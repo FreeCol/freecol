@@ -1111,13 +1111,13 @@ public final class FreeColServer {
         addBooleanOption(GameOptions.ENHANCED_MISSIONARIES,
             "gameOptions.map", false, false);
         // Introduced: SAVEGAME_VERSION == 12
-        addBooleanOption("model.option.continueFoundingFatherRecruitment",
+        addBooleanOption(GameOptions.CONTINUE_FOUNDING_FATHER_RECRUITMENT,
             "gameOptions.map", false, false);
         // Introduced: SAVEGAME_VERSION == 12
-        addIntegerOption("model.option.settlementLimitModifier",
+        addIntegerOption(GameOptions.SETTLEMENT_LIMIT_MODIFIER,
             "gameOptions.map", 0, false);
         // Introduced: SAVEGAME_VERSION == 12
-        addIntegerOption("model.option.startingPositions",
+        addIntegerOption(GameOptions.STARTING_POSITIONS,
             "gameOptions.map", 0, false);
         // Introduced: SAVEGAME_VERSION == 12
         addBooleanOption(GameOptions.TELEPORT_REF,
@@ -1137,20 +1137,20 @@ public final class FreeColServer {
             "gameOptions.colony", 0, false);
         // Introduced: SAVEGAME_VERSION == 12
         addOptionGroup("model.difficulty.cheat", true);
-        addIntegerOption("model.option.liftBoycottCheat",
+        addIntegerOption(GameOptions.LIFT_BOYCOTT_CHEAT,
             "model.difficulty.cheat", 10, true);
-        addIntegerOption("model.option.equipScoutCheat",
+        addIntegerOption(GameOptions.EQUIP_SCOUT_CHEAT,
             "model.difficulty.cheat", 10, true);
-        addIntegerOption("model.option.landUnitCheat",
+        addIntegerOption(GameOptions.LAND_UNIT_CHEAT,
             "model.difficulty.cheat", 10, true);
-        addIntegerOption("model.option.offensiveNavalUnitCheat",
+        addIntegerOption(GameOptions.OFFENSIVE_NAVAL_UNIT_CHEAT,
             "model.difficulty.cheat", 10, true);
-        addIntegerOption("model.option.transportNavalUnitCheat",
+        addIntegerOption(GameOptions.TRANSPORT_NAVAL_UNIT_CHEAT,
             "model.difficulty.cheat", 10, true);
         // Introduced: SAVEGAME_VERSION == 12
-        addIntegerOption("model.option.giftProbability",
+        addIntegerOption(GameOptions.GIFT_PROBABILITY,
             "gameOptions.map", 5, false);
-        addIntegerOption("model.option.demandProbability",
+        addIntegerOption(GameOptions.DEMAND_PROBABILITY,
             "gameOptions.map", 10, false);
         // Introduced: SAVEGAME_VERSION == 12
         addBooleanOption(GameOptions.EMPTY_TRADERS,

@@ -27,6 +27,7 @@ import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
@@ -76,9 +77,9 @@ public class ServerEurope extends Europe implements ServerModelObject {
         ServerPlayer player = (ServerPlayer) getOwner();
         List<RandomChoice<UnitType>> recruits
             = player.generateRecruitablesList();
-        if (spec.hasOption("model.option.immigrants")) {
+        if (spec.hasOption(GameOptions.IMMIGRANTS)) {
             UnitListOption option
-                = (UnitListOption)spec.getOption("model.option.immigrants");
+                = (UnitListOption)spec.getOption(GameOptions.IMMIGRANTS);
             List<AbstractUnit> immigrants = option.getOptionValues();
             for (int index = 0; index < Europe.RECRUIT_COUNT; index++) {
                 UnitType immigrant = (index < immigrants.size())
@@ -110,8 +111,8 @@ public class ServerEurope extends Europe implements ServerModelObject {
      */
     public void increaseRecruitmentDifficulty() {
         final Specification spec = getSpecification();
-        recruitPrice += spec.getInteger("model.option.recruitPriceIncrease");
-        recruitLowerCap += spec.getInteger("model.option.lowerCapIncrease");
+        recruitPrice += spec.getInteger(GameOptions.RECRUIT_PRICE_INCREASE);
+        recruitLowerCap += spec.getInteger(GameOptions.LOWER_CAP_INCREASE);
     }
 
     /**
@@ -122,7 +123,7 @@ public class ServerEurope extends Europe implements ServerModelObject {
      */
     public void increasePrice(UnitType unitType, int price) {
         final Specification spec = getSpecification();
-        String baseOption = "model.option.priceIncreasePerType";
+        String baseOption = GameOptions.PRICE_INCREASE_PER_TYPE;
         String name = unitType.getId().substring(unitType.getId().lastIndexOf('.'));
         String option = (spec.getBoolean(baseOption))
             ? "model.option.priceIncrease" + name

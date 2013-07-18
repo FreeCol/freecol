@@ -117,9 +117,9 @@ public class SimpleMapGenerator implements MapGenerator {
      * @return The approximate number of land tiles
      */
     private int getApproximateLandCount() {
-        return mapGeneratorOptions.getInteger("model.option.mapWidth")
-            * mapGeneratorOptions.getInteger("model.option.mapHeight")
-            * mapGeneratorOptions.getInteger("model.option.landMass")
+        return mapGeneratorOptions.getInteger(MapGeneratorOptions.MAP_WIDTH)
+            * mapGeneratorOptions.getInteger(MapGeneratorOptions.MAP_HEIGHT)
+            * mapGeneratorOptions.getInteger(MapGeneratorOptions.LAND_MASS)
             / 100;
     }
 
@@ -162,7 +162,7 @@ public class SimpleMapGenerator implements MapGenerator {
         terrainGenerator.createMap(game, importGame, landMap);
 
         Map map = game.getMap();
-        if (game.getSpecification().getBoolean("model.option.importSettlements")) {
+        if (game.getSpecification().getBoolean(MapGeneratorOptions.IMPORT_SETTLEMENTS)) {
             importIndianSettlements(map, importGame);
         } else {
             createIndianSettlements(map, game.getPlayers());
@@ -228,7 +228,7 @@ public class SimpleMapGenerator implements MapGenerator {
                 }
             }
         } else {
-            int number = getApproximateLandCount() / getMapGeneratorOptions().getInteger("model.option.rumourNumber");
+            int number = getApproximateLandCount() / getMapGeneratorOptions().getInteger(MapGeneratorOptions.RUMOUR_NUMBER);
             int counter = 0;
 
             // TODO: Remove temporary fix:
@@ -238,7 +238,7 @@ public class SimpleMapGenerator implements MapGenerator {
             // END TODO
 
             int difficulty = map.getGame().getSpecification()
-                .getInteger("model.option.rumourDifficulty");
+                .getInteger(GameOptions.RUMOUR_DIFFICULTY);
             for (int i = 0; i < number; i++) {
                 for (int tries=0; tries<100; tries++) {
                     Tile t = terrainGenerator.getRandomLandTile(map, random);
@@ -410,7 +410,7 @@ public class SimpleMapGenerator implements MapGenerator {
         // native settlements such that can be guaranteed at least one
         // layer of surrounding tiles to own.
         int minSettlementDistance
-            = spec.getRangeOption("model.option.settlementNumber").getValue();
+            = spec.getRangeOption(GameOptions.SETTLEMENT_NUMBER).getValue();
         List<Tile> settlementTiles = new ArrayList<Tile>();
         tiles: for (Tile tile : map.getAllTiles()) {
             if (!tile.isPolar() && suitableForNativeSettlement(tile)) {

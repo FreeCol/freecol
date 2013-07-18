@@ -95,9 +95,9 @@ public class MapGeneratorTest extends FreeColTestCase {
         // Check that the map is created at all
         assertNotNull(g.getMap());
 
-        assertEquals(gen.getMapGeneratorOptions().getInteger("model.option.mapWidth"),
+        assertEquals(gen.getMapGeneratorOptions().getInteger(MapGeneratorOptions.MAP_WIDTH),
                      g.getMap().getWidth());
-        assertEquals(gen.getMapGeneratorOptions().getInteger("model.option.mapHeight"),
+        assertEquals(gen.getMapGeneratorOptions().getInteger(MapGeneratorOptions.MAP_HEIGHT),
                      g.getMap().getHeight());
 
     }
@@ -138,9 +138,9 @@ public class MapGeneratorTest extends FreeColTestCase {
         // Map of correct size?
         Map m = g.getMap();
         assertEquals(m.getWidth(),
-                     gen.getMapGeneratorOptions().getInteger("model.option.mapWidth"));
+                     gen.getMapGeneratorOptions().getInteger(MapGeneratorOptions.MAP_WIDTH));
         assertEquals(m.getHeight(),
-                     gen.getMapGeneratorOptions().getInteger("model.option.mapHeight"));
+                     gen.getMapGeneratorOptions().getInteger(MapGeneratorOptions.MAP_HEIGHT));
 
         // Sufficient land?
         Iterator<Position> it = m.getWholeMapIterator();
@@ -155,12 +155,12 @@ public class MapGeneratorTest extends FreeColTestCase {
         }
         // Land Mass requirement fulfilled?
         assertTrue(100 * land / total >= gen.getMapGeneratorOptions()
-                   .getInteger("model.option.landMass"));
+                   .getInteger(MapGeneratorOptions.LAND_MASS));
 
         // Does the wholeMapIterator visit all fields?
         assertEquals(total,
-                     gen.getMapGeneratorOptions().getInteger("model.option.mapWidth")
-                     * gen.getMapGeneratorOptions().getInteger("model.option.mapHeight"));
+                     gen.getMapGeneratorOptions().getInteger(MapGeneratorOptions.MAP_WIDTH)
+                     * gen.getMapGeneratorOptions().getInteger(MapGeneratorOptions.MAP_HEIGHT));
     }
 
     /**

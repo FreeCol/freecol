@@ -58,6 +58,7 @@ import net.sf.freecol.common.model.EuropeWas;
 import net.sf.freecol.common.model.Event;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
@@ -1841,7 +1842,7 @@ public final class InGameController implements NetworkConstants {
                 template = StringTemplate.template("cashInTreasureTrain.free");
             } else {
                 int percent = getSpecification()
-                    .getInteger("model.option.treasureTransportFee");
+                    .getInteger(GameOptions.TREASURE_TRANSPORT_FEE);
                 template = StringTemplate.template("cashInTreasureTrain.pay")
                     .addAmount("%fee%", percent);
             }

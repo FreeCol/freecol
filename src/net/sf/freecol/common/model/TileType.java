@@ -91,8 +91,6 @@ public final class TileType extends FreeColGameObjectType {
      */
     private List<ProductionType> productionTypes = null;
 
-    private static final String TILE_PRODUCTION = "model.option.tileProduction";
-
 
     /**
      * Create a new tile type.
@@ -319,7 +317,7 @@ public final class TileType extends FreeColGameObjectType {
      * @return The TILE_PRODUCTION option value.
      */
     private String getTileProduction() {
-        return getSpecification().getString(TILE_PRODUCTION);
+        return getSpecification().getString(GameOptions.TILE_PRODUCTION);
     }
 
     /**

@@ -27,132 +27,339 @@ package net.sf.freecol.common.model;
  */
 public class GameOptions {
 
-    /** The amount of money each player will receive before the game starts. */
-    public static final String STARTING_MONEY
-        = "model.option.startingMoney";
+    // Map group
 
-    /** The penalty applied to trading with the natives from a ship. */
-    public static final String SHIP_TRADE_PENALTY
-        = "model.option.shipTradePenalty";
+    /** The number of turns to sail between Europe and the New World. */
+    public static final String TURNS_TO_SAIL
+        = "model.option.turnsToSail";
 
-    public static final String DESTROY_SETTLEMENT_SCORE
-        = "model.option.destroySettlementScore";
+    /** Changes the settlement limits. */
+    public static final String SETTLEMENT_LIMIT_MODIFIER
+        = "model.option.settlementLimitModifier";
 
     /** Enables/disables fog of war. */
-    public static final String FOG_OF_WAR = "model.option.fogOfWar";
-
-    /** The cost of a single hammer when buying a building in a colony. */
-    //Unused at the moment
-    // public static final String HAMMER_PRICE = "hammerPrice";
-
-    /** Does the Custom House sell boycotted goods **/
-    public static final String CUSTOM_IGNORE_BOYCOTT = "model.option.customIgnoreBoycott";
-
-    /** Whether experts have connections, producing without raw materials in factories */
-    public static final String EXPERTS_HAVE_CONNECTIONS = "model.option.expertsHaveConnections";
-
-    public static final String SAVE_PRODUCTION_OVERFLOW = "model.option.saveProductionOverflow";
+    public static final String FOG_OF_WAR
+        = "model.option.fogOfWar";
 
     /** Whether to award exploration points or not. */
-    public static final String EXPLORATION_POINTS = "model.option.explorationPoints";
+    public static final String EXPLORATION_POINTS
+        = "model.option.explorationPoints";
+
+    /** Allow amphibious moves. */
+    public static final String AMPHIBIOUS_MOVES
+        = "model.option.amphibiousMoves";
+
+    /** Allow empty units to trade. */
+    public static final String EMPTY_TRADERS
+        = "model.option.emptyTraders";
+
+    /** Do settlement actions consume the chief contact bonus. */
+    public static final String SETTLEMENT_ACTIONS_CONTACT_CHIEF
+        = "model.option.settlementActionsContactChief";
+
+    /** Do missionaries provide extra benefits. */
+    public static final String ENHANCED_MISSIONARIES
+        = "model.option.enhancedMissionaries";
+
+    /** Probability of a settlement with a surplus offering a gift. */
+    public static final String GIFT_PROBABILITY
+        = "model.option.giftProbability";
+
+    /** Probability of an angry settlement making a demand. */
+    public static final String DEMAND_PROBABILITY
+        = "model.option.demandProbability";
+
+    /** Continue recruiting founding fathers after declaring independence. */
+    public static final String CONTINUE_FOUNDING_FATHER_RECRUITMENT
+        = "model.option.continueFoundingFatherRecruitment";
+
+    /** Does the REF "teleport" to its first target. */
+    public static final String TELEPORT_REF
+        = "model.option.teleportREF";
+
+    /** How to determine the starting positions of European players. */
+    public static final String STARTING_POSITIONS
+        = "model.option.startingPositions";
+    public static final int STARTING_POSITIONS_CLASSIC = 0;
+    public static final int STARTING_POSITIONS_RANDOM = 1;
+    public static final int STARTING_POSITIONS_HISTORICAL = 2;
+
+
+    // Colony group
+
+    /** Does the Custom House sell boycotted goods? */
+    public static final String CUSTOM_IGNORE_BOYCOTT
+        = "model.option.customIgnoreBoycott";
 
     /**
-     * Victory condition: Should the <code>Player</code> who first defeats the
-     * Royal Expeditionary Force win the game?
+     * Whether experts have connections, producing without raw
+     * materials in factories.
      */
-    public static final String VICTORY_DEFEAT_REF = "model.option.victoryDefeatREF";
+    public static final String EXPERTS_HAVE_CONNECTIONS
+        = "model.option.expertsHaveConnections";
 
     /**
-     * Victory condition: Should a <code>Player</code> who first defeats all
-     * other european players win the game?
+     * Does a hammer surplus after a build completes accumulate to
+     * the next build?
      */
-    public static final String VICTORY_DEFEAT_EUROPEANS = "model.option.victoryDefeatEuropeans";
-
-    /**
-     * Victory condition: Should a <code>Player</code> who first defeats all
-     * other human players win the game?
-     */
-    public static final String VICTORY_DEFEAT_HUMANS = "model.option.victoryDefeatHumans";
+    public static final String SAVE_PRODUCTION_OVERFLOW
+        = "model.option.saveProductionOverflow";
 
     /**
      * Whether to educate the least skilled unit first. This is the
      * behaviour of the original game and disallows manually assigning
      * students to teachers.
      */
-    public static final String ALLOW_STUDENT_SELECTION =
-        "model.option.allowStudentSelection";
+    public static final String ALLOW_STUDENT_SELECTION
+        = "model.option.allowStudentSelection";
+
+    /** Enable upkeep requirement on buildings. */
+    public static final String ENABLE_UPKEEP
+        = "model.option.enableUpkeep";
+
+    /** Enable natural disasters striking colonies. */
+    public static final String NATURAL_DISASTERS
+        = "model.option.naturalDisasters";
+
+    ///** The cost of a single hammer when buying a building in a colony. */
+    //Unused at the moment
+    // public static final String HAMMER_PRICE = "hammerPrice";
+
+
+    // Victory conditions group
+
+    /**
+     * Victory condition: Should the <code>Player</code> who first
+     * defeats the Royal Expeditionary Force win the game?
+     */
+    public static final String VICTORY_DEFEAT_REF
+        = "model.option.victoryDefeatREF";
+
+    /**
+     * Victory condition: Should a <code>Player</code> who
+     * defeats all other European players win the game?
+     */
+    public static final String VICTORY_DEFEAT_EUROPEANS
+        = "model.option.victoryDefeatEuropeans";
+
+    /**
+     * Victory condition: Should a <code>Player</code> who defeats all
+     * other human players win the game?
+     */
+    public static final String VICTORY_DEFEAT_HUMANS
+        = "model.option.victoryDefeatHumans";
+
+
+    // Year group
 
     /**
      * The year in which the game starts. At the moment, changing this
-     * value only shortens the game. In future, it might cause the map
+     * value only shortens the game.  In future, it might cause the map
      * generator to create foreign colonies.
      */
-    public static final String STARTING_YEAR = "model.option.startingYear";
+    public static final String STARTING_YEAR
+        = "model.option.startingYear";
 
     /**
-     * The first year in which there are two seasons. Changing this
+     * The first year in which there are two seasons.  Changing this
      * value influences the duration of the game.
      */
-    public static final String SEASON_YEAR = "model.option.seasonYear";
+    public static final String SEASON_YEAR
+        = "model.option.seasonYear";
+
+    /** The year in which owning at least one colony becomes mandatory. */
+    public static final String MANDATORY_COLONY_YEAR
+        = "model.option.mandatoryColonyYear";
+
+    /** The very last year of the game. */
+    public static final String LAST_YEAR
+        = "model.option.lastYear";
 
     /**
-     * The year in which owning at least one colony becomes mandatory.
+     * The last year of the game for colonial players.  In other
+     * words, if a colonial player does not declare independence by
+     * the end of this year, the game is lost.
      */
-    public static final String MANDATORY_COLONY_YEAR = "model.option.mandatoryColonyYear";
+    public static final String LAST_COLONIAL_YEAR
+        = "model.option.lastColonialYear";
+
+
+    // Immigration (difficulty) group
+
+    /** Rate cross requirement increases. */
+    public static final String CROSSES_INCREMENT
+        = "model.option.crossesIncrement";
+
+    /** Rate recruitment prices increase. */
+    public static final String RECRUIT_PRICE_INCREASE
+        = "model.option.recruitPriceIncrease";
+
+    /** Lower bound on the recruitment price. */
+    public static final String LOWER_CAP_INCREASE
+        = "model.option.lowerCapIncrease";
+
+    /** Are there price increases specific to unit type. */
+    public static final String PRICE_INCREASE_PER_TYPE
+        = "model.option.priceIncreasePerType";
+
+    /** Are the initial immigrants expert units. */
+    public static final String EXPERT_STARTING_UNITS
+        = "model.option.expertStartingUnits";
+
+    /** Predefined initial immigrants. */
+    public static final String IMMIGRANTS
+        = "model.option.immigrants";
+
+
+    // Native (difficulty) group
+
+    /** Base multiplier from land productivity to price. */
+    public static final String LAND_PRICE_FACTOR
+        = "model.option.landPriceFactor";
+
+    /** Probability of an attack extracting converts. */
+    public static final String NATIVE_CONVERT_PROBABILITY
+        = "model.option.nativeConvertProbability";
+
+    /** Probability of angry natives burning missions. */
+    public static final String BURN_PROBABILITY
+        = "model.option.burnProbability";
+
+    /** Factor for how a successful native demand reduces tension. */
+    public static final String NATIVE_DEMANDS
+        = "model.option.nativeDemands";
+
+    /** Rumour difficulty factor. [FIXME: move to the map generator options!] */
+    public static final String RUMOUR_DIFFICULTY
+        = "model.option.rumourDifficulty";
+
+    /** The penalty applied to trading with the natives from a ship. */
+    public static final String SHIP_TRADE_PENALTY
+        = "model.option.shipTradePenalty";
+
+    /** The score penalty for destroying a settlement. */
+    public static final String DESTROY_SETTLEMENT_SCORE
+        = "model.option.destroySettlementScore";
+
+    /** The behaviour when building on native land. */
+    public static final String BUILD_ON_NATIVE_LAND
+        = "model.option.buildOnNativeLand";
+    public static final String BUILD_ON_NATIVE_LAND_ALWAYS
+        = "model.option.buildOnNativeLand.always";
+    public static final String BUILD_ON_NATIVE_LAND_FIRST
+        = "model.option.buildOnNativeLand.first";
+    public static final String BUILD_ON_NATIVE_LAND_FIRST_AND_UNCONTACTED
+        = "model.option.buildOnNativeLand.firstAndUncontacted";
+    public static final String BUILD_ON_NATIVE_LAND_NEVER
+        = "model.option.buildOnNativeLand.never";
+
+    /** The minimum distance between settlements. [FIXME: move to map generator options!] */
+    public static final String SETTLEMENT_NUMBER
+        = "model.option.settlementNumber";
+
+
+    // Monarch (difficulty) group
 
     /**
-     * The very last year of the game.
+     * The grace period at the start of the game before the monarch
+     * begins to meddle.
      */
-    public static final String LAST_YEAR = "model.option.lastYear";
+    public static final String MONARCH_MEDDLING
+        = "model.option.monarchMeddling";
 
-    /**
-     * The last year of the game for colonial players. In other words,
-     * if a colonial player does not declare independence by the end
-     * of this year, the game is lost.
-     */
-    public static final String LAST_COLONIAL_YEAR = "model.option.lastColonialYear";
+    /** Moderating factor for tax raises. */
+    public static final String TAX_ADJUSTMENT
+        = "model.option.taxAdjustment";
 
-    /**
-     * How to determine the starting positions of European players.
-     */
-    public static final String STARTING_POSITIONS = "model.option.startingPositions";
-    public static final int STARTING_POSITIONS_CLASSIC = 0;
-    public static final int STARTING_POSITIONS_RANDOM = 1;
-    public static final int STARTING_POSITIONS_HISTORICAL = 2;
+    /** Percentage of real price to change for mercenary units. */
+    public static final String MERCENARY_PRICE
+        = "model.option.mercenaryPrice";
 
-    /**
-     * Allow amphibious moves.
-     */
-    public static final String AMPHIBIOUS_MOVES
-        = "model.option.amphibiousMoves";
+    /** Maximum tax rate. */
+    public static final String MAXIMUM_TAX
+        = "model.option.maximumTax";
 
-    /**
-     * Allow empty units to trade.
-     */
-    public static final String EMPTY_TRADERS
-        = "model.option.emptyTraders";
+    /** The degree of monarch support. */
+    public static final String MONARCH_SUPPORT
+        = "model.option.monarchSupport";
 
-    /**
-     * Do missionaries provide extra benefits.
-     */
-    public static final String ENHANCED_MISSIONARIES
-        = "model.option.enhancedMissionaries";
+    /** Percentage fee for transporting treasures to Europe. */
+    public static final String TREASURE_TRANSPORT_FEE
+        = "model.option.treasureTransportFee";
 
-    /**
-     * Does the REF "teleport" to its first target.
-     */
-    public static final String TELEPORT_REF = "model.option.teleportREF";
+    /** Bells to generate to trigger the intervention force. */
+    public static final String INTERVENTION_BELLS
+        = "model.option.interventionBells";
 
-    public static final String ENABLE_UPKEEP = "model.option.enableUpkeep";
+    /** How often to update the intervention force. */
+    public static final String INTERVENTION_TURNS
+        = "model.option.interventionTurns";
 
-    public static final String NATURAL_DISASTERS = "model.option.naturalDisasters";
+    /** The basic composition of the REF.  "refSize" is a legacy term. */
+    public static final String REF_FORCE
+        = "model.option.refSize";
 
-    /**
-     * The various cheat options.
-     */
-    public static final String LIFT_BOYCOTT_CHEAT = "model.option.liftBoycottCheat";
-    public static final String EQUIP_SCOUT_CHEAT = "model.option.equipScoutCheat";
-    public static final String LAND_UNIT_CHEAT = "model.option.landUnitCheat";
-    public static final String OFFENSIVE_NAVAL_UNIT_CHEAT = "model.option.offensiveNavalUnitCheat";
-    public static final String TRANSPORT_NAVAL_UNIT_CHEAT = "model.option.transportNavalUnitCheat";
+    /** The basic composition of the intervention force. */
+    public static final String INTERVENTION_FORCE
+        = "model.option.interventionForce";
+
+    /** The basic composition of the mercenary force. */
+    public static final String MERCENARY_FORCE
+        = "model.option.mercenaryForce";
+
+
+    // Government (difficulty) group
+
+    /** The percent SoL to achieve "bad" government. */
+    public static final String BAD_GOVERNMENT_LIMIT
+        = "model.option.badGovernmentLimit";
+
+    /** The percent SoL to achieve "very bad" government. */
+    public static final String VERY_BAD_GOVERNMENT_LIMIT
+        = "model.option.veryBadGovernmentLimit";
+
+    /** The percent SoL to achieve "good" government. */
+    public static final String GOOD_GOVERNMENT_LIMIT
+        = "model.option.goodGovernmentLimit";
+
+    /** The percent SoL to achieve "very good" government. */
+    public static final String VERY_GOOD_GOVERNMENT_LIMIT
+        = "model.option.veryGoodGovernmentLimit";
+
+
+    // Other (difficulty) group
+
+    /** The amount of money each player will receive before the game starts. */
+    public static final String STARTING_MONEY
+        = "model.option.startingMoney";
+
+    /** Rate the bells for founding father recruitment grows. */
+    public static final String FOUNDING_FATHER_FACTOR
+        = "model.option.foundingFatherFactor";
+
+    /** Retributive markup on tea party goods. */
+    public static final String ARREARS_FACTOR
+        = "model.option.arrearsFactor";
+
+    /** The number of units that do not consume bells. */
+    public static final String UNITS_THAT_USE_NO_BELLS
+        = "model.option.unitsThatUseNoBells";
+
+    /** Tile production. */
+    public static final String TILE_PRODUCTION
+        = "model.option.tileProduction";
+
+
+    // Cheat (difficulty) group
+
+    public static final String LIFT_BOYCOTT_CHEAT
+        = "model.option.liftBoycottCheat";
+    public static final String EQUIP_SCOUT_CHEAT
+        = "model.option.equipScoutCheat";
+    public static final String LAND_UNIT_CHEAT
+        = "model.option.landUnitCheat";
+    public static final String OFFENSIVE_NAVAL_UNIT_CHEAT
+        = "model.option.offensiveNavalUnitCheat";
+    public static final String TRANSPORT_NAVAL_UNIT_CHEAT
+        = "model.option.transportNavalUnitCheat";
 }

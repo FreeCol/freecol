@@ -1687,19 +1687,19 @@ public final class Specification {
         // end @compat
 
         // @compat 0.10.5
-        String id = "model.option.interventionBells";
+        String id = GameOptions.INTERVENTION_BELLS;
         if (allOptions.get(id) == null) {
             IntegerOption interventionBells = new IntegerOption(id);
             interventionBells.setValue(5000);
             allOptions.put(id, interventionBells);
         }
-        id = "model.option.interventionTurns";
+        id = GameOptions.INTERVENTION_TURNS;
         if (allOptions.get(id) == null) {
             IntegerOption interventionTurns = new IntegerOption(id);
             interventionTurns.setValue(52);
             allOptions.put(id, interventionTurns);
         }
-        id = "model.option.interventionForce";
+        id = GameOptions.INTERVENTION_FORCE;
         if (allOptions.get(id) == null) {
             UnitListOption interventionForce = new UnitListOption(id);
             AbstractUnitOption regulars
@@ -1724,7 +1724,7 @@ public final class Specification {
             interventionForce.getValue().add(menOfWar);
             allOptions.put(id, interventionForce);
         }
-        id = "model.option.mercenaryForce";
+        id = GameOptions.MERCENARY_FORCE;
         if (allOptions.get(id) == null) {
             UnitListOption mercenaryForce = new UnitListOption(id);
             AbstractUnitOption regulars
@@ -1749,13 +1749,13 @@ public final class Specification {
             mercenaryForce.getValue().add(menOfWar);
             allOptions.put(id, mercenaryForce);
         }
-        id = "model.option.goodGovernmentLimit";
+        id = GameOptions.GOOD_GOVERNMENT_LIMIT;
         if (allOptions.get(id) == null) {
             IntegerOption goodGovernmentLimit = new IntegerOption(id);
             goodGovernmentLimit.setValue(50);
             allOptions.put(id, goodGovernmentLimit);
         }
-        id = "model.option.veryGoodGovernmentLimit";
+        id = GameOptions.VERY_GOOD_GOVERNMENT_LIMIT;
         if (allOptions.get(id) == null) {
             IntegerOption veryGoodGovernmentLimit = new IntegerOption(id);
             veryGoodGovernmentLimit.setValue(100);

@@ -116,12 +116,12 @@ public class LandGenerator {
      */
     public boolean[][] createLandMap() {
         //get values from mapGeneratorOptions
-        width = mapGeneratorOptions.getInteger("model.option.mapWidth");
-        height = mapGeneratorOptions.getInteger("model.option.mapHeight");
-        preferredDistanceToEdge = mapGeneratorOptions.getInteger("model.option.preferredDistanceToEdge");
-        landMass = mapGeneratorOptions.getInteger("model.option.landMass");
+        width = mapGeneratorOptions.getInteger(MapGeneratorOptions.MAP_WIDTH);
+        height = mapGeneratorOptions.getInteger(MapGeneratorOptions.MAP_HEIGHT);
+        preferredDistanceToEdge = mapGeneratorOptions.getInteger(MapGeneratorOptions.PREFERRED_DISTANCE_TO_EDGE);
+        landMass = mapGeneratorOptions.getInteger(MapGeneratorOptions.LAND_MASS);
         minimumNumberOfTiles = width * height * landMass / 100;
-        genType = mapGeneratorOptions.getInteger("model.option.landGeneratorType");
+        genType = mapGeneratorOptions.getInteger(MapGeneratorOptions.LAND_GENERATOR_TYPE);
 
         //set other internal values
         map = new boolean[width][height];
@@ -131,10 +131,10 @@ public class LandGenerator {
         //based on setting in mapGeneratorOptions
         //"Classic" is the original FreeCol land generator
         switch (genType) {
-            case MapGeneratorOptions.LAND_GEN_CLASSIC:
+            case MapGeneratorOptions.LAND_GENERATOR_CLASSIC:
                 createClassicLandMap();
                 break;
-            case MapGeneratorOptions.LAND_GEN_CONTINENT:
+            case MapGeneratorOptions.LAND_GENERATOR_CONTINENT:
                 addPolarRegions();
                 //create one landmass of 75%, start it somewhere near the center
                 int contsize = (minimumNumberOfTiles*75)/100;
@@ -146,7 +146,7 @@ public class LandGenerator {
                 }
                 cleanMap();
                 break;
-            case MapGeneratorOptions.LAND_GEN_ARCHIPELAGO:
+            case MapGeneratorOptions.LAND_GENERATOR_ARCHIPELAGO:
                 addPolarRegions();
                 //create 5 islands of 10% each
                 int archsize = (minimumNumberOfTiles*10)/100;
@@ -154,7 +154,7 @@ public class LandGenerator {
                     addLandmass(archsize-10,archsize);
                 }
                 //then, fall into next case to generate small islands
-            case MapGeneratorOptions.LAND_GEN_ISLANDS:
+            case MapGeneratorOptions.LAND_GENERATOR_ISLANDS:
                 addPolarRegions();
                 //creates only islands of 25..75 tiles
                 while (numberOfLandTiles < minimumNumberOfTiles) {

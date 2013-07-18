@@ -547,7 +547,7 @@ public class TileTest extends FreeColTestCase {
         assertTrue(arctic.canSettle());
 
         OptionGroup difficultyLevel = spec().getDifficultyLevel("model.difficulty.veryEasy");
-        String tileProduction = difficultyLevel.getString("model.option.tileProduction");
+        String tileProduction = difficultyLevel.getString(GameOptions.TILE_PRODUCTION);
         List<ProductionType> productionTypes = arctic.getProductionTypes(true, tileProduction);
         assertEquals(1, productionTypes.size());
         ProductionType arcticProduction = productionTypes.get(0);
@@ -557,7 +557,7 @@ public class TileTest extends FreeColTestCase {
         assertEquals(2, outputs.get(0).getAmount());
 
         difficultyLevel = spec().getDifficultyLevel("model.difficulty.easy");
-        tileProduction = difficultyLevel.getString("model.option.tileProduction");
+        tileProduction = difficultyLevel.getString(GameOptions.TILE_PRODUCTION);
         productionTypes = arctic.getProductionTypes(true, tileProduction);
         assertEquals(1, productionTypes.size());
         arcticProduction = productionTypes.get(0);
@@ -568,7 +568,7 @@ public class TileTest extends FreeColTestCase {
 
         for (String level : new String[] { "medium", "hard", "veryHard" }) {
             difficultyLevel = spec().getDifficultyLevel("model.difficulty." + level);
-            tileProduction = difficultyLevel.getString("model.option.tileProduction");
+            tileProduction = difficultyLevel.getString(GameOptions.TILE_PRODUCTION);
             productionTypes = arctic.getProductionTypes(true, tileProduction);
             assertTrue(productionTypes.isEmpty());
         }

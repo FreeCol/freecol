@@ -99,7 +99,7 @@ public class ProductionCache {
 
         final Specification spec = colony.getSpecification();
         GoodsType bells = spec.getGoodsType("model.goods.bells");
-        int unitsThatUseNoBells = spec.getInteger("model.option.unitsThatUseNoBells");
+        int unitsThatUseNoBells = spec.getInteger(GameOptions.UNITS_THAT_USE_NO_BELLS);
         int amount = Math.min(unitsThatUseNoBells, colony.getUnitCount());
         ProductionInfo bellsInfo = new ProductionInfo();
         bellsInfo.addProduction(new AbstractGoods(bells, amount));

@@ -1198,7 +1198,7 @@ public class Colony extends Settlement implements Nameable {
         final Specification spec = getSpecification();
         int result = super.getConsumptionOf(goodsType);
         if (spec.getGoodsType("model.goods.bells").equals(goodsType)) {
-            result -= spec.getInteger("model.option.unitsThatUseNoBells");
+            result -= spec.getInteger(GameOptions.UNITS_THAT_USE_NO_BELLS);
         }
         return Math.max(0, result);
     }
@@ -1825,13 +1825,13 @@ public class Colony extends Settlement implements Nameable {
     public int governmentChange(int unitCount) {
         final Specification spec = getSpecification();
         final int veryBadGovernment
-            = spec.getInteger("model.option.veryBadGovernmentLimit");
+            = spec.getInteger(GameOptions.VERY_BAD_GOVERNMENT_LIMIT);
         final int badGovernment
-            = spec.getInteger("model.option.badGovernmentLimit");
+            = spec.getInteger(GameOptions.BAD_GOVERNMENT_LIMIT);
         final int veryGoodGovernment
-            = spec.getInteger("model.option.veryGoodGovernmentLimit");
+            = spec.getInteger(GameOptions.VERY_GOOD_GOVERNMENT_LIMIT);
         final int goodGovernment
-            = spec.getInteger("model.option.goodGovernmentLimit");
+            = spec.getInteger(GameOptions.GOOD_GOVERNMENT_LIMIT);
 
         int rebelPercent = calculateSoL(unitCount, getEffectiveLiberty());
         int rebelCount = calculateRebels(unitCount, rebelPercent);
@@ -1875,13 +1875,13 @@ public class Colony extends Settlement implements Nameable {
     public ModelMessage checkForGovMgtChangeMessage() {
         final Specification spec = getSpecification();
         final int veryBadGovernment
-            = spec.getInteger("model.option.veryBadGovernmentLimit");
+            = spec.getInteger(GameOptions.VERY_BAD_GOVERNMENT_LIMIT);
         final int badGovernment
-            = spec.getInteger("model.option.badGovernmentLimit");
+            = spec.getInteger(GameOptions.BAD_GOVERNMENT_LIMIT);
         final int veryGoodGovernment
-            = spec.getInteger("model.option.veryGoodGovernmentLimit");
+            = spec.getInteger(GameOptions.VERY_GOOD_GOVERNMENT_LIMIT);
         final int goodGovernment
-            = spec.getInteger("model.option.goodGovernmentLimit");
+            = spec.getInteger(GameOptions.GOOD_GOVERNMENT_LIMIT);
 
         String msgId = null;
         int number = 0;
@@ -1944,13 +1944,13 @@ public class Colony extends Settlement implements Nameable {
     protected void updateProductionBonus() {
         final Specification spec = getSpecification();
         final int veryBadGovernment
-            = spec.getInteger("model.option.veryBadGovernmentLimit");
+            = spec.getInteger(GameOptions.VERY_BAD_GOVERNMENT_LIMIT);
         final int badGovernment
-            = spec.getInteger("model.option.badGovernmentLimit");
+            = spec.getInteger(GameOptions.BAD_GOVERNMENT_LIMIT);
         final int veryGoodGovernment
-            = spec.getInteger("model.option.veryGoodGovernmentLimit");
+            = spec.getInteger(GameOptions.VERY_GOOD_GOVERNMENT_LIMIT);
         final int goodGovernment
-            = spec.getInteger("model.option.goodGovernmentLimit");
+            = spec.getInteger(GameOptions.GOOD_GOVERNMENT_LIMIT);
         int newBonus = (sonsOfLiberty >= veryGoodGovernment) ? 2
             : (sonsOfLiberty >= goodGovernment) ? 1
             : (tories > veryBadGovernment) ? -2
@@ -1981,7 +1981,7 @@ public class Colony extends Settlement implements Nameable {
             return -i;
         } else {
             final Specification spec = getSpecification();
-            limit = spec.getInteger("model.option.badGovernmentLimit");
+            limit = spec.getInteger(GameOptions.BAD_GOVERNMENT_LIMIT);
             for (i = 1; i < limit; i++) {
                 if (governmentChange(pop + i) == -1) break;
             }

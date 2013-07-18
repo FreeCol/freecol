@@ -27,6 +27,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
@@ -185,8 +186,8 @@ public class ServerUnitTest extends FreeColTestCase {
 
         //assertEquals(2, dutch.getDifficulty().getIndex());
         //assertEquals("model.difficulty.medium", dutch.getDifficulty().getId());
-        assertEquals(6, spec().getInteger("model.option.badGovernmentLimit"));
-        assertEquals(10, spec().getInteger("model.option.veryBadGovernmentLimit"));
+        assertEquals(6, spec().getInteger(GameOptions.BAD_GOVERNMENT_LIMIT));
+        assertEquals(10, spec().getInteger(GameOptions.VERY_BAD_GOVERNMENT_LIMIT));
 
         // Found colony on 6,8
         ServerUnit soldier = new ServerUnit(game, map.getTile(6, 8), dutch,

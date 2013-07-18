@@ -203,8 +203,8 @@ public class SerializationTest extends FreeColTestCase {
         assertEquals(level1.getId(), level2.getId());
 
         try {
-            int increment1 = spec1.getInteger("model.option.crossesIncrement");
-            int increment2 = spec2.getInteger("model.option.crossesIncrement");
+            int increment1 = spec1.getInteger(GameOptions.CROSSES_INCREMENT);
+            int increment2 = spec2.getInteger(GameOptions.CROSSES_INCREMENT);
             assertEquals(increment1, increment2);
         } catch (Exception e) {
             fail(e.getMessage());

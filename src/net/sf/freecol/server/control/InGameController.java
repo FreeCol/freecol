@@ -638,7 +638,7 @@ public final class InGameController extends Controller {
         serverPlayer.csContact((ServerPlayer) is.getOwner(), null, cs);
         is.setVisited(serverPlayer);
         if (scout > 0 || (scout == 0 && getGame().getSpecification()
-                .getBoolean("model.option.settlementActionsContactChief"))) {
+                .getBoolean(GameOptions.SETTLEMENT_ACTIONS_CONTACT_CHIEF))) {
             is.setScouted(serverPlayer);
         }
     }
@@ -1375,7 +1375,7 @@ public final class InGameController extends Controller {
                                        "declareIndependence.interventionForce",
                                        serverPlayer)
                       .add("%nation%", getNonPlayerNation())
-                      .addAmount("%number%", spec.getInteger("model.option.interventionBells")));
+                      .addAmount("%number%", spec.getInteger(GameOptions.INTERVENTION_BELLS)));
 
         // Now the REF is ready, we can dispose of the European connection.
         serverPlayer.getHighSeas().removeDestination(europe);
@@ -3531,7 +3531,7 @@ public final class InGameController extends Controller {
                                 Colony colony, Goods goods, int gold) {
         final Specification spec = getGame().getSpecification();
         ServerPlayer victim = (ServerPlayer) colony.getOwner();
-        int difficulty = spec.getInteger("model.option.nativeDemands");
+        int difficulty = spec.getInteger(GameOptions.NATIVE_DEMANDS);
         ChangeSet cs = new ChangeSet();
 
         DOMMessage reply = askTimeout(victim,

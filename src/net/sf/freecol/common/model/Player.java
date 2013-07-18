@@ -1433,7 +1433,7 @@ public class Player extends FreeColGameObject implements Nameable {
         if (!isColonial()) return;
 
         final Specification spec = getSpecification();
-        int base = spec.getInteger("model.option.crossesIncrement");
+        int base = spec.getInteger(GameOptions.CROSSES_INCREMENT);
         immigrationRequired += (int)applyModifier(base,
             "model.modifier.religiousUnrestBonus");
         // The book I have tells me the crosses needed is:
@@ -1685,7 +1685,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public int getTotalFoundingFatherCost() {
         final Specification spec = getSpecification();
-        int base = spec.getInteger("model.option.foundingFatherFactor");
+        int base = spec.getInteger(GameOptions.FOUNDING_FATHER_FACTOR);
         int count = getFatherCount();
         return ((count + 1) * (count + 2) - 1) * base + count;
     }
@@ -3033,7 +3033,7 @@ public class Player extends FreeColGameObject implements Nameable {
             }
             price += tile.potential(type, null);
         }
-        price *= spec.getInteger("model.option.landPriceFactor");
+        price *= spec.getInteger(GameOptions.LAND_PRICE_FACTOR);
         price += 100;
         return (int) applyModifier(price, "model.modifier.landPaymentModifier",
                                    null, getGame().getTurn());
@@ -3169,14 +3169,14 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     private boolean canClaimFreeCenterTile(Tile tile) {
         final Specification spec = getGame().getSpecification();
-        String build = spec.getString("model.option.buildOnNativeLand");
+        String build = spec.getString(GameOptions.BUILD_ON_NATIVE_LAND);
         return isEuropean()
             && tile.getOwner() != null
             && tile.getOwner().isIndian()
-            && ("model.option.buildOnNativeLand.always".equals(build)
-                || ("model.option.buildOnNativeLand.first".equals(build)
+            && (GameOptions.BUILD_ON_NATIVE_LAND_ALWAYS.equals(build)
+                || (GameOptions.BUILD_ON_NATIVE_LAND_FIRST.equals(build)
                     && hasZeroSettlements())
-                || ("model.option.buildOnNativeLand.firstAndUncontacted".equals(build)
+                || (GameOptions.BUILD_ON_NATIVE_LAND_FIRST_AND_UNCONTACTED.equals(build)
                     && hasZeroSettlements()
                     && (tile.getOwner() == null
                         || tile.getOwner().getStance(this)

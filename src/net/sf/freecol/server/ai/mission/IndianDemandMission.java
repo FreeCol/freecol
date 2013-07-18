@@ -26,6 +26,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
@@ -131,7 +132,7 @@ public class IndianDemandMission extends Mission {
     public Goods selectGoods(Colony target) {
         final Specification spec = getSpecification();
         Tension.Level tension = getUnit().getOwner().getTension(target.getOwner()).getLevel();
-        int dx = spec.getInteger("model.option.nativeDemands") + 1;
+        int dx = spec.getInteger(GameOptions.NATIVE_DEMANDS) + 1;
         GoodsType food = getSpecification().getPrimaryFoodType();
         Goods goods = null;
         if (tension.compareTo(Tension.Level.CONTENT) <= 0 &&

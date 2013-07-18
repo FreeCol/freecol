@@ -491,7 +491,7 @@ public class NativeAIPlayer extends AIPlayer {
         final Map map = getGame().getMap();
         final CostDecider cd = CostDeciders.numberOfLegalTiles();
         final int giftProbability = getGame().getSpecification()
-            .getInteger("model.option.giftProbability");
+            .getInteger(GameOptions.GIFT_PROBABILITY);
 
         for (IndianSettlement is : player.getIndianSettlements()) {
             // Do not bring gifts all the time.
@@ -590,7 +590,7 @@ public class NativeAIPlayer extends AIPlayer {
         final Player player = getPlayer();
         final CostDecider cd = CostDeciders.numberOfLegalTiles();
         final int demandProbability = getGame().getSpecification()
-            .getInteger("model.option.demandProbability");
+            .getInteger(GameOptions.DEMAND_PROBABILITY);
 
         for (IndianSettlement is : player.getIndianSettlements()) {
             // Do not demand tribute all of the time.

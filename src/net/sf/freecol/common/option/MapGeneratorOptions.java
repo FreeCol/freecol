@@ -31,104 +31,105 @@ import net.sf.freecol.server.generator.MapGenerator;
  */
 public class MapGeneratorOptions {
 
-    /**
-     * Option for setting the land mass of the map.
-     */
-    public static final String LAND_MASS = "model.option.landMass";
+    /** Option for setting the map width. */
+    public static final String MAP_WIDTH
+        = "model.option.mapWidth";
 
-    /**
-     * Option for setting the number of rivers on the map.
-     */
-    public static final String RIVER_NUMBER = "model.option.riverNumber";
+    /** Option for setting the map height. */
+    public static final String MAP_HEIGHT
+        = "model.option.mapHeight";
 
-    /**
-     * Option for setting the number of mountains on the map.
-     */
-    public static final String MOUNTAIN_NUMBER = "model.option.mountainNumber";
+    /** Option for setting the land mass of the map. */
+    public static final String LAND_MASS
+        = "model.option.landMass";
 
-    /**
-     * Option for setting the number of rumours on the map.
-     */
-    public static final String RUMOUR_NUMBER = "model.option.rumourNumber";
+    /** Option for setting the number of rivers on the map. */
+    public static final String RIVER_NUMBER
+        = "model.option.riverNumber";
 
-    /**
-     * Option for setting the number of settlements on the map.
-     */
-    public static final String SETTLEMENT_NUMBER = "model.option.settlementNumber";
+    /** Option for setting the number of mountains on the map. */
+    public static final String MOUNTAIN_NUMBER
+        = "model.option.mountainNumber";
 
-    /**
-     * Option for setting the percentage of forests on the map.
-     */
-    public static final String FOREST_NUMBER = "model.option.forestNumber";
+    /** Option for setting the number of rumours on the map. */
+    public static final String RUMOUR_NUMBER
+        = "model.option.rumourNumber";
 
-    /**
-     * Option for setting the percentage of bonus tiles on the map.
-     */
-    public static final String BONUS_NUMBER = "model.option.bonusNumber";
+    /** Option for setting the number of settlements on the map. */
+    public static final String SETTLEMENT_NUMBER
+        = "model.option.settlementNumber";
 
-    /**
-     * Option for setting the humidity of the map.
-     */
-    public static final String HUMIDITY = "model.option.humidity";
+    /** Option for setting the percentage of forests on the map. */
+    public static final String FOREST_NUMBER 
+        = "model.option.forestNumber";
 
-    /**
-     * Option for setting the temperature of the map.
-     */
-    public static final String TEMPERATURE = "model.option.temperature";
+    /** Option for setting the percentage of bonus tiles on the map. */
+    public static final String BONUS_NUMBER 
+        = "model.option.bonusNumber";
 
-    /**
-     * One of the settings used by {@link #TEMPERATURE}.
-     */
+    /** Option for setting the humidity of the map. */
+    public static final String HUMIDITY 
+        = "model.option.humidity";
+
+    /** Option for setting the temperature of the map. */
+    public static final String TEMPERATURE 
+        = "model.option.temperature";
+
+    /** One of the settings used by {@link #TEMPERATURE}. */
     public static final int TEMPERATURE_COLD      = 0,
                             TEMPERATURE_CHILLY    = 1,
                             TEMPERATURE_TEMPERATE = 2,
                             TEMPERATURE_WARM      = 3,
                             TEMPERATURE_HOT       = 4;
 
-    /**
-     * Option for setting a file to be imported (map etc).
-     */
-    public static final String IMPORT_FILE = "model.option.importFile";
+    /** Option for setting a file to be imported (map etc). */
+    public static final String IMPORT_FILE 
+        = "model.option.importFile";
 
-    /**
-     * Option for using the terrain imported from a file.
-     */
-    public static final String IMPORT_TERRAIN = "model.option.importTerrain";
+    /** Option for using the terrain imported from a file. */
+    public static final String IMPORT_TERRAIN 
+        = "model.option.importTerrain";
 
-    /**
-     * Option for using the bonuses imported from a file.
-     */
-    public static final String IMPORT_BONUSES = "model.option.importBonuses";
+    /** Option for using the bonuses imported from a file. */
+    public static final String IMPORT_BONUSES 
+        = "model.option.importBonuses";
 
-    /**
-     * Option for using the lost city rumours imported from a file.
-     */
-    public static final String IMPORT_RUMOURS = "model.option.importRumours";
+    /** Option for using the lost city rumours imported from a file. */
+    public static final String IMPORT_RUMOURS 
+        = "model.option.importRumours";
 
-    /**
-     * Option for using the settlements imported from a file.
-     */
-    public static final String IMPORT_SETTLEMENTS = "model.option.importSettlements";
+    /** Option for using the settlements imported from a file. */
+    public static final String IMPORT_SETTLEMENTS 
+        = "model.option.importSettlements";
 
-    /**
-     * Option for setting the type of land generator to be used.
-     */
-    public static final String LAND_GEN_TYPE = "model.option.landGeneratorType";
+    /** Option for setting the type of land generator to be used. */
+    public static final String LAND_GENERATOR_TYPE 
+        = "model.option.landGeneratorType";
+    public static final int LAND_GENERATOR_CLASSIC     = 0,
+                            LAND_GENERATOR_CONTINENT   = 1,
+                            LAND_GENERATOR_ARCHIPELAGO = 2,
+                            LAND_GENERATOR_ISLANDS     = 3;
 
-    public static final int LAND_GEN_CLASSIC     = 0,
-                            LAND_GEN_CONTINENT   = 1,
-                            LAND_GEN_ARCHIPELAGO = 2,
-                            LAND_GEN_ISLANDS     = 3;
+    /** Option for setting the preferred distance to the map edge. */
+    public static final String PREFERRED_DISTANCE_TO_EDGE
+        = "model.option.preferredDistanceToEdge";
 
-    /**
-     * The minimum latitude of the map.
-     */
-    public static final String MINIMUM_LATITUDE = "model.option.minimumLatitude";
+    /** Option for setting the maximum distance to the map edge. */
+    public static final String MAXIMUM_DISTANCE_TO_EDGE
+        = "model.option.maximumDistanceToEdge";
 
-    /**
-     * The maximum latitude of the map.
-     */
-    public static final String MAXIMUM_LATITUDE = "model.option.maximumLatitude";
+    /** Option for setting the distance to the high seas. */
+    public static final String DISTANCE_TO_HIGH_SEA
+        = "model.option.distanceToHighSea";
+
+    /** The minimum latitude of the map. */
+    public static final String MINIMUM_LATITUDE 
+        = "model.option.minimumLatitude";
+
+    /** The maximum latitude of the map. */
+    public static final String MAXIMUM_LATITUDE 
+        = "model.option.maximumLatitude";
+
 
     /**
      * Gets the tag name of the root element representing this object.

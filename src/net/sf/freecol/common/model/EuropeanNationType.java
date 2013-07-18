@@ -41,9 +41,6 @@ import net.sf.freecol.common.option.OptionGroup;
  */
 public class EuropeanNationType extends NationType {
 
-    public static final String EXPERT_STARTING_UNITS
-        = "model.option.expertStartingUnits";
-
     /** Whether this is an REF Nation. */
     private boolean ref = false;
 
@@ -102,7 +99,7 @@ public class EuropeanNationType extends NationType {
      * @return A list of <code>AbstractUnit</code>s to start with.
      */
     public List<AbstractUnit> getStartingUnits() {
-        boolean ex = getSpecification().getBoolean(EXPERT_STARTING_UNITS);
+        boolean ex = getSpecification().getBoolean(GameOptions.EXPERT_STARTING_UNITS);
         return getStartingUnits(String.valueOf(ex));
     }
 

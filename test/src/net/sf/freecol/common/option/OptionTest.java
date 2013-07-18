@@ -31,11 +31,11 @@ public class OptionTest extends FreeColTestCase {
         assertNotNull(gameOptions);
         assertNotNull(spec().getOptionGroup("gameOptions.map"));
         assertNotNull(spec().getOptionGroup("gameOptions.colony"));
-        assertNotNull(spec().getOption("model.option.fogOfWar"));
-        assertNotNull(spec().getOption("model.option.allowStudentSelection"));
+        assertNotNull(spec().getOption(GameOptions.FOG_OF_WAR));
+        assertNotNull(spec().getOption(GameOptions.ALLOW_STUDENT_SELECTION));
         assertNotNull(gameOptions);
         assertTrue(gameOptions.iterator().hasNext());
-        assertNotNull(gameOptions.getOption("model.option.fogOfWar"));
+        assertNotNull(gameOptions.getOption(GameOptions.FOG_OF_WAR));
         assertFalse(((BooleanOption) gameOptions.getOption(GameOptions.CUSTOM_IGNORE_BOYCOTT))
                     .getValue());
         assertFalse(spec().getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT));
@@ -45,7 +45,7 @@ public class OptionTest extends FreeColTestCase {
     }
 
     public void testCloneIntegerOption() {
-        IntegerOption money = spec().getIntegerOption("model.option.startingMoney");
+        IntegerOption money = spec().getIntegerOption(GameOptions.STARTING_MONEY);
         IntegerOption money2 = money.clone();
 
         assertFalse(money == money2);
@@ -61,7 +61,7 @@ public class OptionTest extends FreeColTestCase {
 
     public void testUnitListOption() {
 
-        UnitListOption refOption = (UnitListOption) spec().getOption("model.option.refSize");
+        UnitListOption refOption = (UnitListOption) spec().getOption(GameOptions.REF_FORCE);
 
         for (AbstractUnit unit : refOption.getOptionValues()) {
             assertTrue(unit.getNumber() > 0);

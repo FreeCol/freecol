@@ -127,9 +127,9 @@ public final class Monarch extends FreeColGameObject implements Named {
 
         final Specification spec = getSpecification();
         UnitListOption op;
-        op = (UnitListOption)spec.getOption("model.option.refSize");
+        op = (UnitListOption)spec.getOption(GameOptions.REF_FORCE);
         expeditionaryForce = new Force(op, Ability.REF_UNIT);
-        op = (UnitListOption)spec.getOption("model.option.interventionForce");
+        op = (UnitListOption)spec.getOption(GameOptions.INTERVENTION_FORCE);
         interventionForce = new Force(op, null);
     }
 
@@ -225,7 +225,7 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @return The maximum tax rate in the game.
      */
     private int taxMaximum() {
-        return getSpecification().getInteger("model.option.maximumTax");
+        return getSpecification().getInteger(GameOptions.MAXIMUM_TAX);
     }
 
     /**
@@ -338,7 +338,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         final Specification spec = getSpecification();
         List<RandomChoice<MonarchAction>> choices
             = new ArrayList<RandomChoice<MonarchAction>>();
-        int dx = 1 + spec.getInteger("model.option.monarchMeddling");
+        int dx = 1 + spec.getInteger(GameOptions.MONARCH_MEDDLING);
         int turn = getGame().getTurn().getNumber();
         int grace = (6 - dx) * 10; // 10-50
 
@@ -393,7 +393,7 @@ public final class Monarch extends FreeColGameObject implements Named {
      */
     public int raiseTax(Random random) {
         final Specification spec = getSpecification();
-        int taxAdjustment = spec.getInteger("model.option.taxAdjustment");
+        int taxAdjustment = spec.getInteger(GameOptions.TAX_ADJUSTMENT);
         int turn = getGame().getTurn().getNumber();
         int oldTax = player.getTax();
         int adjust = Math.max(1, (6 - taxAdjustment) * 10); // 20-60
@@ -410,7 +410,7 @@ public final class Monarch extends FreeColGameObject implements Named {
      */
     public int lowerTax(Random random) {
         final Specification spec = getSpecification();
-        int taxAdjustment = spec.getInteger("model.option.taxAdjustment");
+        int taxAdjustment = spec.getInteger(GameOptions.TAX_ADJUSTMENT);
         int oldTax = player.getTax();
         int adjust = Math.max(1, 10 - taxAdjustment); // 5-10
         adjust = 1 + Utils.randomInt(logger, "Tax reduction", random, adjust);
@@ -457,7 +457,7 @@ public final class Monarch extends FreeColGameObject implements Named {
      */
     public void updateInterventionForce() {
         Specification spec = getSpecification();
-        int interventionTurns = spec.getInteger("model.option.interventionTurns");
+        int interventionTurns = spec.getInteger(GameOptions.INTERVENTION_TURNS);
         if (interventionTurns > 0) {
             int updates = getGame().getTurn().getNumber() / interventionTurns;
             for (AbstractUnit unit : interventionForce.getLandUnits()) {
@@ -491,7 +491,7 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @return An addition to the colonial forces.
      */
     public List<AbstractUnit> getSupport(Random random, boolean naval) {
-        Specification spec = getSpecification();
+        final Specification spec = getSpecification();
         List<AbstractUnit> support = new ArrayList<AbstractUnit>();
         List<UnitType> navalTypes = new ArrayList<UnitType>();
         List<UnitType> bombardTypes = new ArrayList<UnitType>();
@@ -522,7 +522,7 @@ public final class Monarch extends FreeColGameObject implements Named {
          * units with strength 5, or three units with strength 3 (plus
          * one with strength 1, if there is one).
          */
-        int difficulty = spec.getInteger("model.option.monarchSupport");
+        int difficulty = spec.getInteger(GameOptions.MONARCH_SUPPORT);
         switch (difficulty) {
         case 4:
             support.add(new AbstractUnit(Utils.getRandomMember(logger,
@@ -579,7 +579,7 @@ public final class Monarch extends FreeColGameObject implements Named {
             }
         }
 
-        int mercPrice = spec.getInteger("model.option.mercenaryPrice");
+        int mercPrice = spec.getInteger(GameOptions.MERCENARY_PRICE);
         List<AbstractUnit> mercs = new ArrayList<AbstractUnit>();
         // FIXME: magic numbers for 2-4 mercs
         int count = Utils.randomInt(logger, "Mercenary count", random, 2) + 2;
@@ -899,10 +899,10 @@ public final class Monarch extends FreeColGameObject implements Named {
         // default definitions for the benefit of earlier versions.        
         final Specification spec = getSpecification();
         if (interventionForce.getUnits().isEmpty()) {
-            interventionForce = new Force((UnitListOption)spec.getOption("model.option.interventionForce"), null);
+            interventionForce = new Force((UnitListOption)spec.getOption(GameOptions.INTERVENTION_FORCE), null);
         }
         if (mercenaryForce.getUnits().isEmpty()) {
-            mercenaryForce = new Force((UnitListOption)spec.getOption("model.option.mercenaryForce"), null);
+            mercenaryForce = new Force((UnitListOption)spec.getOption(GameOptions.MERCENARY_FORCE), null);
         }
         // end @compat
     }

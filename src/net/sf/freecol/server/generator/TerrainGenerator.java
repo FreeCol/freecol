@@ -112,9 +112,9 @@ public class TerrainGenerator {
      * @return The approximate number of land tiles
      */
     private int getApproximateLandCount() {
-        return mapOptions.getInteger("model.option.mapWidth")
-            * mapOptions.getInteger("model.option.mapHeight")
-            * mapOptions.getInteger("model.option.landMass")
+        return mapOptions.getInteger(MapGeneratorOptions.MAP_WIDTH)
+            * mapOptions.getInteger(MapGeneratorOptions.MAP_HEIGHT)
+            * mapOptions.getInteger(MapGeneratorOptions.LAND_MASS)
             / 100;
     }
 
@@ -215,9 +215,9 @@ public class TerrainGenerator {
                                        int latitude) {
         // decode options
         final int forestChance
-            = mapOptions.getInteger("model.option.forestNumber");
+            = mapOptions.getInteger(MapGeneratorOptions.FOREST_NUMBER);
         final int temperaturePreference
-            = mapOptions.getInteger("model.option.temperature");
+            = mapOptions.getInteger(MapGeneratorOptions.TEMPERATURE);
 
         // temperature calculation
         int poleTemperature = -20;
@@ -1018,8 +1018,8 @@ public class TerrainGenerator {
      */
     private void createHighSeas(Map map) {
         OptionGroup opt = mapOptions;
-        createHighSeas(map, opt.getInteger("model.option.distanceToHighSea"),
-                       opt.getInteger("model.option.maximumDistanceToEdge"));
+        createHighSeas(map, opt.getInteger(MapGeneratorOptions.DISTANCE_TO_HIGH_SEA),
+                       opt.getInteger(MapGeneratorOptions.MAXIMUM_DISTANCE_TO_EDGE));
     }
 
     /**
@@ -1143,10 +1143,10 @@ public class TerrainGenerator {
         // here and there the rest will be allocated for large
         // mountain ranges
         int maximumLength
-            = Math.max(mapOptions.getInteger("model.option.mapWidth"),
-                mapOptions.getInteger("model.option.mapHeight")) / 10;
+            = Math.max(mapOptions.getInteger(MapGeneratorOptions.MAP_WIDTH),
+                mapOptions.getInteger(MapGeneratorOptions.MAP_HEIGHT)) / 10;
         int number = (int)((getApproximateLandCount()
-                / mapOptions.getInteger("model.option.mountainNumber"))
+                / mapOptions.getInteger(MapGeneratorOptions.MOUNTAIN_NUMBER))
             * (1 - randomHillsRatio));
         logger.info("Number of mountain tiles is " + number);
         logger.fine("Maximum length of mountain ranges is " + maximumLength);
@@ -1226,7 +1226,7 @@ public class TerrainGenerator {
 
         // and sprinkle a few random hills/mountains here and there
         number = (int) (getApproximateLandCount() * randomHillsRatio)
-            / mapOptions.getInteger("model.option.mountainNumber");
+            / mapOptions.getInteger(MapGeneratorOptions.MOUNTAIN_NUMBER);
         counter = 0;
         nextTry: for (int tries = 0; tries < 1000; tries++) {
             if (counter < number) {
@@ -1270,7 +1270,7 @@ public class TerrainGenerator {
         final TileImprovementType riverType
             = spec.getTileImprovementType("model.improvement.river");
         final int number = getApproximateLandCount()
-            / mapOptions.getInteger("model.option.riverNumber");
+            / mapOptions.getInteger(MapGeneratorOptions.RIVER_NUMBER);
         int counter = 0;
         HashMap<Position, River> riverMap = new HashMap<Position, River>();
         List<River> rivers = new ArrayList<River>();
@@ -1398,7 +1398,7 @@ public class TerrainGenerator {
         TileImprovementType fishBonusRiverType
             = spec.getTileImprovementType("model.improvement.fishBonusRiver");
         final int bonusNumber
-            = mapOptions.getInteger("model.option.bonusNumber");
+            = mapOptions.getInteger(MapGeneratorOptions.BONUS_NUMBER);
         if (t.isLand()) {
             if (generateBonus
                 && Utils.randomInt(logger, "Land Resource", random, 100) < bonusNumber) {

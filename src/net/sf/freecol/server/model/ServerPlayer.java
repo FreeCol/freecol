@@ -412,7 +412,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
         // The player does not have any valid units or settlements on the map.
 
-        int mandatory = spec.getInteger("model.option.mandatoryColonyYear");
+        int mandatory = spec.getInteger(GameOptions.MANDATORY_COLONY_YEAR);
         if (getGame().getTurn().getYear() >= mandatory) {
             // After the season cutover year there must be a presence
             // in the New World.
@@ -637,7 +637,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         case COLONIAL:
             break;
         case REBEL: case INDEPENDENT:
-            if (!spec.getBoolean("model.option.continueFoundingFatherRecruitment")) return false;
+            if (!spec.getBoolean(GameOptions.CONTINUE_FOUNDING_FATHER_RECRUITMENT)) return false;
             break;
         default:
             return false;
@@ -1162,7 +1162,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
 
             if (getPlayerType() == PlayerType.REBEL
-                && interventionBells >= getSpecification().getInteger("model.option.interventionBells")) {
+                && interventionBells >= getSpecification().getInteger(GameOptions.INTERVENTION_BELLS)) {
                 interventionBells = Integer.MIN_VALUE;
                 // TODO: this assumes that the entry location will
                 // always be a tile.  This seems safe enough at the moment.
@@ -3660,7 +3660,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             colony.removeGoods(goodsType, amount);
 
             int arrears = market.getPaidForSale(goodsType)
-                * spec.getInteger("model.option.arrearsFactor");
+                * spec.getInteger(GameOptions.ARREARS_FACTOR);
             Market market = getMarket();
             market.setArrears(goodsType, arrears);
 

@@ -499,7 +499,7 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
             = SwingUtilities.getAncestorOfClass(JInternalFrame.class, this);
         if (frame != null
             && getClientOptions() != null
-            && getClientOptions().getBoolean("model.option.rememberPanelPositions")) {
+            && getClientOptions().getBoolean(ClientOptions.REMEMBER_PANEL_POSITIONS)) {
             saveInteger(".x", frame.getLocation().x);
             saveInteger(".y", frame.getLocation().y);
         }

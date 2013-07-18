@@ -35,6 +35,7 @@ import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
@@ -595,7 +596,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
 
         Game game = getGame();
         Specification spec = game.getSpecification();
-        int difficulty = spec.getInteger("model.option.rumourDifficulty");
+        int difficulty = spec.getInteger(GameOptions.RUMOUR_DIFFICULTY);
         int dx = 10 - difficulty;
         UnitType unitType;
         Unit newUnit = null;

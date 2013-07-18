@@ -176,9 +176,9 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
      */
     public void updateMapGeneratorOptions() {
         getFreeColClient().getGame().getMapGeneratorOptions()
-            .getOption("model.option.mapWidth");
+            .getOption(MapGeneratorOptions.MAP_WIDTH);
         getFreeColClient().getGame().getMapGeneratorOptions()
-            .getOption("model.option.mapHeight");
+            .getOption(MapGeneratorOptions.MAP_HEIGHT);
     }
 
     /**

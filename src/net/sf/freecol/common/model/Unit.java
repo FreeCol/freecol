@@ -2447,7 +2447,7 @@ public class Unit extends GoodsLocation
      * @return The number of turns to sail to/from Europe.
      */
     public int getSailTurns() {
-        float base = getSpecification().getInteger("model.option.turnsToSail");
+        float base = getSpecification().getInteger(GameOptions.TURNS_TO_SAIL);
         return (int)getOwner().applyModifier(base,
                                              "model.modifier.sailHighSeas",
                                              unitType, getGame().getTurn());
@@ -3180,7 +3180,7 @@ public class Unit extends GoodsLocation
      */
     public float getConvertProbability() {
         final Specification spec = getSpecification();
-        int opt = spec.getInteger("model.option.nativeConvertProbability");
+        int opt = spec.getInteger(GameOptions.NATIVE_CONVERT_PROBABILITY);
         return 0.01f * FeatureContainer.applyModifierSet(opt,
             getGame().getTurn(),
             getModifierSet("model.modifier.nativeConvertBonus"));
@@ -3190,12 +3190,13 @@ public class Unit extends GoodsLocation
      * Gets the probability that an attack by this unit will provoke natives
      * to burn our missions.
      *
+     * TODO: enhance burn probability proportionally with tension
+     *
      * @return A probability of burning missions.
      */
     public float getBurnProbability() {
-        // TODO: enhance burn probability proportionally with tension
         final Specification spec = getSpecification();
-        return 0.01f * spec.getInteger("model.option.burnProbability");
+        return 0.01f * spec.getInteger(GameOptions.BURN_PROBABILITY);
     }
 
     /**
@@ -3257,9 +3258,10 @@ public class Unit extends GoodsLocation
      */
     public int getTransportFee() {
         if (!isInEurope() && getOwner().getEurope() != null) {
-            float fee = (getSpecification().getInteger("model.option.treasureTransportFee")
-                         * getTreasureAmount()) / 100;
-            return (int) getOwner().applyModifier(fee,
+            float fee = (getSpecification()
+                .getInteger(GameOptions.TREASURE_TRANSPORT_FEE)
+                * getTreasureAmount()) / 100;
+            return (int)getOwner().applyModifier(fee,
                 "model.modifier.treasureTransportFee",
                 unitType, getGame().getTurn());
         }
