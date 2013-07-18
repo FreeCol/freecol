@@ -491,7 +491,8 @@ public class TransportMission extends Mission {
      */
     private PathNode getTrivialPath() {
         final Unit carrier = getUnit();
-        return (carrier.isNaval()) ? carrier.findOurNearestPort()
+        return (carrier.isDisposed()) ? null
+            : (carrier.isNaval()) ? carrier.findOurNearestPort()
             : carrier.findOurNearestSettlement();
     }
 
