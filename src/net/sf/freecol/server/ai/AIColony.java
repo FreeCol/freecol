@@ -776,8 +776,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         if (ag.getTransport() != null
             && ag.getTransport().getMission() instanceof TransportMission) {
             ((TransportMission)ag.getTransport().getMission())
-                .removeTransportable((Transportable)ag,
-                    "No longer required by " + colony.getName());
+                .removeTransportable((Transportable)ag);
         }
         removeAIGoods(ag);
         ag.dispose();

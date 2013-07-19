@@ -302,7 +302,7 @@ public class AIUnit extends AIObject implements Transportable {
         if (transport != null) {
             Mission m = transport.getMission();
             if (m instanceof TransportMission) {
-                ((TransportMission)m).removeTransportable(this, reason);
+                ((TransportMission)m).removeTransportable(this);
             }
         }
         setTransport(null, reason);

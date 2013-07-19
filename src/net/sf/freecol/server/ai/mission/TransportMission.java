@@ -1314,7 +1314,7 @@ public class TransportMission extends Mission {
         AIUnit oldCarrier = t.getTransport();
         if (oldCarrier.getMission() instanceof TransportMission) {
             ((TransportMission)oldCarrier.getMission())
-                .removeTransportable(t, "transferring to " + getUnit());
+                .removeTransportable(t);
         }
 
         Cargo cargo = makeCargo(t);
@@ -1325,13 +1325,11 @@ public class TransportMission extends Mission {
      * Removes the given <code>Transportable</code> from the cargo list.
      *
      * @param t The <code>Transportable</code> to remove.
-     * @param reason The reason for its removal (if null, do not log, it has
-     *     already been mentioned).
      * @return True if the removal succeeded.
      */
-    public boolean removeTransportable(Transportable t, String reason) {
+    public boolean removeTransportable(Transportable t) {
         Cargo cargo = tFind(t);
-        return (cargo == null) ? false : removeCargo(cargo, reason);
+        return (cargo == null) ? false : tRemove(cargo);
     }
 
     /**
