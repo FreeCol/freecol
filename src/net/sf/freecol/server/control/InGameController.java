@@ -1350,7 +1350,7 @@ public final class InGameController extends Controller {
                         for (int index = 0; index < limit; index++) {
                             Unit unit = entry.getValue().get(index);
                             if (unit == null) break;
-                            unit.setType(upgrades.get(entry.getKey()));
+                            unit.setType(upgrades.get(entry.getKey()));//-vis
                             cs.add(See.only(serverPlayer), unit);
                         }
                         cs.addMessage(See.only(serverPlayer),
@@ -1401,6 +1401,7 @@ public final class InGameController extends Controller {
                 .add("%ruler%", serverPlayer.getRulerNameKey()));
         cs.add(See.only(serverPlayer), serverPlayer);
         serverPlayer.csChangeStance(Stance.WAR, refPlayer, true, cs);
+        serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
 
         sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
@@ -2791,6 +2792,9 @@ public final class InGameController extends Controller {
     /**
      * Clear the specialty of a unit.
      *
+     * TODO: why not clear speciality in the open?  You can disband!
+     * If we implement this remember to fix the visibility.
+     *
      * @param serverPlayer The owner of the unit.
      * @param unit The <code>Unit</code> to clear the speciality of.
      * @return An <code>Element</code> encapsulating this action.
@@ -2813,11 +2817,10 @@ public final class InGameController extends Controller {
         }
 
         // Valid, change type.
-        unit.setType(newType);
+        unit.setType(newType);//-vis: safe in colony
 
         // Update just the unit, others can not see it as this only happens
-        // in-colony.  TODO: why not clear speciality in the open,
-        // you can disband...
+        // in-colony.
         return new ChangeSet().add(See.only(serverPlayer), unit)
             .build(serverPlayer);
     }
@@ -3263,7 +3266,7 @@ public final class InGameController extends Controller {
         UnitTypeChange change = oldType
             .getUnitTypeChange(ChangeType.ENTER_COLONY, unit.getOwner());
         if (change != null) {
-            unit.setType(change.getNewUnitType());
+            unit.setType(change.getNewUnitType());//-vis: safe in colony
         }
 
         // Change the location.

@@ -406,6 +406,8 @@ public class Unit extends GoodsLocation
     /**
      * Sets the type of the unit.
      *
+     * -vis: Has visibility issues as the line of sight may change.
+     *
      * @param newUnitType The new type of the unit.
      */
     public void setType(UnitType newUnitType) {

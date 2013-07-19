@@ -123,7 +123,7 @@ public class ServerBuilding extends Building implements ServerModelObject {
                                        + " can not learn from "
                                        + teacher.getId());
                     } else {
-                        student.setType(skill);
+                        student.setType(skill);//-vis: safe within colony
                         StringTemplate newName = student.getLabel();
                         cs.addMessage(See.only(owner),
                                       new ModelMessage(ModelMessage.MessageType.UNIT_IMPROVED,

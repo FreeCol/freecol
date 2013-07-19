@@ -247,7 +247,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 && Utils.randomInt(logger, "Experience", random, maxValue)
                 < Math.min(getExperience(), maximumExperience)) {
                 StringTemplate oldName = getLabel();
-                setType(learn);
+                setType(learn);//-vis: safe within colony
                 cs.addMessage(See.only(owner),
                     new ModelMessage(ModelMessage.MessageType.UNIT_IMPROVED,
                         "model.unit.experience",
@@ -694,7 +694,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
             List<UnitType> learnTypes = getType().getUnitTypesLearntInLostCity();
             unitType = Utils.getRandomMember(logger, "Choose learn",
                                              learnTypes, random);
-            setType(unitType);
+            setType(unitType);//-vis(serverPlayer)
+            serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                     "lostCityRumour.learn", serverPlayer, this)
@@ -712,6 +713,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                         : "lostCityRumour.tribalChief"),
                     serverPlayer, this)
                 .addAmount("%money%", chiefAmount));
+            serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
             break;
         case COLONIST:
             List<UnitType> foundTypes = spec.getUnitTypesWithAbility(Ability.FOUND_IN_LOST_CITY);

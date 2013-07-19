@@ -1616,7 +1616,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     brave.changeOwner(other);//-vis: but within colony so safe
                     brave.setHomeIndianSettlement(null);
                     brave.setNationality(other.getNationId());
-                    brave.setType(Utils.getRandomMember(logger,
+                    brave.setType(Utils.getRandomMember(logger,//-vis: as above
                                   "Choose convert type", converts, random));
                     brave.setLocation(colony.getTile());
                     cs.add(See.only(this), settlement);
@@ -1709,7 +1709,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         Game game = getGame();
         Specification spec = game.getSpecification();
         Europe europe = getEurope();
-        boolean europeDirty = false;
+        boolean europeDirty = false, visibilityChange = false;
 
         // TODO: We do not want to have to update the whole player
         // just to get the FF into the client.  Use this hack until
@@ -1738,7 +1738,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
             for (Unit u : getUnits()) {
                 UnitType newType = upgrades.get(u.getType());
                 if (newType != null) {
-                    u.setType(newType);
+                    u.setType(newType);//-vis(this)
+                    visibilityChange = true;
                     cs.add(See.perhaps(), u);
                 }
             }
@@ -1782,13 +1783,14 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         colony.getBuildQueue().remove(type);
                         cs.add(See.only(this), colony);
                         if (isAI()) {
-                            colony.firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
+                            colony.firePropertyChange(Colony.REARRANGE_WORKERS,
+                                                      true, false);
                         }
                     }
                 }
 
             } else if (eventId.equals("model.event.seeAllColonies")) {
-                invalidateCanSeeTiles(); // seeAllColonies ability added
+                visibilityChange = true;//-vis(this), can now see other colonies
                 for (Tile t : game.getMap().getAllTiles()) {
                     Colony colony = t.getColony();
                     if (colony != null && !this.owns(colony)) {
@@ -1825,6 +1827,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
 
         if (europeDirty) cs.add(See.only(this), europe);
+        if (visibilityChange) invalidateCanSeeTiles(); //+vis(this)
     }
 
 
