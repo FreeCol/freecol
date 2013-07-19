@@ -213,6 +213,7 @@ public class ColonyTile extends WorkLocation {
     //   UnitLocation.getLocationNameFor
     //   UnitLocation.contains
     //   UnitLocation.canAdd
+    //   WorkLocation.remove
     //   UnitLocation.getUnitCount
     //   final UnitLocation.getUnitIterator
     //   UnitLocation.getUnitList
@@ -259,26 +260,6 @@ public class ColonyTile extends WorkLocation {
             } else {
                 setProductionType(getBestProductionType(unit.getWorkType()));
             }
-
-            getColony().invalidateCache();
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean remove(final Locatable locatable) {
-        if (!(locatable instanceof Unit)) {
-            throw new IllegalStateException("Not a unit: " + locatable);
-        }
-        Unit unit = (Unit) locatable;
-        if (!contains(unit)) return true;
-
-        if (super.remove(unit)) {
-            unit.setState(Unit.UnitState.ACTIVE);
-            unit.setMovesLeft(0);
 
             getColony().invalidateCache();
             return true;

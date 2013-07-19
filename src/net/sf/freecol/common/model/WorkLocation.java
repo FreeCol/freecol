@@ -354,23 +354,27 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
         if (!(locatable instanceof Unit)) {
             throw new IllegalStateException("Not a unit: " + locatable);
         }
+        Unit unit = (Unit)locatable;
+        if (!contains(unit)) return true;
+        if (!super.remove(unit)) return false;
 
-        Unit unit = (Unit) locatable;
-        if (super.remove(unit)) {
-            if (this.canTeach()) {
-                Unit student = unit.getStudent();
-                if (student != null) {
-                    student.setTeacher(null);
-                    unit.setStudent(null);
-                }
-                unit.setTurnsOfTraining(0);
+        unit.setState(Unit.UnitState.ACTIVE);
+        unit.setMovesLeft(0);
+
+        if (this.canTeach()) {
+            Unit student = unit.getStudent();
+            if (student != null) {
+                student.setTeacher(null);
+                unit.setStudent(null);
             }
-            // Do not clear teacher like in add().  Do that at the
-            // colony level so that students can be moved from one
-            // work location to another without disrupting teaching.
-            return true;
+            unit.setTurnsOfTraining(0);
         }
-        return false;
+        // Do not clear teacher like in add().  Do that at the
+        // colony level so that students can be moved from one
+        // work location to another without disrupting teaching.
+        
+        colony.invalidateCache();
+        return true;
     }
 
     /**

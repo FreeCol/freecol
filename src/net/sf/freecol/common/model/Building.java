@@ -396,6 +396,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     //   UnitLocation.getLocationNameFor
     //   UnitLocation.contains
     //   UnitLocation.canAdd
+    //   WorkLocation.remove
     //   UnitLocation.getUnitCount
     //   final UnitLocation.getUnitIterator
     //   UnitLocation.getUnitList
@@ -431,27 +432,6 @@ public class Building extends WorkLocation implements Named, Comparable<Building
             if (outputs.size() == 1) {
                 unit.changeWorkType(outputs.get(0).getType());
             }
-            getColony().invalidateCache();
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean remove(final Locatable locatable) {
-        if (!(locatable instanceof Unit)) {
-            throw new IllegalStateException("Not a unit: " + locatable);
-        }
-        Unit unit = (Unit) locatable;
-        if (!contains(unit)) return true;
-
-        if (super.remove(unit)) {
-            unit.setState(Unit.UnitState.ACTIVE);
-            unit.setMovesLeft(0);
-
             getColony().invalidateCache();
             return true;
         }
