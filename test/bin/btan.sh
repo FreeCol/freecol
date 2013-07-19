@@ -7,13 +7,19 @@
 #
 if test "x$1" = "x" ; then name=Unknown ; else name="$1" ; fi
 name=`date +%Y%m%d`-"$name"
+if test "x$STATS" = "x" ; then
+    dpath=`dirname "$0"`
+    if test -x "${dpath}/stats.awk" ; then
+        STATS="${dpath}/stats.awk"
+    fi
+fi
 STATS=${STATS:-stats.awk} # Where is the stats awk script?
 blockitstate=y
 
 
 blockit () {
     if test "$blockitstate" = "y" ; then
-        echo -n "         "
+        echo -n "       "
         blockitstate=n
     else
         echo
@@ -24,7 +30,7 @@ blockit () {
 statit () {
     statitMEAN=0 ; statitSD=0
     eval `$STATS | sed -n -e 's/^n=[^ ]* *mean=\([^ ]*\) *sd=\(.*\)$/statitMEAN="\1";statitSD="\2"/p' -`
-    printf "%7.3f ~ %7.3f" "$statitMEAN" "$statitSD"
+    printf "%8.3f ~ %8.3f" "$statitMEAN" "$statitSD"
 }
 
 tmp=`mktemp btan.XXXXXXXX`
