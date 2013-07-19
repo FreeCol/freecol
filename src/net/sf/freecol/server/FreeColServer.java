@@ -1159,7 +1159,7 @@ public final class FreeColServer {
 
         // Introduced: SAVEGAME_VERSION == 13
         addIntegerOption(GameOptions.DESTROY_SETTLEMENT_SCORE,
-            "gameOptions.natives", -5, true);
+            "model.difficulty.natives", -5, true);
     }
 
     private void addOptionGroup(String id, boolean difficulty) {
