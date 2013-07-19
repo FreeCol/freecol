@@ -76,22 +76,7 @@ public abstract class ServerAPI {
 
     private static final Logger logger = Logger.getLogger(ServerAPI.class.getName());
 
-    /** Temporary trivial message wrapper. */
-    private class TrivialMessage extends DOMMessage {
-
-        private String tag;
-        private String[] attributes;
-
-        public TrivialMessage(String tag, String... attributes) {
-            this.tag = tag;
-            this.attributes = attributes;
-        }
-
-        public Element toXMLElement() {
-            return DOMMessage.createMessage(tag, attributes);
-        }
-    }
-
+    /** The Client used to communicate with the server. */
     private Client client;
 
 
@@ -101,14 +86,27 @@ public abstract class ServerAPI {
     public ServerAPI() {}
 
 
+    /**
+     * Do local client processing for a reply.
+     *
+     * @param reply The reply <code>Element</code>.
+     */
     protected abstract void doClientProcessingFor(Element reply);
 
+    /**
+     * Handle error conditions detected by the client.
+     *
+     * @param complaint The error message.
+     */
     protected abstract void doRaiseErrorMessage(String complaint);
+
 
     // Internal message passing routines
 
     /**
      * Sends an Element to the server.
+     *
+     * TODO: remove all uses of this.
      *
      * @param element The <code>Element</code> to send.
      * @return True if the send succeeded.
@@ -129,7 +127,13 @@ public abstract class ServerAPI {
      * @return True if the send succeeded.
      */
     private boolean send(DOMMessage message) {
-        return send(message.toXMLElement());
+        try {
+            client.send(message);
+            return true;
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Could not send: " + message, ioe);
+        }
+        return false;
     }
 
     /**
@@ -140,7 +144,7 @@ public abstract class ServerAPI {
      */
     private boolean sendAndWait(DOMMessage message) {
         try {
-            client.sendAndWait(message.toXMLElement());
+            client.sendAndWait(message);
             return true;
         } catch (IOException e) {
             logger.log(Level.WARNING, "Could not send: " + message, e);
@@ -157,7 +161,7 @@ public abstract class ServerAPI {
     private Element ask(DOMMessage message) {
         Element reply = null;
         try {
-            reply = client.ask(message.toXMLElement());
+            reply = client.ask(message);
         } catch (IOException e) {
             logger.log(Level.WARNING, "Could not ask: " + message, e);
         }

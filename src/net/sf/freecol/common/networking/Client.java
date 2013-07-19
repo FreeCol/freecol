@@ -115,6 +115,18 @@ public final class Client {
     /**
      * Sends the specified message to the server.
      *
+     * @param message The <code>DOMMessage</code> to send.
+     * @see #sendAndWait(Element)
+     * @see #ask(Element)
+     * @exception IOException
+     */
+    public void send(DOMMessage message) throws IOException {
+        c.sendDumping(message.toXMLElement());
+    }
+
+    /**
+     * Sends the specified message to the server.
+     *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *                holds all the information
      * @see #sendAndWait(Element)
@@ -129,6 +141,19 @@ public final class Client {
      * Sends the specified message to the server and waits for the reply
      * to be returned before returning from this method.
      *
+     * @param message The <code>DOMMessage</code> to send.
+     * @see #send(Element)
+     * @see #ask(Element)
+     * @exception IOException
+     */
+    public void sendAndWait(DOMMessage message) throws IOException {
+        c.sendAndWait(message.toXMLElement());
+    }
+
+    /**
+     * Sends the specified message to the server and waits for the reply
+     * to be returned before returning from this method.
+     *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *                holds all the information
      * @see #send(Element)
@@ -137,6 +162,20 @@ public final class Client {
      */
     public void sendAndWait(Element element) throws IOException {
         c.sendAndWait(element);
+    }
+
+    /**
+     * Sends the specified message to the server and returns the reply.
+     *
+     * @param message The <code>DOMMessage</code> to send.
+     * @return The answer from the server or <code>null</code> if either
+     *       an error occured or the server did not send a reply.
+     * @see #sendAndWait
+     * @see #send
+     * @exception IOException
+     */
+    public Element ask(DOMMessage message) throws IOException {
+        return c.askDumping(message.toXMLElement());
     }
 
     /**
