@@ -616,16 +616,16 @@ public class TerrainGenerator {
         int nNP = 0, nSP = 0, nNA = 0, nSA = 0;
 
         Rectangle rNP = new Rectangle(0,0,       midx,midy);
-        Rectangle rSP = new Rectangle(0,midy,    midx,maxy);
-        Rectangle rNA = new Rectangle(midx,0,    maxx,midy);
-        Rectangle rSA = new Rectangle(midx,midy, maxx,maxy);
+        Rectangle rSP = new Rectangle(0,midy,    midx,maxy-midy);
+        Rectangle rNA = new Rectangle(midx,0,    maxx-midx,midy);
+        Rectangle rSA = new Rectangle(midx,midy, maxx-midx,maxy-midy);
         if (tNP != null) nNP += fillOcean(map, tNP, northPacific,  rNP);
         if (tSP != null) nSP += fillOcean(map, tSP, southPacific,  rSP);
         if (tNA != null) nNA += fillOcean(map, tNA, northAtlantic, rNA);
         if (tSA != null) nSA += fillOcean(map, tSA, southAtlantic, rSA);
 
         Rectangle rN = new Rectangle(0,0,    maxx,midy);
-        Rectangle rS = new Rectangle(0,midy, maxx,maxy);
+        Rectangle rS = new Rectangle(0,midy, maxx,maxy-midy);
         if (tNP != null) nNP += fillOcean(map, tNP, northPacific,  rN);
         if (tSP != null) nSP += fillOcean(map, tSP, southPacific,  rS);
         if (tNA != null) nNA += fillOcean(map, tNA, northAtlantic, rN);
@@ -750,8 +750,7 @@ public class TerrainGenerator {
                 "model.region.northWest", RegionType.LAND, null);
             map.putRegion(northWest);
         }
-        northWest.setBounds(new Rectangle(0,0,
-                thirdWidth,thirdHeight));
+        northWest.setBounds(new Rectangle(0,0,thirdWidth,thirdHeight));
         northWest.setPrediscovered(true);
         ServerRegion north = (ServerRegion)map
             .getRegion("model.region.north");
@@ -760,8 +759,7 @@ public class TerrainGenerator {
                 "model.region.north", RegionType.LAND, null);
             map.putRegion(north);
         }
-        north.setBounds(new Rectangle(thirdWidth,0,
-                twoThirdWidth,thirdHeight));
+        north.setBounds(new Rectangle(thirdWidth,0,thirdWidth,thirdHeight));
         north.setPrediscovered(true);
         ServerRegion northEast = (ServerRegion)map
             .getRegion("model.region.northEast");
@@ -770,8 +768,7 @@ public class TerrainGenerator {
                 "model.region.northEast", RegionType.LAND, null);
             map.putRegion(northEast);
         }
-        northEast.setBounds(new Rectangle(twoThirdWidth,0,
-                map.getWidth(),thirdHeight));
+        northEast.setBounds(new Rectangle(twoThirdWidth,0,thirdWidth,thirdHeight));
         northEast.setPrediscovered(true);
         ServerRegion west = (ServerRegion)map
             .getRegion("model.region.west");
@@ -780,8 +777,7 @@ public class TerrainGenerator {
                 "model.region.west", RegionType.LAND, null);
             map.putRegion(west);
         }
-        west.setBounds(new Rectangle(0,thirdHeight,
-                thirdWidth,twoThirdHeight));
+        west.setBounds(new Rectangle(0,thirdHeight,thirdWidth,thirdHeight));
         west.setPrediscovered(true);
         ServerRegion center = (ServerRegion)map
             .getRegion("model.region.center");
@@ -790,8 +786,7 @@ public class TerrainGenerator {
                 "model.region.center", RegionType.LAND, null);
             map.putRegion(center);
         }
-        center.setBounds(new Rectangle(thirdWidth,thirdHeight,
-                twoThirdWidth,twoThirdHeight));
+        center.setBounds(new Rectangle(thirdWidth,thirdHeight,thirdWidth,thirdHeight));
         center.setPrediscovered(true);
         ServerRegion east = (ServerRegion)map
             .getRegion("model.region.east");
@@ -800,8 +795,7 @@ public class TerrainGenerator {
                 "model.region.east", RegionType.LAND, null);
             map.putRegion(east);
         }
-        east.setBounds(new Rectangle(twoThirdWidth,thirdHeight,
-                map.getWidth(),twoThirdHeight));
+        east.setBounds(new Rectangle(twoThirdWidth,thirdHeight,thirdWidth,thirdHeight));
         east.setPrediscovered(true);
         ServerRegion southWest = (ServerRegion)map
             .getRegion("model.region.southWest");
@@ -810,8 +804,7 @@ public class TerrainGenerator {
                 "model.region.southWest", RegionType.LAND, null);
             map.putRegion(southWest);
         }
-        southWest.setBounds(new Rectangle(0,twoThirdHeight,
-                thirdWidth,map.getHeight()));
+        southWest.setBounds(new Rectangle(0,twoThirdHeight,thirdWidth,thirdHeight));
         southWest.setPrediscovered(true);
         ServerRegion south = (ServerRegion)map
             .getRegion("model.region.south");
@@ -820,8 +813,7 @@ public class TerrainGenerator {
                 "model.region.south", RegionType.LAND, null);
             map.putRegion(south);
         }
-        south.setBounds(new Rectangle(thirdWidth,twoThirdHeight,
-                twoThirdWidth,map.getHeight()));
+        south.setBounds(new Rectangle(thirdWidth,twoThirdHeight,thirdWidth,thirdHeight));
         south.setPrediscovered(true);
         ServerRegion southEast = (ServerRegion)map
             .getRegion("model.region.southEast");
@@ -830,8 +822,7 @@ public class TerrainGenerator {
                 "model.region.southEast", RegionType.LAND, null);
             map.putRegion(southEast);
         }
-        southEast.setBounds(new Rectangle(twoThirdWidth,twoThirdHeight,
-                map.getWidth(),map.getHeight()));
+        southEast.setBounds(new Rectangle(twoThirdWidth,twoThirdHeight,thirdWidth,thirdHeight));
         southEast.setPrediscovered(true);
         return new ServerRegion[] {
             northWest, north, northEast,
