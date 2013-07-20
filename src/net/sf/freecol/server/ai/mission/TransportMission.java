@@ -1732,7 +1732,11 @@ public class TransportMission extends Mission {
                 }
 
                 retarget();
-                if (carrier.isAtLocation(target)) {
+                if ((reason = invalidReason()) != null) {
+                    logger.finest(tag + " mission now broken ( " + reason
+                        + " ): " + toFullString());
+                    return;
+                } else if (carrier.isAtLocation(target)) {
                     logger.finest(tag + " waiting at " + target
                         + ": " + toFullString());
                     return;
