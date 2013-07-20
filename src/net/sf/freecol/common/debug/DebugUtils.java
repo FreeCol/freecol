@@ -549,11 +549,12 @@ public class DebugUtils {
                         sb.append("Unit missing on client-side.\n");
                         sb.append("  Server: ");
                         sb.append(Messages.message(Messages.getLabel(u))
-                            + "(" + u.getId() + "). Position: "
-                            + u.getTile().getPosition() + ".\n");
+                            + "(" + u.getId() + ") from: "
+                            + u.getLocation().getId() + ".\n");
                         try {
                             sb.append("  Client: "
-                                + map.getTile(u.getTile().getPosition())
+                                + map.getTile(u.getTile().getX(),
+                                              u.getTile().getY())
                                 .getFirstUnit().getId() + "\n");
                         } catch (NullPointerException npe) {}
                         problemDetected = true;
@@ -564,12 +565,12 @@ public class DebugUtils {
                             && !cUnit.getTile().getId().equals(u.getTile().getId())) {
                             sb.append("Unit located on different tiles.\n");
                             sb.append("  Server: " + Messages.message(Messages.getLabel(u))
-                                + "(" + u.getId() + "). Position: "
-                                + u.getTile().getPosition() + "\n");
+                                + "(" + u.getId() + ") from: "
+                                + u.getLocation().getId() + "\n");
                             sb.append("  Client: "
                                 + Messages.message(Messages.getLabel(cUnit))
-                                + "(" + cUnit.getId() + "). Position: "
-                                + cUnit.getTile().getPosition() + "\n");
+                                + "(" + cUnit.getId() + ") at: "
+                                + cUnit.getLocation().getId() + "\n");
                             problemDetected = true;
                         }
                     }

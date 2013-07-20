@@ -911,8 +911,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                         && newTile.getOwningSettlement() == null))
                 && serverPlayer.isIndian()
                 && (settlement = getHomeIndianSettlement()) != null
-                && ((d = newTile.getPosition()
-                        .getDistance(settlement.getTile().getPosition()))
+                && ((d = newTile.getDistanceTo(settlement.getTile()))
                     < (settlement.getRadius()
                         + settlement.getType().getExtraClaimableRadius()))
                 && Utils.randomInt(logger, "Claim tribal land", random,

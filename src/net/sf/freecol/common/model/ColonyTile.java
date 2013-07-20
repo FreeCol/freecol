@@ -535,7 +535,7 @@ public class ColonyTile extends WorkLocation {
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
         sb.append("[").append(getId())
-            .append(" ").append(getWorkTile().getPosition().toString())
+            .append(" ").append(getWorkTile())
             .append("/").append(getColony().getName())
             .append("]");
         return sb.toString();
