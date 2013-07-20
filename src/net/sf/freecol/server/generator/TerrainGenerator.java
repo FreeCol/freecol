@@ -871,8 +871,7 @@ public class TerrainGenerator {
             for (int x = 0; x < map.getWidth(); x++) {
                 if (landmap[x][y]) { // Found a new region.
                     continents++;
-                    boolean[][] continent = Map.floodFill(landmap,
-                        new Position(x,y));
+                    boolean[][] continent = Map.floodFill(landmap, x, y);
 
                     for (int yy = 0; yy < map.getHeight(); yy++) {
                         for (int xx = 0; xx < map.getWidth(); xx++) {
@@ -902,13 +901,13 @@ public class TerrainGenerator {
             if (continentsize[c] > LAND_REGION_MAX_SIZE) {
                 boolean[][] splitcontinent
                     = new boolean[map.getWidth()][map.getHeight()];
-                Position splitposition = new Position(0,0);
+                int splitX = 0, splitY = 0;
 
                 for (int x = 0; x < map.getWidth(); x++) {
                     for (int y = 0; y < map.getHeight(); y++) {
                         if (continentmap[x][y] == c) {
                             splitcontinent[x][y] = true;
-                            splitposition = new Position(x,y);
+                            splitX = x; splitY = y;
                         } else {
                             splitcontinent[x][y] = false;
                         }
@@ -921,9 +920,8 @@ public class TerrainGenerator {
                         targetsize = continentsize[c]/2;
                     }
                     continents++; //index of the new region in continentmap[][]
-                    boolean[][] newregion
-                        = Map.floodFill(splitcontinent, splitposition,
-                                        targetsize);
+                    boolean[][] newregion = Map.floodFill(splitcontinent,
+                        splitX, splitY, targetsize);
                     for (int x = 0; x < map.getWidth(); x++) {
                         for (int y = 0; y < map.getHeight(); y++) {
                             if (newregion[x][y]) {
@@ -932,7 +930,7 @@ public class TerrainGenerator {
                                 continentsize[c]--;
                             }
                             if (splitcontinent[x][y]) {
-                                splitposition = new Position(x,y);
+                                splitX = x; splitY = y;
                             }
                         }
                     }

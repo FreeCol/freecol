@@ -1943,12 +1943,13 @@ public class Map extends FreeColGameObject implements Location {
      * connectivity information encoded in boolmap
      *
      * @param boolmap The connectivity information for this floodfill.
-     * @param p The starting <code>Position</code>.
+     * @param x The starting x coordinate.
+     * @param y The starting y coordinate.
      * @return A boolean[][] of the same size as boolmap, where "true"
      *      means the fill succeeded at that location.
      */
-    public static boolean[][] floodFill(boolean[][] boolmap, Position p) {
-        return floodFill(boolmap, p, Integer.MAX_VALUE);
+    public static boolean[][] floodFill(boolean[][] boolmap, int x, int y) {
+        return floodFill(boolmap, x, y, Integer.MAX_VALUE);
     }
 
     /**
@@ -1956,13 +1957,15 @@ public class Map extends FreeColGameObject implements Location {
      * connectivity information encoded in boolmap
      *
      * @param boolmap The connectivity information for this floodfill.
-     * @param p The starting <code>Position</code>.
+     * @param x The starting x coordinate.
+     * @param y The starting y coordinate.
      * @param limit Limit to stop flood fill at.
      * @return A boolean[][] of the same size as boolmap, where "true"
      *      means the fill succeeded at that location.
      */
-    public static boolean[][] floodFill(boolean[][] boolmap, Position p,
+    public static boolean[][] floodFill(boolean[][] boolmap, int x, int y,
                                         int limit) {
+        Position p = new Position(x, y);
         Queue<Position> q = new LinkedList<Position>();
         boolean[][] visited = new boolean[boolmap.length][boolmap[0].length];
         visited[p.getX()][p.getY()] = true;
@@ -2011,8 +2014,7 @@ public class Map extends FreeColGameObject implements Location {
                     Tile tile = getTile(x, y);
                     if (tile.getContiguity() >= 0) continue;
                     
-                    boolean[][] found = floodFill(waterMap,
-                                                  new Position(x, y));
+                    boolean[][] found = floodFill(waterMap, x, y);
                     for (int yy = 0; yy < getHeight(); yy++) {
                         for (int xx = 0; xx < getWidth(); xx++) {
                             if (found[xx][yy]) {
@@ -2042,8 +2044,7 @@ public class Map extends FreeColGameObject implements Location {
                     Tile tile = getTile(x, y);
                     if (tile.getContiguity() >= 0) continue;
                     
-                    boolean[][] found = floodFill(waterMap,
-                                                  new Position(x, y));
+                    boolean[][] found = floodFill(waterMap, x, y);
                     for (int yy = 0; yy < getHeight(); yy++) {
                         for (int xx = 0; xx < getWidth(); xx++) {
                             if (found[xx][yy]) {
