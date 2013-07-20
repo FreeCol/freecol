@@ -33,7 +33,6 @@ import net.sf.freecol.common.model.TileImprovementStyle;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.TileType;
-import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.server.model.ServerRegion;
 import net.sf.freecol.common.util.Utils;
 
@@ -124,7 +123,7 @@ public class River {
     /**
      * A hashtable of position-river pairs.
      */
-    private java.util.Map<Position, River> riverMap;
+    private java.util.Map<Tile, River> riverMap;
 
     /**
      * Whether the river is connected to the high seas.
@@ -140,7 +139,7 @@ public class River {
      * @param region The region for this river.
      * @param random The <code>Random</code> number source to use.
      */
-    public River(Map map, java.util.Map<Position, River> riverMap,
+    public River(Map map, java.util.Map<Tile, River> riverMap,
                  ServerRegion region, Random random) {
         this.map = map;
         this.riverMap = riverMap;
@@ -192,29 +191,29 @@ public class River {
     /**
      * Adds a new section to this river.
      *
-     * @param position Where this section is located.
-     * @param direction The direction the river is flowing in.
+     * @param tile The <code>Tile</code> where this section is located.
+     * @param direction The <code>Direction</code> the river is flowing in.
      */
-    public void add(Position position, Direction direction) {
-        this.sections.add(new RiverSection(position, direction));
+    public void add(Tile tile, Direction direction) {
+        this.sections.add(new RiverSection(tile, direction));
     }
 
     /**
      * Increases the size of this river.
      *
      * @param lastSection The last section of the river flowing into this one.
-     * @param position The position of the confluence.
+     * @param position The tile of the confluence.
      */
-    public void grow(RiverSection lastSection, Position position) {
+    public void grow(RiverSection lastSection, Tile tile) {
 
         boolean found = false;
 
         for (RiverSection section : sections) {
             if (found) {
                 section.grow();
-            } else if (section.getPosition().equals(position)) {
+            } else if (section.getTile().equals(tile)) {
                 section.setBranch(lastSection.direction.getReverseDirection(),
-                        lastSection.getSize());
+                                  lastSection.getSize());
                 section.grow();
                 found = true;
             }
@@ -222,95 +221,81 @@ public class River {
         drawToMap(sections);
         if (nextRiver != null) {
             RiverSection section = sections.get(sections.size() - 1);
-            Position neighbor = section.getPosition().getAdjacent(section.direction);
+            Tile neighbor = section.getTile().getNeighbourOrNull(section.direction);
             nextRiver.grow(section, neighbor);
         }
     }
 
     /**
-     * Returns true if the given position is next to this river.
+     * Returns true if the given tile is next to this river.
      *
-     * @param p A map position.
-     * @return true if the given position is next to this river.
+     * @param tile A map tile.
+     * @return true if the given tile is next to this river.
      */
-    public boolean isNextToSelf(Position p) {
+    public boolean isNextToSelf(Tile tile) {
         for (Direction direction : Direction.longSides) {
-            Position px = p.getAdjacent(direction);
-            if (this.contains(px)) {
-                return true;
-            }
+            Tile t = tile.getNeighbourOrNull(direction);
+            if (this.contains(t)) return true;
         }
         return false;
     }
 
     /**
-     * Returns true if the given position is next to a river, lake or sea.
+     * Returns true if the given tile is next to a river, lake or sea.
      *
-     * @param p A map position.
-     * @return true if the given position is next to a river, lake or sea.
+     * @param tile A map tile.
+     * @return true if the given tile is next to a river, lake or sea.
      */
-    public boolean isNextToWater(Position p) {
+    public boolean isNextToWater(Tile tile) {
         for (Direction direction : Direction.longSides) {
-            Position px = p.getAdjacent(direction);
-            final Tile tile = map.getTile(px);
-            if (tile == null) {
-                continue;
-            }
-            if (!tile.isLand() || tile.hasRiver()) {
-                return true;
-            }
+            Tile t = tile.getNeighbourOrNull(direction);
+            if (t != null && (!t.isLand() || t.hasRiver())) return true;
         }
         return false;
     }
 
     /**
-     * Returns true if this river already contains the given position.
+     * Returns true if this river already contains the given tile.
      *
-     * @param p A map position.
-     * @return true if this river already contains the given position.
+     * @param tile A map tile.
+     * @return true if this river already contains the given tile.
      */
-    public boolean contains(Position p) {
-        Iterator<RiverSection> sectionIterator = sections.iterator();
-        while (sectionIterator.hasNext()) {
-            Position q = sectionIterator.next().getPosition();
-            if (p.equals(q)) {
-                return true;
-            }
+    public boolean contains(Tile tile) {
+        for (RiverSection rs : getSections()) {
+            if (tile == rs.getTile()) return true;
         }
         return false;
     }
 
     /**
-     * Creates a river flowing from the given position if possible.
+     * Creates a river flowing from the given tile if possible.
      *
-     * @param position A map position.
+     * @param position A map tile.
      * @return true if a river was created, false otherwise.
      */
-    public boolean flowFromSource(Position position) {
+    public boolean flowFromSource(Tile tile) {
         TileImprovementType riverType =
             map.getSpecification().getTileImprovementType("model.improvement.river");
-        Tile tile = map.getTile(position);
         if (!tile.getType().canHaveImprovement(riverType)) {
             // Mountains, ocean cannot have rivers
-            logger.fine("Tile (" + tile.getType().toString() + ") at "
-                        + position + " cannot have rivers.");
+            logger.fine("Tile (" + tile + ") can not have a river.");
             return false;
-        } else if (isNextToWater(position)) {
-            logger.fine("Tile at " + position + " is next to water.");
+        } else if (isNextToWater(tile)) {
+            logger.fine("Tile (" + tile + ") is next to water.");
             return false;
         } else {
-            logger.fine("Tile at " + position + " is suitable source.");
-            return flow(position);
+            logger.fine("Tile (" + tile + ") is suitable source.");
+            return flow(tile);
         }
     }
 
     /**
-     * Lets the river flow from the given position.
+     * Lets the river flow from the given tile.
      *
-     * @param source A map position.
+     * @param source A map tile.
      * @return true if a river was created, false otherwise.
      */
-    private boolean flow(Position source) {
+    private boolean flow(Tile source) {
 
         if (sections.size() % 2 == 0) {
             // get random new direction
@@ -323,72 +308,67 @@ public class River {
 
         for (DirectionChange change : DirectionChange.values()) {
             Direction dir = change.getNewDirection(direction);
-            Position newPosition = source.getAdjacent(dir);
-            Tile nextTile = map.getTile(newPosition);
+            Tile nextTile = source.getNeighbourOrNull(dir);
+            if (nextTile == null) continue;
 
-            if (nextTile == null) {
-                continue;
-            }
             // is the tile suitable for this river?
             if (!nextTile.getType().canHaveImprovement(riverType)) {
                 // Mountains, ocean cannot have rivers
-                logger.fine("Tile (" + nextTile.getType().toString() + ") at "
-                            + newPosition + " cannot have rivers.");
+                logger.fine("Tile (" + nextTile + ") can not have a river.");
                 continue;
-            } else if (this.contains(newPosition)) {
-                logger.fine("Tile at " + newPosition + " is already in river.");
+            } else if (this.contains(nextTile)) {
+                logger.fine("Tile (" + nextTile + ") is already in river.");
                 continue;
-            } else if (isNextToSelf(newPosition)) {
-                logger.fine("Tile at " + newPosition + " is next to the river.");
+            } else if (isNextToSelf(nextTile)) {
+                logger.fine("Tile (" + nextTile + ") is next to the river.");
                 continue;
             } else {
                 // find out if an adjacent tile is next to water
                 for (DirectionChange change2 : DirectionChange.values()) {
                     Direction lastDir = change2.getNewDirection(dir);
-                    Position px = newPosition.getAdjacent(lastDir);
-                    Tile tile = map.getTile(px);
-                    if (tile != null && (!tile.isLand() || tile.hasRiver())) {
+                    Tile t = nextTile.getNeighbourOrNull(lastDir);
+                    if (t == null) continue;
+                    if (t.isLand() && !t.hasRiver()) continue;
 
-                        sections.add(new RiverSection(source, dir));
-                        RiverSection lastSection = new RiverSection(newPosition, lastDir);
-                        sections.add(lastSection);
+                    sections.add(new RiverSection(source, dir));
+                    RiverSection lastSection = new RiverSection(nextTile, lastDir);
+                    sections.add(lastSection);
 
-                        if (tile.hasRiver() && tile.isLand()) {
-                            logger.fine("Point " + newPosition + " is next to another river.");
-                            // increase the size of the other river
-                            nextRiver = riverMap.get(px);
-                            nextRiver.grow(lastSection, px);
-                            // if the other river is connected, so is this one
-                            connected |= nextRiver.connected;
-                            // add this region to other river if too small
-                            if (getLength() < 10) {
-                                region = nextRiver.region;
-                            }
-                            drawToMap(sections);
-                        } else {
-                            // flow into the sea (or a lake)
-                            logger.fine("Point " + newPosition + " is next to water.");
-                            River someRiver = riverMap.get(px);
-                            if (someRiver == null) {
-                                sections.add(new RiverSection(px, lastDir.getReverseDirection()));
-                                if (lastSection.getSize() < TileImprovement.FJORD_RIVER) {
-                                    createDelta(newPosition, lastDir, lastSection);
-                                }
-                            } else {
-                                RiverSection waterSection = someRiver.getLastSection();
-                                waterSection.setBranch(lastDir.getReverseDirection(),
-                                                       TileImprovement.SMALL_RIVER);
-                            }
-                            connected |= tile.isHighSeasConnected();
-                            drawToMap(sections);
+                    if (t.hasRiver() && t.isLand()) {
+                        logger.fine("Tile (" + t + ") is next to another river.");
+                        // increase the size of the other river
+                        nextRiver = riverMap.get(t);
+                        nextRiver.grow(lastSection, t);
+                        // if the other river is connected, so is this one
+                        connected |= nextRiver.connected;
+                        // add this region to other river if too small
+                        if (getLength() < 10) {
+                            region = nextRiver.region;
                         }
-                        return true;
+                        drawToMap(sections);
+                    } else {
+                        // flow into the sea (or a lake)
+                        logger.fine("Tile (" + t + ") is next to water.");
+                        River someRiver = riverMap.get(t);
+                        if (someRiver == null) {
+                            sections.add(new RiverSection(t, lastDir.getReverseDirection()));
+                            if (lastSection.getSize() < TileImprovement.FJORD_RIVER) {
+                                createDelta(nextTile, lastDir, lastSection);
+                            }
+                        } else {
+                            RiverSection waterSection = someRiver.getLastSection();
+                            waterSection.setBranch(lastDir.getReverseDirection(),
+                                TileImprovement.SMALL_RIVER);
+                        }
+                        connected |= t.isHighSeasConnected();
+                        drawToMap(sections);
                     }
+                    return true;
                 }
-                // this is not the case
-                logger.fine("Tile at " + newPosition + " is suitable.");
+                // not next to water
+                logger.fine("Tile (" + nextTile + ") is suitable.");
                 sections.add(new RiverSection(source, dir));
-                return flow(newPosition);
+                return flow(nextTile);
             }
         }
         sections = new ArrayList<RiverSection>();
@@ -398,32 +378,30 @@ public class River {
     /**
      * Describe <code>createDelta</code> method here.
      *
-     * @param position a <code>Position</code> value
+     * @param tile A <code>Tile</code> value
      * @param direction a <code>Direction</code> value
      */
-    private void createDelta(Position position, Direction direction, RiverSection section) {
-        delta(position, direction, section, DirectionChange.LEFT_TURN.getNewDirection(direction));
-        delta(position, direction, section, DirectionChange.RIGHT_TURN.getNewDirection(direction));
+    private void createDelta(Tile tile, Direction direction, RiverSection section) {
+        delta(tile, direction, section, DirectionChange.LEFT_TURN.getNewDirection(direction));
+        delta(tile, direction, section, DirectionChange.RIGHT_TURN.getNewDirection(direction));
     }
 
-    private void delta(Position position, Direction direction, RiverSection section, Direction d) {
-        Position p = position.getAdjacent(d);
-        Tile tile = map.getTile(p);
-        if (!tile.isLand()) {
+    private void delta(Tile tile, Direction direction, RiverSection section, Direction d) {
+        Tile t = tile.getNeighbourOrNull(d);
+        if (!t.isLand()) {
             List<RiverSection> deltaSections = new ArrayList<RiverSection>();
             section.setBranch(d, TileImprovement.SMALL_RIVER);
-            deltaSections.add(new RiverSection(p, d.getReverseDirection()));
+            deltaSections.add(new RiverSection(tile, d.getReverseDirection()));
             drawToMap(deltaSections);
-        } else if (tile.getType().canHaveImprovement(riverType)) {
-            Position p2 = p.getAdjacent(direction);
-            Tile tile2 = map.getTile(p2);
-            if (!tile2.isLand() && Utils.randomInt(logger, "Delta", random, 2) == 0) {
+        } else if (t.getType().canHaveImprovement(riverType)) {
+            Tile t2 = t.getNeighbourOrNull(direction);
+            if (!t2.isLand() && Utils.randomInt(logger, "Delta", random, 2) == 0) {
                 List<RiverSection> deltaSections = new ArrayList<RiverSection>();
                 section.setBranch(d, TileImprovement.SMALL_RIVER);
-                RiverSection rs = new RiverSection(p, direction);
+                RiverSection rs = new RiverSection(t, direction);
                 rs.setBranch(d.getReverseDirection(), TileImprovement.SMALL_RIVER);
                 deltaSections.add(rs);
-                rs = new RiverSection(p2, direction.getReverseDirection());
+                rs = new RiverSection(t2, direction.getReverseDirection());
                 deltaSections.add(rs);
                 drawToMap(deltaSections);
             }
@@ -438,12 +416,12 @@ public class River {
         RiverSection oldSection = null;
 
         for (RiverSection section : sections) {
-            riverMap.put(section.getPosition(), this);
+            riverMap.put(section.getTile(), this);
             if (oldSection != null) {
                 section.setBranch(oldSection.direction.getReverseDirection(),
-                        oldSection.getSize());
+                                  oldSection.getSize());
             }
-            Tile tile = map.getTile(section.getPosition());
+            Tile tile = section.getTile();
             if (tile.isLand()) {
                 if (section.getSize() >= TileImprovement.FJORD_RIVER) {
                     TileType greatRiver = map.getSpecification().getTileType("model.tile.greatRiver");
@@ -451,14 +429,13 @@ public class River {
                     // changing the type resets the improvements
                     //container.addRiver(section.getSize(), section.encodeStyle());
                     logger.fine("Added fjord (magnitude: " + section.getSize() +
-                                ") to tile at " + section.getPosition());
+                                ") to tile: " + section.getTile());
                 } else if (section.getSize() > TileImprovement.NO_RIVER) {
                     String style = section.encodeStyle();
                     tile.addRiver(section.getSize(), style);
                     logger.fine("Added river"
                         + "(magnitude: " + section.getSize()
-                        + " style: " + style
-                        + ") at " + section.getPosition());
+                        + " style: " + style);
                 }
                 region.addTile(tile);
                 oldSection = section;

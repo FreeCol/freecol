@@ -33,7 +33,6 @@ import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
-import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Region.RegionType;
 import net.sf.freecol.common.model.Resource;
@@ -1250,7 +1249,7 @@ public class TerrainGenerator {
         final int number = getApproximateLandCount()
             / mapOptions.getInteger(MapGeneratorOptions.RIVER_NUMBER);
         int counter = 0;
-        HashMap<Position, River> riverMap = new HashMap<Position, River>();
+        HashMap<Tile, River> riverMap = new HashMap<Tile, River>();
         List<River> rivers = new ArrayList<River>();
 
         for (int i = 0; i < number; i++) {
@@ -1268,7 +1267,7 @@ public class TerrainGenerator {
                         continue nextTry;
                     }
                 }
-                if (riverMap.get(tile.getPosition()) == null) {
+                if (riverMap.get(tile) == null) {
                     // no river here yet
                     ServerRegion riverRegion = new ServerRegion(map.getGame(),
                         "model.region.river" + i, Region.RegionType.RIVER,
@@ -1276,7 +1275,7 @@ public class TerrainGenerator {
                     riverRegion.setDiscoverable(true);
                     riverRegion.setClaimable(true);
                     River river = new River(map, riverMap, riverRegion, random);
-                    if (river.flowFromSource(tile.getPosition())) {
+                    if (river.flowFromSource(tile)) {
                         logger.fine("Created new river with length "
                             + river.getLength());
                         map.putRegion(riverRegion);

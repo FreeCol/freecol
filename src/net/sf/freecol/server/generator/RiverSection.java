@@ -22,8 +22,10 @@ package net.sf.freecol.server.generator;
 //import java.util.logging.Logger;
 
 import java.util.EnumMap;
+
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 
 
@@ -61,9 +63,10 @@ public class RiverSection {
     public Direction direction;
 
     /**
-     * Position of the current river section
+     * Tile of the current river section
      */
-    private Map.Position position;
+    private Tile tile;
+
 
     /**
      * Creates a new RiverSection with the given branches. This
@@ -78,21 +81,22 @@ public class RiverSection {
     /**
      * Constructor used to automatically generate rivers.
      *
-     * @param position The map position
+     * @param tile The map tile
      * @param direction The direction the river is flowing toward
      */
-    public RiverSection(Map.Position position, Direction direction) {
-        this.position = position;
+    public RiverSection(Tile tile, Direction direction) {
+        this.tile = tile;
         this.direction = direction;
         setBranch(direction, TileImprovement.SMALL_RIVER);
     }
 
     /**
-     * Returns the position
-     * @return position
+     * Get the section tile.
+     *
+     * @return The <code>Tile</code>.
      */
-    public Map.Position getPosition() {
-        return position;
+    public Tile getTile() {
+        return tile;
     }
 
     /**
@@ -157,6 +161,4 @@ public class RiverSection {
         }
         return result;
     }
-
-
 }
