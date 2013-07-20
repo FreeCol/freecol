@@ -1123,7 +1123,9 @@ public class SimpleMapGenerator implements MapGenerator {
         }
 
         public Position getCenter() {
-            return (position == null) ? region.getCenter() : position;
+            if (position != null) return position;
+            int[] xy = region.getCenter();
+            return new Position(xy[0], xy[1]);
         }
 
         public Tile getCenterTile(Map map) {

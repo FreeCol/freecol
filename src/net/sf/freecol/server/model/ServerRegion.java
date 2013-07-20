@@ -22,7 +22,6 @@ package net.sf.freecol.server.model;
 import java.awt.Rectangle;
 
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Tile;
 
@@ -32,14 +31,10 @@ import net.sf.freecol.common.model.Tile;
  */
 public class ServerRegion extends Region {
 
-    /**
-     * The size of this Region (number of Tiles).
-     */
+    /** The size of this Region (number of Tiles). */
     private int size = 0;
 
-    /**
-     * A Rectangle that contains all points of the Region.
-     */
+    /** A Rectangle that contains all points of the Region. */
     private Rectangle bounds = new Rectangle();
 
 
@@ -76,52 +71,53 @@ public class ServerRegion extends Region {
         setParent(parent);
     }
 
+
     /**
-     * Get the <code>Size</code> value.
+     * Get the number of tiles in this region.
      *
-     * @return an <code>int</code> value
+     * @return The number of tiles in this region.
      */
     public final int getSize() {
         return size;
     }
 
     /**
-     * Set the <code>Size</code> value.
+     * Set the number of tiles in this region.
      *
-     * @param newSize The new Size value.
+     * @param size The new number of tiles.
      */
-    public final void setSize(final int newSize) {
-        this.size = newSize;
+    public final void setSize(final int size) {
+        this.size = size;
     }
 
     /**
-     * Get the <code>Bounds</code> value.
+     * Get the bounding rectangle for this region.
      *
-     * @return a <code>Rectangle</code> value
+     * @return The bounding <code>Rectangle</code>.
      */
     public final Rectangle getBounds() {
         return bounds;
     }
 
     /**
-     * Set the <code>Bounds</code> value.
+     * Set the bounding rectangle for this region.
      *
-     * @param newBounds The new Bounds value.
+     * @param newBounds A new bounding <code>Rectangle</code>.
      */
     public final void setBounds(final Rectangle newBounds) {
         this.bounds = newBounds;
     }
 
     /**
-     * Add the given Tile to this Region.
+     * Add the given tile to this region.
      *
-     * @param tile a <code>Tile</code> value
+     * @param tile A <code>Tile</code> to add.
      */
     public void addTile(Tile tile) {
         tile.setRegion(this);
         size++;
-        if (bounds.x == 0 && bounds.width == 0 ||
-            bounds.y == 0 && bounds.height == 0) {
+        if (bounds.x == 0 && bounds.width == 0
+            || bounds.y == 0 && bounds.height == 0) {
             bounds.setBounds(tile.getX(), tile.getY(), 0, 0);
         } else {
             bounds.add(tile.getX(), tile.getY());
@@ -129,14 +125,30 @@ public class ServerRegion extends Region {
     }
 
     /**
-     * Return the center of the Region's bounding box.
+     * Get the center of the regions bounds.
      *
-     * @return a <code>Position</code> value
+     * @return An two element array [x,y] of the center coordinate.
      */
-    public Position getCenter() {
-        return new Position(bounds.x + bounds.width/2, bounds.y + bounds.height/2);
+    public int[] getCenter() {
+        return new int[] { bounds.x + bounds.width/2,
+                           bounds.y + bounds.height/2 };
     }
 
+    /**
+     * Does this region contain the center of another?
+     *
+     * @param other The other <code>ServerRegion</code> to check.
+     * @return True if the center of the other region is within this one.
+     */
+    public boolean containsCenter(ServerRegion other) {
+        int[] xy = other.getCenter();
+        return bounds.contains(xy[0], xy[1]);
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
