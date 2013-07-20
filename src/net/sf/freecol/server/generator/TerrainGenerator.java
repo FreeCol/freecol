@@ -602,24 +602,16 @@ public class TerrainGenerator {
         final int maxy = map.getHeight();
         final int midy = maxy / 2;
 
-        Position pNP = null, pSP = null, pNA = null, pSA = null;
+        Tile tNP = null, tSP = null, tNA = null, tSA = null, t;
         for (int y = midy-1; y >= 0; y--) {
-            if (pNP == null && !map.getTile(0, y).isLand()) {
-                pNP = new Position(0, y);
-            }
-            if (pNA == null && !map.getTile(maxx-1, y).isLand()) {
-                pNA = new Position(maxx-1, y);
-            }
-            if (pNP != null && pNA != null) break;
+            if (tNP == null && !(t = map.getTile(0, y)).isLand()) tNP = t;
+            if (tNA == null && !(t = map.getTile(maxx-1, y)).isLand()) tNA = t;
+            if (tNP != null && tNA != null) break;
         }
         for (int y = midy; y < maxy; y++) {
-            if (pSP == null && !map.getTile(0, y).isLand()) {
-                pSP = new Position(0, y);
-            }
-            if (pSA == null && !map.getTile(maxx-1, y).isLand()) {
-                pSA = new Position(maxx-1, y);
-            }
-            if (pSP != null && pSA != null) break;
+            if (tSP == null && !(t = map.getTile(0, y)).isLand()) tSP = t;
+            if (tSA == null && !(t = map.getTile(maxx-1, y)).isLand()) tSA = t;
+            if (tSP != null && tSA != null) break;
         }
         int nNP = 0, nSP = 0, nNA = 0, nSA = 0;
 
@@ -627,23 +619,23 @@ public class TerrainGenerator {
         Rectangle rSP = new Rectangle(0,midy,    midx,maxy);
         Rectangle rNA = new Rectangle(midx,0,    maxx,midy);
         Rectangle rSA = new Rectangle(midx,midy, maxx,maxy);
-        if (pNP != null) nNP += fillOcean(map, pNP, northPacific,  rNP);
-        if (pSP != null) nSP += fillOcean(map, pSP, southPacific,  rSP);
-        if (pNA != null) nNA += fillOcean(map, pNA, northAtlantic, rNA);
-        if (pSA != null) nSA += fillOcean(map, pSA, southAtlantic, rSA);
+        if (tNP != null) nNP += fillOcean(map, tNP, northPacific,  rNP);
+        if (tSP != null) nSP += fillOcean(map, tSP, southPacific,  rSP);
+        if (tNA != null) nNA += fillOcean(map, tNA, northAtlantic, rNA);
+        if (tSA != null) nSA += fillOcean(map, tSA, southAtlantic, rSA);
 
         Rectangle rN = new Rectangle(0,0,    maxx,midy);
         Rectangle rS = new Rectangle(0,midy, maxx,maxy);
-        if (pNP != null) nNP += fillOcean(map, pNP, northPacific,  rN);
-        if (pSP != null) nSP += fillOcean(map, pSP, southPacific,  rS);
-        if (pNA != null) nNA += fillOcean(map, pNA, northAtlantic, rN);
-        if (pSA != null) nSA += fillOcean(map, pSA, southAtlantic, rS);
+        if (tNP != null) nNP += fillOcean(map, tNP, northPacific,  rN);
+        if (tSP != null) nSP += fillOcean(map, tSP, southPacific,  rS);
+        if (tNA != null) nNA += fillOcean(map, tNA, northAtlantic, rN);
+        if (tSA != null) nSA += fillOcean(map, tSA, southAtlantic, rS);
 
         Rectangle rAll = new Rectangle(0,0, maxx,maxy);
-        if (pNP != null) nNP += fillOcean(map, pNP, northPacific,  rAll);
-        if (pSP != null) nSP += fillOcean(map, pSP, southPacific,  rAll);
-        if (pNA != null) nNA += fillOcean(map, pNA, northAtlantic, rAll);
-        if (pSA != null) nSA += fillOcean(map, pSA, southAtlantic, rAll);
+        if (tNP != null) nNP += fillOcean(map, tNP, northPacific,  rAll);
+        if (tSP != null) nSP += fillOcean(map, tSP, southPacific,  rAll);
+        if (tNA != null) nNA += fillOcean(map, tNA, northAtlantic, rAll);
+        if (tSA != null) nSA += fillOcean(map, tSA, southAtlantic, rAll);
 
         if (nNP <= 0) logger.warning("No North Pacific tiles found");
         if (nSP <= 0) logger.warning("No South Pacific tiles found");
@@ -660,34 +652,32 @@ public class TerrainGenerator {
      * Flood fill ocean regions.
      *
      * @param map The <code>Map</code> to fill in.
-     * @param p A valid starting <code>Position</code>.
+     * @param tile A valid starting <code>Tile</code>.
      * @param region A <code>ServerRegion</code> to fill with.
      * @param bounds A <code>Rectangle</code> that bounds the filling.
      * @return The number of tiles filled.
      */
-    private int fillOcean(Map map, Position p, ServerRegion region,
+    private int fillOcean(Map map, Tile tile, ServerRegion region,
                           Rectangle bounds) {
-        Queue<Position> q = new LinkedList<Position>();
+        Queue<Tile> q = new LinkedList<Tile>();
         int n = 0;
         boolean[][] visited = new boolean[map.getWidth()][map.getHeight()];
-        visited[p.getX()][p.getY()] = true;
-        q.add(p);
+        visited[tile.getX()][tile.getY()] = true;
+        q.add(tile);
 
-        while ((p = q.poll()) != null) {
-            Tile tile = map.getTile(p);
+        while ((tile = q.poll()) != null) {
             region.addTile(tile);
             n++;
 
             for (Direction direction : Direction.values()) {
-                Position next = p.getAdjacent(direction);
-                if (map.isValid(next)
-                    && !visited[next.getX()][next.getY()]
-                    && bounds.contains(next.getX(), next.getY())) {
-                    visited[next.getX()][next.getY()] = true;
-                    Tile t = map.getTile(next);
+                Tile t = map.getAdjacentTile(tile, direction);
+                if (t != null
+                    && !visited[t.getX()][t.getY()]
+                    && bounds.contains(t.getX(), t.getY())) {
+                    visited[t.getX()][t.getY()] = true;
                     if ((t.getRegion() == null || t.getRegion() == region)
                         && !t.isLand()) {
-                        q.add(next);
+                        q.add(t);
                     }
                 }
             }

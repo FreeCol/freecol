@@ -747,18 +747,30 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Gets the adjacent Tile in a given direction.
+     * Gets the adjacent tile in a given direction from the given coordinates.
      *
      * @param x The x coordinate to work from.
      * @param y The y coordinate to work from.
      * @param direction The <code>Direction</code> to check.
-     * @return The adjacent tile in the specified direction, or null
-     *     if invalid.
+     * @return The adjacent <code>Tile</code> in the specified
+     *     direction, or null if invalid.
      */
     public Tile getAdjacentTile(int x, int y, Direction direction) {
         x += ((y & 1) != 0) ? direction.getOddDX() : direction.getEvenDX();
         y += ((y & 1) != 0) ? direction.getOddDY() : direction.getEvenDY();
         return getTile(x, y);
+    }
+
+    /**
+     * Gets the adjacent tile in a given direction from a given tile.
+     *
+     * @param tile The starting <code>Tile</code>.
+     * @param direction The <code>Direction</code> to check.
+     * @return The adjacent <code>Tile</code> in the specified
+     *     direction, or null if invalid.
+     */
+    public Tile getAdjacentTile(Tile tile, Direction direction) {
+        return getAdjacentTile(tile.getX(), tile.getY(), direction);
     }
 
 
