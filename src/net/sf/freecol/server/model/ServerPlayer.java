@@ -874,8 +874,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * to carry it.  Fill greedily, so as if there is excess naval
      * capacity then the naval units at the end of the list will tend
      * to be empty or very lightly filled, allowing them to defend the
-     * whole fleet at full strength. Returns a list of units that
+     * whole fleet at full strength.  Returns a list of units that
      * could not be placed on ships.
+     *
+     * -vis: Has visibility implications depending on the initial
+     * location of the loaded units.  Usually ATM this is Europe which
+     * is safe, but beware.
      *
      * @param landUnits A list of land units to put on ships.
      * @param navalUnits A list of ships to put land units on.
@@ -890,7 +894,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         landUnit: for (Unit unit : landUnits) {
             for (Unit carrier : navalUnits) {
                 if (carrier.canAdd(unit)) {
-                    unit.setLocation(carrier);
+                    unit.setLocation(carrier);//-vis(owner)
                     logger.finest("Loading " + unit
                         + " onto carrier " + carrier);
                     continue landUnit;
@@ -1174,11 +1178,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
                                                    entryLocation);//-vis(this)
                 List<Unit> navalUnits = createUnits(ivf.getNavalUnits(),
                                                     entryLocation);//-vis(this)
-                List<Unit> leftOver = loadShips(landUnits, navalUnits, random);
+                List<Unit> leftOver = loadShips(landUnits, navalUnits,
+                                                random);//-vis(this)
                 for (Unit unit : leftOver) {
                     // no use for left over units
                     logger.warning("Disposing of left over unit " + unit);
-                    unit.setLocationNoUpdate(null);
+                    unit.setLocationNoUpdate(null);//-vis: safe, off map
                     unit.disposeList();//-vis: safe, never sighted
                 }
                 invalidateCanSeeTiles();//+vis(this)
@@ -1613,15 +1618,15 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         random);
                     brave.clearEquipment();
                     brave.setRole(Unit.Role.DEFAULT);
-                    brave.changeOwner(other);//-vis: but within colony so safe
+                    brave.changeOwner(other);//-vis: safe/colony
                     brave.setHomeIndianSettlement(null);
                     brave.setNationality(other.getNationId());
-                    brave.setType(Utils.getRandomMember(logger,//-vis: as above
+                    brave.setType(Utils.getRandomMember(logger,//-vis: ditto
                                   "Choose convert type", converts, random));
-                    brave.setLocation(colony.getTile());
+                    brave.setLocation(colony.getTile());//-vis: safe/colony
                     cs.add(See.only(this), settlement);
                     cs.addDispose(See.only(this), settlement.getTile(),
-                                  brave);//-vis: again safe
+                                  brave);//-vis: safe/settlement
                     cs.add(See.only(other), colony.getTile());
                     cs.addMessage(See.only(other),
                         new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
@@ -1890,8 +1895,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         UnitType recruitType = europe.getRecruitable(index);
         Game game = getGame();
         Unit unit = new ServerUnit(game, europe, this,
-                                   recruitType);//-vis: Europe
-        unit.setLocation(europe);
+                                   recruitType);//-vis: safe/Europe
 
         // Handle migration type specific changes.
         switch (type) {

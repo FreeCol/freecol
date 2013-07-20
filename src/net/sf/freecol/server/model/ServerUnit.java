@@ -174,7 +174,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             nationality = owner.getNationId();
             ethnicity = nationality;
         }
-        setLocation(location);
+        setLocation(location);//-vis(owner)
 
         workLeft = -1;
         workType = null;
@@ -193,7 +193,6 @@ public class ServerUnit extends Unit implements ServerModelObject {
         setStateUnchecked(state);
 
         owner.addUnit(this);
-        owner.invalidateCanSeeTiles();
     }
 
 
@@ -351,7 +350,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                         .add("%europe%", europe.getNameKey()));
                 }
                 setState(UnitState.ACTIVE);
-                setLocation(europe);
+                setLocation(europe);//-vis: safe/Europe
                 cs.add(See.only(owner), owner.getHighSeas());
                 return true;
             } else if (result instanceof Tile) {
@@ -880,9 +879,11 @@ public class ServerUnit extends Unit implements ServerModelObject {
         }
 
         // Do the move and explore a rumour if needed.
-        setLocation(newTile);
+        setLocation(newTile);//-vis(serverPlayer)
         if (newTile.hasLostCityRumour() && serverPlayer.isEuropean()) {
-            csExploreLostCityRumour(random, cs);
+            csExploreLostCityRumour(random, cs);//+vis(serverPlayer)
+        } else {
+            serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
         }
 
         // Unless moving in from off-map, update the old location and
@@ -891,9 +892,9 @@ public class ServerUnit extends Unit implements ServerModelObject {
         // make no discoveries.  Always update the new tile.
         if (oldLocation instanceof Tile) {
             cs.addMove(See.perhaps().always(serverPlayer), this,
-                oldLocation, newTile);
+                       oldLocation, newTile);
             cs.add(See.perhaps().always(serverPlayer),
-                (FreeColGameObject)oldLocation);
+                   (FreeColGameObject)oldLocation);
         } else {
             cs.add(See.only(serverPlayer), (FreeColGameObject)oldLocation);
         }

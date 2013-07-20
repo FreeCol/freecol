@@ -48,6 +48,7 @@ import net.sf.freecol.common.model.LastSale;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
+import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Region;
@@ -218,6 +219,8 @@ public final class InGameInputHandler extends InputHandler {
      * @return The reply.
      */
     public Element update(Element updateElement) {
+        final Player player = getFreeColClient().getMyPlayer();
+        boolean visibilityChange = false;
         NodeList nodeList = updateElement.getChildNodes();
         for (int i = 0; i < nodeList.getLength(); i++) {
             Element element = (Element) nodeList.item(i);
@@ -228,8 +231,14 @@ public final class InGameInputHandler extends InputHandler {
             } else {
                 fcgo.readFromXMLElement(element);
             }
+            if ((fcgo instanceof Player && ((Player)fcgo == player))
+                || ((fcgo instanceof Settlement || fcgo instanceof Unit)
+                    && player.owns((Ownable)fcgo))) {
+                visibilityChange = true;//-vis(player)
+            }
         }
 
+        if (visibilityChange) player.invalidateCanSeeTiles();//+vis(player)
         new RefreshCanvasSwingTask().invokeLater();
         return null;
     }
@@ -245,6 +254,7 @@ public final class InGameInputHandler extends InputHandler {
         String ds = removeElement.getAttribute("divert");
         FreeColGameObject divert = game.getFreeColGameObject(ds);
         Player player = getFreeColClient().getMyPlayer();
+        boolean visibilityChange = false;
         NodeList nodeList = removeElement.getChildNodes();
         for (int i = 0; i < nodeList.getLength(); i++) {
             Element element = (Element) nodeList.item(i);
@@ -259,16 +269,17 @@ public final class InGameInputHandler extends InputHandler {
                 }
                 if (fcgo instanceof Settlement) {
                     player.removeSettlement((Settlement)fcgo);
+                    visibilityChange = true;//-vis(player)
 
                 } else if (fcgo instanceof Unit) {
                     // Deselect the object if it is the current active unit.
-                    Unit u = (Unit) fcgo;
-                    player.invalidateCanSeeTiles();
+                    Unit u = (Unit)fcgo;
                     if (u == getGUI().getActiveUnit()) {
                         getGUI().setActiveUnit(null);
                     }
                     // Temporary hack until we have real containers.
                     player.removeUnit(u);
+                    visibilityChange = true;//-vis(player)
                 }
 
                 // Do just the low level dispose that removes
@@ -277,6 +288,8 @@ public final class InGameInputHandler extends InputHandler {
                 fcgo.fundamentalDispose();
             }
         }
+
+        if (visibilityChange) player.invalidateCanSeeTiles();//+vis(player)
         new RefreshCanvasSwingTask().invokeLater();
         return null;
     }

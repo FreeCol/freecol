@@ -591,18 +591,24 @@ public class ServerColony extends Colony implements ServerModelObject {
      * Called on building type changes, see below and
      * @see ServerPlayer#csDamageBuilding
      *
-     * @param building The <code>Building</code> to eject from.
+     * @param workLocation The <code>WorkLocation</code> to eject from.
      * @param units A list of <code>Unit</code>s to eject.
+     * @return True if units were ejected.
      */
-    public void ejectUnits(Building building, List<Unit> units) {
+    public boolean ejectUnits(WorkLocation workLocation, List<Unit> units) {
+        if (units == null || units.isEmpty()) return false;
         unit: for (Unit u : units) {
             for (WorkLocation wl : getAvailableWorkLocations()) {
-                if (wl == building || !wl.canAdd(u)) continue;
-                u.setLocation(wl);
+                if (wl == workLocation || !wl.canAdd(u)) continue;
+                u.setLocation(wl);//-vis: safe/colony
                 continue unit;
             }
-            u.setLocation(getTile());
+            u.setLocation(getTile());//-vis: safe/colony
         }
+        if (getOwner().isAI()) {
+            firePropertyChange(REARRANGE_WORKERS, true, false);
+        }
+        return true;
     }
 
     /**
@@ -645,7 +651,6 @@ public class ServerColony extends Colony implements ServerModelObject {
             if (owner.isAI()) {
                 firePropertyChange(REARRANGE_WORKERS, true, false);
             }
-            
         }
         return success;
     }
@@ -719,30 +724,25 @@ public class ServerColony extends Colony implements ServerModelObject {
      * @param enemyUnit The <code>Unit</code> that has moved in.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    public void csEvictUser(Unit enemyUnit, ChangeSet cs) {
-        ServerPlayer serverPlayer = (ServerPlayer) getOwner();
+    public void csEvictUsers(Unit enemyUnit, ChangeSet cs) {
+        ServerPlayer serverPlayer = (ServerPlayer)getOwner();
         Tile tile = enemyUnit.getTile();
-        ServerColonyTile ct = (ServerColonyTile) getColonyTile(tile);
-        if (ct == null || ct.isEmpty()) return;
-        Tile centerTile = getTile();
+        ServerColonyTile ct = (ServerColonyTile)getColonyTile(tile);
+        if (ct == null || !ejectUnits(ct, ct.getUnitList())) return;
 
-        for (Unit unit : ct.getUnitList()) {
-            unit.setLocation(centerTile);
-            cs.addMessage(See.only(serverPlayer),
-                new ModelMessage(ModelMessage.MessageType.WARNING,
-                    "model.colony.workerEvicted", this, this)
-                    .addName("%colony%", getName())
-                    .addStringTemplate("%unit%", unit.getLabel())
-                    .addStringTemplate("%location%", tile.getLocationName())
-                    .addStringTemplate("%enemyUnit%", enemyUnit.getLabel()));
-        }
+        cs.addMessage(See.only(serverPlayer),
+            new ModelMessage(ModelMessage.MessageType.WARNING,
+                             "model.colony.workersEvicted", this, this)
+                .addName("%colony%", getName())
+                .addStringTemplate("%location%", tile.getLocationName())
+                .addStringTemplate("%enemyUnit%", enemyUnit.getLabel()));
         cs.add(See.only(serverPlayer), ct);
-        cs.add(See.perhaps(), centerTile);
+        cs.add(See.perhaps(), getTile()); // Colony size might have changed
     }
 
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "serverColony"
      */

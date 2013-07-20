@@ -330,9 +330,9 @@ public class ServerGame extends Game implements ServerModelObject {
                 unit.changeOwner(strongestAIPlayer); //-vis(both)
                 logMe += " " + unit.getId();
                 if (unit.getLocation() instanceof Europe) {
-                    unit.setLocation(strongestAIPlayer.getEurope());
+                    unit.setLocation(strongestAIPlayer.getEurope());//-vis
                 } else if (unit.getLocation() instanceof HighSeas) {
-                    unit.setLocation(strongestAIPlayer.getHighSeas());
+                    unit.setLocation(strongestAIPlayer.getHighSeas());//-vis
                 }
                 cs.add(See.perhaps(), unit);
             }

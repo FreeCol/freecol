@@ -81,6 +81,9 @@ import net.sf.freecol.server.model.ServerUnit;
 
 /**
  * Creates random maps and sets the starting locations for the players.
+ *
+ * No visibility implications here as this all happens pre-game,
+ * so no +/-vis annotations are needed.
  */
 public class SimpleMapGenerator implements MapGenerator {
 

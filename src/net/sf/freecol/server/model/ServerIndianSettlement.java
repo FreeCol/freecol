@@ -161,7 +161,7 @@ public class ServerIndianSettlement extends IndianSettlement
                 owner.csDisposeSettlement(this, cs);//+vis(owner)
                 return;
             }
-            tile.getFirstUnit().setLocation(this);
+            tile.getFirstUnit().setLocation(this);//-vis: safe in settlement
         }
 
         // Check for new resident.

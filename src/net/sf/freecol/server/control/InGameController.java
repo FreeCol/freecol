@@ -345,15 +345,15 @@ public final class InGameController extends Controller {
         // Instantiate the REF in Europe
         Monarch.Force exf = monarch.getExpeditionaryForce();
         List<Unit> landUnits = refPlayer.createUnits(exf.getLandUnits(),
-                                                     europe);//-vis: safe/Europe
+                                                     europe);//-vis: safe!map
         List<Unit> navalUnits = refPlayer.createUnits(exf.getNavalUnits(),
-                                                     europe);//-vis: safe/Europe
-        refPlayer.loadShips(landUnits, navalUnits, random);
+                                                     europe);//-vis: safe!map
+        refPlayer.loadShips(landUnits, navalUnits, random);//-vis: safe!map
         // Send the navy on its way
         for (Unit u : navalUnits) {
             u.setWorkLeft(1);
             u.setDestination(getGame().getMap());
-            u.setLocation(u.getOwner().getHighSeas());
+            u.setLocation(u.getOwner().getHighSeas());//-vis: safe!map
         }
 
         return refPlayer;
@@ -784,11 +784,12 @@ public final class InGameController extends Controller {
                 if (teleport) {
                     for (Unit u : player.getUnits()) {
                         if (u.isNaval()) {
-                            u.setLocation(entry);
+                            u.setLocation(entry);//-vis(player)
                             u.setWorkLeft(-1);
                             u.setState(Unit.UnitState.ACTIVE);
                         }
                     }
+                    player.invalidateCanSeeTiles();//+vis(player)
                     cs.add(See.perhaps(), entry);
                 }
             }
@@ -1800,7 +1801,8 @@ public final class InGameController extends Controller {
                 unit.setWorkLeft(unit.getSailTurns());
                 unit.setDestination(destination);
                 unit.setMovesLeft(0);
-                unit.setLocation(highSeas);
+                unit.setLocation(highSeas);//-vis(serverPlayer)
+                serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
                 cs.addDisappear(serverPlayer, tile, unit);
                 cs.add(See.only(serverPlayer), tile, highSeas);
                 others = true;
@@ -1826,7 +1828,8 @@ public final class InGameController extends Controller {
                 unit.setWorkLeft(unit.getSailTurns());
                 unit.setDestination(destination);
                 unit.setMovesLeft(0);
-                unit.setLocation(highSeas);
+                unit.setLocation(highSeas);//-vis: safe!map
+                serverPlayer.invalidateCanSeeTiles();
                 cs.add(See.only(serverPlayer), europe, highSeas);
             } else {
                 invalid = true;
@@ -1846,7 +1849,7 @@ public final class InGameController extends Controller {
                 unit.setWorkLeft(unit.getSailTurns());
                 unit.setDestination(destination);
                 unit.setMovesLeft(0);
-                unit.setLocation(highSeas);
+                unit.setLocation(highSeas);//-vis: safe!map
                 cs.add(See.only(serverPlayer), europe, highSeas);
             } else {
                 invalid = true;
@@ -1889,7 +1892,7 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
 
         Location oldLocation = unit.getLocation();
-        unit.setLocation(carrier);
+        unit.setLocation(carrier);//-vis: only if on a different tile
         unit.setMovesLeft(0);
         cs.add(See.only(serverPlayer), (FreeColGameObject)oldLocation);
         if (carrier.getLocation() != oldLocation) {
@@ -1899,6 +1902,7 @@ public final class InGameController extends Controller {
             if (carrier.getTile() != (Tile)oldLocation) {
                 cs.addMove(See.only(serverPlayer), unit, (Tile)oldLocation,
                            carrier.getTile());
+                serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
             }
             cs.addDisappear(serverPlayer, (Tile)oldLocation, unit);
         }
@@ -1932,7 +1936,8 @@ public final class InGameController extends Controller {
         Location newLocation = carrier.getLocation();
         List<Tile> newTiles = (newLocation.getTile() == null) ? null
             : ((ServerUnit) unit).collectNewTiles(newLocation.getTile());
-        unit.setLocation(newLocation);
+        unit.setLocation(newLocation);//-vis(serverPlayer)
+        serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
         unit.setMovesLeft(0); // In Col1 disembark consumes whole move.
         cs.add(See.perhaps(), (FreeColGameObject)newLocation);
         if (newTiles != null) {
@@ -2913,7 +2918,8 @@ public final class InGameController extends Controller {
         ((ServerUnit)unit).csRemoveEquipment(settlement,
             new HashSet<EquipmentType>(unit.getEquipment().keySet()),
             0, random, cs);
-        unit.setLocation(settlement);
+        unit.setLocation(settlement);//-vis(serverPlayer)
+        serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
         unit.setMovesLeft(0);
 
         // Update with settlement tile, and newly owned tiles.
@@ -2952,7 +2958,7 @@ public final class InGameController extends Controller {
         Tile tile = colony.getTile();
 
         // Join.
-        unit.setLocation(colony);
+        unit.setLocation(colony);//-vis: safe/colony
         unit.setMovesLeft(0);
         ((ServerUnit)unit).csRemoveEquipment(colony,
             new HashSet<EquipmentType>(unit.getEquipment().keySet()),
@@ -3273,7 +3279,7 @@ public final class InGameController extends Controller {
         // We could avoid updating the whole tile if we knew that this
         // was definitely a move between locations and no student/teacher
         // interaction occurred.
-        unit.setLocation(workLocation);
+        unit.setLocation(workLocation);//-vis: safe/colony
         cs.add(See.perhaps(), colony.getTile());
         // Others can see colony change size
         sendToOthers(serverPlayer, cs);
@@ -3396,7 +3402,7 @@ public final class InGameController extends Controller {
             // Equipping a unit at work in a colony should remove the unit
             // from the work location.
             if (unit.getLocation() instanceof WorkLocation) {
-                unit.setLocation(settlement.getTile());
+                unit.setLocation(settlement.getTile());//-vis: safe/colony
                 tileDirty = true;
             }
             settlement.getGoodsContainer().saveState();
@@ -3653,7 +3659,7 @@ public final class InGameController extends Controller {
     public Element putOutsideColony(ServerPlayer serverPlayer, Unit unit) {
         Tile tile = unit.getTile();
         Colony colony = unit.getColony();
-        unit.setLocation(tile);
+        unit.setLocation(tile);//-vis: safe/colony
 
         // Full tile update for the player, the rest get their limited
         // view of the colony so that population changes.
@@ -3735,7 +3741,7 @@ public final class InGameController extends Controller {
                 && serverPlayer.getStance(owner) != Stance.ALLIANCE
                 && serverPlayer.getStance(owner) != Stance.PEACE) {
                 if (colony.isTileInUse(tile)) {
-                    colony.csEvictUser(unit, cs);
+                    colony.csEvictUsers(unit, cs);
                 }
             }
         }

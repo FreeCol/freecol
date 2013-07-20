@@ -743,6 +743,8 @@ public class Unit extends GoodsLocation
     /**
      * Sets the units location without updating any other variables
      *
+     * -vis: This routine changes player visibility.
+     *
      * @param newLocation The new <code>Location</code>.
      */
     public void setLocationNoUpdate(Location newLocation) {
@@ -751,6 +753,8 @@ public class Unit extends GoodsLocation
 
     /**
      * Sets the location of this Unit.
+     *
+     * -vis: This routine changes player visibility.
      *
      * @param newLocation The new <code>Location</code>.
      */
@@ -773,7 +777,7 @@ public class Unit extends GoodsLocation
         }
         /*if (!result) return false;*/
 
-        location = newLocation;
+        setLocationNoUpdate(newLocation);
 
         // It is possible to add a unit to a non-specific location
         // within a colony by specifying the colony as the new

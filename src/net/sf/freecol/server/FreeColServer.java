@@ -999,20 +999,20 @@ public final class FreeColServer {
                     p.initializeHighSeas();
 
                     for (Unit u : p.getEurope().getUnitList()) {
-                        // move units to high seas use setLocation()
+                        // Move units to high seas.  Use setLocation()
                         // so that units are removed from Europe, and
                         // appear in correct panes in the EuropePanel
                         // do not set the UnitState, as this clears
-                        // workLeft
+                        // workLeft.
                         if (u.getState() == Unit.UnitState.TO_EUROPE) {
                             logger.info("Found unit on way to europe: "
                                 + u.toString());
-                            u.setLocation(p.getHighSeas());
+                            u.setLocation(p.getHighSeas());//-vis: safe!map
                             u.setDestination(p.getEurope());
                         } else if (u.getState() == Unit.UnitState.TO_AMERICA) {
                             logger.info("Found unit on way to new world: "
                                 + u.toString());
-                            u.setLocation(p.getHighSeas());
+                            u.setLocation(p.getHighSeas());//-vis: safe!map
                             u.setDestination(game.getMap());
                         }
                     }
