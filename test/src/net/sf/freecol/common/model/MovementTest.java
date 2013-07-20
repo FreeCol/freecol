@@ -146,7 +146,7 @@ public class MovementTest extends FreeColTestCase {
         Map map = getTestMap(plains);
         game.setMap(map);
         Tile tile1 = map.getTile(5, 8);
-        Tile tile2 = tile1.getAdjacentTile(Map.Direction.NE);
+        Tile tile2 = tile1.getNeighbourOrNull(Map.Direction.NE);
         tile1.updatePlayerExploredTile(dutch, false);
         tile2.updatePlayerExploredTile(dutch, false);
         assertEquals(Map.Direction.NE, map.getDirection(tile1, tile2));

@@ -873,9 +873,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *     <code>Direction</code>, or null if none present.
      */
     public Tile getNeighbourOrNull(Direction direction) {
-        Position position = getPosition();
-        return (!getMap().isValid(position)) ? null
-            : getMap().getTile(position.getAdjacent(direction));
+        return getMap().getAdjacentTile(getX(), getY(), direction);
     }
 
     /**
@@ -887,17 +885,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public boolean isAdjacent(Tile tile) {
         return (tile == null) ? false : this.getDistanceTo(tile) == 1;
-    }
-
-    /**
-     * Gets the adjacent Tile in a given direction.
-     *
-     * @param direction The <code>Direction</code> to check.
-     * @return The adjacent <code>Tile</code> in the specified
-     *     direction, or null if invalid.
-     */
-    public Tile getAdjacentTile(Direction direction) {
-        return getMap().getAdjacentTile(getX(), getY(), direction);
     }
 
     /**

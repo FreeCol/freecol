@@ -294,7 +294,7 @@ public class TransportMissionTest extends FreeColTestCase {
         Location dest = mission.getTarget();
         assertEquals("Destination should be colony one.", one, dest);
 
-        wagonTrain.setLocation(one.getTile().getAdjacentTile(Map.Direction.NE));
+        wagonTrain.setLocation(one.getTile().getNeighbourOrNull(Map.Direction.NE));
         dest = mission.getTarget();
         assertEquals("Destination should still be colony one.", one, dest);
 

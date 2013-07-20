@@ -1673,7 +1673,7 @@ public final class MapViewer {
                 }
 
                 for (Direction direction : Direction.values()) {
-                    Tile borderingTile = tile.getAdjacentTile(direction);
+                    Tile borderingTile = tile.getNeighbourOrNull(direction);
                     if (borderingTile != null) {
 
                         if (!drawUnexploredBorders && !borderingTile.isExplored() &&
@@ -2411,7 +2411,7 @@ public final class MapViewer {
         if (tile != null && tile.isExplored()) {
             if (drawUnexploredBorders) {
                 for (Direction direction : Direction.values()) {
-                    Tile borderingTile = tile.getAdjacentTile(direction);
+                    Tile borderingTile = tile.getNeighbourOrNull(direction);
                     if (borderingTile != null && !borderingTile.isExplored()) {
                         g.drawImage(lib.getBorderImage(null, direction,
                                 tile.getX(), tile.getY()), 0, 0, null);
@@ -2567,7 +2567,7 @@ public final class MapViewer {
         List<Point2D.Float> points = new ArrayList<Point2D.Float>(8);
         List<Direction> directions = new ArrayList<Direction>(8);
         for (Direction direction : Direction.values()) {
-            Tile borderingTile = tile.getAdjacentTile(direction);
+            Tile borderingTile = tile.getNeighbourOrNull(direction);
             TileImprovement r;
             if (borderingTile != null
                 && (r = borderingTile.getRoad()) != null

@@ -396,7 +396,7 @@ public class ColonyTest extends FreeColTestCase {
         Game game = getGame();
         game.setMap(getTestMap(true));
         Colony colony = getStandardColony(5);
-        Tile tile = colony.getTile().getAdjacentTile(Direction.N);
+        Tile tile = colony.getTile().getNeighbourOrNull(Direction.N);
         Player iroquois = game.getPlayer("model.nation.iroquois");
 
         assertFalse("No enemy units present.", colony.isUnderSiege());
