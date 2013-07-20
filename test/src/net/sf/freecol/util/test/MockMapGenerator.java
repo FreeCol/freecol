@@ -65,11 +65,9 @@ public class MockMapGenerator implements MapGenerator {
             FreeColGameObject other = game.getFreeColGameObject(fcgo.getId());
             if (other != fcgo) {
                 if (other != null) {
-                    net.sf.freecol.common.debug.FreeColDebugger.debugLog("REMOVE " + other.getId());
                     game.removeFreeColGameObject(other.getId());
                 }
                 game.setFreeColGameObject(fcgo.getId(), fcgo);
-                net.sf.freecol.common.debug.FreeColDebugger.debugLog("ADDED " + fcgo.getId());
             }
         }
     }

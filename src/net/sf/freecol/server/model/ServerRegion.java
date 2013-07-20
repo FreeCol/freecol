@@ -136,4 +136,15 @@ public class ServerRegion extends Region {
     public Position getCenter() {
         return new Position(bounds.x + bounds.width/2, bounds.y + bounds.height/2);
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(32);
+        sb.append("[").append(getId())
+            .append(" ").append((name == null) ? "(null)" : name)
+            .append(" ").append(nameKey).append(" ").append(type)
+            .append(" ").append(size).append(" ").append(bounds)
+            .append("]");
+        return sb.toString();
+    }
 }

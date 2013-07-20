@@ -265,6 +265,10 @@ public class Map extends FreeColGameObject implements Location {
             y = posY;
         }
 
+        public Position(Tile tile) {
+            this(tile.getX(), tile.getY());
+        }
+
         /**
          * Gets the x-coordinate of this Position.
          *
@@ -771,6 +775,37 @@ public class Map extends FreeColGameObject implements Location {
      */
     public Tile getAdjacentTile(Tile tile, Direction direction) {
         return getAdjacentTile(tile.getX(), tile.getY(), direction);
+    }
+
+    /**
+     * Gets the distance between two tiles.
+     *
+     * @param t1 The first <code>Tile</code>.
+     * @param t2 The second <code>Tile</code>.
+     * @return The distance between the tiles.
+     */
+    public int getDistance(Tile t1, Tile t2) {
+        return new Position(t1).getDistance(new Position(t2));
+    }
+
+    /**
+     * Get the closest tile to a given one from a list of other tiles.
+     *
+     * @param tile The <code>Tile</code> to start from.
+     * @param tiles The list of <code>Tile</code>s to check.
+     * @return The closest tile found (may be null if the list is empty).
+     */
+    public Tile getClosestTile(Tile tile, List<Tile> tiles) {
+        Tile result = null;
+        int minimumDistance = Integer.MAX_VALUE;
+        for (Tile t : tiles) {
+            int distance = getDistance(t, tile);
+            if (distance < minimumDistance) {
+                minimumDistance = distance;
+                result = t;
+            }
+        }
+        return result;
     }
 
 
@@ -1812,7 +1847,7 @@ public class Map extends FreeColGameObject implements Location {
      */
     public Iterable<Tile> getCircleTiles(Tile center, boolean isFilled,
                                          int radius) {
-        return makeMapIteratorIterable(getCircleIterator(center.getPosition(),
+        return makeMapIteratorIterable(getCircleIterator(new Position(center),
                                                          isFilled, radius));
     }
 

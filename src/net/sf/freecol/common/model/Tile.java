@@ -851,7 +851,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return The distance.
      */
     public int getDistanceTo(Tile tile) {
-        return getPosition().getDistance(tile.getPosition());
+        return getMap().getDistance(this, tile);
     }
 
     /**

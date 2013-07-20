@@ -358,14 +358,14 @@ public class SimpleMapGenerator implements MapGenerator {
                 = ((IndianNationType) player.getNationType()).getRegionNames();
             Territory territory = null;
             if (regionNames == null || regionNames.isEmpty()) {
-                territory = new Territory(player, terrainGenerator.getRandomLandTile(map, random).getPosition());
+                territory = new Territory(player, terrainGenerator.getRandomLandTile(map, random));
                 territoryMap.put(player.getId(), territory);
             } else {
                 for (String name : regionNames) {
                     if (territoryMap.get(name) == null) {
                         ServerRegion region = (ServerRegion) map.getRegion(name);
                         if (region == null) {
-                            territory = new Territory(player, terrainGenerator.getRandomLandTile(map, random).getPosition());
+                            territory = new Territory(player, terrainGenerator.getRandomLandTile(map, random));
                         } else {
                             territory = new Territory(player, region);
                         }
@@ -397,7 +397,7 @@ public class SimpleMapGenerator implements MapGenerator {
                     if (territory == null) {
                         logger.warning("Unable to find free region for "
                                        + player.getName());
-                        territory = new Territory(player, terrainGenerator.getRandomLandTile(map, random).getPosition());
+                        territory = new Territory(player, terrainGenerator.getRandomLandTile(map, random));
                         territoryMap.put(player.getId(), territory);
                     }
                 }
@@ -456,8 +456,8 @@ public class SimpleMapGenerator implements MapGenerator {
             int radius = territory.player.getNationType().getCapitalType().getClaimableRadius();
             ArrayList<Tile> capitalTiles = new ArrayList<Tile>(settlementTiles);
             while (!capitalTiles.isEmpty()) {
-                Tile tile = getClosestTile(territory.getCenter(),
-                                           capitalTiles);
+                Tile tile = map.getClosestTile(territory.getCenterTile(map),
+                                               capitalTiles);
                 capitalTiles.remove(tile);
                 // Choose this tile if it is free and half the expected tile
                 // claim can succeed (preventing capitals on small islands).
@@ -495,7 +495,7 @@ public class SimpleMapGenerator implements MapGenerator {
             Tile tile = settlementTiles.remove(0);
             if (tile.getOwner() != null) continue; // No close overlap
 
-            Territory territory = getClosestTerritory(tile, territories);
+            Territory territory = getClosestTerritory(map, tile, territories);
             int radius = territory.player.getNationType().getSettlementType(false)
                 .getClaimableRadius();
             // Insist that the settlement can not be linear
@@ -667,24 +667,11 @@ public class SimpleMapGenerator implements MapGenerator {
         return null;
     }
 
-    private Tile getClosestTile(Position center, List<Tile> tiles) {
-        Tile result = null;
-        int minimumDistance = Integer.MAX_VALUE;
-        for (Tile tile : tiles) {
-            int distance = tile.getPosition().getDistance(center);
-            if (distance < minimumDistance) {
-                minimumDistance = distance;
-                result = tile;
-            }
-        }
-        return result;
-    }
-
-    private Territory getClosestTerritory(Tile tile, List<Territory> territories) {
+    private Territory getClosestTerritory(Map map, Tile tile, List<Territory> territories) {
         Territory result = null;
         int minimumDistance = Integer.MAX_VALUE;
         for (Territory territory : territories) {
-            int distance = tile.getPosition().getDistance(territory.getCenter());
+            int distance = map.getDistance(tile, territory.getCenterTile(map));
             if (distance < minimumDistance) {
                 minimumDistance = distance;
                 result = territory;
@@ -1125,17 +1112,23 @@ public class SimpleMapGenerator implements MapGenerator {
             this.position = position;
         }
 
+        public Territory(Player player, Tile tile) {
+            this.player = player;
+            this.position = new Position(tile);
+        }
+
         public Territory(Player player, ServerRegion region) {
             this.player = player;
             this.region = region;
         }
 
         public Position getCenter() {
-            if (position == null) {
-                return region.getCenter();
-            } else {
-                return position;
-            }
+            return (position == null) ? region.getCenter() : position;
+        }
+
+        public Tile getCenterTile(Map map) {
+            Position center = getCenter();
+            return map.getTile(center.getX(), center.getY());
         }
 
         /**
