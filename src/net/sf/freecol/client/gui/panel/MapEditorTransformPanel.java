@@ -255,7 +255,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         }
 
         public void transform(Tile t) {
-            t.setType(tileType);
+            t.changeType(tileType);
             t.removeLostCityRumour();
         }
     }
