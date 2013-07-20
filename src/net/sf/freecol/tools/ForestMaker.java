@@ -43,6 +43,13 @@ public class ForestMaker {
     private static int BASE_HEIGHT = 64;
     private static int MARGIN = 20;
     private static int TREES = 60;
+    private static int RIVER_MARGIN = 4;
+
+    private static int HALF_WIDTH = BASE_WIDTH / 2;
+    private static int HALF_HEIGHT = BASE_HEIGHT / 2;
+
+    private static final int[] POWERS_OF_TWO
+        = new int[] { 1, 2, 4, 8 };
 
     private static class ImageLocation implements Comparable<ImageLocation> {
         BufferedImage image;
@@ -108,43 +115,120 @@ public class ForestMaker {
             int numberOfImages = images.size();
             Random random = new Random(1492);
 
-            // first, the base image
-            BufferedImage base = new BufferedImage(BASE_WIDTH, BASE_HEIGHT + MARGIN,
-                                                   BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g = base.createGraphics();
-            int[] x_coords = new int[] { 64, 127, 64, 0 };
-            int[] y_coords = new int[] { 0, 32, 63, 32 };
+            // the tile itself
+            int[] x_coords = new int[] {
+                HALF_WIDTH, BASE_WIDTH, HALF_WIDTH, 0
+            };
+            int[] y_coords = new int[] {
+                0, HALF_HEIGHT, BASE_HEIGHT, HALF_HEIGHT
+            };
             Polygon diamond = new Polygon(x_coords, y_coords, 4);
             diamond.translate(0, MARGIN);
-            g.setColor(Color.RED);
-            g.draw(diamond);
+            //g.setColor(Color.RED);
+            //g.draw(diamond);
 
-            int half = BASE_WIDTH / 2;
+            Polygon[] polygons = getPolygons(RIVER_MARGIN);
+            for (int index = 0; index < 16; index++) {
+                BufferedImage base = new BufferedImage(BASE_WIDTH, BASE_HEIGHT + MARGIN,
+                                                       BufferedImage.TYPE_INT_ARGB);
+                Graphics2D g = base.createGraphics();
 
-            List<ImageLocation> trees = new ArrayList<ImageLocation>(TREES);
-            int count = 0;
-            while (count < TREES) {
-                int x = random.nextInt(BASE_WIDTH);
-                int y = random.nextInt(BASE_HEIGHT + MARGIN);
-                BufferedImage image = images.get(count % numberOfImages);
-                if (diamond.contains(x, y + image.getHeight())
-                    && diamond.contains(x + image.getWidth(), y + image.getHeight())) {
-                    trees.add(new ImageLocation(image, x, y));
-                    count++;
+                List<ImageLocation> trees = new ArrayList<ImageLocation>(TREES);
+                int count = 0;
+                // reduce number of trees if branches are present
+                int numberOfTrees = (8 - Integer.bitCount(index)) * TREES / 8;
+                trees: while (count < numberOfTrees) {
+                    int x = random.nextInt(BASE_WIDTH);
+                    int y = random.nextInt(BASE_HEIGHT + MARGIN);
+                    BufferedImage image = images.get(count % numberOfImages);
+                    int width = image.getWidth();
+                    int height = image.getHeight();
+                    if (diamond.contains(x + width/2, y + height)
+                        && x + width < BASE_WIDTH) {
+                        for (int i = 0; i < POWERS_OF_TWO.length; i++) {
+                            if ((index & POWERS_OF_TWO[i]) == POWERS_OF_TWO[i]
+                                && polygons[i].intersects(x, y, width, height)) {
+                                continue trees;
+                            }
+                        }
+                        trees.add(new ImageLocation(image, x, y));
+                        count++;
+                    }
                 }
-            }
 
-            // sort by y, x coordinate
-            Collections.sort(trees);
-            for (ImageLocation imageLocation : trees) {
-                g.drawImage(imageLocation.image, imageLocation.x, imageLocation.y, null);
-            }
-            ImageIO.write(base, "png", new File(sourceDirectory.getName() + ".png"));
+                // sort by y, x coordinate
+                Collections.sort(trees);
+                for (ImageLocation imageLocation : trees) {
+                    g.drawImage(imageLocation.image, imageLocation.x, imageLocation.y, null);
+                }
+                String counter = "";
+                if (index > 0) {
+                    for (int i = 0; i < POWERS_OF_TWO.length; i++) {
+                        counter += (index & POWERS_OF_TWO[i]) == POWERS_OF_TWO[i]
+                            ? "1" : "0";
+                    }
+                }
+                ImageIO.write(base, "png", new File(sourceDirectory.getName() + counter + ".png"));
 
+            }
         }
     }
 
+    private static int getY(int x, int y, double slope, int newX) {
+        return (int) (y + slope * (newX - x));
+    }
 
+    private static Polygon[] getPolygons(int height) {
+        int width = 2 * height;
+        Polygon[] result = new Polygon[4];
+        int[] x = new int[4];
+        int[] y = new int[4];
+        // north-east
+        x[0] = HALF_WIDTH - width;
+        y[0] = HALF_HEIGHT;
+        x[1] = HALF_WIDTH;
+        y[1] = HALF_HEIGHT + height;
+        x[2] = BASE_WIDTH;
+        y[2] = getY(x[1], y[1], -0.5, BASE_WIDTH);
+        x[3] = BASE_WIDTH;
+        y[3] = getY(x[0], y[0], -0.5, BASE_WIDTH);
+        result[0] = new Polygon(x, y, 4);
+        result[0].translate(0, MARGIN);
+        // south-east
+        x[0] = HALF_WIDTH - width;
+        y[0] = HALF_HEIGHT;
+        x[1] = HALF_WIDTH;
+        y[1] = HALF_HEIGHT - height;
+        x[2] = BASE_WIDTH;
+        y[2] = getY(x[1], y[1], 0.5, BASE_WIDTH);
+        x[3] = BASE_WIDTH;
+        y[3] = getY(x[0], y[0], 0.5, BASE_WIDTH);
+        result[1] = new Polygon(x, y, 4);
+        result[1].translate(0, MARGIN);
+        // south-west
+        x[0] = HALF_WIDTH;
+        y[0] = HALF_HEIGHT - height;
+        x[1] = HALF_WIDTH + width;
+        y[1] = HALF_HEIGHT;
+        x[2] = 0;
+        y[2] = getY(x[1], y[1], -0.5, 0);
+        x[3] = 0;
+        y[3] = getY(x[0], y[0], -0.5, 0);
+        result[2] = new Polygon(x, y, 4);
+        result[2].translate(0, MARGIN);
+        // north-west
+        x[0] = HALF_WIDTH + width;
+        y[0] = HALF_HEIGHT;
+        x[1] = HALF_WIDTH;
+        y[1] = HALF_HEIGHT + height;
+        x[2] = 0;
+        y[2] = getY(x[1], y[1], 0.5, 0);
+        x[3] = 0;
+        y[3] = getY(x[0], y[0], 0.5, 0);
+        result[3] = new Polygon(x, y, 4);
+        result[3].translate(0, MARGIN);
 
+        return result;
+    }
 }
 
