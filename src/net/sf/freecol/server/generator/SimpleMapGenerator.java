@@ -215,23 +215,24 @@ public class SimpleMapGenerator implements MapGenerator {
      * @param importGame The game to lost city rumours from.
      */
     private void createLostCityRumours(Map map, Game importGame) {
-        final boolean importRumours = getMapGeneratorOptions().getBoolean(MapGeneratorOptions.IMPORT_RUMOURS);
+        final boolean importRumours = getMapGeneratorOptions()
+            .getBoolean(MapGeneratorOptions.IMPORT_RUMOURS);
 
         if (importGame != null && importRumours) {
             for (Tile importTile : importGame.getMap().getAllTiles()) {
-            	LostCityRumour rumor = importTile.getLostCityRumour();
-            	// no rumor
-            	if (rumor == null) {
-                    continue;
-            	}
-                final Position p = importTile.getPosition();
-                if (map.isValid(p)) {
-                    final Tile t = map.getTile(p);
+                LostCityRumour rumor = importTile.getLostCityRumour();
+                // no rumor
+                if (rumor == null) continue;
+                int x = importTile.getX();
+                int y = importTile.getY();
+                if (map.isValid(x, y)) {
+                    final Tile t = map.getTile(x, y);
                     t.add(rumor);
                 }
             }
         } else {
-            int number = getApproximateLandCount() / getMapGeneratorOptions().getInteger(MapGeneratorOptions.RUMOUR_NUMBER);
+            int number = getApproximateLandCount() / getMapGeneratorOptions()
+                .getInteger(MapGeneratorOptions.RUMOUR_NUMBER);
             int counter = 0;
 
             // TODO: Remove temporary fix:
@@ -278,7 +279,9 @@ public class SimpleMapGenerator implements MapGenerator {
                     game.addPlayer(indian);
                 }
                 for (IndianSettlement template : player.getIndianSettlements()) {
-                    Tile tile = map.getTile(template.getTile().getPosition());
+                    int x = template.getTile().getX();
+                    int y = template.getTile().getY();
+                    Tile tile = map.getTile(x, y);
                     if (tile != null) {
                         UnitType skill = template.getLearnableSkill();
                         IndianSettlement settlement =
@@ -311,7 +314,7 @@ public class SimpleMapGenerator implements MapGenerator {
                 if (template.getOwner() != null) {
                     String nationId = template.getOwner().getNationId();
                     Player owner = game.getPlayer(nationId);
-                    Tile tile = map.getTile(template.getPosition());
+                    Tile tile = map.getTile(template.getX(), template.getY());
                     if (owner != null && tile != null) {
                         tile.setOwner(owner);
                         if (template.getOwningSettlement() != null) {
@@ -374,9 +377,7 @@ public class SimpleMapGenerator implements MapGenerator {
                         }
                         territoryMap.put(name, territory);
                         logger.fine("Allocated region " + name
-                                    + " for " + player
-                                    + ". Center is " + territory.getCenter()
-                                    + ".");
+                                    + " for " + player + ".");
                         break;
                     }
                 }
@@ -470,11 +471,11 @@ public class SimpleMapGenerator implements MapGenerator {
                         : territory.region.getNameKey();
                     logger.fine("Placing the " + territory.player
                                 + " capital in region: " + name
-                                + " at Tile: "+ tile.getPosition());
+                                + " at tile: " + tile);
                     settlements.add(placeIndianSettlement(territory.player,
-                            true, tile.getPosition(), map));
+                                                          true, tile, map));
                     territory.numberOfSettlements--;
-                    territory.position = tile.getPosition();
+                    territory.tile = tile;
                     settlementTiles.remove(tile);
                     settlementsPlaced++;
                     break;
@@ -508,9 +509,9 @@ public class SimpleMapGenerator implements MapGenerator {
                     : territory.region.getNameKey();
                 logger.fine("Placing a " + territory.player
                             + " camp in region: " + name
-                            + " at Tile: " + tile.getPosition());
+                            + " at tile: " + tile);
                 settlements.add(placeIndianSettlement(territory.player,
-                        false, tile.getPosition(), map));
+                                                      false, tile, map));
                 settlementsPlaced++;
                 territory.numberOfSettlements--;
                 if (territory.numberOfSettlements <= 0) {
@@ -690,14 +691,13 @@ public class SimpleMapGenerator implements MapGenerator {
      * @param player The player owning the new settlement.
      * @param capital <code>true</code> if the settlement should be a
      *      {@link IndianSettlement#isCapital() capital}.
-     * @param position The position to place the settlement.
+     * @param tile The <code>Tile</code> to place the settlement.
      * @param map The map that should get a new settlement.
      * @return The <code>IndianSettlement</code> just being placed
      *      on the map.
      */
     private IndianSettlement placeIndianSettlement(Player player,
-        boolean capital, Position position, Map map) {
-        final Tile tile = map.getTile(position);
+        boolean capital, Tile tile, Map map) {
         String name = (capital) ? player.getCapitalName(random)
             : player.getSettlementName(random);
         UnitType skill
@@ -1106,18 +1106,13 @@ public class SimpleMapGenerator implements MapGenerator {
 
     private class Territory {
         public ServerRegion region;
-        public Position position;
+        public Tile tile;
         public Player player;
         public int numberOfSettlements;
 
-        public Territory(Player player, Position position) {
-            this.player = player;
-            this.position = position;
-        }
-
         public Territory(Player player, Tile tile) {
             this.player = player;
-            this.position = new Position(tile);
+            this.tile = tile;
         }
 
         public Territory(Player player, ServerRegion region) {
@@ -1125,15 +1120,10 @@ public class SimpleMapGenerator implements MapGenerator {
             this.region = region;
         }
 
-        public Position getCenter() {
-            if (position != null) return position;
-            int[] xy = region.getCenter();
-            return new Position(xy[0], xy[1]);
-        }
-
         public Tile getCenterTile(Map map) {
-            Position center = getCenter();
-            return map.getTile(center.getX(), center.getY());
+            if (tile != null) return tile;
+            int[] xy = region.getCenter();
+            return map.getTile(xy[0], xy[1]);
         }
 
         /**

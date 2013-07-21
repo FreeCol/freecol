@@ -39,7 +39,6 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Map.Direction;
-import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.Utils;
@@ -248,15 +247,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public int getY() {
         return y;
-    }
-
-    /**
-     * Gets the position of this tile.
-     *
-     * @return The <code>Position</code> of this <code>Tile</code>.
-     */
-    public Position getPosition() {
-        return new Position(x, y);
     }
 
     /**

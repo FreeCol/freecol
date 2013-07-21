@@ -1663,10 +1663,10 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
             ColonyTile colonyTile = (ColonyTile)loc;
             // Have to use positions to get the direction as
             // Map.getDirection() will not see copied tiles.
-            Position cPos = colonyTile.getColony().getTile().getPosition();
-            Position wPos = colonyTile.getWorkTile().getPosition();
+            Tile cTile = colonyTile.getColony().getTile();
+            Tile wTile = colonyTile.getWorkTile();
             return colonyTile.getWorkTile().getType().getSuffix() + "/"
-                + cPos.getDirection(wPos).toString();
+                + cTile.getDirection(wTile).toString();
         } else {
             return loc.getId();
         }
@@ -1680,7 +1680,7 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
         final Tile tile = colony.getTile();
         final StringBuilder sb = new StringBuilder(256);
         sb.append("ColonyPlan: ").append(colony.getName())
-            .append(" ").append(colony.getTile().getPosition())
+            .append(" ").append(colony.getTile())
             .append("\nProfile: ").append(profileType.toString())
             .append("\nPreferred production:\n");
         for (GoodsType goodsType : getPreferredProduction()) {
