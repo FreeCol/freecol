@@ -143,14 +143,10 @@ public class MapGeneratorTest extends FreeColTestCase {
                      gen.getMapGeneratorOptions().getInteger(MapGeneratorOptions.MAP_HEIGHT));
 
         // Sufficient land?
-        Iterator<Position> it = m.getWholeMapIterator();
         int land = 0;
         int total = 0;
-        while (it.hasNext()) {
-            Position p = it.next();
-            Tile t = m.getTile(p);
-            if (t.isLand())
-                land++;
+        for (Tile t : m.getAllTiles()) {
+            if (t.isLand()) land++;
             total++;
         }
         // Land Mass requirement fulfilled?

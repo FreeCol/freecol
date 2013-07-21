@@ -1854,11 +1854,9 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * An iterator for the whole map.
      */
-    private final class WholeMapIterator extends MapIterator {
+    private class WholeMapIterator implements Iterator<Tile> {
        
-        /**
-         * The current coordinate position in the iteration.
-         */
+        /** The current coordinate position in the iteration. */
         private int x, y;
 
 
@@ -1866,57 +1864,64 @@ public class Map extends FreeColGameObject implements Location {
          * Default constructor.
          */
         public WholeMapIterator() {
-            x = 0;
-            y = 0;
+            x = y = 0;
         }
 
         /**
-         * Checks if the iterator has another position in it.
-         *
-         * @return True of there is another position
+         * {@inheritDoc}
          */
+        @Override
         public boolean hasNext() {
             return y < getHeight();
         }
 
         /**
-         * Gets the next position in the iteration.
-         *
-         * @return The next <code>Position</code>.
-         * @throws NoSuchElementException if the iterator is exhausted.
+         * {@inheritDoc}
          */
         @Override
-        public Position nextPosition() throws NoSuchElementException {
+        public Tile next() throws NoSuchElementException {
             if (!hasNext()) {
                 throw new NoSuchElementException("WholeMapIterator exhausted");
             }
-            Position newPosition = new Position(x, y);
+            Tile result = getTile(x, y);
             x++;
             if (x == getWidth()) {
                 x = 0;
                 y++;
             }
-            return newPosition;
+            return result;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
         }
     }
 
     /**
      * Gets an <code>Iterator</code> of every <code>Tile</code> on the map.
      *
-     * @return The <code>Iterator</code>.
+     * @return An <code>Iterator</code> for the whole map.
      */
-    public MapIterator getWholeMapIterator() {
+    public Iterator<Tile> getWholeMapIterator() {
         return new WholeMapIterator();
     }
 
     /**
-     * Gets an iterable for all the tiles in the map on using an
+     * Gets an iterable for all the tiles in the map using an
      * underlying WholeMapIterator.
      *
      * @return An <code>Iterable</code> for all tiles of the map.
      */
     public Iterable<Tile> getAllTiles() {
-        return makeMapIteratorIterable(getWholeMapIterator());
+        return new Iterable<Tile>() {
+            public Iterator<Tile> iterator() {
+                return new WholeMapIterator();
+            }
+        };
     }
 
 
