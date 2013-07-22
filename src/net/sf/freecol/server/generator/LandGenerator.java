@@ -112,7 +112,7 @@ public class LandGenerator {
      * Creates a new land map.
      *
      * @return An array where <i>true</i> means land
-     * and <i>false</i> means ocean.
+     *     and <i>false</i> means ocean.
      */
     public boolean[][] createLandMap() {
         //get values from mapGeneratorOptions
@@ -207,14 +207,15 @@ public class LandGenerator {
         int size = 0;
         boolean[][] newland = new boolean[width][height];
 
-        List<Position>l = new ArrayList<Position>();
-        Position p;
-
         //pick a starting position that is sea without neighbouring land
         if (x<0 || y<0) {
             do {
-                x = (Utils.randomInt(logger, "LandW", random, width-preferredDistanceToEdge*2)) + preferredDistanceToEdge;
-                y = (Utils.randomInt(logger, "LandH", random, height-preferredDistanceToEdge*2)) + preferredDistanceToEdge;
+                x = Utils.randomInt(logger, "LandW", random, 
+                                    width-preferredDistanceToEdge*2)
+                    + preferredDistanceToEdge;
+                y = Utils.randomInt(logger, "LandH", random,
+                                    height-preferredDistanceToEdge*2)
+                    + preferredDistanceToEdge;
             } while (map[x][y] || !isSingleTile(x,y));
         }
 
@@ -222,9 +223,10 @@ public class LandGenerator {
         size++;
 
         //add all valid neighbour positions to list
-        p = new Position(x, y);
+        List<Position>l = new ArrayList<Position>();
+        Position p = new Position(x, y);
         for (Direction direction : Direction.longSides) {
-            Position n = p.getAdjacent(direction);
+            Position n = new Position(p, direction);
             if (n.isValid(width, height)
                 && isSingleTile(n.getX(), n.getY())
                 && n.getX() > preferredDistanceToEdge
@@ -246,7 +248,7 @@ public class LandGenerator {
 
                 //add all valid neighbour positions to list
                 for (Direction direction : Direction.longSides) {
-                    Position n = p.getAdjacent(direction);
+                    Position n = new Position(p, direction);
                     if (n.isValid(width, height)
                         && isSingleTile(n.getX(), n.getY())
                         && n.getX() > preferredDistanceToEdge
@@ -318,7 +320,7 @@ public class LandGenerator {
         Position p = new Position(x, y);
 
         for (Direction direction : Direction.values()) {
-            Position n = p.getAdjacent(direction);
+            Position n = new Position(p, direction);
             if (n.isValid(width, height) && map[n.getX()][n.getY()]) {
                 return false;
             }
@@ -345,7 +347,7 @@ public class LandGenerator {
         Position p = new Position(x, y);
 
         for (Direction direction : Direction.longSides) {
-            Position n = p.getAdjacent(direction);
+            Position n = new Position(p, direction);
             if (n.isValid(width, height)) {
                 growLand(n.getX(), n.getY());
             }
@@ -381,7 +383,7 @@ public class LandGenerator {
         Position p = new Position(i, j);
 
         for (Direction direction : Direction.values()) {
-            Position n = p.getAdjacent(direction);
+            Position n = new Position(p, direction);
             if (n.isValid(width, height) && map[n.getX()][n.getY()]) {
                 sum++;
             }

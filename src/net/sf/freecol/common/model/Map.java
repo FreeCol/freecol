@@ -113,20 +113,27 @@ public class Map extends FreeColGameObject implements Location {
             this.evenDY = evenDY;
         }
 
-        public int getOddDX() {
-            return oddDX;
+
+        /**
+         * Step an x coordinate in this direction.
+         *
+         * @param x The x coordinate.
+         * @param y The y coordinate.
+         * @return The x coordinate after the step.
+         */
+        public int stepX(int x, int y) {
+            return x + (((y & 1) != 0) ? oddDX : evenDX);
         }
 
-        public int getOddDY() {
-            return oddDY;
-        }
-
-        public int getEvenDX() {
-            return evenDX;
-        }
-
-        public int getEvenDY() {
-            return evenDY;
+        /**
+         * Step a y coordinate in this direction.
+         *
+         * @param x The x coordinate.
+         * @param y The y coordinate.
+         * @return The y coordinate after the step.
+         */
+        public int stepY(int x, int y) {
+            return y + (((y & 1) != 0) ? oddDY : evenDY);
         }
 
         /**
@@ -265,9 +272,33 @@ public class Map extends FreeColGameObject implements Location {
             y = posY;
         }
 
+        /**
+         * Creates a new <code>Position</code> object with the coordinates
+         * of a supplied tile.
+         *
+         * @param tile The <code>Tile</code> to extract coordinates from.
+         */
         public Position(Tile tile) {
             this(tile.getX(), tile.getY());
         }
+
+        /**
+         * Creates a new <code>Position</code> from an existing one with
+         * an optional step in a given direction.
+         *
+         * @param start The starting <code>Position</code>.
+         * @param direction An optional <code>Direction</code> to step.
+         */
+        public Position(Position start, Direction direction) {
+            int xx = start.x, yy = start.y;
+            if (direction != null) {
+                xx = direction.stepX(xx, yy);
+                yy = direction.stepY(xx, yy);
+            }
+            this.x = xx;
+            this.y = yy;
+        }
+
 
         /**
          * Gets the x-coordinate of this Position.
@@ -330,18 +361,24 @@ public class Map extends FreeColGameObject implements Location {
         }
 
         /**
-         * Gets the position adjacent to a given position, in a given
-         * direction.
+         * Gets the distance in tiles between two map positions.
+         * With an isometric map this is a non-trivial task.
+         * The formula below has been developed largely through trial and
+         * error.  It should cover all cases, but I wouldn't bet my
+         * life on it.
          *
-         * @param direction The <code>Direction</code> to check.
-         * @return The adjacent position.
+         * @param position The other <code>Position</code> to compare.
+         * @return The distance in tiles to the other position.
          */
-        public Position getAdjacent(Direction direction) {
-            int x = this.x + (((this.y & 1) != 0) ? direction.getOddDX()
-                : direction.getEvenDX());
-            int y = this.y + (((this.y & 1) != 0) ? direction.getOddDY()
-                : direction.getEvenDY());
-            return new Position(x, y);
+        public static int getDistance(int ax, int ay, int bx, int by) {
+            int r = (bx - ax) - (ay - by) / 2;
+
+            if (by > ay && ay % 2 == 0 && by % 2 != 0) {
+                r++;
+            } else if (by < ay && ay % 2 != 0 && by % 2 == 0) {
+                r--;
+            }
+            return Math.max(Math.abs(ay - by + r), Math.abs(r));
         }
 
         /**
@@ -355,16 +392,8 @@ public class Map extends FreeColGameObject implements Location {
          * @return The distance in tiles to the other position.
          */
         public int getDistance(Position position) {
-            int ay = getY();
-            int by = position.getY();
-            int r = position.getX() - getX() - (ay - by) / 2;
-
-            if (by > ay && ay % 2 == 0 && by % 2 != 0) {
-                r++;
-            } else if (by < ay && ay % 2 != 0 && by % 2 == 0) {
-                r--;
-            }
-            return Math.max(Math.abs(ay - by + r), Math.abs(r));
+            return getDistance(getX(), getY(),
+                               position.getX(), position.getY());
         }
 
         /**
@@ -375,8 +404,9 @@ public class Map extends FreeColGameObject implements Location {
          */
         public Direction getDirection(Position other) {
             for (Direction d : Direction.values()) {
-                Position step = getAdjacent(d);
-                if (step.equals(other)) return d;
+                int x = d.stepX(this.x, this.y);
+                int y = d.stepY(this.x, this.y);
+                if (x == other.x && y == other.y) return d;
             }
             return null;
         }
@@ -745,7 +775,8 @@ public class Map extends FreeColGameObject implements Location {
      */
     public Direction getDirection(Tile t1, Tile t2) {
         for (Direction d : Direction.values()) {
-            if (t1.getNeighbourOrNull(d) == t2) return d;
+            if (d.stepX(t1.getX(), t1.getY()) == t2.getX()
+                && d.stepY(t1.getX(), t1.getY()) == t2.getY()) return d;
         }
         return null;
     }
@@ -760,9 +791,7 @@ public class Map extends FreeColGameObject implements Location {
      *     direction, or null if invalid.
      */
     public Tile getAdjacentTile(int x, int y, Direction direction) {
-        x += ((y & 1) != 0) ? direction.getOddDX() : direction.getEvenDX();
-        y += ((y & 1) != 0) ? direction.getOddDY() : direction.getEvenDY();
-        return getTile(x, y);
+        return getTile(direction.stepX(x, y), direction.stepY(x, y));
     }
 
     /**
@@ -785,7 +814,8 @@ public class Map extends FreeColGameObject implements Location {
      * @return The distance between the tiles.
      */
     public int getDistance(Tile t1, Tile t2) {
-        return new Position(t1).getDistance(new Position(t2));
+        return Position.getDistance(t1.getX(), t1.getY(),
+                                    t2.getX(), t2.getY());
     }
 
     /**
@@ -1731,15 +1761,15 @@ public class Map extends FreeColGameObject implements Location {
             n = 0;
 
             if (isFilled || radius == 1) {
-                nextPosition = center.getAdjacent(Direction.NE);
+                nextPosition = new Position(center, Direction.NE);
                 currentRadius = 1;
             } else {
                 this.currentRadius = radius;
                 nextPosition = center;
                 for (int i = 1; i < radius; i++) {
-                    nextPosition = nextPosition.getAdjacent(Direction.N);
+                    nextPosition = new Position(nextPosition, Direction.N);
                 }
-                nextPosition = nextPosition.getAdjacent(Direction.NE);
+                nextPosition = new Position(nextPosition, Direction.NE);
             }
             if (!isValid(nextPosition)) {
                 determineNextPosition();
@@ -1773,7 +1803,7 @@ public class Map extends FreeColGameObject implements Location {
                     } else {
                         n = 0;
                         positionReturned = false;
-                        nextPosition = nextPosition.getAdjacent(Direction.NE);
+                        nextPosition = new Position(nextPosition, Direction.NE);
                     }
                 } else {
                     int i = n / width;
@@ -1795,7 +1825,7 @@ public class Map extends FreeColGameObject implements Location {
                         throw new IllegalStateException("i=" + i + ", n=" + n
                                                         + ", width=" + width);
                     }
-                    nextPosition = nextPosition.getAdjacent(direction);
+                    nextPosition = new Position(nextPosition, direction);
                 }
             } while (nextPosition != null && !isValid(nextPosition));
         }
@@ -1977,7 +2007,7 @@ public class Map extends FreeColGameObject implements Location {
         limit--;
         do {
             for (Direction direction : Direction.values()) {
-                Position n = p.getAdjacent(direction);
+                Position n = new Position(p, direction);
                 if (n.isValid(boolmap.length, boolmap[0].length)
                     && boolmap[n.getX()][n.getY()]
                     && !visited[n.getX()][n.getY()] && limit > 0) {
@@ -2111,7 +2141,7 @@ public class Map extends FreeColGameObject implements Location {
                 // is not necessarily true in the test suite.
                 Position position = new Position(tile.getX(), tile.getY());
                 for (Direction d : Direction.values()) {
-                    Position p = position.getAdjacent(d);
+                    Position p = new Position(position, d);
                     if (isValid(p)) {
                         Tile t = getTile(p);
                         if (t.getHighSeasCount() < 0) {
