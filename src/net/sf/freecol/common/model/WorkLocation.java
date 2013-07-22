@@ -312,6 +312,7 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final Tile getTile() {
         return colony.getTile();
     }
@@ -319,37 +320,61 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean add(final Locatable locatable) {
-        if (!(locatable instanceof Unit)) {
-            throw new IllegalStateException("Not a unit: " + locatable);
+        NoAddReason reason = getNoAddReason(locatable);
+        if (reason != NoAddReason.NONE) {
+            throw new IllegalStateException("Can not add " + locatable
+                + " to " + toString() + " because " + reason);
+        }
+        if (!super.add(locatable)) return false;
+        Unit unit = (Unit)locatable;
+
+        unit.setState(Unit.UnitState.IN_COLONY);
+        unit.setMovesLeft(0);
+
+        // Choose a sensible work type only if none already specified
+        // or it is not useful at this location.
+        ProductionType best = null;
+        if (unit.getWorkType() != null) {
+            if ((best = getBestProductionType(unit.getWorkType())) != null) {
+                setProductionType(best);
+            }
+        }
+        if (best == null) {
+            if ((best = getBestProductionType(unit)) != null) {
+                setProductionType(best);
+                // TODO: unit work type needs to be a production
+                // type rather than a goods type
+                unit.changeWorkType(best.getOutputs().get(0).getType());
+            }
         }
 
-        Unit unit = (Unit) locatable;
-        if (super.add(unit)) {
-            if (this.canTeach()) {
-                Unit student = unit.getStudent();
-                if (student == null
-                    && (student = getColony().findStudent(unit)) != null) {
-                    unit.setStudent(student);
-                    student.setTeacher(unit);
-                }
-                unit.changeWorkType(null);
-            } else {
-                Unit teacher = unit.getTeacher();
-                if (teacher == null
-                    && (teacher = getColony().findTeacher(unit)) != null) {
-                    unit.setTeacher(teacher);
-                    teacher.setStudent(unit);
-                }
+        if (this.canTeach()) {
+            Unit student = unit.getStudent();
+            if (student == null
+                && (student = getColony().findStudent(unit)) != null) {
+                unit.setStudent(student);
+                student.setTeacher(unit);
             }
-            return true;
+            unit.changeWorkType(null);
+        } else {
+            Unit teacher = unit.getTeacher();
+            if (teacher == null
+                && (teacher = getColony().findTeacher(unit)) != null) {
+                unit.setTeacher(teacher);
+                teacher.setStudent(unit);
+            }
         }
-        return false;
+
+        colony.invalidateCache();
+        return true;
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean remove(final Locatable locatable) {
         if (!(locatable instanceof Unit)) {
             throw new IllegalStateException("Not a unit: " + locatable);
@@ -380,6 +405,7 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final Settlement getSettlement() {
         return colony;
     }
@@ -464,10 +490,26 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      * @param unit The <code>Unit</code> to check.
      * @return The best production type.
      */
-    public abstract ProductionType getBestProductionType(Unit unit);
+    public ProductionType getBestProductionType(Unit unit) {
+        ProductionType best = null;
+        int amount = 0;
+        for (ProductionType productionType : getProductionTypes()) {
+            if (productionType.getOutputs() != null) {
+                for (AbstractGoods output : productionType.getOutputs()) {
+                    int newAmount = getPotentialProduction(output.getType(),
+                                                           unit.getType());
+                    if (newAmount > amount) {
+                        amount = newAmount;
+                        best = productionType;
+                    }
+                }
+            }
+        }
+        return best;
+    }
 
     /**
-     * Returns the best production type for the production of the
+     * Gets the best production type for the production of the
      * given goods type.  This method is likely to be removed in the
      * future.
      *

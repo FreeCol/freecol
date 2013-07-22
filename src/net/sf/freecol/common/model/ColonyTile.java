@@ -233,40 +233,6 @@ public class ColonyTile extends WorkLocation {
                 .addName("%location%", name);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public boolean add(final Locatable locatable) {
-        NoAddReason reason = getNoAddReason(locatable);
-        if (reason != NoAddReason.NONE) {
-            throw new IllegalStateException("Can not add " + locatable
-                + " to " + toString() + " because " + reason);
-        }
-        Unit unit = (Unit) locatable;
-        if (contains(unit)) return true;
-
-        if (super.add(unit)) {
-            unit.setState(Unit.UnitState.IN_COLONY);
-
-            // Choose a sensible work type only if none already specified.
-            if (unit.getWorkType() == null) {
-                ProductionType best = getBestProductionType(unit);
-                if (best != null) {
-                    setProductionType(best);
-                    // TODO: unit work type needs to be a production
-                    // type rather than a goods type
-                    unit.changeWorkType(best.getOutputs().get(0).getType());
-                }
-            } else {
-                setProductionType(getBestProductionType(unit.getWorkType()));
-            }
-
-            getColony().invalidateCache();
-            return true;
-        }
-        return false;
-    }
-
 
     // Interface UnitLocation
     // Inherits:
@@ -430,26 +396,6 @@ public class ColonyTile extends WorkLocation {
         } else {
             return new ArrayList<ProductionType>();
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public ProductionType getBestProductionType(Unit unit) {
-        ProductionType best = null;
-        int amount = 0;
-        for (ProductionType productionType : getProductionTypes()) {
-            if (productionType.getOutputs() != null) {
-                for (AbstractGoods output : productionType.getOutputs()) {
-                    int newAmount = getPotentialProduction(output.getType(), unit.getType());
-                    if (newAmount > amount) {
-                        amount = newAmount;
-                        best = productionType;
-                    }
-                }
-            }
-        }
-        return best;
     }
 
     /**

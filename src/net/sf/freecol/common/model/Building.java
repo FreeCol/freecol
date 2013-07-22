@@ -407,35 +407,9 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     /**
      * {@inheritDoc}
      */
-    @Override
     public StringTemplate getLocationName() {
         return StringTemplate.template("inLocation")
             .add("%location%", getNameKey());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean add(final Locatable locatable) {
-        NoAddReason reason = getNoAddReason(locatable);
-        if (reason != NoAddReason.NONE) {
-            throw new IllegalStateException("Can not add " + locatable
-                + " to " + toString() + " because " + reason);
-        }
-        Unit unit = (Unit) locatable;
-        if (contains(unit)) return true;
-
-        if (super.add(unit)) {
-            unit.setState(Unit.UnitState.IN_COLONY);
-            List<AbstractGoods> outputs = getOutputs();
-            if (outputs.size() == 1) {
-                unit.changeWorkType(outputs.get(0).getType());
-            }
-            getColony().invalidateCache();
-            return true;
-        }
-        return false;
     }
 
 
@@ -452,7 +426,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     public NoAddReason getNoAddReason(Locatable locatable) {
         if (!(locatable instanceof Unit)) return NoAddReason.WRONG_TYPE;
         NoAddReason reason = getNoWorkReason();
-        Unit unit = (Unit) locatable;
+        Unit unit = (Unit)locatable;
         BuildingType type = getType();
 
         return (reason != NoAddReason.NONE) ? reason
@@ -562,15 +536,6 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      */
     public List<ProductionType> getProductionTypes() {
         return getType().getProductionTypes();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public ProductionType getBestProductionType(Unit unit) {
-        // TODO: think of something better
-        return getType().getProductionTypes().isEmpty()
-            ? null : getType().getProductionTypes().get(0);
     }
 
 
