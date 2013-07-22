@@ -1309,7 +1309,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public void updatePlayerExploredTile(Player player, boolean full) {
         if (playerExploredTiles == null || !player.isEuropean()) return;
         PlayerExploredTile pet = requirePlayerExploredTile(player);
-        pet.update(full);
+        pet.update();
+        if (full) pet.updateInternals();
     }
 
     /**

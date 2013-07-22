@@ -96,6 +96,9 @@ public class IndianSettlement extends Settlement {
             }
         };
 
+    /** The maximum number of wanted goods. */
+    public static final int WANTED_GOODS_COUNT = 3;
+
     /** Radius of native tales map reveal. */
     public static final int TALES_RADIUS = 6;
 
@@ -1245,11 +1248,13 @@ public class IndianSettlement extends Settlement {
             xw.writeAttribute(LEARNABLE_SKILL_TAG, pet.getSkill());
 
             GoodsType[] wanted = pet.getWantedGoods();
-            int i, j = 0;
-            for (i = 0; i < wanted.length; i++) {
-                if (wanted[i] != null) {
-                    xw.writeAttribute(WANTED_GOODS_TAG + j, wanted[i]);
-                    j++;
+            if (wanted != null) {
+                int i, j = 0;
+                for (i = 0; i < wanted.length; i++) {
+                    if (wanted[i] != null) {
+                        xw.writeAttribute(WANTED_GOODS_TAG + j, wanted[i]);
+                        j++;
+                    }
                 }
             }
 
