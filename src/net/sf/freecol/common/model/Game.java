@@ -328,9 +328,8 @@ public class Game extends FreeColGameObject {
      */
     public Location makeFreeColLocation(String id) {
         FreeColGameObject fcgo = getFreeColGameObject(id);
-        if (fcgo instanceof Location) {
-            return (Location)fcgo;
-        } else if (fcgo != null) {
+        if (fcgo != null) {
+            if (fcgo instanceof Location) return (Location)fcgo;
             logger.warning("Not a location: " + id);
             return null;
         }

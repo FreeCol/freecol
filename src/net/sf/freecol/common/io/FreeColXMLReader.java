@@ -440,18 +440,17 @@ public class FreeColXMLReader extends StreamReaderDelegate {
 
         if (attrib != null) {
             FreeColObject fco = lookup(game, attrib);
-            if (fco instanceof Location) {
-                return (Location)fco;
-            } else if (fco != null) {
-                logger.warning("Not a location: " + attrib);
-                return null;
-            }
-            if (make) {
-                try {
-                    return game.makeFreeColLocation(attrib);
-                } catch (IllegalArgumentException iae) {
-                    throw new XMLStreamException(iae);
+            if (fco == null) {
+                if (make) {
+                    try {
+                        return game.makeFreeColLocation(attrib);
+                    } catch (IllegalArgumentException iae) {
+                        throw new XMLStreamException(iae);
+                    }
                 }
+            } else {
+                if (fco instanceof Location) return (Location)fco;
+                logger.warning("Not a location: " + attrib);
             }
         }
         return null;
