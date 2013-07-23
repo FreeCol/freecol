@@ -759,46 +759,62 @@ public class Unit extends GoodsLocation
      * @param newLocation The new <code>Location</code>.
      */
     public void setLocation(Location newLocation) {
-        // If either the add or remove involves a colony, call the
-        // colony-specific routine...
-        Colony oldColony = (location instanceof WorkLocation)
-            ? this.getColony() : null;
-        Colony newColony = (newLocation instanceof WorkLocation)
-            ? newLocation.getColony() : null;
-        // However if the unit is moving within the same colony,
-        // do not call the colony-specific routines.
-        if (oldColony == newColony) oldColony = newColony = null;
-
-        boolean result = true;
-        if (location != null) {
-            result = (oldColony != null)
-                ? oldColony.removeUnit(this)
-                : location.remove(this);
-        }
-        /*if (!result) return false;*/
-
-        setLocationNoUpdate(newLocation);
-
         // It is possible to add a unit to a non-specific location
         // within a colony by specifying the colony as the new
-        // location.
+        // location.  Find a suitable work location.
         if (newLocation instanceof Colony) {
-            newColony = (Colony) newLocation;
-            location = newLocation = newColony.getWorkLocationFor(this);
+            newLocation = ((Colony)newLocation).getWorkLocationFor(this);
+            if (newLocation == null) return; // Just fail fast.
         }
 
-        if (newLocation != null) {
-            result = (newColony != null)
-                ? newColony.addUnit(this, (WorkLocation) newLocation)
-                : newLocation.add(this);
+        if (newLocation == location) return;
+        if (newLocation != null && !newLocation.canAdd(this)) {
+            logger.warning("Can not add " + this + " to "
+                + newLocation.getId());
+            return;
+        }
+
+        // If the unit either starts or ends this move in a colony
+        // then teaching status can change.  However, if it moves
+        // between locations within the same colony with the same
+        // teaching ability, the teaching state should *not* change.
+        // We have to handle this issue here in setLocation as this is
+        // the only place that contains information about both
+        // locations.
+        Colony oldColony = (location instanceof WorkLocation)
+            ? location.getColony() : null;
+        Colony newColony = (newLocation instanceof WorkLocation)
+            ? newLocation.getColony() : null;
+        boolean withinColony = newColony != null && newColony == oldColony;
+        boolean preserveEducation = withinColony
+            && (((WorkLocation)location).canTeach()
+                == ((WorkLocation)newLocation).canTeach());
+        
+        if (location != null && !location.remove(this)) {
+            // "Should not happen" (should always be able to remove)
+            throw new RuntimeException("Failed to remove " + this
+                + " from " + location.getId());
+        }
+        if (oldColony != null) {
+            if (!withinColony) oldColony.updatePopulation();
+            if (!preserveEducation) oldColony.updateEducation(this, false);
+        }
+
+        if (newLocation != null && !newLocation.add(this)) {
+            // "Should not happen" (canAdd was checked above)
+            throw new RuntimeException("Failed to add "
+                + this + " to " + newLocation.getId());
+        }
+        setLocationNoUpdate(newLocation);//-vis
+        if (newColony != null) {
+            if (!withinColony) newColony.updatePopulation();
+            if (!preserveEducation) newColony.updateEducation(this, true);
         }
 
         // Explore the new location now to prevent dealing with tiles
         // with null (unexplored) type.  This will update the PETs so
         // it needs to be done after the unit is added back to its tile.
         getOwner().setExplored(this);
-
-        return /*result*/;
     }
 
     /**

@@ -1320,57 +1320,6 @@ public class Colony extends Settlement implements Nameable {
     // Unit manipulation and population
 
     /**
-     * Adds a <code>Unit</code> to an optional
-     * <code>WorkLocation</code> in this Colony.
-     *
-     * @param unit The <code>Unit</code> to add.
-     * @param loc The <code>WorkLocation</code> to add to (if null,
-     *     one is chosen).
-     * @return True if the add succeeded.
-     */
-    public boolean addUnit(Unit unit, WorkLocation loc) {
-        if (!unit.isPerson()) return false;
-        if (loc == null) {
-            loc = getWorkLocationFor(unit);
-            if (loc == null) return false;
-        }
-        if (!loc.add(unit)) return false;
-        Player owner = unit.getOwner();
-        updatePopulation(1);
-        unit.setState(Unit.UnitState.IN_COLONY);
-        if (owner.isAI()) {
-            firePropertyChange(REARRANGE_WORKERS, true, false);
-        }
-        return true;
-    }
-
-    /**
-     * Removes a <code>Unit</code> from this Colony.
-     *
-     * @param unit The <code>Unit</code> to remove.
-     * @return True if the remove succeeded.
-     */
-    public boolean removeUnit(Unit unit) {
-        Player owner = unit.getOwner();
-        for (WorkLocation w : getCurrentWorkLocations()) {
-            if (w.contains(unit) && w.remove(unit)) {
-                Unit teacher = unit.getTeacher();
-                if (teacher != null) {
-                    teacher.setStudent(null);
-                    unit.setTeacher(null);
-                }
-                updatePopulation(-1);
-                unit.setState(Unit.UnitState.ACTIVE);
-                if (owner.isAI()) {
-                    firePropertyChange(REARRANGE_WORKERS, true, false);
-                }
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Can this colony reduce its population voluntarily?
      *
      * This is generally the case, but can be prevented by buildings
@@ -1537,17 +1486,74 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
-     * Updates SoL and builds Buildings that are free if possible.
-     *
-     * @param difference The difference in population.
+     * Signal to the colony that its population is changing.
+     * Called from Unit.setLocation when a unit moves into or out of this
+     * colony, but *not* if it is moving within the colony.
      */
-    public void updatePopulation(int difference) {
-        int population = getUnitCount();
-        if (population > 0) {
-            getTile().updatePlayerExploredTiles();
+    public void updatePopulation() {
+        getTile().updatePlayerExploredTiles();
+        updateSoL();
+        updateProductionBonus();
+        if (getOwner().isAI()) {
+            firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
+        }
+    }
 
-            updateSoL();
-            updateProductionBonus();
+    /**
+     * Signal to the colony that a unit is moving in or out or
+     * changing its internal work location to one with a different
+     * teaching ability.  This requires either checking for a new
+     * teacher or student, or clearing any existing education
+     * relationships.
+     *
+     * @param unit The <code>Unit</code> that is changing its education state.
+     * @param enable If true, check for new education opportunities, otherwise
+     *     clear existing ones.
+     */
+    public void updateEducation(Unit unit, boolean enable) {
+        Location loc = unit.getLocation();
+        WorkLocation wl = (loc instanceof WorkLocation) ? (WorkLocation)loc
+            : null;
+        if (wl == null) {
+            throw new RuntimeException("updateEducation(" + unit
+                + ") unit not at work location.");
+        } else if (wl.getColony() != this) {
+            throw new RuntimeException("updateEducation(" + unit
+                + ") unit not at work location in this colony.");
+        }
+        if (enable) {
+            if (wl.canTeach()) {
+                Unit student = unit.getStudent();
+                if (student == null
+                    && (student = findStudent(unit)) != null) {
+                    unit.setStudent(student);
+                    student.setTeacher(unit);
+                    unit.setTurnsOfTraining(0);// Teacher starts teaching
+                    unit.changeWorkType(null);
+                }
+            } else {
+                Unit teacher = unit.getTeacher();
+                if (teacher == null
+                    && (teacher = findTeacher(unit)) != null) {
+                    unit.setTeacher(teacher);
+                    teacher.setStudent(unit);
+                }
+            }
+        } else {
+            if (wl.canTeach()) {
+                Unit student = unit.getStudent();
+                if (student != null) {
+                    student.setTeacher(null);
+                    unit.setStudent(null);
+                    unit.setTurnsOfTraining(0);// Teacher stops teaching
+                }
+            } else {
+                Unit teacher = unit.getTeacher();
+                if (teacher != null) {
+                    teacher.setStudent(null);
+                    unit.setTeacher(null);
+                }
+            }
         }
     }
 
@@ -2364,7 +2370,9 @@ public class Colony extends Settlement implements Nameable {
     @Override
     public boolean add(Locatable locatable) {
         if (locatable instanceof Unit) {
-            return addUnit((Unit)locatable, null);
+            WorkLocation wl = getWorkLocationFor((Unit)locatable);
+            if (wl == null) return false;
+            return wl.add(locatable);
         }
         return super.add(locatable);
     }
@@ -2375,7 +2383,14 @@ public class Colony extends Settlement implements Nameable {
     @Override
     public boolean remove(Locatable locatable) {
         if (locatable instanceof Unit) {
-            return removeUnit((Unit)locatable);
+            Location loc = ((Unit)locatable).getLocation();
+            if (loc instanceof WorkLocation) {
+                WorkLocation wl = (WorkLocation)loc;
+                if (wl.getColony() == this) {
+                    return wl.remove(locatable);
+                }
+            }                
+            return false;
         }
         return super.remove(locatable);
     }

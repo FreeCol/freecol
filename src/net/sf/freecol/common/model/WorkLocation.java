@@ -350,24 +350,7 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
             }
         }
 
-        if (this.canTeach()) {
-            Unit student = unit.getStudent();
-            if (student == null
-                && (student = getColony().findStudent(unit)) != null) {
-                unit.setStudent(student);
-                student.setTeacher(unit);
-            }
-            unit.changeWorkType(null);
-        } else {
-            Unit teacher = unit.getTeacher();
-            if (teacher == null
-                && (teacher = getColony().findTeacher(unit)) != null) {
-                unit.setTeacher(teacher);
-                teacher.setStudent(unit);
-            }
-        }
-
-        colony.invalidateCache();
+        getColony().invalidateCache();
         return true;
     }
 
@@ -385,20 +368,7 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
 
         unit.setState(Unit.UnitState.ACTIVE);
         unit.setMovesLeft(0);
-
-        if (this.canTeach()) {
-            Unit student = unit.getStudent();
-            if (student != null) {
-                student.setTeacher(null);
-                unit.setStudent(null);
-            }
-            unit.setTurnsOfTraining(0);
-        }
-        // Do not clear teacher like in add().  Do that at the
-        // colony level so that students can be moved from one
-        // work location to another without disrupting teaching.
-        
-        colony.invalidateCache();
+        getColony().invalidateCache();
         return true;
     }
 

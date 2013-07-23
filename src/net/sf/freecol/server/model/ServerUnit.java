@@ -161,37 +161,38 @@ public class ServerUnit extends Unit implements ServerModelObject {
                       UnitType type, EquipmentType... initialEquipment) {
         super(game);
 
-        visibleGoodsCount = -1;
 
         if (type.canCarryGoods()) {
             setGoodsContainer(new GoodsContainer(game, this));
         }
 
         UnitType newType = type.getTargetType(ChangeType.CREATION, owner);
-        unitType = (newType == null) ? type : newType;
+        this.unitType = (newType == null) ? type : newType;
         this.owner = owner;
         if (isPerson()) {
-            nationality = owner.getNationId();
-            ethnicity = nationality;
+            this.nationality = owner.getNationId();
+            this.ethnicity = nationality;
         }
-        setLocation(location);//-vis(owner)
+        this.location = null;
 
-        workLeft = -1;
-        workType = null;
+        this.workLeft = -1;
+        this.workType = null;
 
         this.movesLeft = getInitialMovesLeft();
-        hitPoints = unitType.getHitPoints();
+        this.hitPoints = unitType.getHitPoints();
 
         for (EquipmentType equipmentType : initialEquipment) {
             if (EquipmentType.NO_EQUIPMENT.equals(equipmentType)) {
-                equipment.clear();
+                this.equipment.clear();
                 break;
             }
-            equipment.incrementCount(equipmentType, 1);
+            this.equipment.incrementCount(equipmentType, 1);
         }
         setRole();
         setStateUnchecked(state);
+        this.visibleGoodsCount = -1;
 
+        setLocation(location);//-vis(owner)
         owner.addUnit(this);
     }
 

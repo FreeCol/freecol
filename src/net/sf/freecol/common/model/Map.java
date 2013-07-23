@@ -2152,7 +2152,9 @@ public class Map extends FreeColGameObject implements Location {
     public boolean add(Locatable locatable) {
         // Used to add units to their entry location.  Dropped as this
         // is handled explicitly in the server.
-        if (locatable instanceof Unit) throw new RuntimeException("DISABLED MAP.ADD");
+        if (locatable instanceof Unit) {
+            throw new RuntimeException("Disabled Map.add(Unit)");
+        }
         return false;
     }
 
