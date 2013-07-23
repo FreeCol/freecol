@@ -19,12 +19,16 @@
 
 package net.sf.freecol.tools;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.geom.Rectangle2D;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.Point;
 import java.awt.Polygon;
+import java.awt.Rectangle;
+import java.awt.TexturePaint;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,14 +46,27 @@ public class ForestMaker {
     private static int BASE_WIDTH = 128;
     private static int BASE_HEIGHT = 64;
     private static int MARGIN = 20;
-    private static int TREES = 60;
+    private static int TREES = 40;
     private static int RIVER_MARGIN = 4;
 
     private static int HALF_WIDTH = BASE_WIDTH / 2;
     private static int HALF_HEIGHT = BASE_HEIGHT / 2;
 
+    private static int[] X = new int[] {
+        BASE_WIDTH, BASE_WIDTH, 0, 0
+    };
+
+    private static double[] SLOPE = new double[] {
+        -0.5, 0.5, -0.5, 0.5
+    };
+
     private static final int[] POWERS_OF_TWO
         = new int[] { 1, 2, 4, 8 };
+
+
+    private static boolean drawBorder = true;
+    private static boolean drawRiver = true;
+
 
     private static class ImageLocation implements Comparable<ImageLocation> {
         BufferedImage image;
@@ -82,6 +99,16 @@ public class ForestMaker {
             System.out.println("Usage: ForestMaker <directory>...");
             System.exit(1);
         }
+
+        String riverName = "data/rules/classic/resources/images/terrain/"
+            + "ocean/center0.png";
+        BufferedImage river = ImageIO.read(new File(riverName));
+        // grab a rectangle completely filled with water
+        river = river.getSubimage(44, 22, 40, 20);
+        Rectangle2D rectangle = new Rectangle(0, 0, river.getWidth(), river.getHeight());
+        TexturePaint texture = new TexturePaint(river, rectangle);
+
+
         for (String arg : args) {
             File sourceDirectory = new File(arg);
             if (!sourceDirectory.exists()) {
@@ -124,14 +151,16 @@ public class ForestMaker {
             };
             Polygon diamond = new Polygon(x_coords, y_coords, 4);
             diamond.translate(0, MARGIN);
-            //g.setColor(Color.RED);
-            //g.draw(diamond);
 
             Polygon[] polygons = getPolygons(RIVER_MARGIN);
             for (int index = 0; index < 16; index++) {
                 BufferedImage base = new BufferedImage(BASE_WIDTH, BASE_HEIGHT + MARGIN,
                                                        BufferedImage.TYPE_INT_ARGB);
                 Graphics2D g = base.createGraphics();
+                if (drawBorder) {
+                    g.setColor(Color.RED);
+                    g.draw(diamond);
+                }
 
                 List<ImageLocation> trees = new ArrayList<ImageLocation>(TREES);
                 int count = 0;
@@ -161,11 +190,21 @@ public class ForestMaker {
                 for (ImageLocation imageLocation : trees) {
                     g.drawImage(imageLocation.image, imageLocation.x, imageLocation.y, null);
                 }
+
+                g.setPaint(texture);
+                g.setStroke(new BasicStroke(6));
                 String counter = "";
                 if (index > 0) {
                     for (int i = 0; i < POWERS_OF_TWO.length; i++) {
-                        counter += (index & POWERS_OF_TWO[i]) == POWERS_OF_TWO[i]
-                            ? "1" : "0";
+                        if ((index & POWERS_OF_TWO[i]) == POWERS_OF_TWO[i]) {
+                            counter += "1";
+                            if (drawRiver) {
+                                g.drawLine(HALF_WIDTH, HALF_HEIGHT + MARGIN, X[i],
+                                           getY(HALF_WIDTH, HALF_HEIGHT + MARGIN, SLOPE[i], X[i]));
+                            }
+                        } else {
+                            counter += "0";
+                        }
                     }
                 }
                 ImageIO.write(base, "png", new File(sourceDirectory.getName() + counter + ".png"));
@@ -189,9 +228,9 @@ public class ForestMaker {
         x[1] = HALF_WIDTH;
         y[1] = HALF_HEIGHT + height;
         x[2] = BASE_WIDTH;
-        y[2] = getY(x[1], y[1], -0.5, BASE_WIDTH);
+        y[2] = getY(x[1], y[1], SLOPE[0], X[0]);
         x[3] = BASE_WIDTH;
-        y[3] = getY(x[0], y[0], -0.5, BASE_WIDTH);
+        y[3] = getY(x[0], y[0], SLOPE[0], X[0]);
         result[0] = new Polygon(x, y, 4);
         result[0].translate(0, MARGIN);
         // south-east
@@ -200,9 +239,9 @@ public class ForestMaker {
         x[1] = HALF_WIDTH;
         y[1] = HALF_HEIGHT - height;
         x[2] = BASE_WIDTH;
-        y[2] = getY(x[1], y[1], 0.5, BASE_WIDTH);
+        y[2] = getY(x[1], y[1], SLOPE[1], X[1]);
         x[3] = BASE_WIDTH;
-        y[3] = getY(x[0], y[0], 0.5, BASE_WIDTH);
+        y[3] = getY(x[0], y[0], SLOPE[1], X[1]);
         result[1] = new Polygon(x, y, 4);
         result[1].translate(0, MARGIN);
         // south-west
@@ -211,9 +250,9 @@ public class ForestMaker {
         x[1] = HALF_WIDTH + width;
         y[1] = HALF_HEIGHT;
         x[2] = 0;
-        y[2] = getY(x[1], y[1], -0.5, 0);
+        y[2] = getY(x[1], y[1], SLOPE[2], X[2]);
         x[3] = 0;
-        y[3] = getY(x[0], y[0], -0.5, 0);
+        y[3] = getY(x[0], y[0], SLOPE[2], X[2]);
         result[2] = new Polygon(x, y, 4);
         result[2].translate(0, MARGIN);
         // north-west
@@ -222,9 +261,9 @@ public class ForestMaker {
         x[1] = HALF_WIDTH;
         y[1] = HALF_HEIGHT + height;
         x[2] = 0;
-        y[2] = getY(x[1], y[1], 0.5, 0);
+        y[2] = getY(x[1], y[1], SLOPE[3], X[3]);
         x[3] = 0;
-        y[3] = getY(x[0], y[0], 0.5, 0);
+        y[3] = getY(x[0], y[0], SLOPE[3], X[3]);
         result[3] = new Polygon(x, y, 4);
         result[3].translate(0, MARGIN);
 
