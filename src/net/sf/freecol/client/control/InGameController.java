@@ -453,15 +453,17 @@ public final class InGameController implements NetworkConstants {
         // its trade route into this string buffer.  Always allocate
         // so we can use sb for error messages even when detailed
         // goods movement is disabled.
-        StringBuffer sb = new StringBuffer(128);
+        StringBuffer sb = (tr.isSilent()) ? null : new StringBuffer(128);
 
         for (;;) {
             stop = unit.getStop();
             // Complain and return if the stop is no longer valid.
             if (!TradeRoute.isStopValid(unit, stop)) {
-                sb.append(" ")
-                    .append(stopMessage("tradeRoute.invalidStop",
-                            stop, player));
+                if (sb != null) {
+                    sb.append(" ")
+                        .append(stopMessage("tradeRoute.invalidStop",
+                                stop, player));
+                }
                 clearOrders(unit);
                 result = true;
                 break;
@@ -478,15 +480,15 @@ public final class InGameController implements NetworkConstants {
                     + (FreeColGameObject)stop.getLocation());
             }
             if (atStop) {
-                int len = sb.length();
+                int len = (sb == null) ? -1 : sb.length();
                 // Anything to unload?
-                unloadUnitAtStop(unit, (detailed) ? sb : null);
+                unloadUnitAtStop(unit, (sb != null && detailed) ? sb : null);
 
                 // Anything to load?
-                loadUnitAtStop(unit, (detailed) ? sb : null);
+                loadUnitAtStop(unit, (sb != null && detailed) ? sb : null);
 
                 // Wrap load/unload messages.
-                if (detailed && sb.length() > len) {
+                if (sb != null && detailed && sb.length() > len) {
                     sb.insert(len, stopMessage("tradeRoute.atStop",
                                                stop, player));
                     sb.insert(len, " ");
@@ -509,7 +511,7 @@ public final class InGameController implements NetworkConstants {
                 // messages notifying that a stop has been skipped.
                 int next = unit.validateCurrentStop();
                 if (next == index) {
-                    if (detailed) {
+                    if (sb != null && detailed) {
                         sb.append(" ")
                             .append(Messages.message("tradeRoute.wait"));
                     }
@@ -519,7 +521,7 @@ public final class InGameController implements NetworkConstants {
                 for (;;) {
                     if (++index >= stops.size()) index = 0;
                     if (index == next) break;
-                    if (detailed) {
+                    if (sb != null && detailed) {
                         sb.append(" ")
                             .append(stopMessage("tradeRoute.skipStop",
                                     stops.get(index), player));
@@ -534,9 +536,10 @@ public final class InGameController implements NetworkConstants {
             if (unit.getMovesLeft() <= 0
                 || unit.getState() == UnitState.SKIPPED
                 || !more) {
-                if (detailed) {
+                if (sb != null && detailed) {
                     sb.append(" ")
-                        .append(stopMessage("tradeRoute.toStop", stop, player));
+                        .append(stopMessage("tradeRoute.toStop",
+                                            stop, player));
                 }
                 break;
             }
@@ -545,8 +548,11 @@ public final class InGameController implements NetworkConstants {
             Location destination = stop.getLocation();
             PathNode path = unit.findPath(destination);
             if (path == null) {
-                sb.append(" ")
-                    .append(stopMessage("tradeRoute.pathStop", stop, player));
+                if (sb != null) {
+                    sb.append(" ")
+                        .append(stopMessage("tradeRoute.pathStop",
+                                            stop, player));
+                }
                 unit.setState(UnitState.SKIPPED);
                 break;
             }
@@ -559,7 +565,7 @@ public final class InGameController implements NetworkConstants {
             }
         }
 
-        if (sb.length() > 0) {
+        if (sb != null && sb.length() > 0) {
             ModelMessage m = new ModelMessage(MessageType.GOODS_MOVEMENT,
                                               "tradeRoute.prefix", unit)
                 .addName("%route%", tr.getName())

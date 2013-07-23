@@ -39,6 +39,7 @@ import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -107,6 +108,9 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
 
     @SuppressWarnings("unchecked") // FIXME in Java7
     private final JList stopList = new JList(stopListModel);
+
+    private final JCheckBox messagesBox
+        = new JCheckBox(Messages.message("traderouteDialog.silence"));
 
     private final JScrollPane tradeRouteView = new JScrollPane(stopList);
 
@@ -226,8 +230,9 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
         add(tradeRouteName, "span");
         add(destinationLabel);
         add(destinationSelector, "span");
-        add(addStopButton, "skip 2");
-        add(removeStopButton);
+        add(messagesBox);
+        add(addStopButton);
+        add(removeStopButton, "span");
         add(goodsPanel, "span");
         add(cargoPanel, "span, height 80:, growy");
         add(okButton, "newline 20, span, split 2, tag ok");
@@ -235,7 +240,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
 
         final Game game = freeColClient.getGame();
         final Player player = getMyPlayer();
-        TradeRoute tradeRoute = newRoute.copy(game, TradeRoute.class);
+        final TradeRoute tradeRoute = newRoute.copy(game, TradeRoute.class);
 
         // combo box for selecting destination
         destinationSelector.setRenderer(new DestinationCellRenderer());
@@ -248,6 +253,13 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
             destinationSelector.addItem((Settlement) colony);
         }
 
+        messagesBox.setSelected(tradeRoute.isSilent());
+        messagesBox.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    tradeRoute.setSilent(messagesBox.isSelected());
+                }
+            });
+
         // add stops if any
         for (TradeRouteStop stop : tradeRoute.getStops()) {
             stopListModel.addElement(stop);
@@ -256,7 +268,8 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
         // update cargo panel if stop is selected
         if (stopListModel.getSize() > 0) {
             stopList.setSelectedIndex(0);
-            TradeRouteStop selectedStop = (TradeRouteStop)stopListModel.firstElement();
+            TradeRouteStop selectedStop
+                = (TradeRouteStop)stopListModel.firstElement();
             cargoPanel.initialize(selectedStop);
         }
 
@@ -267,7 +280,6 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
         tradeRouteName.setText(tradeRoute.getName());
 
         restoreSavedSize(getPreferredSize());
-
     }
 
     private void deleteCurrentlySelectedStops() {
@@ -279,10 +291,12 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
             lastIndex = index;
         }
 
-        // if the remaining list is non-empty, make sure that
-        // the element beneath the last of the previously selected
-        // is selected (ie, delete one of many, the one -under- the deleted is selected)
-        // the user can then click in the list once, and continue deleting without having to click in the list again.
+        // If the remaining list is non-empty, make sure that the
+        // element beneath the last of the previously selected is
+        // selected (ie, delete one of many, the one -under- the
+        // deleted is selected) the user can then click in the list
+        // once, and continue deleting without having to click in the
+        // list again.
         if (stopListModel.getSize() > 0) {
             stopList.setSelectedIndex(lastIndex - count + 1);
         }
@@ -360,6 +374,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
                 originalRoute.addStop((TradeRouteStop)stopListModel.get(index));
             }
             // TODO: update trade routes only if they have been modified
+            originalRoute.setSilent(messagesBox.isSelected());
             getController().updateTradeRoute(originalRoute);
             getGUI().removeFromCanvas(this);
             setResponse(Boolean.TRUE);

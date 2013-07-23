@@ -54,6 +54,9 @@ public class TradeRoute extends FreeColGameObject
     /** A list of stops. */
     private final List<TradeRouteStop> stops = new ArrayList<TradeRouteStop>();
 
+    /** Silence the messaging for this trade route. */
+    private boolean silent = false;
+
 
     /**
      * Creates a new <code>TradeRoute</code> instance.
@@ -66,6 +69,7 @@ public class TradeRoute extends FreeColGameObject
         super(game);
         this.name = name;
         this.owner = player;
+        this.silent = false;
     }
 
     /**
@@ -104,6 +108,7 @@ public class TradeRoute extends FreeColGameObject
         for (TradeRouteStop otherStop : other.getStops()) {
             addStop(new TradeRouteStop(otherStop));
         }
+        silent = other.silent;
     }
 
     /**
@@ -122,6 +127,24 @@ public class TradeRoute extends FreeColGameObject
      */
     public final void setName(final String newName) {
         this.name = newName;
+    }
+
+    /**
+     * Does this trade route generate no messages to the player?
+     *
+     * @return True if this trade route is silent.
+     */
+    public boolean isSilent() {
+        return silent;
+    }
+
+    /**
+     * Set the silence status of this trade route.
+     *
+     * @param silent The new silence status of this trade route.
+     */
+    public void setSilent(boolean silent) {
+        this.silent = silent;
     }
 
     /**
@@ -209,6 +232,7 @@ public class TradeRoute extends FreeColGameObject
 
     private static final String NAME_TAG = "name";
     private static final String OWNER_TAG = "owner";
+    private static final String SILENT_TAG = "silent";
 
 
     /**
@@ -221,6 +245,8 @@ public class TradeRoute extends FreeColGameObject
         xw.writeAttribute(NAME_TAG, getName());
 
         xw.writeAttribute(OWNER_TAG, getOwner());
+
+        xw.writeAttribute(SILENT_TAG, isSilent());
     }
 
     /**
@@ -244,6 +270,8 @@ public class TradeRoute extends FreeColGameObject
 
         owner = xr.findFreeColGameObject(getGame(), OWNER_TAG,
                                          Player.class, (Player)null, true);
+
+        silent = xr.getAttribute(SILENT_TAG, false);
     }
 
     /**
@@ -277,7 +305,13 @@ public class TradeRoute extends FreeColGameObject
      */
     @Override
     public String toString() {
-        return getName();
+        StringBuilder sb = new StringBuilder(64);
+        sb.append("[").append(getXMLTagName()).append(" ").append(getName());
+        for (TradeRouteStop stop : getStops()) {
+            sb.append(" ").append(stop.toString());
+        }
+        sb.append("]");
+        return sb.toString();
     }
 
     /**
