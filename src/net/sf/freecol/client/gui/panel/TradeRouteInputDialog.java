@@ -233,9 +233,9 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
         add(okButton, "newline 20, span, split 2, tag ok");
         add(cancelButton, "tag cancel");
 
-        TradeRoute tradeRoute = newRoute.clone();
-
-        Player player = getMyPlayer();
+        final Game game = freeColClient.getGame();
+        final Player player = getMyPlayer();
+        TradeRoute tradeRoute = newRoute.copy(game, TradeRoute.class);
 
         // combo box for selecting destination
         destinationSelector.setRenderer(new DestinationCellRenderer());

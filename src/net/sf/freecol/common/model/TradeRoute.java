@@ -150,42 +150,6 @@ public class TradeRoute extends FreeColGameObject
     }
 
     /**
-     * Replace all the stops for this trade route with the stops passed from
-     * another trade route.
-     *
-     * This method will create a deep copy as it creates new stops
-     * based on the given ones.
-     *
-     * @param otherStops The list of new <code>Stop</code>s to use.
-     * @see #clone()
-     */
-    private void replaceStops(List<TradeRouteStop> otherStops) {
-        clearStops();
-        for (TradeRouteStop otherStop : otherStops) {
-            addStop(new TradeRouteStop(otherStop));
-        }
-    }
-
-    /**
-     * Clone the trade route and return a deep copy.
-     * <p>
-     * The copied trade route has no reference back to the original and can
-     * safely be used as a temporary copy.  It is NOT registered with the game,
-     * but will have the same unique identifier as the original.
-     *
-     * @return deep copy of trade route.
-     */
-    public TradeRoute clone() {
-        try {
-            TradeRoute copy = (TradeRoute) super.clone();
-            copy.replaceStops(getStops());
-            return copy;
-        } catch (CloneNotSupportedException e) {
-            throw new IllegalStateException("Clone should be supported!", e);
-        }
-    }
-
-    /**
      * Get the units assigned to this route.
      *
      * @return A list of assigned <code>Unit</code>s.
