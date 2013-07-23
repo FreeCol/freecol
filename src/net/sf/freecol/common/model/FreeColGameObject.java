@@ -288,16 +288,6 @@ public abstract class FreeColGameObject extends FreeColObject {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String toString() {
-        return getClass().getName() + ":" + getId()
-            + " (super hashcode: " + Integer.toHexString(super.hashCode())
-            + ")";
-    }
-
-    /**
      * Gets the tag name of the root element representing this object.
      * This method should be overwritten by any sub-class, preferably
      * with the name of the class with the first letter in lower case.

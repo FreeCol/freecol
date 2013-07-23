@@ -1147,6 +1147,15 @@ public abstract class FreeColObject implements ObjectWithId {
 
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return getClass().getName() + ":" + getId();
+        //+ " (super hashcode: " + Integer.toHexString(super.hashCode()) + ")"
+    }
+
+    /**
      * Gets the tag name used to serialize this object, generally the
      * class name starting with a lower case letter.
      *
