@@ -220,20 +220,23 @@ public class TradeRouteStop extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        xw.writeStartElement(getXMLElementTagName());
-
+    public void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         xw.writeLocationAttribute(LOCATION_TAG, location);
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         for (GoodsType cargoType : cargo) {
+
             xw.writeStartElement(CARGO_TAG);
             
             xw.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG, cargoType);
 
             xw.writeEndElement();
         }
-
-        xw.writeEndElement();
     }
 
     /**
@@ -282,7 +285,7 @@ public class TradeRouteStop extends FreeColObject {
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
         sb.append("[").append(getXMLTagName())
-            .append(" ").append(getLocation().toString());
+            .append(" ").append(getLocation().getId());
         for (GoodsType goodsType : getCargo()) {
             sb.append(" ").append(goodsType.toString());
         }
