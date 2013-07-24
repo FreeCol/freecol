@@ -40,6 +40,11 @@ public class SchoolTest extends FreeColTestCase {
     private static final BuildingType universityType
         = spec().getBuildingType("model.building.university");
 
+    private static final GoodsType lumber
+        = spec().getGoodsType("model.goods.lumber");
+    private static final GoodsType cotton
+        = spec().getGoodsType("model.goods.cotton");
+
     private static final UnitType colonialRegularType
         = spec().getUnitType("model.unit.colonialRegular");
     private static final UnitType elderStatesmanType
@@ -112,9 +117,6 @@ public class SchoolTest extends FreeColTestCase {
     }
 
     public void testEducationOption() {
-        GoodsType lumber = spec().getGoodsType("model.goods.lumber");
-        GoodsType cotton = spec().getGoodsType("model.goods.cotton");
-
         Game game = getGame();
         game.setMap(getTestMap(true));
 
@@ -133,11 +135,12 @@ public class SchoolTest extends FreeColTestCase {
         Unit colonist2 = units.next();
         colonist2.setType(freeColonistType);
 
+        boolean selection = FreeColTestUtils.setStudentSelection(true);
+
         colony.addBuilding(new ServerBuilding(getGame(), colony, schoolType));
         Building school = colony.getBuilding(schoolType);
         assertTrue(school.canTeach());
         assertTrue(colony.canTrain(lumberJack));
-        assertTrue(spec().getBoolean(GameOptions.ALLOW_STUDENT_SELECTION));
         lumberJack.setLocation(school);
 
         colonist1.changeWorkType(cotton);
@@ -149,14 +152,16 @@ public class SchoolTest extends FreeColTestCase {
         lumberJack.setStudent(null);
         colonist2.setTeacher(null);
 
-        spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION).setValue(false);
+        FreeColTestUtils.setStudentSelection(false);
+
         criminal1.changeWorkType(cotton);
         criminal2.changeWorkType(lumber);
         assertEquals(criminal2, colony.findStudent(lumberJack));
 
+        FreeColTestUtils.setStudentSelection(selection);
     }
 
-    public void testChangeTeachers(){
+    public void testChangeTeachers() {
         Game game = getGame();
         game.setMap(getTestMap());
 
@@ -176,17 +181,17 @@ public class SchoolTest extends FreeColTestCase {
         assertNull("Teacher2 should not have a student yet",
                    teacher2.getStudent());
 
+        boolean selection = FreeColTestUtils.setStudentSelection(false);
+
         // add first teacher
-        spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION)
-            .setValue(false);
-        school.add(teacher1);
-        assertEquals("Teacher1 should now have a student",
-                     teacher1.getStudent(), student);
-        assertEquals("Student should have assigned teacher1",
-                     student.getTeacher(), teacher1);
+        teacher1.setLocation(school);
+        assertEquals("Teacher1 should now have a student", student,
+                     teacher1.getStudent());
+        assertEquals("Student should have assigned teacher1", teacher1,
+                     student.getTeacher());
 
         // add a second teacher
-        school.add(teacher2);
+        teacher2.setLocation(school);
         assertEquals("Teacher1 should still have a student",
                      teacher1.getStudent(), student);
         assertNull("Teacher2 should not have a student yet",
@@ -198,12 +203,11 @@ public class SchoolTest extends FreeColTestCase {
         student.setTeacher(teacher2);
         assertNull("Teacher1 should not have a student now",
                    teacher1.getStudent());
-        assertEquals("Teacher2 should now have a student",
-                     teacher2.getStudent(), student);
-        assertEquals("Student should have assigned teacher2",
-                     student.getTeacher(), teacher2);
+        assertEquals("Teacher2 should now have a student", student,
+                     teacher2.getStudent());
+        assertEquals("Student should have assigned teacher2", teacher2,
+                     student.getTeacher());
 
-        spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION)
-            .setValue(true);
+        FreeColTestUtils.setStudentSelection(selection);
     }
 }

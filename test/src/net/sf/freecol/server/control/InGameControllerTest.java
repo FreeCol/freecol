@@ -64,6 +64,7 @@ import net.sf.freecol.server.model.ServerBuilding;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
+import net.sf.freecol.util.test.FreeColTestUtils;
 
 
 public class InGameControllerTest extends FreeColTestCase {
@@ -434,9 +435,7 @@ public class InGameControllerTest extends FreeColTestCase {
         assertEquals("Unit should be a hardy pioneer",
                      hardyPioneerType, teacher.getType());
 
-        boolean sel = spec().getBoolean(GameOptions.ALLOW_STUDENT_SELECTION);
-        spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION)
-            .setValue(false);
+        boolean selection = FreeColTestUtils.setStudentSelection(false);
         teacher.setLocation(school);
         assertNotNull("Teacher should have student", teacher.getStudent());
 
@@ -444,8 +443,7 @@ public class InGameControllerTest extends FreeColTestCase {
         assertEquals("Teacher specialty cannot be cleared",
                      hardyPioneerType, teacher.getType());
 
-        spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION)
-            .setValue(sel);
+        FreeColTestUtils.setStudentSelection(selection);
     }
 
     public void testAtackedNavalUnitIsDamaged() {

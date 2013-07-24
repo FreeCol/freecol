@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.util.test.FreeColTestCase;
+import net.sf.freecol.util.test.FreeColTestUtils;
 
 
 public class ServerBuildingTest extends FreeColTestCase {
@@ -138,7 +139,7 @@ public class ServerBuildingTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
         // otherwise this test will crash and burn
-        spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION).setValue(false);
+        boolean selection = FreeColTestUtils.setStudentSelection(false);
 
         Colony colony = getSchoolColony(4, SchoolLevel.SCHOOLHOUSE);
         Building school = colony.getBuilding(schoolType);
@@ -164,13 +165,15 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         trainForTurns(colony, ore.getNeededTurnsOfTraining());
         assertEquals(expertOreMinerType, colonist.getType());
+
+        FreeColTestUtils.setStudentSelection(selection);
     }
 
     public void testCollege() {
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
         // otherwise this test will crash and burn
-        spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION).setValue(false);
+        boolean selection = FreeColTestUtils.setStudentSelection(false);
 
         Colony colony = getSchoolColony(4, SchoolLevel.COLLEGE);
         Building college = colony.getBuilding(collegeType);
@@ -188,13 +191,15 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         trainForTurns(colony, blackSmith.getNeededTurnsOfTraining());
         assertEquals(masterBlacksmithType, colonist.getType());
+
+        FreeColTestUtils.setStudentSelection(selection);
     }
 
     public void testUniversity() {
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
         // otherwise this test will crash and burn
-        spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION).setValue(false);
+        boolean selection = FreeColTestUtils.setStudentSelection(false);
 
         Colony colony = getSchoolColony(4, SchoolLevel.UNIVERSITY);
         assertEquals(4, colony.getUnitCount());
@@ -214,6 +219,8 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         trainForTurns(colony, elder.getNeededTurnsOfTraining());
         assertEquals(elderStatesmanType, colonist.getType());
+
+        FreeColTestUtils.setStudentSelection(selection);
     }
 
     /**
@@ -245,7 +252,7 @@ public class ServerBuildingTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
         // otherwise this test will crash and burn
-        spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION).setValue(false);
+        boolean selection = FreeColTestUtils.setStudentSelection(false);
 
         Colony colony = getSchoolColony(8, SchoolLevel.COLLEGE);
         // prevent starvation
@@ -335,11 +342,13 @@ public class ServerBuildingTest extends FreeColTestCase {
         }
         assertEquals(0, getUnitList(colony, freeColonistType).size());
         assertEquals(2, getUnitList(colony, veteranSoldierType).size());
+
+        FreeColTestUtils.setStudentSelection(selection);
     }
 
     public void testTwoTeachersSimple() {
-        spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION)
-            .setValue(false);
+        boolean selection = FreeColTestUtils.setStudentSelection(false);
+
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
         Colony colony = getSchoolColony(5, SchoolLevel.UNIVERSITY);
         // prevent starvation
@@ -385,6 +394,8 @@ public class ServerBuildingTest extends FreeColTestCase {
         assertEquals(1, getUnitList(colony, freeColonistType).size());
         assertEquals(2, getUnitList(colony, masterBlacksmithType).size());
         assertEquals(2, getUnitList(colony, expertOreMinerType).size());
+
+        FreeColTestUtils.setStudentSelection(selection);
     }
 
 
@@ -392,8 +403,7 @@ public class ServerBuildingTest extends FreeColTestCase {
      * If there are two teachers, but just one colonist to be taught.
      */
     public void testSingleGuyTwoTeachers() {
-        spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION)
-            .setValue(false);
+        boolean selection = FreeColTestUtils.setStudentSelection(false);
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
         Colony colony = getSchoolColony(4, SchoolLevel.UNIVERSITY);
@@ -427,6 +437,8 @@ public class ServerBuildingTest extends FreeColTestCase {
         assertEquals(0, getUnitList(colony, freeColonistType).size());
         assertEquals(1, getUnitList(colony, expertLumberJackType).size());
         assertEquals(2, getUnitList(colony, masterBlacksmithType).size());
+
+        FreeColTestUtils.setStudentSelection(selection);
     }
 
     /**
@@ -434,8 +446,7 @@ public class ServerBuildingTest extends FreeColTestCase {
      * taught, this should not mean any speed up.
      */
     public void testTwoTeachersOfSameKind() {
-        spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION)
-            .setValue(false);
+        boolean selection = FreeColTestUtils.setStudentSelection(false);
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
         Colony colony = getSchoolColony(4, SchoolLevel.UNIVERSITY);
@@ -464,6 +475,8 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         assertEquals(0, getUnitList(colony, freeColonistType).size());
         assertEquals(3, getUnitList(colony, expertLumberJackType).size());
+
+        FreeColTestUtils.setStudentSelection(selection);
     }
 
     /**
@@ -472,8 +485,7 @@ public class ServerBuildingTest extends FreeColTestCase {
      *
      */
     public void testSingleGuyTwoTeachers2() {
-        spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION)
-            .setValue(false);
+        boolean selection = FreeColTestUtils.setStudentSelection(false);
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
         Colony colony = getSchoolColony(4, SchoolLevel.UNIVERSITY);
@@ -521,14 +533,15 @@ public class ServerBuildingTest extends FreeColTestCase {
         assertEquals(0, getUnitList(colony, freeColonistType).size());
         assertEquals(2, getUnitList(colony, expertLumberJackType).size());
         assertEquals(1, getUnitList(colony, expertOreMinerType).size());
+
+        FreeColTestUtils.setStudentSelection(selection);
     }
 
     /**
      * Test that an petty criminal becomes an indentured servant
      */
     public void testTeachPettyCriminals() {
-        spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION)
-            .setValue(false);
+        boolean selection = FreeColTestUtils.setStudentSelection(false);
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
         Colony colony = getSchoolColony(4, SchoolLevel.UNIVERSITY);
@@ -551,6 +564,8 @@ public class ServerBuildingTest extends FreeColTestCase {
         trainForTurns(colony, teacher.getNeededTurnsOfTraining());
         assertEquals(0, getUnitList(colony, pettyCriminalType).size());
         assertEquals(indenturedServantType, criminal.getType());
+
+        FreeColTestUtils.setStudentSelection(selection);
     }
 
     /**
@@ -558,8 +573,7 @@ public class ServerBuildingTest extends FreeColTestCase {
      * taught, but on the teacher.
      */
     public void testTeachPettyCriminalsByMaster() {
-        spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION)
-            .setValue(false);
+        boolean selection = FreeColTestUtils.setStudentSelection(false);
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
         Colony colony = getSchoolColony(4, SchoolLevel.UNIVERSITY);
@@ -580,14 +594,15 @@ public class ServerBuildingTest extends FreeColTestCase {
         trainForTurns(colony, teacher.getNeededTurnsOfTraining());
         assertEquals(0, getUnitList(colony, pettyCriminalType).size());
         assertEquals(indenturedServantType, criminal.getType());
+
+        FreeColTestUtils.setStudentSelection(selection);
     }
 
     /**
      * Test that an indentured servant becomes a free colonist
      */
     public void testTeachIndenturedServants() {
-        spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION)
-            .setValue(false);
+        boolean selection = FreeColTestUtils.setStudentSelection(false);
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
         Colony colony = getSchoolColony(4, SchoolLevel.UNIVERSITY);
@@ -608,6 +623,8 @@ public class ServerBuildingTest extends FreeColTestCase {
         trainForTurns(colony, teacher.getNeededTurnsOfTraining());
         assertEquals(0, getUnitList(colony, indenturedServantType).size());
         assertEquals(freeColonistType, indenturedServant.getType());
+
+        FreeColTestUtils.setStudentSelection(selection);
     }
 
     /**
@@ -617,8 +634,7 @@ public class ServerBuildingTest extends FreeColTestCase {
      * there to simplify gameplay.
      */
     public void testTeacherStoresProgress() {
-        spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION)
-            .setValue(false);
+        boolean selection = FreeColTestUtils.setStudentSelection(false);
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
         Colony colony = getSchoolColony(4, SchoolLevel.UNIVERSITY);
@@ -649,6 +665,8 @@ public class ServerBuildingTest extends FreeColTestCase {
         ServerTestHelper.newTurn();
         assertEquals(0, getUnitList(colony, freeColonistType).size());
         assertEquals(expertOreMinerType, outsider.getType());
+
+        FreeColTestUtils.setStudentSelection(selection);
     }
 
     /**
@@ -657,8 +675,7 @@ public class ServerBuildingTest extends FreeColTestCase {
      * Moving a teacher inside the colony should not reset its training.
      */
     public void testMoveTeacherInside() {
-        spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION)
-            .setValue(false);
+        boolean selection = FreeColTestUtils.setStudentSelection(false);
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
         Colony colony = getSchoolColony(4, SchoolLevel.UNIVERSITY);
@@ -738,11 +755,12 @@ public class ServerBuildingTest extends FreeColTestCase {
         assertEquals(1, getUnitList(colony, indenturedServantType).size());
         assertEquals(1, getUnitList(colony, expertOreMinerType).size());
         assertEquals(2, getUnitList(colony, masterCarpenterType).size());
+
+        FreeColTestUtils.setStudentSelection(selection);
     }
 
     public void testCaseTwoTeachersWithDifferentExp() {
-        spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION)
-            .setValue(false);
+        boolean selection = FreeColTestUtils.setStudentSelection(false);
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
         Colony colony = getSchoolColony(4, SchoolLevel.UNIVERSITY);
@@ -782,6 +800,8 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         assertEquals(0, teacher1.getTurnsOfTraining());
         assertEquals(2, teacher2.getTurnsOfTraining());
+
+        FreeColTestUtils.setStudentSelection(selection);
     }
 
     /**
@@ -790,8 +810,7 @@ public class ServerBuildingTest extends FreeColTestCase {
      * Moving a teacher outside the colony should reset its training.
      */
     public void testMoveTeacherOutside() {
-        spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION)
-            .setValue(false);
+        boolean selection = FreeColTestUtils.setStudentSelection(false);
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
         Colony otherColony = getStandardColony(1, 10, 10);
@@ -875,6 +894,8 @@ public class ServerBuildingTest extends FreeColTestCase {
         assertEquals(1, getUnitList(colony, indenturedServantType).size());
         assertEquals(2, getUnitList(colony, expertOreMinerType).size());
         assertEquals(1, getUnitList(colony, masterCarpenterType).size());
+
+        FreeColTestUtils.setStudentSelection(selection);
     }
 
     /* Actually, now it should.  Disabled. */
@@ -910,8 +931,7 @@ public class ServerBuildingTest extends FreeColTestCase {
      * Should not save progress but start all over.
      */
     public void testPartTraining() {
-        spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION)
-            .setValue(false);
+        boolean selection = FreeColTestUtils.setStudentSelection(false);
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
         Colony colony = getSchoolColony(4, SchoolLevel.UNIVERSITY);
@@ -948,6 +968,8 @@ public class ServerBuildingTest extends FreeColTestCase {
         trainForTurns(colony, miner.getNeededTurnsOfTraining());
         assertEquals(0, getUnitList(colony, freeColonistType).size());
         assertEquals(2, getUnitList(colony, expertOreMinerType).size());
+
+        FreeColTestUtils.setStudentSelection(selection);
     }
 
     /**
@@ -955,8 +977,7 @@ public class ServerBuildingTest extends FreeColTestCase {
      * are preferred to petty criminals.
      */
     public void testTeachingOrder() {
-        spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION)
-            .setValue(false);
+        boolean selection = FreeColTestUtils.setStudentSelection(false);
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
         Colony colony = getSchoolColony(4, SchoolLevel.UNIVERSITY);
@@ -1018,6 +1039,8 @@ public class ServerBuildingTest extends FreeColTestCase {
         assertEquals(2, getUnitList(colony, expertOreMinerType).size());
         assertEquals(expertOreMinerType, indenturedServant.getType());
         assertEquals(indenturedServant.getTeacher(), null);
+
+        FreeColTestUtils.setStudentSelection(selection);
     }
 
     /**
@@ -1025,8 +1048,7 @@ public class ServerBuildingTest extends FreeColTestCase {
      * learn a skill at the same time.
      */
     public void testTeachingDoublePromotion() {
-        spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION)
-            .setValue(false);
+        boolean selection = FreeColTestUtils.setStudentSelection(false);
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
         Colony colony = getSchoolColony(4, SchoolLevel.UNIVERSITY);
@@ -1080,11 +1102,12 @@ public class ServerBuildingTest extends FreeColTestCase {
         assertEquals(0, getUnitList(colony, freeColonistType).size());
         assertEquals(0, getUnitList(colony, indenturedServantType).size());
         assertEquals(0, getUnitList(colony, pettyCriminalType).size());
+
+        FreeColTestUtils.setStudentSelection(selection);
     }
 
     public void testColonialRegular() {
-        spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION)
-            .setValue(false);
+        boolean selection = FreeColTestUtils.setStudentSelection(false);
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
         Colony colony = getSchoolColony(4, SchoolLevel.UNIVERSITY);
@@ -1104,11 +1127,12 @@ public class ServerBuildingTest extends FreeColTestCase {
         trainForTurns(colony, freeColonistType.getEducationTurns(veteranSoldierType));
 
         assertEquals(veteranSoldierType, colonist.getType());
+
+        FreeColTestUtils.setStudentSelection(selection);
     }
 
     public void testConcurrentUpgrade() {
-        spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION)
-            .setValue(false);
+        boolean selection = FreeColTestUtils.setStudentSelection(false);
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
         Colony colony = getSchoolColony(2, SchoolLevel.SCHOOLHOUSE);
@@ -1141,11 +1165,12 @@ public class ServerBuildingTest extends FreeColTestCase {
         student.setType(masterCarpenterType);
         assertNull(lumber.getStudent());
         assertNull(student.getTeacher());
+
+        FreeColTestUtils.setStudentSelection(selection);
     }
 
     public void testProductionBonus() {
-        spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION)
-            .setValue(false);
+        boolean selection = FreeColTestUtils.setStudentSelection(false);
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
         Colony colony = getSchoolColony(6, SchoolLevel.UNIVERSITY);
@@ -1176,5 +1201,7 @@ public class ServerBuildingTest extends FreeColTestCase {
             assertEquals(6 - bonus, blacksmith.getNeededTurnsOfTraining());
             assertEquals(8 - bonus, statesman.getNeededTurnsOfTraining());
         }
+
+        FreeColTestUtils.setStudentSelection(selection);
     }
 }
