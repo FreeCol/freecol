@@ -206,7 +206,7 @@ public abstract class Settlement extends GoodsLocation
     /**
      * Put a prepared settlement onto the map.
      *
-     * Several visibility issues accumulated here.
+     * -vis: Several visibility issues accumulated here.
      *
      * @param maximal If true, also claim all the tiles possible.
      */
@@ -219,7 +219,7 @@ public abstract class Settlement extends GoodsLocation
             tiles.add(tile);
         }
 
-        tile.setSettlement(this);
+        tile.setSettlement(this);//-vis(owner)
         tile.changeOwningSettlement(this);
         for (Tile t : tiles) {
             t.changeOwnership(owner, this);
@@ -233,11 +233,12 @@ public abstract class Settlement extends GoodsLocation
             road.setVirtual(true);
             road.updateRoadConnections(true);
         }
-        owner.invalidateCanSeeTiles();
     }
 
     /**
      * Remove a settlement from the map.
+     *
+     * -vis: Visibility reduced when settlement goes away.
      *
      * Several visibility issues accumulated here.
      */
@@ -247,7 +248,7 @@ public abstract class Settlement extends GoodsLocation
         for (Tile tile : lostTiles) {
             tile.changeOwnership(null, null);
         }
-        settlementTile.setSettlement(null);
+        settlementTile.setSettlement(null);//-vis(owner)
         settlementTile.setOwningSettlement(null);
         TileImprovement road = settlementTile.getRoad();
         if (road != null && road.isVirtual()) {
@@ -436,22 +437,14 @@ public abstract class Settlement extends GoodsLocation
 
     /**
      * {@inheritDoc}
+     *
+     * -vis: Visibility changes when the settlement is removed.
      */
     @Override
     public List<FreeColGameObject> disposeList() {
         List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
-        if (owner != null
-            && getTile() != null
-            && getTile().hasSettlement()) {
-            // Defensive tests to handle transition from calling dispose()
-            // on both sides to when it is only called on server-side.
-
-            // Get off the map
-            exciseSettlement();
-
-            // The owner forgets about the settlement.
+        if (owner != null) {
             owner.removeSettlement(this);
-            owner.invalidateCanSeeTiles();
             // It is not safe to setOwner(null).  When a settlement is
             // destroyed there is a race between this code and some
             // display routines that still need to know who owned the

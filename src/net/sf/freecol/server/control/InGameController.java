@@ -2875,7 +2875,8 @@ public final class InGameController extends Controller {
             StringTemplate nation = serverPlayer.getNationName();
             settlement = new ServerColony(game, serverPlayer, name, tile);
             serverPlayer.addSettlement(settlement);
-            settlement.placeSettlement(false);
+            settlement.placeSettlement(false);//-vis(serverPlayer)
+            serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
             for (ServerPlayer sp : getOtherPlayers(serverPlayer)) {
                 if (!sp.hasAbility(Ability.SEE_ALL_COLONIES)) continue;
                 tile.updatePlayerExploredTile(sp, true);
@@ -2903,7 +2904,8 @@ public final class InGameController extends Controller {
             settlement = new ServerIndianSettlement(game, serverPlayer, name,
                                                     tile, false, skill, null);
             serverPlayer.addSettlement(settlement);
-            settlement.placeSettlement(true);
+            settlement.placeSettlement(true);//-vis(serverPlayer)
+            serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
             for (Player p : getGame().getPlayers()) {
                 if ((ServerPlayer)p == serverPlayer) continue;
                 ((IndianSettlement)settlement).setAlarm(p, (p.isIndian())

@@ -475,7 +475,6 @@ public class TileTest extends FreeColTestCase {
 
 
     public void testColonyImprovements() throws Exception {
-
         Game game = getStandardGame();
         Map map = getTestMap(plains);
         game.setMap(map);
@@ -484,7 +483,7 @@ public class TileTest extends FreeColTestCase {
 
         assertTrue(colony.getTile().hasRoad());
 
-        colony.dispose();
+        colony.exciseSettlement();
 
         assertFalse(colony.getTile().hasRoad());
     }

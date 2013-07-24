@@ -163,7 +163,7 @@ public class ServerColony extends Colony implements ServerModelObject {
         // nonsensical 0-unit colony.
         if (getUnitCount() <= 0) {
             logger.warning("Cleaning up 0-unit colony: " + getName());
-            exciseSettlement();
+            exciseSettlement();//-vis(owner)
             cs.add(See.perhaps().always(owner), tile);
             cs.addDispose(See.perhaps().always(owner), tile, this);//-vis(owner)
             owner.invalidateCanSeeTiles();//+vis(owner)

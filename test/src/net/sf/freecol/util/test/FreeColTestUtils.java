@@ -161,7 +161,8 @@ public class FreeColTestUtils {
 
             Colony colony = new ServerColony(game, player, name, colonyTile);
             player.addSettlement(colony);
-            colony.placeSettlement(true);
+            colony.placeSettlement(true);//-vis(player)
+            player.invalidateCanSeeTiles();//+vis(player)
 
 
             // Add colonists
