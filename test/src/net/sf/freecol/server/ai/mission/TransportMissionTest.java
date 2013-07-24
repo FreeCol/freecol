@@ -118,7 +118,7 @@ public class TransportMissionTest extends FreeColTestCase {
         assertFalse(aiUnit.getMission() instanceof TransportMission);
     }
 
-    public void testGetNextStopAlreadyAtDestination(){
+    public void testGetNextStopAlreadyAtDestination() {
         Game game = ServerTestHelper.startServerGame(getCoastTestMap(plainsType));
         Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
@@ -198,11 +198,13 @@ public class TransportMissionTest extends FreeColTestCase {
         Europe europe = dutch.getEurope();
         assertNotNull("Setup error, europe is null", europe);
 
-        // create a ship carrying a colonist
         Tile colonyTile = map.getTile(9, 9);
-        Tile galleonTile = map.getTile(9, 10);
+        assertTrue(colonyTile.isLand());
         getStandardColony(1, colonyTile.getX(), colonyTile.getY());
 
+        // create a ship
+        Tile galleonTile = map.getTile(10, 9);
+        assertFalse(galleonTile.isLand());
         Unit galleon = new ServerUnit(game, galleonTile, dutch, galleonType);
         AIUnit aiUnit = aiMain.getAIUnit(galleon);
         assertNotNull(aiUnit);
@@ -236,8 +238,8 @@ public class TransportMissionTest extends FreeColTestCase {
         assertNotNull("Setup error, europe is null", europe);
 
         // create a ship
-
-        Tile galleonTile = map.getTile(9, 10);
+        Tile galleonTile = map.getTile(10, 9);
+        assertFalse(galleonTile.isLand());
         Unit galleon = new ServerUnit(game, galleonTile, dutch, galleonType);
         AIUnit aiUnit = aiMain.getAIUnit(galleon);
         assertNotNull(aiUnit);
