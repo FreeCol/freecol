@@ -268,7 +268,7 @@ public class BuildingTest extends FreeColTestCase {
      *
      * TODO: make this more generic.
      */
-    public void testCanAddToSchool(){
+    public void testCanAddToSchool() {
         Game game = getGame();
         game.setMap(getTestMap(true));
 
@@ -325,12 +325,14 @@ public class BuildingTest extends FreeColTestCase {
                     school.canAdd(distiller));
         assertTrue("unable to add master farmer to Schoolhouse",
                    school.canAdd(farmer));
-        school.add(farmer);
+        farmer.setLocation(school);
+        assertEquals(school, farmer.getLocation());
         assertFalse("able to add master carpenter to Schoolhouse",
                     school.canAdd(carpenter));
-        school.remove(farmer);
 
         school.upgrade();
+        farmer.setLocation(colony.getTile());
+
         // these can never teach
         assertFalse("able to add free colonist to College",
                     school.canAdd(colonist));
@@ -345,19 +347,18 @@ public class BuildingTest extends FreeColTestCase {
                     school.canAdd(elder));
         assertTrue("unable to add master distiller to College",
                    school.canAdd(distiller));
-        school.add(distiller);
+        distiller.setLocation(school);
         assertTrue("unable to add master farmer to College",
                    school.canAdd(farmer));
-        school.add(farmer);
+        farmer.setLocation(school);
         assertFalse("able to add master carpenter to College",
                     school.canAdd(carpenter));
-        school.remove(distiller);
-        school.remove(farmer);
 
         school.upgrade();
-
-        assertEquals(school.getType().toString(), school.getType(),
-            universityType);
+        assertEquals(school.getType().toString(), universityType,
+                     school.getType());
+        distiller.setLocation(colony.getTile());
+        farmer.setLocation(colony.getTile());
 
         // these can never teach
         assertFalse("able to add free colonist to University",
@@ -371,19 +372,15 @@ public class BuildingTest extends FreeColTestCase {
 
         assertTrue("unable to add elder statesman to University",
                    school.canAdd(elder));
-        school.add(elder);
+        elder.setLocation(school);
         assertTrue("unable to add master distiller to University",
                    school.canAdd(distiller));
-        school.add(distiller);
+        distiller.setLocation(school);
         assertTrue("unable to add master farmer to University",
                    school.canAdd(farmer));
-        school.add(farmer);
+        farmer.setLocation(school);
         assertFalse("able to add master carpenter to University",
                     school.canAdd(carpenter));
-        school.remove(elder);
-        school.remove(distiller);
-        school.remove(farmer);
-
     }
 
     public void testSerialize() {
@@ -466,7 +463,7 @@ public class BuildingTest extends FreeColTestCase {
         assertTrue(worker.getLocation() instanceof ColonyTile);
         assertEquals(plainsType, ((ColonyTile)worker.getLocation()).getWorkTile().getType());
 
-        weaver.add(worker);
+        worker.setLocation(weaver);
         assertEquals(worker, weaver.getUnitList().get(0));
 
         colony.addGoods(cottonType, 2);
@@ -571,8 +568,7 @@ public class BuildingTest extends FreeColTestCase {
         assertEquals("Initial bell production", (int)bellsModifier.getValue(),
                      building.getTotalProductionOf(bellsType));
 
-        building.add(colonist);
-        colony.invalidateCache();
+        colonist.setLocation(building);
         // 3 from the colonist
         assertEquals("Production(Colonist)", 3,
                      building.getUnitProduction(colonist, bellsType));
@@ -609,7 +605,7 @@ public class BuildingTest extends FreeColTestCase {
                      building.getTotalProductionOf(bellsType));
 
         // Add statesman
-        building.add(statesman);
+        statesman.setLocation(building);
         // 3 * 2(expert) = 6
         assertEquals("Production(Statesman/Jefferson)", 6,
                      building.getUnitProduction(statesman, bellsType));
@@ -661,7 +657,7 @@ public class BuildingTest extends FreeColTestCase {
         expectBellProd = 1;
         assertEquals("Wrong bell production with printing press",expectBellProd,bellProduction);
 
-        building.add(unit);
+        unit.setLocation(building);
         bellProduction = building.getTotalProductionOf(bellsType);
         expectBellProd = 6; // 1 initial plus 3 from the colonist + 2 from printing press
         assertEquals("Wrong final bell production",expectBellProd,bellProduction);
@@ -686,7 +682,7 @@ public class BuildingTest extends FreeColTestCase {
         expectBellProd = 2;
         assertEquals("Wrong bell production with newspaper",expectBellProd,bellProduction);
 
-        building.add(unit);
+        unit.setLocation(building);
         bellProduction = building.getTotalProductionOf(bellsType);
         expectBellProd = 8; // 1 initial plus 3 from the colonist + 4 from newspaper
         assertEquals("Wrong final bell production",expectBellProd,bellProduction);
@@ -704,7 +700,7 @@ public class BuildingTest extends FreeColTestCase {
         assertEquals("Production()", 0,
             building.getTotalProductionOf(hammersType));
 
-        building.add(unit);
+        unit.setLocation(building);
         colony.invalidateCache();
         assertEquals("Production(unit)", 3,
             building.getTotalProductionOf(hammersType));
@@ -770,12 +766,12 @@ public class BuildingTest extends FreeColTestCase {
                         Colony.LIBERTY_PER_REBEL * 3);
 
         Building smithy = colony.getBuilding(blacksmithType);
-        smithy.add(units.get(0));
-        smithy.add(units.get(1));
+        units.get(0).setLocation(smithy);
+        units.get(1).setLocation(smithy);
         Building armory = new ServerBuilding(game, colony, armoryType);
         colony.addBuilding(armory);
-        armory.add(units.get(2));
-        armory.add(units.get(3));
+        units.get(2).setLocation(armory);
+        units.get(3).setLocation(armory);
 
         assertEquals(6, smithy.getTotalProductionOf(toolsType));
         assertEquals(6, armory.getTotalProductionOf(musketsType));

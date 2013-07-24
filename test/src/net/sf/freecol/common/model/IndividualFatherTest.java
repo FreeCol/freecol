@@ -351,7 +351,7 @@ public class IndividualFatherTest extends FreeColTestCase {
         Colony colony = getStandardColony(4);
         Player player = colony.getOwner();
         Building townHall = colony.getBuilding(townHallType);
-        townHall.add(colony.getUnitList().get(0));
+        colony.getUnitList().get(0).setLocation(townHall);
 
         assertEquals(0, player.getModifierSet("model.goods.bells").size());
         assertEquals(1, colony.getModifierSet("model.goods.bells").size());

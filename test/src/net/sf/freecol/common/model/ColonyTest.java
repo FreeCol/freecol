@@ -282,7 +282,7 @@ public class ColonyTest extends FreeColTestCase {
                 break;
             } else if (workedTile.getType() == plainsTileType) {
                 colonist.changeWorkType(spec().getPrimaryFoodType());
-                ct.add(colonist);
+                colonist.setLocation(ct);
                 break;
             }
         }

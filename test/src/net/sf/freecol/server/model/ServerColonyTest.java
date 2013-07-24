@@ -283,7 +283,7 @@ public class ServerColonyTest extends FreeColTestCase {
         ServerBuilding carpenterHouse = new ServerBuilding(getGame(), colony, carpenterHouseType);
         colony.addBuilding(carpenterHouse);
         Unit unit = colony.getUnitList().get(0);
-        colony.getBuilding(carpenterHouseType).add(unit);
+        unit.setLocation(colony.getBuilding(carpenterHouseType));
         // necessary for work production
         int initialLumber = 100;
         int initialHammers = 0;
@@ -317,14 +317,14 @@ public class ServerColonyTest extends FreeColTestCase {
         colony.addBuilding(townHall);
         Unit statesman = colony.getUnitList().get(0);
         statesman.setLocation(null);
-        townHall.add(statesman);
+        statesman.setLocation(townHall);
 
         ServerBuilding church = new ServerBuilding(getGame(), colony, churchType);
         colony.addBuilding(church);
         church.upgrade();
         Unit preacher = colony.getUnitList().get(1);
         preacher.setLocation(null);
-        church.add(preacher);
+        preacher.setLocation(church);
 
         GoodsType bellsType = spec().getGoodsType("model.goods.bells");
         GoodsType crossType = spec().getGoodsType("model.goods.crosses");
