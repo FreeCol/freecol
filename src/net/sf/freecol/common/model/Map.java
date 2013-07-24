@@ -1678,63 +1678,11 @@ public class Map extends FreeColGameObject implements Location {
     // Support for various kinds of map iteration.
 
     /**
-     * Base class for internal iterators.
-     */
-    private abstract class MapIterator implements Iterator<Position> {
-
-        /**
-         * Gets the next position as a position rather as an object.
-         *
-         * @return The next <code>Position</code>.
-         * @throws NoSuchElementException if the iterator is exhausted.
-         */
-        public abstract Position nextPosition() throws NoSuchElementException;
-
-        /**
-         * Gets the next position in the iteration.
-         *
-         * @return The next <code>Position</code> in the iteration.
-         * @exception NoSuchElementException if the iterator is exhausted.
-         */
-        public Position next() {
-            return nextPosition();
-        }
-
-        /**
-         * Removes from the underlying collection the last element returned by
-         * the iterator (optional operation).
-         *
-         * @exception UnsupportedOperationException no matter what.
-         */
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
-    }
-
-    /**
-     * Makes an iterable version of a map iterator.
-     *
-     * @param m The <code>MapIterator</code> to make iterable.
-     * @return A corresponding iterable.
-     */
-    private Iterable<Tile> makeMapIteratorIterable(final MapIterator m) {
-        return new Iterable<Tile>() {
-            public Iterator<Tile> iterator() {
-                return new Iterator<Tile>() {
-                    public boolean hasNext() { return m.hasNext(); }
-                    public Tile next() { return getTile(m.next()); }
-                    public void remove() { m.remove(); }
-                };
-            }
-        };
-    }
-
-    /**
      * An iterator returning positions in a spiral starting at a given
-     * center tile.  The center tile is never included in the
-     * positions returned, and all returned positions are valid.
+     * center tile.  The center tile is never included in the returned
+     * tiles, and all returned tiles are valid.
      */
-    private final class CircleIterator extends MapIterator {
+    private final class CircleIterator implements Iterator<Tile> {
 
         /** The maximum radius. */
         private int radius;
@@ -1743,17 +1691,17 @@ public class Map extends FreeColGameObject implements Location {
         /** The current index in the circle with the current radius: */
         private int n;
         /** The current position in the circle. */
-        private Position nextPosition = null;
+        private int x, y;
 
 
         /**
          * Create a new Circle Iterator.
          *
-         * @param center The center <code>Position</code> of the circle.
+         * @param center The center <code>Tile</code> of the circle.
          * @param isFilled True to get all of the positions within the circle.
          * @param radius The radius of the circle.
          */
-        public CircleIterator(Position center, boolean isFilled, int radius) {
+        public CircleIterator(Tile center, boolean isFilled, int radius) {
             if (center == null) {
                 throw new IllegalArgumentException("center must not be null.");
             }
@@ -1761,19 +1709,21 @@ public class Map extends FreeColGameObject implements Location {
             n = 0;
 
             if (isFilled || radius == 1) {
-                nextPosition = new Position(center, Direction.NE);
+                x = Direction.NE.stepX(center.getX(), center.getY());
+                y = Direction.NE.stepY(center.getX(), center.getY());
                 currentRadius = 1;
             } else {
                 this.currentRadius = radius;
-                nextPosition = center;
+                x = center.getX();
+                y = center.getY();
                 for (int i = 1; i < radius; i++) {
-                    nextPosition = new Position(nextPosition, Direction.N);
+                    x = Direction.N.stepX(x, y);
+                    y = Direction.N.stepY(x, y);
                 }
-                nextPosition = new Position(nextPosition, Direction.NE);
+                x = Direction.NE.stepX(x, y);
+                y = Direction.NE.stepY(x, y);
             }
-            if (!isValid(nextPosition)) {
-                determineNextPosition();
-            }
+            if (!isValid(x, y)) nextTile();
         }
 
         /**
@@ -1789,21 +1739,24 @@ public class Map extends FreeColGameObject implements Location {
         /**
          * Finds the next position.
          */
-        private void determineNextPosition() {
-            boolean positionReturned = n != 0;
+        private void nextTile() {
+            boolean started = n != 0;
             do {
                 n++;
                 final int width = currentRadius * 2;
                 if (n >= width * 4) {
                     currentRadius++;
                     if (currentRadius > radius) {
-                        nextPosition = null;
-                    } else if (!positionReturned) {
-                        nextPosition = null;
+                        x = y = UNDEFINED;
+                        break;
+                    } else if (!started) {
+                        x = y = UNDEFINED;
+                        break;
                     } else {
                         n = 0;
-                        positionReturned = false;
-                        nextPosition = new Position(nextPosition, Direction.NE);
+                        started = false;
+                        x = Direction.NE.stepX(x, y);
+                        y = Direction.NE.stepY(x, y);
                     }
                 } else {
                     int i = n / width;
@@ -1825,43 +1778,50 @@ public class Map extends FreeColGameObject implements Location {
                         throw new IllegalStateException("i=" + i + ", n=" + n
                                                         + ", width=" + width);
                     }
-                    nextPosition = new Position(nextPosition, direction);
+                    x = direction.stepX(x, y);
+                    y = direction.stepY(x, y);
                 }
-            } while (nextPosition != null && !isValid(nextPosition));
+            } while (!isValid(x, y));
         }
 
         /**
-         * Check if the iterator has another position in it.
-         *
-         * @return True if there is another position.
+         * {@inheritDoc}
          */
         public boolean hasNext() {
-            return nextPosition != null;
+            return x != UNDEFINED && y != UNDEFINED;
         }
 
         /**
-         * Gets the next position.
-         *
-         * @return The next valid position.
+         * {@inheritDoc}
          */
         @Override
-        public Position nextPosition() {
-            if (nextPosition == null) return null;
-            final Position p = nextPosition;
-            determineNextPosition();
-            return p;
+        public Tile next() throws NoSuchElementException {
+            if (!hasNext()) {
+                throw new NoSuchElementException("CircleIterator exhausted");
+            }
+            Tile result = getTile(x, y);
+            nextTile();
+            return result;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
         }
     }
 
     /**
      * Gets a circle iterator.
      *
-     * @param center The center <code>Position</code> to iterate around.
+     * @param center The center <code>Tile</code> to iterate around.
      * @param isFilled True to get all of the positions in the circle.
      * @param radius The radius of circle.
      * @return The circle iterator.
      */
-    public CircleIterator getCircleIterator(Position center, boolean isFilled,
+    public Iterator<Tile> getCircleIterator(Tile center, boolean isFilled,
                                             int radius) {
         return new CircleIterator(center, isFilled, radius);
     }
@@ -1875,10 +1835,14 @@ public class Map extends FreeColGameObject implements Location {
      * @param radius The radius of circle.
      * @return An <code>Iterable</code> for a circle of tiles.
      */
-    public Iterable<Tile> getCircleTiles(Tile center, boolean isFilled,
-                                         int radius) {
-        return makeMapIteratorIterable(getCircleIterator(new Position(center),
-                                                         isFilled, radius));
+    public Iterable<Tile> getCircleTiles(final Tile center,
+                                         final boolean isFilled,
+                                         final int radius) {
+        return new Iterable<Tile>() {
+            public Iterator<Tile> iterator() {
+                return getCircleIterator(center, isFilled, radius);
+            }
+        };
     }
 
     /**
