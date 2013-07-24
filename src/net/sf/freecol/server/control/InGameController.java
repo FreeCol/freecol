@@ -2347,13 +2347,11 @@ public final class InGameController extends Controller {
             serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
             break;
         case HAPPY: case CONTENT: case DISPLEASED:
-            cs.add(See.perhaps().always(serverPlayer), unit.getTile());
-            unit.setLocation(settlement);//-vis(serverPlayer)
-            unit.setMovesLeft(0);
-            cs.add(See.only(serverPlayer), unit);
             ((ServerIndianSettlement)settlement)
                 .csChangeMissionary(unit, cs);//+vis(serverPlayer)
+            unit.setMovesLeft(0);
             settlement.setConvertProgress(0);
+            cs.add(See.perhaps().always(serverPlayer), unit.getTile());
             List<? extends FreeColGameObject> modifiedSettlements
                 = ((ServerIndianSettlement)settlement).modifyAlarm(serverPlayer,
                     ALARM_NEW_MISSIONARY);

@@ -269,6 +269,11 @@ public class ServerIndianSettlement extends IndianSettlement
         if (missionary != null) {
             newOwner = (ServerPlayer)missionary.getOwner();
             setMissionary(missionary);//-vis(newOwner)
+            // Take the missionary off the map, and give it a fake
+            // location at the settlement, bypassing the normal
+            // validity checks.
+            missionary.setLocation(null);//-vis(newOwner)
+            missionary.setLocationNoUpdate(this);//-vis(newOwner)
             tile.updatePlayerExploredTile(newOwner, true);
         }
 
