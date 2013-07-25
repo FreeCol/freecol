@@ -53,8 +53,6 @@ public class Colony extends Settlement implements Nameable {
     public static final String REARRANGE_WORKERS = "rearrangeWorkers";
     public static final int LIBERTY_PER_REBEL = 200;
 
-    public static final Ability HAS_PORT = new Ability(Ability.HAS_PORT);
-
     public static enum ColonyChangeEvent {
         POPULATION_CHANGE,
         PRODUCTION_CHANGE,
@@ -2763,7 +2761,6 @@ public class Colony extends Settlement implements Nameable {
         productionBonus = xr.getAttribute(PRODUCTION_BONUS_TAG, 0);
 
         landLocked = xr.getAttribute(LAND_LOCKED_TAG, true);
-        if (!landLocked) addAbility(HAS_PORT);
 
         displayUnitCount = xr.getAttribute(UNIT_COUNT_TAG, 0);
 
@@ -2817,9 +2814,6 @@ public class Colony extends Settlement implements Nameable {
             ExportData data = new ExportData(xr);
             exportData.put(data.getId(), data);
         
-        } else if (Modifier.getXMLElementTagName().equals(tag)) {
-            addModifier(new Modifier(xr, spec));
-
         } else {
             super.readChild(xr);
         }

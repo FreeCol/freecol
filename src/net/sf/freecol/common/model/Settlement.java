@@ -665,6 +665,22 @@ public abstract class Settlement extends GoodsLocation
      * {@inheritDoc}
      */
     @Override
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
+
+        for (Ability ability : getSortedCopy(getAbilities())) {
+            ability.toXML(xw);
+        }
+
+        for (Modifier modifier : getSortedModifiers()) {
+            modifier.toXML(xw);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
@@ -682,5 +698,35 @@ public abstract class Settlement extends GoodsLocation
 
         String type = xr.getAttribute(SETTLEMENT_TYPE_TAG, (String)null);
         changeType(owner.getNationType().getSettlementType(type));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        // Clear containers.
+        featureContainer.clear();
+
+        super.readChildren(xr);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
+        final Specification spec = getSpecification();
+        final String tag = xr.getLocalName();
+
+        if (Ability.getXMLElementTagName().equals(tag)) {
+            addAbility(new Ability(xr, spec));
+
+        } else if (Modifier.getXMLElementTagName().equals(tag)) {
+            addModifier(new Modifier(xr, spec));
+
+        } else {
+            super.readChild(xr);
+        }
     }
 }

@@ -64,6 +64,9 @@ public class ServerColony extends Colony implements ServerModelObject {
 
     private static final Logger logger = Logger.getLogger(ServerColony.class.getName());
 
+    /** Colonies with an adjoining water tile have this ability. */
+    private static final Ability hasPort = new Ability(Ability.HAS_PORT);
+
 
     /**
      * Trivial constructor required for all ServerModelObjects.
@@ -102,7 +105,7 @@ public class ServerColony extends Colony implements ServerModelObject {
             buildQueue.add(spec.getBuildingType("model.building.warehouse"));
         } else {
             buildQueue.add(spec.getBuildingType("model.building.docks"));
-            addAbility(HAS_PORT);
+            addAbility(hasPort);
         }
         for (UnitType unitType : spec.getUnitTypesWithAbility(Ability.BORN_IN_COLONY)) {
             if (unitType.needsGoodsToBuild()) {

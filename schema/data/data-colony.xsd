@@ -42,6 +42,7 @@
         <xs:element ref="populationQueueItem" minOccurs="0" maxOccurs="unbounded" />
 	      <xs:element ref="building" />
 	      <xs:element ref="exportData" />
+	      <xs:element ref="ability" />
 	      <xs:element ref="modifier" />
       </xs:choice>
       
