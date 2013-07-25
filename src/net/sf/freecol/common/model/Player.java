@@ -3819,6 +3819,14 @@ public class Player extends FreeColGameObject implements Nameable {
 
         if (xw.validFor(this)) {
 
+            for (Ability ability : getSortedCopy(getAbilities())) {
+                ability.toXML(xw);
+            }
+
+            for (Modifier modifier : getSortedModifiers()) {
+                modifier.toXML(xw);
+            }
+
             for (Player p : getSortedCopy(tension.keySet())) {
                 xw.writeStartElement(TENSION_TAG);
 
@@ -3995,6 +4003,8 @@ public class Player extends FreeColGameObject implements Nameable {
         modelMessages.clear();
         lastSales = null;
         highSeas = null;
+        featureContainer.clear();
+        if (nationType != null) addFeatures(nationType);
 
         super.readChildren(xr);
 
@@ -4048,6 +4058,9 @@ public class Player extends FreeColGameObject implements Nameable {
                         new Tension(xr.getAttribute(VALUE_TAG, 0)));
             xr.closeTag(TENSION_TAG);
         
+        } else if (Ability.getXMLElementTagName().equals(tag)) {
+            addAbility(new Ability(xr, spec));
+
         } else if (Europe.getXMLElementTagName().equals(tag)) {
             europe = xr.readFreeColGameObject(game, Europe.class);
 
