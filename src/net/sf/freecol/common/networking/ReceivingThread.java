@@ -288,7 +288,7 @@ final class ReceivingThread extends Thread {
         if (!shouldRun()) return;
         in.enable();
 
-        final int LOOK_AHEAD = 5000;
+        final int LOOK_AHEAD = 8192;
         BufferedInputStream bis = new BufferedInputStream(in, LOOK_AHEAD);
         bis.mark(LOOK_AHEAD);
 
