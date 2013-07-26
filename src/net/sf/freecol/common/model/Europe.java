@@ -332,6 +332,14 @@ public class Europe extends UnitLocation implements Ownable, Named {
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
+        for (Ability ability : getSortedCopy(getAbilities())) {
+            ability.toXML(xw);
+        }
+
+        for (Modifier modifier : getSortedModifiers()) {
+            modifier.toXML(xw);
+        }
+
         for (UnitType unitType : getSortedCopy(unitPrices.keySet())) {
             xw.writeStartElement(UNIT_PRICE_TAG);
 
@@ -351,12 +359,6 @@ public class Europe extends UnitLocation implements Ownable, Named {
         super.readAttributes(xr);
 
         final Specification spec = getSpecification();
-
-        // @compat 0.10.0
-        if (!hasAbility(Ability.DRESS_MISSIONARY)) {
-            addAbility(new Ability(Ability.DRESS_MISSIONARY));
-        }
-        // end @compat
 
         for (int index = 0; index < recruitables.length; index++) {
             UnitType unitType = xr.getType(spec, RECRUIT_TAG + index,
@@ -381,6 +383,8 @@ public class Europe extends UnitLocation implements Ownable, Named {
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
         unitPrices.clear();
+        featureContainer.clear();
+        addAbility(new Ability(Ability.DRESS_MISSIONARY));
 
         super.readChildren(xr);
 
@@ -409,6 +413,12 @@ public class Europe extends UnitLocation implements Ownable, Named {
 
             unitPrices.put(unitType, new Integer(price));
             xr.closeTag(UNIT_PRICE_TAG);
+
+        } else if (Ability.getXMLElementTagName().equals(tag)) {
+            addAbility(new Ability(xr, spec));
+
+        } else if (Modifier.getXMLElementTagName().equals(tag)) {
+            addModifier(new Modifier(xr, spec));
 
         } else {
             super.readChild(xr);
