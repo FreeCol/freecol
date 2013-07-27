@@ -65,34 +65,10 @@ public final class FeatureContainer {
         if (modifiers == null) modifiers = new HashMap<String, Set<Modifier>>();
     }
 
-    /**
-     * Is an ability present in this container?
-     * All applicable abilities must be true, and there must be at least one.
-     *
-     * @param id The object identifier.
-     * @param fcgot An optional <code>FreeColGameObjectType</code> the
-     *     ability applies to.
-     * @param turn An optional applicable <code>Turn</code>.
-     * @return True if the ability is `satisfied'.
-     */
-    public static boolean hasAbility(FeatureContainer fc, String id,
-                                     FreeColGameObjectType fcgot, Turn turn) {
-        Set<Ability> abilitySet;
-        if (fc == null || fc.abilities == null
-            || (abilitySet = fc.abilities.get(id)) == null) return false;
-        boolean ret = false;
-        for (Ability ability : abilitySet) {
-            if (ability.appliesTo(fcgot, turn)) {
-                if (!ability.getValue()) return false;
-                ret = true;
-            }
-        }
-        return ret;
-    }
 
     /**
-     * Is the given set of abilities non-empty and does not contain
-     * any false-valued members.
+     * Is the given set of abilities non-empty and contains no
+     * false-valued members?
      *
      * @return True if the ability set is `satisfied'.
      */
@@ -105,54 +81,57 @@ public final class FeatureContainer {
     }
 
     /**
-     * Checks if this container contains a given ability key.
+     * Is the given set of abilities non-empty and contains no
+     * false-valued members?
      *
-     * @param fc The <code>FeatureContainer</code> to get abilities from.
-     * @param key The key to check.
-     * @return True if the key is present.
+     * @param id The object identifier.
+     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     *     ability applies to.
+     * @param turn An optional applicable <code>Turn</code>.
+     * @return True if the ability is present.
      */
-    public static boolean containsAbilityKey(FeatureContainer fc, String key) {
-        return (fc == null || fc.abilities == null) ? false
-            : fc.abilities.containsKey(key);
+    public boolean hasAbility(String id, FreeColGameObjectType fcgot,
+                              Turn turn) {
+        return FeatureContainer.hasAbility(getAbilitySet(id, fcgot, turn));
     }
 
     /**
-     * Gets a copy of the abilities of a container.
+     * Checks if this container contains a given ability key.
      *
-     * @param fc The <code>FeatureContainer</code> to get abilities from.
-     * @return A set of abilities.
+     * @param key The key to check.
+     * @return True if the key is present.
      */
-    public static Set<Ability> getAbilities(FeatureContainer fc) {
-        Set<Ability> result = new HashSet<Ability>();
-        if (fc != null && fc.abilities != null) {
-            for (Set<Ability> abilitySet : fc.abilities.values()) {
-                result.addAll(abilitySet);
-            }
-        }
-        return result;
+    public boolean containsAbilityKey(String key) {
+        return !getAbilitySet(key, null, null).isEmpty();
     }
 
     /**
      * Gets the set of abilities with the given identifier from a
      * container.
      *
-     * @param fc The <code>FeatureContainer</code> to query.
-     * @param id The object identifier.
+     * @param id The object identifier (null matches all).
      * @param fcgot An optional <code>FreeColGameObjectType</code> the
      *     ability applies to.
      * @param turn An optional applicable <code>Turn</code>.
      * @return A set of abilities.
      */
-    public static Set<Ability> getAbilitySet(FeatureContainer fc, String id,
-                                             FreeColGameObjectType fcgot,
-                                             Turn turn) {
+    public Set<Ability> getAbilitySet(String id, FreeColGameObjectType fcgot,
+                                      Turn turn) {
         Set<Ability> result = new HashSet<Ability>();
+        if (abilities == null) return result;
+
         Set<Ability> abilitySet;
-        if (fc != null && fc.abilities != null
-            && (abilitySet = fc.abilities.get(id)) != null) {
-            for (Ability ability : abilitySet) {
-                if (ability.appliesTo(fcgot, turn)) result.add(ability);
+        if (id == null) {
+            abilitySet = new HashSet<Ability>();
+            for (Set<Ability> aset : abilities.values()) {
+                abilitySet.addAll(aset);
             }
+        } else {
+            if ((abilitySet = abilities.get(id)) == null) return result;
+        }
+
+        for (Ability ability : abilitySet) {
+            if (ability.appliesTo(fcgot, turn)) result.add(ability);
         }
         return result;
     }
@@ -164,13 +143,13 @@ public final class FeatureContainer {
      * @param ability An <code>Ability</code> to add.
      * @return True if the Ability was added.
      */
-    public static boolean addAbility(FeatureContainer fc, Ability ability) {
-        if (fc == null || ability == null) return false;
-        fc.requireAbilities();
-        Set<Ability> abilitySet = fc.abilities.get(ability.getId());
+    public boolean addAbility(Ability ability) {
+        if (ability == null) return false;
+        requireAbilities();
+        Set<Ability> abilitySet = abilities.get(ability.getId());
         if (abilitySet == null) {
             abilitySet = new HashSet<Ability>();
-            fc.abilities.put(ability.getId(), abilitySet);
+            abilities.put(ability.getId(), abilitySet);
         }
         return abilitySet.add(ability);
     }
@@ -178,13 +157,12 @@ public final class FeatureContainer {
     /**
      * Remove the given ability from a container.
      *
-     * @param fc The <code>FeatureContainer</code> to remove from.
      * @param ability An <code>Ability</code> to remove.
-     * @return The ability removed.
+     * @return The ability removed or null on failure.
      */
-    public static Ability removeAbility(FeatureContainer fc, Ability ability) {
-        if (fc == null || fc.abilities == null || ability == null) return null;
-        Set<Ability> abilitySet = fc.abilities.get(ability.getId());
+    public Ability removeAbility(Ability ability) {
+        if (abilities == null || ability == null) return null;
+        Set<Ability> abilitySet = abilities.get(ability.getId());
         return (abilitySet == null || !abilitySet.remove(ability)) ? null
             : ability;
     }
@@ -192,47 +170,12 @@ public final class FeatureContainer {
     /**
      * Remove all abilities with a given identifier.
      *
-     * @param fc The <code>FeatureContainer</code> to remove abilities from.
      * @param id The object identifier.
      */
-    public static void removeAbilities(FeatureContainer fc, String id) {
-        if (fc != null && fc.abilities != null) fc.abilities.remove(id);
+    public void removeAbilities(String id) {
+        if (abilities != null) abilities.remove(id);
     }
 
-
-    /**
-     * Gets a copy of the modifiers in a container.
-     *
-     * @param fc The <code>FeatureContainer</code> to get modifiers from.
-     * @return A set of modifiers.
-     */
-    public static Set<Modifier> getModifiers(FeatureContainer fc) {
-        Set<Modifier> result = new HashSet<Modifier>();
-        if (fc != null && fc.modifiers != null) {
-            for (Set<Modifier> modifierSet : fc.modifiers.values()) {
-                result.addAll(modifierSet);
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Gets the set of modifiers with the given identifier from a
-     * container.
-     *
-     * @param fc The <code>FeatureContainer</code> to get modifiers from.
-     * @param id The object identifier.
-     * @param fcgot An optional <code>FreeColGameObjectType</code> the
-     *     modifier applies to.
-     * @param turn An optional applicable <code>Turn</code>.
-     * @return A set of modifiers.
-     */
-    public static Set<Modifier> getModifierSet(FeatureContainer fc, String id,
-                                               FreeColGameObjectType fcgot,
-                                               Turn turn) {
-        return (fc == null || fc.modifiers == null) ? new HashSet<Modifier>()
-            : fc.getModifierSet(id, fcgot, turn);
-    }
 
     /**
      * Gets the set of modifiers with the given identifier from this
@@ -248,11 +191,20 @@ public final class FeatureContainer {
                                         FreeColGameObjectType fcgot,
                                         Turn turn) {
         Set<Modifier> result = new HashSet<Modifier>();
+        if (modifiers == null) return result;
+
         Set<Modifier> modifierSet;
-        if (modifiers != null && (modifierSet = modifiers.get(id)) != null) {
-            for (Modifier modifier : modifierSet) {
-                if (modifier.appliesTo(fcgot, turn)) result.add(modifier);
+        if (id == null) {
+            modifierSet = new HashSet<Modifier>();
+            for (Set<Modifier> mset : modifiers.values()) {
+                modifierSet.addAll(mset);
             }
+        } else {
+            if ((modifierSet = modifiers.get(id)) == null) return result;
+        }
+
+        for (Modifier modifier : modifierSet) {
+            if (modifier.appliesTo(fcgot, turn)) result.add(modifier);
         }
         return result;
     }
@@ -357,22 +309,16 @@ public final class FeatureContainer {
     /**
      * Adds a modifier to a container.
      *
-     * @param fc The <code>FeatureContainer</code> to add to.
      * @param modifier The <code>Modifier</code> to add.
      * @return True if the modifier was added.
      */
-    public static boolean addModifier(FeatureContainer fc,
-                                      Modifier modifier) {
-        if (fc == null) {
-            logger.warning("addModifier to <null-feature-container>: "
-                + modifier);
-            return false;
-        } else if (modifier == null) return false;
-        fc.requireModifiers();
-        Set<Modifier> modifierSet = fc.modifiers.get(modifier.getId());
+    public boolean addModifier(Modifier modifier) {
+        if (modifier == null) return false;
+        requireModifiers();
+        Set<Modifier> modifierSet = modifiers.get(modifier.getId());
         if (modifierSet == null) {
             modifierSet = new HashSet<Modifier>();
-            fc.modifiers.put(modifier.getId(), modifierSet);
+            modifiers.put(modifier.getId(), modifierSet);
         }
         return modifierSet.add(modifier);
     }
@@ -380,18 +326,12 @@ public final class FeatureContainer {
     /**
      * Removes a modifier from a container.
      *
-     * @param fc The <code>FeatureContainer</code> to remove from.
      * @param modifier The <code>Modifier</code> to remove.
      * @return The modifier removed.
      */
-    public static Modifier removeModifier(FeatureContainer fc,
-                                          Modifier modifier) {
-        if (fc == null) {
-            logger.warning("removeModifier from <null-feature-container>: "
-                + modifier);
-            return null;
-        } else if (fc.modifiers == null || modifier == null) return null;
-        Set<Modifier> modifierSet = fc.modifiers.get(modifier.getId());
+    public Modifier removeModifier(Modifier modifier) {
+        if (modifier == null) return null;
+        Set<Modifier> modifierSet = modifiers.get(modifier.getId());
         return (modifierSet == null || !modifierSet.remove(modifier)) ? null
             : modifier;
     }
@@ -399,45 +339,40 @@ public final class FeatureContainer {
     /**
      * Removes all modifiers with a given identifier.
      *
-     * @param fc The <code>FeatureContainer</code> to remove from.
      * @param id The object identifier.
      */
-    public static void removeModifiers(FeatureContainer fc, String id) {
-        if (fc == null) {
-            logger.warning("removeModifiers from <null-feature-container>: "
-                + id);
-        } else if (fc.modifiers != null) fc.modifiers.remove(id);
+    public void removeModifiers(String id) {
+        if (modifiers != null) modifiers.remove(id);
     }
 
 
     /**
      * Adds all the features in an object to this object.
      *
-     * @param fc The <code>FreeColObject</code> to add features from.
      * @param fco The <code>FreeColObject</code> to add features from.
      */
-    public static void addFeatures(FeatureContainer fc, FreeColObject fco) {
+    public void addFeatures(FreeColObject fco) {
         FeatureContainer c = fco.getFeatureContainer();
-        if (fc == null || c == null) return;
+        if (c == null) return;
         if (c.abilities != null) {
-            fc.requireAbilities();
+            requireAbilities();
             for (Entry<String, Set<Ability>> entry : c.abilities.entrySet()) {
-                Set<Ability> abilitySet = fc.abilities.get(entry.getKey());
+                Set<Ability> abilitySet = abilities.get(entry.getKey());
                 if (abilitySet == null) {
-                    fc.abilities.put(entry.getKey(),
-                                     new HashSet<Ability>(entry.getValue()));
+                    abilities.put(entry.getKey(),
+                                  new HashSet<Ability>(entry.getValue()));
                 } else {
                     abilitySet.addAll(entry.getValue());
                 }
             }
         }
         if (c.modifiers != null) {
-            fc.requireModifiers();
+            requireModifiers();
             for (Entry<String, Set<Modifier>> entry : c.modifiers.entrySet()) {
-                Set<Modifier> modifierSet = fc.modifiers.get(entry.getKey());
+                Set<Modifier> modifierSet = modifiers.get(entry.getKey());
                 if (modifierSet == null) {
-                    fc.modifiers.put(entry.getKey(),
-                                     new HashSet<Modifier>(entry.getValue()));
+                    modifiers.put(entry.getKey(),
+                                  new HashSet<Modifier>(entry.getValue()));
                 } else {
                     modifierSet.addAll(entry.getValue());
                 }
@@ -448,24 +383,23 @@ public final class FeatureContainer {
     /**
      * Removes all the features in an object from a container.
      *
-     * @param fc The <code>FeatureContainer</code> to remove features from.
      * @param fco The <code>FreeColObject</code> to find features to remove
      *     in.
      */
-    public static void removeFeatures(FeatureContainer fc, FreeColObject fco) {
+    public void removeFeatures(FreeColObject fco) {
         FeatureContainer c = fco.getFeatureContainer();
-        if (fc == null || c == null) return;
-        if (c.abilities != null && fc.abilities != null) {
+        if (c == null) return;
+        if (c.abilities != null && abilities != null) {
             for (Entry<String, Set<Ability>> entry : c.abilities.entrySet()) {
-                Set<Ability> abilitySet = fc.abilities.get(entry.getKey());
+                Set<Ability> abilitySet = abilities.get(entry.getKey());
                 if (abilitySet != null) {
                     abilitySet.removeAll(entry.getValue());
                 }
             }
         }
-        if (c.modifiers != null && fc.modifiers != null) {
+        if (c.modifiers != null && modifiers != null) {
             for (Entry<String, Set<Modifier>> entry : c.modifiers.entrySet()) {
-                Set<Modifier> modifierSet = fc.modifiers.get(entry.getKey());
+                Set<Modifier> modifierSet = modifiers.get(entry.getKey());
                 if (modifierSet != null) {
                     modifierSet.removeAll(entry.getValue());
                 }
@@ -490,20 +424,20 @@ public final class FeatureContainer {
      */
     public void replaceSource(FreeColGameObjectType oldSource,
                               FreeColGameObjectType newSource) {
-        for (Ability ability : getAbilities(this)) {
+        for (Ability ability : getAbilitySet(null, null, null)) {
             if (oldSource == null || ability.getSource() == oldSource) {
-                removeAbility(this, ability);
+                removeAbility(ability);
                 Ability newAbility = new Ability(ability);
                 newAbility.setSource(newSource);
-                addAbility(this, newAbility);
+                addAbility(newAbility);
             }
         }
-        for (Modifier modifier : getModifiers(this)) {
+        for (Modifier modifier : getModifierSet(null, null, null)) {
             if (oldSource == null || modifier.getSource() == oldSource) {
-                removeModifier(this, modifier);
+                removeModifier(modifier);
                 Modifier newModifier = new Modifier(modifier);
                 newModifier.setSource(newSource);
-                addModifier(this, newModifier);
+                addModifier(newModifier);
             }
         }
     }
@@ -517,14 +451,14 @@ public final class FeatureContainer {
         sb.append("[FeatureContainer");
         if (abilities != null) {
             sb.append(" [abilities");
-            for (Ability ability : getAbilities(this)) {
+            for (Ability ability : getAbilitySet(null, null, null)) {
                 sb.append(" ").append(ability.toString());
             }
             sb.append("]");
         }
         if (modifiers != null) {
             sb.append(" [modifiers");
-            for (Modifier modifier : getModifiers(this)) {
+            for (Modifier modifier : getModifierSet(null, null, null)) {
                 sb.append(" ").append(modifier.toString());
             }
             sb.append("]");

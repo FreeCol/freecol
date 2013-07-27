@@ -243,7 +243,7 @@ public abstract class Feature extends FreeColObject {
      * Does this feature apply to a given turn?
      *
      * @param turn The <code>Turn</code> to test.
-     * @return True if the turn is not outside a valid time limit.
+     * @return True if the turn is null or not outside a valid time limit.
      */
     protected boolean appliesTo(final Turn turn) {
         return !(turn != null

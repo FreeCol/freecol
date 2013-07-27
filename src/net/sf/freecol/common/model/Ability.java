@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
  * that can be applied to any action within the game, most obviously
  * combat.
  */
-public final class Ability extends Feature {
+public final class Ability extends Feature implements Comparable<Ability> {
 
     /**
      * The ability to add the current tax as a bonus to the production
@@ -491,6 +491,16 @@ public final class Ability extends Feature {
         } else {
             return false;
         }
+    }
+
+    /**
+     * Compares this object with the specified object for order.
+     *
+     * @param ability The <code>Ability</code> to compare to.
+     * @return A comparison result.
+     */
+    public int compareTo(Ability ability) {
+        return getIdComparator().compare(this, ability);
     }
 
 

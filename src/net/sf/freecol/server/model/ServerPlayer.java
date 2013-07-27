@@ -1231,7 +1231,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 // the only effects of a disaster that can be reversed
                 // are the modifiers
                 for (RandomChoice<Effect> effect: bankruptcy.getEffects()) {
-                    for (Modifier modifier : effect.getObject().getModifiers()) {
+                    for (Modifier modifier : effect.getObject().getModifierSet()) {
                         cs.addFeatureChange(this, this, modifier, false);
                     }
                 }
@@ -1327,7 +1327,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             if (colony == null) {
                 // currently, the only effects that can apply to the
                 // player itself are production modifiers
-                for (Modifier modifier : effect.getModifiers()) {
+                for (Modifier modifier : effect.getModifierSet()) {
                     if (modifier.getDuration() > 0) {
                         Modifier timedModifier = Modifier
                             .makeTimedModifier(modifier.getId(), modifier, getGame().getTurn());
@@ -1391,7 +1391,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 } else {
                     messages.add(new ModelMessage(ModelMessage.MessageType.DEFAULT,
                                                   effect.getId(), this));
-                    for (Modifier modifier : effect.getModifiers()) {
+                    for (Modifier modifier : effect.getModifierSet()) {
                         if (modifier.getDuration() > 0) {
                             Modifier timedModifier = Modifier
                                 .makeTimedModifier(modifier.getId(), modifier, getGame().getTurn());
@@ -1750,7 +1750,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
         }
 
-        if (!father.getModifiers().isEmpty()) {
+        if (!father.getModifierSet().isEmpty()) {
             cs.add(See.only(this), this);
         }
 
@@ -2583,7 +2583,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             .changeOwner(attackerPlayer);//-vis(attackerPlayer,colonyPlayer)
 
         // Remove goods party modifiers as they apply to a different monarch.
-        for (Modifier m : colony.getModifiers()) {
+        for (Modifier m : colony.getModifierSet()) {
             if ("model.modifier.colonyGoodsParty".equals(m.getSource())) {
                 colony.removeModifier(m);
             }

@@ -118,8 +118,8 @@ public class NationTypeDetailPanel extends ColopediaGameObjectTypePanel<NationTy
 
         Font boldFont = ResourceManager.getFont("SimpleFont", Font.BOLD, 16f);
 
-        Set<Ability> abilities = nationType.getAbilities();
-        Set<Modifier> modifiers = nationType.getModifiers();
+        Set<Ability> abilities = nationType.getAbilitySet();
+        Set<Modifier> modifiers = nationType.getModifierSet();
 
         panel.setLayout(new MigLayout("wrap 2, gapx 20"));
 

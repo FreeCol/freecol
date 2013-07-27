@@ -115,9 +115,9 @@ public class ModifierTest extends FreeColTestCase {
         Modifier modifier3 = new Modifier("test", 30, Modifier.Type.PERCENTAGE);
 
         FeatureContainer featureContainer = new FeatureContainer();
-        FeatureContainer.addModifier(featureContainer, modifier1);
-        FeatureContainer.addModifier(featureContainer, modifier2);
-        FeatureContainer.addModifier(featureContainer, modifier3);
+        featureContainer.addModifier(modifier1);
+        featureContainer.addModifier(modifier2);
+        featureContainer.addModifier(modifier3);
 
         // applies to frigate
         Scope scope1 = new Scope();
@@ -192,8 +192,8 @@ public class ModifierTest extends FreeColTestCase {
         assertTrue(modifier2.appliesTo(frigate, new Turn(25)));
 
         FeatureContainer featureContainer = new FeatureContainer();
-        FeatureContainer.addModifier(featureContainer, modifier1);
-        FeatureContainer.addModifier(featureContainer, modifier2);
+        featureContainer.addModifier(modifier1);
+        featureContainer.addModifier(modifier2);
         Set<Modifier> modifierSet = featureContainer.getModifierSet("test", frigate, new Turn(15));
         assertEquals(1, modifierSet.size());
         assertEquals(modifier1, modifierSet.iterator().next());
@@ -216,8 +216,8 @@ public class ModifierTest extends FreeColTestCase {
         assertTrue(modifier1.hasIncrement());
 
         FeatureContainer featureContainer = new FeatureContainer();
-        FeatureContainer.addModifier(featureContainer, modifier1);
-        FeatureContainer.addModifier(featureContainer, modifier2);
+        featureContainer.addModifier(modifier1);
+        featureContainer.addModifier(modifier2);
 
         // only modifier2
         assertEquals(3f, featureContainer.applyModifier(1, "test", frigate, new Turn(9)));
@@ -314,9 +314,9 @@ public class ModifierTest extends FreeColTestCase {
         Modifier modifier3 = new Modifier("test", 30, Modifier.Type.PERCENTAGE);
 
         FeatureContainer featureContainer = new FeatureContainer();
-        FeatureContainer.addModifier(featureContainer, modifier1);
-        FeatureContainer.addModifier(featureContainer, modifier2);
-        FeatureContainer.addModifier(featureContainer, modifier3);
+        featureContainer.addModifier(modifier1);
+        featureContainer.addModifier(modifier2);
+        featureContainer.addModifier(modifier3);
 
         assertEquals(Modifier.UNKNOWN, featureContainer.applyModifier(1, "test", null, new Turn(15)));
 

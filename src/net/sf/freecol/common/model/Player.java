@@ -3819,7 +3819,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
         if (xw.validFor(this)) {
 
-            for (Ability ability : getSortedCopy(getAbilities())) {
+            for (Ability ability : getSortedAbilities()) {
                 ability.toXML(xw);
             }
 

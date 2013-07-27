@@ -344,8 +344,6 @@ public abstract class FreeColObject implements ObjectWithId {
 
     /**
      * Is an ability present in this object?
-     * Subclasses with complex ability handling should override this
-     * routine.
      *
      * @param id The object identifier.
      * @param fcgot An optional <code>FreeColGameObjectType</code> the
@@ -354,9 +352,9 @@ public abstract class FreeColObject implements ObjectWithId {
      * @return True if the ability is present.
      */
     public boolean hasAbility(String id, FreeColGameObjectType fcgot,
-                              Turn turn) {
-        return FeatureContainer.hasAbility(getFeatureContainer(),
-                                           id, fcgot, turn);
+                                    Turn turn) {
+        FeatureContainer fc = getFeatureContainer();
+        return (fc == null) ? false : fc.hasAbility(id, fcgot, turn);
     }
 
     /**
@@ -366,8 +364,19 @@ public abstract class FreeColObject implements ObjectWithId {
      * @return True if the key is present.
      */
     public boolean containsAbilityKey(String key) {
-        return FeatureContainer.containsAbilityKey(getFeatureContainer(),
-                                                   key);
+        return !getAbilitySet(key, null, null).isEmpty();
+    }
+
+    /**
+     * Gets a sorted copy of the abilities of this object.
+     *
+     * @return A list of abilities.
+     */
+    public final List<Ability> getSortedAbilities() {
+        List<Ability> abilities = new ArrayList<Ability>();
+        abilities.addAll(getAbilitySet());
+        Collections.sort(abilities);
+        return abilities;
     }
 
     /**
@@ -375,8 +384,8 @@ public abstract class FreeColObject implements ObjectWithId {
      *
      * @return A set of abilities.
      */
-    public Set<Ability> getAbilities() {
-        return FeatureContainer.getAbilities(getFeatureContainer());
+    public final Set<Ability> getAbilitySet() {
+        return getAbilitySet(null);
     }
 
     /**
@@ -405,7 +414,7 @@ public abstract class FreeColObject implements ObjectWithId {
     /**
      * Gets the set of abilities with the given identifier from this
      * object.  Subclasses with complex ability handling should
-     * override this routine.
+     * override this as all prior routines are derived from it.
      *
      * @param id The object identifier.
      * @param fcgot An optional <code>FreeColGameObjectType</code> the
@@ -416,8 +425,9 @@ public abstract class FreeColObject implements ObjectWithId {
     public Set<Ability> getAbilitySet(String id,
                                       FreeColGameObjectType fcgot,
                                       Turn turn) {
-        return FeatureContainer.getAbilitySet(getFeatureContainer(),
-                                              id, fcgot, turn);
+        FeatureContainer fc = getFeatureContainer();
+        if (fc == null) return Collections.emptySet();
+        return fc.getAbilitySet(id, fcgot, turn);
     }
 
     /**
@@ -427,17 +437,19 @@ public abstract class FreeColObject implements ObjectWithId {
      * @return True if the ability was added.
      */
     public boolean addAbility(Ability ability) {
-        return FeatureContainer.addAbility(getFeatureContainer(), ability);
+        FeatureContainer fc = getFeatureContainer();
+        return (fc == null) ? false : fc.addAbility(ability);
     }
 
     /**
      * Remove the given ability from this object.
      *
      * @param ability An <code>Ability</code> to remove.
-     * @return The ability removed.
+     * @return The ability removed or null on failure.
      */
     public Ability removeAbility(Ability ability) {
-        return FeatureContainer.removeAbility(getFeatureContainer(), ability);
+        FeatureContainer fc = getFeatureContainer();
+        return (fc == null) ? null : fc.removeAbility(ability);
     }
 
     /**
@@ -446,7 +458,8 @@ public abstract class FreeColObject implements ObjectWithId {
      * @param id The object identifier.
      */
     public void removeAbilities(String id) {
-        FeatureContainer.removeAbilities(getFeatureContainer(), id);
+        FeatureContainer fc = getFeatureContainer();
+        if (fc != null) fc.removeAbilities(id);
     }
 
 
@@ -462,24 +475,24 @@ public abstract class FreeColObject implements ObjectWithId {
     }
 
     /**
-     * Gets a copy of the modifiers of this object.
-     *
-     * @return A set of modifiers.
-     */
-    public final Set<Modifier> getModifiers() {
-        return FeatureContainer.getModifiers(getFeatureContainer());
-    }
-
-    /**
      * Gets a sorted copy of the modifiers of this object.
      *
      * @return A list of modifiers.
      */
-    public List<Modifier> getSortedModifiers() {
+    public final List<Modifier> getSortedModifiers() {
         List<Modifier> modifiers = new ArrayList<Modifier>();
-        modifiers.addAll(getModifiers());
+        modifiers.addAll(getModifierSet());
         Collections.sort(modifiers);
         return modifiers;
+    }
+
+    /**
+     * Gets a copy of the modifiers of this object.
+     *
+     * @return A set of modifiers.
+     */
+    public final Set<Modifier> getModifierSet() {
+        return getModifierSet(null);
     }
 
     /**
@@ -520,8 +533,9 @@ public abstract class FreeColObject implements ObjectWithId {
     public Set<Modifier> getModifierSet(String id,
                                         FreeColGameObjectType fcgot,
                                         Turn turn) {
-        return FeatureContainer.getModifierSet(getFeatureContainer(), 
-                                               id, fcgot, turn);
+        FeatureContainer fc = getFeatureContainer();
+        if (fc == null) return Collections.emptySet();
+        return fc.getModifierSet(id, fcgot, turn);
     }
 
     /**
@@ -574,7 +588,9 @@ public abstract class FreeColObject implements ObjectWithId {
      * @return True if the modifier was added.
      */
     public boolean addModifier(Modifier modifier) {
-        return FeatureContainer.addModifier(getFeatureContainer(), modifier);
+        FeatureContainer fc = getFeatureContainer();
+        if (fc == null) return false;
+        return fc.addModifier(modifier);
     }
 
     /**
@@ -584,7 +600,9 @@ public abstract class FreeColObject implements ObjectWithId {
      * @return The modifier removed.
      */
     public Modifier removeModifier(Modifier modifier) {
-        return FeatureContainer.removeModifier(getFeatureContainer(), modifier);
+        FeatureContainer fc = getFeatureContainer();
+        if (fc == null) return null;
+        return fc.removeModifier(modifier);
     }
 
     /**
@@ -593,7 +611,8 @@ public abstract class FreeColObject implements ObjectWithId {
      * @param id The object identifier.
      */
     public void removeModifiers(String id) {
-        FeatureContainer.removeModifiers(getFeatureContainer(), id);
+        FeatureContainer fc = getFeatureContainer();
+        if (fc != null) fc.removeModifiers(id);
     }
 
 
@@ -603,7 +622,8 @@ public abstract class FreeColObject implements ObjectWithId {
      * @param fco The <code>FreeColObject</code> to add features from.
      */
     public void addFeatures(FreeColObject fco) {
-        FeatureContainer.addFeatures(getFeatureContainer(), fco);
+        FeatureContainer fc = getFeatureContainer();
+        if (fc != null) fc.addFeatures(fco);
     }
 
     /**
@@ -612,7 +632,8 @@ public abstract class FreeColObject implements ObjectWithId {
      * @param fco The <code>FreeColObject</code> to find features to remove in.
      */
     public void removeFeatures(FreeColObject fco) {
-        FeatureContainer.removeFeatures(getFeatureContainer(), fco);
+        FeatureContainer fc = getFeatureContainer();
+        if (fc != null) fc.removeFeatures(fco);
     }
 
 

@@ -3345,9 +3345,9 @@ public class Unit extends GoodsLocation
             result.addAll(getOwner().getAbilitySet(id, equipmentType, turn));
         }
         // Location abilities may apply.
-        // TODO: extend this to all locations? May simplify
-        // code. Units are also Locations, however, which complicates
-        // the issue. We do not want Units aboard other Units to share
+        // TODO: extend this to all locations?  May simplify
+        // code.  Units are also Locations however, which complicates
+        // the issue as we do not want Units aboard other Units to share
         // the abilities of the carriers.
         if (getSettlement() != null) {
             result.addAll(getSettlement().getAbilitySet(id, unitType, turn));

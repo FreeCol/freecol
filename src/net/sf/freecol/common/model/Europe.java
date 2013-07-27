@@ -332,7 +332,7 @@ public class Europe extends UnitLocation implements Ownable, Named {
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        for (Ability ability : getSortedCopy(getAbilities())) {
+        for (Ability ability : getSortedAbilities()) {
             ability.toXML(xw);
         }
 
