@@ -70,6 +70,43 @@ public class Player extends FreeColGameObject implements Nameable {
         NATIVE, COLONIAL, REBEL, INDEPENDENT, ROYAL, UNDEAD, RETIRED
     }
 
+    /** Colony value categories. */
+    public static enum ColonyValueCategory {
+        A_OVERRIDE, // override slot containing showstopper NoValueType values
+        A_PROD,     // general production level
+        A_TILE,     // strangeness with the tile
+        A_EUROPE,   // proximity to Europe
+        A_RESOURCE, // penalize building on top of a resource
+        A_ADJACENT, // penalize adjacent units and settlement-owned-tiles
+        A_FOOD,     // penalize food shortage
+        A_LEVEL,    // reward high production potential
+        A_NEARBY,   // penalize nearby units and settlements
+        A_GOODS,    // check sufficient critical goods available (e.g. lumber)
+        // A_GOODS must be last, the spec is entitled to require checks on
+        // as many goods types as it likes
+    }
+
+    /** Special return values for showstopper getColonyValue fail. */
+    public static enum NoValueType {
+        BOGUS(-1), TERRAIN(-2), RUMOUR(-3), SETTLED(-4), FOOD(-5), INLAND(-6), POLAR(-7);
+     
+        private static final int MAX = values().length;
+
+        private int value;
+
+
+        NoValueType(int value) { this.value = value; }
+
+        public int getValue() { return value; }
+
+        public double getDouble() { return (double)value; }
+
+        public static NoValueType fromValue(int i) {
+            int n = -i - 1;
+            return (n >= 0 && n < MAX) ? NoValueType.values()[n] : BOGUS;
+        }
+    }
+
     /**
      * A predicate that can be applied to a unit.
      */
@@ -2275,6 +2312,20 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Get the number of port settlements.
+     *
+     * @return The number of port settlements this player has.
+     */
+    public int getNumberOfPorts() {
+        if (!isEuropean()) return 0;
+        int n = 0;
+        for (Colony colony : getColonies()) {
+            if (colony.isConnectedPort()) n++;
+        }
+        return n;
+    }
+
+    /**
      * Does this player own a given settlement.
      *
      * @param settlement The <code>Settlement</code> to check.
@@ -3248,6 +3299,8 @@ public class Player extends FreeColGameObject implements Nameable {
     //
 
     /**
+     * Not currently in use.  Leave here for now, it might yet be revived.
+     *
      * Calculates the value of an outpost-type colony at this tile.
      * An "outpost" is supposed to be a colony containing one worker, exporting
      * its whole production to europe. The value of such colony is the maximum
@@ -3256,7 +3309,6 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @return The value of a future colony located on this tile. This value is
      *         used by the AI when deciding where to build a new colony.
-     */
     public int getOutpostValue(Tile t) {
         Market market = getMarket();
         if (canClaimToFoundSettlement(t)) {
@@ -3321,219 +3373,311 @@ public class Player extends FreeColGameObject implements Nameable {
         }
         return 0;
     }
+    */
 
     /**
-     * Gets the value of building a <code>Colony</code> on the given tile.
-     * This method adds bonuses to the colony value if the tile is close to (but
-     * not overlapping with) another friendly colony. Penalties for enemy
-     * units/colonies are added as well.
+     * Gets a list of values for building a <code>Colony</code> on the
+     * given tile for each <code>ColonyValueCategory</code>.
+     *
+     * TODO: tune magic numbers.  Expose more to the spec?
      *
      * @param tile The <code>Tile</code>
-     * @return The value of building a colony on the given tile.
+     * @return A list of values.
      */
-    public int getColonyValue(Tile tile) {
-        //----- TODO: tune magic numbers
-        //applied once
-        final float MOD_HAS_RESOURCE           = 0.75f;
-        final float MOD_NO_PATH                = 0.5f;
-        final float MOD_LONG_PATH              = 0.75f;
-        final float MOD_FOOD_LOW               = 0.75f;
-        final float MOD_FOOD_VERY_LOW          = 0.5f;
+    public List<Double> getAllColonyValues(Tile tile) {
+        // Want a few settlements before taking risks
+        final int LOW_SETTLEMENT_NUMBER = 3;
 
-        //applied per goods
-        final float MOD_BUILD_MATERIAL_MISSING = 0.10f;
+        // Would like a caravel to reach high seas in 3 moves
+        final int LONG_PATH_TILES = 12;
 
-        //applied per surrounding tile
-        final float MOD_ADJ_SETTLEMENT_BIG     = 0.25f;
-        final float MOD_ADJ_SETTLEMENT         = 0.5f;
-        final float MOD_OWNED_EUROPEAN         = 0.8f;
-        final float MOD_OWNED_NATIVE           = 0.9f;
+        // Applied once
+        final double MOD_HAS_RESOURCE           = 0.75;
+        final double MOD_FOOD_LOW               = 0.75;
+        final double MOD_INITIAL_FOOD           = 2.0;
+        final double MOD_STEAL                  = 0.5;
+        final double MOD_INLAND                 = 0.5;
 
-        //applied per goods production, per surrounding tile
-        final float MOD_HIGH_PRODUCTION        = 1.2f;
-        final float MOD_GOOD_PRODUCTION        = 1.1f;
+        // Applied per surrounding tile
+        final double MOD_OWNED_EUROPEAN         = 0.67;
+        final double MOD_OWNED_NATIVE           = 0.8;
 
-        //applied per occurrence (own colony only one-time), range-dependent.
-        final float[] MOD_OWN_COLONY     = {0.0f, 0.0f, 0.5f, 1.50f, 1.25f};
-        final float[] MOD_ENEMY_COLONY   = {0.0f, 0.0f, 0.4f, 0.5f,  0.7f};
-        final float[] MOD_NEUTRAL_COLONY = {0.0f, 0.0f, 0.7f, 0.8f,  1.0f};
-        final float[] MOD_ENEMY_UNIT     = {0.0f, 0.5f, 0.6f, 0.75f, 0.9f};
+        // Applied per goods production, per surrounding tile
+        final double MOD_HIGH_PRODUCTION        = 1.2;
+        final double MOD_GOOD_PRODUCTION        = 1.1;
 
-        final int LONG_PATH_TILES = 16;
-        final int PRIMARY_GOODS_VALUE = 30;
+        // Applied per occurrence (own colony only one-time), range-dependent.
+        final int DISTANCE_MAX = 5;
+        final double[] MOD_OWN_COLONY     = {0.0, 0.0, 0.5, 1.50, 1.25};
+        final double[] MOD_ENEMY_COLONY   = {0.0, 0.0, 0.4, 0.50, 0.70};
+        final double[] MOD_NEUTRAL_COLONY = {0.0, 0.0, 0.7, 0.80, 1.00};
+        final double[] MOD_ENEMY_UNIT     = {0.4, 0.5, 0.6, 0.75, 0.90};
 
-        //goods production in excess of this on a tile counts as good/high
+        // Goods production in excess of this on a tile counts as good/high
         final int GOOD_PRODUCTION = 4;
         final int HIGH_PRODUCTION = 8;
 
-        //counting "high" production as 2, "good" production as 1
-        //overall food production is considered low/very low if less than...
+        // Counting "high" production as 2, "good" production as 1
+        // overall food production is considered low/very low if less than...
         final int FOOD_LOW = 4;
-        final int FOOD_VERY_LOW = 2;
+        final int FOOD_VERY_LOW = 1;
 
-        //----- END MAGIC NUMBERS
+        // Multiplicative modifiers, to be applied to value later
+        List<Double> values = new ArrayList<Double>();
+        for (ColonyValueCategory c : ColonyValueCategory.values()) {
+            values.add(1.0);
+        }
+        // Penalize certain problems more in the initial colonies.
+        double development = Math.min(LOW_SETTLEMENT_NUMBER, settlements.size())
+                / (double)LOW_SETTLEMENT_NUMBER;
+        int portCount = getNumberOfPorts();
 
-        // Return -INFINITY if there is a settlement here or neighbouring.
-        for (Tile t : tile.getSurroundingTiles(0, 1)) {
-            if (t.hasSettlement()) return -INFINITY;
+        if (tile.isPolar() && settlements.size() < LOW_SETTLEMENT_NUMBER) {
+            values.set(ColonyValueCategory.A_OVERRIDE.ordinal(),
+                       NoValueType.POLAR.getDouble());
+            return values;
         }
 
-        //initialize tile value
-        int value = 0;
+        switch (canClaimToFoundSettlementReason(tile)) {
+        case NONE:
+            break;
+        case TERRAIN: case WATER:
+            values.set(ColonyValueCategory.A_OVERRIDE.ordinal(),
+                       NoValueType.TERRAIN.getDouble());
+            return values;
+        case RUMOUR:
+            if (settlements.isEmpty()) {
+                values.set(ColonyValueCategory.A_OVERRIDE.ordinal(),
+                           NoValueType.RUMOUR.getDouble());
+                return values;
+            }
+            values.set(ColonyValueCategory.A_TILE.ordinal(),
+                       development);
+            break;
+        case OCCUPIED: // transient we hope
+            values.set(ColonyValueCategory.A_TILE.ordinal(),
+                       MOD_ENEMY_UNIT[0]);
+            break;
+        case SETTLEMENT: case WORKED: case EUROPEANS:
+            values.set(ColonyValueCategory.A_OVERRIDE.ordinal(),
+                       NoValueType.SETTLED.getDouble());
+            return values;
+        case NATIVES: // If we have no ports, we are desperate enough to steal
+            if (tile.getOwningSettlement().getTile().isAdjacent(tile)) {
+                values.set(ColonyValueCategory.A_OVERRIDE.ordinal(),
+                           NoValueType.SETTLED.getDouble());
+                return values;
+            }
+            int price = getLandPrice(tile);
+            if (price > 0 && !checkGold(price) && portCount > 0) {
+                values.set(ColonyValueCategory.A_TILE.ordinal(),
+                           MOD_STEAL);
+            }
+            break;
+        default:
+            values.set(ColonyValueCategory.A_OVERRIDE.ordinal(),
+                       NoValueType.BOGUS.getDouble());
+            return values;
+        }
+
+        // Set up maps for all foods and building materials
+        final Specification spec = getSpecification();
+        TypeCountMap<GoodsType> production = new TypeCountMap<GoodsType>();
+
+        // Initialize tile value with food production.
+        int initialFood = 0;
+        final GoodsType foodType = spec.getPrimaryFoodType();
         for (ProductionType productionType : tile.getType()
                  .getProductionTypes(true)) {
             if (productionType.getOutputs() != null) {
                 for (AbstractGoods output : productionType.getOutputs()) {
-                    if (output.getType().isFoodType()) {
-                        int food = tile.potential(output.getType(), null)
-                            * PRIMARY_GOODS_VALUE;
-                        if (food > value) {
-                            value = food;
-                        }
-                    }
+                    if (!output.getType().isFoodType()) continue;
+                    int amount = tile.potential(output.getType(), null);
+                    if (amount > initialFood) initialFood = amount;
                 }
             }
         }
-        //value += tile.potential(tile.secondaryGoods(), null) * tile.secondaryGoods().getInitialSellPrice();
-
-        //multiplicative modifier, to be applied to value later
-        float advantage = 1f;
-
-        //set up maps for all foods and building materials
-        final Specification spec = getSpecification();
-        TypeCountMap<GoodsType> rawBuildingMaterialMap
-            = new TypeCountMap<GoodsType>();
-        for (GoodsType g : spec.getRawBuildingGoodsTypeList()) {
-            rawBuildingMaterialMap.incrementCount(g, 0);
+        if (initialFood <= FOOD_VERY_LOW) {
+            values.set(ColonyValueCategory.A_OVERRIDE.ordinal(),
+                       NoValueType.FOOD.getDouble());
+            return values;
         }
-        TypeCountMap<GoodsType> foodMap = new TypeCountMap<GoodsType>();
-        for (GoodsType g : spec.getFoodGoodsTypeList()) {
-            foodMap.incrementCount(g, 0);
+        production.incrementCount(foodType, initialFood);
+        values.set(ColonyValueCategory.A_PROD.ordinal(),
+                   (double)initialFood * foodType.getProductionWeight());
+
+        // Penalty if there is no direct connection to the high seas, or
+        // if it is too long.
+        int tilesToHighSeas = tile.getHighSeasCount();
+        if (tilesToHighSeas < 0) {
+            if (portCount < LOW_SETTLEMENT_NUMBER) {
+                values.set(ColonyValueCategory.A_OVERRIDE.ordinal(),
+                           NoValueType.INLAND.getDouble());
+                return values;
+            }
+            values.set(ColonyValueCategory.A_EUROPE.ordinal(),
+                       MOD_INLAND);
+        } else if (tilesToHighSeas >= LONG_PATH_TILES) {
+            // Normally penalize in direct proportion to length of
+            // path, but scale up to penalizing by the square of the
+            // path length for the first colony.
+            double trip = (double)LONG_PATH_TILES / tilesToHighSeas;
+            values.set(ColonyValueCategory.A_EUROPE.ordinal(),
+                       Math.pow(trip, 2.0 - development));
+        } else {
+            values.set(ColonyValueCategory.A_EUROPE.ordinal(),
+                       1.0 + 0.25 * ((double)LONG_PATH_TILES
+                           / (LONG_PATH_TILES - tilesToHighSeas)));
         }
 
         // Penalty for building on a resource tile, because production
         // can not be improved much.
-        if (tile.hasResource()) advantage *= MOD_HAS_RESOURCE;
+        values.set(ColonyValueCategory.A_RESOURCE.ordinal(),
+                   (tile.hasResource()) ? MOD_HAS_RESOURCE : 1.0);
 
-        // Penalty if there is no direct connection to the high seas, or
-        // if it is too long.
-        int tilesToHighSeas = Integer.MAX_VALUE;
-        for (Tile n : tile.getSurroundingTiles(1)) {
-            int v = tile.getHighSeasCount();
-            if (v >= 0 && v < tilesToHighSeas) tilesToHighSeas = v;
-        }
-        if (tilesToHighSeas == Integer.MAX_VALUE) {
-            advantage *= MOD_NO_PATH;
-        } else if (tilesToHighSeas > LONG_PATH_TILES) {
-            advantage *= MOD_LONG_PATH;
-        }
+        Set<GoodsType> highProduction = new HashSet<GoodsType>();
+        Set<GoodsType> goodProduction = new HashSet<GoodsType>();
+        for (Tile t : tile.getSurroundingTiles(1)) {
+            if (t.getType() == null) continue; // Unexplored!?!
+            if (t.getSettlement() != null) { // Should not happen, tested above
+                values.set(ColonyValueCategory.A_OVERRIDE.ordinal(),
+                           NoValueType.SETTLED.getDouble());
+                return values;
+            }
 
-        boolean supportingColony = false;
-        for (int radius = 1; radius < 5; radius++) {
-            for (Tile t : getGame().getMap().getCircleTiles(tile, false, radius)) {
-                Settlement set = t.getSettlement(); //may be null!
-                Colony col = t.getColony(); //may be null!
-
-                if (radius == 1) {
-                    //already checked: no colony here - if set!=null, it's indian
-                    if (set != null) {
-                        //penalize building next to native settlement
-                        SettlementType type = set.getType();
-                        if (type.getClaimableRadius() > 1) {
-                            // really shouldn't build next to cities
-                            advantage *= MOD_ADJ_SETTLEMENT_BIG;
-                        } else {
-                            advantage *= MOD_ADJ_SETTLEMENT;
-                        }
-
-                    //no settlement on neighbouring tile
-                    } else {
-                        //apply penalty for owned neighbouring tiles
-                        if (t.getOwner() != null && !this.owns(t)) {
-                            if (t.getOwner().isEuropean()) {
-                                advantage *= MOD_OWNED_EUROPEAN;
-                            } else {
-                                advantage *= MOD_OWNED_NATIVE;
-                            }
-                        }
-
-                        //count production
-                        if (t.getType()!=null) {
-                            for (AbstractGoods production : t.getType().getProduction()) {
-                                GoodsType type = production.getType();
-                                int potential = t.potential(type, null);
-                                value += potential * type.getInitialSellPrice();
-                                // a few tiles with high production are better
-                                // than many tiles with low production
-                                int highProductionValue = 0;
-                                if (potential > HIGH_PRODUCTION) {
-                                    advantage *= MOD_HIGH_PRODUCTION;
-                                    highProductionValue = 2;
-                                } else if (potential > GOOD_PRODUCTION) {
-                                    advantage *= MOD_GOOD_PRODUCTION;
-                                    highProductionValue = 1;
-                                }
-                                if (type.isFoodType()) {
-                                    foodMap.incrementCount(type, highProductionValue);
-                                } else if (type.isRawBuildingMaterial()) {
-                                    rawBuildingMaterialMap.incrementCount(type, highProductionValue);
-                                }
-                            }
-                        }
+            double pf = 1.0;
+            if (t.getOwner() != null && !this.owns(t)) {
+                if (t.getOwner().isEuropean()) {
+                    if (portCount < LOW_SETTLEMENT_NUMBER) {
+                        values.set(ColonyValueCategory.A_OVERRIDE.ordinal(),
+                                   NoValueType.SETTLED.getDouble());
+                        return values;
                     }
-
-                //radius > 1
+                    values.set(ColonyValueCategory.A_ADJACENT.ordinal(),
+                               values.get(ColonyValueCategory.A_ADJACENT.ordinal())
+                               * MOD_OWNED_EUROPEAN * development);
+                    continue; // Always ignore production from this tile
                 } else {
-                    if (value <= 0) {
-                        //value no longer changes, so return if still <=0
-                        return 0;
-                    }
-                    if (col != null) {
-                        //apply modifier for own colony at this distance
-                        if (col.getOwner()==this) {
-                            if (!supportingColony) {
-                                supportingColony = true;
-                                advantage *= MOD_OWN_COLONY[radius];
-                            }
-                        //apply modifier for other colonies at this distance
-                        } else {
-                            if (atWarWith(col.getOwner())) {
-                                advantage *= MOD_ENEMY_COLONY[radius];
-                            } else {
-                                advantage *= MOD_NEUTRAL_COLONY[radius];
-                            }
+                    pf = MOD_OWNED_NATIVE;
+                    if (portCount > 0) pf *= development;
+                }
+            }
+
+            // Count production
+            for (AbstractGoods ag : t.getSortedPotential()) {
+                GoodsType type = ag.getType();
+                if (type.isFoodType()) type = foodType;
+                int amount = ag.getAmount();
+                if (!t.isLand()) amount *= development;
+                values.set(ColonyValueCategory.A_PROD.ordinal(),
+                           values.get(ColonyValueCategory.A_PROD.ordinal())
+                           + amount * type.getProductionWeight() * pf);
+                production.incrementCount(type, amount);
+                // A few tiles with distinct high production are
+                // better than many tiles with low production.
+                if (amount > HIGH_PRODUCTION) {
+                    highProduction.add(type);
+                } else if (amount > GOOD_PRODUCTION) {
+                    goodProduction.add(type);
+                }
+            }
+
+            for (Unit u : t.getUnitList()) {
+                if (!owns(u) && u.isOffensiveUnit()
+                    && atWarWith(u.getOwner())) {
+                    values.set(ColonyValueCategory.A_ADJACENT.ordinal(),
+                        values.get(ColonyValueCategory.A_ADJACENT.ordinal())
+                        * MOD_ENEMY_UNIT[1]);
+                }
+            }
+        }
+
+        for (GoodsType g : highProduction) {
+            values.set(ColonyValueCategory.A_LEVEL.ordinal(),
+                       values.get(ColonyValueCategory.A_LEVEL.ordinal())
+                       * MOD_HIGH_PRODUCTION);
+            goodProduction.remove(g);
+        }
+        if (!goodProduction.isEmpty()) {
+            values.set(ColonyValueCategory.A_LEVEL.ordinal(),
+                       values.get(ColonyValueCategory.A_LEVEL.ordinal())
+                       * MOD_GOOD_PRODUCTION * goodProduction.size());
+        }
+
+        // Apply modifiers for other settlements and units at distance.
+        boolean supportingColony = false;
+        for (int radius = 2; radius < DISTANCE_MAX; radius++) {
+            for (Tile t : getGame().getMap().getCircleTiles(tile, false,
+                                                            radius)) {
+                Settlement settlement = t.getSettlement();
+                if (settlement != null) {
+                    if (owns(settlement)) {
+                        if (!supportingColony) {
+                            supportingColony = true;
+                            values.set(ColonyValueCategory.A_NEARBY.ordinal(),
+                                values.get(ColonyValueCategory.A_NEARBY.ordinal())
+                                * MOD_OWN_COLONY[radius]);
                         }
+                    } else if (atWarWith(settlement.getOwner())) {
+                        values.set(ColonyValueCategory.A_NEARBY.ordinal(),
+                            values.get(ColonyValueCategory.A_NEARBY.ordinal())
+                            * MOD_ENEMY_COLONY[radius]);
+                    } else {
+                        values.set(ColonyValueCategory.A_NEARBY.ordinal(),
+                            values.get(ColonyValueCategory.A_NEARBY.ordinal())
+                            * MOD_NEUTRAL_COLONY[radius]);
                     }
                 }
 
                 for (Unit u : t.getUnitList()) {
-                    if (u.getOwner() != this && u.isOffensiveUnit()
-                        && u.getOwner().isEuropean()
+                    if (!owns(u) && u.isOffensiveUnit()
                         && atWarWith(u.getOwner())) {
-                        advantage *= MOD_ENEMY_UNIT[radius];
+                        values.set(ColonyValueCategory.A_NEARBY.ordinal(),
+                            values.get(ColonyValueCategory.A_NEARBY.ordinal())
+                            * MOD_ENEMY_UNIT[radius]);
                     }
                 }
             }
         }
 
-        //check availability of key goods
-        for (GoodsType type : rawBuildingMaterialMap.keySet()) {
-            Integer amount = rawBuildingMaterialMap.getCount(type);
-            if (amount == 0) {
-                advantage *= MOD_BUILD_MATERIAL_MISSING;
+        // Check availability of key goods
+        if (production.getCount(foodType) < FOOD_LOW) {
+            values.set(ColonyValueCategory.A_FOOD.ordinal(),
+                       values.get(ColonyValueCategory.A_FOOD.ordinal())
+                       * MOD_FOOD_LOW);
+        }
+        int a = ColonyValueCategory.A_GOODS.ordinal() - 1;
+        for (GoodsType type : production.keySet()) {
+            Integer amount = production.getCount(type);
+            double threshold = type.getLowProductionThreshold();
+            if (threshold > 0.0) {
+                if (++a == values.size()) values.add(1.0);
+                if (amount < threshold) {
+                    double fraction = (double)amount / threshold;
+                    double zeroValue = type.getZeroProductionFactor();
+                    values.set(a, (1.0 - fraction) * zeroValue + fraction);
+                }
             }
         }
-        int foodProduction = 0;
-        for (Integer food : foodMap.values()) {
-            foodProduction += food;
-        }
-        if (foodProduction < FOOD_VERY_LOW) {
-            advantage *= MOD_FOOD_VERY_LOW;
-        } else if (foodProduction < FOOD_LOW) {
-            advantage *= MOD_FOOD_LOW;
-        }
 
-        return (int) (value * advantage);
+        return values;
+    }
+
+    /**
+     * Gets the value for building a <code>Colony</code> on
+     * the given tile.
+     *
+     * TODO: tune magic numbers.  Expose more to the spec?
+     *
+     * @param tile The <code>Tile</code>
+     * @return A score for the tile.
+     */
+    public int getColonyValue(Tile tile) {
+        List<Double> values = getAllColonyValues(tile);
+        if (values.get(0) < 0.0) return (int)Math.round(values.get(0));
+        double v = 1.0;
+        for (Double d : values) v *= d;
+        return (int)Math.round(v);
     }
 
 

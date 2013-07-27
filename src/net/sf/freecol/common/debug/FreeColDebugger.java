@@ -31,6 +31,7 @@ import java.util.logging.LogRecord;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.common.model.Player;
 
 
 /**
@@ -40,6 +41,7 @@ public class FreeColDebugger {
 
     private static final Logger logger = Logger.getLogger(FreeColDebugger.class.getName());
 
+    /** The debug modes, any of which may be active. */
     public static enum DebugMode {
         COMMS, // Trace print full c-s communications, and verbose
                // (non-i18n) server errors.
@@ -51,7 +53,6 @@ public class FreeColDebugger {
         INIT   // An initial colony is made, and goods added to all
                // native settlements.
     }
-
     private static int debugMode = 0;
 
     /**
@@ -69,6 +70,18 @@ public class FreeColDebugger {
      * Allows restore to previous state when re-enabling normal vision
      */
     private static boolean normalGameFogOfWar = false;
+
+    /** Display map coordinates? */
+    private static boolean displayCoordinates = false;
+
+    /** Display tile values as a colony site for this player? */
+    public static Player displayColonyValuePlayer = null;
+
+    /** Show the mission for an AI unit? */
+    public static boolean showMission = false;
+
+    /** Show full mission information? */
+    public static boolean showMissionInfo = false;
 
 
     /**
@@ -266,6 +279,79 @@ public class FreeColDebugger {
      */
     public static void signalEndDebugRun() {
         if (debugRunTurns > 0) setDebugRunTurns(0);
+    }
+
+    /**
+     * Should the map viewer display tile coordinates?
+     *
+     * @return True if the map viewer should display coordinates.
+     */
+    public static boolean debugDisplayCoordinates() {
+        return displayCoordinates;
+    }
+
+    /**
+     * Set the display tile coordinates state.
+     *
+     * @param display Whether to display or not.
+     */
+    public static void setDebugDisplayCoordinates(boolean display) {
+        displayCoordinates = display;
+    }
+
+    /**
+     * Should the map viewer display colony values for a player?
+     *
+     * @return The <code>Player</code> to display colony values for,
+     *     or null if not to display.
+     */
+    public static Player debugDisplayColonyValuePlayer() {
+        return displayColonyValuePlayer;
+    }
+
+    /**
+     * Set the player to display colony values for.
+     *
+     * @param display The new <code>Player</code> to display for.
+     */
+    public static void setDebugDisplayColonyValuePlayer(Player display) {
+        displayColonyValuePlayer = display;
+    }
+
+    /**
+     * Should the map viewer show AI missions?
+     *
+     * @return True if the map viewer should show AI missions?
+     */
+    public static boolean debugShowMission() {
+        return showMission;
+    }
+
+    /**
+     * Set the display of AI missions state.
+     *
+     * @param display Whether to display or not.
+     */
+    public static void setDebugShowMission(boolean display) {
+        showMission = display;
+    }
+
+    /**
+     * Should the map viewer show full AI mission info?
+     *
+     * @return True if the map viewer should show full AI mission info.
+     */
+    public static boolean debugShowMissionInfo() {
+        return showMissionInfo;
+    }
+
+    /**
+     * Set the display of full AI mission info state.
+     *
+     * @param display Whether to display or not.
+     */
+    public static void setDebugShowMissionInfo(boolean display) {
+        showMissionInfo = display;
     }
 
     /**

@@ -363,10 +363,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         case REBEL: case INDEPENDENT:
             // Post-declaration European player needs a coastal colony
             // and can not hope for resupply from Europe.
-            for (Colony colony : getColonies()) {
-                if (colony.isConnectedPort()) return IS_ALIVE;
-            }
-            return IS_DEAD;
+            return (getNumberOfPorts() > 0) ? IS_ALIVE : IS_DEAD;
 
         case ROYAL:
             return (getRebels().isEmpty()) ? IS_DEAD : IS_ALIVE;

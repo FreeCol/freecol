@@ -44,6 +44,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.common.debug.DebugUtils;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Player;
@@ -95,14 +96,14 @@ public class DebugMenu extends JMenu {
 
         final JCheckBoxMenuItem sc = new JCheckBoxMenuItem(
             Messages.message("menuBar.debug.showCoordinates"),
-            gui.getMapViewer().displayCoordinates);
+            FreeColDebugger.debugDisplayCoordinates());
         sc.setOpaque(false);
         sc.setMnemonic(KeyEvent.VK_S);
         this.add(sc);
         sc.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    gui.getMapViewer().displayCoordinates
-                        = ((JCheckBoxMenuItem)e.getSource()).isSelected();
+                    boolean val = ((JCheckBoxMenuItem)e.getSource()).isSelected();
+                    FreeColDebugger.setDebugDisplayCoordinates(val);
                     gui.refresh();
                 }
             });
@@ -140,44 +141,23 @@ public class DebugMenu extends JMenu {
         ButtonGroup bg = new ButtonGroup();
         final JRadioButtonMenuItem cv1
             = new JRadioButtonMenuItem("Do not display",
-                !gui.getMapViewer().displayColonyValue);
+                FreeColDebugger.debugDisplayColonyValuePlayer() == null);
         cv1.setOpaque(false);
         cv1.setMnemonic(KeyEvent.VK_C);
         cvpMenu.add(cv1);
         bg.add(cv1);
         cv1.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    gui.getMapViewer().displayColonyValue = false;
-                    gui.getMapViewer().displayColonyValuePlayer = null;
+                    FreeColDebugger.setDebugDisplayColonyValuePlayer(null);
                     gui.refresh();
                 }
             });
         this.add(cvpMenu);
-
-        final JRadioButtonMenuItem cv3 = new JRadioButtonMenuItem(
-            Messages.message("menuBar.debug.showCommonOutpostValue"),
-            gui.getMapViewer().displayColonyValue
-            && gui.getMapViewer().displayColonyValuePlayer == null);
-        cv3.setOpaque(false);
-        //cv3.setMnemonic(KeyEvent.VK_C);
-        cvpMenu.add(cv3);
-        bg.add(cv3);
-        cv3.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    gui.getMapViewer().displayColonyValue = true;
-                    gui.getMapViewer().displayColonyValuePlayer = null;
-                    gui.refresh();
-                }
-            });
-        this.add(cvpMenu);
-
         cvpMenu.addSeparator();
-
         for (Player p : game.getLiveEuropeanPlayers()) {
-            final JRadioButtonMenuItem cv2 = new JRadioButtonMenuItem(
-                Messages.message(p.getNationName()),
-                gui.getMapViewer().displayColonyValue
-                && gui.getMapViewer().displayColonyValuePlayer == p);
+            final JRadioButtonMenuItem cv2
+                = new JRadioButtonMenuItem(Messages.message(p.getNationName()),
+                    FreeColDebugger.debugDisplayColonyValuePlayer() == p);
             cv2.setOpaque(false);
             //cv2.setMnemonic(KeyEvent.VK_C);
             cvpMenu.add(cv2);
@@ -185,8 +165,7 @@ public class DebugMenu extends JMenu {
             final Player fp = p;
             cv2.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        gui.getMapViewer().displayColonyValue = true;
-                        gui.getMapViewer().displayColonyValuePlayer = fp;
+                        FreeColDebugger.setDebugDisplayColonyValuePlayer(fp);
                         gui.refresh();
                     }
                 });
@@ -369,18 +348,18 @@ public class DebugMenu extends JMenu {
 
         final JCheckBoxMenuItem dam
             = new JCheckBoxMenuItem("Display AI-missions",
-                    gui.getMapViewer().debugShowMission);
+                FreeColDebugger.debugShowMission());
         final JCheckBoxMenuItem dami
             = new JCheckBoxMenuItem("Additional AI-mission info",
-                    gui.getMapViewer().debugShowMissionInfo);
+                FreeColDebugger.debugShowMissionInfo());
         dam.setOpaque(false);
         dam.setMnemonic(KeyEvent.VK_A);
         this.add(dam);
         dam.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    gui.getMapViewer().debugShowMission
-                        = ((JCheckBoxMenuItem) e.getSource()).isSelected();
-                    dami.setEnabled(gui.getMapViewer().debugShowMission);
+                    boolean val = ((JCheckBoxMenuItem) e.getSource()).isSelected();
+                    FreeColDebugger.setDebugShowMission(val);
+                    dami.setEnabled(val);
                     gui.refresh();
                 }
             });
@@ -406,12 +385,13 @@ public class DebugMenu extends JMenu {
         this.add(dami);
         dami.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    gui.getMapViewer().debugShowMissionInfo
-                        = ((JCheckBoxMenuItem) e.getSource()).isSelected();
+                    boolean val = ((JCheckBoxMenuItem) e.getSource()).isSelected();
+                    FreeColDebugger.setDebugShowMissionInfo(val);
+                    dami.setEnabled(val);
                     gui.refresh();
                 }
             });
-        dami.setEnabled(gui.getMapViewer().debugShowMissionInfo);
+        dami.setEnabled(FreeColDebugger.debugShowMissionInfo());
 
         this.addSeparator();
 

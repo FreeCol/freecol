@@ -617,6 +617,29 @@ public class DebugUtils {
     }
 
     /**
+     * Debug action to create a string showing the colony value for
+     * a given tile and player.
+     *
+     * Note: passing the freeColClient is redundant for now, but will
+     * be needed if/when we move getColonyValue into the AI.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param player The <code>Player</code> to evaluate the site.
+     * @param tile The colony <code>Tile</code> to evaluate.
+     * @return A string describing the colony value of a tile.
+     */
+    public static String displayColonyValue(final FreeColClient freeColClient,
+                                            Tile tile) {
+        Player player = FreeColDebugger.debugDisplayColonyValuePlayer();
+        if (player == null) return null;
+        int value = player.getColonyValue(tile);
+        if (value < 0) {
+            return Player.NoValueType.fromValue(value).toString();
+        }
+        return Integer.toString(value);          
+    }
+
+    /**
      * Debug action to display Europe.
      *
      * Called from the debug popup menu.

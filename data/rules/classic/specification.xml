@@ -20,7 +20,7 @@
     In case of incompatible changes, please update version number and
     XSD schema for validation.
 -->
-<freecol-specification id="classic" version="0.77">
+<freecol-specification id="classic" version="0.78">
 
   <!-- Modifiers that are not attached to other game object
        types. They may be modified, but MUST NOT be removed. -->
@@ -95,68 +95,81 @@
   </events>
 
   <goods-types>
-    <goods-type id="model.goods.food" is-farmed="true" ignore-limit="true" is-food="true">
-      <market initial-amount="10000" initial-price="1"  price-difference="7"/>
+    <goods-type id="model.goods.food" is-farmed="true"
+                ignore-limit="true" is-food="true"
+                production-weight="5.0">
+      <market initial-amount="10000" initial-price="1" price-difference="7" />
     </goods-type>
     <goods-type id="model.goods.grain" is-farmed="true" storable="false"
-                stored-as="model.goods.food" is-food="true" />
+                stored-as="model.goods.food" is-food="true"
+                production-weight="5.0" />
     <goods-type id="model.goods.fish" is-farmed="true" storable="false"
-                stored-as="model.goods.food" is-food="true" />
+                stored-as="model.goods.food" is-food="true"
+                production-weight="5.0" />
     <!--
         <goods-type id="model.goods.meat" is-farmed="true" storable="false"
         stored-as="model.goods.food" is-food="true" />
     -->
-    <goods-type id="model.goods.sugar" is-farmed="true" new-world-goods="true">
-      <market initial-amount="1500"  initial-price="2"  price-difference="4"/>
+    <goods-type id="model.goods.sugar" is-farmed="true"
+                new-world-goods="true" production-weight="2.5">
+      <market initial-amount="1500"  initial-price="2"  price-difference="4" />
     </goods-type>
-    <goods-type id="model.goods.tobacco" is-farmed="true" new-world-goods="true">
-      <market initial-amount="1500"  initial-price="2"  price-difference="4"/>
+    <goods-type id="model.goods.tobacco" is-farmed="true"
+                new-world-goods="true" production-weight="2.5">
+      <market initial-amount="1500"  initial-price="2"  price-difference="4" />
     </goods-type>
-    <goods-type id="model.goods.cotton" is-farmed="true" new-world-goods="true">
-      <market initial-amount="1500"  initial-price="2"  price-difference="4"/>
+    <goods-type id="model.goods.cotton" is-farmed="true"
+                new-world-goods="true" production-weight="2.5">
+      <market initial-amount="1500"  initial-price="2"  price-difference="4" />
     </goods-type>
-    <goods-type id="model.goods.furs" is-farmed="true" new-world-goods="true">
-      <market initial-amount="1500"  initial-price="2"  price-difference="4"/>
+    <goods-type id="model.goods.furs" is-farmed="true"
+                new-world-goods="true" production-weight="2.5">
+      <market initial-amount="1500"  initial-price="2"  price-difference="4" />
     </goods-type>
-    <goods-type id="model.goods.lumber" is-farmed="true">
-      <market initial-amount="3000"  initial-price="1"  price-difference="5"/>
+    <goods-type id="model.goods.lumber" is-farmed="true"
+                production-weight="4.0"
+                low-production-threshold="6" zero-production-factor="0.0">
+      <market initial-amount="3000"  initial-price="1"  price-difference="5" />
     </goods-type>
-    <goods-type id="model.goods.ore" is-farmed="true">
-      <market initial-amount="2000"  initial-price="4"  price-difference="3"/>
+    <goods-type id="model.goods.ore" is-farmed="true"
+                production-weight="3.0"
+                low-production-threshold="4" zero-production-factor="0.5">
+      <market initial-amount="2000"  initial-price="4"  price-difference="3" />
     </goods-type>
-    <goods-type id="model.goods.silver" is-farmed="true">
-      <market initial-amount="500"   initial-price="16" price-difference="2"/>
+    <goods-type id="model.goods.silver" is-farmed="true"
+                production-weight="3.0">
+      <market initial-amount="500"   initial-price="16" price-difference="2" />
     </goods-type>
     <goods-type id="model.goods.horses" is-farmed="false"
                 breeding-number="2" made-from="model.goods.food">
-      <market initial-amount="1000"  initial-price="1"  price-difference="2"/>
+      <market initial-amount="1000"  initial-price="1"  price-difference="2" />
     </goods-type>
     <goods-type id="model.goods.rum" is-farmed="false" made-from="model.goods.sugar">
-      <market initial-amount="1000"  initial-price="10" price-difference="2"/>
+      <market initial-amount="1000"  initial-price="10" price-difference="2" />
     </goods-type>
     <goods-type id="model.goods.cigars" is-farmed="false" made-from="model.goods.tobacco">
-      <market initial-amount="1000"  initial-price="10" price-difference="2"/>
+      <market initial-amount="1000"  initial-price="10" price-difference="2" />
     </goods-type>
     <goods-type id="model.goods.cloth" is-farmed="false" made-from="model.goods.cotton">
-      <market initial-amount="1000"  initial-price="10" price-difference="2"/>
+      <market initial-amount="1000"  initial-price="10" price-difference="2" />
     </goods-type>
     <goods-type id="model.goods.coats" is-farmed="false" made-from="model.goods.furs">
-      <market initial-amount="1000"  initial-price="10" price-difference="2"/>
+      <market initial-amount="1000"  initial-price="10" price-difference="2" />
     </goods-type>
     <goods-type id="model.goods.tradeGoods" is-farmed="false" trade-goods="true">
-      <market initial-amount="3000"  initial-price="1"  price-difference="2"/>
+      <market initial-amount="3000"  initial-price="1"  price-difference="2" />
     </goods-type>
     <goods-type id="model.goods.tools" is-farmed="false" made-from="model.goods.ore">
-      <market initial-amount="1000"   initial-price="1"  price-difference="2"/>
+      <market initial-amount="1000"   initial-price="1"  price-difference="2" />
     </goods-type>
     <goods-type id="model.goods.muskets" is-farmed="false" made-from="model.goods.tools">
-      <market initial-amount="1000"   initial-price="1"  price-difference="2"/>
+      <market initial-amount="1000"   initial-price="1"  price-difference="2" />
     </goods-type>
     <goods-type id="model.goods.bells" is-farmed="false" ignore-limit="true" storable="false">
-      <modifier id="model.modifier.liberty" type="multiplicative" value="1"/>
+      <modifier id="model.modifier.liberty" type="multiplicative" value="1" />
     </goods-type>
     <goods-type id="model.goods.crosses" is-farmed="false" ignore-limit="true" storable="false">
-      <modifier id="model.modifier.immigration" type="multiplicative" value="1"/>
+      <modifier id="model.modifier.immigration" type="multiplicative" value="1" />
     </goods-type>
     <goods-type id="model.goods.hammers" is-farmed="false"
                 made-from="model.goods.lumber" ignore-limit="true" storable="false" price="20"/>
