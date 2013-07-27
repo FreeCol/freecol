@@ -89,6 +89,8 @@
         <xs:element ref="tradeRoute"/>
         <xs:element ref="market" />
         <xs:element ref="highSeas" />
+        <xs:element ref="ability" />
+        <xs:element ref="modifier" />
       </xs:choice>
 
       <xs:attribute name="id" type="PlayerId" use="required"/>
