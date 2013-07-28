@@ -152,7 +152,7 @@ public class ForestMaker {
             };
 
             Polygon diamond = new Polygon(x_coords, y_coords, 4);
-            Polygon[] polygons = getPolygons(RIVER_MARGIN);
+            Polygon[] polygons = getBranches(RIVER_MARGIN);
 
             for (int index = 0; index < 16; index++) {
                 BufferedImage base = new BufferedImage(BASE_WIDTH, BASE_HEIGHT + MARGIN,
@@ -165,36 +165,68 @@ public class ForestMaker {
                 if (drawBorders) {
                     g.setColor(Color.RED);
                     g.draw(diamond);
-                    g.setColor(Color.GREEN);
                     for (Polygon p : polygons) {
                         g.draw(p);
+                    }
+                }
+
+                g.setPaint(texture);
+                g.setStroke(new BasicStroke(6));
+                String counter = "";
+                boolean[] branches = new boolean[4];
+                if (index > 0) {
+                    for (int i = 0; i < POWERS_OF_TWO.length; i++) {
+                        if ((index & POWERS_OF_TWO[i]) == POWERS_OF_TWO[i]) {
+                            branches[i] = true;
+                            counter += "1";
+                            if (drawRivers) {
+                                g.drawLine(0, 0, LIMIT[i], getY(0, 0, SLOPE[i], LIMIT[i]));
+                            }
+                        } else {
+                            counter += "0";
+                        }
                     }
                 }
 
                 if (drawTrees) {
                     List<ImageLocation> trees = new ArrayList<ImageLocation>(TREES);
                     int count = 0;
-                    // reduce number of trees if branches are present
+                    // reduce number of trees if river branches are present
                     int numberOfTrees = (8 - Integer.bitCount(index)) * TREES / 8;
-                    trees: for (int loop = 0; loop < 1000; loop++) {
-                        BufferedImage image = images.get(count % numberOfImages);
-                        int width = image.getWidth();
-                        int height = image.getHeight();
-                        int x = random.nextInt(BASE_WIDTH) - HALF_WIDTH;
-                        int y = random.nextInt(BASE_HEIGHT) - HALF_HEIGHT;
-                        if (diamond.contains(x, y)
-                            && x + width < HALF_WIDTH) {
-                            for (int i = 0; i < POWERS_OF_TWO.length; i++) {
-                                if ((index & POWERS_OF_TWO[i]) == POWERS_OF_TWO[i]
-                                    && polygons[i].intersects(x, y - height, width, height)) {
-                                    continue trees;
+
+                    int x, y;
+                    trees: while (count < numberOfTrees) {
+                        images: for (int im = 0; im < numberOfImages; im++) {
+                            BufferedImage image = images.get((count + im) % numberOfImages);
+                            int width = image.getWidth();
+                            int height = image.getHeight();
+                            x = random.nextInt(BASE_WIDTH) - HALF_WIDTH;
+                            if (count < 10) {
+                                // choose a particularly favourable
+                                // point near the southern edge of the
+                                // diamond
+                                y = HALF_HEIGHT - Math.abs(x)/2;
+                                if (x > 0) {
+                                    x -= width;
                                 }
-                            }
-                            trees.add(new ImageLocation(image, x, y - height));
-                            if (count < numberOfTrees) {
-                                count++;
                             } else {
-                                break;
+                                y = getRandomY(random, x);
+                            }
+                            // crown of the tree
+                            int crown = y - height;
+                            // assume trees are more or less symmetrical
+                            if (diamond.contains(x + width/2, y)
+                                && x + width < HALF_WIDTH
+                                && y - height > -(HALF_HEIGHT + MARGIN)) {
+                                for (int i = 0; i < branches.length; i++) {
+                                    if (branches[i]
+                                        && polygons[i].intersects(x, crown, width, height)) {
+                                        // would obscure river image
+                                        continue images;
+                                    }
+                                }
+                                trees.add(new ImageLocation(image, x, y - height));
+                                count++;
                             }
                         }
                     }
@@ -207,22 +239,6 @@ public class ForestMaker {
 
                 }
 
-                g.setPaint(texture);
-                g.setStroke(new BasicStroke(6));
-                String counter = "";
-                if (index > 0) {
-                    for (int i = 0; i < POWERS_OF_TWO.length; i++) {
-                        if ((index & POWERS_OF_TWO[i]) == POWERS_OF_TWO[i]) {
-                            counter += "1";
-                            if (drawRivers) {
-                                g.drawLine(0, 0, LIMIT[i], getY(0, 0, SLOPE[i], LIMIT[i]));
-                            }
-                        } else {
-                            counter += "0";
-                        }
-                    }
-                }
-
                 ImageIO.write(base, "png", new File(sourceDirectory.getName() + counter + ".png"));
 
             }
@@ -233,7 +249,19 @@ public class ForestMaker {
         return (int) (y + slope * (newX - x));
     }
 
-    private static Polygon[] getPolygons(int height) {
+    private static int getRandomY(Random random, int x) {
+        int height = HALF_HEIGHT - Math.abs(x) / 2;
+        return (height == 0) ? 0 : random.nextInt(2 * height) - height;
+    }
+
+    /**
+     * Returns an array of polygons describing the river branches of
+     * the tile.
+     *
+     * @param height an <code>int</code> value
+     * @return a <code>Polygon[]</code> value
+     */
+    private static Polygon[] getBranches(int height) {
         int width = 2 * height;
         Polygon[] result = new Polygon[4];
         int[] xx = new int[] { 0, -width, 0, width };
