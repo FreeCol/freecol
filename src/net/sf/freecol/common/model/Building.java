@@ -315,7 +315,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
             // experts in factory level buildings may produce a
             // certain amount of goods even when no input is available
             if (available < required
-                && getType().hasAbility(Ability.EXPERTS_USE_CONNECTIONS)
+                && hasAbility(Ability.EXPERTS_USE_CONNECTIONS)
                 && getSpecification().getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS)) {
                 int minimumGoodsInput = 0;
                 for (Unit unit: getUnitList()) {
@@ -337,7 +337,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
         // finally, check whether there is space enough to store the
         // goods produced in order to avoid excess production
 
-        if (getType().hasAbility(Ability.AVOID_EXCESS_PRODUCTION)) {
+        if (hasAbility(Ability.AVOID_EXCESS_PRODUCTION)) {
             int capacity = getColony().getWarehouseCapacity();
             for (AbstractGoods output : getOutputs()) {
                 double production = (output.getAmount() * minimumRatio);
@@ -459,7 +459,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      * {@inheritDoc}
      */
     public boolean canAutoProduce() {
-        return getType().hasAbility(Ability.AUTO_PRODUCTION);
+        return hasAbility(Ability.AUTO_PRODUCTION);
     }
 
     /**
@@ -555,39 +555,6 @@ public class Building extends WorkLocation implements Named, Comparable<Building
         return getType().getPriority();
     }
 
-    /**
-     * Is an ability present in this Building?
-     *
-     * The method actually returns whether the type of the building
-     * has the required ability, since Buildings have no abilities
-     * independent of their type.
-     *
-     * @param id The id of the ability to test.
-     * @param type A <code>FreeColGameObjectType</code> (ignored).
-     * @param turn A <code>Turn</code> (ignored).
-     * @return True if the ability is present.
-     */
-    @Override
-    public boolean hasAbility(String id, FreeColGameObjectType type,
-                              Turn turn) {
-        return getType().hasAbility(id);
-    }
-
-    /**
-     * Gets the set of modifiers with the given identifier from this
-     * Building.  Delegate to the type.
-     *
-     * @param id The id of the modifier to retrieve.
-     * @param fcgot A <code>FreeColGameObjectType</code> (ignored).
-     * @param turn A <code>Turn</code> (ignored).
-     * @return A set of modifiers.
-     */
-    @Override
-    public Set<Modifier> getModifierSet(String id, FreeColGameObjectType fcgot,
-                                        Turn turn) {
-        return getType().getModifierSet(id, fcgot, turn);
-    }
-
 
     // Interface Named
 
@@ -596,6 +563,29 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      */
     public String getNameKey() {
         return getType().getNameKey();
+    }
+
+
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<Ability> getAbilitySet(String id, FreeColGameObjectType type,
+                                      Turn turn) {
+        // Buildings have no abilities independent of their type (for now).
+        return getType().getAbilitySet(id, type, turn);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<Modifier> getModifierSet(String id, FreeColGameObjectType fcgot,
+                                        Turn turn) {
+        // Buildings have no modifiers independent of type
+        return getType().getModifierSet(id, fcgot, turn);
     }
 
 

@@ -353,8 +353,7 @@ public abstract class FreeColObject implements ObjectWithId {
      */
     public boolean hasAbility(String id, FreeColGameObjectType fcgot,
                                     Turn turn) {
-        FeatureContainer fc = getFeatureContainer();
-        return (fc == null) ? false : fc.hasAbility(id, fcgot, turn);
+        return FeatureContainer.hasAbility(getAbilitySet(id, fcgot, turn));
     }
 
     /**
