@@ -327,8 +327,9 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
             throw new IllegalStateException("Can not add " + locatable
                 + " to " + toString() + " because " + reason);
         }
-        if (!super.add(locatable)) return false;
         Unit unit = (Unit)locatable;
+        if (contains(unit)) return true;
+        if (!super.add(unit)) return false;
 
         unit.setState(Unit.UnitState.IN_COLONY);
         unit.setMovesLeft(0);
