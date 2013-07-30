@@ -396,6 +396,10 @@ public class Player extends FreeColGameObject implements Nameable {
     // Constants
     //
 
+    /** An ability to apply post-declaration. */
+    public static final Ability ABILITY_INDEPENDENCE_DECLARED
+        = new Ability(Ability.INDEPENDENCE_DECLARED);
+
     /** A comparator for ordering players. */
     public static final Comparator<Player> playerComparator
         = new Comparator<Player>() {
@@ -3564,16 +3568,6 @@ public class Player extends FreeColGameObject implements Nameable {
     //
 
     /**
-     * Get the feature container for this player.
-     *
-     * @return The <code>FeatureContainer</code>.
-     */
-    @Override
-    public final FeatureContainer getFeatureContainer() {
-        return featureContainer;
-    }
-
-    /**
      * Standardized log of an instance of cheating by this player.
      *
      * @param what A description of the cheating.
@@ -3689,6 +3683,36 @@ public class Player extends FreeColGameObject implements Nameable {
                     result = -1;
                 }
             }
+        }
+        return result;
+    }
+
+
+    //
+    // Override FreeColObject
+    //
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final FeatureContainer getFeatureContainer() {
+        return featureContainer;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<Ability> getAbilitySet(String id, FreeColGameObjectType fcgot,
+                                      Turn turn) {
+        Set<Ability> result = super.getAbilitySet(id, fcgot, turn);
+        switch (playerType) {
+        case REBEL: case INDEPENDENT:
+            result.add(ABILITY_INDEPENDENCE_DECLARED);
+            break;
+        default: // No other special abilities, just silence the warning.
+            break;
         }
         return result;
     }
@@ -4007,15 +4031,6 @@ public class Player extends FreeColGameObject implements Nameable {
         if (nationType != null) addFeatures(nationType);
 
         super.readChildren(xr);
-
-        // Dynamic abilities are not currently saved.  TODO: better?
-        switch (playerType) {
-        case REBEL: case INDEPENDENT:
-            addAbility(new Ability(Ability.INDEPENDENCE_DECLARED));
-            break;
-        default: // No other special abilities, just silence the warning.
-            break;
-        }
 
         recalculateBellsBonus(); // Bells bonuses depend on tax
 
