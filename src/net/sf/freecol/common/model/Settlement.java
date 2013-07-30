@@ -222,7 +222,7 @@ public abstract class Settlement extends GoodsLocation
         tile.setSettlement(this);//-vis(owner)
         tile.changeOwningSettlement(this);
         for (Tile t : tiles) {
-            t.changeOwnership(owner, this);
+            t.changeOwnership(owner, this);//-vis(owner,this)
         }
         for (Tile t : tile.getSurroundingTiles(getLineOfSight())) {
             owner.setExplored(t);
@@ -259,6 +259,8 @@ public abstract class Settlement extends GoodsLocation
     /**
      * Change the owner of this <code>Settlement</code>.
      *
+     * -vis: Changes visibility.
+     *
      * @param newOwner The <code>Player</code> that shall own this
      *            <code>Settlement</code>.
      * @see #getOwner
@@ -285,8 +287,6 @@ public abstract class Settlement extends GoodsLocation
         for (Tile t : getOwnedTiles()) {
             t.changeOwnership(newOwner, this);
         }
-        oldOwner.invalidateCanSeeTiles();//+vis(oldOwner)
-        newOwner.invalidateCanSeeTiles();//+vis(newOwner)
 
         getGame().notifyOwnerChanged(this, oldOwner, newOwner);
     }
@@ -488,6 +488,8 @@ public abstract class Settlement extends GoodsLocation
 
     /**
      * {@inheritDoc}
+     *
+     * -vis: Changes visibility.
      */
     public void setOwner(Player player) {
         this.owner = player;

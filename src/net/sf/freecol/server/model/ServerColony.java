@@ -129,12 +129,14 @@ public class ServerColony extends Colony implements ServerModelObject {
      * Sets the owner of this <code>Colony</code>, including all units
      * within, and change main tile nation ownership.
      *
+     * -vis: Changes visibility.
+     *
      * @param owner The new owner <code>Player</code>.
      * @see Settlement#changeOwner
      */
     @Override
     public void changeOwner(Player owner) {
-        super.changeOwner(owner);
+        super.changeOwner(owner);//-vis(owner,previous-owner)
         // Disable all exports
         for (ExportData exportDatum : exportData.values()) {
             exportDatum.setExported(false);
