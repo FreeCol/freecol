@@ -454,7 +454,7 @@ public class Unit extends GoodsLocation
      * @return True if this <code>Unit</code> can carry treasure.
      */
     public boolean canCarryTreasure() {
-        return getType().hasAbility(Ability.CARRY_TREASURE);
+        return hasAbility(Ability.CARRY_TREASURE);
     }
 
     /**
@@ -463,7 +463,7 @@ public class Unit extends GoodsLocation
      * @return True if this <code>Unit</code> is capable of capturing goods.
      */
     public boolean canCaptureGoods() {
-        return unitType.hasAbility(Ability.CAPTURE_GOODS);
+        return hasAbility(Ability.CAPTURE_GOODS);
     }
 
     /**
@@ -3321,69 +3321,6 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Does this unit or its owner satisfy the ability set identified
-     * by the object identifier.
-     *
-     * @param id The id of the ability to test.
-     * @param fcgot An optional <code>FreeColGameObjectType</code> the
-     *     ability applies to.
-     * @param turn An optional applicable <code>Turn</code>.
-     * @return True if the ability is present.
-     */
-    public boolean hasAbility(String id, FreeColGameObjectType fcgot,
-                              Turn turn) {
-        if (turn == null) turn = getGame().getTurn();
-        Set<Ability> result = new HashSet<Ability>();
-        // UnitType abilities always apply
-        result.addAll(unitType.getAbilitySet(id));
-        // The player's abilities require more qualification.
-        result.addAll(getOwner().getAbilitySet(id, unitType, turn));
-        // EquipmentType abilities always apply.
-        for (EquipmentType equipmentType : equipment.keySet()) {
-            result.addAll(equipmentType.getAbilitySet(id));
-            // Player abilities may also apply to equipment (e.g. missionary).
-            result.addAll(getOwner().getAbilitySet(id, equipmentType, turn));
-        }
-        // Location abilities may apply.
-        // TODO: extend this to all locations?  May simplify
-        // code.  Units are also Locations however, which complicates
-        // the issue as we do not want Units aboard other Units to share
-        // the abilities of the carriers.
-        if (getSettlement() != null) {
-            result.addAll(getSettlement().getAbilitySet(id, unitType, turn));
-        } else if (isInEurope()) {
-            result.addAll(getOwner().getEurope().getAbilitySet(id, unitType, turn));
-        }
-        return FeatureContainer.hasAbility(result);
-    }
-
-    /**
-     * Get the modifiers that apply to this Unit.
-     *
-     * @param id The id of the modifier to test.
-     * @param fcgot An optional <code>FreeColGameObjectType</code> the
-     *     modifier applies to.
-     * @param turn An optional applicable <code>Turn</code>.
-     * @return A set of modifiers.
-     */
-    public Set<Modifier> getModifierSet(String id, FreeColGameObjectType fcgot,
-                                        Turn turn) {
-        if (turn == null) turn = getGame().getTurn();
-        Set<Modifier> result = new HashSet<Modifier>();
-        // UnitType modifiers always apply
-        result.addAll(unitType.getModifierSet(id));
-        // the player's modifiers may not apply
-        result.addAll(getOwner().getModifierSet(id, unitType, turn));
-        // EquipmentType modifiers always apply
-        for (EquipmentType equipmentType : equipment.keySet()) {
-            result.addAll(equipmentType.getModifierSet(id));
-            // player modifiers may also apply to equipment (unused)
-            result.addAll(getOwner().getModifierSet(id, equipmentType, turn));
-        }
-        return result;
-    }
-
-    /**
      * Get a modifier that applies to the given Ownable. This is used
      * for the offenceAgainst and defenceAgainst modifiers.
      *
@@ -3754,6 +3691,67 @@ public class Unit extends GoodsLocation
 
         objects.addAll(super.disposeList());
         return objects;
+    }
+
+
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<Ability> getAbilitySet(String id, FreeColGameObjectType fcgot,
+                                      Turn turn) {
+        final Player owner = getOwner();
+        final UnitType unitType = getType();
+        Set<Ability> result = new HashSet<Ability>();
+        if (turn == null) turn = getGame().getTurn();
+
+        // UnitType abilities always apply
+        result.addAll(unitType.getAbilitySet(id));
+        // The player's abilities require more qualification.
+        result.addAll(owner.getAbilitySet(id, fcgot, turn));
+        // EquipmentType abilities always apply.
+        for (EquipmentType equipmentType : equipment.keySet()) {
+            result.addAll(equipmentType.getAbilitySet(id));
+            // Player abilities may also apply to equipment (e.g. missionary).
+            result.addAll(owner.getAbilitySet(id, equipmentType, turn));
+        }
+        // Location abilities may apply.
+        // TODO: extend this to all locations?  May simplify
+        // code.  Units are also Locations however, which complicates
+        // the issue as we do not want Units aboard other Units to share
+        // the abilities of the carriers.
+        if (getSettlement() != null) {
+            result.addAll(getSettlement().getAbilitySet(id, unitType, turn));
+        } else if (isInEurope()) {
+            result.addAll(owner.getEurope().getAbilitySet(id, unitType, turn));
+        }
+        return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<Modifier> getModifierSet(String id, FreeColGameObjectType fcgot,
+                                        Turn turn) {
+        final Player owner = getOwner();
+        final UnitType unitType = getType();
+        Set<Modifier> result = new HashSet<Modifier>();
+        if (turn == null) turn = getGame().getTurn();
+
+        // UnitType modifiers always apply
+        result.addAll(unitType.getModifierSet(id));
+        // the player's modifiers may not apply
+        result.addAll(owner.getModifierSet(id, unitType, turn));
+        // EquipmentType modifiers always apply
+        for (EquipmentType equipmentType : equipment.keySet()) {
+            result.addAll(equipmentType.getModifierSet(id));
+            // player modifiers may also apply to equipment (unused)
+            result.addAll(owner.getModifierSet(id, equipmentType, turn));
+        }
+        return result;
     }
 
 

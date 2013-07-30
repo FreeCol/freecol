@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -425,8 +426,8 @@ public abstract class FreeColObject implements ObjectWithId {
                                       FreeColGameObjectType fcgot,
                                       Turn turn) {
         FeatureContainer fc = getFeatureContainer();
-        if (fc == null) return Collections.emptySet();
-        return fc.getAbilitySet(id, fcgot, turn);
+        return (fc == null) ? new HashSet<Ability>()
+            : fc.getAbilitySet(id, fcgot, turn);
     }
 
     /**
@@ -533,8 +534,8 @@ public abstract class FreeColObject implements ObjectWithId {
                                         FreeColGameObjectType fcgot,
                                         Turn turn) {
         FeatureContainer fc = getFeatureContainer();
-        if (fc == null) return Collections.emptySet();
-        return fc.getModifierSet(id, fcgot, turn);
+        return (fc == null) ? new HashSet<Modifier>()
+            : fc.getModifierSet(id, fcgot, turn);
     }
 
     /**
