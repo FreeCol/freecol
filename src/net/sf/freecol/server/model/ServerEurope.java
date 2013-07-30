@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
 
-import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
@@ -61,8 +60,6 @@ public class ServerEurope extends Europe implements ServerModelObject {
      */
     public ServerEurope(Game game, Player owner) {
         super(game, owner);
-        // TODO: put this in the specification
-        addAbility(new Ability(Ability.DRESS_MISSIONARY));
     }
 
 

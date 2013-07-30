@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -28,6 +29,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Unit.UnitState;
 
 
@@ -49,6 +51,9 @@ public class Europe extends UnitLocation implements Ownable, Named {
     private static final int LOWER_CAP_INITIAL = 80;
 
     public static final String UNIT_CHANGE = "unitChange";
+
+    public static final Ability ABILITY_DRESS_MISSIONARY
+        = new Ability(Ability.DRESS_MISSIONARY);
 
     /** Reasons to migrate. */
     public static enum MigrationType {
@@ -294,6 +299,20 @@ public class Europe extends UnitLocation implements Ownable, Named {
     }
 
 
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    public Set<Ability> getAbilitySet(String id, FreeColGameObjectType fcgot,
+                                      Turn turn) {
+        Set<Ability> result = super.getAbilitySet(id, fcgot, turn);
+        // Always able to dress a missionary.
+        result.add(ABILITY_DRESS_MISSIONARY);
+        return result;
+    }
+
+
     // Serialization
 
     private static final String OWNER_TAG = "owner";
@@ -384,7 +403,6 @@ public class Europe extends UnitLocation implements Ownable, Named {
         // Clear containers.
         unitPrices.clear();
         featureContainer.clear();
-        addAbility(new Ability(Ability.DRESS_MISSIONARY));
 
         super.readChildren(xr);
 
