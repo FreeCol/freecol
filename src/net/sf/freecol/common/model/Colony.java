@@ -2308,20 +2308,16 @@ public class Colony extends Settlement implements Nameable {
     // Override FreeColObject
 
     /**
-     * Does the Colony or its owner have a given ability?
-     *
-     * @param id The id of the ability to test.
-     * @param type An optional <code>FreeColGameObjectType</code> the
-     *     ability applies to.
-     * @param turn An optional applicable <code>Turn</code>.
-     * @return True if the ability is present.
+     * {@inheritDoc}
      */
     @Override
-    public boolean hasAbility(String id, FreeColGameObjectType type,
-                              Turn turn) {
+    public Set<Ability> getAbilitySet(String id, FreeColGameObjectType type,
+                                      Turn turn) {
         if (turn == null) turn = getGame().getTurn();
-        return super.hasAbility(id, type, turn)
-            || (owner != null && owner.hasAbility(id, type, turn));
+        Set<Ability> result = super.getAbilitySet(id, type, turn);
+        // Owner abilities also apply to colonies
+        if (owner != null) result.addAll(owner.getAbilitySet(id, type, turn));
+        return result;
     }
 
 
