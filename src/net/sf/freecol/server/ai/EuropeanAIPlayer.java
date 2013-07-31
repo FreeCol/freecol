@@ -37,6 +37,7 @@ import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTradeItem;
 import net.sf.freecol.common.model.DiplomaticTrade;
+import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.FoundingFather;
@@ -171,10 +172,12 @@ public class EuropeanAIPlayer extends AIPlayer {
                 } else if (unit.hasAbility(Ability.EXPERT_SCOUT)) {
                     return 600;
                 }
+                List<EquipmentType> scoutEquipment
+                    = unit.getRoleEquipment(Unit.Role.SCOUT);                
                 int base = (unit.isInEurope()) ? 500
                     : (unit.getLocation().getColony() != null
                         && unit.getLocation().getColony()
-                        .canProvideEquipment(Unit.Role.SCOUT.getRoleEquipment(unit.getSpecification()))) ? 400
+                        .canProvideEquipment(scoutEquipment)) ? 400
                     : -1000;
                 if (!unit.getEquipment().isEmpty()) {
                     base -= 400;
@@ -212,10 +215,12 @@ public class EuropeanAIPlayer extends AIPlayer {
                 } else if (unit.hasAbility(Ability.EXPERT_PIONEER)) {
                     return 600;
                 }
+                List<EquipmentType> pioneerEquipment
+                    = unit.getRoleEquipment(Unit.Role.PIONEER);
                 int base = (unit.isInEurope()) ? 500
                     : (unit.getLocation().getColony() != null
                         && unit.getLocation().getColony()
-                        .canProvideEquipment(Unit.Role.PIONEER.getRoleEquipment(unit.getSpecification()))) ? 400
+                        .canProvideEquipment(pioneerEquipment)) ? 400
                     : -1000;
                 if (!unit.getEquipment().isEmpty()) {
                     base -= 400;

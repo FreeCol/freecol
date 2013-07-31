@@ -1803,15 +1803,28 @@ public class Unit extends GoodsLocation
      *         <code>EquipmentType</code> at the current location.
      */
     public boolean canBeEquippedWith(EquipmentType equipmentType) {
-        for (Entry<String, Boolean> entry : equipmentType.getRequiredAbilities().entrySet()) {
-            if (hasAbility(entry.getKey()) != entry.getValue()) {
-                return false;
-            }
-        }
+        if (!equipmentType.isAvailableTo(this)) return false;
         if (equipment.getCount(equipmentType) >= equipmentType.getMaximumCount()) {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Get the equipment types needed for this unit to perform a given role.
+     * Does not take account of current equipment.
+     *
+     * @param role The <code>Role</code> to perform.
+     * @return A list of <code>EquipmentType</code>s.
+     */
+    public List<EquipmentType> getRoleEquipment(Role role) {
+        List<EquipmentType> equipment = role.getRoleEquipment(getSpecification());
+        Iterator<EquipmentType> i = equipment.iterator();
+        while (i.hasNext()) {
+            EquipmentType et = i.next();
+            if (!et.isAvailableTo(this)) i.remove();
+        }
+        return equipment;
     }
 
     /**

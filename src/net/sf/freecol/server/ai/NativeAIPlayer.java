@@ -226,14 +226,10 @@ public class NativeAIPlayer extends AIPlayer {
         units.addAll(is.getTile().getUnitList());
         roles: for (Role r : new Role[] { Role.DRAGOON, Role.SOLDIER,
                                           Role.SCOUT }) {
-            List<EquipmentType> e = r.getRoleEquipment(spec);
             while (!units.isEmpty()) {
                 Unit u = units.get(0);
-                for (EquipmentType et : e) {
-                    if (u.canBeEquippedWith(et)
-                        && !is.canProvideEquipment(et)) {
-                        continue roles;
-                    }
+                for (EquipmentType et : u.getRoleEquipment(r)) {
+                    if (!is.canProvideEquipment(et)) continue roles;
                 }
                 if (u.getRole() != Role.DRAGOON && u.getRole() != r) {
                     getAIUnit(u).equipForRole(r, false);
@@ -403,12 +399,12 @@ public class NativeAIPlayer extends AIPlayer {
         final AIMain aiMain = getAIMain();
         final Specification spec = aiMain.getGame().getSpecification();
         final int turnNumber = getGame().getTurn().getNumber();
-        final List<EquipmentType> scoutEq
-            = Unit.Role.SCOUT.getRoleEquipment(spec);
-        final List<EquipmentType> soldierEq
-            = Unit.Role.SOLDIER.getRoleEquipment(spec);
-
         List<AIUnit> aiUnits = getAIUnits();
+        final List<EquipmentType> scoutEq = aiUnits.get(0).getUnit()
+            .getRoleEquipment(Unit.Role.SCOUT);
+        final List<EquipmentType> soldierEq = aiUnits.get(0).getUnit()
+            .getRoleEquipment(Unit.Role.SOLDIER);
+
         String report = "";
         int allUnits = aiUnits.size(), i = 0;
         while (i < aiUnits.size()) {

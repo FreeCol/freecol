@@ -358,11 +358,7 @@ public class AIUnit extends AIObject implements Transportable {
             || ((settlement = loc.getSettlement()) == null
                 && europe == null)) return false;
 
-        eq: for (EquipmentType e : r.getRoleEquipment(spec)) {
-            if (!unit.canBeEquippedWith(e)) {
-                // Weed out native/colonial-specific equipment types.
-                continue;
-            }
+        eq: for (EquipmentType e : unit.getRoleEquipment(r)) {
             // Check that this should succeed before querying server.
             if (europe != null) {
                 for (AbstractGoods ag : e.getRequiredGoods()) {

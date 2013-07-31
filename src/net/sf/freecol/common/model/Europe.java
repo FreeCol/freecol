@@ -53,7 +53,7 @@ public class Europe extends UnitLocation implements Ownable, Named {
     public static final String UNIT_CHANGE = "unitChange";
 
     public static final Ability ABILITY_DRESS_MISSIONARY
-        = new Ability(Ability.DRESS_MISSIONARY);
+        = new Ability(Ability.DRESS_MISSIONARY, true);
 
     /** Reasons to migrate. */
     public static enum MigrationType {
@@ -308,7 +308,9 @@ public class Europe extends UnitLocation implements Ownable, Named {
                                       Turn turn) {
         Set<Ability> result = super.getAbilitySet(id, fcgot, turn);
         // Always able to dress a missionary.
-        result.add(ABILITY_DRESS_MISSIONARY);
+        if (id == null || id == Ability.DRESS_MISSIONARY) {
+            result.add(ABILITY_DRESS_MISSIONARY);
+        }
         return result;
     }
 

@@ -106,7 +106,7 @@ public class ScoutingMission extends Mission {
      * @param aiUnit The scout <code>AIUnit</code> to check.
      * @return True if the scout has horses.
      */
-    private static boolean hasHorses(AIUnit aiUnit) {
+    private static boolean canScoutNatives(AIUnit aiUnit) {
         return aiUnit.getUnit()
             .hasAbility(Ability.SCOUT_INDIAN_SETTLEMENT);
     }
@@ -116,8 +116,8 @@ public class ScoutingMission extends Mission {
      *
      * @return True if the scout has horses.
      */
-    private boolean hasHorses() {
-        return hasHorses(getAIUnit());
+    private boolean canScoutNatives() {
+        return canScoutNatives(getAIUnit());
     }
 
     /**
@@ -235,7 +235,8 @@ public class ScoutingMission extends Mission {
     }
 
     /**
-     * Prepare a unit for this mission.
+     * Prepare a unit for this mission.  Allow even experts to proceed
+     * even if not mounted.
      *
      * @param aiUnit The <code>AIUnit</code> to prepare.
      * @return A reason why the unit can not perform this mission, or null
@@ -243,11 +244,11 @@ public class ScoutingMission extends Mission {
      */
     public static String prepare(AIUnit aiUnit) {
         String reason = invalidReason(aiUnit);
-        if (reason != null) return reason;
-        if (!hasHorses(aiUnit)) aiUnit.equipForRole(Unit.Role.SCOUT, false);
-        return (hasHorses(aiUnit)
-            || aiUnit.getUnit().hasAbility(Ability.EXPERT_SCOUT)) ? null
-            : "unit-not-a-SCOUT";
+        return (reason != null) ? reason
+            : (canScoutNatives(aiUnit)
+                || aiUnit.equipForRole(Unit.Role.SCOUT, false)
+                || aiUnit.getUnit().hasAbility(Ability.EXPERT_SCOUT)) ? null
+            : "unit-unprepared-to-SCOUT";
     }
 
 
@@ -301,7 +302,7 @@ public class ScoutingMission extends Mission {
     private static String invalidMissionReason(AIUnit aiUnit) {
         String reason = invalidAIUnitReason(aiUnit);
         return (reason != null) ? reason
-            : (!hasHorses(aiUnit)) ? "unit-not-a-SCOUT"
+            : (!canScoutNatives(aiUnit)) ? "unit-not-a-SCOUT"
             : null;
     }
 

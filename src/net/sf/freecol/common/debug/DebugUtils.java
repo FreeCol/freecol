@@ -514,7 +514,7 @@ public class DebugUtils {
         sUnit.clearEquipment();
         sUnit.setRole(Unit.Role.DEFAULT);
         final Specification sSpec = server.getSpecification();
-        for (EquipmentType et : roleChoice.getRoleEquipment(sSpec)) {
+        for (EquipmentType et : sUnit.getRoleEquipment(roleChoice)) {
             sUnit.changeEquipment(et, 1);
         }
         sUnit.setRole(roleChoice);

@@ -64,9 +64,6 @@ public class PioneeringMissionTest extends FreeColTestCase {
 
 
     public void testImprovementNoLongerValid() {
-        final List<EquipmentType> pioneerEquipment
-            = Unit.Role.PIONEER.getRoleEquipment(spec());
-
         Game game = ServerTestHelper.startServerGame(getTestMap());
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
         
@@ -77,6 +74,8 @@ public class PioneeringMissionTest extends FreeColTestCase {
         AIColony aiColony = aiMain.getAIColony(colony);
         Unit colonist = new ServerUnit(game, colony.getTile(), player,
             colonistType);
+        final List<EquipmentType> pioneerEquipment
+            = colonist.getRoleEquipment(Unit.Role.PIONEER);
         AIUnit aiUnit = aiMain.getAIUnit(colonist);
         assertNotNull(aiUnit);
         aiUnit.abortMission("Test");

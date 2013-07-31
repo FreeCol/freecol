@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -167,6 +168,21 @@ public class EquipmentType extends BuildableType {
      */
     public final boolean isMilitaryEquipment() {
         return militaryEquipment;
+    }
+
+    /**
+     * Is this equipment type available to a given Unit?
+     *
+     * @param unit The <code>Unit</code> to check.
+     * @return True if the equipment type is available.
+     */
+    public boolean isAvailableTo(Unit unit) {
+        for (Entry<String, Boolean> entry : getRequiredAbilities().entrySet()) {
+            if (unit.hasAbility(entry.getKey()) != entry.getValue()) {
+                return false;
+            }
+        }
+        return true;
     }
 
 

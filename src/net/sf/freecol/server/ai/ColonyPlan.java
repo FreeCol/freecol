@@ -1224,15 +1224,13 @@ public class ColonyPlan {
         if (!unit.isPerson()) return false;
         final Specification spec = colony.getSpecification();
 
-        List<EquipmentType> roleEq = role.getRoleEquipment(spec);
+        List<EquipmentType> roleEq = unit.getRoleEquipment(role);
         TypeCountMap<EquipmentType> change = new TypeCountMap<EquipmentType>();
 
         for (EquipmentType et : spec.getEquipmentTypeList()) {
-            if (!unit.canBeEquippedWith(et)) continue; // Drop native equipment
             int oldCount = unit.getEquipmentCount(et);
             int newCount = (roleEq.contains(et)) ? 1 : 0;
             if (newCount > oldCount && !colony.canBuildEquipment(et)) {
-logger.warning("equipUnit fail " + unit + "/" + unit.getRole() + "/" + unit.isMounted() + " " + et + " oldCOunt=" + oldCount + " newCount=" + newCount + " contianer=" + colony.getGoodsContainer().toString());
                 return false;
             }
             if (newCount != oldCount) {

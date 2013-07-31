@@ -844,6 +844,15 @@ public abstract class FreeColObject implements ObjectWithId {
     }
 
     /**
+     * Debugging tool, dump set XML to System.err.
+     */
+    public static <T extends FreeColObject> void dumpSet(Set<T> set) {
+        System.err.println("[Set begin");
+        for (T t : set) t.dumpObject();
+        System.err.println("Set end]");
+    }
+
+    /**
      * Writes the object to the given file.
      *
      * @param file The <code>File</code> to write to.
