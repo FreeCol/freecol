@@ -162,6 +162,7 @@ public class FreeColTestUtils {
             Colony colony = new ServerColony(game, player, name, colonyTile);
             player.addSettlement(colony);
             colony.placeSettlement(true);//-vis(player)
+            for (Tile t : colony.getOwnedTiles()) player.setExplored(t);
             player.invalidateCanSeeTiles();//+vis(player)
 
 

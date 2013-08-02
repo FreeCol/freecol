@@ -3746,16 +3746,15 @@ public final class InGameController implements NetworkConstants {
 
         if (freeColClient.getMyPlayer().equals(player)
             && freeColClient.getFreeColServer() != null) {
+            
+            player.removeDisplayedModelMessages();
+            player.invalidateCanSeeTiles();
 
-           // auto-save the game (if it isn't newly loaded)
-           if ( turnsPlayed > 0 ) {
-              autosave_game();
-           }
+            // auto-save the game (if it isn't newly loaded)
+            if ( turnsPlayed > 0 ) autosave_game();
 
-           player.invalidateCanSeeTiles();
-
-           // Check for emigration.
-           while (player.checkEmigrate()) {
+            // Check for emigration.
+            while (player.checkEmigrate()) {
                 if (player.hasAbility(Ability.SELECT_RECRUIT)
                     && player.getEurope().recruitablesDiffer()) {
                     int index = gui.showEmigrationPanel(false);
@@ -3763,29 +3762,13 @@ public final class InGameController implements NetworkConstants {
                 } else {
                     emigrate(player, 0);
                 }
-           }
-
-           // GUI management.
-           if (!freeColClient.isSinglePlayer()) {
-               gui.playSound("sound.anthem." + player.getNationId());
-           }
-           displayModelMessages(true, true);
-
-           // TEMPORARY PARANOIA
-           boolean bad = false;
-           for (Settlement s : player.getSettlements()) {
-               if (!player.owns(s)) {
-                   logger.log(Level.SEVERE, "Not " + player + "'s settlement: " + s);
-                   bad = true;
-               }
-           }
-           for (Unit u : player.getUnits()) {
-               if (!player.owns(u)) {
-                   logger.log(Level.SEVERE, "Not " + player + "'s unit: " + u);
-                   bad = true;
-               }
-           }
-           if (bad) System.exit(1);
+            }
+            
+            // GUI management.
+            if (!freeColClient.isSinglePlayer()) {
+                gui.playSound("sound.anthem." + player.getNationId());
+            }
+            displayModelMessages(true, true);
         }
         logger.finest("Exiting client setCurrentPlayer: " + player.getName());
     }

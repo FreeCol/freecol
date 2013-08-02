@@ -1828,7 +1828,6 @@ public final class InGameController extends Controller {
                 unit.setDestination(destination);
                 unit.setMovesLeft(0);
                 unit.setLocation(highSeas);//-vis: safe!map
-                serverPlayer.invalidateCanSeeTiles();
                 cs.add(See.only(serverPlayer), europe, highSeas);
             } else {
                 invalid = true;
@@ -2874,12 +2873,33 @@ public final class InGameController extends Controller {
             StringTemplate nation = serverPlayer.getNationName();
             settlement = new ServerColony(game, serverPlayer, name, tile);
             serverPlayer.addSettlement(settlement);
-            settlement.placeSettlement(false);//-vis(serverPlayer)
-            serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
+            settlement.placeSettlement(false);//-vis(serverPlayer,?)
+            // Also send any tiles that can now be seen because the colony
+            // can perhaps see further than the founding unit.
+            if (settlement.getLineOfSight() > unit.getLineOfSight()) {
+                for (Tile t : tile.getSurroundingTiles(unit.getLineOfSight()+1,
+                        settlement.getLineOfSight())) {
+                    serverPlayer.setExplored(t);
+                    cs.add(See.only(serverPlayer), t);
+                }
+            }
+            cs.addHistory(serverPlayer, new HistoryEvent(game.getTurn(),
+                    HistoryEvent.EventType.FOUND_COLONY)
+                .addName("%colony%", settlement.getName()));
+
+            // Remove equipment from founder in case role confuses
+            // placement.
+            ((ServerUnit)unit).csRemoveEquipment(settlement,
+                new HashSet<EquipmentType>(unit.getEquipment().keySet()),
+                0, random, cs);
+
+            // Coronado
             for (ServerPlayer sp : getOtherPlayers(serverPlayer)) {
                 if (!sp.hasAbility(Ability.SEE_ALL_COLONIES)) continue;
-                tile.updatePlayerExploredTile(sp, true);
-                sp.invalidateCanSeeTiles();
+                for (Tile t : settlement.getOwnedTiles()) {
+                    sp.setExplored(t);
+                }
+                sp.invalidateCanSeeTiles();//+vis(sp)
                 cs.addMessage(See.only(sp),
                     new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                                      "buildColony.others", settlement)
@@ -2904,7 +2924,6 @@ public final class InGameController extends Controller {
                                                     tile, false, skill, null);
             serverPlayer.addSettlement(settlement);
             settlement.placeSettlement(true);//-vis(serverPlayer)
-            serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
             for (Player p : getGame().getPlayers()) {
                 if ((ServerPlayer)p == serverPlayer) continue;
                 ((IndianSettlement)settlement).setAlarm(p, (p.isIndian())
@@ -2913,29 +2932,13 @@ public final class InGameController extends Controller {
             }
         }
 
-        // Join.  Remove equipment first in case role confuses placement.
-        ((ServerUnit)unit).csRemoveEquipment(settlement,
-            new HashSet<EquipmentType>(unit.getEquipment().keySet()),
-            0, random, cs);
+        // Join the settlement.
         unit.setLocation(settlement);//-vis(serverPlayer)
-        serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
         unit.setMovesLeft(0);
 
         // Update with settlement tile, and newly owned tiles.
         cs.add(See.perhaps(), settlement.getOwnedTiles());
-
-        cs.addHistory(serverPlayer, new HistoryEvent(game.getTurn(),
-                HistoryEvent.EventType.FOUND_COLONY)
-            .addName("%colony%", settlement.getName()));
-
-        // Also send any tiles that can now be seen because the colony
-        // can perhaps see further than the founding unit.
-        if (settlement.getLineOfSight() > unit.getLineOfSight()) {
-            for (Tile t : tile.getSurroundingTiles(unit.getLineOfSight()+1,
-                    settlement.getLineOfSight())) {
-                cs.add(See.only(serverPlayer), t);
-            }
-        }
+        serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
 
         // Others can see tile changes.
         sendToOthers(serverPlayer, cs);
@@ -3020,13 +3023,13 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
         serverPlayer.csClaimLand(tile, settlement, price, cs);
 
-        if (settlement != null) {
+        if (settlement != null && serverPlayer.isEuropean()) {
             // Define Coronado to make all colony-owned tiles visible
             for (ServerPlayer sp : getOtherPlayers(serverPlayer)) {
                 if (sp.isEuropean()
                     && sp.hasAbility(Ability.SEE_ALL_COLONIES)) {
-                    tile.updatePlayerExploredTile(sp, false);
-                    sp.invalidateCanSeeTiles();
+                    sp.setExplored(tile);
+                    sp.invalidateCanSeeTiles();//+vis(sp)
                 }
             }
         }

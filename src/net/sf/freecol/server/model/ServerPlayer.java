@@ -799,8 +799,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
-     * Makes the entire map visible.
-     * Debug mode helper.
+     * Makes the entire map visible or invisible.
      *
      * @param reveal If true, reveal the map, if false, hide it.
      * @return A list of tiles whose visibility changed.
@@ -812,12 +811,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 if (reveal) {
                     tile.updatePlayerExploredTile(this, false);
                 } else {
-                    tile.unexplore(this);
+                    tile.unexplore(this);//-vis(this)
                 }
                 result.add(tile);
             }
         }
-        invalidateCanSeeTiles();
+        invalidateCanSeeTiles();//+vis(this)
         return result;
     }
 
@@ -833,7 +832,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
         if (getGame() == null || getGame().getMap() == null || unit == null
             || !unit.hasTile()) return;
 
-        invalidateCanSeeTiles();
         Tile tile = unit.getTile();
         setExplored(tile);
         for (Tile t : tile.getSurroundingTiles(unit.getLineOfSight())) {
@@ -1849,7 +1847,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                             ChangeSet cs) {
         Player owner = tile.getOwner();
         Settlement ownerSettlement = tile.getOwningSettlement();
-        tile.changeOwnership(this, settlement);
+        tile.changeOwnership(this, settlement);//-vis(?)
 
         // Update the tile for all, and privately any now-angrier
         // owners, or the player gold if a price was paid.

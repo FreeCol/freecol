@@ -720,14 +720,14 @@ public final class InGameInputHandler extends InputHandler {
         case ACCEPT_TRADE:
             boolean visibilityChange = false;
             for (Colony c : agreement.getColoniesGivenBy(player)) {
-                player.removeSettlement(c);
+                player.removeSettlement(c);//-vis(player)
                 visibilityChange = true;
             }
             for (Unit u : agreement.getUnitsGivenBy(player)) {
-                player.removeUnit(u);
+                player.removeUnit(u);//-vis(player)
                 visibilityChange = true;
             }
-            if (visibilityChange) player.invalidateCanSeeTiles();
+            if (visibilityChange) player.invalidateCanSeeTiles();//+vis(player)
             new ShowInformationMessageSwingTask(StringTemplate
                 .template("negotiationDialog.offerAccepted")
                     .addName("%nation%", nation)).show();

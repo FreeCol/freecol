@@ -2638,6 +2638,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * - Mission removed (if enhanced missionaries enabled)
      * - Mission ownership changes (Spanish succession with enhanced
      *                              missionaries enabled)
+     * - Map is unexplored (debug mode)
      *
      * Ideally then when any of these events occurs we should call
      * invalidateCanSeeTiles().  However while iCST is quick and
@@ -2697,7 +2698,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @see Tile#updatePlayerExploredTile(Player, boolean)
      */
     public void setExplored(Tile tile) {
-        logger.warning("Implemented by ServerPlayer");
+        logger.warning("Player.setExplored(Tile) implemented by ServerPlayer");
     }
 
     /**
@@ -2709,11 +2710,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @see #hasExplored
      */
     public void setExplored(Unit unit) {
-        if (getGame() == null || getGame().getMap() == null || unit == null
-            || !unit.hasTile() || isIndian()) {
-            return;
-        }
-        invalidateCanSeeTiles();
+        logger.warning("Player.setExplored(Unit) implemented by ServerPlayer");
     }
 
     /**
@@ -4036,7 +4033,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
         recalculateBellsBonus(); // Bells bonuses depend on tax
 
-        invalidateCanSeeTiles();
+        invalidateCanSeeTiles();//TODO: is this needed
     }
 
     /**

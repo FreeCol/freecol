@@ -608,8 +608,8 @@ public class FreeColTestCase extends TestCase {
      * Build/place a colony with a unit, without requiring the server.
      */
     public void nonServerBuildColony(Unit builder, Colony colony) {
-        colony.placeSettlement(true);
-        colony.getOwner().invalidateCanSeeTiles();
+        colony.placeSettlement(true);//-vis
+        colony.getOwner().invalidateCanSeeTiles();//+vis
         nonServerJoinColony(builder, colony);
     }
 

@@ -224,9 +224,6 @@ public abstract class Settlement extends GoodsLocation
         for (Tile t : tiles) {
             t.changeOwnership(owner, this);//-vis(owner,this)
         }
-        for (Tile t : tile.getSurroundingTiles(getLineOfSight())) {
-            owner.setExplored(t);
-        }
         if (this instanceof Colony && !tile.hasRoad()) {
             TileImprovement road = tile.addRoad();
             road.setTurnsToComplete(0);
