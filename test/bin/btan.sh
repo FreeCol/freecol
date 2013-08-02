@@ -55,6 +55,10 @@ section "Builds"
 sed -n -e 's/^Count builds: *\(.*\)$/\1/p' "$tmp" | statit
 blockit
 
+section "Building#"
+(for r in $runs ; do eval $r ; echo $NB ;   done) | statit
+blockit
+
 section "Cashins"
 sed -n -e 's/^Count cashins: *\(.*\)$/\1/p' "$tmp" | statit
 blockit
@@ -65,10 +69,6 @@ blockit
 
 section "ColonySize"
 (for r in $runs ; do eval $r ; echo $MEAN ; done) | statit
-blockit
-
-section "Building#"
-(for r in $runs ; do eval $r ; echo $NB ;   done) | statit
 blockit
 
 section "Defences"
