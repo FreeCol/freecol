@@ -26,7 +26,13 @@ for f in ${1+"$@"} ; do
                     -e 's|^.*</colony>.*$|>|p' -e 's|^.*<unit.*$|U|p' \
                 | awk '{ if ($1 == "<") n = 0; else if ($1 == "U") n++; else if ($1 == ">") print n; }' \
                 | $STATS`
-            echo "colonies: $colonies"
+            buildings=`xml_grep 'building' "$b/savegame.xml" | grep -c '<building'`
+            echo "colonies: $colonies, buildings: $buildings"
+            xml_grep 'player' "$b/savegame.xml" \
+            | sed -n -e '/playerType="NATIVE"/d' -e '/playerType="REF"/d' \
+                -e '/playerType="native"/d' -e '/playerType="ref"/d' \
+                -e '/"model.nation.unknownEnemy"/d' \
+                -e 's/^.*<player.*nationI[dD]="model.nation.\([^"]*\)".*score="\([^"]*\)".*$/\1 \2/p'
         fi
         cd "$now"
         ;;

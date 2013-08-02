@@ -1,10 +1,14 @@
-#! /bin/sh
+#! /bin/bash
 # btan.sh
 # Analyze bigtest run
+# Has to be bash now we are using arrays
 #
 # Usage:
 #   btan.sh <tag> < <fc-log-score-output>
 #
+nations="dutch english french spanish danish portuguese swedish russian"
+declare -A nat
+
 if test "x$1" = "x" ; then name=Unknown ; else name="$1" ; fi
 name=`date +%Y%m%d`-"$name"
 if test "x$STATS" = "x" ; then
@@ -27,6 +31,10 @@ blockit () {
     fi
 }
 
+section () {
+    printf "%-15s" "$1"
+}
+
 statit () {
     statitMEAN=0 ; statitSD=0
     eval `$STATS | sed -n -e 's/^n=[^ ]* *mean=\([^ ]*\) *sd=\(.*\)$/statitMEAN="\1";statitSD="\2"/p' -`
@@ -36,71 +44,81 @@ statit () {
 tmp=`mktemp btan.XXXXXXXX`
 trap "rm -f '$tmp'" 0
 cat - > "$tmp"
-runs=`sed -n -e 's/^run: .*colonies: n=\([0-9]*\) mean=\([\.0-9]*\) sd=\([\.0-9]*\)$/NC="\1";MEAN="\2";SD="\3"/p' "$tmp"`
+runs=`sed -n -e 's/^run: .*colonies: n=\([0-9]*\) mean=\([\.0-9]*\) sd=\([\.0-9]*\), buildings: \([0-9]*\)$/NC="\1";MEAN="\2";SD="\3";NB="\4"/p' "$tmp"`
 
 N=0
 for r in $runs ; do N=`expr $N + 1`; done
 echo "$name x $N"
 
 
-echo -n "Builds        "
+section "Builds"
 sed -n -e 's/^Count builds: *\(.*\)$/\1/p' "$tmp" | statit
 blockit
 
-echo -n "Cashins       "
+section "Cashins"
 sed -n -e 's/^Count cashins: *\(.*\)$/\1/p' "$tmp" | statit
 blockit
 
-echo -n "Colony#       "
+section "Colony#"
 (for r in $runs ; do eval $r ; echo $NC ;   done) | statit
 blockit
 
-echo -n "ColonySize    "
+section "ColonySize"
 (for r in $runs ; do eval $r ; echo $MEAN ; done) | statit
 blockit
 
-echo -n "Defences      "
+section "Building#"
+(for r in $runs ; do eval $r ; echo $NB ;   done) | statit
+blockit
+
+section "Defences"
 sed -n -e 's/^Count defences: *\(.*\)$/\1/p' "$tmp" | statit
 blockit
 
-echo -n "Missions      "
+section "Missions"
 sed -n -e 's/^Count missions: *\(.*\)$/\1/p' "$tmp" | statit
 blockit
 
-echo -n "Native Demands"
+section "Native Demands"
 sed -n -e 's/^Count demands: *\(.*\)$/\1/p' "$tmp" | statit
 blockit
 
-echo -n "Native Gifts  "
+section "Native Gifts"
 sed -n -e 's/^Count gifts: *\(.*\)$/\1/p' "$tmp" | statit
 blockit
 
-echo -n "Pioneerings   "
+section "Pioneerings"
 sed -n -e 's/^Count pioneerings: *\(.*\)$/\1/p' "$tmp" | statit
 blockit
 
-echo -n "Piracies      "
+section "Piracies"
 sed -n -e 's/^Count piracies: *\(.*\)$/\1/p' "$tmp" | statit
 blockit
 
-echo -n "Scoutings     "
+section "Scoutings"
 sed -n -e 's/^Count scoutings: *\(.*\)$/\1/p' "$tmp" | statit
 blockit
 
-echo -n "Seek+Destroys "
+section "Seek+Destroys"
 sed -n -e 's/^Count seek+dests: *\(.*\)$/\1/p' "$tmp" | statit
 blockit
 
-echo -n "Transports    "
+section "Transports"
 sed -n -e 's/^Count transports: *\(.*\)$/\1/p' "$tmp" | statit
 blockit
 
-echo -n "Turn Speed    "
+section "Turn Speed"
 sed -n -e 's/^Average turn: *\(.*\)$/\1/p' "$tmp" | statit
 blockit
 
-echo -n "Wishes        "
+section "Wishes"
 sed -n -e 's/^Count wishes: *\(.*\)$/\1/p' "$tmp" | statit
 blockit
+
+for n in $nations ; do
+    section "$n"
+    sed -n -e 's/^'"$n"' \([0-9]*\)$/\1/p' "$tmp" | statit
+    blockit
+done
 
 test "$blockitstate" = "y" || echo
