@@ -40,7 +40,7 @@ public class UnitWas implements Comparable<UnitWas> {
 
     private Unit unit;
     private UnitType type;
-    private Unit.Role role;
+    private Role role;
     private Location loc;
     private GoodsType work;
     private int workAmount;
@@ -108,7 +108,7 @@ public class UnitWas implements Comparable<UnitWas> {
      */
     public void fireChanges() {
         UnitType newType = null;
-        Unit.Role newRole = null;
+        Role newRole = null;
         Location newLoc = null;
         GoodsType newWork = null;
         int newWorkAmount = 0;

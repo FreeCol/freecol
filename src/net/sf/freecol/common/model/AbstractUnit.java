@@ -26,7 +26,6 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.Unit.Role;
 
 
 /**
@@ -164,29 +163,20 @@ public class AbstractUnit extends FreeColObject {
      */
     public EquipmentType[] getEquipment(Specification spec) {
         List<EquipmentType> equipment = new ArrayList<EquipmentType>();
-        switch (role) {
-        case PIONEER:
+        if (role == Role.PIONEER) {
             EquipmentType tools = spec.getEquipmentType("model.equipment.tools");
             for (int count = 0; count < tools.getMaximumCount(); count++) {
                 equipment.add(tools);
             }
-            break;
-        case MISSIONARY:
+        } else if (role == Role.MISSIONARY) {
             equipment.add(spec.getEquipmentType("model.equipment.missionary"));
-            break;
-        case SOLDIER:
+        } else if (role == Role.SOLDIER) {
             equipment.add(spec.getEquipmentType("model.equipment.muskets"));
-            break;
-        case SCOUT:
+        } else if (role == Role.SCOUT) {
             equipment.add(spec.getEquipmentType("model.equipment.horses"));
-            break;
-        case DRAGOON:
+        } else if (role == Role.DRAGOON) {
             equipment.add(spec.getEquipmentType("model.equipment.muskets"));
             equipment.add(spec.getEquipmentType("model.equipment.horses"));
-            break;
-        case DEFAULT:
-        default:
-            break;
         }
         return equipment.toArray(new EquipmentType[equipment.size()]);
     }
@@ -217,7 +207,7 @@ public class AbstractUnit extends FreeColObject {
     protected final void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        role = xr.getAttribute(ROLE_TAG, Role.class, Role.DEFAULT);
+        role = xr.getType(getSpecification(), ROLE_TAG, Role.class, Role.DEFAULT);
 
         number = xr.getAttribute(NUMBER_TAG, 1);
     }

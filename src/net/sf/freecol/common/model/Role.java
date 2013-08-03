@@ -34,6 +34,13 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
  */
 public class Role extends BuildableType {
 
+    public static Role DEFAULT = null;
+    public static Role SCOUT;
+    public static Role SOLDIER;
+    public static Role DRAGOON;
+    public static Role PIONEER;
+    public static Role MISSIONARY;
+
     /**
      * The Role to downgrade to after losing a battle. Defaults to
      * <code>null</code>. Note that some UnitTypes and Roles may be
@@ -83,7 +90,36 @@ public class Role extends BuildableType {
         }
     };
 
+    // TODO: make this go away
+    public Role newRole(Role role) {
+        if (this == SOLDIER && role == SCOUT) {
+            return DRAGOON;
+        } else if (this == SCOUT && role == SOLDIER) {
+            return DRAGOON;
+        } else {
+            return role;
+        }
+    }
 
+    // and this, too
+    public List<EquipmentType> getRoleEquipment() {
+        Specification spec = getSpecification();
+        List<EquipmentType> result = new ArrayList<EquipmentType>();
+        if (getRequiredGoods().isEmpty()) {
+            result.add(spec.getEquipmentType("model.equipment.missionary"));
+        } else {
+            for (AbstractGoods goods : getRequiredGoods()) {
+                if ("model.goods.horses".equals(goods.getType().getId())) {
+                    result.add(spec.getEquipmentType("model.equipment.horses"));
+                } else if ("model.goods.muskets".equals(goods.getType().getId())) {
+                    result.add(spec.getEquipmentType("model.equipment.muskets"));
+                } else if ("model.goods.tools".equals(goods.getType().getId())) {
+                    result.add(spec.getEquipmentType("model.equipment.tools"));
+                }
+            }
+        }
+        return result;
+    }
 
     /**
      * Creates a new <code>Role</code> instance.

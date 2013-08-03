@@ -48,7 +48,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Scope;
-import net.sf.freecol.common.model.Unit.Role;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.UnitType;
 
 

@@ -44,7 +44,7 @@ import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.Role;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.UnitType;
 
 
@@ -76,7 +76,11 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
         public int compare(Unit unit1, Unit unit2) {
             int deltaType = unit2.getType().compareTo(unit1.getType());
             if (deltaType == 0) {
-                return unit2.getRole().ordinal() - unit1.getRole().ordinal();
+                if (unit2.getRole() == null) {
+                    return -1;
+                } else {
+                    return unit2.getRole().getId().compareTo(unit1.getRole().getId());
+                }
             } else {
                 return deltaType;
             }

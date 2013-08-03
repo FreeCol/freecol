@@ -59,7 +59,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeItem;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.Role;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.UnitTradeItem;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
@@ -401,9 +401,9 @@ public class NativeAIPlayer extends AIPlayer {
         final int turnNumber = getGame().getTurn().getNumber();
         List<AIUnit> aiUnits = getAIUnits();
         final List<EquipmentType> scoutEq = aiUnits.get(0).getUnit()
-            .getRoleEquipment(Unit.Role.SCOUT);
+            .getRoleEquipment(Role.SCOUT);
         final List<EquipmentType> soldierEq = aiUnits.get(0).getUnit()
-            .getRoleEquipment(Unit.Role.SOLDIER);
+            .getRoleEquipment(Role.SOLDIER);
 
         String report = "";
         int allUnits = aiUnits.size(), i = 0;

@@ -53,6 +53,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
@@ -180,7 +181,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * XML-representation.
      *
      * @param aiMain The main AI-object.
-     * @param element The root element for the XML-representation 
+     * @param element The root element for the XML-representation
      *       of a <code>Wish</code>.
      */
     public AIColony(AIMain aiMain, Element element) {
@@ -191,7 +192,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         uninitialized = getColony() == null;
     }
-    
+
     /**
      * Creates a new <code>AIColony</code> from the given
      * XML-representation.
@@ -464,7 +465,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 : Integer.MAX_VALUE;
             nextRearrange = Math.max(1, Math.min(nextRearrange, when));
         }
-                    
+
         // Log the changes.
         build = colony.getCurrentlyBuilding();
         String buildStr = (build != null) ? build.toString()
@@ -486,7 +487,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 && ((WorkInsideColonyMission)aiU.getMission()).getAIColony()
                 == this) {
                 ;// Do nothing
-            } else {                
+            } else {
                 aiU.setMission(new WorkInsideColonyMission(aiMain, aiU, this));
             }
         }
@@ -497,21 +498,15 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             AIUnit aiU = getAIUnit(u);
             if (aiU == null || aiU.getMission() != null) continue;
             Mission m = null;
-            switch (u.getRole()) {
-            case SOLDIER: case DRAGOON:
+            if (u.getRole() == Role.SOLDIER
+                || u.getRole() == Role.DRAGOON) {
                 m = new DefendSettlementMission(aiMain, aiU, colony);
-                break;
-            case SCOUT:
+            } else if (u.getRole() == Role.SCOUT) {
                 if (preferScouts) m = aip.getScoutingMission(aiU);
-                break;
-            case PIONEER:
+            } else if (u.getRole() == Role.PIONEER) {
                 if (pioneersWanted) m = aip.getPioneeringMission(aiU);
-                break;
-            case MISSIONARY:
+            } else if (u.getRole() == Role.MISSIONARY) {
                 m = aip.getMissionaryMission(aiU);
-                break;
-            default:
-                break;
             }
             if (m != null) aiU.setMission(m);
         }
@@ -744,7 +739,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         if (colony.getUnitCount() <= 0) avertAutoDestruction();
         rearrangeTurn = new Turn(getGame().getTurn().getNumber());
     }
-    
+
     /**
      * Gets the goods to be exported from this AI colony.
      *
@@ -827,7 +822,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 // On its way, no longer of interest here, but do not dispose
                 // as that will happen when delivered.
                 goodsLog(ag, "sends");
-                aiGoods.remove(i); 
+                aiGoods.remove(i);
             } else if (colony.getAdjustedNetProductionOf(ag.getGoods()
                     .getType()) < 0) {
                 goodsLog(ag, "needs");
@@ -1328,7 +1323,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
         return null;
     }
-        
+
     /**
      * Creates a list of the <code>Tile</code>-improvements which will
      * increase the production by this <code>Colony</code>.

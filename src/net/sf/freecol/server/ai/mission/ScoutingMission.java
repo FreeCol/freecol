@@ -35,6 +35,7 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
@@ -246,7 +247,7 @@ public class ScoutingMission extends Mission {
         String reason = invalidReason(aiUnit);
         return (reason != null) ? reason
             : (canScoutNatives(aiUnit)
-                || aiUnit.equipForRole(Unit.Role.SCOUT, false)
+                || aiUnit.equipForRole(Role.SCOUT, false)
                 || aiUnit.getUnit().hasAbility(Ability.EXPERT_SCOUT)) ? null
             : "unit-unprepared-to-SCOUT";
     }

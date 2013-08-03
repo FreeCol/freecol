@@ -31,7 +31,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.Unit.Role;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
 

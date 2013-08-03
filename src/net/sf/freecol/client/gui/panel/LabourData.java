@@ -33,6 +33,7 @@ import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -487,23 +488,17 @@ public class LabourData {
     }
 
     private void incrementOutsideWorker(UnitData unitData, Unit unit, LocationData.Getter getter) {
-        switch (unit.getRole()) {
-            case DRAGOON:
-            case SOLDIER:
-                incrementOutsideWorker(unitData, unit, soldier, getter);
-                break;
-            case MISSIONARY:
+        if (unit.getRole() == Role.DRAGOON
+            || unit.getRole() == Role.SOLDIER) {
+            incrementOutsideWorker(unitData, unit, soldier, getter);
+        } else if (unit.getRole() == Role.MISSIONARY) {
                 incrementOutsideWorker(unitData, unit, missionary, getter);
-                break;
-            case PIONEER:
-                incrementOutsideWorker(unitData, unit, pioneer, getter);
-                break;
-            case SCOUT:
-                incrementOutsideWorker(unitData, unit, scout, getter);
-                break;
-            default:
-                getter.getLocationData(unitData).notWorking++;
-                break;
+        } else if (unit.getRole() == Role.PIONEER) {
+            incrementOutsideWorker(unitData, unit, pioneer, getter);
+        } else if (unit.getRole() == Role.SCOUT) {
+            incrementOutsideWorker(unitData, unit, scout, getter);
+        } else {
+            getter.getLocationData(unitData).notWorking++;
         }
     }
 

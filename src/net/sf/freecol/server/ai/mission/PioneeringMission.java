@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
@@ -353,7 +354,7 @@ public class PioneeringMission extends Mission {
         if (reason != null) return reason;
         final Unit unit = aiUnit.getUnit();
         if (!hasTools(aiUnit)
-            && !aiUnit.equipForRole(Unit.Role.PIONEER, false))
+            && !aiUnit.equipForRole(Role.PIONEER, false))
             return "unit-could-not-equip";
         return (hasTools(aiUnit) || unit.hasAbility(Ability.EXPERT_PIONEER))
             ? null
@@ -433,7 +434,7 @@ public class PioneeringMission extends Mission {
             ? reason
             : (!hasTools(aiUnit)
                 && !colony.canProvideEquipment(aiUnit.getUnit()
-                    .getRoleEquipment(Unit.Role.PIONEER)))
+                    .getRoleEquipment(Role.PIONEER)))
             ? "colony-can-not-provide-equipment"
             : null;
     }
@@ -565,7 +566,7 @@ public class PioneeringMission extends Mission {
 
             // Try to equip
             String logMe = tag + " reached " + where;
-            logMe += (aiUnit.equipForRole(Unit.Role.PIONEER, false)
+            logMe += (aiUnit.equipForRole(Role.PIONEER, false)
                 && hasTools())
                 ? " and equips"
                 : " but fails to equip";

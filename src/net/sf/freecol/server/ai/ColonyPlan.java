@@ -51,7 +51,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.Role;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
@@ -1220,7 +1220,7 @@ public class ColonyPlan {
      * @param colony The <code>Colony</code> storing the equipment.
      * @return True if the unit was equipped.
      */
-    public static boolean equipUnit(Unit unit, Unit.Role role, Colony colony) {
+    public static boolean equipUnit(Unit unit, Role role, Colony colony) {
         if (!unit.isPerson()) return false;
         final Specification spec = colony.getSpecification();
 
@@ -1267,7 +1267,7 @@ public class ColonyPlan {
      * @param colony The <code>Colony</code> storing the equipment.
      * @return True if the unit was equipped.
      */
-    private static boolean fullEquipUnit(Unit unit, Unit.Role role, Colony colony) {
+    private static boolean fullEquipUnit(Unit unit, Role role, Colony colony) {
         return (role == Role.SOLDIER)
             ? equipUnit(unit, Role.DRAGOON, colony)
                 || equipUnit(unit, Role.SOLDIER, colony)
@@ -1326,7 +1326,7 @@ public class ColonyPlan {
         for (int j = 0; j < outdoorRoles.length; j++) {
             for (Unit u : new ArrayList<Unit>(workers)) {
                 if (workers.size() <= 1) break;
-                if (u.hasAbility(outdoorRoles[j].getExpertAbility())
+                if (u.getType() == outdoorRoles[j].getExpertUnit()
                     && fullEquipUnit(u, outdoorRoles[j], col)) {
                     workers.remove(u);
                     report.append(u.getId()).append("(")

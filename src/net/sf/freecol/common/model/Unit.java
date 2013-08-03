@@ -95,108 +95,6 @@ public class Unit extends GoodsLocation
         SKIPPED
     }
 
-    /**
-     * The roles a Unit can have. TODO: make this configurable by
-     * adding roles to the specification instead of using an enum. New
-     * roles, such as mounted pioneers, have already been suggested.
-     */
-    public static enum Role {
-        DEFAULT, PIONEER, MISSIONARY, SOLDIER, SCOUT, DRAGOON;
-
-        // Equipment types needed for certain roles.
-        private static final HashMap<Role, List<EquipmentType>> roleEquipment
-            = new HashMap<Role, List<EquipmentType>>();
-
-        /**
-         * Initializes roleEquipment.  How about that.
-         */
-        private void initializeRoleEquipment(Specification spec) {
-            if (!roleEquipment.isEmpty()) return;
-            UnitType defaultUnit = spec.getDefaultUnitType();
-            for (EquipmentType e : spec.getEquipmentTypeList()) {
-                Role r = e.getRole();
-                if (r != null) {
-                    List<EquipmentType> eq = roleEquipment.get(r);
-                    if (eq == null) {
-                        eq = new ArrayList<EquipmentType>();
-                        roleEquipment.put(r, eq);
-                    }
-                    eq.add(e);
-                }
-            }
-            // TODO: Not quite completely generic yet.  There are more
-            // equipment types that are compatible with the dragoon role.
-            // The spec expresses this with <compatible-equipment> but
-            // it does not express that while muskets and horses are compatible
-            // for a soldier, they are not for a scout.
-            for (EquipmentType e : spec.getEquipmentTypeList()) {
-                if (!e.isMilitaryEquipment()) continue;
-                List<EquipmentType> eq = roleEquipment.get(Role.DRAGOON);
-                if (eq == null) {
-                    eq = new ArrayList<EquipmentType>();
-                    roleEquipment.put(Role.DRAGOON, eq);
-                }
-                if (!eq.contains(e)) eq.add(e);
-            }
-            // Make sure there is an empty list at least for each role.
-            for (Role r : Role.values()) {
-                List<EquipmentType> e = roleEquipment.get(r);
-                if (e == null) {
-                    e = new ArrayList<EquipmentType>();
-                    roleEquipment.put(r, e);
-                }
-            }
-        }
-
-        /**
-         * Gets the equipment required for this role.
-         * TODO: passing the spec in is a wart.
-         *
-         * @param spec The <code>Specification</code> to extract requirements
-         *     from.
-         * @return A list of required <code>EquipmentType</code>s.
-         */
-        public List<EquipmentType> getRoleEquipment(Specification spec) {
-            initializeRoleEquipment(spec);
-            return new ArrayList<EquipmentType>(roleEquipment.get(this));
-        }
-
-        public boolean isCompatibleWith(Role oldRole) {
-            return (this == oldRole) ||
-                (this == SOLDIER && oldRole == DRAGOON) ||
-                (this == DRAGOON && oldRole == SOLDIER);
-        }
-
-        public Role newRole(Role role) {
-            if (this == SOLDIER && role == SCOUT) {
-                return DRAGOON;
-            } else if (this == SCOUT && role == SOLDIER) {
-                return DRAGOON;
-            } else {
-                return role;
-            }
-        }
-
-        public String getExpertAbility() {
-            switch (this) {
-            case DEFAULT:
-                break;
-            case MISSIONARY:
-                return "model.ability.jesuitMissionary";
-            case PIONEER:
-                return "model.ability.hardyPioneer";
-            case SCOUT:
-                return "model.ability.seasonedScout";
-            case SOLDIER: case DRAGOON:
-                return "model.ability.veteranSoldier";
-            }
-            return null;
-        }
-
-        public String getId() {
-            return toString().toLowerCase(Locale.US);
-        }
-    }
 
     /** The individual name of this unit, not of the unit type. */
     protected String name = null;
@@ -699,7 +597,7 @@ public class Unit extends GoodsLocation
     public Role getRole() {
         return role;
     }
- 
+
     /**
      * Sets the <code>Role</code> of this <code>Unit</code>.
      *
@@ -789,7 +687,7 @@ public class Unit extends GoodsLocation
         boolean preserveEducation = withinColony
             && (((WorkLocation)location).canTeach()
                 == ((WorkLocation)newLocation).canTeach());
-        
+
         if (location != null && !location.remove(this)) {
             // "Should not happen" (should always be able to remove)
             throw new RuntimeException("Failed to remove " + this
@@ -1235,7 +1133,7 @@ public class Unit extends GoodsLocation
      * @param typeStudent the student <code>UnitType</code>.
      * @return The number of turns.
      */
-    public int getNeededTurnsOfTraining(UnitType typeTeacher, 
+    public int getNeededTurnsOfTraining(UnitType typeTeacher,
                                         UnitType typeStudent) {
         UnitType teaching = getUnitTypeTeaching(typeTeacher, typeStudent);
         if (teaching != null) {
@@ -1818,7 +1716,7 @@ public class Unit extends GoodsLocation
      * @return A list of <code>EquipmentType</code>s.
      */
     public List<EquipmentType> getRoleEquipment(Role role) {
-        List<EquipmentType> equipment = role.getRoleEquipment(getSpecification());
+        List<EquipmentType> equipment = role.getRoleEquipment();
         Iterator<EquipmentType> i = equipment.iterator();
         while (i.hasNext()) {
             EquipmentType et = i.next();
@@ -2120,7 +2018,7 @@ public class Unit extends GoodsLocation
      * @return The move type.
      */
     public MoveType getMoveType(Tile target) {
-        return (!hasTile()) 
+        return (!hasTile())
             ? MoveType.MOVE_NO_TILE
             : getMoveType(getTile(), target, getMovesLeft());
     }
@@ -2280,14 +2178,15 @@ public class Unit extends GoodsLocation
             } else if (isTradingUnit()) {
                 return getTradeMoveType(settlement);
             } else if (isColonist()) {
-                switch (getRole()) {
-                case DEFAULT: case PIONEER:
+                if (getRole() == Role.DEFAULT
+                    || getRole() == Role.PIONEER) {
                     return getLearnMoveType(from, settlement);
-                case MISSIONARY:
+                } else if (getRole() == Role.MISSIONARY) {
                     return getMissionaryMoveType(from, settlement);
-                case SCOUT:
+                } else if (getRole() == Role.SCOUT) {
                     return getScoutMoveType(from, settlement);
-                case SOLDIER: case DRAGOON:
+                } else if (getRole() == Role.SOLDIER
+                           || getRole() == Role.DRAGOON) {
                     return (allowMoveFrom(from))
                         ? MoveType.ATTACK_SETTLEMENT
                         : MoveType.MOVE_NO_ATTACK_MARINE;
@@ -2840,7 +2739,7 @@ public class Unit extends GoodsLocation
         }
         return (best == null) ? null : findPath(best.getTile());
     }
- 
+
     /**
      * Find a path for this unit to the nearest settlement with the
      * same owner that is reachable without a carrier, excepting any
@@ -3191,7 +3090,7 @@ public class Unit extends GoodsLocation
 
         Building school = (Building)((teacher) ? getLocation()
             : getTeacher().getLocation());
- 
+
         return (leavingColony)
             ? StringTemplate.template("abandonEducation.text")
             .addStringTemplate("%unit%", Messages.getLabel(this))
@@ -3866,7 +3765,7 @@ public class Unit extends GoodsLocation
             xw.writeAttribute(TURNS_OF_TRAINING_TAG, turnsOfTraining);
 
             if (workType != null) xw.writeAttribute(WORK_TYPE_TAG, workType);
-            
+
             if (experienceType != null) {
                 xw.writeAttribute(EXPERIENCE_TYPE_TAG, experienceType);
             }
@@ -3878,11 +3777,11 @@ public class Unit extends GoodsLocation
             xw.writeAttribute(WORK_LEFT_TAG, workLeft);
 
             xw.writeAttribute(HIT_POINTS_TAG, hitPoints);
-            
+
             xw.writeAttribute(ATTRITION_TAG, attrition);
-            
+
             if (student != null) xw.writeAttribute(STUDENT_TAG, student);
-            
+
             if (teacher != null) xw.writeAttribute(TEACHER_TAG, teacher);
 
             if (destination != null) {
@@ -3915,7 +3814,7 @@ public class Unit extends GoodsLocation
 
         for (EquipmentType et : getSortedCopy(equipment.keySet())) {
             xw.writeStartElement(EQUIPMENT_TAG);
-            
+
             xw.writeAttribute(ID_ATTRIBUTE_TAG, et);
 
             xw.writeAttribute(COUNT_TAG, equipment.getCount(et));
@@ -3947,7 +3846,7 @@ public class Unit extends GoodsLocation
 
         state = xr.getAttribute(STATE_TAG, UnitState.class, UnitState.ACTIVE);
 
-        role = xr.getAttribute(ROLE_TAG, Role.class, Role.DEFAULT);
+        role = xr.getType(spec, ROLE_TAG, Role.class, Role.DEFAULT);
 
         location = xr.getLocationAttribute(game, LOCATION_TAG, true);
 

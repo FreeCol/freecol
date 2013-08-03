@@ -67,6 +67,7 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
@@ -503,16 +504,16 @@ public class DebugUtils {
         final Unit sUnit = sGame.getFreeColGameObject(unit.getId(), Unit.class);
         final GUI gui = freeColClient.getGUI();
 
-        List<ChoiceItem<Unit.Role>> rcs = new ArrayList<ChoiceItem<Unit.Role>>();
-        for (Unit.Role role : Unit.Role.values()) {
-            rcs.add(new ChoiceItem<Unit.Role>(role.toString(), role));
+        List<ChoiceItem<Role>> rcs = new ArrayList<ChoiceItem<Role>>();
+        for (Role role : sGame.getSpecification().getRoles()) {
+            rcs.add(new ChoiceItem<Role>(role.getId(), role));
         }
-        Unit.Role roleChoice = gui.showChoiceDialog(null, "Select role",
+        Role roleChoice = gui.showChoiceDialog(null, "Select role",
                                                     "Cancel", rcs);
         if (roleChoice == null) return;
 
         sUnit.clearEquipment();
-        sUnit.setRole(Unit.Role.DEFAULT);
+        sUnit.setRole(Role.DEFAULT);
         final Specification sSpec = server.getSpecification();
         for (EquipmentType et : sUnit.getRoleEquipment(roleChoice)) {
             sUnit.changeEquipment(et, 1);

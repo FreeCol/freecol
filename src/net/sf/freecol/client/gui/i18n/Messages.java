@@ -47,6 +47,7 @@ import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region.RegionType;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.StringTemplate.TemplateType;
 import net.sf.freecol.common.model.Unit;
@@ -641,7 +642,7 @@ public class Messages {
             typeKey = unit.getType().getNameKey();
             infoKey = Integer.toString(unit.getTreasureAmount());
         } else {
-            String key = (unit.getRole() == Unit.Role.DEFAULT) ? "name"
+            String key = (unit.getRole() == Role.DEFAULT) ? "name"
                 : unit.getRole().toString().toLowerCase();
             String messageID = unit.getType().getId() + "." + key;
             if (containsKey(messageID)) {
@@ -680,9 +681,9 @@ public class Messages {
      * @param count an <code>int</code> value
      * @return The given unit type as a String
      */
-    public static String getLabel(UnitType someType, Unit.Role someRole, int count) {
+    public static String getLabel(UnitType someType, Role someRole, int count) {
         String key = someRole.toString().toLowerCase();
-        if (someRole == Unit.Role.DEFAULT) {
+        if (someRole == Role.DEFAULT) {
             key = "name";
         }
         String messageID = someType.getId() +  "." + key;
@@ -704,7 +705,7 @@ public class Messages {
      */
     public static String getLabel(AbstractUnit unit) {
         String key = unit.getRole().toString().toLowerCase();
-        if (unit.getRole() == Unit.Role.DEFAULT) {
+        if (unit.getRole() == Role.DEFAULT) {
             key = "name";
         }
         String messageID = unit.getId() +  "." + key;

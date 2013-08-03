@@ -91,7 +91,7 @@ import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.TradeRouteStop;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.Role;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitLocation;
 import net.sf.freecol.common.model.UnitType;
@@ -3868,8 +3868,8 @@ public final class InGameController extends Controller {
             units = serverPlayer.getMonarch().getExpeditionaryForce().getUnits();
         } else {
             ServerPlayer REFPlayer = (ServerPlayer) serverPlayer.getREFPlayer();
-            java.util.Map<UnitType, EnumMap<Role, Integer>> unitHash
-                = new HashMap<UnitType, EnumMap<Role, Integer>>();
+            java.util.Map<UnitType, HashMap<Role, Integer>> unitHash
+                = new HashMap<UnitType, HashMap<Role, Integer>>();
             for (Unit unit : REFPlayer.getUnits()) {
                 if (unit.isOffensiveUnit()) {
                     UnitType unitType = defaultType;
@@ -3877,9 +3877,9 @@ public final class InGameController extends Controller {
                         || unit.hasAbility(Ability.EXPERT_SOLDIER)) {
                         unitType = unit.getType();
                     }
-                    EnumMap<Role, Integer> roleMap = unitHash.get(unitType);
+                    HashMap<Role, Integer> roleMap = unitHash.get(unitType);
                     if (roleMap == null) {
-                        roleMap = new EnumMap<Role, Integer>(Role.class);
+                        roleMap = new HashMap<Role, Integer>();
                     }
                     Role role = unit.getRole();
                     Integer count = roleMap.get(role);
@@ -3891,7 +3891,7 @@ public final class InGameController extends Controller {
                     unitHash.put(unitType, roleMap);
                 }
             }
-            for (java.util.Map.Entry<UnitType, EnumMap<Role, Integer>> typeEntry : unitHash.entrySet()) {
+            for (java.util.Map.Entry<UnitType, HashMap<Role, Integer>> typeEntry : unitHash.entrySet()) {
                 for (java.util.Map.Entry<Role, Integer> roleEntry : typeEntry.getValue().entrySet()) {
                     units.add(new AbstractUnit(typeEntry.getKey(), roleEntry.getKey(), roleEntry.getValue()));
                 }

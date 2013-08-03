@@ -75,7 +75,7 @@ public class PioneeringMissionTest extends FreeColTestCase {
         Unit colonist = new ServerUnit(game, colony.getTile(), player,
             colonistType);
         final List<EquipmentType> pioneerEquipment
-            = colonist.getRoleEquipment(Unit.Role.PIONEER);
+            = colonist.getRoleEquipment(Role.PIONEER);
         AIUnit aiUnit = aiMain.getAIUnit(colonist);
         assertNotNull(aiUnit);
         aiUnit.abortMission("Test");

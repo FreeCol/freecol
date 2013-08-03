@@ -415,6 +415,14 @@ public final class Specification {
             }
         }
 
+        // TODO: remove this as soon as we no longer need these fields
+        Role.SCOUT = getRole("model.role.scout");
+        Role.SOLDIER = getRole("model.role.soldier");
+        Role.DRAGOON = getRole("model.role.dragoon");
+        Role.PIONEER = getRole("model.role.pioneer");
+        Role.MISSIONARY = getRole("model.role.missionary");
+        // end TODO
+
         farmedGoodsTypeList.clear();
         foodGoodsTypeList.clear();
         newWorldGoodsTypeList.clear();
@@ -1705,22 +1713,22 @@ public final class Specification {
             AbstractUnitOption regulars
                 = new AbstractUnitOption(id + ".regulars");
             regulars.setValue(new AbstractUnit("model.unit.colonialRegular",
-                                               Unit.Role.SOLDIER, 2));
+                                               Role.SOLDIER, 2));
             interventionForce.getValue().add(regulars);
             AbstractUnitOption dragoons
                 = new AbstractUnitOption(id + ".dragoons");
             dragoons.setValue(new AbstractUnit("model.unit.colonialRegular",
-                                               Unit.Role.DRAGOON, 2));
+                                               Role.DRAGOON, 2));
             interventionForce.getValue().add(dragoons);
             AbstractUnitOption artillery
                 = new AbstractUnitOption(id + ".artillery");
             artillery.setValue(new AbstractUnit("model.unit.artillery",
-                                                Unit.Role.DEFAULT, 2));
+                                                Role.DEFAULT, 2));
             interventionForce.getValue().add(artillery);
             AbstractUnitOption menOfWar
                 = new AbstractUnitOption(id + ".menOfWar");
             menOfWar.setValue(new AbstractUnit("model.unit.manOWar",
-                                               Unit.Role.DEFAULT, 2));
+                                               Role.DEFAULT, 2));
             interventionForce.getValue().add(menOfWar);
             allOptions.put(id, interventionForce);
         }
@@ -1730,22 +1738,22 @@ public final class Specification {
             AbstractUnitOption regulars
                 = new AbstractUnitOption(id + ".regulars");
             regulars.setValue(new AbstractUnit("model.unit.veteranSoldier",
-                                               Unit.Role.SOLDIER, 2));
+                                               Role.SOLDIER, 2));
             mercenaryForce.getValue().add(regulars);
             AbstractUnitOption dragoons
                 = new AbstractUnitOption(id + ".dragoons");
             dragoons.setValue(new AbstractUnit("model.unit.veteranSoldier",
-                                               Unit.Role.DRAGOON, 2));
+                                               Role.DRAGOON, 2));
             mercenaryForce.getValue().add(dragoons);
             AbstractUnitOption artillery
                 = new AbstractUnitOption(id + ".artillery");
             artillery.setValue(new AbstractUnit("model.unit.artillery",
-                                                Unit.Role.DEFAULT, 2));
+                                                Role.DEFAULT, 2));
             mercenaryForce.getValue().add(artillery);
             AbstractUnitOption menOfWar
                 = new AbstractUnitOption(id + ".menOfWar");
             menOfWar.setValue(new AbstractUnit("model.unit.manOWar",
-                                               Unit.Role.DEFAULT, 2));
+                                               Role.DEFAULT, 2));
             mercenaryForce.getValue().add(menOfWar);
             allOptions.put(id, mercenaryForce);
         }

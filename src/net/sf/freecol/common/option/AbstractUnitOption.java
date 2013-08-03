@@ -30,7 +30,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.model.Unit.Role;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.option.UnitTypeOption.TypeSelector;
 
 
@@ -165,10 +165,20 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     public void generateChoices() {
         unitType.generateChoices();
         List<String> roles = new ArrayList<String>();
-        for (Role r : Role.values()) {
+        for (Role r : getSpecification().getRoles()) {
             roles.add(r.getId());
         }
         role.setChoices(roles);
+    }
+
+    public Role getRole(String name) {
+        if (name.indexOf('.') < 0) {
+            // @compat 0.10.7
+            // Role enum instead of Role class
+            name = "model.role." + name.toLowerCase();
+            // end @compat
+        }
+        return getSpecification().getRole(name);
     }
 
 
@@ -203,7 +213,7 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
         AbstractUnit au = null;
         if (unitType != null && role != null && number != null) {
             au = new AbstractUnit(unitType.getValue(),
-                                  Role.valueOf(role.getValue()),
+                                  getRole(role.getValue()),
                                   number.getValue());
         }
         setValue(au);

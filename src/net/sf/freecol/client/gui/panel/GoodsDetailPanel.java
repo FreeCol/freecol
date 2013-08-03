@@ -20,7 +20,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -43,7 +43,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TileImprovementType;
-import net.sf.freecol.common.model.Unit.Role;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.UnitType;
 
 
@@ -163,7 +163,7 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
             allTypes = filterBuildables(getSpecification().getEquipmentTypeList(), equipmentTypes, type);
             if (equipmentTypes.size() > 0) {
                 panel.add(localizedLabel("colopedia.goods.equipment"), "newline 20");
-                Set<Role> roles = EnumSet.noneOf(Role.class);
+                Set<Role> roles = new HashSet<Role>();
                 for (EquipmentType equipment : equipmentTypes) {
                     roles.add(equipment.getRole());
                 }

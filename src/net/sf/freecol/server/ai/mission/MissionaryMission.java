@@ -33,6 +33,7 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -233,7 +234,7 @@ public class MissionaryMission extends Mission {
             if (!unit.hasAbility(Ability.ESTABLISH_MISSION)
                 && (((FreeColGameObject)unit.getLocation())
                     .hasAbility(Ability.DRESS_MISSIONARY))) {
-                aiUnit.equipForRole(Unit.Role.MISSIONARY, false);
+                aiUnit.equipForRole(Role.MISSIONARY, false);
             }
             reason = (unit.hasAbility(Ability.ESTABLISH_MISSION))
                 ? null

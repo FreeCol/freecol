@@ -42,7 +42,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
-import net.sf.freecol.common.model.Unit.Role;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.option.AbstractUnitOption;
@@ -122,7 +122,7 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
         roleUI.updateOption();
         numberUI.updateOption();
         UnitType type = typeUI.getOption().getValue();
-        Role role = Role.valueOf(roleUI.getOption().getValue());
+        Role role = getOption().getRole(roleUI.getOption().getValue());
         int number = numberUI.getOption().getValue();
         getOption().setValue(new AbstractUnit(type, role, number));
     }

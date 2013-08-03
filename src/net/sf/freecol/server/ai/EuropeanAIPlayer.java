@@ -57,6 +57,7 @@ import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StanceTradeItem;
@@ -136,7 +137,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             private int score(AIUnit a) {
                 Unit unit;
                 if (a == null || (unit = a.getUnit()) == null
-                    || BuildColonyMission.invalidReason(a) != null) 
+                    || BuildColonyMission.invalidReason(a) != null)
                     return -1000;
                 int base = (!unit.getEquipment().isEmpty()) ? 0
                     : (unit.getSkillLevel() > 0) ? 100
@@ -173,7 +174,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                     return 600;
                 }
                 List<EquipmentType> scoutEquipment
-                    = unit.getRoleEquipment(Unit.Role.SCOUT);                
+                    = unit.getRoleEquipment(Role.SCOUT);
                 int base = (unit.isInEurope()) ? 500
                     : (unit.getLocation().getColony() != null
                         && unit.getLocation().getColony()
@@ -216,7 +217,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                     return 600;
                 }
                 List<EquipmentType> pioneerEquipment
-                    = unit.getRoleEquipment(Unit.Role.PIONEER);
+                    = unit.getRoleEquipment(Role.PIONEER);
                 int base = (unit.isInEurope()) ? 500
                     : (unit.getLocation().getColony() != null
                         && unit.getLocation().getColony()
@@ -510,7 +511,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                     nNavalCarrier--;
                 } else {
                     changeNeedWagon(u.getTile(), -1);
-                }                    
+                }
             } else {
                 checkTransport(aiu);
                 if (requestsTransport(aiu)) {
@@ -825,7 +826,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 return true;
             }
         }
-        
+
         return false;
     }
 
@@ -1079,7 +1080,7 @@ public class EuropeanAIPlayer extends AIPlayer {
 
         for (GoodsType goodsType : spec.getGoodsTypeList()) {
             if (market.getArrears(goodsType) > 0
-                && Utils.randomInt(logger, "Lift Boycott?", air, 100) 
+                && Utils.randomInt(logger, "Lift Boycott?", air, 100)
                 < liftBoycottCheatPercent) {
                 market.setArrears(goodsType, 0);
                 // Just remove one goods party modifier (we can not
@@ -1102,15 +1103,15 @@ public class EuropeanAIPlayer extends AIPlayer {
 
         if (!getAIMain().getFreeColServer().isSinglePlayer()
             || player.getPlayerType() != PlayerType.COLONIAL) return;
-        
+
         if (!europe.isEmpty()
             && scoutsNeeded() > 0
             && Utils.randomInt(logger, "Equip Scout?", air, 100)
             < equipScoutCheatPercent) {
             for (Unit u : europe.getUnitList()) {
-                if (u.getRole() == Unit.Role.DEFAULT
+                if (u.getRole() == Role.DEFAULT
                     && u.isPerson()
-                    && getAIUnit(u).equipForRole(Unit.Role.SCOUT, true)) {
+                    && getAIUnit(u).equipForRole(Role.SCOUT, true)) {
                     player.logCheat("equipped scout " + u);
                     break;
                 }
@@ -1181,7 +1182,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             : (0.0f < naval && naval < 0.5f)
             ? (int)(naval * offensiveNavalUnitCheatPercent)
             : -1;
-        List<RandomChoice<UnitType>> rc 
+        List<RandomChoice<UnitType>> rc
             = new ArrayList<RandomChoice<UnitType>>();
         if (Utils.randomInt(logger, "Build Offensive Naval Unit?", air, 100)
             < nNaval) {
@@ -1193,7 +1194,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                     && unitType.hasPrice()
                     && unitType.isOffensive()) {
                     navalUnits.add(unitType);
-                    int weight = unitType.getOffence() 
+                    int weight = unitType.getOffence()
                         * 100000 / europe.getUnitPrice(unitType);
                     rc.add(new RandomChoice<UnitType>(unitType, weight));
                 }
@@ -1282,7 +1283,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 }
                 putReason(aiUnit,
                     "Vital-to-" + unit.getSettlement().getName());
-                
+
             } else if (unit.isInMission()) {
                 putReason(aiUnit, "In-Mission");
 
@@ -1398,7 +1399,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 i++;
             }
         }
-        
+
         // Process the free naval units, possibly adding to the usable
         // transport missions.
         i = 0;
@@ -1534,7 +1535,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         }
         return null;
     }
-     
+
     /**
      * What is the best transportable for a carrier to collect?
      *
@@ -1702,7 +1703,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         if (worstColony == null) return null;
         return new DefendSettlementMission(getAIMain(), aiUnit, worstColony);
     }
-                        
+
     /**
      * Gets a new MissionaryMission for a unit.
      *
@@ -1943,7 +1944,7 @@ public class EuropeanAIPlayer extends AIPlayer {
 
     /**
      * Makes every unit perform their mission.
-     * Does all other missions before the transport missions to try to 
+     * Does all other missions before the transport missions to try to
      * give the transports valid targets.
      */
     @Override
@@ -2112,7 +2113,7 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     public int buyProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
         logger.finest("Entering method buyProposition");
-        final Specification spec = getSpecification(); 
+        final Specification spec = getSpecification();
         Player buyer = unit.getOwner();
         IndianSettlement is = (IndianSettlement)settlement;
         String goldKey = "tradeGold#" + goods.getType().getId()

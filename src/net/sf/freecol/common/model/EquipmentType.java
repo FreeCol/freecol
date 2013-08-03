@@ -29,7 +29,6 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.Unit.Role;
 
 
 /**
@@ -295,7 +294,7 @@ public class EquipmentType extends BuildableType {
 
         combatLossPriority = xr.getAttribute(COMBAT_LOSS_PRIORITY_TAG, -1);
 
-        role = xr.getAttribute(ROLE_TAG, Role.class, Role.DEFAULT);
+        role = xr.getType(getSpecification(), ROLE_TAG, Role.class, Role.DEFAULT);
     }
 
     /**

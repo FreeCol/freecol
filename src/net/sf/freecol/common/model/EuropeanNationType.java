@@ -30,7 +30,6 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.OptionGroup;
 
@@ -253,7 +252,7 @@ public class EuropeanNationType extends NationType {
 
             String type = xr.getAttribute(TYPE_TAG, (String)null);
 
-            Role role = xr.getAttribute(ROLE_TAG, Role.class, Role.DEFAULT);
+            Role role = xr.getType(getSpecification(), ROLE_TAG, Role.class, Role.DEFAULT);
 
             boolean ex = xr.getAttribute(EXPERT_STARTING_UNITS_TAG, false);
 

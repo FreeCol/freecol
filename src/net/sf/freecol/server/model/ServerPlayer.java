@@ -66,6 +66,7 @@ import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
@@ -1615,7 +1616,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                             : settlement.getUnitList()),
                         random);
                     brave.clearEquipment();
-                    brave.setRole(Unit.Role.DEFAULT);
+                    brave.setRole(Role.DEFAULT);
                     brave.changeOwner(other);//-vis: safe/colony
                     brave.setHomeIndianSettlement(null);
                     brave.setNationality(other.getNationId());
@@ -2630,7 +2631,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         UnitType type = Utils.getRandomMember(logger, "Choose convert",
                                               converts, random);
         Unit convert = natives.getUnitList().get(0);
-        convert.setRole(Unit.Role.DEFAULT);
+        convert.setRole(Role.DEFAULT);
         convert.clearEquipment();
 
         cs.addMessage(See.only(attackerPlayer),
