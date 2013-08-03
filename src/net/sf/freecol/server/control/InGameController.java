@@ -780,15 +780,19 @@ public final class InGameController extends Controller {
                     }
                 }
                 player.setEntryLocation(entry);
-                logger.info(player.getName() + " will appear at " + entry);
+                logger.fine(player.getName() + " will appear at " + entry);
                 if (teleport) {
+                    Unit explorer = null;
                     for (Unit u : player.getUnits()) {
                         if (u.isNaval()) {
+                            explorer = u;
                             u.setLocation(entry);//-vis(player)
                             u.setWorkLeft(-1);
                             u.setState(Unit.UnitState.ACTIVE);
                         }
                     }
+                    if (explorer != null) cs.add(See.only(player),
+                        ((ServerPlayer)player).setExplored(explorer));
                     player.invalidateCanSeeTiles();//+vis(player)
                     cs.add(See.perhaps(), entry);
                 }
@@ -925,6 +929,7 @@ public final class InGameController extends Controller {
                                                      independent);
                 if (downgrade != null) u.setType(downgrade);//-vis(owner)
                 u.changeOwner(independent);//-vis(both)
+                cs.add(See.only(independent), independent.setExplored(u));
                 cs.add(See.perhaps().always(serverPlayer), u);
             }
             cs.addMessage(See.only(independent),
@@ -1679,7 +1684,7 @@ public final class InGameController extends Controller {
      */
     public Element move(ServerPlayer serverPlayer, Unit unit, Tile newTile) {
         ChangeSet cs = new ChangeSet();
-        ((ServerUnit) unit).csMove(newTile, random, cs);
+        ((ServerUnit)unit).csMove(newTile, random, cs);
         sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
@@ -1987,7 +1992,7 @@ public final class InGameController extends Controller {
 
         csVisit(serverPlayer, settlement, 0, cs);
         Tile tile = settlement.getTile();
-        tile.updatePlayerExploredTile(serverPlayer, true);
+        tile.updateIndianSettlement(serverPlayer);
         cs.add(See.only(serverPlayer), tile);
         unit.setMovesLeft(0);
         cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
@@ -2049,8 +2054,8 @@ public final class InGameController extends Controller {
             break;
         }
         Tile tile = settlement.getTile();
+        tile.updateIndianSettlement(serverPlayer);
         cs.add(See.only(serverPlayer), tile);
-        tile.updatePlayerExploredTile(serverPlayer, true);
 
         // Others always see the unit, it may have died or been taught.
         sendToOthers(serverPlayer, cs);
@@ -2118,7 +2123,7 @@ public final class InGameController extends Controller {
         }
         cs.addMessage(See.only(serverPlayer), m);
         Tile tile = settlement.getTile();
-        tile.updatePlayerExploredTile(serverPlayer, true);
+        tile.updateIndianSettlement(serverPlayer);
         cs.add(See.only(serverPlayer), tile);
         unit.setMovesLeft(0);
         cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
@@ -2143,7 +2148,7 @@ public final class InGameController extends Controller {
         Tile tile = settlement.getTile();
 
         csVisit(serverPlayer, settlement, -1, cs);
-        tile.updatePlayerExploredTile(serverPlayer, true);
+        tile.updateIndianSettlement(serverPlayer);
         cs.add(See.only(serverPlayer), tile);
         cs.addAttribute(See.only(serverPlayer), "settlements",
             Integer.toString(settlement.getOwner().getSettlements().size()));
@@ -2222,12 +2227,13 @@ public final class InGameController extends Controller {
 
             // Update settlement tile with new information, and any
             // newly visible tiles, possibly with enhanced radius.
-            for (Tile t : tile.getSurroundingTiles(radius)) {
+            List<Tile> tiles = new ArrayList<Tile>();
+            for (Tile t : tile.getSurroundingTiles(1, radius)) {
                 if (!serverPlayer.canSee(t) && (t.isLand() || t.isShore())) {
-                    serverPlayer.setExplored(t);
-                    cs.add(See.only(serverPlayer), t);
+                    tiles.add(t);
                 }
             }
+            cs.add(See.only(serverPlayer), serverPlayer.setExplored(tiles));
 
             // If the unit was promoted, update it completely, otherwise just
             // update moves and possibly gold+score.
@@ -2243,7 +2249,8 @@ public final class InGameController extends Controller {
             }
         }
         if (tileDirty) {
-            tile.updatePlayerExploredTile(serverPlayer, true);
+            tile.updateIndianSettlement(serverPlayer);
+            tile.updatePlayerExploredTile(serverPlayer);
             cs.add(See.only(serverPlayer), tile);
         }
 
@@ -2363,13 +2370,13 @@ public final class InGameController extends Controller {
                 : 1;
             for (Tile x : settlement.getTile().getSurroundingTiles(radius)) {
                 if (x == null) continue;
-                x.updatePlayerExploredTile(serverPlayer, true);
+                x.updatePlayerExploredTile(serverPlayer);
                 cs.add(See.only(serverPlayer), x);
             }
             break;
         }
         Tile tile = settlement.getTile();
-        tile.updatePlayerExploredTile(serverPlayer, true);
+        tile.updateIndianSettlement(serverPlayer);
         cs.add(See.perhaps().always(serverPlayer), tile);
         String messageId = "indianSettlement.mission."
             + settlement.getAlarm(serverPlayer).getKey();
@@ -2401,7 +2408,7 @@ public final class InGameController extends Controller {
 
         Tile tile = settlement.getTile();
         csVisit(serverPlayer, settlement, 0, cs);
-        tile.updatePlayerExploredTile(serverPlayer, true);
+        tile.updateIndianSettlement(serverPlayer);
         cs.add(See.only(serverPlayer), tile);
 
         // How much gold will be needed?
@@ -2562,7 +2569,7 @@ public final class InGameController extends Controller {
         cs.add(See.only(serverPlayer),
             ((ServerIndianSettlement)settlement).modifyAlarm(serverPlayer,
                 -amount / 50));
-        tile.updatePlayerExploredTile(serverPlayer, true);
+        tile.updateIndianSettlement(serverPlayer);
         cs.add(See.only(serverPlayer), tile);
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
         session.setBuy();
@@ -2618,7 +2625,7 @@ public final class InGameController extends Controller {
                 -amount / 500));
         Tile tile = settlement.getTile();
         settlement.updateWantedGoods();
-        tile.updatePlayerExploredTile(serverPlayer, true);
+        tile.updateIndianSettlement(serverPlayer);
         cs.add(See.only(serverPlayer), tile);
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
         session.setSell();
@@ -2664,7 +2671,7 @@ public final class InGameController extends Controller {
                 ((ServerIndianSettlement)is).modifyAlarm(serverPlayer,
                     -is.getPriceToBuy(goods) / 50));
             is.updateWantedGoods();
-            tile.updatePlayerExploredTile(serverPlayer, true);
+            tile.updateIndianSettlement(serverPlayer);
             cs.add(See.only(serverPlayer), tile);
         }
         session.setGift();
@@ -2874,15 +2881,9 @@ public final class InGameController extends Controller {
             settlement = new ServerColony(game, serverPlayer, name, tile);
             serverPlayer.addSettlement(settlement);
             settlement.placeSettlement(false);//-vis(serverPlayer,?)
-            // Also send any tiles that can now be seen because the colony
-            // can perhaps see further than the founding unit.
-            if (settlement.getLineOfSight() > unit.getLineOfSight()) {
-                for (Tile t : tile.getSurroundingTiles(unit.getLineOfSight()+1,
-                        settlement.getLineOfSight())) {
-                    serverPlayer.setExplored(t);
-                    cs.add(See.only(serverPlayer), t);
-                }
-            }
+            cs.add(See.only(serverPlayer),
+                serverPlayer.setExplored(settlement));
+
             cs.addHistory(serverPlayer, new HistoryEvent(game.getTurn(),
                     HistoryEvent.EventType.FOUND_COLONY)
                 .addName("%colony%", settlement.getName()));
@@ -2896,9 +2897,7 @@ public final class InGameController extends Controller {
             // Coronado
             for (ServerPlayer sp : getOtherPlayers(serverPlayer)) {
                 if (!sp.hasAbility(Ability.SEE_ALL_COLONIES)) continue;
-                for (Tile t : settlement.getOwnedTiles()) {
-                    sp.setExplored(t);
-                }
+                sp.setExplored(settlement);//-vis(sp)
                 sp.invalidateCanSeeTiles();//+vis(sp)
                 cs.addMessage(See.only(sp),
                     new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
@@ -3029,6 +3028,7 @@ public final class InGameController extends Controller {
                 if (sp.isEuropean()
                     && sp.hasAbility(Ability.SEE_ALL_COLONIES)) {
                     sp.setExplored(tile);
+                    cs.add(See.only(sp), tile);
                     sp.invalidateCanSeeTiles();//+vis(sp)
                 }
             }
@@ -3087,11 +3087,9 @@ public final class InGameController extends Controller {
             if (colony != null) {
                 ServerPlayer former = (ServerPlayer) colony.getOwner();
                 ((ServerColony)colony).changeOwner(dest);//-vis(both)
+                cs.add(See.only(dest), dest.setExplored(colony));
+                cs.add(See.perhaps().always(former), colony.getOwnedTiles());
                 visibilityChange = true;
-                List<FreeColGameObject> tiles
-                    = new ArrayList<FreeColGameObject>();
-                tiles.addAll(colony.getOwnedTiles());
-                cs.add(See.perhaps().always(former), tiles);
             }
             int gold = tradeItem.getGold();
             if (gold > 0) {
@@ -3110,8 +3108,9 @@ public final class InGameController extends Controller {
             if (newUnit != null) {
                 ServerPlayer former = (ServerPlayer) newUnit.getOwner();
                 unit.changeOwner(dest);//-vis(both)
-                visibilityChange = true;
+                cs.add(See.only(dest), dest.setExplored(unit));
                 cs.add(See.perhaps().always(former), newUnit);
+                visibilityChange = true;
             }
         }
         if (visibilityChange) {

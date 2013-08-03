@@ -263,7 +263,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
 
         // Update moves left.
         if (isInMission()) {
-            getLocation().getTile().updatePlayerExploredTile(owner, true);
+            getTile().updateIndianSettlement(owner);
             setMovesLeft(0);
         } else if (isDamaged()) {
             setMovesLeft(0);
@@ -839,7 +839,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
     public List<Tile> collectNewTiles(Tile tile) {
         List<Tile> newTiles = new ArrayList<Tile>();
         int los = getLineOfSight();
-        for (Tile t : tile.getSurroundingTiles(los)) {
+        for (Tile t : tile.getSurroundingTiles(0, los)) {
             if (!getOwner().canSee(t)) newTiles.add(t);
         }
         return newTiles;

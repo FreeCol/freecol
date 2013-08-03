@@ -657,7 +657,8 @@ public class Unit extends GoodsLocation
      * Change the owner of this unit.
      *
      * -vis: This routine calls setOwner() and thus has visibility
-     * implications.  It should be in the server.
+     * implications.  Ideally it should be in ServerUnit but we keep
+     * it here for the benefit of the test suite.
      *
      * @param owner The new owner <code>Player</code>.
      */
@@ -670,23 +671,19 @@ public class Unit extends GoodsLocation
                 + " had no owner, when changing owner to " + owner.getId());
         }
 
+        // This need to be set right away.
+        this.owner = owner;
+
         // Clear trade route and goto orders if changing owner.
         if (getTradeRoute() != null) setTradeRoute(null);
         if (getDestination() != null) setDestination(null);
-
-        // This need to be set right away.
-        this.owner = owner;
 
         // If its a carrier, we need to update the units it has loaded
         // before finishing with it
         for (Unit u : getUnitList()) u.changeOwner(owner);
 
         if (oldOwner != null) oldOwner.removeUnit(this);
-        if (owner != null) {
-            owner.addUnit(this);
-
-            if (!isOnCarrier()) owner.setExplored(this);
-        }
+        if (owner != null) owner.addUnit(this);
 
         getGame().notifyOwnerChanged(this, oldOwner, owner);
     }
@@ -810,11 +807,6 @@ public class Unit extends GoodsLocation
             if (!withinColony) newColony.updatePopulation();
             if (!preserveEducation) newColony.updateEducation(this, true);
         }
-
-        // Explore the new location now to prevent dealing with tiles
-        // with null (unexplored) type.  This will update the PETs so
-        // it needs to be done after the unit is added back to its tile.
-        getOwner().setExplored(this);
     }
 
     /**

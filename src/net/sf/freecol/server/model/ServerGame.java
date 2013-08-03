@@ -306,37 +306,44 @@ public class ServerGame extends Game implements ServerModelObject {
             sb.append(" ]\n=> ").append(weakestAIPlayer.getName())
                 .append(" cedes to ").append(strongestAIPlayer.getName())
                 .append(":");
+            ServerPlayer strongest = (ServerPlayer)strongestAIPlayer;
+            ServerPlayer weakest = (ServerPlayer)weakestAIPlayer;
+            List<Tile> tiles = new ArrayList<Tile>();
             for (Player player : getPlayers()) {
                 if (!player.isIndian()) continue;
-                for (IndianSettlement settlement : player.getIndianSettlements()) {
-                    if (!settlement.hasMissionary(weakestAIPlayer)) continue;
-                    sb.append(" ").append(settlement.getName())
-                        .append("(mission)");
-                    settlement.setContacted(strongestAIPlayer);
-                    settlement.getMissionary()
-                        .changeOwner(strongestAIPlayer);//-vis(both)
-                    Tile t = settlement.getTile();
-                    t.updatePlayerExploredTile(strongestAIPlayer, true);
-                    t.updatePlayerExploredTiles();
-                    cs.add(See.perhaps().always((ServerPlayer)strongestAIPlayer),
-                        settlement);
+                for (IndianSettlement is : player.getIndianSettlements()) {
+                    if (!is.hasMissionary(weakest)) continue;
+                    sb.append(" ").append(is.getName()).append("(mission)");
+                    is.setContacted(strongest);
+                    is.getMissionary().changeOwner(strongest);//-vis(both)
+                    cs.add(See.only(strongest), strongest.setExplored(is));
+                    Tile tile = is.getTile();
+                    tile.updateIndianSettlement(strongest);
+                    tile.updatePlayerExploredTiles();
+                    cs.add(See.perhaps().always(strongest), is);
                 }
             }
-            for (Colony colony : weakestAIPlayer.getColonies()) {
-                ((ServerColony)colony)
-                    .changeOwner(strongestAIPlayer);//-vis(both)
+            for (Colony colony : weakest.getColonies()) {
+                ((ServerColony)colony).changeOwner(strongest);//-vis(both)
+                cs.add(See.only(strongest), strongest.setExplored(colony));
                 sb.append(" ").append(colony.getName());
-                cs.add(See.perhaps(), colony.getOwnedTiles());
+                tiles.addAll(colony.getOwnedTiles());
             }
-            for (Unit unit : weakestAIPlayer.getUnits()) {
-                unit.changeOwner(strongestAIPlayer); //-vis(both)
+            for (Unit unit : weakest.getUnits()) {
+                unit.changeOwner(strongest); //-vis(both)
+                cs.add(See.only(strongest), strongest.setExplored(unit));
                 sb.append(" ").append(unit.getId());
                 if (unit.getLocation() instanceof Europe) {
                     unit.setLocation(strongestAIPlayer.getEurope());//-vis
+                    cs.add(See.only(strongest), unit);
                 } else if (unit.getLocation() instanceof HighSeas) {
                     unit.setLocation(strongestAIPlayer.getHighSeas());//-vis
+                    cs.add(See.only(strongest), unit);
+                } else if (unit.getLocation() instanceof Tile) {
+                    Tile tile = unit.getTile();
+                    tile.updatePlayerExploredTiles();
+                    if (!tiles.contains(tile)) tiles.add(tile);
                 }
-                cs.add(See.perhaps(), unit);
             }
 
             StringTemplate loser = weakestAIPlayer.getNationName();
@@ -345,18 +352,19 @@ public class ServerGame extends Game implements ServerModelObject {
                 new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                                  "model.diplomacy.spanishSuccession",
                                  strongestAIPlayer)
-                          .addStringTemplate("%loserNation%", loser)
-                          .addStringTemplate("%nation%", winner));
+                                 .addStringTemplate("%loserNation%", loser)
+                                 .addStringTemplate("%nation%", winner));
             cs.addGlobalHistory(this,
                 new HistoryEvent(getTurn(),
                                  HistoryEvent.EventType.SPANISH_SUCCESSION)
-                                .addStringTemplate("%loserNation%", loser)
-                                .addStringTemplate("%nation%", winner));
+                                 .addStringTemplate("%loserNation%", loser)
+                                 .addStringTemplate("%nation%", winner));
             setSpanishSuccession(true);
             cs.addPartial(See.all(), this, "spanishSuccession");
+            cs.add(See.perhaps(), tiles);
 
-            ((ServerPlayer)weakestAIPlayer).csKill(cs);//+vis(weakest)
-            strongestAIPlayer.invalidateCanSeeTiles();//+vis(strongest)
+            weakest.csKill(cs);//+vis(weakest)
+            strongest.invalidateCanSeeTiles();//+vis(strongest)
             logger.info(sb.toString());
         }
     }

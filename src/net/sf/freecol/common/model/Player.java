@@ -2691,29 +2691,6 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Sets the given tile to be explored by this player and updates the
-     * player's information about the tile.
-     *
-     * @param tile The <code>Tile</code> to set explored.
-     * @see Tile#updatePlayerExploredTile(Player, boolean)
-     */
-    public void setExplored(Tile tile) {
-        logger.warning("Player.setExplored(Tile) implemented by ServerPlayer");
-    }
-
-    /**
-     * Sets the tiles within the given <code>Unit</code>'s line of sight to
-     * be explored by this player.
-     *
-     * @param unit The <code>Unit</code>.
-     * @see #setExplored(Tile)
-     * @see #hasExplored
-     */
-    public void setExplored(Unit unit) {
-        logger.warning("Player.setExplored(Unit) implemented by ServerPlayer");
-    }
-
-    /**
      * Builds a canSeeTiles array.
      *
      * Note that tiles must be tested for null as they may be both

@@ -1293,7 +1293,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         if (playerExploredTiles == null) return;
         for (Player player : getGame().getLiveEuropeanPlayers()) {
             if (player == oldPlayer || player.canSee(this)) {
-                updatePlayerExploredTile(player, false);
+                updatePlayerExploredTile(player);
             }
         }
     }
@@ -1303,14 +1303,21 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * <code>Player</code>.
      *
      * @param player The <code>Player</code>.
-     * @param full If true, also update any hidden information specific to a
-     *     settlement present on the <code>Tile</code>.
      */
-    public void updatePlayerExploredTile(Player player, boolean full) {
+    public void updatePlayerExploredTile(Player player) {
         if (playerExploredTiles == null || !player.isEuropean()) return;
-        PlayerExploredTile pet = requirePlayerExploredTile(player);
-        pet.update();
-        if (full) pet.updateInternals();
+        requirePlayerExploredTile(player).update();
+    }
+
+    /**
+     * Updates the information about the native settlement on this
+     * <code>Tile</code> for the given <code>Player</code>.
+     *
+     * @param player The <code>Player</code>.
+     */
+    public void updateIndianSettlement(Player player) {
+        if (playerExploredTiles == null || !player.isEuropean()) return;
+        requirePlayerExploredTile(player).updateInternals();
     }
 
     /**
@@ -1322,9 +1329,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *     by the given <code>Player</code>.
      */
     public boolean isExploredBy(Player player) {
-        if (!player.isEuropean()) return true;
-        if (!isExplored()) return false;
-        return getPlayerExploredTile(player) != null;
+        return (!player.isEuropean()) ? true
+            : (!isExplored()) ? false
+            : getPlayerExploredTile(player) != null;
     }
 
     /**

@@ -356,11 +356,12 @@ public class DebugUtils {
         Location loc = (sCarrier != null) ? sCarrier : sTile;
         ServerUnit sUnit = new ServerUnit(sGame, loc, sPlayer,
                                           unitChoice);//-vis(sPlayer)
+        ((ServerPlayer)sPlayer).setExplored(sUnit);
         sUnit.setMovesLeft(sUnit.getInitialMovesLeft());
         sPlayer.invalidateCanSeeTiles();//+vis(sPlayer)
         int los = sUnit.getLineOfSight();
         for (Tile t : loc.getTile().getSurroundingTiles(los)) {
-            t.updatePlayerExploredTile(sPlayer, true);
+            t.updatePlayerExploredTile(sPlayer);
         }
 
         freeColClient.getConnectController().reconnect();
@@ -445,6 +446,7 @@ public class DebugUtils {
                                                           ServerPlayer.class);
         ServerPlayer sOldPlayer = (ServerPlayer)sSettlement.getOwner();
         sSettlement.changeOwner(sPlayer);//-vis(sPlayer,sOldPlayer)
+        sPlayer.setExplored(sSettlement);
         sPlayer.invalidateCanSeeTiles();//+vis(sPlayer)
         sOldPlayer.invalidateCanSeeTiles();//+vis(sOldPlayer)
 
@@ -482,6 +484,7 @@ public class DebugUtils {
                                                           ServerPlayer.class);
         ServerPlayer sOldPlayer = (ServerPlayer)sUnit.getOwner();
         sUnit.changeOwner(sPlayer);//-vis(sPlayer,sOldPlayer)
+        sPlayer.setExplored(sUnit);
         sPlayer.invalidateCanSeeTiles();//+vis(sPlayer)
         sOldPlayer.invalidateCanSeeTiles();//+vis(sOldPlayer)
 

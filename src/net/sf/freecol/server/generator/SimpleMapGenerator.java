@@ -873,12 +873,13 @@ public class SimpleMapGenerator implements MapGenerator {
                 throw new RuntimeException(err);
             }
 
-            startTile.updatePlayerExploredTile(player, false);
+            startTile.updatePlayerExploredTile(player);
             player.setEntryLocation(startTile);
 
             if (startAtSea) {
                 for (Unit carrier : carriers) {
                     carrier.setLocation(startTile);
+                    ((ServerPlayer)player).setExplored(carrier);
                 }
                 passengers: for (Unit unit : passengers) {
                     for (Unit carrier : carriers) {
@@ -894,6 +895,7 @@ public class SimpleMapGenerator implements MapGenerator {
                 for (Unit unit : passengers) {
                     unit.setLocation(startTile);
                 }
+                ((ServerPlayer)player).setExplored(startTile);
             }
 
             if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.INIT)) {
@@ -1058,6 +1060,8 @@ public class SimpleMapGenerator implements MapGenerator {
         @SuppressWarnings("unused")
         Unit unit16 = new ServerUnit(game, colonyTile, player, unitType);
         // END DEBUG
+
+        ((ServerPlayer)player).setExplored(colony);
     }
 
     private List<Position> generateStartingPositions(Map map, List<Player> players) {
