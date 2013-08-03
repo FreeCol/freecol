@@ -296,20 +296,22 @@ public class ServerGame extends Game implements ServerModelObject {
         if (weakestAIPlayer != null
             && strongestAIPlayer != null
             && weakestAIPlayer != strongestAIPlayer) {
-            String logMe = "Spanish succession"
-                + " in " + getTurn()
-                + " scores[";
+            StringBuffer sb = new StringBuffer(512);
+            sb.append("Spanish succession in ").append(getTurn())
+                .append(" scores[");
             for (Player player : scores.keySet()) {
-                logMe += " " + player.getName() + "=" + scores.get(player);
+                sb.append(" ").append(player.getName())
+                    .append("=").append(scores.get(player));
             }
-            logMe += " ]\n=> " + weakestAIPlayer.getName()
-                + " cedes to " + strongestAIPlayer.getName()
-                + ":";
+            sb.append(" ]\n=> ").append(weakestAIPlayer.getName())
+                .append(" cedes to ").append(strongestAIPlayer.getName())
+                .append(":");
             for (Player player : getPlayers()) {
                 if (!player.isIndian()) continue;
                 for (IndianSettlement settlement : player.getIndianSettlements()) {
                     if (!settlement.hasMissionary(weakestAIPlayer)) continue;
-                    logMe += " " + settlement.getName() + "(mission)";
+                    sb.append(" ").append(settlement.getName())
+                        .append("(mission)");
                     settlement.setContacted(strongestAIPlayer);
                     settlement.getMissionary()
                         .changeOwner(strongestAIPlayer);//-vis(both)
@@ -323,12 +325,12 @@ public class ServerGame extends Game implements ServerModelObject {
             for (Colony colony : weakestAIPlayer.getColonies()) {
                 ((ServerColony)colony)
                     .changeOwner(strongestAIPlayer);//-vis(both)
-                logMe += " " + colony.getName();
+                sb.append(" ").append(colony.getName());
                 cs.add(See.perhaps(), colony.getOwnedTiles());
             }
             for (Unit unit : weakestAIPlayer.getUnits()) {
                 unit.changeOwner(strongestAIPlayer); //-vis(both)
-                logMe += " " + unit.getId();
+                sb.append(" ").append(unit.getId());
                 if (unit.getLocation() instanceof Europe) {
                     unit.setLocation(strongestAIPlayer.getEurope());//-vis
                 } else if (unit.getLocation() instanceof HighSeas) {
@@ -355,7 +357,7 @@ public class ServerGame extends Game implements ServerModelObject {
 
             ((ServerPlayer)weakestAIPlayer).csKill(cs);//+vis(weakest)
             strongestAIPlayer.invalidateCanSeeTiles();//+vis(strongest)
-            logger.info(logMe);
+            logger.info(sb.toString());
         }
     }
 
