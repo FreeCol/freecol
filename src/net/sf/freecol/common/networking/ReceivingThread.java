@@ -54,7 +54,7 @@ final class ReceivingThread extends Thread {
      */
     private class FreeColNetworkInputStream extends InputStream {
 
-        private static final int BUFFER_SIZE = 8192;
+        private static final int BUFFER_SIZE = 16384;
 
         private static final char END_OF_STREAM = '\n';
 
