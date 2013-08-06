@@ -2890,9 +2890,7 @@ public final class InGameController extends Controller {
 
             // Remove equipment from founder in case role confuses
             // placement.
-            ((ServerUnit)unit).csRemoveEquipment(settlement,
-                new HashSet<EquipmentType>(unit.getEquipment().keySet()),
-                0, random, cs);
+            unit.clearEquipment(settlement);
 
             // Coronado
             for (ServerPlayer sp : getOtherPlayers(serverPlayer)) {
@@ -2961,9 +2959,7 @@ public final class InGameController extends Controller {
         // Join.
         unit.setLocation(colony);//-vis: safe/colony
         unit.setMovesLeft(0);
-        ((ServerUnit)unit).csRemoveEquipment(colony,
-            new HashSet<EquipmentType>(unit.getEquipment().keySet()),
-            0, random, cs);
+        unit.clearEquipment(colony);
 
         // Update with colony tile, and tiles now owned.
         cs.add(See.only(serverPlayer), tile);
@@ -3260,13 +3256,7 @@ public final class InGameController extends Controller {
             }
         }
 
-        // Remove any unit equipment
-        if (!unit.getEquipment().isEmpty()) {
-            ((ServerUnit)unit).csRemoveEquipment(colony,
-                new HashSet<EquipmentType>(unit.getEquipment().keySet()),
-                0, random, cs);
-
-        }
+        unit.clearEquipment(colony); // Remove any unit equipment
 
         // Check for upgrade.
         UnitType oldType = unit.getType();
@@ -3383,100 +3373,148 @@ public final class InGameController extends Controller {
      */
     public Element equipUnit(ServerPlayer serverPlayer, Unit unit,
                              EquipmentType type, int amount) {
-        Settlement settlement = (!unit.hasTile()) ? null
-            : unit.getSettlement();
-        GoodsContainer container = null;
-        boolean tileDirty = false;
+        if (amount == 0) return null;
+        Settlement settlement;
+        ChangeSet cs = new ChangeSet();
+
         if (unit.isInEurope()) {
-            // Refuse to trade in boycotted goods
+            Market market = serverPlayer.getMarket();
+            int price = 0;
             for (AbstractGoods goods : type.getRequiredGoods()) {
                 GoodsType goodsType = goods.getType();
+                // Refuse to trade in boycotted goods
                 if (!serverPlayer.canTrade(goodsType)) {
                     return DOMMessage.clientError("No equip of " + type.getId()
                         + " due to boycott of " + goodsType.getId());
                 }
+                if (amount > 0) {
+                    price += market.getBidPrice(goodsType,
+                        amount * goods.getAmount());
+                }
+            }
+            if (!serverPlayer.checkGold(price)) {
+                return DOMMessage.clientError("Insufficient funds to equip "
+                    + unit.getId() + " with " + type.getId() + " in Europe.");
             }
             // Will need a fake container to contain the goods to buy
             // in Europe.  Units may not necessarily have one.
-            container = new GoodsContainer(getGame(), serverPlayer.getEurope());
-        } else if (settlement != null) {
-            // Equipping a unit at work in a colony should remove the unit
-            // from the work location.
-            if (unit.getLocation() instanceof WorkLocation) {
-                unit.setLocation(settlement.getTile());//-vis: safe/colony
-                tileDirty = true;
-            }
-            settlement.getGoodsContainer().saveState();
-        }
+            GoodsContainer container
+                = new GoodsContainer(getGame(), serverPlayer.getEurope());
 
-        ChangeSet cs = new ChangeSet();
-        List<EquipmentType> remove = null;
-        // Process adding equipment first, so as to settle what has to
-        // be removed.
-        if (amount > 0) {
-            for (AbstractGoods goods : type.getRequiredGoods()) {
-                GoodsType goodsType = goods.getType();
-                int n = amount * goods.getAmount();
-                if (unit.isInEurope()) {
+            List<EquipmentType> remove = null;
+            // Process adding equipment first, so as to settle what has to
+            // be removed.
+            if (amount > 0) {
+                for (AbstractGoods goods : type.getRequiredGoods()) {
+                    GoodsType goodsType = goods.getType();
+                    int n = amount * goods.getAmount();
                     try {
                         serverPlayer.buy(container, goodsType, n, random);
                         serverPlayer.csFlushMarket(goodsType, cs);
                     } catch (IllegalStateException e) {
                         return DOMMessage.clientError(e.getMessage());
                     }
-                } else if (settlement != null) {
-                    if (settlement.getGoodsCount(goodsType) < n) {
-                        return DOMMessage.clientError("Failed to equip: "
-                            + unit.getId() + " not enough " + goodsType
-                            + " in settlement " + settlement.getId());
-                    }
-                    settlement.removeGoods(goodsType, n);
                 }
+                remove = unit.changeEquipment(type, amount);
+                amount = 0; // 0 => all, now
+            } else { // amount < 0
+                remove = new ArrayList<EquipmentType>();
+                remove.add(type);
+                amount = -amount;
             }
-            remove = unit.changeEquipment(type, amount);
-            amount = 0; // 0 => all, now
-        } else if (amount < 0) {
-            remove = new ArrayList<EquipmentType>();
-            remove.add(type);
-            amount = -amount;
-        } else {
-            return null; // Nothing to do.
-        }
 
-        // Now do removal of equipment.
-        ((ServerUnit)unit).csRemoveEquipment(settlement, remove, amount,
-                                             random, cs);
+            for (EquipmentType e : remove) {
+                int a = (amount > 0) ? amount : unit.getEquipmentCount(e);
+                for (AbstractGoods ag : e.getRequiredGoods()) {
+                    GoodsType goodsType = ag.getType();
+                    int n = ag.getAmount() * a;
+                    if (serverPlayer.canTrade(goodsType,
+                                              Market.Access.EUROPE)) {
+                        serverPlayer.sell(null, goodsType, n, random);
+                        serverPlayer.csFlushMarket(goodsType, cs);
+                    }
+                }
+                // Removals can not cause incompatible-equipment trouble
+                unit.changeEquipment(e, -a);
+            }
 
-        // Nothing for others to see except if the settlement population
-        // changes.
-        // If in Europe, we can get away with just updating the unit
-        // as sell() will have added sales changes.  In a settlement,
-        // the goods container will always be dirty, but the whole tile
-        // will only need to be updated if the unit moved into it.
-        if (unit.getInitialMovesLeft() != unit.getMovesLeft()) {
-            unit.setMovesLeft(0);
-        }
-        if (unit.isInEurope()) {
+            // We can get away with just updating the unit as sell()
+            // will have added sales changes.
             cs.add(See.only(serverPlayer), unit);
             cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
-        } else if (settlement != null) {
+            
+        } else if ((settlement = unit.getSettlement()) != null) {
+            if (!equipUnitAtSettlement(unit, type, amount, settlement)) {
+                return DOMMessage.clientError("Settlement "
+                    + settlement.getName() + " can not provide " + type.getId()
+                    + " for unit " + unit.getId());
+            }
+            // Equipping a unit at work in a colony should remove the unit
+            // from the work location.
+            if (unit.getLocation() instanceof WorkLocation) {
+                unit.setLocation(settlement.getTile());//-vis: safe/colony
+            }
+            if (unit.getInitialMovesLeft() != unit.getMovesLeft()) {
+                unit.setMovesLeft(0);
+            }
             Unit carrier = unit.getCarrier();
             if (carrier != null
                 && carrier.getInitialMovesLeft() != carrier.getMovesLeft()
                 && carrier.getMovesLeft() != 0) {
                 carrier.setMovesLeft(0);
-                cs.add(See.only(serverPlayer), carrier);
             }
-            if (tileDirty) {
-                cs.add(See.perhaps(), settlement.getTile());
-            } else {
-                cs.add(See.only(serverPlayer), unit,
-                       settlement.getGoodsContainer());
-            }
+            cs.add(See.perhaps(), unit.getTile());
+
+        } else {
+            return DOMMessage.clientError("Bad location for equipUnit.");
         }
+
         return cs.build(serverPlayer);
     }
 
+    /**
+     * Equip a unit in a settlement.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
+     * @param unit The <code>Unit</code> to equip.
+     * @param type The <code>EquipmentType</code> to equip with.
+     * @param amount The change in the amount of equipment (may be negative).
+     * @param settlement The <code>Settlement</code> to provide the goods
+     *     to make the equipment.
+     * @return True if the equipment is provided.
+     */
+    public boolean equipUnitAtSettlement(Unit unit, EquipmentType type,
+                                         int amount, Settlement settlement) {
+        if (amount == 0) return true;
+
+        // Process adding equipment first, so as to settle what has to
+        // be removed.
+        List<EquipmentType> remove = null;
+        if (amount > 0) {
+            if (!settlement.canBuildEquipment(type, amount)) return false;
+            for (AbstractGoods goods : type.getRequiredGoods()) {
+                GoodsType goodsType = goods.getType();
+                int n = amount * goods.getAmount();
+                settlement.removeGoods(goodsType, n);
+            }
+            remove = unit.changeEquipment(type, amount);
+            amount = 0; // 0 => all, now
+        } else { // amount < 0
+            remove = new ArrayList<EquipmentType>();
+            remove.add(type);
+            amount = -amount;
+        }
+        for (EquipmentType e : remove) {
+            int a = (amount > 0) ? amount : unit.getEquipmentCount(e);
+            for (AbstractGoods ag : e.getRequiredGoods()) {
+                GoodsType goodsType = ag.getType();
+                int n = ag.getAmount() * a;
+                settlement.addGoods(goodsType, n);
+            }
+            unit.changeEquipment(e, -a);
+        }
+        return true;
+    }
 
     /**
      * Pay for a building.

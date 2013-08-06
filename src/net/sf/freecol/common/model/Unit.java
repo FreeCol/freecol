@@ -149,8 +149,10 @@ public class Unit extends GoodsLocation
         }
 
         /**
-         * Gets the equipment required for this role.
-         * TODO: passing the spec in is a wart.
+         * Gets all equipment that could support this role.  Do not
+         * use directly as it will return both normal and native versions
+         * of the military equipment.  Use Unit.getRoleEquipment() which
+         * provides the correct scope.
          *
          * @param spec The <code>Specification</code> to extract requirements
          *     from.
@@ -1841,6 +1843,68 @@ public class Unit extends GoodsLocation
         }
         setRole();
         return result;
+    }
+
+    /**
+     * Convenience function to remove all equipment this unit has and
+     * drop it in a settlement.
+     *
+     * @param settlement The <code>Settlement</code> to collect the equipment
+     *     goods.
+     */
+    public void clearEquipment(Settlement settlement) {
+        TypeCountMap<EquipmentType> eq = getEquipment();
+        for (EquipmentType et : eq.keySet()) {
+            settlement.addEquipmentGoods(et, eq.getCount(et));
+        }
+        clearEquipment();
+        setRole(Role.DEFAULT);
+    }
+
+    /**
+     * Equip and set a unit to a particular role.  Take or drop equipment
+     * at the given settlement.
+     *
+     * @param role The <code>Role</code> to perform.
+     * @param settlement The <code>Settlement</code> that holds the equipment.
+     * @return True if the role was set.
+     */
+    public boolean equipForRole(Role role, Settlement settlement) {
+        if (!isPerson()) return false;
+        final Specification spec = getSpecification();
+        final List<EquipmentType> roleEq = getRoleEquipment(role);
+
+        TypeCountMap<EquipmentType> change = new TypeCountMap<EquipmentType>();
+        for (EquipmentType et : spec.getEquipmentTypeList()) {
+            int oldCount = getEquipmentCount(et);
+            int newCount = (roleEq.contains(et)) ? 1 : 0;
+            if (newCount > oldCount && !settlement.canBuildEquipment(et)) {
+                return false;
+            }
+            if (newCount != oldCount) {
+                change.incrementCount(et, newCount - oldCount);
+            }
+        }
+        for (Entry<EquipmentType, Integer> entry
+                 : change.getValues().entrySet()) {
+            EquipmentType et = entry.getKey();
+            int count = entry.getValue().intValue();
+            if (count < 0) {
+                changeEquipment(et, count); // can not fail
+                settlement.addEquipmentGoods(et, -count);
+            }
+        }
+        for (Entry<EquipmentType, Integer> entry
+                 : change.getValues().entrySet()) {
+            EquipmentType et = entry.getKey();
+            int count = entry.getValue().intValue();
+            if (count > 0) {
+                changeEquipment(et, count); // should not fail!
+                settlement.addEquipmentGoods(et, -count);
+            }
+        }
+        setRole(role);
+        return getRole() == role;
     }
 
 

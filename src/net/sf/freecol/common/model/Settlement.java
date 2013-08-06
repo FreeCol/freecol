@@ -361,15 +361,29 @@ public abstract class Settlement extends GoodsLocation
     }
 
     /**
-     * Return true if this Colony could build at least one item of the
-     * given EquipmentType.
+     * Can this Colony could build at least one item of the given
+     * EquipmentType?
      *
      * @param equipmentType The <code>EquipmentType</code> to build.
      * @return True if the equipment can be built.
      */
     public boolean canBuildEquipment(EquipmentType equipmentType) {
+        return canBuildEquipment(equipmentType, 1);
+    }
+
+    /**
+     * Can this Colony could build some amount of the given
+     * EquipmentType?
+     *
+     * @param equipmentType The <code>EquipmentType</code> to build.
+     * @param amount The number of instances of equipment to build.
+     * @return True if the equipment can be built.
+     */
+    public boolean canBuildEquipment(EquipmentType equipmentType, int amount) {
         for (AbstractGoods ag : equipmentType.getRequiredGoods()) {
-            if (getGoodsCount(ag.getType()) < ag.getAmount()) return false;
+            if (getGoodsCount(ag.getType()) < ag.getAmount() * amount) {
+                return false;
+            }
         }
         return true;
     }
