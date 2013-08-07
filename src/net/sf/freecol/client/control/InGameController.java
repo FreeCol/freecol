@@ -2084,6 +2084,14 @@ public final class InGameController implements NetworkConstants {
             if (colony == null) {
                 throw new IllegalStateException("Equip unit not in settlement/Europe");
             }
+            if (!colony.canBuildEquipment(type, amount)) {
+                gui.showInformationMessage(unit,
+                    StringTemplate.template("equipUnit.impossible")
+                        .addName("%colony", colony.getName())
+                        .add("%equipment%", type.getNameKey())
+                        .addStringTemplate("%unit%", Messages.getLabel(unit)));
+                return;
+            }
         }
 
         ColonyWas colonyWas = (colony == null) ? null : new ColonyWas(colony);

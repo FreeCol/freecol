@@ -3374,28 +3374,15 @@ public final class InGameController extends Controller {
     public Element equipUnit(ServerPlayer serverPlayer, Unit unit,
                              EquipmentType type, int amount) {
         if (amount == 0) return null;
-        Settlement settlement;
-        ChangeSet cs = new ChangeSet();
+        UnitLocation loc = (unit.isInEurope()) ? serverPlayer.getEurope()
+            : unit.getSettlement();
+        if (loc == null || !loc.canBuildEquipment(type, amount)) {
+            return DOMMessage.clientError("Can not built " + type.getId()
+                + " at " + loc + " for: " + unit.getId());
+        }
 
+        ChangeSet cs = new ChangeSet();
         if (unit.isInEurope()) {
-            Market market = serverPlayer.getMarket();
-            int price = 0;
-            for (AbstractGoods goods : type.getRequiredGoods()) {
-                GoodsType goodsType = goods.getType();
-                // Refuse to trade in boycotted goods
-                if (!serverPlayer.canTrade(goodsType)) {
-                    return DOMMessage.clientError("No equip of " + type.getId()
-                        + " due to boycott of " + goodsType.getId());
-                }
-                if (amount > 0) {
-                    price += market.getBidPrice(goodsType,
-                        amount * goods.getAmount());
-                }
-            }
-            if (!serverPlayer.checkGold(price)) {
-                return DOMMessage.clientError("Insufficient funds to equip "
-                    + unit.getId() + " with " + type.getId() + " in Europe.");
-            }
             // Will need a fake container to contain the goods to buy
             // in Europe.  Units may not necessarily have one.
             GoodsContainer container
@@ -3443,32 +3430,31 @@ public final class InGameController extends Controller {
             cs.add(See.only(serverPlayer), unit);
             cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
             
-        } else if ((settlement = unit.getSettlement()) != null) {
+        } else {
+            Settlement settlement = (Settlement)loc;
             if (!equipUnitAtSettlement(unit, type, amount, settlement)) {
                 return DOMMessage.clientError("Settlement "
                     + settlement.getName() + " can not provide " + type.getId()
                     + " for unit " + unit.getId());
             }
             // Equipping a unit at work in a colony should remove the unit
-            // from the work location.
+            // from the work location which might cause a visible change
+            // in population.
             if (unit.getLocation() instanceof WorkLocation) {
                 unit.setLocation(settlement.getTile());//-vis: safe/colony
             }
-            if (unit.getInitialMovesLeft() != unit.getMovesLeft()) {
-                unit.setMovesLeft(0);
-            }
-            Unit carrier = unit.getCarrier();
-            if (carrier != null
-                && carrier.getInitialMovesLeft() != carrier.getMovesLeft()
-                && carrier.getMovesLeft() != 0) {
-                carrier.setMovesLeft(0);
-            }
             cs.add(See.perhaps(), unit.getTile());
-
-        } else {
-            return DOMMessage.clientError("Bad location for equipUnit.");
         }
 
+        if (unit.getInitialMovesLeft() != unit.getMovesLeft()) {
+            unit.setMovesLeft(0);
+        }
+        Unit carrier = unit.getCarrier();
+        if (carrier != null
+            && carrier.getInitialMovesLeft() != carrier.getMovesLeft()
+            && carrier.getMovesLeft() != 0) {
+            carrier.setMovesLeft(0);
+        }
         return cs.build(serverPlayer);
     }
 

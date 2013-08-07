@@ -2430,6 +2430,7 @@ public class Colony extends Settlement implements Nameable {
     //   UnitLocation.getSpaceTaken [Irrelevant!]
     //   UnitLocation.moveToFront [Irrelevant!]
     //   UnitLocation.clearUnitList [Irrelevant!]
+    //   Settlement.canBuildEquipment
     //   Settlement.getNoAddReason
 
 

@@ -186,25 +186,6 @@ public class Europe extends UnitLocation implements Ownable, Named {
                         recruitLowerCap);
     }
 
-    /**
-     * Can this Europe build at least one item of the given EquipmentType?
-     *
-     * @param equipmentType The <code>EquipmentType</code> to check.
-     * @return True if the build could succeed.
-     */
-    public boolean canBuildEquipment(EquipmentType equipmentType) {
-        Market m = getOwner().getMarket();
-        for (AbstractGoods ag : equipmentType.getRequiredGoods()) {
-            GoodsType goodsType = ag.getType();
-            if (!(getOwner().canTrade(goodsType)
-                  && getOwner().checkGold(m.getBidPrice(goodsType,
-                                                        ag.getAmount())))) {
-                return false;
-            }
-        }
-        return true;
-    }
-
 
     // Override FreeColObject
 
@@ -270,6 +251,26 @@ public class Europe extends UnitLocation implements Ownable, Named {
     //   UnitLocation.clearUnitList
     //   UnitLocation.getNoAddReason
     //   UnitLocation.getUnitCapacity
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean canBuildEquipment(EquipmentType eq, int amount) {
+        Player player = getOwner();
+        Market market = player.getMarket();
+        int price = 0;
+        for (AbstractGoods goods : eq.getRequiredGoods()) {
+            GoodsType goodsType = goods.getType();
+            // Refuse to trade in boycotted goods
+            if (!player.canTrade(goodsType)) return false;
+            if (amount > 0) {
+                price += market.getBidPrice(goodsType,
+                    amount * goods.getAmount());
+            }
+        }
+        return player.checkGold(price);
+    }
 
 
     // Interface Named

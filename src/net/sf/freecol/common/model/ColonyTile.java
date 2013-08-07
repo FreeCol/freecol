@@ -239,6 +239,7 @@ public class ColonyTile extends WorkLocation {
     //   UnitLocation.getSpaceTaken
     //   UnitLocation.moveToFront
     //   UnitLocation.clearUnitList
+    //   UnitLocation.canBuildEquipment
 
     /**
      * {@inheritDoc}
