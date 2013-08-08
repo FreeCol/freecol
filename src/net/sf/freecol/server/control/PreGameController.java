@@ -93,6 +93,7 @@ public final class PreGameController extends Controller {
         // Inform the clients.
         for (Player player : game.getPlayers()) {
             if (!player.isAI()) {
+                player.invalidateCanSeeTiles();//Send clean copy of the game
                 Connection conn = ((ServerPlayer)player).getConnection();
                 Element update = DOMMessage.createMessage("updateGame");
                 update.appendChild(game.toXMLElement(update.getOwnerDocument(),
