@@ -4153,8 +4153,6 @@ public class Player extends FreeColGameObject implements Nameable {
         super.readChildren(xr);
 
         recalculateBellsBonus(); // Bells bonuses depend on tax
-
-        invalidateCanSeeTiles();//TODO: is this needed
     }
 
     /**

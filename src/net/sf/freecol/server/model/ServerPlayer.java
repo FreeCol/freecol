@@ -219,8 +219,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
         this.socket = socket;
         this.connection = connection;
         connected = connection != null;
-
-        invalidateCanSeeTiles();
     }
 
     /**

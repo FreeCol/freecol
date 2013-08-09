@@ -837,6 +837,8 @@ public class Game extends FreeColGameObject {
 
     /**
      * Maintain the player containers for certain ownables.
+     * Mainly useful in the client, informing the player that it has
+     * gained or lost an ownable.
      *
      * @param o The <code>Ownable</code> that may have changed.
      * @param oldOwner The previous (possible unchanged) owning
@@ -847,10 +849,10 @@ public class Game extends FreeColGameObject {
         if (oldOwner == newOwner) return;
 
         if (oldOwner != null && oldOwner.removeOwnable(o)) {
-            oldOwner.invalidateCanSeeTiles();
+            oldOwner.invalidateCanSeeTiles();//+vis
         }
         if (newOwner != null && newOwner.addOwnable(o)) {
-            newOwner.invalidateCanSeeTiles();
+            newOwner.invalidateCanSeeTiles();//+vis
         }
     }
 

@@ -1034,6 +1034,7 @@ public final class InGameInputHandler extends InputHandler {
             if (FoundingFather.getXMLElementTagName() == tag) {
                 FoundingFather father = spec.getFoundingFather(FreeColObject.readId(e));
                 if (father != null) player.addFather(father);
+                player.invalidateCanSeeTiles();// Might be coronado?
                 
             } else if (HistoryEvent.getXMLElementTagName() == tag) {
                 player.getHistory().add(new HistoryEvent(e));
