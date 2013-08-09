@@ -3752,14 +3752,13 @@ public final class InGameController implements NetworkConstants {
         Game game = freeColClient.getGame();
         game.setCurrentPlayer(player);
 
-        if (freeColClient.getMyPlayer().equals(player)
-            && freeColClient.getFreeColServer() != null) {
-            
+        if (freeColClient.getMyPlayer().equals(player)) {
             player.removeDisplayedModelMessages();
             player.invalidateCanSeeTiles();
 
             // auto-save the game (if it isn't newly loaded)
-            if ( turnsPlayed > 0 ) autosave_game();
+            if (freeColClient.getFreeColServer() != null
+                && turnsPlayed > 0) autosave_game();
 
             // Check for emigration.
             while (player.checkEmigrate()) {
@@ -3772,6 +3771,21 @@ public final class InGameController implements NetworkConstants {
                 }
             }
             
+            try {
+                List<Settlement> settlements = player.getSettlements();
+                Tile defTile = ((settlements.isEmpty())
+                    ? player.getEntryLocation().getTile()
+                    : settlements.get(0).getTile()).getSafeTile(null, null);
+                player.resetIterators();
+                nextActiveUnit(defTile);
+            } catch (Exception e) {
+                // We end up here if there is a crash in things like the
+                // turn report.  These were hard to track down because we
+                // used to fail silently.  We now complain louder.
+                logger.log(Level.WARNING, "Client new turn failure for "
+                    + player, e);
+            }
+
             // GUI management.
             if (!freeColClient.isSinglePlayer()) {
                 gui.playSound("sound.anthem." + player.getNationId());
