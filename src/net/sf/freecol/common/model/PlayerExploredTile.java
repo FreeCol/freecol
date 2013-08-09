@@ -57,9 +57,6 @@ public class PlayerExploredTile extends FreeColGameObject {
         /** The goods the settlement is interested in. */
         public GoodsType[] wantedGoods = null;
 
-        /** The current most hated nation. */
-        public Player mostHated = null;
-
         /** Update the internal information from a native settlement. */
         public void update(IndianSettlement indianSettlement) {
             this.skill = indianSettlement.getLearnableSkill();
@@ -69,7 +66,6 @@ public class PlayerExploredTile extends FreeColGameObject {
             GoodsType[] wanted = indianSettlement.getWantedGoods();
             System.arraycopy(wanted, 0, this.wantedGoods, 0,
                              Math.min(wanted.length, this.wantedGoods.length));
-            this.mostHated = indianSettlement.getMostHated();
         }
     }
             
@@ -96,6 +92,7 @@ public class PlayerExploredTile extends FreeColGameObject {
     // Visible IndianSettlement data.
     private Unit missionary = null;
     private Tension alarm = null;
+    private Player mostHated = null;
 
     // Invisible IndianSettlement data.
     private IndianSettlementInternals nativeInternals = null;
@@ -221,6 +218,10 @@ public class PlayerExploredTile extends FreeColGameObject {
         return missionary;
     }
 
+    public Player getMostHated() {
+        return mostHated;
+    }
+
     public Tension getAlarm() {
         return alarm;
     }
@@ -233,9 +234,6 @@ public class PlayerExploredTile extends FreeColGameObject {
         return (nativeInternals == null) ? null : nativeInternals.wantedGoods;
     }
 
-    public Player getMostHated() {
-        return (nativeInternals == null) ? null : nativeInternals.mostHated;
-    }
 
     // Temporary hack
 
@@ -322,6 +320,10 @@ public class PlayerExploredTile extends FreeColGameObject {
 
         if (alarm != null) xw.writeAttribute(ALARM_TAG, alarm.getValue());
 
+        if (mostHated != null) {
+            xw.writeAttribute(MOST_HATED_TAG, mostHated.getId());
+        }
+
         if (nativeInternals != null) {
             if (nativeInternals.skill != null) {
                 xw.writeAttribute(LEARNABLE_SKILL_TAG, nativeInternals.skill);
@@ -332,11 +334,6 @@ public class PlayerExploredTile extends FreeColGameObject {
                     xw.writeAttribute(WANTED_GOODS_TAG + i,
                         nativeInternals.wantedGoods[i]);
                 }
-            }
-
-            if (nativeInternals.mostHated != null) {
-                xw.writeAttribute(MOST_HATED_TAG,
-                    nativeInternals.mostHated.getId());
             }
         }
     }
@@ -394,6 +391,9 @@ public class PlayerExploredTile extends FreeColGameObject {
 
         alarm = new Tension(xr.getAttribute(ALARM_TAG, 0));
 
+        mostHated = xr.makeFreeColGameObject(game, MOST_HATED_TAG,
+                                             Player.class, false);
+
         boolean natives = false;
         UnitType skill = xr.getType(spec, LEARNABLE_SKILL_TAG,
                                     UnitType.class, (UnitType)null);
@@ -405,16 +405,12 @@ public class PlayerExploredTile extends FreeColGameObject {
             natives = wanted[i] != null;
         }
 
-        Player mostHated = xr.makeFreeColGameObject(game, MOST_HATED_TAG,
-                                                    Player.class, false);
-
-        if (natives || skill != null || mostHated != null) {
+        if (natives || skill != null) {
             if (nativeInternals == null) {
                 nativeInternals = new IndianSettlementInternals();
             }
             nativeInternals.skill = skill;
             nativeInternals.wantedGoods = wanted;
-            nativeInternals.mostHated = mostHated;
         } else {
             nativeInternals = null;
         }
