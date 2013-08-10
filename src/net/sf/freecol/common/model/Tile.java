@@ -136,11 +136,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     private int contiguity = -1;
 
     /**
-     * Stores each player's view of this tile.
-     * Only initialized when needed, only relevant on the server.
+     * Stores each player's view of this tile.  Only non-null in the server.
      */
-    private java.util.Map<Player, PlayerExploredTile> playerExploredTiles
-        = null;
+    private final java.util.Map<Player, PlayerExploredTile> playerExploredTiles;
 
 
     /**
@@ -160,9 +158,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         this.owningSettlement = null;
         this.settlement = null;
 
-        if (game.isInServer()) {
-            this.playerExploredTiles = new HashMap<Player, PlayerExploredTile>();
-        }
+        this.playerExploredTiles = (game.isInServer())
+            ? new HashMap<Player, PlayerExploredTile>()
+            : null;
     }
 
     /**
@@ -176,9 +174,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public Tile(Game game, String id) {
         super(game, id);
 
-        if (game.isInServer()) {
-            this.playerExploredTiles = new HashMap<Player, PlayerExploredTile>();
-        }
+        this.playerExploredTiles = (game.isInServer())
+            ? new HashMap<Player, PlayerExploredTile>()
+            : null;
     }
 
 
@@ -197,6 +195,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
     /**
      * Sets the type for this Tile.
+     *
+     * -til: Changes appearance.
      *
      * @param t The new <code>TileType</code> for this <code>Tile</code>.
      */
@@ -274,6 +274,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * settlement located on it.  The settlement will also become the
      * owner of this tile.
      *
+     * -til: Changes appearance.
+     *
      * @param settlement A <code>Settlement</code> to put on this
      *     <code>Tile</code>.
      * @see #getSettlement
@@ -303,6 +305,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
     /**
      * Sets the settlement that owns this tile.
+     *
+     * -til: Changes appearance.
      *
      * @param owner The <code>Settlement</code> to own this <code>Tile</code>.
      * @see #getOwner
@@ -340,6 +344,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
     /**
      * Set the tile region.
+     *
+     * -til: Changes appearance.
      *
      * @param newRegion The new <code>Region</code> value.
      */
@@ -425,6 +431,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Set the tile style.
      *
+     * -til: Changes appearance.
+     *
      * @param newStyle The new style value.
      */
     public void setStyle(final int newStyle) {
@@ -471,24 +479,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public PlayerExploredTile getPlayerExploredTile(Player player) {
         return (playerExploredTiles == null) ? null
             : playerExploredTiles.get(player);
-    }
-
-    /**
-     * Get or create the <code>PlayerExploredTile</code> for the given player
-     * if on the server.
-     *
-     * @param player The <code>Player</code> to query.
-     * @return The <code>PlayerExploredTile</code> for the given player.
-     * @see PlayerExploredTile
-     */
-    private PlayerExploredTile requirePlayerExploredTile(Player player) {
-        if (playerExploredTiles == null) return null;
-        PlayerExploredTile pet = playerExploredTiles.get(player);
-        if (pet == null) {
-            pet = new PlayerExploredTile(getGame(), player, this);
-            playerExploredTiles.put(player, pet);
-        }
-        return pet;
     }
 
 
@@ -626,6 +616,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Adds a tile item to this tile.
      *
+     * -til: Changes appearance.
+     *
      * @param item The <code>TileItem</code> to add.
      * @return True if the item was added.
      */
@@ -635,12 +627,13 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             tileItemContainer = new TileItemContainer(getGame(), this);
         }
         TileItem added = tileItemContainer.addTileItem(item);
-        updatePlayerExploredTiles();
         return added == item;
     }
 
     /**
      * Removes a tile item from this tile.
+     *
+     * -til: Changes appearance.
      *
      * @param item The <code>TileItem</code> to remove.
      * @return The item removed, or null on failure.
@@ -648,12 +641,13 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     private <T extends TileItem> T removeTileItem(T item) {
         if (item == null || tileItemContainer == null) return null;
         T result = tileItemContainer.removeTileItem(item);
-        updatePlayerExploredTiles();
         return result;
     }
 
     /**
      * Adds a lost city rumour to this tile.
+     *
+     * -til: Changes appearance.
      *
      * @param rumour The <code>LostCityRumour</code> to add.
      */
@@ -665,6 +659,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * Removes the lost city rumour from this <code>Tile</code> if there
      * is one.
      *
+     * -til: Changes appearance.
+     *
      * @return The removed <code>LostCityRumour</code>.
      */
     public LostCityRumour removeLostCityRumour() {
@@ -673,6 +669,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
     /**
      * Adds a new river to this tile.
+     *
+     * -til: Changes appearance.
      *
      * @param magnitude The magnitude of the river to be created
      * @param conns The encoded river size/connections.
@@ -693,6 +691,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Removes a river from this tile.
      *
+     * -til: Changes appearance.
+     *
      * @return The removed river.
      */
     public TileImprovement removeRiver() {
@@ -706,6 +706,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Adds a road to this tile.  It is not complete.
      *
+     * -til: Changes appearance.
+     *
      * @return The new road added, or the existing one.
      */
     public TileImprovement addRoad() {
@@ -718,6 +720,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
     /**
      * Removes a road from this tile.
+     *
+     * -til: Changes appearance.
      *
      * @return The removed road.
      */
@@ -742,6 +746,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Adds a resource to this tile.
      *
+     * -til: Changes appearance.
+     *
      * @param resource The <code>Resource</code> to add.
      */
     public void addResource(Resource resource) {
@@ -750,6 +756,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
     /**
      * Removes a resource from this tile.
+     *
+     * -til: Changes appearance.
      *
      * @return The removed <code>Resource</code>.
      */
@@ -1021,7 +1029,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * Changes the type of this tile.
      * The map generator et al should just use setType(), whereas this
      * routine should be called for the special case of a change of an
-     * existing tile type (e.g. pioneer clearing forest).     *
+     * existing tile type (e.g. pioneer clearing forest).
+     *
+     * -til: Changes appearance.
      *
      * @param tileType The new <code>TileType</code>.
      */
@@ -1033,7 +1043,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         }
         if (!isLand()) settlement = null;
 
-        updatePlayerExploredTiles();
         updateColonyTiles();
     }
 
@@ -1050,6 +1059,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Changes the owning settlement for this tile.
      *
+     * -til: Changes appearance.
+     *
      * @param settlement The new owning <code>Settlement</code> for
      *     this <code>Tile</code>.
      */
@@ -1057,7 +1068,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         if (owningSettlement != null) {
             owningSettlement.removeTile(this);
         }
-        setOwningSettlement(settlement);
+        setOwningSettlement(settlement);//-til
         if (settlement != null) {
             settlement.addTile(this);
         }
@@ -1067,15 +1078,15 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * Change the tile ownership.  Also change the owning settlement
      * as the two are commonly related.
      *
+     * -til: Changes appearance.
+     *
      * @param player The <code>Player</code> to own the tile.
      * @param settlement The <code>Settlement</code> to own the
      *     <code>Tile</code>.
      */
     public void changeOwnership(Player player, Settlement settlement) {
-        Player old = getOwner();
-        setOwner(player);
-        changeOwningSettlement(settlement);
-        updatePlayerExploredTiles(old);
+        setOwner(player);//-til
+        changeOwningSettlement(settlement);//-til
     }
 
 
@@ -1306,7 +1317,12 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public void updatePlayerExploredTile(Player player) {
         if (playerExploredTiles == null || !player.isEuropean()) return;
-        requirePlayerExploredTile(player).update();
+        if (getPlayerExploredTile(player) == null) {
+            throw new IllegalStateException("uPET fail for "
+                + player.getName() + ": " + this + "/" + playerExploredTiles);
+        } else {
+            getPlayerExploredTile(player).update();
+        }
     }
 
     /**
@@ -1317,7 +1333,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public void updateIndianSettlement(Player player) {
         if (playerExploredTiles == null || !player.isEuropean()) return;
-        requirePlayerExploredTile(player).updateInternals();
+        getPlayerExploredTile(player).updateInternals();
     }
 
     /**
@@ -1335,31 +1351,18 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
-     * Unexplore this tile for a player.
+     * Explore/unexplore a tile for a player.
      *
-     * @param player The <code>Player</code> that forgets the tile.
+     * @param player The <code>Player</code> that is exploring.
+     * @param reveal The exploration state.
      */
-    public void unexplore(Player player) {
-        if (playerExploredTiles != null && player.isEuropean()) {
+    public void setExplored(Player player, boolean reveal) {
+        if (playerExploredTiles == null || !player.isEuropean()) return;
+        if (reveal) {
+            playerExploredTiles.put(player, 
+                new PlayerExploredTile(getGame(), player, this));
+        } else {
             playerExploredTiles.remove(player);
-        }
-    }
-
-
-    /**
-     * This is a hack.  When a missionary is removed, its player
-     * disposes of it.  However they can still exist in the PETs.
-     * Ideally players that can not see the change should still see
-     * the old missionary, but referring to a disposed unit is a Bad
-     * Thing.  For now, we clean up the PET-missionaries but do not
-     * explicitly update the rest of the PET.  This needs to go away
-     * at next save-break when we properly virtualize the settlements.
-     *
-     * @param old The old missionary <code>Unit</code> to fix.
-     */
-    public void fixMissionary(Unit old) {
-        for (PlayerExploredTile pet : playerExploredTiles.values()) {
-            if (pet.getMissionary() == old) pet.setMissionary(null);
         }
     }
 
@@ -1579,6 +1582,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
     /**
      * {@inheritDoc}
+     *
+     * -til: Changes appearance with TileItems.
      */
     public boolean add(Locatable locatable) {
         if (locatable instanceof TileItem) {
@@ -1598,6 +1603,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
     /**
      * {@inheritDoc}
+     *
+     * -til: Changes appearance with TileItems.
      */
     public boolean remove(Locatable locatable) {
         if (locatable instanceof TileItem) {
@@ -1667,6 +1674,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
     /**
      * {@inheritDoc}
+     *
+     * -til: Changes appearance.
      */
     public void setOwner(Player owner) {
         this.owner = owner;
@@ -1821,13 +1830,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
             if (settlement != null) settlement.toXML(xw);
 
-            // Save the pets to saved games.
-            if (xw.validForSave() && playerExploredTiles != null) {
-                for (PlayerExploredTile p : playerExploredTiles.values()) {
-                    p.toXML(xw);
-                }
-            }
-
         } else if ((pet = getPlayerExploredTile(xw.getClientPlayer())) != null) {
             // Only display the settlement if we know it owns the tile
             // and we have a useful level of information about it.
@@ -1843,6 +1845,13 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         }
 
         if (tileItemContainer != null) tileItemContainer.toXML(xw);
+
+        // Save the pets to saved games.
+        if (xw.validForSave() && playerExploredTiles != null) {
+            for (PlayerExploredTile p : playerExploredTiles.values()) {
+                p.toXML(xw);
+            }
+        }
     }
 
     /**

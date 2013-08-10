@@ -130,15 +130,14 @@ public class ServerColony extends Colony implements ServerModelObject {
      * within, and change main tile nation ownership.
      *
      * -vis: Changes visibility.
+     * -til: Changes tile appearance.
      *
      * @param owner The new owner <code>Player</code>.
      * @see Settlement#changeOwner
      */
     @Override
     public void changeOwner(Player owner) {
-        super.changeOwner(owner);//-vis(owner,previous-owner)
-
-        for (Tile t : getOwnedTiles()) t.updatePlayerExploredTiles();
+        super.changeOwner(owner);//-vis(owner,previous-owner),-til
 
         // Disable all exports
         for (ExportData exportDatum : exportData.values()) {
@@ -171,10 +170,7 @@ public class ServerColony extends Colony implements ServerModelObject {
         // nonsensical 0-unit colony.
         if (getUnitCount() <= 0) {
             logger.warning("Cleaning up 0-unit colony: " + getName());
-            exciseSettlement();//-vis(owner)
-            cs.add(See.perhaps().always(owner), tile);
-            cs.addDispose(See.perhaps().always(owner), tile, this);//-vis(owner)
-            owner.invalidateCanSeeTiles();//+vis(owner)
+            owner.csDisposeSettlement(this, cs);
             return;
         }
 
@@ -450,7 +446,11 @@ public class ServerColony extends Colony implements ServerModelObject {
         // Check for free buildings
         for (BuildingType buildingType : spec.getBuildingTypeList()) {
             if (isAutomaticBuild(buildingType)) {
-                addBuilding(new ServerBuilding(getGame(), this, buildingType));
+                addBuilding(new ServerBuilding(getGame(), this,
+                                               buildingType));//-til
+                if (buildingType.isDefenceType()) {//+til
+                    getTile().updatePlayerExploredTiles();
+                }
             }
         }
 
@@ -599,6 +599,8 @@ public class ServerColony extends Colony implements ServerModelObject {
      * Called on building type changes, see below and
      * @see ServerPlayer#csDamageBuilding
      *
+     * -til: Might change the visible colony size.
+     *
      * @param workLocation The <code>WorkLocation</code> to eject from.
      * @param units A list of <code>Unit</code>s to eject.
      * @return True if units were ejected.
@@ -632,14 +634,17 @@ public class ServerColony extends Colony implements ServerModelObject {
         BuildingType from = type.getUpgradesFrom();
         boolean success;
         if (from == null) {
-            addBuilding(new ServerBuilding(getGame(), this, type));
+            addBuilding(new ServerBuilding(getGame(), this, type));//-til
+            if (type.isDefenceType()) {
+                getTile().updatePlayerExploredTiles();//+til
+            }
             success = true;
         } else {
             Building building = getBuilding(from);
-            List<Unit> eject = building.upgrade();
+            List<Unit> eject = building.upgrade();//-til
             success = eject != null;
             if (success) {
-                ejectUnits(building, eject);
+                ejectUnits(building, eject);//-til
             } else {
                 cs.addMessage(See.only((ServerPlayer) owner),
                     new ModelMessage(ModelMessage.MessageType.BUILDING_COMPLETED,
@@ -647,6 +652,9 @@ public class ServerColony extends Colony implements ServerModelObject {
                                      this)
                         .addName("%colony%", getName())
                         .add("%object%", type.getNameKey()));
+            }
+            if (success || type.isDefenceType()) {
+                getTile().updatePlayerExploredTiles();//+til
             }
         }
         if (success) {
@@ -736,8 +744,10 @@ public class ServerColony extends Colony implements ServerModelObject {
         ServerPlayer serverPlayer = (ServerPlayer)getOwner();
         Tile tile = enemyUnit.getTile();
         ServerColonyTile ct = (ServerColonyTile)getColonyTile(tile);
-        if (ct == null || !ejectUnits(ct, ct.getUnitList())) return;
-
+        if (ct == null || !ejectUnits(ct, ct.getUnitList())) {//-til
+            return;
+        }
+        ct.getColony().getTile().updatePlayerExploredTiles();//+til
         cs.addMessage(See.only(serverPlayer),
             new ModelMessage(ModelMessage.MessageType.WARNING,
                              "model.colony.workersEvicted", this, this)

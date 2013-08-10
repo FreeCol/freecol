@@ -100,6 +100,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
      * Creates a new ServerUnit.
      *
      * -vis: Visibility issues depending on location.
+     * -til: Changes appearance if unit goes into a colony.
      *
      * @param game The <code>Game</code> in which this unit belongs.
      * @param location The <code>Location</code> to place this at.
@@ -115,6 +116,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
      * Create a new ServerUnit from a template.
      *
      * -vis: Visibility issues depending on location.
+     * -til: Changes appearance if unit goes into a colony.
      *
      * @param game The <code>Game</code> in which this unit belongs.
      * @param location The <code>Location</code> to place this at.
@@ -150,6 +152,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
      * Creates a new ServerUnit.
      *
      * -vis: Visibility issues depending on location.
+     * -til: Changes appearance if unit goes into a colony.
      *
      * @param game The <code>Game</code> in which this unit belongs.
      * @param location The <code>Location</code> to place this at.
@@ -192,7 +195,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         setStateUnchecked(state);
         this.visibleGoodsCount = -1;
 
-        setLocation(location);//-vis(owner)
+        setLocation(location);//-vis(owner),-til
         owner.addUnit(this);
     }
 
@@ -385,6 +388,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
     /**
      * Completes a tile improvement.
      *
+     * +til: Resolves the change of appearance.
+     *
      * @param random A pseudo-random number source.
      * @param cs A <code>ChangeSet</code> to update.
      */
@@ -435,7 +440,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             // Changes like clearing a forest need to be completed,
             // whereas for changes like road building the improvement
             // is already added and now complete.
-            tile.changeType(changeType);
+            tile.changeType(changeType);//-til
         }
 
         // Does a resource get exposed?
@@ -453,8 +458,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 int value = minValue + ((minValue == maxValue) ? 0
                     : Utils.randomInt(logger, "Resource quantity",
                                       random, maxValue - minValue + 1));
-                tile.addResource(new Resource(getGame(), tile, 
-                                              resType, value));
+                tile.addResource(new Resource(getGame(), tile,
+                                              resType, value));//-til
             }
         }
 
@@ -487,6 +492,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 .addStringTemplate("%unit%", getLabel())
                 .addStringTemplate("%location%", locName));
         }
+
+        tile.updatePlayerExploredTiles();//+til
     }
 
     /**
@@ -572,7 +579,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         ServerPlayer serverPlayer = (ServerPlayer) getOwner();
         Tile tile = getTile();
         Player indianPlayer = tile.getOwner();
-        cs.add(See.only(serverPlayer),
+        cs.addTension(See.only(serverPlayer),//-til,+til
             indianPlayer.modifyTension(serverPlayer,
                 Tension.Level.HATEFUL.getLimit()));
         cs.add(See.only(serverPlayer), indianPlayer);
@@ -811,7 +818,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
             logger.warning("Bogus rumour type: " + rumour);
             break;
         }
-        tile.removeLostCityRumour();
+        tile.removeLostCityRumour();//-til
+        tile.updatePlayerExploredTiles();//+til
     }
 
     /**
@@ -880,7 +888,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         }
 
         // Do the move and explore a rumour if needed.
-        setLocation(newTile);//-vis(serverPlayer)
+        setLocation(newTile);//-vis(serverPlayer),-til?
         if (newTile.hasLostCityRumour() && serverPlayer.isEuropean()) {
             csExploreLostCityRumour(random, cs);//+vis(serverPlayer)
         } else {
@@ -897,6 +905,10 @@ public class ServerUnit extends Unit implements ServerModelObject {
             cs.add(See.perhaps().always(serverPlayer),
                    (FreeColGameObject)oldLocation);
         } else {
+            if (oldLocation instanceof WorkLocation) {
+                ((WorkLocation)oldLocation).getColony().getTile()
+                    .updatePlayerExploredTiles();//+til
+            }
             cs.add(See.only(serverPlayer), (FreeColGameObject)oldLocation);
         }
         cs.add(See.perhaps().always(serverPlayer), newTile);
@@ -918,8 +930,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
                         + settlement.getType().getExtraClaimableRadius()))
                 && Utils.randomInt(logger, "Claim tribal land", random,
                                    d + 1) == 0) {
-                newTile.setOwner(serverPlayer);
-                newTile.changeOwningSettlement(settlement);
+                newTile.changeOwnership(serverPlayer, settlement);//-til
+                newTile.updatePlayerExploredTiles();//+til
             }
 
             // Check for first landing

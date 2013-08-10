@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HistoryEvent;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.LastSale;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelMessage;
@@ -1585,6 +1586,26 @@ public class ChangeSet {
                                    TradeRoute tradeRoute) {
         changes.add(new OwnedChange(See.only(serverPlayer), tradeRoute));
         serverPlayer.getTradeRoutes().add(tradeRoute);
+        return this;
+    }
+
+    /**
+     * Helper function to add tension changes to a ChangeSet.
+     *
+     * +til: Resolves tile appearance changes due to tension change.
+     *
+     * @param see The visibility of this change.
+     * @param fcgos A list of <code>FreeColGameObject</code>s that have changed
+     *     their tension/alarm state.
+     * @return The updated <code>ChangeSet</code>.
+     */
+    public ChangeSet addTension(See see, List<FreeColGameObject> fcgos) {
+        for (FreeColGameObject o : fcgos) {
+            if (o instanceof IndianSettlement) {//+til
+                ((IndianSettlement)o).getTile().updatePlayerExploredTiles();
+            }
+            changes.add(new ObjectChange(see, o));
+        }
         return this;
     }
 

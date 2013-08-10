@@ -213,6 +213,7 @@ public abstract class Settlement extends GoodsLocation
      * Put a prepared settlement onto the map.
      *
      * -vis: Several visibility issues accumulated here.
+     * -til: Several tile appearance issues accumulated here.
      *
      * @param maximal If true, also claim all the tiles possible.
      */
@@ -225,10 +226,9 @@ public abstract class Settlement extends GoodsLocation
             tiles.add(tile);
         }
 
-        tile.setSettlement(this);//-vis(owner)
-        tile.changeOwningSettlement(this);
+        tile.setSettlement(this);//-vis(owner),-til
         for (Tile t : tiles) {
-            t.changeOwnership(owner, this);//-vis(owner,this)
+            t.changeOwnership(owner, this);//-vis(owner,this),-til
         }
         if (this instanceof Colony && !tile.hasRoad()) {
             TileImprovement road = tile.addRoad();
@@ -242,6 +242,7 @@ public abstract class Settlement extends GoodsLocation
      * Remove a settlement from the map.
      *
      * -vis: Visibility reduced when settlement goes away.
+     * -til: Several tile appearance issues accumulated here.
      *
      * Several visibility issues accumulated here.
      */
@@ -249,13 +250,13 @@ public abstract class Settlement extends GoodsLocation
         Tile settlementTile = getTile();
         List<Tile> lostTiles = getOwnedTiles();
         for (Tile tile : lostTiles) {
-            tile.changeOwnership(null, null);
+            tile.changeOwnership(null, null);//-til
         }
-        settlementTile.setSettlement(null);//-vis(owner)
-        settlementTile.setOwningSettlement(null);
+        settlementTile.setSettlement(null);//-vis(owner),-til
+        settlementTile.changeOwnership(null, null);//-til
         TileImprovement road = settlementTile.getRoad();
         if (road != null && road.isVirtual()) {
-            settlementTile.removeRoad();
+            settlementTile.removeRoad();//-til
         }
     }
 
@@ -263,6 +264,7 @@ public abstract class Settlement extends GoodsLocation
      * Change the owner of this <code>Settlement</code>.
      *
      * -vis: Changes visibility.
+     * -til: Changes tile appearance.
      *
      * @param newOwner The <code>Player</code> that shall own this
      *            <code>Settlement</code>.
@@ -270,7 +272,7 @@ public abstract class Settlement extends GoodsLocation
      */
     public void changeOwner(Player newOwner) {
         Player oldOwner = this.owner;
-        setOwner(newOwner);
+        setOwner(newOwner);//-til
 
         getGame().checkOwners(this, oldOwner);
 
@@ -288,7 +290,7 @@ public abstract class Settlement extends GoodsLocation
         }
 
         for (Tile t : getOwnedTiles()) {
-            t.changeOwnership(newOwner, this);
+            t.changeOwnership(newOwner, this);//-til
         }
 
         getGame().notifyOwnerChanged(this, oldOwner, newOwner);

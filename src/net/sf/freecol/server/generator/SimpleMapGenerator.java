@@ -288,7 +288,7 @@ public class SimpleMapGenerator implements MapGenerator {
                             new ServerIndianSettlement(game, indian, template.getName(), tile,
                                                        template.isCapital(), skill, null);
                         tile.setSettlement(settlement);
-                        tile.changeOwningSettlement(settlement);
+                        tile.changeOwnership(player, settlement);
                         indian.addSettlement(settlement);
                         // TODO: the template settlement might have additional owned
                         // units elsewhere on the map
@@ -873,13 +873,12 @@ public class SimpleMapGenerator implements MapGenerator {
                 throw new RuntimeException(err);
             }
 
-            startTile.updatePlayerExploredTile(player);
             player.setEntryLocation(startTile);
 
             if (startAtSea) {
                 for (Unit carrier : carriers) {
                     carrier.setLocation(startTile);
-                    ((ServerPlayer)player).setExplored(carrier);
+                    ((ServerPlayer)player).exploreForUnit(carrier);
                 }
                 passengers: for (Unit unit : passengers) {
                     for (Unit carrier : carriers) {
@@ -894,8 +893,8 @@ public class SimpleMapGenerator implements MapGenerator {
             } else {
                 for (Unit unit : passengers) {
                     unit.setLocation(startTile);
+                    ((ServerPlayer)player).exploreForUnit(unit);
                 }
-                ((ServerPlayer)player).setExplored(startTile);
             }
 
             if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.INIT)) {
@@ -1061,7 +1060,7 @@ public class SimpleMapGenerator implements MapGenerator {
         Unit unit16 = new ServerUnit(game, colonyTile, player, unitType);
         // END DEBUG
 
-        ((ServerPlayer)player).setExplored(colony);
+        ((ServerPlayer)player).exploreForSettlement(colony);
     }
 
     private List<Position> generateStartingPositions(Map map, List<Player> players) {

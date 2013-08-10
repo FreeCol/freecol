@@ -315,23 +315,25 @@ public class ServerGame extends Game implements ServerModelObject {
                     if (!is.hasMissionary(weakest)) continue;
                     sb.append(" ").append(is.getName()).append("(mission)");
                     is.setContacted(strongest);
-                    is.getMissionary().changeOwner(strongest);//-vis(both)
-                    cs.add(See.only(strongest), strongest.setExplored(is));
+                    is.getMissionary().changeOwner(strongest);//-vis(both),-til
+                    cs.add(See.only(strongest),
+                           strongest.exploreForSettlement(is));
                     Tile tile = is.getTile();
                     tile.updateIndianSettlement(strongest);
-                    tile.updatePlayerExploredTiles();
+                    tile.updatePlayerExploredTiles();//+til
                     cs.add(See.perhaps().always(strongest), is);
                 }
             }
             for (Colony colony : weakest.getColonies()) {
-                ((ServerColony)colony).changeOwner(strongest);//-vis(both)
-                cs.add(See.only(strongest), strongest.setExplored(colony));
+                ((ServerColony)colony).changeOwner(strongest);//-vis(both),-til
+                cs.add(See.only(strongest),
+                       strongest.exploreForSettlement(colony));
                 sb.append(" ").append(colony.getName());
                 tiles.addAll(colony.getOwnedTiles());
             }
             for (Unit unit : weakest.getUnits()) {
                 unit.changeOwner(strongest); //-vis(both)
-                cs.add(See.only(strongest), strongest.setExplored(unit));
+                cs.add(See.only(strongest), strongest.exploreForUnit(unit));
                 sb.append(" ").append(unit.getId());
                 if (unit.getLocation() instanceof Europe) {
                     unit.setLocation(strongestAIPlayer.getEurope());//-vis
@@ -341,7 +343,6 @@ public class ServerGame extends Game implements ServerModelObject {
                     cs.add(See.only(strongest), unit);
                 } else if (unit.getLocation() instanceof Tile) {
                     Tile tile = unit.getTile();
-                    tile.updatePlayerExploredTiles();
                     if (!tiles.contains(tile)) tiles.add(tile);
                 }
             }
@@ -360,6 +361,9 @@ public class ServerGame extends Game implements ServerModelObject {
                                  .addStringTemplate("%loserNation%", loser)
                                  .addStringTemplate("%nation%", winner));
             setSpanishSuccession(true);
+            for (Tile t : tiles) {
+                t.updatePlayerExploredTiles();//+til
+            }
             cs.addPartial(See.all(), this, "spanishSuccession");
             cs.add(See.perhaps(), tiles);
 

@@ -113,8 +113,8 @@ public class ServerColonyTile extends ColonyTile implements ServerModelObject {
 
         if (resource.useQuantity(goodsType, unitType,
                                  tile.potential(goodsType, unitType)) == 0) {
-            tile.removeResource();
-            tile.updatePlayerExploredTiles();
+            tile.removeResource();//-til
+            tile.updatePlayerExploredTiles();//+til
             return resource;
         }
         return null;

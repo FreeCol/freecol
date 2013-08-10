@@ -62,8 +62,8 @@ public class MovementTest extends FreeColTestCase {
         game.setMap(map);
         Tile tile1 = map.getTile(5, 8);
         Tile tile2 = map.getTile(4, 8);
-        tile1.updatePlayerExploredTile(dutch);
-        tile2.updatePlayerExploredTile(dutch);
+        tile1.setExplored(dutch, true);
+        tile2.setExplored(dutch, true);
 
         Unit colonist = new ServerUnit(game, tile1, dutch, colonistType);
 
@@ -92,8 +92,8 @@ public class MovementTest extends FreeColTestCase {
         Tile tile1 = map.getTile(5, 8);
         Tile tile2 = map.getTile(4, 8);
         tile2.setType(hills);
-        tile1.updatePlayerExploredTile(dutch);
-        tile2.updatePlayerExploredTile(dutch);
+        tile1.setExplored(dutch, true);
+        tile2.setExplored(dutch, true);
 
         Unit colonist = new ServerUnit(game, tile1, dutch, colonistType);
 
@@ -112,8 +112,8 @@ public class MovementTest extends FreeColTestCase {
         game.setMap(map);
         Tile tile1 = map.getTile(5, 8);
         Tile tile2 = map.getTile(4, 8);
-        tile1.updatePlayerExploredTile(dutch);
-        tile2.updatePlayerExploredTile(dutch);
+        tile1.setExplored(dutch, true);
+        tile2.setExplored(dutch, true);
 
         TileImprovement road1 = tile1.addRoad();
         assertTrue(road1.isRoad());
@@ -147,8 +147,8 @@ public class MovementTest extends FreeColTestCase {
         game.setMap(map);
         Tile tile1 = map.getTile(5, 8);
         Tile tile2 = tile1.getNeighbourOrNull(Map.Direction.NE);
-        tile1.updatePlayerExploredTile(dutch);
-        tile2.updatePlayerExploredTile(dutch);
+        tile1.setExplored(dutch, true);
+        tile2.setExplored(dutch, true);
         assertEquals(Map.Direction.NE, map.getDirection(tile1, tile2));
         assertEquals(Map.Direction.SW, map.getDirection(tile2, tile1));
 
@@ -210,12 +210,12 @@ public class MovementTest extends FreeColTestCase {
         Tile tile1 = map.getTile(5, 8);
         Tile tile2 = map.getTile(4, 8);
         Tile tile3 = map.getTile(6, 8);
-        tile1.updatePlayerExploredTile(french);
-        tile2.updatePlayerExploredTile(french);
-        tile3.updatePlayerExploredTile(french);
-        tile1.updatePlayerExploredTile(dutch);
-        tile2.updatePlayerExploredTile(dutch);
-        tile3.updatePlayerExploredTile(dutch);
+        tile1.setExplored(french, true);
+        tile2.setExplored(french, true);
+        tile3.setExplored(french, true);
+        tile1.setExplored(dutch, true);
+        tile2.setExplored(dutch, true);
+        tile3.setExplored(dutch, true);
 
         Colony colony = getStandardColony();
 
@@ -251,9 +251,9 @@ public class MovementTest extends FreeColTestCase {
         Tile tile1 = map.getTile(5, 8);
         Tile tile2 = map.getTile(4, 8);
         Tile tile3 = map.getTile(6, 8);
-        tile1.updatePlayerExploredTile(french);
-        tile2.updatePlayerExploredTile(french);
-        tile3.updatePlayerExploredTile(french);
+        tile1.setExplored(french, true);
+        tile2.setExplored(french, true);
+        tile3.setExplored(french, true);
 
         // Build settlement
         FreeColTestCase.IndianSettlementBuilder builder

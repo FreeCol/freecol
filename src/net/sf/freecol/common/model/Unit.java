@@ -650,6 +650,8 @@ public class Unit extends GoodsLocation
      * Sets the location of this Unit.
      *
      * -vis: This routine changes player visibility.
+     * -til: While units do not contribute to tile appearance as such, if
+     *     they move in/out of a colony the visible colony size changes.
      *
      * @param newLocation The new <code>Location</code>.
      */

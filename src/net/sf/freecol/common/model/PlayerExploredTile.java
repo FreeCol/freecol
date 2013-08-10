@@ -345,7 +345,11 @@ public class PlayerExploredTile extends FreeColGameObject {
     public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        if (missionary != null) {
+        if (missionary != null
+            // Hack to avoid writing now-invalid missionary.
+            && tile.getSettlement() != null
+            && tile.getSettlement() instanceof IndianSettlement
+            && ((IndianSettlement)tile.getSettlement()).getMissionary() == missionary) {
             xw.writeStartElement(MISSIONARY_TAG);
 
             missionary.toXML(xw);

@@ -161,7 +161,7 @@ public class ServerIndianSettlement extends IndianSettlement
                 owner.csDisposeSettlement(this, cs);//+vis(owner)
                 return;
             }
-            tile.getFirstUnit().setLocation(this);//-vis: safe in settlement
+            tile.getFirstUnit().setLocation(this);//-vis,til: safe in settlement
         }
 
         // Check for new resident.
@@ -250,6 +250,7 @@ public class ServerIndianSettlement extends IndianSettlement
      * Changes the missionary for this settlement and updates other players.
      *
      * +vis: Handles the visibility implications.
+     * +til: Handles the tile appearance change.
      *
      * @param missionary The new missionary for this settlement.
      * @param cs A <code>ChangeSet</code> to update.
@@ -261,7 +262,7 @@ public class ServerIndianSettlement extends IndianSettlement
 
         if (old != null) {
             oldOwner = (ServerPlayer)old.getOwner(); 
-            setMissionary(null);//-vis(oldOwner)
+            setMissionary(null);//-vis(oldOwner),-til
             tile.updateIndianSettlement(oldOwner);
             cs.addDispose(See.perhaps(), tile, old);//-vis(oldOwner)
         }
@@ -273,12 +274,12 @@ public class ServerIndianSettlement extends IndianSettlement
             // location at the settlement, bypassing the normal
             // validity checks.
             missionary.setLocation(null);//-vis(newOwner)
-            missionary.setLocationNoUpdate(this);//-vis(newOwner)
-            cs.add(See.only(newOwner), newOwner.setExplored(this));
+            missionary.setLocationNoUpdate(this);//-vis(newOwner),-til
+            cs.add(See.only(newOwner), newOwner.exploreForSettlement(this));
             tile.updateIndianSettlement(newOwner);
         }
 
-        tile.updatePlayerExploredTiles();
+        tile.updatePlayerExploredTiles();//+til
         cs.add(See.perhaps().always(oldOwner), tile);
         if (oldOwner != null) oldOwner.invalidateCanSeeTiles();//+vis(oldOwner)
         if (newOwner != null) newOwner.invalidateCanSeeTiles();//+vis(newOwner)

@@ -326,6 +326,7 @@ public class IndianSettlement extends Settlement {
      *
      * -vis: This routine has visibility implications when enhanced
      * missionaries are enabled.
+     * -til: This changes the tile appearance.
      *
      * @param missionary The missionary for this settlement.
      */
@@ -392,6 +393,8 @@ public class IndianSettlement extends Settlement {
 
     /**
      * Updates the most hated nation of this settlement.
+     *
+     * -til: This might change the tile appearance.
      */
     public void updateMostHated() {
         mostHated = null;
@@ -530,6 +533,8 @@ public class IndianSettlement extends Settlement {
     /**
      * Sets alarm towards the given player.
      *
+     * -til: Might change tile appearance through most hated state
+     *
      * @param player The <code>Player</code> to set the alarm level for.
      * @param newAlarm The new alarm value.
      */
@@ -543,6 +548,8 @@ public class IndianSettlement extends Settlement {
     /**
      * Removes all alarm towards the given player.  Used the a player leaves
      * the game.
+     *
+     * -til: Might change tile appearance through most hated state
      *
      * @param player The <code>Player</code> to remove the alarm for.
      */
@@ -567,6 +574,8 @@ public class IndianSettlement extends Settlement {
 
     /**
      * Change the alarm level of this settlement by a given amount.
+     *
+     * -til: Might change tile appearance through most hated state
      *
      * @param player The <code>Player</code> the alarm level changes wrt.
      * @param amount The amount to change the alarm by.

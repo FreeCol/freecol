@@ -88,6 +88,8 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      * Changes the type of the Building.  The type of a building may
      * change when it is upgraded or damaged.
      *
+     * -til: If this is a defensive building.
+     *
      * @see #upgrade
      * @see #downgrade
      * @param newBuildingType The new <code>BuildingType</code>.
@@ -171,6 +173,8 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     /**
      * Downgrade this building.
      *
+     * -til: If this is a defensive building.
+     *
      * @return A list of units to eject (usually empty) if the
      *     building was downgraded, or null on failure.
      */
@@ -183,6 +187,8 @@ public class Building extends WorkLocation implements Named, Comparable<Building
 
     /**
      * Upgrade this building to next level.
+     *
+     * -til: If this is a defensive building.
      *
      * @return A list of units to eject (usually empty) if the
      *     building was upgraded, or null on failure.

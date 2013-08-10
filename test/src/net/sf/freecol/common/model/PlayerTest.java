@@ -38,10 +38,10 @@ public class PlayerTest extends FreeColTestCase {
         Player french = game.getPlayer("model.nation.french");
         Map map = getTestMap(spec().getTileType("model.tile.plains"));
         game.setMap(map);
-        map.getTile(4, 7).updatePlayerExploredTile(dutch);
-        map.getTile(4, 8).updatePlayerExploredTile(dutch);
-        map.getTile(5, 7).updatePlayerExploredTile(dutch);
-        map.getTile(5, 8).updatePlayerExploredTile(dutch);
+        map.getTile(4, 7).setExplored(dutch, true);
+        map.getTile(4, 8).setExplored(dutch, true);
+        map.getTile(5, 7).setExplored(dutch, true);
+        map.getTile(5, 8).setExplored(dutch, true);
 
         UnitType freeColonist = spec().getUnitType("model.unit.freeColonist");
 
@@ -247,8 +247,8 @@ public class PlayerTest extends FreeColTestCase {
     }
 
     public void testTension(){
-    	String errMsg = "";
-    	Game game = getStandardGame();
+        String errMsg = "";
+        Game game = getStandardGame();
 
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");

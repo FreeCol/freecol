@@ -61,9 +61,9 @@ public class MoveTest extends FreeColTestCase {
 
             Player dutch = game.getPlayer("model.nation.dutch");
             Tile plain1 = map.getTile(5, 8);
-            plain1.updatePlayerExploredTile(dutch);
+            plain1.setExplored(dutch, true);
             Tile plain2 = map.getTile(5, 7);
-            plain2.updatePlayerExploredTile(dutch);
+            plain2.setExplored(dutch, true);
     
             Unit hardyPioneer = new ServerUnit(game, plain1, dutch,
                                                pioneerType);

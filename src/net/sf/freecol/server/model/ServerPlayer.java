@@ -523,6 +523,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * Kill off a player and clear out its remains.
      *
      * +vis: Albeit killing the player makes visibility changes moot.
+     * +til: Fixes the appearance changes too.
      *
      * @param cs A <code>ChangeSet</code> to update.
      */
@@ -539,7 +540,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     if (s.hasMissionary(this)) {
                         ((ServerIndianSettlement)s).csKillMissionary(null, cs);
                     }
-                    s.removeAlarm(this);
+                    s.removeAlarm(this);//-til
+                    s.getTile().updatePlayerExploredTiles();//+til
                 }
                 other.removeTension(this);
             }
@@ -555,7 +557,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // Clean up remaining tile ownerships
         for (Tile tile : getGame().getMap().getAllTiles()) {
             if (tile.getOwner() == this) {
-                tile.changeOwnership(null, null);
+                tile.changeOwnership(null, null);//-til
+                tile.updatePlayerExploredTiles();//+til
                 cs.add(See.perhaps().always(this), tile);
             }
         }
@@ -791,12 +794,15 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * Sets the given tile to be explored by this player and updates
      * the player's information about the tile.
      *
+     * +til: Exploring the tile also updates the pet.
+     *
      * @return True if the tile is newly explored by this action.
      */
-    public boolean setExplored(Tile tile) {
-        if (hasExplored(tile)) return false;
+    public boolean exploreTile(Tile tile) {
+        boolean ret = !hasExplored(tile);
+        if (ret) tile.setExplored(this, true);
         tile.updatePlayerExploredTile(this);
-        return true;
+        return ret;
     }
 
     /**
@@ -808,12 +814,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @see #setExplored(Tile)
      * @see #hasExplored
      */
-    public List<Tile> setExplored(List<Tile> tiles) {
+    public List<Tile> exploreTiles(List<Tile> tiles) {
         List<Tile> result = new ArrayList<Tile>();
         List<Tile> done = new ArrayList<Tile>();
         for (Tile t : tiles) {
             if (done.contains(t)) continue; // Ignore duplicates
-            if (setExplored(t)) result.add(t);
+            if (exploreTile(t)) result.add(t);
             done.add(t);
         }
         return result;
@@ -822,15 +828,16 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /**
      * Sets the tiles visible to a given settlement to be explored by
      * this player and updates the player's information about the
-     * tiles.
+     * tiles.  Note that the player does not necessarily own the settlement
+     * (e.g. missionary at native settlement).
      *
      * @return A list of newly explored <code>Tile</code>s.
      */
-    public List<Tile> setExplored(Settlement settlement) {
+    public List<Tile> exploreForSettlement(Settlement settlement) {
         List<Tile> tiles = new ArrayList<Tile>(settlement.getOwnedTiles());
         tiles.addAll(settlement.getTile().getSurroundingTiles(1,
                 settlement.getLineOfSight()));
-        return setExplored(tiles);
+        return exploreTiles(tiles);
     }
 
     /**
@@ -839,14 +846,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
      *
      * @param unit The <code>Unit</code>.
      * @return A list of newly explored <code>Tile</code>s.
-     * @see #setExplored(Tile)
      * @see #hasExplored
      */
-    public List<Tile> setExplored(Unit unit) {
+    public List<Tile> exploreForUnit(Unit unit) {
         if (getGame() == null || getGame().getMap() == null || unit == null
             || !unit.hasTile()) return Collections.emptyList();
 
-        return setExplored(unit.getTile().getSurroundingTiles(0,
+        return exploreTiles(unit.getTile().getSurroundingTiles(0,
                 unit.getLineOfSight()));
     }
 
@@ -860,11 +866,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         List<Tile> result = new ArrayList<Tile>();
         for (Tile tile : getGame().getMap().getAllTiles()) {
             if (hasExplored(tile) != reveal) {
-                if (reveal) {
-                    tile.updatePlayerExploredTile(this);
-                } else {
-                    tile.unexplore(this);//-vis(this)
-                }
+                tile.setExplored(this, reveal);//-vis(this)
                 result.add(tile);
             }
         }
@@ -877,6 +879,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * Europeans at present.
      *
      * -vis: Visibility issues depending on location.
+     * -til: Tile appearance issue if created in a colony (not ATM)
      *
      * @param abstractUnits The list of <code>AbstractUnit</code>s to create.
      * @param location The <code>Location</code> where the units will
@@ -911,6 +914,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * -vis: Has visibility implications depending on the initial
      * location of the loaded units.  Usually ATM this is Europe which
      * is safe, but beware.
+     * -til: Safe while in Europe though.
      *
      * @param landUnits A list of land units to put on ships.
      * @param navalUnits A list of ships to put land units on.
@@ -1094,8 +1098,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
             int modifier = old.getTensionModifier(stance);
             setStance(otherPlayer, stance);
             if (modifier != 0) {
-                cs.add(See.only(null).perhaps(other),
-                       modifyTension(otherPlayer, modifier));
+                cs.addTension(See.perhaps(),//-til,+til
+                    modifyTension(otherPlayer, modifier));
             }
             logger.info("Stance modification " + getName()
                 + " " + old.toString() + " -> " + stance.toString()
@@ -1113,7 +1117,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             int modifier = old.getTensionModifier(stance);
             otherPlayer.setStance(this, stance);
             if (modifier != 0) {
-                cs.add(See.only(null).perhaps(this),
+                cs.addTension(See.perhaps(),//-til,+til
                     otherPlayer.modifyTension(this, modifier));
             }
             logger.info("Stance modification " + otherPlayer.getName()
@@ -1560,8 +1564,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         change = (int)player.applyModifier((float)change,
                             "model.modifier.nativeAlarmModifier",
                             null, game.getTurn());
-                        ((ServerIndianSettlement)settlement).modifyAlarm(player,
-                            change);
+                        ServerIndianSettlement sis
+                            = (ServerIndianSettlement)settlement;
+                        cs.addTension(See.perhaps(),//-til,+til
+                            sis.modifyAlarm(player, change));
                     }
                 }
             }
@@ -1570,7 +1576,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
             for (Player enemy : game.getLiveEuropeanPlayers()) {
                 if (getTension(enemy).getValue() > 0) {
                     int change = -getTension(enemy).getValue()/100 - 4;
-                    modifyTension(enemy, change);
+                    cs.addTension(See.perhaps(),//-til,+til
+                        modifyTension(enemy, change));
                 }
             }
 
@@ -1794,7 +1801,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         for (IndianSettlement is : p.getIndianSettlements()) {
                             if (is.hasContacted(this)) {
                                 is.setAlarm(this,
-                                            new Tension(Tension.TENSION_MIN));
+                                    new Tension(Tension.TENSION_MIN));//-til
+                                is.getTile().updatePlayerExploredTiles();//+til
                                 cs.add(See.only(this), is);
                             }
                         }
@@ -1815,7 +1823,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 BuildingType type = spec.getBuildingType(event.getValue());
                 for (Colony colony : getColonies()) {
                     if (colony.canBuild(type)) {
-                        colony.addBuilding(new ServerBuilding(game, colony, type));
+                        colony.addBuilding(new ServerBuilding(game, colony,
+                                                              type));//-til
+                        if (type.isDefenceType()) {
+                            colony.getTile().updatePlayerExploredTiles();//+til
+                        }
                         colony.getBuildQueue().remove(type);
                         cs.add(See.only(this), colony);
                         if (isAI()) {
@@ -1830,7 +1842,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 for (Tile t : game.getMap().getAllTiles()) {
                     Colony colony = t.getColony();
                     if (colony != null && !this.owns(colony)) {
-                        setExplored(colony);
+                        exploreForSettlement(colony);
                         cs.add(See.only(this), colony.getOwnedTiles());
                     }
                 }
@@ -1878,20 +1890,21 @@ public class ServerPlayer extends Player implements ServerModelObject {
                             ChangeSet cs) {
         Player owner = tile.getOwner();
         Settlement ownerSettlement = tile.getOwningSettlement();
-        tile.changeOwnership(this, settlement);//-vis(?)
+        tile.changeOwnership(this, settlement);//-vis(?),-til
+        tile.updatePlayerExploredTiles();//+til
 
-        // Update the tile for all, and privately any now-angrier
-        // owners, or the player gold if a price was paid.
+        // Update the tile and any now-angrier owners, and the player
+        // gold if a price was paid.
         cs.add(See.perhaps(), tile);
         if (price > 0) {
             modifyGold(-price);
             owner.modifyGold(price);
             cs.addPartial(See.only(this), this, "gold");
         } else if (price < 0 && owner.isIndian()) {
-            IndianSettlement is = (IndianSettlement) ownerSettlement;
+            IndianSettlement is = (IndianSettlement)ownerSettlement;
             if (is != null) {
-                cs.add(See.only(null).perhaps(this),
-                       owner.modifyTension(this, Tension.TENSION_ADD_LAND_TAKEN, is));
+                cs.addTension(See.perhaps(),//-til,+til
+                    owner.modifyTension(this, Tension.TENSION_ADD_LAND_TAKEN, is));
             }
         }
         logger.finest(this.getDisplayName() + " claimed " + tile
@@ -2424,12 +2437,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 }
             }
             if (attackerTension != 0) {
-                cs.add(See.only(null).perhaps(defenderPlayer),
-                       modifyTension(defenderPlayer, attackerTension));
+                cs.addTension(See.perhaps(),//-til,+til
+                    modifyTension(defenderPlayer, attackerTension));
             }
             if (defenderTension != 0) {
-                cs.add(See.only(null).perhaps(this),
-                       defenderPlayer.modifyTension(this, defenderTension));
+                cs.addTension(See.perhaps(),//-til,+til
+                    defenderPlayer.modifyTension(this, defenderTension));
             }
         }
 
@@ -2607,10 +2620,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
             cs.addPartial(See.only(colonyPlayer), colonyPlayer, "gold");
         }
 
-        // Hand over the colony.
-        ((ServerColony)colony)
-            .changeOwner(attackerPlayer);//-vis(attackerPlayer,colonyPlayer)
-        
         // Remove goods party modifiers as they apply to a different monarch.
         for (Modifier m : colony.getModifierSet()) {
             if ("model.modifier.colonyGoodsParty".equals(m.getSource())) {
@@ -2618,13 +2627,23 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
         }
 
-        // Inform former owner of loss of owned tiles, and process
-        // possible increase in line of sight.  Do not include the
-        // colony tile, which is updated in csCombat().
-        cs.add(See.only(attackerPlayer), attackerPlayer.setExplored(colony));
-        List<Tile> tiles = new ArrayList<Tile>(colony.getOwnedTiles());
+        // Hand over the colony.  Inform former owner of loss of owned
+        // tiles, and process possible increase in line of sight.  Do
+        // not include the colony tile, which is updated in
+        // csCombat().
+        ((ServerColony)colony)//-til
+            .changeOwner(attackerPlayer);//-vis(attackerPlayer,colonyPlayer)
+        List<Tile> explored = attackerPlayer.exploreForSettlement(colony);
+        List<Tile> tiles = colony.getOwnedTiles();
+        for (Tile t : tiles) {
+            t.updatePlayerExploredTiles();//+til
+            if (!explored.contains(t)) explored.add(t);
+        }
         tiles.remove(tile);
-        cs.add(See.perhaps().always(colonyPlayer), tiles);
+        explored.remove(tile);
+        cs.add(See.only(attackerPlayer), explored);
+        cs.add(See.perhaps().always(colonyPlayer).except(attackerPlayer),
+               tiles);
 
         // Inform the former owner of loss of units, and add sound.
         cs.addRemoves(See.only(colonyPlayer), null, units);
@@ -2758,16 +2777,16 @@ public class ServerPlayer extends Player implements ServerModelObject {
             .getLocationNameFor(winnerPlayer);
 
         // Capture the unit.  There are visibility implications for
-        // both players because the captured unitloser might be the
-        // only one on its tile, and the winner might have captured a
-        // unit with greater line of sight.
+        // both players because the captured unit might be the only
+        // one on its tile, and the winner might have captured a unit
+        // with greater line of sight.
         UnitType type = loser.getTypeChange((winnerPlayer.isUndead())
                                             ? ChangeType.UNDEAD
                                             : ChangeType.CAPTURE, winnerPlayer);
         loser.changeOwner(winnerPlayer);//-vis(loserPlayer)
         if (type != null) loser.setType(type);//-vis(winnerPlayer)
         loser.setLocation(winner.getTile());//-vis(winnerPlayer)
-        cs.add(See.only(winnerPlayer), winnerPlayer.setExplored(loser));
+        cs.add(See.only(winnerPlayer), winnerPlayer.exploreForUnit(loser));
         loser.setState(Unit.UnitState.ACTIVE);
         winnerPlayer.invalidateCanSeeTiles();//+vis(winnerPlayer)
         loserPlayer.invalidateCanSeeTiles();//+vis(loserPlayer)
@@ -3083,6 +3102,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /**
      * Disposes of a settlement and reassign its tiles.
      *
+     * +vis,til: Resolves the whole mess.
+     *
      * @param settlement The <code>Settlement</code> under attack.
      * @param cs A <code>ChangeSet</code> to update.
      */
@@ -3101,7 +3122,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
             
         // Get it off the map and off the owners list.
-        settlement.exciseSettlement();//-vis(owner)
+        settlement.exciseSettlement();//-vis(owner),-til
         if (!owner.removeSettlement(settlement)) {
             throw new IllegalStateException("Failed to remove settlement: "
                 + settlement);
@@ -3161,12 +3182,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
         for (Tile t : claims.keySet()) {
             claimant = claims.get(t);
             if (claimant == null) {
-                t.changeOwnership(null, null);
+                t.changeOwnership(null, null);//-til
             } else {
                 ServerPlayer newOwner = (ServerPlayer)claimant.getOwner();
-                t.changeOwnership(newOwner, claimant);
+                t.changeOwnership(newOwner, claimant);//-til
             }
         }
+        for (Tile t : owned) t.updatePlayerExploredTiles();//+til
 
         cs.add(See.perhaps().always(owner), owned);
         cs.addDispose(See.perhaps().always(owner), centerTile, 
@@ -3444,12 +3466,19 @@ public class ServerPlayer extends Player implements ServerModelObject {
         boolean def = building.getType().isDefenceType();
         int unitCount = colony.getUnitCount();
         if (building.getType().getUpgradesFrom() == null) {
-            colony.ejectUnits(building, building.getUnitList());
-            colony.removeBuilding(building);
+            boolean eject
+                = colony.ejectUnits(building, building.getUnitList());//-til
+            colony.removeBuilding(building);//-til
+            if (eject || def) {
+                colony.getTile().updatePlayerExploredTiles();//+til
+            }
             cs.addDispose(See.only((ServerPlayer)colony.getOwner()), colony, 
                           building);//-vis: safe, buildings are ok
         } else if (building.canBeDamaged()) {
-            colony.ejectUnits(building, building.downgrade());
+            if (colony.ejectUnits(building, building.downgrade())//-til
+                || def) {
+                colony.getTile().updatePlayerExploredTiles();//+til
+            }
         } else {
             return;
         }
@@ -3651,10 +3680,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param cs A <code>ChangeSet</code> to update.
      */
     public void csSeeNewTiles(List<Tile> newTiles, ChangeSet cs) {
-        for (Tile t : newTiles) {
-            t.updatePlayerExploredTile(this);
-            cs.add(See.only(this), t);
-        }
+        exploreTiles(newTiles);
+        cs.add(See.only(this), newTiles);
     }
 
     /**

@@ -322,7 +322,9 @@ public class FreeColTestCase extends TestCase {
         FreeColTestUtils.ColonyBuilder builder = FreeColTestUtils.getColonyBuilder();
         builder.colonyTile(tile).initialColonists(numberOfSettlers);
 
-        return builder.build();
+        Colony ret = builder.build();
+        ((ServerPlayer)ret.getOwner()).exploreForSettlement(ret);
+        return ret;
     }
 
     public static class MapBuilder{
@@ -437,7 +439,7 @@ public class FreeColTestCase extends TestCase {
             if (exploredByAll) {
                 for (Player player : game.getPlayers()) {
                     for (Tile tile : m.getAllTiles()) {
-                        tile.updatePlayerExploredTile(player);
+                        tile.setExplored(player, true);
                     }
                 }
             }

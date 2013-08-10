@@ -348,6 +348,8 @@ public class Colony extends Settlement implements Nameable {
     /**
      * Add a Building to this Colony.
      *
+     * -til: Could change the tile appearance if the building is stockade-type
+     *
      * @param building a <code>Building</code> value
      */
     public void addBuilding(final Building building) {
@@ -359,6 +361,8 @@ public class Colony extends Settlement implements Nameable {
 
     /**
      * Remove a building from this Colony.
+     *
+     * -til: Could change the tile appearance if the building is stockade-type
      *
      * @param building The <code>Building</code> to remove.
      * @return True if the building was removed.
@@ -1489,7 +1493,6 @@ public class Colony extends Settlement implements Nameable {
      * colony, but *not* if it is moving within the colony.
      */
     public void updatePopulation() {
-        getTile().updatePlayerExploredTiles();
         updateSoL();
         updateProductionBonus();
         if (getOwner().isAI()) {

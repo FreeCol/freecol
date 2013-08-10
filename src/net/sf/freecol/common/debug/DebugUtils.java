@@ -151,7 +151,10 @@ public class DebugUtils {
             if (reason == Colony.NoBuildReason.NONE) {
                 Building sBuilding = new ServerBuilding(sGame, sColony,
                                                         sBuildingType);
-                sColony.addBuilding(sBuilding);
+                sColony.addBuilding(sBuilding);//-til
+                if (sBuilding.getType().isDefenceType()) {
+                    sColony.getTile().updatePlayerExploredTiles();//+til
+                }
             } else {
                 fails++;
             }
@@ -357,13 +360,9 @@ public class DebugUtils {
         Location loc = (sCarrier != null) ? sCarrier : sTile;
         ServerUnit sUnit = new ServerUnit(sGame, loc, sPlayer,
                                           unitChoice);//-vis(sPlayer)
-        ((ServerPlayer)sPlayer).setExplored(sUnit);
+        ((ServerPlayer)sPlayer).exploreForUnit(sUnit);
         sUnit.setMovesLeft(sUnit.getInitialMovesLeft());
         sPlayer.invalidateCanSeeTiles();//+vis(sPlayer)
-        int los = sUnit.getLineOfSight();
-        for (Tile t : loc.getTile().getSurroundingTiles(los)) {
-            t.updatePlayerExploredTile(sPlayer);
-        }
 
         freeColClient.getConnectController().reconnect();
         Unit unit = game.getFreeColGameObject(sUnit.getId(), Unit.class);
@@ -446,8 +445,11 @@ public class DebugUtils {
         ServerPlayer sPlayer = sGame.getFreeColGameObject(player.getId(),
                                                           ServerPlayer.class);
         ServerPlayer sOldPlayer = (ServerPlayer)sSettlement.getOwner();
-        sSettlement.changeOwner(sPlayer);//-vis(sPlayer,sOldPlayer)
-        sPlayer.setExplored(sSettlement);
+        sSettlement.changeOwner(sPlayer);//-vis(sPlayer,sOldPlayer),//-til
+        sPlayer.exploreForSettlement(sSettlement);
+        for (Tile t : sSettlement.getOwnedTiles()) {
+            t.updatePlayerExploredTiles();//+til
+        }
         sPlayer.invalidateCanSeeTiles();//+vis(sPlayer)
         sOldPlayer.invalidateCanSeeTiles();//+vis(sOldPlayer)
 
@@ -485,7 +487,7 @@ public class DebugUtils {
                                                           ServerPlayer.class);
         ServerPlayer sOldPlayer = (ServerPlayer)sUnit.getOwner();
         sUnit.changeOwner(sPlayer);//-vis(sPlayer,sOldPlayer)
-        sPlayer.setExplored(sUnit);
+        sPlayer.exploreForUnit(sUnit);
         sPlayer.invalidateCanSeeTiles();//+vis(sPlayer)
         sOldPlayer.invalidateCanSeeTiles();//+vis(sOldPlayer)
 
