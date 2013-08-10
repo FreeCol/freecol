@@ -849,9 +849,12 @@ public final class Monarch extends FreeColGameObject implements Named {
 
         xw.writeAttribute(NAME_TAG, name);
 
-        xw.writeAttribute(SUPPORT_SEA_TAG, supportSea);
+        if (xw.validFor(this.player)) {
 
-        xw.writeAttribute(DISPLEASURE_TAG, displeasure);
+            xw.writeAttribute(SUPPORT_SEA_TAG, supportSea);
+
+            xw.writeAttribute(DISPLEASURE_TAG, displeasure);
+        }
     }
 
     /**

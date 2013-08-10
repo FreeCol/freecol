@@ -3894,15 +3894,15 @@ public class Player extends FreeColGameObject implements Nameable {
 
         xw.writeAttribute(DEAD_TAG, dead);
 
-        xw.writeAttribute(BANKRUPT_TAG, bankrupt);
-
         xw.writeAttribute(PLAYER_TYPE_TAG, playerType);
 
         xw.writeAttribute(AI_TAG, ai);
 
-        xw.writeAttribute(TAX_TAG, tax);
-
         if (xw.validFor(this)) {
+
+            xw.writeAttribute(BANKRUPT_TAG, bankrupt);
+
+            xw.writeAttribute(TAX_TAG, tax);
 
             xw.writeAttribute(GOLD_TAG, gold);
 
