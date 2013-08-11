@@ -154,10 +154,16 @@ public abstract class Settlement extends GoodsLocation
     /**
      * Adds a tile to this settlement.
      *
+     * We can not clear the settlement owned tiles container when the
+     * settlement is read because this is called when the Tile is
+     * read, and tiles can appear before and after the settlement in
+     * the map definition.  So we just accumulate and defend against
+     * duplicates.
+     *
      * @param tile The <code>Tile</code> to add.
      */
     public void addTile(Tile tile) {
-        ownedTiles.add(tile);
+        if (!ownedTiles.contains(tile)) ownedTiles.add(tile);
     }
 
     /**
