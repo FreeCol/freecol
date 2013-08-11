@@ -485,10 +485,6 @@ public final class InGameInputHandler extends InputHandler {
         return null;
     }
 
-    private void takeTurn(Player player, boolean newTurn) {
-        final FreeColClient fcc = getFreeColClient();
-    }
-
     /**
      * Handles a "setCurrentPlayer"-message.
      *
@@ -506,21 +502,6 @@ public final class InGameInputHandler extends InputHandler {
         FreeColDebugger.finishDebugRun(fcc, false);
         
         fcc.getInGameController().setCurrentPlayer(newPlayer);
-        if (player == newPlayer) { // Prepare client for our player turn.
-            try {
-                List<Settlement> settlements = player.getSettlements();
-                Tile defTile = ((settlements.isEmpty())
-                    ? player.getEntryLocation().getTile()
-                    : settlements.get(0).getTile()).getSafeTile(null, null);
-                player.resetIterators();
-                fcc.getInGameController().nextActiveUnit(defTile);
-            } catch (Exception e) {
-                // We end up here if there is a crash in things like the
-                // turn report.  These were hard to track down because we
-                // used to fail silently.  We now complain louder.
-                logger.log(Level.WARNING, "Client new turn failure for " + player, e);
-            }
-        }
         fcc.updateActions();
 
         new RefreshCanvasSwingTask(true).invokeLater();
@@ -1053,6 +1034,7 @@ public final class InGameInputHandler extends InputHandler {
             if (FoundingFather.getXMLElementTagName() == tag) {
                 FoundingFather father = spec.getFoundingFather(FreeColObject.readId(e));
                 if (father != null) player.addFather(father);
+                player.invalidateCanSeeTiles();// Might be coronado?
                 
             } else if (HistoryEvent.getXMLElementTagName() == tag) {
                 player.getHistory().add(new HistoryEvent(e));

@@ -32,9 +32,9 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 /**
  * The role of a unit.
  */
-public class Role extends BuildableType {
+public class Role extends BuildableType implements Comparable<Role> {
 
-    public static Role DEFAULT = null;
+    public static Role DEFAULT;
     public static Role SCOUT;
     public static Role SOLDIER;
     public static Role DRAGOON;
@@ -266,6 +266,28 @@ public class Role extends BuildableType {
             }
         }
         return result;
+    }
+
+    public int compareTo(Role other) {
+        int diff = other.getAbilityIndex() - this.getAbilityIndex();
+        if (diff == 0) {
+            diff = other.getRequiredGoods().size()
+                - this.getRequiredGoods().size();
+        }
+        if (diff == 0) {
+            getId().compareTo(other.getId());
+        }
+        return diff;
+    }
+
+    private int getAbilityIndex() {
+        if (requiresAbility("model.ability.native")) {
+            return 10;
+        } else if (requiresAbility("model.ability.refUnit")) {
+            return 5;
+        } else {
+            return 0;
+        }
     }
 
 

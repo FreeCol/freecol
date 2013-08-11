@@ -38,10 +38,10 @@ public class PlayerTest extends FreeColTestCase {
         Player french = game.getPlayer("model.nation.french");
         Map map = getTestMap(spec().getTileType("model.tile.plains"));
         game.setMap(map);
-        map.getTile(4, 7).updatePlayerExploredTile(dutch, false);
-        map.getTile(4, 8).updatePlayerExploredTile(dutch, false);
-        map.getTile(5, 7).updatePlayerExploredTile(dutch, false);
-        map.getTile(5, 8).updatePlayerExploredTile(dutch, false);
+        map.getTile(4, 7).updatePlayerExploredTile(dutch);
+        map.getTile(4, 8).updatePlayerExploredTile(dutch);
+        map.getTile(5, 7).updatePlayerExploredTile(dutch);
+        map.getTile(5, 8).updatePlayerExploredTile(dutch);
 
         UnitType freeColonist = spec().getUnitType("model.unit.freeColonist");
 

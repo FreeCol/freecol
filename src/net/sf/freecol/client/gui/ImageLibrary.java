@@ -38,6 +38,7 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Building;
@@ -259,32 +260,35 @@ public final class ImageLibrary {
      * most hated nation if any.
      *
      * @param is The <code>IndianSettlement</code> to check.
-     * @param text The text for the chip.
+     * @param player The observing <code>Player</code>.
      * @return An alarm chip, or null if none suitable.
      */
-    public Image getAlarmChip(IndianSettlement is, String text) {
+    public Image getAlarmChip(IndianSettlement is, Player player) {
+        Player enemy;
+        if (player == null || !is.hasContacted(player)
+            || (enemy = is.getMostHated()) == null) return null;
         Color ownerColor = is.getOwner().getNationColor();
-        Color enemyColor;
-        int amount;
-        Player enemy = is.getMostHated();
-        Tension alarm;
-        if (enemy != null && (alarm = is.getAlarm(enemy)) != null) {
-            enemyColor = enemy.getNationColor();
-            // Set amount to [0-4] corresponding to HAPPY, CONTENT,
-            // DISPLEASED, ANGRY, HATEFUL.
-            amount = alarm.getLevel().ordinal() - Tension.Level.HAPPY.ordinal();
-        } else {
-            enemyColor = Color.WHITE;
-            amount = 0;
+        Color enemyColor = enemy.getNationColor();
+        // Set amount to [0-4] corresponding to HAPPY, CONTENT,
+        // DISPLEASED, ANGRY, HATEFUL but only if the player is the
+        // most hated, because other nation alarm is not nor should be
+        // serialized to the client.
+        int amount = 4;
+        if (player == enemy) {
+            Tension alarm = is.getAlarm(enemy);
+            amount = (alarm == null) ? 4 : alarm.getLevel().ordinal();
+            if (amount == 0) amount = 1; // Show *something*!
         }
-        Color foreground = getForegroundColor((amount > 2) ? enemyColor
-                                              : ownerColor);
-        String key = "dynamic.alarm." + text + "." + ownerColor.getRGB();
-        key += "." + amount + "." + enemyColor.getRGB();
+        Color foreground = getForegroundColor(enemyColor);
+        String text = Messages.message((is.hasScouted(player))
+                                       ? "indianSettlement.scouted"
+                                       : "indianSettlement.contacted");
+        String key = "dynamic.alarm." + text + "." + ownerColor.getRGB()
+            + "." + amount + "." + enemyColor.getRGB();
         Image img = (Image)ResourceManager.getImage(key);
         if (img == null) {
-            img = createFilledChip(text, Color.BLACK, ownerColor,
-                                   amount/4.0, enemyColor, foreground);
+            img = createFilledChip(text, Color.BLACK, ownerColor, amount/4.0,
+                                   enemyColor, foreground);
             ResourceManager.addGameMapping(key, new ImageResource(img));
         }
         return img;

@@ -63,6 +63,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.BuildableType;
@@ -185,15 +186,6 @@ public final class MapViewer {
 
     private GeneralPath gridPath = null;
     private GeneralPath fog = new GeneralPath();
-    // Debug variables:
-    public boolean displayCoordinates = false;
-
-    public boolean displayColonyValue = false;
-    public Player displayColonyValuePlayer = null;
-
-    public boolean debugShowMission = false;
-
-    public boolean debugShowMissionInfo = false;
 
     private volatile boolean blinkingMarqueeEnabled;
 
@@ -2224,22 +2216,15 @@ public final class MapViewer {
             }
         }
 
-        if (displayCoordinates) {
+        if (FreeColDebugger.debugDisplayCoordinates()) {
             String posString = tile.getX() + ", " + tile.getY();
             if (tile.getHighSeasCount() >= 0) {
                 posString += "/" + Integer.toString(tile.getHighSeasCount());
             }
             centerString(g, posString);
         }
-        if (displayColonyValue && tile.isExplored() && tile.isLand()) {
-            String valueString;
-            if (displayColonyValuePlayer == null) {
-                valueString = Integer.toString(freeColClient.getGame().getCurrentPlayer().getOutpostValue(tile));
-            } else {
-                valueString = Integer.toString(displayColonyValuePlayer.getColonyValue(tile));
-            }
-            centerString(g, valueString);
-        }
+        String value = DebugUtils.displayColonyValue(freeColClient, tile);
+        if (value != null) centerString(g, value);
     }
 
     /**
@@ -2315,11 +2300,7 @@ public final class MapViewer {
 
                 // Draw the alarm chip if needed.
                 Player player = freeColClient.getMyPlayer();
-                if (player != null && is.hasContacted(player)) {
-                    chip = lib.getAlarmChip(is,
-                        Messages.message((is.hasScouted(player))
-                            ? "indianSettlement.scouted"
-                            : "indianSettlement.contacted"));
+                if ((chip = lib.getAlarmChip(is, player)) != null) {
                     g.drawImage(chip, (int)xOffset, (int)yOffset, null);
                 }
             } else {
@@ -2492,13 +2473,13 @@ public final class MapViewer {
             && freeColClient.getFreeColServer() != null
             && (au = freeColClient.getFreeColServer().getAIMain()
                 .getAIUnit(unit)) != null) {
-            if (debugShowMission) {
+            if (FreeColDebugger.debugShowMission()) {
                 g.setColor(Color.WHITE);
                 g.drawString((!au.hasMission()) ? "No mission"
                     : Utils.lastPart(au.getMission().getClass().toString(), "."),
                     0, 0);
             }
-            if (debugShowMissionInfo && au.hasMission()) {
+            if (FreeColDebugger.debugShowMissionInfo() && au.hasMission()) {
                 g.setColor(Color.WHITE);
                 g.drawString(au.getMission().toString(), 0, 25);
             }

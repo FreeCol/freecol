@@ -127,7 +127,7 @@ public class BuildColonyMission extends Mission {
      * @param path The <code>PathNode</code> to check.
      * @return A score for the target.
      */
-    public static int scorePath(AIUnit aiUnit, PathNode path) {
+    public static float scorePath(AIUnit aiUnit, PathNode path) {
         Location loc;
         if (path == null
             || !((loc = extractTarget(aiUnit, path)) instanceof Tile)) 
@@ -135,20 +135,8 @@ public class BuildColonyMission extends Mission {
 
         final Tile tile = (Tile)loc;
         final Player player = aiUnit.getUnit().getOwner();
-        float steal = 1.0f;
-        switch (player.canClaimToFoundSettlementReason(tile)) {
-        case NONE:
-            break;
-        case NATIVES:
-            // Penalize value when the tile will need to be stolen
-            int price = player.getLandPrice(tile);
-            if (price > 0 && !player.checkGold(price)) steal = 0.2f;
-            break;
-        default:
-            return Integer.MIN_VALUE;
-        }
-        return (int)(player.getColonyValue(tile) * steal
-            / (path.getTotalTurns() + 1));
+        int turns = path.getTotalTurns() + 1;
+        return (float)player.getColonyValue(tile) / turns;
     }
 
     /**
@@ -163,14 +151,14 @@ public class BuildColonyMission extends Mission {
                                               boolean deferOK) {
         GoalDecider gd = new GoalDecider() {
                 private PathNode bestPath = null;
-                private int bestValue = 0;
+                private float bestValue = 0f;
 
                 public PathNode getGoal() { return bestPath; }
                 public boolean hasSubGoals() { return true; }
                 public boolean check(Unit u, PathNode path) {
                     Location loc = extractTarget(aiUnit, path);
                     if (loc instanceof Tile) {
-                        int value = scorePath(aiUnit, path);
+                        float value = scorePath(aiUnit, path);
                         if (bestValue < value) {
                             bestValue = value;
                             bestPath = path;

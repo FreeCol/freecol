@@ -24,6 +24,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.ComponentInputMap;
@@ -40,7 +41,10 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.debug.DebugUtils;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
@@ -151,6 +155,30 @@ public final class TilePanel extends FreeColPanel {
                                              Messages.message(expert.getNameKey()));
                     }
                 }
+            }
+        }
+
+        Player player = FreeColDebugger.debugDisplayColonyValuePlayer();
+        if (player != null) {
+            List<Double> values = player.getAllColonyValues(tile);
+            int result = player.getColonyValue(tile);
+            if (result < 0) {
+                add(new JLabel(DebugUtils.displayColonyValue(freeColClient,
+                                                             tile)),
+                    "newline 5, align center");
+            } else {
+                for (Player.ColonyValueCategory c
+                         : Player.ColonyValueCategory.values()) {
+                    add(new JLabel(c.toString().substring(2) + " "
+                            + values.get(c.ordinal())),
+                        "newline 5, align center");
+                }
+                for (int a = Player.ColonyValueCategory.A_GOODS.ordinal();
+                     a < values.size(); a++) {
+                    add(new JLabel("... " + values.get(a)),
+                        "newline 5, align center");
+                }
+                add(new JLabel("Result " + result), "newline 5, align center");
             }
         }
 

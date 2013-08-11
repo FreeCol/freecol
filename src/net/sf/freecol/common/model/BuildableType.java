@@ -95,6 +95,12 @@ public abstract class BuildableType extends FreeColGameObjectType {
             : new HashMap<String, Boolean>();
     }
 
+    public boolean requiresAbility(String key) {
+        return (requiredAbilities == null)
+            ? false
+            : requiredAbilities.get(key);
+    }
+
     /**
      * Sets the abilities required by this type.
      *
@@ -225,7 +231,7 @@ public abstract class BuildableType extends FreeColGameObjectType {
     // Subclasses need to check this.
     public static final String REQUIRED_POPULATION_TAG = "required-population";
 
- 
+
    /**
      * {@inheritDoc}
      */

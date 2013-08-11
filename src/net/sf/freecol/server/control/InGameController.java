@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
@@ -107,6 +108,8 @@ import net.sf.freecol.common.networking.GoodsForSaleMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
+import net.sf.freecol.common.networking.RearrangeColonyMessage;
+import net.sf.freecol.common.networking.RearrangeColonyMessage.UnitChange;
 import net.sf.freecol.common.util.Introspector;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.Utils;
@@ -780,15 +783,19 @@ public final class InGameController extends Controller {
                     }
                 }
                 player.setEntryLocation(entry);
-                logger.info(player.getName() + " will appear at " + entry);
+                logger.fine(player.getName() + " will appear at " + entry);
                 if (teleport) {
+                    Unit explorer = null;
                     for (Unit u : player.getUnits()) {
                         if (u.isNaval()) {
+                            explorer = u;
                             u.setLocation(entry);//-vis(player)
                             u.setWorkLeft(-1);
                             u.setState(Unit.UnitState.ACTIVE);
                         }
                     }
+                    if (explorer != null) cs.add(See.only(player),
+                        ((ServerPlayer)player).setExplored(explorer));
                     player.invalidateCanSeeTiles();//+vis(player)
                     cs.add(See.perhaps(), entry);
                 }
@@ -925,6 +932,7 @@ public final class InGameController extends Controller {
                                                      independent);
                 if (downgrade != null) u.setType(downgrade);//-vis(owner)
                 u.changeOwner(independent);//-vis(both)
+                cs.add(See.only(independent), independent.setExplored(u));
                 cs.add(See.perhaps().always(serverPlayer), u);
             }
             cs.addMessage(See.only(independent),
@@ -1679,7 +1687,7 @@ public final class InGameController extends Controller {
      */
     public Element move(ServerPlayer serverPlayer, Unit unit, Tile newTile) {
         ChangeSet cs = new ChangeSet();
-        ((ServerUnit) unit).csMove(newTile, random, cs);
+        ((ServerUnit)unit).csMove(newTile, random, cs);
         sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
@@ -1987,7 +1995,7 @@ public final class InGameController extends Controller {
 
         csVisit(serverPlayer, settlement, 0, cs);
         Tile tile = settlement.getTile();
-        tile.updatePlayerExploredTile(serverPlayer, true);
+        tile.updateIndianSettlement(serverPlayer);
         cs.add(See.only(serverPlayer), tile);
         unit.setMovesLeft(0);
         cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
@@ -2049,8 +2057,8 @@ public final class InGameController extends Controller {
             break;
         }
         Tile tile = settlement.getTile();
+        tile.updateIndianSettlement(serverPlayer);
         cs.add(See.only(serverPlayer), tile);
-        tile.updatePlayerExploredTile(serverPlayer, true);
 
         // Others always see the unit, it may have died or been taught.
         sendToOthers(serverPlayer, cs);
@@ -2118,7 +2126,7 @@ public final class InGameController extends Controller {
         }
         cs.addMessage(See.only(serverPlayer), m);
         Tile tile = settlement.getTile();
-        tile.updatePlayerExploredTile(serverPlayer, true);
+        tile.updateIndianSettlement(serverPlayer);
         cs.add(See.only(serverPlayer), tile);
         unit.setMovesLeft(0);
         cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
@@ -2143,7 +2151,7 @@ public final class InGameController extends Controller {
         Tile tile = settlement.getTile();
 
         csVisit(serverPlayer, settlement, -1, cs);
-        tile.updatePlayerExploredTile(serverPlayer, true);
+        tile.updateIndianSettlement(serverPlayer);
         cs.add(See.only(serverPlayer), tile);
         cs.addAttribute(See.only(serverPlayer), "settlements",
             Integer.toString(settlement.getOwner().getSettlements().size()));
@@ -2222,12 +2230,13 @@ public final class InGameController extends Controller {
 
             // Update settlement tile with new information, and any
             // newly visible tiles, possibly with enhanced radius.
-            for (Tile t : tile.getSurroundingTiles(radius)) {
+            List<Tile> tiles = new ArrayList<Tile>();
+            for (Tile t : tile.getSurroundingTiles(1, radius)) {
                 if (!serverPlayer.canSee(t) && (t.isLand() || t.isShore())) {
-                    serverPlayer.setExplored(t);
-                    cs.add(See.only(serverPlayer), t);
+                    tiles.add(t);
                 }
             }
+            cs.add(See.only(serverPlayer), serverPlayer.setExplored(tiles));
 
             // If the unit was promoted, update it completely, otherwise just
             // update moves and possibly gold+score.
@@ -2243,7 +2252,8 @@ public final class InGameController extends Controller {
             }
         }
         if (tileDirty) {
-            tile.updatePlayerExploredTile(serverPlayer, true);
+            tile.updateIndianSettlement(serverPlayer);
+            tile.updatePlayerExploredTile(serverPlayer);
             cs.add(See.only(serverPlayer), tile);
         }
 
@@ -2363,13 +2373,13 @@ public final class InGameController extends Controller {
                 : 1;
             for (Tile x : settlement.getTile().getSurroundingTiles(radius)) {
                 if (x == null) continue;
-                x.updatePlayerExploredTile(serverPlayer, true);
+                x.updatePlayerExploredTile(serverPlayer);
                 cs.add(See.only(serverPlayer), x);
             }
             break;
         }
         Tile tile = settlement.getTile();
-        tile.updatePlayerExploredTile(serverPlayer, true);
+        tile.updateIndianSettlement(serverPlayer);
         cs.add(See.perhaps().always(serverPlayer), tile);
         String messageId = "indianSettlement.mission."
             + settlement.getAlarm(serverPlayer).getKey();
@@ -2401,7 +2411,7 @@ public final class InGameController extends Controller {
 
         Tile tile = settlement.getTile();
         csVisit(serverPlayer, settlement, 0, cs);
-        tile.updatePlayerExploredTile(serverPlayer, true);
+        tile.updateIndianSettlement(serverPlayer);
         cs.add(See.only(serverPlayer), tile);
 
         // How much gold will be needed?
@@ -2562,7 +2572,7 @@ public final class InGameController extends Controller {
         cs.add(See.only(serverPlayer),
             ((ServerIndianSettlement)settlement).modifyAlarm(serverPlayer,
                 -amount / 50));
-        tile.updatePlayerExploredTile(serverPlayer, true);
+        tile.updateIndianSettlement(serverPlayer);
         cs.add(See.only(serverPlayer), tile);
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
         session.setBuy();
@@ -2618,7 +2628,7 @@ public final class InGameController extends Controller {
                 -amount / 500));
         Tile tile = settlement.getTile();
         settlement.updateWantedGoods();
-        tile.updatePlayerExploredTile(serverPlayer, true);
+        tile.updateIndianSettlement(serverPlayer);
         cs.add(See.only(serverPlayer), tile);
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
         session.setSell();
@@ -2664,7 +2674,7 @@ public final class InGameController extends Controller {
                 ((ServerIndianSettlement)is).modifyAlarm(serverPlayer,
                     -is.getPriceToBuy(goods) / 50));
             is.updateWantedGoods();
-            tile.updatePlayerExploredTile(serverPlayer, true);
+            tile.updateIndianSettlement(serverPlayer);
             cs.add(See.only(serverPlayer), tile);
         }
         session.setGift();
@@ -2874,31 +2884,21 @@ public final class InGameController extends Controller {
             settlement = new ServerColony(game, serverPlayer, name, tile);
             serverPlayer.addSettlement(settlement);
             settlement.placeSettlement(false);//-vis(serverPlayer,?)
-            // Also send any tiles that can now be seen because the colony
-            // can perhaps see further than the founding unit.
-            if (settlement.getLineOfSight() > unit.getLineOfSight()) {
-                for (Tile t : tile.getSurroundingTiles(unit.getLineOfSight()+1,
-                        settlement.getLineOfSight())) {
-                    serverPlayer.setExplored(t);
-                    cs.add(See.only(serverPlayer), t);
-                }
-            }
+            cs.add(See.only(serverPlayer),
+                serverPlayer.setExplored(settlement));
+
             cs.addHistory(serverPlayer, new HistoryEvent(game.getTurn(),
                     HistoryEvent.EventType.FOUND_COLONY)
                 .addName("%colony%", settlement.getName()));
 
             // Remove equipment from founder in case role confuses
             // placement.
-            ((ServerUnit)unit).csRemoveEquipment(settlement,
-                new HashSet<EquipmentType>(unit.getEquipment().keySet()),
-                0, random, cs);
+            unit.clearEquipment(settlement);
 
             // Coronado
             for (ServerPlayer sp : getOtherPlayers(serverPlayer)) {
                 if (!sp.hasAbility(Ability.SEE_ALL_COLONIES)) continue;
-                for (Tile t : settlement.getOwnedTiles()) {
-                    sp.setExplored(t);
-                }
+                sp.setExplored(settlement);//-vis(sp)
                 sp.invalidateCanSeeTiles();//+vis(sp)
                 cs.addMessage(See.only(sp),
                     new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
@@ -2962,9 +2962,7 @@ public final class InGameController extends Controller {
         // Join.
         unit.setLocation(colony);//-vis: safe/colony
         unit.setMovesLeft(0);
-        ((ServerUnit)unit).csRemoveEquipment(colony,
-            new HashSet<EquipmentType>(unit.getEquipment().keySet()),
-            0, random, cs);
+        unit.clearEquipment(colony);
 
         // Update with colony tile, and tiles now owned.
         cs.add(See.only(serverPlayer), tile);
@@ -3029,6 +3027,7 @@ public final class InGameController extends Controller {
                 if (sp.isEuropean()
                     && sp.hasAbility(Ability.SEE_ALL_COLONIES)) {
                     sp.setExplored(tile);
+                    cs.add(See.only(sp), tile);
                     sp.invalidateCanSeeTiles();//+vis(sp)
                 }
             }
@@ -3087,11 +3086,9 @@ public final class InGameController extends Controller {
             if (colony != null) {
                 ServerPlayer former = (ServerPlayer) colony.getOwner();
                 ((ServerColony)colony).changeOwner(dest);//-vis(both)
+                cs.add(See.only(dest), dest.setExplored(colony));
+                cs.add(See.perhaps().always(former), colony.getOwnedTiles());
                 visibilityChange = true;
-                List<FreeColGameObject> tiles
-                    = new ArrayList<FreeColGameObject>();
-                tiles.addAll(colony.getOwnedTiles());
-                cs.add(See.perhaps().always(former), tiles);
             }
             int gold = tradeItem.getGold();
             if (gold > 0) {
@@ -3110,8 +3107,9 @@ public final class InGameController extends Controller {
             if (newUnit != null) {
                 ServerPlayer former = (ServerPlayer) newUnit.getOwner();
                 unit.changeOwner(dest);//-vis(both)
-                visibilityChange = true;
+                cs.add(See.only(dest), dest.setExplored(unit));
                 cs.add(See.perhaps().always(former), newUnit);
+                visibilityChange = true;
             }
         }
         if (visibilityChange) {
@@ -3261,13 +3259,7 @@ public final class InGameController extends Controller {
             }
         }
 
-        // Remove any unit equipment
-        if (!unit.getEquipment().isEmpty()) {
-            ((ServerUnit)unit).csRemoveEquipment(colony,
-                new HashSet<EquipmentType>(unit.getEquipment().keySet()),
-                0, random, cs);
-
-        }
+        unit.clearEquipment(colony); // Remove any unit equipment
 
         // Check for upgrade.
         UnitType oldType = unit.getType();
@@ -3369,7 +3361,6 @@ public final class InGameController extends Controller {
         return cs.build(serverPlayer);
     }
 
-
     /**
      * Equip a unit.
      * Currently the unit is either in Europe or in a settlement.
@@ -3384,100 +3375,134 @@ public final class InGameController extends Controller {
      */
     public Element equipUnit(ServerPlayer serverPlayer, Unit unit,
                              EquipmentType type, int amount) {
-        Settlement settlement = (!unit.hasTile()) ? null
+        if (amount == 0) return null;
+        UnitLocation loc = (unit.isInEurope()) ? serverPlayer.getEurope()
             : unit.getSettlement();
-        GoodsContainer container = null;
-        boolean tileDirty = false;
-        if (unit.isInEurope()) {
-            // Refuse to trade in boycotted goods
-            for (AbstractGoods goods : type.getRequiredGoods()) {
-                GoodsType goodsType = goods.getType();
-                if (!serverPlayer.canTrade(goodsType)) {
-                    return DOMMessage.clientError("No equip of " + type.getId()
-                        + " due to boycott of " + goodsType.getId());
-                }
-            }
-            // Will need a fake container to contain the goods to buy
-            // in Europe.  Units may not necessarily have one.
-            container = new GoodsContainer(getGame(), serverPlayer.getEurope());
-        } else if (settlement != null) {
-            // Equipping a unit at work in a colony should remove the unit
-            // from the work location.
-            if (unit.getLocation() instanceof WorkLocation) {
-                unit.setLocation(settlement.getTile());//-vis: safe/colony
-                tileDirty = true;
-            }
-            settlement.getGoodsContainer().saveState();
+        if (loc == null || !loc.canBuildEquipment(type, amount)) {
+            return DOMMessage.clientError("Can not built " + type.getId()
+                + " at " + loc + " for: " + unit.getId());
         }
 
         ChangeSet cs = new ChangeSet();
-        List<EquipmentType> remove = null;
-        // Process adding equipment first, so as to settle what has to
-        // be removed.
-        if (amount > 0) {
-            for (AbstractGoods goods : type.getRequiredGoods()) {
-                GoodsType goodsType = goods.getType();
-                int n = amount * goods.getAmount();
-                if (unit.isInEurope()) {
+        if (unit.isInEurope()) {
+            // Will need a fake container to contain the goods to buy
+            // in Europe.  Units may not necessarily have one.
+            GoodsContainer container
+                = new GoodsContainer(getGame(), serverPlayer.getEurope());
+
+            List<EquipmentType> remove = null;
+            // Process adding equipment first, so as to settle what has to
+            // be removed.
+            if (amount > 0) {
+                for (AbstractGoods goods : type.getRequiredGoods()) {
+                    GoodsType goodsType = goods.getType();
+                    int n = amount * goods.getAmount();
                     try {
                         serverPlayer.buy(container, goodsType, n, random);
                         serverPlayer.csFlushMarket(goodsType, cs);
                     } catch (IllegalStateException e) {
                         return DOMMessage.clientError(e.getMessage());
                     }
-                } else if (settlement != null) {
-                    if (settlement.getGoodsCount(goodsType) < n) {
-                        return DOMMessage.clientError("Failed to equip: "
-                            + unit.getId() + " not enough " + goodsType
-                            + " in settlement " + settlement.getId());
-                    }
-                    settlement.removeGoods(goodsType, n);
                 }
+                remove = unit.changeEquipment(type, amount);
+                amount = 0; // 0 => all, now
+            } else { // amount < 0
+                remove = new ArrayList<EquipmentType>();
+                remove.add(type);
+                amount = -amount;
             }
-            remove = unit.changeEquipment(type, amount);
-            amount = 0; // 0 => all, now
-        } else if (amount < 0) {
-            remove = new ArrayList<EquipmentType>();
-            remove.add(type);
-            amount = -amount;
+
+            for (EquipmentType e : remove) {
+                int a = (amount > 0) ? amount : unit.getEquipmentCount(e);
+                for (AbstractGoods ag : e.getRequiredGoods()) {
+                    GoodsType goodsType = ag.getType();
+                    int n = ag.getAmount() * a;
+                    if (serverPlayer.canTrade(goodsType,
+                                              Market.Access.EUROPE)) {
+                        serverPlayer.sell(null, goodsType, n, random);
+                        serverPlayer.csFlushMarket(goodsType, cs);
+                    }
+                }
+                // Removals can not cause incompatible-equipment trouble
+                unit.changeEquipment(e, -a);
+            }
+
+            // We can get away with just updating the unit as sell()
+            // will have added sales changes.
+            cs.add(See.only(serverPlayer), unit);
+            cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
+            
         } else {
-            return null; // Nothing to do.
+            Settlement settlement = (Settlement)loc;
+            if (!equipUnitAtSettlement(unit, type, amount, settlement)) {
+                return DOMMessage.clientError("Settlement "
+                    + settlement.getName() + " can not provide " + type.getId()
+                    + " for unit " + unit.getId());
+            }
+            // Equipping a unit at work in a colony should remove the unit
+            // from the work location which might cause a visible change
+            // in population.
+            if (unit.getLocation() instanceof WorkLocation) {
+                unit.setLocation(settlement.getTile());//-vis: safe/colony
+            }
+            cs.add(See.perhaps(), unit.getTile());
         }
 
-        // Now do removal of equipment.
-        ((ServerUnit)unit).csRemoveEquipment(settlement, remove, amount,
-                                             random, cs);
-
-        // Nothing for others to see except if the settlement population
-        // changes.
-        // If in Europe, we can get away with just updating the unit
-        // as sell() will have added sales changes.  In a settlement,
-        // the goods container will always be dirty, but the whole tile
-        // will only need to be updated if the unit moved into it.
         if (unit.getInitialMovesLeft() != unit.getMovesLeft()) {
             unit.setMovesLeft(0);
         }
-        if (unit.isInEurope()) {
-            cs.add(See.only(serverPlayer), unit);
-            cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
-        } else if (settlement != null) {
-            Unit carrier = unit.getCarrier();
-            if (carrier != null
-                && carrier.getInitialMovesLeft() != carrier.getMovesLeft()
-                && carrier.getMovesLeft() != 0) {
-                carrier.setMovesLeft(0);
-                cs.add(See.only(serverPlayer), carrier);
-            }
-            if (tileDirty) {
-                cs.add(See.perhaps(), settlement.getTile());
-            } else {
-                cs.add(See.only(serverPlayer), unit,
-                       settlement.getGoodsContainer());
-            }
+        Unit carrier = unit.getCarrier();
+        if (carrier != null
+            && carrier.getInitialMovesLeft() != carrier.getMovesLeft()
+            && carrier.getMovesLeft() != 0) {
+            carrier.setMovesLeft(0);
         }
         return cs.build(serverPlayer);
     }
 
+    /**
+     * Equip a unit in a settlement.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
+     * @param unit The <code>Unit</code> to equip.
+     * @param type The <code>EquipmentType</code> to equip with.
+     * @param amount The change in the amount of equipment (may be negative).
+     * @param settlement The <code>Settlement</code> to provide the goods
+     *     to make the equipment.
+     * @return True if the equipment is provided.
+     */
+    public boolean equipUnitAtSettlement(Unit unit, EquipmentType type,
+                                         int amount, Settlement settlement) {
+        if (amount == 0) return true;
+
+        // Process adding equipment first, so as to settle what has to
+        // be removed.
+        List<EquipmentType> remove = null;
+        if (amount > 0) {
+            if (!settlement.canBuildEquipment(type, amount)) return false;
+            for (AbstractGoods goods : type.getRequiredGoods()) {
+                GoodsType goodsType = goods.getType();
+                int n = amount * goods.getAmount();
+                settlement.removeGoods(goodsType, n);
+            }
+            remove = unit.changeEquipment(type, amount);
+            amount = 0; // 0 => all, now
+        } else { // amount < 0
+            remove = new ArrayList<EquipmentType>();
+            remove.add(type);
+            amount = -amount;
+        }
+        for (EquipmentType e : remove) {
+            int a = (amount > 0) ? amount : unit.getEquipmentCount(e);
+            for (AbstractGoods ag : e.getRequiredGoods()) {
+                GoodsType goodsType = ag.getType();
+                int n = ag.getAmount() * a;
+                settlement.addGoods(goodsType, n);
+            }
+            unit.changeEquipment(e, -a);
+        }
+        return true;
+    }
 
     /**
      * Pay for a building.
@@ -4031,5 +4056,73 @@ public final class InGameController extends Controller {
         cs.add(See.perhaps(), start);
         sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
+    }
+
+
+    /**
+     * Rearrange a colony.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is querying.
+     * @param colony The <code>Colony</code> to rearrange.
+     * @param unitChanges A list of <code>UnitChange</code>s to apply.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element rearrangeColony(ServerPlayer serverPlayer, Colony colony,
+                                   List<UnitChange> unitChanges) {
+        ChangeSet cs = new ChangeSet();
+        Tile tile = colony.getTile();
+
+        // Move everyone out of the way.
+        for (UnitChange uc : unitChanges) {
+            uc.unit.setLocation(tile);
+        }
+
+        List<UnitChange> todo = new ArrayList<UnitChange>(unitChanges);
+        while (!todo.isEmpty()) {
+            UnitChange uc = todo.remove(0);
+            if (uc.loc == tile) continue;
+            WorkLocation wl = (WorkLocation)uc.loc;
+            // Adding to wl can fail, and in the worse case there
+            // might be a circular dependency.  If the move can
+            // succeed, do it, but if not move the unit to the tile
+            // and retry.
+            switch (wl.getNoAddReason(uc.unit)) {
+            case NONE:
+                uc.unit.setLocation(wl);
+                // Fall through
+            case ALREADY_PRESENT:
+                if (uc.unit.getWorkType() != uc.work) {
+                    uc.unit.changeWorkType(uc.work);
+                }
+                break;
+            case CAPACITY_EXCEEDED:
+                todo.add(todo.size(), uc);
+                break;
+            default:
+                logger.warning("Bad move for " + uc.unit + " to " + wl);
+                break;
+            }
+        }
+
+        Iterator<UnitChange> uci = unitChanges.iterator();
+        while (uci.hasNext()) {
+            UnitChange uc = uci.next();
+            if (uc.unit.getRole() == uc.role) uci.remove();
+        }
+        if (!unitChanges.isEmpty()) {
+            Collections.sort(unitChanges,
+                             RearrangeColonyMessage.roleComparator);
+            for (UnitChange uc : unitChanges) {
+                if (!uc.unit.equipForRole(uc.role, colony)) {
+                    // Should not happen if we equip simplest first
+                    return DOMMessage.clientError("Failed to equip "
+                        + uc.unit.getId() + " for role " + uc.role);
+                }
+            }
+        }
+
+        // Just update the whole tile, including for other players
+        // which might see colony population change.
+        return new ChangeSet().add(See.perhaps(), tile).build(serverPlayer);
     }
 }

@@ -131,7 +131,8 @@ public abstract class ServerAPI {
             client.send(message);
             return true;
         } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Could not send: " + message, ioe);
+            logger.log(Level.WARNING, "Could not send: " + message.getType(),
+                       ioe);
         }
         return false;
     }
@@ -146,8 +147,9 @@ public abstract class ServerAPI {
         try {
             client.sendAndWait(message);
             return true;
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Could not send: " + message, e);
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Could not send: " + message.getType(),
+                       ioe);
         }
         return false;
     }
@@ -162,8 +164,9 @@ public abstract class ServerAPI {
         Element reply = null;
         try {
             reply = client.ask(message);
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Could not ask: " + message, e);
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Could not ask: " + message.getType(),
+                       ioe);
         }
         return reply;
     }

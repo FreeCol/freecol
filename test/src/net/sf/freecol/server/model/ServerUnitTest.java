@@ -107,7 +107,7 @@ public class ServerUnitTest extends FreeColTestCase {
 
         Player dutch = game.getPlayer("model.nation.dutch");
         Tile tile1 = game.getMap().getTile(5, 8);
-        tile1.updatePlayerExploredTile(dutch, false);
+        tile1.updatePlayerExploredTile(dutch);
         ServerUnit scout = new ServerUnit(game, tile1, dutch, colonistType);
 
         // make sure unit has all moves left
@@ -137,7 +137,7 @@ public class ServerUnitTest extends FreeColTestCase {
 
         ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
         Tile plain = game.getMap().getTile(5, 8);
-        plain.updatePlayerExploredTile(dutch, false);
+        plain.updatePlayerExploredTile(dutch);
         plain.setOwner(dutch);
 
         ServerUnit hardyPioneer = new ServerUnit(game, plain, dutch,
@@ -180,8 +180,8 @@ public class ServerUnitTest extends FreeColTestCase {
 
         ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
         Map map = game.getMap();
-        map.getTile(5, 8).updatePlayerExploredTile(dutch, false);
-        map.getTile(6, 8).updatePlayerExploredTile(dutch, false);
+        map.getTile(5, 8).updatePlayerExploredTile(dutch);
+        map.getTile(6, 8).updatePlayerExploredTile(dutch);
         Tile plain58 = map.getTile(5, 8);
 
         //assertEquals(2, dutch.getDifficulty().getIndex());
@@ -265,7 +265,7 @@ public class ServerUnitTest extends FreeColTestCase {
         ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
         Map map = game.getMap();
         Tile tile = map.getTile(5, 8);
-        map.getTile(5, 8).updatePlayerExploredTile(dutch, false);
+        map.getTile(5, 8).updatePlayerExploredTile(dutch);
 
         ServerUnit hardyPioneer1 = new ServerUnit(game, tile, dutch,
                                                   pioneerType);
@@ -419,7 +419,7 @@ public class ServerUnitTest extends FreeColTestCase {
         Map map = game.getMap();
         Tile tile = map.getTile(5, 8);
         tile.setOwner(dutch);
-        tile.updatePlayerExploredTile(dutch, false);
+        tile.updatePlayerExploredTile(dutch);
 
         // Almost clear the tile
         ServerUnit hardyPioneer = new ServerUnit(game, tile, dutch,

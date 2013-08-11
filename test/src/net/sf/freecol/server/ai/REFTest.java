@@ -25,6 +25,7 @@ import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.ServerTestHelper;
@@ -71,16 +72,12 @@ public class REFTest extends FreeColTestCase {
                 continue;
             }
             if(unitType == soldierType){
-                switch(unit.getRole()){
-                case SOLDIER:
+                if (unit.getRole() == Role.SOLDIER) {
                     soldiersBeforeIndependence += unit.getNumber();
-                    break;
-                case DRAGOON:
+                } else if (unit.getRole() == Role.DRAGOON) {
                     dragoonsBeforeIndependence += unit.getNumber();
-                    break;
-                default:
+                } else {
                     fail("Unknown REF role: " + unit.getRole().toString());
-                    break;
                 }
                 continue;
             }
@@ -113,16 +110,12 @@ public class REFTest extends FreeColTestCase {
                 continue;
             }
             if(unitType == soldierType){
-                switch(unit.getRole()){
-                case SOLDIER:
+                if (unit.getRole() == Role.SOLDIER) {
                     soldiersAfterIndependence++;
-                    break;
-                case DRAGOON:
+                } else if (unit.getRole() == Role.DRAGOON) {
                     dragoonsAfterIndependence++;
-                    break;
-                default:
+                } else {
                     fail("Unknown REF role: " + unit.getRole().toString());
-                    break;
                 }
                 continue;
             }

@@ -20,6 +20,7 @@
 package net.sf.freecol.server.ai;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,6 +29,7 @@ import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
@@ -68,6 +70,8 @@ import net.sf.freecol.common.networking.MissionaryMessage;
 import net.sf.freecol.common.networking.MoveMessage;
 import net.sf.freecol.common.networking.MoveToMessage;
 import net.sf.freecol.common.networking.PutOutsideColonyMessage;
+import net.sf.freecol.common.networking.RearrangeColonyMessage;
+import net.sf.freecol.common.networking.RearrangeColonyMessage.UnitChange;
 import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
 import net.sf.freecol.common.networking.SellGoodsMessage;
 import net.sf.freecol.common.networking.SetBuildQueueMessage;
@@ -556,6 +560,34 @@ public class AIMessage {
                            new PutOutsideColonyMessage(aiUnit.getUnit()));
     }
 
+
+    /**
+     * Rearrange an AI colony.
+     *
+     * @param aiColony The <code>AIColony</code> to rearrange.
+     * @param workers A list of worker <code>Unit</code>s that may change.
+     * @param scratch A copy of the underlying <code>Colony</code> with the
+     *     workers arranged as required.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askRearrangeColony(AIColony aiColony,
+        List<Unit> workers, Colony scratch) {
+        Colony colony = aiColony.getColony();
+        RearrangeColonyMessage message = new RearrangeColonyMessage(colony);
+        for (Unit u : workers) {
+            Unit su = scratch.getCorresponding(u);
+            if (u.getLocation().getId() == su.getLocation().getId()
+                && u.getWorkType() == su.getWorkType()
+                && u.getRole() == su.getRole()) continue;
+            message.addChange(u,
+                (Location)colony.getCorresponding((FreeColObject)su.getLocation()),
+                su.getWorkType(),
+                su.getRole());
+        }
+        return (message.isEmpty()) ? false
+            : sendMessage(aiColony.getAIOwner().getConnection(), message);
+    }
+        
 
     /**
      * An AI unit scouts a native settlement.

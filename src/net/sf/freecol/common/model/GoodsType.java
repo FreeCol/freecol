@@ -33,6 +33,10 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
  */
 public final class GoodsType extends FreeColGameObjectType {
 
+    private final float DEFAULT_PRODUCTION_WEIGHT = 1.0f;
+    private final float DEFAULT_LOW_PRODUCTION_THRESHOLD = 0.0f;
+    private final float DEFAULT_ZERO_PRODUCTION_FACTOR = 1.0f;
+
     /** Is this a farmed goods type. */
     private boolean isFarmed;
 
@@ -89,6 +93,25 @@ public final class GoodsType extends FreeColGameObjectType {
      * that can not be traded in the market, such as hammers.
      */
     private int price = INFINITY;
+
+    /**
+     * A weight for the potential production of this goods type at a
+     * colony site.
+     */
+    private float productionWeight = DEFAULT_PRODUCTION_WEIGHT;
+
+    /**
+     * A threshold amount of potential production of this goods type
+     * at a colony site, below which the score for the site is reduced.
+     */
+    private float lowProductionThreshold = DEFAULT_LOW_PRODUCTION_THRESHOLD;
+
+    /**
+     * The multiplicative factor with which to penalize a colony site
+     * with zero production of this goods type, scaling linearly to
+     * unity when the amount reaches lowResourceThreshold.
+     */
+    private float zeroProductionFactor = DEFAULT_ZERO_PRODUCTION_FACTOR;
 
 
     /**
@@ -360,6 +383,33 @@ public final class GoodsType extends FreeColGameObjectType {
         this.price = newPrice;
     }
 
+    /**
+     * Get the production weight.
+     *
+     * @return The production weight.
+     */
+    public float getProductionWeight() {
+        return productionWeight;
+    }
+
+    /**
+     * Get the low production threshold.
+     *
+     * @return The low production threshold.
+     */
+    public float getLowProductionThreshold() {
+        return lowProductionThreshold;
+    }
+
+    /**
+     * Get the zero production factor.
+     *
+     * @return The zero production factor.
+     */
+    public float getZeroProductionFactor() {
+        return zeroProductionFactor;
+    }
+
 
     /**
      * Gets the i18n-ed name for this goods type.
@@ -423,14 +473,17 @@ public final class GoodsType extends FreeColGameObjectType {
     private static final String INITIAL_PRICE_TAG = "initial-price";
     private static final String IS_FARMED_TAG = "is-farmed";
     private static final String IS_FOOD_TAG = "is-food";
+    private static final String LOW_PRODUCTION_THRESHOLD_TAG = "low-production-threshold";
     private static final String MADE_FROM_TAG = "made-from";
     private static final String MARKET_TAG = "market";
     private static final String NEW_WORLD_GOODS_TAG = "new-world-goods";
     private static final String PRICE_TAG = "price";
     private static final String PRICE_DIFFERENCE_TAG = "price-difference";
+    private static final String PRODUCTION_WEIGHT_TAG = "production-weight";
     private static final String STORABLE_TAG = "storable";
     private static final String STORED_AS_TAG = "stored-as";
     private static final String TRADE_GOODS_TAG = "trade-goods";
+    private static final String ZERO_PRODUCTION_FACTOR_TAG = "zero-production-factor";
 
 
     /**
@@ -466,6 +519,18 @@ public final class GoodsType extends FreeColGameObjectType {
 
         if (storedAs != null) {
             xw.writeAttribute(STORED_AS_TAG, storedAs);
+        }
+
+        xw.writeAttribute(PRODUCTION_WEIGHT_TAG, productionWeight);
+
+        if (lowProductionThreshold > DEFAULT_LOW_PRODUCTION_THRESHOLD) {
+            xw.writeAttribute(LOW_PRODUCTION_THRESHOLD_TAG,
+                              lowProductionThreshold);
+        }
+
+        if (0.0 <= zeroProductionFactor
+            && zeroProductionFactor < DEFAULT_ZERO_PRODUCTION_FACTOR) {
+            xw.writeAttribute(ZERO_PRODUCTION_FACTOR_TAG, zeroProductionFactor);
         }
     }
 
@@ -520,6 +585,21 @@ public final class GoodsType extends FreeColGameObjectType {
 
         storedAs = xr.getType(spec, STORED_AS_TAG, GoodsType.class,
                               (GoodsType)null);
+
+        productionWeight = xr.getAttribute(PRODUCTION_WEIGHT_TAG,
+            DEFAULT_PRODUCTION_WEIGHT);
+        // @compat 0.10.7
+        if (!xr.hasAttribute(PRODUCTION_WEIGHT_TAG) && isFarmed) {
+            // Use something a bit more than the default for old games
+            productionWeight = 3.0f;
+        }
+        // end @compat 0.10.7
+
+        lowProductionThreshold = xr.getAttribute(LOW_PRODUCTION_THRESHOLD_TAG,
+            DEFAULT_LOW_PRODUCTION_THRESHOLD);
+
+        zeroProductionFactor = xr.getAttribute(ZERO_PRODUCTION_FACTOR_TAG,
+            DEFAULT_ZERO_PRODUCTION_FACTOR);
     }
 
     /**

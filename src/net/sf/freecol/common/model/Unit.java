@@ -555,7 +555,8 @@ public class Unit extends GoodsLocation
      * Change the owner of this unit.
      *
      * -vis: This routine calls setOwner() and thus has visibility
-     * implications.  It should be in the server.
+     * implications.  Ideally it should be in ServerUnit but we keep
+     * it here for the benefit of the test suite.
      *
      * @param owner The new owner <code>Player</code>.
      */
@@ -568,23 +569,19 @@ public class Unit extends GoodsLocation
                 + " had no owner, when changing owner to " + owner.getId());
         }
 
+        // This need to be set right away.
+        this.owner = owner;
+
         // Clear trade route and goto orders if changing owner.
         if (getTradeRoute() != null) setTradeRoute(null);
         if (getDestination() != null) setDestination(null);
-
-        // This need to be set right away.
-        this.owner = owner;
 
         // If its a carrier, we need to update the units it has loaded
         // before finishing with it
         for (Unit u : getUnitList()) u.changeOwner(owner);
 
         if (oldOwner != null) oldOwner.removeUnit(this);
-        if (owner != null) {
-            owner.addUnit(this);
-
-            if (!isOnCarrier()) owner.setExplored(this);
-        }
+        if (owner != null) owner.addUnit(this);
 
         getGame().notifyOwnerChanged(this, oldOwner, owner);
     }
@@ -708,11 +705,6 @@ public class Unit extends GoodsLocation
             if (!withinColony) newColony.updatePopulation();
             if (!preserveEducation) newColony.updateEducation(this, true);
         }
-
-        // Explore the new location now to prevent dealing with tiles
-        // with null (unexplored) type.  This will update the PETs so
-        // it needs to be done after the unit is added back to its tile.
-        getOwner().setExplored(this);
     }
 
     /**
@@ -1747,6 +1739,68 @@ public class Unit extends GoodsLocation
         }
         setRole();
         return result;
+    }
+
+    /**
+     * Convenience function to remove all equipment this unit has and
+     * drop it in a settlement.
+     *
+     * @param settlement The <code>Settlement</code> to collect the equipment
+     *     goods.
+     */
+    public void clearEquipment(Settlement settlement) {
+        TypeCountMap<EquipmentType> eq = getEquipment();
+        for (EquipmentType et : eq.keySet()) {
+            settlement.addEquipmentGoods(et, eq.getCount(et));
+        }
+        clearEquipment();
+        setRole(Role.DEFAULT);
+    }
+
+    /**
+     * Equip and set a unit to a particular role.  Take or drop equipment
+     * at the given settlement.
+     *
+     * @param role The <code>Role</code> to perform.
+     * @param settlement The <code>Settlement</code> that holds the equipment.
+     * @return True if the role was set.
+     */
+    public boolean equipForRole(Role role, Settlement settlement) {
+        if (!isPerson()) return false;
+        final Specification spec = getSpecification();
+        final List<EquipmentType> roleEq = getRoleEquipment(role);
+
+        TypeCountMap<EquipmentType> change = new TypeCountMap<EquipmentType>();
+        for (EquipmentType et : spec.getEquipmentTypeList()) {
+            int oldCount = getEquipmentCount(et);
+            int newCount = (roleEq.contains(et)) ? 1 : 0;
+            if (newCount > oldCount && !settlement.canBuildEquipment(et)) {
+                return false;
+            }
+            if (newCount != oldCount) {
+                change.incrementCount(et, newCount - oldCount);
+            }
+        }
+        for (Entry<EquipmentType, Integer> entry
+                 : change.getValues().entrySet()) {
+            EquipmentType et = entry.getKey();
+            int count = entry.getValue().intValue();
+            if (count < 0) {
+                changeEquipment(et, count); // can not fail
+                settlement.addEquipmentGoods(et, -count);
+            }
+        }
+        for (Entry<EquipmentType, Integer> entry
+                 : change.getValues().entrySet()) {
+            EquipmentType et = entry.getKey();
+            int count = entry.getValue().intValue();
+            if (count > 0) {
+                changeEquipment(et, count); // should not fail!
+                settlement.addEquipmentGoods(et, -count);
+            }
+        }
+        setRole(role);
+        return getRole() == role;
     }
 
 
@@ -3846,7 +3900,7 @@ public class Unit extends GoodsLocation
 
         state = xr.getAttribute(STATE_TAG, UnitState.class, UnitState.ACTIVE);
 
-        role = xr.getType(spec, ROLE_TAG, Role.class, Role.DEFAULT);
+        role = xr.getRole(spec, ROLE_TAG, Role.class, Role.DEFAULT);
 
         location = xr.getLocationAttribute(game, LOCATION_TAG, true);
 

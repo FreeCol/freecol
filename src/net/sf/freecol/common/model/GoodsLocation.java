@@ -238,6 +238,7 @@ public abstract class GoodsLocation extends UnitLocation {
     //   UnitLocation.moveToFront
     //   UnitLocation.clearUnitList,
     //   UnitLocation.getUnitCapacity
+    //   UnitLocation.canBuildEquipment
 
     /**
      * {@inheritDoc}

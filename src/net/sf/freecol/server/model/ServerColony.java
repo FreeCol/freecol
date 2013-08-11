@@ -137,6 +137,9 @@ public class ServerColony extends Colony implements ServerModelObject {
     @Override
     public void changeOwner(Player owner) {
         super.changeOwner(owner);//-vis(owner,previous-owner)
+
+        for (Tile t : getOwnedTiles()) t.updatePlayerExploredTiles();
+
         // Disable all exports
         for (ExportData exportDatum : exportData.values()) {
             exportDatum.setExported(false);

@@ -100,8 +100,7 @@ public class NationTypeTest extends FreeColTestCase {
                              3, startingUnits.size());
                 for (AbstractUnit unit : startingUnits) {
                     String unitTypeId = unit.getId();
-                    switch(unit.getRole()) {
-                    case SOLDIER:
+                    if (unit.getRole() == Role.SOLDIER) {
                         if (difficulty == 0 || difficulty == 1
                             || "model.nationType.conquest".equals(type.getId())) {
                             assertEquals("Wrong type of soldier: " + type.toString(),
@@ -110,8 +109,7 @@ public class NationTypeTest extends FreeColTestCase {
                             assertFalse("Wrong type of soldier: " + type.toString(),
                                         "model.unit.veteranSoldier".equals(unitTypeId));
                         }
-                        break;
-                    case PIONEER:
+                    } else if (unit.getRole() == Role.PIONEER) {
                         if ("model.nationType.cooperation".equals(type.getId())) {
                             assertEquals("Wrong type of pioneer: " + type.toString(),
                                          "model.unit.hardyPioneer", unitTypeId);
@@ -119,8 +117,7 @@ public class NationTypeTest extends FreeColTestCase {
                             assertFalse("Wrong type of pioneer: " + type.toString(),
                                         "model.unit.hardyPioneer".equals(unitTypeId));
                         }
-                        break;
-                    case DEFAULT:
+                    } else if (unit.getRole() == Role.DEFAULT) {
                         assertTrue("Ship is not naval: " + type.toString(),
                                    unit.getUnitType(spec()).hasAbility(Ability.NAVAL_UNIT));
                         if ("model.nationType.trade".equals(type.getId())
@@ -131,7 +128,6 @@ public class NationTypeTest extends FreeColTestCase {
                             assertEquals("Wrong type of ship: " + type.toString(),
                                          "model.unit.caravel", unitTypeId);
                         }
-                        break;
                     }
                 }
             }

@@ -1269,9 +1269,9 @@ public class ColonyPlan {
      */
     private static boolean fullEquipUnit(Unit unit, Role role, Colony colony) {
         return (role == Role.SOLDIER)
-            ? equipUnit(unit, Role.DRAGOON, colony)
-                || equipUnit(unit, Role.SOLDIER, colony)
-            : equipUnit(unit, role, colony);
+            ? unit.equipForRole(Role.DRAGOON, colony)
+                || unit.equipForRole(Role.SOLDIER, colony)
+            : unit.equipForRole(role, colony);
     }
 
     /**
@@ -1312,7 +1312,7 @@ public class ColonyPlan {
         // or active pioneers should be on the worker list.
         for (Unit u : workers) {
             u.setLocation(tile);
-            unequipUnit(u, col);
+            u.clearEquipment(col);
         }
 
         // Move outdoor experts outside if possible.
@@ -1343,13 +1343,21 @@ public class ColonyPlan {
         Comparator<Unit> soldierComparator = new Comparator<Unit>() {
             public int compare(Unit u1, Unit u2) {
                 int cmp = u1.getSkillLevel() - u2.getSkillLevel();
-                if (cmp != 0) return cmp;
-                GoodsType g1 = u1.getType().getExpertProduction();
-                GoodsType g2 = u2.getType().getExpertProduction();
-                if (g1 != null && g2 != null) {
-                    return produce.indexOf(g2) - produce.indexOf(g1);
+                if (cmp == 0) {
+                    GoodsType g1 = u1.getType().getExpertProduction();
+                    GoodsType g2 = u2.getType().getExpertProduction();
+                    cmp = ((g2 == null) ? 1 : 0) - ((g1 == null) ? 1 : 0);
+                    if (cmp == 0 && g1 != null) {
+                        int i = produce.indexOf(g2);
+                        cmp = (i < 0) ? produce.size() : i;
+                        i = produce.indexOf(g1);
+                        cmp -= (i < 0) ? produce.size() : i;
+                    }
                 }
-                return u1.getExperience() - u2.getExperience();
+                if (cmp == 0) {
+                    cmp = u1.getExperience() - u2.getExperience();
+                }
+                return cmp;
             }
         };
         Collections.sort(workers, soldierComparator);

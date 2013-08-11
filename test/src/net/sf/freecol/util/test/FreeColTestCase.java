@@ -437,7 +437,7 @@ public class FreeColTestCase extends TestCase {
             if (exploredByAll) {
                 for (Player player : game.getPlayers()) {
                     for (Tile tile : m.getAllTiles()) {
-                        tile.updatePlayerExploredTile(player, false);
+                        tile.updatePlayerExploredTile(player);
                     }
                 }
             }

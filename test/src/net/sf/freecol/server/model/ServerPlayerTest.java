@@ -145,6 +145,8 @@ public class ServerPlayerTest extends FreeColTestCase {
         Map map = game.getMap();
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
         ServerPlayer french = (ServerPlayer) game.getPlayer("model.nation.french");
+        InGameController igc = ServerTestHelper.getInGameController();
+        Tile tile0 = map.getTile(0, 0);
         Tile tile1 = map.getTile(6, 8);
         Tile tile2 = map.getTile(8, 6);
         assertFalse("Setup error, tile1 should not be explored by dutch player",dutch.hasExplored(tile1));
@@ -152,8 +154,12 @@ public class ServerPlayerTest extends FreeColTestCase {
         assertFalse("Setup error, tile2 should not be explored by dutch player",dutch.hasExplored(tile2));
         assertFalse("Setup error, tile2 should not be explored by french player",french.hasExplored(tile2));
 
-        new ServerUnit(game, tile1, dutch, colonistType);
-        new ServerUnit(game, tile2, french, colonistType);
+        igc.move(dutch, new ServerUnit(game, tile0, dutch, colonistType),
+                 tile1);
+        igc.move(french, new ServerUnit(game, tile0, french, colonistType),
+                 tile2);
+        assertTrue("Tile1 is explored", tile1.isExplored());
+        assertTrue("Tile2 is explored", tile2.isExplored());
         assertTrue("Tile1 should be explored by dutch player",dutch.hasExplored(tile1));
         assertFalse("Tile1 should not be explored by french player",french.hasExplored(tile1));
         assertFalse("Tile2 should not be explored by dutch player",dutch.hasExplored(tile2));

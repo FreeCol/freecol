@@ -1223,10 +1223,11 @@ public class IndianSettlement extends Settlement {
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
-        boolean full = xw.validFor(getOwner());
-
         PlayerExploredTile pet;
-        if (full) {
+        if (xw.validFor(getOwner())) {
+
+            Player hated = getMostHated();
+            if (hated != null) xw.writeAttribute(MOST_HATED_TAG, hated);
 
             xw.writeAttribute(LAST_TRIBUTE_TAG, lastTribute);
 
@@ -1240,10 +1241,10 @@ public class IndianSettlement extends Settlement {
                 }
             }
 
-            Player hated = getMostHated();
-            if (hated != null) xw.writeAttribute(MOST_HATED_TAG, hated);
-
         } else if ((pet = getTile().getPlayerExploredTile(xw.getClientPlayer())) != null) {
+
+            Player hated = pet.getMostHated();
+            if (hated != null) xw.writeAttribute(MOST_HATED_TAG, hated);
 
             xw.writeAttribute(LEARNABLE_SKILL_TAG, pet.getSkill());
 
@@ -1257,9 +1258,6 @@ public class IndianSettlement extends Settlement {
                     }
                 }
             }
-
-            Player hated = pet.getMostHated();
-            if (hated != null) xw.writeAttribute(MOST_HATED_TAG, hated);
         }
     }
 

@@ -27,6 +27,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileItemContainer;
@@ -66,7 +67,7 @@ public class PioneeringMissionTest extends FreeColTestCase {
     public void testImprovementNoLongerValid() {
         Game game = ServerTestHelper.startServerGame(getTestMap());
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
-        
+
         // Get player, colony and unit
         ServerPlayer player = (ServerPlayer) game.getPlayer("model.nation.dutch");
         EuropeanAIPlayer aiPlayer = (EuropeanAIPlayer) aiMain.getAIPlayer(player);

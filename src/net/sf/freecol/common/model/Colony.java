@@ -2293,6 +2293,11 @@ public class Colony extends Settlement implements Nameable {
             for (WorkLocation t : getAllWorkLocations()) {
                 if (t.getId().equals(id)) return (T)t;
             }
+        } else if (fco instanceof Tile) {
+            if (getTile().getId().equals(id)) return (T)getTile();
+            for (ColonyTile ct : getColonyTiles()) {
+                if (ct.getWorkTile().getId().equals(id)) return (T)ct.getWorkTile();
+            }
         } else if (fco instanceof Unit) {
             for (Unit t : getUnitList()) {
                 if (t.getId().equals(id)) return (T)t;
@@ -2430,6 +2435,7 @@ public class Colony extends Settlement implements Nameable {
     //   UnitLocation.getSpaceTaken [Irrelevant!]
     //   UnitLocation.moveToFront [Irrelevant!]
     //   UnitLocation.clearUnitList [Irrelevant!]
+    //   Settlement.canBuildEquipment
     //   Settlement.getNoAddReason
 
 

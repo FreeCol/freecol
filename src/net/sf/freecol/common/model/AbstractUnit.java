@@ -207,7 +207,7 @@ public class AbstractUnit extends FreeColObject {
     protected final void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        role = xr.getType(getSpecification(), ROLE_TAG, Role.class, Role.DEFAULT);
+        role = xr.getRole(Role.DEFAULT.getSpecification(), ROLE_TAG, Role.class, Role.DEFAULT);
 
         number = xr.getAttribute(NUMBER_TAG, 1);
     }

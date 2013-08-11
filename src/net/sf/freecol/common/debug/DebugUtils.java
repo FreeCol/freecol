@@ -357,11 +357,12 @@ public class DebugUtils {
         Location loc = (sCarrier != null) ? sCarrier : sTile;
         ServerUnit sUnit = new ServerUnit(sGame, loc, sPlayer,
                                           unitChoice);//-vis(sPlayer)
+        ((ServerPlayer)sPlayer).setExplored(sUnit);
         sUnit.setMovesLeft(sUnit.getInitialMovesLeft());
         sPlayer.invalidateCanSeeTiles();//+vis(sPlayer)
         int los = sUnit.getLineOfSight();
         for (Tile t : loc.getTile().getSurroundingTiles(los)) {
-            t.updatePlayerExploredTile(sPlayer, true);
+            t.updatePlayerExploredTile(sPlayer);
         }
 
         freeColClient.getConnectController().reconnect();
@@ -446,6 +447,7 @@ public class DebugUtils {
                                                           ServerPlayer.class);
         ServerPlayer sOldPlayer = (ServerPlayer)sSettlement.getOwner();
         sSettlement.changeOwner(sPlayer);//-vis(sPlayer,sOldPlayer)
+        sPlayer.setExplored(sSettlement);
         sPlayer.invalidateCanSeeTiles();//+vis(sPlayer)
         sOldPlayer.invalidateCanSeeTiles();//+vis(sOldPlayer)
 
@@ -483,6 +485,7 @@ public class DebugUtils {
                                                           ServerPlayer.class);
         ServerPlayer sOldPlayer = (ServerPlayer)sUnit.getOwner();
         sUnit.changeOwner(sPlayer);//-vis(sPlayer,sOldPlayer)
+        sPlayer.setExplored(sUnit);
         sPlayer.invalidateCanSeeTiles();//+vis(sPlayer)
         sOldPlayer.invalidateCanSeeTiles();//+vis(sOldPlayer)
 
@@ -513,7 +516,6 @@ public class DebugUtils {
         if (roleChoice == null) return;
 
         sUnit.clearEquipment();
-        sUnit.setRole(Role.DEFAULT);
         final Specification sSpec = server.getSpecification();
         for (EquipmentType et : sUnit.getRoleEquipment(roleChoice)) {
             sUnit.changeEquipment(et, 1);
@@ -613,6 +615,29 @@ public class DebugUtils {
         freeColClient.getGUI().showInformationMessage((aiColony == null)
             ? colony.getName() + "is not an AI colony."
             : aiColony.planToString());
+    }
+
+    /**
+     * Debug action to create a string showing the colony value for
+     * a given tile and player.
+     *
+     * Note: passing the freeColClient is redundant for now, but will
+     * be needed if/when we move getColonyValue into the AI.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param player The <code>Player</code> to evaluate the site.
+     * @param tile The colony <code>Tile</code> to evaluate.
+     * @return A string describing the colony value of a tile.
+     */
+    public static String displayColonyValue(final FreeColClient freeColClient,
+                                            Tile tile) {
+        Player player = FreeColDebugger.debugDisplayColonyValuePlayer();
+        if (player == null) return null;
+        int value = player.getColonyValue(tile);
+        if (value < 0) {
+            return Player.NoValueType.fromValue(value).toString();
+        }
+        return Integer.toString(value);          
     }
 
     /**

@@ -263,7 +263,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
 
         // Update moves left.
         if (isInMission()) {
-            getLocation().getTile().updatePlayerExploredTile(owner, true);
+            getTile().updateIndianSettlement(owner);
             setMovesLeft(0);
         } else if (isDamaged()) {
             setMovesLeft(0);
@@ -839,7 +839,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
     public List<Tile> collectNewTiles(Tile tile) {
         List<Tile> newTiles = new ArrayList<Tile>();
         int los = getLineOfSight();
-        for (Tile t : tile.getSurroundingTiles(los)) {
+        for (Tile t : tile.getSurroundingTiles(0, los)) {
             if (!getOwner().canSee(t)) newTiles.add(t);
         }
         return newTiles;
@@ -1035,41 +1035,6 @@ public class ServerUnit extends Unit implements ServerModelObject {
             }
         }
     }
-
-    /**
-     * Remove equipment from a unit.
-     *
-     * @param settlement The <code>Settlement</code> where the unit is
-     *     (may be null if the unit is in Europe).
-     * @param remove A collection of <code>EquipmentType</code> to remove.
-     * @param amount Override the amount of equipment to remove.
-     * @param random A pseudo-random number source.
-     * @param cs A <code>ChangeSet</code> to update.
-     */
-    public void csRemoveEquipment(Settlement settlement,
-                                  Collection<EquipmentType> remove,
-                                  int amount, Random random, ChangeSet cs) {
-        ServerPlayer serverPlayer = (ServerPlayer) getOwner();
-        for (EquipmentType e : remove) {
-            int a = (amount > 0) ? amount : getEquipmentCount(e);
-            for (AbstractGoods ag : e.getRequiredGoods()) {
-                GoodsType goodsType = ag.getType();
-                int n = ag.getAmount() * a;
-                if (isInEurope()) {
-                    if (serverPlayer.canTrade(goodsType,
-                                              Market.Access.EUROPE)) {
-                        serverPlayer.sell(null, goodsType, n, random);
-                        serverPlayer.csFlushMarket(goodsType, cs);
-                    }
-                } else if (settlement != null) {
-                    settlement.addGoods(goodsType, n);
-                }
-            }
-            // Removals can not cause incompatible-equipment trouble
-            changeEquipment(e, -a);
-        }
-    }
-
 
     /**
      * Is there work for a unit to do at a stop?

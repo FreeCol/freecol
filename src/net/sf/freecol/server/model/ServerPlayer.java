@@ -220,8 +220,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
         this.socket = socket;
         this.connection = connection;
         connected = connection != null;
-
-        invalidateCanSeeTiles();
     }
 
     /**
@@ -364,10 +362,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         case REBEL: case INDEPENDENT:
             // Post-declaration European player needs a coastal colony
             // and can not hope for resupply from Europe.
-            for (Colony colony : getColonies()) {
-                if (colony.isConnectedPort()) return IS_ALIVE;
-            }
-            return IS_DEAD;
+            return (getNumberOfPorts() > 0) ? IS_ALIVE : IS_DEAD;
 
         case ROYAL:
             return (getRebels().isEmpty()) ? IS_DEAD : IS_ALIVE;
@@ -787,6 +782,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @return <i>true</i> if the <code>Tile</code> has been explored and
      *         <i>false</i> otherwise.
      */
+    @Override
     public boolean hasExplored(Tile tile) {
         return tile.isExploredBy(this);
     }
@@ -794,9 +790,64 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /**
      * Sets the given tile to be explored by this player and updates
      * the player's information about the tile.
+     *
+     * @return True if the tile is newly explored by this action.
      */
-    public void setExplored(Tile tile) {
-        tile.updatePlayerExploredTile(this, false);
+    public boolean setExplored(Tile tile) {
+        if (hasExplored(tile)) return false;
+        tile.updatePlayerExploredTile(this);
+        return true;
+    }
+
+    /**
+     * Sets the tiles within the given <code>Unit</code>'s line of
+     * sight to be explored by this player.
+     *
+     * @param unit The <code>Unit</code>.
+     * @return A list of newly explored <code>Tile</code>s.
+     * @see #setExplored(Tile)
+     * @see #hasExplored
+     */
+    public List<Tile> setExplored(List<Tile> tiles) {
+        List<Tile> result = new ArrayList<Tile>();
+        List<Tile> done = new ArrayList<Tile>();
+        for (Tile t : tiles) {
+            if (done.contains(t)) continue; // Ignore duplicates
+            if (setExplored(t)) result.add(t);
+            done.add(t);
+        }
+        return result;
+    }
+
+    /**
+     * Sets the tiles visible to a given settlement to be explored by
+     * this player and updates the player's information about the
+     * tiles.
+     *
+     * @return A list of newly explored <code>Tile</code>s.
+     */
+    public List<Tile> setExplored(Settlement settlement) {
+        List<Tile> tiles = new ArrayList<Tile>(settlement.getOwnedTiles());
+        tiles.addAll(settlement.getTile().getSurroundingTiles(1,
+                settlement.getLineOfSight()));
+        return setExplored(tiles);
+    }
+
+    /**
+     * Sets the tiles within the given <code>Unit</code>'s line of
+     * sight to be explored by this player.
+     *
+     * @param unit The <code>Unit</code>.
+     * @return A list of newly explored <code>Tile</code>s.
+     * @see #setExplored(Tile)
+     * @see #hasExplored
+     */
+    public List<Tile> setExplored(Unit unit) {
+        if (getGame() == null || getGame().getMap() == null || unit == null
+            || !unit.hasTile()) return Collections.emptyList();
+
+        return setExplored(unit.getTile().getSurroundingTiles(0,
+                unit.getLineOfSight()));
     }
 
     /**
@@ -810,7 +861,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         for (Tile tile : getGame().getMap().getAllTiles()) {
             if (hasExplored(tile) != reveal) {
                 if (reveal) {
-                    tile.updatePlayerExploredTile(this, false);
+                    tile.updatePlayerExploredTile(this);
                 } else {
                     tile.unexplore(this);//-vis(this)
                 }
@@ -819,25 +870,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
         invalidateCanSeeTiles();//+vis(this)
         return result;
-    }
-
-    /**
-     * Sets the tiles within the given <code>Unit</code>'s line of
-     * sight to be explored by this player.
-     *
-     * @param unit The <code>Unit</code>.
-     * @see #setExplored(Tile)
-     * @see #hasExplored
-     */
-    public void setExplored(Unit unit) {
-        if (getGame() == null || getGame().getMap() == null || unit == null
-            || !unit.hasTile()) return;
-
-        Tile tile = unit.getTile();
-        setExplored(tile);
-        for (Tile t : tile.getSurroundingTiles(unit.getLineOfSight())) {
-            setExplored(t);
-        }
     }
 
     /**
@@ -1798,9 +1830,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 for (Tile t : game.getMap().getAllTiles()) {
                     Colony colony = t.getColony();
                     if (colony != null && !this.owns(colony)) {
-                        for (Tile x : colony.getOwnedTiles()) {
-                            x.updatePlayerExploredTile(this, false);
-                        }
+                        setExplored(colony);
                         cs.add(See.only(this), colony.getOwnedTiles());
                     }
                 }
@@ -2580,7 +2610,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // Hand over the colony.
         ((ServerColony)colony)
             .changeOwner(attackerPlayer);//-vis(attackerPlayer,colonyPlayer)
-
+        
         // Remove goods party modifiers as they apply to a different monarch.
         for (Modifier m : colony.getModifierSet()) {
             if ("model.modifier.colonyGoodsParty".equals(m.getSource())) {
@@ -2588,27 +2618,20 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
         }
 
-        // Inform former owner of loss of owned tiles, and process possible
-        // increase in line of sight.  Leave other exploration etc to csMove.
-        for (Tile t : colony.getOwnedTiles()) {
-            if (t == tile) continue;
-            cs.add(See.perhaps().always(colonyPlayer), t);
-        }
-        if (colony.getLineOfSight() > attacker.getLineOfSight()) {
-            for (Tile t : tile.getSurroundingTiles(attacker.getLineOfSight(),
-                                                   colony.getLineOfSight())) {
-                // New owner has now explored within settlement line of sight.
-                attackerPlayer.setExplored(t);
-                cs.add(See.only(attackerPlayer), t);
-            }
-        }
+        // Inform former owner of loss of owned tiles, and process
+        // possible increase in line of sight.  Do not include the
+        // colony tile, which is updated in csCombat().
+        cs.add(See.only(attackerPlayer), attackerPlayer.setExplored(colony));
+        List<Tile> tiles = new ArrayList<Tile>(colony.getOwnedTiles());
+        tiles.remove(tile);
+        cs.add(See.perhaps().always(colonyPlayer), tiles);
 
         // Inform the former owner of loss of units, and add sound.
         cs.addRemoves(See.only(colonyPlayer), null, units);
         cs.addAttribute(See.only(attackerPlayer), "sound",
                         "sound.event.captureColony");
 
-        // Handle visibility
+        // Ready to reset visibility
         attackerPlayer.invalidateCanSeeTiles();//+vis(attackerPlayer)
         colonyPlayer.invalidateCanSeeTiles();//+vis(colonyPlayer)
     }
@@ -2744,6 +2767,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         loser.changeOwner(winnerPlayer);//-vis(loserPlayer)
         if (type != null) loser.setType(type);//-vis(winnerPlayer)
         loser.setLocation(winner.getTile());//-vis(winnerPlayer)
+        cs.add(See.only(winnerPlayer), winnerPlayer.setExplored(loser));
         loser.setState(Unit.UnitState.ACTIVE);
         winnerPlayer.invalidateCanSeeTiles();//+vis(winnerPlayer)
         loserPlayer.invalidateCanSeeTiles();//+vis(loserPlayer)
@@ -3628,7 +3652,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     public void csSeeNewTiles(List<Tile> newTiles, ChangeSet cs) {
         for (Tile t : newTiles) {
-            t.updatePlayerExploredTile(this, false);
+            t.updatePlayerExploredTile(this);
             cs.add(See.only(this), t);
         }
     }

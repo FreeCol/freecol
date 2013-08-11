@@ -24,6 +24,25 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class RoleTest extends FreeColTestCase {
 
+    // TODO: get rid of static fields as soon as possible
+    public void testStaticFields() {
+        Role[] roles = new Role[] {
+            Role.DEFAULT,
+            Role.SCOUT,
+            Role.SOLDIER,
+            Role.DRAGOON,
+            Role.PIONEER,
+            Role.MISSIONARY
+        };
+
+        for (Role role : roles) {
+            assertNotNull(role);
+            assertEquals(role.getId(), role, spec().getRole(role.getId()));
+            assertNotNull(role.getId(), role.getSpecification());
+        }
+
+    }
+
     public void testComparators() {
 
         Role soldier = spec().getRole("model.role.soldier");
