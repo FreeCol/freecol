@@ -479,16 +479,16 @@ public class AIMessage {
      *
      * @param aiUnit The <code>AIUnit</code> that is demanding.
      * @param colony The <code>Colony</code> to demand of.
-     * @param goods The <code>Goods</code> to demand.
-     * @param gold The amount of gold to demand.
+     * @param type The <code>GoodsType</code> to demand.
+     * @param amount The amount of goods to demand.
      * @return True if the message was sent, a non-error reply returned, and
      *     the demand was accepted.
      */
     public static boolean askIndianDemand(AIUnit aiUnit, Colony colony,
-                                          Goods goods, int gold) {
+                                          GoodsType type, int amount) {
         Element reply = askMessage(aiUnit.getAIOwner().getConnection(),
             new IndianDemandMessage(aiUnit.getUnit(), colony,
-                goods, gold).toXMLElement());
+                                    type, amount).toXMLElement());
         IndianDemandMessage message
             = new IndianDemandMessage(colony.getGame(), reply);
         return (message == null) ? false : message.getResult();

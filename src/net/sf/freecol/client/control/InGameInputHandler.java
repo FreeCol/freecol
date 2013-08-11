@@ -42,6 +42,7 @@ import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.LastSale;
@@ -760,21 +761,21 @@ public final class InGameInputHandler extends InputHandler {
         } else if (!player.owns(colony)) {
             throw new IllegalArgumentException("Demand to anothers colony");
         }
-        Goods goods = message.getGoods();
-        String goldStr = Integer.toString(message.getGold());
         boolean accepted;
         ModelMessage m = null;
+        GoodsType type = message.getType(game);
+        int amount = message.getAmount();
         String nation = Messages.message(unit.getOwner().getNationName());
         int opt = getFreeColClient().getClientOptions()
             .getInteger(ClientOptions.INDIAN_DEMAND_RESPONSE);
-        if (goods == null) {
+        if (type == null) {
             switch (opt) {
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ASK:
                 accepted = new ShowConfirmDialogSwingTask(colony.getTile(),
                     StringTemplate.template("indianDemand.gold.text")
                     .addName("%nation%", nation)
                     .addName("%colony%", colony.getName())
-                    .addAmount("%amount%", message.getGold()),
+                    .addAmount("%amount%", amount),
                     "indianDemand.gold.yes",
                     "indianDemand.gold.no").confirm();
                 break;
@@ -783,7 +784,7 @@ public final class InGameInputHandler extends InputHandler {
                     "indianDemand.gold.text", colony, unit)
                     .addName("%nation%", nation)
                     .addName("%colony%", colony.getName())
-                    .addName("%amount%", goldStr);
+                    .addAmount("%amount%", amount);
                 accepted = true;
                 break;
             case ClientOptions.INDIAN_DEMAND_RESPONSE_REJECT:
@@ -791,22 +792,21 @@ public final class InGameInputHandler extends InputHandler {
                     "indianDemand.gold.text", colony, unit)
                     .addName("%nation%", nation)
                     .addName("%colony%", colony.getName())
-                    .addName("%amount%", goldStr);
+                    .addAmount("%amount%", amount);
                 accepted = false;
                 break;
             default:
                 throw new IllegalArgumentException("Impossible option value.");
             }
         } else {
-            String amount = String.valueOf(goods.getAmount());
             switch (opt) {
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ASK:
-                if (goods.getType().isFoodType()) {
+                if (type.isFoodType()) {
                     accepted = new ShowConfirmDialogSwingTask(colony.getTile(),
                         StringTemplate.template("indianDemand.food.text")
                         .addName("%nation%", nation)
                         .addName("%colony%", colony.getName())
-                        .addAmount("%amount%", goods.getAmount()),
+                        .addAmount("%amount%", amount),
                         "indianDemand.food.yes",
                         "indianDemand.food.no").confirm();
                 } else {
@@ -814,43 +814,43 @@ public final class InGameInputHandler extends InputHandler {
                         StringTemplate.template("indianDemand.other.text")
                         .addName("%nation%", nation)
                         .addName("%colony%", colony.getName())
-                        .addAmount("%amount%", goods.getAmount())
-                        .add("%goods%", goods.getType().getNameKey()),
+                        .addAmount("%amount%", amount)
+                        .add("%goods%", type.getNameKey()),
                         "indianDemand.other.yes",
                         "indianDemand.other.no").confirm();
                 }
                 break;
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ACCEPT:
-                if (goods.getType().isFoodType()) {
+                if (type.isFoodType()) {
                     m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
                         "indianDemand.food.text", colony, unit)
                         .addName("%nation%", nation)
                         .addName("%colony%", colony.getName())
-                        .addName("%amount%", amount);
+                        .addAmount("%amount%", amount);
                 } else {
                     m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
                         "indianDemand.other.text", colony, unit)
                         .addName("%nation%", nation)
                         .addName("%colony%", colony.getName())
-                        .addName("%amount%", amount)
-                        .add("%goods%", goods.getNameKey());
+                        .addAmount("%amount%", amount)
+                        .add("%goods%", type.getNameKey());
                 }
                 accepted = true;
                 break;
             case ClientOptions.INDIAN_DEMAND_RESPONSE_REJECT:
-                if (goods.getType().isFoodType()) {
+                if (type.isFoodType()) {
                     m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
                         "indianDemand.food.text", colony, unit)
                         .addName("%nation%", nation)
                         .addName("%colony%", colony.getName())
-                        .addName("%amount%", amount);
+                        .addAmount("%amount%", amount);
                 } else {
                     m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
                         "indianDemand.other.text", colony, unit)
                         .addName("%nation%", nation)
                         .addName("%colony%", colony.getName())
-                        .addName("%amount%", amount)
-                        .add("%goods%", goods.getNameKey());
+                        .addAmount("%amount%", amount)
+                        .add("%goods%", type.getNameKey());
                 }
                 accepted = false;
                 break;

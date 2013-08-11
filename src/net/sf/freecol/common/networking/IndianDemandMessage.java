@@ -21,7 +21,7 @@ package net.sf.freecol.common.networking;
 
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
@@ -36,20 +36,20 @@ import org.w3c.dom.Element;
  */
 public class IndianDemandMessage extends DOMMessage {
 
-    // The identifier of the unit that is demanding.
+    /** The identifier of the unit that is demanding. */
     private String unitId;
 
-    // The identifier of the colony being demanded of.
+    /** The identifier of the colony being demanded of. */
     private String colonyId;
 
-    // The goods being demanded.
-    private Goods goods;
+    /** The type of goods being demanded, null implies gold. */
+    private String typeId;
 
-    // The gold being demanded.
-    private String goldString;
+    /** The amount of goods being demanded. */
+    private String amount;
 
-    // The result of this demand: null => not decided yet
-    private String resultString;
+    /** The result of this demand: null implies not decided yet. */
+    private String result;
 
 
     /**
@@ -58,15 +58,16 @@ public class IndianDemandMessage extends DOMMessage {
      *
      * @param unit The <code>Unit</code> that is demanding.
      * @param colony The <code>Colony</code> being demanded of.
-     * @param goods The <code>Goods</code> being demanded.
-     * @param gold The gold being demanded.
+     * @param type The <code>GoodsType</code> being demanded.
+     * @param amount The amount of goods being demanded.
      */
-    public IndianDemandMessage(Unit unit, Colony colony, Goods goods, int gold) {
+    public IndianDemandMessage(Unit unit, Colony colony,
+                               GoodsType type, int amount) {
         this.unitId = unit.getId();
         this.colonyId = colony.getId();
-        this.goods = goods;
-        this.goldString = (gold == 0) ? null : Integer.toString(gold);
-        this.resultString = null;
+        this.typeId = (type == null) ? null : type.getId();
+        this.amount = Integer.toString(amount);
+        this.result = null;
     }
 
     /**
@@ -79,13 +80,9 @@ public class IndianDemandMessage extends DOMMessage {
     public IndianDemandMessage(Game game, Element element) {
         this.unitId = element.getAttribute("unit");
         this.colonyId = element.getAttribute("colony");
-        this.goldString = (!element.hasAttribute("gold")) ? null
-            : element.getAttribute("gold");
-        this.resultString = element.getAttribute("result");
-        this.goods = (!element.hasChildNodes()) ? null
-            : new Goods(game,
-                DOMMessage.getChildElement(element,
-                    Goods.getXMLElementTagName()));
+        this.typeId = element.getAttribute("type");
+        this.amount = element.getAttribute("amount");
+        this.result = element.getAttribute("result");
     }
 
     /**
@@ -107,17 +104,21 @@ public class IndianDemandMessage extends DOMMessage {
     }
 
     /**
-     * Client-side convenience function to get the goods in this message.
+     * Client-side convenience function to get the goods type in this message.
      */
-    public Goods getGoods() {
-        return goods;
+    public GoodsType getType(Game game) {
+        return (typeId == null) ? null
+            : game.getSpecification().getGoodsType(typeId);
     }
 
     /**
      * Client-side convenience function to get the gold in this message.
      */
-    public int getGold() {
-        return (goldString == null) ? 0 : Integer.parseInt(goldString);
+    public int getAmount() {
+        try {
+            return Integer.parseInt(amount);
+        } catch (NumberFormatException nfe) {}
+        return -1;
     }
 
     /**
@@ -126,7 +127,7 @@ public class IndianDemandMessage extends DOMMessage {
      * @return The result of this demand.
      */
     public boolean getResult() {
-        return Boolean.valueOf(resultString);
+        return Boolean.valueOf(result);
     }
 
     /**
@@ -135,7 +136,7 @@ public class IndianDemandMessage extends DOMMessage {
      * @param result The new result of this demand.
      */
     public void setResult(boolean result) {
-        this.resultString = Boolean.toString(result);
+        this.result = Boolean.toString(result);
     }
 
     /**
@@ -154,7 +155,7 @@ public class IndianDemandMessage extends DOMMessage {
 
         Unit unit;
         try {
-            if (resultString == null) { // Initial demand
+            if (result == null) { // Initial demand
                 unit = player.getOurFreeColGameObject(unitId, Unit.class);
                 if (unit.getMovesLeft() <= 0) {
                     return DOMMessage.clientError("Unit has no moves left: "
@@ -182,28 +183,14 @@ public class IndianDemandMessage extends DOMMessage {
             return DOMMessage.clientError(e.getMessage());
         }
 
-        int gold = 0;
-        if (goods != null) {
-            if (goods.getLocation() != colony) {
-                return DOMMessage.clientError("Goods are not in colony: "
-                    + colonyId);
-            }
-        } else if (goldString != null) {
-            try {
-                gold = Integer.parseInt(goldString);
-            } catch (NumberFormatException e) {
-                return DOMMessage.clientError(e.getMessage());
-            }
-            if (gold <= 0) {
-                return DOMMessage.clientError("Bad gold: " + goldString);
-            }
-        } else {
-            return DOMMessage.clientError("Goods+gold can not both be empty");
+        if (getAmount() <= 0) {
+            return DOMMessage.clientError("Bad amount: " + amount);
         }
 
         // Proceed to demand.
         return server.getInGameController()
-            .indianDemand(serverPlayer, unit, colony, goods, gold);
+            .indianDemand(serverPlayer, unit, colony,
+                          getType(game), getAmount());
     }
 
     /**
@@ -212,15 +199,13 @@ public class IndianDemandMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createMessage(getXMLElementTagName(),
+        Element ret = createMessage(getXMLElementTagName(),
             "unit", unitId,
-            "colony", colonyId);
-        if (goldString != null) result.setAttribute("gold", goldString);
-        if (resultString != null) result.setAttribute("result", resultString);
-        if (goods != null) {
-            result.appendChild(goods.toXMLElement(result.getOwnerDocument()));
-        }
-        return result;
+            "colony", colonyId,
+            "amount", amount);
+        if (typeId != null) ret.setAttribute("type", typeId);
+        if (result != null) ret.setAttribute("result", result);
+        return ret;
     }
 
     /**

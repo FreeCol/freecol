@@ -288,7 +288,7 @@ public final class AIInGameInputHandler implements MessageHandler {
         IndianDemandMessage message = new IndianDemandMessage(game, element);
         boolean accept = getAIPlayer()
             .indianDemand(message.getUnit(game), message.getColony(game),
-                message.getGoods(), message.getGold());
+                message.getType(game), message.getAmount());
         message.setResult(accept);
         logger.finest("AI handling native demand by " + message.getUnit(game)
             + " at " + message.getColony(game).getName()

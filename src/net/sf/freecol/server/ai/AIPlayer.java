@@ -35,6 +35,7 @@ import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
@@ -484,12 +485,12 @@ public abstract class AIPlayer extends AIObject {
      *
      * @param unit The native <code>Unit</code> making the demand.
      * @param colony The <code>Colony</code> being demanded of.
-     * @param goods The <code>Goods</code> demanded (may be null).
-     * @param gold The gold demanded (invalid if goods non-null).
+     * @param type The <code>GoodsType</code> demanded (may be null).
+     * @param amount The amount demanded.
      * @return The response of the player.
      */
     public boolean indianDemand(Unit unit, Colony colony,
-                                Goods goods, int gold) {
+                                GoodsType type, int amount) {
         return false;
     }
 

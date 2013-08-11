@@ -3559,45 +3559,46 @@ public final class InGameController extends Controller {
      * @param serverPlayer The <code>ServerPlayer</code> that is demanding.
      * @param unit The <code>Unit</code> making the demands.
      * @param colony The <code>Colony</code> that is demanded of.
-     * @param goods The <code>Goods</code> being demanded.
-     * @param gold The amount of gold being demanded.
+     * @param type The <code>GoodsType</code> being demanded, null
+     *     implies gold.
+     * @param amount The amount of goods/gold being demanded.
      * @return An <code>Element</code> encapsulating this action.
      */
     public Element indianDemand(final ServerPlayer serverPlayer, Unit unit,
-                                Colony colony, Goods goods, int gold) {
-        final Specification spec = getGame().getSpecification();
+                                Colony colony, GoodsType type, int amount) {
+        final Game game = getGame();
+        final Specification spec = game.getSpecification();
         ServerPlayer victim = (ServerPlayer) colony.getOwner();
         int difficulty = spec.getInteger(GameOptions.NATIVE_DEMANDS);
         ChangeSet cs = new ChangeSet();
 
         DOMMessage reply = askTimeout(victim,
-            new IndianDemandMessage(unit, colony, goods, gold));
+            new IndianDemandMessage(unit, colony, type, amount));
         boolean result = (reply instanceof IndianDemandMessage)
             ? ((IndianDemandMessage)reply).getResult()
             : false;
         logger.info(serverPlayer.getName() + " unit " + unit
-            + " demands " + goods + " goods and " + gold + " gold "
+            + " demands " + amount + " " + ((type == null) ? "gold" : type)
             + " from " + colony.getName() + " accepted: " + result);
 
         IndianDemandMessage message = new IndianDemandMessage(unit, colony,
-                                                              goods, gold);
+                                                              type, amount);
         message.setResult(result);
         cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL, message);
         if (result) {
-            if (goods != null) {
+            if (type == null) {
+                victim.modifyGold(-amount);
+                serverPlayer.modifyGold(amount);
+                cs.addPartial(See.only(victim), victim, "gold");
+                //cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
+            } else {
                 GoodsContainer colonyContainer = colony.getGoodsContainer();
                 colonyContainer.saveState();
                 GoodsContainer unitContainer = unit.getGoodsContainer();
                 unitContainer.saveState();
-                moveGoods(goods, unit);
+                moveGoods(new Goods(game, colony, type, amount), unit);
                 cs.add(See.only(victim), colonyContainer);
                 //cs.add(See.only(serverPlayer), unitContainer);
-            }
-            if (gold > 0) {
-                victim.modifyGold(-gold);
-                serverPlayer.modifyGold(gold);
-                cs.addPartial(See.only(victim), victim, "gold");
-                //cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
             }
             cs.add(See.only(null).perhaps(victim),
                 serverPlayer.modifyTension(victim, -(5 - difficulty) * 50));
