@@ -666,12 +666,15 @@ public abstract class Settlement extends GoodsLocation
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        for (Ability ability : getSortedAbilities()) {
-            ability.toXML(xw);
-        }
+        if (xw.validFor(getOwner())) {
 
-        for (Modifier modifier : getSortedModifiers()) {
-            modifier.toXML(xw);
+            for (Ability ability : getSortedAbilities()) {
+                ability.toXML(xw);
+            }
+
+            for (Modifier modifier : getSortedModifiers()) {
+                modifier.toXML(xw);
+            }
         }
     }
 

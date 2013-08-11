@@ -334,17 +334,19 @@ public class Europe extends UnitLocation implements Ownable, Named {
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
-        for (int index = 0; index < recruitables.length; index++) {
-            if (recruitables[index] != null) {
-                xw.writeAttribute(RECRUIT_TAG + index, recruitables[index]);
+        if (xw.validFor(getOwner())) {
+            for (int index = 0; index < recruitables.length; index++) {
+                if (recruitables[index] != null) {
+                    xw.writeAttribute(RECRUIT_TAG + index, recruitables[index]);
+                }
             }
+
+            xw.writeAttribute(RECRUIT_PRICE_TAG, recruitPrice);
+
+            xw.writeAttribute(RECRUIT_LOWER_CAP_TAG, recruitLowerCap);
+
+            xw.writeAttribute(OWNER_TAG, owner);
         }
-
-        xw.writeAttribute(RECRUIT_PRICE_TAG, recruitPrice);
-
-        xw.writeAttribute(RECRUIT_LOWER_CAP_TAG, recruitLowerCap);
-
-        xw.writeAttribute(OWNER_TAG, owner);
     }
 
     /**
@@ -354,22 +356,25 @@ public class Europe extends UnitLocation implements Ownable, Named {
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        for (Ability ability : getSortedAbilities()) {
-            ability.toXML(xw);
-        }
+        if (xw.validFor(getOwner())) {
 
-        for (Modifier modifier : getSortedModifiers()) {
-            modifier.toXML(xw);
-        }
+            for (Ability ability : getSortedAbilities()) {
+                ability.toXML(xw);
+            }
 
-        for (UnitType unitType : getSortedCopy(unitPrices.keySet())) {
-            xw.writeStartElement(UNIT_PRICE_TAG);
+            for (Modifier modifier : getSortedModifiers()) {
+                modifier.toXML(xw);
+            }
 
-            xw.writeAttribute(UNIT_TYPE_TAG, unitType);
-
-            xw.writeAttribute(PRICE_TAG, unitPrices.get(unitType).intValue());
-
-            xw.writeEndElement();
+            for (UnitType unitType : getSortedCopy(unitPrices.keySet())) {
+                xw.writeStartElement(UNIT_PRICE_TAG);
+                
+                xw.writeAttribute(UNIT_TYPE_TAG, unitType);
+                
+                xw.writeAttribute(PRICE_TAG, unitPrices.get(unitType).intValue());
+                
+                xw.writeEndElement();
+            }
         }
     }
 
