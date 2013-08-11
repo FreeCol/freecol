@@ -110,9 +110,17 @@ public class Role extends BuildableType implements Comparable<Role> {
         } else {
             for (AbstractGoods goods : getRequiredGoods()) {
                 if ("model.goods.horses".equals(goods.getType().getId())) {
-                    result.add(spec.getEquipmentType("model.equipment.horses"));
+                    if (requiresAbility("model.ability.native")) {
+                        result.add(spec.getEquipmentType("model.equipment.indian.horses"));
+                    } else {
+                        result.add(spec.getEquipmentType("model.equipment.horses"));
+                    }
                 } else if ("model.goods.muskets".equals(goods.getType().getId())) {
-                    result.add(spec.getEquipmentType("model.equipment.muskets"));
+                    if (requiresAbility("model.ability.native")) {
+                        result.add(spec.getEquipmentType("model.equipment.indian.muskets"));
+                    } else {
+                        result.add(spec.getEquipmentType("model.equipment.muskets"));
+                    }
                 } else if ("model.goods.tools".equals(goods.getType().getId())) {
                     result.add(spec.getEquipmentType("model.equipment.tools"));
                 }

@@ -483,6 +483,7 @@ public class UnitTest extends FreeColTestCase {
                    colonist.getExperience() > 0);
 
         colonist.changeEquipment(musketsEquipmentType, 1);
+        //assertEquals(spec().getRole("model.role.soldier"), colonist.getRole());
         assertEquals(Role.SOLDIER, colonist.getRole());
         assertEquals("Colonist should have lost all experience and role", 0,
                      colonist.getExperience());

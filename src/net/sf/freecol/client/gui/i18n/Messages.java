@@ -642,8 +642,16 @@ public class Messages {
             typeKey = unit.getType().getNameKey();
             infoKey = Integer.toString(unit.getTreasureAmount());
         } else {
-            String key = (unit.getRole() == Role.DEFAULT) ? "name"
-                : unit.getRole().toString().toLowerCase();
+            String key;
+            if (unit.getRole() == Role.DEFAULT) {
+                key = "name";
+            } else {
+                if (unit.getRole().getId().startsWith("model.role.")) {
+                    key = unit.getRole().getId().substring(11);
+                } else {
+                    key = unit.getRole().getId();
+                }
+            }
             String messageID = unit.getType().getId() + "." + key;
             if (containsKey(messageID)) {
                 typeKey = messageID;

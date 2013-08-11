@@ -224,8 +224,11 @@ public class NativeAIPlayer extends AIPlayer {
         final Specification spec = getSpecification();
         List<Unit> units = is.getUnitList();
         units.addAll(is.getTile().getUnitList());
-        roles: for (Role r : new Role[] { Role.DRAGOON, Role.SOLDIER,
-                                          Role.SCOUT }) {
+        roles: for (Role r : new Role[] {
+                spec.getRole("model.role.nativeDragoon"),
+                spec.getRole("model.role.armedBrave"),
+                spec.getRole("model.role.mountedBrave")
+            }) {
             while (!units.isEmpty()) {
                 Unit u = units.get(0);
                 for (EquipmentType et : u.getRoleEquipment(r)) {
