@@ -92,7 +92,11 @@
     <xs:attribute name="unitType" type="xs:string" use="required"/>
     <xs:attribute name="movesLeft" type="xs:int" use="required"/>
     <xs:attribute name="state" type="UnitState" use="required"/>
-    <xs:attribute name="role" type="UnitRole" use="required"/>
+    <!-- @compat 0.10.7
+         <xs:attribute name="role" type="RoleId" use="required"/>
+    -->
+    <xs:attribute name="role" type="xs:string" use="required"/>
+    <!-- end @compat -->
     <xs:attribute name="owner" type="PlayerId" use="required"/>
     <xs:attribute name="turnsOfTraining" type="xs:int" use="required"/>
     <xs:attribute name="workType" type="xs:string" use="optional"/>
@@ -151,24 +155,6 @@
     </xs:restriction>
   </xs:simpleType>
 
-  <xs:simpleType name="UnitRole">
-    <xs:restriction base="xs:NMTOKEN">
-      <xs:enumeration value="default" />
-      <xs:enumeration value="pioneer" />
-      <xs:enumeration value="missionary" />
-      <xs:enumeration value="soldier" />
-      <xs:enumeration value="scout" />
-      <xs:enumeration value="dragoon" />
-      <!-- @compat 0.10.7 -->
-      <xs:enumeration value="DEFAULT" />
-      <xs:enumeration value="PIONEER" />
-      <xs:enumeration value="MISSIONARY" />
-      <xs:enumeration value="SOLDIER" />
-      <xs:enumeration value="SCOUT" />
-      <xs:enumeration value="DRAGOON" />
-      <!-- end @compat -->
-    </xs:restriction>
-  </xs:simpleType>
 
 
 </xs:schema>

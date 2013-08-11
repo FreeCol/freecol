@@ -252,7 +252,7 @@ public class EuropeanNationType extends NationType {
 
             String type = xr.getAttribute(TYPE_TAG, (String)null);
 
-            Role role = xr.getType(getSpecification(), ROLE_TAG, Role.class, Role.DEFAULT);
+            Role role = xr.getRole(getSpecification(), ROLE_TAG, Role.class, Role.DEFAULT);
 
             boolean ex = xr.getAttribute(EXPERT_STARTING_UNITS_TAG, false);
 

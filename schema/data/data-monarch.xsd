@@ -68,7 +68,7 @@
   <xs:element name="abstractUnit">
     <xs:complexType>
       <xs:attribute name="id" type="UnitTypeId" use="required"/>
-      <xs:attribute name="role" type="UnitRole" use="required"/>
+      <xs:attribute name="role" type="xs:string" use="required"/>
       <xs:attribute name="number" type="xs:int" use="optional"
                     default="1"/>
     </xs:complexType>

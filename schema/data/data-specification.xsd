@@ -211,18 +211,7 @@
       <xs:attribute name="extends" use="optional" type="xs:string" />
       <xs:attribute name="combat-loss-priority" type="xs:int"/>
       <xs:attribute name="maximum-count" type="xs:nonNegativeInteger"/>
-      <xs:attribute name="role">
-        <xs:simpleType>
-          <xs:restriction base="xs:token">
-            <xs:enumeration value="default"/>
-            <xs:enumeration value="pioneer"/>
-            <xs:enumeration value="missionary"/>
-            <xs:enumeration value="soldier"/>
-            <xs:enumeration value="scout"/>
-            <xs:enumeration value="dragoon"/>
-          </xs:restriction>
-        </xs:simpleType>
-      </xs:attribute>
+      <xs:attribute name="role" type="RoleId"/>
     </xs:complexType>
   </xs:element>
 
@@ -517,18 +506,7 @@
               <xs:complexType>
                 <xs:attribute name="id" use="required" type="xs:string"/>
                 <xs:attribute name="type" use="required" type="UnitTypeId"/>
-                <xs:attribute name="role">
-                  <xs:simpleType>
-                    <xs:restriction base="xs:token">
-                      <xs:enumeration value="default"/>
-                      <xs:enumeration value="pioneer"/>
-                      <xs:enumeration value="missionary"/>
-                      <xs:enumeration value="soldier"/>
-                      <xs:enumeration value="scout"/>
-                      <xs:enumeration value="dragoon"/>
-                    </xs:restriction>
-                  </xs:simpleType>
-                </xs:attribute>
+                <xs:attribute name="role" type="RoleId"/>
                 <xs:attribute name="expert-starting-units" type="xs:string"/>
                 <xs:attribute name="mounted" type="xs:boolean"/>
                 <xs:attribute name="missionary" type="xs:boolean"/>
@@ -748,18 +726,7 @@
             <xs:sequence>
               <xs:element name="choice" minOccurs="0" maxOccurs="unbounded">
                 <xs:complexType>
-                  <xs:attribute name="value">
-                    <xs:simpleType>
-                      <xs:restriction base="xs:token">
-                        <xs:enumeration value="DEFAULT"/>
-                        <xs:enumeration value="PIONEER"/>
-                        <xs:enumeration value="MISSIONARY"/>
-                        <xs:enumeration value="SOLDIER"/>
-                        <xs:enumeration value="SCOUT"/>
-                        <xs:enumeration value="DRAGOON"/>
-                      </xs:restriction>
-                    </xs:simpleType>
-                  </xs:attribute>
+                  <xs:attribute name="value" type="RoleId"/>
                 </xs:complexType>
               </xs:element>
             </xs:sequence>

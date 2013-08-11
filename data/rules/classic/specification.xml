@@ -20,7 +20,7 @@
     In case of incompatible changes, please update version number and
     XSD schema for validation.
 -->
-<freecol-specification id="classic" version="0.78">
+<freecol-specification id="classic" version="0.79">
 
   <!-- Modifiers that are not attached to other game object
        types. They may be modified, but MUST NOT be removed. -->
@@ -839,7 +839,8 @@
   </roles>
 
   <equipment-types>
-    <equipment-type id="model.equipment.horses" combat-loss-priority="20" role="scout">
+    <equipment-type id="model.equipment.horses" combat-loss-priority="20"
+                    role="model.role.scout">
       <modifier id="model.modifier.defence" type="additive" value="1"/>
       <modifier id="model.modifier.offence" type="additive" value="1"/>
       <modifier id="model.modifier.lineOfSightBonus" type="additive" value="1"/>
@@ -854,7 +855,8 @@
       <compatible-equipment id="model.equipment.muskets"/>
       <capture-equipment id="model.equipment.indian.horses" by-indians="true"/>
     </equipment-type>
-    <equipment-type id="model.equipment.muskets" combat-loss-priority="10" role="soldier">
+    <equipment-type id="model.equipment.muskets" combat-loss-priority="10"
+                    role="model.role.soldier">
       <modifier id="model.modifier.defence" type="additive" value="1"/>
       <modifier id="model.modifier.offence" type="additive" value="2"/>
       <ability id="model.ability.scoutIndianSettlement" value="false"/>
@@ -867,14 +869,16 @@
       <compatible-equipment id="model.equipment.horses"/>
       <capture-equipment id="model.equipment.indian.muskets" by-indians="true"/>
     </equipment-type>
-    <equipment-type id="model.equipment.tools" maximum-count="5" role="pioneer">
+    <equipment-type id="model.equipment.tools" maximum-count="5"
+                    role="model.role.pioneer">
       <ability id="model.ability.improveTerrain" value="true"/>
       <ability id="model.ability.disposeOnCombatLoss" value="true"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-ability id="model.ability.bornInIndianSettlement" value="false"/>
       <required-goods id="model.goods.tools" value="20"/>
     </equipment-type>
-    <equipment-type id="model.equipment.missionary" role="missionary">
+    <equipment-type id="model.equipment.missionary"
+                    role="model.role.missionary">
       <modifier id="model.modifier.movementBonus" type="additive" value="3"/>
       <ability id="model.ability.missionary" value="true"/>
       <ability id="model.ability.establishMission" value="true"/>
@@ -884,7 +888,8 @@
       <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-ability id="model.ability.dressMissionary" value="true"/>
     </equipment-type>
-    <equipment-type id="model.equipment.indian.horses" combat-loss-priority="20" role="scout">
+    <equipment-type id="model.equipment.indian.horses" combat-loss-priority="20"
+                    role="model.role.scout">
       <modifier id="model.modifier.defence" type="additive" value="1"/>
       <modifier id="model.modifier.offence" type="additive" value="1"/>
       <modifier id="model.modifier.lineOfSightBonus" type="additive" value="1"/>
@@ -896,7 +901,8 @@
       <compatible-equipment id="model.equipment.indian.muskets"/>
       <capture-equipment id="model.equipment.horses" by-indians="false"/>
     </equipment-type>
-    <equipment-type id="model.equipment.indian.muskets" combat-loss-priority="10" role="soldier">
+    <equipment-type id="model.equipment.indian.muskets" combat-loss-priority="10"
+                    role="model.role.soldier">
       <modifier id="model.modifier.defence" type="additive" value="1"/>
       <modifier id="model.modifier.offence" type="additive" value="2"/>
       <ability id="model.ability.canBeCaptured" value="false"/>
@@ -1890,9 +1896,12 @@ resources of 400, lost city rumours of 500
   <european-nation-types>
     <!-- default nation for multi-player games -->
     <european-nation-type id="model.nationType.default">
-      <unit id="pioneer" type="model.unit.freeColonist" role="pioneer"/>
-      <unit id="soldier" type="model.unit.freeColonist" role="soldier"/>
-      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" expert-starting-units="true"/>
+      <unit id="pioneer" type="model.unit.freeColonist"
+            role="model.role.pioneer"/>
+      <unit id="soldier" type="model.unit.freeColonist"
+            role="model.role.soldier"/>
+      <unit id="soldier" type="model.unit.veteranSoldier"
+            role="model.role.soldier" expert-starting-units="true"/>
       <unit id="ship" type="model.unit.caravel"/>
       <ability id="model.ability.foundsColonies" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
@@ -1921,7 +1930,7 @@ resources of 400, lost city rumours of 500
     <!-- this was the French player -->
     <european-nation-type id="model.nationType.cooperation" extends="model.nationType.default">
       <modifier id="model.modifier.nativeAlarmModifier" type="percentage" value="-50"/>
-      <unit id="pioneer" type="model.unit.hardyPioneer" role="pioneer"/>
+      <unit id="pioneer" type="model.unit.hardyPioneer" role="model.role.pioneer"/>
     </european-nation-type>
     <!-- this was the English player -->
     <european-nation-type id="model.nationType.immigration" extends="model.nationType.default">
@@ -1933,7 +1942,7 @@ resources of 400, lost city rumours of 500
       <modifier id="model.modifier.offenceAgainst" type="percentage" value="50">
         <scope method-name="isIndian" method-value="true"/>
       </modifier>
-      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" mounted="true"/>
+      <unit id="soldier" type="model.unit.veteranSoldier" role="model.role.soldier" mounted="true"/>
     </european-nation-type>
   </european-nation-types>
 
@@ -2198,17 +2207,17 @@ resources of 400, lost city rumours of 500
           <unitListOption id="model.option.immigrants">
             <unitOption id="model.option.immigrants.1">
               <unitType value="model.unit.masterCarpenter"/>
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="1"/>
             </unitOption>
             <unitOption id="model.option.immigrants.2">
               <unitType value="model.unit.expertFarmer"/>
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="1"/>
             </unitOption>
             <unitOption id="model.option.immigrants.3">
               <unitType value="model.unit.seasonedScout"/>
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="1"/>
             </unitOption>
           </unitListOption>
@@ -2242,66 +2251,66 @@ resources of 400, lost city rumours of 500
           <unitListOption id="model.option.refSize">
             <unitOption id="model.option.refSize.soldiers">
               <unitType value="model.unit.kingsRegular" />
-              <role value="SOLDIER" />
+              <role value="model.role.soldier" />
               <number value="15" />
             </unitOption>
             <unitOption id="model.option.refSize.dragoons">
               <unitType value="model.unit.kingsRegular" />
-              <role value="DRAGOON" />
+              <role value="model.role.dragoon" />
               <number value="5" />
             </unitOption>
             <unitOption id="model.option.refSize.artillery">
               <unitType value="model.unit.artillery" />
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="2" />
             </unitOption>
             <unitOption id="model.option.refSize.menOfWar">
               <unitType value="model.unit.manOWar" />
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="2" />
             </unitOption>
           </unitListOption>
           <unitListOption id="model.option.interventionForce">
             <unitOption id="model.option.interventionForce.regulars">
               <unitType value="model.unit.colonialRegular" />
-              <role value="SOLDIER" />
+              <role value="model.role.soldier" />
               <number value="4" />
             </unitOption>
             <unitOption id="model.option.interventionForce.dragoons">
               <unitType value="model.unit.colonialRegular" />
-              <role value="DRAGOON" />
+              <role value="model.role.dragoon" />
               <number value="2" />
             </unitOption>
             <unitOption id="model.option.interventionForce.artillery">
               <unitType value="model.unit.artillery" />
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="4" />
             </unitOption>
             <unitOption id="model.option.interventionForce.menOfWar">
               <unitType value="model.unit.manOWar" />
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="3" />
             </unitOption>
           </unitListOption>
           <unitListOption id="model.option.mercenaryForce">
             <unitOption id="model.option.mercenaryForce.regulars">
               <unitType value="model.unit.veteranSoldier" />
-              <role value="SOLDIER" />
+              <role value="model.role.soldier" />
               <number value="3" />
             </unitOption>
             <unitOption id="model.option.mercenaryForce.dragoons">
               <unitType value="model.unit.veteranSoldier" />
-              <role value="DRAGOON" />
+              <role value="model.role.dragoon" />
               <number value="3" />
             </unitOption>
             <unitOption id="model.option.mercenaryForce.artillery">
               <unitType value="model.unit.artillery" />
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="3" />
             </unitOption>
             <unitOption id="model.option.mercenaryForce.menOfWar">
               <unitType value="model.unit.manOWar" />
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="2" />
             </unitOption>
           </unitListOption>
@@ -2338,12 +2347,12 @@ resources of 400, lost city rumours of 500
           <unitListOption  id="model.option.immigrants">
             <unitOption id="model.option.immigrants.1">
               <unitType value="model.unit.masterCarpenter"/>
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="1"/>
             </unitOption>
             <unitOption id="model.option.immigrants.2">
               <unitType value="model.unit.expertFarmer"/>
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="1"/>
             </unitOption>
           </unitListOption>
@@ -2377,66 +2386,66 @@ resources of 400, lost city rumours of 500
           <unitListOption id="model.option.refSize">
             <unitOption id="model.option.refSize.soldiers">
               <unitType value="model.unit.kingsRegular" />
-              <role value="SOLDIER" />
+              <role value="model.role.soldier" />
               <number value="23" />
             </unitOption>
             <unitOption id="model.option.refSize.dragoons">
               <unitType value="model.unit.kingsRegular" />
-              <role value="DRAGOON" />
+              <role value="model.role.dragoon" />
               <number value="10" />
             </unitOption>
             <unitOption id="model.option.refSize.artillery">
               <unitType value="model.unit.artillery" />
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="8" />
             </unitOption>
             <unitOption id="model.option.refSize.menOfWar">
               <unitType value="model.unit.manOWar" />
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="5" />
             </unitOption>
           </unitListOption>
           <unitListOption id="model.option.interventionForce">
             <unitOption id="model.option.interventionForce.regulars">
               <unitType value="model.unit.colonialRegular" />
-              <role value="SOLDIER" />
+              <role value="model.role.soldier" />
               <number value="3" />
             </unitOption>
             <unitOption id="model.option.interventionForce.dragoons">
               <unitType value="model.unit.colonialRegular" />
-              <role value="DRAGOON" />
+              <role value="model.role.dragoon" />
               <number value="2" />
             </unitOption>
             <unitOption id="model.option.interventionForce.artillery">
               <unitType value="model.unit.artillery" />
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="2" />
             </unitOption>
             <unitOption id="model.option.interventionForce.menOfWar">
               <unitType value="model.unit.manOWar" />
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="2" />
             </unitOption>
           </unitListOption>
           <unitListOption id="model.option.mercenaryForce">
             <unitOption id="model.option.mercenaryForce.regulars">
               <unitType value="model.unit.veteranSoldier" />
-              <role value="SOLDIER" />
+              <role value="model.role.soldier" />
               <number value="3" />
             </unitOption>
             <unitOption id="model.option.mercenaryForce.dragoons">
               <unitType value="model.unit.veteranSoldier" />
-              <role value="DRAGOON" />
+              <role value="model.role.dragoon" />
               <number value="3" />
             </unitOption>
             <unitOption id="model.option.mercenaryForce.artillery">
               <unitType value="model.unit.artillery" />
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="3" />
             </unitOption>
             <unitOption id="model.option.mercenaryForce.menOfWar">
               <unitType value="model.unit.manOWar" />
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="2" />
             </unitOption>
           </unitListOption>
@@ -2473,7 +2482,7 @@ resources of 400, lost city rumours of 500
           <unitListOption  id="model.option.immigrants">
             <unitOption id="model.option.immigrants.1">
               <unitType value="model.unit.masterCarpenter"/>
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="1"/>
             </unitOption>
           </unitListOption>
@@ -2507,66 +2516,66 @@ resources of 400, lost city rumours of 500
           <unitListOption id="model.option.refSize">
             <unitOption id="model.option.refSize.soldiers">
               <unitType value="model.unit.kingsRegular" />
-              <role value="SOLDIER" />
+              <role value="model.role.soldier" />
               <number value="31" />
             </unitOption>
             <unitOption id="model.option.refSize.dragoons">
               <unitType value="model.unit.kingsRegular" />
-              <role value="DRAGOON" />
+              <role value="model.role.dragoon" />
               <number value="15" />
             </unitOption>
             <unitOption id="model.option.refSize.artillery">
               <unitType value="model.unit.artillery" />
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="14" />
             </unitOption>
             <unitOption id="model.option.refSize.menOfWar">
               <unitType value="model.unit.manOWar" />
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="8" />
             </unitOption>
           </unitListOption>
           <unitListOption id="model.option.interventionForce">
             <unitOption id="model.option.interventionForce.regulars">
               <unitType value="model.unit.colonialRegular" />
-              <role value="SOLDIER" />
+              <role value="model.role.soldier" />
               <number value="2" />
             </unitOption>
             <unitOption id="model.option.interventionForce.dragoons">
               <unitType value="model.unit.colonialRegular" />
-              <role value="DRAGOON" />
+              <role value="model.role.dragoon" />
               <number value="2" />
             </unitOption>
             <unitOption id="model.option.interventionForce.artillery">
               <unitType value="model.unit.artillery" />
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="2" />
             </unitOption>
             <unitOption id="model.option.interventionForce.menOfWar">
               <unitType value="model.unit.manOWar" />
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="2" />
             </unitOption>
           </unitListOption>
           <unitListOption id="model.option.mercenaryForce">
             <unitOption id="model.option.mercenaryForce.regulars">
               <unitType value="model.unit.veteranSoldier" />
-              <role value="SOLDIER" />
+              <role value="model.role.soldier" />
               <number value="3" />
             </unitOption>
             <unitOption id="model.option.mercenaryForce.dragoons">
               <unitType value="model.unit.veteranSoldier" />
-              <role value="DRAGOON" />
+              <role value="model.role.dragoon" />
               <number value="3" />
             </unitOption>
             <unitOption id="model.option.mercenaryForce.artillery">
               <unitType value="model.unit.artillery" />
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="3" />
             </unitOption>
             <unitOption id="model.option.mercenaryForce.menOfWar">
               <unitType value="model.unit.manOWar" />
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="2" />
             </unitOption>
           </unitListOption>
@@ -2630,66 +2639,66 @@ resources of 400, lost city rumours of 500
           <unitListOption id="model.option.refSize">
             <unitOption id="model.option.refSize.soldiers">
               <unitType value="model.unit.kingsRegular" />
-              <role value="SOLDIER" />
+              <role value="model.role.soldier" />
               <number value="39" />
             </unitOption>
             <unitOption id="model.option.refSize.dragoons">
               <unitType value="model.unit.kingsRegular" />
-              <role value="DRAGOON" />
+              <role value="model.role.dragoon" />
               <number value="20" />
             </unitOption>
             <unitOption id="model.option.refSize.artillery">
               <unitType value="model.unit.artillery" />
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="20" />
             </unitOption>
             <unitOption id="model.option.refSize.menOfWar">
               <unitType value="model.unit.manOWar" />
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="11" />
             </unitOption>
           </unitListOption>
           <unitListOption id="model.option.interventionForce">
             <unitOption id="model.option.interventionForce.regulars">
               <unitType value="model.unit.colonialRegular" />
-              <role value="SOLDIER" />
+              <role value="model.role.soldier" />
               <number value="2" />
             </unitOption>
             <unitOption id="model.option.interventionForce.dragoons">
               <unitType value="model.unit.colonialRegular" />
-              <role value="DRAGOON" />
+              <role value="model.role.dragoon" />
               <number value="1" />
             </unitOption>
             <unitOption id="model.option.interventionForce.artillery">
               <unitType value="model.unit.artillery" />
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="2" />
             </unitOption>
             <unitOption id="model.option.interventionForce.menOfWar">
               <unitType value="model.unit.manOWar" />
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="2" />
             </unitOption>
           </unitListOption>
           <unitListOption id="model.option.mercenaryForce">
             <unitOption id="model.option.mercenaryForce.regulars">
               <unitType value="model.unit.veteranSoldier" />
-              <role value="SOLDIER" />
+              <role value="model.role.soldier" />
               <number value="3" />
             </unitOption>
             <unitOption id="model.option.mercenaryForce.dragoons">
               <unitType value="model.unit.veteranSoldier" />
-              <role value="DRAGOON" />
+              <role value="model.role.dragoon" />
               <number value="3" />
             </unitOption>
             <unitOption id="model.option.mercenaryForce.artillery">
               <unitType value="model.unit.artillery" />
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="3" />
             </unitOption>
             <unitOption id="model.option.mercenaryForce.menOfWar">
               <unitType value="model.unit.manOWar" />
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="2" />
             </unitOption>
           </unitListOption>
@@ -2753,66 +2762,66 @@ resources of 400, lost city rumours of 500
           <unitListOption id="model.option.refSize">
             <unitOption id="model.option.refSize.soldiers">
               <unitType value="model.unit.kingsRegular" />
-              <role value="SOLDIER" />
+              <role value="model.role.soldier" />
               <number value="47" />
             </unitOption>
             <unitOption id="model.option.refSize.dragoons">
               <unitType value="model.unit.kingsRegular" />
-              <role value="DRAGOON" />
+              <role value="model.role.dragoon" />
               <number value="25" />
             </unitOption>
             <unitOption id="model.option.refSize.artillery">
               <unitType value="model.unit.artillery" />
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="26" />
             </unitOption>
             <unitOption id="model.option.refSize.menOfWar">
               <unitType value="model.unit.manOWar" />
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="14" />
             </unitOption>
           </unitListOption>
           <unitListOption id="model.option.interventionForce">
             <unitOption id="model.option.interventionForce.regulars">
               <unitType value="model.unit.colonialRegular" />
-              <role value="SOLDIER" />
+              <role value="model.role.soldier" />
               <number value="2" />
             </unitOption>
             <unitOption id="model.option.interventionForce.dragoons">
               <unitType value="model.unit.colonialRegular" />
-              <role value="DRAGOON" />
+              <role value="model.role.dragoon" />
               <number value="1" />
             </unitOption>
             <unitOption id="model.option.interventionForce.artillery">
               <unitType value="model.unit.artillery" />
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="2" />
             </unitOption>
             <unitOption id="model.option.interventionForce.menOfWar">
               <unitType value="model.unit.manOWar" />
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="2" />
             </unitOption>
           </unitListOption>
           <unitListOption id="model.option.mercenaryForce">
             <unitOption id="model.option.mercenaryForce.regulars">
               <unitType value="model.unit.veteranSoldier" />
-              <role value="SOLDIER" />
+              <role value="model.role.soldier" />
               <number value="3" />
             </unitOption>
             <unitOption id="model.option.mercenaryForce.dragoons">
               <unitType value="model.unit.veteranSoldier" />
-              <role value="DRAGOON" />
+              <role value="model.role.dragoon" />
               <number value="3" />
             </unitOption>
             <unitOption id="model.option.mercenaryForce.artillery">
               <unitType value="model.unit.artillery" />
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="3" />
             </unitOption>
             <unitOption id="model.option.mercenaryForce.menOfWar">
               <unitType value="model.unit.manOWar" />
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="2" />
             </unitOption>
           </unitListOption>
@@ -2850,8 +2859,8 @@ resources of 400, lost city rumours of 500
             <template>
               <unitOption id="model.option.immigrants.template">
                 <unitType value="model.unit.freeColonist" generate="IMMIGRANTS" />
-                <role value="DEFAULT" >
-                  <choice value="DEFAULT" />
+                <role value="model.role.default" >
+                  <choice value="model.role.default" />
                 </role>
                 <number value="1" minimumValue="1" maximumValue="1" />
               </unitOption>
@@ -2896,81 +2905,81 @@ resources of 400, lost city rumours of 500
             <template>
               <unitOption id="model.option.refSize.template">
                 <unitType value="model.unit.kingsRegular" generate="UNITS" />
-                <role value="SOLDIER">
-                  <choice value="SOLDIER" />
-                  <choice value="DRAGOON" />
+                <role value="model.role.soldier">
+                  <choice value="model.role.soldier" />
+                  <choice value="model.role.dragoon" />
                 </role>
                 <number value="20" minimumValue="0" maximumValue="999" />
               </unitOption>
             </template>
             <unitOption id="model.option.refSize.soldiers">
               <unitType value="model.unit.kingsRegular" generate="UNITS" />
-              <role value="SOLDIER">
-                <choice value="SOLDIER" />
-                <choice value="DRAGOON" />
+              <role value="model.role.soldier">
+                <choice value="model.role.soldier" />
+                <choice value="model.role.dragoon" />
               </role>
               <number value="60" minimumValue="0" maximumValue="999" />
             </unitOption>
             <unitOption id="model.option.refSize.dragoons">
               <unitType value="model.unit.kingsRegular" generate="UNITS" />
-              <role value="DRAGOON" >
-                <choice value="SOLDIER" />
-                <choice value="DRAGOON" />
+              <role value="model.role.dragoon" >
+                <choice value="model.role.soldier" />
+                <choice value="model.role.dragoon" />
               </role>
               <number value="30" minimumValue="0" maximumValue="999" />
             </unitOption>
             <unitOption id="model.option.refSize.artillery">
               <unitType value="model.unit.artillery" generate="UNITS" />
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="30" minimumValue="0" maximumValue="999" />
             </unitOption>
             <unitOption id="model.option.refSize.menOfWar">
               <unitType value="model.unit.manOWar" generate="UNITS" />
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="20" minimumValue="0" maximumValue="999" />
             </unitOption>
           </unitListOption>
           <unitListOption id="model.option.interventionForce">
             <unitOption id="model.option.interventionForce.regulars">
               <unitType value="model.unit.colonialRegular" generate="UNITS" />
-              <role value="SOLDIER" />
+              <role value="model.role.soldier" />
               <number value="2" minimumValue="0" maximumValue="999" />
             </unitOption>
             <unitOption id="model.option.interventionForce.dragoons">
               <unitType value="model.unit.colonialRegular" generate="UNITS" />
-              <role value="DRAGOON" />
+              <role value="model.role.dragoon" />
               <number value="1" minimumValue="0" maximumValue="999" />
             </unitOption>
             <unitOption id="model.option.interventionForce.artillery">
               <unitType value="model.unit.artillery" generate="UNITS" />
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="2" minimumValue="0" maximumValue="999" />
             </unitOption>
             <unitOption id="model.option.interventionForce.menOfWar">
               <unitType value="model.unit.manOWar" generate="UNITS" />
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="2" minimumValue="0" maximumValue="999" />
             </unitOption>
           </unitListOption>
           <unitListOption id="model.option.mercenaryForce">
             <unitOption id="model.option.mercenaryForce.regulars">
               <unitType value="model.unit.veteranSoldier" />
-              <role value="SOLDIER" />
+              <role value="model.role.soldier" />
               <number value="3" />
             </unitOption>
             <unitOption id="model.option.mercenaryForce.dragoons">
               <unitType value="model.unit.veteranSoldier" />
-              <role value="DRAGOON" />
+              <role value="model.role.dragoon" />
               <number value="3" />
             </unitOption>
             <unitOption id="model.option.mercenaryForce.artillery">
               <unitType value="model.unit.artillery" />
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="3" />
             </unitOption>
             <unitOption id="model.option.mercenaryForce.menOfWar">
               <unitType value="model.unit.manOWar" />
-              <role value="DEFAULT" />
+              <role value="model.role.default" />
               <number value="2" />
             </unitOption>
           </unitListOption>
