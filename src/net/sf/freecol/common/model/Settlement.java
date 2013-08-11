@@ -154,10 +154,16 @@ public abstract class Settlement extends GoodsLocation
     /**
      * Adds a tile to this settlement.
      *
+     * We can not clear the settlement owned tiles container when the
+     * settlement is read because this is called when the Tile is
+     * read, and tiles can appear before and after the settlement in
+     * the map definition.  So we just accumulate and defend against
+     * duplicates.
+     *
      * @param tile The <code>Tile</code> to add.
      */
     public void addTile(Tile tile) {
-        ownedTiles.add(tile);
+        if (!ownedTiles.contains(tile)) ownedTiles.add(tile);
     }
 
     /**
@@ -666,12 +672,15 @@ public abstract class Settlement extends GoodsLocation
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        for (Ability ability : getSortedAbilities()) {
-            ability.toXML(xw);
-        }
+        if (xw.validFor(getOwner())) {
 
-        for (Modifier modifier : getSortedModifiers()) {
-            modifier.toXML(xw);
+            for (Ability ability : getSortedAbilities()) {
+                ability.toXML(xw);
+            }
+
+            for (Modifier modifier : getSortedModifiers()) {
+                modifier.toXML(xw);
+            }
         }
     }
 

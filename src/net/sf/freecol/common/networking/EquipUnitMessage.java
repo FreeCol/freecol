@@ -123,6 +123,7 @@ public class EquipUnitMessage extends DOMMessage {
             if (!unit.canBeEquippedWith(type)) {
                 return DOMMessage.clientError("Unable to equip unit " + unitId
                     + " with " + typeId);
+                
             }
         } else {
             if (-amount > unit.getEquipmentCount(type)) {

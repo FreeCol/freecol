@@ -399,7 +399,8 @@ public class IndianDemandMission extends Mission {
             Colony colony = (Colony)getTarget();
             Player enemy = colony.getOwner();
             Goods goods = selectGoods(colony);
-            int gold = 0;
+            GoodsType type = (goods == null) ? null : goods.getType();
+            int amount = (goods == null) ? 0 : goods.getAmount();
             int oldGoods = (goods == null) ? 0
                 : unit.getGoodsCount(goods.getType());
             if (goods == null) {
@@ -409,21 +410,21 @@ public class IndianDemandMission extends Mission {
                         + " at " + colony.getName() + ": " + this);
                     return;
                 }
-                gold = enemy.getGold() / 20;
-                if (gold == 0) gold = enemy.getGold();
+                amount = enemy.getGold() / 20;
+                if (amount == 0) amount = enemy.getGold();
             }
             demanded = true;
 
             boolean accepted
-                = AIMessage.askIndianDemand(aiUnit, colony, goods, gold);
-            if (accepted && (gold > 0 || hasTribute())) {
+                = AIMessage.askIndianDemand(aiUnit, colony, type, amount);
+            if (accepted && (goods == null || hasTribute())) {
                 if (goods != null) {
                     logger.finest(tag + " accepted at " + colony.getName()
                         + " tribute: " + goods.toString() + ": " + this);
                     continue; // Head for home
                 } else {
                     logger.finest(tag + " completed at " + colony.getName()
-                        + " tribute: " + gold + " gold: " + this);
+                        + " tribute: " + amount + " gold: " + this);
                 }
             } else { // Consider attacking if not content.
                 int unitTension = (is == null) ? 0
