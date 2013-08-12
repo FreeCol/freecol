@@ -272,6 +272,34 @@ public class Europe extends UnitLocation implements Ownable, Named {
         return player.checkGold(price);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int canBuildRoleEquipment(Role role) {
+        Player player = getOwner();
+        Market market = player.getMarket();
+        int price = 0;
+        for (EquipmentType et : role.getRoleEquipment()) {
+            for (AbstractGoods ag : et.getRequiredGoods()) {
+                GoodsType goodsType = ag.getType();
+                // Refuse to trade in boycotted goods
+                if (!player.canTrade(goodsType)) return -1;
+                price += market.getBidPrice(goodsType, ag.getAmount());
+            }
+        }
+        return price;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equipForRole(Unit unit, Role role) {
+        throw new RuntimeException("Only valid in the server.");
+    }
+
+
 
     // Interface Named
 

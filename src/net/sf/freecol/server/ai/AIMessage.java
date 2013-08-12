@@ -36,6 +36,7 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
@@ -60,7 +61,7 @@ import net.sf.freecol.common.networking.DisbandUnitMessage;
 import net.sf.freecol.common.networking.DisembarkMessage;
 import net.sf.freecol.common.networking.EmbarkMessage;
 import net.sf.freecol.common.networking.EmigrateUnitMessage;
-import net.sf.freecol.common.networking.EquipUnitMessage;
+import net.sf.freecol.common.networking.EquipForRoleMessage;
 import net.sf.freecol.common.networking.GetNationSummaryMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
@@ -412,15 +413,12 @@ public class AIMessage {
      * Change the equipment of a unit.
      *
      * @param aiUnit The <code>AIUnit</code> to equip.
-     * @param type The <code>EquipmentType</code> to equip with.
-     * @param amount The amount to change the equipment by.
+     * @param role The <code>Role</code> to equip for.
      * @return True if the message was sent, and a non-error reply returned.
      */
-    public static boolean askEquipUnit(AIUnit aiUnit, EquipmentType type,
-                                       int amount) {
+    public static boolean askEquipForRole(AIUnit aiUnit, Role role) {
         return sendMessage(aiUnit.getAIOwner().getConnection(),
-                           new EquipUnitMessage(aiUnit.getUnit(), type,
-                                                amount));
+                           new EquipForRoleMessage(aiUnit.getUnit(), role));
     }
 
 

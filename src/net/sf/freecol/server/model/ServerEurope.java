@@ -23,11 +23,15 @@ import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
+import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
+import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -62,6 +66,45 @@ public class ServerEurope extends Europe implements ServerModelObject {
         super(game, owner);
     }
 
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equipForRole(Unit unit, Role role) {
+        ServerPlayer owner = (ServerPlayer)getOwner();
+        int price = canBuildRoleEquipment(role);
+        if (price < 0 || !owner.checkGold(price)) return false;
+
+        // Process adding equipment first, so as to settle what has to
+        // be removed.
+        List<EquipmentType> remove = null;
+        for (EquipmentType et : role.getRoleEquipment()) {
+            for (AbstractGoods ag : et.getRequiredGoods()) {
+                int m = owner.buy(null, ag.getType(), ag.getAmount());
+                if (m > 0) {
+                    owner.addExtraTrade(new AbstractGoods(ag.getType(), -m));
+                }
+                for (EquipmentType rt : unit.changeEquipment(et, 1)) {
+                    int a = unit.getEquipmentCount(rt);
+                    for (AbstractGoods rg : rt.getRequiredGoods()) {
+                        if (owner.canTrade(rg.getType(),
+                                           Market.Access.EUROPE)) {
+                            int rm = owner.sell(null, rg.getType(),
+                                                a * rg.getAmount());
+                            if (rm > 0) {
+                                owner.addExtraTrade(new AbstractGoods(rg.getType(), rm));
+                            }
+                        }
+                    }
+                    // Removals can not cause incompatible-equipment trouble
+                    unit.changeEquipment(rt, -a);
+                }
+            }
+        }
+        unit.setRole();
+        return unit.getRole() == role;
+    }
 
     /**
      * Generates the initial recruits for this player.  Recruits may

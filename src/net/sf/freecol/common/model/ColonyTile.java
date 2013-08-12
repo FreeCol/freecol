@@ -240,6 +240,8 @@ public class ColonyTile extends WorkLocation {
     //   UnitLocation.moveToFront
     //   UnitLocation.clearUnitList
     //   UnitLocation.canBuildEquipment
+    //   UnitLocation.canBuildRoleEquipment
+    //   UnitLocation.equipForRole
 
     /**
      * {@inheritDoc}

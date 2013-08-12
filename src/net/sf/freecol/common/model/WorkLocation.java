@@ -389,6 +389,8 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
     //   UnitLocation.clearUnitList
     //   UnitLocation.getUnitCapacity
     //   UnitLocation.canBuildEquipment
+    //   UnitLocation.canBuildRoleEquipment
+    //   UnitLocation.equipForRole
 
     /**
      * {@inheritDoc}

@@ -607,7 +607,7 @@ public class Unit extends GoodsLocation
     /**
      * Set the unit role based on its equipment.
      */
-    protected void setRole() {
+    public void setRole() {
         Role oldRole = role;
         role = Role.DEFAULT;
         for (EquipmentType type : equipment.keySet()) {

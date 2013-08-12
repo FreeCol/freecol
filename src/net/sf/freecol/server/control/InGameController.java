@@ -3398,7 +3398,7 @@ public final class InGameController extends Controller {
         UnitLocation loc = (unit.isInEurope()) ? serverPlayer.getEurope()
             : unit.getSettlement();
         if (loc == null || !loc.canBuildEquipment(type, amount)) {
-            return DOMMessage.clientError("Can not built " + type.getId()
+            return DOMMessage.clientError("Can not build " + type.getId()
                 + " at " + loc + " for: " + unit.getId());
         }
 
@@ -3526,6 +3526,52 @@ public final class InGameController extends Controller {
             unit.changeEquipment(e, -a);
         }
         return true;
+    }
+
+    /**
+     * Equip a unit for a specific role.
+     * Currently the unit is either in Europe or in a settlement.
+     * Might one day allow the unit to be on a tile co-located with
+     * an equipment-bearing wagon.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
+     * @param unit The <code>Unit</code> to equip.
+     * @param role The <code>Role</code> to equip for.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element equipForRole(ServerPlayer serverPlayer, Unit unit,
+                                Role role) {
+        UnitLocation loc = (unit.isInEurope()) ? serverPlayer.getEurope()
+            : unit.getSettlement();
+        if (loc == null) {
+            return DOMMessage.clientError("Unsuitable equip location for: "
+                + unit.getId());
+        } else if (!loc.equipForRole(unit, role)) {
+            return DOMMessage.clientError("Can not build " + role.getId()
+                + " equipment at " + loc + " for: " + unit.getId());
+        }
+
+        ChangeSet cs = new ChangeSet();
+        if (loc instanceof Europe) {
+            cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
+        }
+        if (loc instanceof WorkLocation) {
+            unit.setLocation(loc.getTile());//-vis: safe/colony,-til
+            loc.getTile().updatePlayerExploredTiles();//+til
+            cs.add(See.perhaps(), unit.getTile());
+        } else {
+            cs.add(See.only(serverPlayer), unit);
+        }
+        if (unit.getInitialMovesLeft() != unit.getMovesLeft()) {
+            unit.setMovesLeft(0);
+        }
+        Unit carrier = unit.getCarrier();
+        if (carrier != null
+            && carrier.getInitialMovesLeft() != carrier.getMovesLeft()
+            && carrier.getMovesLeft() != 0) {
+            carrier.setMovesLeft(0);
+        }
+        return cs.build(serverPlayer);
     }
 
     /**

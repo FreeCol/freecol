@@ -561,6 +561,49 @@ public abstract class Settlement extends GoodsLocation
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int canBuildRoleEquipment(Role role) {
+        for (EquipmentType et : role.getRoleEquipment()) {
+            for (AbstractGoods ag : et.getRequiredGoods()) {
+                if (getGoodsCount(ag.getType()) < ag.getAmount()) return -1;
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equipForRole(Unit unit, Role role) {
+        if (!getGame().isInServer()) {
+            throw new RuntimeException("Must be in server");
+        }
+        int price = canBuildRoleEquipment(role);
+        if (price < 0 || !owner.checkGold(price)) return false;
+        // Process adding equipment first, so as to settle what has to
+        // be removed.
+        List<EquipmentType> remove = null;
+        for (EquipmentType et : role.getRoleEquipment()) {
+            for (AbstractGoods ag : et.getRequiredGoods()) {
+                removeGoods(ag);
+            }
+            for (EquipmentType rt : unit.changeEquipment(et, 1)) {
+                int a = unit.getEquipmentCount(rt);
+                for (AbstractGoods ag : rt.getRequiredGoods()) {
+                    addGoods(ag.getType(), ag.getAmount() * a);
+                }
+                unit.changeEquipment(rt, -a);
+            }
+        }
+        unit.setRole();
+        return unit.getRole() == role;
+    }
+
+
     // Interface GoodsLocation
     // Inherits
     //   GoodsLocation.addGoods

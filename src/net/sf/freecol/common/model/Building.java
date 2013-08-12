@@ -425,6 +425,8 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     //   UnitLocation.moveToFront
     //   UnitLocation.clearUnitList
     //   UnitLocation.canBuildEquipment
+    //   UnitLocation.canBuildRoleEquipment
+    //   UnitLocation.equipForRole
     
     /**
      * {@inheritDoc}

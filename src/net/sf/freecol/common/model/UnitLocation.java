@@ -467,6 +467,28 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         return false;
     }
 
+    /**
+     * Can equipment for a given role built here?
+     *
+     * @param role The <code>Role</code> to build for.
+     * @return Negative if the equipment can not be built, otherwise the
+     *     price to build the required equipment (may be zero).
+     */
+    public int canBuildRoleEquipment(Role role) {
+        return -1;
+    }
+
+    /**
+     * Equip a unit for a role using resources at this location.
+     *
+     * @param unit The <code>Unit</code> to equip.
+     * @param role The <code>Role</code> to build for.
+     * @return True if the equipping succeeded.
+     */
+    public boolean equipForRole(Unit unit, Role role) {
+        return false;
+    }
+
 
     // Serialization
 

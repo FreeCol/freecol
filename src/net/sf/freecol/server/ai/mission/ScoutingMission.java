@@ -475,10 +475,7 @@ public class ScoutingMission extends Mission {
         setTarget(findTarget(aiUnit, 20, false));
         if (completed instanceof Colony) {
             if (getTarget() == null || getTarget() == completed) {
-                for (EquipmentType e : new ArrayList<EquipmentType>(unit
-                        .getEquipment().keySet())) {
-                    AIMessage.askEquipUnit(aiUnit, e, -unit.getEquipmentCount(e));
-                }
+                aiUnit.equipForRole(Role.DEFAULT, false);
                 setTarget(null);
             }
             logger.finest(tag + " arrived at " + ((Colony)completed).getName()

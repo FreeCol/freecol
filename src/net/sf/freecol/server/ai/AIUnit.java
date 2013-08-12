@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitLocation;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.goal.Goal;
@@ -337,11 +338,6 @@ public class AIUnit extends AIObject implements Transportable {
      * (possibly requiring a purchase, which may fail due to lack of gold
      * or boycotts in effect).
      *
-     * When multiple equipment types are needed, try them all --- so for
-     * example, if a request is made to equip a unit in Europe as a dragoon
-     * but muskets are boycotted, it may still acquire the horses and end
-     * up as a scout.
-     *
      * TODO: remove cheat.
      *
      * @param r The <code>Role</code> to adopt.
@@ -351,39 +347,16 @@ public class AIUnit extends AIObject implements Transportable {
     public boolean equipForRole(Role r, boolean cheat) {
         final Specification spec = getSpecification();
         final Player player = unit.getOwner();
-        Location loc = unit.getLocation();
-        Europe europe = (unit.isInEurope()) ? player.getEurope() : null;
-        Settlement settlement;
-        if (loc == null
-            || ((settlement = loc.getSettlement()) == null
-                && europe == null)) return false;
-
-        eq: for (EquipmentType e : unit.getRoleEquipment(r)) {
-            // Check that this should succeed before querying server.
-            if (europe != null) {
-                for (AbstractGoods ag : e.getRequiredGoods()) {
-                    if (player.getMarket().getArrears(ag.getType()) > 0) {
-                        continue eq; // Boycott prevents purchase.
-                    }
-                    int cost = player.getMarket().getBidPrice(ag.getType(),
-                                                              ag.getAmount());
-                    if (!player.checkGold(cost)) {
-                        if (cheat) {
-                            player.logCheat("minted " + cost
-                                + " gold to equip " + unit + " for " + r);
-                            player.modifyGold(cost);
-                        } else {
-                            continue eq;
-                        }
-                    }
-                }
-            } else {
-                if (!settlement.canBuildEquipment(e)) continue eq;
-            }
-            // Should now only fail due to comms lossage.
-            AIMessage.askEquipUnit(this, e, 1);
+        UnitLocation loc = (UnitLocation)unit.getLocation();
+        int price = loc.canBuildRoleEquipment(r);
+        if (price < 0) return false;
+        if (!player.checkGold(price)) {
+            if (!cheat) return false;
+            player.logCheat("minted " + price + " gold to equip " + unit
+                + " for " + r);
+            player.modifyGold(price);
         }
-        return unit.getRole() == r;
+        return AIMessage.askEquipForRole(this, r) && unit.getRole() == r;
     }
 
     /**

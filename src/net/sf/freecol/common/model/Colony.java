@@ -2439,6 +2439,8 @@ public class Colony extends Settlement implements Nameable {
     //   UnitLocation.moveToFront [Irrelevant!]
     //   UnitLocation.clearUnitList [Irrelevant!]
     //   Settlement.canBuildEquipment
+    //   Settlement.canBuildRoleEquipment
+    //   Settlement.equipForRole
     //   Settlement.getNoAddReason
 
 
