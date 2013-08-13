@@ -92,12 +92,15 @@ public class ServerPlayerTest extends FreeColTestCase {
 
         // Sell lightly in the English market to check that the good
         // is now considered "traded".
-        english.sell(null, silverType, 1, new Random());
+        Random random = new Random();
+        int m = english.sell(null, silverType, 1);
+        if (m > 0) english.propagateToEuropeanMarkets(silverType, m, random);
         assertTrue(englishMarket.hasBeenTraded(silverType));
         int englishAmount = englishMarket.getAmountInMarket(silverType);
 
         // Sell heavily in the French market, price should drop.
-        french.sell(null, silverType, 200, new Random());
+        m = french.sell(null, silverType, 200);
+        if (m > 0) french.propagateToEuropeanMarkets(silverType, m, random);
         assertEquals(frenchGold + silverPrice * 200, french.getGold());
         assertTrue(frenchMarket.hasBeenTraded(silverType));
         assertTrue(frenchMarket.getSalePrice(silverType, 1) < silverPrice);
@@ -430,7 +433,7 @@ public class ServerPlayerTest extends FreeColTestCase {
         Market dm = p.getMarket();
         int previousGold = p.getGold();
         int price = spec().getInitialPrice(silverType);
-        p.sell(null, silverType, 1000, new Random());
+        p.sell(null, silverType, 1000);
 
         assertEquals(previousGold + price * 1000, p.getGold());
         assertTrue(dm.getSalePrice(silverType, 1) < price);
@@ -443,9 +446,8 @@ public class ServerPlayerTest extends FreeColTestCase {
         Market dm = player.getMarket();
         player.modifyGold(1000000);
         int price = dm.getCostToBuy(foodType);
-        player.buy(new GoodsContainer(game, player.getEurope()), foodType,
-                   10000, new Random());
-
+        int n = player.buy(new GoodsContainer(game, player.getEurope()),
+                                              foodType, 10000);
         assertEquals(1000000 - 10000 * price, player.getGold());
         assertTrue(dm.getBidPrice(foodType, 1) > price);
     }
@@ -456,45 +458,40 @@ public class ServerPlayerTest extends FreeColTestCase {
      */
     public int sellUntilPriceDrop(Game game, ServerPlayer player,
                                   GoodsType type) {
-        Random random = new Random();
-
         int result = 0;
-
         Market market = player.getMarket();
-
         int price = market.getSalePrice(type, 1);
-
-        if (price == 0)
+        if (price == 0) {
             throw new IllegalArgumentException("Price is already 0 for selling " + type);
+        }
 
-        while (price == market.getSalePrice(type, 1)){
-            player.sell(null, type, 10, random);
+        while (price == market.getSalePrice(type, 1)) {
+            player.sell(null, type, 10);
             result++;
         }
         return result;
     }
 
     /*
-     * Helper method for finding out how much to buy of a good before the prices
-     * rises.
+     * Helper method for finding out how much to buy of a good before
+     * the prices rises.
      */
     public int buyUntilPriceRise(Game game, ServerPlayer player,
                                  GoodsType type) {
         Game g = ServerTestHelper.startServerGame(getTestMap());
         Random random = new Random();
-
         int result = 0;
-
         Market market = player.getMarket();
-
         int price = market.getBidPrice(type, 1);
 
-        if (price == 20)
+        if (price == 20) {
             throw new IllegalArgumentException("Price is already 20 for buying " + type);
+        }
 
-        GoodsContainer container = new GoodsContainer(game, player.getEurope());
+        GoodsContainer container
+            = new GoodsContainer(game, player.getEurope());
         while (price == market.getBidPrice(type, 1)) {
-            player.buy(container, type, 10, random);
+            player.buy(container, type, 10);
             result++;
         }
         return result;

@@ -142,6 +142,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /** Players with respect to which stance has changed. */
     private List<ServerPlayer> stanceDirty = new ArrayList<ServerPlayer>();
 
+    /** Accumulate extra trades here.  Do not serialize. */
+    private final List<AbstractGoods> extraTrades
+        = new ArrayList<AbstractGoods>();
+
 
     /**
      * Trivial constructor required for all ServerModelObjects.
@@ -267,6 +271,15 @@ public class ServerPlayer extends Player implements ServerModelObject {
     public void setConnection(Connection connection) {
         this.connection = connection;
         connected = (connection != null);
+    }
+
+    /**
+     * Accumulate extra trades.
+     *
+     * @param ag The <code>AbstractGoods</code> describing the sale.
+     */
+    public void addExtraTrade(AbstractGoods ag) {
+        extraTrades.add(ag);
     }
 
     /**
@@ -956,36 +969,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
-     * Propagate an European market change to the other European markets.
-     *
-     * @param type The type of goods that was traded.
-     * @param amount The amount of goods that was traded.
-     * @param random A <code>Random</code> number source.
-     */
-    private void propagateToEuropeanMarkets(GoodsType type, int amount,
-                                            Random random) {
-        if (!type.isStorable()) return;
-
-        // Propagate 5-30% of the original change.
-        final int lowerBound = 5; // TODO: make into game option?
-        final int upperBound = 30;// TODO: make into game option?
-        amount *= Utils.randomInt(logger, "Propagate goods", random,
-                                  upperBound - lowerBound + 1) + lowerBound;
-        amount /= 100;
-        if (amount == 0) return;
-
-        // Do not need to update the clients here, these changes happen
-        // while it is not their turn.
-        for (Player other : getGame().getLiveEuropeanPlayers()) {
-            Market market;
-            if ((ServerPlayer) other != this
-                && (market = other.getMarket()) != null) {
-                market.addGoodsToMarket(type, amount);
-            }
-        }
-    }
-
-    /**
      * Flush any market price changes for a specified goods type.
      *
      * @param type The <code>GoodsType</code> to check.
@@ -1009,34 +992,26 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param container The <code>GoodsContainer</code> to carry the goods.
      * @param type The <code>GoodsType</code> to buy.
      * @param amount The amount of goods to buy.
-     * @param random A <code>Random</code> number source.
-     * @throws IllegalStateException If the <code>player</code> cannot afford
-     *                               to buy the goods.
+     * @return The amount actually removed from the market, or
+     *     negative on failure.
      */
-    public void buy(GoodsContainer container, GoodsType type, int amount,
-                    Random random)
-        throws IllegalStateException {
-        logger.finest(getName() + " buys " + amount + " " + type);
+    public int buy(GoodsContainer container, GoodsType type, int amount) {
         Market market = getMarket();
         int price = market.getBidPrice(type, amount);
-        if (!checkGold(price)) {
-            throw new IllegalStateException("Player " + getName()
-                + " tried to buy " + Integer.toString(amount)
-                + " " + type.toString()
-                + " for " + Integer.toString(price)
-                + " but has " + Integer.toString(getGold()) + " gold.");
-        }
+        if (!checkGold(price)) return -1;
+        logger.finest(getName() + " buys " + amount + " " + type
+            + " for " + price);
+
         modifyGold(-price);
         market.modifySales(type, -amount);
+        if (container != null) container.addGoods(type, amount);
         market.modifyIncomeBeforeTaxes(type, -price);
         market.modifyIncomeAfterTaxes(type, -price);
-        int marketAmount = -(int)applyModifier((float)amount,
-                                               "model.modifier.tradeBonus",
-                                               type, getGame().getTurn());
-        market.addGoodsToMarket(type, marketAmount);
-        propagateToEuropeanMarkets(type, marketAmount, random);
-
-        container.addGoods(type, amount);
+        int marketAmount = (int)applyModifier((float)amount,
+                                              "model.modifier.tradeBonus",
+                                              type, getGame().getTurn());
+        market.addGoodsToMarket(type, -marketAmount);
+        return marketAmount;
     }
 
     /**
@@ -1046,28 +1021,27 @@ public class ServerPlayer extends Player implements ServerModelObject {
      *     carrying the goods.
      * @param type The <code>GoodsType</code> to sell.
      * @param amount The amount of goods to sell.
-     * @param random A <code>Random</code> number source.
-     * @return The post-tax income from the sale.
+     * @return The amount actually added to the market, or negative on failure.
      */
-    public int sell(GoodsContainer container, GoodsType type, int amount,
-                    Random random) {
-        logger.finest(getName() + " sells " + amount + " " + type);
+    public int sell(GoodsContainer container, GoodsType type, int amount) {
         Market market = getMarket();
-        int tax = getTax();
-        int incomeBeforeTaxes = market.getSalePrice(type, amount);
+        int price = market.getSalePrice(type, amount);
+        logger.finest(getName() + " sells " + amount + " " + type
+            + " for " + price);
+
+        final int tax = getTax();
+        int incomeBeforeTaxes = price;
         int incomeAfterTaxes = ((100 - tax) * incomeBeforeTaxes) / 100;
         modifyGold(incomeAfterTaxes);
         market.modifySales(type, amount);
+        if (container != null) container.addGoods(type, -amount);
         market.modifyIncomeBeforeTaxes(type, incomeBeforeTaxes);
         market.modifyIncomeAfterTaxes(type, incomeAfterTaxes);
         int marketAmount = (int)applyModifier((float)amount,
                                               "model.modifier.tradeBonus",
                                               type, getGame().getTurn());
         market.addGoodsToMarket(type, marketAmount);
-        propagateToEuropeanMarkets(type, marketAmount, random);
-
-        if (container != null) container.addGoods(type, -amount);
-        return incomeAfterTaxes;
+        return marketAmount;
     }
 
     /**
@@ -1150,7 +1124,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             = new ArrayList<Settlement>(getSettlements());
         int newSoL = 0;
         for (Settlement settlement : settlements) {
-            ((ServerModelObject) settlement).csNewTurn(random, cs);
+            ((ServerModelObject)settlement).csNewTurn(random, cs);
             newSoL += settlement.getSoL();
         }
         int numberOfColonies = settlements.size();
@@ -1456,10 +1430,84 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
+     * Propagate an European market trade to the other European markets.
+     *
+     * @param type The type of goods that was traded.
+     * @param amount The amount of goods that was traded.
+     * @param random A pseudo-random number source.
+     */
+    public void propagateToEuropeanMarkets(GoodsType type, int amount,
+                                           Random random) {
+        if (!type.isStorable()) return;
+
+        // Propagate 5-30% of the original change.
+        final int lowerBound = 5; // TODO: make into game option?
+        final int upperBound = 30;// TODO: make into game option?
+        amount *= Utils.randomInt(logger, "Propagate goods", random,
+                                  upperBound - lowerBound + 1) + lowerBound;
+        amount /= 100;
+        if (amount == 0) return;
+
+        // Do not need to update the clients here, these changes happen
+        // while it is not their turn.
+        for (Player p : getGame().getLiveEuropeanPlayers()) {
+            if (p == this) continue;
+            Market market = p.getMarket();
+            if (market != null) market.addGoodsToMarket(type, amount);
+        }
+    }
+
+    /**
+     * Add or remove a standard yearly amount of storable goods, and a
+     * random extra amount of a random type.  Then push out all the
+     * accumulated trades.
+     *
+     * @param random A pseudo-random number source.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    public void csYearlyGoodsAdjust(Random random, ChangeSet cs) {
+        List<GoodsType> goodsTypes = getGame().getSpecification()
+            .getGoodsTypeList();
+        Market market = getMarket();
+
+        // Pick a random type of storable goods to add/remove an extra
+        // amount of.
+        GoodsType extraType;
+        while (!(extraType = Utils.getRandomMember(logger, "Choose goods type",
+                                                   goodsTypes, random))
+               .isStorable());
+
+        // Remove standard amount, and the extra amount.
+        for (GoodsType type : goodsTypes) {
+            if (type.isStorable() && market.hasBeenTraded(type)) {
+                boolean add = market.getAmountInMarket(type)
+                    < type.getInitialAmount();
+                int amount = getGame().getTurn().getNumber() / 10;
+                if (type == extraType) amount = 2 * amount + 1;
+                if (amount <= 0) continue;
+                amount = Utils.randomInt(logger, "Market adjust " + type,
+                                         random, amount);
+                if (!add) amount = -amount;
+                market.addGoodsToMarket(type, amount);
+                logger.finest(getName() + " adjust of " + amount
+                              + " " + type
+                              + ", total: " + market.getAmountInMarket(type)
+                              + ", initial: " + type.getInitialAmount());
+                addExtraTrade(new AbstractGoods(type, amount));
+            }
+        }
+
+        while (!extraTrades.isEmpty()) {
+            AbstractGoods ag = extraTrades.remove(0);
+            propagateToEuropeanMarkets(ag.getType(), ag.getAmount(), random);
+        }
+        for (GoodsType type : goodsTypes) {
+            csFlushMarket(type, cs);
+        }
+    }
+
+    /**
      * Starts a new turn for a player.
-     * Carefully do any random number generation outside of any
-     * threads that start so as to keep random number generation
-     * deterministic.
      *
      * @param random A pseudo-random number source.
      * @param cs A <code>ChangeSet</code> to update.
@@ -1696,46 +1744,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         }
                     }
                 }
-            }
-        }
-    }
-
-    /**
-     * Add or remove a standard yearly amount of storable goods, and a
-     * random extra amount of a random type.
-     *
-     * @param random A pseudo-random number source.
-     * @param cs A <code>ChangeSet</code> to update.
-     */
-    public void csYearlyGoodsAdjust(Random random, ChangeSet cs) {
-        List<GoodsType> goodsTypes = getGame().getSpecification()
-            .getGoodsTypeList();
-        Market market = getMarket();
-
-        // Pick a random type of storable goods to add/remove an extra
-        // amount of.
-        GoodsType extraType;
-        while (!(extraType = Utils.getRandomMember(logger, "Choose goods type",
-                                                   goodsTypes, random))
-               .isStorable());
-
-        // Remove standard amount, and the extra amount.
-        for (GoodsType type : goodsTypes) {
-            if (type.isStorable() && market.hasBeenTraded(type)) {
-                boolean add = market.getAmountInMarket(type)
-                    < type.getInitialAmount();
-                int amount = getGame().getTurn().getNumber() / 10;
-                if (type == extraType) amount = 2 * amount + 1;
-                if (amount <= 0) continue;
-                amount = Utils.randomInt(logger, "Market adjust " + type,
-                                         random, amount);
-                if (!add) amount = -amount;
-                market.addGoodsToMarket(type, amount);
-                logger.finest(getName() + " adjust of " + amount
-                              + " " + type
-                              + ", total: " + market.getAmountInMarket(type)
-                              + ", initial: " + type.getInitialAmount());
-                csFlushMarket(type, cs);
             }
         }
     }

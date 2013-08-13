@@ -1623,7 +1623,11 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
         GoodsContainer container = unit.getGoodsContainer();
         container.saveState();
-        serverPlayer.buy(container, type, amount, random);
+        if ((amount = serverPlayer.buy(container, type, amount)) < 0) {
+            return DOMMessage.clientError("Player " + serverPlayer.getName()
+                + " tried to buy " + amount + " " + type);
+        }
+        serverPlayer.propagateToEuropeanMarkets(type, -amount, random);
         serverPlayer.csFlushMarket(type, cs);
         unit.setMovesLeft(0);
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
@@ -1649,7 +1653,10 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
         GoodsContainer container = unit.getGoodsContainer();
         container.saveState();
-        serverPlayer.sell(container, type, amount, random);
+        amount = serverPlayer.sell(container, type, amount);
+        if (amount > 0) {
+            serverPlayer.propagateToEuropeanMarkets(type, amount, random);
+        }
         serverPlayer.csFlushMarket(type, cs);
         unit.setMovesLeft(0);
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
@@ -3406,15 +3413,17 @@ public final class InGameController extends Controller {
             // Process adding equipment first, so as to settle what has to
             // be removed.
             if (amount > 0) {
-                for (AbstractGoods goods : type.getRequiredGoods()) {
-                    GoodsType goodsType = goods.getType();
-                    int n = amount * goods.getAmount();
-                    try {
-                        serverPlayer.buy(container, goodsType, n, random);
-                        serverPlayer.csFlushMarket(goodsType, cs);
-                    } catch (IllegalStateException e) {
-                        return DOMMessage.clientError(e.getMessage());
+                for (AbstractGoods ag : type.getRequiredGoods()) {
+                    GoodsType goodsType = ag.getType();
+                    int n = amount * ag.getAmount();
+                    int m = serverPlayer.buy(container, goodsType, n);
+                    if (m < 0) {
+                        return DOMMessage.clientError("Can not buy " + n
+                            + " " + goodsType + " for " + type);
                     }
+                    serverPlayer.propagateToEuropeanMarkets(goodsType, -m,
+                                                            random);
+                    serverPlayer.csFlushMarket(goodsType, cs);
                 }
                 remove = unit.changeEquipment(type, amount);
                 amount = 0; // 0 => all, now
@@ -3431,7 +3440,9 @@ public final class InGameController extends Controller {
                     int n = ag.getAmount() * a;
                     if (serverPlayer.canTrade(goodsType,
                                               Market.Access.EUROPE)) {
-                        serverPlayer.sell(null, goodsType, n, random);
+                        int m = serverPlayer.sell(null, goodsType, n);
+                        serverPlayer.propagateToEuropeanMarkets(goodsType, m,
+                                                                random);
                         serverPlayer.csFlushMarket(goodsType, cs);
                     }
                 }
@@ -3550,7 +3561,11 @@ public final class InGameController extends Controller {
             int amount = ag.getAmount();
             if (type.isStorable()) {
                 // TODO: should also check canTrade(type, Access.?)
-                serverPlayer.buy(container, type, amount, random);
+                if ((amount = serverPlayer.buy(container, type, amount)) < 0) {
+                    return DOMMessage.clientError("Can not buy " + amount
+                        + " " + type + " for " + build);
+                }
+                serverPlayer.propagateToEuropeanMarkets(type, -amount, random);
                 serverPlayer.csFlushMarket(type, cs);
             } else {
                 container.addGoods(type, amount);

@@ -351,18 +351,20 @@ public class ServerColony extends Colony implements ServerModelObject {
             for (Goods goods : getCompactGoods()) {
                 GoodsType type = goods.getType();
                 ExportData data = getExportData(type);
-                if (data.isExported()
-                    && owner.canTrade(goods.getType(), Market.Access.CUSTOM_HOUSE)) {
-                    int amount = goods.getAmount() - data.getExportLevel();
-                    if (amount > 0) {
-                        int gold = owner.sell(container, type, amount, random);
-                        StringTemplate st = StringTemplate.template("customs.saleData")
-                            .addAmount("%amount%", amount)
-                            .add("%goods%", type.getNameKey())
-                            .addAmount("%gold%", gold);
-                        sb.append(Messages.message(st) + ", ");
-                    }
+                if (!data.isExported()
+                    || !owner.canTrade(goods.getType(), Market.Access.CUSTOM_HOUSE)) continue;
+                int amount = goods.getAmount() - data.getExportLevel();
+                if (amount <= 0) continue;
+                int oldGold = owner.getGold();
+                int marketAmount = owner.sell(container, type, amount);
+                if (marketAmount > 0) {
+                    owner.addExtraTrade(new AbstractGoods(type, marketAmount));
                 }
+                StringTemplate st = StringTemplate.template("customs.saleData")
+                    .addAmount("%amount%", amount)
+                    .add("%goods%", type.getNameKey())
+                    .addAmount("%gold%", (owner.getGold() - oldGold));
+                sb.append(Messages.message(st) + ", ");
             }
             if (sb.length() > 1) {
                 sb.setLength(sb.length() - 2);
