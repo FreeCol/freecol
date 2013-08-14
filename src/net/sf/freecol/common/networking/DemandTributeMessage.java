@@ -92,10 +92,10 @@ public class DemandTributeMessage extends DOMMessage {
             return DOMMessage.clientError(e.getMessage());
         }
         if (unit.isArmed()
-            || unit.hasAbility(Ability.SCOUT_INDIAN_SETTLEMENT)) {
+            || unit.hasAbility(Ability.DEMAND_TRIBUTE)) {
             ; // ok
         } else {
-            return DOMMessage.clientError("Unit is neither armed nor a scout: "
+            return DOMMessage.clientError("Unit is neither armed nor able to demand tribute: "
                 + unitId);
         }
 

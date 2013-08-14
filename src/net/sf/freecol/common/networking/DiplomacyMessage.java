@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.FreeColObject;
@@ -155,6 +156,8 @@ public class DiplomacyMessage extends DOMMessage {
         } else if (unit.getOwner() != serverPlayer) {
             return DOMMessage.clientError("Player does not own unit: "
                 + unit.getId());
+        } else if (!unit.hasAbility(Ability.NEGOTIATE)) {
+            return DOMMessage.clientError("Unit lacks abiility to negotiate: " + unit.getId());
         }
 
         Settlement settlement = getSettlement();

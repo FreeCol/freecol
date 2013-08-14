@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Settlement;
@@ -89,6 +90,9 @@ public class SpySettlementMessage extends DOMMessage {
             unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
+        }
+        if (!unit.hasAbility(Ability.SPY_ON_COLONY)) {
+            return DOMMessage.clientError("Unit lacks ability to spy on colony: " + unitId);
         }
 
         Tile tile;

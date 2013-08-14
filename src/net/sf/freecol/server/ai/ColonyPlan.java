@@ -776,7 +776,7 @@ public class ColonyPlan {
                     support/*FIXME: need for the thing now buildable*/);
             }
 
-            if (type.hasAbility(Ability.CAN_TEACH)) {
+            if (type.hasAbility(Ability.TEACH)) {
                 prioritize(type, TEACH_WEIGHT,
                     1.0/*FIXME: #students, #specialists here, #wanted*/);
             }

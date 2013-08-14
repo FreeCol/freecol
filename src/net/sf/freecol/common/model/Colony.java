@@ -1755,7 +1755,7 @@ public class Colony extends Settlement implements Nameable {
      * @return <code>true</code> if this unit type could be added.
      */
     public boolean canTrain(UnitType unitType) {
-        if (!hasAbility(Ability.CAN_TEACH)) {
+        if (!hasAbility(Ability.TEACH)) {
             return false;
         }
 

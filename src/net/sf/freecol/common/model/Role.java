@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.Ability;
 
 
 /**
@@ -110,13 +111,13 @@ public class Role extends BuildableType implements Comparable<Role> {
         } else {
             for (AbstractGoods goods : getRequiredGoods()) {
                 if ("model.goods.horses".equals(goods.getType().getId())) {
-                    if (requiresAbility("model.ability.native")) {
+                    if (requiresAbility(Ability.NATIVE)) {
                         result.add(spec.getEquipmentType("model.equipment.indian.horses"));
                     } else {
                         result.add(spec.getEquipmentType("model.equipment.horses"));
                     }
                 } else if ("model.goods.muskets".equals(goods.getType().getId())) {
-                    if (requiresAbility("model.ability.native")) {
+                    if (requiresAbility(Ability.NATIVE)) {
                         result.add(spec.getEquipmentType("model.equipment.indian.muskets"));
                     } else {
                         result.add(spec.getEquipmentType("model.equipment.muskets"));
@@ -289,9 +290,9 @@ public class Role extends BuildableType implements Comparable<Role> {
     }
 
     private int getAbilityIndex() {
-        if (requiresAbility("model.ability.native")) {
+        if (requiresAbility(Ability.NATIVE)) {
             return 10;
-        } else if (requiresAbility("model.ability.refUnit")) {
+        } else if (requiresAbility(Ability.REF_UNIT)) {
             return 5;
         } else {
             return 0;

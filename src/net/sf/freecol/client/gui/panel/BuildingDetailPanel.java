@@ -190,7 +190,7 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
         }
 
         // Production - Needs & Produces
-        if (buildingType.hasAbility(Ability.CAN_TEACH)) {
+        if (buildingType.hasAbility(Ability.TEACH)) {
             panel.add(localizedLabel("colopedia.buildings.teaches"), "newline, top");
             int count = 0;
             for (UnitType unitType2 : getSpecification().getUnitTypeList()) {

@@ -148,7 +148,7 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
 
             List<BuildingType> schools = new ArrayList<BuildingType>();
             for (final BuildingType buildingType : getSpecification().getBuildingTypeList()) {
-                if (buildingType.hasAbility(Ability.CAN_TEACH) && buildingType.canAdd(type)) {
+                if (buildingType.hasAbility(Ability.TEACH) && buildingType.canAdd(type)) {
                     schools.add(buildingType);
                 }
             }

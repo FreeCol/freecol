@@ -57,22 +57,20 @@ public final class Ability extends Feature implements Comparable<Ability> {
     public static final String AMBUSH_TERRAIN
         = "model.ability.ambushTerrain";
 
-    /**
-     * The ability of certain buildings (e.g. the stables) to produce
-     * goods even if no units are present.
-     */
-    public static final String AUTO_PRODUCTION
-        = "model.ability.autoProduction";
-
-    /**
-     * The ability of a colony to automatocally arm defenders (Revere).
-     */
+    /** The ability of a colony to automatocally arm defenders (Revere). */
     public static final String AUTOMATIC_EQUIPMENT
         = "model.ability.automaticEquipment";
 
     /** The ability to automatically promote combat winners (Washington). */
     public static final String AUTOMATIC_PROMOTION
         = "model.ability.automaticPromotion";
+
+    /**
+     * The ability of certain buildings (e.g. the stables) to produce
+     * goods even if no units are present.
+     */
+    public static final String AUTO_PRODUCTION
+        = "model.ability.autoProduction";
 
     /**
      * The ability of certain buildings (e.g. the stables) to avoid
@@ -133,18 +131,9 @@ public final class Ability extends Feature implements Comparable<Ability> {
     public static final String CAN_BE_CAPTURED
         = "model.ability.canBeCaptured";
 
-    /**
-     * The ability of certain units to be equipped with tools, muskets, etc.
-     */
+    /** The ability of certain units to be equipped with tools, muskets, etc. */
     public static final String CAN_BE_EQUIPPED
         = "model.ability.canBeEquipped";
-
-    /** 
-     * The ability of some buildings (e.g. the schoolhouse) to teach
-     * skills.
-     */
-    public static final String CAN_TEACH
-        = "model.ability.teach";
 
     /** The ability of a player to recruit units. */
     public static final String CAN_RECRUIT_UNIT
@@ -195,6 +184,10 @@ public final class Ability extends Feature implements Comparable<Ability> {
     public static final String CUSTOM_HOUSE_TRADES_WITH_FOREIGN_COUNTRIES
         = "model.ability.customHouseTradesWithForeignCountries";
 
+    /** The ability to demand tribute even when unarmed. */
+    public static final String DEMAND_TRIBUTE
+        = "model.ability.demandTribute";
+    
     /** Units with this ability are demoted on losing all equipment. */
     public static final String DEMOTE_ON_ALL_EQUIPMENT_LOST
         = "model.ability.demoteOnAllEquipLost";
@@ -263,13 +256,13 @@ public final class Ability extends Feature implements Comparable<Ability> {
     public static final String FOUND_COLONY
         = "model.ability.foundColony";
 
-    /** The ability of a player to found colonies. */
-    public static final String FOUNDS_COLONIES
-        = "model.ability.foundsColonies";
-
     /** The ability of a unit to be found in a lost city. */
     public static final String FOUND_IN_LOST_CITY
         = "model.ability.foundInLostCity";
+
+    /** The ability of a player to found colonies. */
+    public static final String FOUNDS_COLONIES
+        = "model.ability.foundsColonies";
 
     /** The ability of a colony which is a port. */
     public static final String HAS_PORT
@@ -283,16 +276,16 @@ public final class Ability extends Feature implements Comparable<Ability> {
     public static final String IMPROVE_TERRAIN
         = "model.ability.improveTerrain";
 
+    /** The ability to incite the natives. */
+    public static final String INCITE_NATIVES
+        = "model.ability.inciteNatives";
+
     /**
      * The ability denoting that a declaration of independence has
      * been made.
      */
     public static final String INDEPENDENCE_DECLARED
         = "model.ability.independenceDeclared";
-
-    /** The ability to incite the natives. */
-    public static final String INCITE_NATIVES
-        = "model.ability.inciteNatives";
 
     /** Units with this ability can be chosen as mercenaries support units. */
     public static final String MERCENARY_UNIT
@@ -318,6 +311,10 @@ public final class Ability extends Feature implements Comparable<Ability> {
     public static final String NAVAL_UNIT
         = "model.ability.navalUnit";
 
+    /** The ability to engage in diplomatic negotiation. */
+    public static final String NEGOTIATE
+        = "model.ability.negotiate";
+
     /** Units with this property are persons, not a ship or wagon etc. */
     public static final String PERSON
         = "model.ability.person";
@@ -333,6 +330,13 @@ public final class Ability extends Feature implements Comparable<Ability> {
     public static final String PIRACY
         = "model.ability.piracy";
 
+    /**
+     * An ability that enhances the treasure plundered from native
+     * settlements.
+     */
+    public static final String PLUNDER_NATIVES
+        = "model.ability.plunderNatives";
+
     /** The ability to produce goods (e.g. fish) on water tiles. */
     public static final String PRODUCE_IN_WATER
         = "model.ability.produceInWater";
@@ -344,6 +348,10 @@ public final class Ability extends Feature implements Comparable<Ability> {
     /** The ability to repair certain units. */
     public static final String REPAIR_UNITS
         = "model.ability.repairUnits";
+
+    /** A national ability required to generate a REF. */
+    public static final String ROYAL_EXPEDITIIONARY_FORCE
+        = "model.ability.royalExpeditionaryForce";
 
     /** LCRs always yield positive results (deSoto). */
     public static final String RUMOURS_ALWAYS_POSITIVE
@@ -361,12 +369,24 @@ public final class Ability extends Feature implements Comparable<Ability> {
     public static final String SELECT_RECRUIT
         = "model.ability.selectRecruit";
 
+    /** The ability to speak to a native settlement chief. */
+    public static final String SPEAK_WITH_CHIEF
+        = "model.ability.speakWithChief";
+
+    /** The ability to spy on a colony. */
+    public static final String SPY_ON_COLONY
+        = "model.ability.spyOnColony";
+
     /**
      * Units with this ability can be chosen as support units from
      * the crown.
      */
     public static final String SUPPORT_UNIT
         = "model.ability.supportUnit";
+
+    /** Buildings with this ability can be used to teach. */
+    public static final String TEACH
+        = "model.ability.teach";
 
     /** The ability to trade with foreign colonies (deWitt). */
     public static final String TRADE_WITH_FOREIGN_COLONIES

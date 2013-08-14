@@ -191,10 +191,10 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      * Does this work location have teaching capability?
      *
      * @return True if this is a teaching location.
-     * @see Ability#CAN_TEACH
+     * @see Ability#TEACH
      */
     public boolean canTeach() {
-        return hasAbility(Ability.CAN_TEACH);
+        return hasAbility(Ability.TEACH);
     }
 
     /**

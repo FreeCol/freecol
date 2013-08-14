@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map.Direction;
@@ -86,6 +87,9 @@ public class ScoutSpeakToChiefMessage extends DOMMessage {
             unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
+        }
+        if (!unit.hasAbility(Ability.SPEAK_WITH_CHIEF)) {
+            return DOMMessage.clientError("Unit lacks ability to speak to chief: " + unitId);
         }
 
         Tile tile;

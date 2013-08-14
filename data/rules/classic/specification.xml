@@ -846,7 +846,7 @@
       <modifier id="model.modifier.lineOfSightBonus" type="additive" value="1"/>
       <modifier id="model.modifier.movementBonus" type="additive" value="9"/>
       <ability id="model.ability.scoutIndianSettlement" value="true"/>
-      <ability id="model.ability.scoutForeignColony" value="true"/>
+      <ability id="model.ability.spyOnColony" value="true"/>
       <ability id="model.ability.canBeCaptured" value="false"/>
       <ability id="model.ability.disposeOnAllEquipLost" value="true"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
@@ -860,7 +860,7 @@
       <modifier id="model.modifier.defence" type="additive" value="1"/>
       <modifier id="model.modifier.offence" type="additive" value="2"/>
       <ability id="model.ability.scoutIndianSettlement" value="false"/>
-      <ability id="model.ability.scoutForeignColony" value="false"/>
+      <ability id="model.ability.spyOnColony" value="false"/>
       <ability id="model.ability.captureUnits" value="true"/>
       <ability id="model.ability.canBeCaptured" value="false"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>

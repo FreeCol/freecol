@@ -323,7 +323,7 @@ public final class CompactLabourReport extends ReportPanel {
         }
 
         Building schoolhouse = colony != null && data.isTraining() ?
-            colony.getBuildingWithAbility(Ability.CAN_TEACH) : null;
+            colony.getBuildingWithAbility(Ability.TEACH) : null;
 
         if (showBuildings && schoolhouse != null && row > buildingStartRow) {
             reportPanel.add(createEmptyLabel(), "cell " + BUILDING_COLUMN + " " + buildingStartRow + " 1 " + (row - buildingStartRow));
