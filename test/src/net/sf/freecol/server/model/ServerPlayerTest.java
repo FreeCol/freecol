@@ -31,6 +31,7 @@ import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Market;
+import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Turn;
@@ -507,8 +508,8 @@ public class ServerPlayerTest extends FreeColTestCase {
         ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
         ServerPlayer french = (ServerPlayer)game.getPlayer("model.nation.french");
         assertEquals("model.nationType.trade", dutch.getNationType().getId());
-        assertFalse(dutch.getNationType().getModifierSet("model.modifier.tradeBonus").isEmpty());
-        assertFalse(dutch.getModifierSet("model.modifier.tradeBonus").isEmpty());
+        assertFalse(dutch.getNationType().getModifierSet(Modifier.TRADE_BONUS).isEmpty());
+        assertFalse(dutch.getModifierSet(Modifier.TRADE_BONUS).isEmpty());
 
         {// Test that the dutch can sell more goods until the price drops
             int dutchSellAmount = sellUntilPriceDrop(game, dutch, silverType);

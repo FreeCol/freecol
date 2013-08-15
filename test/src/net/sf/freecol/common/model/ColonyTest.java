@@ -178,7 +178,7 @@ public class ColonyTest extends FreeColTestCase {
 
     private Modifier createTeaPartyModifier(Turn turn) {
         Modifier template = spec()
-            .getModifiers("model.modifier.colonyGoodsParty").get(0);
+            .getModifiers(Modifier.COLONY_GOODS_PARTY).get(0);
         return Modifier.makeTimedModifier("model.goods.bells", template, turn);
     }
 

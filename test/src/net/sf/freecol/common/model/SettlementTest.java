@@ -124,7 +124,8 @@ public class SettlementTest extends FreeColTestCase {
         assertEquals(2, colony.getLineOfSight());
 
         BuildingType towerType = new BuildingType("tower", spec());
-        Modifier modifier = new Modifier("model.modifier.lineOfSightBonus", 2, Modifier.Type.ADDITIVE);
+        Modifier modifier = new Modifier(Modifier.LINE_OF_SIGHT_BONUS, 2,
+                                         Modifier.Type.ADDITIVE);
         towerType.addModifier(modifier);
         Building tower = new ServerBuilding(getGame(), colony, towerType);
         colony.addBuilding(tower);

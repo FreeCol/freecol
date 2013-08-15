@@ -1936,7 +1936,7 @@ public class InGameControllerTest extends FreeColTestCase {
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
         FoundingFather father = new FoundingFather("father", spec());
         father.setType(FoundingFatherType.TRADE);
-        Modifier priceBonus = new Modifier("model.modifier.buildingPriceBonus",
+        Modifier priceBonus = new Modifier(Modifier.BUILDING_PRICE_BONUS,
                                            -100f, Modifier.Type.PERCENTAGE);
         Scope pressScope = new Scope();
         pressScope.setType("model.building.printingPress");

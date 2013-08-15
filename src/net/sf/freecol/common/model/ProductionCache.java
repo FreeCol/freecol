@@ -107,7 +107,8 @@ public class ProductionCache {
         netProduction.incrementCount(bells, amount);
 
         for (Consumer consumer : colony.getConsumers()) {
-            Set<Modifier> modifier = consumer.getModifierSet("model.modifier.consumeOnlySurplusProduction");
+            Set<Modifier> modifier = consumer
+                .getModifierSet(Modifier.CONSUME_ONLY_SURPLUS_PRODUCTION);
             List<AbstractGoods> goods = new ArrayList<AbstractGoods>();
             for (AbstractGoods g : consumer.getConsumedGoods()) {
                 goodsUsed.add(g.getType());

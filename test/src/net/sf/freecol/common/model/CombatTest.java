@@ -104,20 +104,20 @@ public class CombatTest extends FreeColTestCase {
         Unit soldier = new ServerUnit(game, tile2, french, veteranType, muskets, horses);
         soldier.setMovesLeft(1);
 
-        Modifier bigMovementPenalty = spec().getModifiers(SimpleCombatModel.BIG_MOVEMENT_PENALTY)
+        Modifier bigMovementPenalty = spec().getModifiers(Modifier.BIG_MOVEMENT_PENALTY)
             .get(0);
-        Modifier attackBonus = spec().getModifiers(SimpleCombatModel.ATTACK_BONUS).get(0);
-        Modifier fortified = spec().getModifiers(SimpleCombatModel.FORTIFIED).get(0);
+        Modifier attackBonus = spec().getModifiers(Modifier.ATTACK_BONUS).get(0);
+        Modifier fortified = spec().getModifiers(Modifier.FORTIFIED).get(0);
 
-        Set<Modifier> veteranModifierSet = veteranType.getModifierSet("model.modifier.offence");
+        Set<Modifier> veteranModifierSet = veteranType.getModifierSet(Modifier.OFFENCE);
         assertEquals(1, veteranModifierSet.size());
         Modifier veteranModifier = veteranModifierSet.iterator().next();
 
-        Set<Modifier> musketModifierSet = muskets.getModifierSet("model.modifier.offence");
+        Set<Modifier> musketModifierSet = muskets.getModifierSet(Modifier.OFFENCE);
         assertEquals(1, musketModifierSet.size());
         Modifier musketModifier = musketModifierSet.iterator().next();
 
-        Set<Modifier> horsesModifierSet = horses.getModifierSet("model.modifier.offence");
+        Set<Modifier> horsesModifierSet = horses.getModifierSet(Modifier.OFFENCE);
         assertEquals(1, horsesModifierSet.size());
         Modifier horsesModifier = horsesModifierSet.iterator().next();
 
@@ -227,12 +227,12 @@ public class CombatTest extends FreeColTestCase {
          * Francis Drake
          */
         FoundingFather drake = spec().getFoundingFather("model.foundingFather.francisDrake");
-        Set<Modifier> drakeModifiers = drake.getModifierSet("model.modifier.offence", privateerType);
+        Set<Modifier> drakeModifiers = drake.getModifierSet(Modifier.OFFENCE, privateerType);
         assertEquals(1, drakeModifiers.size());
         Modifier drakeModifier = drakeModifiers.iterator().next();
 
         french.addFather(drake);
-        drakeModifiers = french.getModifierSet("model.modifier.offence", privateerType);
+        drakeModifiers = french.getModifierSet(Modifier.OFFENCE, privateerType);
         assertEquals(1, drakeModifiers.size());
         assertEquals(drakeModifier, drakeModifiers.iterator().next());
 

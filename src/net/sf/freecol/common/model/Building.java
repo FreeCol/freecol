@@ -284,10 +284,10 @@ public class Building extends WorkLocation implements Named, Comparable<Building
                     // we need at least these many horses/animals to breed
                     double newRatio = 0;
                     int divisor = (int) getType()
-                        .applyModifier(0f, "model.modifier.breedingDivisor");
+                        .applyModifier(0f, Modifier.BREEDING_DIVISOR);
                     if (divisor > 0) {
                         int factor = (int) getType()
-                            .applyModifier(0f, "model.modifier.breedingFactor");
+                            .applyModifier(0f, Modifier.BREEDING_FACTOR);
                         int maximumOutput = ((available - 1) / divisor + 1) * factor;
                         newRatio = maximumOutput / output.getAmount();
                     }

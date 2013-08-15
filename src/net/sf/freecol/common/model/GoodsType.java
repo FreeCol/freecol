@@ -222,7 +222,7 @@ public final class GoodsType extends FreeColGameObjectType {
      * @return True if this goods type produces liberty.
      */
     public boolean isLibertyType() {
-        return containsModifierKey("model.modifier.liberty");
+        return containsModifierKey(Modifier.LIBERTY);
     }
 
     /**
@@ -231,7 +231,7 @@ public final class GoodsType extends FreeColGameObjectType {
      * @return True if this goods type produces immigration.
      */
     public boolean isImmigrationType() {
-        return containsModifierKey("model.modifier.immigration");
+        return containsModifierKey(Modifier.IMMIGRATION);
     }
 
     /**

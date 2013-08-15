@@ -26,6 +26,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.util.Utils;
@@ -43,22 +44,6 @@ public class SimpleCombatModel extends CombatModel {
     // naval unit.
     public static final int MAXIMUM_BOMBARD_POWER = 48;
 
-    public static final String SMALL_MOVEMENT_PENALTY
-        = "model.modifier.smallMovementPenalty";
-    public static final String BIG_MOVEMENT_PENALTY
-        = "model.modifier.bigMovementPenalty";
-    public static final String ARTILLERY_IN_THE_OPEN
-        = "model.modifier.artilleryInTheOpen";
-    public static final String ATTACK_BONUS
-        = "model.modifier.attackBonus";
-    public static final String FORTIFIED
-        = "model.modifier.fortified";
-    public static final String ARTILLERY_AGAINST_RAID
-        = "model.modifier.artilleryAgainstRaid";
-    public static final String AMPHIBIOUS_ATTACK
-        = "model.modifier.amphibiousAttack";
-    public static final String BOMBARD_BONUS
-        = "model.modifier.bombardBonus";
     public static final Modifier UNKNOWN_DEFENCE_MODIFIER
         = new Modifier("bogus", Modifier.UNKNOWN, Modifier.Type.ADDITIVE);
 
@@ -185,7 +170,7 @@ public class SimpleCombatModel extends CombatModel {
             }
 
         } else if (combatIsBombard(attacker, defender)) {
-            result.add(new Modifier("model.modifier.bombardModifier",
+            result.add(new Modifier(Modifier.BOMBARD_BONUS,
                                     getOffencePower(attacker, defender),
                                     Modifier.Type.ADDITIVE));
 
@@ -215,7 +200,7 @@ public class SimpleCombatModel extends CombatModel {
         }
 
         Specification spec = attacker.getSpecification();
-        result.addAll(spec.getModifiers(ATTACK_BONUS));
+        result.addAll(spec.getModifiers(Modifier.ATTACK_BONUS));
     }
 
     /**
@@ -238,18 +223,18 @@ public class SimpleCombatModel extends CombatModel {
             }
         }
         // Attack bonus
-        result.addAll(spec.getModifiers(ATTACK_BONUS));
+        result.addAll(spec.getModifiers(Modifier.ATTACK_BONUS));
         // Movement penalty
         int movesLeft = attackerUnit.getMovesLeft();
         if (movesLeft == 1) {
-            result.addAll(spec.getModifiers(BIG_MOVEMENT_PENALTY));
+            result.addAll(spec.getModifiers(Modifier.BIG_MOVEMENT_PENALTY));
         } else if (movesLeft == 2) {
-            result.addAll(spec.getModifiers(SMALL_MOVEMENT_PENALTY));
+            result.addAll(spec.getModifiers(Modifier.SMALL_MOVEMENT_PENALTY));
         }
 
         // Amphibious attack?
         if (combatIsAmphibious(attacker, defender)) {
-            result.addAll(spec.getModifiers(AMPHIBIOUS_ATTACK));
+            result.addAll(spec.getModifiers(Modifier.AMPHIBIOUS_ATTACK));
         }
 
         if (combatIsAttackMeasurement(attacker, defender)) {
@@ -257,14 +242,14 @@ public class SimpleCombatModel extends CombatModel {
         } else if (combatIsSettlementAttack(attacker, defender)) {
             // Settlement present, REF bombardment bonus
             result.addAll(attackerUnit
-                          .getModifierSet(BOMBARD_BONUS));
+                          .getModifierSet(Modifier.BOMBARD_BONUS));
         } else if (combatIsAttack(attacker, defender)) {
             Unit defenderUnit = (Unit) defender;
             Tile tile = defenderUnit.getTile();
             if (tile != null) {
                 if (tile.hasSettlement()) {
                     result.addAll(attackerUnit
-                                  .getModifierSet(BOMBARD_BONUS));
+                                  .getModifierSet(Modifier.BOMBARD_BONUS));
                 } else {
                     // Ambush bonus in the open = defender's defence
                     // bonus, if defender is REF, or attacker is indian.
@@ -281,7 +266,7 @@ public class SimpleCombatModel extends CombatModel {
                     if (attackerUnit.hasAbility(Ability.BOMBARD)
                         && attackerUnit.getLocation() instanceof Tile
                         && attackerUnit.getSettlement() == null) {
-                        result.addAll(spec.getModifiers(ARTILLERY_IN_THE_OPEN));
+                        result.addAll(spec.getModifiers(Modifier.ARTILLERY_IN_THE_OPEN));
                     }
                 }
             }
@@ -323,7 +308,7 @@ public class SimpleCombatModel extends CombatModel {
 
         } else if (combatIsBombard(attacker, defender)) {
             Unit defenderUnit = (Unit) defender;
-            result.add(new Modifier("model.modifier.defenceBonus",
+            result.add(new Modifier(Modifier.DEFENCE,
                                     defenderUnit.getType().getDefence(),
                                     Modifier.Type.ADDITIVE));
 
@@ -380,7 +365,7 @@ public class SimpleCombatModel extends CombatModel {
         }
         // Fortify bonus
         if (defenderUnit.getState() == Unit.UnitState.FORTIFIED) {
-            result.addAll(spec.getModifiers(FORTIFIED));
+            result.addAll(spec.getModifiers(Modifier.FORTIFIED));
         }
         Tile tile = defenderUnit.getTile();
         if (tile != null) {
@@ -393,7 +378,7 @@ public class SimpleCombatModel extends CombatModel {
                 // Artillery in the Open penalty
                 if (defenderUnit.hasAbility(Ability.BOMBARD)
                     && defenderUnit.getState() != Unit.UnitState.FORTIFIED) {
-                    result.addAll(spec.getModifiers(ARTILLERY_IN_THE_OPEN));
+                    result.addAll(spec.getModifiers(Modifier.ARTILLERY_IN_THE_OPEN));
                 }
             } else { // In settlement
                 result.addAll(tile.getType().getDefenceBonus());
@@ -404,7 +389,7 @@ public class SimpleCombatModel extends CombatModel {
                 if (defenderUnit.hasAbility(Ability.BOMBARD)
                     && attacker != null
                     && ((Unit)attacker).getOwner().isIndian()) {
-                    result.addAll(spec.getModifiers(ARTILLERY_AGAINST_RAID));
+                    result.addAll(spec.getModifiers(Modifier.ARTILLERY_AGAINST_RAID));
                 }
             }
         }

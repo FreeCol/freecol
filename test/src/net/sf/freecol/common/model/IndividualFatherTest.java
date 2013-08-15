@@ -227,7 +227,7 @@ public class IndividualFatherTest extends FreeColTestCase {
         assertEquals(inc + inc/5, colony.getEffectiveLiberty());
 
         Set<Modifier> modifierSet
-            = player.getModifierSet("model.modifier.liberty");
+            = player.getModifierSet(Modifier.LIBERTY);
         assertEquals(1, modifierSet.size());
         Modifier bolivarModifier = modifierSet.iterator().next();
         assertEquals(simonBolivar, bolivarModifier.getSource());

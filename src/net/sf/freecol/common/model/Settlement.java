@@ -193,7 +193,7 @@ public abstract class Settlement extends GoodsLocation
      */
     public int getLineOfSight() {
         return (int)applyModifier((float)getType().getVisibleRadius(),
-                                  "model.modifier.lineOfSightBonus");
+                                  Modifier.LINE_OF_SIGHT_BONUS);
     }
 
     /**

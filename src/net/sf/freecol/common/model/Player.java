@@ -1476,7 +1476,7 @@ public class Player extends FreeColGameObject implements Nameable {
         final Specification spec = getSpecification();
         int base = spec.getInteger(GameOptions.CROSSES_INCREMENT);
         immigrationRequired += (int)applyModifier(base,
-            "model.modifier.religiousUnrestBonus");
+            Modifier.RELIGIOUS_UNREST_BONUS);
         // The book I have tells me the crosses needed is:
         // [(colonist count in colonies + total colonist count) * 2] + 8.
         // So every unit counts as 2 unless they're in a colony,
@@ -1534,7 +1534,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The effective amount of liberty points.
      */
     public int getEffectiveLiberty() {
-        return (int)applyModifier((float)getLiberty(), "model.modifier.liberty",
+        return (int)applyModifier((float)getLiberty(), Modifier.LIBERTY,
                                   null, getGame().getTurn());
     }
 
@@ -1595,7 +1595,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 nextTurn += colony.getTotalProductionOf(libertyGoods);
             }
         }
-        return (int)applyModifier((float)nextTurn, "model.modifier.liberty",
+        return (int)applyModifier((float)nextTurn, Modifier.LIBERTY,
                                   null, getGame().getTurn());
     }
 
@@ -3064,7 +3064,7 @@ public class Player extends FreeColGameObject implements Nameable {
         }
         price *= spec.getInteger(GameOptions.LAND_PRICE_FACTOR);
         price += 100;
-        return (int) applyModifier(price, "model.modifier.landPaymentModifier",
+        return (int) applyModifier(price, Modifier.LAND_PAYMENT_MODIFIER,
                                    null, getGame().getTurn());
     }
 

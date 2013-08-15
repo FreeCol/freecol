@@ -267,7 +267,7 @@ public class Colony extends Settlement implements Nameable {
     public int getEffectiveLiberty() {
         return (int)FeatureContainer.applyModifierSet((float)getLiberty(),
             getGame().getTurn(),
-            getOwner().getModifierSet("model.modifier.liberty"));
+            getOwner().getModifierSet(Modifier.LIBERTY));
     }
 
     /**
@@ -782,7 +782,7 @@ public class Colony extends Settlement implements Nameable {
         // TODO: it should search for more than one building?
         for (Building building : buildingMap.values()) {
             if (!building.getType()
-                .getModifierSet("model.modifier.warehouseStorage").isEmpty()) {
+                .getModifierSet(Modifier.WAREHOUSE_STORAGE).isEmpty()) {
                 return building;
             }
         }
@@ -863,8 +863,7 @@ public class Colony extends Settlement implements Nameable {
      * @return True if the building is available at zero cost.
      */
     public boolean isAutomaticBuild(BuildingType buildingType) {
-        float value = owner.applyModifier(100f,
-                                          "model.modifier.buildingPriceBonus",
+        float value = owner.applyModifier(100f, Modifier.BUILDING_PRICE_BONUS,
                                           buildingType, getGame().getTurn());
         return value == 0f && canBuild(buildingType);
     }
@@ -1332,7 +1331,7 @@ public class Colony extends Settlement implements Nameable {
     public boolean canReducePopulation() {
         return getUnitCount() >
             FeatureContainer.applyModifierSet(0f, getGame().getTurn(),
-                getModifierSet("model.modifier.minimumColonySize"));
+                getModifierSet(Modifier.MINIMUM_COLONY_SIZE));
     }
 
     /**
@@ -1345,7 +1344,7 @@ public class Colony extends Settlement implements Nameable {
         if (canReducePopulation()) return null;
         String message = "";
         Set<Modifier> modifierSet
-            = getModifierSet("model.modifier.minimumColonySize");
+            = getModifierSet(Modifier.MINIMUM_COLONY_SIZE);
         for (Modifier modifier : modifierSet) {
             FreeColObject source = modifier.getSource();
             if (source instanceof BuildingType) {
@@ -2450,7 +2449,7 @@ public class Colony extends Settlement implements Nameable {
      * {@inheritDoc}
      */
     public int getGoodsCapacity() {
-        return (int) applyModifier(0f, "model.modifier.warehouseStorage",
+        return (int) applyModifier(0f, Modifier.WAREHOUSE_STORAGE,
                                    null, getGame().getTurn());
     }
 
@@ -2478,7 +2477,7 @@ public class Colony extends Settlement implements Nameable {
 
     private void modifySpecialGoods(GoodsType goodsType, int amount) {
         Set<Modifier> libertyModifiers
-            = goodsType.getModifierSet("model.modifier.liberty");
+            = goodsType.getModifierSet(Modifier.LIBERTY);
         if (!libertyModifiers.isEmpty()) {
             int newLiberty = (int)FeatureContainer
                 .applyModifierSet(amount, getGame().getTurn(),
@@ -2487,7 +2486,7 @@ public class Colony extends Settlement implements Nameable {
         }
 
         Set<Modifier> immigrationModifiers
-            = goodsType.getModifierSet("model.modifier.immigration");
+            = goodsType.getModifierSet(Modifier.IMMIGRATION);
         if (!immigrationModifiers.isEmpty()) {
             int newImmigration = (int)FeatureContainer
                 .applyModifierSet(amount, getGame().getTurn(),

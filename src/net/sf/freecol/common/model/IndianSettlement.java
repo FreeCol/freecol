@@ -899,7 +899,7 @@ public class IndianSettlement extends Settlement {
             if (unit != null) {
                 amount = Math.round(FeatureContainer
                     .applyModifierSet((float) amount, getGame().getTurn(),
-                        unit.getModifierSet("model.modifier.tradeVolumePenalty")));
+                        unit.getModifierSet(Modifier.TRADE_VOLUME_PENALTY)));
             }
             if (amount < TRADE_MINIMUM_SIZE) continue;
             result.add(new Goods(getGame(), this, goods.getType(), amount));

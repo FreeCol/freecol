@@ -803,14 +803,14 @@ public class ColonyPlan {
                     }
                 }
                 // Hacks.  No good way to make this really generic.
-                if (!type.getModifierSet("model.modifier.warehouseStorage")
+                if (!type.getModifierSet(Modifier.WAREHOUSE_STORAGE)
                     .isEmpty()) {
                     double factor = 1.0;
                     if ("trade".equals(advantage)) factor = 1.1;
                     prioritize(type, STORAGE_WEIGHT * factor,
                         1.0/*FIXME: amount of goods*/);
                 }
-                if (!type.getModifierSet("model.modifier.breedingDivisor")
+                if (!type.getModifierSet(Modifier.BREEDING_DIVISOR)
                     .isEmpty()) {
                     prioritize(type, BREEDING_WEIGHT,
                         1.0/*FIXME: horses present?*/);

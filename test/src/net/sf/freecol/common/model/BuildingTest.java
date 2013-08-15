@@ -422,7 +422,7 @@ public class BuildingTest extends FreeColTestCase {
         assertEquals(100f, modifier.getValue());
         assertEquals(Modifier.Type.PERCENTAGE, modifier.getType());
         assertEquals(0f, stockadeType.applyModifier(0,
-                "model.modifier.minimumColonySize"));
+                Modifier.MINIMUM_COLONY_SIZE));
 
         modifierSet = fortType.getModifierSet(Modifier.DEFENCE);
         assertEquals(1, modifierSet.size());
@@ -430,7 +430,7 @@ public class BuildingTest extends FreeColTestCase {
         assertEquals(150f, modifier.getValue());
         assertEquals(Modifier.Type.PERCENTAGE, modifier.getType());
         assertEquals(0f, stockadeType.applyModifier(0,
-                "model.modifier.minimumColonySize"));
+                Modifier.MINIMUM_COLONY_SIZE));
 
         modifierSet = fortressType.getModifierSet(Modifier.DEFENCE);
         assertEquals(1, modifierSet.size());
@@ -438,7 +438,7 @@ public class BuildingTest extends FreeColTestCase {
         assertEquals(200f, modifier.getValue());
         assertEquals(Modifier.Type.PERCENTAGE, modifier.getType());
         assertEquals(0f, stockadeType.applyModifier(0,
-                "model.modifier.minimumColonySize"));
+                Modifier.MINIMUM_COLONY_SIZE));
     }
 
     public void testCottonClothProduction() {

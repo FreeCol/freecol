@@ -87,12 +87,6 @@ public class NativeAIPlayer extends AIPlayer {
 
     private static final Logger logger = Logger.getLogger(NativeAIPlayer.class.getName());
 
-    /**
-     * The modifier to apply when a ship is trading.
-     */
-    private static final String SHIP_TRADE_PENALTY
-        = "model.modifier.shipTradePenalty";
-
     public static final int MAX_DISTANCE_TO_BRING_GIFTS = 5;
 
     public static final int MAX_NUMBER_OF_GIFTS_BEING_DELIVERED = 1;
@@ -810,7 +804,7 @@ public class NativeAIPlayer extends AIPlayer {
      */
     private Set<Modifier> getShipTradePenalties(boolean sense) {
         Specification spec = getSpecification();
-        List<Modifier> shipPenalties = spec.getModifiers(SHIP_TRADE_PENALTY);
+        List<Modifier> shipPenalties = spec.getModifiers(Modifier.SHIP_TRADE_PENALTY);
         Set<Modifier> result = new HashSet<Modifier>();
         int penalty = spec.getInteger(GameOptions.SHIP_TRADE_PENALTY);
         for (Modifier m : shipPenalties) {

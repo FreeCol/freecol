@@ -35,14 +35,76 @@ import org.w3c.dom.Element;
  */
 public class Modifier extends Feature implements Comparable<Modifier> {
 
-    public static final String OFFENCE = "model.modifier.offence";
-    public static final String DEFENCE = "model.modifier.defence";
+    public static final String AMPHIBIOUS_ATTACK
+        = "model.modifier.amphibiousAttack";
+    public static final String ARTILLERY_AGAINST_RAID
+        = "model.modifier.artilleryAgainstRaid";
+    public static final String ARTILLERY_IN_THE_OPEN
+        = "model.modifier.artilleryInTheOpen";
+    public static final String ATTACK_BONUS
+        = "model.modifier.attackBonus";
+    public static final String BIG_MOVEMENT_PENALTY
+        = "model.modifier.bigMovementPenalty";
+    public static final String BOMBARD_BONUS
+        = "model.modifier.bombardBonus";
+    public static final String BREEDING_DIVISOR
+        = "model.modifier.breedingDivisor";
+    public static final String BREEDING_FACTOR
+        = "model.modifier.breedingFactor";
+    public static final String BUILDING_PRICE_BONUS
+        = "model.modifier.buildingPriceBonus";
+    public static final String COLONY_GOODS_PARTY
+        = "model.modifier.colonyGoodsParty";
+    public static final String CONSUME_ONLY_SURPLUS_PRODUCTION
+        = "model.modifier.consumeOnlySurplusProduction";
+    public static final String CONVERSION_ALARM_RATE
+        = "model.modifier.conversionAlarmRate";
+    public static final String CONVERSION_SKILL
+        = "model.modifier.conversionSkill";
+    public static final String DEFENCE
+        = "model.modifier.defence";
+    public static final String FORTIFIED
+        = "model.modifier.fortified";
+    public static final String IMMIGRATION
+        = "model.modifier.immigration";
+    public static final String LAND_PAYMENT_MODIFIER
+        = "model.modifier.landPaymentModifier";
+    public static final String LIBERTY
+        = "model.modifier.liberty";
+    public static final String LINE_OF_SIGHT_BONUS
+        = "model.modifier.lineOfSightBonus";
+    public static final String MINIMUM_COLONY_SIZE
+        = "model.modifier.minimumColonySize";
+    public static final String MISSIONARY_TRADE_BONUS
+        = "model.modifier.missionaryTradeBonus";
+    public static final String MOVEMENT_BONUS
+        = "model.modifier.movementBonus";
+    public static final String NATIVE_ALARM_MODIFIER
+        = "model.modifier.nativeAlarmModifier";
+    public static final String NATIVE_CONVERT_BONUS
+        = "model.modifier.nativeConvertBonus";
+    public static final String OFFENCE
+        = "model.modifier.offence";
     public static final String OFFENCE_AGAINST
         = "model.modifier.offenceAgainst";
-    public static final String DEFENCE_AGAINST
-        = "model.modifier.defenceAgainst";
+    public static final String RELIGIOUS_UNREST_BONUS
+        = "model.modifier.religiousUnrestBonus";
+    public static final String SAIL_HIGH_SEAS
+        = "model.modifier.sailHighSeas";
+    public static final String SHIP_TRADE_PENALTY
+        = "model.modifier.shipTradePenalty";
+    public static final String SMALL_MOVEMENT_PENALTY
+        = "model.modifier.smallMovementPenalty";
     public static final String TILE_TYPE_CHANGE_PRODUCTION
         = "model.modifier.tileTypeChangeProduction";
+    public static final String TRADE_BONUS
+        = "model.modifier.tradeBonus";
+    public static final String TRADE_VOLUME_PENALTY
+        = "model.modifier.tradeVolumePenalty";
+    public static final String TREASURE_TRANSPORT_FEE
+        = "model.modifier.treasureTransportFee";
+    public static final String WAREHOUSE_STORAGE
+        = "model.modifier.warehouseStorage";
 
     public static final float UNKNOWN = Float.MIN_VALUE;
 

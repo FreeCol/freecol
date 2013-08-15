@@ -202,7 +202,7 @@ public class Role extends BuildableType implements Comparable<Role> {
      */
     private float getOffence() {
         return getFeatureContainer()
-            .applyModifier(1, "model.modifier.offence", null, null);
+            .applyModifier(1, Modifier.OFFENCE, null, null);
     }
 
     /**

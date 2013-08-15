@@ -1008,7 +1008,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         market.modifyIncomeBeforeTaxes(type, -price);
         market.modifyIncomeAfterTaxes(type, -price);
         int marketAmount = (int)applyModifier((float)amount,
-                                              "model.modifier.tradeBonus",
+                                              Modifier.TRADE_BONUS,
                                               type, getGame().getTurn());
         market.addGoodsToMarket(type, -marketAmount);
         return marketAmount;
@@ -1038,7 +1038,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         market.modifyIncomeBeforeTaxes(type, incomeBeforeTaxes);
         market.modifyIncomeAfterTaxes(type, incomeAfterTaxes);
         int marketAmount = (int)applyModifier((float)amount,
-                                              "model.modifier.tradeBonus",
+                                              Modifier.TRADE_BONUS,
                                               type, getGame().getTurn());
         market.addGoodsToMarket(type, marketAmount);
         return marketAmount;
@@ -1610,7 +1610,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     int change = entry.getValue().intValue();
                     if (change != 0) {
                         change = (int)player.applyModifier((float)change,
-                            "model.modifier.nativeAlarmModifier",
+                            Modifier.NATIVE_ALARM_MODIFIER,
                             null, game.getTurn());
                         ServerIndianSettlement sis
                             = (ServerIndianSettlement)settlement;
@@ -1674,13 +1674,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
                 ServerPlayer other = (ServerPlayer)missionary.getOwner();
                 float convert = missionary.applyModifier(0f,
-                    "model.modifier.conversionSkill");
+                    Modifier.CONVERSION_SKILL);
                 // The convert rate increases by a percentage of the
                 // current alarm.
                 int alarm = Math.min(settlement.getAlarm(other).getValue(),
                                      Tension.TENSION_MAX);
                 convert += missionary.applyModifier(alarm,
-                    "model.modifier.conversionAlarmRate") - alarm;
+                    Modifier.CONVERSION_ALARM_RATE) - alarm;
                 convert += settlement.getConvertProgress();
                 Settlement colony = null;
                 if (convert < (float)settlement.getType().getConvertThreshold()
@@ -2630,7 +2630,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         // Remove goods party modifiers as they apply to a different monarch.
         for (Modifier m : colony.getModifierSet()) {
-            if ("model.modifier.colonyGoodsParty".equals(m.getSource())) {
+            if (Modifier.COLONY_GOODS_PARTY.equals(m.getSource())) {
                 colony.removeModifier(m);
             }
         }
@@ -3731,7 +3731,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
             Turn turn = getGame().getTurn();
             List<Modifier> modifiers
-                = spec.getModifiers("model.modifier.colonyGoodsParty");
+                = spec.getModifiers(Modifier.COLONY_GOODS_PARTY);
             Modifier template = modifiers.get(0);
             Modifier modifier = Modifier.makeTimedModifier("model.goods.bells",
                                                            template, turn);

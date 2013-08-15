@@ -1125,8 +1125,8 @@ public final class FreeColServer {
         // Introduced: SAVEGAME_VERSION == 12
         addIntegerOption(GameOptions.SHIP_TRADE_PENALTY,
             "gameOptions.map", -30, false);
-        if (spec.getModifiers("model.modifier.shipTradePenalty") == null) {
-            spec.addModifier(new Modifier("model.modifier.shipTradePenalty",
+        if (spec.getModifiers(Modifier.SHIP_TRADE_PENALTY) == null) {
+            spec.addModifier(new Modifier(Modifier.SHIP_TRADE_PENALTY,
                     Specification.SHIP_TRADE_PENALTY_SOURCE,
                     -30.0f, Modifier.Type.PERCENTAGE));
         }

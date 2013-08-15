@@ -132,7 +132,7 @@ public final class SpecificationTest extends FreeColTestCase {
 
         // Additive Modifier
         BuildingType depot = spec.getBuildingType("model.building.depot");
-        Modifier modifier = depot.getModifierSet("model.modifier.warehouseStorage").iterator().next();
+        Modifier modifier = depot.getModifierSet(Modifier.WAREHOUSE_STORAGE).iterator().next();
         assertEquals(Modifier.Type.ADDITIVE, modifier.getType());
         assertEquals(100f, modifier.getValue());
 

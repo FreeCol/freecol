@@ -608,7 +608,7 @@ public class TileTest extends FreeColTestCase {
             if (tileType.isForested()
                 || "model.tile.hills".equals(tileType.getId())
                 || "model.tile.mountains".equals(tileType.getId())) {
-                assertFalse(tileType.getModifierSet("model.modifier.defence").isEmpty());
+                assertFalse(tileType.getModifierSet(Modifier.DEFENCE).isEmpty());
             }
         }
     }

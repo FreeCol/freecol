@@ -42,6 +42,7 @@ import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
@@ -2407,7 +2408,7 @@ public class Unit extends GoodsLocation
     public int getInitialMovesLeft() {
         return (int)FeatureContainer.applyModifierSet(unitType.getMovement(),
             getGame().getTurn(),
-            getModifierSet("model.modifier.movementBonus"));
+            getModifierSet(Modifier.MOVEMENT_BONUS));
     }
 
     /**
@@ -2439,7 +2440,7 @@ public class Unit extends GoodsLocation
     public int getSailTurns() {
         float base = getSpecification().getInteger(GameOptions.TURNS_TO_SAIL);
         return (int)getOwner().applyModifier(base,
-                                             "model.modifier.sailHighSeas",
+                                             Modifier.SAIL_HIGH_SEAS,
                                              unitType, getGame().getTurn());
     }
 
@@ -2927,11 +2928,10 @@ public class Unit extends GoodsLocation
     public int getLineOfSight() {
         Turn turn = getGame().getTurn();
         Set<Modifier> modifierSet = new HashSet<Modifier>();
-        modifierSet.addAll(getModifierSet("model.modifier.lineOfSightBonus"));
+        modifierSet.addAll(getModifierSet(Modifier.LINE_OF_SIGHT_BONUS));
         if (hasTile() && getTile().isExplored()) {
             modifierSet.addAll(getTile().getType()
-                .getModifierSet("model.modifier.lineOfSightBonus",
-                                unitType, turn));
+                .getModifierSet(Modifier.LINE_OF_SIGHT_BONUS, unitType, turn));
         }
         return (int)FeatureContainer
             .applyModifierSet((float)unitType.getLineOfSight(),
@@ -3173,7 +3173,7 @@ public class Unit extends GoodsLocation
         int opt = spec.getInteger(GameOptions.NATIVE_CONVERT_PROBABILITY);
         return 0.01f * FeatureContainer.applyModifierSet(opt,
             getGame().getTurn(),
-            getModifierSet("model.modifier.nativeConvertBonus"));
+            getModifierSet(Modifier.NATIVE_CONVERT_BONUS));
     }
 
     /**
@@ -3252,7 +3252,7 @@ public class Unit extends GoodsLocation
                 .getInteger(GameOptions.TREASURE_TRANSPORT_FEE)
                 * getTreasureAmount()) / 100;
             return (int)getOwner().applyModifier(fee,
-                "model.modifier.treasureTransportFee",
+                Modifier.TREASURE_TRANSPORT_FEE,
                 unitType, getGame().getTurn());
         }
         return 0;
@@ -3316,7 +3316,7 @@ public class Unit extends GoodsLocation
      */
     public Set<Modifier> getMissionaryTradeModifiers(boolean sense) {
         HashSet<Modifier> result = new HashSet<Modifier>();
-        for (Modifier m : getModifierSet("model.modifier.missionaryTradeBonus")) {
+        for (Modifier m : getModifierSet(Modifier.MISSIONARY_TRADE_BONUS)) {
             Modifier modifier = new Modifier(m);
             if (!sense) modifier.setValue(-m.getValue());
             result.add(modifier);

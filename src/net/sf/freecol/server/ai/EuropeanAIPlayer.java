@@ -1091,7 +1091,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 // modifiers because of the cheat boycott removal.
                 findOne: for (Colony c : player.getColonies()) {
                     for (Modifier m : c.getModifierSet()) {
-                        if ("model.modifier.colonyGoodsParty".equals(m.getSource())) {
+                        if (Modifier.COLONY_GOODS_PARTY.equals(m.getSource())) {
                             c.removeModifier(m);
                             player.logCheat("lift-boycott at " + c.getName());
                             break findOne;
