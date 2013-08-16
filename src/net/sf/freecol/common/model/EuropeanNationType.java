@@ -184,15 +184,15 @@ public class EuropeanNationType extends NationType {
     }
 
     private void writeUnit(FreeColXMLWriter xw, String id,
-                           AbstractUnit unit,
+                           AbstractUnit au,
                            boolean expert) throws XMLStreamException {
         xw.writeStartElement(UNIT_TAG);
 
         xw.writeAttribute(ID_ATTRIBUTE_TAG, id);
 
-        xw.writeAttribute(TYPE_TAG, unit);
+        xw.writeAttribute(TYPE_TAG, au);
 
-        xw.writeAttribute(ROLE_TAG, unit.getRole());
+        xw.writeAttribute(ROLE_TAG, au.getRoleId());
 
         //xw.writeAttribute("number", unit.getNumber());
 
@@ -252,11 +252,11 @@ public class EuropeanNationType extends NationType {
 
             String type = xr.getAttribute(TYPE_TAG, (String)null);
 
-            Role role = xr.getRole(getSpecification(), ROLE_TAG, Role.class, Role.DEFAULT);
+            String roleId = xr.getAttribute(ROLE_TAG, "model.role.default");
 
             boolean ex = xr.getAttribute(EXPERT_STARTING_UNITS_TAG, false);
 
-            addStartingUnit(id, new AbstractUnit(type, role, 1), ex);
+            addStartingUnit(id, new AbstractUnit(type, roleId, 1), ex);
             xr.closeTag(UNIT_TAG);
 
         } else {

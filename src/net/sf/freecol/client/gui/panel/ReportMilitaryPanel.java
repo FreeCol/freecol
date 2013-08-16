@@ -110,18 +110,25 @@ public final class ReportMilitaryPanel extends ReportUnitPanel {
                 (unitType.hasAbility(Ability.EXPERT_SOLDIER) ||
                  unitType.getOffence() > 0)) {
                 if (unitType.hasAbility(Ability.CAN_BE_EQUIPPED)) {
-                    scoutUnits.add(new AbstractUnit(unitType, Role.SCOUT, getCount("scouts", unitType)));
-                    dragoonUnits.add(new AbstractUnit(unitType, Role.DRAGOON, getCount("dragoons", unitType)));
-                    soldierUnits.add(new AbstractUnit(unitType, Role.SOLDIER, getCount("soldiers", unitType)));
+                    scoutUnits.add(new AbstractUnit(unitType,
+                            "model.role.scout", getCount("scouts", unitType)));
+                    dragoonUnits.add(new AbstractUnit(unitType,
+                            "model.role.dragoon", getCount("dragoons", unitType)));
+                    soldierUnits.add(new AbstractUnit(unitType,
+                            "model.role.soldier", getCount("soldiers", unitType)));
                 } else {
-                    units.add(new AbstractUnit(unitType, Role.DEFAULT, getCount("others", unitType)));
+                    units.add(new AbstractUnit(unitType,
+                            "model.role.default", getCount("others", unitType)));
                 }
             }
         }
         UnitType defaultType = getSpecification().getDefaultUnitType();
-        dragoonUnits.add(new AbstractUnit(defaultType, Role.DRAGOON, getCount("dragoons", defaultType)));
-        soldierUnits.add(new AbstractUnit(defaultType, Role.SOLDIER, getCount("soldiers", defaultType)));
-        scoutUnits.add(new  AbstractUnit(defaultType, Role.SCOUT, getCount("scouts", defaultType)));
+        dragoonUnits.add(new AbstractUnit(defaultType,
+                "model.role.dragoon", getCount("dragoons", defaultType)));
+        soldierUnits.add(new AbstractUnit(defaultType,
+                "model.role.soldier", getCount("soldiers", defaultType)));
+        scoutUnits.add(new  AbstractUnit(defaultType,
+                "model.role.scout", getCount("scouts", defaultType)));
         units.addAll(dragoonUnits);
         units.addAll(soldierUnits);
         units.addAll(scoutUnits);

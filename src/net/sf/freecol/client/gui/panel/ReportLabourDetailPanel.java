@@ -79,15 +79,15 @@ public final class ReportLabourDetailPanel extends ReportPanel implements Action
         JPanel detailPanel = new JPanel(new MigLayout("wrap 7", "[]30[][]30[][]30[][]", ""));
         detailPanel.setOpaque(false);
 
-        Role role = Role.DEFAULT;
+        String roleId = "model.role.default";
         if (unitType.hasAbility(Ability.EXPERT_PIONEER)) {
-            role = Role.PIONEER;
+            roleId = "model.role.pioneer";
         } else if (unitType.hasAbility(Ability.EXPERT_MISSIONARY)) {
-            role = Role.MISSIONARY;
+            roleId = "model.role.missionary";
         }
 
         // summary
-        detailPanel.add(new JLabel(getLibrary().getUnitImageIcon(unitType, role)), "spany");
+        detailPanel.add(new JLabel(getLibrary().getUnitImageIcon(unitType, roleId)), "spany");
         detailPanel.add(localizedLabel(unitType.getNameKey()));
         detailPanel.add(new JLabel(String.valueOf(unitCount.getCount(unitType))), "wrap 10");
         boolean canTrain = false;

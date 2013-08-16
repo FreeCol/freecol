@@ -650,7 +650,8 @@ public final class QuickActionMenu extends JPopupMenu {
             final EquipmentType horseType = horses;
             final EquipmentType musketType = muskets;
             JMenuItem newItem = new JMenuItem(Messages.message("model.equipment.dragoon"),
-                imageLibrary.getUnitImageIcon(tempUnit.getType(), Role.DRAGOON, 1.0/3));
+                imageLibrary.getUnitImageIcon(tempUnit.getType(),
+                    "model.role.dragoon", 1.0/3));
             newItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         igc.equipUnit(tempUnit, horseType, 1);

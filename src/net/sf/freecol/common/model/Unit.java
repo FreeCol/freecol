@@ -264,23 +264,22 @@ public class Unit extends GoodsLocation
      *
      * @param name The unit name, if any.
      * @param type The <code>UnitType</code>.
-     * @param role The <code>Role</code>.
+     * @param roleId The role identifier.
      * @param number A unit count.
      * @return A <code>StringTemplate</code> describing a <code>Unit</code>.
      */
     public static StringTemplate getLabel(String name, UnitType type,
-                                          Role role, int number) {
-        StringTemplate result = StringTemplate.label(" ")
-            .add(type.getNameKey());
-        if (name != null) {
-            result.addName(name);
-        }
-        if (role != Role.DEFAULT) {
-            result = StringTemplate.template("model.unit." + role.getId()
-                                             + ".name")
+                                          String roleId, int number) {
+        StringTemplate result;
+        if ("model.role.default".equals(roleId)) {
+            result = StringTemplate.label(" ")
+                .add(type.getNameKey());
+        } else {
+            result = StringTemplate.template("model.unit." + roleId + ".name")
                 .addAmount("%number%", number)
                 .add("%unit%", type.getNameKey());
         }
+        if (name != null) result.addName(name);
         return result;
     }
 
@@ -290,7 +289,7 @@ public class Unit extends GoodsLocation
      * @return A <code>StringTemplate</code> describing this <code>Unit</code>.
      */
     public StringTemplate getLabel() {
-        return getLabel(name, getType(), getRole(), 1);
+        return getLabel(name, getType(), getRole().getId(), 1);
     }
 
     /**

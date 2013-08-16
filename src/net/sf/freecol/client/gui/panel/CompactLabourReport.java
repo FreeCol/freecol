@@ -616,14 +616,14 @@ public final class CompactLabourReport extends ReportPanel {
     }
 
     private ImageIcon getUnitIcon(UnitType unit) {
-        Role role = Role.DEFAULT;
+        String roleId = "model.role.default";
         if (unit.hasAbility(Ability.EXPERT_PIONEER)) {
-            role = Role.PIONEER;
+            roleId = "model.role.pioneer";
         } else if (unit.hasAbility(Ability.EXPERT_MISSIONARY)) {
-            role = Role.MISSIONARY;
+            roleId = "model.role.missionary";
         }
 
-        return getLibrary().getUnitImageIcon(unit, role);
+        return getLibrary().getUnitImageIcon(unit, roleId);
     }
 
     /**

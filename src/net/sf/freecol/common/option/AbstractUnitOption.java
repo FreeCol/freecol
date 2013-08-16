@@ -213,7 +213,7 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
         AbstractUnit au = null;
         if (unitType != null && role != null && number != null) {
             au = new AbstractUnit(unitType.getValue(),
-                                  getRole(role.getValue()),
+                                  role.getValue(),
                                   number.getValue());
         }
         setValue(au);

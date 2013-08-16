@@ -112,16 +112,16 @@ public final class ReportLabourPanel extends ReportPanel {
                 continue;
             }
 
-            Role role = Role.DEFAULT;
+            String roleId = "model.role.default";
             if (unitType.hasAbility(Ability.EXPERT_PIONEER)) {
-                role = Role.PIONEER;
+                roleId = "model.role.pioneer";
             } else if (unitType.hasAbility(Ability.EXPERT_MISSIONARY)) {
-                role = Role.MISSIONARY;
+                roleId = "model.role.missionary";
             }
 
             int unitTypeCount = unitCount.getCount(unitType);
             if (unitTypeCount == 0) {
-                JLabel unitIcon = new JLabel(getLibrary().getUnitImageIcon(unitType, role, true, 0.8));
+                JLabel unitIcon = new JLabel(getLibrary().getUnitImageIcon(unitType, roleId, true, 0.8));
                 JLabel unitCount = new JLabel("0");
                 JLabel unitName = localizedLabel(unitType.getNameKey());
                 unitCount.setForeground(Color.GRAY);
@@ -130,7 +130,7 @@ public final class ReportLabourPanel extends ReportPanel {
                 reportPanel.add(unitCount);
                 reportPanel.add(unitName);
             } else {
-                JLabel unitIcon = new JLabel(getLibrary().getUnitImageIcon(unitType, role, false, 0.8));
+                JLabel unitIcon = new JLabel(getLibrary().getUnitImageIcon(unitType, roleId, false, 0.8));
                 JLabel unitCount = new JLabel("" + unitTypeCount);
                 JButton linkButton = getLinkButton(Messages.message(unitType.getNameKey()),
                                                    null, unitType.getId());

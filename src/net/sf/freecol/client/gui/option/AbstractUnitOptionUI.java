@@ -44,6 +44,7 @@ import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.option.AbstractUnitOption;
 import net.sf.freecol.common.option.IntegerOption;
@@ -115,16 +116,17 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
     }
 
     /**
-     * Updates the value of the {@link net.sf.freecol.common.option.Option} this object keeps.
+     * Updates the value of the {@link net.sf.freecol.common.option.Option}
+     * this object keeps.
      */
     public void updateOption() {
         typeUI.updateOption();
         roleUI.updateOption();
         numberUI.updateOption();
         UnitType type = typeUI.getOption().getValue();
-        Role role = getOption().getRole(roleUI.getOption().getValue());
+        String roleId = roleUI.getOption().getValue();
         int number = numberUI.getOption().getValue();
-        getOption().setValue(new AbstractUnit(type, role, number));
+        getOption().setValue(new AbstractUnit(type, roleId, number));
     }
 
     /**
@@ -205,21 +207,22 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
             c.removeAll();
             c.setForeground(list.getForeground());
             c.setFont(list.getFont());
-            AbstractUnit unit = (AbstractUnit) ((AbstractUnitOption) value).getValue();
-            String key = unit.getId();
-            if (unit.getUnitType(getOption().getSpecification())
-                .hasAbility(Ability.CAN_BE_EQUIPPED)
-                && unit.getRole() != Role.DEFAULT) {
-                key = "model.unit." + unit.getRole().toString().toLowerCase(Locale.US);
+            final Specification spec = getOption().getSpecification();
+            AbstractUnit au = (AbstractUnit)((AbstractUnitOption)value)
+                .getValue();
+            String key = au.getId();
+            if (au.getUnitType(spec).hasAbility(Ability.CAN_BE_EQUIPPED)
+                && !"model.role.default".equals(au.getRoleId())) {
+                key = "model.unit." + au.getRoleId();
             }
             StringTemplate template = StringTemplate.template(key + ".name")
-                .addAmount("%number%", unit.getNumber())
-                .add("%unit%", unit.getId() + ".name");
+                .addAmount("%number%", au.getNumber())
+                .add("%unit%", au.getId() + ".name");
             /*
             c.add(new JLabel(new ImageIcon(ResourceManager.getImage(unit.getId() + ".image", 0.5))),
                   "width 80, align center");
             */
-            c.add(new JLabel(Integer.toString(unit.getNumber())));
+            c.add(new JLabel(Integer.toString(au.getNumber())));
             c.add(new JLabel(Messages.message(template)));
             return c;
         }

@@ -1753,22 +1753,22 @@ public final class Specification {
             AbstractUnitOption regulars
                 = new AbstractUnitOption(id + ".regulars");
             regulars.setValue(new AbstractUnit("model.unit.colonialRegular",
-                                               Role.SOLDIER, 2));
+                                               "model.role.soldier", 2));
             interventionForce.getValue().add(regulars);
             AbstractUnitOption dragoons
                 = new AbstractUnitOption(id + ".dragoons");
             dragoons.setValue(new AbstractUnit("model.unit.colonialRegular",
-                                               Role.DRAGOON, 2));
+                                               "model.role.dragoon", 2));
             interventionForce.getValue().add(dragoons);
             AbstractUnitOption artillery
                 = new AbstractUnitOption(id + ".artillery");
             artillery.setValue(new AbstractUnit("model.unit.artillery",
-                                                Role.DEFAULT, 2));
+                                                "model.role.default", 2));
             interventionForce.getValue().add(artillery);
             AbstractUnitOption menOfWar
                 = new AbstractUnitOption(id + ".menOfWar");
             menOfWar.setValue(new AbstractUnit("model.unit.manOWar",
-                                               Role.DEFAULT, 2));
+                                               "model.role.default", 2));
             interventionForce.getValue().add(menOfWar);
             allOptions.put(id, interventionForce);
         }
@@ -1778,22 +1778,22 @@ public final class Specification {
             AbstractUnitOption regulars
                 = new AbstractUnitOption(id + ".regulars");
             regulars.setValue(new AbstractUnit("model.unit.veteranSoldier",
-                                               Role.SOLDIER, 2));
+                                               "model.role.soldier", 2));
             mercenaryForce.getValue().add(regulars);
             AbstractUnitOption dragoons
                 = new AbstractUnitOption(id + ".dragoons");
             dragoons.setValue(new AbstractUnit("model.unit.veteranSoldier",
-                                               Role.DRAGOON, 2));
+                                               "model.role.dragoon", 2));
             mercenaryForce.getValue().add(dragoons);
             AbstractUnitOption artillery
                 = new AbstractUnitOption(id + ".artillery");
             artillery.setValue(new AbstractUnit("model.unit.artillery",
-                                                Role.DEFAULT, 2));
+                                                "model.role.default", 2));
             mercenaryForce.getValue().add(artillery);
             AbstractUnitOption menOfWar
                 = new AbstractUnitOption(id + ".menOfWar");
             menOfWar.setValue(new AbstractUnit("model.unit.manOWar",
-                                               Role.DEFAULT, 2));
+                                               "model.role.default", 2));
             mercenaryForce.getValue().add(menOfWar);
             allOptions.put(id, mercenaryForce);
         }

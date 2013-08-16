@@ -433,15 +433,15 @@ public final class Monarch extends FreeColGameObject implements Named {
         if (types.isEmpty()) return null;
         UnitType unitType = Utils.getRandomMember(logger, "Choose REF unit",
                                                   types, random);
-        Role role = (needNaval
+        String roleId = (needNaval
             || !unitType.hasAbility(Ability.CAN_BE_EQUIPPED))
-            ? Role.DEFAULT
+            ? "model.role.default"
             : (Utils.randomInt(logger, "Choose land role", random, 2) == 0)
-            ? Role.SOLDIER
-            : Role.DRAGOON;
+            ? "model.role.soldier"
+            : "model.role.dragoon";
         int number = (needNaval) ? 1
             : Utils.randomInt(logger, "Choose land#", random, 3) + 1;
-        AbstractUnit result = new AbstractUnit(unitType, role, number);
+        AbstractUnit result = new AbstractUnit(unitType, roleId, number);
         logger.info("Add to REF: capacity=" + expeditionaryForce.getCapacity()
             + " spaceRequired=" + expeditionaryForce.getSpaceRequired()
             + " => " + ((needNaval) ? "naval" : "land") + " unit"
@@ -509,7 +509,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         if (naval) {
             support.add(new AbstractUnit(Utils.getRandomMember(logger,
                         "Choose naval support", navalTypes, random),
-                        Role.DEFAULT, 1));
+                        "model.role.default", 1));
             setSupportSea(true);
             return support;
         }
@@ -526,36 +526,36 @@ public final class Monarch extends FreeColGameObject implements Named {
         case 4:
             support.add(new AbstractUnit(Utils.getRandomMember(logger,
                         "Choose bombard", bombardTypes, random),
-                        Role.DEFAULT, 1));
+                        "model.role.default", 1));
             support.add(new AbstractUnit(Utils.getRandomMember(logger,
                         "Choose mounted", mountedTypes, random),
-                        Role.DRAGOON, 2));
+                        "model.role.dragoon", 2));
             break;
         case 3:
             support.add(new AbstractUnit(Utils.getRandomMember(logger,
                         "Choose mounted", mountedTypes, random),
-                        Role.DRAGOON, 2));
+                        "model.role.dragoon", 2));
             support.add(new AbstractUnit(Utils.getRandomMember(logger,
                         "Choose soldier", mountedTypes, random),
-                        Role.SOLDIER, 1));
+                        "model.role.soldier", 1));
             break;
         case 2:
             support.add(new AbstractUnit(Utils.getRandomMember(logger,
                         "Choose mounted", mountedTypes, random),
-                        Role.DRAGOON, 2));
+                        "model.role.dragoon", 2));
             break;
         case 1:
             support.add(new AbstractUnit(Utils.getRandomMember(logger,
                         "Choose mounted", mountedTypes, random),
-                        Role.DRAGOON, 1));
+                        "model.role.dragoon", 1));
             support.add(new AbstractUnit(Utils.getRandomMember(logger,
                         "Choose soldier", mountedTypes, random),
-                        Role.SOLDIER, 1));
+                        "model.role.soldier", 1));
             break;
         case 0:
             support.add(new AbstractUnit(Utils.getRandomMember(logger,
                         "Choose soldier", mountedTypes, random),
-                        Role.SOLDIER, 1));
+                        "model.role.soldier", 1));
             break;
         default:
             break;
@@ -589,15 +589,15 @@ public final class Monarch extends FreeColGameObject implements Named {
                                              random);
             unitTypes.remove(unitType);
 
-            Role[] roles = (unitType.hasAbility(Ability.CAN_BE_EQUIPPED))
+            String[] roleIds = (unitType.hasAbility(Ability.CAN_BE_EQUIPPED))
                 ? ((Utils.randomInt(logger, "Swap role", random, 2) == 0)
-                    ? new Role[] { Role.DRAGOON, Role.SOLDIER }
-                    : new Role[] { Role.SOLDIER, Role.DRAGOON })
-                : new Role[] { Role.DEFAULT };
-            for (int r = 0; r < roles.length; r++) {
+                    ? new String[] { "model.role.dragoon", "model.role.soldier" }
+                    : new String[] { "model.role.soldier", "model.role.dragoon" })
+                : new String[] { "model.role.default" };
+            for (int r = 0; r < roleIds.length; r++) {
                 int n = Utils.randomInt(logger, "Choose number " + unitType,
                                         random, Math.min(count, 2)) + 1;
-                AbstractUnit au = new AbstractUnit(unitType, roles[r], n);
+                AbstractUnit au = new AbstractUnit(unitType, roleIds[r], n);
                 for (;;) {
                     int newPrice = player.getPrice(au) * mercPrice / 100;
                     if (player.checkGold(price + newPrice)) {
@@ -615,10 +615,10 @@ public final class Monarch extends FreeColGameObject implements Named {
 
         /* Try to always return something, even if it is not affordable */
         if (mercs.isEmpty() && unitType != null) {
-            Role role = (unitType.hasAbility(Ability.CAN_BE_EQUIPPED))
-                ? Role.SOLDIER
-                : Role.DEFAULT;
-            mercs.add(new AbstractUnit(unitType, role, 1));
+            String roleId = (unitType.hasAbility(Ability.CAN_BE_EQUIPPED))
+                ? "model.role.soldier"
+                : "model.role.default";
+            mercs.add(new AbstractUnit(unitType, roleId, 1));
         }
         return mercs;
     }
@@ -763,7 +763,7 @@ public final class Monarch extends FreeColGameObject implements Named {
             } else {
                 for (AbstractUnit refUnit : landUnits) {
                     if (refUnit.getUnitType(spec) == unitType
-                        && refUnit.getRole().equals(units.getRole())) {
+                        && refUnit.getRoleId().equals(units.getRoleId())) {
                         refUnit.setNumber(refUnit.getNumber() + n);
                         spaceRequired += unitType.getSpaceTaken() * n;
                         added = true;

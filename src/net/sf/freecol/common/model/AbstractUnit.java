@@ -33,8 +33,8 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
  */
 public class AbstractUnit extends FreeColObject {
 
-    /** The role of this AbstractUnit. */
-    private Role role = Role.DEFAULT;
+    /** The role identifier of this AbstractUnit. */
+    private String roleId = "model.role.default";
 
     /** The number of units. */
     private int number = 1;
@@ -49,24 +49,24 @@ public class AbstractUnit extends FreeColObject {
      * Create a new AbstractUnit.
      *
      * @param id The object identifier.
-     * @param someRole The unit <code>Role</code>.
-     * @param someNumber The number of units.
+     * @param roleId The unit role identifier.
+     * @param number A number of units.
      */
-    public AbstractUnit(String id, Role someRole, int someNumber) {
+    public AbstractUnit(String id, String roleId, int number) {
         setId(id);
-        this.role = someRole;
-        this.number = someNumber;
+        this.roleId = roleId;
+        this.number = number;
     }
 
     /**
      * Create a new AbstractUnit.
      *
      * @param unitType The type of unit to create.
-     * @param someRole The unit <code>Role</code>.
-     * @param someNumber The number of units.
+     * @param roleId The unit role identifier.
+     * @param number The number of units.
      */
-    public AbstractUnit(UnitType unitType, Role someRole, int someNumber) {
-        this(unitType.getId(), someRole, someNumber);
+    public AbstractUnit(UnitType unitType, String roleId, int number) {
+        this(unitType.getId(), roleId, number);
     }
 
     /**
@@ -86,7 +86,7 @@ public class AbstractUnit extends FreeColObject {
      * @return The copy.
      */
     public AbstractUnit clone() {
-        return new AbstractUnit(getId(), getRole(), getNumber());
+        return new AbstractUnit(getId(), getRoleId(), getNumber());
     }
 
 
@@ -103,19 +103,29 @@ public class AbstractUnit extends FreeColObject {
     /**
      * Get the <code>Role</code> value.
      *
+     * @param specification The <code>Specification</code> to refer to.
      * @return The unit role.
      */
-    public final Role getRole() {
-        return role;
+    public final Role getRole(Specification specification) {
+        return specification.getRole(roleId);
     }
 
     /**
-     * Set the <code>Role</code> value.
+     * Get the role identifier.
      *
-     * @param newRole The new <code>Role</code> value.
+     * @return The role identifier.
      */
-    public final void setRole(final Role newRole) {
-        this.role = newRole;
+    public final String getRoleId() {
+        return roleId;
+    }
+
+    /**
+     * Set the role identifier.
+     *
+     * @param roleId The new role identifier.
+     */
+    public final void setRole(final String roleId) {
+        this.roleId = roleId;
     }
 
     /**
@@ -145,11 +155,11 @@ public class AbstractUnit extends FreeColObject {
     public StringTemplate getLabel(Specification spec) {
         StringTemplate result = StringTemplate.template("abstractUnit")
             .addAmount("%number%", getNumber());
-        if (role == Role.DEFAULT) {
+        if ("model.role.default".equals(getRoleId())) {
             result.add("%unit%", getUnitType(spec).getNameKey());
         } else {
             result.addStringTemplate("%unit%",
-                Unit.getLabel(null, getUnitType(spec), role, getNumber()));
+                Unit.getLabel(null, getUnitType(spec), getRoleId(), getNumber()));
         }
         return result;
     }
@@ -163,20 +173,38 @@ public class AbstractUnit extends FreeColObject {
      */
     public EquipmentType[] getEquipment(Specification spec) {
         List<EquipmentType> equipment = new ArrayList<EquipmentType>();
-        if (role == Role.PIONEER) {
-            EquipmentType tools = spec.getEquipmentType("model.equipment.tools");
-            for (int count = 0; count < tools.getMaximumCount(); count++) {
-                equipment.add(tools);
+        EquipmentType[] types = {
+            ("model.role.armedBrave".equals(roleId))
+            ? spec.getEquipmentType("model.equipment.indian.muskets")
+            : ("model.role.mountedBrave".equals(roleId))
+            ? spec.getEquipmentType("model.equipment.indian.horses")
+            : ("model.role.nativeDragoon".equals(roleId))
+            ? spec.getEquipmentType("model.equipment.indian.muskets")
+            : ("model.role.pioneer".equals(roleId))
+            ? spec.getEquipmentType("model.equipment.tools")
+            : ("model.role.missionary".equals(roleId))
+            ? spec.getEquipmentType("model.equipment.missionary")
+            : ("model.role.scout".equals(roleId))
+            ? spec.getEquipmentType("model.equipment.horses")
+            : ("model.role.soldier".equals(roleId)
+                || "model.role.infantry".equals(roleId))
+            ? spec.getEquipmentType("model.equipment.muskets")
+            : ("model.role.dragoon".equals(roleId)
+                || "model.role.cavalry".equals(roleId))
+            ? spec.getEquipmentType("model.equipment.muskets")
+            : null,
+            ("model.role.dragoon".equals(roleId)
+                || "model.role.cavalry".equals(roleId))
+            ? spec.getEquipmentType("model.equipment.horses")
+            : ("model.role.nativeDragoon".equals(roleId))
+            ? spec.getEquipmentType("model.equipment.indian.horses")
+            : null
+        };
+        for (EquipmentType et : types) {
+            if (et == null) continue;
+            for (int count = 0; count < et.getMaximumCount(); count++) {
+                equipment.add(et);
             }
-        } else if (role == Role.MISSIONARY) {
-            equipment.add(spec.getEquipmentType("model.equipment.missionary"));
-        } else if (role == Role.SOLDIER) {
-            equipment.add(spec.getEquipmentType("model.equipment.muskets"));
-        } else if (role == Role.SCOUT) {
-            equipment.add(spec.getEquipmentType("model.equipment.horses"));
-        } else if (role == Role.DRAGOON) {
-            equipment.add(spec.getEquipmentType("model.equipment.muskets"));
-            equipment.add(spec.getEquipmentType("model.equipment.horses"));
         }
         return equipment.toArray(new EquipmentType[equipment.size()]);
     }
@@ -195,7 +223,7 @@ public class AbstractUnit extends FreeColObject {
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
-        xw.writeAttribute(ROLE_TAG, role);
+        xw.writeAttribute(ROLE_TAG, roleId);
 
         xw.writeAttribute(NUMBER_TAG, number);
     }
@@ -207,7 +235,7 @@ public class AbstractUnit extends FreeColObject {
     protected final void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        role = xr.getRole(Role.DEFAULT.getSpecification(), ROLE_TAG, Role.class, Role.DEFAULT);
+        roleId = xr.getAttribute(ROLE_TAG, "model.role.default");
 
         number = xr.getAttribute(NUMBER_TAG, 1);
     }
@@ -219,7 +247,7 @@ public class AbstractUnit extends FreeColObject {
     public String toString() {
         StringBuilder sb = new StringBuilder(16);
         sb.append(number).append(" ").append(getId())
-            .append(" (").append(role).append(")");
+            .append(" (").append(roleId).append(")");
         return sb.toString();
     }
 

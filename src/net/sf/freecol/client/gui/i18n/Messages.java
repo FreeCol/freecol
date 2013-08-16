@@ -53,6 +53,7 @@ import net.sf.freecol.common.model.StringTemplate.TemplateType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.Option;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -685,23 +686,17 @@ public class Messages {
      * can be used when communicating with the user.
      *
      * @param someType an <code>UnitType</code> value
-     * @param someRole a <code>Role</code> value
+     * @param roleId The unit role identifier.
      * @param count an <code>int</code> value
      * @return The given unit type as a String
      */
-    public static String getLabel(UnitType someType, Role someRole, int count) {
-        String key = someRole.toString().toLowerCase();
-        if (someRole == Role.DEFAULT) {
-            key = "name";
-        }
-        String messageID = someType.getId() +  "." + key;
-        if (containsKey(messageID)) {
-            return message(messageID);
-        } else {
-            return message(StringTemplate.template("model.unit." + key + ".name")
-                           .addAmount("%number%", count)
-                           .addName("%unit%", someType));
-        }
+    public static String getLabel(UnitType someType, String roleId, int count) {
+        String key = ("model.role.default".equals(roleId))
+            ? someType.getId() + ".name"
+            : "model.unit.role." + Utils.lastPart(roleId, ".") + ".name";
+        return message(StringTemplate.template(key)
+            .addAmount("%number%", count)
+            .addName("%unit%", someType));
     }
 
     /**
@@ -711,17 +706,17 @@ public class Messages {
      * @param unit an <code>AbstractUnit</code> value
      * @return The given unit type as a String
      */
-    public static String getLabel(AbstractUnit unit) {
-        String key = unit.getRole().toString().toLowerCase();
-        if (unit.getRole() == Role.DEFAULT) {
+    public static String getLabel(AbstractUnit au) {
+        String key = au.getRoleId();
+        if ("model.role.default".equals(au.getRoleId())) {
             key = "name";
         }
-        String messageID = unit.getId() +  "." + key;
+        String messageID = au.getId() + "." + key;
         if (containsKey(messageID)) {
             return message(messageID);
         } else {
             return message(StringTemplate.template("model.unit." + key + ".name")
-                           .addName("%unit%", unit));
+                           .addName("%unit%", au));
         }
     }
 

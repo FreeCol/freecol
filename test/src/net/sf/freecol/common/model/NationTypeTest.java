@@ -98,9 +98,9 @@ public class NationTypeTest extends FreeColTestCase {
                 List<AbstractUnit> startingUnits = type.getStartingUnits();
                 assertEquals("Wrong number of starting units: " + type.toString(),
                              3, startingUnits.size());
-                for (AbstractUnit unit : startingUnits) {
-                    String unitTypeId = unit.getId();
-                    if (unit.getRole() == Role.SOLDIER) {
+                for (AbstractUnit au : startingUnits) {
+                    String unitTypeId = au.getId();
+                    if ("model.role.soldier".equals(au.getRoleId())) {
                         if (difficulty == 0 || difficulty == 1
                             || "model.nationType.conquest".equals(type.getId())) {
                             assertEquals("Wrong type of soldier: " + type.toString(),
@@ -109,7 +109,7 @@ public class NationTypeTest extends FreeColTestCase {
                             assertFalse("Wrong type of soldier: " + type.toString(),
                                         "model.unit.veteranSoldier".equals(unitTypeId));
                         }
-                    } else if (unit.getRole() == Role.PIONEER) {
+                    } else if ("model.role.pioneer".equals(au.getRoleId())) {
                         if ("model.nationType.cooperation".equals(type.getId())) {
                             assertEquals("Wrong type of pioneer: " + type.toString(),
                                          "model.unit.hardyPioneer", unitTypeId);
@@ -117,9 +117,9 @@ public class NationTypeTest extends FreeColTestCase {
                             assertFalse("Wrong type of pioneer: " + type.toString(),
                                         "model.unit.hardyPioneer".equals(unitTypeId));
                         }
-                    } else if (unit.getRole() == Role.DEFAULT) {
+                    } else if ("model.role.default".equals(au.getRoleId())) {
                         assertTrue("Ship is not naval: " + type.toString(),
-                                   unit.getUnitType(spec()).hasAbility(Ability.NAVAL_UNIT));
+                                   au.getUnitType(spec()).hasAbility(Ability.NAVAL_UNIT));
                         if ("model.nationType.trade".equals(type.getId())
                             || "model.nationType.naval".equals(type.getId())) {
                             assertEquals("Wrong type of ship: " + type.toString(),

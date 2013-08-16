@@ -1008,23 +1008,23 @@ public final class ImageLibrary {
      * @return an <code>ImageIcon</code> value
      */
     public ImageIcon getUnitImageIcon(Unit unit) {
-        return getUnitImageIcon(unit.getType(), unit.getRole(),
+        return getUnitImageIcon(unit.getType(), unit.getRole().getId(),
             unit.hasNativeEthnicity(), false, scalingFactor);
     }
 
     public ImageIcon getUnitImageIcon(Unit unit, boolean grayscale) {
-        return getUnitImageIcon(unit.getType(), unit.getRole(),
+        return getUnitImageIcon(unit.getType(), unit.getRole().getId(),
             unit.hasNativeEthnicity(), grayscale, scalingFactor);
     }
 
     public ImageIcon getUnitImageIcon(Unit unit, boolean grayscale,
                                       double scale) {
-        return getUnitImageIcon(unit.getType(), unit.getRole(),
+        return getUnitImageIcon(unit.getType(), unit.getRole().getId(),
             unit.hasNativeEthnicity(), grayscale, scale);
     }
 
     public ImageIcon getUnitImageIcon(Unit unit, double scale) {
-        return getUnitImageIcon(unit.getType(), unit.getRole(),
+        return getUnitImageIcon(unit.getType(), unit.getRole().getId(),
             unit.hasNativeEthnicity(), false, scale);
     }
 
@@ -1035,34 +1035,47 @@ public final class ImageLibrary {
      * @return an <code>ImageIcon</code> value
      */
     public ImageIcon getUnitImageIcon(UnitType unitType) {
-        return getUnitImageIcon(unitType, Role.DEFAULT, false, false,
-                                scalingFactor);
+        return getUnitImageIcon(unitType, "model.role.default", false,
+                                false, scalingFactor);
     }
 
     public ImageIcon getUnitImageIcon(UnitType unitType, boolean grayscale) {
-        return getUnitImageIcon(unitType, Role.DEFAULT, false, grayscale,
-                                scalingFactor);
+        return getUnitImageIcon(unitType, "model.role.default", false,
+                                grayscale, scalingFactor);
     }
 
     public ImageIcon getUnitImageIcon(UnitType unitType, boolean grayscale,
                                       double scale) {
-        return getUnitImageIcon(unitType, Role.DEFAULT, false, grayscale,
-                                scale);
+        return getUnitImageIcon(unitType, "model.role.default", false,
+                                grayscale, scale);
     }
 
     public ImageIcon getUnitImageIcon(UnitType unitType, double scale) {
-        return getUnitImageIcon(unitType, Role.DEFAULT, false, false, scale);
+        return getUnitImageIcon(unitType, "model.role.default", false,
+                                false, scale);
     }
 
-    public ImageIcon getUnitImageIcon(UnitType unitType, Role role) {
-        return getUnitImageIcon(unitType, role, false, false, scalingFactor);
+    public ImageIcon getUnitImageIcon(UnitType unitType, String roleId) {
+        return getUnitImageIcon(unitType, roleId, false,
+                                false, scalingFactor);
     }
 
-
-    public ImageIcon getUnitImageIcon(UnitType unitType, Role role,
+    public ImageIcon getUnitImageIcon(UnitType unitType, String roleId,
                                       boolean grayscale) {
-        return getUnitImageIcon(unitType, role, false, grayscale,
-                                scalingFactor);
+        return getUnitImageIcon(unitType, roleId, false,
+                                grayscale, scalingFactor);
+    }
+
+    public ImageIcon getUnitImageIcon(UnitType unitType, String roleId,
+                                      boolean grayscale, double scale) {
+        return getUnitImageIcon(unitType, roleId, false,
+                                grayscale, scale);
+    }
+
+    public ImageIcon getUnitImageIcon(UnitType unitType, String roleId,
+                                      double scale) {
+        return getUnitImageIcon(unitType, roleId, false,
+                                false, scale);
     }
 
     /**
@@ -1075,15 +1088,14 @@ public final class ImageLibrary {
      * @param grayscale draws the icon in an inactive/disabled-looking state
      * @return an <code>ImageIcon</code> value
      */
-    public ImageIcon getUnitImageIcon(UnitType unitType, Role role,
+    public ImageIcon getUnitImageIcon(UnitType unitType, String roleId,
                                       boolean nativeEthnicity,
                                       boolean grayscale, double scale) {
         // units that can only be native don't need the .native key part
         if (unitType.getId().equals("model.unit.indianConvert")
             || unitType.getId().equals("model.unit.brave")) {
             nativeEthnicity = false;
-        }
-        else for (Entry<String, Boolean> entry
+        } else for (Entry<String, Boolean> entry
                       : unitType.getRequiredAbilities().entrySet()) {
             if (entry.getKey().equals(Ability.NATIVE)
                 && entry.getValue() == true) {
@@ -1092,14 +1104,13 @@ public final class ImageLibrary {
         }
         
         // try to get an image matching the key
-        String key = unitType.getId()
-            + (role == Role.DEFAULT ? "" : "." + role.getId())
-            + (nativeEthnicity ? ".native" : "")
+        String roleQual = ("model.role.default".equals(roleId)) ? ""
+            : "." + roleId;
+        String key = unitType.getId() + roleQual
+            + ((nativeEthnicity) ? ".native" : "")
             + ".image";
         if (!ResourceManager.hasResource(key) && nativeEthnicity) {
-            key = unitType.getId()
-                + (role == Role.DEFAULT ? "" : "." + role.getId())
-                + ".image";
+            key = unitType.getId() + roleQual + ".image";
         }
         Image image = (grayscale)
             ? ResourceManager.getGrayscaleImage(key, scale)
@@ -1123,11 +1134,6 @@ public final class ImageLibrary {
         return new ImageIcon(image);
     }
 
-    public ImageIcon getUnitImageIcon(UnitType unitType, Role role,
-                                      boolean grayscale, double scale) {
-        return getUnitImageIcon(unitType, role, false, grayscale, scale);
-    }
-
     /*
     private Image getPathIllegalImage(Unit u) {
         if (u == null || u.isNaval()) {
@@ -1141,17 +1147,4 @@ public final class ImageLibrary {
         }
     }
     */
-
-    /**
-     * Gets an image to represent the path of the given <code>Unit</code>.
-     *
-     * @param unitType The <code>UnitType</code> to search for.
-     * @param role The unit <code>Role</code>.
-     * @param scale The scale for the image.
-     * @return A suitable <code>Image</code>.
-     */
-    public ImageIcon getUnitImageIcon(UnitType unitType, Role role,
-                                      double scale) {
-        return getUnitImageIcon(unitType, role, false, false, scale);
-    }
 }

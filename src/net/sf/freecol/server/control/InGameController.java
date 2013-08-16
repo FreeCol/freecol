@@ -3972,8 +3972,8 @@ public final class InGameController extends Controller {
             units = serverPlayer.getMonarch().getExpeditionaryForce().getUnits();
         } else {
             ServerPlayer REFPlayer = (ServerPlayer) serverPlayer.getREFPlayer();
-            java.util.Map<UnitType, HashMap<Role, Integer>> unitHash
-                = new HashMap<UnitType, HashMap<Role, Integer>>();
+            java.util.Map<UnitType, HashMap<String, Integer>> unitHash
+                = new HashMap<UnitType, HashMap<String, Integer>>();
             for (Unit unit : REFPlayer.getUnits()) {
                 if (unit.isOffensiveUnit()) {
                     UnitType unitType = defaultType;
@@ -3981,22 +3981,22 @@ public final class InGameController extends Controller {
                         || unit.hasAbility(Ability.EXPERT_SOLDIER)) {
                         unitType = unit.getType();
                     }
-                    HashMap<Role, Integer> roleMap = unitHash.get(unitType);
+                    HashMap<String, Integer> roleMap = unitHash.get(unitType);
                     if (roleMap == null) {
-                        roleMap = new HashMap<Role, Integer>();
+                        roleMap = new HashMap<String, Integer>();
                     }
-                    Role role = unit.getRole();
-                    Integer count = roleMap.get(role);
+                    String roleId = unit.getRole().getId();
+                    Integer count = roleMap.get(roleId);
                     if (count == null) {
-                        roleMap.put(role, new Integer(1));
+                        roleMap.put(roleId, new Integer(1));
                     } else {
-                        roleMap.put(role, new Integer(count.intValue() + 1));
+                        roleMap.put(roleId, new Integer(count.intValue() + 1));
                     }
                     unitHash.put(unitType, roleMap);
                 }
             }
-            for (java.util.Map.Entry<UnitType, HashMap<Role, Integer>> typeEntry : unitHash.entrySet()) {
-                for (java.util.Map.Entry<Role, Integer> roleEntry : typeEntry.getValue().entrySet()) {
+            for (java.util.Map.Entry<UnitType, HashMap<String, Integer>> typeEntry : unitHash.entrySet()) {
+                for (java.util.Map.Entry<String, Integer> roleEntry : typeEntry.getValue().entrySet()) {
                     units.add(new AbstractUnit(typeEntry.getKey(), roleEntry.getKey(), roleEntry.getValue()));
                 }
             }

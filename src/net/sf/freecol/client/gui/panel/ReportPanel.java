@@ -158,17 +158,18 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
         return new EmptyBorder(20, 20, 20, 20);
     }
 
-    protected JLabel createUnitTypeLabel(AbstractUnit unit) {
-        UnitType unitType = unit.getUnitType(getSpecification());
-        Role role = unit.getRole();
-        int count = unit.getNumber();
-        ImageIcon unitIcon = getLibrary().getUnitImageIcon(unitType, role, (count == 0), 0.66);
+    protected JLabel createUnitTypeLabel(AbstractUnit au) {
+        UnitType unitType = au.getUnitType(getSpecification());
+        String roleId = au.getRoleId();
+        int count = au.getNumber();
+        ImageIcon unitIcon = getLibrary().getUnitImageIcon(unitType, roleId,
+                                                           (count == 0), 0.66);
         JLabel unitLabel = new JLabel(unitIcon);
         unitLabel.setText(String.valueOf(count));
         if (count == 0) {
             unitLabel.setForeground(Color.GRAY);
         }
-        unitLabel.setToolTipText(Messages.getLabel(unitType, role, count));
+        unitLabel.setToolTipText(Messages.getLabel(unitType, roleId, count));
         return unitLabel;
     }
 

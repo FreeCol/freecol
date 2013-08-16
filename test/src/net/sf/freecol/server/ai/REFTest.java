@@ -55,41 +55,41 @@ public class REFTest extends FreeColTestCase {
 
         // Create player
         ServerPlayer player1 = (ServerPlayer) game.getPlayer("model.nation.dutch");
-        List <AbstractUnit> refUnitsBeforeIndependence = player1.getMonarch()
+        List<AbstractUnit> refUnitsBeforeIndependence = player1.getMonarch()
             .getExpeditionaryForce().getUnits();
         int soldiersBeforeIndependence = 0;
         int dragoonsBeforeIndependence = 0;
         int artilleryBeforeIndependence = 0;
         int shipsBeforeIndependence = 0;
-        for(AbstractUnit unit : refUnitsBeforeIndependence){
-            UnitType unitType = unit.getUnitType(spec());
-            if(unitType.hasAbility(Ability.NAVAL_UNIT)){
-                shipsBeforeIndependence += unit.getNumber();
+        for (AbstractUnit au : refUnitsBeforeIndependence) {
+            UnitType unitType = au.getUnitType(spec());
+            if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
+                shipsBeforeIndependence += au.getNumber();
                 continue;
             }
-            if(unitType == artilleryType){
-                artilleryBeforeIndependence += unit.getNumber();
+            if (unitType == artilleryType) {
+                artilleryBeforeIndependence += au.getNumber();
                 continue;
             }
-            if(unitType == soldierType){
-                if (unit.getRole() == Role.SOLDIER) {
-                    soldiersBeforeIndependence += unit.getNumber();
-                } else if (unit.getRole() == Role.DRAGOON) {
-                    dragoonsBeforeIndependence += unit.getNumber();
+            if (unitType == soldierType) {
+                if ("model.role.soldier".equals(au.getRoleId())) {
+                    soldiersBeforeIndependence += au.getNumber();
+                } else if ("model.role.dragoon".equals(au.getRoleId())) {
+                    dragoonsBeforeIndependence += au.getNumber();
                 } else {
-                    fail("Unknown REF role: " + unit.getRole().toString());
+                    fail("Unknown REF role: " + au.getRoleId());
                 }
                 continue;
             }
-            fail("Unknown REF unit: " +  unit.toString());
+            fail("Unknown REF unit: " + au);
         }
 
         ServerPlayer refPlayer = igc.createREFPlayer(player1);
 
-        assertNotNull("REF player is null",refPlayer);
-        assertNotNull("Player ref is null",player1.getREFPlayer());
-        assertEquals("REF player should be player1 ref", refPlayer, player1.getREFPlayer());
-
+        assertNotNull("REF player is null", refPlayer);
+        assertNotNull("Player ref is null", player1.getREFPlayer());
+        assertEquals("REF player should be player1 ref", refPlayer,
+            player1.getREFPlayer());
 
         // Execute
         List<Unit> refUnitsAfterIndependence = refPlayer.getUnits();
@@ -99,23 +99,23 @@ public class REFTest extends FreeColTestCase {
         int dragoonsAfterIndependence = 0;
         int artilleryAfterIndependence = 0;
         int shipsAfterIndependence = 0;
-        for(Unit unit : refUnitsAfterIndependence){
+        for (Unit unit : refUnitsAfterIndependence) {
             UnitType unitType = unit.getType();
-            if(unitType.hasAbility(Ability.NAVAL_UNIT)){
+            if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
                 shipsAfterIndependence++;
                 continue;
             }
-            if(unitType == artilleryType){
+            if (unitType == artilleryType) {
                 artilleryAfterIndependence++;
                 continue;
             }
-            if(unitType == soldierType){
-                if (unit.getRole() == Role.SOLDIER) {
+            if (unitType == soldierType) {
+                if (unit.isArmed() && !unit.isMounted()) {
                     soldiersAfterIndependence++;
-                } else if (unit.getRole() == Role.DRAGOON) {
+                } else if (unit.isArmed() && unit.isMounted()) {
                     dragoonsAfterIndependence++;
                 } else {
-                    fail("Unknown REF role: " + unit.getRole().toString());
+                    fail("Unknown REF role: " + unit.getRole());
                 }
                 continue;
             }
@@ -123,9 +123,13 @@ public class REFTest extends FreeColTestCase {
         }
 
         // Verify results
-        assertEquals("Wrong number of ships",shipsBeforeIndependence,shipsAfterIndependence);
-        assertEquals("Wrong number of artillery",artilleryBeforeIndependence,artilleryAfterIndependence);
-        assertEquals("Wrong number of soldiers",soldiersBeforeIndependence,soldiersAfterIndependence);
-        assertEquals("Wrong number of dragoons",dragoonsBeforeIndependence,dragoonsAfterIndependence);
+        assertEquals("Wrong number of ships", shipsBeforeIndependence,
+                     shipsAfterIndependence);
+        assertEquals("Wrong number of artillery", artilleryBeforeIndependence,
+                     artilleryAfterIndependence);
+        assertEquals("Wrong number of soldiers", soldiersBeforeIndependence,
+                     soldiersAfterIndependence);
+        assertEquals("Wrong number of dragoons", dragoonsBeforeIndependence,
+                     dragoonsAfterIndependence);
     }
 }

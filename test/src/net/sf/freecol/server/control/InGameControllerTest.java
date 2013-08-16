@@ -1808,8 +1808,8 @@ public class InGameControllerTest extends FreeColTestCase {
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
         assertTrue(dutch.getUnits().isEmpty());
         List<AbstractUnit> units = new ArrayList<AbstractUnit>();
-        units.add(new AbstractUnit(colonistType, Role.DEFAULT, 1));
-        units.add(new AbstractUnit(statesmanType, Role.DEFAULT, 1));
+        units.add(new AbstractUnit(colonistType, "model.role.default", 1));
+        units.add(new AbstractUnit(statesmanType, "model.role.default", 1));
         FoundingFather father = new FoundingFather("father", spec());
         father.setType(FoundingFatherType.TRADE);
         father.setUnits(units);

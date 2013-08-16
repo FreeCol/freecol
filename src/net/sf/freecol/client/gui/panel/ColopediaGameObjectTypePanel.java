@@ -180,19 +180,20 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
         return result;
     }
 
-    protected JButton getUnitButton(AbstractUnit unit) {
-        return getUnitButton(unit.getUnitType(getSpecification()), unit.getRole());
+    protected JButton getUnitButton(AbstractUnit au) {
+        return getUnitButton(au.getUnitType(getSpecification()),
+                             au.getRoleId());
     }
 
-    protected JButton getUnitButton(final UnitType unitType, Role role) {
-        ImageIcon unitIcon = getLibrary().getUnitImageIcon(unitType, role, 0.66);
+    protected JButton getUnitButton(final UnitType unitType, String roleId) {
+        ImageIcon unitIcon = getLibrary().getUnitImageIcon(unitType, roleId, 0.66);
         JButton unitButton = getButton(unitType, null, unitIcon);
         unitButton.setHorizontalAlignment(JButton.LEFT);
         return unitButton;
     }
 
     protected JButton getUnitButton(final UnitType unitType) {
-        return getUnitButton(unitType, Role.DEFAULT);
+        return getUnitButton(unitType, "model.role.default");
     }
 
     private String getFeatureName(Feature feature) {
