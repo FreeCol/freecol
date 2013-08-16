@@ -173,8 +173,9 @@ public class EuropeanAIPlayer extends AIPlayer {
                 } else if (unit.hasAbility(Ability.EXPERT_SCOUT)) {
                     return 600;
                 }
+                Specification spec = unit.getSpecification();
                 List<EquipmentType> scoutEquipment
-                    = unit.getRoleEquipment(Role.SCOUT);
+                    = unit.getRoleEquipment(spec.getRole("model.role.scout"));
                 int base = (unit.isInEurope()) ? 500
                     : (unit.getLocation().getColony() != null
                         && unit.getLocation().getColony()
@@ -216,8 +217,9 @@ public class EuropeanAIPlayer extends AIPlayer {
                 } else if (unit.hasAbility(Ability.EXPERT_PIONEER)) {
                     return 600;
                 }
+                Specification spec = unit.getSpecification();
                 List<EquipmentType> pioneerEquipment
-                    = unit.getRoleEquipment(Role.PIONEER);
+                    = unit.getRoleEquipment(spec.getRole("model.role.pioneer"));
                 int base = (unit.isInEurope()) ? 500
                     : (unit.getLocation().getColony() != null
                         && unit.getLocation().getColony()
@@ -1109,9 +1111,9 @@ public class EuropeanAIPlayer extends AIPlayer {
             && Utils.randomInt(logger, "Equip Scout?", air, 100)
             < equipScoutCheatPercent) {
             for (Unit u : europe.getUnitList()) {
-                if (u.getRole() == Role.DEFAULT
+                if ("model.role.default".equals(u.getRole().getId())
                     && u.isPerson()
-                    && getAIUnit(u).equipForRole(Role.SCOUT, true)) {
+                    && getAIUnit(u).equipForRole("model.role.scout", true)) {
                     player.logCheat("equipped scout " + u);
                     break;
                 }

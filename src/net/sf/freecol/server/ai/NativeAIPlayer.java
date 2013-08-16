@@ -218,8 +218,9 @@ public class NativeAIPlayer extends AIPlayer {
         final Specification spec = getSpecification();
         List<Unit> units = is.getUnitList();
         units.addAll(is.getTile().getUnitList());
+        final Role nativeDragoon = spec.getRole("model.role.nativeDragoon");
         roles: for (Role r : new Role[] {
-                spec.getRole("model.role.nativeDragoon"),
+                nativeDragoon,
                 spec.getRole("model.role.armedBrave"),
                 spec.getRole("model.role.mountedBrave")
             }) {
@@ -228,8 +229,8 @@ public class NativeAIPlayer extends AIPlayer {
                 for (EquipmentType et : u.getRoleEquipment(r)) {
                     if (!is.canProvideEquipment(et)) continue roles;
                 }
-                if (u.getRole() != Role.DRAGOON && u.getRole() != r) {
-                    getAIUnit(u).equipForRole(r, false);
+                if (u.getRole() != nativeDragoon && u.getRole() != r) {
+                    getAIUnit(u).equipForRole(r.getId(), false);
                 }
                 units.remove(0);
             }
@@ -398,9 +399,9 @@ public class NativeAIPlayer extends AIPlayer {
         final int turnNumber = getGame().getTurn().getNumber();
         List<AIUnit> aiUnits = getAIUnits();
         final List<EquipmentType> scoutEq = aiUnits.get(0).getUnit()
-            .getRoleEquipment(Role.SCOUT);
+            .getRoleEquipment(spec.getRole("model.role.scout"));
         final List<EquipmentType> soldierEq = aiUnits.get(0).getUnit()
-            .getRoleEquipment(Role.SOLDIER);
+            .getRoleEquipment(spec.getRole("model.role.soldier"));
 
         String report = "";
         int allUnits = aiUnits.size(), i = 0;

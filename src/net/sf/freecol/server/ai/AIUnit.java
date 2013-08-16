@@ -340,12 +340,13 @@ public class AIUnit extends AIObject implements Transportable {
      *
      * TODO: remove cheat.
      *
-     * @param r The <code>Role</code> to adopt.
+     * @param roleId The role identifier.
      * @param cheat Cheat goods purchase in Europe (but *not* boycotts).
      * @return True if the role change was successful.
      */
-    public boolean equipForRole(Role r, boolean cheat) {
+    public boolean equipForRole(String roleId, boolean cheat) {
         final Specification spec = getSpecification();
+        Role r = spec.getRole(roleId);
         final Player player = unit.getOwner();
         UnitLocation loc = (UnitLocation)unit.getLocation();
         int price = loc.canBuildRoleEquipment(r);

@@ -354,7 +354,7 @@ public class PioneeringMission extends Mission {
         if (reason != null) return reason;
         final Unit unit = aiUnit.getUnit();
         if (!hasTools(aiUnit)
-            && !aiUnit.equipForRole(Role.PIONEER, false))
+            && !aiUnit.equipForRole("model.role.pioneer", false))
             return "unit-could-not-equip";
         return (hasTools(aiUnit) || unit.hasAbility(Ability.EXPERT_PIONEER))
             ? null
@@ -434,7 +434,8 @@ public class PioneeringMission extends Mission {
             ? reason
             : (!hasTools(aiUnit)
                 && !colony.canProvideEquipment(aiUnit.getUnit()
-                    .getRoleEquipment(Role.PIONEER)))
+                    .getRoleEquipment(aiUnit.getUnit().getSpecification()
+                        .getRole("model.role.pioneer"))))
             ? "colony-can-not-provide-equipment"
             : null;
     }
@@ -566,7 +567,7 @@ public class PioneeringMission extends Mission {
 
             // Try to equip
             String logMe = tag + " reached " + where;
-            logMe += (aiUnit.equipForRole(Role.PIONEER, false)
+            logMe += (aiUnit.equipForRole("model.role.pioneer", false)
                 && hasTools())
                 ? " and equips"
                 : " but fails to equip";

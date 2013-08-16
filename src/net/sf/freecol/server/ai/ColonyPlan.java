@@ -1203,10 +1203,11 @@ public class ColonyPlan {
      * @param colony The <code>Colony</code> storing the equipment.
      * @return True if the unit was equipped.
      */
-    private static boolean fullEquipUnit(Unit unit, Role role, Colony colony) {
-        return (role == Role.SOLDIER)
-            ? colony.equipForRole(unit, Role.DRAGOON)
-                || colony.equipForRole(unit, Role.SOLDIER)
+    private static boolean fullEquipUnit(Specification spec, Unit unit,
+                                         Role role, Colony colony) {
+        return ("model.role.soldier".equals(role.getId()))
+            ? colony.equipForRole(unit, spec.getRole("model.role.dragoon"))
+                || colony.equipForRole(unit, spec.getRole("model.role.soldier"))
             : colony.equipForRole(unit, role);
     }
 
@@ -1253,17 +1254,19 @@ public class ColonyPlan {
 
         // Move outdoor experts outside if possible.
         // Prefer scouts in early game if there are very few.
-        Role[] outdoorRoles = new Role[] { Role.PIONEER,
-                                           Role.SOLDIER, Role.SCOUT };
+        Role[] outdoorRoles = new Role[] { spec().getRole("model.role.pioneer"),
+                                           spec().getRole("model.role.soldier"),
+                                           spec().getRole("model.role.scout") };
         if (preferScout) {
-            outdoorRoles[1] = Role.SCOUT;
-            outdoorRoles[2] = Role.SOLDIER;
+            Role tmp = outdoorRoles[1];
+            outdoorRoles[1] = outdoorRoles[2];
+            outdoorRoles[2] = tmp;
         }
         for (int j = 0; j < outdoorRoles.length; j++) {
             for (Unit u : new ArrayList<Unit>(workers)) {
                 if (workers.size() <= 1) break;
                 if (u.getType() == outdoorRoles[j].getExpertUnit()
-                    && fullEquipUnit(u, outdoorRoles[j], col)) {
+                    && fullEquipUnit(spec(), u, outdoorRoles[j], col)) {
                     workers.remove(u);
                     report.append(u.getId()).append("(")
                         .append(u.getType().getSuffix())
@@ -1300,7 +1303,7 @@ public class ColonyPlan {
         for (Unit u : new ArrayList<Unit>(workers)) {
             if (workers.size() <= 1) break;
             if (!AIColony.isBadlyDefended(col)) break;
-            if (fullEquipUnit(u, Role.SOLDIER, col)) {
+            if (fullEquipUnit(spec(), u, spec().getRole("model.role.soldier"), col)) {
                 workers.remove(u);
                 report.append(u.getId()).append("(")
                     .append(u.getType().getSuffix())
@@ -1563,7 +1566,7 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
         // Rearm what remains as far as possible.
         Collections.sort(workers, soldierComparator);
         for (Unit u : new ArrayList<Unit>(workers)) {
-            if (fullEquipUnit(u, Role.SOLDIER, col)) {
+            if (fullEquipUnit(spec(), u, spec().getRole("model.role.soldier"), col)) {
                 report.append(u.getId()).append("(")
                     .append(u.getType().getSuffix())
                     .append(") -> ").append(u.getRole()).append("\n");

@@ -431,14 +431,13 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             AIUnit aiU = getAIUnit(u);
             if (aiU == null || aiU.getMission() != null) continue;
             Mission m = null;
-            if (u.getRole() == Role.SOLDIER
-                || u.getRole() == Role.DRAGOON) {
+            if (u.isArmed()) {
                 m = new DefendSettlementMission(aiMain, aiU, colony);
-            } else if (u.getRole() == Role.SCOUT) {
+            } else if (u.hasAbility(Ability.SCOUT_INDIAN_SETTLEMENT)) {
                 if (preferScouts) m = aip.getScoutingMission(aiU);
-            } else if (u.getRole() == Role.PIONEER) {
+            } else if (u.hasAbility(Ability.IMPROVE_TERRAIN)) {
                 if (pioneersWanted) m = aip.getPioneeringMission(aiU);
-            } else if (u.getRole() == Role.MISSIONARY) {
+            } else if (u.hasAbility(Ability.ESTABLISH_MISSION)) {
                 m = aip.getMissionaryMission(aiU);
             }
             if (m != null) aiU.setMission(m);

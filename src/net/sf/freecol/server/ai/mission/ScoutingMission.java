@@ -247,7 +247,7 @@ public class ScoutingMission extends Mission {
         String reason = invalidReason(aiUnit);
         return (reason != null) ? reason
             : (canScoutNatives(aiUnit)
-                || aiUnit.equipForRole(Role.SCOUT, false)
+                || aiUnit.equipForRole("model.role.scout", false)
                 || aiUnit.getUnit().hasAbility(Ability.EXPERT_SCOUT)) ? null
             : "unit-unprepared-to-SCOUT";
     }
@@ -475,7 +475,7 @@ public class ScoutingMission extends Mission {
         setTarget(findTarget(aiUnit, 20, false));
         if (completed instanceof Colony) {
             if (getTarget() == null || getTarget() == completed) {
-                aiUnit.equipForRole(Role.DEFAULT, false);
+                aiUnit.equipForRole("model.role.default", false);
                 setTarget(null);
             }
             logger.finest(tag + " arrived at " + ((Colony)completed).getName()
