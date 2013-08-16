@@ -64,6 +64,7 @@ import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.resources.ResourceManager;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -1105,7 +1106,7 @@ public final class ImageLibrary {
         
         // try to get an image matching the key
         String roleQual = ("model.role.default".equals(roleId)) ? ""
-            : "." + roleId;
+            : "." + Utils.lastPart(roleId, ".");
         String key = unitType.getId() + roleQual
             + ((nativeEthnicity) ? ".native" : "")
             + ".image";
