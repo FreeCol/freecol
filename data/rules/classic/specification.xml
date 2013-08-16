@@ -849,6 +849,7 @@
       <ability id="model.ability.spyOnColony" value="true"/>
       <ability id="model.ability.canBeCaptured" value="false"/>
       <ability id="model.ability.disposeOnAllEquipLost" value="true"/>
+      <ability id="model.ability.mounted" value="true"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-ability id="model.ability.bornInIndianSettlement" value="false"/>
       <required-goods id="model.goods.horses" value="50"/>
@@ -863,6 +864,7 @@
       <ability id="model.ability.spyOnColony" value="false"/>
       <ability id="model.ability.captureUnits" value="true"/>
       <ability id="model.ability.canBeCaptured" value="false"/>
+      <ability id="model.ability.armed" value="true"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-ability id="model.ability.bornInIndianSettlement" value="false"/>
       <required-goods id="model.goods.muskets" value="50"/>
@@ -895,6 +897,7 @@
       <modifier id="model.modifier.lineOfSightBonus" type="additive" value="1"/>
       <modifier id="model.modifier.movementBonus" type="additive" value="9"/>
       <ability id="model.ability.canBeCaptured" value="false"/>
+      <ability id="model.ability.mounted" value="true"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-ability id="model.ability.bornInIndianSettlement" value="true"/>
       <required-goods id="model.goods.horses" value="25"/>
@@ -906,6 +909,7 @@
       <modifier id="model.modifier.defence" type="additive" value="1"/>
       <modifier id="model.modifier.offence" type="additive" value="2"/>
       <ability id="model.ability.canBeCaptured" value="false"/>
+      <ability id="model.ability.armed" value="true"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-ability id="model.ability.bornInIndianSettlement" value="true"/>
       <required-goods id="model.goods.muskets" value="25"/>

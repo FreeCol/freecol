@@ -1499,15 +1499,7 @@ public class Unit extends GoodsLocation
      * @return True if the unit has arms.
      */
     public boolean isArmed() {
-        if (musketsEq[0] == null) {
-            Specification spec = getSpecification();
-            musketsEq[0] = spec.getEquipmentType("model.equipment.muskets");
-            musketsEq[1] = spec.getEquipmentType("model.equipment.indian.muskets");
-        }
-        for (EquipmentType et : musketsEq) {
-            if (getEquipmentCount(et) > 0) return true;
-        }
-        return false;
+        return hasAbility(Ability.ARMED);
     }
 
     /**
@@ -1516,15 +1508,7 @@ public class Unit extends GoodsLocation
      * @return True if the unit have a mount.
      */
     public boolean isMounted() {
-        if (horsesEq[0] == null) {
-            Specification spec = getSpecification();
-            horsesEq[0] = spec.getEquipmentType("model.equipment.horses");
-            horsesEq[1] = spec.getEquipmentType("model.equipment.indian.horses");
-        }
-        for (EquipmentType et : horsesEq) {
-            if (getEquipmentCount(et) > 0) return true;
-        }
-        return false;
+        return hasAbility(Ability.MOUNTED);
     }
 
     /**

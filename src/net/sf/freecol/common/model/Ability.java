@@ -57,6 +57,10 @@ public final class Ability extends Feature implements Comparable<Ability> {
     public static final String AMBUSH_TERRAIN
         = "model.ability.ambushTerrain";
 
+    /** Equipment type ability denoting the holder is armed. */
+    public static final String ARMED
+        = "model.ability.armed";
+
     /** The ability of a colony to automatocally arm defenders (Revere). */
     public static final String AUTOMATIC_EQUIPMENT
         = "model.ability.automaticEquipment";
@@ -294,6 +298,10 @@ public final class Ability extends Feature implements Comparable<Ability> {
     /** The ability to operate a mission. */
     public static final String MISSIONARY
         = "model.ability.missionary";
+
+    /** Equipment type ability denoting the holder is mounted. */
+    public static final String MOUNTED
+        = "model.ability.mounted";
 
     /** The ability to move to Europe from a tile. */
     public static final String MOVE_TO_EUROPE
