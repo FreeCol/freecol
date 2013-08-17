@@ -644,14 +644,12 @@ public class Messages {
             infoKey = Integer.toString(unit.getTreasureAmount());
         } else {
             String key;
-            if (unit.getRole() == Role.DEFAULT) {
+            if ("model.Role.default".equals(unit.getRole().getId())) {
                 key = "name";
+            } else if (unit.getRole().getId().startsWith("model.role.")) {
+                key = unit.getRole().getId().substring(11);
             } else {
-                if (unit.getRole().getId().startsWith("model.role.")) {
-                    key = unit.getRole().getId().substring(11);
-                } else {
-                    key = unit.getRole().getId();
-                }
+                key = unit.getRole().getId();
             }
             String messageID = unit.getType().getId() + "." + key;
             if (containsKey(messageID)) {

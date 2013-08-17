@@ -488,17 +488,22 @@ public class LabourData {
     }
 
     private void incrementOutsideWorker(UnitData unitData, Unit unit, LocationData.Getter getter) {
-        if (unit.getRole() == Role.DRAGOON
-            || unit.getRole() == Role.SOLDIER) {
-            incrementOutsideWorker(unitData, unit, soldier, getter);
-        } else if (unit.getRole() == Role.MISSIONARY) {
-                incrementOutsideWorker(unitData, unit, missionary, getter);
-        } else if (unit.getRole() == Role.PIONEER) {
-            incrementOutsideWorker(unitData, unit, pioneer, getter);
-        } else if (unit.getRole() == Role.SCOUT) {
-            incrementOutsideWorker(unitData, unit, scout, getter);
-        } else {
+        String roleId = unit.getRole().getId();
+        UnitData workingAs = null;
+        if ("model.role.dragoon".equals(roleId)
+            || "model.role.soldier".equals(roleId)) {
+            workingAs = soldier;
+        } else if ("model.role.missionary".equals(roleId)) {
+            workingAs = missionary;
+        } else if ("model.role.pioneer".equals(roleId)) {
+            workingAs = pioneer;
+        } else if ("model.role.scout".equals(roleId)) {
+            workingAs = scout;
+        }
+        if (workingAs == null) {
             getter.getLocationData(unitData).notWorking++;
+        } else {
+            incrementOutsideWorker(unitData, unit, workingAs, getter);
         }
     }
 

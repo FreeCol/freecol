@@ -157,9 +157,9 @@ public final class ReportMilitaryPanel extends ReportUnitPanel {
                     unit.hasAbility(Ability.EXPERT_SOLDIER)) {
                     unitType = unit.getType();
                 }
-                String key = unit.getRole() == Role.DRAGOON
+                String key = "model.Role.dragoon".equals(unit.getRole().getId())
                     ? "dragoons"
-                    : unit.getRole() == Role.SOLDIER
+                    : "model.Role.soldier".equals(unit.getRole().getId())
                     ? "soldiers"
                     : "others";
                 addUnit(unit, key);

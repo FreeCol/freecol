@@ -159,21 +159,13 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
                     }
                 }
             }
-            List<EquipmentType> equipmentTypes = new ArrayList<EquipmentType>();
-            allTypes = filterBuildables(getSpecification().getEquipmentTypeList(), equipmentTypes, type);
-            if (equipmentTypes.size() > 0) {
+            List<Role> roles = new ArrayList<Role>();
+            allTypes = filterBuildables(getSpecification().getRoles(), roles, type);
+            if (!roles.isEmpty()) {
                 panel.add(localizedLabel("colopedia.goods.equipment"), "newline 20");
-                Set<Role> roles = new HashSet<Role>();
-                for (EquipmentType equipment : equipmentTypes) {
-                    roles.add(equipment.getRole());
-                }
-                // TODO: fix special case by upgrading role to FreeColGameObjectType
-                if (roles.contains(Role.SOLDIER) || roles.contains(Role.SCOUT)) {
-                    roles.add(Role.DRAGOON);
-                }
                 int count = 0;
                 for (Role role : roles) {
-                    JLabel label = localizedLabel("model.unit.role." + role.getId());
+                    JLabel label = localizedLabel(role.getId());
                     if (count > 0 && count % 3 == 0) {
                         panel.add(label, "skip");
                     } else {
