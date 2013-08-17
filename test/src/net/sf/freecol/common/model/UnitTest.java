@@ -100,6 +100,19 @@ public class UnitTest extends FreeColTestCase {
     private static final UnitType wagonType
         = spec().getUnitType("model.unit.wagonTrain");
 
+    private static final Role role_default
+        = spec().getRole("model.role.default");
+    private static final Role role_scout
+        = spec().getRole("model.role.scout");
+    private static final Role role_soldier
+        = spec().getRole("model.role.soldier");
+    private static final Role role_dragoon
+        = spec().getRole("model.role.dragoon");
+    private static final Role role_pioneer
+        = spec().getRole("model.role.pioneer");
+    private static final Role role_missionary
+        = spec().getRole("model.role.missionary");
+
 
     /**
      * Test unit for colonist status
@@ -478,50 +491,37 @@ public class UnitTest extends FreeColTestCase {
         Unit colonist = new ServerUnit(game, map.getTile(6, 8), dutch,
                                        colonistType);
         colonist.modifyExperience(10);
-        assertEquals(Role.DEFAULT, colonist.getRole());
+        assertEquals(role_default, colonist.getRole());
         assertTrue("Colonist should some initial experience",
                    colonist.getExperience() > 0);
 
         colonist.changeEquipment(musketsEquipmentType, 1);
         //assertEquals(spec().getRole("model.role.soldier"), colonist.getRole());
-        assertEquals(Role.SOLDIER, colonist.getRole());
+        assertEquals(role_soldier, colonist.getRole());
         assertEquals("Colonist should have lost all experience and role", 0,
                      colonist.getExperience());
 
         colonist.modifyExperience(10);
         colonist.changeEquipment(horsesEquipmentType, 1);
-        assertEquals(Role.DRAGOON, colonist.getRole());
+        assertEquals(role_dragoon, colonist.getRole());
         assertTrue("Colonist should not have lost experience, compatible role",
                    colonist.getExperience() > 0);
     }
 
     public void testCompatibleRoles() {
-        assertFalse(Role.SOLDIER.isCompatibleWith(Role.DEFAULT));
-        assertFalse(Role.SOLDIER.isCompatibleWith(Role.PIONEER));
-        assertFalse(Role.SOLDIER.isCompatibleWith(Role.MISSIONARY));
-        assertTrue(Role.SOLDIER.isCompatibleWith(Role.SOLDIER));
-        assertFalse(Role.SOLDIER.isCompatibleWith(Role.SCOUT));
-        assertTrue(Role.SOLDIER.isCompatibleWith(Role.DRAGOON));
+        assertFalse(role_soldier.isCompatibleWith(role_default));
+        assertFalse(role_soldier.isCompatibleWith(role_pioneer));
+        assertFalse(role_soldier.isCompatibleWith(role_missionary));
+        assertTrue(role_soldier.isCompatibleWith(role_soldier));
+        assertFalse(role_soldier.isCompatibleWith(role_scout));
+        assertTrue(role_soldier.isCompatibleWith(role_dragoon));
 
-        assertFalse(Role.MISSIONARY.isCompatibleWith(Role.DEFAULT));
-        assertFalse(Role.MISSIONARY.isCompatibleWith(Role.PIONEER));
-        assertTrue(Role.MISSIONARY.isCompatibleWith(Role.MISSIONARY));
-        assertFalse(Role.MISSIONARY.isCompatibleWith(Role.SOLDIER));
-        assertFalse(Role.MISSIONARY.isCompatibleWith(Role.SCOUT));
-        assertFalse(Role.MISSIONARY.isCompatibleWith(Role.DRAGOON));
-    }
-
-    public void testNewRole() {
-        assertEquals(Role.PIONEER, Role.DEFAULT.newRole(Role.PIONEER));
-        assertEquals(Role.MISSIONARY, Role.DEFAULT.newRole(Role.MISSIONARY));
-        assertEquals(Role.SOLDIER, Role.DEFAULT.newRole(Role.SOLDIER));
-        assertEquals(Role.SCOUT, Role.DEFAULT.newRole(Role.SCOUT));
-        assertEquals(Role.DRAGOON, Role.DEFAULT.newRole(Role.DRAGOON));
-
-        assertEquals(Role.PIONEER, Role.SOLDIER.newRole(Role.PIONEER));
-        assertEquals(Role.MISSIONARY, Role.SOLDIER.newRole(Role.MISSIONARY));
-        assertEquals(Role.DRAGOON, Role.SOLDIER.newRole(Role.SCOUT));
-        assertEquals(Role.DRAGOON, Role.SCOUT.newRole(Role.SOLDIER));
+        assertFalse(role_missionary.isCompatibleWith(role_default));
+        assertFalse(role_missionary.isCompatibleWith(role_pioneer));
+        assertTrue(role_missionary.isCompatibleWith(role_missionary));
+        assertFalse(role_missionary.isCompatibleWith(role_soldier));
+        assertFalse(role_missionary.isCompatibleWith(role_scout));
+        assertFalse(role_missionary.isCompatibleWith(role_dragoon));
     }
 
     public void testOwnerChange(){
