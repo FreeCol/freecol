@@ -880,6 +880,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         for (Tile tile : getGame().getMap().getAllTiles()) {
             if (hasExplored(tile) != reveal) {
                 tile.setExplored(this, reveal);//-vis(this)
+                if (reveal) tile.updatePlayerExploredTile(this);
                 result.add(tile);
             }
         }
