@@ -2218,20 +2218,17 @@ public class Unit extends GoodsLocation
             } else if (isTradingUnit()) {
                 return getTradeMoveType(settlement);
             } else if (isColonist()) {
-                if (getRole() == Role.DEFAULT
-                    || getRole() == Role.PIONEER) {
-                    return getLearnMoveType(from, settlement);
-                } else if (getRole() == Role.MISSIONARY) {
-                    return getMissionaryMoveType(from, settlement);
-                } else if (getRole() == Role.SCOUT) {
-                    return getScoutMoveType(from, settlement);
-                } else if (getRole() == Role.SOLDIER
-                           || getRole() == Role.DRAGOON) {
+                if (isArmed()) {
                     return (allowMoveFrom(from))
                         ? MoveType.ATTACK_SETTLEMENT
                         : MoveType.MOVE_NO_ATTACK_MARINE;
+                } else if (hasAbility(Ability.ESTABLISH_MISSION)) {
+                    return getMissionaryMoveType(from, settlement);
+                } else if (hasAbility(Ability.SCOUT_INDIAN_SETTLEMENT)) {
+                    return getScoutMoveType(from, settlement);
+                } else {
+                    return getLearnMoveType(from, settlement);
                 }
-                return MoveType.MOVE_ILLEGAL; // should not happen
             } else if (isOffensiveUnit()) {
                 return (allowMoveFrom(from))
                     ? MoveType.ATTACK_SETTLEMENT
