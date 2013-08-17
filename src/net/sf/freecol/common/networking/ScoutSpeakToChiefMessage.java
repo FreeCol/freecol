@@ -89,7 +89,8 @@ public class ScoutSpeakToChiefMessage extends DOMMessage {
             return DOMMessage.clientError(e.getMessage());
         }
         if (!unit.hasAbility(Ability.SPEAK_WITH_CHIEF)) {
-            return DOMMessage.clientError("Unit lacks ability to speak to chief: " + unitId);
+            return DOMMessage.clientError("Unit lacks ability to speak to chief: "
+                + unitId);
         }
 
         Tile tile;

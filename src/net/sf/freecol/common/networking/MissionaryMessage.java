@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map.Direction;
@@ -120,11 +121,15 @@ public class MissionaryMessage extends DOMMessage {
             } else if (missionary.getOwner() == player) {
                 return DOMMessage.clientError("Denouncing our own missionary at: "
                     + is.getId());
+            } else if (!unit.hasAbility(Ability.DENOUNCE_HERESY)) {
+                return DOMMessage.clientError("Unit lacks denouncement ability: " + unitId);
             }
         } else {
             if (missionary != null) {
                 return DOMMessage.clientError("Establishing extra mission at: "
                     + is.getId());
+            } else if (!unit.hasAbility(Ability.ESTABLISH_MISSION)) {
+                return DOMMessage.clientError("Unit lacks establish mission ability: " + unitId);
             }
         }
 
