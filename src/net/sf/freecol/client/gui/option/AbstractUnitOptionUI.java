@@ -146,7 +146,7 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
             box.setModel(new DefaultComboBoxModel(roleUI.getOption().getChoices().toArray(new String[0])));
             box.setEnabled(roleEditable);
         } else {
-            box.setModel(new DefaultComboBoxModel(new String[] { Role.DEFAULT.toString() }));
+            box.setModel(new DefaultComboBoxModel(new String[] { "model.role.default" }));
             box.setEnabled(false);
         }
     }

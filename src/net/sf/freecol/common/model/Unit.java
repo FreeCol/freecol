@@ -611,7 +611,14 @@ public class Unit extends GoodsLocation
         Role oldRole = role;
         role = getSpecification().getRole("model.role.default");
         for (EquipmentType type : equipment.keySet()) {
-            role = role.newRole(type.getRole());
+            if (("model.role.soldier".equals(role.getId())
+                 && "model.role.scout".equals(type.getRole().getId()))
+                || ("model.role.scout".equals(role.getId())
+                    && "model.role.soldier".equals(type.getRole().getId()))) {
+                role = getSpecification().getRole("model.role.dragoon");
+            } else {
+                role = type.getRole();
+            }
         }
         if (getState() == UnitState.IMPROVING
             && !hasAbility(Ability.IMPROVE_TERRAIN)) {

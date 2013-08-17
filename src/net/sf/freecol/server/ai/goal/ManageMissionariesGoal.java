@@ -49,8 +49,8 @@ import net.sf.freecol.server.ai.AIUnit;
  * or brought there from Europe, this assumption will most often be valid.
  * </p><p>
  * If a settlement has been found, a {@link CreateMissionAtSettlementGoal}
- * will be created, and the unit be moved there.   
- */       
+ * will be created, and the unit be moved there.
+ */
 public class ManageMissionariesGoal extends Goal {
 
     private static final Logger logger = Logger.getLogger(ManageMissionariesGoal.class.getName());
@@ -73,7 +73,7 @@ public class ManageMissionariesGoal extends Goal {
         //all our subgoals are on the subGoalList
         return subGoalList.iterator();
     }
-    
+
     protected void removeUnit(AIUnit u) {
         Iterator<AIUnit> uit = availableUnitsList.iterator();
         while (uit.hasNext()) {
@@ -83,15 +83,15 @@ public class ManageMissionariesGoal extends Goal {
             }
         }
     }
-    
+
     /**
      * Plans this goal.
      * NOTE: This goal currently does not send unit requests, but only deals
-     * with the units it gets passively.          
-     */         
+     * with the units it gets passively.
+     */
     protected void plan() {
         isFinished = false;
-        
+
         //cancel already finished subgoals first
         //most of the time, we won't get any units back from this
         Iterator<Goal> git = subGoalList.iterator();
@@ -103,19 +103,19 @@ public class ManageMissionariesGoal extends Goal {
                 git.remove();
             }
         }
-        
+
         //check whether our unit references are still valid,
         //so that we can use them in the following step
         validateOwnedUnits();
-        
+
         //Run through available units. If it's a missionary, create a subgoal
         //for it. If not, return unit to AIPlayer.
         Iterator<AIUnit> uit = availableUnitsList.iterator();
         while (uit.hasNext()) {
             AIUnit u = uit.next();
             uit.remove();
-            
-            if (u.getUnit().getRole() == Role.MISSIONARY) {
+
+            if ("model.role.missionary".equals(u.getUnit().getRole().getId())) {
                 IndianSettlement i = findSettlement(u.getUnit().getTile());
                 if (i != null) {
                     PathNode pathNode = u.getUnit().findPath(i.getTile());
@@ -146,13 +146,13 @@ public class ManageMissionariesGoal extends Goal {
             }
         }
     }
-    
+
     public String getGoalDescription() {
         String descr = super.getGoalDescription();
         descr += ":"+availableUnitsList.size();
         return descr;
     }
-    
+
 /* INTERNAL *******************************************************************/
 
 

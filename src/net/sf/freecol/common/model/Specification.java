@@ -289,7 +289,7 @@ public final class Specification {
         readerMap.put(RESOURCE_TYPES_TAG,
                       new TypeReader<ResourceType>(ResourceType.class, resourceTypeList));
         readerMap.put(ROLES_TAG,
-                      new RoleReader(roles));
+                      new TypeReader<Role>(Role.class, roles));
         readerMap.put(TILE_TYPES_TAG,
                       new TypeReader<TileType>(TileType.class, tileTypeList));
         readerMap.put(TILEIMPROVEMENT_TYPES_TAG,
@@ -414,23 +414,6 @@ public final class Specification {
                 typeIterator.remove();
             }
         }
-
-        /**
-         * We need to define the static fields in the role reader (or
-         * something similar), so that AbstractUnit can access the
-         * specification. We could fix that by upgrading AbstractUnit
-         * to FreeColGameObjectType, or by using a role ID instead of
-         * a role object.
-         *
-         * I don't understand why we need to define them a second time
-         * in the clean method, but if we don't, there will be NPEs.
-         */
-        Role.DEFAULT = getRole("model.role.default");
-        Role.SCOUT = getRole("model.role.scout");
-        Role.SOLDIER = getRole("model.role.soldier");
-        Role.DRAGOON = getRole("model.role.dragoon");
-        Role.PIONEER = getRole("model.role.pioneer");
-        Role.MISSIONARY = getRole("model.role.missionary");
 
         farmedGoodsTypeList.clear();
         foodGoodsTypeList.clear();
@@ -679,36 +662,6 @@ public final class Specification {
         }
     }
 
-
-    // TODO: remove this as soon as we no longer need these fields
-    private class RoleReader extends TypeReader<Role> {
-
-        public RoleReader(List<Role> listToFill) {
-            super(Role.class, listToFill);
-        }
-
-        public void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-            super.readChildren(xr);
-
-            /**
-             * We need to define the static fields in the role reader
-             * (or something similar), so that AbstractUnit can access
-             * the specification. We could fix that by upgrading
-             * AbstractUnit to FreeColGameObjectType, or by using a
-             * role ID instead of a role object.
-             *
-             * I don't understand why we need to define them a second
-             * time in the clean method, but if we don't, there will
-             * be NPEs.
-             */
-            Role.DEFAULT = getRole("model.role.default");
-            Role.SCOUT = getRole("model.role.scout");
-            Role.SOLDIER = getRole("model.role.soldier");
-            Role.DRAGOON = getRole("model.role.dragoon");
-            Role.PIONEER = getRole("model.role.pioneer");
-            Role.MISSIONARY = getRole("model.role.missionary");
-        }
-    }
 
     /**
      * Options are special as they live in the allOptionGroups

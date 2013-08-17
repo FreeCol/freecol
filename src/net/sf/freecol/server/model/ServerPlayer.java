@@ -1703,7 +1703,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                             : settlement.getUnitList()),
                         random);
                     brave.clearEquipment();
-                    brave.setRole(Role.DEFAULT);
+                    brave.setRole(game.getSpecification().getRole("model.role.default"));
                     brave.changeOwner(other);//-vis: safe/colony
                     brave.setHomeIndianSettlement(null);
                     brave.setNationality(other.getNationId());
@@ -2681,7 +2681,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         UnitType type = Utils.getRandomMember(logger, "Choose convert",
                                               converts, random);
         Unit convert = natives.getUnitList().get(0);
-        convert.setRole(Role.DEFAULT);
+        convert.setRole(getGame().getSpecification().getRole("model.role.default"));
         convert.clearEquipment();
 
         cs.addMessage(See.only(attackerPlayer),

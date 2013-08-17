@@ -35,13 +35,6 @@ import net.sf.freecol.common.model.Ability;
  */
 public class Role extends BuildableType implements Comparable<Role> {
 
-    public static Role DEFAULT;
-    public static Role SCOUT;
-    public static Role SOLDIER;
-    public static Role DRAGOON;
-    public static Role PIONEER;
-    public static Role MISSIONARY;
-
     /**
      * The Role to downgrade to after losing a battle. Defaults to
      * <code>null</code>. Note that some UnitTypes and Roles may be
@@ -91,16 +84,6 @@ public class Role extends BuildableType implements Comparable<Role> {
         }
     };
 
-    // TODO: make this go away
-    public Role newRole(Role role) {
-        if (this == SOLDIER && role == SCOUT) {
-            return DRAGOON;
-        } else if (this == SCOUT && role == SOLDIER) {
-            return DRAGOON;
-        } else {
-            return role;
-        }
-    }
 
     // and this, too
     public List<EquipmentType> getRoleEquipment() {
