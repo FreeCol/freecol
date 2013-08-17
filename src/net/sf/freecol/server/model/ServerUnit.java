@@ -172,7 +172,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         UnitType newType = type.getTargetType(ChangeType.CREATION, owner);
         this.unitType = (newType == null) ? type : newType;
         this.owner = owner;
-        if (isPerson()) {
+        if (unitType.hasAbility(Ability.PERSON)) {
             this.nationality = owner.getNationId();
             this.ethnicity = nationality;
         }

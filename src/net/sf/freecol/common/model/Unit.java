@@ -110,7 +110,7 @@ public class Unit extends GoodsLocation
     protected UnitState state = UnitState.ACTIVE;
 
     /** Current unit role. */
-    protected Role role = getSpecification().getRole("model.role.default");
+    protected Role role;
 
     /** The current unit location. */
     protected Location location;
@@ -3663,8 +3663,10 @@ public class Unit extends GoodsLocation
         Set<Ability> result = new HashSet<Ability>();
         if (turn == null) turn = getGame().getTurn();
 
-        // UnitType abilities always apply
+        // UnitType abilities always apply.
         result.addAll(unitType.getAbilitySet(id));
+        // Roles apply with qualification.
+        result.addAll(role.getAbilitySet(id, fcgot, turn));
         // The player's abilities require more qualification.
         result.addAll(owner.getAbilitySet(id, fcgot, turn));
         // EquipmentType abilities always apply.

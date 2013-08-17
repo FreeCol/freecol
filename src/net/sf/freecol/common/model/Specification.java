@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.model;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
@@ -35,6 +37,7 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.io.FreeColXMLReader;
@@ -311,6 +314,7 @@ public final class Specification {
         this();
         initialized = false;
         load(xr);
+        fixup010x();
         clean("load from stream");
         initialized = true;
     }
@@ -340,6 +344,7 @@ public final class Specification {
         this();
         initialized = false;
         load(in);
+        fixup010x();
         clean("load from InputStream");
         initialized = true;
     }
@@ -661,7 +666,6 @@ public final class Specification {
             }
         }
     }
-
 
     /**
      * Options are special as they live in the allOptionGroups
@@ -1663,6 +1667,16 @@ public final class Specification {
         while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = xr.getLocalName();
             logger.finest("Found child named " + childName);
+            // @compat 0.10.x
+            // Ideally we would handle role backward compatibility in
+            // the type reader triggered by the "roles" section of the
+            // spec.  Alas, specs pre-0.10.6 had no roles section.
+            // The next section after roles in modern specs is
+            // "equipment-types", which is also the first place roles
+            // are referred to directly.  So this is the last chance
+            // to fix any role omissions.
+            if ("equipment-types".equals(childName)) fixupRoles();
+            // end @compat 0.10.x
             ChildReader reader = readerMap.get(childName);
             if (reader == null) {
                 logger.warning("No reader found for: " + childName);
@@ -1670,7 +1684,33 @@ public final class Specification {
                 reader.readChildren(xr);
             }
         }
+    }
 
+    // @compat 0.10.x
+    private void fixupRoles() {
+        if (roles.isEmpty()) { // @compat 0.10.0-5 (no <role> definitions)
+            try {
+                logger.warning("Loading role backward compatibility fragment.");
+                File base = FreeColDirectories.getBaseDirectory();
+                load(new FileInputStream(new File(base, "roles-compat.xml")));
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Failed to load remedial roles.", e);
+            }
+        } else { // @compat 0.10.6-7
+            String id = "model.role.default";
+            if (findType(id) == null) {
+                Role role = new Role(id, this);
+                roles.add(role);
+                allTypes.put(role.getId(), role);
+            }
+            Role scout = (Role)findType("model.role.scout");
+            if (!scout.hasAbility(Ability.CAPTURE_UNITS)) {
+                scout.addAbility(new Ability(Ability.CAPTURE_UNITS));
+            }
+        }
+    }
+
+    private void fixup010x() {
         // @compat 0.10.1
         String[] years = new String[] {
             "startingYear", "seasonYear", "mandatoryColonyYear",
@@ -1784,15 +1824,8 @@ public final class Specification {
             }
         }
         // end @compat
-
-        if (getREFUnitTypes(true).isEmpty()) {
-            logger.warning("No naval REF units, REF will not function.");
-        } else if (getREFUnitTypes(false).isEmpty()) {
-            logger.warning("No land REF units, REF will not function.");
-        }
-
-        initialized = true;
     }
+    // end @compat 0.10.x
 
     /**
      * Gets the tag name of the root element representing this object.

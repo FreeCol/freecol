@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    *  Copyright (C) 2002-2013  The FreeCol Team
+    *
+    *  This file is part of FreeCol.
+    *
+    *  FreeCol is free software: you can redistribute it and/or modify
+    *  it under the terms of the GNU General Public License as published by
+    *  the Free Software Foundation, either version 2 of the License, or
+    *  (at your option) any later version.
+    *
+    *  FreeCol is distributed in the hope that it will be useful,
+    *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+    *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    *  GNU General Public License for more details.
+    *
+    *  You should have received a copy of the GNU General Public License
+    *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
+    *
+  -->
+<freecol-specification id="rolesCompat" version="0.79">
+<!--
+    A copy of the latest roles section of classic/specification.xml
+    to be loaded into the specification of games lacking a roles
+    section (0.10.0-5).
+-->
+  <roles>
+    <role id="model.role.default" />
+    <role id="model.role.scout" expertUnit="model.unit.seasonedScout">
+      <required-ability id="model.ability.canBeEquipped" />
+      <required-goods id="model.goods.horses" value="50" />
+      <ability id="model.ability.captureUnits"/>
+      <ability id="model.ability.speakWithChief"/>
+      <ability id="model.ability.demandTribute"/>
+      <ability id="model.ability.spyOnColony"/>
+      <ability id="model.ability.negotiate"/>
+      <ability id="model.ability.disposeOnCombatLoss"/>
+      <modifier id="model.modifier.defence" type="additive" value="1"/>
+      <modifier id="model.modifier.offence" type="additive" value="1"/>
+      <modifier id="model.modifier.lineOfSightBonus" type="additive" value="1"/>
+      <modifier id="model.modifier.movementBonus" type="additive" value="9"/>
+    </role>
+    <role id="model.role.soldier" expertUnit="model.unit.veteranSoldier">
+      <required-ability id="model.ability.canBeEquipped" />
+      <required-goods id="model.goods.muskets" value="50" />
+      <ability id="model.ability.captureUnits"/>
+      <modifier id="model.modifier.defence" type="additive" value="1"/>
+      <modifier id="model.modifier.offence" type="additive" value="2"/>
+    </role>
+    <role id="model.role.dragoon" downgrade="model.role.soldier" expertUnit="model.unit.veteranSoldier">
+      <required-ability id="model.ability.canBeEquipped" />
+      <required-goods id="model.goods.muskets" value="50" />
+      <required-goods id="model.goods.horses" value="50" />
+      <ability id="model.ability.captureUnits" value="true"/>
+      <modifier id="model.modifier.defence" type="additive" value="2"/>
+      <modifier id="model.modifier.offence" type="additive" value="3"/>
+      <modifier id="model.modifier.movementBonus" type="additive" value="9"/>
+    </role>
+    <role id="model.role.pioneer" maximumCount="5" expertUnit="model.unit.hardyPioneer">
+      <required-ability id="model.ability.canBeEquipped" />
+      <required-goods id="model.goods.tools" value="20" />
+      <ability id="model.ability.disposeOnCombatLoss"/>
+      <ability id="model.ability.improveTerrain"/>
+    </role>
+    <role id="model.role.missionary" expertUnit="model.unit.jesuitMissionary">
+      <required-ability id="model.ability.canBeEquipped" />
+      <required-ability id="model.ability.dressMissionary" />
+      <modifier id="model.modifier.movementBonus" type="additive" value="3"/>
+      <ability id="model.ability.establishMission" />
+      <ability id="model.ability.denounceHeresy" />
+      <ability id="model.ability.inciteNatives" />
+    </role>
+    <role id="model.role.infantry">
+      <required-ability id="model.ability.canBeEquipped" />
+      <required-ability id="model.ability.refUnit" />
+      <required-goods id="model.goods.muskets" value="50" />
+      <ability id="model.ability.captureUnits"/>
+      <ability id="model.ability.disposeOnCombatLoss"/>
+      <modifier id="model.modifier.defence" type="additive" value="1"/>
+      <modifier id="model.modifier.offence" type="additive" value="2"/>
+    </role>
+    <role id="model.role.cavalry" downgrade="model.role.infantry">
+      <required-ability id="model.ability.canBeEquipped" />
+      <required-ability id="model.ability.refUnit" />
+      <required-goods id="model.goods.muskets" value="50" />
+      <required-goods id="model.goods.horses" value="50" />
+      <ability id="model.ability.captureUnits" value="true"/>
+      <modifier id="model.modifier.defence" type="additive" value="2"/>
+      <modifier id="model.modifier.offence" type="additive" value="3"/>
+      <modifier id="model.modifier.movementBonus" type="additive" value="9"/>
+    </role>
+    <role id="model.role.mountedBrave">
+      <required-ability id="model.ability.native" />
+      <required-goods id="model.goods.horses" value="25" />
+      <ability id="model.ability.disposeOnCombatLoss"/>
+      <modifier id="model.modifier.defence" type="additive" value="1"/>
+      <modifier id="model.modifier.offence" type="additive" value="1"/>
+      <modifier id="model.modifier.movementBonus" type="additive" value="9"/>
+    </role>
+    <role id="model.role.armedBrave">
+      <required-ability id="model.ability.native"/>
+      <required-goods id="model.goods.muskets" value="25" />
+      <ability id="model.ability.disposeOnCombatLoss"/>
+      <modifier id="model.modifier.defence" type="additive" value="1"/>
+      <modifier id="model.modifier.offence" type="additive" value="2"/>
+    </role>
+    <role id="model.role.nativeDragoon" downgrade="model.role.armedBrave">
+      <required-ability id="model.ability.native"/>
+      <required-goods id="model.goods.muskets" value="25" />
+      <required-goods id="model.goods.horses" value="25" />
+      <modifier id="model.modifier.defence" type="additive" value="2"/>
+      <modifier id="model.modifier.offence" type="additive" value="3"/>
+      <modifier id="model.modifier.movementBonus" type="additive" value="9"/>
+    </role>
+  </roles>
+</freecol-specification>

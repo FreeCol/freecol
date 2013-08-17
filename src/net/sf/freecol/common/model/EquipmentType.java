@@ -57,7 +57,7 @@ public class EquipmentType extends BuildableType {
     private boolean captureEquipmentByIndians = false;
 
     /** The default Role of the Unit carrying this type of Equipment. */
-    private Role role = getSpecification().getRole("model.role.default");
+    private Role role = null;
 
     /** Is this military equipment? */
     private boolean militaryEquipment = false;
