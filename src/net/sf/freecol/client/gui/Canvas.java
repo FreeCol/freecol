@@ -667,7 +667,7 @@ public final class Canvas extends JDesktopPane {
         closeMenus();
         removeInGameComponents();
 
-        showMainPanel();
+        showMainPanel(null);
         gui.playSound("sound.intro.general");
         repaint();
     }
@@ -1381,13 +1381,15 @@ public final class Canvas extends JDesktopPane {
     /**
      * Shows the <code>MainPanel</code>.
      *
+     * @param userMsg An option message key to show.
      * @see MainPanel
      */
-    public void showMainPanel() {
+    public void showMainPanel(String userMsg) {
         closeMenus();
         gui.setupMenuBarToNull();
         mainPanel = new MainPanel(freeColClient);
         addCentered(mainPanel, MAIN_LAYER);
+        showInformationMessage(userMsg);
         mainPanel.requestFocus();
     }
 
@@ -1532,7 +1534,7 @@ public final class Canvas extends JDesktopPane {
                 vp.removeVideoListener(this);
                 vp.stop();
                 Canvas.this.remove(vp);
-                showMainPanel();
+                showMainPanel(null);
                 gui.playSound("sound.intro.general");
             }
         }

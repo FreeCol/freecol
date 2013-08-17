@@ -316,7 +316,7 @@ public final class MapEditorController {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 gui.closeMainPanel();
-                gui.showMainPanel();
+                gui.showMainPanel(null);
                 gui.playSound("sound.intro.general");
             }
         });

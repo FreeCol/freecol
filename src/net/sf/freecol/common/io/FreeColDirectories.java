@@ -19,8 +19,9 @@
 package net.sf.freecol.common.io;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 import javax.swing.filechooser.FileSystemView;
 
@@ -43,7 +44,12 @@ public class FreeColDirectories {
 
     private static final String CLIENT_OPTIONS_FILE = "options.xml";
 
+    private static final String[] CONFIG_DIRS
+        = new String[] { "classic", "freecol" };
+
     private static final String DATA_DIRECTORY = "data";
+
+    private static final String FREECOL_DIRECTORY = "freecol";
 
     private static final String HIGH_SCORE_FILE = "HighScores.xml";
 
@@ -60,6 +66,13 @@ public class FreeColDirectories {
     private static final String SAVE_DIRECTORY = "save";
 
     private static final String SEPARATOR = System.getProperty("file.separator");
+
+    private static final String XDG_CONFIG_HOME_ENV = "XDG_CONFIG_HOME";
+    private static final String XDG_CONFIG_HOME_DEFAULT = ".config";
+    private static final String XDG_DATA_HOME_ENV = "XDG_DATA_HOME";
+    private static final String XDG_DATA_HOME_DEFAULT = ".local/share";
+    private static final String XDG_CACHE_HOME_ENV = "XDG_CACHE_HOME";
+    private static final String XDG_CACHE_HOME_DEFAULT = ".cache";
 
     /**
      * The directory containing automatically created save games.  At
@@ -95,19 +108,6 @@ public class FreeColDirectories {
     private static String logFilePath = null;
 
     /**
-     * The root directory where freecol saves user information.
-     *
-     * This will be set by default but can be overridden at the
-     * command line.
-     */
-    private static File mainUserDirectory = null;
-
-    /**
-     * An optional directory containing user mods.
-     */
-    private static File userModsDirectory = null;
-
-    /**
      * Where games are saved.
      *
      * Can be overridden in game or from the command line by
@@ -122,48 +122,331 @@ public class FreeColDirectories {
      */
     private static File savegameFile = null;
 
+    /**
+     * The directory where freecol saves transient information.
+     */
+    private static File userCacheDirectory = null;
 
     /**
-     * Checks/creates the freecol directory structure for the current
-     * user.
+     * The directory where freecol saves user configuration.
      *
-     * The main user directory is in the current user's home
-     * directory.  It used to be called ".freecol" (UNIXes) or
-     * "freecol", but now we also use Library/FreeCol under MacOSX and
-     * some JFileChooser trickery with Windows.
-     *
-     * Note: the freecol data directory is set independently and earlier
-     * in initialization than this routine.
-     *
-     * TODO: The default location of the main user and data
-     * directories should be determined by the installer.
-     *
-     * @return True if the directory structure is sufficiently intact for
-     *     the game to proceed.
+     * This will be set by default but can be overridden at the
+     * command line.
      */
-    public static boolean createAndSetDirectories() {
-        if (mainUserDirectory == null) {
-            if (setMainUserDirectory(null) != null) return false;
+    private static File userConfigDirectory = null;
+
+    /**
+     * The directory where freecol saves user data.
+     *
+     * This will be set by default but can be overridden at the
+     * command line.
+     */
+    private static File userDataDirectory = null;
+
+    /**
+     * An optional directory containing user mods.
+     */
+    private static File userModsDirectory = null;
+
+
+    /**
+     * Does the OS look like Mac OS X?
+     * 
+     * @return True if Mac OS X appears to be present.
+     */
+    public static boolean onMacOSX() {
+        return System.getProperty("os.name").equals("Mac OS X");
+    }
+
+    /**
+     * Does the OS look like some sort of unix?
+     *
+     * @return True we hope.
+     */
+    public static boolean onUnix() {
+        return "/".equals(SEPARATOR);
+    }
+
+    /**
+     * Does the OS look like some sort of Windows?
+     * 
+     * @return True if Windows appears to be present.
+     */
+    public static boolean onWindows() {
+        return System.getProperty("os.name").startsWith("Windows");
+    }
+
+    /**
+     * Get the user home directory.
+     *
+     * @return The user home directory.
+     */
+    private static File getUserDefaultDirectory() {
+        return FileSystemView.getFileSystemView().getDefaultDirectory();
+    }
+
+    /**
+     * Check a directory for read and write access.
+     *
+     * @param dir The <code>File</code> that must be a usable directory.
+     * @return Null on success, an error message key on failure.
+     */
+    public static String checkDir(File dir) {
+        return (dir == null || !dir.exists()) ? "cli.error.home.notExists"
+            : (!dir.isDirectory()) ? "cli.error.home.notDir"
+            : (!dir.canRead()) ? "cli.error.home.noRead"
+            : (!dir.canWrite()) ? "cli.error.home.noWrite"
+            : null;
+    }
+
+    /**
+     * Get directories for XDG compliant systems.
+     *
+     * Result is:
+     * - Negative if a non-XDG OS is detected or there is insufficient
+     *   XDG structure to merit migrating, or what structure there is is
+     *   broken in some way.
+     * - Zero if there is at least one relevant XDG environment
+     *   variable in use and it points to a valid writable directory,
+     *   or the default exists and is writable.  
+     * - Positive if there are a full set of suitable XDG directories and
+     *   there are freecol directories therein.
+     * - Otherwise negative, including non-directories in the wrong place
+     *   and unwritable directories.
+     *
+     * The intent is to ignore XDG on negative, migrate on zero, and use
+     * on positive.
+     *
+     * @param dirs An array of <code>File</code> to be filled in with the
+     *     XDG directory if it is present or created.
+     * @return The XDG compliance state.
+     */
+    private static int getXDGDirs(File[] dirs) {
+        if (onMacOSX() || onWindows() || !onUnix()) return -1;
+        int ret = -1;
+        File home = getUserDefaultDirectory();
+        if (home == null) return -1; // Fail badly
+        String[][] xdg = { { XDG_CONFIG_HOME_ENV, XDG_CONFIG_HOME_DEFAULT },
+                           { XDG_DATA_HOME_ENV,   XDG_DATA_HOME_DEFAULT },
+                           { XDG_CACHE_HOME_ENV,  XDG_CACHE_HOME_DEFAULT } };
+        for (int i = 0; i < xdg.length; i++) {
+            String env = System.getenv(xdg[i][0]);
+            File d = (env != null) ? new File(home, env)
+                : new File(home, xdg[i][1]);
+            if (d.exists()) {
+                if (!d.isDirectory() || !d.canWrite()) {
+                    return -1; // Fail hard if something is broken
+                }
+                dirs[i] = d;
+                ret = Math.max(ret, 0);
+                File f = new File(d, FREECOL_DIRECTORY);
+                if (f.exists()) {
+                    if (!f.isDirectory() || !f.canWrite()) {
+                        return -1; // Again, fail hard
+                    }
+                    dirs[i] = f;
+                    ret++;
+                }
+            } else {
+                dirs[i] = null;
+            }
+        }
+        if (ret < 0) return -1; // No evidence of interest in XDG standard
+        if (ret == xdg.length) return 1; // Already fully XDG compliant
+        // Create directories for migration
+        for (int i = 0; i < dirs.length; i++) {
+            File d = dirs[i];
+            if (!d.getPath().endsWith(FREECOL_DIRECTORY)) {
+                File f = new File(d, FREECOL_DIRECTORY);
+                if (!f.mkdir()) return -1; // Again, fail hard
+                dirs[i] = f;
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Get FreeCol directories for MacOSX.
+     *
+     * No separate cache directory here.
+     *
+     * Result is:
+     * - Negative on failure.
+     * - Zero if a migration is needed.
+     * - Positive if no migration is needed.
+     *
+     * @param dirs An array of <code>File</code> to be filled in with the
+     *     MacOSX freecol directories if present or created.
+     * @return The migration state.
+     */
+    private static int getMacOSXDirs(File[] dirs) {
+        if (!onMacOSX()) return -1;
+        int ret = 0;
+        File homeDir = getUserDefaultDirectory();
+        if (homeDir == null) return -1;
+        File libDir = new File(homeDir, "Library");
+        if (!libDir.exists() || !libDir.isDirectory()
+            || !libDir.canWrite()) return -1;
+        File prefsDir = new File(libDir, "Preferences");
+        if (prefsDir.exists() && prefsDir.isDirectory()
+            && prefsDir.canWrite()) {
+            dirs[0] = prefsDir;
+            File d = new File(prefsDir, FREECOL_DIRECTORY);
+            if (d.exists()) {
+                if (d.isDirectory() && d.canWrite()) {
+                    dirs[0] = d;
+                    ret++;
+                } else return -1;
+            }
+        } else return -1;
+        File appsDir = new File(libDir, "Application Support");
+        if (appsDir.exists() && appsDir.isDirectory() && appsDir.canWrite()) {
+            dirs[1] = appsDir;
+            File d = new File(appsDir, FREECOL_DIRECTORY);
+            if (d.exists()) {
+                if (d.isDirectory() && d.canWrite()) {
+                    dirs[1] = d;
+                    ret++;
+                } else return -1;
+            }
+        } else return -1;
+
+        if (ret == 2) {
+            dirs[2] = dirs[1];
+            return 1;
         }
 
-        if (logFilePath == null) {
-            logFilePath = getMainUserDirectory() + SEPARATOR + LOG_FILE;
-        }
+        File d = new File(dirs[0], FREECOL_DIRECTORY);
+        if (!d.mkdir()) return -1;
+        dirs[0] = d;
+        d = new File(dirs[1], FREECOL_DIRECTORY);
+        if (!d.mkdir()) return -1;
+        dirs[1] = d;
+        dirs[2] = d;
+        return 0;
+    }
 
-        if (saveDirectory == null) {
-            saveDirectory = new File(getMainUserDirectory(), SAVE_DIRECTORY);
-            if (!insistDirectory(saveDirectory)) return false;
+    /**
+     * Get FreeCol directories for Windows.
+     *
+     * Simple case, everything is in the one directory.
+     *
+     * Result is:
+     * - Negative on failure.
+     * - Zero if a migration is needed.
+     * - Positive if no migration is needed.
+     *
+     * @param dirs An array of <code>File</code> to be filled in with the
+     *     Windows freecol directories if present or created.
+     * @return The migration state.
+     */
+    private static int getWindowsDirs(File[] dirs) {
+        if (onMacOSX() || onWindows() || !onUnix()) return -1;
+        File home = getUserDefaultDirectory();
+        if (home == null) return -1; // Fail badly
+        File d = new File(home, FREECOL_DIRECTORY);
+        if (d.exists()) {
+            if (d.isDirectory() && d.canWrite()) {
+                dirs[0] = dirs[1] = dirs[2] = d;
+                return 1;
+            } else return -1;
         }
-    
-        autosaveDirectory = new File(getSaveDirectory(), AUTOSAVE_DIRECTORY);
-        if (!insistDirectory(autosaveDirectory)) autosaveDirectory = null;
-    
-        userModsDirectory = new File(getMainUserDirectory(), MODS_DIRECTORY);
-        if (!insistDirectory(userModsDirectory)) userModsDirectory = null;
+        if (!d.mkdir()) return -1;
+        dirs[0] = dirs[1] = dirs[2] = d;
+        return 0;
+    }
 
+    /**
+     * Find the old user directory.
+     *
+     * Does not try to be clever, just tries ~/FreeCol, ~/.freecol, and
+     * ~/Library/FreeCol which should find the old directory on the three
+     * known systems.
+     *
+     * @return The old user directory, or null if none found.
+     */
+    private static File getOldUserDirectory() {
+        File home = getUserDefaultDirectory();
+        File old = new File(home, "FreeCol");
+        if (old.exists() && old.isDirectory() && old.canRead()) return old;
+        old = new File(home, ".freecol");
+        if (old.exists() && old.isDirectory() && old.canRead()) return old;
+        old = new File(home, "Library");
+        if (old.exists() && old.isDirectory() && old.canRead()) {
+            old = new File(old, "FreeCol");
+            if (old.exists() && old.isDirectory() && old.canRead()) return old;
+        }
+        return null;
+    }
+
+    /**
+     * Copy files/directories from one path to another.
+     *
+     * Yes this is easier in Java7, but we are not there yet.
+     *
+     * @param src The source directory.
+     * @param dst The destination directory.
+     * @return True if the copy succeeded.
+     */
+    private static boolean copyDir(File src, File dst) {
+        if (!dst.mkdir()) return false;
+        for (String f : src.list()) {
+            File srcFile = new File(src, f);
+            File dstFile = new File(dst, f);
+            if (srcFile.isDirectory()) {
+                if (!copyDir(srcFile, dstFile)) return false;
+            } else if (srcFile.isFile()) {
+                if (!copyFile(srcFile, dstFile)) return false;
+            } else {
+                // do not copy other objects
+            }
+        }
         return true;
     }
 
+    /**
+     * Copy a file.
+     *
+     * @param src The source <code>File</code>.
+     * @param dst The destination <code>File</code>.
+     * @return True if the copy succeeded.
+     */
+    private static boolean copyFile(File src, File dst) {
+        byte[] buf = new byte[16384];
+        int len;
+        FileInputStream in = null;
+        FileOutputStream out = null;
+    		try {
+            in = new FileInputStream(src);
+            out = new FileOutputStream(dst); 
+            while ((len = in.read(buf)) > 0) out.write(buf, 0, len);
+        } catch (IOException ioe) {
+            return false;
+        } finally {
+            try {
+                if (out != null) out.close();
+                if (in != null) in.close();
+            } catch (IOException ioe) {} // Ignore
+        }
+        return true;
+    }
+
+    /**
+     * Copy directory with given name under an old directory to a new
+     * directory.
+     *
+     * @param oldDir The old directory.
+     * @param name The name of the directory to copy.
+     * @param newDir The new directory.
+     */
+    private static void copyIfFound(File oldDir, String name, File newDir) {
+        File src = new File(oldDir, name);
+        File dst = new File(newDir, name);
+        if (src.exists() && src.isDirectory() && !dst.exists()) {
+            copyDir(src, dst);
+        }
+    }
+            
     /**
      * Insist that a directory either already exists, or is created.
      *
@@ -186,6 +469,118 @@ public class FreeColDirectories {
         }
     }
 
+
+    // Main initialization/bootstrap routines.
+    // These need to be called early before the subsidiary directory
+    // accessors are used.
+
+    /**
+     * Sets the data directory.
+     *
+     * Insist that the base resources and i18n subdirectories are present.
+     *
+     * @param path The path to the new data directory, or null to
+     *     apply the default.
+     * @return A (non-i18n) error message on failure, null on success.
+     */
+    public static String setDataDirectory(String path) {
+        if (path == null) path = DATA_DIRECTORY;
+        File dir = new File(path);
+        if (!dir.isDirectory()) return "Not a directory: " + path;
+        if (!dir.canRead()) return "Can not read directory: " + path;
+        dataDirectory = dir;
+        if (getBaseDirectory() == null) {
+            return "Can not find base resources directory: " + path
+                + SEPARATOR + BASE_DIRECTORY;
+        }
+        if (getI18nDirectory() == null) {
+            return "Can not find I18n resources directory: " + path
+                + SEPARATOR + I18N_DIRECTORY;
+        }
+        return null;
+    }
+
+    /**
+     * Checks/creates the freecol directory structure for the current
+     * user.
+     *
+     * The main user directory used to be in the current user's home
+     * directory, and called ".freecol" (UNIXes including Mac in
+     * 0.9.x) or "freecol" or even FreeCol.  Now we use:
+     *
+     * - on XDG standard compliant Unixes:
+     *   - config:  ~/.config/freecol
+     *   - data:    ~/.local/share/freecol
+     *   - logging: ~/.cache/freecol
+     * - on Mac:
+     *   - config:  ~/Library/Preferences/freecol
+     *   - else:    ~/Library/Application Support/freecol
+     * - on Windows:
+     *   - everything in \<default directory\>/freecol
+     * - otherwise use what was there
+     *
+     * Note: the freecol data directory is set independently and earlier
+     * in initialization than this routine.
+     *
+     * TODO: Should the default location of the main user and data
+     * directories be determined by the installer?
+     *
+     * @return A message key to use to create a message to the user
+     *     possibly describing any directory migration, or null if
+     *     nothing to say.
+     */
+    public static String setUserDirectories() {
+        File homeDir = getUserDefaultDirectory();
+        File oldDir = getOldUserDirectory();
+        File dirs[] = { null, null, null };
+
+        // Check for OSX first because it is a Unix.
+        int migrate = (onMacOSX()) ? getMacOSXDirs(dirs)
+            : (onUnix()) ? getXDGDirs(dirs)
+            : (onWindows()) ? getWindowsDirs(dirs)
+            : -1;
+        if (migrate < 0) {
+            if (oldDir == null) return "main.userDir.fail";
+            dirs[0] = dirs[1] = dirs[2] = oldDir; // Do not migrate.
+            migrate = 1;
+        }
+
+        userConfigDirectory = dirs[0];
+        userDataDirectory = dirs[1];
+        userCacheDirectory = dirs[2];
+        if (migrate == 0 && oldDir != null) {
+            copyIfFound(oldDir, "classic", userConfigDirectory);
+            copyIfFound(oldDir, "freecol", userConfigDirectory);
+            copyIfFound(oldDir, "save",    userDataDirectory);
+            copyIfFound(oldDir, "mods",    userDataDirectory);
+        }
+
+        if (logFilePath == null) {
+            logFilePath = getUserCacheDirectory() + SEPARATOR + LOG_FILE;
+        }
+
+        if (saveDirectory == null) {
+            saveDirectory = new File(getUserDataDirectory(), SAVE_DIRECTORY);
+            if (!insistDirectory(saveDirectory)) return "main.userDir.fail";
+        }
+    
+        autosaveDirectory = new File(getSaveDirectory(), AUTOSAVE_DIRECTORY);
+        if (!insistDirectory(autosaveDirectory)) autosaveDirectory = null;
+    
+        userModsDirectory = new File(getUserDataDirectory(), MODS_DIRECTORY);
+        if (!insistDirectory(userModsDirectory)) userModsDirectory = null;
+
+        return (migrate > 0) ? null
+            : (onMacOSX())  ? "main.userDir.macosx"
+            : (onUnix())    ? "main.userDir.unix"
+            : (onWindows()) ? "main.userDir.windows"
+            : null;
+    }
+
+
+    // Directory accessors.
+    // Where there are supported command line arguments there will also
+    // be a mutator.
 
     /**
      * Gets the directory where the automatically saved games should be put.
@@ -240,32 +635,6 @@ public class FreeColDirectories {
     }
 
     /**
-     * Sets the data directory.
-     *
-     * Insist that the base resources and i18n subdirectories are present.
-     *
-     * @param path The path to the new data directory, or null to
-     *     apply the default.
-     * @return A (non-i18n) error message on failure, null on success.
-     */
-    public static String setDataDirectory(String path) {
-        if (path == null) path = DATA_DIRECTORY;
-        File dir = new File(path);
-        if (!dir.isDirectory()) return "Not a directory: " + path;
-        if (!dir.canRead()) return "Can not read directory: " + path;
-        dataDirectory = dir;
-        if (getBaseDirectory() == null) {
-            return "Can not find base resources directory: " + path
-                + SEPARATOR + BASE_DIRECTORY;
-        }
-        if (getI18nDirectory() == null) {
-            return "Can not find I18n resources directory: " + path
-                + SEPARATOR + I18N_DIRECTORY;
-        }
-        return null;
-    }
-
-    /**
      * Gets the high score file.
      *
      * @return The high score file, if it exists.
@@ -302,80 +671,6 @@ public class FreeColDirectories {
     }
 
     /**
-     * Gets the main user directory, that is the directory under which
-     * the user-specific data lives.
-     *
-     * @return The main user directory.
-     */
-    public static File getMainUserDirectory() {
-        return mainUserDirectory;
-    }
-
-    /**
-     * Gets the default main user directory under their home.
-     *
-     * @return The default main user directory.
-     */
-    public static File getDefaultMainUserDirectory() {
-        String freeColDirectoryName = "/".equals(SEPARATOR) ? ".freecol"
-            : "freecol";
-        File userHome = FileSystemView.getFileSystemView()
-            .getDefaultDirectory();
-        if (userHome == null) return null;
-
-        // Checks for OS specific paths, however if the old
-        // {home}/.freecol exists that overrides OS-specifics for
-        // backwards compatibility.
-        // TODO: remove compatibility code and fix BR#3526832
-        if (System.getProperty("os.name").equals("Mac OS X")) {
-            // We are running on a Mac and should use {home}/Library/FreeCol
-            if (!new File(userHome, freeColDirectoryName).isDirectory()) {
-                return new File(new File(userHome, "Library"), "FreeCol");
-            }
-        } else if (System.getProperty("os.name").startsWith("Windows")) {
-            // We are running on Windows and should use "My Documents"
-            // (or localized equivalent)
-            if (!new File(userHome, freeColDirectoryName).isDirectory()) {
-                freeColDirectoryName = "FreeCol";
-            }
-        }
-        
-        return new File(userHome, freeColDirectoryName);
-    }
-
-    /**
-     * Sets the main user directory, creating it if necessary.
-     * If pre-existing, it must be a directory, readable and writable.
-     *
-     * @param path The path to the new main user directory, or null to apply
-     *     the default.
-     * @return Null on success, an error message key on failure.
-     */
-    public static String setMainUserDirectory(String path) {
-        String ret = null;
-        File dir = (path == null) ? getDefaultMainUserDirectory()
-            : new File(path);
-        if (!dir.exists()) {
-            ret = "cli.error.home.notExists";
-            try {
-                if (dir.mkdir()) {
-                    mainUserDirectory = dir;
-                    ret = null;
-                }
-            } catch (Exception e) {}
-        } else if (!dir.isDirectory()) {
-            ret = "cli.error.home.notExists";
-        } else if (!dir.canRead()) {
-            ret = "cli.error.home.noRead";
-        } else if (!dir.canWrite()) {
-            ret = "cli.error.home.noWrite";
-        } else {
-            mainUserDirectory = dir;
-        }
-        return ret;
-    }
-
-    /**
      * Gets the directory containing the predefined maps.
      *
      * @return The predefined maps.
@@ -394,21 +689,12 @@ public class FreeColDirectories {
     }
 
     /**
-     * Gets the user mods directory.
-     *
-     * @return The directory where user mods are located, or null if none.
-     */
-    public static File getUserModsDirectory() {
-        return userModsDirectory;
-    }
-
-    /**
      * Gets the directory where the user options are saved.
      *
      * @return The directory to save user options in.
      */
     public static File getOptionsDirectory() {
-        return new File(getMainUserDirectory(), FreeCol.getTC());
+        return new File(getUserConfigDirectory(), FreeCol.getTC());
     }
 
     /**
@@ -480,5 +766,73 @@ public class FreeColDirectories {
         setSavegameFile(file);
         setSaveDirectory(file.getParentFile());
         return true;
+    }
+
+    /**
+     * Gets the user cache directory, that is the directory under which
+     * the transient user files live.
+     *
+     * @return The user cache directory.
+     */
+    public static File getUserCacheDirectory() {
+        return userCacheDirectory;
+    }
+
+    /**
+     * Gets the user config directory, that is the directory under which
+     * the user-specific config files live.
+     *
+     * @return The user config directory.
+     */
+    public static File getUserConfigDirectory() {
+        return userConfigDirectory;
+    }
+
+    /**
+     * Sets the user config directory, that is the directory under which
+     * the user-specific config files live.
+     *
+     * @param path The path to the new user config directory.
+     * @return Null on success, an error message key on failure.
+     */
+    public static String setUserConfigDirectory(String path) {
+        File dir = new File(path);
+        String ret = checkDir(dir);
+        if (ret == null) userConfigDirectory = dir;
+        return ret;
+    }
+
+    /**
+     * Gets the user data directory, that is the directory under which
+     * the user-specific data lives.
+     *
+     * @return The user data directory.
+     */
+    public static File getUserDataDirectory() {
+        return userDataDirectory;
+    }
+
+    /**
+     * Sets the main user data directory, creating it if necessary.
+     * If pre-existing, it must be a directory, readable and writable.
+     *
+     * @param path The path to the new main data user directory, or
+     *     null to apply the default.
+     * @return Null on success, an error message key on failure.
+     */
+    public static String setUserDataDirectory(String path) {
+        File dir = new File(path);
+        String ret = checkDir(dir);
+        if (ret == null) userDataDirectory = dir;
+        return ret;
+    }
+
+    /**
+     * Gets the user mods directory.
+     *
+     * @return The directory where user mods are located, or null if none.
+     */
+    public static File getUserModsDirectory() {
+        return userModsDirectory;
     }
 }

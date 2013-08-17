@@ -258,9 +258,10 @@ public final class ConnectController {
      * Loads and starts a game from the given file.
      *
      * @param file The saved game.
+     * @param userMsg An optional message key to be displayed early.
      * @return True if the game starts successully.
      */
-    public boolean startSavedGame(File file) {
+    public boolean startSavedGame(File file, final String userMsg) {
         freeColClient.setMapEditor(false);
 
         class ErrorJob implements Runnable {
@@ -371,6 +372,7 @@ public final class ConnectController {
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 ResourceManager.setScenarioMapping(saveGame.getResourceMapping());
+                                if (userMsg != null) gui.showInformationMessage(userMsg);
                                 gui.closeStatusPanel();
                             }
                         });
@@ -403,7 +405,7 @@ public final class ConnectController {
                     SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 gui.closeMainPanel();
-                                gui.showMainPanel();
+                                gui.showMainPanel(null);
                             }
                         });
                     SwingUtilities.invokeLater(new ErrorJob(err));

@@ -824,8 +824,8 @@ public class GUI {
         canvas.showLogFilePanel();
     }
 
-    public void showMainPanel() {
-        canvas.showMainPanel();
+    public void showMainPanel(String userMsg) {
+        canvas.showMainPanel(userMsg);
     }
 
     public OptionGroup showMapGeneratorOptionsDialog(OptionGroup mgo, boolean editable, boolean loadCustomOptions){

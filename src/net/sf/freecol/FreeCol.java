@@ -222,10 +222,10 @@ public final class FreeCol {
                     .addAmount("%minMemory%", MEMORY_MIN)));
         }
 
-        // Having parsed the command line args, we know where the main
-        // user directory should be, so we can set up the rest of the
+        // Having parsed the command line args, we know where the user
+        // directories should be, so we can set up the rest of the
         // file/directory structure.
-        FreeColDirectories.createAndSetDirectories();
+        String userMsg = FreeColDirectories.setUserDirectories();
 
         // Now we have the log file path, start logging.
         final Logger baseLogger = Logger.getLogger("");
@@ -266,22 +266,28 @@ public final class FreeCol {
         Messages.setModMessageBundle(locale);
 
         // Report on where we are.
+        if (userMsg != null) logger.info(Messages.message(userMsg));
         File autosave = FreeColDirectories.getAutosaveDirectory();
         File clientOptionsFile = FreeColDirectories.getClientOptionsFile();
         File userMods = FreeColDirectories.getUserModsDirectory();
         logger.info("Initialization:"
-            + "\n  java:     " + version
-            + "\n  memory:   " + memory
-            + "\n  locale:   " + locale.toString()
-            + "\n  data:     " + FreeColDirectories.getDataDirectory().getPath()
-            + "\n  userMain: " + FreeColDirectories.getMainUserDirectory().getPath()
-            + "\n  autosave: " + ((autosave == null) ? "NONE"
-                                   : autosave.getPath())
-            + "\n  logFile:  " + FreeColDirectories.getLogFilePath()
-            + "\n  options:  " + ((clientOptionsFile == null) ? "NONE"
-                                   : clientOptionsFile.getPath())
-            + "\n  save:     " + FreeColDirectories.getSaveDirectory().getPath()
-            + "\n  userMods: " + ((userMods == null) ? "NONE"
+            + "\n  java:       " + version
+            + "\n  memory:     " + memory
+            + "\n  locale:     " + locale.toString()
+            + "\n  data:       " + FreeColDirectories.getDataDirectory()
+                                                     .getPath()
+            + "\n  userConfig: " + FreeColDirectories.getUserConfigDirectory()
+                                                     .getPath()
+            + "\n  userData:   " + FreeColDirectories.getUserDataDirectory()
+                                                     .getPath()
+            + "\n  autosave:   " + ((autosave == null) ? "NONE"
+                                     : autosave.getPath())
+            + "\n  logFile:    " + FreeColDirectories.getLogFilePath()
+            + "\n  options:    " + ((clientOptionsFile == null) ? "NONE"
+                                     : clientOptionsFile.getPath())
+            + "\n  save:       " + FreeColDirectories.getSaveDirectory()
+                                                     .getPath()
+            + "\n  userMods:   " + ((userMods == null) ? "NONE"
                                    : userMods.getPath())
             );
 
@@ -289,7 +295,7 @@ public final class FreeCol {
         if (standAloneServer) {
             startServer();
         } else {
-            startClient();
+            startClient(userMsg);
         }
     }
 
@@ -391,8 +397,14 @@ public final class FreeCol {
                           .withArgName(Messages.message("cli.arg.font"))
                           .hasArg()
                           .create());
-        options.addOption(OptionBuilder.withLongOpt("home-directory")
-                          .withDescription(Messages.message("cli.home-directory"))
+        options.addOption(OptionBuilder.withLongOpt("user-config-directory")
+                          .withDescription(Messages.message("cli.user-config-directory"))
+                          .withArgName(Messages.message("cli.arg.directory"))
+                          .withType(new File("dummy"))
+                          .hasArg()
+                          .create());
+        options.addOption(OptionBuilder.withLongOpt("user-data-directory")
+                          .withDescription(Messages.message("cli.user-data-directory"))
                           .withArgName(Messages.message("cli.arg.directory"))
                           .withType(new File("dummy"))
                           .hasArg()
@@ -551,12 +563,20 @@ public final class FreeCol {
                 }
             }
 
-            if (line.hasOption("home-directory")) {
-                String arg = line.getOptionValue("home-directory");
-                String errMsg = FreeColDirectories.setMainUserDirectory(arg);
-                if (errMsg != null) {
+            if (line.hasOption("user-data-directory")) {
+                String arg = line.getOptionValue("user-data-directory");
+                String errMsg = FreeColDirectories.setUserDataDirectory(arg);
+                if (errMsg != null) { // Fatal, unable to save.
                     fatal(Messages.message(StringTemplate.template(errMsg)
                             .addName("%string%", arg)));
+                }
+            }
+
+            if (line.hasOption("user-config-directory")) {
+                String arg = line.getOptionValue("user-config-directory");
+                String errMsg = FreeColDirectories.setUserConfigDirectory(arg);
+                if (errMsg != null) { // Not fatal.
+                    System.err.println(Messages.message(errMsg));
                 }
             }
 
@@ -949,8 +969,10 @@ public final class FreeCol {
 
     /**
      * Start a client.
+     *
+     * @param userMsg An optional user message key.
      */
-    private static void startClient() {
+    private static void startClient(String userMsg) {
         Specification spec = null;
         if (debugStart) {
             try {
@@ -964,7 +986,8 @@ public final class FreeCol {
             } catch (IOException ioe) {}
         }
         new FreeColClient(FreeColDirectories.getSavegameFile(), windowSize,
-                          sound, splashFilename, introVideo, fontName, spec);
+                          sound, splashFilename, introVideo, fontName, 
+                          userMsg, spec);
     }
 
     /**

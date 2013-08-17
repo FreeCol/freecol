@@ -369,12 +369,18 @@ be special effects.
   (normally \texttt{options.xml} in the freecol directory).
 \item\verb$--font FONTSPEC$ Override the default font with a Java
 font specifier (e.g. Arial-BOLD-12).
-\item\verb$--home-directory DIRECTORY$ Use the given directory instead
-  of your default home directory to load and save games, options and
-  log files. You can use this in order to run the game from a USB
-  stick\index{USB stick}, for example. Please note that specifying a
-  save game file on the command line will override the save game
-  directory.
+\item\verb$--user-config-directory DIRECTORY$ Use the given directory
+  instead of your default FreeCol user configuration directory to load
+  client and custom options. You can use this in order to run the
+  game from a USB stick\index{USB stick}, for example.  Please note
+  that specifying a client options file on the command line will override
+  the options directory.
+\item\verb$--user-data-directory DIRECTORY$ Use the given directory
+  instead of your default FreeCol user data directory to load and save
+  games, and user mods. You can use this in order to run the
+  game from a USB stick\index{USB stick}, for example. Please note
+  that specifying a save game file on the command line will override
+  the save game directory.
 \item\verb$--name NAME$ Specify a player name.
 \item\verb$--server PORT$ Start a stand-alone server on the specified
 port. If you don't know what that means, you will not need the option.

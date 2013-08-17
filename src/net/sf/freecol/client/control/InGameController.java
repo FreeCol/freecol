@@ -1098,7 +1098,7 @@ public final class InGameController implements NetworkConstants {
         freeColClient.getConnectController().quitGame(true);
         gui.setActiveUnit(null);
         gui.removeInGameComponents();
-        freeColClient.getConnectController().startSavedGame(file);
+        freeColClient.getConnectController().startSavedGame(file, null);
     }
 
     /**
@@ -1121,7 +1121,7 @@ public final class InGameController implements NetworkConstants {
                 if (ok) {
                     freeColClient.getConnectController().quitGame(true);
                     gui.removeInGameComponents();
-                    freeColClient.getConnectController().startSavedGame(file);
+                    freeColClient.getConnectController().startSavedGame(file, null);
                     return true;
                 }
             }

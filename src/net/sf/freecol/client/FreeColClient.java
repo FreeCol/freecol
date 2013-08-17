@@ -141,6 +141,7 @@ public final class FreeColClient {
      * @param splashFilename The name of the splash image.
      * @param showOpeningVideo Display the opening video.
      * @param fontName An optional override of the main font.
+     * @param userMsg An optional message key to be displayed early.
      * @param spec If non-null, a <code>Specification</code> to use to start
      *     a new game immediately.
      */
@@ -150,6 +151,7 @@ public final class FreeColClient {
                          final String splashFilename,
                          final boolean showOpeningVideo,
                          final String fontName,
+                         final String userMsg,
                          final Specification spec) {
         // Headless mode is enabled for the test suite, where it now
         // works again.
@@ -271,8 +273,8 @@ public final class FreeColClient {
         if (savedGame != null) {
             SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        if (!connectController.startSavedGame(savedGame)) {
-                            gui.showMainPanel();
+                        if (!connectController.startSavedGame(savedGame, userMsg)) {
+                            gui.showMainPanel(null);
                         }
                     }
                 });
@@ -280,14 +282,14 @@ public final class FreeColClient {
             SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         if (!connectController.startSinglePlayerGame(spec, true)) {
-                            gui.showMainPanel();
+                            gui.showMainPanel(userMsg);
                         }
                     }
                 });
         } else {
             SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        gui.showMainPanel();
+                        gui.showMainPanel(userMsg);
                     }
                 });
         }
