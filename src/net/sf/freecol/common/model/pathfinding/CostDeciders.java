@@ -176,7 +176,7 @@ public final class CostDeciders {
      */
     public static CostDecider defaultCostDeciderFor(final Unit unit) {
         return (unit != null && unit.isOffensiveUnit()
-            && unit.getRole() != Role.SCOUT)
+                && unit.getRole().isOffensive())
             ? avoidSettlements()
             : avoidSettlementsAndBlockingUnits();
     }

@@ -110,7 +110,7 @@ public class Unit extends GoodsLocation
     protected UnitState state = UnitState.ACTIVE;
 
     /** Current unit role. */
-    protected Role role = Role.DEFAULT;
+    protected Role role = getSpecification().getRole("model.role.default");
 
     /** The current unit location. */
     protected Location location;
@@ -609,7 +609,7 @@ public class Unit extends GoodsLocation
      */
     public void setRole() {
         Role oldRole = role;
-        role = Role.DEFAULT;
+        role = getSpecification().getRole("model.role.default");
         for (EquipmentType type : equipment.keySet()) {
             role = role.newRole(type.getRole());
         }
@@ -1740,7 +1740,7 @@ public class Unit extends GoodsLocation
             settlement.addEquipmentGoods(et, eq.getCount(et));
         }
         clearEquipment();
-        setRole(Role.DEFAULT);
+        setRole(getSpecification().getRole("model.role.default"));
     }
 
     /**
@@ -3883,7 +3883,7 @@ public class Unit extends GoodsLocation
 
         state = xr.getAttribute(STATE_TAG, UnitState.class, UnitState.ACTIVE);
 
-        role = xr.getRole(spec, ROLE_TAG, Role.class, Role.DEFAULT);
+        role = xr.getRole(spec, ROLE_TAG, Role.class, spec.getRole("model.role.default"));
 
         location = xr.getLocationAttribute(game, LOCATION_TAG, true);
 
@@ -4015,7 +4015,7 @@ public class Unit extends GoodsLocation
         } else {
             sb.append(" ").append(Utils.lastPart(owner.getNationId(), "."))
                 .append(" ").append(getType().getSuffix());
-            if (getRole() != Role.DEFAULT) {
+            if (!"model.role.default".equals(getRole().getId())) {
                 sb.append("-").append(getRole());
             }
             sb.append(" ").append(getMovesAsString());
