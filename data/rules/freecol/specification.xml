@@ -16,8 +16,8 @@
     *
     *  You should have received a copy of the GNU General Public License
     *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
-    
-    In case of incompatible changes, please update version number and 
+
+    In case of incompatible changes, please update version number and
     XSD schema for validation.
 -->
 <freecol-specification id="freecol" version="0.77" extends="classic">
@@ -45,20 +45,20 @@
       <modifier id="model.goods.hammers" type="additive" value="2">
         <scope ability-id="model.ability.person" />
       </modifier>
-      <unit id="pioneer" type="model.unit.masterCarpenter" role="pioneer"/>
-      <unit id="soldier" type="model.unit.expertLumberJack" role="soldier"/>
+      <unit id="pioneer" type="model.unit.masterCarpenter" role="model.role.pioneer"/>
+      <unit id="soldier" type="model.unit.expertLumberJack" role="model.role.soldier"/>
     </european-nation-type>
     <european-nation-type id="model.nationType.agriculture" extends="model.nationType.default">
       <modifier id="model.goods.grain" type="additive" value="2"/>
-      <unit id="pioneer" type="model.unit.expertFarmer" role="pioneer"/>
+      <unit id="pioneer" type="model.unit.expertFarmer" role="model.role.pioneer"/>
     </european-nation-type>
     <european-nation-type id="model.nationType.furTrapping" extends="model.nationType.default">
       <modifier id="model.goods.furs" type="additive" value="2"/>
       <modifier id="model.goods.coats" type="additive" value="2">
         <scope ability-id="model.ability.person" />
       </modifier>
-      <unit id="pioneer" type="model.unit.expertFurTrapper" role="pioneer"/>
-      <unit id="soldier" type="model.unit.masterFurTrader" role="soldier"/>
+      <unit id="pioneer" type="model.unit.expertFurTrapper" role="model.role.pioneer"/>
+      <unit id="soldier" type="model.unit.masterFurTrader" role="model.role.soldier"/>
     </european-nation-type>
   </european-nation-types>
 
