@@ -644,7 +644,7 @@ public class Messages {
             infoKey = Integer.toString(unit.getTreasureAmount());
         } else {
             String key;
-            if ("model.Role.default".equals(unit.getRole().getId())) {
+            if ("model.role.default".equals(unit.getRole().getId())) {
                 key = "name";
             } else if (unit.getRole().getId().startsWith("model.role.")) {
                 key = unit.getRole().getId().substring(11);
