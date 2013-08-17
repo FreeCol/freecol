@@ -983,7 +983,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                         && (is = getHomeIndianSettlement()) != null)) {
                     if (contactPlayer.hasExplored(is.getTile())
                         && is.setContacted(contactPlayer)) {
-                        cs.add(See.only(contactPlayer), is);
+                        cs.add(See.only(contactPlayer), is);//-til
                         // First European contact with native settlement.
                         StringTemplate nation = is.getOwner().getNationName();
                         cs.addMessage(See.only(contactPlayer),
@@ -992,6 +992,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                                              this, is)
                                 .addStringTemplate("%nation%", nation)
                                 .addName("%settlement%", is.getName()));
+                        is.getTile().updatePlayerExploredTile(contactPlayer);//+til
                         logger.finest("First contact between " + contactPlayer
                             + " and " + is + " at " + newTile);
                     }                   
