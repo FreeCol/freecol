@@ -594,8 +594,8 @@ public class AIUnit extends AIObject implements Transportable {
         if (aiOwner != null) {
             aiOwner.removeAIUnit(this);
         } else {
-            logger.warning("Disposing of " + getId() + " but owner is null!\n"
-                + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
+            // This happens with missionaries.
+            logger.warning("Disposing of " + getId() + " but owner is null!");
         }
         abortMission("AIUnit-disposed");
         setTransport(null, "disposing");

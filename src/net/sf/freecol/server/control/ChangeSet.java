@@ -22,6 +22,7 @@ package net.sf.freecol.server.control;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 import net.sf.freecol.common.model.Ability;
@@ -233,6 +234,17 @@ public class ChangeSet {
             this.see = see;
         }
 
+
+        /**
+         * Does this Change operate on the given object?
+         *
+         * @param fcgo The <code>FreeColGameObject</code> to check.
+         * @return True if the object is a subject of this change.
+         */
+        public boolean matches(FreeColGameObject fcgo) {
+            return false;
+        }
+
         /**
          * Gets the sort priority of a change, to be used by the
          * changeComparator.
@@ -394,7 +406,7 @@ public class ChangeSet {
             if (!serverPlayer.canSeeUnit(defender)) {
                 // Disclose fully.  If scoped to serverPlayer
                 // insufficient information is serialized when inside
-                // a settlement, but comabt animation is an exception
+                // a settlement, but combat animation is an exception
                 // to the normal visibility rules.
                 element.appendChild(defender.toXMLElement(doc));
             }
@@ -687,6 +699,15 @@ public class ChangeSet {
         public ObjectChange(See see, FreeColGameObject fcgo) {
             super(see);
             this.fcgo = fcgo;
+        }
+
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean matches(FreeColGameObject fcgo) {
+            return this.fcgo == fcgo;
         }
 
         /**
@@ -1249,6 +1270,20 @@ public class ChangeSet {
 
 
     // Helper routines that should be used to construct a change set.
+
+    /**
+     * Sometimes we need to backtrack on making a change.
+     *
+     * @param fcgo A <code>FreeColGameObject</code> to remove a matching
+     *     change for.
+     */
+    public void remove(FreeColGameObject fcgo) {
+        Iterator<Change> ci = changes.iterator();
+        while (ci.hasNext()) {
+            Change c = ci.next();
+            if (c.matches(fcgo)) ci.remove();
+        }
+    }
 
     /**
      * Helper function to add updates for multiple objects to a ChangeSet.

@@ -2486,8 +2486,14 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         // Make sure we always update the attacker and defender tile
         // if it is not already done yet.
-        if (attackerTileDirty) cs.add(vis, attackerTile);
-        if (defenderTileDirty) cs.add(vis, defenderTile);
+        if (attackerTileDirty) {
+            if (attackerSettlement != null) cs.remove(attackerSettlement);
+            cs.add(vis, attackerTile);
+        }
+        if (defenderTileDirty) {
+            if (settlement != null) cs.remove(settlement);
+            cs.add(vis, defenderTile);
+        }
     }
 
     /**
@@ -2553,11 +2559,14 @@ public class ServerPlayer extends Player implements ServerModelObject {
                       .addStringTemplate("%enemyNation%", nativeNation));
 
         // Burn down the missions
+        boolean here = settlement.hasMissionary(attackerPlayer);
         for (IndianSettlement s : nativePlayer.getIndianSettlements()) {
             if (s.hasMissionary(attackerPlayer)) {
                 ((ServerIndianSettlement)s).csKillMissionary(null, cs);
             }
         }
+        // Backtrack on updating this tile, avoiding duplication in csCombat
+        if (here) cs.remove(settlement.getTile());
     }
 
     /**
@@ -3642,7 +3651,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         cs.addMessage(See.only(winnerPlayer),
             new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
-                messageId, winner)
+                             messageId, winner)
             .setDefaultId("model.unit.unitSlaughtered")
             .addStringTemplate("%nation%", loserNation)
             .addStringTemplate("%unit%", loser.getLabel())
@@ -3651,7 +3660,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             .addStringTemplate("%location%", winnerLocation));
         cs.addMessage(See.only(loserPlayer),
             new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
-                messageId, loser.getTile())
+                             messageId, loser.getTile())
             .setDefaultId("model.unit.unitSlaughtered")
             .addStringTemplate("%nation%", loserPlayer.getNationName())
             .addStringTemplate("%unit%", loser.getLabel())
@@ -3662,7 +3671,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             StringTemplate nativeNation = loserPlayer.getNationName();
             cs.addGlobalHistory(getGame(),
                 new HistoryEvent(getGame().getTurn(),
-                    HistoryEvent.EventType.DESTROY_NATION)
+                                 HistoryEvent.EventType.DESTROY_NATION)
                 .addStringTemplate("%nation%", winnerNation)
                 .addStringTemplate("%nativeNation%", nativeNation));
         }

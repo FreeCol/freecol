@@ -593,6 +593,7 @@ public class SimpleCombatModel extends CombatModel {
                 // tile.
                 IndianSettlement is = (IndianSettlement) settlement;
                 int lose = 1;
+                crs.add(CombatResult.SLAUGHTER_UNIT);
                 if (attackerWon) {
                     if (r < winner.getConvertProbability()) {
                         if (is.getUnitCount() + tile.getUnitCount() > 1
@@ -612,7 +613,6 @@ public class SimpleCombatModel extends CombatModel {
                         }
                     }
                 }
-                crs.add(CombatResult.SLAUGHTER_UNIT);
                 if (settlement.getUnitCount() + tile.getUnitCount() <= lose) {
                     crs.add(CombatResult.DESTROY_SETTLEMENT);
                 }

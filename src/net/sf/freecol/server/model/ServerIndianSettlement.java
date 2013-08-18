@@ -264,7 +264,8 @@ public class ServerIndianSettlement extends IndianSettlement
             oldOwner = (ServerPlayer)old.getOwner(); 
             setMissionary(null);//-vis(oldOwner),-til
             tile.updateIndianSettlement(oldOwner);
-            cs.addDispose(See.perhaps(), tile, old);//-vis(oldOwner)
+            cs.addDispose(See.only(oldOwner), null, old);//-vis(oldOwner)
+            cs.add(See.perhaps().always(oldOwner), tile);
         }
 
         if (missionary != null) {
@@ -280,7 +281,6 @@ public class ServerIndianSettlement extends IndianSettlement
         }
 
         tile.updatePlayerExploredTiles();//+til
-        cs.add(See.perhaps().always(oldOwner), tile);
         if (oldOwner != null) oldOwner.invalidateCanSeeTiles();//+vis(oldOwner)
         if (newOwner != null) newOwner.invalidateCanSeeTiles();//+vis(newOwner)
     }
