@@ -100,20 +100,6 @@ public class UnitTest extends FreeColTestCase {
     private static final UnitType wagonType
         = spec().getUnitType("model.unit.wagonTrain");
 
-    private static final Role role_default
-        = spec().getRole("model.role.default");
-    private static final Role role_scout
-        = spec().getRole("model.role.scout");
-    private static final Role role_soldier
-        = spec().getRole("model.role.soldier");
-    private static final Role role_dragoon
-        = spec().getRole("model.role.dragoon");
-    private static final Role role_pioneer
-        = spec().getRole("model.role.pioneer");
-    private static final Role role_missionary
-        = spec().getRole("model.role.missionary");
-
-
     /**
      * Test unit for colonist status
      *
@@ -491,37 +477,23 @@ public class UnitTest extends FreeColTestCase {
         Unit colonist = new ServerUnit(game, map.getTile(6, 8), dutch,
                                        colonistType);
         colonist.modifyExperience(10);
-        assertEquals(role_default, colonist.getRole());
+        assertEquals(spec().getRole("model.role.default"),
+                     colonist.getRole());
         assertTrue("Colonist should some initial experience",
                    colonist.getExperience() > 0);
 
         colonist.changeEquipment(musketsEquipmentType, 1);
-        //assertEquals(spec().getRole("model.role.soldier"), colonist.getRole());
-        assertEquals(role_soldier, colonist.getRole());
+        assertEquals(spec().getRole("model.role.soldier"),
+                     colonist.getRole());
         assertEquals("Colonist should have lost all experience and role", 0,
                      colonist.getExperience());
 
         colonist.modifyExperience(10);
         colonist.changeEquipment(horsesEquipmentType, 1);
-        assertEquals(role_dragoon, colonist.getRole());
+        assertEquals(spec().getRole("model.role.dragoon"),
+                     colonist.getRole());
         assertTrue("Colonist should not have lost experience, compatible role",
                    colonist.getExperience() > 0);
-    }
-
-    public void testCompatibleRoles() {
-        assertFalse(role_soldier.isCompatibleWith(role_default));
-        assertFalse(role_soldier.isCompatibleWith(role_pioneer));
-        assertFalse(role_soldier.isCompatibleWith(role_missionary));
-        assertTrue(role_soldier.isCompatibleWith(role_soldier));
-        assertFalse(role_soldier.isCompatibleWith(role_scout));
-        assertTrue(role_soldier.isCompatibleWith(role_dragoon));
-
-        assertFalse(role_missionary.isCompatibleWith(role_default));
-        assertFalse(role_missionary.isCompatibleWith(role_pioneer));
-        assertTrue(role_missionary.isCompatibleWith(role_missionary));
-        assertFalse(role_missionary.isCompatibleWith(role_soldier));
-        assertFalse(role_missionary.isCompatibleWith(role_scout));
-        assertFalse(role_missionary.isCompatibleWith(role_dragoon));
     }
 
     public void testOwnerChange(){

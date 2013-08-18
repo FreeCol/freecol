@@ -621,16 +621,44 @@ public class Unit extends GoodsLocation
     public void setRole() {
         Role oldRole = role;
         role = getSpecification().getRole("model.role.default");
+        boolean horses = false, muskets = false;
         for (EquipmentType type : equipment.keySet()) {
-            if (("model.role.soldier".equals(role.getId())
-                 && "model.role.scout".equals(type.getRole().getId()))
-                || ("model.role.scout".equals(role.getId())
-                    && "model.role.soldier".equals(type.getRole().getId()))) {
-                role = getSpecification().getRole("model.role.dragoon");
+            if ("model.equipment.horses".equals(type.getId())
+                || "model.equipment.indian.horses".equals(type.getId())) {
+                horses = true;
+            } else if ("model.equipment.muskets".equals(type.getId())
+                       || "model.equipment.indian.muskets".equals(type.getId())) {
+                muskets = true;
             } else {
                 role = type.getRole();
             }
         }
+        if (horses && muskets) {
+            if (owner.isIndian()) {
+                role = getSpecification().getRole("model.role.nativeDragoon");
+            } else if (owner.isREF()) {
+                role = getSpecification().getRole("model.role.cavalry");
+            } else {
+                role = getSpecification().getRole("model.role.dragoon");
+            }
+        } else if (horses) {
+            if (owner.isIndian()) {
+                role = getSpecification().getRole("model.role.mountedBrave");
+            } else if (owner.isREF()) {
+                logger.warning("Undefined role: REF Scout");
+            } else {
+                role = getSpecification().getRole("model.role.scout");
+            }
+        } else if (muskets) {
+            if (owner.isIndian()) {
+                role = getSpecification().getRole("model.role.armedBrave");
+            } else if (owner.isREF()) {
+                role = getSpecification().getRole("model.role.infantry");
+            } else {
+                role = getSpecification().getRole("model.role.soldier");
+            }
+        }
+
         if (getState() == UnitState.IMPROVING
             && !hasAbility(Ability.IMPROVE_TERRAIN)) {
             setStateUnchecked(UnitState.ACTIVE);
