@@ -1821,7 +1821,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         PlayerExploredTile pet;
         if (xw.canSee(this)) {
 
-            // Show enemy units if there is no enemy settlement.
+            // Show tile contents (e.g. enemy units) if there is no
+            // blocking enemy settlement.
             if (settlement == null
                 || xw.validFor(settlement.getOwner())) {
 

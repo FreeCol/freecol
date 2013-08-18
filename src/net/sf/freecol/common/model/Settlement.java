@@ -715,9 +715,10 @@ public abstract class Settlement extends GoodsLocation
      */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
-        super.writeChildren(xw);
-
         if (xw.validFor(getOwner())) {
+
+            // Settlement contents only visible to the owner by default.
+            super.writeChildren(xw);
 
             for (Ability ability : getSortedAbilities()) {
                 ability.toXML(xw);
