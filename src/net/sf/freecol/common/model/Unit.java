@@ -275,11 +275,12 @@ public class Unit extends GoodsLocation
             result = StringTemplate.label(" ")
                 .add(type.getNameKey());
         } else {
-            result = StringTemplate.template("model.unit." + roleId + ".name")
+            String key = "model.unit." + Utils.lastPart(roleId, ".") + ".name";
+            result = StringTemplate.template(key)
                 .addAmount("%number%", number)
                 .add("%unit%", type.getNameKey());
+            if (name != null) result.addName(name);
         }
-        if (name != null) result.addName(name);
         return result;
     }
 
