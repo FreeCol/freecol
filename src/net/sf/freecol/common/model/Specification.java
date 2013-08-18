@@ -1823,7 +1823,15 @@ public final class Specification {
                 ent.addAbility(new Ability(Ability.FOUNDS_COLONIES, ent, true));
             }
         }
-        // end @compat
+        getEquipmentType("model.equipment.horses")
+            .addAbility(new Ability(Ability.MOUNTED));
+        getEquipmentType("model.equipment.indian.horses")
+            .addAbility(new Ability(Ability.MOUNTED));
+        getEquipmentType("model.equipment.muskets")
+            .addAbility(new Ability(Ability.ARMED));
+        getEquipmentType("model.equipment.indian.muskets")
+            .addAbility(new Ability(Ability.ARMED));
+        // end @compat 0.10.7
     }
     // end @compat 0.10.x
 
