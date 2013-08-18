@@ -605,6 +605,16 @@ public class Unit extends GoodsLocation
     }
 
     /**
+     * Get the last part of the role identifier, which is often used as
+     * part of a message key.
+     *
+     * @return The role suffix.
+     */
+    public String getRoleSuffix() {
+        return Utils.lastPart(role.getId(), ".");
+    }
+
+    /**
      * Set the unit role based on its equipment.
      */
     public void setRole() {
@@ -4027,7 +4037,7 @@ else logger.warning("WRITING UNIT WITH NULL LOCATION: " + this);
             sb.append(" ").append(Utils.lastPart(owner.getNationId(), "."))
                 .append(" ").append(getType().getSuffix());
             if (!"model.role.default".equals(getRole().getId())) {
-                sb.append("-").append(getRole());
+                sb.append("-").append(getRoleSuffix());
             }
             sb.append(" ").append(getMovesAsString());
         }
