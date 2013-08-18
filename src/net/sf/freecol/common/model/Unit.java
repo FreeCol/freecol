@@ -3628,7 +3628,8 @@ public class Unit extends GoodsLocation
 
         if (location != null) {
             location.remove(this);
-            location = null;
+            // Do not set location to null, units that are slaughtered in
+            // battle need to remain valid during the animation.
         }
 
         if (teacher != null) {
@@ -3800,6 +3801,7 @@ public class Unit extends GoodsLocation
                 xw.writeLocationAttribute(LOCATION_TAG, location);
             }
         }
+else logger.warning("WRITING UNIT WITH NULL LOCATION: " + this);
 
         xw.writeAttribute(TREASURE_AMOUNT_TAG, treasureAmount);
 

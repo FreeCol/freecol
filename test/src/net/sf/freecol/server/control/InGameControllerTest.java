@@ -340,6 +340,8 @@ public class InGameControllerTest extends FreeColTestCase {
                      100, dutch.getGold() - oldGold);
 
         // Succeed from a port
+        treasure = new ServerUnit(game, tile, dutch, treasureTrainType);
+        treasure.setTreasureAmount(100);
         Colony port = getStandardColony(1, 9, 4);
         assertFalse("Standard colony is not landlocked",
                     port.isLandLocked());

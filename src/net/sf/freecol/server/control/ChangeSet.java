@@ -392,7 +392,11 @@ public class ChangeSet {
                 }
             }
             if (!serverPlayer.canSeeUnit(defender)) {
-                element.appendChild(defender.toXMLElement(doc, serverPlayer));
+                // Disclose fully.  If scoped to serverPlayer
+                // insufficient information is serialized when inside
+                // a settlement, but comabt animation is an exception
+                // to the normal visibility rules.
+                element.appendChild(defender.toXMLElement(doc));
             }
             return element;
         }
