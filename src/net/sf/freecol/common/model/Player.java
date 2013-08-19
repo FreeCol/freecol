@@ -3919,18 +3919,10 @@ public class Player extends FreeColGameObject implements Nameable {
             xw.writeAttribute(IMMIGRATION_REQUIRED_TAG, immigrationRequired);
 
             xw.writeAttribute(ATTACKED_BY_PRIVATEERS_TAG, attackedByPrivateers);
+
             xw.writeAttribute(OLD_SOL_TAG, oldSoL);
 
             xw.writeAttribute(SCORE_TAG, score);
-
-        } else {
-            xw.writeAttribute(GOLD_TAG, -1);
-
-            xw.writeAttribute(IMMIGRATION_TAG, -1);
-
-            xw.writeAttribute(LIBERTY_TAG, -1);
-
-            xw.writeAttribute(IMMIGRATION_REQUIRED_TAG, -1);
         }
 
         if (newLandName != null) {
