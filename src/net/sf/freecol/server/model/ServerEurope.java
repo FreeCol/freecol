@@ -85,21 +85,21 @@ public class ServerEurope extends Europe implements ServerModelObject {
                 if (m > 0) {
                     owner.addExtraTrade(new AbstractGoods(ag.getType(), -m));
                 }
-                for (EquipmentType rt : unit.changeEquipment(et, 1)) {
-                    int a = unit.getEquipmentCount(rt);
-                    for (AbstractGoods rg : rt.getRequiredGoods()) {
-                        if (owner.canTrade(rg.getType(),
-                                           Market.Access.EUROPE)) {
-                            int rm = owner.sell(null, rg.getType(),
-                                                a * rg.getAmount());
-                            if (rm > 0) {
-                                owner.addExtraTrade(new AbstractGoods(rg.getType(), rm));
-                            }
+            }
+            for (EquipmentType rt : unit.changeEquipment(et, 1)) {
+                int a = unit.getEquipmentCount(rt);
+                for (AbstractGoods rg : rt.getRequiredGoods()) {
+                    if (owner.canTrade(rg.getType(),
+                            Market.Access.EUROPE)) {
+                        int rm = owner.sell(null, rg.getType(),
+                                            a * rg.getAmount());
+                        if (rm > 0) {
+                            owner.addExtraTrade(new AbstractGoods(rg.getType(), rm));
                         }
                     }
-                    // Removals can not cause incompatible-equipment trouble
-                    unit.changeEquipment(rt, -a);
                 }
+                // Removals can not cause incompatible-equipment trouble
+                unit.changeEquipment(rt, -a);
             }
         }
         unit.setRole();

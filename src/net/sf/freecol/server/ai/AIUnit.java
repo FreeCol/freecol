@@ -348,7 +348,8 @@ public class AIUnit extends AIObject implements Transportable {
         final Specification spec = getSpecification();
         Role r = spec.getRole(roleId);
         final Player player = unit.getOwner();
-        UnitLocation loc = (UnitLocation)unit.getLocation();
+        UnitLocation loc = (unit.isInEurope()) ? player.getEurope()
+            : unit.getSettlement();
         int price = loc.canBuildRoleEquipment(r);
         if (price < 0) return false;
         if (!player.checkGold(price)) {
