@@ -105,6 +105,12 @@ public class RearrangeColonyMessage extends DOMMessage {
         public String roleKey(int i) {
             return "x" + i + "role";
         }
+
+        public String toString() {
+            return "[UnitChange " + unit.getId() + " at " + loc.getId()
+                + " " + role.getRoleSuffix()
+                + ((work == null) ? "" : " work " + work.getId()) + "]";
+        }
     }
 
     /** A comparator for UnitChanges, favouring simplest roles first. */

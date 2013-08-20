@@ -55,35 +55,29 @@ public class Role extends BuildableType implements Comparable<Role> {
      */
     private UnitType expertUnit = null;
 
-    /** Sorts roles by defensive power, descendingly. */
-    public static final Comparator<Role> defensiveComparator = new Comparator<Role>() {
-        public int compare(Role role1, Role role2) {
-            float defence1 = role1.getDefence();
-            float defence2 = role2.getDefence();
-            if (defence1 > defence2) {
-                return -1;
-            } else if (defence1 < defence2) {
-                return 1;
-            } else {
-                return 0;
+    /** Sorts roles by descending defensive power. */
+    public static final Comparator<Role> defensiveComparator
+        = new Comparator<Role>() {
+            public int compare(Role role1, Role role2) {
+                float defence1 = role1.getDefence();
+                float defence2 = role2.getDefence();
+                return (defence1 > defence2) ? 1
+                    : (defence1 < defence2) ? -1
+                    : 0;
             }
-        }
-    };
+        };
 
-    /** Sorts roles by offensive power, descendingly. */
-    public static final Comparator<Role> offensiveComparator = new Comparator<Role>() {
-        public int compare(Role role1, Role role2) {
-            float offence1 = role1.getOffence();
-            float offence2 = role2.getOffence();
-            if (offence1 > offence2) {
-                return -1;
-            } else if (offence1 < offence2) {
-                return 1;
-            } else {
-                return 0;
+    /** Sorts roles by descending offensive power. */
+    public static final Comparator<Role> offensiveComparator
+        = new Comparator<Role>() {
+            public int compare(Role role1, Role role2) {
+                float offence1 = role1.getOffence();
+                float offence2 = role2.getOffence();
+                return (offence1 > offence2) ? 1
+                    : (offence1 < offence2) ? -1
+                    : 0;
             }
-        }
-    };
+        };
 
 
     // and this, too
@@ -132,6 +126,15 @@ public class Role extends BuildableType implements Comparable<Role> {
      */
     public String getRoleKey() {
         return getRoleKey(getId());
+    }
+
+    /**
+     * Get the last part of a role identifier.
+     *
+     * @return The role suffix.
+     */
+    public String getRoleSuffix() {
+        return Role.getRoleSuffix(getId());
     }
 
     /**

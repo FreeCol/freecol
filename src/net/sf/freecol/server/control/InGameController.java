@@ -4183,6 +4183,7 @@ public final class InGameController extends Controller {
         if (!unitChanges.isEmpty()) {
             Collections.sort(unitChanges,
                              RearrangeColonyMessage.roleComparator);
+            Collections.reverse(unitChanges);
             for (UnitChange uc : unitChanges) {
                 if (!uc.unit.equipForRole(uc.role, colony)) {
                     // Should not happen if we equip simplest first
