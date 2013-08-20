@@ -1307,7 +1307,7 @@ public class ColonyPlan {
                 workers.remove(u);
                 report.append(u.getId()).append("(")
                     .append(u.getType().getSuffix())
-                    .append(") -> ").append(u.getRole()).append("\n");
+                    .append(") -> ").append(u.getRoleSuffix()).append("\n");
             }
         }
 
@@ -1569,7 +1569,7 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
             if (fullEquipUnit(spec(), u, spec().getRole("model.role.soldier"), col)) {
                 report.append(u.getId()).append("(")
                     .append(u.getType().getSuffix())
-                    .append(") -> ").append(u.getRole()).append("\n");
+                    .append(") -> ").append(u.getRoleSuffix()).append("\n");
                 workers.remove(u);
             } else break;
         }

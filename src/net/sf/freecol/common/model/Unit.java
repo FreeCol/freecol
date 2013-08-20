@@ -612,7 +612,7 @@ public class Unit extends GoodsLocation
      * @return The role suffix.
      */
     public String getRoleSuffix() {
-        return Utils.lastPart(role.getId(), ".");
+        return Role.getRoleSuffix(role.getId());
     }
 
     /**

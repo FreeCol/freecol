@@ -76,11 +76,8 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
         public int compare(Unit unit1, Unit unit2) {
             int deltaType = unit2.getType().compareTo(unit1.getType());
             if (deltaType == 0) {
-                if (unit2.getRole() == null) {
-                    return -1;
-                } else {
-                    return unit2.getRole().getId().compareTo(unit1.getRole().getId());
-                }
+                return (unit2.getRole() == null) ? -1
+                    : unit2.getRole().getId().compareTo(unit1.getRole().getId());
             } else {
                 return deltaType;
             }

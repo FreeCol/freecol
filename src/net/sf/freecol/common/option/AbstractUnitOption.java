@@ -171,16 +171,6 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
         role.setChoices(roles);
     }
 
-    public Role getRole(String name) {
-        if (name.indexOf('.') < 0) {
-            // @compat 0.10.7
-            // Role enum instead of Role class
-            name = "model.role." + name.toLowerCase();
-            // end @compat
-        }
-        return getSpecification().getRole(name);
-    }
-
 
     // Serialization
 

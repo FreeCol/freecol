@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Ability;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -123,6 +124,36 @@ public class Role extends BuildableType implements Comparable<Role> {
         super(id, specification);
     }
 
+
+    /**
+     * Get a message key for this role.
+     *
+     * @return A message key, which is null for the default role.
+     */
+    public String getRoleKey() {
+        return getRoleKey(getId());
+    }
+
+    /**
+     * Get the last part of a role identifier.
+     *
+     * @param roleId A role identifier.
+     * @return The role suffix.
+     */
+    public static String getRoleSuffix(String roleId) {
+        return Utils.lastPart(roleId, ".");
+    }
+
+    /**
+     * Get a message key for a given role identifier.
+     *
+     * @param roleId The role identifier to query.
+     * @return A message key, which is null for the default role.
+     */
+    public static String getRoleKey(String roleId) {
+        return ("model.role.default".equals(roleId)) ? null
+            : getRoleSuffix(roleId);
+    }
 
     /**
      * Get the downgraded role from this one.
