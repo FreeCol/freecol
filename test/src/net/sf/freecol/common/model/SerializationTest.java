@@ -175,6 +175,7 @@ public class SerializationTest extends FreeColTestCase {
     }
 
     public void testDifficulty() throws Exception {
+System.err.println("TESTDIFF");
         Specification spec1 = null;
         Specification spec2 = null;
         try {

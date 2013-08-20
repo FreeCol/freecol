@@ -160,6 +160,15 @@ public class EquipmentType extends BuildableType {
     }
 
     /**
+     * Set the role for this equipment type.
+     *
+     * @param The new equipment related <code>Role</code>.
+     */
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    /**
      * Is this military equiment?
      * (True if it grants an offensive or defensive bonus)
      *

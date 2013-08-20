@@ -72,12 +72,13 @@ public class REFTest extends FreeColTestCase {
                 continue;
             }
             if (unitType == soldierType) {
-                if ("model.role.soldier".equals(au.getRoleId())) {
+                if ("model.role.infantry".equals(au.getRoleId())) {
                     soldiersBeforeIndependence += au.getNumber();
-                } else if ("model.role.dragoon".equals(au.getRoleId())) {
+                } else if ("model.role.cavalry".equals(au.getRoleId())) {
                     dragoonsBeforeIndependence += au.getNumber();
                 } else {
-                    fail("Unknown REF role: " + au.getRoleId());
+                    fail("Unknown REF role for " + unitType.getId()
+                        + ": " + au.getRoleId());
                 }
                 continue;
             }

@@ -44,6 +44,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.FreeColGameObjectType;
+import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.AbstractUnitOption;
 import net.sf.freecol.common.option.BooleanOption;
@@ -1825,12 +1826,76 @@ public final class Specification {
         }
         getEquipmentType("model.equipment.horses")
             .addAbility(new Ability(Ability.MOUNTED));
-        getEquipmentType("model.equipment.indian.horses")
-            .addAbility(new Ability(Ability.MOUNTED));
+        EquipmentType ih = getEquipmentType("model.equipment.indian.horses");
+        ih.addAbility(new Ability(Ability.MOUNTED));
+        ih.setRole(getRole("model.role.mountedBrave")); // was scout
         getEquipmentType("model.equipment.muskets")
             .addAbility(new Ability(Ability.ARMED));
-        getEquipmentType("model.equipment.indian.muskets")
-            .addAbility(new Ability(Ability.ARMED));
+        EquipmentType im = getEquipmentType("model.equipment.indian.muskets");
+        im.addAbility(new Ability(Ability.ARMED));
+        im.setRole(getRole("model.role.armedBrave")); // was soldier
+
+        // Fix REF roles, soldier -> infantry, dragoon -> cavalry
+        // Older specs (<= 0.10.5 ?) had refSize directly under difficulty
+        // level, later moved it under the monarch group.
+        for (Option o : allOptionGroups.get("difficultyLevels").getOptions()) {
+            if (!(o instanceof OptionGroup)) continue;
+            Option monarch = ((OptionGroup)o)
+                .getOption("model.difficulty.monarch");
+            Option refSize = ((OptionGroup)((monarch != null
+                        && (monarch instanceof OptionGroup)) ? monarch : o))
+                .getOption("model.option.refSize");
+            if (refSize == null
+                || !(refSize instanceof UnitListOption)) continue;
+            for (AbstractUnit au
+                     : ((UnitListOption)refSize).getOptionValues()) {
+                if ("DEFAULT".equals(au.getRoleId())) {
+                    au.setRoleId("model.role.default");
+                } else if ("model.role.soldier".equals(au.getRoleId())
+                    || "SOLDIER".equals(au.getRoleId())) {
+                    au.setRoleId("model.role.infantry");
+                } else if ("model.role.dragoon".equals(au.getRoleId())
+                    || "DRAGOON".equals(au.getRoleId())) {
+                    au.setRoleId("model.role.cavalry");
+                }
+            }
+        }
+        // Fix all other UnitListOptions
+        List<Option> todo
+            = new ArrayList<Option>(allOptionGroups.get("difficultyLevels")
+                                                   .getOptions());
+        while (!todo.isEmpty()) {
+            Option o = todo.remove(0);
+            if (o instanceof OptionGroup) {
+                List<Option> next = ((OptionGroup)o).getOptions();
+                todo.addAll(new ArrayList<Option>(next));
+            } else if (o instanceof UnitListOption) {
+                for (AbstractUnit au : ((UnitListOption)o).getOptionValues()) {
+                    String roleId = au.getRoleId();
+                    if (roleId == null) {
+                        au.setRoleId("model.role.default");
+                    } else if (au.getRoleId().startsWith("model.role.")) {
+                        ; // OK
+                    } else if ("DEFAULT".equals(au.getRoleId())) {
+                        au.setRoleId("model.role.default");
+                    } else if ("DRAGOON".equals(au.getRoleId())) {
+                        au.setRoleId("model.role.dragoon");
+                    } else if ("MISSIONARY".equals(au.getRoleId())) {
+                        au.setRoleId("model.role.missionary");
+                    } else if ("PIONEER".equals(au.getRoleId())) {
+                        au.setRoleId("model.role.pioneer");
+                    } else if ("MISSIONARY".equals(au.getRoleId())) {
+                        au.setRoleId("model.role.missionary");
+                    } else if ("SCOUT".equals(au.getRoleId())) {
+                        au.setRoleId("model.role.scout");
+                    } else if ("SOLDIER".equals(au.getRoleId())) {
+                        au.setRoleId("model.role.soldier");
+                    } else {
+                        au.setRoleId("model.role.default");
+                    }
+                }
+            }
+        }
         // end @compat 0.10.7
     }
     // end @compat 0.10.x

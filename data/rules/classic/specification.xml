@@ -2255,12 +2255,12 @@ resources of 400, lost city rumours of 500
           <unitListOption id="model.option.refSize">
             <unitOption id="model.option.refSize.soldiers">
               <unitType value="model.unit.kingsRegular" />
-              <role value="model.role.soldier" />
+              <role value="model.role.infantry" />
               <number value="15" />
             </unitOption>
             <unitOption id="model.option.refSize.dragoons">
               <unitType value="model.unit.kingsRegular" />
-              <role value="model.role.dragoon" />
+              <role value="model.role.cavalry" />
               <number value="5" />
             </unitOption>
             <unitOption id="model.option.refSize.artillery">
@@ -2390,12 +2390,12 @@ resources of 400, lost city rumours of 500
           <unitListOption id="model.option.refSize">
             <unitOption id="model.option.refSize.soldiers">
               <unitType value="model.unit.kingsRegular" />
-              <role value="model.role.soldier" />
+              <role value="model.role.infantry" />
               <number value="23" />
             </unitOption>
             <unitOption id="model.option.refSize.dragoons">
               <unitType value="model.unit.kingsRegular" />
-              <role value="model.role.dragoon" />
+              <role value="model.role.cavalry" />
               <number value="10" />
             </unitOption>
             <unitOption id="model.option.refSize.artillery">
@@ -2520,12 +2520,12 @@ resources of 400, lost city rumours of 500
           <unitListOption id="model.option.refSize">
             <unitOption id="model.option.refSize.soldiers">
               <unitType value="model.unit.kingsRegular" />
-              <role value="model.role.soldier" />
+              <role value="model.role.infantry" />
               <number value="31" />
             </unitOption>
             <unitOption id="model.option.refSize.dragoons">
               <unitType value="model.unit.kingsRegular" />
-              <role value="model.role.dragoon" />
+              <role value="model.role.cavalry" />
               <number value="15" />
             </unitOption>
             <unitOption id="model.option.refSize.artillery">
@@ -2643,12 +2643,12 @@ resources of 400, lost city rumours of 500
           <unitListOption id="model.option.refSize">
             <unitOption id="model.option.refSize.soldiers">
               <unitType value="model.unit.kingsRegular" />
-              <role value="model.role.soldier" />
+              <role value="model.role.infantry" />
               <number value="39" />
             </unitOption>
             <unitOption id="model.option.refSize.dragoons">
               <unitType value="model.unit.kingsRegular" />
-              <role value="model.role.dragoon" />
+              <role value="model.role.cavalry" />
               <number value="20" />
             </unitOption>
             <unitOption id="model.option.refSize.artillery">
@@ -2766,12 +2766,12 @@ resources of 400, lost city rumours of 500
           <unitListOption id="model.option.refSize">
             <unitOption id="model.option.refSize.soldiers">
               <unitType value="model.unit.kingsRegular" />
-              <role value="model.role.soldier" />
+              <role value="model.role.infantry" />
               <number value="47" />
             </unitOption>
             <unitOption id="model.option.refSize.dragoons">
               <unitType value="model.unit.kingsRegular" />
-              <role value="model.role.dragoon" />
+              <role value="model.role.cavalry" />
               <number value="25" />
             </unitOption>
             <unitOption id="model.option.refSize.artillery">
@@ -2909,26 +2909,26 @@ resources of 400, lost city rumours of 500
             <template>
               <unitOption id="model.option.refSize.template">
                 <unitType value="model.unit.kingsRegular" generate="UNITS" />
-                <role value="model.role.soldier">
-                  <choice value="model.role.soldier" />
-                  <choice value="model.role.dragoon" />
+                <role value="model.role.infantry">
+                  <choice value="model.role.infantry" />
+                  <choice value="model.role.cavalry" />
                 </role>
                 <number value="20" minimumValue="0" maximumValue="999" />
               </unitOption>
             </template>
             <unitOption id="model.option.refSize.soldiers">
               <unitType value="model.unit.kingsRegular" generate="UNITS" />
-              <role value="model.role.soldier">
-                <choice value="model.role.soldier" />
-                <choice value="model.role.dragoon" />
+              <role value="model.role.infantry">
+                <choice value="model.role.infantry" />
+                <choice value="model.role.cavalry" />
               </role>
               <number value="60" minimumValue="0" maximumValue="999" />
             </unitOption>
             <unitOption id="model.option.refSize.dragoons">
               <unitType value="model.unit.kingsRegular" generate="UNITS" />
-              <role value="model.role.dragoon" >
-                <choice value="model.role.soldier" />
-                <choice value="model.role.dragoon" />
+              <role value="model.role.cavalry" >
+                <choice value="model.role.infantry" />
+                <choice value="model.role.cavalry" />
               </role>
               <number value="30" minimumValue="0" maximumValue="999" />
             </unitOption>

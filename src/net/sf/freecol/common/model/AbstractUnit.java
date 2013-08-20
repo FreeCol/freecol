@@ -125,7 +125,7 @@ public class AbstractUnit extends FreeColObject {
      *
      * @param roleId The new role identifier.
      */
-    public final void setRole(final String roleId) {
+    public final void setRoleId(final String roleId) {
         this.roleId = roleId;
     }
 
