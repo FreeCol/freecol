@@ -1746,7 +1746,7 @@ public final class Canvas extends JDesktopPane {
                 Messages.message("scoutColony.attack"),
                 ScoutColonyAction.FOREIGN_COLONY_ATTACK));
         StringTemplate template = StringTemplate.template("scoutColony.text")
-            .addStringTemplate("%unit%", Messages.getLabel(unit))
+            .addStringTemplate("%unit%", unit.getFullLabel())
             .addName("%colony%", colony.getName());
         ScoutColonyAction result =
             showChoiceDialog(unit.getTile(), Messages.message(template),

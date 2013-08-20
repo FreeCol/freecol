@@ -24,6 +24,7 @@ import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 
@@ -149,19 +150,14 @@ public class AbstractUnit extends FreeColObject {
     /**
      * Gets a description of this abstract unit.
      *
-     * @param spec A <code>Specification<code> to query.
-     * @return A label.
+     * @return A <code>StringTemplate</code> describing the abstract unit.
      */
-    public StringTemplate getLabel(Specification spec) {
-        StringTemplate result = StringTemplate.template("abstractUnit")
-            .addAmount("%number%", getNumber());
-        if ("model.role.default".equals(getRoleId())) {
-            result.add("%unit%", getUnitType(spec).getNameKey());
-        } else {
-            result.addStringTemplate("%unit%",
-                Unit.getLabel(null, getUnitType(spec), getRoleId(), getNumber()));
-        }
-        return result;
+    public StringTemplate getLabel() {
+        StringTemplate unitTemplate = Messages.getLabel(getId(), getRoleId(),
+                                                        getNumber());
+        return StringTemplate.template("abstractUnit")
+                             .addAmount("%number%", getNumber())
+                             .addStringTemplate("%unit%", unitTemplate);
     }
 
     /**

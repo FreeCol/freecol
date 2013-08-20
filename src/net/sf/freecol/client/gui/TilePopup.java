@@ -402,7 +402,7 @@ public final class TilePopup extends JPopupMenu {
         String text = (indent ? "    " : "")
             + Messages.message(StringTemplate.template("model.unit.nationUnit")
                 .addStringTemplate("%nation%", unit.getOwner().getNationName())
-                .addStringTemplate("%unit%", Messages.getLabel(unit)))
+                .addStringTemplate("%unit%", unit.getFullLabel()))
             + " (" + Messages.message(occ) + ")";
         JMenuItem menuItem = new JMenuItem(text);
         menuItem.addActionListener(new ActionListener() {

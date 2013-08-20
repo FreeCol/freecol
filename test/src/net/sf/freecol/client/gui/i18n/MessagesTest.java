@@ -30,7 +30,9 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
 
 
@@ -38,13 +40,44 @@ public class MessagesTest extends FreeColTestCase {
 
     public static final String noSuchKey = "should.not.exist.and.thus.return.null";
 
+    public static final EquipmentType bible
+        = spec().getEquipmentType("model.equipment.missionary");
+    public static final EquipmentType horses
+        = spec().getEquipmentType("model.equipment.horses");
+    public static final EquipmentType muskets
+        = spec().getEquipmentType("model.equipment.muskets");
+    public static final EquipmentType indianHorses
+        = spec().getEquipmentType("model.equipment.indian.horses");
+    public static final EquipmentType indianMuskets
+        = spec().getEquipmentType("model.equipment.indian.muskets");
+    public static final EquipmentType tools
+        = spec().getEquipmentType("model.equipment.tools");
+
+    public static final UnitType artillery
+        = spec().getUnitType("model.unit.artillery");
+    public static final UnitType brave
+        = spec().getUnitType("model.unit.brave");
+    public static final UnitType colonialRegular
+        = spec().getUnitType("model.unit.colonialRegular");
+    public static final UnitType hardyPioneer
+        = spec().getUnitType("model.unit.hardyPioneer");
+    public static final UnitType jesuitMissionary
+        = spec().getUnitType("model.unit.jesuitMissionary");
+    public static final UnitType kingsRegular
+        = spec().getUnitType("model.unit.kingsRegular");
+    public static final UnitType manOWar
+        = spec().getUnitType("model.unit.manOWar");
+    public static final UnitType veteranSoldier
+        = spec().getUnitType("model.unit.veteranSoldier");
+
+
     public void tearDown(){
         Messages.setMessageBundle(Locale.US);
     }
 
     public void testMessageString() {
 
-    	assertEquals("Press enter in order to end the turn.", Messages.message("infoPanel.endTurnPanel.text"));
+        assertEquals("Press enter in order to end the turn.", Messages.message("infoPanel.endTurnPanel.text"));
         assertEquals("Trade Advisor", Messages.message("reportTradeAction.name"));
 
         // With parameters
@@ -73,19 +106,18 @@ public class MessagesTest extends FreeColTestCase {
 
     // Tests if messages with special chars (like $) are well processed
     public void testMessageWithSpecialChars(){
-    	String errMsg = "Error setting up test.";
-    	String expected = "You establish the colony of %colony%.";
+        String errMsg = "Error setting up test.";
+        String expected = "You establish the colony of %colony%.";
         String message = Messages.message("model.history.FOUND_COLONY");
-    	assertEquals(errMsg, expected, message);
+        assertEquals(errMsg, expected, message);
 
         String colNameWithSpecialChars="$specialColName\\";
         errMsg = "Wrong message";
         expected = "You establish the colony of $specialColName\\.";
-        try{
+        try {
             message = Messages.message(StringTemplate.template("model.history.FOUND_COLONY")
                                        .addName("%colony%", colNameWithSpecialChars));
-        }
-        catch(IllegalArgumentException e){
+        } catch(IllegalArgumentException e){
             if(e.getMessage().contains("Illegal group reference")){
                 fail("Does not process messages with special chars");
             }
@@ -95,19 +127,18 @@ public class MessagesTest extends FreeColTestCase {
     }
 
     public void testStringTemplates() {
-
         Messages.setMessageBundle(Locale.US);
 
         // template with key not in message bundle
-	StringTemplate s1 = StringTemplate.key("!no.such.string.template");
+        StringTemplate s1 = StringTemplate.key("!no.such.string.template");
         assertEquals(s1.getId(), Messages.message(s1));
 
-	StringTemplate s2 = StringTemplate.key("model.tile.plains.name");
+        StringTemplate s2 = StringTemplate.key("model.tile.plains.name");
         assertEquals("Plains", Messages.message(s2));
 
-	StringTemplate t1 = StringTemplate.template("model.goods.goodsAmount")
-	    .add("%goods%", "model.goods.food.name")
-	    .addName("%amount%", "100");
+        StringTemplate t1 = StringTemplate.template("model.goods.goodsAmount")
+            .add("%goods%", "model.goods.food.name")
+            .addName("%amount%", "100");
         assertEquals(2, t1.getKeys().size());
         assertEquals(2, t1.getReplacements().size());
         assertEquals(StringTemplate.TemplateType.KEY,
@@ -117,18 +148,18 @@ public class MessagesTest extends FreeColTestCase {
         assertEquals("model.goods.goodsAmount", t1.getId());
         assertEquals("100 Food", Messages.message(t1));
 
-	StringTemplate t2 = StringTemplate.label(" / ")
-	    .add("model.goods.food.name")
-	    .addName("xyz");
+        StringTemplate t2 = StringTemplate.label(" / ")
+            .add("model.goods.food.name")
+            .addName("xyz");
         assertEquals("Food / xyz", Messages.message(t2));
 
         Game game = getGame();
-    	game.setMap(getTestMap());
-    	Colony colony = getStandardColony();
+        game.setMap(getTestMap());
+        Colony colony = getStandardColony();
         assertEquals("New Amsterdam", colony.getName());
 
-	StringTemplate t3 = StringTemplate.template("inLocation")
-	    .addName("%location%", colony.getName());
+        StringTemplate t3 = StringTemplate.template("inLocation")
+            .addName("%location%", colony.getName());
         assertEquals("In New Amsterdam", Messages.message(t3));
 
         StringTemplate t4 = StringTemplate.label("")
@@ -336,95 +367,100 @@ public class MessagesTest extends FreeColTestCase {
 
     public void testLabels() {
         Game game = getStandardGame();
-        Player dutch = game.getPlayer("model.nation.dutch");
-
-        EquipmentType muskets = spec().getEquipmentType("model.equipment.muskets");
-        EquipmentType horses = spec().getEquipmentType("model.equipment.horses");
-        EquipmentType tools = spec().getEquipmentType("model.equipment.tools");
-        EquipmentType bible = spec().getEquipmentType("model.equipment.missionary");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        ServerPlayer dutchREF = new ServerPlayer(game, "dutchREF", false,
+            dutch.getNation().getREFNation(), null, null);
+        ServerPlayer sioux = (ServerPlayer)game.getPlayer("model.nation.sioux");
+        Unit unit;
 
         // King's regulars
-        Unit unit = new ServerUnit(game, null, dutch, spec().getUnitType("model.unit.kingsRegular"));
-        assertEquals("King's Regular", Messages.message(Messages.getLabel(unit)));
+        unit = new ServerUnit(game, null, dutchREF, kingsRegular);
+        assertEquals("King's Regular", Messages.message(unit.getLabel()));
 
         unit.changeEquipment(muskets, 1);
-        assertEquals("Infantry", Messages.message(Messages.getLabel(unit)));
+        assertEquals(spec().getRole("model.role.infantry"), unit.getRole());
+        assertEquals("Infantry", Messages.message(unit.getLabel()));
 
         unit.changeEquipment(horses, 1);
-        assertEquals("Cavalry", Messages.message(Messages.getLabel(unit)));
+        assertEquals(spec().getRole("model.role.cavalry"), unit.getRole());
+        assertEquals("Cavalry", Messages.message(unit.getLabel()));
 
         // Colonial regulars
-        unit = new ServerUnit(game, null, dutch, spec().getUnitType("model.unit.colonialRegular"));
-        assertEquals("Colonial Regular", Messages.message(Messages.getLabel(unit)));
+        unit = new ServerUnit(game, null, dutch, colonialRegular);
+        assertEquals("Colonial Regular", Messages.message(unit.getLabel()));
 
         unit.changeEquipment(muskets, 1);
-        assertEquals("Continental Army", Messages.message(Messages.getLabel(unit)));
+        assertEquals("Continental Army", Messages.message(unit.getLabel()));
 
         unit.changeEquipment(horses, 1);
-        assertEquals("Continental Cavalry", Messages.message(Messages.getLabel(unit)));
+        assertEquals("Continental Cavalry", Messages.message(unit.getLabel()));
 
         // Veteran Soldiers
-        unit = new ServerUnit(game, null, dutch, spec().getUnitType("model.unit.veteranSoldier"));
+        unit = new ServerUnit(game, null, dutch, veteranSoldier);
         assertEquals(1, unit.getEquipment().getCount(muskets));
-        assertEquals("Veteran Soldier", Messages.message(Messages.getLabel(unit)));
+        assertEquals("Veteran Soldier", Messages.message(unit.getFullLabel()));
 
         unit.changeEquipment(muskets, -1);
-        assertEquals("Veteran Soldier (no muskets)", Messages.message(Messages.getLabel(unit)));
+        assertEquals("Veteran Soldier (no muskets)",
+                     Messages.message(unit.getFullLabel()));
 
         unit.changeEquipment(horses, 1);
         unit.changeEquipment(muskets, 1);
-        assertEquals("Veteran Dragoon", Messages.message(Messages.getLabel(unit)));
+        assertEquals("Veteran Dragoon", Messages.message(unit.getLabel()));
 
         // Indian Braves
-        unit = new ServerUnit(game, null, dutch, spec().getUnitType("model.unit.brave"));
-        assertEquals(0, unit.getEquipment().getCount(muskets));
-        assertEquals("Brave", Messages.message(Messages.getLabel(unit)));
+        unit = new ServerUnit(game, null, sioux, brave);
+        assertEquals(0, unit.getEquipment().getCount(indianMuskets));
+        assertEquals("Brave", Messages.message(unit.getLabel()));
 
-        unit.changeEquipment(muskets, 1);
-        assertEquals("Armed Brave", Messages.message(Messages.getLabel(unit)));
+        unit.changeEquipment(indianMuskets, 1);
+        assertEquals("Armed Brave", Messages.message(unit.getLabel()));
 
-        unit.changeEquipment(horses, 1);
-        assertEquals("Indian Dragoon", Messages.message(Messages.getLabel(unit)));
+        unit.changeEquipment(indianHorses, 1);
+        assertEquals("Native Dragoon", Messages.message(unit.getLabel()));
 
         // Hardy Pioneers
-        unit = new ServerUnit(game, null, dutch, spec().getUnitType("model.unit.hardyPioneer"));
+        unit = new ServerUnit(game, null, dutch, hardyPioneer);
         assertEquals(5, unit.getEquipment().getCount(tools));
-        assertEquals("Hardy Pioneer", Messages.message(Messages.getLabel(unit)));
+        assertEquals("Hardy Pioneer", Messages.message(unit.getLabel()));
 
         unit.changeEquipment(tools, -5);
-        assertEquals("Hardy Pioneer (no tools)", Messages.message(Messages.getLabel(unit)));
+        assertEquals("Hardy Pioneer (no tools)",
+                     Messages.message(unit.getFullLabel()));
 
         // Jesuit Missionaries
-        unit = new ServerUnit(game, null, dutch, spec().getUnitType("model.unit.jesuitMissionary"));
+        unit = new ServerUnit(game, null, dutch, jesuitMissionary);
         assertEquals(1, unit.getEquipment().getCount(bible));
-        assertEquals("Jesuit Missionary", Messages.message(Messages.getLabel(unit)));
+        assertEquals("Jesuit Missionary", Messages.message(unit.getLabel()));
 
         unit.changeEquipment(bible, -1);
-        assertEquals("Jesuit Missionary (not commissioned)", Messages.message(Messages.getLabel(unit)));
+        assertEquals("Jesuit Missionary (not commissioned)",
+                     Messages.message(unit.getFullLabel()));
 
         // REF addition message
-        StringTemplate template = StringTemplate.template("model.monarch.action.ADD_TO_REF")
-            .addAmount("%number%", 1)
-            .add("%unit%", spec().getUnitType("model.unit.kingsRegular").getNameKey());
-        String expected = "The Crown has added 1 King's Regular to the Royal Expeditionary Force."
+        StringTemplate template
+            = StringTemplate.template("model.monarch.action.ADD_TO_REF")
+                            .addAmount("%number%", 1)
+                            .add("%unit%", kingsRegular.getNameKey());
+        String expected = "The Crown has added 1 King's Regular"
+            + " to the Royal Expeditionary Force."
             + " Colonial leaders express concern.";
         assertEquals(expected, Messages.message(template));
 
         template = StringTemplate.template("model.monarch.action.ADD_TO_REF")
-            .addAmount("%number%", 2)
-            .add("%unit%", spec().getUnitType("model.unit.artillery").getNameKey());
-        expected = "The Crown has added 2 Pieces of Artillery to the Royal Expeditionary Force."
+                                 .addAmount("%number%", 2)
+                                 .add("%unit%", artillery.getNameKey());
+        expected = "The Crown has added 2 Pieces of Artillery"
+            + " to the Royal Expeditionary Force."
             + " Colonial leaders express concern.";
         assertEquals(expected, Messages.message(template));
 
         template = StringTemplate.template("model.monarch.action.ADD_TO_REF")
-            .addAmount("%number%", 3)
-            .add("%unit%", spec().getUnitType("model.unit.manOWar").getNameKey());
-        expected = "The Crown has added 3 Men of War to the Royal Expeditionary Force."
+                                 .addAmount("%number%", 3)
+                                 .add("%unit%", manOWar.getNameKey());
+        expected = "The Crown has added 3 Men of War"
+            + " to the Royal Expeditionary Force."
             + " Colonial leaders express concern.";
         assertEquals(expected, Messages.message(template));
-
     }
-
-
 }

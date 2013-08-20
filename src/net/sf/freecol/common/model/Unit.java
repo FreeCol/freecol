@@ -260,37 +260,42 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Get a description of a unit by name, type, role and number.
+     * Get a string template for a unit in a human readable form.  The
+     * label consists of up to three items:
+     * - The type of the unit
+     * - A role if not the default
+     * - The specific name of the unit if it has one
      *
-     * @param name The unit name, if any.
-     * @param type The <code>UnitType</code>.
-     * @param roleId The role identifier.
-     * @param number A unit count.
-     * @return A <code>StringTemplate</code> describing a <code>Unit</code>.
+     * @return The <code>StringTemplate</code> to describe the given unit.
      */
-    public static StringTemplate getLabel(String name, UnitType type,
-                                          String roleId, int number) {
-        StringTemplate result;
-        if ("model.role.default".equals(roleId)) {
-            result = StringTemplate.label(" ")
-                .add(type.getNameKey());
-        } else {
-            String key = "model.unit." + Utils.lastPart(roleId, ".") + ".name";
-            result = StringTemplate.template(key)
-                .addAmount("%number%", number)
-                .add("%unit%", type.getNameKey());
-            if (name != null) result.addName(name);
-        }
+    public StringTemplate getLabel() {
+        StringTemplate result = Messages.getLabel(getType().getId(),
+                                                  getRole().getId(), 1);
+        if (getName() != null) result.addName(" ").addName(getName());
         return result;
     }
 
     /**
-     * Get a description of this unit.
+     * Get a string template for a unit in a human readable form.  The
+     * label consists of the three items of getLabel() plus extra
+     * information about treasure (for treasure trains) or missing
+     * expected equipment.
      *
-     * @return A <code>StringTemplate</code> describing this <code>Unit</code>.
+     * @return The <code>StringTemplate</code> to describe the given unit.
      */
-    public StringTemplate getLabel() {
-        return getLabel(name, getType(), getRole().getId(), 1);
+    public StringTemplate getFullLabel() {
+        StringTemplate result = getLabel();
+        String infoKey = (canCarryTreasure())
+            ? Integer.toString(getTreasureAmount())
+            : (getEquipment().isEmpty())
+            ? ((getType().getDefaultEquipmentType() == null)
+                ? null
+                : getType().getDefaultEquipmentType().getId() + ".none")
+            : null;
+        if (infoKey != null) {
+            result.addName(" (").add(infoKey).addName(")");
+        }
+        return result;
     }
 
     /**
@@ -3176,7 +3181,7 @@ public class Unit extends GoodsLocation
 
         return (leavingColony)
             ? StringTemplate.template("abandonEducation.text")
-            .addStringTemplate("%unit%", Messages.getLabel(this))
+            .addStringTemplate("%unit%", getFullLabel())
             .addName("%colony%", getColony().getName())
             .add("%building%", school.getNameKey())
             .addName("%action%", (teacher)
@@ -3184,7 +3189,7 @@ public class Unit extends GoodsLocation
                 : Messages.message("abandonEducation.action.studying"))
             : (teacher)
             ? StringTemplate.template("abandonTeaching.text")
-            .addStringTemplate("%unit%", Messages.getLabel(this))
+            .addStringTemplate("%unit%", getFullLabel())
             .add("%building%", school.getNameKey())
             : null;
     }
@@ -3527,7 +3532,7 @@ public class Unit extends GoodsLocation
     @Override
     public StringTemplate getLocationName() {
         return StringTemplate.template("onBoard")
-            .addStringTemplate("%unit%", getLabel());
+            .addStringTemplate("%unit%", this.getLabel());
     }
 
     /**

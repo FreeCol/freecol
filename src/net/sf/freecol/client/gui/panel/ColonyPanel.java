@@ -1746,7 +1746,7 @@ public final class ColonyPanel extends PortPanel
                     setToolTipText(tileMsg);
                 } else {
                     String unitMsg
-                        = Messages.message(Messages.getLabel(unit.getUnit()));
+                        = Messages.message(unit.getUnit().getFullLabel());
                     if (toAdd) unitMsg = tileMsg + " [" + unitMsg + "]";
                     unit.setDescriptionLabel(unitMsg);
                 }
@@ -1902,7 +1902,7 @@ public final class ColonyPanel extends PortPanel
                             < best.getPotentialProduction(workType, unit.getType()))) {
                         StringTemplate template
                             = StringTemplate.template("colonyPanel.notBestTile")
-                            .addStringTemplate("%unit%", Messages.getLabel(unit))
+                            .addStringTemplate("%unit%", unit.getFullLabel())
                             .add("%goods%", workType.getNameKey())
                             .addStringTemplate("%tile%", best.getLabel());
                         getGUI().showInformationMessage(best, template);

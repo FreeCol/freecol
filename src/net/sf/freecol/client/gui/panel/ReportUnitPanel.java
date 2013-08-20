@@ -221,7 +221,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
                                                        unit.getRole().getId());
         JButton button = getLinkButton("", icon, unit.getLocation().getId());
         button.addActionListener(this);
-        String toolTip = Messages.message(Messages.getLabel(unit));
+        String toolTip = Messages.message(unit.getFullLabel());
         if (unit.getDestination() != null) {
             String type = unit.isPerson()
                 ? "person"

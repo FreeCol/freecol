@@ -179,7 +179,7 @@ public class CargoPanel extends FreeColPanel
             border.setTitle(Messages.message("cargoOnCarrier"));
         } else {
             StringTemplate t = StringTemplate.template("cargoOnCarrierLong")
-                .addStringTemplate("%name%", Messages.getLabel(carrier))
+                .addStringTemplate("%name%", carrier.getFullLabel())
                 .addAmount("%space%", carrier.getSpaceLeft());
             border.setTitle(Messages.message(t));
         }

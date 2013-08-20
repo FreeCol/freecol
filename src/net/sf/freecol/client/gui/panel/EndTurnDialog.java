@@ -75,7 +75,7 @@ public final class EndTurnDialog extends FreeColDialog<Boolean> implements ListS
 
         public UnitWrapper(Unit unit) {
             this.unit = unit;
-            name = Messages.message(Messages.getLabel(unit));
+            name = Messages.message(unit.getFullLabel());
             location = Messages.message(unit.getLocation().getLocationName());
         }
 

@@ -622,100 +622,38 @@ public class Messages {
         return id;
     }
 
-
     /**
-     * Returns the name of a unit in a human readable format. The
-     * label consists of up to three items: If the unit has a role
-     * other than the unit type's default role, the current role, the
-     * proper name of the unit and the unit's type. Otherwise, the
-     * unit's type, the proper name of the unit, and additional
-     * information about gold (in the case of treasure trains), or
-     * equipment.
+     * Get a label for a unit given the type and role identifiers and
+     * the number of units.  This is the fundamental routine called
+     * from Unit and AbstractUnit.getLabel().
      *
-     * @param unit an <code>Unit</code> value
-     * @return A label to describe the given unit
-     */
-    public static StringTemplate getLabel(Unit unit) {
-        String typeKey = null;
-        String infoKey = null;
-
-        if (unit.canCarryTreasure()) {
-            typeKey = unit.getType().getNameKey();
-            infoKey = Integer.toString(unit.getTreasureAmount());
-        } else {
-            String key;
-            if ("model.role.default".equals(unit.getRole().getId())) {
-                key = "name";
-            } else if (unit.getRole().getId().startsWith("model.role.")) {
-                key = unit.getRole().getId().substring(11);
-            } else {
-                key = unit.getRole().getId();
-            }
-            String messageID = unit.getType().getId() + "." + key;
-            if (containsKey(messageID)) {
-                typeKey = messageID;
-                if ((unit.getEquipment() == null || unit.getEquipment().isEmpty()) &&
-                    unit.getType().getDefaultEquipmentType() != null) {
-                    infoKey = unit.getType().getDefaultEquipmentType().getId() + ".none";
-                }
-            } else {
-                typeKey = "model.unit.role." + key;
-                infoKey = unit.getType().getNameKey();
-            }
-        }
-
-        StringTemplate result = StringTemplate.label(" ")
-            .add(typeKey);
-        if (unit.getName() != null) {
-            result.addName(unit.getName());
-        }
-        if (infoKey != null) {
-            result.addStringTemplate(StringTemplate.label("")
-                                     .addName("(")
-                                     .add(infoKey)
-                                     .addName(")"));
-        }
-        return result;
-    }
-
-
-    /**
-     * Returns the name of a unit in a human readable format. The return value
-     * can be used when communicating with the user.
-     *
-     * @param someType an <code>UnitType</code> value
+     * @param typeId The unit type identifier.
      * @param roleId The unit role identifier.
-     * @param count an <code>int</code> value
-     * @return The given unit type as a String
+     * @param number The number of units.
+     * @return A <code>StringTemplate</code> to describe the given unit.
      */
-    public static String getLabel(UnitType someType, String roleId, int count) {
-        String key = ("model.role.default".equals(roleId))
-            ? someType.getId() + ".name"
-            : "model.unit.role." + Utils.lastPart(roleId, ".") + ".name";
-        return message(StringTemplate.template(key)
-            .addAmount("%number%", count)
-            .addName("%unit%", someType));
-    }
-
-    /**
-     * Returns the name of a unit in a human readable format. The return value
-     * can be used when communicating with the user.
-     *
-     * @param unit an <code>AbstractUnit</code> value
-     * @return The given unit type as a String
-     */
-    public static String getLabel(AbstractUnit au) {
-        String key = au.getRoleId();
-        if ("model.role.default".equals(au.getRoleId())) {
-            key = "name";
-        }
-        String messageID = au.getId() + "." + key;
-        if (containsKey(messageID)) {
-            return message(messageID);
+    public static StringTemplate getLabel(String typeId, String roleId,
+                                          int number) {
+        // Check for special role-specific key, which will not have a
+        // %role% argument.  These exist so we can avoid mentioning
+        // the role twice, e.g. "Seasoned Scout Scout".
+        String baseKey = typeId + "." + Role.getRoleSuffix(roleId);
+        StringTemplate result;
+        if (containsKey(baseKey)) {
+            result = StringTemplate.template(baseKey)
+                                   .addAmount("%number%", number);
         } else {
-            return message(StringTemplate.template("model.unit." + key + ".name")
-                           .addName("%unit%", au));
+            baseKey = typeId + ".name";
+            StringTemplate roleTemplate = StringTemplate.label("");
+            String roleKey = Role.getRoleKey(roleId);
+            if (roleKey != null) {
+                roleTemplate.addName(" ").add(roleKey);
+            }
+            result = StringTemplate.template(baseKey)
+                                   .addAmount("%number%", number)
+                                   .addStringTemplate("%role%", roleTemplate);
         }
+        return StringTemplate.label("").addStringTemplate(result);
     }
 
     /**
@@ -732,12 +670,16 @@ public class Messages {
             : ">" + Integer.toString(-turns);
     }
 
+    /**
+     * Get the new land name for a player.
+     *
+     * @param player The <code>Player</code> to query.
+     * @return The new land name of a player.
+     */
     public static String getNewLandName(Player player) {
-        if (player.getNewLandName() == null) {
-            return message(player.getNationId() + ".newLandName");
-        } else {
-            return player.getNewLandName();
-        }
+        return (player.getNewLandName() == null)
+            ? message(player.getNationId() + ".newLandName")
+            : player.getNewLandName();
     }
 
 

@@ -395,7 +395,7 @@ public final class UnitLabel extends JLabel
         ImageLibrary lib = gui.getImageLibrary();
         setIcon(lib.getUnitImageIcon(unit));
         setDisabledIcon(lib.getUnitImageIcon(unit, true));
-        setDescriptionLabel(Messages.message(Messages.getLabel(unit)));
+        setDescriptionLabel(Messages.message(unit.getFullLabel()));
         StringTemplate label = unit.getEquipmentLabel();
         if (label != null) {
             setDescriptionLabel(getDescriptionLabel() + " ("

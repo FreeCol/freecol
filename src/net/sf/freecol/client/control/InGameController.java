@@ -569,7 +569,7 @@ public final class InGameController implements NetworkConstants {
             ModelMessage m = new ModelMessage(MessageType.GOODS_MOVEMENT,
                                               "tradeRoute.prefix", unit)
                 .addName("%route%", tr.getName())
-                .addStringTemplate("%unit%", Messages.getLabel(unit))
+                .addStringTemplate("%unit%", unit.getFullLabel())
                 .addName("%data%", sb.toString());
             if (messages != null) {
                 messages.add(m);
@@ -744,7 +744,7 @@ public final class InGameController implements NetworkConstants {
                 case ClientOptions.UNLOAD_OVERFLOW_RESPONSE_ASK:
                     StringTemplate template
                         = StringTemplate.template("traderoute.warehouseCapacity")
-                        .addStringTemplate("%unit%", Messages.getLabel(unit))
+                        .addStringTemplate("%unit%", unit.getFullLabel())
                         .addName("%colony%", locName)
                         .addName("%amount%", overflow)
                         .add("%goods%", goods.getNameKey());
@@ -1941,14 +1941,14 @@ public final class InGameController implements NetworkConstants {
         if (newType == null) {
             gui.showInformationMessage(unit,
                 StringTemplate.template("clearSpeciality.impossible")
-                .addStringTemplate("%unit%", Messages.getLabel(unit)));
+                .addStringTemplate("%unit%", unit.getFullLabel()));
             return;
         }
 
         Tile tile = (gui.isShowingSubPanel()) ? null : unit.getTile();
         if (!gui.showConfirmDialog(tile,
                 StringTemplate.template("clearSpeciality.areYouSure")
-                .addStringTemplate("%oldUnit%", Messages.getLabel(unit))
+                .addStringTemplate("%oldUnit%", unit.getFullLabel())
                 .add("%unit%", newType.getNameKey()),
                 "yes", "no")) {
             return;
@@ -2089,7 +2089,7 @@ public final class InGameController implements NetworkConstants {
                     StringTemplate.template("equipUnit.impossible")
                         .addName("%colony", colony.getName())
                         .add("%equipment%", type.getNameKey())
-                        .addStringTemplate("%unit%", Messages.getLabel(unit)));
+                        .addStringTemplate("%unit%", unit.getFullLabel()));
                 return;
             }
         }
@@ -2360,7 +2360,7 @@ public final class InGameController implements NetworkConstants {
             StringTemplate dst = destination.getLocationNameFor(player);
             gui.showInformationMessage(unit,
                 StringTemplate.template("selectDestination.failed")
-                .addStringTemplate("%unit%", Messages.getLabel(unit))
+                .addStringTemplate("%unit%", unit.getFullLabel())
                 .addStringTemplate("%location%", src)
                 .addStringTemplate("%destination%", dst));
             return false;
@@ -2469,7 +2469,7 @@ public final class InGameController implements NetworkConstants {
                 gui.showInformationMessage(unit,
                     StringTemplate.template("move.noAccessGoods")
                     .addStringTemplate("%nation%", nation)
-                    .addStringTemplate("%unit%", Messages.getLabel(unit)));
+                    .addStringTemplate("%unit%", unit.getFullLabel()));
             }
             break;
         case MOVE_NO_ACCESS_LAND:
@@ -2485,7 +2485,7 @@ public final class InGameController implements NetworkConstants {
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
                 gui.showInformationMessage(unit,
                     StringTemplate.template("move.noAccessSettlement")
-                    .addStringTemplate("%unit%", Messages.getLabel(unit))
+                    .addStringTemplate("%unit%", unit.getFullLabel())
                     .addStringTemplate("%nation%", nation));
             }
             break;
@@ -2494,7 +2494,7 @@ public final class InGameController implements NetworkConstants {
                 gui.playSound("sound.event.illegalMove");
                 gui.showInformationMessage(unit,
                     StringTemplate.template("move.noAccessSkill")
-                    .addStringTemplate("%unit%", Messages.getLabel(unit)));
+                    .addStringTemplate("%unit%", unit.getFullLabel()));
             }
             break;
         case MOVE_NO_ACCESS_TRADE:
@@ -2520,7 +2520,7 @@ public final class InGameController implements NetworkConstants {
                 gui.playSound("sound.event.illegalMove");
                 gui.showInformationMessage(unit,
                     StringTemplate.template("move.noAccessWater")
-                    .addStringTemplate("%unit%", Messages.getLabel(unit)));
+                    .addStringTemplate("%unit%", unit.getFullLabel()));
             }
             break;
         case MOVE_NO_ATTACK_MARINE:
@@ -2528,7 +2528,7 @@ public final class InGameController implements NetworkConstants {
                 gui.playSound("sound.event.illegalMove");
                 gui.showInformationMessage(unit,
                     StringTemplate.template("move.noAttackWater")
-                    .addStringTemplate("%unit%", Messages.getLabel(unit)));
+                    .addStringTemplate("%unit%", unit.getFullLabel()));
             }
             break;
         case MOVE_NO_MOVES:
@@ -2544,7 +2544,7 @@ public final class InGameController implements NetworkConstants {
                 gui.playSound("sound.event.illegalMove");
                 gui.showInformationMessage(unit,
                     StringTemplate.template("move.noTile")
-                    .addStringTemplate("%unit%", Messages.getLabel(unit)));
+                    .addStringTemplate("%unit%", unit.getFullLabel()));
             }
             break;
         default:
@@ -2637,7 +2637,7 @@ public final class InGameController implements NetworkConstants {
             }
             List<ChoiceItem<Unit>> choices = new ArrayList<ChoiceItem<Unit>>();
             for (Unit dUnit : disembarkable) {
-                choices.add(new ChoiceItem<Unit>(Messages.message(Messages.getLabel(dUnit)), dUnit));
+                choices.add(new ChoiceItem<Unit>(Messages.message(dUnit.getFullLabel()), dUnit));
             }
             if (disembarkable.size() > 1) {
                 choices.add(new ChoiceItem<Unit>(Messages.message("all"), unit));
@@ -2689,7 +2689,7 @@ public final class InGameController implements NetworkConstants {
         List<ChoiceItem<Unit>> choices = new ArrayList<ChoiceItem<Unit>>();
         for (Unit u : destinationTile.getUnitList()) {
             if (u.canAdd(unit)) {
-                String m = Messages.message(Messages.getLabel(u));
+                String m = Messages.message(u.getFullLabel());
                 choices.add(new ChoiceItem<Unit>(m, u));
                 carrier = u; // Save a default
             }
@@ -2814,7 +2814,7 @@ public final class InGameController implements NetworkConstants {
         } else if (!unit.getType().canBeUpgraded(skill, ChangeType.NATIVES)) {
             gui.showInformationMessage(settlement,
                 StringTemplate.template("indianSettlement.cantLearnSkill")
-                .addStringTemplate("%unit%", Messages.getLabel(unit))
+                .addStringTemplate("%unit%", unit.getFullLabel())
                 .add("%skill%", skill.getNameKey()));
         } else if (gui.showConfirmDialog(unit.getTile(),
                 StringTemplate.template("learnSkill.text")
@@ -3807,7 +3807,7 @@ public final class InGameController implements NetworkConstants {
         if (unit.getTradeRoute() != null) {
             StringTemplate template
                 = StringTemplate.template("traderoute.reassignRoute")
-                .addStringTemplate("%unit%", Messages.getLabel(unit))
+                .addStringTemplate("%unit%", unit.getFullLabel())
                 .addName("%route%", unit.getTradeRoute().getName());
             if (!gui.showConfirmDialog(unit.getTile(), template,
                     "yes", "no")) return false;

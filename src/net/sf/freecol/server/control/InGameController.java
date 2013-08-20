@@ -971,7 +971,7 @@ public final class InGameController extends Controller {
         StringTemplate template = StringTemplate.label(base);
         Specification spec = getGame().getSpecification();
         for (AbstractUnit au : units) {
-            template.addStringTemplate(au.getLabel(spec));
+            template.addStringTemplate(au.getLabel());
         }
         return template;
     }

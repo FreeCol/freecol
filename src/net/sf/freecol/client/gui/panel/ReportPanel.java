@@ -166,7 +166,7 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
         if (count == 0) {
             unitLabel.setForeground(Color.GRAY);
         }
-        unitLabel.setToolTipText(Messages.getLabel(unitType, roleId, count));
+        unitLabel.setToolTipText(Messages.message(au.getLabel()));
         return unitLabel;
     }
 
