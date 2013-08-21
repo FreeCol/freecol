@@ -80,7 +80,8 @@ public class IndianDemandMessage extends DOMMessage {
     public IndianDemandMessage(Game game, Element element) {
         this.unitId = element.getAttribute("unit");
         this.colonyId = element.getAttribute("colony");
-        this.typeId = element.getAttribute("type");
+        this.typeId = (!element.hasAttribute("type")) ? null
+            : element.getAttribute("type");
         this.amount = element.getAttribute("amount");
         this.result = element.getAttribute("result");
     }
