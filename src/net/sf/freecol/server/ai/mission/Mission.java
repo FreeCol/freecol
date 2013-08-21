@@ -429,6 +429,7 @@ public abstract class Mission extends AIObject {
      * - MOVE_ILLEGAL if the unit is unable to proceed for now
      * - MOVE_NO_MOVES is underway but short of the target
      * - MOVE_NO_REPAIR if the unit died for whatever reason
+     * - MOVE_NO_TILE if there is no path (usually transitory on rivers)
      * - other legal results (e.g. ENTER_INDIAN_SETTLEMENT*) if that would
      *   occur if the unit proceeded.  Such moves require special handling
      *   and are not performed here, the calling mission code must
@@ -494,8 +495,7 @@ public abstract class Mission extends AIObject {
             throw new IllegalStateException("Unit not on the map: " + unit);
         } else if (target instanceof Europe) {
             if (!unit.getOwner().canMoveToEurope()) {
-                logger.fine(logMe + " impossible move to Europe"
-                    + ": " + this);
+                logger.fine(logMe + " impossible move to Europe: " + this);
                 return MoveType.MOVE_ILLEGAL;
             }
             if (unit.getType().canMoveToHighSeas()
@@ -517,7 +517,7 @@ public abstract class Mission extends AIObject {
             if (unit.getType().canMoveToHighSeas() || unit.isOnCarrier()) {
                 logger.fine(logMe + " no path from " + unit.getLocation()
                     + " to " + target + ": " + this);
-                return MoveType.MOVE_ILLEGAL;
+                return MoveType.MOVE_NO_TILE;
             }
             AIUnit newAICarrier = aiUnit.getTransport();
             if (newAICarrier == null) {

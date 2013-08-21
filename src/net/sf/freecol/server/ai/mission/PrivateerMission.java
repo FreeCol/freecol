@@ -415,7 +415,7 @@ public class PrivateerMission extends Mission {
         case MOVE: case MOVE_HIGH_SEAS: case MOVE_NO_MOVES:
         case MOVE_NO_REPAIR:
             return;
-        case MOVE_ILLEGAL: // Can happen when another unit blocks a river
+        case MOVE_NO_TILE: // Can happen when another unit blocks a river
             logger.finest(tag + " hit unexpected blockage: " + this);
             moveRandomly(tag, null);
             unit.setMovesLeft(0);

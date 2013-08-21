@@ -1605,7 +1605,12 @@ public class TransportMission extends Mission {
             logger.info(tag + " travelling: " + toFullString());
             Unit.MoveType mt = travelToTarget(tag, target, costDecider);
             switch (mt) {
-            case MOVE_NO_MOVES: case MOVE_HIGH_SEAS:
+            case MOVE_HIGH_SEAS: case MOVE_NO_MOVES: case MOVE_NO_REPAIR:
+                return;
+            case MOVE_NO_TILE: // Can happen when another unit blocks a river
+                logger.finest(tag + " hit unexpected blockage: " + this);
+                moveRandomly(tag, null);
+                carrier.setMovesLeft(0);
                 return;
             case ATTACK_UNIT:
                 Location blocker = resolveBlockage(aiCarrier, target);

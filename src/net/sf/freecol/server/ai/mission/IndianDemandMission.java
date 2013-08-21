@@ -369,7 +369,7 @@ public class IndianDemandMission extends Mission {
             Unit.MoveType mt = travelToTarget(tag, target, null);
             Direction d;
             switch (mt) {
-            case MOVE_NO_MOVES:
+            case MOVE_NO_MOVES: case MOVE_NO_REPAIR:
                 return;
             case ATTACK_SETTLEMENT:
                 d = unit.getTile().getDirection(target.getTile());

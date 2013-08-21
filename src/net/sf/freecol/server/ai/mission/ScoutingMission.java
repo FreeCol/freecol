@@ -426,7 +426,8 @@ public class ScoutingMission extends Mission {
         Unit.MoveType mt = travelToTarget(tag, getTarget(),
             CostDeciders.avoidSettlementsAndBlockingUnits());
         switch (mt) {
-        case MOVE_ILLEGAL: case MOVE_NO_MOVES: case MOVE_NO_REPAIR:
+        case MOVE_ILLEGAL:
+        case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
             return;
         case ATTACK_UNIT:
             // Could be adjacent to the destination but it is

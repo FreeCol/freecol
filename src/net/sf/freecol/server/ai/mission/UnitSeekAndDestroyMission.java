@@ -484,7 +484,8 @@ public class UnitSeekAndDestroyMission extends Mission {
         Unit.MoveType mt = travelToTarget(tag, currentTarget,
             CostDeciders.avoidSettlementsAndBlockingUnits());
         switch (mt) {
-        case MOVE_NO_MOVES: case MOVE_ILLEGAL:
+        case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
+        case MOVE_ILLEGAL:
             break;
         case ATTACK_UNIT: case ATTACK_SETTLEMENT:
             Tile unitTile = unit.getTile();

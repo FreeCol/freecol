@@ -619,7 +619,7 @@ public class PioneeringMission extends Mission {
         // Going to a tile to perform an improvement.
         Unit.MoveType mt = travelToTarget(tag, getTarget(), costDecider);
         switch (mt) {
-        case MOVE_NO_MOVES:
+        case MOVE_NO_MOVES: case MOVE_NO_REPAIR:
             return;
         case MOVE_ILLEGAL: case MOVE_NO_ATTACK_CIVILIAN:
             // Might be a temporary blockage due to an occupying unit
