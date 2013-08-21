@@ -23,7 +23,7 @@ blockitstate=y
 
 blockit () {
     if test "$blockitstate" = "y" ; then
-        echo -n "       "
+        echo -n "     "
         blockitstate=n
     else
         echo
@@ -38,7 +38,7 @@ section () {
 statit () {
     statitMEAN=0 ; statitSD=0
     eval `$STATS | sed -n -e 's/^n=[^ ]* *mean=\([^ ]*\) *sd=\(.*\)$/statitMEAN="\1";statitSD="\2"/p' -`
-    printf "%8.3f ~ %8.3f" "$statitMEAN" "$statitSD"
+    printf "%9.3f ~ %8.3f" "$statitMEAN" "$statitSD"
 }
 
 tmp=`mktemp btan.XXXXXXXX`
