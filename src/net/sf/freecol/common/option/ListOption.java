@@ -263,7 +263,7 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
             if (modId != null) {
                 FreeColModFile fcmf = Mods.getModFile(modId);
                 if (fcmf != null) {
-                    ModOption modOption = new ModOption(modId);
+                    ModOption modOption = new ModOption(getSpecification());
                     modOption.setValue(fcmf);
                     addMember((AbstractOption<T>)modOption);
                 }

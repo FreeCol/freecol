@@ -46,29 +46,10 @@ public class ModOption extends AbstractOption<FreeColModFile> {
     /**
      * Creates a new <code>ModOption</code>.
      *
-     * @param id The object identifier.
-     */
-    public ModOption(String id) {
-        super(id);
-    }
-
-    /**
-     * Creates a new <code>ModOption</code>.
-     *
      * @param specification The <code>Specification</code> to refer to.
      */
     public ModOption(Specification specification) {
         super(specification);
-    }
-
-    /**
-     * Creates a new <code>ModOption</code>.
-     *
-     * @param id The object identifier.
-     * @param specification The <code>Specification</code> to refer to.
-     */
-    public ModOption(String id, Specification specification) {
-        super(id, specification);
     }
 
 
@@ -88,7 +69,8 @@ public class ModOption extends AbstractOption<FreeColModFile> {
      * {@inheritDoc}
      */
     public ModOption clone() {
-        ModOption result = new ModOption(getId());
+        ModOption result = new ModOption(getSpecification());
+        result.setId(this.getId());
         result.setValues(this);
         return result;
     }
@@ -110,6 +92,7 @@ public class ModOption extends AbstractOption<FreeColModFile> {
     public void setValue(FreeColModFile value) {
         final FreeColModFile oldValue = this.value;
         this.value = value;
+        setId(value.getId());
 
         if (isDefined && value != oldValue) {
             firePropertyChange(VALUE_TAG, oldValue, value);
@@ -176,9 +159,7 @@ public class ModOption extends AbstractOption<FreeColModFile> {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
-        sb.append("[").append(getId())
-            .append(" value=").append(value.getId())
-            .append("]");
+        sb.append("[").append(getId()).append("]");
         return sb.toString();
     }
 

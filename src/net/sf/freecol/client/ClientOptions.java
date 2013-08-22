@@ -621,18 +621,13 @@ public class ClientOptions extends OptionGroup {
      */
     @SuppressWarnings("unchecked")
     public List<FreeColModFile> getActiveMods() {
-        final Collection<FreeColModFile> fcmfs = Mods.getAllMods();
         List<FreeColModFile> active = new ArrayList<FreeColModFile>();
         ModListOption option = (ModListOption)getOption(ClientOptions.USER_MODS);
         if (option != null) {
             for (FreeColModFile modInfo : option.getOptionValues()) {
                 if (modInfo != null) {
-                    for (FreeColModFile f : fcmfs) {
-                        if (modInfo.getId().equals(f.getId())) {
-                            active.add(f);
-                            break;
-                        }
-                    }
+                    FreeColModFile f = Mods.getFreeColModFile(modInfo.getId());
+                    if (f != null) active.add(f);
                 }
             }
         }

@@ -72,7 +72,9 @@ public class Mods {
             for (File f : directory.listFiles(MOD_FILTER)) {
                 try {
                     FreeColModFile fcmf = new FreeColModFile(f);
-                    if (fcmf != null) allMods.put(fcmf.getId(), fcmf);
+                    if (fcmf != null) {
+                        allMods.put(fcmf.getId(), fcmf);
+                    }
                 } catch (IOException e) {
                     logger.log(Level.WARNING, "Bad mod in " + f.getName(), e);
                 }
@@ -110,6 +112,16 @@ public class Mods {
      */
     public static Collection<FreeColModFile> getAllMods() {
         return allMods.values();
+    }
+
+    /**
+     * Get a mod by id.
+     *
+     * @param id The mod file identifier to look for.
+     * @return The <code>FreeColModFile</code> found, or null if none present.
+     */
+    public static FreeColModFile getFreeColModFile(String id) {
+        return allMods.get(id);
     }
 
     /**
