@@ -131,7 +131,7 @@ public class DebugUtils {
         List<ChoiceItem<BuildingType>> buildings
             = new ArrayList<ChoiceItem<BuildingType>>();
         for (BuildingType b : game.getSpecification().getBuildingTypeList()) {
-            String msg = Messages.message(b.toString() + ".name");
+            String msg = Messages.message(b.getNameKey());
             buildings.add(new ChoiceItem<BuildingType>(msg, b));
         }
         BuildingType buildingType
@@ -338,7 +338,7 @@ public class DebugUtils {
 
         List<ChoiceItem<UnitType>> uts = new ArrayList<ChoiceItem<UnitType>>();
         for (UnitType t : sSpec.getUnitTypeList()) {
-            String msg = Messages.message(t.toString() + ".name");
+            String msg = Messages.message(t.getNameKey());
             uts.add(new ChoiceItem<UnitType>(msg, t));
         }
         UnitType unitChoice = gui.showChoiceDialog(null, "Select Unit Type",
@@ -388,7 +388,7 @@ public class DebugUtils {
             = new ArrayList<ChoiceItem<GoodsType>>();
         for (GoodsType t : sSpec.getGoodsTypeList()) {
             if (t.isFoodType() && t != sSpec.getPrimaryFoodType()) continue;
-            String msg = Messages.message(t.toString() + ".name");
+            String msg = Messages.message(t.getNameKey());
             gtl.add(new ChoiceItem<GoodsType>(msg, t));
         }
         GoodsType goodsType = gui.showChoiceDialog(null, "Select Goods Type",
@@ -866,7 +866,7 @@ public class DebugUtils {
             = new ArrayList<ChoiceItem<GoodsType>>();
         for (GoodsType t : spec.getGoodsTypeList()) {
             if (t.isFoodType() && t != spec.getPrimaryFoodType()) continue;
-            String msg = Messages.message(t.toString() + ".name");
+            String msg = Messages.message(t.getNameKey());
             gtl.add(new ChoiceItem<GoodsType>(msg, t));
         }
         GoodsType goodsType = freeColClient.getGUI().showChoiceDialog(null,
