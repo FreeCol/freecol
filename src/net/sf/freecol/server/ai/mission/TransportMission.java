@@ -373,6 +373,8 @@ public class TransportMission extends Mission {
                         this.turns = path.getLastNode().getTotalTurns();
                         this.target = upLoc(path.getLastNode().getLocation());
                     }
+                } else if (goods.getLocation() instanceof Unit) {
+                    return "goods-already-collected";
                 } else {
                     path = carrier.findPath(goods.getLocation());
                     if (path == null) {
