@@ -640,20 +640,19 @@ public class Messages {
         String baseKey = typeId + "." + Role.getRoleSuffix(roleId);
         StringTemplate result;
         if (containsKey(baseKey)) {
-            result = StringTemplate.template(baseKey)
-                                   .addAmount("%number%", number);
-        } else {
-            baseKey = typeId + ".name";
-            StringTemplate roleTemplate = StringTemplate.label("");
-            String roleKey = Role.getRoleKey(roleId);
-            if (roleKey != null) {
-                roleTemplate.addName(" ").add(roleKey);
-            }
-            result = StringTemplate.template(baseKey)
-                                   .addAmount("%number%", number)
-                                   .addStringTemplate("%role%", roleTemplate);
+            return StringTemplate.label("")
+                .addStringTemplate(StringTemplate.template(baseKey)
+                    .addAmount("%number%", number));
         }
-        return StringTemplate.label("").addStringTemplate(result);
+        StringTemplate baseTemplate
+            = StringTemplate.template(typeId + ".name")
+                .addAmount("%number%", number);
+        StringTemplate roleTemplate = StringTemplate.label("");
+        String roleKey = Role.getRoleKey(roleId);
+        if (roleKey != null) roleTemplate.addName(" ").add(roleKey);
+        return StringTemplate.label("")
+            .addStringTemplate(baseTemplate)
+            .addStringTemplate(roleTemplate);
     }
 
     /**
