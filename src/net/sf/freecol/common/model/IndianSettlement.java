@@ -1242,7 +1242,9 @@ public class IndianSettlement extends Settlement {
 
             xw.writeAttribute(CONVERT_PROGRESS_TAG, convertProgress);
 
-            xw.writeAttribute(LEARNABLE_SKILL_TAG, learnableSkill);
+            if (learnableSkill != null) {
+                xw.writeAttribute(LEARNABLE_SKILL_TAG, learnableSkill);
+            }
 
             for (int i = 0; i < wantedGoods.length; i++) {
                 if (wantedGoods[i] != null) {
@@ -1255,9 +1257,14 @@ public class IndianSettlement extends Settlement {
             Player hated = pet.getMostHated();
             if (hated != null) xw.writeAttribute(MOST_HATED_TAG, hated);
 
-            xw.writeAttribute(LEARNABLE_SKILL_TAG, pet.getSkill());
+            // Special handling for skill and wanted goods which are
+            // only visible when in close contact with the settlement.
+            UnitType skill = getTile().getLearnableSkill(xw.getClientPlayer());
+            if (skill != null) {
+                xw.writeAttribute(LEARNABLE_SKILL_TAG, skill);
+            }
 
-            GoodsType[] wanted = pet.getWantedGoods();
+            GoodsType[] wanted = getTile().getWantedGoods(xw.getClientPlayer());
             if (wanted != null) {
                 int i, j = 0;
                 for (i = 0; i < wanted.length; i++) {

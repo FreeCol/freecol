@@ -2479,7 +2479,7 @@ public class Player extends FreeColGameObject implements Nameable {
         }
         return best;
     }
-         
+
 
     //
     // Messages and history

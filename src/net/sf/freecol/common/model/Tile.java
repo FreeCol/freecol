@@ -54,6 +54,43 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     private static final Logger logger = Logger.getLogger(Tile.class.getName());
 
     /**
+     * Information that is internal to the native settlements, and only
+     * updated on close contact.
+     */
+    private class IndianSettlementInternals {
+
+        /** The skill taught at the settlement. */
+        public UnitType skill = null;
+
+        /** The goods the settlement is interested in. */
+        public GoodsType[] wantedGoods = null;
+
+        /** Update the internal information from a native settlement. */
+        public void update(IndianSettlement indianSettlement) {
+            this.skill = indianSettlement.getLearnableSkill();
+            if (this.wantedGoods == null) {
+                this.wantedGoods = new GoodsType[IndianSettlement.WANTED_GOODS_COUNT];
+            }
+            setValues(indianSettlement.getLearnableSkill(),
+                      indianSettlement.getWantedGoods());
+        }
+
+        /** Set the internal values. */
+        public void setValues(UnitType skill, GoodsType[] wanted) {
+            this.skill = skill;
+            if (wanted == null) {
+                this.wantedGoods = null;
+            } else {
+                if (this.wantedGoods == null) {
+                    this.wantedGoods = new GoodsType[IndianSettlement.WANTED_GOODS_COUNT];
+                }
+                System.arraycopy(wanted, 0, this.wantedGoods, 0,
+                    Math.min(wanted.length, this.wantedGoods.length));
+            }
+        }
+    }
+
+    /**
      * This must be distinct from ColonyTile/Building.UNIT_CHANGE or
      * the colony panel can get confused.
      */
@@ -136,9 +173,11 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     private int contiguity = -1;
 
     /**
-     * Stores each player's view of this tile.  Only non-null in the server.
+     * Stores each player's view of this tile.  Only non-null in the
+     * server.
      */
-    private final java.util.Map<Player, PlayerExploredTile> playerExploredTiles;
+    private java.util.Map<Player, PlayerExploredTile> playerExploredTiles;
+    private java.util.Map<Player, IndianSettlementInternals> playerIndianSettlements;
 
 
     /**
@@ -158,9 +197,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         this.owningSettlement = null;
         this.settlement = null;
 
-        this.playerExploredTiles = (game.isInServer())
-            ? new HashMap<Player, PlayerExploredTile>()
-            : null;
+        initializePlayerView(game);
     }
 
     /**
@@ -174,9 +211,14 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public Tile(Game game, String id) {
         super(game, id);
 
-        this.playerExploredTiles = (game.isInServer())
-            ? new HashMap<Player, PlayerExploredTile>()
-            : null;
+        initializePlayerView(game);
+    }
+
+    private void initializePlayerView(Game game) {
+        if (!game.isInServer()) return;
+        this.playerExploredTiles = new HashMap<Player, PlayerExploredTile>();
+        this.playerIndianSettlements
+            = new HashMap<Player, IndianSettlementInternals>();
     }
 
 
@@ -479,6 +521,18 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public PlayerExploredTile getPlayerExploredTile(Player player) {
         return (playerExploredTiles == null) ? null
             : playerExploredTiles.get(player);
+    }
+
+    /**
+     * Gets the <code>IndianSettlementInternals</code> for the given player.
+     *
+     * @param player The <code>Player</code> to query.
+     * @return The <code>IndianSettlementInternals</code> for the given player,
+     *     or null if none present.
+     */
+    private IndianSettlementInternals getPlayerIndianSettlement(Player player) {
+        return (playerIndianSettlements == null) ? null
+            : playerIndianSettlements.get(player);
     }
 
 
@@ -1332,9 +1386,50 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @param player The <code>Player</code>.
      */
     public void updateIndianSettlement(Player player) {
-        if (playerExploredTiles == null || !player.isEuropean()) return;
-        getPlayerExploredTile(player).updateInternals();
+        if (playerIndianSettlements == null || !player.isEuropean()) return;
+        IndianSettlementInternals isi = getPlayerIndianSettlement(player);
+        IndianSettlement is = getIndianSettlement();
+        if (is == null) {
+            if (isi != null) playerIndianSettlements.remove(player);
+        } else {
+            if (isi == null) {
+                isi = new IndianSettlementInternals();
+                playerIndianSettlements.put(player, isi);
+            }
+            isi.update(is);
+        }
     }
+
+    public UnitType getLearnableSkill(Player player) {
+        IndianSettlementInternals isi = getPlayerIndianSettlement(player);
+        return (isi == null) ? null : isi.skill;
+    }
+
+    public GoodsType[] getWantedGoods(Player player) {
+        IndianSettlementInternals isi = getPlayerIndianSettlement(player);
+        return (isi == null) ? null : isi.wantedGoods;
+    }
+
+    // @compat 0.10.7
+    /**
+     * Backward compatibility hack for PlayerExploredTiles to set
+     * native settlement information.  Do not check the current map
+     * state as we might leak destruction information.
+     *
+     * @param player The <code>Player</code> to pet belonged to.
+     * @param skill The skill taught by the settlement.
+     * @param wanted The goods wanted by the settlement.
+     */
+    public void setIndianSettlementInternals(Player player, UnitType skill,
+                                             GoodsType[] wanted) {
+        IndianSettlementInternals isi = getPlayerIndianSettlement(player);
+        if (isi == null) {
+            isi = new IndianSettlementInternals();
+            playerIndianSettlements.put(player, isi);
+        }
+        isi.setValues(skill, wanted);
+    }
+    // end @compat 0.10.7
 
     /**
      * Checks if this <code>Tile</code> has been explored by the given

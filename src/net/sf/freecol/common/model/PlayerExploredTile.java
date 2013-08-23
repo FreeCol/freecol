@@ -45,30 +45,6 @@ public class PlayerExploredTile extends FreeColGameObject {
 
     private static final Logger logger = Logger.getLogger(PlayerExploredTile.class.getName());
 
-    /**
-     * Information that is internal to the native settlements, and only
-     * updated on close contact.
-     */
-    private class IndianSettlementInternals {
-
-        /** The skill taught at the settlement. */
-        public UnitType skill = null;
-
-        /** The goods the settlement is interested in. */
-        public GoodsType[] wantedGoods = null;
-
-        /** Update the internal information from a native settlement. */
-        public void update(IndianSettlement indianSettlement) {
-            this.skill = indianSettlement.getLearnableSkill();
-            if (this.wantedGoods == null) {
-                this.wantedGoods = new GoodsType[IndianSettlement.WANTED_GOODS_COUNT];
-            }
-            GoodsType[] wanted = indianSettlement.getWantedGoods();
-            System.arraycopy(wanted, 0, this.wantedGoods, 0,
-                             Math.min(wanted.length, this.wantedGoods.length));
-        }
-    }
-            
 
     /** The owner of this view. */
     private Player player;
@@ -93,9 +69,6 @@ public class PlayerExploredTile extends FreeColGameObject {
     private Unit missionary = null;
     private Tension alarm = null;
     private Player mostHated = null;
-
-    // Invisible IndianSettlement data.
-    private IndianSettlementInternals nativeInternals = null;
 
 
     /**
@@ -153,25 +126,9 @@ public class PlayerExploredTile extends FreeColGameObject {
         if (is == null) {
             missionary = null;
             alarm = null;
-            nativeInternals = null;
         } else {
             missionary = is.getMissionary();
             alarm = is.getAlarm(player);
-        }
-    }
-
-    /**
-     * Update the native settlement internals.
-     */
-    public void updateInternals() {
-        IndianSettlement is = tile.getIndianSettlement();
-        if (is == null) {
-            nativeInternals = null;
-        } else {
-            if (nativeInternals == null) {
-                nativeInternals = new IndianSettlementInternals();
-            }
-            nativeInternals.update(is);
         }
     }
 
@@ -224,14 +181,6 @@ public class PlayerExploredTile extends FreeColGameObject {
 
     public Tension getAlarm() {
         return alarm;
-    }
-
-    public UnitType getSkill() {
-        return (nativeInternals == null) ? null : nativeInternals.skill;
-    }
-
-    public GoodsType[] getWantedGoods() {
-        return (nativeInternals == null) ? null : nativeInternals.wantedGoods;
     }
 
 
@@ -323,19 +272,6 @@ public class PlayerExploredTile extends FreeColGameObject {
         if (mostHated != null) {
             xw.writeAttribute(MOST_HATED_TAG, mostHated.getId());
         }
-
-        if (nativeInternals != null) {
-            if (nativeInternals.skill != null) {
-                xw.writeAttribute(LEARNABLE_SKILL_TAG, nativeInternals.skill);
-            }
-
-            if (nativeInternals.wantedGoods != null) {
-                for (int i = 0; i < nativeInternals.wantedGoods.length; i++) {
-                    xw.writeAttribute(WANTED_GOODS_TAG + i,
-                        nativeInternals.wantedGoods[i]);
-                }
-            }
-        }
     }
 
     /**
@@ -398,26 +334,26 @@ public class PlayerExploredTile extends FreeColGameObject {
         mostHated = xr.makeFreeColGameObject(game, MOST_HATED_TAG,
                                              Player.class, false);
 
-        boolean natives = false;
-        UnitType skill = xr.getType(spec, LEARNABLE_SKILL_TAG,
-                                    UnitType.class, (UnitType)null);
 
-        GoodsType[] wanted = new GoodsType[IndianSettlement.WANTED_GOODS_COUNT];
-        for (int i = 0; i < IndianSettlement.WANTED_GOODS_COUNT; i++) {
-            wanted[i] = xr.getType(spec, WANTED_GOODS_TAG + i,
-                                   GoodsType.class, (GoodsType)null);
-            natives = wanted[i] != null;
-        }
+        // @compat 0.10.7
+        IndianSettlement is = tile.getIndianSettlement();
+        if (is != null) {
+            UnitType skill = xr.getType(spec, LEARNABLE_SKILL_TAG,
+                                        UnitType.class, (UnitType)null);
 
-        if (natives || skill != null) {
-            if (nativeInternals == null) {
-                nativeInternals = new IndianSettlementInternals();
+            boolean natives = skill != null;
+            GoodsType[] wanted = new GoodsType[IndianSettlement.WANTED_GOODS_COUNT];
+            for (int i = 0; i < IndianSettlement.WANTED_GOODS_COUNT; i++) {
+                wanted[i] = xr.getType(spec, WANTED_GOODS_TAG + i,
+                                       GoodsType.class, (GoodsType)null);
+                natives |= wanted[i] != null;
             }
-            nativeInternals.skill = skill;
-            nativeInternals.wantedGoods = wanted;
-        } else {
-            nativeInternals = null;
+            
+            if (natives) {
+                tile.setIndianSettlementInternals(player, skill, wanted);
+            }
         }
+        // end @compat
     }
 
     /**
