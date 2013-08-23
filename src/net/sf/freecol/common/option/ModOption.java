@@ -109,7 +109,13 @@ public class ModOption extends AbstractOption<FreeColModFile> {
     @Override
     protected void setValue(String valueString, String defaultValueString) {
         String id = (valueString != null) ? valueString : defaultValueString;
-        setValue(Mods.getModFile(id));
+        FreeColModFile fcmf = Mods.getModFile(id);
+        if (fcmf == null) {
+            logger.warning("Could not find mod for option: " + id);
+        } else {
+            setValue(fcmf);
+        }
+
     }
 
     /**
