@@ -96,48 +96,11 @@ public class PlayerExploredTile extends FreeColGameObject {
 
 
     /**
-     * Update this PlayerExploredTile with the current state of its tile.
-     */
-    public void update() {
-        owner = tile.getOwner();
-        owningSettlement = tile.getOwningSettlement();
-
-        if (tileItems != null) tileItems.clear();
-        TileItemContainer tic = tile.getTileItemContainer();
-        if (tic != null) {
-            for (TileItem ti : tic.getImprovements()) addTileItem(ti);
-            if (tic.getResource() != null) {
-                addTileItem(tic.getResource());
-            }
-            if (tic.getLostCityRumour() != null) {
-                addTileItem(tic.getLostCityRumour());
-            }
-        }
-
-        Colony colony = tile.getColony();
-        if (colony == null) {
-            colonyUnitCount = -1;
-            colonyStockadeKey = null;
-        } else {
-            colonyUnitCount = colony.getDisplayUnitCount();
-            colonyStockadeKey = colony.getTrueStockadeKey();
-        }
-        IndianSettlement is = tile.getIndianSettlement();
-        if (is == null) {
-            missionary = null;
-            alarm = null;
-        } else {
-            missionary = is.getMissionary();
-            alarm = is.getAlarm(player);
-        }
-    }
-
-    /**
      * Get the tile items in this pet.
      *
      * @return A list of <code>TileItems</code>.
      */
-    public List<TileItem> getTileItems() {
+    private List<TileItem> getTileItems() {
         if (tileItems == null) return Collections.emptyList();
         return tileItems;
     }
@@ -147,85 +110,78 @@ public class PlayerExploredTile extends FreeColGameObject {
      *
      * @param item The <code>TileItem</code> to add.
      */
-    public void addTileItem(TileItem item) {
+    private void addTileItem(TileItem item) {
         if (tileItems == null) tileItems = new ArrayList<TileItem>();
         tileItems.add(item);
     }
 
-
-    // Trivial public accessors.
-
-    public Player getOwner() {
-        return owner;
-    }
-
-    public Settlement getOwningSettlement() {
-        return owningSettlement;
-    }
-
-    public int getColonyUnitCount() {
-        return colonyUnitCount;
-    }
-
-    public String getColonyStockadeKey() {
-        return colonyStockadeKey;
-    }
-
-    public Unit getMissionary() {
-        return missionary;
-    }
-
-    public Player getMostHated() {
-        return mostHated;
-    }
-
-    public Tension getAlarm() {
-        return alarm;
-    }
-
-
-    // Temporary hack
-
-    public void setMissionary(Unit missionary) {
-        this.missionary = missionary;
-    }
-
-
+    // @compat 0.10.7
     /**
-     * Check for any integrity problems.
-     *
-     * @param fix Fix problems if possible.
-     * @return Negative if there are problems remaining, zero if
-     *     problems were fixed, positive if no problems found at all.
+     * Use this PET so set an approximation to the correct cached
+     * tile.  This is impossible in general, and will only happen once
+     * when converting an old saved game, but at least try to do
+     * something credible.
      */
-    public int checkIntegrity(boolean fix) {
-        int result = 1;
-        if (tileItems != null) {
-            for (TileItem ti : new ArrayList<TileItem>(tileItems)) {
-                int integ = ti.checkIntegrity(fix);
-                if (fix) {
-                    // @compat 0.10.5
-                    // Somewhere around 0.10.5 there were maps with LCRs
-                    // that reference the wrong tile.
-                    if (ti.getTile() != tile) {
-                        logger.warning("Fixing improvement tile at: " + tile
-                                       + " / " + ti.getId());
-                        ti.setLocation(tile);
-                        integ = Math.min(integ, 0);
-                    }
-                    // end @compat
-                    if (integ < 0) {
-                        logger.warning("Removing broken improvement at: "
-                                       + tile);
-                        tileItems.remove(ti);
-                    }
+    public void fixCache() {
+        Tile copied = tile.getTileToCache();
+        boolean ok = true;
+        if (tile.getOwner() != owner) {
+            copied.setOwner(owner);
+            ok = false;
+        }
+
+        if (tile.getOwningSettlement() != owningSettlement) {
+            copied.setOwningSettlement(owningSettlement);
+            ok = false;
+        }
+
+        List<TileItem> ti = (copied.getTileItemContainer() == null) ? null
+            : copied.getTileItemContainer().getTileItems();
+        if ((ti == null) != (tileItems == null)
+            || (ti != null && ti.size() != tileItems.size())) {
+            // Not trying too hard to match up the tile items
+            ok = false;
+        }
+
+        Settlement ts = copied.getSettlement();
+        if (ts instanceof Colony) {
+            if (colonyUnitCount <= 0 && colonyStockadeKey == null) {
+                copied.setSettlement(null);
+            } else {
+                Colony colony = (Colony)ts;
+                if (colonyUnitCount != colony.getUnitCount()) {
+                    colony.setDisplayUnitCount(colonyUnitCount);
+                    ok = false;
                 }
-                result = Math.min(result, integ);
+                if (colonyStockadeKey != null
+                    && !colonyStockadeKey.equals(colony.getStockadeKey())) {
+                    colony.setStockadeKey(colonyStockadeKey);
+                    ok = false;
+                }
+            }
+        } else if (ts instanceof IndianSettlement) {
+            if (missionary == null && mostHated == null && alarm == null) {
+                copied.setSettlement(null);
+            } else {
+                IndianSettlement is = (IndianSettlement)ts;
+                if (missionary != is.getMissionary()) {
+                    // Do not try to be clever with a unit that might be gone.
+                    is.setMissionary(null);
+                    ok = false;
+                }
+                if (mostHated != is.getMostHated()) {
+                    is.setMostHated(mostHated);
+                    ok = false;
+                }
+                if (alarm != is.getAlarm(player)) {
+                    is.setAlarm(player, alarm);
+                    ok = false;
+                }
             }
         }
-        return result;
+        tile.setCachedTile(player, (ok) ? tile : copied);
     }
-
+        
 
     // Serialization
     

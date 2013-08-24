@@ -306,30 +306,33 @@ public class ServerGame extends Game implements ServerModelObject {
             sb.append(" ]\n=> ").append(weakestAIPlayer.getName())
                 .append(" cedes to ").append(strongestAIPlayer.getName())
                 .append(":");
+            List<Tile> tiles = new ArrayList<Tile>();
             ServerPlayer strongest = (ServerPlayer)strongestAIPlayer;
             ServerPlayer weakest = (ServerPlayer)weakestAIPlayer;
-            List<Tile> tiles = new ArrayList<Tile>();
             for (Player player : getPlayers()) {
                 if (!player.isIndian()) continue;
                 for (IndianSettlement is : player.getIndianSettlements()) {
                     if (!is.hasMissionary(weakest)) continue;
                     sb.append(" ").append(is.getName()).append("(mission)");
-                    is.setContacted(strongest);
+                    is.getTile().cacheUnseen(strongest);//+til
+                    tiles.add(is.getTile());
+                    is.setContacted(strongest);//-til
                     is.getMissionary().changeOwner(strongest);//-vis(both),-til
                     cs.add(See.only(strongest),
                            strongest.exploreForSettlement(is));
-                    Tile tile = is.getTile();
-                    tile.updateIndianSettlement(strongest);
-                    tile.updatePlayerExploredTiles();//+til
+                    is.getTile().updateIndianSettlement(strongest);
                     cs.add(See.perhaps().always(strongest), is);
                 }
             }
             for (Colony colony : weakest.getColonies()) {
+                for (Tile t : colony.getOwnedTiles()) {
+                    t.cacheUnseen();//+til
+                    tiles.add(t);
+                }
                 ((ServerColony)colony).changeOwner(strongest);//-vis(both),-til
                 cs.add(See.only(strongest),
                        strongest.exploreForSettlement(colony));
                 sb.append(" ").append(colony.getName());
-                tiles.addAll(colony.getOwnedTiles());
             }
             for (Unit unit : weakest.getUnits()) {
                 unit.changeOwner(strongest); //-vis(both)
@@ -361,9 +364,6 @@ public class ServerGame extends Game implements ServerModelObject {
                                  .addStringTemplate("%loserNation%", loser)
                                  .addStringTemplate("%nation%", winner));
             setSpanishSuccession(true);
-            for (Tile t : tiles) {
-                t.updatePlayerExploredTiles();//+til
-            }
             cs.addPartial(See.all(), this, "spanishSuccession");
             cs.add(See.perhaps(), tiles);
 

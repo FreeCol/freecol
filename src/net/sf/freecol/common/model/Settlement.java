@@ -189,7 +189,6 @@ public abstract class Settlement extends GoodsLocation
      * Gets this settlement's line of sight value.
      *
      * @return The line of sight value.
-     * @see Player#canSee(Tile)
      */
     public int getLineOfSight() {
         return (int)applyModifier((float)getType().getVisibleRadius(),
@@ -461,6 +460,8 @@ public abstract class Settlement extends GoodsLocation
     /**
      * Sets the name of this <code>Settlement</code>.
      *
+     * -til: Changes the tile appearance.
+     *
      * @param newName The new name.
      */
     public void setName(String newName) {
@@ -481,6 +482,7 @@ public abstract class Settlement extends GoodsLocation
      * {@inheritDoc}
      *
      * -vis: Changes visibility.
+     * -til: Changes tile appearance.
      */
     public void setOwner(Player player) {
         this.owner = player;
@@ -690,7 +692,6 @@ public abstract class Settlement extends GoodsLocation
 
         xw.writeAttribute(NAME_TAG, getName());
 
-        // TODO: Not owner, it is subject to PlayerExploredTile handling?
         xw.writeAttribute(OWNER_TAG, owner);
 
         xw.writeAttribute(TILE_TAG, tile);

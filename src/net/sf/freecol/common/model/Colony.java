@@ -825,6 +825,15 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
+     * Sets the stockade key.
+     *
+     * @param key A new value for the stockade key.
+     */
+    public void setStockadeKey(String key) {
+        this.stockadeKey = key;
+    }
+
+    /**
      * Gets the true stockade key, as should be visible to the owner
      * or a player that can see this colony.
      *
@@ -1568,19 +1577,6 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
-     * Gets the total number of units in the work locations.
-     *
-     * @return The number of <code>Unit</code>s in the work locations.
-     */
-    public int getWorkLocationUnitCount() {
-        int count = 0;
-        for (WorkLocation w : getCurrentWorkLocations()) {
-            count += w.getUnitCount();
-        }
-        return count;
-    }
-
-    /**
      * Gets the apparent number of units at this colony.
      * Used in client enemy colonies
      *
@@ -1588,6 +1584,17 @@ public class Colony extends Settlement implements Nameable {
      */
     public int getDisplayUnitCount() {
         return (displayUnitCount > 0) ? displayUnitCount : getUnitCount();
+    }
+
+    /**
+     * Sets the apparent number of units at this colony.
+     * Used in client enemy colonies
+     *
+     * @param count The new apparent number of <code>Unit</code>s at
+     *     this colony.
+     */
+    public void setDisplayUnitCount(int count) {
+        this.displayUnitCount = count;
     }
 
 
@@ -2556,7 +2563,7 @@ public class Colony extends Settlement implements Nameable {
      * {@inheritDoc}
      */
     public float getDefenceRatio() {
-        return getTotalDefencePower() / (1 + getWorkLocationUnitCount());
+        return getTotalDefencePower() / (1 + getUnitCount());
     }
 
     /**
@@ -2658,7 +2665,6 @@ public class Colony extends Settlement implements Nameable {
 
         xw.writeAttribute(ESTABLISHED_TAG, established.getNumber());
 
-        PlayerExploredTile pet;
         if (xw.validFor(getOwner())) {
 
             xw.writeAttribute(SONS_OF_LIBERTY_TAG, sonsOfLiberty);
@@ -2677,13 +2683,12 @@ public class Colony extends Settlement implements Nameable {
 
             xw.writeAttribute(LAND_LOCKED_TAG, landLocked);
 
-        } else if ((pet = getTile().getPlayerExploredTile(xw.getClientPlayer())) != null) {
-            if (pet.getColonyUnitCount() > 0) {
-                xw.writeAttribute(UNIT_COUNT_TAG, pet.getColonyUnitCount());
-            }
+        } else {
 
-            if (pet.getColonyStockadeKey() != null) {
-                xw.writeAttribute(STOCKADE_KEY_TAG, pet.getColonyStockadeKey());
+            xw.writeAttribute(UNIT_COUNT_TAG, getUnitCount());
+
+            if (hasStockade()) {
+                xw.writeAttribute(STOCKADE_KEY_TAG, getStockadeKey());
             }
         }
     }

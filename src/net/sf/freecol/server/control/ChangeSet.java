@@ -366,9 +366,9 @@ public class ChangeSet {
         }
 
         /**
-         * Should a player perhaps be notified of this attack?
-         * Do not use ServerPlayer.canSeeUnit because that gives a false
-         * negative for units in settlements, which should be animated.
+         * Should a player perhaps be notified of this attack?  Do not
+         * use canSeeUnit because that gives a false negative for
+         * units in settlements, which should be animated.
          *
          * @param serverPlayer The <code>ServerPlayer</code> to notify.
          * @return True if the player should be notified.
@@ -396,14 +396,14 @@ public class ChangeSet {
             element.setAttribute("attackerTile", attackerTile.getId());
             element.setAttribute("defenderTile", defenderTile.getId());
             element.setAttribute("success", Boolean.toString(success));
-            if (!serverPlayer.canSeeUnit(attacker)) {
+            if (!canSeeUnit(serverPlayer, attacker)) {
                 element.appendChild(attacker.toXMLElement(doc, serverPlayer));
                 if (attacker.getLocation() instanceof Unit) {
                     Unit loc = (Unit)attacker.getLocation();
                     element.appendChild(loc.toXMLElement(doc, serverPlayer));
                 }
             }
-            if (!serverPlayer.canSeeUnit(defender)) {
+            if (!canSeeUnit(serverPlayer, defender)) {
                 // Disclose fully.  If scoped to serverPlayer
                 // insufficient information is serialized when inside
                 // a settlement, but combat animation is an exception
@@ -584,7 +584,7 @@ public class ChangeSet {
         }
 
         private boolean seeNew(ServerPlayer serverPlayer) {
-            return serverPlayer.canSeeUnit(unit);
+            return canSeeUnit(serverPlayer, unit);
         }
 
 
@@ -730,7 +730,7 @@ public class ChangeSet {
             if (fcgo instanceof Unit) {
                 // Units have a precise test, use that rather than
                 // the more general interface-based tests.
-                return serverPlayer.canSeeUnit((Unit)fcgo);
+                return canSeeUnit(serverPlayer, (Unit)fcgo);
             }
             // If we own it, we can see it.
             if (fcgo instanceof Ownable && serverPlayer.owns((Ownable)fcgo)) {
@@ -1104,7 +1104,8 @@ public class ChangeSet {
             // Have to tack on two copies of the settlement tile.
             // One full version, one ordinary version to restore.
             element.appendChild(tile.toXMLElement(doc));
-            element.appendChild(tile.toXMLElement(doc, serverPlayer));
+            element.appendChild(tile.getCachedTile(serverPlayer)
+                .toXMLElement(doc, serverPlayer));
             return element;
         }
 
@@ -1644,6 +1645,23 @@ public class ChangeSet {
     }
 
     // Conversion of a change set to a corresponding element.
+
+    /**
+     * Checks if a player can see a unit.
+     *
+     * @param player The <code>ServerPlayer</code> looking for the unit.
+     * @param unit The <code>Unit</code> to check.
+     * @return True if the <code>Unit</code> is visible to the player.
+     */
+    private static boolean canSeeUnit(ServerPlayer serverPlayer, Unit unit) {
+        Tile tile;
+        return (serverPlayer.owns(unit)) ? true
+            : ((tile = unit.getTile()) == null) ? false
+            : (!serverPlayer.canSee(tile)) ? false
+            : (tile.hasSettlement()) ? false
+            : (unit.isOnCarrier()) ? false
+            : true;
+    }
 
     /**
      * Collapse one element into another.

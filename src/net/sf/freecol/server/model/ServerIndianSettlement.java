@@ -316,10 +316,11 @@ public class ServerIndianSettlement extends IndianSettlement
      */
     public void csModifyAlarm(Player player, int add, boolean propagate,
                               ChangeSet cs) {
+        Tile copied = getTile().getTileToCache();
         boolean change = changeAlarm(player, add);//-til
-        if (change && player.hasExplored(getTile())) {
+        if (change) {
+            getTile().cacheUnseen(copied);//+til
             cs.add(See.perhaps(), this);
-            getTile().updatePlayerExploredTiles();//+til
         }
 
         if (propagate) {
@@ -343,10 +344,13 @@ public class ServerIndianSettlement extends IndianSettlement
      * @param cs A <code>ChangeSet</code> to update.
      */
     public void csChangeMissionary(Unit missionary, ChangeSet cs) {
-        Tile tile = getTile();
         Unit old = getMissionary();
-        ServerPlayer oldOwner = null, newOwner = null;
+        if (missionary == old) return;
+        Tile tile = getTile();
+        ServerPlayer oldOwner = null, newOwner = (missionary == null) ? null
+            : (ServerPlayer)missionary.getOwner();
 
+        tile.cacheUnseen(newOwner);//+til
         if (old != null) {
             oldOwner = (ServerPlayer)old.getOwner(); 
             setMissionary(null);//-vis(oldOwner),-til
@@ -356,7 +360,6 @@ public class ServerIndianSettlement extends IndianSettlement
         }
 
         if (missionary != null) {
-            newOwner = (ServerPlayer)missionary.getOwner();
             setMissionary(missionary);//-vis(newOwner)
             // Take the missionary off the map, and give it a fake
             // location at the settlement, bypassing the normal
@@ -367,7 +370,6 @@ public class ServerIndianSettlement extends IndianSettlement
             tile.updateIndianSettlement(newOwner);
         }
 
-        tile.updatePlayerExploredTiles();//+til
         if (oldOwner != null) oldOwner.invalidateCanSeeTiles();//+vis(oldOwner)
         if (newOwner != null) newOwner.invalidateCanSeeTiles();//+vis(newOwner)
     }

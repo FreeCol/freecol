@@ -33,7 +33,6 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.PlayerExploredTile;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Layer;
 
@@ -583,18 +582,8 @@ public class TileItemContainer extends FreeColGameObject {
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        PlayerExploredTile pet;
-        if (xw.canSee(tile)) {
-
-            for (TileItem item : tileItems) {
-                item.toXML(xw);
-            }
-
-        } else if ((pet = tile.getPlayerExploredTile(xw.getClientPlayer())) != null) {
-
-            List<TileItem> petItems = pet.getTileItems();
-            Collections.sort(petItems, tileItemComparator);
-            for (TileItem item : petItems) item.toXML(xw);
+        for (TileItem item : tileItems) {
+            item.toXML(xw);
         }
     }
 

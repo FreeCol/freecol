@@ -448,11 +448,11 @@ public class ServerColony extends Colony implements ServerModelObject {
         // Check for free buildings
         for (BuildingType buildingType : spec.getBuildingTypeList()) {
             if (isAutomaticBuild(buildingType)) {
+                if (buildingType.isDefenceType()) {
+                    getTile().cacheUnseen();//+til
+                }
                 addBuilding(new ServerBuilding(getGame(), this,
                                                buildingType));//-til
-                if (buildingType.isDefenceType()) {//+til
-                    getTile().updatePlayerExploredTiles();
-                }
             }
         }
 
@@ -633,20 +633,22 @@ public class ServerColony extends Colony implements ServerModelObject {
     private boolean csBuildBuilding(BuildQueue<? extends BuildableType> buildQueue,
                                     ChangeSet cs) {
         BuildingType type = (BuildingType) buildQueue.getCurrentlyBuilding();
+        Tile copied = getTile().getTileToCache();
         BuildingType from = type.getUpgradesFrom();
         boolean success;
         if (from == null) {
             addBuilding(new ServerBuilding(getGame(), this, type));//-til
-            if (type.isDefenceType()) {
-                getTile().updatePlayerExploredTiles();//+til
-            }
             success = true;
+            if (type.isDefenceType()) getTile().cacheUnseen(copied);//+til
         } else {
             Building building = getBuilding(from);
             List<Unit> eject = building.upgrade();//-til
             success = eject != null;
             if (success) {
                 ejectUnits(building, eject);//-til
+                if (!eject.isEmpty() || type.isDefenceType()) {
+                    getTile().cacheUnseen(copied);//+til
+                }
             } else {
                 cs.addMessage(See.only((ServerPlayer) owner),
                     new ModelMessage(ModelMessage.MessageType.BUILDING_COMPLETED,
@@ -654,9 +656,6 @@ public class ServerColony extends Colony implements ServerModelObject {
                                      this)
                         .addName("%colony%", getName())
                         .add("%object%", type.getNameKey()));
-            }
-            if (success || type.isDefenceType()) {
-                getTile().updatePlayerExploredTiles();//+til
             }
         }
         if (success) {
@@ -746,10 +745,11 @@ public class ServerColony extends Colony implements ServerModelObject {
         ServerPlayer serverPlayer = (ServerPlayer)getOwner();
         Tile tile = enemyUnit.getTile();
         ServerColonyTile ct = (ServerColonyTile)getColonyTile(tile);
-        if (ct == null || !ejectUnits(ct, ct.getUnitList())) {//-til
-            return;
-        }
-        ct.getColony().getTile().updatePlayerExploredTiles();//+til
+        if (ct == null) return;
+        Tile colonyTile = ct.getColony().getTile();
+        Tile copied = colonyTile.getTileToCache();
+        if (!ejectUnits(ct, ct.getUnitList())) return;//-til
+        colonyTile.cacheUnseen(copied);//+til
         cs.addMessage(See.only(serverPlayer),
             new ModelMessage(ModelMessage.MessageType.WARNING,
                              "model.colony.workersEvicted", this, this)
