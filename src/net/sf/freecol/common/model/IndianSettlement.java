@@ -175,7 +175,7 @@ public class IndianSettlement extends Settlement {
      * has never been contacted by a player, alarm.get(player) will be null.
      * Acts causing contact initialize this variable.
      */
-    private final java.util.Map<Player, Tension> alarm
+    protected final java.util.Map<Player, Tension> alarm
         = new HashMap<Player, Tension>();
 
 
@@ -392,26 +392,6 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-     * Updates the most hated nation of this settlement.
-     *
-     * -til: This might change the tile appearance.
-     */
-    public void updateMostHated() {
-        mostHated = null;
-        int bestValue = Integer.MIN_VALUE;
-        for (Player p : getGame().getLiveEuropeanPlayers()) {
-            Tension alarm = getAlarm(p);
-            if (alarm == null
-                || alarm.getLevel() == Tension.Level.HAPPY) continue;
-            int value = alarm.getValue();
-            if (bestValue < value) {
-                bestValue = value;
-                mostHated = p;
-            }
-        }
-    }
-
-    /**
      * Gets the contact level between this settlement and a player.
      *
      * @param player The <code>Player</code> to check.
@@ -539,25 +519,7 @@ public class IndianSettlement extends Settlement {
      * @param newAlarm The new alarm value.
      */
     public void setAlarm(Player player, Tension newAlarm) {
-        if (player != null && player != owner) {
-            alarm.put(player, newAlarm);
-            updateMostHated();
-        }
-    }
-
-    /**
-     * Removes all alarm towards the given player.  Used the a player leaves
-     * the game.
-     *
-     * -til: Might change tile appearance through most hated state
-     *
-     * @param player The <code>Player</code> to remove the alarm for.
-     */
-    public void removeAlarm(Player player) {
-        if (player != null) {
-            alarm.remove(player);
-            updateMostHated();
-        }
+        alarm.put(player, newAlarm);
     }
 
     /**
@@ -566,32 +528,10 @@ public class IndianSettlement extends Settlement {
      *
      * @param player The <code>Player</code> to set the alarm level for.
      */
-    private void initializeAlarm(Player player) {
+    protected void initializeAlarm(Player player) {
         Tension tension = owner.getTension(player);
         setAlarm(player, new Tension((tension == null) ? 0
                 : tension.getValue()));
-    }
-
-    /**
-     * Change the alarm level of this settlement by a given amount.
-     *
-     * -til: Might change tile appearance through most hated state
-     *
-     * @param player The <code>Player</code> the alarm level changes wrt.
-     * @param amount The amount to change the alarm by.
-     * @return True if the <code>Tension.Level</code> of the
-     *     settlement alarm changes as a result of this change.
-     */
-    protected boolean changeAlarm(Player player, int amount) {
-        Tension alarm = getAlarm(player);
-        if (alarm == null) {
-            initializeAlarm(player);
-            alarm = getAlarm(player);
-        }
-        Level oldLevel = alarm.getLevel();
-        alarm.modify(amount);
-        updateMostHated();
-        return oldLevel != alarm.getLevel();
     }
 
     /**
@@ -1163,14 +1103,6 @@ public class IndianSettlement extends Settlement {
     public int getUpkeep() {
         // Native settlements do not require upkeep.
         return 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean propagateAlarm(Player player, int addToAlarm) {
-        return (hasContacted(player)) ? changeAlarm(player, addToAlarm)
-            : false;
     }
 
     /**

@@ -553,7 +553,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     if (s.hasMissionary(this)) {
                         ((ServerIndianSettlement)s).csKillMissionary(null, cs);
                     }
-                    s.removeAlarm(this);//-til
+                    ((ServerIndianSettlement)s).removeAlarm(this);//-til
                     s.getTile().updatePlayerExploredTiles();//+til
                 }
                 other.removeTension(this);
@@ -1063,7 +1063,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param cs A <code>ChangeSet</code> to update.
      * @return True if there was a change in stance at all.
      */
-    public boolean csChangeStance(Stance stance, Player otherPlayer,
+    public boolean csChangeStance(Stance stance, ServerPlayer otherPlayer,
                                   boolean symmetric, ChangeSet cs) {
         ServerPlayer other = (ServerPlayer) otherPlayer;
         boolean change = false;
@@ -1073,8 +1073,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             int modifier = old.getTensionModifier(stance);
             setStance(otherPlayer, stance);
             if (modifier != 0) {
-                cs.addTension(See.perhaps(),//-til,+til
-                    modifyTension(otherPlayer, modifier));
+                csModifyTension(otherPlayer, modifier, cs);//+til
             }
             logger.info("Stance modification " + getName()
                 + " " + old.toString() + " -> " + stance.toString()
@@ -1092,8 +1091,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             int modifier = old.getTensionModifier(stance);
             otherPlayer.setStance(this, stance);
             if (modifier != 0) {
-                cs.addTension(See.perhaps(),//-til,+til
-                    otherPlayer.modifyTension(this, modifier));
+                other.csModifyTension(this, modifier, cs);//+til
             }
             logger.info("Stance modification " + otherPlayer.getName()
                 + " " + old.toString() + " -> " + stance.toString()
@@ -1109,6 +1107,49 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
 
         return change;
+    }
+
+    /**
+     * Modifies the hostility against the given player.
+     *
+     * +til: Handles tile modifications.
+     *
+     * @param player The <code>Player</code>.
+     * @param add The amount to add to the current tension level.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    public void csModifyTension(Player player, int add, ChangeSet cs) {
+        csModifyTension(player, add, null, cs);
+    }
+
+    /**
+     * Modifies the hostility against the given player.
+     *
+     * +til: Handles tile modifications.
+     *
+     * @param player The <code>Player</code>.
+     * @param add The amount to add to the current tension level.
+     * @param origin A <code>Settlement</code> where the alarming event
+     *     occurred.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    public void csModifyTension(Player player, int add, Settlement origin,
+                                ChangeSet cs) {
+        Tension.Level oldLevel = getTension(player).getLevel();
+        getTension(player).modify(add);
+        if (oldLevel != getTension(player).getLevel()) {
+            cs.add(See.only((ServerPlayer)player), this);
+        }
+
+        // Propagate tension change as settlement alarm to all
+        // settlements except the one that originated it (if any).
+        if (isIndian()) {
+            for (IndianSettlement is : getIndianSettlements()) {
+                if (is == origin || !is.hasContacted(player)) continue;
+                ((ServerIndianSettlement)is).csModifyAlarm(player, add,
+                                                           false, cs);//+til
+            }
+        }
     }
 
     /**
@@ -1615,8 +1656,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                             null, game.getTurn());
                         ServerIndianSettlement sis
                             = (ServerIndianSettlement)settlement;
-                        cs.addTension(See.perhaps(),//-til,+til
-                            sis.modifyAlarm(player, change));
+                        sis.csModifyAlarm((ServerPlayer)player, change,
+                                          true, cs);
                     }
                 }
             }
@@ -1625,8 +1666,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             for (Player enemy : game.getLiveEuropeanPlayers()) {
                 if (getTension(enemy).getValue() > 0) {
                     int change = -getTension(enemy).getValue()/100 - 4;
-                    cs.addTension(See.perhaps(),//-til,+til
-                        modifyTension(enemy, change));
+                    csModifyTension(enemy, change, cs);//+til
                 }
             }
 
@@ -1815,7 +1855,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                                 cs.add(See.only(this), is);
                             }
                         }
-                        csChangeStance(Stance.PEACE, p, true, cs);
+                        csChangeStance(Stance.PEACE, (ServerPlayer)p, true, cs);
                     }
                 }
 
@@ -1897,7 +1937,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     public void csClaimLand(Tile tile, Settlement settlement, int price,
                             ChangeSet cs) {
-        Player owner = tile.getOwner();
+        ServerPlayer owner = (ServerPlayer)tile.getOwner();
         Settlement ownerSettlement = tile.getOwningSettlement();
         tile.changeOwnership(this, settlement);//-vis(?),-til
         tile.updatePlayerExploredTiles();//+til
@@ -1910,10 +1950,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
             owner.modifyGold(price);
             cs.addPartial(See.only(this), this, "gold");
         } else if (price < 0 && owner.isIndian()) {
-            IndianSettlement is = (IndianSettlement)ownerSettlement;
-            if (is != null) {
-                cs.addTension(See.perhaps(),//-til,+til
-                    owner.modifyTension(this, Tension.TENSION_ADD_LAND_TAKEN, is));
+            ServerIndianSettlement is = (ServerIndianSettlement)ownerSettlement;
+            if (is == null) {
+                owner.csModifyTension(this, Tension.TENSION_ADD_LAND_TAKEN,
+                                      cs);
+            } else {
+                is.csModifyAlarm(this, Tension.TENSION_ADD_LAND_TAKEN,
+                                 true, cs);
             }
         }
         logger.finest(this.getDisplayName() + " claimed " + tile
@@ -2446,12 +2489,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 }
             }
             if (attackerTension != 0) {
-                cs.addTension(See.perhaps(),//-til,+til
-                    modifyTension(defenderPlayer, attackerTension));
+                this.csModifyTension(defenderPlayer,
+                                     attackerTension, cs);//+til
             }
             if (defenderTension != 0) {
-                cs.addTension(See.perhaps(),//-til,+til
-                    defenderPlayer.modifyTension(this, defenderTension));
+                defenderPlayer.csModifyTension(this,
+                                               defenderTension, cs);//+til
             }
         }
 

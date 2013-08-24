@@ -2592,13 +2592,6 @@ public class Colony extends Settlement implements Nameable {
     /**
      * {@inheritDoc}
      */
-    public boolean propagateAlarm(Player player, int addToAlarm) {
-        return false; // No-op for European colonies.
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public int getTotalProductionOf(GoodsType goodsType) {
         int amount = 0;
         for (WorkLocation workLocation : getCurrentWorkLocations()) {

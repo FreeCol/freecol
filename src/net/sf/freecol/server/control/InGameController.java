@@ -253,14 +253,15 @@ public final class InGameController extends Controller {
      *
      * @param player The originating <code>Player</code>.
      * @param stance The new <code>Stance</code>.
-     * @param otherPlayer The <code>Player</code> wrt which the stance changes.
+     * @param other The <code>Player</code> wrt which the
+     *     stance changes.
      * @param symmetric If true, change the otherPlayer stance as well.
      */
     public void changeStance(Player player, Stance stance,
-                             Player otherPlayer, boolean symmetric) {
+                             Player other, boolean symmetric) {
         ChangeSet cs = new ChangeSet();
-        ServerPlayer serverPlayer = (ServerPlayer) player;
-        if (serverPlayer.csChangeStance(stance, otherPlayer, symmetric, cs)) {
+        if (((ServerPlayer)player).csChangeStance(stance, (ServerPlayer)other,
+                                                  symmetric, cs)) {
             sendToAll(cs);
         }
     }
@@ -1094,7 +1095,8 @@ public final class InGameController extends Controller {
             if (friends.isEmpty()) break;
             Player friend = Utils.getRandomMember(logger, "Choose friend",
                                                   friends, random);
-            serverPlayer.csChangeStance(Stance.PEACE, friend, true, cs);
+            serverPlayer.csChangeStance(Stance.PEACE, (ServerPlayer)friend,
+                                        true, cs);
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
                 new MonarchActionMessage(action,
                     StringTemplate.template(messageId)
@@ -1105,7 +1107,8 @@ public final class InGameController extends Controller {
             if (enemies.isEmpty()) break;
             Player enemy = Utils.getRandomMember(logger, "Choose enemy",
                                                  enemies, random);
-            serverPlayer.csChangeStance(Stance.WAR, enemy, true, cs);
+            serverPlayer.csChangeStance(Stance.WAR, (ServerPlayer)enemy,
+                                        true, cs);
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
                 new MonarchActionMessage(action,
                     StringTemplate.template(messageId)
@@ -1736,9 +1739,8 @@ public final class InGameController extends Controller {
                 tile.updatePlayerExploredTiles();//+til
                 cs.add(See.perhaps(), tile);
             } else { // Consider not accepting the treaty to be an insult.
-                cs.addTension(See.perhaps(),//-til,+til
-                    welcomer.modifyTension(serverPlayer,
-                        Tension.TENSION_ADD_MAJOR));
+                welcomer.csModifyTension(serverPlayer,
+                    Tension.TENSION_ADD_MAJOR, cs);//+til
             }
         }
 
@@ -2109,9 +2111,8 @@ public final class InGameController extends Controller {
 
         // Increase tension whether we paid or not.  Apply tension
         // directly to the settlement and let propagation work.
-        cs.addTension(See.perhaps(),//-til,+til
-            ((ServerIndianSettlement)settlement).modifyAlarm(serverPlayer,
-                Tension.TENSION_ADD_NORMAL));
+        ((ServerIndianSettlement)settlement).csModifyAlarm(serverPlayer,
+            Tension.TENSION_ADD_NORMAL, true, cs);
         settlement.setLastTribute(year);
         ModelMessage m;
         if (gold > 0) {
@@ -2362,9 +2363,8 @@ public final class InGameController extends Controller {
             unit.setMovesLeft(0);
             settlement.setConvertProgress(0);
             cs.add(See.perhaps().always(serverPlayer), unit.getTile());
-            cs.addTension(See.perhaps(),
-                ((ServerIndianSettlement)settlement).modifyAlarm(serverPlayer,
-                    ALARM_NEW_MISSIONARY));//-til,+til
+            ((ServerIndianSettlement)settlement).csModifyAlarm(serverPlayer,
+                ALARM_NEW_MISSIONARY, true, cs);//+til
             int radius = (serverPlayer.getSpecification()
                 .getBoolean(GameOptions.ENHANCED_MISSIONARIES))
                 ? settlement.getLineOfSight()
@@ -2411,8 +2411,8 @@ public final class InGameController extends Controller {
         cs.add(See.only(serverPlayer), tile);
 
         // How much gold will be needed?
-        ServerPlayer enemyPlayer = (ServerPlayer) enemy;
-        Player nativePlayer = settlement.getOwner();
+        ServerPlayer enemyPlayer = (ServerPlayer)enemy;
+        ServerPlayer nativePlayer = (ServerPlayer)settlement.getOwner();
         int payingValue = nativePlayer.getTension(serverPlayer).getValue();
         int targetValue = nativePlayer.getTension(enemyPlayer).getValue();
         int goldToPay = (payingValue > targetValue) ? 10000 : 5000;
@@ -2437,11 +2437,10 @@ public final class InGameController extends Controller {
             // Success.  Raise the tension for the native player with respect
             // to the European player.  Let resulting stance changes happen
             // naturally in the AI player turn/s.
-            cs.addTension(See.only(null).perhaps(enemyPlayer),//-til,+til
-                nativePlayer.modifyTension(enemyPlayer, Tension.WAR_MODIFIER));
-            cs.addTension(See.only(null).perhaps(serverPlayer),//-til,+til
-                enemyPlayer.modifyTension(serverPlayer,
-                    Tension.TENSION_ADD_WAR_INCITER));
+            nativePlayer.csModifyTension(enemyPlayer,
+                Tension.WAR_MODIFIER, cs);//+til
+            enemyPlayer.csModifyTension(serverPlayer,
+                Tension.TENSION_ADD_WAR_INCITER, cs);//+til
             cs.addAttribute(See.only(serverPlayer),
                             "gold", Integer.toString(gold));
             serverPlayer.modifyGold(-gold);
@@ -2564,9 +2563,8 @@ public final class InGameController extends Controller {
         settlement.updateWantedGoods();
         settlementPlayer.modifyGold(amount);
         serverPlayer.modifyGold(-amount);
-        cs.addTension(See.perhaps(),//-til,+til
-            ((ServerIndianSettlement)settlement).modifyAlarm(serverPlayer,
-                -amount / 50));
+        ((ServerIndianSettlement)settlement).csModifyAlarm(serverPlayer,
+            -amount / 50, true, cs);
         tile.updateIndianSettlement(serverPlayer);
         cs.add(See.only(serverPlayer), tile);
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
@@ -2618,9 +2616,8 @@ public final class InGameController extends Controller {
         Player settlementPlayer = settlement.getOwner();
         settlementPlayer.modifyGold(-amount);
         serverPlayer.modifyGold(amount);
-        cs.addTension(See.perhaps(),//-til,+til
-            ((ServerIndianSettlement)settlement).modifyAlarm(serverPlayer,
-                -amount / 500));
+        ((ServerIndianSettlement)settlement).csModifyAlarm(serverPlayer,
+            -amount / 500, true, cs);
         Tile tile = settlement.getTile();
         settlement.updateWantedGoods();
         tile.updateIndianSettlement(serverPlayer);
@@ -2665,9 +2662,8 @@ public final class InGameController extends Controller {
         if (settlement instanceof IndianSettlement) {
             IndianSettlement is = (IndianSettlement) settlement;
             csVisit(serverPlayer, is, 0, cs);
-            cs.addTension(See.perhaps(),//-til,+til
-                ((ServerIndianSettlement)is).modifyAlarm(serverPlayer,
-                    -is.getPriceToBuy(goods) / 50));
+            ((ServerIndianSettlement)is).csModifyAlarm(serverPlayer,
+                -is.getPriceToBuy(goods) / 50, true, cs);
             is.updateWantedGoods();
             tile.updateIndianSettlement(serverPlayer);
             cs.add(See.only(serverPlayer), tile);
@@ -3665,8 +3661,14 @@ public final class InGameController extends Controller {
                 cs.add(See.only(victim), colonyContainer);
                 //cs.add(See.only(serverPlayer), unitContainer);
             }
-            cs.addTension(See.perhaps(),//-til,+til
-                serverPlayer.modifyTension(victim, -(5 - difficulty) * 50));
+            int tension = -(5 - difficulty) * 50;
+            ServerIndianSettlement is = (ServerIndianSettlement)
+                unit.getHomeIndianSettlement();
+            if (is == null) {
+                serverPlayer.csModifyTension(victim, tension, cs);
+            } else {
+                is.csModifyAlarm(victim, tension, true, cs);
+            }
         }
 
         sendToOthers(serverPlayer, cs);
@@ -4114,9 +4116,10 @@ public final class InGameController extends Controller {
 
         // No one likes the undead.
         for (Player p : game.getPlayers()) {
-            if (serverPlayer != (ServerPlayer) p
+            if (serverPlayer != (ServerPlayer)p
                 && serverPlayer.hasContacted(p)) {
-                serverPlayer.csChangeStance(Stance.WAR, p, true, cs);
+                serverPlayer.csChangeStance(Stance.WAR, (ServerPlayer)p,
+                                            true, cs);
             }
         }
 

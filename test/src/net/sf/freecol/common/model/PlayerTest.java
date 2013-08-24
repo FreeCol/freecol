@@ -250,8 +250,8 @@ public class PlayerTest extends FreeColTestCase {
         String errMsg = "";
         Game game = getStandardGame();
 
-        Player dutch = game.getPlayer("model.nation.dutch");
-        Player french = game.getPlayer("model.nation.french");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        ServerPlayer french = (ServerPlayer)game.getPlayer("model.nation.french");
 
         int initialTension = 500;
         int change = 250;
@@ -259,7 +259,7 @@ public class PlayerTest extends FreeColTestCase {
         dutch.setTension(french, new Tension(initialTension));
         french.setTension(dutch, new Tension(initialTension));
 
-        dutch.modifyTension(french, change);
+        dutch.getTension(french).modify(change);
 
         int expectedDutchTension = initialTension + change;
         int expectedFrenchTension = initialTension;

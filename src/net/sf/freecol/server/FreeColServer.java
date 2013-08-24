@@ -99,6 +99,7 @@ import net.sf.freecol.server.generator.MapGenerator;
 import net.sf.freecol.server.generator.SimpleMapGenerator;
 import net.sf.freecol.server.generator.TerrainGenerator;
 import net.sf.freecol.server.model.ServerGame;
+import net.sf.freecol.server.model.ServerIndianSettlement;
 import net.sf.freecol.server.model.ServerModelObject;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.TransactionSession;
@@ -990,7 +991,7 @@ public final class FreeColServer {
                 // @compat 0.10.5
                 if (p.isIndian()) {
                     for (IndianSettlement is : p.getIndianSettlements()) {
-                        is.updateMostHated();
+                        ((ServerIndianSettlement)is).updateMostHated();
                     }
                 }
                 // end @compat 0.10.5

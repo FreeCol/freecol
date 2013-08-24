@@ -665,18 +665,6 @@ public abstract class Settlement extends GoodsLocation
     public abstract int getUpkeep();
 
     /**
-     * Propagates a global change in tension down to a settlement.
-     * Only apply the change if the settlement is aware of the player
-     * causing alarm.
-     *
-     * @param player The <code>Player</code> towards whom the alarm is felt.
-     * @param addToAlarm The amount to add to the current alarm level.
-     * @return True if the settlement alarm level changes as a result
-     *     of this change.
-     */
-    public abstract boolean propagateAlarm(Player player, int addToAlarm);
-
-    /**
      * Gets the total production of the given type of goods in this settlement.
      *
      * @param goodsType The type of goods to get the production for.

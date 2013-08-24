@@ -1629,26 +1629,6 @@ public class ChangeSet {
     }
 
     /**
-     * Helper function to add tension changes to a ChangeSet.
-     *
-     * +til: Resolves tile appearance changes due to tension change.
-     *
-     * @param see The visibility of this change.
-     * @param fcgos A list of <code>FreeColGameObject</code>s that have changed
-     *     their tension/alarm state.
-     * @return The updated <code>ChangeSet</code>.
-     */
-    public ChangeSet addTension(See see, List<FreeColGameObject> fcgos) {
-        for (FreeColGameObject o : fcgos) {
-            if (o instanceof IndianSettlement) {//+til
-                ((IndianSettlement)o).getTile().updatePlayerExploredTiles();
-            }
-            changes.add(new ObjectChange(see, o));
-        }
-        return this;
-    }
-
-    /**
      * Helper function to add a trivial element to a ChangeSet.
      *
      * @param see The visibility of this change.

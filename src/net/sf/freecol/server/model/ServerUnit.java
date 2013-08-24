@@ -576,13 +576,11 @@ public class ServerUnit extends Unit implements ServerModelObject {
      * @param cs A <code>ChangeSet</code> to add changes to.
      */
     private void csNativeBurialGround(ChangeSet cs) {
-        ServerPlayer serverPlayer = (ServerPlayer) getOwner();
+        ServerPlayer serverPlayer = (ServerPlayer)getOwner();
         Tile tile = getTile();
-        Player indianPlayer = tile.getOwner();
-        cs.addTension(See.only(serverPlayer),//-til,+til
-            indianPlayer.modifyTension(serverPlayer,
-                Tension.Level.HATEFUL.getLimit()));
-        cs.add(See.only(serverPlayer), indianPlayer);
+        ServerPlayer indianPlayer = (ServerPlayer)tile.getOwner();
+        indianPlayer.csModifyTension(serverPlayer, 
+            Tension.Level.HATEFUL.getLimit(), cs);//+til
         cs.addMessage(See.only(serverPlayer),
             new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                 "lostCityRumour.burialGround", serverPlayer, this)

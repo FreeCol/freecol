@@ -33,6 +33,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -222,28 +223,114 @@ public class ServerIndianSettlement extends IndianSettlement
     }
 
     /**
+     * Sets alarm towards the given player.
+     *
+     * -til: Might change tile appearance through most hated state
+     *
+     * @param player The <code>Player</code> to set the alarm level for.
+     * @param newAlarm The new alarm value.
+     */
+    @Override
+    public void setAlarm(Player player, Tension newAlarm) {
+        if (player != null && player != owner) {
+            super.setAlarm(player, newAlarm);
+            updateMostHated();
+        }
+    }
+
+    /**
+     * Removes all alarm towards the given player.  Used the a player leaves
+     * the game.
+     *
+     * -til: Might change tile appearance through most hated state
+     *
+     * @param player The <code>Player</code> to remove the alarm for.
+     */
+    public void removeAlarm(Player player) {
+        if (player != null) {
+            alarm.remove(player);
+            updateMostHated();
+        }
+    }
+
+    /**
+     * Updates the most hated nation of this settlement.
+     * Needs to be public so it can be set by backwards compatibility code
+     * in FreeColServer.loadGame.
+     *
+     * -til: This might change the tile appearance.
+     *
+     * @return True if the most hated nation changed.
+     */
+    public boolean updateMostHated() {
+        Player old = mostHated;
+        mostHated = null;
+        int bestValue = Integer.MIN_VALUE;
+        for (Player p : getGame().getLiveEuropeanPlayers()) {
+            Tension alarm = getAlarm(p);
+            if (alarm == null
+                || alarm.getLevel() == Tension.Level.HAPPY) continue;
+            int value = alarm.getValue();
+            if (bestValue < value) {
+                bestValue = value;
+                mostHated = p;
+            }
+        }
+        return mostHated != old;
+    }
+
+    /**
+     * Change the alarm level of this settlement by a given amount.
+     *
+     * -til: Might change tile appearance through most hated state
+     *
+     * @param player The <code>Player</code> the alarm level changes wrt.
+     * @param amount The amount to change the alarm by.
+     * @return True if the <code>Tension.Level</code> of the
+     *     settlement alarm changes as a result of this change.
+     */
+    private boolean changeAlarm(Player player, int amount) {
+        Tension alarm = getAlarm(player);
+        if (alarm == null) {
+            initializeAlarm(player);
+            alarm = getAlarm(player);
+        }
+        Tension.Level oldLevel = alarm.getLevel();
+        alarm.modify(amount);
+        boolean change = updateMostHated();
+        return change || oldLevel != alarm.getLevel();
+    }
+
+    /**
      * Modifies the alarm level towards the given player due to an event
      * at this settlement, and propagate the alarm upwards through the
      * tribe.
      *
-     * @param player The <code>Player</code>.
-     * @param addToAlarm The amount to add to the current alarm level.
-     * @return A list of settlements whose alarm level has changed.
+     * +til: Handles tile visibility changes.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> to modify alarm for.
+     * @param add The amount to add to the current alarm level.
+     * @param propagate If true, propagate the alarm change upward to the
+     *     owning player.
+     * @param cs A <code>ChangeSet</code> to update.
      */
-    public List<FreeColGameObject> modifyAlarm(Player player, int addToAlarm) {
-        boolean change = changeAlarm(player, addToAlarm);
-
-        // Propagate alarm upwards.  Capital has a greater impact.
-        List<FreeColGameObject> modified = owner.modifyTension(player,
-                ((isCapital()) ? addToAlarm : addToAlarm/2), this);
+    public void csModifyAlarm(Player player, int add, boolean propagate,
+                              ChangeSet cs) {
+        boolean change = changeAlarm(player, add);//-til
         if (change && player.hasExplored(getTile())) {
-            modified.add(this);
+            cs.add(See.perhaps(), this);
+            getTile().updatePlayerExploredTiles();//+til
+        }
+
+        if (propagate) {
+            // Propagate alarm upwards.  Capital has a greater impact.
+            ((ServerPlayer)getOwner()).csModifyTension(player,
+                ((isCapital()) ? add : add/2), this, cs);
         }
         logger.finest("Alarm at " + getName()
             + " toward " + player.getName()
-            + " modified by " + addToAlarm
+            + " modified by " + add
             + " now = " + getAlarm(player).getValue());
-        return modified;
     }
 
     /**

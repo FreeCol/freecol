@@ -64,8 +64,7 @@ public class DemandSession extends TransactionSession {
 
     public void complete(ChangeSet cs) {
         if (tension > 0) {
-            cs.addTension(See.perhaps(),//-til,+til
-                demander.modifyTension(victim, tension));
+            ((ServerPlayer)demander).csModifyTension(victim, tension, cs);
         }
         super.complete(cs);
     }
