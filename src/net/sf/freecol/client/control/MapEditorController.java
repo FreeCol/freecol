@@ -86,12 +86,8 @@ public final class MapEditorController {
      * but we should do better.
      */
     public void startMapEditor() {
-        final String tc = FreeCol.getTC();
-
         try {
-            FreeColTcFile tcData = new FreeColTcFile(tc);
-            Specification specification = tcData.getSpecification();
-            specification.applyDifficultyLevel(FreeCol.getDifficulty());
+            Specification specification = getDefaultSpecification();
             freeColClient.setMapEditor(true);
             final FreeColServer freeColServer
                 = new FreeColServer(false, false, specification, 0, null);
@@ -114,6 +110,20 @@ public final class MapEditorController {
         }
     }
 
+    /**
+     * Get the default specification from the default TC.
+     *
+     * @return A <code>Specification</code> to use in the map editor.
+     * @throws IOException on failure to find the spec.
+     */
+    public Specification getDefaultSpecification() throws IOException {
+        final String tc = FreeCol.getTC();
+        FreeColTcFile tcData = new FreeColTcFile(tc);
+        Specification spec = tcData.getSpecification();
+        spec.applyDifficultyLevel(FreeCol.getDifficulty());
+        return spec;
+    }
+        
     /**
      * Sets the currently chosen <code>MapTransform</code>.
      * @param mt The transform that should be applied to a
@@ -267,8 +277,9 @@ public final class MapEditorController {
             public void run() {
                 FreeColServer freeColServer = null;
                 try {
+                    Specification spec = getDefaultSpecification();
                     freeColServer = new FreeColServer(new FreeColSavegameFile(theFile),
-                        (Specification)null, 0, "MapEditor");
+                        spec, 0, "MapEditor");
                     freeColClient.setFreeColServer(freeColServer);
                     freeColClient.setGame(freeColServer.getGame());
                     SwingUtilities.invokeLater( new Runnable() {
