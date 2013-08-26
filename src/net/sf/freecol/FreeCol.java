@@ -308,7 +308,7 @@ public final class FreeCol {
      *
      * @param err The error message to print.
      */
-    private static void fatal(String err) {
+    public static void fatal(String err) {
         if (err == null || "".equals(err)) {
             err = "Bogus null fatal error message";
             Thread.dumpStack();
