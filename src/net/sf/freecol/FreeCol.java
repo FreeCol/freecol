@@ -164,6 +164,10 @@ public final class FreeCol {
             System.err.println("Unable to load Manifest: " + e.getMessage());
         }
 
+        // Java bug #7075600 causes BR#2554.  The workaround is to set
+        // the following property.  Remove if/when they fix Java.
+        System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
+
         // We can not even emit localized error messages until we find
         // the data directory, which might have been specified on the
         // command line.  Take care to use the *last* instance.
