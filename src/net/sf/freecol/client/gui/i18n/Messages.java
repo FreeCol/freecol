@@ -43,6 +43,7 @@ import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColDataFile;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.Mods;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Player;
@@ -653,6 +654,90 @@ public class Messages {
         return StringTemplate.label("")
             .addStringTemplate(baseTemplate)
             .addStringTemplate(roleTemplate);
+    }
+
+    public static String getLabel(Unit unit) {
+        return Messages.message(getLabelTemplate(unit));
+    }
+
+    public static StringTemplate getLabelTemplate(Unit unit) {
+        UnitType type = unit.getType();
+        Role role = unit.getRole();
+        Role defaultRole = unit.getSpecification().getRole("model.role.default");
+
+        String nationName = getName(unit.getOwner().getNation());
+        String unitName = getName(type);
+        String roleName = getName(role);
+        String extra = unitName;
+        boolean showRole = true;
+
+        String key = type.getId() + "." + role.getSuffix();
+        if (containsKey(key)) {
+            // first, check for special unit/role combinations
+            showRole = false;
+            unitName = message(StringTemplate.template(key)
+                               .addAmount("%number%", 1));
+        } else if (defaultRole == role) {
+            if (unit.canCarryTreasure()) {
+                // treasure trains display amount of gold
+                roleName = unitName;
+                extra = message(StringTemplate.template("goldAmount")
+                                .addAmount("%amount%", unit.getTreasureAmount()));
+            } else {
+                boolean noEquipment = false;
+                // unequipped expert has no-equipment label
+                List<Role> expertRoles = type.getExpertRoles();
+                for (Role someRole : expertRoles) {
+                    if (containsKey(someRole.getId() + ".noequipment")) {
+                        roleName = unitName;
+                        extra = message(someRole.getId() + ".noequipment");
+                        noEquipment = true;
+                        break;
+                    }
+                }
+                if (!noEquipment) {
+                    // no extra label
+                    showRole = false;
+                }
+            }
+        } else if (role.getExpertUnit() == type) {
+            // expert equipped as expert has no additional label,
+            // unless maximum equipment count is greater than one
+            if (role.getMaximumCount() > 1) {
+                List<AbstractGoods> requiredGoods = role.getRequiredGoods();
+                if (!requiredGoods.isEmpty()) {
+                    int count = unit.getEquipmentCount();
+                    AbstractGoods goods = requiredGoods.get(0);
+                    roleName = unitName;
+                    extra = message(StringTemplate.template("model.goods.goodsAmount")
+                                    .addAmount("%amount%", goods.getAmount() * count)
+                                    .addName("%goods%", goods.getType()));
+                }
+            } else {
+                showRole = false;
+            }
+        }
+
+        StringTemplate result = null;
+        if (unit.getName() == null) {
+            if (showRole) {
+                result = StringTemplate.template("model.unit.nationUnitRole");
+            } else {
+                result = StringTemplate.template("model.unit.nationUnit");
+            }
+        } else {
+            if (showRole) {
+                result = StringTemplate.template("model.unit.namedNationUnitRole");
+            } else {
+                result = StringTemplate.template("model.unit.namedNationUnit");
+            }
+            result.addName("%name%", unit.getName());
+        }
+        result.addName("%nation%", nationName)
+            .addName("%unit%", unitName)
+            .addName("%role%", roleName)
+            .addName("%extra%", extra);
+        return result;
     }
 
     /**

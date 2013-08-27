@@ -1539,6 +1539,21 @@ public class Unit extends GoodsLocation
         return equipment.getCount(equipmentType);
     }
 
+    /**
+     * Get the amount of equipment this unit has.
+     *
+     * @return The amount of equipment.
+     */
+    public int getEquipmentCount() {
+        // TODO: introduce equipmentCount field
+        if (!(equipment == null || equipment.isEmpty())) {
+            for (Integer result : equipment.values()) {
+                return result;
+            }
+        }
+        return 0;
+    }
+
 
 
     // More complex equipment manipulation.

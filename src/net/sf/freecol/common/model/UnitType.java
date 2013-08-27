@@ -371,6 +371,22 @@ public final class UnitType extends BuildableType
     }
 
     /**
+     * Returns a list of roles for which a unit of this type is an
+     * expert.
+     *
+     * @return a list of expert roles
+     */
+    public List<Role> getExpertRoles() {
+        List<Role> result = new ArrayList<Role>();
+        for (Role role : getSpecification().getRoles()) {
+            if (role.getExpertUnit() == this) {
+                result.add(role);
+            }
+        }
+        return result;
+    }
+
+    /**
      * Gets the list of all type changes associated with this unit type.
      *
      * @return The list of type changes.

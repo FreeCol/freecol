@@ -28,6 +28,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -463,4 +464,129 @@ public class MessagesTest extends FreeColTestCase {
             + " Colonial leaders express concern.";
         assertEquals(expected, Messages.message(template));
     }
+
+    public void testUnitLabel() {
+        Game game = getStandardGame();
+        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        ServerPlayer dutchREF = new ServerPlayer(game, "dutchREF", false,
+            dutch.getNation().getREFNation(), null, null);
+        ServerPlayer sioux = (ServerPlayer)game.getPlayer("model.nation.sioux");
+
+        Role scout = spec().getRole("model.role.scout");
+        Role soldier = spec().getRole("model.role.soldier");
+        Role dragoon = spec().getRole("model.role.dragoon");
+        Role pioneer = spec().getRole("model.role.pioneer");
+        Role missionary = spec().getRole("model.role.missionary");
+        Unit unit;
+
+        // Free Colonists
+        unit = new ServerUnit(game, null, dutch, spec()
+                              .getUnitType("model.unit.freeColonist"));
+        assertEquals("Dutch Free Colonist", Messages.getLabel(unit));
+
+        unit.setRole(soldier);
+        assertEquals("Dutch Soldier (Free Colonist)", Messages.getLabel(unit));
+
+        unit.setName("John Doe");
+        assertEquals("John Doe (Dutch Soldier/Free Colonist)", Messages.getLabel(unit));
+
+        // Master Carpenter
+        unit = new ServerUnit(game, null, dutch, spec()
+                              .getUnitType("model.unit.masterCarpenter"));
+        assertEquals("Dutch Master Carpenter", Messages.getLabel(unit));
+
+        unit.setRole(missionary);
+        assertEquals("Dutch Missionary (Master Carpenter)", Messages.getLabel(unit));
+
+
+        // King's regulars
+        unit = new ServerUnit(game, null, dutchREF, kingsRegular);
+        assertEquals("Dutch Royal Expeditionary Force King's Regular",
+                     Messages.getLabel(unit));
+
+        unit.changeEquipment(muskets, 1);
+        assertEquals(spec().getRole("model.role.infantry"), unit.getRole());
+        assertEquals("Dutch Royal Expeditionary Force Infantry", Messages.getLabel(unit));
+
+        unit.changeEquipment(horses, 1);
+        assertEquals(spec().getRole("model.role.cavalry"), unit.getRole());
+        assertEquals("Dutch Royal Expeditionary Force Cavalry", Messages.getLabel(unit));
+
+        // Colonial regulars
+        unit = new ServerUnit(game, null, dutch, colonialRegular);
+        assertEquals("Dutch Colonial Regular", Messages.getLabel(unit));
+
+        unit.changeEquipment(muskets, 1);
+        assertEquals("Dutch Continental Army", Messages.getLabel(unit));
+
+        unit.changeEquipment(horses, 1);
+        assertEquals("Dutch Continental Cavalry", Messages.getLabel(unit));
+
+        // Veteran Soldiers
+        unit = new ServerUnit(game, null, dutch, veteranSoldier);
+        assertEquals(1, unit.getEquipment().getCount(muskets));
+        assertEquals("Dutch Veteran Soldier", Messages.getLabel(unit));
+
+        unit.changeEquipment(muskets, -1);
+        assertEquals("Dutch Veteran Soldier (no muskets)",
+                     Messages.getLabel(unit));
+
+        unit.changeEquipment(horses, 1);
+        unit.changeEquipment(muskets, 1);
+        assertEquals("Dutch Veteran Dragoon", Messages.getLabel(unit));
+
+        unit.setName("Davy Crockett");
+        assertEquals("Davy Crockett (Dutch Veteran Dragoon)", Messages.getLabel(unit));
+
+        // Indian Braves
+        unit = new ServerUnit(game, null, sioux, brave);
+        assertEquals(0, unit.getEquipment().getCount(indianMuskets));
+        assertEquals("Sioux Brave", Messages.getLabel(unit));
+
+        unit.changeEquipment(indianMuskets, 1);
+        assertEquals("Sioux Armed Brave", Messages.getLabel(unit));
+
+        unit.changeEquipment(indianHorses, 1);
+        assertEquals("Sioux Native Dragoon", Messages.getLabel(unit));
+
+        unit.setName("Chingachgook");
+        assertEquals("Chingachgook (Sioux Native Dragoon)", Messages.getLabel(unit));
+
+        // Hardy Pioneers
+        unit = new ServerUnit(game, null, dutch, hardyPioneer);
+        assertEquals(5, unit.getEquipment().getCount(tools));
+        assertEquals("Dutch Hardy Pioneer (100 Tools)", Messages.getLabel(unit));
+
+        unit.changeEquipment(tools, -5);
+        assertEquals("Dutch Hardy Pioneer (no tools)", Messages.getLabel(unit));
+
+        unit.setName("Daniel Boone");
+        assertEquals("Daniel Boone (Dutch Hardy Pioneer/no tools)", Messages.getLabel(unit));
+
+        // Jesuit Missionaries
+        unit = new ServerUnit(game, null, dutch, jesuitMissionary);
+        assertEquals(1, unit.getEquipment().getCount(bible));
+        assertEquals("Dutch Jesuit Missionary", Messages.getLabel(unit));
+
+        unit.changeEquipment(bible, -1);
+        assertEquals("Dutch Jesuit Missionary (not commissioned)",
+                     Messages.getLabel(unit));
+
+        // Treasure Train
+        unit = new ServerUnit(game, null, dutch, spec().getUnitType("model.unit.treasureTrain"));
+        unit.setTreasureAmount(4567);
+        assertEquals("Dutch Treasure Train (4567 gold)", Messages.getLabel(unit));
+
+        unit.setName("The Gold of El Dorado");
+        assertEquals("The Gold of El Dorado (Dutch Treasure Train/4567 gold)", Messages.getLabel(unit));
+
+        // Caravel
+        unit = new ServerUnit(game, null, dutch, spec().getUnitType("model.unit.caravel"));
+        assertEquals("Dutch Caravel", Messages.getLabel(unit));
+
+        unit.setName("Santa Maria");
+        assertEquals("Santa Maria (Dutch Caravel)", Messages.getLabel(unit));
+    }
+
+
 }
