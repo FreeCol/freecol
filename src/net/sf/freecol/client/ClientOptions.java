@@ -835,7 +835,7 @@ public class ClientOptions extends OptionGroup {
 
     private void addBooleanOption(String id, String gr, boolean val) {
         if (getOption(id) == null) {
-            BooleanOption op = new BooleanOption(id);
+            BooleanOption op = new BooleanOption(id, null);
             op.setGroup(gr);
             op.setValue(val);
             add(op);
@@ -844,7 +844,7 @@ public class ClientOptions extends OptionGroup {
 
     private void addIntegerOption(String id, String gr, int val) {
         if (getOption(id) == null) {
-            IntegerOption op = new IntegerOption(id);
+            IntegerOption op = new IntegerOption(id, null);
             op.setGroup(gr);
             op.setValue(val);
             add(op);

@@ -70,15 +70,18 @@ public final class DifficultyDialog extends OptionsDialog implements TreeSelecti
      * current game read-only.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param specification The <code>Specification</code> to base the
+     *     difficulty on.
      * @param level An <code>OptionGroup</code> encapsulating the difficulty
      *     level to display.
      * @param editable a <code>boolean</code> value
      */
     public DifficultyDialog(FreeColClient freeColClient,
+                            Specification specification,
                             OptionGroup level, boolean editable) {
         super(freeColClient, editable);
 
-        specification = getSpecification();
+        this.specification = specification;
         selected = level;
         initialize(level, Messages.message("difficulty"), null);
         getOptionUI().getTree().addTreeSelectionListener(this);
@@ -121,11 +124,6 @@ public final class DifficultyDialog extends OptionsDialog implements TreeSelecti
                 tree.collapseRow(row);
             }
             selectLevel(tree, CUSTOM_LEVEL);
-        } else if (LOAD.equals(command)) {
-            File loadFile = getGUI().showLoadDialog(FreeColDirectories.getOptionsDirectory(), filters);
-            if (loadFile != null) {
-                load(loadFile);
-            }
         } else {
             super.actionPerformed(event);
         }

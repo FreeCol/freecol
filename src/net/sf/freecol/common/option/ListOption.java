@@ -60,19 +60,20 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
     /**
      * Creates a new <code>ListOption</code>.
      *
-     * @param id The object identifier.
+     * @param specification The <code>Specification</code> to refer to.
      */
-    public ListOption(String id) {
-        super(id);
+    public ListOption(Specification specification) {
+        super(specification);
     }
 
     /**
      * Creates a new <code>ListOption</code>.
      *
+     * @param id The object identifier.
      * @param specification The <code>Specification</code> to refer to.
      */
-    public ListOption(Specification specification) {
-        super(specification);
+    public ListOption(String id, Specification specification) {
+        super(id, specification);
     }
 
 

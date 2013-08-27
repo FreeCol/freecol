@@ -1017,13 +1017,16 @@ public final class Canvas extends JDesktopPane {
 
     public void showDifficultyDialog(boolean editable) {
         Game game = freeColClient.getGame();
-        showSubPanel(new DifficultyDialog(freeColClient,
-                game.getSpecification().getDifficultyLevel(), editable), false);
+        Specification spec = game.getSpecification();
+        showSubPanel(new DifficultyDialog(freeColClient, spec,
+                                          spec.getDifficultyLevel(), editable),
+                     false);
     }
 
-    public void showDifficultyDialog(OptionGroup group) {
+    public void showDifficultyDialog(Specification spec, OptionGroup group) {
         boolean editable = group.isEditable();
-        showSubPanel(new DifficultyDialog(freeColClient, group, editable), false);
+        showSubPanel(new DifficultyDialog(freeColClient, spec, group, editable),
+                     false);
     }
 
     /**

@@ -477,7 +477,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener, Item
             getGUI().showMainPanel();
             break;
         case SHOW_DIFFICULTY:
-            getGUI().showDifficultyDialog(level);
+            getGUI().showDifficultyDialog(spec, level);
             break;
         case SINGLE:
         case JOIN:

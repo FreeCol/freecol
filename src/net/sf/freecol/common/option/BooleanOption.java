@@ -43,19 +43,20 @@ public class BooleanOption extends AbstractOption<Boolean> {
     /**
      * Creates a new <code>BooleanOption</code>.
      *
-     * @param id The object identifier.
+     * @param specification The <code>Specification</code> to refer to.
      */
-    public BooleanOption(String id) {
-        super(id);
+    public BooleanOption(Specification specification) {
+        super(specification);
     }
 
     /**
      * Creates a new <code>BooleanOption</code>.
      *
+     * @param id The object identifier.
      * @param specification The <code>Specification</code> to refer to.
      */
-    public BooleanOption(Specification specification) {
-        super(specification);
+    public BooleanOption(String id, Specification specification) {
+        super(id, specification);
     }
 
 
@@ -65,7 +66,7 @@ public class BooleanOption extends AbstractOption<Boolean> {
      * {@inheritDoc}
      */
     public BooleanOption clone() {
-        BooleanOption result = new BooleanOption(getId());
+        BooleanOption result = new BooleanOption(getId(), getSpecification());
         result.setValues(this);
         return result;
     }

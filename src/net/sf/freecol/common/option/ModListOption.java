@@ -35,17 +35,6 @@ public class ModListOption extends ListOption<FreeColModFile> {
     /**
      * Creates a new <code>ModListOption</code>.
      *
-     * @param id The object identifier.
-     */
-    public ModListOption(String id) {
-        super(id);
-
-        setAllowDuplicates(false);
-    }
-
-    /**
-     * Creates a new <code>ModListOption</code>.
-     *
      * @param specification The <code>Specification</code> to refer to.
      */
     public ModListOption(Specification specification) {
@@ -55,11 +44,23 @@ public class ModListOption extends ListOption<FreeColModFile> {
     }
 
     /**
+     * Creates a new <code>ModListOption</code>.
+     *
+     * @param id The object identifier.
+     * @param specification The <code>Specification</code> to refer to.
+     */
+    public ModListOption(String id, Specification specification) {
+        super(id, specification);
+
+        setAllowDuplicates(false);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
     public ModListOption clone() {
-        ModListOption ret = new ModListOption(getId());
+        ModListOption ret = new ModListOption(getId(), getSpecification());
         ret.setValues(this);
         return ret;
     }

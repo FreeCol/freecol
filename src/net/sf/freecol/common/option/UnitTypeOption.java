@@ -63,15 +63,6 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
     /**
      * Creates a new <code>UnitTypeOption</code>.
      *
-     * @param id The object identifier.
-     */
-    public UnitTypeOption(String id) {
-        super(id);
-    }
-
-    /**
-     * Creates a new <code>UnitTypeOption</code>.
-     *
      * @param specification The <code>Specification</code> to refer to.
      */
     public UnitTypeOption(Specification specification) {

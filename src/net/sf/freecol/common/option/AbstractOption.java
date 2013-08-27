@@ -59,7 +59,7 @@ public abstract class AbstractOption<T> extends FreeColObject
      * @param id The object identifier.
      */
     public AbstractOption(String id) {
-        this(id, null);
+        setId(id);
     }
 
     /**

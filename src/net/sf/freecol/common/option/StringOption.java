@@ -50,15 +50,6 @@ public class StringOption extends AbstractOption<String> {
     /**
      * Creates a new <code>StringOption</code>.
      *
-     * @param id The object identifier.
-     */
-    public StringOption(String id) {
-        super(id);
-    }
-
-    /**
-     * Creates a new <code>StringOption</code>.
-     *
      * @param specification The <code>Specification</code> to refer to.
      */
     public StringOption(Specification specification) {
@@ -102,7 +93,7 @@ public class StringOption extends AbstractOption<String> {
      * {@inheritDoc}
      */
     public StringOption clone() {
-        StringOption result = new StringOption(getId());
+        StringOption result = new StringOption(getId(), getSpecification());
         result.setValues(this);
         result.setChoices(this.choices);
         return result;

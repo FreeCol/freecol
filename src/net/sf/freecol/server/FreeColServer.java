@@ -1174,7 +1174,7 @@ public final class FreeColServer {
 
     private void addBooleanOption(String id, String gr, boolean defaultValue,
                                   boolean difficulty) {
-        BooleanOption op = new BooleanOption(id);
+        BooleanOption op = new BooleanOption(id, game.getSpecification());
         op.setGroup(gr);
         op.setValue(defaultValue);
         addOption(op, difficulty);
@@ -1182,7 +1182,7 @@ public final class FreeColServer {
 
     private void addIntegerOption(String id, String gr, int defaultValue,
                                   boolean difficulty) {
-        IntegerOption op = new IntegerOption(id);
+        IntegerOption op = new IntegerOption(id, game.getSpecification());
         op.setGroup(gr);
         op.setValue(defaultValue);
         addOption(op, difficulty);
@@ -1190,7 +1190,7 @@ public final class FreeColServer {
 
     private void addStringOption(String id, String gr, String defaultValue,
                                  boolean difficulty) {
-        StringOption op = new StringOption(id);
+        StringOption op = new StringOption(id, game.getSpecification());
         op.setGroup(gr);
         op.setValue(defaultValue);
         addOption(op, difficulty);

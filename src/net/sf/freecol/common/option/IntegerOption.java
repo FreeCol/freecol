@@ -50,15 +50,6 @@ public class IntegerOption extends AbstractOption<Integer> {
     /**
      * Creates a new <code>IntegerOption</code>.
      *
-     * @param id The object identifier.
-     */
-    public IntegerOption(String id) {
-        super(id);
-    }
-
-    /**
-     * Creates a new <code>IntegerOption</code>.
-     *
      * @param specification The <code>Specification</code> to refer to.
      */
     public IntegerOption(Specification specification) {
@@ -119,7 +110,7 @@ public class IntegerOption extends AbstractOption<Integer> {
      * {@inheritDoc}
      */
     public IntegerOption clone() {
-        IntegerOption result = new IntegerOption(getId());
+        IntegerOption result = new IntegerOption(getId(), getSpecification());
         result.setValues(this);
         result.minimumValue = minimumValue;
         result.maximumValue = maximumValue;

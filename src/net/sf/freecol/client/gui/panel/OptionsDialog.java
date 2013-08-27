@@ -66,7 +66,8 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
     private JPanel optionPanel;
 
     private List<JButton> buttons = new ArrayList<JButton>();
-
+    private String header = null;
+    private Component component = null;
 
     protected static final FileFilter[] filters = new FileFilter[] {
         new FileFilter() {
@@ -112,8 +113,9 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
 
 
     protected void initialize(OptionGroup group, String header, Component component) {
-
         this.group = group;
+        this.header = header;
+        this.component = component;
 
         removeAll();
 
@@ -234,8 +236,9 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
             }
         } else if (LOAD.equals(command)) {
             File loadFile = getGUI().showLoadDialog(FreeColDirectories.getOptionsDirectory(), filters);
-            if (loadFile != null) {
-                load(loadFile);
+            if (loadFile != null && load(loadFile)) {
+                revalidate();
+                repaint();
             }
         } else {
             logger.warning("Invalid ActionCommand: " + command);
@@ -247,7 +250,8 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
      *
      * @param file a <code>File</code> value
      */
-    protected void load(File file) {
+    protected boolean load(File file) {
+        boolean ret = false;
         FreeColXMLReader xr = null;
         try {
             xr = new FreeColXMLReader(new FileInputStream(file));
@@ -255,15 +259,29 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
             // TODO: read into group rather than specification
             OptionGroup group = new OptionGroup(getSpecification());
             group.readFromXML(xr);
-            getSpecification().getOptionGroup(getOptionGroupId()).setValue(group);
-            logger.info("Loaded custom options from file " + file.getPath());
-
+            String expect = getOptionGroupId();
+            if (!expect.equals(group.getId())) {
+                try {
+                    group = group.getOptionGroup(expect);
+                } catch (Exception e) {
+                    group = null;
+                    logger.warning("Options file " + file.getPath()
+                        + " does not contain expected group " + expect);
+                }
+            }
+            if (group != null) {
+                getSpecification().getOptionGroup(expect).setValue(group);
+                logger.info("Loaded options from file " + file.getPath());
+                initialize(group, this.header, this.component);
+                ret = true;
+            }
         } catch (Exception e) {
             logger.log(Level.WARNING, "Failed to load OptionGroup "
                 + getOptionGroupId() + " from " + file.getName(), e);
         } finally {
             if (xr != null) xr.close();
         }
+        return ret;
     }
 
     /**

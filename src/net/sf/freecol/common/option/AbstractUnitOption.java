@@ -59,15 +59,6 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     /**
      * Creates a new <code>AbstractUnitOption</code>.
      *
-     * @param id The object identifier.
-     */
-    public AbstractUnitOption(String id) {
-        super(id);
-    }
-
-    /**
-     * Creates a new <code>AbstractUnitOption</code>.
-     *
      * @param specification The <code>Specification</code> to refer to.
      */
     public AbstractUnitOption(Specification specification) {
@@ -119,7 +110,8 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
      * {@inheritDoc}
      */
     public AbstractUnitOption clone() {
-        AbstractUnitOption result = new AbstractUnitOption(getId());
+        AbstractUnitOption result
+            = new AbstractUnitOption(getId(), getSpecification());
         result.setValues(this);
         if (value != null) result.setValue(value.clone());
         if (unitType != null) result.unitType = unitType.clone();

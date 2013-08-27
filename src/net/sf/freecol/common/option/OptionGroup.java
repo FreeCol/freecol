@@ -400,7 +400,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      */
     @Override
     public OptionGroup clone() throws CloneNotSupportedException {
-        OptionGroup result = new OptionGroup(this.getId());
+        OptionGroup result = new OptionGroup(this.getId(), getSpecification());
         result.editable = this.editable;
         result.setValues(this);
         result.options.addAll(this.options);

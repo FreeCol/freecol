@@ -1721,7 +1721,7 @@ public final class Specification {
         for (int index = 0; index < years.length; index++) {
             String id = "model.option." + years[index];
             if (allOptions.get(id) == null) {
-                IntegerOption option = new IntegerOption(id);
+                IntegerOption option = new IntegerOption(id, this);
                 option.setValue(values[index]);
                 allOptions.put(id, option);
             }
@@ -1731,36 +1731,36 @@ public final class Specification {
         // @compat 0.10.5
         String id = GameOptions.INTERVENTION_BELLS;
         if (allOptions.get(id) == null) {
-            IntegerOption interventionBells = new IntegerOption(id);
+            IntegerOption interventionBells = new IntegerOption(id, this);
             interventionBells.setValue(5000);
             allOptions.put(id, interventionBells);
         }
         id = GameOptions.INTERVENTION_TURNS;
         if (allOptions.get(id) == null) {
-            IntegerOption interventionTurns = new IntegerOption(id);
+            IntegerOption interventionTurns = new IntegerOption(id, this);
             interventionTurns.setValue(52);
             allOptions.put(id, interventionTurns);
         }
         id = GameOptions.INTERVENTION_FORCE;
         if (allOptions.get(id) == null) {
-            UnitListOption interventionForce = new UnitListOption(id);
+            UnitListOption interventionForce = new UnitListOption(id, this);
             AbstractUnitOption regulars
-                = new AbstractUnitOption(id + ".regulars");
+                = new AbstractUnitOption(id + ".regulars", this);
             regulars.setValue(new AbstractUnit("model.unit.colonialRegular",
                                                "model.role.soldier", 2));
             interventionForce.getValue().add(regulars);
             AbstractUnitOption dragoons
-                = new AbstractUnitOption(id + ".dragoons");
+                = new AbstractUnitOption(id + ".dragoons", this);
             dragoons.setValue(new AbstractUnit("model.unit.colonialRegular",
                                                "model.role.dragoon", 2));
             interventionForce.getValue().add(dragoons);
             AbstractUnitOption artillery
-                = new AbstractUnitOption(id + ".artillery");
+                = new AbstractUnitOption(id + ".artillery", this);
             artillery.setValue(new AbstractUnit("model.unit.artillery",
                                                 "model.role.default", 2));
             interventionForce.getValue().add(artillery);
             AbstractUnitOption menOfWar
-                = new AbstractUnitOption(id + ".menOfWar");
+                = new AbstractUnitOption(id + ".menOfWar", this);
             menOfWar.setValue(new AbstractUnit("model.unit.manOWar",
                                                "model.role.default", 2));
             interventionForce.getValue().add(menOfWar);
@@ -1768,24 +1768,24 @@ public final class Specification {
         }
         id = GameOptions.MERCENARY_FORCE;
         if (allOptions.get(id) == null) {
-            UnitListOption mercenaryForce = new UnitListOption(id);
+            UnitListOption mercenaryForce = new UnitListOption(id, this);
             AbstractUnitOption regulars
-                = new AbstractUnitOption(id + ".regulars");
+                = new AbstractUnitOption(id + ".regulars", this);
             regulars.setValue(new AbstractUnit("model.unit.veteranSoldier",
                                                "model.role.soldier", 2));
             mercenaryForce.getValue().add(regulars);
             AbstractUnitOption dragoons
-                = new AbstractUnitOption(id + ".dragoons");
+                = new AbstractUnitOption(id + ".dragoons", this);
             dragoons.setValue(new AbstractUnit("model.unit.veteranSoldier",
                                                "model.role.dragoon", 2));
             mercenaryForce.getValue().add(dragoons);
             AbstractUnitOption artillery
-                = new AbstractUnitOption(id + ".artillery");
+                = new AbstractUnitOption(id + ".artillery", this);
             artillery.setValue(new AbstractUnit("model.unit.artillery",
                                                 "model.role.default", 2));
             mercenaryForce.getValue().add(artillery);
             AbstractUnitOption menOfWar
-                = new AbstractUnitOption(id + ".menOfWar");
+                = new AbstractUnitOption(id + ".menOfWar", this);
             menOfWar.setValue(new AbstractUnit("model.unit.manOWar",
                                                "model.role.default", 2));
             mercenaryForce.getValue().add(menOfWar);
@@ -1793,13 +1793,13 @@ public final class Specification {
         }
         id = GameOptions.GOOD_GOVERNMENT_LIMIT;
         if (allOptions.get(id) == null) {
-            IntegerOption goodGovernmentLimit = new IntegerOption(id);
+            IntegerOption goodGovernmentLimit = new IntegerOption(id, this);
             goodGovernmentLimit.setValue(50);
             allOptions.put(id, goodGovernmentLimit);
         }
         id = GameOptions.VERY_GOOD_GOVERNMENT_LIMIT;
         if (allOptions.get(id) == null) {
-            IntegerOption veryGoodGovernmentLimit = new IntegerOption(id);
+            IntegerOption veryGoodGovernmentLimit = new IntegerOption(id, this);
             veryGoodGovernmentLimit.setValue(100);
             allOptions.put(id, veryGoodGovernmentLimit);
         }

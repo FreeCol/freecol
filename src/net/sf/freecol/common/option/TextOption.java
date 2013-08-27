@@ -42,14 +42,6 @@ public class TextOption extends AbstractOption<String> {
     /** The value of this option. */
     private String value;
 
-    /**
-     * Creates a new <code>TextOption</code>.
-     *
-     * @param id The object identifier.
-     */
-    public TextOption(String id) {
-        super(id);
-    }
 
     /**
      * Creates a new <code>TextOption</code>.
@@ -77,7 +69,7 @@ public class TextOption extends AbstractOption<String> {
      * {@inheritDoc}
      */
     public TextOption clone() {
-        TextOption result = new TextOption(getId());
+        TextOption result = new TextOption(getId(), getSpecification());
         result.setValues(this);
         return result;
     }

@@ -35,15 +35,6 @@ public class UnitListOption extends ListOption<AbstractUnit> {
     /**
      * Creates a new <code>UnitListOption</code>.
      *
-     * @param id The object identifier.
-     */
-    public UnitListOption(String id) {
-        super(id);
-    }
-
-    /**
-     * Creates a new <code>UnitListOption</code>.
-     *
      * @param specification The <code>Specification</code> to refer to.
      */
     public UnitListOption(Specification specification) {
@@ -51,11 +42,21 @@ public class UnitListOption extends ListOption<AbstractUnit> {
     }
 
     /**
+     * Creates a new <code>UnitListOption</code>.
+     *
+     * @param id The object identifier.
+     * @param specification The <code>Specification</code> to refer to.
+     */
+    public UnitListOption(String id, Specification specification) {
+        super(id, specification);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
     public UnitListOption clone() {
-        UnitListOption ret = new UnitListOption(getId());
+        UnitListOption ret = new UnitListOption(getId(), getSpecification());
         ret.setValues(this);
         return ret;
     }
