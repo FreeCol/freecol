@@ -98,10 +98,6 @@ public class FreeColXMLWriter implements XMLStreamWriter {
         public boolean validFor(Player player) {
             return this != WriteScope.CLIENT || this.player == player;
         }
-
-        public boolean canSee(Tile tile) {
-            return this != WriteScope.CLIENT || this.player.canSee(tile);
-        }
     }
 
 
@@ -324,10 +320,6 @@ public class FreeColXMLWriter implements XMLStreamWriter {
 
     public boolean validFor(Player player) {
         return writeScope.validFor(player);
-    }
-
-    public boolean canSee(Tile tile) {
-        return writeScope.canSee(tile);
     }
 
     // Simple delegations to the XMLStreamWriter.  All should be

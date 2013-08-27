@@ -238,7 +238,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     public static boolean isBadlyDefended(Colony colony) {
         return colony.getTotalDefencePower()
-            < 1.25f * colony.getWorkLocationUnitCount() - 2.5f;
+            < 1.25f * colony.getUnitCount() - 2.5f;
     }
 
     /**
@@ -263,7 +263,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // Skip this colony if it does not yet need rearranging, but
         // first check if it is collapsing.
         final int turn = getGame().getTurn().getNumber();
-        if (colony.getWorkLocationUnitCount() <= 0) {
+        if (colony.getUnitCount() <= 0) {
             avertAutoDestruction();
         } else if (rearrangeTurn.getNumber() > turn) {
             if (colony.getCurrentlyBuilding() == null
@@ -356,7 +356,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         AIMessage.askRearrangeColony(this, workers, scratch);
 
         // Emergency recovery if something broke and the colony is empty.
-        if (colony.getWorkLocationUnitCount() <= 0) {
+        if (colony.getUnitCount() <= 0) {
             String destruct = "Autodestruct at " + colony.getName()
                 + " in " + turn + ":";
             for (UnitWas uw : was) destruct += "\n" + uw.toString();
@@ -406,7 +406,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             ? "unexpected-null(" + build.toString() + ")"
             : "expected-null";
         String report = "Rearrange " + colony.getName()
-            + " (" + colony.getWorkLocationUnitCount() + ")"
+            + " (" + colony.getUnitCount() + ")"
             + " build=" + buildStr
             + " " + getGame().getTurn()
             + " + " + nextRearrange;
@@ -651,7 +651,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             }
         }
         // No good, no choice but to fail.
-        if (colony.getWorkLocationUnitCount() <= 0) {
+        if (colony.getUnitCount() <= 0) {
             throw new IllegalStateException(msg);
         }
     }
@@ -1064,7 +1064,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // Request population increase if no worker wishes and the bonus
         // can take it.
         if (experts.isEmpty()
-            && colony.governmentChange(colony.getWorkLocationUnitCount() + 1) >= 0) {
+            && colony.governmentChange(colony.getUnitCount() + 1) >= 0) {
             boolean needFood = colony.getFoodProduction()
                 <= colony.getFoodConsumption()
                 + colony.getOwner().getMaximumFoodConsumption();

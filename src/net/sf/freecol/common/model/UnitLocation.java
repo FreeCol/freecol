@@ -410,11 +410,12 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         if (units.remove(u)) units.add(0, u);
     }
 
-    // @compat 0.10.5
+    /**
+     * Clear the units from this container.
+     */
     protected void clearUnitList() {
         units.clear();
     }
-    // end @compat
 
     /**
      * Gets the reason why a given <code>Locatable</code> can not be

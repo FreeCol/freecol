@@ -614,6 +614,8 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /** The tiles the player can see. */
     private boolean[][] canSeeTiles = null;
+    /** Are the canSeeTiles valid or do they need to be recalculated? */
+    private boolean canSeeValid = false;
     /** Do not access canSeeTiles without taking canSeeLock. */
     private final Object canSeeLock = new Object();
 
@@ -2656,7 +2658,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
         do {
             synchronized (canSeeLock) {
-                if (canSeeTiles != null) {
+                if (canSeeValid) {
                     return canSeeTiles[tile.getX()][tile.getY()];
                 }
             }
@@ -2707,7 +2709,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public void invalidateCanSeeTiles() {
         synchronized (canSeeLock) {
-            canSeeTiles = null;
+            canSeeValid = false;
         }
     }
 
@@ -2727,6 +2729,7 @@ public class Player extends FreeColGameObject implements Nameable {
         boolean[][] cST = makeCanSeeTiles(map);
         synchronized (canSeeLock) {
             canSeeTiles = cST;
+            canSeeValid = true;
         }
         return true;
     }
@@ -2756,57 +2759,69 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     private boolean[][] makeCanSeeTiles(Map map) {
         final Specification spec = getSpecification();
-        boolean[][] cST = new boolean[map.getWidth()][map.getHeight()];
-
+        // Simple case when there is no fog of war: a tile is
+        // visible once it is explored.
         if (!spec.getBoolean(GameOptions.FOG_OF_WAR)) {
+            boolean[][] cST = (canSeeTiles != null) ? canSeeTiles
+                : new boolean[map.getWidth()][map.getHeight()];
             for (Tile t : getGame().getMap().getAllTiles()) {
                 if (t != null) {
                     cST[t.getX()][t.getY()] = hasExplored(t);
                 }
             }
-        } else {
-            for (Unit unit : getUnits()) {
-                // Only consider units directly on the map, not those
-                // on a carrier or in Europe.
-                if (!(unit.getLocation() instanceof Tile)) continue;
+            return cST;
+        }
 
-                Tile tile = (Tile) unit.getLocation();
-                cST[tile.getX()][tile.getY()] = true;
-                for (Tile t : tile.getSurroundingTiles(unit.getLineOfSight())) {
-                    if (t != null) {
-                        cST[t.getX()][t.getY()] = true;
-                    }
-                }
+        // When there is fog, have to trace all locations where the
+        // player has units, settlements, (optionally) missions, and
+        // extra visibility.
+        // Set the PET for visible tiles to the tile itself.
+        boolean[][] cST = new boolean[map.getWidth()][map.getHeight()];
+
+        for (Unit unit : getUnits()) {
+            // Only consider units directly on the map, not those on a
+            // carrier or in Europe.
+            if (!(unit.getLocation() instanceof Tile)) continue;
+
+            // All the units.
+            for (Tile t : ((Tile)unit.getLocation()).getSurroundingTiles(0,
+                    unit.getLineOfSight())) {
+                cST[t.getX()][t.getY()] = true;
+                t.seeTile(this);
             }
+            // All the settlements.
             for (Settlement settlement : getSettlements()) {
-                Tile tile = settlement.getTile();
-                cST[tile.getX()][tile.getY()] = true;
-                for (Tile t : tile.getSurroundingTiles(settlement.getLineOfSight())) {
-                    if (t != null) {
-                        cST[t.getX()][t.getY()] = true;
-                    }
+                for (Tile t : settlement.getTile().getSurroundingTiles(0,
+                        settlement.getLineOfSight())) {
+                    cST[t.getX()][t.getY()] = true;
+                    t.seeTile(this);
                 }
             }
+            // All missions if using enhanced missionaries.
             if (isEuropean()
                 && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
                 for (Player other : getGame().getPlayers()) {
                     if (this.equals(other) || !other.isIndian()) continue;
                     for (IndianSettlement is : other.getIndianSettlements()) {
                         if (!is.hasMissionary(this)) continue;
-                        for (Tile t : is.getTile().getSurroundingTiles(is.getLineOfSight())) {
-                            if (t != null) {
-                                cST[t.getX()][t.getY()] = true;
-                            }
+                        for (Tile t : is.getTile().getSurroundingTiles(0,
+                                is.getLineOfSight())) {
+                            cST[t.getX()][t.getY()] = true;
+                            t.seeTile(this);
                         }
                     }
                 }
             }
+            // All other European settlements if can see all colonies.
             if (isEuropean() && hasAbility(Ability.SEE_ALL_COLONIES)) {
                 for (Player other : getGame().getPlayers()) {
                     if (this.equals(other) || !other.isEuropean()) continue;
                     for (Colony colony : other.getColonies()) {
-                        Tile t = colony.getTile();
-                        cST[t.getX()][t.getY()] = true;
+                        for (Tile t : colony.getTile().getSurroundingTiles(0,
+                                colony.getLineOfSight())) {
+                            cST[t.getX()][t.getY()] = true;
+                            t.seeTile(this);
+                        }
                     }
                 }
             }

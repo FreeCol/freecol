@@ -395,6 +395,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
      */
     private void csImproveTile(Random random, ChangeSet cs) {
         Tile tile = getTile();
+        tile.cacheUnseen();//+til
         AbstractGoods deliver = getWorkImprovement().getType().getProduction(tile.getType());
         if (deliver != null) { // Deliver goods if any
             int amount = deliver.getAmount();
@@ -492,8 +493,6 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 .addStringTemplate("%unit%", getLabel())
                 .addStringTemplate("%location%", locName));
         }
-
-        tile.updatePlayerExploredTiles();//+til
     }
 
     /**
@@ -816,8 +815,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
             logger.warning("Bogus rumour type: " + rumour);
             break;
         }
+        tile.cacheUnseen();//+til
         tile.removeLostCityRumour();//-til
-        tile.updatePlayerExploredTiles();//+til
     }
 
     /**
@@ -886,7 +885,10 @@ public class ServerUnit extends Unit implements ServerModelObject {
         }
 
         // Do the move and explore a rumour if needed.
-        setLocation(newTile);//-vis(serverPlayer),-til?
+        if (oldLocation instanceof WorkLocation) {
+            oldLocation.getTile().cacheUnseen();//+til
+        }
+        setLocation(newTile);//-vis(serverPlayer),-til if in colony
         if (newTile.hasLostCityRumour() && serverPlayer.isEuropean()) {
             csExploreLostCityRumour(random, cs);//+vis(serverPlayer)
         } else {
@@ -903,10 +905,6 @@ public class ServerUnit extends Unit implements ServerModelObject {
             cs.add(See.perhaps().always(serverPlayer),
                    (FreeColGameObject)oldLocation);
         } else {
-            if (oldLocation instanceof WorkLocation) {
-                ((WorkLocation)oldLocation).getColony().getTile()
-                    .updatePlayerExploredTiles();//+til
-            }
             cs.add(See.only(serverPlayer), (FreeColGameObject)oldLocation);
         }
         cs.add(See.perhaps().always(serverPlayer), newTile);
@@ -928,8 +926,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
                         + settlement.getType().getExtraClaimableRadius()))
                 && Utils.randomInt(logger, "Claim tribal land", random,
                                    d + 1) == 0) {
+                newTile.cacheUnseen();//+til
                 newTile.changeOwnership(serverPlayer, settlement);//-til
-                newTile.updatePlayerExploredTiles();//+til
             }
 
             // Check for first landing
@@ -979,9 +977,11 @@ public class ServerUnit extends Unit implements ServerModelObject {
                         && (contactPlayer = (ServerPlayer)unit.getOwner())
                             .isEuropean()
                         && (is = getHomeIndianSettlement()) != null)) {
+                    Tile copied = is.getTile().getTileToCache();
                     if (contactPlayer.hasExplored(is.getTile())
-                        && is.setContacted(contactPlayer)) {
-                        cs.add(See.only(contactPlayer), is);//-til
+                        && is.setContacted(contactPlayer)) {//-til
+                        is.getTile().cacheUnseen(copied);//+til
+                        cs.add(See.only(contactPlayer), is);
                         // First European contact with native settlement.
                         StringTemplate nation = is.getOwner().getNationName();
                         cs.addMessage(See.only(contactPlayer),
@@ -990,7 +990,6 @@ public class ServerUnit extends Unit implements ServerModelObject {
                                              this, is)
                                 .addStringTemplate("%nation%", nation)
                                 .addName("%settlement%", is.getName()));
-                        is.getTile().updatePlayerExploredTile(contactPlayer);//+til
                         logger.finest("First contact between " + contactPlayer
                             + " and " + is + " at " + newTile);
                     }                   

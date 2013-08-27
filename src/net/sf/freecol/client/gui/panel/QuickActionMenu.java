@@ -312,7 +312,7 @@ public final class QuickActionMenu extends JPopupMenu {
         WorkLocation current = (unit.getLocation() instanceof WorkLocation)
             ? (WorkLocation)unit.getLocation() : null;
         final int bonusChange = (current != null) ? 0
-            : colony.governmentChange(colony.getWorkLocationUnitCount() + 1);
+            : colony.governmentChange(colony.getUnitCount() + 1);
 
         Map<JMenuItem, Integer> items = new HashMap<JMenuItem, Integer>();
         Map<JMenuItem, Integer> extras = new HashMap<JMenuItem, Integer>();

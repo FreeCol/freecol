@@ -392,6 +392,17 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
+     * Sets the most hated nation of this settlement.
+     *
+     * -til: Changes the tile appearance.
+     *
+     * @param mostHated The new most hated nation.
+     */
+    public void setMostHated(Player mostHated) {
+        this.mostHated = mostHated;
+    }
+
+    /**
      * Gets the contact level between this settlement and a player.
      *
      * @param player The <code>Player</code> to check.
@@ -1148,13 +1159,15 @@ public class IndianSettlement extends Settlement {
     private static final String CONVERT_PROGRESS_TAG = "convertProgress";
     private static final String IS_VISITED_TAG = "isVisited";
     private static final String LAST_TRIBUTE_TAG = "lastTribute";
-    private static final String LEARNABLE_SKILL_TAG = "learnableSkill";
     private static final String LEVEL_TAG = "level";
     private static final String MISSIONARY_TAG = "missionary";
     private static final String MOST_HATED_TAG = "mostHated";
     private static final String OWNED_UNITS_TAG = "ownedUnits";
     private static final String PLAYER_TAG = "player";
-    private static final String WANTED_GOODS_TAG = "wantedGoods";
+    // Public for now while 0.10.7 backward compatibility code in Tile
+    // for PlayerExploredTile needs to check these.
+    public static final String LEARNABLE_SKILL_TAG = "learnableSkill";
+    public static final String WANTED_GOODS_TAG = "wantedGoods";
 
 
     /**
@@ -1164,11 +1177,10 @@ public class IndianSettlement extends Settlement {
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
-        PlayerExploredTile pet;
-        if (xw.validFor(getOwner())) {
+        Player hated = getMostHated();
+        if (hated != null) xw.writeAttribute(MOST_HATED_TAG, hated);
 
-            Player hated = getMostHated();
-            if (hated != null) xw.writeAttribute(MOST_HATED_TAG, hated);
+        if (xw.validFor(getOwner())) {
 
             xw.writeAttribute(LAST_TRIBUTE_TAG, lastTribute);
 
@@ -1184,11 +1196,7 @@ public class IndianSettlement extends Settlement {
                 }
             }
 
-        } else if ((pet = getTile().getPlayerExploredTile(xw.getClientPlayer())) != null) {
-
-            Player hated = pet.getMostHated();
-            if (hated != null) xw.writeAttribute(MOST_HATED_TAG, hated);
-
+        } else {
             // Special handling for skill and wanted goods which are
             // only visible when in close contact with the settlement.
             UnitType skill = getTile().getLearnableSkill(xw.getClientPlayer());
@@ -1216,7 +1224,14 @@ public class IndianSettlement extends Settlement {
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        PlayerExploredTile pet;
+        if (missionary != null) {
+            xw.writeStartElement(MISSIONARY_TAG);
+            
+            missionary.toXML(xw);
+
+            xw.writeEndElement();
+        }
+
         if (xw.validFor(getOwner())) {
 
             for (Player p : getSortedCopy(contactLevels.keySet())) {
@@ -1239,14 +1254,6 @@ public class IndianSettlement extends Settlement {
                 xw.writeEndElement();
             }
 
-            if (missionary != null) {
-                xw.writeStartElement(MISSIONARY_TAG);
-
-                missionary.toXML(xw);
-
-                xw.writeEndElement();
-            }
-
             for (Unit unit : getSortedCopy(ownedUnits)) {
                 xw.writeStartElement(OWNED_UNITS_TAG);
 
@@ -1255,7 +1262,7 @@ public class IndianSettlement extends Settlement {
                 xw.writeEndElement();
             }
 
-        } else if ((pet = getTile().getPlayerExploredTile(xw.getClientPlayer())) != null) {
+        } else {
             Player player = xw.getClientPlayer();
 
             ContactLevel cl = contactLevels.get(player);
@@ -1269,20 +1276,13 @@ public class IndianSettlement extends Settlement {
                 xw.writeEndElement();
             }
 
-            if (pet.getAlarm() != null) {
+            Tension alarm = getAlarm(player);
+            if (alarm != null) {
                 xw.writeStartElement(ALARM_TAG);
 
                 xw.writeAttribute(PLAYER_TAG, player);
 
-                xw.writeAttribute(VALUE_TAG, pet.getAlarm().getValue());
-
-                xw.writeEndElement();
-            }
-
-            if (pet.getMissionary() != null) {
-                xw.writeStartElement(MISSIONARY_TAG);
-
-                pet.getMissionary().toXML(xw);
+                xw.writeAttribute(VALUE_TAG, alarm.getValue());
 
                 xw.writeEndElement();
             }

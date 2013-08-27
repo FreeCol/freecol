@@ -149,12 +149,12 @@ public class DebugUtils {
             Colony.NoBuildReason reason = sColony.getNoBuildReason(sBuildingType);
             results.add(sColony.getName() + ": " + reason.toString());
             if (reason == Colony.NoBuildReason.NONE) {
+                if (sBuildingType.isDefenceType()) {
+                    sColony.getTile().cacheUnseen();//+til
+                }
                 Building sBuilding = new ServerBuilding(sGame, sColony,
                                                         sBuildingType);
                 sColony.addBuilding(sBuilding);//-til
-                if (sBuilding.getType().isDefenceType()) {
-                    sColony.getTile().updatePlayerExploredTiles();//+til
-                }
             } else {
                 fails++;
             }
@@ -445,11 +445,11 @@ public class DebugUtils {
         ServerPlayer sPlayer = sGame.getFreeColGameObject(player.getId(),
                                                           ServerPlayer.class);
         ServerPlayer sOldPlayer = (ServerPlayer)sSettlement.getOwner();
-        sSettlement.changeOwner(sPlayer);//-vis(sPlayer,sOldPlayer),//-til
-        sPlayer.exploreForSettlement(sSettlement);
         for (Tile t : sSettlement.getOwnedTiles()) {
-            t.updatePlayerExploredTiles();//+til
+            t.cacheUnseen(sPlayer);//+til
         }
+        sPlayer.exploreForSettlement(sSettlement);
+        sSettlement.changeOwner(sPlayer);//-vis(sPlayer,sOldPlayer),//-til
         sPlayer.invalidateCanSeeTiles();//+vis(sPlayer)
         sOldPlayer.invalidateCanSeeTiles();//+vis(sOldPlayer)
 
@@ -549,7 +549,8 @@ public class DebugUtils {
         for (Tile t : sMap.getAllTiles()) {
             if (sPlayer.canSee(t)) {
                 for (Unit u : t.getUnitList()) {
-                    if (!sPlayer.canSeeUnit(u)) continue;
+                    if (!sPlayer.owns(u)
+                        && (t.hasSettlement() || u.isOnCarrier())) continue;
                     if (game.getFreeColGameObject(u.getId(), Unit.class) == null) {
                         sb.append("Unit missing on client-side.\n");
                         sb.append("  Server: ");

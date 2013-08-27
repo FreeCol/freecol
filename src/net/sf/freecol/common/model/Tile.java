@@ -172,11 +172,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     private int contiguity = -1;
 
-    /**
-     * Stores each player's view of this tile.  Only non-null in the
-     * server.
-     */
-    private java.util.Map<Player, PlayerExploredTile> playerExploredTiles;
+    /** A map of cached tiles for each European player. */
+    private java.util.Map<Player, Tile> cachedTiles = null;
+
+    /** A map of native settlement internals for each European player. */
     private java.util.Map<Player, IndianSettlementInternals> playerIndianSettlements;
 
 
@@ -216,7 +215,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
     private void initializePlayerView(Game game) {
         if (!game.isInServer()) return;
-        this.playerExploredTiles = new HashMap<Player, PlayerExploredTile>();
+        this.cachedTiles = new HashMap<Player, Tile>();
         this.playerIndianSettlements
             = new HashMap<Player, IndianSettlementInternals>();
     }
@@ -508,19 +507,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public boolean isConnectedTo(Tile other) {
         return getContiguity() == other.getContiguity();
-    }
-
-    /**
-     * Gets the <code>PlayerExploredTile</code> for the given player.
-     *
-     * @param player The <code>Player</code> to query.
-     * @return The <code>PlayerExploredTile</code> for the given player,
-     *     or null if the <code>Tile</code> has not been explored.
-     * @see PlayerExploredTile
-     */
-    public PlayerExploredTile getPlayerExploredTile(Player player) {
-        return (playerExploredTiles == null) ? null
-            : playerExploredTiles.get(player);
     }
 
     /**
@@ -1319,7 +1305,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
 
     //
-    // ColonyTile and PlayerExploredTile maintenance
+    // Colony and cached Tile maintenance
     //
 
     /**
@@ -1338,44 +1324,96 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
-     * Updates the <code>PlayerExploredTile</code> for each player.
-     * This update will only be performed if the player
-     * {@link Player#canSee(Tile) can see} this <code>Tile</code>.
+     * Get a players view of this tile.
+     *
+     * @param player The <code>Player</code> who owns the view.
+     * @return The view of this <code>Tile</code>.
      */
-    public void updatePlayerExploredTiles() {
-        updatePlayerExploredTiles(null);
+    public Tile getCachedTile(Player player) {
+        return (cachedTiles == null) ? null
+            : (player.isEuropean()) ? cachedTiles.get(player)
+            : this;
     }
 
     /**
-     * Updates the <code>PlayerExploredTile</code> for each player.
-     * This update will only be performed if the player
-     * {@link Player#canSee(Tile) can see} this <code>Tile</code>.
+     * Set a players view of this tile.
      *
-     * @param oldPlayer The optional <code>Player</code> that formerly
-     *     had visibility of this <code>Tile</code> and should see the change.
+     * @param player The <code>Player</code> who owns the view.
+     * @param The view of the tile (either this tile, or an uninterned
+     *     copy of it).
      */
-    public void updatePlayerExploredTiles(Player oldPlayer) {
-        if (playerExploredTiles == null) return;
-        for (Player player : getGame().getLiveEuropeanPlayers()) {
-            if (player == oldPlayer || player.canSee(this)) {
-                updatePlayerExploredTile(player);
+    public void setCachedTile(Player player, Tile tile) {
+        if (cachedTiles == null || !player.isEuropean()) return;
+        cachedTiles.put(player, tile);
+    }
+
+    /**
+     * Set a players view of this tile to the tile itself.
+     *
+     * @param player The <code>Player</code> who owns the view.
+     */
+    public void seeTile(Player player) {
+        setCachedTile(player, this);
+    }
+
+    /**
+     * A change is about to occur on this tile.  Cache it if unseen.
+     */
+    public void cacheUnseen() {
+        cacheUnseen(null, null);
+    }
+
+    /**
+     * Get a copy of this tile suitable for caching (lacking units).
+     *
+     * @return An uninterned copy of this <code>Tile</code>.
+     */
+    public Tile getTileToCache() {
+        Tile tile = this.copy(getGame(), Tile.class);
+        tile.clearUnitList();
+        return tile;
+    }
+
+    /**
+     * A change is about to occur on this tile.  Cache it if unseen.
+     *
+     * @param player A <code>Player</code> that currently may not be able
+     *     to see the tile, but will as a result of the change, and so
+     *     should not cache it.
+     */
+    public void cacheUnseen(Player player) {
+        cacheUnseen(player, null);
+    }
+
+    /**
+     * A change may have occured on this tile.  Establish caches where
+     * needed.  Use the copied tile if supplied (which should have
+     * been created previously with {@link #getTileToCache},
+     *
+     * @param copied An optional <code>Tile</code> to cache.
+     */
+    public void cacheUnseen(Tile copied) {
+        cacheUnseen(null, copied);
+    }
+
+    /**
+     * A change may have occured on this tile.  Establish caches where
+     * needed.  Use the copied tile if supplied (which should have
+     * been created previously with {@link #getTileToCache},
+     *
+     * @param player A <code>Player</code> that currently may not be able
+     *     to see the tile, but will as a result of the change, and so
+     *     should not cache it.
+     * @param copied An optional <code>Tile</code> to cache.
+     */
+    public void cacheUnseen(Player player, Tile copied) {
+        if (cachedTiles == null) return;
+        for (Player p : getGame().getLiveEuropeanPlayers()) {
+            if (p != player && !p.canSee(this)
+                && getCachedTile(p) == this) {
+                if (copied == null) copied = getTileToCache();
+                setCachedTile(p, copied);
             }
-        }
-    }
-
-    /**
-     * Updates the information about this <code>Tile</code> for the given
-     * <code>Player</code>.
-     *
-     * @param player The <code>Player</code>.
-     */
-    public void updatePlayerExploredTile(Player player) {
-        if (playerExploredTiles == null || !player.isEuropean()) return;
-        if (getPlayerExploredTile(player) == null) {
-            throw new IllegalStateException("uPET fail for "
-                + player.getName() + ": " + this + "/" + playerExploredTiles);
-        } else {
-            getPlayerExploredTile(player).update();
         }
     }
 
@@ -1412,9 +1450,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
     // @compat 0.10.7
     /**
-     * Backward compatibility hack for PlayerExploredTiles to set
-     * native settlement information.  Do not check the current map
-     * state as we might leak destruction information.
+     * Backward compatibility hack to set native settlement
+     * information.  Do not check the current map state as we might
+     * leak destruction information.
      *
      * @param player The <code>Player</code> to pet belonged to.
      * @param skill The skill taught by the settlement.
@@ -1442,7 +1480,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public boolean isExploredBy(Player player) {
         return (!player.isEuropean()) ? true
             : (!isExplored()) ? false
-            : getPlayerExploredTile(player) != null;
+            : getCachedTile(player) != null;
     }
 
     /**
@@ -1452,12 +1490,11 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @param reveal The exploration state.
      */
     public void setExplored(Player player, boolean reveal) {
-        if (playerExploredTiles == null || !player.isEuropean()) return;
+        if (cachedTiles == null || !player.isEuropean()) return;
         if (reveal) {
-            playerExploredTiles.put(player, 
-                new PlayerExploredTile(getGame(), player, this));
+            seeTile(player);
         } else {
-            playerExploredTiles.remove(player);
+            cachedTiles.remove(player);
         }
     }
 
@@ -1682,7 +1719,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public boolean add(Locatable locatable) {
         if (locatable instanceof TileItem) {
-            return addTileItem((TileItem) locatable);
+            return addTileItem((TileItem) locatable);//-til
 
         } else if (locatable instanceof Unit) {
             if (super.add(locatable)) {
@@ -1703,7 +1740,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public boolean remove(Locatable locatable) {
         if (locatable instanceof TileItem) {
-            return removeTileItem((TileItem)locatable) == (TileItem)locatable;
+            return removeTileItem((TileItem)locatable)
+                == (TileItem)locatable;//-til
 
         } else {
             return super.remove(locatable);
@@ -1748,8 +1786,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         } else {
             Player player = getGame().getCurrentPlayer();
             if (player != null) {
-                PlayerExploredTile pet = getPlayerExploredTile(player);
-                return (pet != null) ? getType().getNameKey() : "unexplored";
+                return (getCachedTile(player) == null) ? "unexplored"
+                    : getType().getNameKey();
             } else {
                 logger.warning("player == null");
                 return "";
@@ -1807,22 +1845,17 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *     problems were fixed, positive if no problems found at all.
      */
     public int checkIntegrity(boolean fix) {
-        int result = (tileItemContainer == null) ? 1
+        return (tileItemContainer == null) ? 1
             : tileItemContainer.checkIntegrity(fix);
-        if (playerExploredTiles != null) {
-            for (PlayerExploredTile pet : playerExploredTiles.values()) {
-                result = Math.min(result, pet.checkIntegrity(fix));
-            }
-        }
-        if (type == null) result = -1;
-        return result;
     }
 
 
     // Serialization
 
+    private static final String CACHED_TILE_TAG = "cachedTile";
     private static final String CONNECTED_TAG = "connected";
     private static final String CONTIGUITY_TAG = "contiguity";
+    private static final String COPIED_TAG = "copied";
     private static final String MOVE_TO_EUROPE_TAG = "moveToEurope";
     private static final String OWNER_TAG = "owner";
     private static final String OWNING_SETTLEMENT_TAG = "owningSettlement";
@@ -1841,6 +1874,39 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * {@inheritDoc}
      */
     @Override
+    public void toXML(FreeColXMLWriter xw, String tag) throws XMLStreamException {
+        // Special override of tile output serialization that handles
+        // the tile caching.
+        // 1. If not writing to a player, just write this tile.
+        // 2. If there is no cached tile then it is unexplored, so
+        //    write the minimal tile (id, x, y).
+        // 3. Otherwise write the cached tile, which will either be a
+        //    copy or <code>this</code>.
+        Player player = xw.getClientPlayer();
+        Tile tile = (player == null) ? this : getCachedTile(player);
+        
+        xw.writeStartElement(tag);
+
+        if (tile == null) {
+            xw.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+
+            xw.writeAttribute(X_TAG, this.x);
+
+            xw.writeAttribute(Y_TAG, this.y);
+
+        } else {
+            tile.writeAttributes(xw);
+
+            tile.writeChildren(xw);
+        }
+
+        xw.writeEndElement();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
@@ -1848,51 +1914,21 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
         xw.writeAttribute(Y_TAG, this.y);
 
-        PlayerExploredTile pet;
-        if (xw.canSee(this)) {
+        xw.writeAttribute(TYPE_TAG, type);
 
-            xw.writeAttribute(TYPE_TAG, type);
-
-            if (owner != null) {
-                xw.writeAttribute(OWNER_TAG, owner);
-            }
-
-            if (owningSettlement != null) {
-                xw.writeAttribute(OWNING_SETTLEMENT_TAG, owningSettlement);
-            }
-            
-            xw.writeAttribute(STYLE_TAG, style);
-
-            writeCommonAttributes(xw);
-
-        } else if ((pet = getPlayerExploredTile(xw.getClientPlayer())) != null) {
-
-            // These need to move into the pet.
-            xw.writeAttribute(TYPE_TAG, type);
-            xw.writeAttribute(STYLE_TAG, style);
-
-            if (pet.getOwner() != null) {
-                xw.writeAttribute(OWNER_TAG, pet.getOwner());
-            }
-
-            if (pet.getOwningSettlement() != null) {
-                xw.writeAttribute(OWNING_SETTLEMENT_TAG,
-                    pet.getOwningSettlement());
-            }
-
-            writeCommonAttributes(xw);
+        if (owner != null) {
+            xw.writeAttribute(OWNER_TAG, owner);
         }
-    }
-
-    /**
-     * Write the attributes that do not change once discovered and thus
-     * do not need to be cached in the pet.
-     *
-     * @param xw The <code>FreeColXMLWriter</code> to write to.
-     * @exception XMLStreamException if there is problem writing to the stream.
-     */
-    private void writeCommonAttributes(FreeColXMLWriter xw) throws XMLStreamException {
-        xw.writeAttribute(REGION_TAG, region);
+        
+        if (owningSettlement != null) {
+            xw.writeAttribute(OWNING_SETTLEMENT_TAG, owningSettlement);
+        }
+        
+        xw.writeAttribute(STYLE_TAG, style);
+        
+        if (region != null) {
+            xw.writeAttribute(REGION_TAG, region);
+        }
         
         if (moveToEurope != null) {
             xw.writeAttribute(MOVE_TO_EUROPE_TAG,
@@ -1913,39 +1949,38 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
-        PlayerExploredTile pet;
-        if (xw.canSee(this)) {
+        // Show tile contents (e.g. enemy units) if there is no
+        // blocking enemy settlement.
+        if (settlement == null
+            || xw.validFor(settlement.getOwner())) {
 
-            // Show tile contents (e.g. enemy units) if there is no
-            // blocking enemy settlement.
-            if (settlement == null
-                || xw.validFor(settlement.getOwner())) {
-
-                super.writeChildren(xw);
-            }
-
-            if (settlement != null) settlement.toXML(xw);
-
-        } else if ((pet = getPlayerExploredTile(xw.getClientPlayer())) != null) {
-            // Only display the settlement if we know it owns the tile
-            // and we have a useful level of information about it.
-            // This is a compromise, but something more precise is too
-            // complex for the present.
-            if (settlement != null
-                && settlement == pet.getOwningSettlement()
-                && settlement.getOwner() == pet.getOwner()
-                && !(settlement instanceof Colony
-                    && pet.getColonyUnitCount() <= 0)) {
-                settlement.toXML(xw);
-            }
+            super.writeChildren(xw);
         }
+
+        if (settlement != null) settlement.toXML(xw);
 
         if (tileItemContainer != null) tileItemContainer.toXML(xw);
 
-        // Save the pets to saved games.
-        if (xw.validForSave() && playerExploredTiles != null) {
-            for (PlayerExploredTile p : playerExploredTiles.values()) {
-                p.toXML(xw);
+        // Save the cached tiles to saved games.
+        if (xw.validForSave() && cachedTiles != null) {
+            for (Player p : getGame().getLiveEuropeanPlayers()) {
+                Tile t = getCachedTile(p);
+                if (t == null) continue;
+
+                xw.writeStartElement(CACHED_TILE_TAG);
+
+                xw.writeAttribute(PLAYER_TAG, p);
+
+                xw.writeAttribute(COPIED_TAG, t != this);
+
+                if (t != this) { // Only write copied tiles, with limited scope
+                    FreeColXMLWriter.WriteScope scope = xw.getWriteScope();
+                    xw.setWriteScope(FreeColXMLWriter.WriteScope.toClient(p));
+                    t.toXML(xw);
+                    xw.setWriteScope(scope);
+                }
+
+                xw.writeEndElement();
             }
         }
     }
@@ -2040,11 +2075,32 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
+        final Specification spec = getSpecification();
         final Game game = getGame();
         final String tag = xr.getLocalName();
 
+        if (cachedTiles != null && CACHED_TILE_TAG.equals(tag)) {
+            Player player = xr.findFreeColGameObject(game, PLAYER_TAG, 
+                Player.class, (Player)null, true);
+
+            boolean copied = xr.getAttribute(COPIED_TAG, false);
+
+            if (copied) {
+                FreeColXMLReader.ReadScope scope = xr.getReadScope();
+                xr.setReadScope(FreeColXMLReader.ReadScope.NOINTERN);
+                xr.nextTag();
+                xr.expectTag(Tile.getXMLElementTagName());
+                Tile tile = xr.readFreeColGameObject(game, Tile.class);
+                setCachedTile(player, tile);
+                xr.setReadScope(scope);
+
+            } else {
+                setCachedTile(player, this);
+            }
+            xr.closeTag(CACHED_TILE_TAG);
+
         // @compat 0.10.1
-        if (OLD_UNITS_TAG.equals(tag)) {
+        } else if (OLD_UNITS_TAG.equals(tag)) {
             while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 super.readChild(xr);
             }
@@ -2056,13 +2112,31 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         } else if (IndianSettlement.getXMLElementTagName().equals(tag)) {
             settlement = xr.readFreeColGameObject(game, IndianSettlement.class);
 
+        // @compat 0.10.7
         } else if (PlayerExploredTile.getXMLElementTagName().equals(tag)) {
             // Only from a saved game.
             Player player = xr.findFreeColGameObject(game, PLAYER_TAG,
                 Player.class, (Player)null, true);
+
+            if (xr.hasAttribute(IndianSettlement.LEARNABLE_SKILL_TAG)
+                || xr.hasAttribute(IndianSettlement.WANTED_GOODS_TAG + "0")) {
+                UnitType skill = xr.getType(spec,
+                    IndianSettlement.LEARNABLE_SKILL_TAG,
+                    UnitType.class, (UnitType)null);
+                GoodsType[] wanted
+                    = new GoodsType[IndianSettlement.WANTED_GOODS_COUNT];
+                for (int i = 0; i < wanted.length; i++) {
+                    wanted[i] = xr.getType(spec,
+                        IndianSettlement.WANTED_GOODS_TAG + i,
+                        GoodsType.class, (GoodsType)null);
+                }
+                setIndianSettlementInternals(player, skill, wanted);
+            }
+
             PlayerExploredTile pet = xr.readFreeColGameObject(game,
                 PlayerExploredTile.class);
-            playerExploredTiles.put(player, pet);
+            pet.fixCache();
+        // end @compat 0.10.7
 
         } else if (TileItemContainer.getXMLElementTagName().equals(tag)) {
             tileItemContainer = xr.readFreeColGameObject(game,

@@ -39,6 +39,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.ServerInfo;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColSavegameFile;
@@ -394,6 +395,11 @@ public final class ConnectController {
                     logger.log(Level.WARNING, "Stream error.", e);
                 }
                 if (err != null) {
+                    // If this is a debug run, fail hard.
+                    if (freeColClient.isHeadless()
+                        || FreeColDebugger.getDebugRunTurns() >= 0) {
+                        FreeCol.fatal(Messages.message(err));
+                    }
                     SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 gui.closeMainPanel();

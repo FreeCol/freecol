@@ -393,7 +393,7 @@ public class ColonyPlan {
 
         // Update the profile type.
         profileType = ProfileType
-            .getProfileTypeFromSize(colony.getWorkLocationUnitCount());
+            .getProfileTypeFromSize(colony.getUnitCount());
 
         // Build the total map of all possible production with standard units.
         Map<GoodsType, Map<WorkLocation, Integer>> production
@@ -1478,7 +1478,7 @@ public class ColonyPlan {
         //   unit can *improve* production by being added.
         //   - find a place to produce food that at least avoids
         //     starvation and add one worker.
-        if (col.getWorkLocationUnitCount() == 0) {
+        if (col.getUnitCount() == 0) {
             if (getFoodPlans().isEmpty()) {
 locations:      for (WorkLocation wl : col.getAvailableWorkLocations()) {
                     for (Unit u : new ArrayList<Unit>(workers)) {
@@ -1581,9 +1581,8 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
             report.append(u.getId()).append("(")
                 .append(u.getType().getSuffix()).append(") -> UNUSED\n");
         }                
-        report.append("Final population = ")
-            .append(col.getWorkLocationUnitCount());
-        if (col.getWorkLocationUnitCount() <= 0) {
+        report.append("Final population = ").append(col.getUnitCount());
+        if (col.getUnitCount() <= 0) {
             report.append("\nassignWorkers at ").append(name)
                 .append(" failed.");
             col = null;

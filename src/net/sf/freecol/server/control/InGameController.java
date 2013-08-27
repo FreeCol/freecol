@@ -1421,7 +1421,10 @@ public final class InGameController extends Controller {
                                 String newName) {
         ChangeSet cs = new ChangeSet();
 
-        object.setName(newName);
+        if (object instanceof Settlement) {
+            ((Settlement)object).getTile().cacheUnseen();//+til
+        }
+        object.setName(newName);//-til?
         FreeColGameObject fcgo = (FreeColGameObject)object;
         cs.addPartial(See.all(), fcgo, "name");
 
@@ -1701,8 +1704,8 @@ public final class InGameController extends Controller {
      * @return An <code>Element</code> encapsulating this action.
      */
     public Element declineMounds(ServerPlayer serverPlayer, Tile tile) {
+        tile.cacheUnseen();//+til
         tile.removeLostCityRumour();//-til
-        tile.updatePlayerExploredTiles();//+til
 
         // Others might see rumour disappear
         ChangeSet cs = new ChangeSet();
@@ -1735,8 +1738,8 @@ public final class InGameController extends Controller {
         if (welcomer != null) {
             if (accept) { // Claim land
                 Tile tile = unit.getTile();
+                tile.cacheUnseen();//+til
                 tile.changeOwnership(serverPlayer, null);//-til
-                tile.updatePlayerExploredTiles();//+til
                 cs.add(See.perhaps(), tile);
             } else { // Consider not accepting the treaty to be an insult.
                 welcomer.csModifyTension(serverPlayer,
@@ -1900,6 +1903,9 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
 
         Location oldLocation = unit.getLocation();
+        if (oldLocation instanceof WorkLocation) {
+            oldLocation.getTile().cacheUnseen();//+til
+        }
         unit.setLocation(carrier);//-vis: only if on a different tile
                                   //-til if moving from colony
         unit.setMovesLeft(0);
@@ -1914,8 +1920,6 @@ public final class InGameController extends Controller {
                 serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
             }
             cs.addDisappear(serverPlayer, (Tile)oldLocation, unit);
-        } else if (oldLocation instanceof WorkLocation) {
-            oldLocation.getTile().updatePlayerExploredTiles();//+til
         }
 
         // Others might see the unit disappear, or the carrier capacity.
@@ -2875,6 +2879,9 @@ public final class InGameController extends Controller {
         if (serverPlayer.isEuropean()) {
             StringTemplate nation = serverPlayer.getNationName();
             settlement = new ServerColony(game, serverPlayer, name, tile);
+            for (Tile t : tile.getSurroundingTiles(settlement.getRadius())) {
+                t.cacheUnseen();//+til
+            }
             serverPlayer.addSettlement(settlement);
             settlement.placeSettlement(false);//-vis(serverPlayer,?),-til
             serverPlayer.exploreForSettlement(settlement);
@@ -2916,6 +2923,9 @@ public final class InGameController extends Controller {
             }
             settlement = new ServerIndianSettlement(game, serverPlayer, name,
                                                     tile, false, skill, null);
+            for (Tile t : tile.getSurroundingTiles(settlement.getRadius())) {
+                t.cacheUnseen();//+til
+            }
             serverPlayer.addSettlement(settlement);
             settlement.placeSettlement(true);//-vis(serverPlayer),-til
             for (Player p : getGame().getPlayers()) {
@@ -2928,13 +2938,9 @@ public final class InGameController extends Controller {
 
         // Join the settlement.
         unit.setLocation(settlement);//-vis(serverPlayer),-til
-        tile.updatePlayerExploredTiles();//+til
         unit.setMovesLeft(0);
 
         // Update with settlement tile, and newly owned tiles.
-        for (Tile t : settlement.getOwnedTiles()) {
-            t.updatePlayerExploredTiles();//+til
-        }
         cs.add(See.perhaps(), settlement.getOwnedTiles());
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
 
@@ -2958,8 +2964,8 @@ public final class InGameController extends Controller {
         Tile tile = colony.getTile();
 
         // Join.
+        tile.cacheUnseen();//+til
         unit.setLocation(colony);//-vis: safe/colony,-til
-        tile.updatePlayerExploredTiles();//+til
         unit.setMovesLeft(0);
         unit.clearEquipment(colony);
 
@@ -3084,10 +3090,10 @@ public final class InGameController extends Controller {
             Colony colony = tradeItem.getColony();
             if (colony != null) {
                 ServerPlayer former = (ServerPlayer) colony.getOwner();
-                ((ServerColony)colony).changeOwner(dest);//-vis(both),-til
                 for (Tile t : colony.getOwnedTiles()) {
-                    t.updatePlayerExploredTiles();//+til
+                    t.cacheUnseen(dest);//+til
                 }
+                ((ServerColony)colony).changeOwner(dest);//-vis(both),-til
                 cs.add(See.only(dest), dest.exploreForSettlement(colony));
                 cs.add(See.perhaps().always(former), colony.getOwnedTiles());
                 visibilityChange = true;
@@ -3276,10 +3282,10 @@ public final class InGameController extends Controller {
         // was definitely a move between locations and no student/teacher
         // interaction occurred.
         Location oldLoc = unit.getLocation();
-        unit.setLocation(workLocation);//-vis: safe/colony,-til if not in colony
         if (!(oldLoc instanceof WorkLocation)) {
-            colony.getTile().updatePlayerExploredTiles();//+til
+            colony.getTile().cacheUnseen();//+til
         }
+        unit.setLocation(workLocation);//-vis: safe/colony,-til if not in colony
         cs.add(See.perhaps(), colony.getTile());
         // Others can see colony change size
         sendToOthers(serverPlayer, cs);
@@ -3453,8 +3459,8 @@ public final class InGameController extends Controller {
             // from the work location which might cause a visible change
             // in population.
             if (unit.getLocation() instanceof WorkLocation) {
+                settlement.getTile().cacheUnseen();//+til
                 unit.setLocation(settlement.getTile());//-vis: safe/colony,-til
-                settlement.getTile().updatePlayerExploredTiles();//+til
             }
             cs.add(See.perhaps(), unit.getTile());
         }
@@ -3543,8 +3549,8 @@ public final class InGameController extends Controller {
             cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
         }
         if (loc instanceof WorkLocation) {
+            loc.getTile().cacheUnseen();//+til
             unit.setLocation(loc.getTile());//-vis: safe/colony,-til
-            loc.getTile().updatePlayerExploredTiles();//+til
             cs.add(See.perhaps(), unit.getTile());
         } else {
             cs.add(See.only(serverPlayer), unit);
@@ -3755,10 +3761,10 @@ public final class InGameController extends Controller {
         Tile tile = unit.getTile();
         Colony colony = unit.getColony();
         Location oldLoc = unit.getLocation();
-        unit.setLocation(tile);//-vis: safe/colony,-til if in colony
         if (oldLoc instanceof WorkLocation) {
-            tile.updatePlayerExploredTiles();//+til
+            tile.cacheUnseen();//+til
         }
+        unit.setLocation(tile);//-vis: safe/colony,-til if in colony
 
         // Full tile update for the player, the rest get their limited
         // view of the colony so that population changes.
@@ -4144,6 +4150,7 @@ public final class InGameController extends Controller {
                                    List<UnitChange> unitChanges) {
         ChangeSet cs = new ChangeSet();
         Tile tile = colony.getTile();
+        tile.cacheUnseen();//+til
         final int oldUnitCount = colony.getUnitCount();
 
         // Move everyone out of the way.
@@ -4196,11 +4203,6 @@ public final class InGameController extends Controller {
             }
         }
         
-        // Lots of things might have changed the population.
-        if (colony.getUnitCount() != oldUnitCount) {
-            colony.getTile().updatePlayerExploredTiles();//+til
-        }
-
         // Just update the whole tile, including for other players
         // which might see colony population change.
         return new ChangeSet().add(See.perhaps(), tile).build(serverPlayer);
