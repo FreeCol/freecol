@@ -63,7 +63,6 @@ public class PlayerExploredTile extends FreeColGameObject {
 
     // Visible Colony data.
     private int colonyUnitCount = 0;
-    private String colonyStockadeKey = null;
 
     // Visible IndianSettlement data.
     private Unit missionary = null;
@@ -145,19 +144,10 @@ public class PlayerExploredTile extends FreeColGameObject {
 
         Settlement ts = copied.getSettlement();
         if (ts instanceof Colony) {
-            if (colonyUnitCount <= 0 && colonyStockadeKey == null) {
-                copied.setSettlement(null);
-            } else {
-                Colony colony = (Colony)ts;
-                if (colonyUnitCount != colony.getUnitCount()) {
-                    colony.setDisplayUnitCount(colonyUnitCount);
-                    ok = false;
-                }
-                if (colonyStockadeKey != null
-                    && !colonyStockadeKey.equals(colony.getStockadeKey())) {
-                    colony.setStockadeKey(colonyStockadeKey);
-                    ok = false;
-                }
+            Colony colony = (Colony)ts;
+            if (colonyUnitCount != colony.getUnitCount()) {
+                colony.setDisplayUnitCount(colonyUnitCount);
+                ok = false;
             }
         } else if (ts instanceof IndianSettlement) {
             if (missionary == null && mostHated == null && alarm == null) {
@@ -186,7 +176,6 @@ public class PlayerExploredTile extends FreeColGameObject {
     // Serialization
     
     private static final String ALARM_TAG = "alarm";
-    private static final String COLONY_STOCKADE_KEY_TAG = "colonyStockadeKey";
     private static final String COLONY_UNIT_COUNT_TAG = "colonyUnitCount";
     private static final String LEARNABLE_SKILL_TAG = "learnableSkill";
     private static final String MISSIONARY_TAG = "missionary";
@@ -217,10 +206,6 @@ public class PlayerExploredTile extends FreeColGameObject {
 
         if (colonyUnitCount > 0) {
             xw.writeAttribute(COLONY_UNIT_COUNT_TAG, colonyUnitCount);
-        }
-
-        if (colonyStockadeKey != null) {
-            xw.writeAttribute(COLONY_STOCKADE_KEY_TAG, colonyStockadeKey);
         }
 
         if (alarm != null) xw.writeAttribute(ALARM_TAG, alarm.getValue());
@@ -281,9 +266,6 @@ public class PlayerExploredTile extends FreeColGameObject {
                 Settlement.class, (Settlement)null, false);
 
         colonyUnitCount = xr.getAttribute(COLONY_UNIT_COUNT_TAG, 0);
-
-        colonyStockadeKey = xr.getAttribute(COLONY_STOCKADE_KEY_TAG,
-                                            (String)null);
 
         alarm = new Tension(xr.getAttribute(ALARM_TAG, 0));
 

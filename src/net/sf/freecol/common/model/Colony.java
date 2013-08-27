@@ -145,7 +145,6 @@ public class Colony extends Settlement implements Nameable {
 
     // Will only be used on enemy colonies:
     protected int displayUnitCount = -1;
-    protected String stockadeKey = null;
 
     // Do not serialize below.
 
@@ -814,35 +813,14 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
-     * Gets the stockade key.
-     * Uses the "stockadeKey" variable if it is non-null, which should
-     * only be true for other player colonies.  Otherwise, get the real value.
-     *
-     * @return The stockade key.
-     */
-    public String getStockadeKey() {
-        return (stockadeKey != null) ? stockadeKey : getTrueStockadeKey();
-    }
-
-    /**
-     * Sets the stockade key.
-     *
-     * @param key A new value for the stockade key.
-     */
-    public void setStockadeKey(String key) {
-        this.stockadeKey = key;
-    }
-
-    /**
-     * Gets the true stockade key, as should be visible to the owner
+     * Gets the stockade key, as should be visible to the owner
      * or a player that can see this colony.
      *
-     * @return The true stockade key.
+     * @return The stockade key, or null if no stockade-building is present.
      */
-    public String getTrueStockadeKey() {
+    public String getStockadeKey() {
         Building stockade = getStockade();
-        return (stockade == null) ? null
-            : stockade.getType().getId().substring("model.building".length());
+        return (stockade == null) ? null : stockade.getType().getSuffix();
     }
 
     /**
@@ -2517,7 +2495,7 @@ public class Colony extends Settlement implements Nameable {
             : (count <= 7) ? "medium"
             : "large";
         String stockade = getStockadeKey();
-        if (stockade != null) key += stockade;
+        if (stockade != null) key += "." + stockade;
         return "model.settlement." + key + ".image";
     }
 
@@ -2650,7 +2628,6 @@ public class Colony extends Settlement implements Nameable {
     private static final String OLD_TORIES_TAG = "oldTories";
     private static final String POPULATION_QUEUE_TAG = "populationQueueItem";
     private static final String SONS_OF_LIBERTY_TAG = "sonsOfLiberty";
-    private static final String STOCKADE_KEY_TAG = "stockadeKey";
     private static final String TORIES_TAG = "tories";
     private static final String UNIT_COUNT_TAG = "unitCount";
 
@@ -2686,10 +2663,6 @@ public class Colony extends Settlement implements Nameable {
         } else {
 
             xw.writeAttribute(UNIT_COUNT_TAG, getUnitCount());
-
-            if (hasStockade()) {
-                xw.writeAttribute(STOCKADE_KEY_TAG, getStockadeKey());
-            }
         }
     }
 
@@ -2738,6 +2711,15 @@ public class Colony extends Settlement implements Nameable {
 
                 xw.writeEndElement();
             }
+
+        } else {
+            // Special case.  Serialize stockade-class buildings to
+            // otherwise unprivileged clients as the stockade level is
+            // visible to anyone who can see the colony.  This should
+            // have no other information leaks because stockade
+            // buildings have no production or units inside.
+            Building stockade = getStockade();
+            if (stockade != null) stockade.toXML(xw);
         }
     }
 
@@ -2767,8 +2749,6 @@ public class Colony extends Settlement implements Nameable {
         landLocked = xr.getAttribute(LAND_LOCKED_TAG, true);
 
         displayUnitCount = xr.getAttribute(UNIT_COUNT_TAG, 0);
-
-        stockadeKey = xr.getAttribute(STOCKADE_KEY_TAG, (String)null);
     }
 
     /**
