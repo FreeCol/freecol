@@ -1921,7 +1921,20 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         }
         
         if (owningSettlement != null) {
-            xw.writeAttribute(OWNING_SETTLEMENT_TAG, owningSettlement);
+            if (owningSettlement.isDisposed()) {
+                // Owning settlement is a special case because it is a
+                // reference to something outside this tile.  If the
+                // tile being written here is a cached copy, and the
+                // owning settlement referred to therein has really
+                // been destroyed, then we risk corrupting or at least
+                // confusing the client by referring to the disposed
+                // settlement.  So clear out such cases.  This is an
+                // information leak, but a better option than the
+                // crashes caused by the alternative.
+                this.owningSettlement = null;
+            } else {
+                xw.writeAttribute(OWNING_SETTLEMENT_TAG, owningSettlement);
+            }
         }
         
         xw.writeAttribute(STYLE_TAG, style);
