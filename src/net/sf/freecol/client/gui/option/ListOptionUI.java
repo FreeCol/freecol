@@ -92,9 +92,10 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
         model = new DefaultListModel();
         for (AbstractOption<T> o : option.getValue()) {
             try {
-                model.addElement(o.clone());
+                AbstractOption<T> c = o.clone();
+                model.addElement(c);
             } catch (CloneNotSupportedException e) {
-                logger.log(Level.WARNING, "Can not clone: " + o, e);
+                logger.log(Level.WARNING, "Can not clone" + o.getId(), e);
             }
         }
         list = new JList(model);
@@ -118,20 +119,21 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
         }
 
         addButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent event) {
                 AbstractOption<T> oldValue
                     = (AbstractOption<T>)list.getSelectedValue();
                 if (oldValue == null) oldValue = option.getTemplate();
                 try {
                     AbstractOption<T> newValue = oldValue.clone();
                     if (gui.showEditOptionDialog(newValue)) {
-                        if (!option.canAdd(newValue)) return;
-                        model.addElement(newValue);
-                        list.setSelectedValue(newValue, true);
-                        list.repaint();
+                        if (option.canAdd(newValue)) {
+                            model.addElement(newValue);
+                            list.setSelectedValue(newValue, true);
+                            list.repaint();
+                        }
                     }
-                } catch (CloneNotSupportedException ex) {
-                    logger.log(Level.WARNING, "Can not clone: " + oldValue, ex);
+                } catch (CloneNotSupportedException e) {
+                    logger.log(Level.WARNING, "Can not clone: " + oldValue, e);
                 }
             }
         });

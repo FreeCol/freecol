@@ -125,9 +125,11 @@ public abstract class AbstractOption<T> extends FreeColObject
      *     this <code>Option</code>.
      * @param defaultValueString The string representation of the
      *     default value of this <code>Option</code>.
+     * @exception XMLStreamException if the value is invalid.
      */
-    protected void setValue(String valueString, String defaultValueString) {
-        logger.warning("Unsupported method: setValue.");
+    protected void setValue(String valueString, String defaultValueString)
+        throws XMLStreamException {
+        throw new XMLStreamException("Unsupported method: setValue.");
     }
 
     /**
@@ -189,7 +191,6 @@ public abstract class AbstractOption<T> extends FreeColObject
         String defaultValue = xr.getAttribute(DEFAULT_VALUE_TAG, (String)null);
 
         String value = xr.getAttribute(VALUE_TAG, (String)null);
-
         if (defaultValue == null && value == null) {
             if (!isNullValueOK()) {
                 throw new XMLStreamException("invalid option " + getId()

@@ -71,7 +71,7 @@ public class ModOption extends AbstractOption<FreeColModFile> {
     public ModOption clone() {
         ModOption result = new ModOption(getSpecification());
         result.setId(this.getId());
-        result.setValues(this);
+        result.value = this.value;
         return result;
     }
 
@@ -93,7 +93,6 @@ public class ModOption extends AbstractOption<FreeColModFile> {
         final FreeColModFile oldValue = this.value;
         this.value = value;
         setId(value.getId());
-
         if (isDefined && value != oldValue) {
             firePropertyChange(VALUE_TAG, oldValue, value);
         }
@@ -107,15 +106,13 @@ public class ModOption extends AbstractOption<FreeColModFile> {
      * {@inheritDoc}
      */
     @Override
-    protected void setValue(String valueString, String defaultValueString) {
+    protected void setValue(String valueString, String defaultValueString) throws XMLStreamException {
         String id = (valueString != null) ? valueString : defaultValueString;
         FreeColModFile fcmf = Mods.getModFile(id);
         if (fcmf == null) {
-            logger.warning("Could not find mod for option: " + id);
-        } else {
-            setValue(fcmf);
+            throw new XMLStreamException("Could not find mod for: " + id);
         }
-
+        setValue(fcmf);
     }
 
     /**

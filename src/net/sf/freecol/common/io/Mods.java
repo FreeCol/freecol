@@ -74,9 +74,11 @@ public class Mods {
                     FreeColModFile fcmf = new FreeColModFile(f);
                     if (fcmf != null) {
                         allMods.put(fcmf.getId(), fcmf);
+                        logger.info("Found mod " + fcmf.getId()
+                            + " in " + f.getPath());
                     }
                 } catch (IOException e) {
-                    logger.log(Level.WARNING, "Bad mod in " + f.getName(), e);
+                    logger.log(Level.WARNING, "Bad mod in " + f.getPath(), e);
                 }
             }
         }
@@ -134,7 +136,8 @@ public class Mods {
         File directory = FreeColDirectories.getRulesDirectory();
         for (File dir : directory.listFiles()) {
             if (dir.isDirectory()) {
-                File modDescription = new File(dir, FreeColModFile.MOD_DESCRIPTOR_FILE);
+                File modDescription
+                    = new File(dir, FreeColModFile.MOD_DESCRIPTOR_FILE);
                 if (modDescription.exists()) {
                     try {
                         result.add(new FreeColTcFile(dir));

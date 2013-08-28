@@ -277,7 +277,12 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
             xr.closeTag(TEMPLATE_TAG);
 
         } else {
-            addMember((AbstractOption<T>)readOption(xr));
+            try {
+                AbstractOption<T> op = (AbstractOption<T>)readOption(xr);
+                if (op != null) addMember(op);
+            } catch (XMLStreamException x) {
+                logger.warning("Invalid option at: " + tag);
+            }
         }
     }
 

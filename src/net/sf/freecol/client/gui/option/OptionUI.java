@@ -48,28 +48,25 @@ import net.sf.freecol.common.option.UnitListOption;
  */
 public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
 
-    /**
-     * Whether the Option should be editable.
-     */
+    /** Whether the Option should be editable. */
     private boolean editable;
 
-    /**
-     * The label to use for the Option.
-     */
+    /** The label to use for the Option. */
     private JLabel label = new JLabel();
 
-    /**
-     * The Option value itself.
-     */
+    /** The Option value itself. */
     private T option;
 
+    /** The GUI to display on. */
     protected final GUI gui;
+
 
     /**
      * Constructor.
      *
-     * @param option the Option
-     * @param editable whether the Option should be editable
+     * @param gui The <code>GUI</code> to display on.
+     * @param option The <code>Option</code> to display.
+     * @param editable True if the option should be editable.
      */
     public OptionUI(GUI gui, T option, boolean editable) {
         this.gui = gui;
