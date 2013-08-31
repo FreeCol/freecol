@@ -59,6 +59,8 @@ import net.sf.freecol.client.gui.i18n.Messages;
  */
 public class FreeColDialog<T> extends FreeColPanel {
 
+    private static final Logger logger = Logger.getLogger(FreeColDialog.class.getName());
+
     static final class FreeColFileFilter extends FileFilter {
 
         private final String  extension1;
@@ -92,10 +94,6 @@ public class FreeColDialog<T> extends FreeColPanel {
             return description;
         }
     }
-
-    private static final Logger logger = Logger.getLogger(FreeColDialog.class.getName());
-
-    protected static final String CANCEL = "CANCEL";
 
     /**
      * Creates a new <code>FreeColDialog</code> with a text and a
@@ -614,7 +612,7 @@ public class FreeColDialog<T> extends FreeColPanel {
     /**
      * Sets that no response has been given.
      */
-    public void resetResponse() {
+    public synchronized void resetResponse() {
         response = null;
         responseGiven = false;
     }

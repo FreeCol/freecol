@@ -40,7 +40,6 @@ import net.sf.freecol.common.resources.ResourceManager;
  */
 public class InformationDialog extends FreeColDialog<Boolean> {
 
-
     /**
      * Creates an information dialog that shows the given texts and
      * images, and an "OK" button.
@@ -96,8 +95,8 @@ public class InformationDialog extends FreeColDialog<Boolean> {
         }
 
         JScrollPane scrollPane = new JScrollPane(textPanel,
-                                                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         // correct way to make scroll pane opaque
         scrollPane.getViewport().setOpaque(false);
         scrollPane.setBorder(null);
@@ -105,7 +104,6 @@ public class InformationDialog extends FreeColDialog<Boolean> {
 
         add(scrollPane);
         add(okButton, "tag ok");
-
     }
 
 

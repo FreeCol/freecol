@@ -62,7 +62,7 @@ import net.sf.freecol.common.option.OptionGroup;
  * game, to join a running game, and to fetch a list of games from the
  * meta-server.
  */
-public final class NewPanel extends FreeColPanel implements ActionListener, ItemListener {
+public final class NewPanel extends FreeColPanel implements ItemListener {
 
     private static final Logger logger = Logger.getLogger(NewPanel.class.getName());
 
@@ -155,7 +155,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener, Item
      */
     @SuppressWarnings("unchecked") // FIXME in Java7
     public NewPanel(FreeColClient freeColClient, Specification specification) {
-        super(freeColClient);
+        super(freeColClient, new MigLayout("wrap 6", "[15]", ""));
 
         this.specification = specification;
 
@@ -179,8 +179,8 @@ public final class NewPanel extends FreeColPanel implements ActionListener, Item
         group.add(start);
         group.add(meta);
 
-        setLayout(new MigLayout("wrap 6", "[15]", ""));
-        add(getDefaultHeader(Messages.message("newGamePanel")), "span 6, center");
+        add(getDefaultHeader(Messages.message("newGamePanel")),
+            "span 6, center");
 
         add(single, "newline, span 3");
         add(new JSeparator(JSeparator.VERTICAL), "spany 7, grow");

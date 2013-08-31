@@ -46,7 +46,7 @@ import net.sf.freecol.common.ServerInfo;
 /**
  * This panel is used to display the information received from the meta-server.
  */
-public final class ServerListPanel extends FreeColPanel implements ActionListener {
+public final class ServerListPanel extends FreeColPanel {
 
     private static final Logger logger = Logger.getLogger(ServerListPanel.class.getName());
 

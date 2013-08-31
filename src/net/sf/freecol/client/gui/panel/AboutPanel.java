@@ -63,7 +63,8 @@ public final class AboutPanel extends FreeColPanel {
         Image tempImage = ResourceManager.getImage("TitleImage");
         if (tempImage != null) {
             JLabel logoLabel = new JLabel(new ImageIcon(tempImage));
-            logoLabel.setBorder(new CompoundBorder(new EmptyBorder(2,2,2,2), new BevelBorder(BevelBorder.LOWERED)));
+            logoLabel.setBorder(new CompoundBorder(new EmptyBorder(2,2,2,2),
+                    new BevelBorder(BevelBorder.LOWERED)));
             add(logoLabel, "span, center");
         }
 
@@ -89,7 +90,6 @@ public final class AboutPanel extends FreeColPanel {
         add(localizedLabel("aboutPanel.copyright"), "span, center");
 
         add(okButton, "newline 20, span, tag ok");
-
     }
 
 

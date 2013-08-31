@@ -72,9 +72,8 @@ public final class ColopediaPanel extends FreeColPanel
      * @param id The object identifier of the item to select.
      */
     public ColopediaPanel(FreeColClient freeColClient, String id) {
-        super(freeColClient);
-
-        setLayout(new MigLayout("fill", "[200:]unrelated[550:, grow, fill]", "[][grow, fill][]"));
+        super(freeColClient, new MigLayout("fill", 
+                "[200:]unrelated[550:, grow, fill]", "[][grow, fill][]"));
 
         header = getDefaultHeader(Messages.message("menuBar.colopedia"));
         add(header, "span, align center");
@@ -209,6 +208,19 @@ public final class ColopediaPanel extends FreeColPanel
         }
     }
 
+    public void hyperlinkUpdate(HyperlinkEvent e) {
+        HyperlinkEvent.EventType type = e.getEventType();
+        if (type == HyperlinkEvent.EventType.ACTIVATED) {
+            String[] path = e.getURL().getPath().split("/");
+            if (FreeColObject.ID_ATTRIBUTE_TAG.equals(path[1])) {
+                select(path[2]);
+            } else if ("action".equals(path[1])) {
+                getFreeColClient().getActionManager().getFreeColAction(path[2])
+                    .actionPerformed(null);
+            }
+        }
+    }
+
     /**
      * This function analyses an event and calls the right methods to take care
      * of the user's requests.
@@ -223,18 +235,4 @@ public final class ColopediaPanel extends FreeColPanel
             select(command);
         }
     }
-
-    public void hyperlinkUpdate(HyperlinkEvent e) {
-        HyperlinkEvent.EventType type = e.getEventType();
-        if (type == HyperlinkEvent.EventType.ACTIVATED) {
-            String[] path = e.getURL().getPath().split("/");
-            if (FreeColObject.ID_ATTRIBUTE_TAG.equals(path[1])) {
-                select(path[2]);
-            } else if ("action".equals(path[1])) {
-                getFreeColClient().getActionManager().getFreeColAction(path[2])
-                    .actionPerformed(null);
-            }
-        }
-    }
-
 }

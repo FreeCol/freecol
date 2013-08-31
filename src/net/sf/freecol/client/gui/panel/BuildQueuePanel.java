@@ -85,7 +85,7 @@ import net.sf.freecol.common.util.Utils;
 /**
  * The panel used to display a colony build queue.
  */
-public class BuildQueuePanel extends FreeColPanel implements ActionListener, ItemListener {
+public class BuildQueuePanel extends FreeColPanel implements ItemListener {
 
     private static Logger logger = Logger.getLogger(BuildQueuePanel.class.getName());
 
@@ -117,9 +117,12 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
      */
     private List<UnitType> buildableUnits = new ArrayList<UnitType>();
 
+
     @SuppressWarnings("unchecked") // FIXME in Java7
     public BuildQueuePanel(FreeColClient freeColClient, Colony colony) {
-        super(freeColClient, new MigLayout("wrap 3", "[260:][390:, fill][260:]", "[][][300:400:][]"));
+        super(freeColClient,
+            new MigLayout("wrap 3", "[260:][390:, fill][260:]",
+                          "[][][300:400:][]"));
 
         this.colony = colony;
         this.unitCount = colony.getUnitCount();
@@ -569,42 +572,6 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         return UNABLE_TO_BUILD;
     }
 
-    /**
-     * This function analyses an event and calls the right methods to take
-     * care of the user's requests.
-     *
-     * @param event The incoming ActionEvent.
-     */
-    @Override
-    public void actionPerformed(ActionEvent event) {
-        final String FAIL = "FAIL";
-        if (colony.getOwner() == getMyPlayer()) {
-            String command = event.getActionCommand();
-            List<BuildableType> buildables = getBuildableTypes(buildQueueList);
-            while (!buildables.isEmpty()
-                && lockReasons.get(buildables.get(0)) != null) {
-                getGUI().showInformationMessage(buildables.get(0),
-                    StringTemplate.template("colonyPanel.unbuildable")
-                        .addName("%colony%", colony.getName())
-                        .add("%object%", buildables.get(0).getNameKey()));
-                command = FAIL;
-                removeBuildable(buildables.remove(0));
-            }
-            getController().setBuildQueue(colony, buildables);
-            if (FAIL.equals(command)) { // Let the user reconsider.
-                updateAllLists();
-                return;
-            } else if (OK.equals(command)) {
-                // do nothing?
-            } else if (BUY.equals(command)) {
-                getController().payForBuilding(colony);
-            } else {
-                logger.warning("Unsupported command " + command);
-            }
-        }
-        getGUI().removeFromCanvas(this);
-    }
-
     public void itemStateChanged(ItemEvent event) {
         if (event.getSource() == compact) {
             updateDetailView();
@@ -1035,5 +1002,39 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         }
     }
 
+    /**
+     * This function analyses an event and calls the right methods to take
+     * care of the user's requests.
+     *
+     * @param event The incoming ActionEvent.
+     */
+    @Override
+    public void actionPerformed(ActionEvent event) {
+        final String FAIL = "FAIL";
+        if (colony.getOwner() == getMyPlayer()) {
+            String command = event.getActionCommand();
+            List<BuildableType> buildables = getBuildableTypes(buildQueueList);
+            while (!buildables.isEmpty()
+                && lockReasons.get(buildables.get(0)) != null) {
+                getGUI().showInformationMessage(buildables.get(0),
+                    StringTemplate.template("colonyPanel.unbuildable")
+                        .addName("%colony%", colony.getName())
+                        .add("%object%", buildables.get(0).getNameKey()));
+                command = FAIL;
+                removeBuildable(buildables.remove(0));
+            }
+            getController().setBuildQueue(colony, buildables);
+            if (FAIL.equals(command)) { // Let the user reconsider.
+                updateAllLists();
+                return;
+            } else if (OK.equals(command)) {
+                // do nothing?
+            } else if (BUY.equals(command)) {
+                getController().payForBuilding(colony);
+            } else {
+                logger.warning("Unsupported command " + command);
+            }
+        }
+        getGUI().removeFromCanvas(this);
+    }
 }
-

@@ -71,11 +71,11 @@ public final class TilePanel extends FreeColPanel {
      * @param tile The <code>Tile</code> to describe.
      */
     public TilePanel(FreeColClient freeColClient, Tile tile) {
-        super(freeColClient);
+        super(freeColClient, new MigLayout("wrap 1, insets 20 30 10 30",
+                                           "[center]", ""));
 
         tileType = tile.getType();
 
-        setLayout(new MigLayout("wrap 1, insets 20 30 10 30", "[center]", ""));
 
         JButton colopediaButton = new JButton(Messages.message("menuBar.colopedia"));
         colopediaButton.setActionCommand(String.valueOf(COLOPEDIA));
@@ -192,6 +192,7 @@ public final class TilePanel extends FreeColPanel {
     /**
      * This function analyses an event and calls the right methods to take
      * care of the user's requests.
+     *
      * @param event The incoming ActionEvent.
      */
     public void actionPerformed(ActionEvent event) {

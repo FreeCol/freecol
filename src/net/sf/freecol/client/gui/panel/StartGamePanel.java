@@ -50,7 +50,7 @@ import net.sf.freecol.common.option.OptionGroup;
  * The panel where you choose your nation and color and connected players are
  * shown.
  */
-public final class StartGamePanel extends FreeColPanel implements ActionListener {
+public final class StartGamePanel extends FreeColPanel {
 
     private static final Logger logger = Logger.getLogger(StartGamePanel.class.getName());
 
@@ -240,6 +240,33 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
     }
 
     /**
+     * Displays a chat message to the user.
+     *
+     * @param senderName The name of the player who sent the chat message to the
+     *            server.
+     * @param message The chat message.
+     * @param privateChat 'true' if the message is a private one, 'false'
+     *            otherwise.
+     */
+    public void displayChat(String senderName, String message, boolean privateChat) {
+        if (privateChat) {
+            chatArea.append(senderName + " (private): " + message + '\n');
+        } else {
+            chatArea.append(senderName + ": " + message + '\n');
+        }
+    }
+
+    /**
+     * Refreshes the table that displays the players and the choices that
+     * they've made.
+     */
+    public void refreshPlayersTable() {
+        if (table != null) {
+            table.update();
+        }
+    }
+
+    /**
      * This function analyses an event and calls the right methods to take care
      * of the user's requests.
      *
@@ -301,33 +328,6 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
             }
         } catch (NumberFormatException e) {
             logger.warning("Invalid Actioncommand: not a number: " + command);
-        }
-    }
-
-    /**
-     * Displays a chat message to the user.
-     *
-     * @param senderName The name of the player who sent the chat message to the
-     *            server.
-     * @param message The chat message.
-     * @param privateChat 'true' if the message is a private one, 'false'
-     *            otherwise.
-     */
-    public void displayChat(String senderName, String message, boolean privateChat) {
-        if (privateChat) {
-            chatArea.append(senderName + " (private): " + message + '\n');
-        } else {
-            chatArea.append(senderName + ": " + message + '\n');
-        }
-    }
-
-    /**
-     * Refreshes the table that displays the players and the choices that
-     * they've made.
-     */
-    public void refreshPlayersTable() {
-        if (table != null) {
-            table.update();
         }
     }
 }

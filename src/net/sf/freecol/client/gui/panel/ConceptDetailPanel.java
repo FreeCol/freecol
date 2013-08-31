@@ -78,6 +78,7 @@ public class ConceptDetailPanel extends FreeColPanel
         this.colopediaPanel = colopediaPanel;
     }
 
+
     public String getName() {
         return Messages.message(id + ".name");
     }

@@ -52,9 +52,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
      */
     public IndianSettlementPanel(FreeColClient freeColClient,
                                  IndianSettlement settlement) {
-        super(freeColClient);
-
-        setLayout(new MigLayout("wrap 2, gapx 20", "", ""));
+        super(freeColClient, new MigLayout("wrap 2, gapx 20", "", ""));
         
         JLabel settlementLabel = new JLabel(getGUI().getImageIcon(settlement, false));
         Player indian = settlement.getOwner();

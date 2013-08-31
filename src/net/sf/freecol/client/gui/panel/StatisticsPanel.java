@@ -47,8 +47,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 /**
  * Display the current game statistics.
  */
-public final class StatisticsPanel extends FreeColPanel
-    implements ActionListener {
+public final class StatisticsPanel extends FreeColPanel {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(StatisticsPanel.class.getName());
@@ -173,8 +172,8 @@ public final class StatisticsPanel extends FreeColPanel
         // Actual stats panel
         JPanel statsPanel = new JPanel(new GridLayout(1,2));
         JScrollPane scrollPane = new JScrollPane(statsPanel,
-                                                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         // correct way to make scroll pane opaque
         scrollPane.getViewport().setOpaque(false);
         scrollPane.setBorder(null);

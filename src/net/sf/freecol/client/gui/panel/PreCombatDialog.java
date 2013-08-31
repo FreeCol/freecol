@@ -21,7 +21,11 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.JLabel;
@@ -174,6 +178,32 @@ public class PreCombatDialog extends FreeColDialog<Boolean> {
             return true;
         }
     }
+
+    /**
+     * Sort the given modifiers according to type.
+     *
+     * TODO: Check this agrees with the FeatureContainer.applyModifier
+     * ordering.
+     *
+     * @param result Set of <code>Modifier</code>
+     * @return a sorted Set of <code>Modifier</code>
+     */
+    private Set<Modifier> sortModifiers(Set<Modifier> result) {
+        EnumMap<Modifier.Type, List<Modifier>> modifierMap =
+            new EnumMap<Modifier.Type, List<Modifier>>(Modifier.Type.class);
+        for (Modifier.Type type : Modifier.Type.values()) {
+            modifierMap.put(type, new ArrayList<Modifier>());
+        }
+        for (Modifier modifier : result) {
+            modifierMap.get(modifier.getType()).add(modifier);
+        }
+        Set<Modifier> sortedResult = new LinkedHashSet<Modifier>();
+        for (Modifier.Type type : Modifier.Type.values()) {
+            sortedResult.addAll(modifierMap.get(type));
+        }
+        return sortedResult;
+    }
+
 
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();

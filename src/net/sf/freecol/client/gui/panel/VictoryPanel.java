@@ -54,11 +54,9 @@ public final class VictoryPanel extends FreeColPanel {
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public VictoryPanel(FreeColClient freeColClient) {
-        super(freeColClient);
-        
-        okButton.setText(Messages.message("victory.yes"));
+        super(freeColClient, new MigLayout("wrap 1", "", ""));
 
-        setLayout(new MigLayout("wrap 1", "", ""));
+        okButton.setText(Messages.message("victory.yes"));
 
         add(getDefaultHeader(Messages.message("victory.text")),
             "align center, wrap 20");
@@ -84,6 +82,7 @@ public final class VictoryPanel extends FreeColPanel {
         getGUI().showHighScoresPanel((high) ? "highscores.yes"
             : "highscores.no");
     }
+
 
     /**
      * This function analyses an event and calls the right methods to

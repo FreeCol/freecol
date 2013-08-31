@@ -36,9 +36,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -95,6 +93,7 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(FreeColPanel.class.getName());
 
+    protected static final String CANCEL = "CANCEL";
     protected static final String OK = "OK";
     protected static final String HELP = "HELP";
 
@@ -207,8 +206,7 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
 
         // See the message of Ulf Onnen for more information about the presence
         // of this fake mouse listener.
-        addMouseListener(new MouseAdapter() {
-        });
+        addMouseListener(new MouseAdapter() {});
 
         okButton.setActionCommand(OK);
         okButton.addActionListener(this);
@@ -329,6 +327,27 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
     protected JButton createColonyButton(Colony colony) {
         JButton button = getLinkButton(colony.getName(), null, colony.getId());
         button.addActionListener(this);
+        return button;
+    }
+
+    /**
+     * Return a button suitable for linking to another panel
+     * (e.g. ColopediaPanel).
+     *
+     * @param text a <code>String</code> value
+     * @param icon an <code>Icon</code> value
+     * @param action a <code>String</code> value
+     * @return a <code>JButton</code> value
+     */
+    public static JButton getLinkButton(String text, Icon icon, String action) {
+        JButton button = new JButton(text, icon);
+        button.setMargin(emptyMargin);
+        button.setOpaque(false);
+        button.setForeground(LINK_COLOR);
+        button.setAlignmentY(0.8f);
+        button.setBorder(BorderFactory.createEmptyBorder());
+        button.setActionCommand(action);
+        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         return button;
     }
 
@@ -507,41 +526,6 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
     }
 
     /**
-     * Sort the given modifiers according to type.
-     *
-     * @param result Set of <code>Modifier</code>
-     * @return a sorted Set of <code>Modifier</code>
-     */
-    protected Set<Modifier> sortModifiers(Set<Modifier> result) {
-        EnumMap<Modifier.Type, List<Modifier>> modifierMap =
-            new EnumMap<Modifier.Type, List<Modifier>>(Modifier.Type.class);
-        for (Modifier.Type type : Modifier.Type.values()) {
-            modifierMap.put(type, new ArrayList<Modifier>());
-        }
-        for (Modifier modifier : result) {
-            modifierMap.get(modifier.getType()).add(modifier);
-        }
-        Set<Modifier> sortedResult = new LinkedHashSet<Modifier>();
-        for (Modifier.Type type : Modifier.Type.values()) {
-            sortedResult.addAll(modifierMap.get(type));
-        }
-        return sortedResult;
-    }
-
-    /**
-     * This function analyses an event and calls the right methods to take care
-     * of the user's requests.
-     *
-     * @param event The incoming ActionEvent.
-     */
-    public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
-        if (command.equals(OK)) {
-            getGUI().removeFromCanvas(this);
-        }
-    }
-
-    /**
      * Registers enter key for a JButton.
      *
      * @param button
@@ -598,27 +582,6 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
 
         textPane.setText(text);
         return textPane;
-    }
-
-    /**
-     * Return a button suitable for linking to another panel
-     * (e.g. ColopediaPanel).
-     *
-     * @param text a <code>String</code> value
-     * @param icon an <code>Icon</code> value
-     * @param action a <code>String</code> value
-     * @return a <code>JButton</code> value
-     */
-    public static JButton getLinkButton(String text, Icon icon, String action) {
-        JButton button = new JButton(text, icon);
-        button.setMargin(emptyMargin);
-        button.setOpaque(false);
-        button.setForeground(LINK_COLOR);
-        button.setAlignmentY(0.8f);
-        button.setBorder(BorderFactory.createEmptyBorder());
-        button.setActionCommand(action);
-        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        return button;
     }
 
     /**
@@ -720,5 +683,18 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
         // necessary because of resizing
         textArea.setSize(textArea.getPreferredSize());
         return textArea;
+    }
+
+    /**
+     * This function analyses an event and calls the right methods to take care
+     * of the user's requests.
+     *
+     * @param event The incoming ActionEvent.
+     */
+    public void actionPerformed(ActionEvent event) {
+        String command = event.getActionCommand();
+        if (command.equals(OK)) {
+            getGUI().removeFromCanvas(this);
+        }
     }
 }

@@ -76,21 +76,16 @@ public final class ColorCellEditor extends AbstractCellEditor
          */
         public ColorChooserPanel(FreeColClient freeColClient,
                                  ActionListener l) {
-            super(freeColClient);
-
-            JButton okButton = new JButton(Messages.message("ok"));
-            JButton cancelButton = new JButton(Messages.message("cancel"));
-
-            setLayout(new MigLayout("", "", ""));
+            super(freeColClient, new MigLayout("", "", ""));
 
             add(colorChooser);
+
             add(okButton, "newline 20, split 2, tag ok");
-            add(cancelButton, "tag cancel");
-
-            okButton.setActionCommand(OK);
-            cancelButton.setActionCommand(CANCEL);
-
             okButton.addActionListener(l);
+
+            JButton cancelButton = new JButton(Messages.message("cancel"));
+            add(cancelButton, "tag cancel");
+            cancelButton.setActionCommand(CANCEL);
             cancelButton.addActionListener(l);
 
             setOpaque(true);
@@ -124,6 +119,32 @@ public final class ColorCellEditor extends AbstractCellEditor
 
 
     /**
+     * Get the component used to edit the cell's value.
+     *
+     * @param table The table whose cell needs to be edited.
+     * @param value The value of the cell being edited.
+     * @param hasFocus Indicates whether or not the cell in question has focus.
+     * @param row The row index of the cell that is being edited.
+     * @param column The column index of the cell that is being edited.
+     * @return The component used to edit the cell's value.
+     */
+    public Component getTableCellEditorComponent(JTable table, Object value,
+        boolean hasFocus, int row, int column) {
+
+        currentColor = (Color)value;
+        return colorEditButton;
+    }
+
+    /**
+     * Get the value of the cell editor.
+     *
+     * @return The value of the cell editor.
+     */
+    public Object getCellEditorValue() {
+        return currentColor;
+    }
+
+    /**
      * This function analyzes an event and calls the right methods to take
      * care of the user's requests.
      *
@@ -151,31 +172,5 @@ public final class ColorCellEditor extends AbstractCellEditor
             logger.warning("Invalid ColorCellEditor command: "
                 + event.getActionCommand());
         }
-    }
-
-    /**
-     * Get the component used to edit the cell's value.
-     *
-     * @param table The table whose cell needs to be edited.
-     * @param value The value of the cell being edited.
-     * @param hasFocus Indicates whether or not the cell in question has focus.
-     * @param row The row index of the cell that is being edited.
-     * @param column The column index of the cell that is being edited.
-     * @return The component used to edit the cell's value.
-     */
-    public Component getTableCellEditorComponent(JTable table, Object value,
-        boolean hasFocus, int row, int column) {
-
-        currentColor = (Color)value;
-        return colorEditButton;
-    }
-
-    /**
-     * Get the value of the cell editor.
-     *
-     * @return The value of the cell editor.
-     */
-    public Object getCellEditorValue() {
-        return currentColor;
     }
 }

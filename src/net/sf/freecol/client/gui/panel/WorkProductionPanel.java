@@ -69,9 +69,8 @@ public class WorkProductionPanel extends FreeColPanel {
 
     // TODO: expand display to handle several outputs
     public WorkProductionPanel(FreeColClient freeColClient, Unit unit) {
-        super(freeColClient);
-
-        setLayout(new MigLayout("wrap 3, insets 10 10 10 10", "[]30:push[right][]", ""));
+        super(freeColClient, new MigLayout("wrap 3, insets 10 10 10 10",
+                                           "[]30:push[right][]", ""));
 
         final Colony colony = unit.getColony();
         final UnitType unitType = unit.getType();
