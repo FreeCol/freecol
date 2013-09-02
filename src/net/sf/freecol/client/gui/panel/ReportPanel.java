@@ -51,28 +51,11 @@ import net.sf.freecol.common.model.UnitType;
 /**
  * This panel displays a report.
  */
-public class ReportPanel extends FreeColPanel implements ActionListener {
+public class ReportPanel extends FreeColPanel {
 
     protected static final Logger logger = Logger.getLogger(ReportPanel.class.getName());
 
-    /**
-     * Returns a unit type comparator.
-     *
-     * @return A unit type comparator.
-     */
-    public static Comparator<Unit> getUnitTypeComparator() {
-        return unitTypeComparator;
-    }
-
-    protected JPanel reportPanel;
-
-    protected JLabel header;
-
-
-    protected JScrollPane scrollPane;
-
-
-    public static final Comparator<Unit> unitTypeComparator = new Comparator<Unit>() {
+    private static final Comparator<Unit> unitTypeComparator = new Comparator<Unit>() {
         public int compare(Unit unit1, Unit unit2) {
             int deltaType = unit2.getType().compareTo(unit1.getType());
             if (deltaType == 0) {
@@ -84,6 +67,12 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
         }
     };
 
+    protected JPanel reportPanel;
+
+    protected JLabel header;
+
+    protected JScrollPane scrollPane;
+
 
     /**
      * Creates the basic FreeCol report panel.
@@ -92,9 +81,8 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
      * @param title The title to display on the panel.
      */
     public ReportPanel(FreeColClient freeColClient, String title) {
-        super(freeColClient);
-
-        setLayout(new MigLayout("wrap 1", "[fill]", "[]30[fill]30[]"));
+        super(freeColClient, new MigLayout("wrap 1", "[fill]",
+                                           "[]30[fill]30[]"));
 
         header = getDefaultHeader(title);
         add(header, "cell 0 0, align center");
@@ -109,8 +97,9 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
         reportPanel.setOpaque(true);
         reportPanel.setBorder(createBorder());
 
-        scrollPane = new JScrollPane(reportPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                     JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane = new JScrollPane(reportPanel,
+            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+            JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.getVerticalScrollBar().setUnitIncrement( 16 );
         add(scrollPane, "cell 0 1, height 100%, width 100%");
         add(okButton, "cell 0 2, tag ok");
@@ -120,35 +109,20 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
 
 
     /**
-     * This function analyses an event and calls the right methods to take care
-     * of the user's requests.
-     *
-     * @param event The incoming ActionEvent.
-     */
-    public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
-        if (OK.equals(command)) {
-            getGUI().removeFromCanvas(this);
-        } else {
-            FreeColGameObject object = getGame().getFreeColGameObject(command);
-            if (object instanceof Colony) {
-                getGUI().showColonyPanel((Colony) object);
-            } else if (object instanceof Europe) {
-                getGUI().showEuropePanel();
-            } else if (object instanceof Tile) {
-                getGUI().setFocus(((Tile) object));
-            } else if (object == null) {
-                getGUI().showColopediaPanel(command);
-            }
-        }
-    }
-
-    /**
      * Prepares this panel to be displayed.
      */
     public void initialize() {
         reportPanel.removeAll();
         reportPanel.doLayout();
+    }
+
+    /**
+     * Returns a unit type comparator.
+     *
+     * @return A unit type comparator.
+     */
+    public static Comparator<Unit> getUnitTypeComparator() {
+        return unitTypeComparator;
     }
 
     protected Border createBorder() {
@@ -180,9 +154,32 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
         }
     }
 
-
     protected void setMainComponent(Component main) {
         remove(scrollPane);
         add(main, "cell 0 1, height 100%, width 100%");
+    }
+
+    /**
+     * This function analyses an event and calls the right methods to take care
+     * of the user's requests.
+     *
+     * @param event The incoming ActionEvent.
+     */
+    public void actionPerformed(ActionEvent event) {
+        String command = event.getActionCommand();
+        if (OK.equals(command)) {
+            getGUI().removeFromCanvas(this);
+        } else {
+            FreeColGameObject object = getGame().getFreeColGameObject(command);
+            if (object instanceof Colony) {
+                getGUI().showColonyPanel((Colony) object);
+            } else if (object instanceof Europe) {
+                getGUI().showEuropePanel();
+            } else if (object instanceof Tile) {
+                getGUI().setFocus(((Tile) object));
+            } else if (object == null) {
+                getGUI().showColopediaPanel(command);
+            }
+        }
     }
 }

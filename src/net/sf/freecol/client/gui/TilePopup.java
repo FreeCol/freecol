@@ -170,7 +170,7 @@ public final class TilePopup extends JPopupMenu {
         Container currentMenu = this;
         boolean moreUnits = false;
         List<Unit> units = tile.getUnitList();
-        Collections.sort(units, ReportPanel.unitTypeComparator);
+        Collections.sort(units, ReportPanel.getUnitTypeComparator());
         for (final Unit currentUnit : units) {
 
             if (lineCount > maxUnits) {
