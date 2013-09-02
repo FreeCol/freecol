@@ -169,7 +169,11 @@ public class AbstractGoods extends FreeColObject implements Named {
         super.readAttributes(xr);
 
         type = xr.getType(spec, TYPE_TAG, GoodsType.class, (GoodsType)null);
-        if (type == null) throw new XMLStreamException("Null goods type.");
+        if (type == null) {
+            throw new XMLStreamException("Null goods type.");
+        } else {
+            setId(type.getId());
+        }
 
         amount = xr.getAttribute(AMOUNT_TAG, 0);
     }

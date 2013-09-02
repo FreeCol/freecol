@@ -80,6 +80,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
         }
 
         this.game = game;
+        setId(type.getId());
         setSpecification(game.getSpecification());
         setType(type);
         setAmount(amount);
