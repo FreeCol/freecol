@@ -25,6 +25,7 @@ import java.awt.Font;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -49,6 +50,7 @@ import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
@@ -658,6 +660,17 @@ public final class FreeColClient {
             && player != null
             && game.getCurrentPlayer() != null
             && game.getCurrentPlayer().equals(player);
+    }
+
+    /**
+     * Get a list of the player colonies.
+     *
+     * @return The players colonies sorted according to the chosen comparator.
+     */
+    public List<Colony> getMySortedColonies() {
+        if (clientOptions == null
+            || player == null) return Collections.emptyList();
+        return clientOptions.getSortedColonies(player);
     }
 
     /**

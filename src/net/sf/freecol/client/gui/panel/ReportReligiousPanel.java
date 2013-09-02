@@ -59,7 +59,7 @@ public final class ReportReligiousPanel extends ReportPanel {
             = new FreeColProgressBar(getGUI(), crosses);
         reportPanel.add(progressBar, "span");
 
-        List<Colony> colonies = getSortedColonies();
+        List<Colony> colonies = freeColClient.getMySortedColonies();
         int production = 0;
         for (Colony colony : colonies) {
             Building building = colony.getBuildingForProducing(crosses);

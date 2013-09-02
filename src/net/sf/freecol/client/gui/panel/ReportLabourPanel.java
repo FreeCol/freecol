@@ -58,7 +58,7 @@ public final class ReportLabourPanel extends ReportPanel {
     public ReportLabourPanel(FreeColClient freeColClient) {
         super(freeColClient, Messages.message("reportLabourAction.name"));
 
-        colonies = getSortedColonies();
+        colonies = freeColClient.getMySortedColonies();
         gatherData();
         displayData();
     }

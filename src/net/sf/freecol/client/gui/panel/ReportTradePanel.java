@@ -77,7 +77,7 @@ public final class ReportTradePanel extends ReportPanel {
 
         setSize(getMinimumSize());
         Player player = getMyPlayer();
-        colonies = getSortedColonies();
+        colonies = freeColClient.getMySortedColonies();
 
         goodsHeader.setBorder(new EmptyBorder(20, 20, 0, 20));
         scrollPane.setColumnHeaderView(goodsHeader);

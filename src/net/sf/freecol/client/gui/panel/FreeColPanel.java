@@ -529,15 +529,6 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
     }
 
     /**
-     * Get a list of colonies.
-     *
-     * @return The players colonies sorted according to the chosen comparator.
-     */
-    public List<Colony> getSortedColonies() {
-        return getClientOptions().getSortedColonies(getMyPlayer());
-    }
-
-    /**
      * This function analyses an event and calls the right methods to take care
      * of the user's requests.
      *

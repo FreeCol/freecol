@@ -86,7 +86,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
     public ReportRequirementsPanel(FreeColClient freeColClient) {
         super(freeColClient, Messages.message("reportRequirementsAction.name"));
 
-        colonies = getSortedColonies();
+        colonies = freeColClient.getMySortedColonies();
 
         // Display Panel
 

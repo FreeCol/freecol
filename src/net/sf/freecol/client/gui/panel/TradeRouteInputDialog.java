@@ -249,7 +249,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
         if (player.getEurope() != null) {
             destinationSelector.addItem(player.getEurope());
         }
-        for (Colony colony : getSortedColonies()) {
+        for (Colony colony : freeColClient.getMySortedColonies()) {
             destinationSelector.addItem((Settlement) colony);
         }
 

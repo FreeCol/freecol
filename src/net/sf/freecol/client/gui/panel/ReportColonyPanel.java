@@ -133,7 +133,7 @@ public final class ReportColonyPanel extends ReportPanel
     public ReportColonyPanel(FreeColClient freeColClient) {
         super(freeColClient, Messages.message("reportColonyAction.name"));
 
-        colonies = getSortedColonies();
+        colonies = freeColClient.getMySortedColonies();
         try {
             useCompact = getClientOptions().getInteger(ClientOptions.COLONY_REPORT)
                 == ClientOptions.COLONY_REPORT_COMPACT;

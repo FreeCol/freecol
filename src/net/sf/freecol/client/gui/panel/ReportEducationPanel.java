@@ -50,7 +50,7 @@ public final class ReportEducationPanel extends ReportPanel {
         super(freeColClient, Messages.message("reportEducationAction.name"));
 
         reportPanel.setLayout(new MigLayout("wrap 2, fill", "[]20[fill, growprio 200]"));
-        List<Colony> colonies = getSortedColonies();
+        List<Colony> colonies = freeColClient.getMySortedColonies();
         for (Colony colony : colonies) {
             for (Building building : colony.getBuildings()) {
                 if (building.canTeach()) {

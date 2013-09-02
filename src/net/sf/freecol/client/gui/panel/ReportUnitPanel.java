@@ -103,7 +103,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "newline, span, growx, wrap 40");
 
         // colonies first, sorted according to user preferences
-        for (Colony colony : getSortedColonies()) {
+        for (Colony colony : freeColClient.getMySortedColonies()) {
             handleLocation(colony, colony.getName(), inColonies.get(colony));
         }
 

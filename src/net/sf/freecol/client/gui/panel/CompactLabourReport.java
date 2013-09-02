@@ -396,7 +396,7 @@ public final class CompactLabourReport extends ReportPanel {
 
         row = addLocationData(unitTotal, null, row);
 
-        for (Colony colony : getSortedColonies()) {
+        for (Colony colony : getFreeColClient().getMySortedColonies()) {
             LabourData.LocationData colonyData = unitData.getDetails().get(colony);
             if (colonyData != null) {
                 reportPanel.add(createColonyButton(colony), "cell " + COLONY_COLUMN + " "
