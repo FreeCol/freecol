@@ -1060,8 +1060,8 @@ public final class FreeColServer {
 
         Collections.sort(game.getPlayers(), Player.playerComparator);
         for (Player player : game.getPlayers()) {
+            ServerPlayer serverPlayer = (ServerPlayer) player;
             if (player.isAI()) {
-                ServerPlayer serverPlayer = (ServerPlayer) player;
                 DummyConnection theConnection
                     = new DummyConnection("Server-Server-" + player.getName(),
                         getInGameInputHandler());
@@ -1073,6 +1073,11 @@ public final class FreeColServer {
                 server.addDummyConnection(theConnection);
                 serverPlayer.setConnection(theConnection);
                 serverPlayer.setConnected(true);
+            }
+            if (player.isEuropean()) {
+                // The map will be invalid, so trigger a recalculation of the
+                // canSeeTiles, by calling canSee for an arbitrary tile.
+                player.canSee(game.getMap().getTile(0, 0));
             }
         }
 
