@@ -442,20 +442,22 @@ public class Unit extends GoodsLocation
      */
     public boolean checkSetState(UnitState s) {
         switch (s) {
-        case ACTIVE: case SENTRY:
+        case ACTIVE:
             return true;
-        case IN_COLONY:
-            return !isNaval();
         case FORTIFIED:
             return getState() == UnitState.FORTIFYING;
+        case FORTIFYING:
+            return getMovesLeft() > 0;
         case IMPROVING:
             return location instanceof Tile
                 && getOwner().canAcquireForImprovement(location.getTile());
+        case IN_COLONY:
+            return !isNaval();
+        case SENTRY:
+            return true;
         case SKIPPED:
             if (getState() == UnitState.ACTIVE) return true;
             // Fall through
-        case FORTIFYING:
-            return getMovesLeft() > 0;
         default:
             logger.warning("Invalid unit state: " + s);
             return false;
@@ -527,7 +529,6 @@ public class Unit extends GoodsLocation
             break;
         case FORTIFYING:
             setWorkLeft(1);
-            movesLeft = 0;
             break;
         case IMPROVING:
             if (workImprovement == null) {
@@ -3860,7 +3861,6 @@ public class Unit extends GoodsLocation
                 xw.writeLocationAttribute(LOCATION_TAG, location);
             }
         }
-else logger.warning("WRITING UNIT WITH NULL LOCATION: " + this);
 
         xw.writeAttribute(TREASURE_AMOUNT_TAG, treasureAmount);
 
@@ -3953,7 +3953,8 @@ else logger.warning("WRITING UNIT WITH NULL LOCATION: " + this);
 
         state = xr.getAttribute(STATE_TAG, UnitState.class, UnitState.ACTIVE);
 
-        role = xr.getRole(spec, ROLE_TAG, Role.class, spec.getRole("model.role.default"));
+        role = xr.getRole(spec, ROLE_TAG, Role.class,
+                          spec.getRole("model.role.default"));
 
         location = xr.getLocationAttribute(game, LOCATION_TAG, true);
 

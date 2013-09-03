@@ -165,6 +165,7 @@ public class Player extends FreeColGameObject implements Nameable {
         public boolean obtains(Unit unit) {
             return !unit.isDisposed()
                 && unit.getOwner() == player
+                && unit.getState() != Unit.UnitState.FORTIFYING
                 && unit.getState() != Unit.UnitState.SKIPPED
                 && unit.getMovesLeft() > 0
                 && (unit.getDestination() != null
