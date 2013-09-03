@@ -131,12 +131,13 @@ public class IndianDemandMission extends Mission {
      */
     public Goods selectGoods(Colony target) {
         final Specification spec = getSpecification();
-        Tension.Level tension = getUnit().getOwner().getTension(target.getOwner()).getLevel();
+        Tension.Level tension = getUnit().getOwner()
+            .getTension(target.getOwner()).getLevel();
         int dx = spec.getInteger(GameOptions.NATIVE_DEMANDS) + 1;
-        GoodsType food = getSpecification().getPrimaryFoodType();
+        final GoodsType food = spec.getPrimaryFoodType();
         Goods goods = null;
-        if (tension.compareTo(Tension.Level.CONTENT) <= 0 &&
-            target.getGoodsCount(food) >= GoodsContainer.CARGO_SIZE) {
+        if (tension.compareTo(Tension.Level.CONTENT) <= 0
+            && target.getGoodsCount(food) >= GoodsContainer.CARGO_SIZE) {
             return new Goods(getGame(), target, food,
                              capAmount(target.getGoodsCount(food), dx));
         } else if (tension.compareTo(Tension.Level.DISPLEASED) <= 0) {
@@ -144,8 +145,8 @@ public class IndianDemandMission extends Mission {
             int value = 0;
             for (Goods currentGoods : target.getCompactGoods()) {
                 int goodsValue = market.getSalePrice(currentGoods);
-                if (currentGoods.getType().isFoodType() ||
-                    currentGoods.getType().isMilitaryGoods()) {
+                if (currentGoods.getType().isFoodType()
+                    || currentGoods.getType().isMilitaryGoods()) {
                     continue;
                 } else if (goodsValue > value) {
                     value = goodsValue;
@@ -157,45 +158,49 @@ public class IndianDemandMission extends Mission {
                 return goods;
             }
         } else {
-            // military goods
-            for (GoodsType preferred : getSpecification().getGoodsTypeList()) {
+            // Military goods
+            for (GoodsType preferred : spec.getGoodsTypeList()) {
                 if (preferred.isMilitaryGoods()) {
                     int amount = target.getGoodsCount(preferred);
                     if (amount > 0) {
-                        return new Goods(getGame(), target, preferred, capAmount(amount, dx));
+                        return new Goods(getGame(), target, preferred,
+                                         capAmount(amount, dx));
                     }
                 }
             }
-            // storable building materials (what do the natives need tools for?)
-            for (GoodsType preferred : getSpecification().getGoodsTypeList()) {
+            // Storable building materials (what do the natives need tools for?)
+            for (GoodsType preferred : spec.getGoodsTypeList()) {
                 if (preferred.isBuildingMaterial() && preferred.isStorable()) {
                     int amount = target.getGoodsCount(preferred);
                     if (amount > 0) {
-                        return new Goods(getGame(), target, preferred, capAmount(amount, dx));
+                        return new Goods(getGame(), target, preferred,
+                                         capAmount(amount, dx));
                     }
                 }
             }
-            // trade goods
-            for (GoodsType preferred : getSpecification().getGoodsTypeList()) {
+            // Trade goods
+            for (GoodsType preferred : spec.getGoodsTypeList()) {
                 if (preferred.isTradeGoods()) {
                     int amount = target.getGoodsCount(preferred);
                     if (amount > 0) {
-                        return new Goods(getGame(), target, preferred, capAmount(amount, dx));
+                        return new Goods(getGame(), target, preferred,
+                                         capAmount(amount, dx));
                     }
                 }
             }
-            // refined goods
-            for (GoodsType preferred : getSpecification().getGoodsTypeList()) {
+            // Refined goods
+            for (GoodsType preferred : spec.getGoodsTypeList()) {
                 if (preferred.isRefined() && preferred.isStorable()) {
                     int amount = target.getGoodsCount(preferred);
                     if (amount > 0) {
-                        return new Goods(getGame(), target, preferred, capAmount(amount, dx));
+                        return new Goods(getGame(), target, preferred,
+                                         capAmount(amount, dx));
                     }
                 }
             }
         }
 
-        // haven't found what we want
+        // Have not found what we want
         Market market = target.getOwner().getMarket();
         int value = 0;
         for (Goods currentGoods : target.getCompactGoods()) {
@@ -212,10 +217,8 @@ public class IndianDemandMission extends Mission {
     }
 
     private int capAmount(int amount, int difficulty) {
-        int finalAmount = Math.max(amount * difficulty / 6, 30);
-        // natives can only carry one load of goods
-        finalAmount = Math.min(finalAmount, GoodsContainer.CARGO_SIZE);
-        return finalAmount;
+        return Math.min(Math.max(amount * difficulty / 6, 30),
+                        GoodsContainer.CARGO_SIZE); // One load of goods max
     }
 
 
