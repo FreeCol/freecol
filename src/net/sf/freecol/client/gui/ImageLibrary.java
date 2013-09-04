@@ -31,6 +31,7 @@ import java.awt.Insets;
 import java.awt.Transparency;
 import java.awt.font.TextLayout;
 import java.awt.image.BufferedImage;
+import java.awt.image.RescaleOp;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -178,6 +179,30 @@ public final class ImageLibrary {
         return bi.getSubimage(0, 0, width, height);
     }
 
+    /**
+     * Create a faded version of an image.
+     *
+     * @param img The <code>Image</code> to fade.
+     * @param fade The amount of fading.
+     * @param target The offset.
+     * @return The faded image.
+     */
+    public BufferedImage fadeImage(Image img, float fade, float target) {
+        int w = img.getWidth(null);
+        int h = img.getHeight(null);
+        BufferedImage bi = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        Graphics g = bi.getGraphics();
+        g.drawImage(img, 0, 0, null);
+
+        float offset = target * (1.0f - fade);
+        float[] scales = { fade, fade, fade, 1.0f };
+        float[] offsets = { offset, offset, offset, 0.0f };
+        RescaleOp rop = new RescaleOp(scales, offsets, null);
+
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.drawImage(bi, rop, 0, 0);
+        return bi;
+    }
 
     /**
      * Gets a suitable foreground color given a background color.

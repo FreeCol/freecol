@@ -24,8 +24,6 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.awt.image.RescaleOp;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -39,6 +37,7 @@ import javax.swing.JToolTip;
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
@@ -55,12 +54,16 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
 
     private static Logger logger = Logger.getLogger(BuildingPanel.class.getName());
 
+    /** The enclosing client. */
     private final FreeColClient freeColClient;
 
+    /** The Building to display. */
     private final Building building;
 
+    /** A label for the production, if any. */
     private ProductionLabel productionOutput = null;
 
+    /** Labels for any units present. */
     private List<UnitLabel> unitLabels = new ArrayList<UnitLabel>();
 
 
@@ -80,12 +83,43 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
     }
 
 
+    /**
+     * Initialize this building panel.
+     */
     public void initialize() {
         cleanup();
         addPropertyChangeListeners();
         update();
     }
 
+    /**
+     * Clean up this building panel.
+     */
+    public void cleanup() {
+        removePropertyChangeListeners();
+    }
+
+    /**
+     * Add any property change listeners.
+     */
+    protected void addPropertyChangeListeners() {
+        if (building != null) {
+            building.addPropertyChangeListener(this);
+        }
+    }
+
+    /**
+     * Remove any property change listeners.
+     */
+    protected void removePropertyChangeListeners() {
+        if (building != null) {
+            building.removePropertyChangeListener(this);
+        }
+    }
+
+    /**
+     * Update up this building panel.
+     */
     public void update() {
         removeAll();
         unitLabels.clear();
@@ -135,67 +169,31 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
         repaint();
     }
 
-    public void cleanup() {
-        removePropertyChangeListeners();
-    }
-
-    private GUI getGUI() {
-        return freeColClient.getGUI();
-    }
 
     /**
-     * Paints this component.
+     * Get the building this panel displays.
      *
-     * @param g The graphics context in which to paint.
+     * @return The displayed <code>Building</code>.
      */
-    @Override
-    public void paintComponent(Graphics g) {
-        BufferedImage bgImage = fadeImage(getGUI().getImageLibrary().getBuildingImage(building), 0.6f, 192.0f);
-        g.drawImage(bgImage, 0, 0, this);
-    }
-
-    public BufferedImage fadeImage(Image img, float fade, float target) {
-        int w = img.getWidth(null);
-        int h = img.getHeight(null);
-        BufferedImage bi = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-        Graphics g = bi.getGraphics();
-        g.drawImage(img, 0, 0, null);
-
-        float offset = target * (1.0f - fade);
-        float[] scales = { fade, fade, fade, 1.0f };
-        float[] offsets = { offset, offset, offset, 0.0f };
-        RescaleOp rop = new RescaleOp(scales, offsets, null);
-
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.drawImage(bi, rop, 0, 0);
-        return bi;
-    }
-
     public Building getBuilding() {
         return building;
     }
 
-    public void updateProductionLabel() {
-        update();
-    }
-
+    /**
+     * Get any unit labels for the units present.
+     *
+     * @return A list of <code>UnitLabel</code>s.
+     */
     public List<UnitLabel> getUnitLabels() {
         return unitLabels;
     }
 
-    @Override
-    public JToolTip createToolTip() {
-        return new BuildingToolTip(freeColClient, building);
-    }
 
-    public void addPropertyChangeListeners() {
-        building.addPropertyChangeListener(this);
-    }
+    // Interface PropertyChangeListener
 
-    public void removePropertyChangeListeners() {
-        building.removePropertyChangeListener(this);
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     public void propertyChange(PropertyChangeEvent event) {
         String property = event.getPropertyName();
         logger.finest(building.getId() + " change " + property
@@ -205,24 +203,60 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
     }
 
 
+    // Override JComponent
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JToolTip createToolTip() {
+        return new BuildingToolTip(freeColClient, building);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void paintComponent(Graphics g) {
+        ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
+        g.drawImage(lib.fadeImage(lib.getBuildingImage(building), 0.6f, 192.0f),
+                    0, 0, this);
+    }
+
+
+    /**
+     * A special label to display the building upkeep required.
+     */
     public class UpkeepLabel extends JLabel {
 
+        /** The base image to display. */
         private final Image image;
 
+        /**
+         * Create an upkeep label.
+         *
+         * @param number The upkeep cost.
+         */
         public UpkeepLabel(int number) {
-            super(getGUI().getImageLibrary().getMiscImageIcon("coin"));
-            image = getGUI().getImageLibrary()
-                .getStringImage(getGUI().getCanvas().getGraphics(),
-                                Integer.toString(number), getForeground(),
-                                ResourceManager.getFont("SimpleFont", Font.BOLD, 12f));
+            super(freeColClient.getGUI().getImageLibrary()
+                .getMiscImageIcon("coin"));
+
+            ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
+            image = lib.getStringImage(freeColClient.getGUI().getCanvas()
+                .getGraphics(),
+                Integer.toString(number), getForeground(),
+                ResourceManager.getFont("SimpleFont", Font.BOLD, 12f));
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void paintComponent(Graphics g) {
             getIcon().paintIcon(null, g, 0, 0);
-            g.drawImage(image, (getIcon().getIconWidth() - image.getWidth(null))/2,
-                        (getIcon().getIconHeight() - image.getHeight(null))/2, null);
+            g.drawImage(image, 
+                (getIcon().getIconWidth() - image.getWidth(null))/2,
+                (getIcon().getIconHeight() - image.getHeight(null))/2, null);
         }
     }
-
 }
