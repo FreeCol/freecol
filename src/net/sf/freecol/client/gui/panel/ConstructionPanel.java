@@ -48,18 +48,21 @@ import net.sf.freecol.common.resources.ResourceManager;
  * unit in a colony.
  */
 public class ConstructionPanel extends JPanel implements PropertyChangeListener {
-    public static final String EVENT = Colony.ColonyChangeEvent.BUILD_QUEUE_CHANGE.toString();
+    public static final String EVENT
+        = Colony.ColonyChangeEvent.BUILD_QUEUE_CHANGE.toString();
 
+    /** The enclosing client. */
     private final FreeColClient freeColClient;
 
+    /** Should a mouse click open the build queue? */
     private final boolean openBuildQueue;
 
+    /** The colony performing the construction. */
     private Colony colony;
 
-    /**
-     * The text to display if buildable == null.
-     */
-    private StringTemplate defaultLabel = StringTemplate.key("colonyPanel.clickToBuild");
+    /** The text to display if buildable == null. */
+    private StringTemplate defaultLabel
+        = StringTemplate.key("colonyPanel.clickToBuild");
 
 
     /**
@@ -74,29 +77,30 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
     public ConstructionPanel(FreeColClient freeColClient,
                              Colony colony, boolean openBuildQueue) {
         this.freeColClient = freeColClient;
+        this.colony = colony;
         this.openBuildQueue = openBuildQueue;
 
-        setLayout(new MigLayout("fill, gapy 2:5, wrap 2", "push[]10[center]push"));
-        setColony(colony);
+        setLayout(new MigLayout("fill, gapy 2:5, wrap 2",
+                "push[]10[center]push"));
+        setOpaque(openBuildQueue);
     }
 
 
     public void setColony(Colony newColony) {
         if (newColony != colony) {
-            if (colony != null) {
-                colony.removePropertyChangeListener(EVENT, this);
-                for (MouseListener listener : getMouseListeners()) {
-                    removeMouseListener(listener);
-                }
-            }
+            cleanup();
             this.colony = newColony;
+            initialize();
+        }
+    }
 
+    public void initialize() {
+        if (colony != null) {
             // we are interested in changes to the build queue, as well as
             // changes to the warehouse and the colony's production bonus
             colony.addPropertyChangeListener(EVENT, this);
-
-            if (openBuildQueue)
-            {
+                
+            if (openBuildQueue) {
                 addMouseListener(new MouseAdapter() {
                         public void mousePressed(MouseEvent e) {
                             freeColClient.getGUI().showBuildQueuePanel(colony);
@@ -104,10 +108,21 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
                     });
             }
         }
-        initialize(colony.getCurrentlyBuilding());
+        update();
     }
 
-    private void initialize(BuildableType buildable) {
+    public void cleanup() {
+        if (colony != null) {
+            colony.removePropertyChangeListener(EVENT, this);
+        }
+        for (MouseListener listener : getMouseListeners()) {
+            removeMouseListener(listener);
+        }
+    }
+
+    public void update() {
+        BuildableType buildable = (colony == null) ? null
+            : colony.getCurrentlyBuilding();
         GUI gui = freeColClient.getGUI();
 
         removeAll();
@@ -152,9 +167,6 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
         repaint();
     }
 
-    public void update() {
-        initialize(colony.getCurrentlyBuilding());
-    }
 
     /**
      * Get the <code>DefaultLabel</code> value.
@@ -175,18 +187,8 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
     }
 
     public void propertyChange(PropertyChangeEvent event) {
-        List<?> buildQueue = (List<?>) event.getNewValue();
-        if (buildQueue == null || buildQueue.isEmpty()) {
-            initialize(null);
-        } else {
-            initialize((BuildableType) buildQueue.get(0));
-        }
+        update();
     }
-
-    public void removePropertyChangeListeners() {
-        colony.removePropertyChangeListener(EVENT, this);
-    }
-
 
     @Override
     public String getUIClassID() {
