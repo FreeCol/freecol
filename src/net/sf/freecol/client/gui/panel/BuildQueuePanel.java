@@ -219,7 +219,6 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         buyBuilding.addActionListener(this);
 
         constructionPanel = new ConstructionPanel(freeColClient, colony, false);
-        constructionPanel.setOpaque(false);
         StringTemplate buildingNothing = StringTemplate.template("colonyPanel.currentlyBuilding")
             .add("%buildable%", "nothing");
         constructionPanel.setDefaultLabel(buildingNothing);

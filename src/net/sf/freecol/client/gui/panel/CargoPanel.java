@@ -48,14 +48,12 @@ public class CargoPanel extends FreeColPanel
 
     private static Logger logger = Logger.getLogger(CargoPanel.class.getName());
 
-    /**
-     * The carrier that contains cargo.
-     */
+    /** The carrier that contains cargo. */
     private Unit carrier;
 
-    private final DefaultTransferHandler defaultTransferHandler;
+    private DefaultTransferHandler defaultTransferHandler = null;
 
-    private final MouseListener pressListener;
+    private MouseListener pressListener = null;
 
     private final TitledBorder border;
 
@@ -69,9 +67,7 @@ public class CargoPanel extends FreeColPanel
     public CargoPanel(FreeColClient freeColClient, boolean withTitle) {
         super(freeColClient);
 
-        carrier = null;
-        defaultTransferHandler = new DefaultTransferHandler(freeColClient, this);
-        pressListener = new DragListener(freeColClient, this);
+        this.carrier = null;
 
         if (withTitle) {
             border = BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
@@ -79,55 +75,46 @@ public class CargoPanel extends FreeColPanel
         } else {
             border = null;
         }
-
         setBorder(border);
-        initialize();
     }
 
-
-    /**
-     * Whether this panel is active.
-     *
-     * @return boolean <b>true</b> == active
-     */
-    public boolean isActive() {
-        return carrier != null;
-    }
-
-    /**
-     * Get the <code>Carrier</code> value.
-     *
-     * @return an <code>Unit</code> value
-     */
-    public Unit getCarrier() {
-        return carrier;
-    }
-
-    /**
-     * Set the <code>Carrier</code> value.
-     *
-     * @param newCarrier The new Carrier value.
-     */
-    public void setCarrier(final Unit newCarrier) {
-        removePropertyChangeListeners();
-        this.carrier = newCarrier;
-        addPropertyChangeListeners();
-        update();
-    }
 
     /**
      * Initialize this CargoPanel.
      */
     public void initialize() {
-        carrier = null;
+        if (defaultTransferHandler == null) {
+            defaultTransferHandler
+                = new DefaultTransferHandler(getFreeColClient(), this);
+        }
+        if (pressListener == null) {
+            pressListener = new DragListener(getFreeColClient(), this);
+        }
         addPropertyChangeListeners();
+        update();
     }
 
     /**
      * Clean up this CargoPanel.
      */
     public void cleanup() {
+        if (defaultTransferHandler != null) defaultTransferHandler = null;
+        if (pressListener != null) pressListener = null;
         removePropertyChangeListeners();
+    }
+
+    protected void addPropertyChangeListeners() {
+        if (carrier != null) {
+            carrier.addPropertyChangeListener(Unit.CARGO_CHANGE, this);
+            carrier.getGoodsContainer().addPropertyChangeListener(this);
+        }
+    }
+
+    protected void removePropertyChangeListeners() {
+        if (carrier != null) {
+            carrier.removePropertyChangeListener(Unit.CARGO_CHANGE, this);
+            carrier.getGoodsContainer().removePropertyChangeListener(this);
+        }
     }
 
     /**
@@ -168,6 +155,38 @@ public class CargoPanel extends FreeColPanel
         revalidate();
         repaint();
     }
+
+    /**
+     * Whether this panel is active.
+     *
+     * @return boolean <b>true</b> == active
+     */
+    public boolean isActive() {
+        return carrier != null;
+    }
+
+    /**
+     * Get the <code>Carrier</code> value.
+     *
+     * @return an <code>Unit</code> value
+     */
+    public Unit getCarrier() {
+        return carrier;
+    }
+
+    /**
+     * Set the <code>Carrier</code> value.
+     *
+     * @param newCarrier The new Carrier value.
+     */
+    public void setCarrier(final Unit newCarrier) {
+        if (newCarrier != carrier) {
+            cleanup();
+            this.carrier = newCarrier;
+            initialize();
+        }
+    }
+
 
     /**
      * Update the title of this CargoPanel.
@@ -265,30 +284,11 @@ public class CargoPanel extends FreeColPanel
         }
     }
 
-    public void addPropertyChangeListeners() {
-        if (carrier != null) {
-            carrier.addPropertyChangeListener(Unit.CARGO_CHANGE, this);
-            carrier.getGoodsContainer().addPropertyChangeListener(this);
-        }
-    }
-
-    public void removePropertyChangeListeners() {
-        if (carrier != null) {
-            carrier.removePropertyChangeListener(Unit.CARGO_CHANGE, this);
-            carrier.getGoodsContainer().removePropertyChangeListener(this);
-        }
-    }
-
     public void propertyChange(PropertyChangeEvent event) {
         logger.finest("CargoPanel change " + event.getPropertyName()
                       + ": " + event.getOldValue()
                       + " -> " + event.getNewValue());
         update();
-    }
-
-    @Override
-    public String getUIClassID() {
-        return "CargoPanelUI";
     }
 
     public boolean accepts(Unit unit) {
@@ -299,4 +299,8 @@ public class CargoPanel extends FreeColPanel
         return true;
     }
 
+    @Override
+    public String getUIClassID() {
+        return "CargoPanelUI";
+    }
 }
