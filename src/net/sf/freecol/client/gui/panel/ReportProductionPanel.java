@@ -175,6 +175,7 @@ public final class ReportProductionPanel extends ReportPanel {
                             BuildingPanel buildingPanel =
                                 new BuildingPanel(getFreeColClient(), building);
                             buildingPanel.setBorder(FreeColPanel.CELLBORDER);
+                            buildingPanel.initialize();
                             reportPanel.add(buildingPanel);
                         }
                     }

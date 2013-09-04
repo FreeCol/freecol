@@ -79,7 +79,6 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
 
         setToolTipText(" ");
         setLayout(new MigLayout("", "[32][32][32]", "[32][44]"));
-        initialize();
     }
 
 
@@ -96,7 +95,10 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
      * Clean up this building panel.
      */
     public void cleanup() {
+        unitLabels.clear();
+        productionOutput = null;
         removePropertyChangeListeners();
+        removeAll();
     }
 
     /**

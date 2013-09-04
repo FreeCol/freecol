@@ -66,7 +66,9 @@ public final class ReportReligiousPanel extends ReportPanel {
             if (building == null) continue;
             reportPanel.add(createColonyButton(colony),
                             "split 2, flowy, align center");
-            reportPanel.add(new BuildingPanel(getFreeColClient(), building));
+            BuildingPanel bp = new BuildingPanel(getFreeColClient(), building);
+            bp.initialize();
+            reportPanel.add(bp);
             production += colony.getNetProductionOf(crosses);
         }
 
