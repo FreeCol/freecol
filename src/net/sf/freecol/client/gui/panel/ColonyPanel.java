@@ -222,7 +222,6 @@ public final class ColonyPanel extends PortPanel
         netProductionPanel.setOpaque(false);
 
         constructionPanel = new ConstructionPanel(freeColClient, colony, true);
-        constructionPanel.setOpaque(true);
 
         outsideColonyPanel = new OutsideColonyPanel();
 
@@ -698,7 +697,7 @@ public final class ColonyPanel extends PortPanel
             buildingsPanel.cleanup();
             warehousePanel.cleanup();
             tilesPanel.cleanup();
-            constructionPanel.removePropertyChangeListeners();
+            constructionPanel.cleanup();
             cargoPanel.setCarrier(null);
             outsideColonyPanel.cleanup();
 
