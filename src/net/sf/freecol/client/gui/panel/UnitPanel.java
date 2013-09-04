@@ -38,28 +38,59 @@ public abstract class UnitPanel extends JPanel implements PropertyChangeListener
 
     private static Logger logger = Logger.getLogger(UnitPanel.class.getName());
 
-    private boolean editable;
+    /** The panel containing the units to display. */
     private PortPanel portPanel;
 
+    /** Whether this panel is editable. */
+    private boolean editable;
+
+
+    /**
+     * Create a unit panel.
+     *
+     * @param portPanel A <code>PortPanel</code> to supply units.
+     * @param name An optional name for the panel.
+     * @param editable True if the panel can be edited.
+     */
     public UnitPanel(PortPanel portPanel, String name, boolean editable) {
         this.portPanel = portPanel;
         this.editable = editable;
         setName(name);
     }
 
-    public boolean isEditable() {
-        return editable;
-    }
 
-    public PortPanel getPortPanel() {
-        return portPanel;
-    }
-
+    /**
+     * Initialize this unit panel.
+     */
     public void initialize() {
         addPropertyChangeListeners();
         update();
     }
 
+    /**
+     * Clean up this unit panel.
+     */
+    public void cleanup() {
+        removePropertyChangeListeners();
+    }
+
+    /**
+     * Add any property change listeners.
+     */
+    protected void addPropertyChangeListeners() {
+        // do nothing
+    }
+
+    /**
+     * Remove any property change listeners.
+     */
+    protected void removePropertyChangeListeners() {
+        // do nothing
+    }
+
+    /**
+     * Update this unit panel.
+     */
     public void update() {
         removeAll();
 
@@ -86,41 +117,50 @@ public abstract class UnitPanel extends JPanel implements PropertyChangeListener
         repaint();
     }
 
+
     /**
-     * Select a UnitLabel based on some criterion. By default, do nothing.
+     * Get the port panel that supplies units to this panel.
      *
+     * @return The <code>PortPanel</code>.
+     */
+    public PortPanel getPortPanel() {
+        return portPanel;
+    }
+
+    /**
+     * Is this panel editable?
+     *
+     * @return True if the panel is editable.
+     */
+    public boolean isEditable() {
+        return editable;
+    }
+
+    /**
+     * Can this panel accepts the given Unit.
+     *
+     * @param unit The <code>Unit</code> to check.
+     * @return True if the unit can be added.
+     */
+    public abstract boolean accepts(Unit unit);
+
+    /**
+     * Select a UnitLabel based on some criterion.
      */
     public void selectLabel() {
-        // do nothing
+        // Default to doing nothing
     }
 
-    public void cleanup() {
-        removePropertyChangeListeners();
-    }
 
-    protected void addPropertyChangeListeners() {
-        // do nothing
-    }
+    // Interface PropertyChangeListener
 
-    protected void removePropertyChangeListeners() {
-        // do nothing
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     public void propertyChange(PropertyChangeEvent event) {
         logger.finest(getName() + " change " + event.getPropertyName()
                       + ": " + event.getOldValue()
                       + " -> " + event.getNewValue());
         update();
     }
-
-    /**
-     * Returns <code>true</code> if this panel accepts the given Unit.
-     *
-     * @param unit an <code>Unit</code> value
-     * @return a <code>boolean</code> value
-     */
-    public abstract boolean accepts(Unit unit);
-
-
 }
-
