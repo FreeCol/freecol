@@ -31,10 +31,22 @@ import net.sf.freecol.common.model.Unit;
  */
 public abstract class InPortPanel extends UnitPanel {
 
+    /**
+     * Create an InPortPanel.
+     *
+     * @param portPanel The <code>PortPanel</code> to enclose.
+     * @param name An optional name for the panel.
+     * @param editable Is this panel editable?
+     */
     public InPortPanel(PortPanel portPanel, String name, boolean editable) {
         super(portPanel, name, editable);
     }
 
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void selectLabel() {
         // Keep the previous selected unit if possible, otherwise default
         // on the last carrier.
@@ -57,10 +69,11 @@ public abstract class InPortPanel extends UnitPanel {
         // No revalidate+repaint as this is done in setSelectedUnitLabel
     }
 
+
+    // Override JLabel
+
     @Override
     public String getUIClassID() {
         return "InPortPanelUI";
     }
-
 }
-
