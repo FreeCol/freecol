@@ -93,11 +93,14 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
 
     private static final int UNABLE_TO_BUILD = -1;
 
-    private final BuildQueueTransferHandler buildQueueHandler = new BuildQueueTransferHandler();
+    private final BuildQueueTransferHandler buildQueueHandler
+        = new BuildQueueTransferHandler();
 
     private ListCellRenderer cellRenderer;
-    private static JCheckBox compact = new JCheckBox();
-    private static JCheckBox showAll = new JCheckBox();
+    private static boolean compact = false;
+    private static boolean showAll = false;
+    private JCheckBox compactBox = new JCheckBox();
+    private JCheckBox showAllBox = new JCheckBox();
     private JList buildQueueList;
     private JList unitList;
     private JList buildingList;
@@ -108,11 +111,13 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
 
     private FeatureContainer featureContainer;
 
-    private Map<BuildableType, String> lockReasons = new HashMap<BuildableType, String>();
-    private Set<BuildableType> unbuildableTypes = new HashSet<BuildableType>();
+    private Map<BuildableType, String> lockReasons
+        = new HashMap<BuildableType, String>();
+    private Set<BuildableType> unbuildableTypes
+        = new HashSet<BuildableType>();
 
     /**
-     * A list of unit types that can be build. Most unit types are
+     * A list of unit types that can be build.  Most unit types are
      * human and can never be built.
      */
     private List<UnitType> buildableUnits = new ArrayList<UnitType>();
@@ -144,18 +149,18 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         cellRenderer = getCellRenderer();
 
         // remove previous listeners
-        for (ItemListener listener : compact.getItemListeners()) {
-            compact.removeItemListener(listener);
+        for (ItemListener listener : compactBox.getItemListeners()) {
+            compactBox.removeItemListener(listener);
         }
-        compact.setText(Messages.message("colonyPanel.compactView"));
-        compact.addItemListener(this);
+        compactBox.setText(Messages.message("colonyPanel.compactView"));
+        compactBox.addItemListener(this);
 
         // remove previous listeners
-        for (ItemListener listener : showAll.getItemListeners()) {
-            showAll.removeItemListener(listener);
+        for (ItemListener listener : showAllBox.getItemListeners()) {
+            showAllBox.removeItemListener(listener);
         }
-        showAll.setText(Messages.message("colonyPanel.showAll"));
-        showAll.addItemListener(this);
+        showAllBox.setText(Messages.message("colonyPanel.showAll"));
+        showAllBox.addItemListener(this);
 
         buildQueueList = new JList(current);
         buildQueueList.setTransferHandler(buildQueueHandler);
@@ -224,6 +229,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         constructionPanel.setDefaultLabel(buildingNothing);
 
         updateAllLists();
+        compactBox.setSelected(compact);
+        showAllBox.setSelected(showAll);
 
         add(headLine, "span 3, align center, wrap 40");
         add(new JLabel(Messages.message("colonyPanel.units")), "align center");
@@ -234,8 +241,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         add(new JScrollPane(buildQueueList), "grow");
         add(new JScrollPane(buildingList), "grow, wrap 20");
         add(buyBuilding, "span, split 4");
-        add(compact);
-        add(showAll);
+        add(compactBox);
+        add(showAllBox);
         add(okButton, "tag ok");
     }
 
@@ -311,7 +318,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                 lockReasons.put(unitType, Messages.message(StringTemplate.template("colonyPanel.requires")
                                                            .addName("%string%", Utils.join("/", lockReason))));
             }
-            if (lockReason.isEmpty() || showAll.isSelected()) {
+            if (lockReason.isEmpty() || showAllBox.isSelected()) {
                 units.addElement(unitType);
             }
         }
@@ -383,7 +390,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                 lockReasons.put(buildingType, Messages.message(StringTemplate.template("colonyPanel.requires")
                                                                .addName("%string%", Utils.join("/", lockReason))));
             }
-            if (lockReason.isEmpty() || showAll.isSelected()) {
+            if (lockReason.isEmpty() || showAllBox.isSelected()) {
                 buildings.addElement(buildingType);
             }
         }
@@ -572,10 +579,12 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
     }
 
     public void itemStateChanged(ItemEvent event) {
-        if (event.getSource() == compact) {
+        if (event.getSource() == compactBox) {
             updateDetailView();
-        } else if (event.getSource() == showAll) {
+            compact = compactBox.isSelected();
+        } else if (event.getSource() == showAllBox) {
             updateAllLists();
+            showAll = showAllBox.isSelected();
         }
     }
 
@@ -588,7 +597,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
     }
 
     private ListCellRenderer getCellRenderer() {
-        if (compact.isSelected()) {
+        if (compactBox.isSelected()) {
             if (cellRenderer == null || cellRenderer instanceof DefaultBuildQueueCellRenderer) {
                 return new FreeColComboBoxRenderer();
             }
