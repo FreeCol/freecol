@@ -682,10 +682,6 @@ public class GUI {
         return canvas.showColonyPanel(colony);
     }
 
-    public void showColonyPanel(Colony colony, Runnable callback) {
-        canvas.showColonyPanel(colony, callback);
-    }
-
     public void showColopediaPanel(String nodeId) {
         canvas.showColopediaPanel(nodeId);
     }
