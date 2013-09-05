@@ -63,6 +63,7 @@ public abstract class UnitPanel extends JPanel implements PropertyChangeListener
      * Initialize this unit panel.
      */
     public void initialize() {
+        cleanup();
         addPropertyChangeListeners();
         update();
     }
@@ -72,6 +73,7 @@ public abstract class UnitPanel extends JPanel implements PropertyChangeListener
      */
     public void cleanup() {
         removePropertyChangeListeners();
+        removeAll();
     }
 
     /**
@@ -125,6 +127,15 @@ public abstract class UnitPanel extends JPanel implements PropertyChangeListener
      */
     public PortPanel getPortPanel() {
         return portPanel;
+    }
+
+    /**
+     * Set the port panel that supplies units to this panel.
+     *
+     * @param portPanel The new <code>PortPanel</code>.
+     */
+    public void setPortPanel(PortPanel portPanel) {
+        this.portPanel = portPanel;
     }
 
     /**

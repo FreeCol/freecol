@@ -155,6 +155,8 @@ public final class ColonyPanel extends PortPanel
     // inherit PortPanel.defaultTransferHandler
     // inherit PortPanel.selectedUnitLabel
 
+    private ActionListener nameActionListener = null;
+
     private MouseListener releaseListener = null;
 
     private MouseAdapter buildQueueListener = null;
@@ -164,20 +166,26 @@ public final class ColonyPanel extends PortPanel
 
     private JPanel netProductionPanel = null;
 
+    private JScrollPane buildingsScroll = null;
     private BuildingsPanel buildingsPanel = null;
 
+    private JScrollPane cargoScroll = null;
     // inherit protected PortPanel.cargoPanel
 
     private ConstructionPanel constructionPanel = null;
 
+    private JScrollPane inPortScroll = null;
     // inherit protected PortPanel.inPortPanel
 
+    private JScrollPane outsideColonyScroll = null;
     private OutsideColonyPanel outsideColonyPanel = null;
 
     private PopulationPanel populationPanel = null;
 
+    private JScrollPane tilesScroll = null;
     private TilesPanel tilesPanel = null;
 
+    private JScrollPane warehouseScroll = null;
     private WarehousePanel warehousePanel = null;
 
 
@@ -212,7 +220,6 @@ public final class ColonyPanel extends PortPanel
             JComponent.WHEN_IN_FOCUSED_WINDOW, unloadIM);
         unloadButton.setActionCommand(String.valueOf(UNLOAD));
         enterPressesWhenFocused(unloadButton);
-        unloadButton.addActionListener(this);
 
         InputMap fillIM = new ComponentInputMap(fillButton);
         fillIM.put(KeyStroke.getKeyStroke(KeyEvent.VK_L, 0, false),
@@ -223,7 +230,6 @@ public final class ColonyPanel extends PortPanel
             JComponent.WHEN_IN_FOCUSED_WINDOW, fillIM);
         fillButton.setActionCommand(String.valueOf(FILL));
         enterPressesWhenFocused(fillButton);
-        fillButton.addActionListener(this);
 
         InputMap warehouseIM = new ComponentInputMap(warehouseButton);
         warehouseIM.put(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0, false),
@@ -234,7 +240,6 @@ public final class ColonyPanel extends PortPanel
             JComponent.WHEN_IN_FOCUSED_WINDOW, warehouseIM);
         warehouseButton.setActionCommand(String.valueOf(WAREHOUSE));
         enterPressesWhenFocused(warehouseButton);
-        warehouseButton.addActionListener(this);
 
         InputMap buildQueueIM = new ComponentInputMap(buildQueueButton);
         buildQueueIM.put(KeyStroke.getKeyStroke(KeyEvent.VK_B, 0, false),
@@ -245,7 +250,6 @@ public final class ColonyPanel extends PortPanel
             JComponent.WHEN_IN_FOCUSED_WINDOW, buildQueueIM);
         buildQueueButton.setActionCommand(String.valueOf(BUILDQUEUE));
         enterPressesWhenFocused(buildQueueButton);
-        buildQueueButton.addActionListener(this);
 
         InputMap colonyUnitsIM = new ComponentInputMap(colonyUnitsButton);
         colonyUnitsIM.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0, false),
@@ -256,16 +260,19 @@ public final class ColonyPanel extends PortPanel
             JComponent.WHEN_IN_FOCUSED_WINDOW, colonyUnitsIM);
         colonyUnitsButton.setActionCommand(String.valueOf(COLONY_UNITS));
         enterPressesWhenFocused(colonyUnitsButton);
-        colonyUnitsButton.addActionListener(this);
 
         if (setGoodsButton != null) {
             setGoodsButton.setActionCommand(String.valueOf(SETGOODS));
             enterPressesWhenFocused(setGoodsButton);
-            setGoodsButton.addActionListener(this);
         }
 
         defaultTransferHandler
             = new DefaultTransferHandler(freeColClient, this);
+        nameActionListener = new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    initialize((Colony)nameBox.getSelectedItem());
+                }
+            };
         pressListener = new DragListener(freeColClient, this);
         releaseListener = new DropListener();
         buildQueueListener = new MouseAdapter() {
@@ -282,21 +289,16 @@ public final class ColonyPanel extends PortPanel
             nameBox.addItem(aColony);
         }
         nameBox.setSelectedItem(colony);
-        nameBox.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    initialize((Colony)nameBox.getSelectedItem());
-                }
-            });
         nameBox.getInputMap().put(KeyStroke.getKeyStroke("LEFT"),
-            "selectPrevious2");
+                                  "selectPrevious2");
         nameBox.getInputMap().put(KeyStroke.getKeyStroke("RIGHT"),
-            "selectNext2");
+                                  "selectNext2");
 
         netProductionPanel = new JPanel();
         netProductionPanel.setOpaque(false);
 
         buildingsPanel = new BuildingsPanel();
-        JScrollPane buildingsScroll = new JScrollPane(buildingsPanel,
+        buildingsScroll = new JScrollPane(buildingsPanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         buildingsScroll.getVerticalScrollBar().setUnitIncrement(16);
@@ -305,7 +307,7 @@ public final class ColonyPanel extends PortPanel
         buildingsScroll.setBorder(BorderFactory.createEtchedBorder());
 
         cargoPanel = new ColonyCargoPanel(freeColClient);
-        JScrollPane cargoScroll = new JScrollPane(cargoPanel,
+        cargoScroll = new JScrollPane(cargoPanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         cargoScroll.setBorder(BorderFactory.createEtchedBorder());
@@ -313,12 +315,12 @@ public final class ColonyPanel extends PortPanel
         constructionPanel = new ConstructionPanel(freeColClient, colony, true);
 
         inPortPanel = new ColonyInPortPanel();
-        JScrollPane inPortScroll = new JScrollPane(inPortPanel);
+        inPortScroll = new JScrollPane(inPortPanel);
         inPortScroll.getVerticalScrollBar().setUnitIncrement(16);
         inPortScroll.setBorder(BorderFactory.createEtchedBorder());
 
         outsideColonyPanel = new OutsideColonyPanel();
-        JScrollPane outsideColonyScroll = new JScrollPane(outsideColonyPanel,
+        outsideColonyScroll = new JScrollPane(outsideColonyPanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         outsideColonyScroll.getVerticalScrollBar().setUnitIncrement(16);
@@ -327,13 +329,13 @@ public final class ColonyPanel extends PortPanel
         populationPanel = new PopulationPanel();
 
         tilesPanel = new TilesPanel();
-        JScrollPane tilesScroll = new JScrollPane(tilesPanel,
+        tilesScroll = new JScrollPane(tilesPanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         tilesScroll.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
 
         warehousePanel = new WarehousePanel();
-        JScrollPane warehouseScroll = new JScrollPane(warehousePanel,
+        warehouseScroll = new JScrollPane(warehousePanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         warehouseScroll.setBorder(BorderFactory.createEtchedBorder());
@@ -351,26 +353,6 @@ public final class ColonyPanel extends PortPanel
         setLayout(new MigLayout("fill, wrap 2, insets 2", "[390!][fill]",
                                 "[][]0[]0[][growprio 200,shrinkprio 10]"
                                 + "[growprio 150,shrinkprio 50]"));
-
-        add(nameBox, "height 48:, grow");
-        add(netProductionPanel, "growx");
-        add(tilesScroll, "width 390!, height 200!, top");
-        add(buildingsScroll, "span 1 3, grow");
-        add(populationPanel, "grow");
-        add(constructionPanel, "grow, top");
-        add(inPortScroll, "span, split 3, grow, sg, height 60:121:");
-        add(cargoScroll, "grow, sg, height 60:121:");
-        add(outsideColonyScroll, "grow, sg, height 60:121:");
-        add(warehouseScroll, "span, height 40:60:, growx");
-        add(unloadButton, "span, split "
-            + Integer.toString((setGoodsButton == null) ? 6 : 7)
-            + ", align center");
-        add(fillButton);
-        add(warehouseButton);
-        add(buildQueueButton);
-        add(colonyUnitsButton);
-        if (setGoodsButton != null) add(setGoodsButton);
-        add(okButton, "tag ok");
 
         initialize(colony);
         restoreSavedSize(850, 600);
@@ -481,6 +463,20 @@ public final class ColonyPanel extends PortPanel
         updateBuildingsPanel();
         updateNetProductionPanel();
         updateConstructionPanel();
+    }
+
+    /**
+     * Update the entire colony panel.
+     */
+    private void update() {
+        buildingsPanel.update();
+        constructionPanel.update();
+        inPortPanel.update();
+        updateNetProductionPanel();
+        outsideColonyPanel.update();
+        populationPanel.update();
+        tilesPanel.update();
+        warehousePanel.update();
     }
 
 
@@ -638,18 +634,26 @@ public final class ColonyPanel extends PortPanel
      * @param colony The <code>Colony</code> to be displayed.
      */
     private void initialize(Colony colony) {
-        removePropertyChangeListeners();
-        removeMouseListeners();
+        cleanup();
+
         setColony(colony);
         // Do not just use colony.getOwner() == getMyPlayer() because
         // in debug mode we are in the *server* colony, and the equality
         // will fail.
         editable = colony.getOwner().getId().equals(getMyPlayer().getId());
+
         addPropertyChangeListeners();
         addMouseListeners();
         setTransferHandlers(isEditable());
 
         // Enable/disable widgets
+        unloadButton.addActionListener(this);
+        fillButton.addActionListener(this);
+        warehouseButton.addActionListener(this);
+        buildQueueButton.addActionListener(this);
+        colonyUnitsButton.addActionListener(this);
+        if (setGoodsButton != null) setGoodsButton.addActionListener(this);
+
         unloadButton.setEnabled(isEditable());
         fillButton.setEnabled(isEditable());
         warehouseButton.setEnabled(isEditable());
@@ -659,9 +663,9 @@ public final class ColonyPanel extends PortPanel
             setGoodsButton.setEnabled(isEditable());
         }
         nameBox.setEnabled(isEditable());
+        nameBox.addActionListener(nameActionListener);
         updateNetProductionPanel();
 
-        // update all the subpanels
         buildingsPanel.initialize();
         cargoPanel.initialize();
         constructionPanel.initialize();
@@ -670,14 +674,63 @@ public final class ColonyPanel extends PortPanel
         populationPanel.initialize();
         tilesPanel.initialize();
         warehousePanel.initialize();
+
+        add(nameBox, "height 48:, grow");
+        add(netProductionPanel, "growx");
+        add(tilesScroll, "width 390!, height 200!, top");
+        add(buildingsScroll, "span 1 3, grow");
+        add(populationPanel, "grow");
+        add(constructionPanel, "grow, top");
+        add(inPortScroll, "span, split 3, grow, sg, height 60:121:");
+        add(cargoScroll, "grow, sg, height 60:121:");
+        add(outsideColonyScroll, "grow, sg, height 60:121:");
+        add(warehouseScroll, "span, height 40:60:, growx");
+        add(unloadButton, "span, split "
+            + Integer.toString((setGoodsButton == null) ? 6 : 7)
+            + ", align center");
+        add(fillButton);
+        add(warehouseButton);
+        add(buildQueueButton);
+        add(colonyUnitsButton);
+        if (setGoodsButton != null) add(setGoodsButton);
+        add(okButton, "tag ok");
+
+        update();
     }
 
-    private void setTransferHandlers(boolean enable) {
-        DefaultTransferHandler dth = (enable) ? defaultTransferHandler : null;
-        cargoPanel.setTransferHandler(dth);
-        inPortPanel.setTransferHandler(dth);
-        outsideColonyPanel.setTransferHandler(dth);
-        warehousePanel.setTransferHandler(dth);
+    /**
+     * Clean up this colony panel.
+     */
+    private void cleanup() {
+        unloadButton.removeActionListener(this);
+        fillButton.removeActionListener(this);
+        warehouseButton.removeActionListener(this);
+        buildQueueButton.removeActionListener(this);
+        colonyUnitsButton.removeActionListener(this);
+        if (setGoodsButton != null) setGoodsButton.removeActionListener(this);
+
+        nameBox.removeActionListener(nameActionListener);
+
+        removePropertyChangeListeners();
+        if (getSelectedUnit() != null) {
+            getSelectedUnit().removePropertyChangeListener(this);
+        }
+        removeMouseListeners();
+        for (MouseListener listener : getMouseListeners()) {
+            removeMouseListener(listener);
+        }
+        setTransferHandlers(false);
+
+        buildingsPanel.cleanup();
+        cargoPanel.cleanup();
+        constructionPanel.cleanup();
+        inPortPanel.cleanup();
+        outsideColonyPanel.cleanup();
+        populationPanel.cleanup();
+        tilesPanel.cleanup();
+        warehousePanel.cleanup();
+
+        removeAll();
     }
 
     private void addMouseListeners() {
@@ -694,6 +747,14 @@ public final class ColonyPanel extends PortPanel
         inPortPanel.removeMouseListener(releaseListener);
         outsideColonyPanel.removeMouseListener(releaseListener);
         warehousePanel.removeMouseListener(releaseListener);
+    }
+
+    private void setTransferHandlers(boolean enable) {
+        DefaultTransferHandler dth = (enable) ? defaultTransferHandler : null;
+        cargoPanel.setTransferHandler(dth);
+        inPortPanel.setTransferHandler(dth);
+        outsideColonyPanel.setTransferHandler(dth);
+        warehousePanel.setTransferHandler(dth);
     }
 
     /**
@@ -721,6 +782,73 @@ public final class ColonyPanel extends PortPanel
     }
 
     /**
+     * ColonyPanel is very prone to leaks.  Try to do something about
+     * it.
+     */
+    private void removeReferences() {
+        if (getLayout() == null) return; // Been here already
+
+        // MigLayout 4.0 is hanging onto references to the parent object.
+        // Clear it out.
+        setLayout(null);
+        buildingsPanel.setLayout(null);
+        cargoPanel.setLayout(null);
+        constructionPanel.setLayout(null);
+        inPortPanel.setLayout(null);
+        inPortPanel.setPortPanel(null);
+        outsideColonyPanel.setLayout(null);
+        outsideColonyPanel.setPortPanel(null);
+        populationPanel.setLayout(null);
+        // tilesPanel does not use MigLayout
+        warehousePanel.setLayout(null);
+
+        // This should not be necessary, but alas ColonyPanel is leaking.
+        okButton = null;
+        unloadButton = null;
+        fillButton = null;
+        warehouseButton = null;
+        buildQueueButton = null;
+        colonyUnitsButton = null;
+        setGoodsButton = null;
+        nameBox = null;
+        netProductionPanel = null;
+        buildingsPanel = null;
+        buildingsScroll = null;
+        cargoPanel = null;
+        cargoScroll = null;
+        constructionPanel = null;
+        inPortPanel = null;
+        inPortScroll = null;
+        outsideColonyPanel = null; 
+        outsideColonyScroll = null; 
+        populationPanel = null;
+        tilesPanel = null;
+        tilesScroll = null;
+        warehousePanel = null;
+        warehouseScroll = null;
+
+        defaultTransferHandler = null;
+        nameActionListener = null;
+        pressListener = null;
+        releaseListener = null;
+        buildQueueListener = null;
+        selectedUnitLabel = null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeNotify() {
+        super.removeNotify();
+
+        // removeNotify gets called when a JPanel has no parent any
+        // more, that is the best opportunity available for JPanels
+        // to be given a chance to remove leak generating references.
+        removeReferences();
+    }
+
+    /**
      * Close this <code>ColonyPanel</code>.
      */
     public void closeColonyPanel() {
@@ -745,61 +873,11 @@ public final class ColonyPanel extends PortPanel
                 return;
             }
         }
-         
+
+        cleanup();
+        removeReferences();
+
         getGUI().removeFromCanvas(this);
-
-        unloadButton.removeActionListener(this);
-        fillButton.removeActionListener(this);
-        warehouseButton.removeActionListener(this);
-        buildQueueButton.removeActionListener(this);
-        colonyUnitsButton.removeActionListener(this);
-        if (setGoodsButton != null) setGoodsButton.removeActionListener(this);
-
-        removePropertyChangeListeners();
-        if (getSelectedUnit() != null) {
-            getSelectedUnit().removePropertyChangeListener(this);
-        }
-        removeMouseListeners();
-        for (MouseListener listener : getMouseListeners()) {
-            removeMouseListener(listener);
-        }
-        setTransferHandlers(false);
-
-        buildingsPanel.cleanup();
-        cargoPanel.cleanup();
-        constructionPanel.cleanup();
-        inPortPanel.cleanup();
-        outsideColonyPanel.cleanup();
-        populationPanel.cleanup();
-        tilesPanel.cleanup();
-        warehousePanel.cleanup();
-
-        // This should not be necessary, but alas ColonyPanel is leaking.
-        unloadButton = null;
-        fillButton = null;
-        warehouseButton = null;
-        buildQueueButton = null;
-        colonyUnitsButton = null;
-        setGoodsButton = null;
-        nameBox = null;
-        netProductionPanel = null;
-        buildingsPanel = null;
-        cargoPanel = null;
-        constructionPanel = null;
-        inPortPanel = null;
-        outsideColonyPanel = null;
-        populationPanel = null;
-        tilesPanel = null;
-        warehousePanel = null;
-
-        defaultTransferHandler = null;
-        pressListener = null;
-        releaseListener = null;
-        buildQueueListener = null;
-        selectedUnitLabel = null;
-
-        removeAll();
-
         getGUI().getMapViewer().restartBlinking();
 
         // Talk to the controller last, allow all the cleanup to happen first.
@@ -1066,6 +1144,7 @@ public final class ColonyPanel extends PortPanel
          * Initialize this population panel.
          */
         public void initialize() {
+            cleanup();
             update();
         }
 
@@ -1073,7 +1152,7 @@ public final class ColonyPanel extends PortPanel
          * Clean up this population panel.
          */
         public void cleanup() {
-            // Nothing yet
+            removeAll();
         }
 
         /**
@@ -1182,6 +1261,16 @@ public final class ColonyPanel extends PortPanel
          * {@inheritDoc}
          */
         @Override
+        public void cleanup() {
+            super.cleanup();
+
+            removeAll();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         protected void addPropertyChangeListeners() {
             final Colony colony = getColony();
             if (colony != null) {
@@ -1202,7 +1291,6 @@ public final class ColonyPanel extends PortPanel
             }
         }
 
-        // Inherit UnitPanel.cleanup
         // Inherit UnitPanel.update
 
 
@@ -1381,6 +1469,7 @@ public final class ColonyPanel extends PortPanel
          */
         public void cleanup() {
             removePropertyChangeListeners();
+            removeAll();
         }
 
         /**
@@ -1408,8 +1497,8 @@ public final class ColonyPanel extends PortPanel
          */
         public void update() {
             final Colony colony = getColony();
-            removeAll();
             if (colony == null) return;
+            removeAll();
 
             ClientOptions options = getClientOptions();
             final int threshold = (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS))
@@ -1619,6 +1708,7 @@ public final class ColonyPanel extends PortPanel
                 removeMouseListener(releaseListener);
                 removeMouseListener(buildQueueListener);
                 setTransferHandler(null);
+                removeAll();
             }
 
             /**
@@ -1893,6 +1983,7 @@ public final class ColonyPanel extends PortPanel
                 removeMouseListener(releaseListener);
                 setTransferHandler(null);
                 removePropertyChangeListeners();
+                removeAll();
             }
 
             protected void addPropertyChangeListeners() {
