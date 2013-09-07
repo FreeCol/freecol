@@ -155,7 +155,7 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
 
         @Override
         public void setLabelValues(JLabel label, Object value) {
-            label.setText(Messages.message("model.unit.role." + ((String) value).toLowerCase(Locale.US)));
+            label.setText(Messages.message(((String) value) + ".name"));
         }
     }
 
@@ -213,7 +213,7 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
             String key = au.getId();
             if (au.getUnitType(spec).hasAbility(Ability.CAN_BE_EQUIPPED)
                 && !"model.role.default".equals(au.getRoleId())) {
-                key = "model.unit." + au.getRoleId();
+                key = au.getRoleId();
             }
             StringTemplate template = StringTemplate.template(key + ".name")
                 .addAmount("%number%", au.getNumber())
