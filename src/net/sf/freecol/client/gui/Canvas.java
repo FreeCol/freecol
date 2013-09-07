@@ -1403,7 +1403,7 @@ public final class Canvas extends JDesktopPane {
         gui.setupMenuBarToNull();
         mainPanel = new MainPanel(freeColClient);
         addCentered(mainPanel, MAIN_LAYER);
-        showInformationMessage(userMsg);
+        if (userMsg != null) showInformationMessage(userMsg);
         mainPanel.requestFocus();
     }
 
