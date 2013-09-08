@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.Locale;
 
 import net.sf.freecol.util.test.FreeColTestCase;
+import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Game;
@@ -362,6 +363,13 @@ public class MessagesTest extends FreeColTestCase {
         t = StringTemplate.template("monarch")
             .addName("%turn%", Turn.toString(1000));
         assertEquals("fred", Messages.message(t));
+
+    }
+
+
+    public void testAbstractUnitLabels() {
+        AbstractUnit unit = new AbstractUnit("model.unit.merchantman", "model.role.default", 1);
+        assertEquals("one Merchantman", Messages.message(unit.getLabel()));
 
     }
 
