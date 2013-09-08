@@ -232,6 +232,11 @@ public class AbstractUnit extends FreeColObject {
         super.readAttributes(xr);
 
         roleId = xr.getAttribute(ROLE_TAG, "model.role.default");
+        // @compat 0.10.7
+        if (roleId.indexOf('.') < 0) {
+            roleId = "model.role." + roleId.toLowerCase();
+        }
+        // end @compat
 
         number = xr.getAttribute(NUMBER_TAG, 1);
     }
