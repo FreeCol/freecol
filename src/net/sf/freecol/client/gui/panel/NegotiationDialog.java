@@ -343,7 +343,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade>
                     .add("%goods%", i.getGoods().getNameKey()));
         } else if (item instanceof UnitTradeItem) {
             UnitTradeItem i = (UnitTradeItem)item;
-            description = Messages.message(i.getUnit().getLabel());
+            description = Messages.getLabel(i.getUnit());
         }
         JButton button = new JButton(new RemoveAction(item));
         button.setText(description);

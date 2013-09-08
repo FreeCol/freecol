@@ -714,14 +714,14 @@ public final class ReportColonyPanel extends ReportPanel
                         true, 0.333), cAlarm,
                     stpl("report.colony.making.noteach.description")
                         .addName("%colony%", colony.getName())
-                        .addStringTemplate("%teacher%", u.getLabel()));
+                        .addStringTemplate("%teacher%", Messages.getLabelTemplate(u)));
             } else {
                 b = colourButton(cac, Integer.toString(left),
                     lib.getUnitImageIcon(u.getType(), "model.role.default",
                         true, 0.333), Color.BLACK,
                     stpl("report.colony.making.educating.description")
                         .addName("%colony%", colony.getName())
-                        .addStringTemplate("%teacher%", u.getLabel())
+                        .addStringTemplate("%teacher%", Messages.getLabelTemplate(u))
                         .addAmount("%turns%", left));
             }
             reportPanel.add(b);

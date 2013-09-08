@@ -103,7 +103,7 @@ public abstract class UnitPanel extends JPanel implements PropertyChangeListener
                     = new UnitLabel(portPanel.getFreeColClient(), unit);
                 TradeRoute tradeRoute = unit.getTradeRoute();
                 if (tradeRoute != null) {
-                    unitLabel.setDescriptionLabel(Messages.message(unit.getFullLabel())
+                    unitLabel.setDescriptionLabel(Messages.getLabel(unit)
                                                   + " (" + tradeRoute.getName() + ")");
                 }
                 if (editable) {

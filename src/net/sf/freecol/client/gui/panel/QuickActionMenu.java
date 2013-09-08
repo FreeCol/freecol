@@ -99,7 +99,7 @@ public final class QuickActionMenu extends JPopupMenu {
         this.setLabel("Unit");
         ImageIcon unitIcon = imageLibrary.getUnitImageIcon(tempUnit, 0.66);
 
-        JMenuItem name = new JMenuItem(Messages.message(tempUnit.getLabel()) + " (" +
+        JMenuItem name = new JMenuItem(Messages.getLabel(tempUnit) + " (" +
                                        Messages.message("menuBar.colopedia") + ")",
                                        unitIcon);
         name.setActionCommand(UnitAction.COLOPEDIA.toString());
@@ -167,17 +167,16 @@ public final class QuickActionMenu extends JPopupMenu {
 
         if (tempUnit.isCarrier()) return false;
         boolean added = false;
-        for (Unit unit : loc.getUnitList()) {
+        for (final Unit unit : loc.getUnitList()) {
             if (unit.isCarrier() && unit.canCarryUnits()
                 && unit.canAdd(tempUnit)
                 && tempUnit.getLocation() != unit) {
-                final Unit funit = unit;
                 StringTemplate template = StringTemplate.template("board")
-                    .addStringTemplate("%unit%", unit.getLabel());
+                    .addStringTemplate("%unit%", Messages.getLabelTemplate(unit));
                 JMenuItem menuItem = new JMenuItem(Messages.message(template));
                 menuItem.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
-                            igc.boardShip(tempUnit, funit);
+                            igc.boardShip(tempUnit, unit);
                         }
                     });
                 this.add(menuItem);
@@ -191,19 +190,18 @@ public final class QuickActionMenu extends JPopupMenu {
         final InGameController igc = freeColClient.getInGameController();
 
         boolean added = false;
-        for (Unit unit : loc.getUnitList()) {
+        for (final Unit unit : loc.getUnitList()) {
             if (unit.isCarrier() && unit.canCarryGoods()
                 && unit.canAdd(goods)) {
-                final Unit funit = unit;
                 StringTemplate template = StringTemplate.template("loadOnTo")
-                    .addStringTemplate("%unit%", unit.getLabel());
+                    .addStringTemplate("%unit%", Messages.getLabelTemplate(unit));
                 JMenuItem menuItem = new JMenuItem(Messages.message(template));
                 menuItem.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
                             if ((e.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
                                 promptForAmount(goods);
                             }
-                            igc.loadCargo(goods, funit);
+                            igc.loadCargo(goods, unit);
                         }
                     });
                 this.add(menuItem);
@@ -225,19 +223,18 @@ public final class QuickActionMenu extends JPopupMenu {
         final Goods goods = new Goods(europe.getGame(), null,
                                       ag.getType(), ag.getAmount());
         boolean added = false;
-        for (Unit unit : europe.getUnitList()) {
+        for (final Unit unit : europe.getUnitList()) {
             if (unit.isCarrier() && unit.canCarryGoods()
                 && unit.canAdd(goods)) {
-                final Unit funit = unit;
                 StringTemplate template = StringTemplate.template("loadOnTo")
-                    .addStringTemplate("%unit%", unit.getLabel());
+                    .addStringTemplate("%unit%", Messages.getLabelTemplate(unit));
                 JMenuItem menuItem = new JMenuItem(Messages.message(template));
                 menuItem.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
                             if ((e.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
                                 promptForAmount(ag);
                             }
-                            igc.buyGoods(ag.getType(), ag.getAmount(), funit);
+                            igc.buyGoods(ag.getType(), ag.getAmount(), unit);
                         }
                     });
                 this.add(menuItem);
@@ -255,7 +252,7 @@ public final class QuickActionMenu extends JPopupMenu {
             this.add(cargo);
 
             for (Unit passenger : tempUnit.getUnitList()) {
-                JMenuItem menuItem = new JMenuItem("    " + Messages.message(passenger.getLabel()));
+                JMenuItem menuItem = new JMenuItem("    " + Messages.getLabel(passenger));
                 menuItem.setFont(menuItem.getFont().deriveFont(Font.ITALIC));
                 this.add(menuItem);
             }

@@ -66,31 +66,19 @@ public class PreCombatDialog extends FreeColDialog<Boolean> {
 
         // left hand side: attacker
         // right hand side: defender
-        String attackerName;
-        JLabel attackerLabel;
-        String defenderName;
-        JLabel defenderLabel;
+        Unit attackerUnit = (Unit) attacker;
+        String attackerName = Messages.getLabel(attackerUnit);
+        JLabel attackerLabel = new UnitLabel(freeColClient, attackerUnit,
+                                             false, true);
+        String defenderName = null;
+        JLabel defenderLabel = null;
         if (combatModel.combatIsAttack(attacker, defender)) {
-            Unit attackerUnit = (Unit) attacker;
             Unit defenderUnit = (Unit) defender;
-            attackerName = Messages.message(StringTemplate.template("model.unit.nationUnit")
-                    .addStringTemplate("%nation%", attackerUnit.getOwner().getNationName())
-                    .addStringTemplate("%unit%", attackerUnit.getLabel()));
-            attackerLabel = new UnitLabel(freeColClient, attackerUnit,
-                                          false, true);
-            defenderName = Messages.message(StringTemplate.template("model.unit.nationUnit")
-                    .addStringTemplate("%nation%", defenderUnit.getOwner().getNationName())
-                    .addStringTemplate("%unit%", defenderUnit.getLabel()));
+            defenderName = Messages.getLabel(defenderUnit);
             defenderLabel = new UnitLabel(freeColClient, defenderUnit,
                                           false, true);
         } else if (combatModel.combatIsSettlementAttack(attacker, defender)) {
-            Unit attackerUnit = (Unit) attacker;
             Settlement settlement = (Settlement) defender;
-            attackerName = Messages.message(StringTemplate.template("model.unit.nationUnit")
-                    .addStringTemplate("%nation%", attackerUnit.getOwner().getNationName())
-                    .addStringTemplate("%unit%", attackerUnit.getLabel()));
-            attackerLabel = new UnitLabel(freeColClient, attackerUnit,
-                                          false, true);
             defenderName = settlement.getName();
             defenderLabel = new JLabel(getGUI().getImageIcon(settlement, false));
         } else {
