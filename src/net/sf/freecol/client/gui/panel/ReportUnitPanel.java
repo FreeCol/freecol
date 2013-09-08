@@ -194,7 +194,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
 
         if (unitList == null || unitList.isEmpty()) {
-            reportPanel.add(new JLabel(Messages.message("none")), "sg");
+            reportPanel.add(localizedLabel("none"), "sg");
         } else {
             Collections.sort(unitList, ReportPanel.getUnitTypeComparator());
             for (Unit unit : unitList) {
@@ -221,7 +221,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
                                                        unit.getRole().getId());
         JButton button = getLinkButton("", icon, unit.getLocation().getId());
         button.addActionListener(this);
-        String toolTip = Messages.message(unit.getFullLabel());
+        String toolTip = Messages.getLabel(unit);
         if (unit.getDestination() != null) {
             String type = unit.isPerson()
                 ? "person"
