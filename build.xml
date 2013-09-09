@@ -140,6 +140,7 @@
             <arg value="rev-parse"/>
             <arg value="HEAD"/>
         </exec>
+        <echo message="${gitRawRevision}" />
     </target>
 
     <target name="git-revision" unless="have-revision"
@@ -150,19 +151,10 @@
             <arg value="describe"/>
             <arg value="--always"/>
         </exec>
+        <echo message="${FreeCol.Revision}" />
     </target>
 
-    <target name="svnproperties" unless="have-revision"
-            description="Creates the svn properties file using svn, setting FreeCol.Revision">
-        <exec executable="svn" failifexecutionfails="false"
-              output="${basedir}/build/svn.properties">
-            <arg value="info"/>
-            <arg value="."/>
-        </exec>
-        <property prefix="FreeCol" file="build/svn.properties"/>
-    </target>
-
-    <target name="manifest" depends="git-revision,svnproperties"
+    <target name="manifest" depends="git-revision"
             description="Creates the Manifest file.">
         <manifestclasspath property="jar.classpath"
                            jarfile="Freecol.jar">
@@ -178,7 +170,7 @@
             <attribute name="Package-Vendor" value="FreeCol Team"/>
         </manifest>
     </target>
-    
+
     <!-- Compiles the source files and creates a JAR-file. -->
     <target name="package" depends="init,build,manifest" description="Compiles the source files and creates a JAR-file.">
         <jar jarfile="${freecol.jar.file}"
@@ -587,7 +579,7 @@
              the short answer depends.
              if you have Ant 1.7, the junit.jar can exist on the classpath.
              upgrading to 1.7 may be the best solution.
-             
+
              if you have Ant 1.6:
              ant -lib test/lib/junit.jar testall
              if you have a version of Ant prior to 1.6 on Windows:
@@ -712,7 +704,7 @@
         </exec>
         <property name="online.manual.is.up.to.date" value="true" />
     </target>
-    
+
     <target name="manual" depends="print-manual,online-manual"
             description="Creates the printable and online user guides.">
     </target>
@@ -796,7 +788,7 @@
             <arg value="${freecol.release.dir}/base/freecol/freecol.desktop" />
         </java>
     </target>
-    
+
     <target name="pmd">
         <taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask"
                  classpath="./pmd-4.1/lib/pmd-4.1.jar"/>
@@ -845,7 +837,7 @@
         <delete dir="${freecol.build.dir}/report" />
         <mkdir dir="${freecol.build.dir}/report"/>
         <mkdir dir="${freecol.build.dir}/report/xml"/>
-        
+
         <echo message="if the next task fails then please read the build script" />
         <junit printsummary="on" errorproperty="error.junit"
                fork="yes" maxmemory="48m">
