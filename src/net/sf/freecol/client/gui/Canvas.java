@@ -131,6 +131,7 @@ import net.sf.freecol.client.gui.video.VideoComponent;
 import net.sf.freecol.client.gui.video.VideoListener;
 import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.debug.FreeColDebugger;
+import net.sf.freecol.common.io.FreeColFileFilter;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.Europe;
@@ -1344,7 +1345,9 @@ public final class Canvas extends JDesktopPane {
      * @see FreeColDialog
      */
     public File showLoadDialog(File directory) {
-        return showLoadDialog(directory, new FileFilter[] { FreeColDialog.getFSGFileFilter() });
+        return showLoadDialog(directory, new FileFilter[] {
+                FreeColFileFilter.getFSGFileFilter()
+            });
     }
 
     /**
@@ -1717,7 +1720,9 @@ public final class Canvas extends JDesktopPane {
      * @see FreeColDialog
      */
     public File showSaveDialog(File directory, String defaultName) {
-        return showSaveDialog(directory, ".fsg", new FileFilter[] { FreeColDialog.getFSGFileFilter() }, defaultName);
+        return showSaveDialog(directory, ".fsg",
+            new FileFilter[] { FreeColFileFilter.getFSGFileFilter() },
+            defaultName);
     }
 
     /**
