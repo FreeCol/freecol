@@ -402,8 +402,10 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
             Option o = freeColClient.getClientOptions()
                 .getOption(getClass().getName() + key);
             if (o == null) {
+                Specification specification = (freeColClient.getGame() == null)
+                    ? null : getSpecification();
                 IntegerOption io = new IntegerOption(getClass().getName()+key,
-                                                     getSpecification());
+                                                     specification);
                 io.setValue(value);
                 freeColClient.getClientOptions().add(io);
             } else if (o instanceof IntegerOption) {
