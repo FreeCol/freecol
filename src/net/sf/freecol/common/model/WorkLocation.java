@@ -255,9 +255,9 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
     }
 
     /**
-     * Update production type on the basis of the current building
-     * type (which might change due to an upgrade) and the work type
-     * of units present.
+     * Update production type on the basis of the current work
+     * location type type (which might change due to an upgrade) and
+     * the work type of units present.
      */
     public void updateProductionType() {
         Unit unit = getFirstUnit();
