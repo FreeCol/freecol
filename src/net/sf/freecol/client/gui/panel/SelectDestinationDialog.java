@@ -108,7 +108,8 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
      */
     @SuppressWarnings("unchecked") // FIXME in Java7
     public SelectDestinationDialog(FreeColClient freeColClient, Unit unit) {
-        super(freeColClient);
+        super(freeColClient, new MigLayout("wrap 1, fill",
+                                           "[align center]", ""));
 
         // Collect the goods the unit is carrying.
         final List<GoodsType> goodsTypes = new ArrayList<GoodsType>();
@@ -120,9 +121,6 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
 
         destinations.clear();
         collectDestinations(unit, goodsTypes);
-
-        MigLayout layout = new MigLayout("wrap 1, fill", "[align center]", "");
-        setLayout(layout);
 
         JLabel header = new JLabel(Messages.message("selectDestination.text"));
         header.setFont(smallHeaderFont);

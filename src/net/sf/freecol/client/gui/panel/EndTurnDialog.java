@@ -99,9 +99,7 @@ public final class EndTurnDialog extends FreeColDialog<Boolean> implements ListS
      */
     @SuppressWarnings("unchecked") // FIXME in Java7
     public EndTurnDialog(FreeColClient freeColClient, List<Unit> units) {
-        super(freeColClient);
-
-        setLayout(new MigLayout("wrap 1", "[align center]"));
+        super(freeColClient, new MigLayout("wrap 1", "[align center]"));
 
         JLabel header = new JLabel(Messages.message("endTurnDialog.name"));
         header.setFont(smallHeaderFont);
@@ -206,13 +204,15 @@ public final class EndTurnDialog extends FreeColDialog<Boolean> implements ListS
         }
     }
 
+
     private class UnitCellRenderer implements ListCellRenderer {
 
-        JPanel itemPanel = new JPanel();
-        JPanel selectedPanel = new JPanel();
-        JLabel imageLabel = new JLabel();
-        JLabel nameLabel = new JLabel();
-        JLabel locationLabel = new JLabel();
+        private JPanel itemPanel = new MigPanel();
+        private JPanel selectedPanel = new MigPanel();
+        private JLabel imageLabel = new JLabel();
+        private JLabel nameLabel = new JLabel();
+        private JLabel locationLabel = new JLabel();
+
 
         public UnitCellRenderer() {
             itemPanel.setOpaque(false);
@@ -229,7 +229,7 @@ public final class EndTurnDialog extends FreeColDialog<Boolean> implements ListS
                                                       boolean isSelected,
                                                       boolean cellHasFocus) {
             UnitWrapper unit = (UnitWrapper) value;
-            JPanel panel = isSelected ? selectedPanel : itemPanel;
+            JPanel panel = (isSelected) ? selectedPanel : itemPanel;
             panel.removeAll();
 
             imageLabel.setIcon(getLibrary().getUnitImageIcon(unit.unit, 0.5));
@@ -242,6 +242,5 @@ public final class EndTurnDialog extends FreeColDialog<Boolean> implements ListS
             return panel;
         }
     }
-
 }
 

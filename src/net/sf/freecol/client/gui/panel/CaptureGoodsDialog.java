@@ -71,11 +71,10 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>>
     @SuppressWarnings("unchecked") // FIXME in Java7
     public CaptureGoodsDialog(FreeColClient freeColClient, Unit winner,
                               List<Goods> loot) {
-        super(freeColClient);
+        super(freeColClient, new MigLayout("wrap 1", "[center]",
+                                           "[]20[]20[]"));
         
         maxCargo = winner.getSpaceLeft();
-
-        setLayout(new MigLayout("wrap 1", "[center]", "[]20[]20[]"));
 
         JLabel header = new JLabel(Messages.message("lootCargo.header"));
         header.setFont(mediumHeaderFont);
@@ -144,15 +143,14 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>>
         goodsList.repaint();
     }
 
+
+    // Interface ActionListener
+
     /**
-     * This function analyses an event and calls the right methods to take
-     * care of the user's requests. The response is an ArrayList of Goods.
-     *
-     * @param e The incoming ActionEvent.
+     * {@inheritDoc}
      */
-    @Override
     public void actionPerformed(ActionEvent e) {
-        String command = e.getActionCommand();
+        final String command = e.getActionCommand();
         if (ALL.equals(command)) {
             for (int i = 0; i < goodsList.getModel().getSize() && i < maxCargo;
                  i++) {
@@ -174,7 +172,7 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>>
             }
             setResponse(list);
         } else {
-            logger.warning("Invalid action command: " + command);
+            super.actionPerformed(e);
         }
     }
 

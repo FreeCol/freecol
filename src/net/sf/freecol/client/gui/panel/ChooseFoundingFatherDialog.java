@@ -63,10 +63,9 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
      */
     public ChooseFoundingFatherDialog(FreeColClient freeColClient,
         List<FoundingFather> possibleFoundingFathers) {
-        super(freeColClient);
+        super(freeColClient, new MigLayout("wrap 1", "align center"));
 
         this.possibleFathers = possibleFoundingFathers;
-        setLayout(new MigLayout("wrap 1", "align center"));
 
         setFocusCycleRoot(false);
 
@@ -76,7 +75,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
             new ColopediaPanel(getFreeColClient()));
         for (int index = 0; index < possibleFoundingFathers.size(); index++) {
             FoundingFather father = possibleFoundingFathers.get(index);
-            JPanel panel = new JPanel();
+            JPanel panel = new MigPanel();
             details.buildDetail(father, panel);
             panel.validate();
             tb.addTab(Messages.message(father.getTypeKey()), panel);

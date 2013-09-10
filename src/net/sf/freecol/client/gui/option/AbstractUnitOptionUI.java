@@ -39,6 +39,7 @@ import javax.swing.ListCellRenderer;
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
@@ -60,7 +61,7 @@ import net.sf.freecol.common.option.UnitTypeOption;
 public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
     implements ItemListener {
 
-    private JPanel panel = new JPanel();
+    private JPanel panel;
     private IntegerOptionUI numberUI;
     private UnitTypeOptionUI typeUI;
     private StringOptionUI roleUI;
@@ -68,15 +69,19 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
     private boolean roleEditable;
 
     /**
-    * Creates a new <code>AbstractUnitOptionUI</code> for the given <code>AbstractUnitOption</code>.
-    *
-    * @param option The <code>AbstractUnitOption</code> to make a user interface for
-    * @param editable boolean whether user can modify the setting
-    */
+     * Creates a new <code>AbstractUnitOptionUI</code> for the given
+     * <code>AbstractUnitOption</code>.
+     *
+     * @param option The <code>AbstractUnitOption</code> to make a
+     *     user interface for
+     * @param editable boolean whether user can modify the setting
+     */
     @SuppressWarnings("unchecked") // FIXME in Java7
-    public AbstractUnitOptionUI(GUI gui, final AbstractUnitOption option, boolean editable) {
+    public AbstractUnitOptionUI(GUI gui, final AbstractUnitOption option,
+                                boolean editable) {
         super(gui, option, editable);
 
+        panel = new MigPanel();
         panel.setLayout(new MigLayout());
 
         IntegerOption numberOption = option.getNumber();
@@ -151,6 +156,7 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
         }
     }
 
+
     private class RoleRenderer extends FreeColComboBoxRenderer {
 
         @Override
@@ -165,8 +171,9 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
 
     private class AbstractUnitRenderer implements ListCellRenderer {
 
-        private final JPanel normal = new JPanel();
-        private final JPanel selected = new JPanel() {
+        private JPanel normal = new MigPanel();
+        private JPanel selected = new MigPanel() {
+                @Override
                 public void paintComponent(Graphics g) {
                     Graphics2D g2d = (Graphics2D) g;
                     Composite oldComposite = g2d.getComposite();
@@ -191,7 +198,8 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
 
 
         /**
-         * Returns a <code>ListCellRenderer</code> for the given <code>JList</code>.
+         * Returns a <code>ListCellRenderer</code> for the given
+         * <code>JList</code>.
          *
          * @param list The <code>JList</code>.
          * @param value The list cell.
@@ -227,6 +235,4 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
             return c;
         }
     }
-
-
 }

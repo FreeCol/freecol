@@ -32,6 +32,7 @@ import javax.swing.JScrollPane;
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.resources.ResourceManager;
 
 
@@ -39,6 +40,10 @@ import net.sf.freecol.common.resources.ResourceManager;
  * A general dialog for information display.
  */
 public class InformationDialog extends FreeColDialog<Boolean> {
+
+    private JPanel textPanel = null;
+    private JScrollPane scrollPane = null;
+
 
     /**
      * Creates an information dialog that shows the given texts and
@@ -63,11 +68,10 @@ public class InformationDialog extends FreeColDialog<Boolean> {
      */
     public InformationDialog(FreeColClient freeColClient,
                              String[] texts, ImageIcon[] images) {
-        super(freeColClient);
+        super(freeColClient, new MigLayout("wrap 1, insets 200 10 10 10",
+                "[510]", "[242]20[20]"));
 
-        setLayout(new MigLayout("wrap 1, insets 200 10 10 10", "[510]", "[242]20[20]"));
-
-        JPanel textPanel = new JPanel();
+        textPanel = new MigPanel();
         textPanel.setOpaque(false);
         if (images != null) {
             textPanel.setLayout(new MigLayout("wrap 2", "", ""));
@@ -94,7 +98,7 @@ public class InformationDialog extends FreeColDialog<Boolean> {
             }
         }
 
-        JScrollPane scrollPane = new JScrollPane(textPanel,
+        scrollPane = new JScrollPane(textPanel,
             JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
             JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         // correct way to make scroll pane opaque
@@ -116,5 +120,19 @@ public class InformationDialog extends FreeColDialog<Boolean> {
     public void paintComponent(Graphics g) {
         Image bgImage = ResourceManager.getImage("InformationDialog.backgroundImage");
         g.drawImage(bgImage, 0, 0, this);
+    }
+
+
+    // Override Component
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeNotify() {
+        super.removeNotify();
+        
+        removeAll();
+        scrollPane = null;
     }
 }

@@ -50,19 +50,26 @@ import net.sf.freecol.common.model.Unit;
  */
 public class PreCombatDialog extends FreeColDialog<Boolean> {
 
+    /**
+     * Create a new pre-combat dialog.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param attacker The attacker (a <code>Unit</code>).
+     * @param defender The defender (either a <code>Unit</code> or
+     *     a <code>Settlement</code>).
+     */
     public PreCombatDialog(FreeColClient freeColClient,
                            FreeColGameObject attacker,
                            FreeColGameObject defender) {
-        super(freeColClient);
+        super(freeColClient, new MigLayout("wrap 6",
+                "[sg label]20[sg value, right]1px[sg percent]40"
+                + "[sg label]20[sg value, right]1px[sg percent]", ""));
 
         CombatModel combatModel = attacker.getGame().getCombatModel();
         Set<Modifier> offence = sortModifiers(combatModel
                 .getOffensiveModifiers(attacker, defender));
         Set<Modifier> defence = sortModifiers(combatModel
                 .getDefensiveModifiers(attacker, defender));
-
-        setLayout(new MigLayout("wrap 6", "[sg label]20[sg value, right]1px[sg percent]40"
-                                + "[sg label]20[sg value, right]1px[sg percent]", ""));
 
         // left hand side: attacker
         // right hand side: defender

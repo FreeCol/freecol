@@ -40,6 +40,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.OptionGroupUI;
+import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
@@ -88,10 +89,9 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
      * @param editable Whether the dialog is editable.
      */
     public OptionsDialog(FreeColClient freeColClient, boolean editable) {
-        super(freeColClient);
+        super(freeColClient, new MigLayout("wrap 1, fill"));
 
         this.editable = editable;
-        setLayout(new MigLayout("wrap 1, fill"));
 
         reset.setActionCommand(RESET);
         reset.addActionListener(this);
@@ -129,12 +129,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
 
         // Options:
         ui = new OptionGroupUI(getGUI(), group, editable);
-        optionPanel = new JPanel() {
-            @Override
-            public String getUIClassID() {
-                return "ReportPanelUI";
-            }
-        };
+        optionPanel = new MigPanel("ReportPanelUI");
         optionPanel.setOpaque(true);
         optionPanel.add(ui);
         JScrollPane scrollPane = new JScrollPane(optionPanel,
@@ -199,6 +194,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
      * @return String
      */
     public abstract String getOptionGroupId();
+
 
     /**
      * Load OptionGroup from given File.

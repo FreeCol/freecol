@@ -39,6 +39,7 @@ import javax.swing.tree.DefaultTreeModel;
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
@@ -47,7 +48,7 @@ import net.sf.freecol.common.option.OptionGroup;
 /**
  * This panel displays an OptionGroup using a JTree.
  */
-public final class OptionGroupUI extends JPanel
+public final class OptionGroupUI extends MigPanel
     implements OptionUpdater, TreeSelectionListener {
 
     private static final Logger logger = Logger.getLogger(OptionGroupUI.class.getName());
@@ -76,6 +77,8 @@ public final class OptionGroupUI extends JPanel
      * @param editable
      */
     public OptionGroupUI(GUI gui, OptionGroup group, boolean editable) {
+        super("ReportPanelUI");
+
         this.gui = gui;
         this.group = group;
         this.editable = editable;
@@ -106,7 +109,8 @@ public final class OptionGroupUI extends JPanel
         renderer.setBackgroundNonSelectionColor(new Color(0,0,0,1));
 
         add(tree);
-        detailPanel = new JPanel(new MigLayout("wrap 2", "[fill]related[fill]"));
+        detailPanel = new MigPanel();
+        detailPanel.setLayout(new MigLayout("wrap 2", "[fill]related[fill]"));
         detailPanel.setOpaque(false);
         add(detailPanel, "grow");
 
@@ -117,8 +121,8 @@ public final class OptionGroupUI extends JPanel
     }
 
     /**
-     * Builds the JTree which represents the navigation menu and then returns it
-     *
+     * Builds the JTree which represents the navigation menu and then
+     * returns it
      */
     private void buildTree(OptionGroup group, DefaultMutableTreeNode parent) {
 
@@ -132,8 +136,9 @@ public final class OptionGroupUI extends JPanel
     }
 
     /**
-     * This function analyses a tree selection event and calls the right methods to take care
-     * of building the requested unit's details.
+     * This function analyses a tree selection event and calls the
+     * right methods to take care of building the requested unit's
+     * details.
      *
      * @param event The incoming TreeSelectionEvent.
      */
@@ -155,7 +160,8 @@ public final class OptionGroupUI extends JPanel
     }
 
     /**
-     * Updates the value of the {@link net.sf.freecol.common.option.Option} this object keeps.
+     * Updates the value of the
+     * {@link net.sf.freecol.common.option.Option} this object keeps.
      */
     public void updateOption() {
         for (OptionUpdater optionUpdater : optionUpdaters) {
@@ -215,10 +221,4 @@ public final class OptionGroupUI extends JPanel
             optionUpdater.reset();
         }
     }
-
-    @Override
-    public String getUIClassID() {
-        return "ReportPanelUI";
-    }
-
 }

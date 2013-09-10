@@ -21,14 +21,16 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.LayoutManager;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
-import javax.swing.BorderFactory;
 import javax.swing.border.TitledBorder;
+
+import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
@@ -63,19 +65,20 @@ public class CargoPanel extends FreeColPanel
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param withTitle Should the panel have a title?
+     * @param layout The <code>LayoutManager</code> to be used.
      */
     public CargoPanel(FreeColClient freeColClient, boolean withTitle) {
-        super(freeColClient);
+        super(freeColClient, new MigLayout("wrap 6, fill, insets 0"));
+
+        this.border = (withTitle) ? setTitledBorder("cargoOnCarrier")
+            : null;
 
         this.carrier = null;
 
-        if (withTitle) {
-            border = BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
-                                                      Messages.message("cargoOnCarrier"));
-        } else {
-            border = null;
-        }
-        setBorder(border);
+        this.defaultTransferHandler
+            = new DefaultTransferHandler(getFreeColClient(), this);
+
+        this.pressListener = new DragListener(getFreeColClient(), this);
     }
 
 
@@ -83,13 +86,6 @@ public class CargoPanel extends FreeColPanel
      * Initialize this CargoPanel.
      */
     public void initialize() {
-        if (defaultTransferHandler == null) {
-            defaultTransferHandler
-                = new DefaultTransferHandler(getFreeColClient(), this);
-        }
-        if (pressListener == null) {
-            pressListener = new DragListener(getFreeColClient(), this);
-        }
         addPropertyChangeListeners();
         update();
     }
@@ -98,8 +94,6 @@ public class CargoPanel extends FreeColPanel
      * Clean up this CargoPanel.
      */
     public void cleanup() {
-        if (defaultTransferHandler != null) defaultTransferHandler = null;
-        if (pressListener != null) pressListener = null;
         removePropertyChangeListeners();
     }
 
@@ -134,7 +128,6 @@ public class CargoPanel extends FreeColPanel
                     label.setTransferHandler(defaultTransferHandler);
                     label.addMouseListener(pressListener);
                 }
-
                 add(label);
             }
 
@@ -147,7 +140,6 @@ public class CargoPanel extends FreeColPanel
                     label.setTransferHandler(defaultTransferHandler);
                     label.addMouseListener(pressListener);
                 }
-
                 add(label);
             }
         }
@@ -155,6 +147,7 @@ public class CargoPanel extends FreeColPanel
         revalidate();
         repaint();
     }
+
 
     /**
      * Whether this panel is active.
@@ -187,7 +180,6 @@ public class CargoPanel extends FreeColPanel
         }
     }
 
-
     /**
      * Update the title of this CargoPanel.
      */
@@ -204,23 +196,28 @@ public class CargoPanel extends FreeColPanel
         }
     }
 
+
+    // Interface DropTarget
+
     /**
-     * Adds a component to this CargoPanel and makes sure that the unit or
-     * good that the component represents gets modified so that it is on
-     * board the currently selected ship.
-     *
-     * @param comp The component to add to this CargoPanel.
-     * @param editState Must be set to 'true' if the state of the component
-     *            that is added (which should be a dropped component
-     *            representing a Unit or good) should be changed so that the
-     *            underlying unit or goods are on board the currently
-     *            selected ship.
-     * @return The component argument.
+     * {@inheritDoc}
+     */
+    public boolean accepts(Unit unit) {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean accepts(Goods goods) {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
      */
     public Component add(Component comp, boolean editState) {
-        if (carrier == null) {
-            return null;
-        }
+        if (carrier == null) return null;
 
         if (editState) {
             if (comp instanceof UnitLabel) {
@@ -266,23 +263,11 @@ public class CargoPanel extends FreeColPanel
         } else {
             super.add(comp);
         }
-
         return null;
     }
 
 
-    @Override
-    public void remove(Component comp) {
-        if (comp instanceof UnitLabel) {
-            Unit unit = ((UnitLabel) comp).getUnit();
-            getController().leaveShip(unit);
-            update();
-        } else if (comp instanceof GoodsLabel) {
-            Goods g = ((GoodsLabel) comp).getGoods();
-            getController().unloadCargo(g, false);
-            update();
-        }
-    }
+    // Interface PropertyChangeListener
 
     public void propertyChange(PropertyChangeEvent event) {
         logger.finest("CargoPanel change " + event.getPropertyName()
@@ -291,16 +276,50 @@ public class CargoPanel extends FreeColPanel
         update();
     }
 
-    public boolean accepts(Unit unit) {
-        return true;
-    }
 
-    public boolean accepts(Goods goods) {
-        return true;
-    }
+    // Override JLabel
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getUIClassID() {
         return "CargoPanelUI";
+    }
+
+
+    // Override Container
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void remove(Component comp) {
+        if (comp instanceof UnitLabel) {
+            Unit unit = ((UnitLabel)comp).getUnit();
+            getController().leaveShip(unit);
+            update();
+        } else if (comp instanceof GoodsLabel) {
+            Goods g = ((GoodsLabel)comp).getGoods();
+            getController().unloadCargo(g, false);
+            update();
+        }
+    }
+
+
+    // Override Component
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeNotify() {
+        super.removeNotify();
+
+        removeAll();
+        removePropertyChangeListeners();
+
+        defaultTransferHandler = null;
+        pressListener = null;
     }
 }

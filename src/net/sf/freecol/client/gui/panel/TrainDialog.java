@@ -52,6 +52,8 @@ public final class TrainDialog extends FreeColDialog<Integer> implements ActionL
 
     private final JLabel question;
 
+    private List<JButton> buttons = new ArrayList<JButton>();
+
     private final List<UnitType> trainableUnits = new ArrayList<UnitType>();
 
     private final Comparator<UnitType> unitPriceComparator;
@@ -97,7 +99,6 @@ public final class TrainDialog extends FreeColDialog<Integer> implements ActionL
      * date.
      */
     public void initialize() {
-
         removeAll();
         add(question, "span, wrap 20");
 
@@ -128,6 +129,7 @@ public final class TrainDialog extends FreeColDialog<Integer> implements ActionL
             newButton.setActionCommand(unitType.getId());
             newButton.addActionListener(this);
             enterPressesWhenFocused(newButton);
+            buttons.add(newButton);
             add(newButton, "grow");
         }
         add(okButton, "newline 20, span, tag ok");
@@ -149,6 +151,23 @@ public final class TrainDialog extends FreeColDialog<Integer> implements ActionL
             UnitType unitType = getSpecification().getUnitType(command);
             getController().trainUnitInEurope(unitType);
             initialize();
+        }
+    }
+
+
+    // Override Component
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeNotify() {
+        super.removeNotify();
+        
+        removeAll();
+        if (buttons != null) {
+            for (JButton jb : buttons) jb.setLayout(null);
+            buttons = null;
         }
     }
 }

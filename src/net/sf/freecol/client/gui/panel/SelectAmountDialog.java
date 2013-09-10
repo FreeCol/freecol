@@ -56,7 +56,7 @@ public final class SelectAmountDialog extends FreeColDialog<Integer> implements 
     @SuppressWarnings("unchecked") // FIXME in Java7
     public SelectAmountDialog(FreeColClient freeColClient, GoodsType goodsType,
         int available, int defaultAmount, boolean needToPay) {
-        super(freeColClient);
+        super(freeColClient, new MigLayout("wrap 1", "", ""));
 
         setFocusCycleRoot(true);
 
@@ -101,8 +101,6 @@ public final class SelectAmountDialog extends FreeColDialog<Integer> implements 
                     setResponse(new Integer(SELECT_CANCEL));
                 }
             });
-
-        setLayout(new MigLayout("wrap 1", "", ""));
 
         add(question);
         add(comboBox, "wrap 20, growx");

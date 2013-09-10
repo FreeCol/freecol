@@ -38,6 +38,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
@@ -76,12 +77,7 @@ public final class CompactLabourReport extends ReportPanel {
 
     private boolean showBuildings;
 
-    private final JPanel headerRow = new JPanel() {
-        @Override
-        public String getUIClassID() {
-            return "ReportPanelUI";
-        }
-    };
+    private final JPanel headerRow = new MigPanel("ReportPanelUI");
 
 
     /**
@@ -639,6 +635,4 @@ public final class CompactLabourReport extends ReportPanel {
     private boolean isSummary() {
         return isOverview() || unitData.isSummary();
     }
-
-
 }

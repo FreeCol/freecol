@@ -39,9 +39,11 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import net.miginfocom.swing.MigLayout;
+
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.model.FreeColObject;
 
 
@@ -61,8 +63,8 @@ public final class ColopediaPanel extends FreeColPanel
 
     private JTree tree;
 
-    private Map<String, DefaultMutableTreeNode> nodeMap =
-        new HashMap<String, DefaultMutableTreeNode>();
+    private Map<String, DefaultMutableTreeNode> nodeMap
+        = new HashMap<String, DefaultMutableTreeNode>();
 
 
     /**
@@ -78,12 +80,7 @@ public final class ColopediaPanel extends FreeColPanel
         header = getDefaultHeader(Messages.message("menuBar.colopedia"));
         add(header, "span, align center");
 
-        listPanel = new JPanel() {
-                @Override
-                public String getUIClassID() {
-                    return "ColopediaPanelUI";
-                }
-            };
+        listPanel = new MigPanel("ColopediaPanelUI");
         listPanel.setOpaque(true);
         JScrollPane sl = new JScrollPane(listPanel,
                                          JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
@@ -92,12 +89,7 @@ public final class ColopediaPanel extends FreeColPanel
         sl.getViewport().setOpaque(false);
         add(sl);
 
-        detailPanel = new JPanel() {
-                @Override
-                public String getUIClassID() {
-                    return "ColopediaPanelUI";
-                }
-            };
+        detailPanel = new MigPanel("ColopediaPanelUI");
         detailPanel.setOpaque(true);
         JScrollPane detail = new JScrollPane(detailPanel,
                                              JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -112,7 +104,6 @@ public final class ColopediaPanel extends FreeColPanel
         tree = buildTree();
 
         select(id);
-
     }
 
     /**
@@ -233,5 +224,23 @@ public final class ColopediaPanel extends FreeColPanel
         } else {
             select(command);
         }
+    }
+
+
+    // Override Component
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeNotify() {
+        super.removeNotify();
+
+        removeAll();
+        detailPanel = null;
+        header = null;
+        listPanel = null;
+        tree = null;
+        nodeMap = null;
     }
 }

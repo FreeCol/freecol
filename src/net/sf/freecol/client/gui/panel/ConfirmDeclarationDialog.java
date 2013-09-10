@@ -52,7 +52,7 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>> {
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public ConfirmDeclarationDialog(FreeColClient freeColClient) {
-        super(freeColClient);
+        super(freeColClient, new MigLayout("wrap 1", "", ""));
 
         Player player = getMyPlayer();
 
@@ -67,8 +67,6 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>> {
 
         okButton.setText(Messages.message("declareIndependence.areYouSure.yes"));
         cancelButton.setText(Messages.message("declareIndependence.areYouSure.no"));
-
-        setLayout(new MigLayout("wrap 1", "", ""));
 
         StringTemplate sure
             = StringTemplate.template("declareIndependence.areYouSure.text")

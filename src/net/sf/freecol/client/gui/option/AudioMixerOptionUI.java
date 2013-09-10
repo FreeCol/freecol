@@ -44,8 +44,7 @@ import net.sf.freecol.common.option.AudioMixerOption.MixerWrapper;
  */
 public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
 
-    JPanel panel = new JPanel();
-
+    private JPanel panel = new JPanel();
     private JComboBox cbox;
     private JButton button1, button2;
     private JLabel currentMixerLabel;

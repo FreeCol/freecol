@@ -22,10 +22,12 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.AWTEvent;
 import java.awt.ActiveEvent;
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
+import java.awt.LayoutManager;
 import java.awt.MenuComponent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -83,7 +85,8 @@ public class FreeColDialog<T> extends FreeColPanel {
 
         final List<JButton> choiceBtnLst = new ArrayList<JButton>();
         final FreeColDialog<ChoiceItem<T>> choiceDialog
-            = new FreeColDialog<ChoiceItem<T>>(freeColClient) {
+            = new FreeColDialog<ChoiceItem<T>>(freeColClient,
+                new MigLayout("fillx, wrap 1", "[align center]", "")) {
                 @Override
                 public void requestFocus() {
                     for (JButton b : choiceBtnLst) {
@@ -95,7 +98,6 @@ public class FreeColDialog<T> extends FreeColPanel {
                 }
             };
 
-        choiceDialog.setLayout(new MigLayout("fillx, wrap 1", "[align center]", ""));
         JTextArea textArea = getDefaultTextArea(text);
 
         choiceDialog.add(textArea);
@@ -190,9 +192,8 @@ public class FreeColDialog<T> extends FreeColPanel {
                             String okText, String cancelText) {
         // create the dialog
         final FreeColDialog<Boolean> confirmDialog
-            = new FreeColDialog<Boolean>(freeColClient);
-
-        confirmDialog.setLayout(new MigLayout("wrap 2", "[][fill]", ""));
+            = new FreeColDialog<Boolean>(freeColClient,
+                new MigLayout("wrap 2", "[][fill]", ""));
 
         confirmDialog.okButton.setText(okText);
         confirmDialog.okButton.addActionListener(new ActionListener() {
@@ -243,14 +244,13 @@ public class FreeColDialog<T> extends FreeColPanel {
 
         final JTextField input = new JTextField(defaultValue);
         final FreeColDialog<String> inputDialog
-            = new FreeColDialog<String>(freeColClient)  {
+            = new FreeColDialog<String>(freeColClient,
+                new MigLayout("wrap 1, gapy 20", "", ""))  {
                 @Override
                 public void requestFocus() {
                     input.requestFocus();
                 }
             };
-
-        inputDialog.setLayout(new MigLayout("wrap 1, gapy 20", "", ""));
 
         inputDialog.okButton.setText(okText);
         inputDialog.okButton.addActionListener(new ActionListener() {
@@ -341,9 +341,8 @@ public class FreeColDialog<T> extends FreeColPanel {
         final JTextField inputHeight = new JTextField(Integer.toString(defaultHeight), COLUMNS);
 
         final FreeColDialog<Dimension> mapSizeDialog
-            = new FreeColDialog<Dimension>(freeColClient);
-
-        mapSizeDialog.setLayout(new MigLayout("wrap 2"));
+            = new FreeColDialog<Dimension>(freeColClient,
+                                           new MigLayout("wrap 2"));
 
         mapSizeDialog.okButton.setText(Messages.message("ok"));
         mapSizeDialog.okButton.addActionListener(new ActionListener() {
@@ -445,7 +444,17 @@ public class FreeColDialog<T> extends FreeColPanel {
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public FreeColDialog(FreeColClient freeColClient) {
-        super(freeColClient);
+        this(freeColClient, new FlowLayout());
+    }
+
+    /**
+     * Creates a FreeCol dialog.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param layout The <code>LayoutManager</code> to be used.
+     */
+    public FreeColDialog(FreeColClient freeColClient, LayoutManager layout) {
+        super(freeColClient, layout);
 
         cancelButton.setActionCommand(CANCEL);
         cancelButton.addActionListener(this);

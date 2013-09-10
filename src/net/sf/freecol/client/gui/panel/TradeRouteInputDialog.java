@@ -130,7 +130,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
     @SuppressWarnings("unchecked") // FIXME in Java7
     public TradeRouteInputDialog(FreeColClient freeColClient,
                                  TradeRoute newRoute) {
-        super(freeColClient);
+        super(freeColClient, new MigLayout("wrap 4, fill", "[]20[fill]rel"));
 
         this.originalRoute = newRoute;
 
@@ -220,8 +220,6 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
                     }
                 }
             });
-
-        setLayout(new MigLayout("wrap 4, fill", "[]20[fill]rel"));
 
         add(getDefaultHeader(Messages.message("traderouteDialog.editRoute")),
             "span, align center");
@@ -432,8 +430,8 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
     }
 
     /**
-     * Panel for the cargo the carrier is supposed to take on board at a certain
-     * stop.
+     * Panel for the cargo the carrier is supposed to take on board at
+     * a certain stop.
      *
      * TODO: create a single cargo panel for this purpose and the use in the
      * ColonyPanel, the EuropePanel and the CaptureGoodsDialog.
@@ -638,8 +636,8 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
 
     private class StopRenderer implements ListCellRenderer {
 
-        private final JPanel SELECTED_COMPONENT = new JPanel();
-        private final JPanel NORMAL_COMPONENT = new JPanel();
+        private final JPanel SELECTED_COMPONENT = new MigPanel();
+        private final JPanel NORMAL_COMPONENT = new MigPanel();
 
         public StopRenderer() {
             NORMAL_COMPONENT.setLayout(new MigLayout("", "[80, center][]"));
@@ -650,19 +648,22 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
         }
 
         /**
-         * Returns a <code>ListCellRenderer</code> for the given <code>JList</code>.
+         * Returns a <code>ListCellRenderer</code> for the given
+         * <code>JList</code>.
          *
          * @param list The <code>JList</code>.
          * @param value The list cell.
          * @param index The index in the list.
-         * @param isSelected <code>true</code> if the given list cell is selected.
-         * @param hasFocus <code>false</code> if the given list cell has the focus.
+         * @param isSelected <code>true</code> if the given list cell
+         *     is selected.
+         * @param hasFocus <code>false</code> if the given list cell
+         *     has the focus.
          * @return The <code>ListCellRenderer</code>
          */
-        public Component getListCellRendererComponent(JList list, Object value, int index,
-                                                      boolean isSelected, boolean hasFocus) {
+        public Component getListCellRendererComponent(JList list,
+            Object value, int index, boolean isSelected, boolean hasFocus) {
 
-            JPanel panel = (isSelected ? SELECTED_COMPONENT : NORMAL_COMPONENT);
+            JPanel panel = (isSelected) ? SELECTED_COMPONENT : NORMAL_COMPONENT;
             panel.removeAll();
             panel.setForeground(list.getForeground());
             panel.setFont(list.getFont());

@@ -62,7 +62,7 @@ public final class DumpCargoDialog extends FreeColDialog<List<Goods>> {
      * @param unit The <code>Unit</code> that is dumping cargo.
      */
     public DumpCargoDialog(FreeColClient freeColClient, Unit unit) {
-        super(freeColClient);
+        super(freeColClient, new MigLayout("wrap 1", "", ""));
 
         header = new JLabel(Messages.message("dumpCargo"));
         header.setFont(smallHeaderFont);
@@ -74,8 +74,6 @@ public final class DumpCargoDialog extends FreeColDialog<List<Goods>> {
 
         goodsList = unit.getGoodsList();
         checkBoxes = new ArrayList<JCheckBox>(goodsList.size());
-
-        setLayout(new MigLayout("wrap 1", "", ""));
 
         for (Goods goods : goodsList) {
             // TODO: find out why check box is not displayed when icon

@@ -79,8 +79,8 @@ public class BuildingToolTip extends JToolTip {
             columns += "20[]5[]";
         }
 
-        MigLayout layout = new MigLayout("fill, insets 20, wrap " + (2 * workplaces + 1),
-                                         columns, "[][][align bottom]");
+        MigLayout layout = new MigLayout("fill, insets 20, wrap "
+            + (2 * workplaces + 1), columns, "[][][align bottom]");
         setLayout(layout);
 
         JLabel buildingName
@@ -178,5 +178,18 @@ public class BuildingToolTip extends JToolTip {
         }
 
         setPreferredSize(layout.preferredLayoutSize(this));
+    }
+
+
+    // Override Component
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeNotify() {
+        super.removeNotify();
+
+        setLayout(null);
     }
 }

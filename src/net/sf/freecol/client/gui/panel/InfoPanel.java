@@ -43,6 +43,7 @@ import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.action.EndTurnAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
+import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Goods;
@@ -251,17 +252,16 @@ public final class InfoPanel extends FreeColPanel {
     /**
      * Panel for displaying <code>Tile</code>-information.
      */
-    public class TileInfoPanel extends JPanel {
+    public class TileInfoPanel extends MigPanel {
 
         private Tile tile;
         private Font font = new JLabel().getFont().deriveFont(9f);
 
         public TileInfoPanel() {
-            super(null);
+            super(new MigLayout("fill, wrap 5, gap 2 2"));
 
             setSize(226, 128);
             setOpaque(false);
-            setLayout(new MigLayout("fill, wrap 5, gap 2 2"));
         }
 
         /**
@@ -270,7 +270,6 @@ public final class InfoPanel extends FreeColPanel {
          * @param tile The displayed tile (or null if none)
          */
         public void update(Tile tile) {
-
             this.tile = tile;
 
             removeAll();
@@ -343,7 +342,7 @@ public final class InfoPanel extends FreeColPanel {
     /**
      * Panel for displaying <code>Unit</code>-information.
      */
-    public class UnitInfoPanel extends JPanel {
+    public class UnitInfoPanel extends MigPanel {
 
         /** The unit to display. */
         private Unit unit;
@@ -449,7 +448,7 @@ public final class InfoPanel extends FreeColPanel {
     /**
      * Panel for ending the turn.
      */
-    public class EndTurnPanel extends JPanel {
+    public class EndTurnPanel extends MigPanel {
 
         public EndTurnPanel(GUI gui) {
             super(new MigLayout("wrap 1, center", "[center]", ""));

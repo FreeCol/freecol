@@ -136,4 +136,18 @@ public class RebelToolTip extends JToolTip {
     public Dimension getPreferredSize() {
         return new Dimension(350, 250);
     }
+
+
+    // Override Component
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeNotify() {
+        super.removeNotify();
+        
+        removeAll();
+        setLayout(null);
+    }
 }

@@ -41,6 +41,7 @@ import javax.swing.event.ListSelectionListener;
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.ListOption;
 import net.sf.freecol.common.option.Option;
@@ -56,7 +57,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
 
     private static Logger logger = Logger.getLogger(ListOptionUI.class.getName());
 
-    private JPanel panel = new JPanel();
+    private JPanel panel = new MigPanel();
     private JList list;
     private DefaultListModel model;
 
@@ -86,7 +87,6 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
 
         panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),
                                                          super.getLabel().getText()));
-
         panel.setLayout(new MigLayout("wrap 2, fill", "[fill, grow]20[fill]"));
 
         model = new DefaultListModel();

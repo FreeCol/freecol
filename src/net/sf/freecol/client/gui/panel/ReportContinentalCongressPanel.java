@@ -34,6 +34,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
@@ -52,6 +53,12 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
 
     static final String none = Messages.message("report.continentalCongress.none");
 
+    private Map<FoundingFatherType, JPanel> panels
+        = new EnumMap<FoundingFatherType, JPanel>(FoundingFatherType.class);
+
+    private JPanel recruitingPanel = null;
+
+
     /**
      * Creates the continental congress report.
      *
@@ -65,7 +72,8 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
 
         Player player = getMyPlayer();
 
-        JPanel recruitingPanel = new JPanel(new MigLayout("center, wrap 1", "center"));
+        recruitingPanel = new MigPanel();
+        recruitingPanel.setLayout(new MigLayout("center, wrap 1", "center"));
         if (player.getCurrentFather() == null) {
             recruitingPanel.add(new JLabel(none), "wrap 20");
         } else {
@@ -91,13 +99,13 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
         tabs.addTab(Messages.message("report.continentalCongress.recruiting"), null,
                     recruitingPanel, null);
 
-        Map<FoundingFatherType, JPanel> panels =
-            new EnumMap<FoundingFatherType, JPanel>(FoundingFatherType.class);
         for (FoundingFatherType type : FoundingFatherType.values()) {
-            JPanel panel = new JPanel(new MigLayout("flowy", "[center]"));
+            JPanel panel = new MigPanel();
+            panel.setLayout(new MigLayout("flowy", "[center]"));
             panels.put(type, panel);
-            JScrollPane scrollPane = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                                     JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            JScrollPane scrollPane = new JScrollPane(panel,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             tabs.addTab(Messages.message(FoundingFather.getTypeKey(type)), null,
                         scrollPane, null);
         }
@@ -122,7 +130,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
                 panel.add(localizedLabel(turn.getLabel()));
             }
         }
-
+        panels.clear();
         setMainComponent(tabs);
     }
 }

@@ -36,7 +36,6 @@ import net.sf.freecol.common.model.Player;
  */
 public final class ReportForeignAffairPanel extends ReportPanel {
 
-
     /**
      * The constructor that will add the items to this panel.
      *
@@ -47,13 +46,16 @@ public final class ReportForeignAffairPanel extends ReportPanel {
 
         // Display Panel
         reportPanel.removeAll();
-        reportPanel.setLayout(new MigLayout("wrap 2", "[]push[]", "[align top]"));
+        reportPanel.setLayout(new MigLayout("wrap 2", "[]push[]",
+                                            "[align top]"));
 
         for (Player enemy : getGame().getLiveEuropeanPlayers()) {
             int n;
             NationSummary ns = getController().getNationSummary(enemy);
             if (ns == null) continue;
-            JPanel enemyPanel = new JPanel(new MigLayout("gapy 0", "[][]20[align right]0[]", ""));
+            JPanel enemyPanel = new MigPanel();
+            enemyPanel.setLayout(new MigLayout("gapy 0",
+                                               "[][]20[align right]0[]", ""));
             enemyPanel.setOpaque(false);
             JLabel coatLabel = new JLabel();
             final ImageIcon coatOfArms = getLibrary()

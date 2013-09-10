@@ -91,7 +91,7 @@ public final class TradeRouteDialog extends FreeColDialog<Boolean>
      */
     @SuppressWarnings("unchecked") // FIXME in Java7
     public TradeRouteDialog(FreeColClient freeColClient, Unit unit) {
-        super(freeColClient);
+        super(freeColClient, new MigLayout("wrap 2", "[fill][fill]"));
 
         this.unit = unit;
 
@@ -170,8 +170,6 @@ public final class TradeRouteDialog extends FreeColDialog<Boolean>
             tradeRoutes.setSelectedValue(unit.getTradeRoute(), true);
         }
         updateButtons();
-
-        setLayout(new MigLayout("wrap 2", "[fill][fill]"));
 
         add(getDefaultHeader(Messages.message("traderouteDialog.name")),
             "span, align center");
