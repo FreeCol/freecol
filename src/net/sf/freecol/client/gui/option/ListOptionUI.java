@@ -173,10 +173,6 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
             }
         });
 
-        editButton.setEnabled(false);
-        removeButton.setEnabled(false);
-        upButton.setEnabled(false);
-        downButton.setEnabled(false);
         list.addListSelectionListener(this);
         initialize();
     }
