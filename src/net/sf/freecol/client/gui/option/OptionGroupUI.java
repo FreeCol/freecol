@@ -168,11 +168,17 @@ public final class OptionGroupUI extends JPanel
     }
 
     private void addOptionUI(Option option, boolean editable) {
-        OptionUI ui = OptionUI.getOptionUI(gui, option, editable);
+        OptionUI ui = optionUIs.get(option.getId());
         if (ui == null) {
-            logger.warning("Unknown option type: " + option.toString());
-        } else if (ui instanceof FreeColActionUI) {
-            ((FreeColActionUI) ui).setOptionGroupUI(this);
+            ui = OptionUI.getOptionUI(gui, option, editable);
+            if (ui == null) {
+                logger.warning("Unknown option type: " + option.toString());
+            } else if (ui instanceof FreeColActionUI) {
+                ((FreeColActionUI) ui).setOptionGroupUI(this);
+            }
+            if (option.getId() != null) {
+                optionUIs.put(option.getId(), ui);
+            }
         }
         JLabel label = ui.getLabel();
         if (label == null) {
@@ -183,9 +189,6 @@ public final class OptionGroupUI extends JPanel
         }
         if (group.isEditable()) {
             optionUpdaters.add((OptionUpdater) ui);
-        }
-        if (option.getId() != null) {
-            optionUIs.put(option.getId(), ui);
         }
     }
 
