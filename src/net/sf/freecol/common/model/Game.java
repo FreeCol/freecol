@@ -1166,6 +1166,16 @@ public class Game extends FreeColGameObject {
 
         super.readChildren(xr);
 
+        // @compat 0.10.7
+        for (Player player : getLiveEuropeanPlayers()) {
+            for (Unit unit : player.getUnits()) {
+                if (unit.getLocation() instanceof WorkLocation) {
+                    ((WorkLocation) unit.getLocation()).updateProductionType();
+                }
+            }
+        }
+        // end @compat
+
         currentPlayer = (current == null) ? null
             : getFreeColGameObject(current, Player.class);
     }
