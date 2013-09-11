@@ -50,6 +50,7 @@ public class ConceptDetailPanel extends FreeColPanel
     private static final String[] concepts = new String[] {
         "taxes",
         "efficiency",
+        "education",
         "independence",
         "ref",
         "interventionForce"
