@@ -71,8 +71,8 @@ public final class TilePanel extends FreeColPanel {
      * @param tile The <code>Tile</code> to describe.
      */
     public TilePanel(FreeColClient freeColClient, Tile tile) {
-        super(freeColClient, new MigLayout("wrap 1, insets 20 30 10 30",
-                                           "[center]", ""));
+        super(freeColClient, new MigLayout("wrap 2, insets 20 30 10 30, fillx",
+                                           "[right, grow][left, grow]"));
 
         tileType = tile.getType();
 
@@ -86,10 +86,13 @@ public final class TilePanel extends FreeColPanel {
         InputMap inputMap = new ComponentInputMap(okButton);
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false), "pressed");
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, true), "released");
-        SwingUtilities.replaceUIInputMap(okButton, JComponent.WHEN_IN_FOCUSED_WINDOW, inputMap);        
+        SwingUtilities.replaceUIInputMap(okButton, JComponent.WHEN_IN_FOCUSED_WINDOW, inputMap);
 
-        String name = Messages.message(tile.getLabel()) + " (" + tile.getX() + ", " + tile.getY() + ")";
-        add(new JLabel(name));
+        StringTemplate template = StringTemplate.template("tilePanel.label")
+            .addStringTemplate("%label%", tile.getLabel())
+            .addAmount("%x%", tile.getX())
+            .addAmount("%y%", tile.getY());
+        add(new JLabel(Messages.message(template)), "span, center");
 
         final ImageLibrary lib = getLibrary();
         final Image terrain = lib.getTerrainImage(tileType, tile.getX(), tile.getY());
@@ -100,16 +103,22 @@ public final class TilePanel extends FreeColPanel {
         Graphics2D g = (Graphics2D)image.getGraphics();
         g.translate(0, height - baseHeight);
         getGUI().displayColonyTile(g, tile, null);
-        add(new JLabel(new ImageIcon(image)));
+        add(new JLabel(new ImageIcon(image)), "span, center");
 
         if (tile.getRegion() != null) {
-            add(localizedLabel(tile.getRegion().getLabel()));
+            add(localizedLabel("tilePanel.region"));
+            add(new JLabel(Messages.message(tile.getRegion().getLabel())));
         }
         if (tile.getOwner() != null) {
             StringTemplate ownerName = tile.getOwner().getNationName();
             if (ownerName != null) {
-                add(localizedLabel(ownerName));
+                add(localizedLabel("tilePanel.owner"));
+                add(new JLabel(Messages.message(ownerName)));
             }
+        }
+        if (tile.getOwningSettlement() != null) {
+            add(localizedLabel("tilePanel.settlement"));
+            add(new JLabel(tile.getOwningSettlement().getName()));
         }
 
         if (tileType != null) {
@@ -127,7 +136,7 @@ public final class TilePanel extends FreeColPanel {
                                        getLibrary().getGoodsImageIcon(goodsType),
                                        JLabel.CENTER);
                     if (first) {
-                        add(label, "split");
+                        add(label, "span, split, center");
                         first = false;
                     } else {
                         add(label);
@@ -142,7 +151,7 @@ public final class TilePanel extends FreeColPanel {
                                            JLabel.CENTER);
                         label.setToolTipText(Messages.message(expert.getNameKey()));
                         if (first) {
-                            add(label, "split");
+                            add(label, "span, split");
                             first = false;
                         } else {
                             add(new JLabel("/"));
@@ -165,24 +174,24 @@ public final class TilePanel extends FreeColPanel {
             if (result < 0) {
                 add(new JLabel(DebugUtils.displayColonyValue(freeColClient,
                                                              tile)),
-                    "newline 5, align center");
+                    "newline 5, span, align center");
             } else {
                 for (Player.ColonyValueCategory c
                          : Player.ColonyValueCategory.values()) {
                     add(new JLabel(c.toString().substring(2) + " "
                             + values.get(c.ordinal())),
-                        "newline 5, align center");
+                        "newline 5, span, align center");
                 }
                 for (int a = Player.ColonyValueCategory.A_GOODS.ordinal();
                      a < values.size(); a++) {
                     add(new JLabel("... " + values.get(a)),
-                        "newline 5, align center");
+                        "newline 5, span, align center");
                 }
-                add(new JLabel("Result " + result), "newline 5, align center");
+                add(new JLabel("Result " + result), "newline 5, span, align center");
             }
         }
 
-        add(okButton, "newline 30, split 2, align center, tag ok");
+        add(okButton, "newline 30, span, split 2, align center, tag ok");
         add(colopediaButton, "tag help");
 
         setSize(getPreferredSize());
