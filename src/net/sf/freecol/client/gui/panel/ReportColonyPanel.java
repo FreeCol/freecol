@@ -289,44 +289,6 @@ public final class ReportColonyPanel extends ReportPanel
         if (cGood == null) cGood = Color.BLUE;
     }
 
-    /**
-     * Implement the action listener, checking for BUILDQUEUE events,
-     * generally displaying the colony panel if given a colony
-     * identifier, but otherwise delegating to the ReportPanel
-     * handler.
-     *
-     * @param event The incoming event.
-     */
-    public void actionPerformed(ActionEvent event) {
-        if (useCompact) {
-            String command = event.getActionCommand();
-            if (command.startsWith(BUILDQUEUE)) {
-                command = command.substring(BUILDQUEUE.length());
-                Colony colony = getGame().getFreeColGameObject(command, Colony.class);
-                if (colony != null) {
-                    getGUI().showBuildQueuePanel(colony, new Runnable() {
-                        public void run() {
-                            updateCompactColonyPanel();
-                        }
-                    });
-                    return;
-                }
-            } else {
-                Colony colony = getGame().getFreeColGameObject(command, Colony.class);
-                if (colony != null) {
-                    getGUI().showColonyPanel(colony)
-                        .addClosingCallback(new Runnable() {
-                                public void run() {
-                                    updateCompactColonyPanel();
-                                }
-                            });
-                    return;
-                }
-            }
-        }
-        super.actionPerformed(event);
-    }
-
     // Work done by (optional) oldType would be better done by newType
     // because it could produce amount more goodsType.
     private class Suggestion {
@@ -930,5 +892,41 @@ public final class ReportColonyPanel extends ReportPanel
             Collections.sort(prod, abstractGoodsComparator);
             return prod.get(0).getType();
         }
+    }
+
+
+    // Interface ActionListener
+
+    /**
+     * {@inheritDoc}
+     */
+    public void actionPerformed(ActionEvent event) {
+        if (useCompact) {
+            String command = event.getActionCommand();
+            if (command.startsWith(BUILDQUEUE)) {
+                command = command.substring(BUILDQUEUE.length());
+                Colony colony = getGame().getFreeColGameObject(command, Colony.class);
+                if (colony != null) {
+                    getGUI().showBuildQueuePanel(colony, new Runnable() {
+                        public void run() {
+                            updateCompactColonyPanel();
+                        }
+                    });
+                    return;
+                }
+            } else {
+                Colony colony = getGame().getFreeColGameObject(command, Colony.class);
+                if (colony != null) {
+                    getGUI().showColonyPanel(colony)
+                        .addClosingCallback(new Runnable() {
+                                public void run() {
+                                    updateCompactColonyPanel();
+                                }
+                            });
+                    return;
+                }
+            }
+        }
+        super.actionPerformed(event);
     }
 }

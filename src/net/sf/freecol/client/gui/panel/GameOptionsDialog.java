@@ -68,22 +68,27 @@ public final class GameOptionsDialog extends OptionsDialog {
     }
 
 
-    @Override
-    public void actionPerformed(ActionEvent event) {
-        super.actionPerformed(event);
-        String command = event.getActionCommand();
-        if (OK.equals(command)) {
-            if (!getFreeColClient().isMapEditor()) {
-                getFreeColClient().getPreGameController().sendGameOptions();
-            }
-        }
-    }
-
     public String getDefaultFileName() {
         return "game_options.xml";
     }
 
     public String getOptionGroupId() {
         return OPTION_GROUP_ID;
+    }
+
+
+    // Interface ActionListener
+
+    /**
+     * {@inheritDoc}
+     */
+    public void actionPerformed(ActionEvent event) {
+        super.actionPerformed(event);
+        final String command = event.getActionCommand();
+        if (OK.equals(command)) {
+            if (!getFreeColClient().isMapEditor()) {
+                getFreeColClient().getPreGameController().sendGameOptions();
+            }
+        }
     }
 }

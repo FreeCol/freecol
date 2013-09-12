@@ -185,8 +185,15 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
         }
     }
  
-    public void actionPerformed(ActionEvent timerEvent){
+
+    // Interface ActionListener
+
+    /**
+     * {@inheritDoc}
+     */
+    public void actionPerformed(ActionEvent e) {
         doubleClickTimer.stop();
-        mapViewer.setSelectedTile(mapViewer.convertToMapTile(centerX, centerY), true);
+        mapViewer.setSelectedTile(mapViewer.convertToMapTile(centerX, centerY),
+            true);
     }
 }

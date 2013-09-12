@@ -30,11 +30,9 @@ import javax.swing.event.EventListenerList;
  * The blinking cursor on the map.
  */
 public class TerrainCursor implements ActionListener  {
-    
 
     public static final int OFF = 0;
     public static final int ON = 1;
-    
 
     private int canvasX;
     private int canvasY;
@@ -42,9 +40,9 @@ public class TerrainCursor implements ActionListener  {
     private boolean active;
     private EventListenerList listenerList;
     
+
     /**
-     * Creates a new <code>Cursor</code> instance.
-     *
+     * Creates a new <code>TerrainCursor</code> instance.
      */
     public TerrainCursor() {
         active = true;
@@ -61,7 +59,7 @@ public class TerrainCursor implements ActionListener  {
      *
      * @return a <code>boolean</code> value
      */
-    public boolean isActive(){
+    public boolean isActive() {
         return active;
     }
     
@@ -70,55 +68,59 @@ public class TerrainCursor implements ActionListener  {
      *
      * @param newState a <code>boolean</code> value
      */
-    public void setActive(boolean newState){
+    public void setActive(boolean newState) {
         active = newState;
     }
     
-    public void startBlinking(){
+    public void startBlinking() {
         if(!blinkTimer.isRunning())
             blinkTimer.start();
     }
     
-    public void stopBlinking(){
+    public void stopBlinking() {
         if(blinkTimer.isRunning())
             blinkTimer.stop();
     }
 
-    public void setCanvasPos(int x,int y){
+    public void setCanvasPos(int x,int y) {
         canvasX = x;
         canvasY = y;
     }
     
-    public int getCanvasX(){
+    public int getCanvasX() {
         return canvasX;
     }
     
-    public int getCanvasY(){
+    public int getCanvasY() {
         return canvasY;
     }
     
-    public void addActionListener(ActionListener listener){
+    public void addActionListener(ActionListener listener) {
         listenerList.add(ActionListener.class, listener);
     }
     
-    public void removeActionListener(ActionListener listener){
+    public void removeActionListener(ActionListener listener) {
         listenerList.remove(ActionListener.class, listener);
     }
     
-    public void actionPerformed(ActionEvent timerEvent){
+    public void fireActionEvent(ActionEvent event) {
+        for (ActionListener al
+                 : listenerList.getListeners(ActionListener.class)) {
+            al.actionPerformed(event);
+        }
+    }
+  
+
+    // Interface ActionListener
+
+    /**
+     * {@inheritDoc}
+     */
+    public void actionPerformed(ActionEvent e) {
         active = !active;
         int eventId = active? ON : OFF;
         ActionEvent blinkEvent = new ActionEvent(this,eventId,"blink");
         
         fireActionEvent(blinkEvent);
     }
-    
-    public void fireActionEvent(ActionEvent event){
-        ActionListener[] listeners = listenerList.getListeners(ActionListener.class);
-        for(int i=0; i < listenerList.getListenerCount(); i++){
-            listeners[i].actionPerformed(event);
-        }
-    }
-  
-    
 }

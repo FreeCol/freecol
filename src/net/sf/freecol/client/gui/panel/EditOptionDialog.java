@@ -50,9 +50,14 @@ public class EditOptionDialog extends FreeColDialog<Boolean> {
         add(cancelButton, "tag cancel");
     }
 
-    @Override
+
+    // Interface ActionListener
+
+    /**
+     * {@inheritDoc}
+     */
     public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
+        final String command = event.getActionCommand();
         if (OK.equals(command)) {
             ui.updateOption();
             setResponse(true);
@@ -60,5 +65,4 @@ public class EditOptionDialog extends FreeColDialog<Boolean> {
             setResponse(false);
         }
     }
-
 }

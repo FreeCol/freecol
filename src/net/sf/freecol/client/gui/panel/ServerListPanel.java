@@ -171,13 +171,20 @@ public final class ServerListPanel extends FreeColPanel {
     }
 
     /**
-     * This function analyses an event and calls the right methods to take care
-     * of the user's requests.
-     * 
-     * @param event The incoming ActionEvent.
+     * Refreshes the table.
+     */
+    public void refreshTable() {
+        tableModel.fireTableDataChanged();
+    }
+
+
+    // Interface ActionListener
+
+    /**
+     * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
+        final String command = event.getActionCommand();
 
         try {
             switch (Integer.valueOf(command).intValue()) {
@@ -190,18 +197,11 @@ public final class ServerListPanel extends FreeColPanel {
                 getGUI().showNewPanel();
                 break;
             default:
-                logger.warning("Invalid Actioncommand: invalid number.");
+                super.actionPerformed(event);
             }
         } catch (NumberFormatException e) {
-            logger.warning("Invalid Actioncommand: not a number: " + command);
+            logger.warning("Invalid ActionEvent, not a number: " + command);
         }
-    }
-
-    /**
-     * Refreshes the table.
-     */
-    public void refreshTable() {
-        tableModel.fireTableDataChanged();
     }
 }
 

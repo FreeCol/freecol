@@ -307,11 +307,78 @@ public final class UnitLabel extends JLabel
         }
     }
 
+
+    public void updateIcon() {
+        ImageLibrary lib = gui.getImageLibrary();
+        setIcon(lib.getUnitImageIcon(unit));
+        setDisabledIcon(lib.getUnitImageIcon(unit, true));
+        setDescriptionLabel(Messages.message(unit.getFullLabel()));
+        StringTemplate label = unit.getEquipmentLabel();
+        if (label != null) {
+            setDescriptionLabel(getDescriptionLabel() + " ("
+                                + Messages.message(label) + ")");
+        }
+        setSmall(isSmall);
+
+        Component uc = getParent();
+        while (uc != null) {
+            if (uc instanceof ColonyPanel) {
+                if (unit.getColony() == null) {
+                    gui.removeFromCanvas(uc);
+                    freeColClient.updateActions();
+                } else {
+                    // ((ColonyPanel) uc).reinitialize();
+                }
+
+                break;
+            } else if (uc instanceof EuropePanel) {
+                break;
+            }
+
+            uc = uc.getParent();
+        }
+
+        // repaint(0, 0, getWidth(), getHeight());
+        // uc.refresh();
+    }
+
+    public boolean canUnitBeEquipedWith(JLabel data){
+        if(!getUnit().hasAbility(Ability.CAN_BE_EQUIPPED)){
+            return false;
+        }
+
+        if(data instanceof GoodsLabel && ((GoodsLabel)data).isToEquip()){
+            return true;
+        }
+
+        if(data instanceof MarketLabel && ((MarketLabel)data).isToEquip()){
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean isOnCarrier() {
+        return unit != null && unit.isOnCarrier();
+    }
+
     /**
-     * Analyzes an event and calls the right external methods to take care of
-     * the user's request.
+     * Gets a string corresponding to the UnitAction to work at a work
+     * location.
      *
-     * @param event The incoming action event
+     * @param wl The <code>WorkLocation</code> to use.
+     * @return The unit action as a string.
+     */
+    public static String getWorkLabel(WorkLocation wl) {
+        return "WORK_" + Utils.lastPart(wl.getClass().toString(), ".")
+            .toUpperCase(Locale.US);
+    }
+
+
+    // Interface ActionListener
+
+    /**
+     * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent event) {
         final Game game = freeColClient.getGame();
@@ -388,72 +455,5 @@ public final class UnitLabel extends JLabel
             break;
         }
         updateIcon();
-    }
-
-
-    public void updateIcon() {
-        ImageLibrary lib = gui.getImageLibrary();
-        setIcon(lib.getUnitImageIcon(unit));
-        setDisabledIcon(lib.getUnitImageIcon(unit, true));
-        setDescriptionLabel(Messages.message(unit.getFullLabel()));
-        StringTemplate label = unit.getEquipmentLabel();
-        if (label != null) {
-            setDescriptionLabel(getDescriptionLabel() + " ("
-                                + Messages.message(label) + ")");
-        }
-        setSmall(isSmall);
-
-        Component uc = getParent();
-        while (uc != null) {
-            if (uc instanceof ColonyPanel) {
-                if (unit.getColony() == null) {
-                    gui.removeFromCanvas(uc);
-                    freeColClient.updateActions();
-                } else {
-                    // ((ColonyPanel) uc).reinitialize();
-                }
-
-                break;
-            } else if (uc instanceof EuropePanel) {
-                break;
-            }
-
-            uc = uc.getParent();
-        }
-
-        // repaint(0, 0, getWidth(), getHeight());
-        // uc.refresh();
-    }
-
-    public boolean canUnitBeEquipedWith(JLabel data){
-        if(!getUnit().hasAbility(Ability.CAN_BE_EQUIPPED)){
-            return false;
-        }
-
-        if(data instanceof GoodsLabel && ((GoodsLabel)data).isToEquip()){
-            return true;
-        }
-
-        if(data instanceof MarketLabel && ((MarketLabel)data).isToEquip()){
-            return true;
-        }
-
-        return false;
-    }
-
-    public boolean isOnCarrier() {
-        return unit != null && unit.isOnCarrier();
-    }
-
-    /**
-     * Gets a string corresponding to the UnitAction to work at a work
-     * location.
-     *
-     * @param wl The <code>WorkLocation</code> to use.
-     * @return The unit action as a string.
-     */
-    public static String getWorkLabel(WorkLocation wl) {
-        return "WORK_" + Utils.lastPart(wl.getClass().toString(), ".")
-            .toUpperCase(Locale.US);
     }
 }

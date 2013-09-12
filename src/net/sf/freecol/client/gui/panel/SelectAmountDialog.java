@@ -117,14 +117,14 @@ public final class SelectAmountDialog extends FreeColDialog<Integer> implements 
         cancelButton.requestFocus();
     }
 
+
+    // Interface ActionListener
+
     /**
-     * Analyzes an event and calls the right external methods to take care of
-     * the user's request.
-     * 
-     * @param event The incoming action event
+     * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent event) {
-    	if (OK.equals(event.getActionCommand())){
+        if (OK.equals(event.getActionCommand())) {
             Object item = comboBox.getSelectedItem();
             if (item instanceof Integer) {
                 setResponse((Integer) item);
@@ -135,6 +135,8 @@ public final class SelectAmountDialog extends FreeColDialog<Integer> implements 
                     // do nothing
                 }
             }
-    	}
+        } else {
+            super.actionPerformed(event);
+        }
     }
 }

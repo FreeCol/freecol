@@ -69,6 +69,9 @@ public final class ClientOptionsDialog extends OptionsDialog  {
         return OPTION_GROUP_ID;
     }
 
+
+    // Interface ActionListener
+
     /**
      * {@inheritDoc}
      */

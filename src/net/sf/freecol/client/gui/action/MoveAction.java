@@ -63,10 +63,10 @@ public class MoveAction extends MapboardAction {
     }
 
 
+    // Interface ActionListener
+
     /**
-     * Applies this action.
-     *
-     * @param e The <code>ActionEvent</code>.
+     * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) { 
         switch (getGUI().getCurrentViewMode()) {

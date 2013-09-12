@@ -201,51 +201,6 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
     public abstract String getOptionGroupId();
 
     /**
-     * This function analyses an event and calls the right methods to take
-     * care of the user's requests.
-     * @param event <code>ActionEvent</code>, the incoming action event
-     */
-    @Override
-    public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
-        if (OK.equals(command)) {
-            ui.updateOption();
-            getGUI().removeFromCanvas(this);
-            setResponse(group);
-        } else if (CANCEL.equals(command)) {
-            ui.reset();
-            getGUI().removeFromCanvas(this);
-            setResponse(null);
-        } else if (RESET.equals(command)) {
-            ui.reset();
-            revalidate();
-            repaint();
-        } else if (SAVE.equals(command)) {
-            File saveFile = getGUI().showSaveDialog(FreeColDirectories.getOptionsDirectory(), ".xml",
-                                                       filters, getDefaultFileName());
-            if (saveFile != null) {
-                ui.updateOption();
-                try {
-                    group.save(saveFile);
-                } catch (FileNotFoundException e) {
-                    logger.log(Level.WARNING, "Save failed", e);
-                    StringTemplate t = StringTemplate.template("failedToSave")
-                        .addName("%name%", saveFile.getPath());
-                    getGUI().showInformationMessage(t);
-                }
-            }
-        } else if (LOAD.equals(command)) {
-            File loadFile = getGUI().showLoadDialog(FreeColDirectories.getOptionsDirectory(), filters);
-            if (loadFile != null && load(loadFile)) {
-                revalidate();
-                repaint();
-            }
-        } else {
-            logger.warning("Invalid ActionCommand: " + command);
-        }
-    }
-
-    /**
      * Load OptionGroup from given File.
      *
      * @param file a <code>File</code> value
@@ -297,6 +252,51 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
             return true;
         } else {
             return false;
+        }
+    }
+
+
+    // Interface ActionListener
+
+    /**
+     * {@inheritDoc}
+     */
+    public void actionPerformed(ActionEvent event) {
+        final String command = event.getActionCommand();
+        if (OK.equals(command)) {
+            ui.updateOption();
+            getGUI().removeFromCanvas(this);
+            setResponse(group);
+        } else if (CANCEL.equals(command)) {
+            ui.reset();
+            getGUI().removeFromCanvas(this);
+            setResponse(null);
+        } else if (RESET.equals(command)) {
+            ui.reset();
+            revalidate();
+            repaint();
+        } else if (SAVE.equals(command)) {
+            File saveFile = getGUI().showSaveDialog(FreeColDirectories.getOptionsDirectory(), ".xml",
+                                                       filters, getDefaultFileName());
+            if (saveFile != null) {
+                ui.updateOption();
+                try {
+                    group.save(saveFile);
+                } catch (FileNotFoundException e) {
+                    logger.log(Level.WARNING, "Save failed", e);
+                    StringTemplate t = StringTemplate.template("failedToSave")
+                        .addName("%name%", saveFile.getPath());
+                    getGUI().showInformationMessage(t);
+                }
+            }
+        } else if (LOAD.equals(command)) {
+            File loadFile = getGUI().showLoadDialog(FreeColDirectories.getOptionsDirectory(), filters);
+            if (loadFile != null && load(loadFile)) {
+                revalidate();
+                repaint();
+            }
+        } else {
+            super.actionPerformed(event);
         }
     }
 }

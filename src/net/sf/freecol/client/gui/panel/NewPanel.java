@@ -413,13 +413,12 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
         }
     }
 
+
+    // Interface ActionListener
+
     /**
-     * This function analyses an event and calls the right methods to take
-     * care of the user's requests.
-     *
-     * @param event The incoming <code>ActionEvent</code>.
+     * {@inheritDoc}
      */
-    @Override
     public void actionPerformed(ActionEvent event) {
         final Specification spec = getSpecification();
         final ConnectController connectController
@@ -486,7 +485,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
             enableComponents();
             break;
         default:
-            logger.warning("Invalid Action command: " + command);
+            super.actionPerformed(event);
         }
     }
 }

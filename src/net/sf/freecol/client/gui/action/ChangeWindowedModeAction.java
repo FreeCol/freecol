@@ -60,12 +60,12 @@ public class ChangeWindowedModeAction extends SelectableAction {
         return !(gui == null || gui.isWindowed());
     }
 
+
+    // Interface ActionListener
+
     /**
-     * Applies this action.
-     *
-     * @param e The <code>ActionEvent</code>.
+     * {@inheritDoc}
      */
-    @Override
     public void actionPerformed(ActionEvent e) {
         getGUI().changeWindowedMode(!getGUI().isWindowed());
     }

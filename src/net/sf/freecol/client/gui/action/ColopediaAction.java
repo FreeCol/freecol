@@ -65,9 +65,10 @@ public class ColopediaAction extends FreeColAction {
     }
 
 
+    // Interface ActionListener
+
     /**
-     * Applies this action.
-     * @param e The <code>ActionEvent</code>.
+     * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) {
         getGUI().showColopediaPanel(getId());

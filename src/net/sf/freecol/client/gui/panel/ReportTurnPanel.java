@@ -412,7 +412,12 @@ public final class ReportTurnPanel extends ReportPanel {
         document.insertString(document.getLength(), " ", document.getStyle("button"));
     }
     
-    @Override
+
+    // Interface ActionListener
+
+    /**
+     * {@inheritDoc}
+     */
     public void actionPerformed(ActionEvent event) {
         super.actionPerformed(event);
     }

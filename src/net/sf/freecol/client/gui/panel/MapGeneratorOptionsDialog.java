@@ -156,16 +156,15 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog implements Ac
         getOptionUI().reset();
     }
 
+
+    // Interface ActionListener
+
     /**
-     * This function analyses an event and calls the right methods to take care
-     * of the user's requests.
-     *
-     * @param event The incoming ActionEvent.
+     * {@inheritDoc}
      */
-    @Override
     public void actionPerformed(ActionEvent event) {
         super.actionPerformed(event);
-        String command = event.getActionCommand();
+        final String command = event.getActionCommand();
         if (OK.equals(command)) {
             if (!getFreeColClient().isMapEditor()) {
                 getFreeColClient().getPreGameController()

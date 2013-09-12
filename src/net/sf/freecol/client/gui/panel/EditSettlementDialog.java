@@ -151,8 +151,14 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         skill.setSelectedItem(settlement.getLearnableSkill());
     }
 
+
+    // Interface ActionListener
+
+    /**
+     * {@inheritDoc}
+     */
     public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
+        final String command = event.getActionCommand();
         if (OK.equals(command)) {
             settlement.setName(name.getText());
             Nation newNation = (Nation) owner.getSelectedItem();
@@ -204,6 +210,4 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         }
         getGUI().removeFromCanvas(this);
     }
-
-
 }

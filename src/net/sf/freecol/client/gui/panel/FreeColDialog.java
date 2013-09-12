@@ -455,39 +455,6 @@ public class FreeColDialog<T> extends FreeColPanel {
 
 
     /**
-     * This function analyses an event and calls the right methods to
-     * take care of the user's requests.
-     *
-     * @param event The incoming ActionEvent.
-     */
-    @Override
-    public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
-        //TODO Java7 has switch words operates on string values
-        if (CANCEL.equals(command)) {
-            setResponse(null);
-        } else if (JFileChooser.APPROVE_SELECTION.equals(command)) {
-            JFileChooser fileChooser = (JFileChooser) event.getSource();
-            File file = fileChooser.getSelectedFile();
-            if (fileChooser.getDialogType() == JFileChooser.SAVE_DIALOG) {
-                String standardName = (String) fileChooser.getClientProperty("standardName");
-                if (standardName != null && !file.getName().endsWith(standardName)) {
-                    file = new File(file.getAbsolutePath() + standardName);
-                }
-            }
-            @SuppressWarnings("unchecked")
-            T selectedFile = (T) file;
-            if (selectedFile != null) {
-                setResponse(selectedFile);
-            }
-        } else if (JFileChooser.CANCEL_SELECTION.equals(command)) {
-            setResponse(null);
-        } else {
-            super.actionPerformed(event);
-        }
-    }
-
-    /**
      * Returns the <code>response</code> when set by
      * <code>setResponse(Object response)</code>.
      * Waits the thread until then.
@@ -568,5 +535,37 @@ public class FreeColDialog<T> extends FreeColPanel {
         responseGiven = true;
         logger.info("Response has been set to " + response);
         notifyAll();
+    }
+
+
+    // Interface ActionListener
+
+    /**
+     * {@inheritDoc}
+     */
+    public void actionPerformed(ActionEvent event) {
+        final String command = event.getActionCommand();
+        //TODO Java7 has switch words operates on string values
+        if (CANCEL.equals(command)) {
+            setResponse(null);
+        } else if (JFileChooser.APPROVE_SELECTION.equals(command)) {
+            JFileChooser fileChooser = (JFileChooser) event.getSource();
+            File file = fileChooser.getSelectedFile();
+            if (fileChooser.getDialogType() == JFileChooser.SAVE_DIALOG) {
+                String standardName = (String) fileChooser.getClientProperty("standardName");
+                if (standardName != null && !file.getName().endsWith(standardName)) {
+                    file = new File(file.getAbsolutePath() + standardName);
+                }
+            }
+            @SuppressWarnings("unchecked")
+            T selectedFile = (T) file;
+            if (selectedFile != null) {
+                setResponse(selectedFile);
+            }
+        } else if (JFileChooser.CANCEL_SELECTION.equals(command)) {
+            setResponse(null);
+        } else {
+            super.actionPerformed(event);
+        }
     }
 }

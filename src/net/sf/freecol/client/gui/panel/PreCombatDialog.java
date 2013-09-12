@@ -193,8 +193,13 @@ public class PreCombatDialog extends FreeColDialog<Boolean> {
     }
 
 
+    // Interface ActionListener
+
+    /**
+     * {@inheritDoc}
+     */
     public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
+        final String command = event.getActionCommand();
         if (OK.equals(command)) {
             setResponse(Boolean.TRUE);
         } else if (CANCEL.equals(command)) {
@@ -203,5 +208,4 @@ public class PreCombatDialog extends FreeColDialog<Boolean> {
             super.actionPerformed(event);
         }
     }
-
 }

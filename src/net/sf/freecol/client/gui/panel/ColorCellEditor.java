@@ -144,14 +144,15 @@ public final class ColorCellEditor extends AbstractCellEditor
         return currentColor;
     }
 
+
+    // Interface ActionListener
+
     /**
-     * This function analyzes an event and calls the right methods to take
-     * care of the user's requests.
-     *
-     * @param event The incoming ActionEvent.
+     * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent event) {
-        if (event.getActionCommand().equals(EDIT)) {
+        final String command = event.getActionCommand();
+        if (command.equals(EDIT)) {
             if (!canvas.isAncestorOf(colorChooserPanel)) {
                 colorChooser.setColor(currentColor);
     
@@ -159,18 +160,17 @@ public final class ColorCellEditor extends AbstractCellEditor
                 canvas.add(colorChooserPanel, 0);
                 colorChooserPanel.requestFocus();
             }
-        } else if (event.getActionCommand().equals(OK)) {
+        } else if (command.equals(OK)) {
             currentColor = colorChooser.getColor();
             // Remove the colorChooserPanel.
             canvas.remove(colorChooserPanel);
             fireEditingStopped();
-        } else if (event.getActionCommand().equals(CANCEL)) {
+        } else if (command.equals(CANCEL)) {
             // Remove the colorChooserPanel.
             canvas.remove(colorChooserPanel);
             fireEditingCanceled();
         } else {
-            logger.warning("Invalid ColorCellEditor command: "
-                + event.getActionCommand());
+            logger.warning("Bad event: " + command);
         }
     }
 }

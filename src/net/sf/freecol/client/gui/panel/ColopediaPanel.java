@@ -221,11 +221,10 @@ public final class ColopediaPanel extends FreeColPanel
         }
     }
 
+    // Interface ActionListener
+
     /**
-     * This function analyses an event and calls the right methods to take care
-     * of the user's requests.
-     *
-     * @param event The incoming ActionEvent.
+     * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();

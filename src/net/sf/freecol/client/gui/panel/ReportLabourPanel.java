@@ -142,13 +142,12 @@ public final class ReportLabourPanel extends ReportPanel {
         }
     }
 
+
+    // Interface ActionListener
+
     /**
-     * This function analyzes an event and calls the right methods to take care
-     * of the user's requests.
-     *
-     * @param event The incoming ActionEvent.
+     * {@inheritDoc}
      */
-    @Override
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         if (OK.equals(command)) {

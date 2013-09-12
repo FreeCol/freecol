@@ -45,10 +45,10 @@ public class DisplayGridAction extends SelectableAction {
     }
 
 
+    // Interface ActionListener
+
     /**
-     * Applies this action.
-     *
-     * @param e The <code>ActionEvent</code>.
+     * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) {
         boolean b = ((JCheckBoxMenuItem) e.getSource()).isSelected();

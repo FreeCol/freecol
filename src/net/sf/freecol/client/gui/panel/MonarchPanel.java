@@ -101,13 +101,11 @@ public final class MonarchPanel extends FreeColDialog<Boolean> implements Action
     }
 
 
+    // Interface ActionListener
+
     /**
-     * This function analyses an event and calls the right methods to take care
-     * of the user's requests.
-     *
-     * @param event The incoming ActionEvent.
+     * {@inheritDoc}
      */
-    @Override
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         if (OK.equals(command)) {
@@ -117,7 +115,7 @@ public final class MonarchPanel extends FreeColDialog<Boolean> implements Action
         } else if (HELP.equals(command)) {
             getGUI().showColopediaPanel("colopedia.concepts.taxes");
         } else {
-            logger.warning("Invalid action command: " + command);
+            super.actionPerformed(event);
         }
     }
 }

@@ -83,11 +83,10 @@ public final class RiverStylePanel extends FreeColDialog<String> {
     }
 
 
+    // Interface ActionListener
+
     /**
-     * This function analyses an event and calls the right methods to take care
-     * of the user's requests.
-     *
-     * @param event The incoming ActionEvent.
+     * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent event) {
         String style = event.getActionCommand();
