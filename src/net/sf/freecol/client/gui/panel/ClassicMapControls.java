@@ -59,10 +59,10 @@ public final class ClassicMapControls extends MapControls {
         am = freeColClient.getActionManager();
         arrowFont = ResourceManager.getFont("SimpleFont", Font.BOLD, 24f);
 
-        panel = new JPanel(new MigLayout("wrap 3"));
-
+        panel = new MigPanel();
+        panel.setLayout(new MigLayout("wrap 3"));
         panel.add(miniMap, "span, width " + MAP_WIDTH
-                  + ", height " + MAP_HEIGHT);
+                           + ", height " + MAP_HEIGHT);
 
         panel.add(miniMapZoomInButton, "newline 10");
         panel.add(miniMapZoomOutButton, "skip");
@@ -81,7 +81,7 @@ public final class ClassicMapControls extends MapControls {
         }
 
         panel.add(infoPanel, "newline push, span, width " + infoPanel.getWidth()
-                  + ", height " + infoPanel.getHeight());
+                             + ", height " + infoPanel.getHeight());
     }
 
     /**
@@ -117,10 +117,10 @@ public final class ClassicMapControls extends MapControls {
     }
 
     private JButton makeButton(String direction, String arrow) {
-        JButton button = new JButton(am.getFreeColAction("moveAction." + direction));
+        JButton button
+            = new JButton(am.getFreeColAction("moveAction." + direction));
         button.setFont(arrowFont);
         button.setText(arrow);
         return button;
     }
-
 }

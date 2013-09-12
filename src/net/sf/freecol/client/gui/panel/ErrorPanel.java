@@ -48,6 +48,8 @@ public final class ErrorPanel extends FreeColDialog<Boolean> {
 
     private static final String SHOW = "show";
 
+    private JButton showButton;
+
 
     /**
      * Creates a panel to display the given error message.
@@ -56,11 +58,9 @@ public final class ErrorPanel extends FreeColDialog<Boolean> {
      * @param message The error message to display in this error panel.
      */
     public ErrorPanel(FreeColClient freeColClient, String message) {
-        super(freeColClient);
+        super(freeColClient, new MigLayout());
 
-        setLayout(new MigLayout());
-
-        JButton showButton = new JButton(Messages.message("errorMessage.showLogFile"));
+        showButton = new JButton(Messages.message("errorMessage.showLogFile"));
         showButton.setActionCommand(SHOW);
         showButton.addActionListener(this);
 
@@ -75,7 +75,7 @@ public final class ErrorPanel extends FreeColDialog<Boolean> {
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public ErrorPanel(FreeColClient freeColClient) {
-        super(freeColClient);
+        super(freeColClient, new MigLayout());
 
         File logFile = new File(FreeColDirectories.getLogFilePath());
         byte[] buffer = new byte[(int) logFile.length()];
@@ -97,8 +97,6 @@ public final class ErrorPanel extends FreeColDialog<Boolean> {
             }
         }
 
-        setLayout(new MigLayout());
-
         JTextArea textArea = getDefaultTextArea(message, 40);
         textArea.setFocusable(true);
         textArea.setEditable(false);
@@ -112,12 +110,31 @@ public final class ErrorPanel extends FreeColDialog<Boolean> {
     }
 
 
+    // Interface ActionListener
+
+    /**
+     * {@inheritDoc}
+     */
     public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
+        final String command = event.getActionCommand();
         if (SHOW.equals(command)) {
             getGUI().showLogFilePanel();
         } else {
             super.actionPerformed(event);
         }
+    }
+
+
+    // Override Component
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeNotify() {
+        super.removeNotify();
+
+        removeAll();
+        showButton = null;
     }
 }

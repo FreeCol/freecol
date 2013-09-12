@@ -53,6 +53,7 @@ public final class ColorCellEditor extends AbstractCellEditor
 
     private final FreeColClient        freeColClient;
     private final Canvas               canvas;
+    private JButton cancelButton = null;
     private final JButton              colorEditButton;
     private final JColorChooser        colorChooser;
     private final ColorChooserPanel    colorChooserPanel;
@@ -90,6 +91,20 @@ public final class ColorCellEditor extends AbstractCellEditor
 
             setOpaque(true);
             setSize(getPreferredSize());
+        }
+
+
+        // Override Component
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void removeNotify() {
+            super.removeNotify();
+
+            removeAll();
+            cancelButton = null;
         }
     }
 

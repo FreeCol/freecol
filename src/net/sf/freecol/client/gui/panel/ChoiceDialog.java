@@ -61,10 +61,8 @@ public final class ChoiceDialog<T> extends FreeColDialog<T> {
     @SuppressWarnings("unchecked") // FIXME in Java7
     public ChoiceDialog(FreeColClient freeColClient, String text,
                         String cancelText, List<ChoiceItem<T>> choices) {
-        super(freeColClient);
-
-        MigLayout layout = new MigLayout("wrap 1, fill", "[align center]", "[]30[]30[]");
-        setLayout(layout);
+        super(freeColClient, new MigLayout("wrap 1, fill", "[align center]",
+                                           "[]30[]30[]"));
 
         add(getDefaultTextArea(text));
 

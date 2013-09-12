@@ -62,16 +62,15 @@ public final class FindSettlementDialog<T> extends FreeColDialog<T> implements L
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(FindSettlementDialog.class.getName());
 
-    private List<Settlement> knownSettlements = new ArrayList<Settlement>();
-
-    private JList settlementList;
-
-
     private static Comparator<Settlement> settlementComparator = new Comparator<Settlement>() {
         public int compare(Settlement s1, Settlement s2) {
             return s1.getName().compareTo(s2.getName());
         }
     };
+
+    private List<Settlement> knownSettlements = new ArrayList<Settlement>();
+
+    private JList settlementList;
 
 
     /**
@@ -79,16 +78,14 @@ public final class FindSettlementDialog<T> extends FreeColDialog<T> implements L
      */
     @SuppressWarnings("unchecked") // FIXME in Java7
     public FindSettlementDialog(FreeColClient freeColClient) {
-        super(freeColClient);
+        super(freeColClient, new MigLayout("wrap 1", "[align center]",
+                                           "[]30[]30[]"));
 
         for (Player player : getGame().getPlayers()) {
             knownSettlements.addAll(player.getSettlements());
         }
 
         Collections.sort(knownSettlements, settlementComparator);
-
-        MigLayout layout = new MigLayout("wrap 1", "[align center]", "[]30[]30[]");
-        setLayout(layout);
 
         JLabel header = new JLabel(Messages.message("findSettlementDialog.name"));
         header.setFont(smallHeaderFont);
@@ -164,6 +161,21 @@ public final class FindSettlementDialog<T> extends FreeColDialog<T> implements L
         Settlement settlement = (Settlement) settlementList.getSelectedValue();
         getGUI().setFocus(settlement.getTile());
     }
+
+
+    // Override Component
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeNotify() {
+        super.removeNotify();
+
+        removeAll();
+        settlementList = null;
+    }
+
 
     private class SettlementRenderer extends FreeColComboBoxRenderer {
 

@@ -81,13 +81,11 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
     @SuppressWarnings("unchecked") // FIXME in Java7
     public EditSettlementDialog(FreeColClient freeColClient,
                                 final IndianSettlement settlement) {
-        super(freeColClient);
+        super(freeColClient, new MigLayout("wrap 2, gapx 20"));
 
         this.settlement = settlement;
 
         okButton.addActionListener(this);
-
-        setLayout(new MigLayout("wrap 2, gapx 20"));
 
         add(new JLabel(Messages.message("name")));
         name = new JTextField(settlement.getName(), 30);

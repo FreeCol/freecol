@@ -36,6 +36,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
@@ -59,12 +60,7 @@ public final class ReportTradePanel extends ReportPanel {
 
     private List<Colony> colonies;
 
-    private final JPanel goodsHeader = new JPanel() {
-        @Override
-        public String getUIClassID() {
-            return "ReportPanelUI";
-        }
-    };
+    private final JPanel goodsHeader = new MigPanel("ReportPanelUI");
 
 
     /**
@@ -256,5 +252,4 @@ public final class ReportTradePanel extends ReportPanel {
     protected Border createBorder() {
         return new EmptyBorder(0, 20, 20, 20);
     }
-
 }

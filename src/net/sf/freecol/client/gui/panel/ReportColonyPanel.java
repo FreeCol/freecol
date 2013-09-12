@@ -274,7 +274,7 @@ public final class ReportColonyPanel extends ReportPanel
         for (int i = 0; i < goodsTypes.size(); i++) cols += "[c]";
         cols += "[c][c][l][l][l]";
         reportPanel.setLayout(new MigLayout("fillx, insets 0, gap 0 0",
-                cols, ""));
+                                            cols, ""));
 
         // Load the customized colours, with simple fallbacks.
         cAlarm = ResourceManager.getColor("report.colony.alarmColor");

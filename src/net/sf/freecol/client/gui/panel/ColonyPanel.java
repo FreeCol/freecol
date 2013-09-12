@@ -65,6 +65,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 
 import net.miginfocom.swing.MigLayout;
+
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
@@ -197,7 +198,11 @@ public final class ColonyPanel extends PortPanel
      */
     @SuppressWarnings("unchecked") // FIXME in Java7
     public ColonyPanel(FreeColClient freeColClient, Colony colony) {
-        super(freeColClient);
+        super(freeColClient,
+            new MigLayout("fill, wrap 2, insets 2",
+                          "[390!][fill]",
+                          "[][]0[]0[][growprio 200,shrinkprio 10]"
+                          + "[growprio 150,shrinkprio 50]"));
 
         setFocusCycleRoot(true);
 
@@ -348,29 +353,13 @@ public final class ColonyPanel extends PortPanel
 
         // See the message of Ulf Onnen for more information about the
         // presence of this fake mouse listener.
+        // Disabled 2013/09, no longer appears necessary.
         //addMouseListener(new MouseAdapter() {});
-
-        setLayout(new MigLayout("fill, wrap 2, insets 2", "[390!][fill]",
-                                "[][]0[]0[][growprio 200,shrinkprio 10]"
-                                + "[growprio 150,shrinkprio 50]"));
 
         initialize(colony);
         restoreSavedSize(850, 600);
     }
 
-
-    /**
-     * Gets the <code>Colony</code> in use.
-     *
-     * Try to use this at the top of all the routines that need the colony,
-     * to get a stable value.  There have been nasty races when the colony
-     * changes out from underneath us, and more may be lurking.
-     *
-     * @return The <code>Colony</code>.
-     */
-    public synchronized final Colony getColony() {
-        return colony;
-    }
 
     /**
      * Set the current colony.
@@ -379,249 +368,6 @@ public final class ColonyPanel extends PortPanel
      */
     private synchronized void setColony(Colony colony) {
         this.colony = colony;
-    }
-
-    /**
-     * Gets the <code>TilesPanel</code>-object in use.
-     *
-     * @return The <code>TilesPanel</code>.
-     */
-    public final TilesPanel getTilesPanel() {
-        return tilesPanel;
-    }
-
-    /**
-     * Gets the <code>WarehousePanel</code>-object in use.
-     *
-     * @return The <code>WarehousePanel</code>.
-     */
-    public final WarehousePanel getWarehousePanel() {
-        return warehousePanel;
-    }
-
-
-    // Public update routines
-
-    public void updateBuildingsPanel() {
-        buildingsPanel.update();
-    }
-
-    public void updateConstructionPanel() {
-        constructionPanel.update();
-    }
-
-    public void updateInPortPanel() {
-        inPortPanel.update();
-    }
-
-    public void updateNetProductionPanel() {
-        final Colony colony = getColony();
-        final Specification spec = colony.getSpecification();
-        // TODO: find out why the cache needs to be explicitly invalidated
-        colony.invalidateCache();
-        netProductionPanel.removeAll();
-
-        for (GoodsType goodsType : spec.getGoodsTypeList()) {
-            int amount = colony.getAdjustedNetProductionOf(goodsType);
-            if (amount != 0) {
-                netProductionPanel.add(new ProductionLabel(getFreeColClient(),
-                                                           goodsType, amount));
-            }
-        }
-
-        netProductionPanel.revalidate();
-    }
-
-    public void updateOutsideColonyPanel() {
-        outsideColonyPanel.update();
-    }
-
-    public void updatePopulationPanel() {
-        populationPanel.update();
-    }
-
-    public void updateTilesPanel() {
-        tilesPanel.update();
-    }
-
-    public void updateWarehousePanel() {
-        warehousePanel.update();
-    }
-
-    /**
-     * Update all the production-related panels.
-     *
-     * This has to be very broad as a change at one work location can
-     * have a secondary effect on another, and especially if the
-     * population hits a bonus boundary.  A simple example is that
-     * adding extra lumber production may improve the production of the
-     * lumber mill.  These changes can then flow on to production and
-     * construction displays.
-     */
-    private void updateProduction() {
-        updateTilesPanel();
-        updateBuildingsPanel();
-        updateNetProductionPanel();
-        updateConstructionPanel();
-    }
-
-    /**
-     * Update the entire colony panel.
-     */
-    private void update() {
-        buildingsPanel.update();
-        constructionPanel.update();
-        inPortPanel.update();
-        updateNetProductionPanel();
-        outsideColonyPanel.update();
-        populationPanel.update();
-        tilesPanel.update();
-        warehousePanel.update();
-    }
-
-
-    /**
-     * Analyzes an event and calls the right external methods to take
-     * care of the user's request.
-     *
-     * @param event The incoming action event
-     */
-    public void actionPerformed(ActionEvent event) {
-        final Colony colony = getColony();
-        String command = event.getActionCommand();
-        if (OK.equals(command)) {
-            closeColonyPanel();
-        } else {
-            try {
-                switch (Integer.valueOf(command).intValue()) {
-                case UNLOAD:
-                    unload();
-                    break;
-                case WAREHOUSE:
-                    if (getGUI().showWarehouseDialog(colony)) {
-                        updateWarehousePanel();
-                    }
-                    break;
-                case BUILDQUEUE:
-                    getGUI().showBuildQueuePanel(colony);
-                    updateConstructionPanel();
-                    break;
-                case FILL:
-                    fill();
-                    break;
-                case COLONY_UNITS:
-                    generateColonyUnitsMenu();
-                    break;
-                case SETGOODS:
-                    DebugUtils.setColonyGoods(getFreeColClient(), colony);
-                    updateWarehousePanel();
-                    updateProduction();
-                    break;
-                default:
-                    logger.warning("Invalid action");
-                    break;
-                }
-            } catch (NumberFormatException e) {
-                logger.warning("Invalid action number: " + command);
-            }
-        }
-    }
-
-    /**
-     * Unloads all goods and units from the carrier currently selected.
-     */
-    private void unload() {
-        Unit unit = getSelectedUnit();
-        if (unit != null && unit.isCarrier()) {
-            for (Goods goods : unit.getGoodsContainer().getGoods()) {
-                getController().unloadCargo(goods, false);
-            }
-            for (Unit u : unit.getUnitList()) {
-                getController().leaveShip(u);
-            }
-            cargoPanel.update();
-            updateOutsideColonyPanel();
-        }
-        unloadButton.setEnabled(false);
-        fillButton.setEnabled(false);
-    }
-
-    /**
-     * Fill goods from the carrier currently selected to capacity.
-     */
-    private void fill() {
-        final Colony colony = getColony();
-        Unit unit = getSelectedUnit();
-        if (unit != null && unit.isCarrier()) {
-            for (Goods goods : unit.getGoodsContainer().getGoods()) {
-                int space = GoodsContainer.CARGO_SIZE - goods.getAmount();
-                int count = colony.getGoodsCount(goods.getType());
-                if (space > 0 && count > 0) {
-                    Goods newGoods = new Goods(goods.getGame(), colony,
-                                               goods.getType(),
-                                               Math.min(space, count));
-                    getController().loadCargo(newGoods, unit);
-                }
-            }
-        }
-    }
-
-    /**
-     * Enables the unload and fill buttons if the currently selected unit is a
-     * carrier with some cargo.
-     */
-    private void updateCarrierButtons() {
-        final Colony colony = getColony();
-        unloadButton.setEnabled(false);
-        fillButton.setEnabled(false);
-        if (isEditable() && selectedUnitLabel != null) {
-            Unit unit = selectedUnitLabel.getUnit();
-            if (unit != null && unit.isCarrier() && unit.hasCargo()) {
-                unloadButton.setEnabled(true);
-                for (Goods goods : unit.getCompactGoodsList()) {
-                    if (colony.getGoodsCount(goods.getType()) > 0) {
-                        fillButton.setEnabled(true);
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Returns the currently select unit.
-     *
-     * @return The currently select unit.
-     */
-    public Unit getSelectedUnit() {
-        return (selectedUnitLabel == null) ? null
-            : selectedUnitLabel.getUnit();
-    }
-
-    /**
-     * Selects a unit that is located somewhere on this panel.
-     *
-     * @param unitLabel The <code>UnitLabel</code> for the unit that
-     *     is being selected.
-     */
-    public void setSelectedUnitLabel(UnitLabel unitLabel) {
-        if (selectedUnitLabel != unitLabel) {
-            if (selectedUnitLabel != null) {
-                selectedUnitLabel.setSelected(false);
-                selectedUnitLabel.getUnit().removePropertyChangeListener(this);
-            }
-            selectedUnitLabel = unitLabel;
-            if (unitLabel == null) {
-                cargoPanel.setCarrier(null);
-            } else {
-                cargoPanel.setCarrier(unitLabel.getUnit());
-                unitLabel.setSelected(true);
-                unitLabel.getUnit().addPropertyChangeListener(this);
-            }
-        }
-        updateCarrierButtons();
-        inPortPanel.revalidate();
-        inPortPanel.repaint();
     }
 
     /**
@@ -782,113 +528,54 @@ public final class ColonyPanel extends PortPanel
     }
 
     /**
-     * ColonyPanel is very prone to leaks.  Try to do something about
-     * it.
+     * Update all the production-related panels.
+     *
+     * This has to be very broad as a change at one work location can
+     * have a secondary effect on another, and especially if the
+     * population hits a bonus boundary.  A simple example is that
+     * adding extra lumber production may improve the production of the
+     * lumber mill.  These changes can then flow on to production and
+     * construction displays.
      */
-    private void removeReferences() {
-        if (getLayout() == null) return; // Been here already
-
-        // MigLayout 4.0 is hanging onto references to the parent object.
-        // Clear it out.
-        setLayout(null);
-        buildingsPanel.setLayout(null);
-        cargoPanel.setLayout(null);
-        constructionPanel.setLayout(null);
-        inPortPanel.setLayout(null);
-        inPortPanel.setPortPanel(null);
-        outsideColonyPanel.setLayout(null);
-        outsideColonyPanel.setPortPanel(null);
-        populationPanel.setLayout(null);
-        // tilesPanel does not use MigLayout
-        warehousePanel.setLayout(null);
-
-        // This should not be necessary, but alas ColonyPanel is leaking.
-        okButton = null;
-        unloadButton = null;
-        fillButton = null;
-        warehouseButton = null;
-        buildQueueButton = null;
-        colonyUnitsButton = null;
-        setGoodsButton = null;
-        nameBox = null;
-        netProductionPanel = null;
-        buildingsPanel = null;
-        buildingsScroll = null;
-        cargoPanel = null;
-        cargoScroll = null;
-        constructionPanel = null;
-        inPortPanel = null;
-        inPortScroll = null;
-        outsideColonyPanel = null; 
-        outsideColonyScroll = null; 
-        populationPanel = null;
-        tilesPanel = null;
-        tilesScroll = null;
-        warehousePanel = null;
-        warehouseScroll = null;
-
-        defaultTransferHandler = null;
-        nameActionListener = null;
-        pressListener = null;
-        releaseListener = null;
-        buildQueueListener = null;
-        selectedUnitLabel = null;
+    private void updateProduction() {
+        updateTilesPanel();
+        updateBuildingsPanel();
+        updateNetProductionPanel();
+        updateConstructionPanel();
     }
 
     /**
-     * {@inheritDoc}
+     * Update the entire colony panel.
      */
-    @Override
-    public void removeNotify() {
-        super.removeNotify();
-
-        // removeNotify gets called when a JPanel has no parent any
-        // more, that is the best opportunity available for JPanels
-        // to be given a chance to remove leak generating references.
-        removeReferences();
+    private void update() {
+        buildingsPanel.update();
+        constructionPanel.update();
+        inPortPanel.update();
+        updateNetProductionPanel();
+        outsideColonyPanel.update();
+        populationPanel.update();
+        tilesPanel.update();
+        warehousePanel.update();
     }
 
     /**
-     * Close this <code>ColonyPanel</code>.
+     * Enables the unload and fill buttons if the currently selected unit is a
+     * carrier with some cargo.
      */
-    public void closeColonyPanel() {
+    private void updateCarrierButtons() {
         final Colony colony = getColony();
-        boolean abandon = false;
-        if (colony.getUnitCount() == 0) {
-            if (!getGUI().showConfirmDialog("abandonColony.text",
-                                            "abandonColony.yes",
-                                            "abandonColony.no")) return;
-            abandon = true;
-        }                
-        if (!abandon) {
-            BuildableType buildable = colony.getCurrentlyBuilding();
-            if (buildable != null
-                && buildable.getRequiredPopulation() > colony.getUnitCount()
-                && !getGUI().showConfirmDialog(null,
-                    StringTemplate.template("colonyPanel.reducePopulation")
-                        .addName("%colony%", colony.getName())
-                        .addAmount("%number%", buildable.getRequiredPopulation())
-                        .add("%buildable%", buildable.getNameKey()),
-                    "ok", "cancel")) {
-                return;
-            }
-        }
-
-        cleanup();
-        removeReferences();
-
-        getGUI().removeFromCanvas(this);
-        getGUI().getMapViewer().restartBlinking();
-
-        // Talk to the controller last, allow all the cleanup to happen first.
-        if (abandon) getController().abandonColony(colony);
-        if (getFreeColClient().currentPlayerIsMyPlayer()) {
-            getController().nextModelMessage();
-            Unit activeUnit = getGUI().getActiveUnit();
-            if (activeUnit == null || !activeUnit.hasTile()
-                || (!(activeUnit.getLocation() instanceof Tile)
-                    && !activeUnit.isOnCarrier())) {
-                getController().nextActiveUnit();
+        unloadButton.setEnabled(false);
+        fillButton.setEnabled(false);
+        if (isEditable() && selectedUnitLabel != null) {
+            Unit unit = selectedUnitLabel.getUnit();
+            if (unit != null && unit.isCarrier() && unit.hasCargo()) {
+                unloadButton.setEnabled(true);
+                for (Goods goods : unit.getCompactGoodsList()) {
+                    if (colony.getGoodsCount(goods.getType()) > 0) {
+                        fillButton.setEnabled(true);
+                        break;
+                    }
+                }
             }
         }
     }
@@ -1016,7 +703,171 @@ public final class ColonyPanel extends PortPanel
     }
 
 
-    // Implement PortPanel
+    // Public base accessors and mutators
+
+    /**
+     * Gets the <code>Colony</code> in use.
+     *
+     * Try to use this at the top of all the routines that need the colony,
+     * to get a stable value.  There have been nasty races when the colony
+     * changes out from underneath us, and more may be lurking.
+     *
+     * @return The <code>Colony</code>.
+     */
+    public synchronized final Colony getColony() {
+        return colony;
+    }
+
+    /**
+     * Gets the <code>TilesPanel</code>-object in use.
+     *
+     * @return The <code>TilesPanel</code>.
+     */
+    public final TilesPanel getTilesPanel() {
+        return tilesPanel;
+    }
+
+    /**
+     * Gets the <code>WarehousePanel</code>-object in use.
+     *
+     * @return The <code>WarehousePanel</code>.
+     */
+    public final WarehousePanel getWarehousePanel() {
+        return warehousePanel;
+    }
+
+    /**
+     * Gets the currently select unit.
+     *
+     * @return The currently select <code>Unit</code>.
+     */
+    public Unit getSelectedUnit() {
+        return (selectedUnitLabel == null) ? null
+            : selectedUnitLabel.getUnit();
+    }
+
+    /**
+     * Selects a unit that is located somewhere on this panel.
+     *
+     * @param unitLabel The <code>UnitLabel</code> for the unit that
+     *     is being selected.
+     */
+    public void setSelectedUnitLabel(UnitLabel unitLabel) {
+        if (selectedUnitLabel != unitLabel) {
+            if (selectedUnitLabel != null) {
+                selectedUnitLabel.setSelected(false);
+                selectedUnitLabel.getUnit().removePropertyChangeListener(this);
+            }
+            selectedUnitLabel = unitLabel;
+            if (unitLabel == null) {
+                cargoPanel.setCarrier(null);
+            } else {
+                cargoPanel.setCarrier(unitLabel.getUnit());
+                unitLabel.setSelected(true);
+                unitLabel.getUnit().addPropertyChangeListener(this);
+            }
+        }
+        updateCarrierButtons();
+        inPortPanel.revalidate();
+        inPortPanel.repaint();
+    }
+
+
+    // Public update routines
+
+    public void updateBuildingsPanel() {
+        buildingsPanel.update();
+    }
+
+    public void updateConstructionPanel() {
+        constructionPanel.update();
+    }
+
+    public void updateInPortPanel() {
+        inPortPanel.update();
+    }
+
+    public void updateNetProductionPanel() {
+        final Colony colony = getColony();
+        final Specification spec = colony.getSpecification();
+        // TODO: find out why the cache needs to be explicitly invalidated
+        colony.invalidateCache();
+        netProductionPanel.removeAll();
+
+        for (GoodsType goodsType : spec.getGoodsTypeList()) {
+            int amount = colony.getAdjustedNetProductionOf(goodsType);
+            if (amount != 0) {
+                netProductionPanel.add(new ProductionLabel(getFreeColClient(),
+                                                           goodsType, amount));
+            }
+        }
+
+        netProductionPanel.revalidate();
+    }
+
+    public void updateOutsideColonyPanel() {
+        outsideColonyPanel.update();
+    }
+
+    public void updatePopulationPanel() {
+        populationPanel.update();
+    }
+
+    public void updateTilesPanel() {
+        tilesPanel.update();
+    }
+
+    public void updateWarehousePanel() {
+        warehousePanel.update();
+    }
+
+
+    /**
+     * Close this <code>ColonyPanel</code>.
+     */
+    public void closeColonyPanel() {
+        final Colony colony = getColony();
+        boolean abandon = false;
+        if (colony.getUnitCount() == 0) {
+            if (!getGUI().showConfirmDialog("abandonColony.text",
+                                            "abandonColony.yes",
+                                            "abandonColony.no")) return;
+            abandon = true;
+        }                
+        if (!abandon) {
+            BuildableType buildable = colony.getCurrentlyBuilding();
+            if (buildable != null
+                && buildable.getRequiredPopulation() > colony.getUnitCount()
+                && !getGUI().showConfirmDialog(null,
+                    StringTemplate.template("colonyPanel.reducePopulation")
+                        .addName("%colony%", colony.getName())
+                        .addAmount("%number%", buildable.getRequiredPopulation())
+                        .add("%buildable%", buildable.getNameKey()),
+                    "ok", "cancel")) {
+                return;
+            }
+        }
+
+        cleanup();
+
+        getGUI().removeFromCanvas(this);
+        getGUI().getMapViewer().restartBlinking();
+
+        // Talk to the controller last, allow all the cleanup to happen first.
+        if (abandon) getController().abandonColony(colony);
+        if (getFreeColClient().currentPlayerIsMyPlayer()) {
+            getController().nextModelMessage();
+            Unit activeUnit = getGUI().getActiveUnit();
+            if (activeUnit == null || !activeUnit.hasTile()
+                || (!(activeUnit.getLocation() instanceof Tile)
+                    && !activeUnit.isOnCarrier())) {
+                getController().nextActiveUnit();
+            }
+        }
+    }
+
+
+    // Interface PortPanel
 
     /**
      * Gets the list of units on the colony tile.
@@ -1029,12 +880,81 @@ public final class ColonyPanel extends PortPanel
     }
 
 
+    // Interface ActionListener
+
+    /**
+     * {@inheritDoc}
+     */
+    public void actionPerformed(ActionEvent event) {
+        final Colony colony = getColony();
+        final String command = event.getActionCommand();
+        final Unit unit = getSelectedUnit();
+
+        if (OK.equals(command)) {
+            closeColonyPanel();
+        } else {
+            int cmd;
+            try {
+                cmd = Integer.valueOf(command).intValue();
+            } catch (NumberFormatException nfe) {
+                logger.warning("Invalid action number: " + command);
+                return;
+            }
+            switch (cmd) {
+            case UNLOAD:
+                if (unit == null || !unit.isCarrier()) break;
+                for (Goods goods : unit.getGoodsContainer().getGoods()) {
+                    getController().unloadCargo(goods, false);
+                }
+                for (Unit u : unit.getUnitList()) {
+                    getController().leaveShip(u);
+                }
+                cargoPanel.update();
+                updateOutsideColonyPanel();
+                unloadButton.setEnabled(false);
+                fillButton.setEnabled(false);
+                break;
+            case WAREHOUSE:
+                if (getGUI().showWarehouseDialog(colony)) {
+                    updateWarehousePanel();
+                }
+                break;
+            case BUILDQUEUE:
+                getGUI().showBuildQueuePanel(colony);
+                updateConstructionPanel();
+                break;
+            case FILL:
+                if (unit == null || !unit.isCarrier()) break;
+                for (Goods goods : unit.getGoodsContainer().getGoods()) {
+                    int space = GoodsContainer.CARGO_SIZE - goods.getAmount();
+                    int count = colony.getGoodsCount(goods.getType());
+                    if (space > 0 && count > 0) {
+                        Goods newGoods = new Goods(goods.getGame(), colony,
+                                                   goods.getType(),
+                                                   Math.min(space, count));
+                        getController().loadCargo(newGoods, unit);
+                    }
+                }
+                break;
+            case COLONY_UNITS:
+                generateColonyUnitsMenu();
+                break;
+            case SETGOODS:
+                DebugUtils.setColonyGoods(getFreeColClient(), colony);
+                updateWarehousePanel();
+                updateProduction();
+                break;
+            default:
+                super.actionPerformed(event);
+            }
+        }
+    }
+
+
     // Interface PropertyChangeListener
 
     /**
-     * Handle a property change event sent to this ColonyPanel.
-     *
-     * @param event The <code>PropertyChangeEvent</code> to handle.
+     * {@inheritDoc}
      */
     public void propertyChange(PropertyChangeEvent event) {
         final Colony colony = getColony();
@@ -1084,6 +1004,54 @@ public final class ColonyPanel extends PortPanel
     }
 
 
+    // Override Component
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeNotify() {
+        super.removeNotify();
+
+        if (nameBox == null) return; // Been here already
+
+        // Alas, ColonyPanel is often leaky.
+        unloadButton = null;
+        fillButton = null;
+        warehouseButton = null;
+        buildQueueButton = null;
+        colonyUnitsButton = null;
+        setGoodsButton = null;
+        nameBox = null;
+        netProductionPanel = null;
+        buildingsPanel = null;
+        buildingsScroll = null;
+        cargoScroll = null;
+        constructionPanel = null;
+        inPortScroll = null;
+        outsideColonyPanel = null; 
+        outsideColonyScroll = null; 
+        populationPanel = null;
+        tilesPanel = null;
+        tilesScroll = null;
+        warehousePanel = null;
+        warehouseScroll = null;
+
+        nameActionListener = null;
+        releaseListener = null;
+        buildQueueListener = null;
+
+        // Inherited from PortPanel
+        //cargoPanel = null;
+        //inPortPanel = null;
+        //defaultTransferHandler = null;
+        //pressListener = null;
+        //selectedUnitLabel = null;
+    }
+
+
+    // Subpanel classes
+
     /**
      * This panel shows the content of a carrier in the colony
      */
@@ -1096,8 +1064,6 @@ public final class ColonyPanel extends PortPanel
          */
         public ColonyCargoPanel(FreeColClient freeColClient) {
             super(freeColClient, true);
-
-            setLayout(new MigLayout("wrap 6, fill, insets 0"));
         }
 
 
@@ -1133,10 +1099,10 @@ public final class ColonyPanel extends PortPanel
          * Create a new population panel.
          */
         public PopulationPanel() {
+            super(new MigLayout("wrap 5, fill, insets 0",
+                                "[][]:push[center]:push[right][]"));
             setOpaque(false);
             setToolTipText(" ");
-            setLayout(new MigLayout("wrap 5, fill, insets 0",
-                                    "[][]:push[center]:push[right][]"));
         }
 
 
@@ -1152,7 +1118,7 @@ public final class ColonyPanel extends PortPanel
          * Clean up this population panel.
          */
         public void cleanup() {
-            removeAll();
+            // Nothing yet
         }
 
         /**
@@ -1164,10 +1130,13 @@ public final class ColonyPanel extends PortPanel
             final int uc = colony.getUnitCount();
             final int solPercent = colony.getSoL();
             final int rebels = Colony.calculateRebels(uc, solPercent);
+            final Nation nation = colony.getOwner().getNation();
+            final int grow = colony.getPreferredSizeChange();
+            final int bonus = colony.getProductionBonus();
             StringTemplate t;
+
             removeAll();
 
-            final Nation nation = colony.getOwner().getNation();
             rebelShield.setIcon(new ImageIcon(getLibrary()
                     .getCoatOfArmsImage(nation, 0.5)));
             add(rebelShield, "bottom");
@@ -1185,8 +1154,6 @@ public final class ColonyPanel extends PortPanel
             popLabel.setText(Messages.message(t));
             add(popLabel, "split 2, flowy");
 
-            final int grow = colony.getPreferredSizeChange();
-            final int bonus = colony.getProductionBonus();
             t = StringTemplate.template("colonyPanel.bonusLabel")
                               .addAmount("%number%", bonus)
                               .add("%extra%", ((grow == 0) ? ""
@@ -1224,6 +1191,20 @@ public final class ColonyPanel extends PortPanel
         public String getUIClassID() {
             return "PopulationPanelUI";
         }
+
+
+        // Override Component
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void removeNotify() {
+            super.removeNotify();
+            
+            removeAll();
+            setLayout(null);
+        }
     }
 
     /**
@@ -1238,9 +1219,10 @@ public final class ColonyPanel extends PortPanel
          */
         public OutsideColonyPanel() {
             super(ColonyPanel.this, null, ColonyPanel.this.isEditable());
+
             setLayout(new MigLayout("wrap 4, fill, insets 0"));
-            setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
-                      Messages.message("outsideColony")));
+            setBorder(BorderFactory.createTitledBorder(BorderFactory
+                    .createEmptyBorder(), Messages.message("outsideColony")));
         }
 
 
@@ -1311,16 +1293,7 @@ public final class ColonyPanel extends PortPanel
         }
 
         /**
-         * Adds a component to this OutsideColonyPanel and makes sure
-         * that the unit that the component represents gets modified
-         * so that it will be located in the colony.
-         *
-         * @param comp The component to add to this ColonistsPanel.
-         * @param editState Must be set to 'true' if the state of the component
-         *            that is added (which should be a dropped component
-         *            representing a Unit) should be changed so that the
-         *            underlying unit will be located in the colony.
-         * @return The component argument.
+         * {@inheritDoc}
          */
         public Component add(Component comp, boolean editState) {
             Container oldParent = comp.getParent();
@@ -1336,7 +1309,8 @@ public final class ColonyPanel extends PortPanel
                     if (unit.getColony() == null) {
                         closeColonyPanel();
                         return null;
-                    } else if (!(unit.getLocation() instanceof Tile) && !unit.isOnCarrier()) {
+                    } else if (!(unit.getLocation() instanceof Tile)
+                        && !unit.isOnCarrier()) {
                         return null;
                     }
 
@@ -1344,11 +1318,11 @@ public final class ColonyPanel extends PortPanel
                     initialize();
                     return comp;
                 } else {
-                    logger.warning("An invalid component got dropped on this ColonistsPanel.");
+                    logger.warning("Invalid component: " + comp);
                     return null;
                 }
             } else {
-                ((UnitLabel) comp).setSmall(false);
+                ((UnitLabel)comp).setSmall(false);
                 Component c = add(comp);
                 return c;
             }
@@ -1379,8 +1353,7 @@ public final class ColonyPanel extends PortPanel
             super(ColonyPanel.this, null, ColonyPanel.this.isEditable());
 
             setLayout(new MigLayout("wrap 3, fill, insets 0"));
-            setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
-                    Messages.message("inPort")));
+            setTitledBorder("inPort");
         }
 
 
@@ -1542,23 +1515,12 @@ public final class ColonyPanel extends PortPanel
         }
 
         /**
-         * Adds a component to this WarehousePanel and makes sure that
-         * the unit or good that the component represents gets
-         * modified so that it is on board the currently selected
-         * ship.
-         *
-         * @param comp The component to add to this WarehousePanel.
-         * @param editState Must be set to 'true' if the state of the
-         *            component that is added (which should be a
-         *            dropped component representing a Unit or good)
-         *            should be changed so that the underlying unit or
-         *            goods are on board the currently selected ship.
-         * @return The component argument.
+         * {@inheritDoc}
          */
         public Component add(Component comp, boolean editState) {
             if (editState) {
                 if (!(comp instanceof GoodsLabel)) {
-                    logger.warning("Invalid component dropped on this WarehousePanel.");
+                    logger.warning("Invalid component: " + comp);
                     return null;
                 }
                 comp.getParent().remove(comp);
@@ -1592,6 +1554,20 @@ public final class ColonyPanel extends PortPanel
         @Override
         public String getUIClassID() {
             return "WarehousePanelUI";
+        }
+
+
+        // Override Component
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void removeNotify() {
+            super.removeNotify();
+            
+            removeAll();
+            setLayout(null);
         }
     }
 
@@ -1663,6 +1639,21 @@ public final class ColonyPanel extends PortPanel
         public String getUIClassID() {
             return "BuildingsPanelUI";
         }
+
+
+        // Override Component
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void removeNotify() {
+            super.removeNotify();
+            
+            removeAll();
+            setLayout(null);
+        }
+
 
         /**
          * This panel is a single line (one building) in the
@@ -1770,17 +1761,7 @@ public final class ColonyPanel extends PortPanel
             }
 
             /**
-             * Adds a component to this ASingleBuildingPanel and makes
-             * sure that the unit that the component represents gets
-             * modified so that it will be located in the colony.
-             *
-             * @param comp The component to add to this ColonistsPanel.
-             * @param editState Must be set to 'true' if the state of the
-             *            component that is added (which should be a dropped
-             *            component representing a Unit) should be changed so
-             *            that the underlying unit will be located in the
-             *            colony.
-             * @return The component argument.
+             * {@inheritDoc}
              */
             public Component add(Component comp, boolean editState) {
                 Container oldParent = comp.getParent();
@@ -2182,18 +2163,7 @@ public final class ColonyPanel extends PortPanel
             }
 
             /**
-             * Adds a component to this CargoPanel and makes sure that
-             * the unit or good that the component represents gets
-             * modified so that it is on board the currently selected
-             * ship.
-             *
-             * @param comp The component to add to this CargoPanel.
-             * @param editState Must be set to 'true' if the state of the
-             *            component that is added (which should be a dropped
-             *            component representing a Unit or good) should be
-             *            changed so that the underlying unit or goods are on
-             *            board the currently selected ship.
-             * @return The component argument.
+             * {@inheritDoc}
              */
             public Component add(Component comp, boolean editState) {
                 Container oldParent = comp.getParent();

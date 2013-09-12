@@ -37,6 +37,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
@@ -87,13 +88,7 @@ public class ReportPanel extends FreeColPanel {
         header = getDefaultHeader(title);
         add(header, "cell 0 0, align center");
 
-        reportPanel = new JPanel() {
-                @Override
-                public String getUIClassID() {
-                    return "ReportPanelUI";
-                }
-            };
-
+        reportPanel = new MigPanel("ReportPanelUI");
         reportPanel.setOpaque(true);
         reportPanel.setBorder(createBorder());
 
@@ -177,9 +172,22 @@ public class ReportPanel extends FreeColPanel {
                 getGUI().showEuropePanel();
             } else if (object instanceof Tile) {
                 getGUI().setFocus(((Tile) object));
-            } else if (object == null) {
+            } else {
                 getGUI().showColopediaPanel(command);
             }
         }
+    }
+
+    // Override Component
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeNotify() {
+        super.removeNotify();
+
+        removeAll();
+        scrollPane = null;
     }
 }

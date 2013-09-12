@@ -38,6 +38,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
@@ -50,7 +51,7 @@ import net.sf.freecol.common.resources.ResourceManager;
 /**
  * This panel represents a single building in a Colony.
  */
-public class BuildingPanel extends JPanel implements PropertyChangeListener {
+public class BuildingPanel extends MigPanel implements PropertyChangeListener {
 
     private static Logger logger = Logger.getLogger(BuildingPanel.class.getName());
 
@@ -74,11 +75,12 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
      * @param building The building to display information from.
      */
     public BuildingPanel(FreeColClient freeColClient, Building building) {
+        super(new MigLayout("", "[32][32][32]", "[32][44]"));
+
         this.freeColClient = freeColClient;
         this.building = building;
 
         setToolTipText(" ");
-        setLayout(new MigLayout("", "[32][32][32]", "[32][44]"));
     }
 
 

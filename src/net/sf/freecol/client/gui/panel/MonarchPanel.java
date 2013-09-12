@@ -52,7 +52,7 @@ public final class MonarchPanel extends FreeColDialog<Boolean> implements Action
      */
     public MonarchPanel(FreeColClient freeColClient,
                         MonarchAction action, StringTemplate template) {
-        super(freeColClient);
+        super(freeColClient, new MigLayout("wrap 2, insets 10", "[]20[]"));
 
         String messageId = "model.monarch.action." + action.toString();
         String yesId = messageId + ".yes";
@@ -62,8 +62,6 @@ public final class MonarchPanel extends FreeColDialog<Boolean> implements Action
             logger.warning("Unrecognized monarch action: " + action);
             return;
         }
-
-        setLayout(new MigLayout("wrap 2, insets 10", "[]20[]"));
 
         JLabel header = new JLabel(Messages.message("aMessageFromTheCrown"));
         header.setFont(mediumHeaderFont);

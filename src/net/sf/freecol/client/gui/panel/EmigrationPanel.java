@@ -54,7 +54,7 @@ public final class EmigrationPanel extends FreeColDialog<Integer> {
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public EmigrationPanel(FreeColClient freeColClient) {
-        super(freeColClient);
+        super(freeColClient, new MigLayout("wrap 1", "[fill]", ""));
 
         for (int index = 0; index < NUMBER_OF_PERSONS; index++) {
             person[index] = new JButton();
@@ -83,8 +83,6 @@ public final class EmigrationPanel extends FreeColDialog<Integer> {
                             + "\n\n", 0);
         }
 
-        setLayout(new MigLayout("wrap 1", "[fill]", ""));
-
         add(question, "wrap 20");
 
         for (int index = 0; index < NUMBER_OF_PERSONS; index++) {
@@ -99,24 +97,39 @@ public final class EmigrationPanel extends FreeColDialog<Integer> {
         setSize(getPreferredSize());
     }
 
+
+    // Interface ActionListener
+
     /**
-     * This function analyses an event and calls the right methods to take care
-     * of the user's requests.
-     * 
-     * @param event The incoming ActionEvent.
+     * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
+        final String command = event.getActionCommand();
         try {
             int action = Integer.valueOf(command).intValue();
             if (action >= 0 && action < NUMBER_OF_PERSONS) {
                 setResponse(new Integer(action));
             } else {
-                logger.warning("Invalid Actioncommand: invalid number.");
+                super.actionPerformed(event);
             }
         } catch (NumberFormatException e) {
-            logger.warning("Invalid Actioncommand: not a number: " + command);
+            logger.warning("Invalid ActionEvent, not a number: " + command);
         }
     }
 
+
+    // Override Component
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeNotify() {
+        super.removeNotify();
+
+        removeAll();
+        if (person != null) {
+            for (int i = 0; i < person.length; i++) person[i] = null;
+        }
+    }
 }

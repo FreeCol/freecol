@@ -17,11 +17,13 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.LayoutManager;
 import java.awt.event.MouseListener;
+
 import java.util.List;
+
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.Unit;
@@ -36,19 +38,22 @@ import net.sf.freecol.common.model.Unit;
 public abstract class PortPanel extends FreeColPanel {
 
     protected CargoPanel cargoPanel;
+    protected InPortPanel inPortPanel;
     protected UnitLabel selectedUnitLabel;
     protected DefaultTransferHandler defaultTransferHandler;
     protected MouseListener pressListener;
-    protected InPortPanel inPortPanel;
 
 
     /**
      * Create a new port panel.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param layout The <code>LayoutManager</code> to be used.
      */
-    public PortPanel(FreeColClient freeColClient) {
-        super(freeColClient);
+    public PortPanel(FreeColClient freeColClient, LayoutManager layout) {
+        super(freeColClient, layout);
+
+        this.selectedUnitLabel = null;
     }
 
 
@@ -80,17 +85,47 @@ public abstract class PortPanel extends FreeColPanel {
         return selectedUnitLabel;
     }
 
+    /**
+     * Set the selected unit label.
+     *
+     * @param label The unit label to select.
+     */
     public void setSelectedUnitLabel(UnitLabel label) {
         selectedUnitLabel = label;
     }
 
-    public DefaultTransferHandler getTransferHandler() {
-        return defaultTransferHandler;
-    }
-
+    /**
+     * Get the press listener.  Associated UnitPanels often add this
+     * mouse listener to their contained UnitLabels.
+     *
+     * @return The press listener.
+     */
     public MouseListener getPressListener() {
         return pressListener;
     }
 
+    /**
+     * Get the units present in this port.
+     *
+     * @return A list of <code>Unit</code>s.
+     */
     public abstract List<Unit> getUnitList();
+
+
+    // Override Component
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeNotify() {
+        super.removeNotify();
+
+        removeAll();
+        cargoPanel = null;
+        cargoPanel = null;
+        inPortPanel = null;
+        defaultTransferHandler = null;
+        pressListener = null;
+        selectedUnitLabel = null;
+    }
 }

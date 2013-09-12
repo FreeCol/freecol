@@ -70,7 +70,7 @@ public final class ServerListPanel extends FreeColPanel {
      */
     public ServerListPanel(FreeColClient freeColClient,
                            ConnectController connectController) {
-        super(freeColClient);
+        super(freeColClient, new MigLayout("", "", ""));
 
         this.connectController = connectController;
 
@@ -113,7 +113,6 @@ public final class ServerListPanel extends FreeColPanel {
         cancel.setActionCommand(String.valueOf(CANCEL));
         cancel.addActionListener(this);
 
-        setLayout(new MigLayout("", "", ""));
         add(tableScroll, "width 400:, height 350:");
         add(connect, "newline 20, split 2");
         add(cancel, "tag cancel");

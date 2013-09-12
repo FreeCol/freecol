@@ -65,11 +65,7 @@ public final class StartGamePanel extends FreeColPanel {
 
     private JTextArea chatArea;
 
-    private JButton start;
-
-    private JButton gameOptions;
-
-    private JButton mapGeneratorOptions;
+    private JButton start, cancel, gameOptions, mapGeneratorOptions;
 
     private PlayersTable table;
 
@@ -80,7 +76,7 @@ public final class StartGamePanel extends FreeColPanel {
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public StartGamePanel(FreeColClient freeColClient) {
-        super(freeColClient);
+        super(freeColClient, new MigLayout("fill, wrap 2"));
     }
 
 
@@ -91,7 +87,7 @@ public final class StartGamePanel extends FreeColPanel {
 
         NationOptions nationOptions = getGame().getNationOptions();
 
-        JButton cancel = new JButton(Messages.message("cancel"));
+        cancel = new JButton(Messages.message("cancel"));
 
         JScrollPane chatScroll = null, tableScroll;
 
@@ -123,8 +119,6 @@ public final class StartGamePanel extends FreeColPanel {
         tableScroll = new JScrollPane(table, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                                       ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         tableScroll.getViewport().setOpaque(false);
-
-        setLayout(new MigLayout("fill, wrap 2"));
 
         add(tableScroll, "width 600:, grow");
         if (!singlePlayerGame) {
@@ -323,10 +317,28 @@ public final class StartGamePanel extends FreeColPanel {
                                                                             loadCustomOptions);
                 break;
             default:
-                logger.warning("Invalid Actioncommand: invalid number.");
+                super.actionPerformed(event);
             }
         } catch (NumberFormatException e) {
-            logger.warning("Invalid Actioncommand: not a number: " + command);
+            logger.warning("Invalid ActionEvent, not a number: " + command);
         }
+    }
+
+
+    // Override Component
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeNotify() {
+        super.removeNotify();
+
+        removeAll();
+        start = null;
+        cancel = null;
+        readyBox = null;
+        gameOptions = null;
+        mapGeneratorOptions = null;
     }
 }

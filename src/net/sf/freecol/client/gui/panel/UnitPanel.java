@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import javax.swing.JPanel;
 
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 
@@ -34,7 +35,8 @@ import net.sf.freecol.common.model.Unit;
  * This class provides common functionality for sub-panels of a
  * PortPanel that display UnitLabels.
  */
-public abstract class UnitPanel extends JPanel implements PropertyChangeListener {
+public abstract class UnitPanel extends MigPanel
+    implements PropertyChangeListener {
 
     private static Logger logger = Logger.getLogger(UnitPanel.class.getName());
 
@@ -73,7 +75,6 @@ public abstract class UnitPanel extends JPanel implements PropertyChangeListener
      */
     public void cleanup() {
         removePropertyChangeListeners();
-        removeAll();
     }
 
     /**
@@ -130,15 +131,6 @@ public abstract class UnitPanel extends JPanel implements PropertyChangeListener
     }
 
     /**
-     * Set the port panel that supplies units to this panel.
-     *
-     * @param portPanel The new <code>PortPanel</code>.
-     */
-    public void setPortPanel(PortPanel portPanel) {
-        this.portPanel = portPanel;
-    }
-
-    /**
      * Is this panel editable?
      *
      * @return True if the panel is editable.
@@ -173,5 +165,18 @@ public abstract class UnitPanel extends JPanel implements PropertyChangeListener
                       + ": " + event.getOldValue()
                       + " -> " + event.getNewValue());
         update();
+    }
+
+
+    // Override Component
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeNotify() {
+        super.removeNotify();
+
+        portPanel = null;
     }
 }

@@ -35,6 +35,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ExportData;
@@ -49,7 +50,7 @@ public final class WarehouseDialog extends FreeColDialog<Boolean> {
 
     private static final Logger logger = Logger.getLogger(WarehouseDialog.class.getName());
 
-    private final JPanel warehouseDialog;
+    private JPanel warehouseDialog = new MigPanel();
 
 
     /**
@@ -61,12 +62,12 @@ public final class WarehouseDialog extends FreeColDialog<Boolean> {
     public WarehouseDialog(FreeColClient freeColClient, Colony colony) {
         super(freeColClient);
 
-        warehouseDialog = new JPanel(new MigLayout("wrap 4"));
+        warehouseDialog.setLayout(new MigLayout("wrap 4"));
         warehouseDialog.setOpaque(false);
 
         JScrollPane scrollPane = new JScrollPane(warehouseDialog,
-                                                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+            JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.getVerticalScrollBar().setUnitIncrement( 16 );
         scrollPane.getViewport().setOpaque(false);
         scrollPane.setBorder(null);
@@ -75,7 +76,8 @@ public final class WarehouseDialog extends FreeColDialog<Boolean> {
 
         setLayout(new MigLayout("fill, wrap 1", "", ""));
 
-        add(getDefaultHeader(Messages.message("warehouseDialog.name")), "align center");
+        add(getDefaultHeader(Messages.message("warehouseDialog.name")),
+            "align center");
         add(scrollPane, "grow");
         add(okButton, "newline 20, split 2, tag ok");
         add(cancelButton, "tag cancel");
@@ -108,12 +110,12 @@ public final class WarehouseDialog extends FreeColDialog<Boolean> {
             getGUI().removeFromCanvas(this);
             setResponse(Boolean.FALSE);
         } else {
-            logger.warning("Invalid ActionCommand: " + command);
+            super.actionPerformed(event);
         }
     }
 
 
-    public class WarehouseGoodsPanel extends JPanel {
+    public class WarehouseGoodsPanel extends MigPanel {
 
         private final Colony colony;
 
@@ -129,6 +131,7 @@ public final class WarehouseDialog extends FreeColDialog<Boolean> {
 
 
         public WarehouseGoodsPanel(Colony colony, GoodsType goodsType) {
+            super("WarehouseGoodsPanelUI");
 
             this.colony = colony;
             this.goodsType = goodsType;
@@ -195,11 +198,6 @@ public final class WarehouseDialog extends FreeColDialog<Boolean> {
             if (changed) {
                 getController().setGoodsLevels(colony, goodsType);
             }
-        }
-
-        @Override
-        public String getUIClassID() {
-            return "WarehouseGoodsPanelUI";
         }
     }
 }

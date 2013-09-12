@@ -32,6 +32,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
+import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
@@ -57,6 +58,7 @@ import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
+import javax.swing.border.TitledBorder;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.Style;
@@ -69,6 +71,7 @@ import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.FreeColObject;
@@ -88,7 +91,7 @@ import net.sf.freecol.common.resources.ResourceManager;
 /**
  * Superclass for all panels in FreeCol.
  */
-public abstract class FreeColPanel extends JPanel implements ActionListener {
+public abstract class FreeColPanel extends MigPanel implements ActionListener {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(FreeColPanel.class.getName());
@@ -212,7 +215,6 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
         okButton.addActionListener(this);
         enterPressesWhenFocused(okButton);
         setCancelComponent(okButton);
-
     }
 
 
@@ -688,15 +690,57 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
     }
 
     /**
-     * This function analyses an event and calls the right methods to take care
-     * of the user's requests.
+     * Put a titled border on this panel.
      *
-     * @param event The incoming ActionEvent.
+     * @param key A message key to use to look up the title.
+     */
+    protected TitledBorder setTitledBorder(String key) {
+        TitledBorder border = BorderFactory.createTitledBorder(BorderFactory
+            .createEmptyBorder(), Messages.message(key));
+        setBorder(border);
+        return border;
+    }
+
+
+    // Interface ActionListener
+
+    /**
+     * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
+        final String command = event.getActionCommand();
         if (command.equals(OK)) {
             getGUI().removeFromCanvas(this);
+        } else {
+            logger.warning("Bad event: " + command);
+        }
+    }
+
+
+    // Override Component
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeNotify() {
+        super.removeNotify();
+
+        // removeNotify gets called when a JPanel has no parent any
+        // more, that is the best opportunity available for JPanels
+        // to be given a chance to remove leak generating references.
+
+        if (okButton == null) return; // Been here before
+
+        // We need to make sure the layout is cleared because some
+        // versions of MigLayout are leaky.
+        setLayout(null);
+
+        okButton.removeActionListener(this);
+        okButton = null;
+
+        for (MouseListener listener : getMouseListeners()) {
+            removeMouseListener(listener);
         }
     }
 }

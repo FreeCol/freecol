@@ -84,18 +84,18 @@ public final class EuropePanel extends PortPanel {
         SAIL
     }
 
-    private final DestinationPanel toAmericaPanel;
+    private DestinationPanel toAmericaPanel;
 
-    private final DestinationPanel toEuropePanel;
+    private DestinationPanel toEuropePanel;
 
-    private final DocksPanel docksPanel;
+    private DocksPanel docksPanel;
 
-    private final MarketPanel marketPanel;
+    private MarketPanel marketPanel;
 
-    private final TransactionLog log;
+    private TransactionLog log;
 
-    private final JButton exitButton, trainButton, purchaseButton,
-                          recruitButton, unloadButton, sailButton;
+    private JButton exitButton, trainButton, purchaseButton,
+                    recruitButton, unloadButton, sailButton;
 
     private final JLabel header = getDefaultHeader("");
 
@@ -109,7 +109,8 @@ public final class EuropePanel extends PortPanel {
      * @param canvas The enclosing <code>Canvas</code>.
      */
     public EuropePanel(FreeColClient freeColClient, Canvas canvas) {
-        super(freeColClient);
+        super(freeColClient, new MigLayout("wrap 3, insets 20, fill",
+                                           "[380:][380:][150:200:]"));
 
         setFocusCycleRoot(true);
 
@@ -225,9 +226,6 @@ public final class EuropePanel extends PortPanel {
         logScroll.getViewport().setOpaque(false);
         log.setOpaque(false);
 
-        setLayout(new MigLayout("wrap 3, insets 20, fill",
-                                "[380:][380:][150:200:]"));
-
         if (canvas.getHeight() > 750) {
             add(header, "span, center");
         }
@@ -326,15 +324,6 @@ public final class EuropePanel extends PortPanel {
     }
 
     /**
-     * Get the units in Europe.
-     *
-     * @return A list of units in Europe.
-     */
-    public List<Unit> getUnitList() {
-        return europe.getUnitList();
-    }
-
-    /**
      * Exits this EuropePanel.
      */
     private void exitAction() {
@@ -381,14 +370,26 @@ public final class EuropePanel extends PortPanel {
         requestFocus();
     }
 
+
+    // Interface PortPanel
+
     /**
-     * Analyzes an event and calls the right external methods to take care of
-     * the user's request.
+     * Get the units in Europe.
      *
-     * @param event The incoming action event
+     * @return A list of units in Europe.
+     */
+    public List<Unit> getUnitList() {
+        return europe.getUnitList();
+    }
+
+
+    // Interface ActionListener
+
+    /**
+     * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
+        final String command = event.getActionCommand();
         // Close any open Europe Dialog, and show new one if required
         EuropeAction act = EuropeAction.valueOf(command);
         getGUI().showEuropeDialog(act);
@@ -406,9 +407,30 @@ public final class EuropePanel extends PortPanel {
             sailAction();
             break;
         default:
-            logger.warning("Invalid action command: " + command);
+            super.actionPerformed(event);
         }
     }
+
+
+    // Override Component
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeNotify() {
+        super.removeNotify();
+
+        removeAll();
+        toAmericaPanel = null;
+        toEuropePanel = null;
+        docksPanel = null;
+        marketPanel = null;
+        log = null;
+        exitButton = trainButton = purchaseButton = recruitButton
+            = unloadButton = sailButton = null;
+    }
+
 
     /**
      * A panel that holds UnitsLabels that represent Units that are going to
@@ -473,22 +495,30 @@ public final class EuropePanel extends PortPanel {
             revalidate();
         }
 
+
+        // Interface DropTarget
+
         /**
-         * Adds a component to this DestinationPanel and makes sure that
-         * the unit that the component represents gets modified so
-         * that it will sail to America.
-         *
-         * @param comp The component to add.
-         * @param editState Must be set to 'true' if the state of the component
-         *            that is added (which should be a dropped component
-         *            representing a Unit) should be changed so that the
-         *            underlying unit is now sailing to America.
-         * @return The component argument.
+         * {@inheritDoc}
+         */
+        public boolean accepts(Unit unit) {
+            return unit.isNaval() && !unit.isDamaged();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public boolean accepts(Goods goods) {
+            return false;
+        }
+
+        /**
+         * {@inheritDoc}
          */
         public Component add(Component comp, boolean editState) {
             if (editState) {
                 if (!(comp instanceof UnitLabel)) {
-                    logger.warning("Invalid component dropped on this DestinationPanel.");
+                    logger.warning("Invalid component: " + comp);
                     return null;
                 }
                 final Unit unit = ((UnitLabel) comp).getUnit();
@@ -525,14 +555,6 @@ public final class EuropePanel extends PortPanel {
             revalidate();
             EuropePanel.this.refresh();
             return c;
-        }
-
-        public boolean accepts(Unit unit) {
-            return unit.isNaval() && !unit.isDamaged();
-        }
-
-        public boolean accepts(Goods goods) {
-            return false;
         }
     }
 
@@ -575,19 +597,10 @@ public final class EuropePanel extends PortPanel {
 
         public DocksPanel() {
             super(EuropePanel.this, "Europe - docks", true);
+
             setLayout(new MigLayout("wrap 6"));
         }
 
-        public Component add(Component comp, boolean editState) {
-            Component c = add(comp);
-            update();
-            return c;
-        }
-
-        @Override
-        public void remove(Component comp) {
-            update();
-        }
 
         public void addPropertyChangeListeners() {
             europe.addPropertyChangeListener(this);
@@ -597,12 +610,41 @@ public final class EuropePanel extends PortPanel {
             europe.removePropertyChangeListener(this);
         }
 
+
+        // Interface DropTarget
+
+        /**
+         * {@inheritDoc}
+         */
         public boolean accepts(Unit unit) {
             return !unit.isNaval();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public boolean accepts(Goods goods) {
             return false;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public Component add(Component comp, boolean editState) {
+            Component c = add(comp);
+            update();
+            return c;
+        }
+
+
+        // Override Container
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void remove(Component comp) {
+            update();
         }
     }
 
@@ -611,17 +653,15 @@ public final class EuropePanel extends PortPanel {
      */
     public final class MarketPanel extends JPanel implements DropTarget {
 
-        private final EuropePanel europePanel;
-
         /**
          * Creates this MarketPanel.
          *
          * @param europePanel The panel that holds this CargoPanel.
          */
         public MarketPanel(EuropePanel europePanel) {
-            this.europePanel = europePanel;
-            setLayout(new GridLayout(2, 8));
+            super(new GridLayout(2, 8));
         }
+
 
         /**
          * Initialize this MarketPanel.
@@ -647,19 +687,30 @@ public final class EuropePanel extends PortPanel {
          */
         public void cleanup() {}
 
+
+        // Interface DropTarget
+
         /**
-         * If a GoodsLabel is dropped here, sell the goods.
-         *
-         * @param comp The component to add to this MarketPanel.
-         * @param editState Must be set to 'true' if the state of the component
-         *            that is added (which should be a dropped component
-         *            representing goods) should be sold.
-         * @return The component argument.
+         * {@inheritDoc}
+         */
+        public boolean accepts(Unit unit) {
+            return false;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public boolean accepts(Goods goods) {
+            return true;
+        }
+
+        /**
+         * {@inheritDoc}
          */
         public Component add(Component comp, boolean editState) {
             if (editState) {
                 if (!(comp instanceof GoodsLabel)) {
-                    logger.warning("Invalid component dropped on this MarketPanel.");
+                    logger.warning("Invalid component: " + comp);
                     return null;
                 }
 
@@ -683,20 +734,19 @@ public final class EuropePanel extends PortPanel {
                 revalidate();
                 getController().nextModelMessage();
             }
-            europePanel.refresh();
+            EuropePanel.this.refresh();
             return comp;
         }
 
+
+        // Override Container
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void remove(Component comp) {
             // Don't remove market labels.
-        }
-
-        public boolean accepts(Unit unit) {
-            return false;
-        }
-
-        public boolean accepts(Goods goods) {
-            return true;
         }
     }
 

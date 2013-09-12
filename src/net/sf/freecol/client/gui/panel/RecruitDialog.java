@@ -59,7 +59,7 @@ public final class RecruitDialog extends FreeColDialog<Integer> implements Actio
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public RecruitDialog(FreeColClient freeColClient) {
-        super(freeColClient);
+        super(freeColClient, new MigLayout("wrap 1", "", ""));
 
         setFocusCycleRoot(true);
 
@@ -74,7 +74,6 @@ public final class RecruitDialog extends FreeColDialog<Integer> implements Actio
         }
 
         initialize();
-
     }
 
 
@@ -83,8 +82,6 @@ public final class RecruitDialog extends FreeColDialog<Integer> implements Actio
      * date.
      */
     public void initialize() {
-
-        setLayout(new MigLayout("wrap 1", "", ""));
 
         add(question, "wrap 20");
 
@@ -125,7 +122,6 @@ public final class RecruitDialog extends FreeColDialog<Integer> implements Actio
         add(cancelButton, "newline 20, tag cancel");
 
         setSize(getPreferredSize());
-
     }
 
     @Override
@@ -156,6 +152,24 @@ public final class RecruitDialog extends FreeColDialog<Integer> implements Actio
             } catch (NumberFormatException e) {
                 logger.warning("Invalid action number: " + command);
                 setResponse(new Integer(-1));
+            }
+        }
+    }
+
+
+    // Override Component
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeNotify() {
+        super.removeNotify();
+
+        removeAll();
+        if (person != null) {
+            for (int i = 0; i < person.length; i++) {
+                person[i] = null;
             }
         }
     }

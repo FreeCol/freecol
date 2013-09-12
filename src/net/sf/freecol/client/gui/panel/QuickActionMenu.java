@@ -43,6 +43,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ColonyPanel.TilesPanel.ASingleTilePanel;
+import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.client.gui.panel.UnitLabel.UnitAction;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -451,7 +452,8 @@ public final class QuickActionMenu extends JPopupMenu {
                 double probability = unit.getType().getUnitTypeChange(expertType)
                     .getProbability(ChangeType.EXPERIENCE) * experience / (double) maxExperience;
                 String jobName = Messages.message(goods.getWorkingAsKey());
-                JPanel experiencePanel = new JPanel(new MigLayout("wrap 3"));
+                JPanel experiencePanel = new MigPanel();
+                experiencePanel.setLayout(new MigLayout("wrap 3"));
                 experiencePanel.add(new JLabel(imageLibrary.getUnitImageIcon(expertType, 0.5)),
                                     "spany 2");
                 StringTemplate message = StringTemplate.template("menu.unit.experience")

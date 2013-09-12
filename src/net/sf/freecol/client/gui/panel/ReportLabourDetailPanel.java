@@ -75,8 +75,9 @@ public final class ReportLabourDetailPanel extends ReportPanel implements Action
 
 
     public void initialize() {
-
-        JPanel detailPanel = new JPanel(new MigLayout("wrap 7", "[]30[][]30[][]30[][]", ""));
+        JPanel detailPanel = new MigPanel();
+        detailPanel.setLayout(new MigLayout("wrap 7", "[]30[][]30[][]30[][]",
+                                            ""));
         detailPanel.setOpaque(false);
 
         String roleId = "model.role.default";

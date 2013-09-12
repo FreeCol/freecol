@@ -48,15 +48,13 @@ public final class EventPanel extends FreeColDialog<Boolean> {
      * @param type The <code>EventType</code> for this panel.
      */
     public EventPanel(FreeColClient freeColClient, EventType type) {
-        super(freeColClient);
-
-        setLayout(new MigLayout("wrap 1", "[center]", "[]20"));
+        super(freeColClient, new MigLayout("wrap 1", "[center]", "[]20"));
 
         // TODO: simplify this -- event should contain the necessary
         // information; add it to enum or upgrade to class
         String text = null;
         String image = null;
-        switch(type) {
+        switch (type) {
         case FIRST_LANDING:
             image = "EventImage.firstLanding";
             text = Messages.message(StringTemplate.template("event.firstLanding")

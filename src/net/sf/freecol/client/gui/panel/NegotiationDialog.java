@@ -42,6 +42,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTradeItem;
 import net.sf.freecol.common.model.DiplomaticTrade;
@@ -123,7 +124,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade>
     public NegotiationDialog(FreeColClient freeColClient, Unit unit,
                              Settlement settlement,
                              DiplomaticTrade agreement) {
-        super(freeColClient);
+        super(freeColClient, new MigLayout("wrap 3",
+                "[200, fill][300, fill][200, fill]", ""));
 
         setFocusCycleRoot(true);
 
@@ -154,7 +156,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade>
             }
         }
 
-        summary = new JPanel(new MigLayout("wrap 2", "[20px][]"));
+        summary = new MigPanel();
+        summary.setLayout(new MigLayout("wrap 2", "[20px][]"));
         summary.setOpaque(false);
     }
 
@@ -192,9 +195,6 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade>
             unitDemand = new UnitTradeItemPanel(this, otherPlayer);
             unitOffer = new UnitTradeItemPanel(this, player);
         */
-
-        setLayout(new MigLayout("wrap 3", "[200, fill][300, fill][200, fill]",
-                                ""));
 
         add(new JLabel(demandMessage), "center");
         add(new JLabel(offerMessage), "skip, center");
@@ -845,6 +845,24 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade>
             if (select != null) {
                 stanceBox.setSelectedItem(new StanceItem(select));
             }
+        }
+
+
+        // Override Component
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void removeNotify() {
+            super.removeNotify();
+
+            removeAll();
+            acceptButton = cancelButton = sendButton = null;
+            stancePanel = null;
+            goldOfferPanel = goldDemandPanel = null;
+            colonyOfferPanel = colonyDemandPanel = null;
+            goodsOfferPanel = goodsDemandPanel = null;
         }
 
 

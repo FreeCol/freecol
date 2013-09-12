@@ -224,6 +224,12 @@ public final class TilePanel extends FreeColPanel {
         }
     }
 
+
+    // Override JPanel
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getUIClassID() {
         return "TilePanelUI";

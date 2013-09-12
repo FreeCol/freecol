@@ -35,6 +35,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.BuildingType;
@@ -47,7 +48,9 @@ import net.sf.freecol.common.resources.ResourceManager;
  * This panel shows the progress of constructing a building or
  * unit in a colony.
  */
-public class ConstructionPanel extends JPanel implements PropertyChangeListener {
+public class ConstructionPanel extends MigPanel
+    implements PropertyChangeListener {
+
     public static final String EVENT
         = Colony.ColonyChangeEvent.BUILD_QUEUE_CHANGE.toString();
 
@@ -76,6 +79,8 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
      */
     public ConstructionPanel(FreeColClient freeColClient,
                              Colony colony, boolean openBuildQueue) {
+        super("ConstructionPanelUI");
+
         this.freeColClient = freeColClient;
         this.colony = colony;
         this.openBuildQueue = openBuildQueue;
@@ -186,12 +191,13 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
         this.defaultLabel = newDefaultLabel;
     }
 
+
+    // Interface PropertyChangeListener
+
+    /**
+     * {@inheritDoc}
+     */
     public void propertyChange(PropertyChangeEvent event) {
         update();
-    }
-
-    @Override
-    public String getUIClassID() {
-        return "ConstructionPanelUI";
     }
 }
