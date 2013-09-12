@@ -3424,7 +3424,9 @@ public class Player extends FreeColGameObject implements Nameable {
                        NoValueType.SETTLED.getDouble());
             return values;
         case NATIVES: // If we have no ports, we are desperate enough to steal
-            if (tile.getOwningSettlement().getTile().isAdjacent(tile)) {
+            if (tile.getOwningSettlement() != null
+                && tile.getOwningSettlement().getTile() != null
+                && tile.getOwningSettlement().getTile().isAdjacent(tile)) {
                 values.set(ColonyValueCategory.A_OVERRIDE.ordinal(),
                            NoValueType.SETTLED.getDouble());
                 return values;
