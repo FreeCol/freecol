@@ -150,13 +150,11 @@ public class ColonyTile extends WorkLocation {
      * Gets the basic production information for the colony tile,
      * ignoring any colony limits (which for now, should be irrelevant).
      *
-     * The following special rules apply to colony center tiles:  All
-     * tile improvements contribute to the production of food.  Only
-     * natural tile improvements, such as rivers, contribute to the
-     * production of other types of goods.  Artificial tile
-     * improvements, such as plowing, are ignored.
-     *
-     * TODO: this arbitrary rule should be configurable.
+     * In the original game, the following special rules apply to
+     * colony center tiles: All tile improvements contribute to the
+     * production of food. Only natural tile improvements, such as
+     * rivers, contribute to the production of other types of goods.
+     * Artificial tile improvements, such as plowing, are ignored.
      *
      * @return The raw production of this colony tile.
      * @see ProductionCache#update
@@ -165,7 +163,9 @@ public class ColonyTile extends WorkLocation {
         ProductionInfo pi = new ProductionInfo();
         if (isColonyCenterTile()) {
             for (AbstractGoods output : getOutputs()) {
-                boolean onlyNaturalImprovements = !output.getType().isFoodType();
+                boolean onlyNaturalImprovements = getSpecification()
+                    .getBoolean(GameOptions.ONLY_NATURAL_IMPROVEMENTS)
+                    && !output.getType().isFoodType();
                 int potential = output.getAmount();
                 if (workTile.getTileItemContainer() != null) {
                     potential = workTile.getTileItemContainer()

@@ -117,6 +117,14 @@ public class GameOptions {
     public static final String ENABLE_UPKEEP
         = "model.option.enableUpkeep";
 
+    /**
+     * Toggle whether artifical tile improvements contribute to the
+     * production of secondary (non-food) goods on the colony center
+     * tile.
+     */
+    public static final String ONLY_NATURAL_IMPROVEMENTS
+        = "model.option.onyNaturalImprovements";
+
     /** Enable natural disasters striking colonies. */
     public static final String NATURAL_DISASTERS
         = "model.option.naturalDisasters";

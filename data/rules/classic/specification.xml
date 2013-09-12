@@ -3070,6 +3070,8 @@ resources of 400, lost city rumours of 500
         <booleanOption id="model.option.allowStudentSelection" defaultValue="false"/>
         <!-- Enable upkeep requirement on buildings. -->
         <booleanOption id="model.option.enableUpkeep" defaultValue="false"/>
+        <!-- Toggle special production rules for secondary goods. -->
+        <booleanOption id="model.option.onlyNaturalImprovements" defaultValue="true" />
         <!-- Enable natural disasters striking colonies. -->
         <integerOption id="model.option.naturalDisasters" defaultValue="0"
                        minimumValue="0" maximumValue="100" />
