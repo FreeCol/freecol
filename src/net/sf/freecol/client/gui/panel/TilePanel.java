@@ -71,8 +71,8 @@ public final class TilePanel extends FreeColPanel {
      * @param tile The <code>Tile</code> to describe.
      */
     public TilePanel(FreeColClient freeColClient, Tile tile) {
-        super(freeColClient, new MigLayout("wrap 2, insets 20 30 10 30, fillx",
-                                           "[right, grow][left, grow]"));
+        super(freeColClient, new MigLayout("wrap 2, insets 20 30 10 30",
+                                           "[right, sg][left, sg]"));
 
         tileType = tile.getType();
 
