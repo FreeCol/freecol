@@ -123,7 +123,7 @@ public class GameOptions {
      * tile.
      */
     public static final String ONLY_NATURAL_IMPROVEMENTS
-        = "model.option.onyNaturalImprovements";
+        = "model.option.onlyNaturalImprovements";
 
     /** Enable natural disasters striking colonies. */
     public static final String NATURAL_DISASTERS
