@@ -59,10 +59,11 @@ public class ScaleMapAction extends FreeColAction {
             && getGame().getMap() != null;
     }
 
+
+    // Interface ActionListener
+
     /**
-     * Applies this action.
-     *
-     * @param e The <code>ActionEvent</code>.
+     * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) {
         Dimension ms = getGUI().showScaleMapSizeDialog();

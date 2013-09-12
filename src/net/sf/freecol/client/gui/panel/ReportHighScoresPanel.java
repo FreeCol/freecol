@@ -125,10 +125,10 @@ public final class ReportHighScoresPanel extends ReportPanel {
     }
 
 
+    // Interface ActionListener
+
     /**
-     * Quit if the player has retired.
-     *
-     * @param event The incoming <code>ActionEvent</code>.
+     * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent event) {
         super.actionPerformed(event);

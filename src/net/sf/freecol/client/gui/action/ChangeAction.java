@@ -84,9 +84,11 @@ public class ChangeAction extends UnitAction {
             && getGUI().getActiveUnit().hasTile();
     }
 
+
+    // Interface ActionListener
+
     /**
-     * Applies this action.
-     * @param e The <code>ActionEvent</code>.
+     * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) {
         Unit unit = getGUI().getActiveUnit();

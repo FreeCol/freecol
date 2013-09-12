@@ -62,11 +62,11 @@ public class LoadAction extends MapboardAction {
     }    
 
 
+    // Interface ActionListener
+
     /**
-     * Applies this action.
-     *
-     * @param e The <code>ActionEvent</code>.
-     */    
+     * {@inheritDoc}
+     */
     public void actionPerformed(ActionEvent e) {
         Unit unit = getGUI().getActiveUnit();
         if (unit != null) {
@@ -86,5 +86,4 @@ public class LoadAction extends MapboardAction {
             }
         }
     }
-
 }

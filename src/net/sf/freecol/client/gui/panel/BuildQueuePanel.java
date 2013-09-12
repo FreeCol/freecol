@@ -1010,13 +1010,12 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         }
     }
 
+
+    // Interface ActionListener
+
     /**
-     * This function analyses an event and calls the right methods to take
-     * care of the user's requests.
-     *
-     * @param event The incoming ActionEvent.
+     * {@inheritDoc}
      */
-    @Override
     public void actionPerformed(ActionEvent event) {
         final String FAIL = "FAIL";
         if (colony.getOwner() == getMyPlayer()) {
@@ -1040,7 +1039,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             } else if (BUY.equals(command)) {
                 getController().payForBuilding(colony);
             } else {
-                logger.warning("Unsupported command " + command);
+                super.actionPerformed(event);
             }
         }
         getGUI().removeFromCanvas(this);

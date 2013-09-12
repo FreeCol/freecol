@@ -187,6 +187,11 @@ public final class FreeColActionUI extends OptionUI<FreeColAction> implements Ac
     }
 
 
+    // Interface ActionListener
+
+    /**
+     * {@inheritDoc}
+     */
     public void actionPerformed(ActionEvent evt) {
         if (evt.getSource() == recordButton) {
             bl.startBlinking();
@@ -197,7 +202,6 @@ public final class FreeColActionUI extends OptionUI<FreeColAction> implements Ac
             keyStroke = null;
         }
     }
-
 
 
     /**
@@ -253,24 +257,6 @@ public final class FreeColActionUI extends OptionUI<FreeColAction> implements Ac
             repaint();
         }
 
-        public void actionPerformed(ActionEvent evt) {
-            if (!hasFocus()) {
-                stopBlinking();
-            }
-
-            if (blinkOn) {
-                setOpaque(false);
-                blinkOn = false;
-                repaint();
-            } else {
-                setOpaque(true);
-                setBackground(Color.RED);
-                blinkOn = true;
-                repaint();
-            }
-        }
-
-
         public void keyPressed(KeyEvent e) { /* No such event */ }
 
         public void keyTyped(KeyEvent e) { /* No such event */ }
@@ -283,6 +269,27 @@ public final class FreeColActionUI extends OptionUI<FreeColAction> implements Ac
             stopBlinking();
             setText(getHumanKeyStrokeText(keyStroke));
             recordButton.requestFocus();
+        }
+
+
+        // Interface ActionListener
+
+        /**
+         * {@inheritDoc}
+         */
+        public void actionPerformed(ActionEvent e) {
+            if (!hasFocus()) stopBlinking();
+
+            if (blinkOn) {
+                setOpaque(false);
+                blinkOn = false;
+                repaint();
+            } else {
+                setOpaque(true);
+                setBackground(Color.RED);
+                blinkOn = true;
+                repaint();
+            }
         }
     }
 }

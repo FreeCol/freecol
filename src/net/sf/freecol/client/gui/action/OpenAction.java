@@ -42,10 +42,10 @@ public class OpenAction extends FreeColAction {
     }
 
 
+    // Interface ActionListener
+
     /**
-     * Applies this action.
-     *
-     * @param e The <code>ActionEvent</code>.
+     * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) {
         if (!freeColClient.isMapEditor()) {

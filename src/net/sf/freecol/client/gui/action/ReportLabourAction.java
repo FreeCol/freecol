@@ -43,10 +43,10 @@ public class ReportLabourAction extends FreeColAction {
     }
 
 
+    // Interface ActionListener
+
     /**
-     * Applies this action.
-     *
-     * @param e The <code>ActionEvent</code>.
+     * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) {
         if (getClientOptions().getInteger(ClientOptions.LABOUR_REPORT)

@@ -55,10 +55,11 @@ public class GotoAction extends UnitAction {
         return super.shouldBeEnabled() && !getGUI().isShowingSubPanel();
     }
 
+
+    // Interface ActionListener
+
     /**
-     * Applies this action.
-     *
-     * @param e The <code>ActionEvent</code>.
+     * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) {
         Unit unit = getGUI().getActiveUnit();

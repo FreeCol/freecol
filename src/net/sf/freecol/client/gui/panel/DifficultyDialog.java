@@ -106,29 +106,6 @@ public final class DifficultyDialog extends OptionsDialog implements TreeSelecti
         return specification;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
-        if (OK.equals(command)) {
-            getOptionUI().updateOption();
-            getGUI().removeFromCanvas(this);
-            setResponse(selected);
-            FreeCol.setDifficulty(selected);
-        } else if (EDIT.equals(command)) {
-            OptionGroup custom = specification.getOptionGroup(CUSTOM_LEVEL);
-            custom.setValue(selected);
-            JTree tree = getOptionUI().getTree();
-            for (int row = tree.getRowCount() - 1; row >= 0; row--) {
-                tree.collapseRow(row);
-            }
-            selectLevel(tree, CUSTOM_LEVEL);
-        } else {
-            super.actionPerformed(event);
-        }
-    }
-
     private void selectLevel(JTree tree, String id) {
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree.getModel().getRoot();
         for (int index = 0; index < root.getChildCount(); index++) {
@@ -166,5 +143,31 @@ public final class DifficultyDialog extends OptionsDialog implements TreeSelecti
      */
     public String getDefaultFileName() {
         return "custom.xml";
+    }
+
+
+    // Interface ActionListener
+
+    /**
+     * {@inheritDoc}
+     */
+    public void actionPerformed(ActionEvent event) {
+        String command = event.getActionCommand();
+        if (OK.equals(command)) {
+            getOptionUI().updateOption();
+            getGUI().removeFromCanvas(this);
+            setResponse(selected);
+            FreeCol.setDifficulty(selected);
+        } else if (EDIT.equals(command)) {
+            OptionGroup custom = specification.getOptionGroup(CUSTOM_LEVEL);
+            custom.setValue(selected);
+            JTree tree = getOptionUI().getTree();
+            for (int row = tree.getRowCount() - 1; row >= 0; row--) {
+                tree.collapseRow(row);
+            }
+            selectLevel(tree, CUSTOM_LEVEL);
+        } else {
+            super.actionPerformed(event);
+        }
     }
 }

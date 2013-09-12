@@ -157,13 +157,12 @@ public final class LoadingSavegameDialog extends FreeColDialog<Boolean> implemen
         this.serverNameField.setText("");
     }
 
+
+    // Interface ActionListener
+
     /**
-     * This function analyses an event and calls the right methods to take care
-     * of the user's requests.
-     *
-     * @param event The incoming ActionEvent.
+     * {@inheritDoc}
      */
-    @Override
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         if (OK.equals(command)) {
@@ -173,7 +172,7 @@ public final class LoadingSavegameDialog extends FreeColDialog<Boolean> implemen
             getGUI().removeFromCanvas(this);
             setResponse(Boolean.FALSE);
         } else {
-            logger.warning("Invalid ActionCommand: " + command);
+            super.actionPerformed(event);
         }
     }
 }

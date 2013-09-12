@@ -135,11 +135,11 @@ public final class TrainDialog extends FreeColDialog<Integer> implements ActionL
         revalidate();
     }
 
+
+    // Interface ActionListener
+
     /**
-     * Analyzes an event and calls the right external methods to take care of
-     * the user's request.
-     *
-     * @param event The incoming action event
+     * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();

@@ -48,11 +48,10 @@ public class ContinueAction extends FreeColAction {
     }
 
 
+    // Interface ActionListener
+
     /**
-     * Applies this action.
-     * Starts the most recent save game if it is defined in the client.
-     *
-     * @param e The <code>ActionEvent</code>.
+     * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) {
         File lastSave = getInGameController().getLastSaveGameFile();

@@ -91,15 +91,14 @@ public final class ChatPanel extends FreeColPanel {
         return message;
     }
 
+
+    // Interface ActionListener
+
     /**
-     * This function analyses an event and calls the right methods to take
-     * care of the user's requests.
-     *
-     * @param event The incoming ActionEvent.
+     * {@inheritDoc}
      */
-    @Override
     public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
+        final String command = event.getActionCommand();
         try {
             switch (Integer.valueOf(command).intValue()) {
             case CHAT:
@@ -109,10 +108,10 @@ public final class ChatPanel extends FreeColPanel {
                 getGUI().removeFromCanvas(this);
                 break;
             default:
-                logger.warning("Invalid Actioncommand: invalid number.");
+                super.actionPerformed(event);
             }
         } catch (NumberFormatException e) {
-            logger.warning("Invalid Actioncommand: not a number: " + command);
+            logger.warning("Invalid ActionEvent, not a number: " + command);
         }
     }
 }

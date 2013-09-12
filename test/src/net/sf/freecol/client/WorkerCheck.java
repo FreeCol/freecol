@@ -76,31 +76,27 @@ public final class WorkerCheck {
             }
         };
 
-        JPanel  buttonPane = new JPanel();
-        buttonPane.add( new JButton(workAction) );
+        JPanel buttonPane = new JPanel();
+        buttonPane.add(new JButton(workAction));
 
-        JFrame  window = new JFrame( "WorkerTest" );
-        window.setDefaultCloseOperation( WindowConstants.DISPOSE_ON_CLOSE );
-        window.getContentPane().add( textArea, BorderLayout.CENTER );
-        window.getContentPane().add( buttonPane, BorderLayout.SOUTH );
+        JFrame window = new JFrame("WorkerTest");
+        window.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        window.getContentPane().add(textArea, BorderLayout.CENTER);
+        window.getContentPane().add(buttonPane, BorderLayout.SOUTH);
         window.pack();
-        window.addWindowListener(
-            new WindowAdapter()
-            {
+        window.addWindowListener(new WindowAdapter() {
                 // for when the window is closed by the OS
-                public void windowClosing( WindowEvent event )
-                {
+                public void windowClosing(WindowEvent event) {
                     worker.askToStop();
                 }
 
                 // for when the window is closed by Java
-                public void windowClosed( WindowEvent event )
-                {
+                public void windowClosed(WindowEvent event) {
                     windowClosing(event);
                 }
             }
         );
-        window.setVisible( true );
+        window.setVisible(true);
 
         // the worker is being run on the main thread in this example
         worker.run();

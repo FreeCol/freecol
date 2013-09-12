@@ -134,14 +134,13 @@ public final class RecruitDialog extends FreeColDialog<Integer> implements Actio
     }
 
 
+    // Interface ActionListener
+
     /**
-     * Analyzes an event and calls the right external methods to take care of
-     * the user's request.
-     *
-     * @param event The incoming action event
+     * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
+        final String command = event.getActionCommand();
         if (CANCEL.equals(command)) {
             setResponse(new Integer(-1));
         } else {

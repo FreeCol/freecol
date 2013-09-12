@@ -93,38 +93,34 @@ public final class MessageMerge {
             }
         };
 
-        JPanel  controlPanel = new JPanel( new GridLayout(1, 3) );
-        controlPanel.add( new JButton(insertInRightAction) );
-        controlPanel.add( new JButton(deleteFromRightAction) );
-        controlPanel.add( new JButton(saveRightAction) );
+        JPanel controlPanel = new JPanel(new GridLayout(1, 3));
+        controlPanel.add(new JButton(insertInRightAction));
+        controlPanel.add(new JButton(deleteFromRightAction));
+        controlPanel.add(new JButton(saveRightAction));
 
-        JPanel  rootPane = new JPanel( new BorderLayout() );
-        rootPane.setBorder( BorderFactory.createEmptyBorder(3, 3, 3, 3) );
-        rootPane.add( new JScrollPane(mergeTable), BorderLayout.CENTER );
-        rootPane.add( controlPanel, BorderLayout.SOUTH );
+        JPanel rootPane = new JPanel(new BorderLayout());
+        rootPane.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+        rootPane.add(new JScrollPane(mergeTable), BorderLayout.CENTER);
+        rootPane.add(controlPanel, BorderLayout.SOUTH);
 
-        JFrame  frame = new JFrame( "MessageMerge" );
-        frame.getContentPane().add( rootPane );
-        frame.setDefaultCloseOperation( WindowConstants.DISPOSE_ON_CLOSE );
-        frame.addWindowListener(
-            new WindowAdapter()
-            {
+        JFrame frame = new JFrame("MessageMerge");
+        frame.getContentPane().add(rootPane);
+        frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        frame.addWindowListener(new WindowAdapter() {
                 // for when the window is closed by the OS
-                public void windowClosing( WindowEvent event )
-                {
-                    System.exit( 0 );
+                public void windowClosing(WindowEvent event) {
+                    System.exit(0);
                 }
 
                 // for when the window is closed by Java
-                public void windowClosed( WindowEvent event )
-                {
+                public void windowClosed(WindowEvent event) {
                     windowClosing(event);
                 }
             }
         );
 
         frame.pack();
-        frame.setVisible( true );
+        frame.setVisible(true);
     }
 
 

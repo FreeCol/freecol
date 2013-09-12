@@ -189,12 +189,14 @@ public final class EndTurnDialog extends FreeColDialog<Boolean> implements ListS
         }
     }
 
+
+    // Interface ActionListener
+
     /**
      * {@inheritDoc}
      */
-    @Override
     public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
+        final String command = event.getActionCommand();
         if (OK.equals(command)) {
             setResponse(Boolean.TRUE);
         } else if (CANCEL.equals(command)) {

@@ -84,8 +84,13 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>> {
     }
 
 
+    // Interface ActionListener
+
+    /**
+     * {@inheritDoc}
+     */
     public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
+        final String command = event.getActionCommand();
         if (OK.equals(command)) {
             List<String> result = new ArrayList<String>();
             // Sanitize user input, used in save file name

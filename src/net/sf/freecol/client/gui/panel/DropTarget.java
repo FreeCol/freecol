@@ -46,11 +46,17 @@ public interface DropTarget {
     public boolean accepts(Goods goods);
 
     /**
-     * Adds the given component to this target.
+     * Adds a component to this container and makes sure that the unit or
+     * goods that the component represents gets modified so that it is on
+     * board the currently selected carrier.
      *
-     * @param comp a <code>Component</code> value
-     * @param editState a <code>boolean</code> value
-     * @return a <code>Component</code> value
+     * @param comp The component to add to this container.
+     * @param editState Must be set to 'true' if the state of the
+     *     component that is added (which should be a dropped
+     *     component representing a unit or goods) should be changed
+     *     so that the underlying unit or goods are on board the
+     *     currently selected carrier.
+     * @return The component argument on success, null on failure.
      */
     public Component add(Component comp, boolean editState);
 

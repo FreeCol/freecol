@@ -47,8 +47,10 @@ public final class AboutPanel extends FreeColPanel {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(AboutPanel.class.getName());
 
-    public static final String SITE_URL = "http://www.freecol.org";
-    public static final String PROJECT_URL = "http://sourceforge.net/projects/freecol/";
+    public static final String SITE_URL
+        = "http://www.freecol.org";
+    public static final String PROJECT_URL
+        = "http://sourceforge.net/projects/freecol/";
 
 
     /**
@@ -93,6 +95,8 @@ public final class AboutPanel extends FreeColPanel {
     }
 
 
+    // Interface ActionListener
+
     /**
      * {@inheritDoc}
      */
@@ -112,7 +116,8 @@ public final class AboutPanel extends FreeColPanel {
                 // Microsoft Windows, use the default browser
                 cmd = new String[] { "rundll32.exe", "url.dll,FileProtocolHandler", url};
             } else if (os.toLowerCase().contains("linux")) {
-                // GNU Linux, use xdg-utils to launch the default browser (portland.freedesktop.org)
+                // GNU Linux, use xdg-utils to launch the default
+                // browser (portland.freedesktop.org)
                 cmd = new String[] {"xdg-open", url};
             } else {
                 // Unix, ...

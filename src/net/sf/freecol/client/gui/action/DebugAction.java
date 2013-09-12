@@ -59,10 +59,11 @@ public class DebugAction extends FreeColAction {
         return !FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS);
     }
 
+
+    // Interface ActionListener
+
     /**
-     * Applies this action.
-     *
-     * @param e The <code>ActionEvent</code>.
+     * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) {
         if (shouldBeEnabled()) {

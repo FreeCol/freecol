@@ -102,16 +102,13 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
         tb.requestFocus();
     }
 
+
+    // Interface ActionListener
+
     /**
-     * This function analyses an event and calls the right methods to take care
-     * of the user's requests.
-     *
-     * @param event The incoming ActionEvent.
+     * {@inheritDoc}
      */
-    @Override
     public void actionPerformed(ActionEvent event) {
         setResponse(possibleFathers.get(tb.getSelectedIndex()));
     }
-
-
 }

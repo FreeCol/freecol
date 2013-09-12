@@ -44,10 +44,11 @@ public class SentryAction extends UnitAction {
         addImageIcons("sentry");
     }
 
+
+    // Interface ActionListener
+
     /**
-     * Applies this action.
-     *
-     * @param actionEvent The <code>ActionEvent</code>.
+     * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent actionEvent) {
         getInGameController().changeState(getGUI().getActiveUnit(),

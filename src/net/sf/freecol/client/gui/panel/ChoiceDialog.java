@@ -126,16 +126,16 @@ public final class ChoiceDialog<T> extends FreeColDialog<T> {
         choiceList.requestFocus();
     }
 
+
+    // Interface ActionListener
+
     /**
-     * This function analyses an event and calls the right methods to take care
-     * of the user's requests.
-     * 
-     * @param event The incoming ActionEvent.
+     * {@inheritDoc}
      */
     @SuppressWarnings("unchecked")
     @Override
     public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
+        final String command = event.getActionCommand();
         ChoiceItem<T> item;
         if (OK.equals(command)
             && (item = (ChoiceItem<T>) choiceList.getSelectedValue()) != null) {
@@ -144,7 +144,5 @@ public final class ChoiceDialog<T> extends FreeColDialog<T> {
             super.actionPerformed(event);
         }
     }
-
-
 } 
 

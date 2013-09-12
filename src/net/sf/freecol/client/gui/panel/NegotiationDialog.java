@@ -438,15 +438,14 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade>
         return agreement.getStance();
     }
 
+
+    // Interface ActionListener
+
     /**
-     * Analyzes an event and calls the right external methods to take care of
-     * the user's request.
-     *
-     * @param event The incoming <code>ActionEvent</code>.
+     * {@inheritDoc}
      */
-    @Override
     public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
+        final String command = event.getActionCommand();
         if (command.equals(CANCEL)) {
             agreement.setStatus(TradeStatus.REJECT_TRADE);
             setResponse(agreement);
@@ -456,6 +455,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade>
         } else if (command.equals(SEND)) {
             agreement.setStatus(TradeStatus.PROPOSE_TRADE);
             setResponse(agreement);
+        } else {
+            super.actionPerformed(event);
         }
     }
 
@@ -467,6 +468,11 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade>
             this.item = item;
         }
 
+        // Interface ActionListener
+
+        /**
+         * {@inheritDoc}
+         */
         public void actionPerformed(ActionEvent e) {
             agreement.remove(item);
             updateDialog();
@@ -553,18 +559,20 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade>
             }
         }
 
+
+        // Implement ActionListener
+
         /**
-         * Analyzes an event and calls the right external methods to
-         * take care of the user's request.
-         *
-         * @param event The incoming <code>ActionEvent</code>.
+         * {@inheritDoc}
          */
         public void actionPerformed(ActionEvent event) {
-            String command = event.getActionCommand();
+            final String command = event.getActionCommand();
             if (command.equals("add")) {
                 negotiationDialog.addColonyTradeItem(player,
                     (Colony)colonyBox.getSelectedItem());
                 updateDialog();
+            } else {
+                logger.warning("Bad command: " + command);
             }
         }
     }
@@ -606,24 +614,27 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade>
             add(addButton);
         }
 
-        /**
-         * Analyzes an event and calls the right external methods to
-         * take care of the user's request.
-         *
-         * @param event The incoming action event
-         */
-        public void actionPerformed(ActionEvent event) {
-            String command = event.getActionCommand();
-            if (command.equals("add")) {
-                int amount = ((Integer) spinner.getValue()).intValue();
-                negotiationDialog.addGoldTradeItem(player, amount);
-                updateDialog();
-            }
-        }
 
         public void setAvailableGold(int gold) {
             SpinnerNumberModel model = (SpinnerNumberModel)spinner.getModel();
             model.setMaximum(new Integer(gold));
+        }
+
+
+        // Implement ActionListener
+
+        /**
+         * {@inheritDoc}
+         */
+        public void actionPerformed(ActionEvent event) {
+            final String command = event.getActionCommand();
+            if (command.equals("add")) {
+                int amount = ((Integer) spinner.getValue()).intValue();
+                negotiationDialog.addGoldTradeItem(player, amount);
+                updateDialog();
+            } else {
+                logger.warning("Bad command: " + command);
+            }
         }
     }
 
@@ -723,18 +734,20 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade>
             goodsBox.setEnabled(enable);
         }
 
+
+        // Interface ActionListener
+
         /**
-         * Analyzes an event and calls the right external methods to
-         * take care of the user's request.
-         *
-         * @param event The incoming <code>ActionEvent</code>.
+         * {@inheritDoc}
          */
         public void actionPerformed(ActionEvent event) {
-            String command = event.getActionCommand();
+            final String command = event.getActionCommand();
             if (command.equals("add")) {
                 negotiationDialog.addGoodsTradeItem(player,
                     ((GoodsItem)goodsBox.getSelectedItem()).getValue());
                 updateDialog();
+            } else {
+                logger.warning("Bad command: " + command);
             }
         }
     }
@@ -811,21 +824,6 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade>
             add(addButton);
         }
 
-        /**
-         * Analyzes an event and calls the right external methods to
-         * take care of the user's request.
-         *
-         * @param event The incoming <code>ActionEvent</code>.
-         */
-        public void actionPerformed(ActionEvent event) {
-            String command = event.getActionCommand();
-            if (command.equals("add")) {
-                StanceItem stance = (StanceItem) stanceBox.getSelectedItem();
-                negotiationDialog.setStance(stance.getValue());
-                updateSummary();
-            }
-        }
-
         @SuppressWarnings("unchecked") // FIXME in Java7
         public void updateStanceBox(){
             stanceBox.removeAllItems();
@@ -846,6 +844,23 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade>
             Stance select = negotiationDialog.getStance();
             if (select != null) {
                 stanceBox.setSelectedItem(new StanceItem(select));
+            }
+        }
+
+
+        // Interface ActionListener
+
+        /**
+         * {@inheritDoc}
+         */
+        public void actionPerformed(ActionEvent event) {
+            final String command = event.getActionCommand();
+            if (command.equals("add")) {
+                StanceItem stance = (StanceItem) stanceBox.getSelectedItem();
+                negotiationDialog.setStance(stance.getValue());
+                updateSummary();
+            } else {
+                logger.warning("Bad command: " + command);
             }
         }
     }
