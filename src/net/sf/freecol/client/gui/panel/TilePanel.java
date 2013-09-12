@@ -43,8 +43,10 @@ import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.debug.FreeColDebugger;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.ProductionType;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
@@ -78,7 +80,7 @@ public final class TilePanel extends FreeColPanel {
 
 
         JButton colopediaButton = new JButton(Messages.message("menuBar.colopedia"));
-        colopediaButton.setActionCommand(String.valueOf(COLOPEDIA));
+        colopediaButton.setActionCommand(tile.getType().getId());
         colopediaButton.addActionListener(this);
         enterPressesWhenFocused(colopediaButton);
 
@@ -127,41 +129,51 @@ public final class TilePanel extends FreeColPanel {
 
             JLabel label = null;
             boolean first = true;
-            for (GoodsType goodsType : getSpecification().getFarmedGoodsTypeList()) {
-                int potential = tile.potential(goodsType, colonist);
-                UnitType expert = getSpecification().getExpertForProducing(goodsType);
-                int expertPotential = tile.potential(goodsType, expert);
-                if (potential > 0) {
-                    label = new JLabel(String.valueOf(potential),
-                                       getLibrary().getGoodsImageIcon(goodsType),
-                                       JLabel.CENTER);
-                    if (first) {
-                        add(label, "span, split, center");
-                        first = false;
-                    } else {
-                        add(label);
+            for (ProductionType productionType : tileType.getProductionTypes(false)) {
+                for (AbstractGoods output : productionType.getOutputs()) {
+                    GoodsType goodsType = output.getType();
+                    int potential = output.getAmount();
+                    if (tile.getTileItemContainer() != null) {
+                        potential = tile.getTileItemContainer()
+                            .getTotalBonusPotential(goodsType, colonist, potential, true);
                     }
-                }
-                if (expertPotential > potential) {
-                    if (label == null) {
-                        // this could happen if a resource were exploitable
-                        // only by experts, for example
-                        label = new JLabel(String.valueOf(expertPotential),
+                    int expertPotential = potential;
+                    UnitType expert = getSpecification().getExpertForProducing(goodsType);
+                    if (expert != null) {
+                        expertPotential = (int)expert.applyModifier(potential, goodsType.getId());
+                    }
+                    if (potential > 0) {
+                        label = new JLabel(String.valueOf(potential),
                                            getLibrary().getGoodsImageIcon(goodsType),
                                            JLabel.CENTER);
-                        label.setToolTipText(Messages.message(expert.getNameKey()));
                         if (first) {
-                            add(label, "span, split");
+                            add(label, "span, split, center");
                             first = false;
                         } else {
-                            add(new JLabel("/"));
                             add(label);
                         }
-                    } else {
-                        label.setText(String.valueOf(potential) + "/" +
-                                      String.valueOf(expertPotential));
-                        label.setToolTipText(Messages.message(colonist.getNameKey()) + "/" +
-                                             Messages.message(expert.getNameKey()));
+                    }
+                    if (expertPotential > potential) {
+                        if (label == null) {
+                            // this could happen if a resource were exploitable
+                            // only by experts, for example
+                            label = new JLabel(String.valueOf(expertPotential),
+                                               getLibrary().getGoodsImageIcon(goodsType),
+                                               JLabel.CENTER);
+                            label.setToolTipText(Messages.message(expert.getNameKey()));
+                            if (first) {
+                                add(label, "span, split");
+                                first = false;
+                            } else {
+                                add(new JLabel("/"));
+                                add(label);
+                            }
+                        } else {
+                            label.setText(String.valueOf(potential) + "/" +
+                                          String.valueOf(expertPotential));
+                            label.setToolTipText(Messages.message(colonist.getNameKey()) + "/" +
+                                                 Messages.message(expert.getNameKey()));
+                        }
                     }
                 }
             }
