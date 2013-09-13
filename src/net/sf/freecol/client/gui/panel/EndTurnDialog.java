@@ -58,7 +58,7 @@ import net.sf.freecol.common.model.Unit;
 public final class EndTurnDialog extends FreeColDialog<Boolean> implements ListSelectionListener {
 
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(FindSettlementDialog.class.getName());
+    private static final Logger logger = Logger.getLogger(EndTurnDialog.class.getName());
 
     private JList unitList;
 

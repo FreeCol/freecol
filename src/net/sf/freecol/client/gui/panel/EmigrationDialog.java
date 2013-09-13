@@ -37,9 +37,9 @@ import net.sf.freecol.common.model.UnitType;
 /**
  * The panel that allows a user to choose which unit will emigrate from Europe.
  */
-public final class EmigrationPanel extends FreeColDialog<Integer> {
+public final class EmigrationDialog extends FreeColDialog<Integer> {
 
-    private static final Logger logger = Logger.getLogger(EmigrationPanel.class.getName());
+    private static final Logger logger = Logger.getLogger(EmigrationDialog.class.getName());
 
     private static final int NUMBER_OF_PERSONS = 3;
 
@@ -53,7 +53,7 @@ public final class EmigrationPanel extends FreeColDialog<Integer> {
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public EmigrationPanel(FreeColClient freeColClient) {
+    public EmigrationDialog(FreeColClient freeColClient) {
         super(freeColClient, new MigLayout("wrap 1", "[fill]", ""));
 
         for (int index = 0; index < NUMBER_OF_PERSONS; index++) {

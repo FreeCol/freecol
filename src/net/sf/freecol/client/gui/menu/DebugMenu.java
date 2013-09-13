@@ -293,15 +293,15 @@ public class DebugMenu extends JMenu {
             = new JMenu(Messages.message("menuBar.debug.displayPanels"));
         panelMenu.setOpaque(false);
 
-        final JMenuItem monarchPanel = new JMenuItem(
+        final JMenuItem monarchDialog = new JMenuItem(
             Messages.message("menuBar.debug.displayMonarchPanel"));
-        monarchPanel.addActionListener(new ActionListener() {
+        monarchDialog.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    gui.showMonarchPanelDialog(
+                    gui.showMonarchDialog(
                         Monarch.MonarchAction.RAISE_TAX_WAR, null);
                 }
             });
-        panelMenu.add(monarchPanel);
+        panelMenu.add(monarchDialog);
 
         final JMenuItem victoryPanel = new JMenuItem(
             Messages.message("menuBar.debug.displayVictoryPanel"));

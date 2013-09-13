@@ -273,7 +273,7 @@ public final class ConnectController {
 
             public void run() {
                 gui.closeMenus();
-                gui.errorMessage( message );
+                gui.errorMessage(message);
             }
         }
 

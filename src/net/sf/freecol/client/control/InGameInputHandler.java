@@ -915,7 +915,7 @@ public final class InGameInputHandler extends InputHandler {
         Game game = getGame();
         MonarchActionMessage message = new MonarchActionMessage(game, element);
         MonarchAction action = message.getAction();
-        boolean accept = new ShowMonarchPanelSwingTask(action,
+        boolean accept = new ShowMonarchSwingTask(action,
             message.getTemplate()).confirm();
         message.setResult(accept);
 
@@ -1162,7 +1162,7 @@ public final class InGameInputHandler extends InputHandler {
             SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         for (int i = 0; i < m; i++) {
-                            int index = getGUI().showEmigrationPanel(true);
+                            int index = getGUI().showEmigrationDialog(true);
                             getFreeColClient().askServer().emigrate(index + 1);
                         }
                     }
@@ -1770,71 +1770,6 @@ public final class InGameInputHandler extends InputHandler {
     }
 
     /**
-     * This class shows a an input dialog and saves the answer (ok/cancel).
-     */
-    class ShowInputDialogSwingTask extends SwingTask {
-
-        private Tile tile;
-
-        private StringTemplate text;
-
-        private String defaultValue;
-
-        private String okText;
-
-        private String cancelText;
-
-        private boolean rejectEmpty;
-
-
-        /**
-         * Constructor.
-         *
-         * @param tile An optional tile to make visible.
-         * @param text A <code>StringTemplate</code> for the question.
-         * @param defaultValue The default value.
-         * @param okText The key for the OK button.
-         * @param cancelText The key for the Cancel button.
-         * @param rejectEmpty Reject the empty response.
-         */
-        public ShowInputDialogSwingTask(Tile tile, StringTemplate text,
-                                        String defaultValue,
-                                        String okText, String cancelText,
-                                        boolean rejectEmpty) {
-            this.tile = tile;
-            this.text = text;
-            this.defaultValue = defaultValue;
-            this.okText = okText;
-            this.cancelText = cancelText;
-            this.rejectEmpty = rejectEmpty;
-        }
-
-        /**
-         * Show dialog and wait for selection.
-         *
-         * @return The result string.
-         */
-        public String show() {
-            try {
-                Object result = invokeSpecial();
-                return (result instanceof String) ? (String) result : null;
-            } catch (InvocationTargetException e) {
-                if (e.getCause() instanceof RuntimeException) {
-                    throw (RuntimeException) e.getCause();
-                } else {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-
-        protected Object doWork() {
-            String choice = getGUI().showInputDialog(tile, text, defaultValue,
-                okText, cancelText, rejectEmpty);
-            return choice;
-        }
-    }
-
-    /**
      * Base class for dialog SwingTasks.
      */
     abstract class ShowMessageSwingTask extends SwingTask {
@@ -1951,9 +1886,9 @@ public final class InGameInputHandler extends InputHandler {
     }
 
     /**
-     * This class shows the monarch panel.
+     * This class shows the monarch dialog.
      */
-    class ShowMonarchPanelSwingTask extends SwingTask {
+    class ShowMonarchSwingTask extends SwingTask {
 
         private MonarchAction action;
 
@@ -1966,8 +1901,8 @@ public final class InGameInputHandler extends InputHandler {
          * @param action The action key.
          * @param replace The replacement values.
          */
-        public ShowMonarchPanelSwingTask(MonarchAction action,
-                                         StringTemplate replace) {
+        public ShowMonarchSwingTask(MonarchAction action,
+                                    StringTemplate replace) {
             this.action = action;
             this.replace = replace;
         }
@@ -1991,7 +1926,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected Object doWork() {
-            boolean choice = getGUI().showMonarchPanelDialog(action, replace);
+            boolean choice = getGUI().showMonarchDialog(action, replace);
             return Boolean.valueOf(choice);
         }
     }

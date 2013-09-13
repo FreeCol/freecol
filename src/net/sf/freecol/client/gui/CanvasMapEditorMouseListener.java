@@ -33,7 +33,7 @@ import javax.swing.JComponent;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.MapEditorController;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.panel.RiverStylePanel;
+import net.sf.freecol.client.gui.panel.RiverStyleDialog;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.TileTypeTransform;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
@@ -149,7 +149,7 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
                         String style = canvas.showRiverStyleDialog();
                         if (style == null) {
                             tile.getTileItemContainer().removeTileItem(river);
-                        } else if (style.equals(RiverStylePanel.CANCEL)) {
+                        } else if (style.equals(RiverStyleDialog.CANCEL)) {
                             // user canceled
                         } else {
                             river.updateRiverConnections(style);

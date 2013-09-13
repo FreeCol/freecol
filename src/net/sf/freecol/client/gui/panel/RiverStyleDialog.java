@@ -41,10 +41,10 @@ import net.sf.freecol.common.resources.ResourceManager;
  * This panel is only used when running in
  * {@link net.sf.freecol.client.FreeColClient#isMapEditor() map editor mode}.
  */
-public final class RiverStylePanel extends FreeColDialog<String> {
+public final class RiverStyleDialog extends FreeColDialog<String> {
 
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(RiverStylePanel.class.getName());
+    private static final Logger logger = Logger.getLogger(RiverStyleDialog.class.getName());
 
     public static final String CANCEL = "CANCEL";
     public static final String DELETE = "DELETE";
@@ -57,7 +57,7 @@ public final class RiverStylePanel extends FreeColDialog<String> {
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public RiverStylePanel(FreeColClient freeColClient) {
+    public RiverStyleDialog(FreeColClient freeColClient) {
         super(freeColClient);
 
         setLayout(new BorderLayout());

@@ -59,20 +59,6 @@ public class ScaleMapAction extends FreeColAction {
             && getGame().getMap() != null;
     }
 
-
-    // Interface ActionListener
-
-    /**
-     * {@inheritDoc}
-     */
-    public void actionPerformed(ActionEvent e) {
-        Dimension ms = getGUI().showScaleMapSizeDialog();
-        if (ms != null) {
-            scaleMapTo(ms.width, ms.height);
-        }
-    }
-
-
     /**
      * Scales the current map into the specified size. The current
      * map is given by freeColClient.getGame().getMap().
@@ -129,5 +115,18 @@ public class ScaleMapAction extends FreeColAction {
 
         getGUI().setSelectedTile(map.getTile(0, 0), false);
         getGUI().refresh();
+    }
+
+
+    // Interface ActionListener
+
+    /**
+     * {@inheritDoc}
+     */
+    public void actionPerformed(ActionEvent e) {
+        Dimension ms = getGUI().showScaleMapSizeDialog();
+        if (ms != null) {
+            scaleMapTo(ms.width, ms.height);
+        }
     }
 }
