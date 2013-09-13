@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Modifier;
+import net.sf.freecol.common.model.UnitLocation.NoAddReason;
 import net.sf.freecol.server.model.ServerBuilding;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -310,23 +311,35 @@ public class BuildingTest extends FreeColTestCase {
         assertTrue(school != null);
 
         // these can never teach
+        assertEquals(NoAddReason.MINIMUM_SKILL, school.getNoAddReason(colonist));
         assertFalse("able to add free colonist to Schoolhouse",
                     school.canAdd(colonist));
+
+        assertEquals(NoAddReason.MINIMUM_SKILL, school.getNoAddReason(criminal));
         assertFalse("able to add petty criminal to Schoolhouse",
                     school.canAdd(criminal));
+
+        assertEquals(NoAddReason.MINIMUM_SKILL, school.getNoAddReason(servant));
         assertFalse("able to add indentured servant to Schoolhouse",
                     school.canAdd(servant));
+
+        assertEquals(NoAddReason.MINIMUM_SKILL, school.getNoAddReason(indian));
         assertFalse("able to add indian convert to Schoolhouse",
                     school.canAdd(indian));
 
+        assertEquals(NoAddReason.MAXIMUM_SKILL, school.getNoAddReason(elder));
         assertFalse("able to add elder statesman to Schoolhouse",
                     school.canAdd(elder));
+
+        assertEquals(NoAddReason.MAXIMUM_SKILL, school.getNoAddReason(distiller));
         assertFalse("able to add master distiller to Schoolhouse",
                     school.canAdd(distiller));
+
         assertTrue("unable to add master farmer to Schoolhouse",
                    school.canAdd(farmer));
         farmer.setLocation(school);
         assertEquals(school, farmer.getLocation());
+
         assertFalse("able to add master carpenter to Schoolhouse",
                     school.canAdd(carpenter));
 

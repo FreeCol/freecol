@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.UnitLocation.NoAddReason;
 
 
 /**
@@ -118,6 +119,21 @@ public final class BuildingType extends BuildableType
         return priority;
     }
 
+    public NoAddReason getNoAddReason(UnitType unitType) {
+        if (workPlaces == 0) {
+            return NoAddReason.CAPACITY_EXCEEDED;
+        } else if (!unitType.hasSkill()) {
+            return NoAddReason.MISSING_SKILL;
+        } else if (unitType.getSkill() < minSkill) {
+            return NoAddReason.MINIMUM_SKILL;
+        } else if (unitType.getSkill() > maxSkill) {
+            return NoAddReason.MAXIMUM_SKILL;
+        } else {
+            return NoAddReason.NONE;
+        }
+    }
+
+
     /**
      * Can a unit of a given type be added to a Building of this type?
      *
@@ -125,10 +141,7 @@ public final class BuildingType extends BuildableType
      * @return True if the unit type can be added.
      */
     public boolean canAdd(UnitType unitType) {
-        return workPlaces > 0
-            && unitType.hasSkill()
-            && unitType.getSkill() >= minSkill
-            && unitType.getSkill() <= maxSkill;
+        return getNoAddReason(unitType) == NoAddReason.NONE;
     }
 
     /**

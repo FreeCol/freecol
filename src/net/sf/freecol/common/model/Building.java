@@ -435,12 +435,14 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     public NoAddReason getNoAddReason(Locatable locatable) {
         if (!(locatable instanceof Unit)) return NoAddReason.WRONG_TYPE;
         NoAddReason reason = getNoWorkReason();
-        Unit unit = (Unit)locatable;
-        BuildingType type = getType();
 
-        return (reason != NoAddReason.NONE) ? reason
-            : !type.canAdd(unit.getType()) ? NoAddReason.MISSING_SKILL
-            : super.getNoAddReason(locatable);
+        if (reason == NoAddReason.NONE) {
+            reason = getType().getNoAddReason(((Unit) locatable).getType());
+            if (reason == NoAddReason.NONE) {
+                reason = super.getNoAddReason(locatable);
+            }
+        }
+        return reason;
     }
 
     /**

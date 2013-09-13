@@ -85,14 +85,22 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
          */
         COLONY_CENTER,
         /**
-         * Missing ability to work colony tile.
+         * Missing ability to work colony tile or building.
          * Currently only produceInWater, which is assumed by the error message
          */
         MISSING_ABILITY,
         /**
-         * Missing skill to work colony tile.
+         * The unit has no skill.
          */
         MISSING_SKILL,
+        /**
+         * The unit does not have the minimum skill required.
+         */
+        MINIMUM_SKILL,
+        /**
+         * The unit exceeds the maximum skill of this type.
+         */
+        MAXIMUM_SKILL,
         /**
          * Either unclaimed or claimed but could be acquired.
          */
