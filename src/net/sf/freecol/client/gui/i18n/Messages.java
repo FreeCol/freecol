@@ -657,7 +657,7 @@ public class Messages {
     }
 
     public static String getLabel(Unit unit) {
-        return Messages.message(getLabelTemplate(unit));
+        return message(getLabelTemplate(unit));
     }
 
     public static StringTemplate getLabelTemplate(Unit unit) {
@@ -672,8 +672,10 @@ public class Messages {
         boolean showRole = true;
 
         String key = type.getId() + "." + role.getSuffix();
-        if (containsKey(key)) {
-            // first, check for special unit/role combinations
+        if (!"model.role.pioneer".equals(role.getId())
+            && containsKey(key)) {
+            // first, check for special unit/role combinations (ignore
+            // pioneer for historical reasons)
             showRole = false;
             unitName = message(StringTemplate.template(key)
                                .addAmount("%number%", 1));
