@@ -672,8 +672,7 @@ public class Messages {
         boolean showRole = true;
 
         String key = type.getId() + "." + role.getSuffix();
-        if (!"model.role.pioneer".equals(role.getId())
-            && containsKey(key)) {
+        if (role.getMaximumCount() == 1 && containsKey(key)) {
             // first, check for special unit/role combinations (ignore
             // pioneer for historical reasons)
             showRole = false;
