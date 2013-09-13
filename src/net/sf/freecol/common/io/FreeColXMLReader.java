@@ -820,7 +820,7 @@ public class FreeColXMLReader extends StreamReaderDelegate {
             return defaultValue;
         }
         if (attrib.indexOf('.') < 0) {
-            attrib = "model.role." + attrib.toLowerCase();
+            attrib = "model.role." + attrib.toLowerCase(Locale.US);
         }
         return spec.getType(attrib, returnClass);
     }
