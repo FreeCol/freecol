@@ -192,6 +192,8 @@ import net.sf.freecol.common.resources.Video;
  */
 public final class Canvas extends JDesktopPane {
 
+    private static final Logger logger = Logger.getLogger(Canvas.class.getName());
+
     /** Number of tries to find a clear spot on the canvas. */
     private final int MAXTRY = 3;
 
@@ -264,30 +266,25 @@ public final class Canvas extends JDesktopPane {
         GIFT
     }
 
-
-
-    /**
-     * A class for frames being used as tool boxes.
-     */
-    class ToolBoxFrame extends JInternalFrame {
-
-    }
-
-    private static final Logger logger = Logger.getLogger(Canvas.class.getName());
-
     private static final Integer MAIN_LAYER = JLayeredPane.DEFAULT_LAYER;
 
     private static final Integer STATUS_LAYER = JLayeredPane.POPUP_LAYER;
 
-    /**
-     * To save the most recently open dialog in Europe
-     * (<code>RecruitDialog</code>, <code>PurchaseDialog</code>, <code>TrainDialog</code>)
-     */
-    private FreeColDialog<Integer> europeOpenDialog = null;
+    /** A class for frames being used as tool boxes. */
+    class ToolBoxFrame extends JInternalFrame {}
 
+    /** The game client. */
     private final FreeColClient freeColClient;
 
+    /** The parent GUI. */
     private GUI gui;
+
+    /**
+     * Save the most recently open dialog in Europe
+     * (<code>RecruitDialog</code>, <code>PurchaseDialog</code>,
+     * <code>TrainDialog</code>)
+     */
+    private FreeColDialog<Integer> europeOpenDialog = null;
 
     private MainPanel mainPanel;
 
@@ -308,9 +305,8 @@ public final class Canvas extends JDesktopPane {
     private final LoadingSavegameDialog loadingSavegameDialog;    
 
     private boolean clientOptionsDialogShowing = false;
-    /**
-     * Variable used for detecting resizing.
-     */
+
+    /** Used to detect resizing. */
     private Dimension oldSize = null;
 
     private Dimension initialSize = null;
@@ -340,7 +336,8 @@ public final class Canvas extends JDesktopPane {
         setLayout(null);
 
         startGamePanel = new StartGamePanel(freeColClient);
-        serverListPanel = new ServerListPanel(freeColClient, freeColClient.getConnectController());
+        serverListPanel = new ServerListPanel(freeColClient,
+            freeColClient.getConnectController());
         europePanel = new EuropePanel(freeColClient, this);
         statusPanel = new StatusPanel(freeColClient);
         chatPanel = new ChatPanel(freeColClient);
@@ -368,10 +365,326 @@ public final class Canvas extends JDesktopPane {
         logger.info("Canvas created.");
     }
 
+
+    // Internals
+
+    /**
+     * Adds a component on this Canvas inside a frame.  Removes the
+     * StatusPanel if visible (and <code>comp != statusPanel</code>).
+     *
+     * @param comp The component to add to the canvas.
+     * @param toolBox Should be set to true if the resulting frame is
+     *     used as a toolbox (that is: it should not be counted as a
+     *     frame).
+     * @param popupPosition A preferred <code>PopupPosition</code>.
+     * @param resizable Whether this component can be resized.
+     * @return The <code>JInternalFrame</code> that was created and added.
+     */
+    private JInternalFrame addAsFrame(JComponent comp, boolean toolBox,
+                                     PopupPosition popupPosition,
+                                     boolean resizable) {
+        final int FRAME_EMPTY_SPACE = 60;
+
+        final JInternalFrame f = (toolBox) ? new ToolBoxFrame()
+            : new JInternalFrame();
+        if (f.getContentPane() instanceof JComponent) {
+            JComponent c = (JComponent) f.getContentPane();
+            c.setOpaque(false);
+            c.setBorder(null);
+        }
+
+        if (comp.getBorder() != null) {
+            if (comp.getBorder() instanceof EmptyBorder) {
+                f.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+            } else {
+                f.setBorder(comp.getBorder());
+                comp.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            }
+        } else {
+            f.setBorder(null);
+        }
+
+        final FrameMotionListener fml = new FrameMotionListener(f);
+        comp.addMouseMotionListener(fml);
+        comp.addMouseListener(fml);
+        if (f.getUI() instanceof BasicInternalFrameUI) {
+            BasicInternalFrameUI biu = (BasicInternalFrameUI) f.getUI();
+            biu.setNorthPane(null);
+            biu.setSouthPane(null);
+            biu.setWestPane(null);
+            biu.setEastPane(null);
+        }
+
+        f.getContentPane().add(comp);
+        f.setOpaque(false);
+        f.pack();
+        int width = f.getWidth();
+        int height = f.getHeight();
+        if (width > getWidth() - FRAME_EMPTY_SPACE) {
+            width = Math.min(width, getWidth());
+        }
+        if (height > getHeight() - FRAME_EMPTY_SPACE) {
+            height = Math.min(height, getHeight());
+        }
+        f.setSize(width, height);
+        Point p = null;
+        if (comp instanceof FreeColPanel
+            && freeColClient.getClientOptions()
+                .getBoolean(ClientOptions.REMEMBER_PANEL_POSITIONS)
+            && (p = ((FreeColPanel)comp).getSavedPosition()) != null) {
+            // Sanity check stuff coming out of client options.
+            if (p.getX() < 0
+                || p.getX() >= getWidth() - f.getWidth()
+                || p.getY() < 0
+                || p.getY() >= getHeight() - f.getHeight()) {
+                p = null;
+            }
+        }
+        int x, y;
+        if (p != null) {
+            x = (int)p.getX();
+            y = (int)p.getY();
+        } else {
+            switch (popupPosition) {
+            case CENTERED:
+                x = (getWidth() - f.getWidth()) / 2;
+                y = (getHeight() - f.getHeight()) / 2;
+                break;
+            case CENTERED_LEFT:
+                x = (getWidth() - f.getWidth()) / 4;
+                y = (getHeight() - f.getHeight()) / 2;
+                break;
+            case CENTERED_RIGHT:
+                x = ((getWidth() - f.getWidth()) * 3) / 4;
+                y = (getHeight() - f.getHeight()) / 2;
+                break;
+            case ORIGIN:
+            default:
+                x = y = 0;
+                break;
+            }
+        }
+        if ((p = getClearSpace(comp, x, y, MAXTRY)) == null) {
+            p = new Point(x, y);
+        }
+        f.setLocation(p);
+        add(f, MODAL_LAYER);
+        f.setName(comp.getClass().getSimpleName());
+
+        f.setFrameIcon(null);
+        f.setVisible(true);
+        f.setResizable(resizable);
+        try {
+            f.setSelected(true);
+        } catch (java.beans.PropertyVetoException e) {}
+
+        return f;
+    }
+
+    /**
+     * Adds a component centered on this Canvas.  Removes the statusPanel if
+     * visible (and <code>comp != statusPanel</code>).
+     *
+     * @param comp The <code>Component</code> to add to this canvas.
+     * @param i The layer to add the component to (see JLayeredPane).
+     */
+    private void addCentered(Component comp, Integer i) {
+        comp.setLocation((getWidth() - comp.getWidth()) / 2,
+                         (getHeight() - comp.getHeight()) / 2);
+
+        add(comp, i);
+    }
+
+    /**
+     * Create key bindings for all actions.
+     */
+    private void createKeyBindings() {
+        for (Option option : freeColClient.getActionManager().getOptions()) {
+            FreeColAction action = (FreeColAction) option;
+            getInputMap().put(action.getAccelerator(), action.getId());
+            getActionMap().put(action.getId(), action);
+        }
+    }
+
+    /**
+     * Filters out and displays the EventPanel messages.
+     *
+     * @param messages The list of <code>ModelMessage</code> to filter.
+     * @return The list of messages without any EventPanel messages.
+     */
+    private List<ModelMessage> filterEventPanels(ModelMessage[] messages) {
+        final String eventMatch = "EventPanel.";
+        List<ModelMessage> normal = new ArrayList<ModelMessage>();
+        for (int i = 0; i < messages.length; i++) {
+            String id = messages[i].getId();
+            if (id.startsWith(eventMatch)) {
+                id = id.substring(eventMatch.length());
+                final EventType e = EventType.valueOf(id);
+                SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            showEventPanel(e);
+                        }
+                    });
+            } else {
+                normal.add(messages[i]);
+            }
+        }
+        return normal;
+    }
+
+    /**
+     * Try to find some free space on the canvas for a component,
+     * starting at x,y.
+     *
+     * @param comp The <code>JComponent</code> to place.
+     * @param x A starting x coordinate.
+     * @param y A starting y coordinate.
+     * @return A <code>Point</code> to place the component at or null
+     *     on failure.
+     */
+    private Point getClearSpace(JComponent comp, int x, int y, int tries) {
+        if (!this.getBounds().contains(x, y)) return null;
+        final int w = comp.getWidth();
+        final int h = comp.getHeight();
+
+        Rectangle r = new Rectangle(x, y, w, h);
+        Component c = null;
+        for (Component child : this.getComponents()) {
+            if (child.getBounds().intersects(r)) {
+                c = child;
+                break;
+            }
+        }
+        if (c == null) return new Point(x, y);
+        if (tries <= 0) return null;
+        Point p;
+        p = getClearSpace(comp, c.getX() + c.getWidth() + 1, y, tries - 1);
+        if (p != null) return p;
+        p = getClearSpace(comp, x, c.getY() + c.getHeight() + 1, tries - 1);
+        if (p != null) return p;
+        p = getClearSpace(comp, c.getX() + c.getWidth() + 1, 
+                          c.getY() + c.getHeight() + 1, tries - 1);
+        return p;
+    }
+
+    /**
+     * Gets any currently displayed colony panel for the specified colony.
+     *
+     * This is distinct from {@link #getExistingFreeColPanel} because
+     * there can be multiple ColonyPanels.
+     *
+     * @param colony The <code>Colony</code> to check.
+     * @return A currently displayed colony panel, or null if not found.
+     */
+    private ColonyPanel getColonyPanel(Colony colony) {
+        for (Component c1 : getComponents()) {
+            if (c1 instanceof JInternalFrame) {
+                for (Component c2 : ((JInternalFrame) c1).getContentPane()
+                         .getComponents()) {
+                    if (c2 instanceof ColonyPanel
+                        && ((ColonyPanel)c2).getColony() == colony) {
+                        return (ColonyPanel)c2;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Gets the internal frame for the given component.
+     *
+     * @param c The <code>Component</code>.
+     * @return The given component if this is an internal frame or the
+     *     first parent that is an internal frame.  Returns
+     *     <code>null</code> if no internal frame is found.
+     */
+    private JInternalFrame getInternalFrame(final Component c) {
+        Component temp = c;
+
+        while (temp != null && !(temp instanceof JInternalFrame)) {
+            temp = temp.getParent();
+        }
+        return (JInternalFrame) temp;
+    }
+
+    /**
+     * Given a tile to be made visible, determine a position to popup
+     * a panel.
+     *
+     * @param tile A <code>Tile</code> to be made visible.
+     * @return A <code>PopupPosition</code> for a panel to be displayed.
+     */
+    private PopupPosition getPopupPosition(Tile tile) {
+        if (tile == null)
+            return PopupPosition.CENTERED;
+        int where = mapViewer.setOffsetFocus(tile);
+        return (where > 0) ? PopupPosition.CENTERED_LEFT
+            : (where < 0) ? PopupPosition.CENTERED_RIGHT
+            : PopupPosition.CENTERED;
+    }
+
+    /**
+     * Displays the given dialog, making sure a tile is visible.
+     *
+     * @param freeColDialog The dialog to be displayed
+     * @param tile A <code>Tile</code> to make visible (not under the dialog!)
+     * @param resizable Should the dialog be resizable?
+     * @return The {@link FreeColDialog#getResponse reponse} returned by
+     *         the dialog.
+     */
+    private <T> T showFreeColDialog(FreeColDialog<T> freeColDialog, Tile tile,
+                                    boolean resizable) {
+        showFreeColPanel(freeColDialog, tile, resizable);
+        T response = freeColDialog.getResponse();
+        remove(freeColDialog);
+        return response;
+    }
+
+    /**
+     * Displays the given panel, making sure a tile is visible.
+     *
+     * @param panel The panel to be displayed
+     * @param tile A <code>Tile</code> to make visible (not under the panel!)
+     * @param resizable Should the panel be resizable?
+     */
+    private void showFreeColPanel(FreeColPanel panel, Tile tile,
+                                  boolean resizable) {
+        showSubPanel(panel, getPopupPosition(tile), resizable);
+    }
+
+    /**
+     * Displays a <code>FreeColPanel</code>.
+     *
+     * @param panel <code>FreeColPanel</code>, panel to show
+     * @param resizable Should the panel be resizable?
+     */
+    private void showSubPanel(FreeColPanel panel, boolean resizable) {
+        showSubPanel(panel, PopupPosition.CENTERED, resizable);
+    }
+
+    /**
+     * Displays a <code>FreeColPanel</code> at a generalized position.
+     *
+     * @param panel <code>FreeColPanel</code>, panel to show
+     * @param popupPosition <code>PopupPosition</code> The generalized
+     *     position to place the panel.
+     * @param resizable Should the panel be resizable?
+     */
+    private void showSubPanel(FreeColPanel panel, PopupPosition popupPosition,
+                              boolean resizable) {
+        repaint();
+        addAsFrame(panel, false, popupPosition, resizable);
+        panel.requestFocus();
+    }
+
+
+    // Public API
+
     /**
      * Adds a component to this Canvas.
      *
-     * @param comp The component to add
+     * @param comp The <code>Component</code> to add.
      * @return The component argument.
      */
     @Override
@@ -381,10 +694,10 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Adds a component to this Canvas. Removes the statuspanel if visible (and
-     * <code>comp != statusPanel</code>).
+     * Adds a component to this Canvas.  Removes the statusPanel if
+     * visible (and <code>comp != statusPanel</code>).
      *
-     * @param comp The component to add to this ToEuropePanel.
+     * @param comp The <code>Component</code> to add to this canvas.
      * @param i The layer to add the component to (see JLayeredPane).
      */
     public void add(Component comp, Integer i) {
@@ -394,16 +707,16 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Adds a component to this Canvas. Removes the statuspanel if visible (and
-     * <code>comp != statusPanel</code>).
+     * Adds a component to this Canvas.  Removes the statusPanel if
+     * visible (and <code>comp != statusPanel</code>).
      *
-     * @param comp The component to add to this ToEuropePanel.
+     * @param comp The <code>Component</code> to add to this canvas.
      * @param i The layer to add the component to (see JLayeredPane).
      */
     public void addToCanvas(Component comp, Integer i) {
-
-        if (comp != statusPanel && !(comp instanceof JMenuItem) && !(comp instanceof FreeColDialog<?>)
-                && statusPanel.isVisible()) {
+        if (comp != statusPanel && !(comp instanceof JMenuItem)
+            && !(comp instanceof FreeColDialog<?>)
+            && statusPanel.isVisible()) {
             removeFromCanvas(statusPanel);
         }
 
@@ -420,6 +733,20 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
+     * Closes all the menus that are currently open.
+     */
+    public void closeMenus() {
+        for (JInternalFrame frame : getAllFrames()) {
+            for (Component c : frame.getContentPane().getComponents()) {
+                if (c instanceof FreeColPanel) {
+                    ((FreeColPanel) c).notifyClose();
+                }
+            }
+            frame.dispose();
+        }
+    }
+
+    /**
      * Closes the {@link MainPanel}.
      */
     public void closeMainPanel() {
@@ -428,7 +755,6 @@ public final class Canvas extends JDesktopPane {
           mainPanel = null;
        }
     }
-
 
     /**
      * Closes the <code>StatusPanel</code>.
@@ -442,9 +768,9 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Checks if this <code>Canvas</code> contains any ingame components.
+     * Checks if this <code>Canvas</code> contains any in game components.
      *
-     * @return <code>true</code> if there is a single ingame component.
+     * @return <code>true</code> if there is any in game components.
      */
     public boolean containsInGameComponents() {
         KeyListener[] keyListeners = getKeyListeners();
@@ -466,16 +792,12 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Detailed view of a foreign colony when in debug mode.
+     * Displays an error message.
      *
-     * @param settlement The <code>Settlement</code> with the colony
+     * @param messageId The i18n-keyname of the error message to display.
      */
-    public void debugForeignColony(Settlement settlement) {
-        if (settlement instanceof Colony) {
-            Colony colony = freeColClient.getFreeColServer().getGame()
-                .getFreeColGameObject(settlement.getId(), Colony.class);
-            showColonyPanel(colony);
-        }
+    public void errorMessage(String messageId) {
+        errorMessage(messageId, "Unspecified error: " + messageId);
     }
 
     /**
@@ -498,23 +820,44 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
+     * Gets a currently displayed FreeColPanel of a given type.
+     *
+     * @param type The type of <code>FreeColPanel</code> to look for.
+     * @return A currently displayed <code>FreeColPanel</code> of the
+     *     requested type, or null if none found.
+     */
+    public <T extends FreeColPanel> T getExistingFreeColPanel(Class<T> type) {
+        for (Component c1 : getComponents()) {
+            if (c1 instanceof JInternalFrame) {
+                for (Component c2 : ((JInternalFrame)c1).getContentPane()
+                         .getComponents()) {
+                    try {
+                        T ret = type.cast(c2);
+                        if (ret != null) {
+                            final JInternalFrame jif = (JInternalFrame)c1;
+                            SwingUtilities.invokeLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        jif.toFront();
+                                        jif.repaint();
+                                    }
+                                });
+                            return ret;
+                        }
+                    } catch (ClassCastException cce) {}
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * Gets the <code>LoadingSavegameDialog</code>.
      *
      * @return The <code>LoadingSavegameDialog</code>.
      */
     public LoadingSavegameDialog getLoadingSavegameDialog() {
         return loadingSavegameDialog;
-    }
-
-
-    @Override
-    public Dimension getMinimumSize() {
-        return new Dimension(640, 480);
-    }
-
-    @Override
-    public Dimension getPreferredSize() {
-        return initialSize;
     }
 
     /**
@@ -524,8 +867,7 @@ public final class Canvas extends JDesktopPane {
      *         displaying, or null if none found.
      */
     public Component getShowingSubPanel() {
-        Component[] components = getComponents();
-        for (Component c : components) {
+        for (Component c : getComponents()) {
             if (c instanceof ToolBoxFrame) {
                 continue;
             }
@@ -570,53 +912,22 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Paints this component.
-     *
-     * Uses {@link MapViewer#display} to draw the map/background on this
-     * component.
-     *
-     * @param g The Graphics context in which to draw this component.
-     * @see MapViewer#display
+     * Refresh this canvas.
      */
-    @Override
-    public void paintComponent(Graphics g) {
-        updateSizes();
-        Graphics2D g2d = (Graphics2D) g;
-        mapViewer.display(g2d);
-    }
-
-    public void refreshPlayersTable() {
-        startGamePanel.refreshPlayersTable();
-
-    }
-
-
-    /**
-     * Removes the given component from this Container.
-     *
-     * @param comp The component to remove from this Container.
-     */
-    @Override
-    public void remove(Component comp) {
-        removeFromCanvas(comp);
-        final boolean takeFocus = (comp != statusPanel);
-        gui.updateMenuBar();
-        freeColClient.updateActions();
-        if (takeFocus && !isShowingSubPanel()) {
-            requestFocus();
-        }
+    public void refresh() {
+        repaint(0, 0, getWidth(), getHeight());
     }
 
     /**
-     * Removes the given component from this Container.
+     * Removes the given component from this canvas.
      *
-     * @param comp The component to remove from this Container.
+     * @param comp The <code>Component</code> to remove.
      */
     public void removeFromCanvas(Component comp) {
         if (comp == null) {
             return;
         } else if (comp instanceof FreeColPanel) {
-            ((FreeColPanel) comp).notifyClose();
+            ((FreeColPanel)comp).notifyClose();
         }
 
         final Rectangle updateBounds = comp.getBounds();
@@ -626,7 +937,8 @@ public final class Canvas extends JDesktopPane {
         } else {
             super.remove(comp);
         }
-        repaint(updateBounds.x, updateBounds.y, updateBounds.width, updateBounds.height);
+        repaint(updateBounds.x, updateBounds.y,
+                updateBounds.width, updateBounds.height);
     }
 
     /**
@@ -656,7 +968,6 @@ public final class Canvas extends JDesktopPane {
         for (Component c : getComponents()) {
             removeFromCanvas(c);
         }
-
     }
 
     /**
@@ -675,15 +986,120 @@ public final class Canvas extends JDesktopPane {
         repaint();
     }
 
+    /**
+     * Updates the sizes of the components on this Canvas.
+     */
+    public void updateSizes() {
+        if (oldSize == null) {
+            oldSize = getSize();
+        }
+        if (oldSize.width != getWidth() || oldSize.height != getHeight()) {
+            gui.updateMapControlsInCanvas();
+            mapViewer.setSize(getSize());
+            mapViewer.forceReposition();
+            oldSize = getSize();
+        }
+    }
+
+
+    // Override JComponent
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void paintComponent(Graphics g) {
+        updateSizes();
+        Graphics2D g2d = (Graphics2D) g;
+        mapViewer.display(g2d);
+    }
+
+
+    // Override Container
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void remove(Component comp) {
+        removeFromCanvas(comp);
+        final boolean takeFocus = (comp != statusPanel);
+        gui.updateMenuBar();
+        freeColClient.updateActions();
+        if (takeFocus && !isShowingSubPanel()) {
+            requestFocus();
+        }
+    }
+
+
+    // Override Component
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Dimension getMinimumSize() {
+        return new Dimension(640, 480);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Dimension getPreferredSize() {
+        return initialSize;
+    }
+
+
+    // Special handling for the startGamePanel.
+
+    /**
+     * Display a chat message in the start panel.
+     *
+     * @param sender The sending player name.
+     * @param message The message to send.
+     * @param privateChat Should the message be private?
+     */
+    public void displayChat(String sender, String message, boolean privateChat) {
+        startGamePanel.displayChat(sender, message, privateChat);
+
+    }
+
+    /**
+     * Refresh the player's table (called when a new player is added
+     * from PreGameInputHandler.addPlayer).
+     */
+    public void refreshPlayersTable() {
+        startGamePanel.refreshPlayersTable();
+    }
+
+    /**
+     * Update the game options in the start panel.
+     */
+    public void updateGameOptions() {
+        startGamePanel.updateGameOptions();
+    }
+
+    /**
+     * Update the map generator options in the start panel.
+     */
+    public void updateMapGeneratorOptions() {
+        startGamePanel.updateMapGeneratorOptions();
+    }
+
+
+    // Simple front ends to display each panel or dialog.
+
+    /**
+     * Display the AboutPanel.
+     */
     public void showAboutPanel() {
         showSubPanel(new AboutPanel(freeColClient), false);
     }
 
-
-
     /**
-     * Displays a dialog that asks the user what he wants to do with his armed
-     * unit in a native settlement.
+     * Displays a dialog that asks the user what he wants to do with
+     * his armed unit in a native settlement.
      *
      * @param settlement The <code>IndianSettlement</code> to consider.
      * @return The chosen action, tribute, attack or cancel.
@@ -711,9 +1127,10 @@ public final class Canvas extends JDesktopPane {
      * Displays a dialog that asks the user whether to pay arrears for
      * boycotted goods or to dump them instead.
      *
-     * @param goods a <code>Goods</code> value
-     * @param europe an <code>Europe</code> value
-     * @return a <code>boolean</code> value
+     * @param goods The <code>Goods</code> to possibly dump.
+     * @param europe The player <code>Europe</code> where the boycott
+     *     is in force.
+     * @return The chosen <code>BoycottAction</code>.
      */
     public BoycottAction showBoycottedGoodsDialog(Goods goods, Europe europe) {
         int arrears = europe.getOwner().getArrears(goods.getType());
@@ -725,27 +1142,36 @@ public final class Canvas extends JDesktopPane {
         choices.add(new ChoiceItem<BoycottAction>(
                 Messages.message("boycottedGoods.dumpGoods"),
                 BoycottAction.DUMP_CARGO));
-        BoycottAction result =
-            showChoiceDialog(null,
-                             Messages.message(StringTemplate.template("boycottedGoods.text")
-                                              .add("%goods%", goods.getNameKey())
-                                              .add("%europe%", europe.getNameKey())
-                                              .addAmount("%amount%", arrears)),
-                Messages.message("cancel"),
-                choices);
+        BoycottAction result = showChoiceDialog(null,
+            Messages.message(StringTemplate.template("boycottedGoods.text")
+                .add("%goods%", goods.getNameKey())
+                .add("%europe%", europe.getNameKey())
+                .addAmount("%amount%", arrears)),
+            Messages.message("cancel"),
+            choices);
         return (result == null) ? BoycottAction.CANCEL : result;
     }
 
+    /**
+     * Show the BuildQueuePanel for a given colony.
+     *
+     * @param colony The <code>Colony</code> to show the build queue of.
+     */
     public void showBuildQueuePanel(Colony colony) {
         showSubPanel(new BuildQueuePanel(freeColClient, colony), true);
-
     }
 
+    /**
+     * Show a build queue panel, with a special callback when it is closed.
+     *
+     * @param colony The <code>Colony</code> to show the build queue of.
+     * @param callBack The <code>Runnable</code> that is run when the
+     *     panel closes.
+     */
     public void showBuildQueuePanel(Colony colony, Runnable callBack) {
         FreeColPanel panel = new BuildQueuePanel(freeColClient, colony);
         panel.addClosingCallback(callBack);
         showSubPanel(panel, true);
-
     }
 
     /**
@@ -791,10 +1217,10 @@ public final class Canvas extends JDesktopPane {
      * @return list of <code>Goods</code> to loot
      */
     public List<Goods> showCaptureGoodsDialog(Unit winner, List<Goods> loot) {
-        CaptureGoodsDialog dialog = new CaptureGoodsDialog(freeColClient, winner, loot);
+        CaptureGoodsDialog dialog
+            = new CaptureGoodsDialog(freeColClient, winner, loot);
         return showFreeColDialog(dialog, winner.getTile(), true);
     }
-
 
     /**
      * Displays the <code>ChatPanel</code>.
@@ -823,7 +1249,8 @@ public final class Canvas extends JDesktopPane {
     public <T> T showChoiceDialog(Tile tile, String text, String cancelText,
                                   List<ChoiceItem<T>> choices) {
         FreeColDialog<ChoiceItem<T>> choiceDialog
-            = FreeColDialog.createChoiceDialog(freeColClient, text, cancelText, choices);
+            = FreeColDialog.createChoiceDialog(freeColClient, text,
+                                               cancelText, choices);
         if (choiceDialog.getHeight() > getHeight() / 3) {
             choiceDialog.setSize(choiceDialog.getWidth(), (getHeight() * 2) / 3);
         }
@@ -831,15 +1258,35 @@ public final class Canvas extends JDesktopPane {
         return (response == null) ? null : response.getObject();
     }
 
-    public MonarchAction showChoiceMonarchActionDialog(String monarchTitle, List<ChoiceItem<MonarchAction>> actions) {
+    /**
+     * Choose a monarch action.
+     *
+     * @param monarchTitle The header to display.
+     * @param actions A list of monarch action choices.
+     * @return The chosen <code>MonarchAction</code>.
+     */
+    public MonarchAction showChooseMonarchActionDialog(String monarchTitle,
+        List<ChoiceItem<MonarchAction>> actions) {
         return showChoiceDialog(null, monarchTitle, "Cancel", actions);
     }
 
-
+    /**
+     * Choose a founding father (debug menu version).
+     *
+     * @param fathers A list of <code>FoundingFather</code>s on offer.
+     * @param fatherTitle A header to display.
+     * @return The chosen <code>FoundingFather</code>.
+     */
     public FoundingFather showChooseFoundingFatherDialog(List<ChoiceItem<FoundingFather>> fathers, String fatherTitle) {
         return showChoiceDialog(null, fatherTitle, "Cancel", fathers);
     }
 
+    /**
+     * Choose a founding father (full game version).
+     *
+     * @param fathers A list of <code>FoundingFather</code>s on offer.
+     * @return The chosen <code>FoundingFather</code>.
+     */
     public FoundingFather showChooseFoundingFatherDialog(List<FoundingFather> ffs) {
         return showFreeColDialog(new ChooseFoundingFatherDialog(freeColClient, ffs), null, true);
     }
@@ -859,17 +1306,14 @@ public final class Canvas extends JDesktopPane {
         List<ChoiceItem<ClaimAction>> choices
             = new ArrayList<ChoiceItem<ClaimAction>>();
         choices.add(new ChoiceItem<ClaimAction>(Messages.message(StringTemplate.template("indianLand.pay")
-                                                                 .addAmount("%amount%", price)),
+                    .addAmount("%amount%", price)),
                 ClaimAction.ACCEPT, canAccept));
-        choices.add(new ChoiceItem<ClaimAction>(
-                Messages.message("indianLand.take"),
+        choices.add(new ChoiceItem<ClaimAction>(Messages.message("indianLand.take"),
                 ClaimAction.STEAL));
-        ClaimAction result =
-            showChoiceDialog(tile,
-                             Messages.message(StringTemplate.template("indianLand.text")
-                                              .addStringTemplate("%player%", owner.getNationName())),
-                             Messages.message("indianLand.cancel"),
-                             choices);
+        ClaimAction result = showChoiceDialog(tile,
+            Messages.message(StringTemplate.template("indianLand.text")
+                .addStringTemplate("%player%", owner.getNationName())),
+            Messages.message("indianLand.cancel"), choices);
         return (result == null) ? ClaimAction.CANCEL : result;
     }
 
@@ -908,10 +1352,10 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Describe <code>showColonyPanel</code> method here.
+     * Show the colony panel for a colony on a given tile.
      *
-     * @param t a <code>Tile</code> value
-     * @return The colony panel.
+     * @param t The <code>Tile</code> to look for a colony on.
+     * @return The colony panel, or null on failure.
      */
     public ColonyPanel showColonyPanel(Tile t) {
         if (gui.getCurrentViewMode() == GUI.MOVE_UNITS_MODE
@@ -924,12 +1368,18 @@ public final class Canvas extends JDesktopPane {
         return null;
     }
 
-
+    /**
+     * Show the colopedia entry for a given node.
+     *
+     * @param nodeId The node identifier to display.
+     */
     public void showColopediaPanel(String nodeId) {
         showSubPanel(new ColopediaPanel(freeColClient, nodeId), false);
     }
 
-
+    /**
+     * Show the compat labour report.
+     */
     public void showCompactLabourReport() {
         CompactLabourReport details = new CompactLabourReport(freeColClient);
         details.initialize();
@@ -937,21 +1387,17 @@ public final class Canvas extends JDesktopPane {
 
     }
 
+    /**
+     * Show the compat labour report for the specified unit data.
+     *
+     * @param unitData The <code>UnitData</code> to display.
+     */
     public void showCompactLabourReport(UnitData unitData) {
-        CompactLabourReport details = new CompactLabourReport(freeColClient, unitData);
+        CompactLabourReport details = new CompactLabourReport(freeColClient,
+                                                              unitData);
         details.initialize();
         showSubPanel(details, false);
     }
-
-    /**
-     * Display a dialog to confirm a declaration of independence.
-     *
-     * @return A list of names for a new nation.
-     */
-    public List<String> showConfirmDeclarationDialog() {
-        return showFreeColDialog(new ConfirmDeclarationDialog(freeColClient), null, true);
-    }
-
 
     /**
      * Displays a dialog with a text and a ok/cancel option.
@@ -963,7 +1409,8 @@ public final class Canvas extends JDesktopPane {
      *         otherwise.
      * @see FreeColDialog
      */
-    public boolean showConfirmDialog(String text, String okText, String cancelText) {
+    public boolean showConfirmDialog(String text, String okText, 
+                                     String cancelText) {
         return showFreeColDialog(FreeColDialog
             .createConfirmDialog(freeColClient, Messages.message(text),
                                  Messages.message(okText),
@@ -975,12 +1422,12 @@ public final class Canvas extends JDesktopPane {
      * Displays a dialog with a text and a ok/cancel option.
      *
      * @param tile An optional <code>Tile</code> to make visible (not
-     *        under the dialog!)
+     *     under the dialog!)
      * @param messages The messages that explains the choice for the user.
      * @param okText The text displayed on the "ok"-button.
      * @param cancelText The text displayed on the "cancel"-button.
      * @return <i>true</i> if the user clicked the "ok"-button and <i>false</i>
-     *         otherwise.
+     *     otherwise.
      * @see FreeColDialog
      */
     public boolean showConfirmDialog(Tile tile, ModelMessage[] messages,
@@ -989,7 +1436,8 @@ public final class Canvas extends JDesktopPane {
         ImageIcon[] images = new ImageIcon[messages.length];
         for (int i = 0; i < messages.length; i++) {
             texts[i] = Messages.message(messages[i]);
-            images[i] = gui.getImageIcon(freeColClient.getGame().getMessageDisplay(messages[i]), false);
+            images[i] = gui.getImageIcon(freeColClient.getGame()
+                .getMessageDisplay(messages[i]), false);
         }
 
         FreeColDialog<Boolean> confirmDialog
@@ -1005,7 +1453,6 @@ public final class Canvas extends JDesktopPane {
      * @param text The text that explains the choice for the user.
      * @param okText The text displayed on the "ok"-button.
      * @param cancelText The text displayed on the "cancel"-button.
-     *
      * @return <i>true</i> if the user clicked the "ok"-button and <i>false</i>
      *         otherwise.
      * @see FreeColDialog
@@ -1020,12 +1467,27 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
+     * Display a dialog to confirm a declaration of independence.
+     *
+     * @return A list of names for a new nation.
+     */
+    public List<String> showConfirmDeclarationDialog() {
+        return showFreeColDialog(new ConfirmDeclarationDialog(freeColClient),
+            null, true);
+    }
+
+    /**
      * Display a dialog following declaration of independence.
      */
     public void showDeclarationDialog() {
         showFreeColDialog(new DeclarationDialog(freeColClient), null, true);
     }
 
+    /**
+     * Display the difficulty dialog.
+     *
+     * @param editable Should this difficulty level be editable?
+     */
     public void showDifficultyDialog(boolean editable) {
         Game game = freeColClient.getGame();
         Specification spec = game.getSpecification();
@@ -1034,9 +1496,15 @@ public final class Canvas extends JDesktopPane {
                      false);
     }
 
+    /**
+     * Display the difficulty dialog for a given group.
+     *
+     * @param spec The enclosing <code>Specification</code>.
+     * @param group The <code>OptionGroup</code> containing the difficulty.
+     */
     public void showDifficultyDialog(Specification spec, OptionGroup group) {
-        boolean editable = group.isEditable();
-        showSubPanel(new DifficultyDialog(freeColClient, spec, group, editable),
+        showSubPanel(new DifficultyDialog(freeColClient, spec, 
+                                          group, group.isEditable()),
                      false);
     }
 
@@ -1052,6 +1520,11 @@ public final class Canvas extends JDesktopPane {
         return showFreeColDialog(dumpDialog, unit.getTile(), true);
     }
 
+    /**
+     * Display the EditOptionDialog.
+     *
+     * @param option The <code>Option</code> to edit.
+     */
     public boolean showEditOptionDialog(Option option) {
         final EditOptionDialog editDialog
             = new EditOptionDialog(freeColClient, option);
@@ -1060,18 +1533,23 @@ public final class Canvas extends JDesktopPane {
         return result;
     }
 
+    /**
+     * Display the EditSettlementDialog.
+     *
+     * @param settlement The <code>IndianSettlement</code> to edit.
+     */
     public void showEditSettlementDialog(IndianSettlement settlement) {
         showFreeColDialog(new EditSettlementDialog(freeColClient, settlement),
             null, true);
     }
 
-
     /**
      * Shows the panel that allows the user to choose which unit will emigrate
-     * from Europe. This method may only be called if the user has William
+     * from Europe.  This method may only be called if the user has William
      * Brewster in congress.
      *
-     * @param fountainOfYouth a <code>boolean</code> value
+     * @param fountainOfYouth Is this dialog displayed as a result of a
+     *     fountain of youth.
      * @return The emigrant that was chosen by the user.
      */
     public int showEmigrationDialog(boolean fountainOfYouth) {
@@ -1081,7 +1559,11 @@ public final class Canvas extends JDesktopPane {
         return showFreeColDialog(emigrationDialog, null, true);
     }
 
-
+    /**
+     * Display the EndTurnDialog with given units that could still move.
+     *
+     * @param units A list of <code>Unit</code>s that could still move.
+     */
     public boolean showEndTurnDialog(List<Unit> units) {
         return showFreeColDialog(new EndTurnDialog(freeColClient, units),
                                  null, true);
@@ -1127,7 +1609,7 @@ public final class Canvas extends JDesktopPane {
         int response = showFreeColDialog(localDialog, null, false);
 
         if (europeOpenDialog == localDialog) {
-            europeOpenDialog = null;    // Clear class variable when it's closed
+            europeOpenDialog = null; // Clear class variable when it's closed
         }
 
         return response;
@@ -1157,11 +1639,33 @@ public final class Canvas extends JDesktopPane {
                      PopupPosition.CENTERED, false);
     }
 
+    /**
+     * Display the FindSettlementDialog.
+     */
     public void showFindSettlementDialog() {
         showSubPanel(new FindSettlementDialog<Canvas>(freeColClient),
                      PopupPosition.ORIGIN, true);
     }
 
+    /**
+     * Detailed view of a foreign colony when in debug mode.
+     *
+     * @param settlement The <code>Settlement</code> with the colony
+     */
+    public void showForeignColony(Settlement settlement) {
+        if (settlement instanceof Colony) {
+            Colony colony = freeColClient.getFreeColServer().getGame()
+                .getFreeColGameObject(settlement.getId(), Colony.class);
+            showColonyPanel(colony);
+        }
+    }
+
+    /**
+     * Display the GameOptionsDialog.
+     *
+     * @param editable Should the game options be editable?
+     * @param loadCustomOptions
+     */
     public void showGameOptionsDialog(boolean editable,
                                       boolean loadCustomOptions) {
         showSubPanel(new GameOptionsDialog(freeColClient, editable,
@@ -1213,33 +1717,33 @@ public final class Canvas extends JDesktopPane {
         choices.add(new ChoiceItem<TradeAction>(
                 Messages.message("tradeProposition.toGift"),
                 TradeAction.GIFT, canGift));
-        TradeAction result =
-            showChoiceDialog(settlement.getTile(),
-                             Messages.message(StringTemplate.template("tradeProposition.welcome")
-                                              .addStringTemplate("%nation%", settlement.getOwner().getNationName())
-                                              .addName("%settlement%", settlement.getName())),
-                             Messages.message("tradeProposition.cancel"),
-                             choices);
+        TradeAction result = showChoiceDialog(settlement.getTile(),
+            Messages.message(StringTemplate.template("tradeProposition.welcome")
+                .addStringTemplate("%nation%", settlement.getOwner().getNationName())
+                .addName("%settlement%", settlement.getName())),
+            Messages.message("tradeProposition.cancel"), choices);
         return (result == null) ? TradeAction.CANCEL : result;
     }
 
     /**
      * Shows a message with some information and an "OK"-button.
      *
-     * @param displayObject Optional object for displaying an icon
+     * @param displayObject Optional object for displaying an icon.
      * @param messageId The messageId of the message to display.
      */
-    public void showInformationMessage(FreeColObject displayObject, String messageId) {
+    public void showInformationMessage(FreeColObject displayObject,
+                                       String messageId) {
         showInformationMessage(displayObject, StringTemplate.key(messageId));
     }
 
     /**
      * Shows a message with some information and an "OK"-button.
      *
-     * @param displayObject Optional object for displaying an icon
-     * @param template the StringTemplate to display
+     * @param displayObject Optional object for displaying an icon.
+     * @param template The <code>StringTemplate</code> to display.
      */
-    public void showInformationMessage(FreeColObject displayObject, StringTemplate template) {
+    public void showInformationMessage(FreeColObject displayObject,
+                                       StringTemplate template) {
         String text = Messages.message(template);
         ImageIcon icon = null;
         if (displayObject != null) {
@@ -1266,9 +1770,14 @@ public final class Canvas extends JDesktopPane {
                          tile, true);
     }
 
+    /**
+     * Show an information message using a model message.
+     *
+     * @param message The <code>ModelMessage</code> to display.
+     */
     public void showInformationMessage(ModelMessage message) {
-        showInformationMessage(freeColClient.getGame().getMessageDisplay(message),
-                               message);
+        showInformationMessage(freeColClient.getGame()
+            .getMessageDisplay(message), message);
     }
 
     /**
@@ -1283,12 +1792,11 @@ public final class Canvas extends JDesktopPane {
     /**
      * Shows a message with some information and an "OK"-button.
      *
-     * @param template the StringTemplate to display
+     * @param template The <code>StringTemplate</code> to display.
      */
     public void showInformationMessage(StringTemplate template) {
         showInformationMessage(null, template);
     }
-
 
     /**
      * Displays a dialog with a text field and a ok/cancel option.
@@ -1324,13 +1832,7 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Displays a dialog where the user may choose a file.  This is the
-     * same as calling:
-     *
-     * <code>
-     * showLoadDialog(directory, new FileFilter[] {
-     *                           FreeColDialog.getFSGFileFilter()});
-     * </code>
+     * Displays a dialog where the user may choose a file.
      *
      * @param directory The directory containing the files.
      * @return The <code>File</code>.
@@ -1347,7 +1849,7 @@ public final class Canvas extends JDesktopPane {
      *
      * @param directory The directory containing the files.
      * @param fileFilters The file filters which the user can select in the
-     *            dialog.
+     *     dialog.
      * @return The <code>File</code>.
      * @see FreeColDialog
      */
@@ -1377,11 +1879,15 @@ public final class Canvas extends JDesktopPane {
      * @return <code>true</code> if the "ok"-button was pressed and
      *         <code>false</code> otherwise.
      */
-    public boolean showLoadingSavegameDialog(boolean publicServer, boolean singlePlayer) {
+    public boolean showLoadingSavegameDialog(boolean publicServer,
+                                             boolean singlePlayer) {
         loadingSavegameDialog.initialize(publicServer, singlePlayer);
         return showFreeColDialog(loadingSavegameDialog, null, true);
     }
 
+    /**
+     * Show a panel containing the log file.
+     */
     public void showLogFilePanel() {
         showSubPanel(new ErrorPanel(freeColClient), true);
 
@@ -1402,17 +1908,33 @@ public final class Canvas extends JDesktopPane {
         mainPanel.requestFocus();
     }
 
+    /**
+     * Display the map editor transform panel.
+     */
     public void showMapEditorTransformPanel() {
-        JInternalFrame f = addAsFrame(new MapEditorTransformPanel(freeColClient), true, PopupPosition.CENTERED, false);
+        JInternalFrame f = addAsFrame(new MapEditorTransformPanel(freeColClient),
+            true, PopupPosition.CENTERED, false);
         f.setLocation(f.getX(), 50);
         repaint();
     }
 
-    public OptionGroup showMapGeneratorOptionsDialog(OptionGroup mgo, boolean editable, boolean loadCustomOptions) {
+    /**
+     * Display the map generator options dialog.
+     *
+     * @param mgo The <code>OptionGroup</code> containing the map
+     *     generator options.
+     * @param editable Should these options be editable.
+     * @param loadCustomOptions Whether to load custom options.
+     */
+    public OptionGroup showMapGeneratorOptionsDialog(OptionGroup mgo,
+        boolean editable, boolean loadCustomOptions) {
         return showFreeColDialog(new MapGeneratorOptionsDialog(freeColClient,
                 mgo, editable, loadCustomOptions), null, false);
     }
 
+    /**
+     * Display the map size dialog.
+     */
     public Dimension showMapSizeDialog() {
         return showFreeColDialog(FreeColDialog
             .createMapSizeDialog(freeColClient), null, true);
@@ -1422,7 +1944,7 @@ public final class Canvas extends JDesktopPane {
     /**
      * Displays a number of ModelMessages.
      *
-     * @param modelMessages
+     * @param modelMessages The <code>ModelMessage</code>s to display.
      */
     public void showModelMessages(ModelMessage... modelMessages) {
         List<ModelMessage> messages = filterEventPanels(modelMessages);
@@ -1466,11 +1988,19 @@ public final class Canvas extends JDesktopPane {
         }
     }
 
-    public boolean showMonarchDialog(MonarchAction action, StringTemplate replace) {
+    /**
+     * Display the monarch dialog.
+     *
+     * @param action The <code>MonarchAction</code> underway.
+     * @param replace The <code>StringTemplate</code> describing the
+     *     situation.
+     * @return Whether the player accepted the monarch action.
+     */
+    public boolean showMonarchDialog(MonarchAction action,
+                                     StringTemplate replace) {
         return showFreeColDialog(new MonarchDialog(freeColClient, action,
                                                    replace), null, true);
     }
-
 
     /**
      * Displays the <code>NegotiationDialog</code>.
@@ -1481,17 +2011,27 @@ public final class Canvas extends JDesktopPane {
      * @return An updated agreement.
      * @see NegotiationDialog
      */
-    public DiplomaticTrade showNegotiationDialog(Unit unit, Settlement settlement, DiplomaticTrade agreement) {
+    public DiplomaticTrade showNegotiationDialog(Unit unit,
+                                                 Settlement settlement,
+                                                 DiplomaticTrade agreement) {
         NegotiationDialog negotiationDialog
             = new NegotiationDialog(freeColClient, unit, settlement, agreement);
         negotiationDialog.initialize();
         return showFreeColDialog(negotiationDialog, unit.getTile(), true);
     }
 
+    /**
+     * Display the NewPanel.
+     */
     public void showNewPanel() {
         showSubPanel(new NewPanel(freeColClient), false);
     }
 
+    /**
+     * Display the NewPanel for a given specification.
+     *
+     * @param specification The <code>Specification</code> to use.
+     */
     public void showNewPanel(Specification specification) {
         showSubPanel(new NewPanel(freeColClient, specification), false);
     }
@@ -1514,7 +2054,8 @@ public final class Canvas extends JDesktopPane {
         addCentered(vp, MAIN_LAYER);
         vp.play();
 
-        final class AbortListener implements KeyListener, MouseListener, VideoListener {
+        final class AbortListener implements KeyListener, MouseListener, 
+            VideoListener {
             public void keyPressed(KeyEvent e) {}
 
             public void keyReleased(KeyEvent e) {
@@ -1554,6 +2095,14 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
+     * Display the parameters dialog.
+     */
+    public Parameters showParametersDialog() {
+        return showFreeColDialog(new ParametersDialog(freeColClient),
+                                 null, false);
+    }
+
+    /**
      * Display a dialog to confirm a combat.
      *
      * @param attacker The attacker.
@@ -1569,6 +2118,14 @@ public final class Canvas extends JDesktopPane {
                                  tile, true);
     }
 
+    /**
+     * Display the labour detail panel.
+     *
+     * @param unitType The <code>UnitType</code> to display.
+     * @param data The labour data.
+     * @param unitCount A map of unit distribution.
+     * @param colonies The list of player <code>Colony</code>s.
+     */
     public void showReportLabourDetailPanel(UnitType unitType,
         Map<UnitType, Map<Location, Integer>> data,
         TypeCountMap<UnitType> unitCount, List<Colony> colonies) {
@@ -1579,6 +2136,430 @@ public final class Canvas extends JDesktopPane {
         showSubPanel(details, true);
     }
 
+    /**
+     * Display the river style dialog.
+     */
+    public String showRiverStyleDialog() {
+        return showFreeColDialog(new RiverStyleDialog(freeColClient),
+                                 null, true);
+    }
+
+    /**
+     * Displays a dialog where the user may choose a filename.
+     *
+     * @param directory The directory containing the files in which
+     *     the user may overwrite.
+     * @param defaultName Default filename for the savegame.
+     * @return The <code>File</code>.
+     * @see FreeColDialog
+     */
+    public File showSaveDialog(File directory, String defaultName) {
+        return showSaveDialog(directory, ".fsg",
+            new FileFilter[] { FreeColFileFilter.getFSGFileFilter() },
+            defaultName);
+    }
+
+    /**
+     * Displays a dialog where the user may choose a filename.
+     *
+     * @param directory The directory containing the files in which
+     *     the user may overwrite.
+     * @param standardName This extension will be added to the specified
+     *            filename (if not added by the user).
+     * @param fileFilters The available file filters in the dialog.
+     * @param defaultName Default filename for the savegame.
+     * @return The <code>File</code>.
+     * @see FreeColDialog
+     */
+    public File showSaveDialog(File directory, String standardName,
+                               FileFilter[] fileFilters, String defaultName) {
+        FreeColDialog<File> saveDialog = FreeColDialog
+            .createSaveDialog(freeColClient, directory, standardName,
+                              fileFilters, defaultName);
+        return showFreeColDialog(saveDialog, null, true);
+    }
+
+    /**
+     * Display the scale map size dialog.
+     */
+    public Dimension showScaleMapSizeDialog() {
+        return showFreeColDialog(new ScaleMapSizeDialog(freeColClient),
+                                 null, false);
+    }
+
+    /**
+     * Displays a dialog that asks the user what he wants to do with his scout
+     * in the foreign colony.
+     *
+     * @param colony The <code>Colony</code> to be scouted.
+     * @param unit The <code>Unit</code> that is scouting.
+     * @param canNegotiate True if negotation is a valid choice.
+     * @return The selected action, either negotiate, spy, attack or cancel.
+     */
+    public ScoutColonyAction showScoutForeignColonyDialog(Colony colony,
+                                                          Unit unit,
+                                                          boolean canNegotiate) {
+        List<ChoiceItem<ScoutColonyAction>> choices
+            = new ArrayList<ChoiceItem<ScoutColonyAction>>();
+        // We cannot negotiate with the REF
+        choices.add(new ChoiceItem<ScoutColonyAction>(
+                Messages.message("scoutColony.negotiate"),
+                ScoutColonyAction.FOREIGN_COLONY_NEGOTIATE, canNegotiate));
+        choices.add(new ChoiceItem<ScoutColonyAction>(
+                Messages.message("scoutColony.spy"),
+                ScoutColonyAction.FOREIGN_COLONY_SPY));
+        choices.add(new ChoiceItem<ScoutColonyAction>(
+                Messages.message("scoutColony.attack"),
+                ScoutColonyAction.FOREIGN_COLONY_ATTACK));
+        StringTemplate template = StringTemplate.template("scoutColony.text")
+            .addStringTemplate("%unit%", unit.getFullLabel())
+            .addName("%colony%", colony.getName());
+        ScoutColonyAction result =
+            showChoiceDialog(unit.getTile(), Messages.message(template),
+        Messages.message("cancel"), choices);
+        return (result == null) ? ScoutColonyAction.CANCEL : result;
+    }
+
+    /**
+     * Displays a dialog that asks the user what he wants to do with
+     * his scout in a native settlement.
+     *
+     * @param settlement The <code>IndianSettlement</code> to be scouted.
+     * @param number The number of settlements in the settlement owner nation.
+     * @return The chosen action, speak, tribute, attack or cancel.
+     */
+    public ScoutIndianSettlementAction showScoutIndianSettlementDialog(IndianSettlement settlement, String number) {
+        StringBuilder text = new StringBuilder(400);
+        Player owner = settlement.getOwner();
+        text.append(Messages.message(StringTemplate.template(settlement.getAlarmLevelMessageId(freeColClient.getMyPlayer()))
+                .addStringTemplate("%nation%", owner.getNationName())));
+        text.append("\n\n");
+        text.append(Messages.message(StringTemplate.template("scoutSettlement.greetings")
+                .addStringTemplate("%nation%", settlement.getOwner().getNationName())
+                .addName("%settlement%", settlement.getName())
+                .add("%number%", number)
+                .add("%settlementType%", ((IndianNationType) owner.getNationType()).getSettlementTypeKey(true))));
+        text.append(" ");
+        if (settlement.getLearnableSkill() != null) {
+            text.append(Messages.message(StringTemplate.template("scoutSettlement.skill")
+                    .add("%skill%", settlement.getLearnableSkill().getNameKey())));
+            text.append(" ");
+        }
+        GoodsType[] wantedGoods = settlement.getWantedGoods();
+        int present = 0;
+        for (present = 0; present < wantedGoods.length; present++) {
+            if (wantedGoods[present] == null) break;
+        }
+        if (present > 0) {
+            StringTemplate t = StringTemplate.template("scoutSettlement.trade."
+                + Integer.toString(present));
+            for (int i = 0; i < present; i++) {
+                t.add("%goods" + Integer.toString(i+1) + "%",
+                    wantedGoods[i].getNameKey());
+            }
+            text.append(Messages.message(t) + "\n\n");
+        }
+
+        List<ChoiceItem<ScoutIndianSettlementAction>> choices
+            = new ArrayList<ChoiceItem<ScoutIndianSettlementAction>>();
+        choices.add(new ChoiceItem<ScoutIndianSettlementAction>(
+                Messages.message("scoutSettlement.speak"),
+                ScoutIndianSettlementAction.INDIAN_SETTLEMENT_SPEAK));
+        choices.add(new ChoiceItem<ScoutIndianSettlementAction>(
+                Messages.message("scoutSettlement.tribute"),
+                ScoutIndianSettlementAction.INDIAN_SETTLEMENT_TRIBUTE));
+        choices.add(new ChoiceItem<ScoutIndianSettlementAction>(
+                Messages.message("scoutSettlement.attack"),
+                ScoutIndianSettlementAction.INDIAN_SETTLEMENT_ATTACK));
+        ScoutIndianSettlementAction result = showChoiceDialog(settlement.getTile(),
+                text.toString(),
+                Messages.message("cancel"),
+                choices);
+        return (result == null) ? ScoutIndianSettlementAction.CANCEL : result;
+    }
+
+    /**
+     * Display the select-amount dialog.
+     *
+     * @param goodsType The <code>GoodsType</code> to select an amount of.
+     * @param available The amount of goods available.
+     * @param defaultAmount The amount to select to start with.
+     * @param needToPay If true, check the player has sufficient funds.
+     * @return The amount selected.
+     */
+    public int showSelectAmountDialog(GoodsType goodsType, int available,
+                                      int defaultAmount, boolean needToPay) {
+        return showFreeColDialog(new SelectAmountDialog(freeColClient,
+                goodsType, available, defaultAmount, needToPay), null, true);
+    }
+
+    /**
+     * Display a dialog allowing the user to select a destination for
+     * a given unit.
+     *
+     * @param unit The <code>Unit</code> to select a destination for.
+     * @return A destination for the unit, or null.
+     */
+    public Location showSelectDestinationDialog(Unit unit) {
+        return showFreeColDialog(new SelectDestinationDialog(freeColClient,
+                unit), unit.getTile(), true);
+    }
+
+    /**
+     * Displays the panel for negotiating a sale to a settlement.
+     *
+     * @param unit The <code>Unit</code> that is selling.
+     * @param settlement The <code>Settlement</code> to sell to.
+     * @param goods The <code>Goods</code> to sell.
+     * @param gold The current negotiated price.
+     * @return The chosen action, sell, gift or haggle, or null.
+     */
+    public SellAction showSellDialog(Unit unit, Settlement settlement,
+                                     Goods goods, int gold) {
+        StringTemplate goodsTemplate
+            = StringTemplate.template("model.goods.goodsAmount")
+            .add("%goods%", goods.getType().getNameKey())
+            .addAmount("%amount%", goods.getAmount());
+        StringTemplate nation = settlement.getOwner().getNationName();
+        List<ChoiceItem<SellAction>> choices
+            = new ArrayList<ChoiceItem<SellAction>>();
+        choices.add(new ChoiceItem<SellAction>(
+                Messages.message("sell.takeOffer"),
+                SellAction.SELL));
+        choices.add(new ChoiceItem<SellAction>(
+                Messages.message("sell.moreGold"),
+                SellAction.HAGGLE));
+        choices.add(new ChoiceItem<SellAction>(
+                Messages.message(StringTemplate.template("sell.gift")
+                                 .addStringTemplate("%goods%", goodsTemplate)),
+                SellAction.GIFT));
+        SellAction result = showChoiceDialog(unit.getTile(),
+                Messages.message(StringTemplate.template("sell.text")
+                                 .addStringTemplate("%nation%", nation)
+                                 .addStringTemplate("%goods%", goodsTemplate)
+                                 .addAmount("%gold%", gold)),
+                Messages.message("sellProposition.cancel"),
+                choices);
+        return (result == null) ? SellAction.CANCEL : result;
+    }
+
+    /**
+     * Displays the <code>ServerListPanel</code>.
+     *
+     * @param serverList The list containing the servers retrieved from the
+     *            metaserver.
+     * @see ServerListPanel
+     */
+    public void showServerListPanel(List<ServerInfo> serverList) {
+        closeMenus();
+
+        serverListPanel.initialize(serverList);
+        showSubPanel(serverListPanel, true);
+    }
+
+    /**
+     * Display the appropriate panel for a given settlement.
+     *
+     * @param settlement The <code>Settlement</code> to display.
+     */
+    public void showSettlement(Settlement settlement) {
+        if (settlement instanceof Colony) {
+            if (settlement.getOwner().equals(freeColClient.getMyPlayer())) {
+                showColonyPanel((Colony)settlement);
+            } else if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
+                showForeignColony(settlement);
+            }
+        } else if (settlement instanceof IndianSettlement) {
+            showIndianSettlementPanel((IndianSettlement)settlement);
+        } else {
+            throw new IllegalStateException("Bogus settlement");
+        }
+    }
+
+    /**
+     * Displays a dialog with a text and a cancel-button, in addition
+     * to buttons for each of the objects in the list.
+     *
+     * @param tile An optional tile to make visible (not under the dialog).
+     * @param text The text that explains the choice for the user.
+     * @param cancelText The text displayed on the "cancel"-button.
+     * @param objects The List containing the objects to create buttons for.
+     * @return The chosen object, or <i>null</i> for the cancel-button.
+     */
+    public <T> T showSimpleChoiceDialog(Tile tile,
+                                        String text, String cancelText,
+                                        List<T> objects) {
+        List<ChoiceItem<T>> choices = new ArrayList<ChoiceItem<T>>();
+        for (T object : objects) {
+            choices.add(new ChoiceItem<T>(object));
+        }
+        return showChoiceDialog(tile,
+                                Messages.message(text),
+                                Messages.message(cancelText),
+                                choices);
+    }
+
+    /**
+     * Displays the <code>StartGamePanel</code>.
+     *
+     * @param game The <code>Game</code> that is about to start.
+     * @param player The <code>Player</code> using this client.
+     * @param singlePlayerMode 'true' if the user wants to start a
+     *     single player game, 'false' otherwise.
+     * @see StartGamePanel
+     */
+    public void showStartGamePanel(Game game, Player player,
+                                   boolean singlePlayerMode) {
+        closeMenus();
+
+        if (game != null && player != null) {
+            startGamePanel.initialize(singlePlayerMode);
+            showSubPanel(startGamePanel, false);
+        } else {
+            logger.warning("Tried to open 'StartGamePanel' without having 'game' and/or 'player' set.");
+        }
+    }
+
+    /**
+     * Display the statistics panel.
+     */
+    public void showStatisticsPanel() {
+        showSubPanel(new StatisticsPanel(freeColClient), true);
+    }
+
+    /**
+     * Shows a status message that cannot be dismissed.  The panel
+     * will be removed when another component is added to this
+     * <code>Canvas</code>.  This includes all the
+     * <code>showXXX</code>-methods. In addition,
+     * {@link #closeStatusPanel()} also removes this panel.
+     *
+     * @param message The text message to display on the status panel.
+     * @see StatusPanel
+     */
+    public void showStatusPanel(String message) {
+        statusPanel.setStatusMessage(message);
+        addCentered(statusPanel, STATUS_LAYER);
+    }
+
+    /**
+     * Display the tile panel for a given tile.
+     *
+     * @param tile The <code>Tile</code> to display.
+     */
+    public void showTilePanel(Tile tile) {
+        showSubPanel(new TilePanel(freeColClient, tile), false);
+    }
+
+    /**
+     * Shows a tile popup.
+     *
+     * @param tile The Tile where the popup occurred.
+     * @param x The x-coordinate on the screen where the popup needs to be
+     *            placed.
+     * @param y The y-coordinate on the screen where the popup needs to be
+     *            placed.
+     * @see TilePopup
+     */
+    public void showTilePopup(Tile tile, int x, int y) {
+        if (tile == null)
+            return;
+        TilePopup tp = new TilePopup(freeColClient, tile);
+        if (tp.hasItem()) {
+            tp.show(this, x, y);
+            tp.repaint();
+        } else if (tile.isExplored()) {
+            showTilePanel(tile);
+        }
+    }
+
+    /**
+     * Display a dialog to select a trade route for a unit.
+     *
+     * @param unit The <code>Unit</code> to select a trade route for.
+     * @return True if the trade route changed.
+     */
+    public boolean showTradeRouteDialog(Unit unit) {
+        return showFreeColDialog(new TradeRouteDialog(freeColClient, unit),
+                                 (unit == null) ? null : unit.getTile(), true);
+    }
+
+    /**
+     * Display the trade route input dialog for a given trade route.
+     *
+     * @param newRoute The <code>TradeRoute</code> to display.
+     * @return True if a new route was added.
+     */
+    public boolean showTradeRouteInputDialog(TradeRoute newRoute) {
+        return showFreeColDialog(new TradeRouteInputDialog(freeColClient,
+                newRoute), null, true);
+    }
+
+    /**
+     * Displays a dialog that asks the user what he wants to do with his
+     * missionary in the indian settlement.
+     *
+     * @param unit The <code>Unit</code> speaking to the settlement.
+     * @param settlement The <code>IndianSettlement</code> being visited.
+     * @param canEstablish Is establish a valid option.
+     * @param canDenounce Is denounce a valid option.
+     * @return The chosen action, establish mission, denounce, incite
+     *         or cancel.
+     */
+    public MissionaryAction showUseMissionaryDialog(Unit unit,
+                                                    IndianSettlement settlement,
+                                                    boolean canEstablish,
+                                                    boolean canDenounce) {
+        List<ChoiceItem<MissionaryAction>> choices
+            = new ArrayList<ChoiceItem<MissionaryAction>>();
+        choices.add(new ChoiceItem<MissionaryAction>(
+                Messages.message("missionarySettlement.establish"),
+                MissionaryAction.ESTABLISH_MISSION, canEstablish));
+        choices.add(new ChoiceItem<MissionaryAction>(
+                Messages.message("missionarySettlement.heresy"),
+                MissionaryAction.DENOUNCE_HERESY, canDenounce));
+        choices.add(new ChoiceItem<MissionaryAction>(
+                Messages.message("missionarySettlement.incite"),
+                MissionaryAction.INCITE_INDIANS));
+        String messageId = settlement.getAlarmLevelMessageId(unit.getOwner());
+        StringBuilder introText
+            = new StringBuilder(Messages.message(StringTemplate.template(messageId)
+                    .addStringTemplate("%nation%", settlement.getOwner().getNationName())));
+        introText.append("\n\n");
+        introText.append(Messages.message(StringTemplate.template("missionarySettlement.question")
+                .addName("%settlement%", settlement.getName())));
+        MissionaryAction result = showChoiceDialog(unit.getTile(),
+                introText.toString(),
+                Messages.message("cancel"),
+                choices);
+        return (result == null) ? MissionaryAction.CANCEL : result;
+    }
+
+    /**
+     * Display the victory panel.
+     */
+    public void showVictoryPanel() {
+        showSubPanel(new VictoryPanel(freeColClient), true);
+    }
+
+    /**
+     * Display the warehouse dialog for a colony.
+     *
+     * @param colony The <code>Colony</code> to display.
+     */
+    public boolean showWarehouseDialog(Colony colony) {
+        return showFreeColDialog(new WarehouseDialog(freeColClient, colony),
+            null, true);
+    }
+
+    /**
+     * Display the production of a unit.
+     *
+     * @param unit The <code>Unit</code> to display.
+     */
+    public void showWorkProductionPanel(Unit unit) {
+        showSubPanel(new WorkProductionPanel(freeColClient, unit), true);
+    }
 
     // Singleton specialist reports
 
@@ -1685,796 +2666,5 @@ public final class Canvas extends JDesktopPane {
         } else {
             r.setMessages(messages);
         }
-    }
-
-
-
-    public String showRiverStyleDialog() {
-        return showFreeColDialog(new RiverStyleDialog(freeColClient), null, true);
-    }
-
-    /**
-     * Displays a dialog where the user may choose a filename. This is the same
-     * as calling:
-     *
-     * <br>
-     * <br>
-     * <code>
-     * showSaveDialog(directory, new FileFilter[] {FreeColDialog.getFSGFileFilter()}, defaultName);
-     * </code>
-     *
-     * @param directory The directory containing the files in which the user may
-     *            overwrite.
-     * @param defaultName Default filename for the savegame.
-     * @return The <code>File</code>.
-     * @see FreeColDialog
-     */
-    public File showSaveDialog(File directory, String defaultName) {
-        return showSaveDialog(directory, ".fsg",
-            new FileFilter[] { FreeColFileFilter.getFSGFileFilter() },
-            defaultName);
-    }
-
-    /**
-     * Displays a dialog where the user may choose a filename.
-     *
-     * @param directory The directory containing the files in which the user may
-     *            overwrite.
-     * @param standardName This extension will be added to the specified
-     *            filename (if not added by the user).
-     * @param fileFilters The available file filters in the dialog.
-     * @param defaultName Default filename for the savegame.
-     * @return The <code>File</code>.
-     * @see FreeColDialog
-     */
-    public File showSaveDialog(File directory, String standardName,
-                               FileFilter[] fileFilters, String defaultName) {
-        FreeColDialog<File> saveDialog = FreeColDialog
-            .createSaveDialog(freeColClient, directory, standardName,
-                              fileFilters, defaultName);
-        return showFreeColDialog(saveDialog, null, true);
-    }
-
-    /**
-     * Displays a dialog that asks the user what he wants to do with his scout
-     * in the foreign colony.
-     *
-     * @param colony The <code>Colony</code> to be scouted.
-     * @param unit The <code>Unit</code> that is scouting.
-     * @param canNegotiate True if negotation is a valid choice.
-     * @return The selected action, either negotiate, spy, attack or cancel.
-     */
-    public ScoutColonyAction showScoutForeignColonyDialog(Colony colony,
-                                                          Unit unit,
-                                                          boolean canNegotiate) {
-        List<ChoiceItem<ScoutColonyAction>> choices
-            = new ArrayList<ChoiceItem<ScoutColonyAction>>();
-        // We cannot negotiate with the REF
-        choices.add(new ChoiceItem<ScoutColonyAction>(
-                Messages.message("scoutColony.negotiate"),
-                ScoutColonyAction.FOREIGN_COLONY_NEGOTIATE, canNegotiate));
-        choices.add(new ChoiceItem<ScoutColonyAction>(
-                Messages.message("scoutColony.spy"),
-                ScoutColonyAction.FOREIGN_COLONY_SPY));
-        choices.add(new ChoiceItem<ScoutColonyAction>(
-                Messages.message("scoutColony.attack"),
-                ScoutColonyAction.FOREIGN_COLONY_ATTACK));
-        StringTemplate template = StringTemplate.template("scoutColony.text")
-            .addStringTemplate("%unit%", unit.getFullLabel())
-            .addName("%colony%", colony.getName());
-        ScoutColonyAction result =
-            showChoiceDialog(unit.getTile(), Messages.message(template),
-        Messages.message("cancel"), choices);
-        return (result == null) ? ScoutColonyAction.CANCEL : result;
-    }
-
-    /**
-     * Displays a dialog that asks the user what he wants to do with
-     * his scout in a native settlement.
-     *
-     * @param settlement The <code>IndianSettlement</code> to be scouted.
-     * @param number The number of settlements in the settlement owner nation.
-     * @return The chosen action, speak, tribute, attack or cancel.
-     */
-    public ScoutIndianSettlementAction showScoutIndianSettlementDialog(IndianSettlement settlement, String number) {
-        StringBuilder text = new StringBuilder(400);
-        Player owner = settlement.getOwner();
-        text.append(Messages.message(StringTemplate.template(settlement.getAlarmLevelMessageId(freeColClient.getMyPlayer()))
-                                     .addStringTemplate("%nation%", owner.getNationName())));
-        text.append("\n\n");
-        text.append(Messages.message(StringTemplate.template("scoutSettlement.greetings")
-                                     .addStringTemplate("%nation%", settlement.getOwner().getNationName())
-                                     .addName("%settlement%", settlement.getName())
-                                     .add("%number%", number)
-                                     .add("%settlementType%", ((IndianNationType) owner.getNationType()).getSettlementTypeKey(true))));
-        text.append(" ");
-        if (settlement.getLearnableSkill() != null) {
-            text.append(Messages.message(StringTemplate.template("scoutSettlement.skill")
-                                         .add("%skill%", settlement.getLearnableSkill().getNameKey())));
-            text.append(" ");
-        }
-        GoodsType[] wantedGoods = settlement.getWantedGoods();
-        int present = 0;
-        for (present = 0; present < wantedGoods.length; present++) {
-            if (wantedGoods[present] == null) break;
-        }
-        if (present > 0) {
-            StringTemplate t = StringTemplate.template("scoutSettlement.trade."
-                + Integer.toString(present));
-            for (int i = 0; i < present; i++) {
-                t.add("%goods" + Integer.toString(i+1) + "%",
-                    wantedGoods[i].getNameKey());
-            }
-            text.append(Messages.message(t) + "\n\n");
-        }
-
-        List<ChoiceItem<ScoutIndianSettlementAction>> choices
-            = new ArrayList<ChoiceItem<ScoutIndianSettlementAction>>();
-        choices.add(new ChoiceItem<ScoutIndianSettlementAction>(
-                Messages.message("scoutSettlement.speak"),
-                ScoutIndianSettlementAction.INDIAN_SETTLEMENT_SPEAK));
-        choices.add(new ChoiceItem<ScoutIndianSettlementAction>(
-                Messages.message("scoutSettlement.tribute"),
-                ScoutIndianSettlementAction.INDIAN_SETTLEMENT_TRIBUTE));
-        choices.add(new ChoiceItem<ScoutIndianSettlementAction>(
-                Messages.message("scoutSettlement.attack"),
-                ScoutIndianSettlementAction.INDIAN_SETTLEMENT_ATTACK));
-        ScoutIndianSettlementAction result = showChoiceDialog(settlement.getTile(),
-                text.toString(),
-                Messages.message("cancel"),
-                choices);
-        return (result == null) ? ScoutIndianSettlementAction.CANCEL : result;
-    }
-
-    public int showSelectAmountDialog(GoodsType goodsType, int available,
-                                      int defaultAmount, boolean needToPay) {
-        return showFreeColDialog(new SelectAmountDialog(freeColClient,
-                goodsType, available, defaultAmount, needToPay), null, true);
-    }
-
-    /**
-     * Display a dialog allowing the user to select a destination for
-     * a given unit.
-     *
-     * @param unit The <code>Unit</code> to select a destination for.
-     * @return A destination for the unit, or null.
-     */
-    public Location showSelectDestinationDialog(Unit unit) {
-        return showFreeColDialog(new SelectDestinationDialog(freeColClient,
-                unit), unit.getTile(), true);
-    }
-
-
-    /**
-     * Displays the panel for negotiating a sale to a settlement.
-     *
-     * @param unit The <code>Unit</code> that is selling.
-     * @param settlement The <code>Settlement</code> to sell to.
-     * @param goods The <code>Goods</code> to sell.
-     * @param gold The current negotiated price.
-     * @return The chosen action, sell, gift or haggle, or null.
-     */
-    public SellAction showSellDialog(Unit unit, Settlement settlement,
-                                     Goods goods, int gold) {
-        StringTemplate goodsTemplate
-            = StringTemplate.template("model.goods.goodsAmount")
-            .add("%goods%", goods.getType().getNameKey())
-            .addAmount("%amount%", goods.getAmount());
-        StringTemplate nation = settlement.getOwner().getNationName();
-        List<ChoiceItem<SellAction>> choices
-            = new ArrayList<ChoiceItem<SellAction>>();
-        choices.add(new ChoiceItem<SellAction>(
-                Messages.message("sell.takeOffer"),
-                SellAction.SELL));
-        choices.add(new ChoiceItem<SellAction>(
-                Messages.message("sell.moreGold"),
-                SellAction.HAGGLE));
-        choices.add(new ChoiceItem<SellAction>(
-                Messages.message(StringTemplate.template("sell.gift")
-                                 .addStringTemplate("%goods%", goodsTemplate)),
-                SellAction.GIFT));
-        SellAction result = showChoiceDialog(unit.getTile(),
-                Messages.message(StringTemplate.template("sell.text")
-                                 .addStringTemplate("%nation%", nation)
-                                 .addStringTemplate("%goods%", goodsTemplate)
-                                 .addAmount("%gold%", gold)),
-                Messages.message("sellProposition.cancel"),
-                choices);
-        return (result == null) ? SellAction.CANCEL : result;
-    }
-
-    /**
-     * Displays the <code>ServerListPanel</code>.
-     *
-     * @param serverList The list containing the servers retrieved from the
-     *            metaserver.
-     * @see ServerListPanel
-     */
-    public void showServerListPanel(List<ServerInfo> serverList) {
-        closeMenus();
-
-        serverListPanel.initialize(serverList);
-        showSubPanel(serverListPanel, true);
-    }
-
-    public void showSettlement(Settlement s) {
-        if (s instanceof Colony) {
-            if (s.getOwner().equals(freeColClient.getMyPlayer())) {
-                showColonyPanel((Colony) s);
-            } else if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
-                debugForeignColony(s);
-            }
-        } else if (s instanceof IndianSettlement) {
-            showIndianSettlementPanel((IndianSettlement) s);
-        } else {
-            throw new IllegalStateException("Bogus settlement");
-        }
-    }
-
-    /**
-     * Displays a dialog with a text and a cancel-button, in addition
-     * to buttons for each of the objects in the list.
-     *
-     * @param tile An optional tile to make visible (not under the dialog).
-     * @param text The text that explains the choice for the user.
-     * @param cancelText The text displayed on the "cancel"-button.
-     * @param objects The List containing the objects to create buttons for.
-     * @return The chosen object, or <i>null</i> for the cancel-button.
-     */
-    public <T> T showSimpleChoiceDialog(Tile tile,
-                                        String text, String cancelText,
-                                        List<T> objects) {
-        List<ChoiceItem<T>> choices = new ArrayList<ChoiceItem<T>>();
-        for (T object : objects) {
-            choices.add(new ChoiceItem<T>(object));
-        }
-        return showChoiceDialog(tile,
-                                Messages.message(text),
-                                Messages.message(cancelText),
-                                choices);
-    }
-
-    /**
-     * Displays the <code>StartGamePanel</code>.
-     *
-     * @param game The <code>Game</code> that is about to start.
-     * @param player The <code>Player</code> using this client.
-     * @param singlePlayerMode 'true' if the user wants to start a single player
-     *            game, 'false' otherwise.
-     * @see StartGamePanel
-     */
-    public void showStartGamePanel(Game game, Player player, boolean singlePlayerMode) {
-        closeMenus();
-
-        if (game != null && player != null) {
-            startGamePanel.initialize(singlePlayerMode);
-            showSubPanel(startGamePanel, false);
-        } else {
-            logger.warning("Tried to open 'StartGamePanel' without having 'game' and/or 'player' set.");
-        }
-    }
-
-    public void showStatisticsPanel() {
-        showSubPanel(new StatisticsPanel(freeColClient), true);
-    }
-
-    /**
-     * Shows a status message that cannot be dismissed. The panel will be
-     * removed when another component is added to this <code>Canvas</code>.
-     * This includes all the <code>showXXX</code>-methods. In addition,
-     * {@link #closeStatusPanel()} also removes this panel.
-     *
-     * @param message The text message to display on the status panel.
-     * @see StatusPanel
-     */
-    public void showStatusPanel(String message) {
-        statusPanel.setStatusMessage(message);
-        addCentered(statusPanel, STATUS_LAYER);
-    }
-
-    public void showTilePanel(Tile tile) {
-        showSubPanel(new TilePanel(freeColClient, tile), false);
-    }
-
-    /**
-     * Shows a tile popup.
-     *
-     * @param tile The Tile where the popup occurred.
-     * @param x The x-coordinate on the screen where the popup needs to be
-     *            placed.
-     * @param y The y-coordinate on the screen where the popup needs to be
-     *            placed.
-     * @see TilePopup
-     */
-    public void showTilePopup(Tile tile, int x, int y) {
-        if (tile == null)
-            return;
-        TilePopup tp = new TilePopup(freeColClient, tile);
-        if (tp.hasItem()) {
-            tp.show(this, x, y);
-            tp.repaint();
-        } else if (tile.isExplored()) {
-            showTilePanel(tile);
-        }
-    }
-
-    /**
-     * Display a dialog to select a trade route for a unit.
-     *
-     * @param unit The <code>Unit</code> to select a trade route for.
-     * @return True if the trade route changed.
-     */
-    public boolean showTradeRouteDialog(Unit unit) {
-        return showFreeColDialog(new TradeRouteDialog(freeColClient, unit),
-                                 (unit == null) ? null : unit.getTile(), true);
-    }
-
-    public boolean showTradeRouteInputDialog(TradeRoute newRoute) {
-        return showFreeColDialog(new TradeRouteInputDialog(freeColClient,
-                newRoute), null, true);
-    }
-
-    /**
-     * Displays a dialog that asks the user what he wants to do with his
-     * missionary in the indian settlement.
-     *
-     * @param unit The <code>Unit</code> speaking to the settlement.
-     * @param settlement The <code>IndianSettlement</code> being visited.
-     * @param canEstablish Is establish a valid option.
-     * @param canDenounce Is denounce a valid option.
-     * @return The chosen action, establish mission, denounce, incite
-     *         or cancel.
-     */
-    public MissionaryAction showUseMissionaryDialog(Unit unit,
-                                                    IndianSettlement settlement,
-                                                    boolean canEstablish,
-                                                    boolean canDenounce) {
-        List<ChoiceItem<MissionaryAction>> choices
-            = new ArrayList<ChoiceItem<MissionaryAction>>();
-        choices.add(new ChoiceItem<MissionaryAction>(
-                Messages.message("missionarySettlement.establish"),
-                MissionaryAction.ESTABLISH_MISSION, canEstablish));
-        choices.add(new ChoiceItem<MissionaryAction>(
-                Messages.message("missionarySettlement.heresy"),
-                MissionaryAction.DENOUNCE_HERESY, canDenounce));
-        choices.add(new ChoiceItem<MissionaryAction>(
-                Messages.message("missionarySettlement.incite"),
-                MissionaryAction.INCITE_INDIANS));
-        String messageId = settlement.getAlarmLevelMessageId(unit.getOwner());
-        StringBuilder introText
-            = new StringBuilder(Messages.message(StringTemplate.template(messageId)
-                                                 .addStringTemplate("%nation%", settlement.getOwner().getNationName())));
-        introText.append("\n\n");
-        introText.append(Messages.message(StringTemplate.template("missionarySettlement.question")
-                                          .addName("%settlement%", settlement.getName())));
-        MissionaryAction result = showChoiceDialog(unit.getTile(),
-                introText.toString(),
-                Messages.message("cancel"),
-                choices);
-        return (result == null) ? MissionaryAction.CANCEL : result;
-    }
-
-    public void showVictoryPanel() {
-        showSubPanel(new VictoryPanel(freeColClient), true);
-    }
-
-    public boolean showWarehouseDialog(Colony colony) {
-        return showFreeColDialog(new WarehouseDialog(freeColClient, colony),
-            null, true);
-    }
-
-    public void showWorkProductionPanel(Unit unit) {
-        showSubPanel(new WorkProductionPanel(freeColClient, unit), true);
-    }
-
-    public void updateGameOptions() {
-        startGamePanel.updateGameOptions();
-    }
-
-    public void updateMapGeneratorOptions() {
-        startGamePanel.updateMapGeneratorOptions();
-
-    }
-
-    /**
-     * Updates the sizes of the components on this Canvas.
-     */
-    public void updateSizes() {
-        if (oldSize == null) {
-            oldSize = getSize();
-        }
-        if (oldSize.width != getWidth() || oldSize.height != getHeight()) {
-            gui.updateMapControlsInCanvas();
-            mapViewer.setSize(getSize());
-            mapViewer.forceReposition();
-            oldSize = getSize();
-        }
-    }
-
-    /**
-     * Closes all the menus that are currently open.
-     */
-    public void closeMenus() {
-        for (JInternalFrame frame : getAllFrames()) {
-            for (Component c : frame.getContentPane().getComponents()) {
-                if (c instanceof FreeColPanel) {
-                    ((FreeColPanel) c).notifyClose();
-                }
-            }
-            frame.dispose();
-        }
-    }
-
-    public void displayChat(String senderNme, String message, boolean privateChat) {
-        startGamePanel.displayChat(senderNme, message, privateChat);
-
-    }
-
-    /**
-     * Displays an error message.
-     *
-     * @param messageId The i18n-keyname of the error message to display.
-     */
-    public void errorMessage(String messageId) {
-        errorMessage(messageId, "Unspecified error: " + messageId);
-    }
-
-    /**
-     * Refreshes this Canvas visually.
-     */
-    public void refresh() {
-        repaint(0, 0, getWidth(), getHeight());
-    }
-
-    /**
-     * Try to find some free space on the canvas for a component,
-     * starting at x,y.
-     *
-     * @param comp The <code>JComponent</code> to place.
-     * @param x A starting x coordinate.
-     * @param y A starting y coordinate.
-     * @return A <code>Point</code> to place the component at or null
-     *     on failure.
-     */
-    private Point getClearSpace(JComponent comp, int x, int y, int tries) {
-        if (!this.getBounds().contains(x, y)) return null;
-        final int w = comp.getWidth();
-        final int h = comp.getHeight();
-
-        Rectangle r = new Rectangle(x, y, w, h);
-        Component c = null;
-        for (Component child : this.getComponents()) {
-            if (child.getBounds().intersects(r)) {
-                c = child;
-                break;
-            }
-        }
-        if (c == null) return new Point(x, y);
-        if (tries <= 0) return null;
-        Point p;
-        p = getClearSpace(comp, c.getX() + c.getWidth() + 1, y, tries - 1);
-        if (p != null) return p;
-        p = getClearSpace(comp, x, c.getY() + c.getHeight() + 1, tries - 1);
-        if (p != null) return p;
-        p = getClearSpace(comp, c.getX() + c.getWidth() + 1, 
-                          c.getY() + c.getHeight() + 1, tries - 1);
-        return p;
-    }
-
-
-    /**
-     * Adds a component on this Canvas inside a frame.  Removes the
-     * StatusPanel if visible (and <code>comp != statusPanel</code>).
-     *
-     * @param comp The component to add to the canvas.
-     * @param toolBox Should be set to true if the resulting frame is
-     *     used as a toolbox (that is: it should not be counted as a
-     *     frame).
-     * @param popupPosition A preferred <code>PopupPosition</code>.
-     * @param resizable Whether this component can be resized.
-     * @return The <code>JInternalFrame</code> that was created and added.
-     */
-    public JInternalFrame addAsFrame(JComponent comp, boolean toolBox,
-                                     PopupPosition popupPosition,
-                                     boolean resizable) {
-        final int FRAME_EMPTY_SPACE = 60;
-
-        final JInternalFrame f = (toolBox) ? new ToolBoxFrame()
-            : new JInternalFrame();
-        if (f.getContentPane() instanceof JComponent) {
-            JComponent c = (JComponent) f.getContentPane();
-            c.setOpaque(false);
-            c.setBorder(null);
-        }
-
-        if (comp.getBorder() != null) {
-            if (comp.getBorder() instanceof EmptyBorder) {
-                f.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-            } else {
-                f.setBorder(comp.getBorder());
-                comp.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-            }
-        } else {
-            f.setBorder(null);
-        }
-
-        final FrameMotionListener fml = new FrameMotionListener(f);
-        comp.addMouseMotionListener(fml);
-        comp.addMouseListener(fml);
-        if (f.getUI() instanceof BasicInternalFrameUI) {
-            BasicInternalFrameUI biu = (BasicInternalFrameUI) f.getUI();
-            biu.setNorthPane(null);
-            biu.setSouthPane(null);
-            biu.setWestPane(null);
-            biu.setEastPane(null);
-        }
-
-        f.getContentPane().add(comp);
-        f.setOpaque(false);
-        f.pack();
-        int width = f.getWidth();
-        int height = f.getHeight();
-        if (width > getWidth() - FRAME_EMPTY_SPACE) {
-            width = Math.min(width, getWidth());
-        }
-        if (height > getHeight() - FRAME_EMPTY_SPACE) {
-            height = Math.min(height, getHeight());
-        }
-        f.setSize(width, height);
-        Point p = null;
-        if (comp instanceof FreeColPanel
-            && freeColClient.getClientOptions()
-                .getBoolean(ClientOptions.REMEMBER_PANEL_POSITIONS)
-            && (p = ((FreeColPanel)comp).getSavedPosition()) != null) {
-            // Sanity check stuff coming out of client options.
-            if (p.getX() < 0
-                || p.getX() >= getWidth() - f.getWidth()
-                || p.getY() < 0
-                || p.getY() >= getHeight() - f.getHeight()) {
-                p = null;
-            }
-        }
-        int x, y;
-        if (p != null) {
-            x = (int)p.getX();
-            y = (int)p.getY();
-        } else {
-            switch (popupPosition) {
-            case CENTERED:
-                x = (getWidth() - f.getWidth()) / 2;
-                y = (getHeight() - f.getHeight()) / 2;
-                break;
-            case CENTERED_LEFT:
-                x = (getWidth() - f.getWidth()) / 4;
-                y = (getHeight() - f.getHeight()) / 2;
-                break;
-            case CENTERED_RIGHT:
-                x = ((getWidth() - f.getWidth()) * 3) / 4;
-                y = (getHeight() - f.getHeight()) / 2;
-                break;
-            case ORIGIN:
-            default:
-                x = y = 0;
-                break;
-            }
-        }
-        if ((p = getClearSpace(comp, x, y, MAXTRY)) == null) {
-            p = new Point(x, y);
-        }
-        f.setLocation(p);
-        add(f, MODAL_LAYER);
-        f.setName(comp.getClass().getSimpleName());
-
-        f.setFrameIcon(null);
-        f.setVisible(true);
-        f.setResizable(resizable);
-        try {
-            f.setSelected(true);
-        } catch (java.beans.PropertyVetoException e) {}
-
-        return f;
-    }
-
-
-    /**
-     * Adds a component centered on this Canvas. Removes the statuspanel if
-     * visible (and <code>comp != statusPanel</code>).
-     *
-     * @param comp The component to add to this ToEuropePanel.
-     * @param i The layer to add the component to (see JLayeredPane).
-     */
-    private void addCentered(Component comp, Integer i) {
-        comp.setLocation((getWidth() - comp.getWidth()) / 2,
-                         (getHeight() - comp.getHeight()) / 2);
-
-        add(comp, i);
-    }
-
-    /**
-     * Create key bindings for all actions.
-     */
-    private void createKeyBindings() {
-        for (Option option : freeColClient.getActionManager().getOptions()) {
-            FreeColAction action = (FreeColAction) option;
-            getInputMap().put(action.getAccelerator(), action.getId());
-            getActionMap().put(action.getId(), action);
-        }
-    }
-
-    /**
-     * Filters out and displays the EventPanel messages.
-     *
-     * @param messages The list of <code>ModelMessage</code> to filter.
-     * @return The list of messages without any EventPanel messages.
-     */
-    private List<ModelMessage> filterEventPanels(ModelMessage[] messages) {
-        final String eventMatch = "EventPanel.";
-        List<ModelMessage> normal = new ArrayList<ModelMessage>();
-        for (int i = 0; i < messages.length; i++) {
-            String id = messages[i].getId();
-            if (id.startsWith(eventMatch)) {
-                id = id.substring(eventMatch.length());
-                final EventType e = EventType.valueOf(id);
-                SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            showEventPanel(e);
-                        }
-                    });
-            } else {
-                normal.add(messages[i]);
-            }
-        }
-        return normal;
-    }
-
-    /**
-     * Gets any currently displayed colony panel for the specified colony.
-     *
-     * This is distinct from {@link #getExistingFreeColPanel} because
-     * there can be multiple ColonyPanels.
-     *
-     * @param colony The <code>Colony</code> to check.
-     * @return A currently displayed colony panel, or null if not found.
-     */
-    private ColonyPanel getColonyPanel(Colony colony) {
-        for (Component c1 : getComponents()) {
-            if (c1 instanceof JInternalFrame) {
-                for (Component c2 : ((JInternalFrame) c1).getContentPane()
-                         .getComponents()) {
-                    if (c2 instanceof ColonyPanel
-                        && ((ColonyPanel)c2).getColony() == colony) {
-                        return (ColonyPanel)c2;
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Gets a currently displayed FreeColPanel of a given type.
-     *
-     * @param type The type of <code>FreeColPanel</code> to look for.
-     * @return A currently displayed <code>FreeColPanel</code> of the
-     *     requested type, or null if none found.
-     */
-    public <T extends FreeColPanel> T getExistingFreeColPanel(Class<T> type) {
-        for (Component c1 : getComponents()) {
-            if (c1 instanceof JInternalFrame) {
-                for (Component c2 : ((JInternalFrame)c1).getContentPane()
-                         .getComponents()) {
-                    try {
-                        T ret = type.cast(c2);
-                        if (ret != null) {
-                            final JInternalFrame jif = (JInternalFrame)c1;
-                            SwingUtilities.invokeLater(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        jif.toFront();
-                                        jif.repaint();
-                                    }
-                                });
-                            return ret;
-                        }
-                    } catch (ClassCastException cce) {}
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Gets the internal frame for the given component.
-     *
-     * @param c The component.
-     * @return The given component if this is an internal frame or the first
-     *         parent that is an internal frame. Returns <code>null</code> if
-     *         no internal frame is found.
-     */
-    private JInternalFrame getInternalFrame(final Component c) {
-        Component temp = c;
-
-        while (temp != null && !(temp instanceof JInternalFrame)) {
-            temp = temp.getParent();
-        }
-        return (JInternalFrame) temp;
-    }
-
-
-    /**
-     * Given a tile to be made visible, determine a position to popup
-     * a panel.
-     *
-     * @param tile A <code>Tile</code> to be made visible.
-     * @return A <code>PopupPosition</code> for a panel to be displayed.
-     */
-    private PopupPosition getPopupPosition(Tile tile) {
-        if (tile == null)
-            return PopupPosition.CENTERED;
-        int where = mapViewer.setOffsetFocus(tile);
-        return (where > 0) ? PopupPosition.CENTERED_LEFT
-            : (where < 0) ? PopupPosition.CENTERED_RIGHT
-            : PopupPosition.CENTERED;
-    }
-
-    /**
-     * Displays the given dialog, making sure a tile is visible.
-     *
-     * @param freeColDialog The dialog to be displayed
-     * @param tile A <code>Tile</code> to make visible (not under the dialog!)
-     * @param resizable Should the dialog be resizable?
-     * @return The {@link FreeColDialog#getResponse reponse} returned by
-     *         the dialog.
-     */
-    private <T> T showFreeColDialog(FreeColDialog<T> freeColDialog, Tile tile,
-                                    boolean resizable) {
-        showFreeColPanel(freeColDialog, tile, resizable);
-        T response = freeColDialog.getResponse();
-        remove(freeColDialog);
-        return response;
-    }
-
-    /**
-     * Displays the given panel, making sure a tile is visible.
-     *
-     * @param panel The panel to be displayed
-     * @param tile A <code>Tile</code> to make visible (not under the panel!)
-     */
-    private void showFreeColPanel(FreeColPanel panel, Tile tile, boolean resizable) {
-        showSubPanel(panel, getPopupPosition(tile), resizable);
-    }
-
-    /**
-     * Displays a <code>FreeColPanel</code>.
-     * @param panel <code>FreeColPanel</code>, panel to show
-     */
-    private void showSubPanel(FreeColPanel panel, boolean resizable) {
-        showSubPanel(panel, PopupPosition.CENTERED, resizable);
-    }
-
-    /**
-     * Displays a <code>FreeColPanel</code> at a generalized position.
-     *
-     * @param panel <code>FreeColPanel</code>, panel to show
-     * @param popupPosition <code>PopupPosition</code> The generalized
-     *     position to place the panel.
-     */
-    private void showSubPanel(FreeColPanel panel, PopupPosition popupPosition,
-                              boolean resizable) {
-        repaint();
-        addAsFrame(panel, false, popupPosition, resizable);
-        panel.requestFocus();
-    }
-
-
-
-    public Parameters showParametersDialog() {
-        return showFreeColDialog(new ParametersDialog(freeColClient),
-                                 null, false);
-    }
-
-    public Dimension showScaleMapSizeDialog() {
-        return showFreeColDialog(new ScaleMapSizeDialog(freeColClient),
-                                 null, false);
     }
 }

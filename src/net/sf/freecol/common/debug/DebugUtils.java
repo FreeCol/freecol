@@ -921,7 +921,7 @@ public class DebugUtils {
             actions.add(new ChoiceItem<MonarchAction>(action));
         }
         MonarchAction action
-            = gui.showChoiceMonarchActionDialog(monarchTitle, actions);
+            = gui.showChooseMonarchActionDialog(monarchTitle, actions);
         server.getInGameController().setMonarchAction(sPlayer, action);
     }
 

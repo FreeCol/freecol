@@ -657,8 +657,8 @@ public class GUI {
         return canvas.showChoiceDialog(tile, text, cancelText, choices);
     }
 
-    public MonarchAction showChoiceMonarchActionDialog(String monarchTitle, List<ChoiceItem<MonarchAction>> actions) {
-        return canvas.showChoiceMonarchActionDialog(monarchTitle, actions);
+    public MonarchAction showChooseMonarchActionDialog(String monarchTitle, List<ChoiceItem<MonarchAction>> actions) {
+        return canvas.showChooseMonarchActionDialog(monarchTitle, actions);
     }
 
     public FoundingFather showChooseFoundingFatherDialog(List<ChoiceItem<FoundingFather>> fathers, String fatherTitle) {
