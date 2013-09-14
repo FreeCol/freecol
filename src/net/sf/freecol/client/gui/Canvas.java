@@ -192,6 +192,8 @@ import net.sf.freecol.common.resources.Video;
  */
 public final class Canvas extends JDesktopPane {
 
+    /** Number of tries to find a clear spot on the canvas. */
+    private final int MAXTRY = 3;
 
     public static enum BoycottAction {
         CANCEL,
@@ -2111,34 +2113,74 @@ public final class Canvas extends JDesktopPane {
     /**
      * Displays an error message.
      *
-     * @param messageID The i18n-keyname of the error message to display.
+     * @param messageId The i18n-keyname of the error message to display.
      */
-    void errorMessage(String messageID) {
-        errorMessage(messageID, "Unspecified error: " + messageID);
+    public void errorMessage(String messageId) {
+        errorMessage(messageId, "Unspecified error: " + messageId);
     }
 
     /**
      * Refreshes this Canvas visually.
      */
-    void refresh() {
+    public void refresh() {
         repaint(0, 0, getWidth(), getHeight());
     }
 
     /**
-     * Adds a component on this Canvas inside a frame. Removes the
-     * statuspanel if visible (and <code>comp != statusPanel</code>).
+     * Try to find some free space on the canvas for a component,
+     * starting at x,y.
      *
-     * @param comp The component to add to this ToEuropePanel.
-     * @param toolBox Should be set to true if the resulting frame
-     *      is used as a toolbox (that is: it should not be counted
-     *      as a frame).
-     * @param popupPosition a <code>PopupPosition</code> value
+     * @param comp The <code>JComponent</code> to place.
+     * @param x A starting x coordinate.
+     * @param y A starting y coordinate.
+     * @return A <code>Point</code> to place the component at or null
+     *     on failure.
+     */
+    private Point getClearSpace(JComponent comp, int x, int y, int tries) {
+        if (!this.getBounds().contains(x, y)) return null;
+        final int w = comp.getWidth();
+        final int h = comp.getHeight();
+
+        Rectangle r = new Rectangle(x, y, w, h);
+        Component c = null;
+        for (Component child : this.getComponents()) {
+            if (child.getBounds().intersects(r)) {
+                c = child;
+                break;
+            }
+        }
+        if (c == null) return new Point(x, y);
+        if (tries <= 0) return null;
+        Point p;
+        p = getClearSpace(comp, c.getX() + c.getWidth() + 1, y, tries - 1);
+        if (p != null) return p;
+        p = getClearSpace(comp, x, c.getY() + c.getHeight() + 1, tries - 1);
+        if (p != null) return p;
+        p = getClearSpace(comp, c.getX() + c.getWidth() + 1, 
+                          c.getY() + c.getHeight() + 1, tries - 1);
+        return p;
+    }
+
+
+    /**
+     * Adds a component on this Canvas inside a frame.  Removes the
+     * StatusPanel if visible (and <code>comp != statusPanel</code>).
+     *
+     * @param comp The component to add to the canvas.
+     * @param toolBox Should be set to true if the resulting frame is
+     *     used as a toolbox (that is: it should not be counted as a
+     *     frame).
+     * @param popupPosition A preferred <code>PopupPosition</code>.
+     * @param resizable Whether this component can be resized.
      * @return The <code>JInternalFrame</code> that was created and added.
      */
-    public JInternalFrame addAsFrame(JComponent comp, boolean toolBox, PopupPosition popupPosition, boolean resizable) {
+    public JInternalFrame addAsFrame(JComponent comp, boolean toolBox,
+                                     PopupPosition popupPosition,
+                                     boolean resizable) {
         final int FRAME_EMPTY_SPACE = 60;
 
-        final JInternalFrame f = (toolBox) ? new ToolBoxFrame() : new JInternalFrame();
+        final JInternalFrame f = (toolBox) ? new ToolBoxFrame()
+            : new JInternalFrame();
         if (f.getContentPane() instanceof JComponent) {
             JComponent c = (JComponent) f.getContentPane();
             c.setOpaque(false);
@@ -2181,8 +2223,9 @@ public final class Canvas extends JDesktopPane {
         f.setSize(width, height);
         Point p = null;
         if (comp instanceof FreeColPanel
-            && freeColClient.getClientOptions().getBoolean(ClientOptions.REMEMBER_PANEL_POSITIONS)
-            && (p = ((FreeColPanel) comp).getSavedPosition()) != null) {
+            && freeColClient.getClientOptions()
+                .getBoolean(ClientOptions.REMEMBER_PANEL_POSITIONS)
+            && (p = ((FreeColPanel)comp).getSavedPosition()) != null) {
             // Sanity check stuff coming out of client options.
             if (p.getX() < 0
                 || p.getX() >= getWidth() - f.getWidth()
@@ -2191,8 +2234,11 @@ public final class Canvas extends JDesktopPane {
                 p = null;
             }
         }
-        if (p == null) {
-            int x, y;
+        int x, y;
+        if (p != null) {
+            x = (int)p.getX();
+            y = (int)p.getY();
+        } else {
             switch (popupPosition) {
             case CENTERED:
                 x = (getWidth() - f.getWidth()) / 2;
@@ -2211,45 +2257,20 @@ public final class Canvas extends JDesktopPane {
                 x = y = 0;
                 break;
             }
-            // Try to move out of the way of an existing component
-            Component c = getComponentAt(x, y);
-            int tries = 3, x0 = x, y0 = y;
-            while (c != this) {
-                int xn = c.getX() + c.getWidth() + 1;
-                if (getComponentAt(xn, y0) == this) {
-                    x0 = xn;
-                    break;
-                }
-                int yn = c.getY() + c.getHeight() + 1;
-                if (getComponentAt(x0, yn) == this) {
-                    y0 = yn;
-                    break;
-                }
-                x0 = xn;
-                y0 = yn;
-                c = getComponentAt(x, y);
-                if (--tries <= 0) { // Give up and use the original x,y
-                    x0 = x;
-                    y0 = y;
-                    break;
-                }
-            }
-            f.setLocation(x0, y0);
-        } else {
-            f.setLocation(p);
         }
+        if ((p = getClearSpace(comp, x, y, MAXTRY)) == null) {
+            p = new Point(x, y);
+        }
+        f.setLocation(p);
         add(f, MODAL_LAYER);
         f.setName(comp.getClass().getSimpleName());
 
         f.setFrameIcon(null);
         f.setVisible(true);
-        f.setResizable(true);
+        f.setResizable(resizable);
         try {
             f.setSelected(true);
-        } catch (java.beans.PropertyVetoException e) {
-        }
-
-        f.setResizable(resizable);
+        } catch (java.beans.PropertyVetoException e) {}
 
         return f;
     }
