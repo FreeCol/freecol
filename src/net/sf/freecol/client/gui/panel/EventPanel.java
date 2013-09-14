@@ -36,7 +36,7 @@ import net.sf.freecol.common.resources.ResourceManager;
 /**
  * This panel is displayed when an imporantant event in the game has happened.
  */
-public final class EventPanel extends FreeColDialog<Boolean> {
+public final class EventPanel extends FreeColPanel {
 
     private static final Logger logger = Logger.getLogger(EventPanel.class.getName());
 
@@ -58,7 +58,7 @@ public final class EventPanel extends FreeColDialog<Boolean> {
         case FIRST_LANDING:
             image = "EventImage.firstLanding";
             text = Messages.message(StringTemplate.template("event.firstLanding")
-                                    .addName("%name%", Messages.getNewLandName(getMyPlayer())));
+                .addName("%name%", Messages.getNewLandName(getMyPlayer())));
             break;
         case MEETING_EUROPEANS:
             image = "EventImage.meetingEuropeans";
@@ -80,14 +80,13 @@ public final class EventPanel extends FreeColDialog<Boolean> {
             image = "EventImage.discoverPacific";
             text = Messages.message("model.region.pacific.discover");
             break;
-        default:
-            setResponse(Boolean.FALSE);
         }
 
         JLabel header = new JLabel(text);
         header.setFont(mediumHeaderFont);
 
-        JLabel imageLabel = new JLabel(new ImageIcon(ResourceManager.getImage(image)));
+        JLabel imageLabel
+            = new JLabel(new ImageIcon(ResourceManager.getImage(image)));
 
         add(header);
         add(imageLabel);

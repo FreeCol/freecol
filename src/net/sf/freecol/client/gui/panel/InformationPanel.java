@@ -37,57 +37,48 @@ import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
- * A general dialog for information display.
+ * A general panel for information display.
  */
-public class InformationDialog extends FreeColDialog<Boolean> {
+public class InformationPanel extends FreeColPanel {
 
     private JPanel textPanel = null;
     private JScrollPane scrollPane = null;
 
 
     /**
-     * Creates an information dialog that shows the given texts and
+     * Creates an information panel that shows the given texts and
      * images, and an "OK" button.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param text The text to be displayed in the dialog.
-     * @param image The image to be displayed in the dialog.
+     * @param text The text to be displayed in the panel.
+     * @param image The image to be displayed in the panel.
      */
-    public InformationDialog(FreeColClient freeColClient,
-                             String text, ImageIcon image) {
+    public InformationPanel(FreeColClient freeColClient,
+                            String text, ImageIcon image) {
         this(freeColClient, new String[] { text }, new ImageIcon[] { image });
     }
 
     /**
-     * Creates an information dialog that shows the given
+     * Creates an information panel that shows the given
      * texts and images, and an "OK" button.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param texts The texts to be displayed in the dialog.
-     * @param images The images to be displayed in the dialog.
+     * @param texts The texts to be displayed in the panel.
+     * @param images The images to be displayed in the panel.
      */
-    public InformationDialog(FreeColClient freeColClient,
+    public InformationPanel(FreeColClient freeColClient,
                              String[] texts, ImageIcon[] images) {
         super(freeColClient, new MigLayout("wrap 1, insets 200 10 10 10",
                 "[510]", "[242]20[20]"));
 
         textPanel = new MigPanel();
         textPanel.setOpaque(false);
-        if (images != null) {
-            textPanel.setLayout(new MigLayout("wrap 2", "", ""));
-        }
-
-        okButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                setResponse(Boolean.FALSE);
-            }
-        });
-
         if (images == null) {
             for (String text : texts) {
                 textPanel.add(getDefaultTextArea(text, 30));
             }
         } else {
+            textPanel.setLayout(new MigLayout("wrap 2", "", ""));
             for (int i = 0; i < texts.length; i++) {
                 if (images[i] == null) {
                     textPanel.add(getDefaultTextArea(texts[i], 30), "skip");
@@ -111,15 +102,12 @@ public class InformationDialog extends FreeColDialog<Boolean> {
     }
 
 
-    /**
-     * Paints this component.
-     *
-     * @param g The graphics context in which to paint.
-     */
+    // Override JComponent
+
     @Override
     public void paintComponent(Graphics g) {
-        Image bgImage = ResourceManager.getImage("InformationDialog.backgroundImage");
-        g.drawImage(bgImage, 0, 0, this);
+        g.drawImage(ResourceManager.getImage("InformationPanel.backgroundImage"),
+            0, 0, this);
     }
 
 

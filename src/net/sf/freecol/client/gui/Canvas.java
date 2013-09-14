@@ -80,7 +80,7 @@ import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.GameOptionsDialog;
 import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
-import net.sf.freecol.client.gui.panel.InformationDialog;
+import net.sf.freecol.client.gui.panel.InformationPanel;
 import net.sf.freecol.client.gui.panel.LabourData.UnitData;
 import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.gui.panel.MainPanel;
@@ -479,14 +479,15 @@ public final class Canvas extends JDesktopPane {
     /**
      * Displays an error message.
      *
-     * @param messageID The i18n-keyname of the error message to display.
-     * @param message An alternative message to display if the resource specified
-     *            by <code>messageID</code> is unavailable.
+     * @param messageId The i18n-keyname of the error message to display.
+     * @param message An alternative (possibly non-i18n) message to
+     *     display if the resource specified by <code>messageId</code>
+     *     is unavailable.
      */
-    public void errorMessage(String messageID, String message) {
+    public void errorMessage(String messageId, String message) {
         String display = null;
-        if (messageID != null) {
-            display = Messages.message(messageID);
+        if (messageId != null) {
+            display = Messages.message(messageId);
         }
         if (display == null || "".equals(display))
             display = message;
@@ -1259,7 +1260,7 @@ public final class Canvas extends JDesktopPane {
             gui.playSound("sound.event.alertSound");
         }
 
-        showFreeColPanel(new InformationDialog(freeColClient, text, icon),
+        showFreeColPanel(new InformationPanel(freeColClient, text, icon),
                          tile, true);
     }
 
@@ -1294,14 +1295,15 @@ public final class Canvas extends JDesktopPane {
      * @param text The text that explains the action to the user.
      * @param defaultValue The default value appearing in the text field.
      * @param okText The text displayed on the "ok"-button.
-     * @param cancelText The text displayed on the "cancel"-button. Use <i>null</i>
-     *            to disable the cancel-option.
+     * @param cancelText The text displayed on the
+     *     "cancel"-button. Use <i>null</i> to disable the cancel-option.
      * @param rejectEmptyString a <code>boolean</code> value
      * @return The text the user have entered or <i>null</i> if the user chose
-     *         to cancel the action.
+     *     to cancel the action.
      * @see FreeColDialog
      */
-    public String showInputDialog(Tile tile, StringTemplate text, String defaultValue,
+    public String showInputDialog(Tile tile, StringTemplate text,
+                                  String defaultValue,
                                   String okText, String cancelText,
                                   boolean rejectEmptyString) {
         FreeColDialog<String> inputDialog
@@ -1312,25 +1314,20 @@ public final class Canvas extends JDesktopPane {
         String response = null;
         for (;;) {
             response = showFreeColDialog(inputDialog, tile, true);
-            if (!rejectEmptyString || response == null || response.length() > 0) {
-                break;
-            }
-
-            showFreeColPanel(new InformationDialog(freeColClient,
-                    Messages.message("enterSomeText"), null),
-                tile, true);
+            if (!rejectEmptyString || response == null
+                || response.length() > 0) break;
+            errorMessage("enterSomeText");
         }
         return response;
     }
 
     /**
-     * Displays a dialog where the user may choose a file. This is the same as
-     * calling:
+     * Displays a dialog where the user may choose a file.  This is the
+     * same as calling:
      *
-     * <br>
-     * <br>
      * <code>
-     * showLoadDialog(directory, new FileFilter[] {FreeColDialog.getFSGFileFilter()});
+     * showLoadDialog(directory, new FileFilter[] {
+     *                           FreeColDialog.getFSGFileFilter()});
      * </code>
      *
      * @param directory The directory containing the files.
@@ -1404,11 +1401,9 @@ public final class Canvas extends JDesktopPane {
     }
 
     public void showMapEditorTransformPanel() {
-
         JInternalFrame f = addAsFrame(new MapEditorTransformPanel(freeColClient), true, PopupPosition.CENTERED, false);
         f.setLocation(f.getX(), 50);
         repaint();
-
     }
 
     public OptionGroup showMapGeneratorOptionsDialog(OptionGroup mgo, boolean editable, boolean loadCustomOptions) {
@@ -1461,7 +1456,7 @@ public final class Canvas extends JDesktopPane {
                 }
             }
         } else {
-            showSubPanel(new InformationDialog(freeColClient, messageText,
+            showSubPanel(new InformationPanel(freeColClient, messageText,
                                                messageIcon), true);
             if (!isShowingSubPanel()) {
                 freeColClient.getInGameController().nextModelMessage();
@@ -2097,7 +2092,7 @@ public final class Canvas extends JDesktopPane {
     /**
      * Closes all the menus that are currently open.
      */
-    void closeMenus() {
+    public void closeMenus() {
         for (JInternalFrame frame : getAllFrames()) {
             for (Component c : frame.getContentPane().getComponents()) {
                 if (c instanceof FreeColPanel) {
@@ -2108,7 +2103,7 @@ public final class Canvas extends JDesktopPane {
         }
     }
 
-    void displayChat(String senderNme, String message, boolean privateChat) {
+    public void displayChat(String senderNme, String message, boolean privateChat) {
         startGamePanel.displayChat(senderNme, message, privateChat);
 
     }
@@ -2406,10 +2401,12 @@ public final class Canvas extends JDesktopPane {
      *
      * @param freeColDialog The dialog to be displayed
      * @param tile A <code>Tile</code> to make visible (not under the dialog!)
+     * @param resizable Should the dialog be resizable?
      * @return The {@link FreeColDialog#getResponse reponse} returned by
      *         the dialog.
      */
-    private <T> T showFreeColDialog(FreeColDialog<T> freeColDialog, Tile tile, boolean resizable) {
+    private <T> T showFreeColDialog(FreeColDialog<T> freeColDialog, Tile tile,
+                                    boolean resizable) {
         showFreeColPanel(freeColDialog, tile, resizable);
         T response = freeColDialog.getResponse();
         remove(freeColDialog);
@@ -2441,7 +2438,8 @@ public final class Canvas extends JDesktopPane {
      * @param popupPosition <code>PopupPosition</code> The generalized
      *     position to place the panel.
      */
-    private void showSubPanel(FreeColPanel panel, PopupPosition popupPosition, boolean resizable) {
+    private void showSubPanel(FreeColPanel panel, PopupPosition popupPosition,
+                              boolean resizable) {
         repaint();
         addAsFrame(panel, false, popupPosition, resizable);
         panel.requestFocus();

@@ -41,14 +41,16 @@ import net.sf.freecol.common.io.FreeColDirectories;
 /**
  * This is the panel that pops up when an error needs to be reported.
  */
-public final class ErrorPanel extends FreeColDialog<Boolean> {
+public final class ErrorPanel extends FreeColPanel {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ErrorPanel.class.getName());
 
     private static final String SHOW = "show";
 
-    private JButton showButton;
+    private JButton showButton = null;
+
+    private JScrollPane scrollPane = null;
 
 
     /**
@@ -70,7 +72,7 @@ public final class ErrorPanel extends FreeColDialog<Boolean> {
     }
 
     /**
-     * Creates a plain error panel.
+     * Creates an error panel containing the log file.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
@@ -85,7 +87,7 @@ public final class ErrorPanel extends FreeColDialog<Boolean> {
             logFileStream = new BufferedInputStream(new FileInputStream(logFile));
             logFileStream.read(buffer);
             message = new String(buffer);
-        } catch(Exception e) {
+        } catch (Exception e) {
             // ignore
         } finally {
             if (logFileStream != null) {
@@ -100,9 +102,10 @@ public final class ErrorPanel extends FreeColDialog<Boolean> {
         JTextArea textArea = getDefaultTextArea(message, 40);
         textArea.setFocusable(true);
         textArea.setEditable(false);
-        JScrollPane scrollPane =
-            new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        
+        scrollPane = new JScrollPane(textArea,
+            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.getViewport().setOpaque(false);
 
         add(scrollPane, "height 200:200:, wrap 20");
@@ -135,6 +138,7 @@ public final class ErrorPanel extends FreeColDialog<Boolean> {
         super.removeNotify();
 
         removeAll();
+        scrollPane = null;
         showButton = null;
     }
 }
