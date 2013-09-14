@@ -126,7 +126,7 @@ public class PreCombatDialog extends FreeColDialog<Boolean> {
         add(new JSeparator(JSeparator.HORIZONTAL), "newline, span 3, growx");
         add(new JSeparator(JSeparator.HORIZONTAL), "span 3, growx");
         add(finalOffenceLabel);
-        JLabel finalOffenceResult = new JLabel(getModifierFormat().format(offenceResult));
+        JLabel finalOffenceResult = new JLabel(ModifierFormat.format(offenceResult));
         finalOffenceResult.setFont(bigFont);
         add(finalOffenceResult);
 
@@ -136,7 +136,7 @@ public class PreCombatDialog extends FreeColDialog<Boolean> {
         add(finalDefenceLabel, "skip");
         JLabel finalDefenceResult = (defenceResult == Modifier.UNKNOWN)
             ? new JLabel("???")
-            : new JLabel(getModifierFormat().format(defenceResult));
+            : new JLabel(ModifierFormat.format(defenceResult));
         finalDefenceResult.setFont(bigFont);
         add(finalDefenceResult);
 
@@ -164,7 +164,7 @@ public class PreCombatDialog extends FreeColDialog<Boolean> {
             sourceName = Messages.getName(source);
         }
         add(new JLabel(sourceName), constraint);
-        String[] bonus = getModifierStrings(modifier.getValue(), modifier.getType());
+        String[] bonus = ModifierFormat.getModifierStrings(modifier);
         add(new JLabel(bonus[0] + bonus[1]));
         if (bonus[2] == null) {
             return false;

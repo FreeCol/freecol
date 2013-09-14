@@ -47,7 +47,6 @@ import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.ResourceType;
-import net.sf.freecol.common.model.Scope;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.UnitType;
 
@@ -196,63 +195,16 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
         return getUnitButton(unitType, "model.role.default");
     }
 
-    private String getFeatureName(Feature feature) {
-        return Messages.message(feature.getNameKey());
-    }
-
-    private String getFeatureAsString(Feature feature) {
-        String label = Messages.message(getFeatureName(feature)) + ":";
-        if (feature.hasScope()) {
-            for (Scope scope : feature.getScopes()) {
-                String key = null;
-                if (scope.getType() != null) {
-                    key = scope.getType();
-                } else if (scope.getAbilityId() != null) {
-                    key = scope.getAbilityId();
-                } else if (scope.getMethodName() != null) {
-                    key = "model.scope." + scope.getMethodName();
-                }
-                if (key != null) {
-                    label += (scope.isMatchNegated() ? " !" : " ")
-                        + Messages.message(key + ".name") + ",";
-                }
-            }
-        }
-        return label.substring(0, label.length() - 1);
-    }
-
-    public String getModifierAsString(Modifier modifier) {
-        String bonus = modifierFormat.format(modifier.getValue());
-        switch(modifier.getType()) {
-        case ADDITIVE:
-            if (modifier.getValue() > 0) {
-                bonus = "+" + bonus;
-            }
-            break;
-        case PERCENTAGE:
-            if (modifier.getValue() > 0) {
-                bonus = "+" + bonus;
-            }
-            bonus = bonus + "%";
-            break;
-        case MULTIPLICATIVE:
-            bonus = "\u00D7" + bonus;
-            break;
-        default:
-        }
-        return bonus;
-    }
-
     public JComponent getModifierComponent(Modifier modifier) {
         try {
             GoodsType goodsType = getSpecification()
                 .getGoodsType(modifier.getId());
-            String bonus = getModifierAsString(modifier);
+            String bonus = ModifierFormat.getModifierAsString(modifier);
             return getGoodsButton(goodsType, bonus);
         } catch(Exception e) {
             // not a production bonus
-            JLabel label = new JLabel(getFeatureAsString(modifier) + ": "
-                                      + getModifierAsString(modifier));
+            JLabel label = new JLabel(ModifierFormat.getFeatureAsString(modifier) + ": "
+                                      + ModifierFormat.getModifierAsString(modifier));
             label.setToolTipText(Messages.message(modifier.getId() + ".shortDescription"));
             return label;
         }
@@ -260,7 +212,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
 
     public JLabel getAbilityComponent(Ability ability) {
         if (ability.getValue()) {
-            JLabel label = new JLabel(getFeatureAsString(ability));
+            JLabel label = new JLabel(ModifierFormat.getFeatureAsString(ability));
             label.setToolTipText(Messages.message(ability.getId() + ".shortDescription"));
             return label;
         } else {
@@ -307,7 +259,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
     @Override
     public void removeNotify() {
         super.removeNotify();
-        
+
         colopediaPanel = null;
     }
 }

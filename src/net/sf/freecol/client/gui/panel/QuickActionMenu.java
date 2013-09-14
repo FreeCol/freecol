@@ -464,7 +464,7 @@ public final class QuickActionMenu extends JPopupMenu {
                     .addAmount("%denominator%", maxExperience);
                 experiencePanel.add(new JLabel(Messages.message(message)), "align right");
                 experiencePanel.add(new JLabel(Messages.message("menu.unit.upgrade")));
-                experiencePanel.add(new JLabel(FreeColPanel.getModifierFormat().format(probability) + "%"),
+                experiencePanel.add(new JLabel(ModifierFormat.format(probability) + "%"),
                                     "align right");
                 this.add(experiencePanel);
                 separatorNeeded = true;

@@ -93,7 +93,7 @@ public class ResourcesDetailPanel extends ColopediaGameObjectTypePanel<ResourceT
         JPanel goodsPanel = new JPanel();
         goodsPanel.setOpaque(false);
         for (Modifier modifier : type.getModifierSet()) {
-            String text = getModifierAsString(modifier);
+            String text = ModifierFormat.getModifierAsString(modifier);
             if (modifier.hasScope()) {
                 List<String> scopeStrings = new ArrayList<String>();
                 for (Scope scope : modifier.getScopes()) {

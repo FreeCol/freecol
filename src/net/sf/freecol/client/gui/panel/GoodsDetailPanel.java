@@ -113,8 +113,8 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
                 for (int index = 0; index < improvements.size(); index++) {
                     String constraints = (index == 0) ? "span" : "skip, span";
                     panel.add(localizedLabel(StringTemplate.template("colopedia.goods.improvement")
-                                                   .addName("%name%", improvements.get(index))
-                                                   .addName("%amount%", getModifierAsString(modifiers.get(index)))),
+                                             .addName("%name%", improvements.get(index))
+                                             .addName("%amount%", ModifierFormat.getModifierAsString(modifiers.get(index)))),
                                     constraints);
                 }
             }

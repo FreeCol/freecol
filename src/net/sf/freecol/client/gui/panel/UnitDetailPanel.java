@@ -219,7 +219,7 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
             productionPanel.setOpaque(false);
             for (Modifier productionBonus : bonusList) {
                 GoodsType goodsType = getSpecification().getGoodsType(productionBonus.getId());
-                String bonus = getModifierAsString(productionBonus);
+                String bonus = ModifierFormat.getModifierAsString(productionBonus);
                 productionPanel.add(getGoodsButton(goodsType, bonus));
             }
             panel.add(productionPanel, "span");

@@ -163,8 +163,8 @@ public class BuildingToolTip extends JToolTip {
             modifiers.addAll(building.getProductionModifiers(output, null));
             Collections.sort(modifiers);
             for (Modifier m : modifiers) {
-                JLabel[] mLabels = FreeColPanel.getModifierLabels(m, null,
-                                                                  game.getTurn());
+                JLabel[] mLabels = ModifierFormat.getModifierLabels(m, null,
+                                                                    game.getTurn());
                 for (int i = 0; i < mLabels.length; i++) {
                     if (mLabels[i] != null) {
                         if (i == 0) {

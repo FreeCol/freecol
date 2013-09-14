@@ -35,7 +35,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -103,10 +102,6 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
     public static final Insets emptyMargin = new Insets(0,0,0,0);
 
     private static final int cancelKeyCode = KeyEvent.VK_ESCAPE;
-
-    // The decimal format to use for Modifiers
-    protected static final DecimalFormat modifierFormat
-        = new DecimalFormat("0.00");
 
     // Font to use for text areas
     protected static final Font defaultFont
@@ -536,7 +531,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
      */
     public static void enterPressesWhenFocused(JButton button) {
         button.registerKeyboardAction(button.getActionForKeyStroke(
-                KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false)), 
+                KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false)),
             KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false),
             JComponent.WHEN_FOCUSED);
 
@@ -586,60 +581,6 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
 
         textPane.setText(text);
         return textPane;
-    }
-
-    /**
-     * Returns the default modifier value format.
-     *
-     * @return a <code>DecimalFormat</code> value
-     */
-    public static final DecimalFormat getModifierFormat() {
-        return modifierFormat;
-    }
-
-    public static final String[] getModifierStrings(float value, Modifier.Type type) {
-        String[] result;
-        String bonus = modifierFormat.format(value);
-        if (value > 0) {
-            result = new String[] { "+", bonus, null };
-        } else {
-            result = new String[] { "-", bonus.substring(1), null };
-        }
-        if (type == Modifier.Type.PERCENTAGE) {
-            result[2] = "%";
-        } else if (type == Modifier.Type.MULTIPLICATIVE) {
-            // this assumes that no multiplicative modifier will ever be negative
-            result[0] = "\u00D7";
-        }
-        return result;
-    }
-
-    public static JLabel[] getModifierLabels(Modifier modifier,
-                                             FreeColGameObjectType fcgot,
-                                             Turn turn) {
-        float value = modifier.getValue(turn);
-        if (value == 0) return new JLabel[0];
-
-        FreeColObject source = modifier.getSource();
-        String sourceName;
-        if (source == null) {
-            sourceName = "???";
-        } else {
-            sourceName = Messages.getName(source);
-            for (Scope scope : modifier.getScopes()) {
-                if (scope.appliesTo(fcgot)) {
-                    sourceName += (fcgot == null) ? " ()"
-                        : " (" + Messages.message(fcgot.getNameKey()) + ")";
-                }
-            }
-        }
-        String[] bonus = getModifierStrings(value, modifier.getType());
-        JLabel[] result = new JLabel[3];
-        result[0] = new JLabel(sourceName);
-        result[1] = new JLabel(bonus[0] + bonus[1]);
-        result[2] = (bonus[2] == null) ? null
-            : new JLabel(bonus[2]);
-        return result;
     }
 
     /**

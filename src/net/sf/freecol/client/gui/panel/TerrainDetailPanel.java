@@ -93,7 +93,7 @@ public class TerrainDetailPanel extends ColopediaGameObjectTypePanel<TileType> {
         String defenseBonus = Messages.message("none");
         Set<Modifier> defenceModifiers = tileType.getDefenceBonus();
         if (!defenceModifiers.isEmpty()) {
-            defenseBonus = getModifierAsString(defenceModifiers.iterator().next());
+            defenseBonus = ModifierFormat.getModifierAsString(defenceModifiers.iterator().next());
         }
 
         JLabel nameLabel = localizedLabel(tileType.getNameKey());

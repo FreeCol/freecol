@@ -123,11 +123,11 @@ public class WorkProductionPanel extends FreeColPanel {
         add(new UnitLabel(getFreeColClient(), unit, false, false), "wrap");
 
         add(new JLabel(shortName));
-        add(new JLabel(getModifierFormat().format(result)));
+        add(new JLabel(ModifierFormat.format(result)));
 
         Collections.sort(modifiers);
         for (Modifier modifier : modifiers) {
-            JLabel[] mLabels = getModifierLabels(modifier, unitType, turn);
+            JLabel[] mLabels = ModifierFormat.getModifierLabels(modifier, unitType, turn);
             for (int i = 0; i < mLabels.length; i++) {
                 if (mLabels[i] != null) {
                     if (i == 0) add(mLabels[i],"newline"); else add(mLabels[i]);
@@ -139,7 +139,7 @@ public class WorkProductionPanel extends FreeColPanel {
         if (result < 0.0f) {
             add(new JLabel(Messages.message("model.source.zeroThreshold.name")),
                 "newline");
-            add(new JLabel(getModifierFormat().format(-result)), "wrap 30");
+            add(new JLabel(ModifierFormat.format(-result)), "wrap 30");
             result = 0.0f;
         }
         Font bigFont = getFont().deriveFont(Font.BOLD, 16);
@@ -147,14 +147,14 @@ public class WorkProductionPanel extends FreeColPanel {
         finalLabel.setFont(bigFont);
         add(finalLabel, "newline");
 
-        JLabel finalResult = new JLabel(getModifierFormat().format(result));
+        JLabel finalResult = new JLabel(ModifierFormat.format(result));
         finalResult.setFont(bigFont);
         finalResult.setBorder(border);
         add(finalResult, "wrap 30");
 
         Collections.sort(moreModifiers);
         for (Modifier modifier : moreModifiers) {
-            JLabel[] mLabels = getModifierLabels(modifier, null, turn);
+            JLabel[] mLabels = ModifierFormat.getModifierLabels(modifier, null, turn);
             for (int i = 0; i < mLabels.length; i++) {
                 if (mLabels[i] != null) {
                     if (i == 0) {
