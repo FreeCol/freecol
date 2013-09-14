@@ -58,7 +58,6 @@ import net.sf.freecol.client.gui.panel.AboutPanel;
 import net.sf.freecol.client.gui.panel.BuildQueuePanel;
 import net.sf.freecol.client.gui.panel.CaptureGoodsDialog;
 import net.sf.freecol.client.gui.panel.ChatPanel;
-import net.sf.freecol.client.gui.panel.ChoiceDialog;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.ChooseFoundingFatherDialog;
 import net.sf.freecol.client.gui.panel.ClientOptionsDialog;
@@ -71,7 +70,7 @@ import net.sf.freecol.client.gui.panel.DifficultyDialog;
 import net.sf.freecol.client.gui.panel.DumpCargoDialog;
 import net.sf.freecol.client.gui.panel.EditOptionDialog;
 import net.sf.freecol.client.gui.panel.EditSettlementDialog;
-import net.sf.freecol.client.gui.panel.EmigrationPanel;
+import net.sf.freecol.client.gui.panel.EmigrationDialog;
 import net.sf.freecol.client.gui.panel.EndTurnDialog;
 import net.sf.freecol.client.gui.panel.ErrorPanel;
 import net.sf.freecol.client.gui.panel.EuropePanel;
@@ -87,7 +86,7 @@ import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.gui.panel.MainPanel;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
 import net.sf.freecol.client.gui.panel.MapGeneratorOptionsDialog;
-import net.sf.freecol.client.gui.panel.MonarchPanel;
+import net.sf.freecol.client.gui.panel.MonarchDialog;
 import net.sf.freecol.client.gui.panel.NegotiationDialog;
 import net.sf.freecol.client.gui.panel.NewPanel;
 import net.sf.freecol.client.gui.panel.Parameters;
@@ -112,7 +111,7 @@ import net.sf.freecol.client.gui.panel.ReportReligiousPanel;
 import net.sf.freecol.client.gui.panel.ReportRequirementsPanel;
 import net.sf.freecol.client.gui.panel.ReportTradePanel;
 import net.sf.freecol.client.gui.panel.ReportTurnPanel;
-import net.sf.freecol.client.gui.panel.RiverStylePanel;
+import net.sf.freecol.client.gui.panel.RiverStyleDialog;
 import net.sf.freecol.client.gui.panel.ScaleMapSizeDialog;
 import net.sf.freecol.client.gui.panel.SelectAmountDialog;
 import net.sf.freecol.client.gui.panel.SelectDestinationDialog;
@@ -830,18 +829,12 @@ public final class Canvas extends JDesktopPane {
     }
 
     public MonarchAction showChoiceMonarchActionDialog(String monarchTitle, List<ChoiceItem<MonarchAction>> actions) {
-        ChoiceDialog<MonarchAction> choiceDialog
-            = new ChoiceDialog<MonarchAction>(freeColClient, monarchTitle,
-                                              "Cancel", actions);
-        return showFreeColDialog(choiceDialog, null, true);
+        return showChoiceDialog(null, monarchTitle, "Cancel", actions);
     }
 
 
     public FoundingFather showChooseFoundingFatherDialog(List<ChoiceItem<FoundingFather>> fathers, String fatherTitle) {
-        ChoiceDialog<FoundingFather> choiceDialog
-            = new ChoiceDialog<FoundingFather>(freeColClient, fatherTitle,
-                                               "Cancel", fathers);
-        return showFreeColDialog(choiceDialog, null, true);
+        return showChoiceDialog(null, fatherTitle, "Cancel", fathers);
     }
 
     public FoundingFather showChooseFoundingFatherDialog(List<FoundingFather> ffs) {
@@ -1078,11 +1071,11 @@ public final class Canvas extends JDesktopPane {
      * @param fountainOfYouth a <code>boolean</code> value
      * @return The emigrant that was chosen by the user.
      */
-    public int showEmigrationPanel(boolean fountainOfYouth) {
-        EmigrationPanel emigrationPanel = new EmigrationPanel(freeColClient);
-        emigrationPanel.initialize(freeColClient.getMyPlayer().getEurope(),
+    public int showEmigrationDialog(boolean fountainOfYouth) {
+        EmigrationDialog emigrationDialog = new EmigrationDialog(freeColClient);
+        emigrationDialog.initialize(freeColClient.getMyPlayer().getEurope(),
                                    fountainOfYouth);
-        return showFreeColDialog(emigrationPanel, null, true);
+        return showFreeColDialog(emigrationDialog, null, true);
     }
 
 
@@ -1476,9 +1469,9 @@ public final class Canvas extends JDesktopPane {
         }
     }
 
-    public boolean showMonarchPanelDialog(MonarchAction action, StringTemplate replace) {
-        return showFreeColDialog(new MonarchPanel(freeColClient, action,
-                                                  replace), null, true);
+    public boolean showMonarchDialog(MonarchAction action, StringTemplate replace) {
+        return showFreeColDialog(new MonarchDialog(freeColClient, action,
+                                                   replace), null, true);
     }
 
 
@@ -1700,7 +1693,7 @@ public final class Canvas extends JDesktopPane {
 
 
     public String showRiverStyleDialog() {
-        return showFreeColDialog(new RiverStylePanel(freeColClient), null, true);
+        return showFreeColDialog(new RiverStyleDialog(freeColClient), null, true);
     }
 
     /**

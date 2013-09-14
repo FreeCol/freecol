@@ -733,8 +733,8 @@ public class GUI {
         return canvas.showEditOptionDialog(option);
     }
 
-    public int showEmigrationPanel(boolean fountainOfYouth) {
-        return canvas.showEmigrationPanel(fountainOfYouth);
+    public int showEmigrationDialog(boolean fountainOfYouth) {
+        return canvas.showEmigrationDialog(fountainOfYouth);
     }
 
     public boolean showEndTurnDialog(List<Unit> units) {
@@ -836,8 +836,8 @@ public class GUI {
         canvas.showModelMessages(modelMessages);
     }
 
-    public boolean showMonarchPanelDialog(MonarchAction action, StringTemplate replace) {
-        return canvas.showMonarchPanelDialog(action, replace);
+    public boolean showMonarchDialog(MonarchAction action, StringTemplate replace) {
+        return canvas.showMonarchDialog(action, replace);
     }
 
     public DiplomaticTrade showNegotiationDialog(Unit unit, Settlement settlement, DiplomaticTrade agreement) {
@@ -1154,32 +1154,10 @@ public class GUI {
             showInformationMessage(message);
             return false;
         }
-        return confirmAbandonEducation(unit, true);
-    }
-
-    /**
-     * Confirms that a unit should move somewhere where it would have
-     * to abandon its participation in education (if any).
-     *
-     * @param unit The <code>Unit</code> to check.
-     * @param leavingColony True if the unit is leaving the colony.
-     * @return True if the unit should proceed to move.
-     */
-    public boolean confirmAbandonEducation(Unit unit, boolean leavingColony) {
-        StringTemplate message = unit.getAbandonEducationMessage(leavingColony);
-        // when leaving the colony, we need to check both for students and teachers leaving
-        if(leavingColony){
-        	return message == null
-        			|| showConfirmDialog(unit.getTile(), message,
-        					"abandonEducation.yes", "abandonEducation.no");
-        }
-        // the teacher is staying in the colony, just stopping teaching
-        // students moving inside the colony have no effect on learning
-        else{
-        	return message == null
-        			|| showConfirmDialog(unit.getTile(), message,
-        					"abandonTeaching.yes", "abandonTeaching.no");
-        }
+        StringTemplate template = unit.getAbandonEducationMessage(true);
+        return template == null
+            || showConfirmDialog(unit.getTile(), template,
+                "abandonEducation.yes", "abandonEducation.no");
     }
 
     public void updateGameOptions() {

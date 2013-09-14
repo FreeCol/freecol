@@ -38,20 +38,20 @@ import net.sf.freecol.common.model.StringTemplate;
 /**
  * This panel is used to show monarch actions.
  */
-public final class MonarchPanel extends FreeColDialog<Boolean> implements ActionListener {
+public final class MonarchDialog extends FreeColDialog<Boolean> implements ActionListener {
 
-    private static final Logger logger = Logger.getLogger(MonarchPanel.class.getName());
+    private static final Logger logger = Logger.getLogger(MonarchDialog.class.getName());
 
  
     /**
-     * Creates a panel to handle monarch interactions.
+     * Creates a dialog to handle monarch interactions.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param action The <code>MonarchAction</code> the monarch is performing.
      * @param template The <code>StringTemplate</code> describing the action.
      */
-    public MonarchPanel(FreeColClient freeColClient,
-                        MonarchAction action, StringTemplate template) {
+    public MonarchDialog(FreeColClient freeColClient,
+                         MonarchAction action, StringTemplate template) {
         super(freeColClient, new MigLayout("wrap 2, insets 10", "[]20[]"));
 
         String messageId = "model.monarch.action." + action.toString();

@@ -182,7 +182,7 @@ public final class MapEditorController {
             gui.refresh();
         } catch (FreeColException e) {
             gui.closeMenus();
-            gui.errorMessage( e.getMessage() );
+            gui.errorMessage(e.getMessage());
         }
     }
 
@@ -261,13 +261,15 @@ public final class MapEditorController {
         freeColClient.setMapEditor(true);
 
         class ErrorJob implements Runnable {
-            private final  String  message;
+            private final String message;
+
             ErrorJob( String message ) {
                 this.message = message;
             }
+
             public void run() {
                 gui.closeMenus();
-                gui.errorMessage( message );
+                gui.errorMessage(message);
             }
         }
 

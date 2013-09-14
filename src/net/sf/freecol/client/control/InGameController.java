@@ -3764,7 +3764,7 @@ public final class InGameController implements NetworkConstants {
             while (player.checkEmigrate()) {
                 if (player.hasAbility(Ability.SELECT_RECRUIT)
                     && player.getEurope().recruitablesDiffer()) {
-                    int index = gui.showEmigrationPanel(false);
+                    int index = gui.showEmigrationDialog(false);
                     emigrate(player, index + 1);
                 } else {
                     emigrate(player, 0);
@@ -3981,9 +3981,12 @@ public final class InGameController implements NetworkConstants {
      */
     public void work(Unit unit, WorkLocation workLocation) {
         if (!requireOurTurn()) return;
+        StringTemplate template;
 
         if (unit.getStudent() != null
-            && !gui.confirmAbandonEducation(unit, false)) return;
+            && (template = unit.getAbandonEducationMessage(false)) != null
+            && !gui.showConfirmDialog(unit.getTile(), template,
+                "abandonTeaching.yes", "abandonTeaching.no")) return;
 
         Colony colony = workLocation.getColony();
         if (workLocation instanceof ColonyTile) {
