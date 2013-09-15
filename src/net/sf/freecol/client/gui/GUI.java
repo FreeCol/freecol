@@ -712,8 +712,8 @@ public class GUI {
         return canvas.showConfirmDialog(tile, text, okText, cancelText);
     }
 
-    public void showDeclarationDialog() {
-        canvas.showDeclarationDialog();
+    public void showDeclarationPanel() {
+        canvas.showDeclarationPanel();
     }
 
     public void showDifficultyDialog(boolean editable) {

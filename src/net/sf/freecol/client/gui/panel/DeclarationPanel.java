@@ -28,6 +28,8 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -46,92 +48,96 @@ import net.sf.freecol.common.util.Utils;
 /**
  * This panel displays the signing of the Declaration of Independence.
  */
-public final class DeclarationDialog extends FreeColDialog<Boolean> {
+public final class DeclarationPanel extends FreeColPanel {
 
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(DeclarationDialog.class.getName());
+    private static final Logger logger = Logger.getLogger(DeclarationPanel.class.getName());
 
-    private final SignaturePanel signaturePanel;
+    private final int SIGNATURE_Y = 450;
+    
+    private final String ANIMATION_STOPPED = "AnimationStopped";
 
-    private final DeclarationDialog theDialog = this;
+    private final int START_DELAY = 2000; // 2s before signing
+    private final int ANIMATION_DELAY = 50; // 50ms between signature steps
+    private final int FINISH_DELAY = 5000; // 5s before closing
 
 
     /**
-     * Creates a DeclarationDialog.
+     * Creates a DeclarationPanel.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public DeclarationDialog(FreeColClient freeColClient) {
-        super(freeColClient);
-
-        this.signaturePanel = new SignaturePanel();
-
-        setLayout(null);
+    public DeclarationPanel(FreeColClient freeColClient) {
+        super(freeColClient, null);
 
         Image image = ResourceManager.getImage("Declaration.image");
         setSize(image.getWidth(null), image.getHeight(null));
         setOpaque(false);
         setBorder(null);
-
-        signaturePanel.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                ActionListener al = new ActionListener() {
-                    public void actionPerformed(ActionEvent e2) {
-                        theDialog.setResponse(Boolean.TRUE);
-                    }
-                };
-                Timer t = new Timer(10000, al);
-                t.setRepeats(false);
-                t.start();
-            }
-        });
-        add(signaturePanel);
-
+        addKeyListener(new KeyAdapter() {
+                public void keyPressed(KeyEvent k) {
+                    getGUI().removeFromCanvas(DeclarationPanel.this);
+                }
+            });
         addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
-                theDialog.setResponse(Boolean.TRUE);
-            }
-        });
+                public void mouseClicked(MouseEvent e) {
+                    getGUI().removeFromCanvas(DeclarationPanel.this);
+                }
+            });
 
-        initialize();
-    }
-
-
-    /**
-     * Paints an image of the Declaration of Independence on this panel.
-     */
-    public void paintComponent(Graphics g) {
-        Image image = ResourceManager.getImage("Declaration.image");
-        g.drawImage(image, 0, 0, null);
-    }
-
-    /**
-     * Initializes this panel.
-     */
-    public void initialize() {
-        final int SIGNATURE_Y = 450;
-        resetResponse();
-
+        final SignaturePanel signaturePanel = new SignaturePanel();
         signaturePanel.initialize(getMyPlayer().getName());
-        signaturePanel.setLocation((getWidth() - signaturePanel.getWidth()) / 2,
-                (getHeight() + SIGNATURE_Y - signaturePanel.getHeight()) / 2 - 15);
+        signaturePanel.setLocation((getWidth()-signaturePanel.getWidth()) / 2,
+            (getHeight() + SIGNATURE_Y - signaturePanel.getHeight()) / 2 - 15);
+        signaturePanel.addActionListener(this);
 
-        ActionListener al = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                signaturePanel.startAnimation();
-            }
-        };
-        Timer t = new Timer(2000, al);
+        add(signaturePanel);
+    
+        Timer t = new Timer(START_DELAY, new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    signaturePanel.startAnimation();
+                }
+            });
         t.setRepeats(false);
         t.start();
     }
 
 
+    // Interface ActionListener
+
+    /**
+     * {@inheritDoc}
+     */
+    public void actionPerformed(ActionEvent event) {
+        final String command = event.getActionCommand();
+        if (ANIMATION_STOPPED.equals(command)) {
+            Timer t = new Timer(FINISH_DELAY, new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        getGUI().removeFromCanvas(DeclarationPanel.this);
+                    }
+                });
+            t.setRepeats(false);
+            t.start();
+        } else {
+            super.actionPerformed(event);
+        }
+    }
+
+
+    // Override JComponent
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void paintComponent(Graphics g) {
+        Image image = ResourceManager.getImage("Declaration.image");
+        g.drawImage(image, 0, 0, null);
+    }
+
+
     /**
      * A panel for displaying an animated signature.
-     * 
-     * <br>
-     * <br>
      * 
      * The panel should be {@link #initialize(String) initialized} with a name
      * before the animation is {@link #startAnimation() started}.
@@ -140,7 +146,8 @@ public final class DeclarationDialog extends FreeColDialog<Boolean> {
 
         private FAFile faFile;
 
-        private ArrayList<ActionListener> actionListeners = new ArrayList<ActionListener>();
+        private ArrayList<ActionListener> actionListeners
+            = new ArrayList<ActionListener>();
 
         private Point[] points = null;
 
@@ -156,24 +163,24 @@ public final class DeclarationDialog extends FreeColDialog<Boolean> {
          * Gets an abbreviated version of the given name.
          * 
          * @param name The name to be abbreviated
-         * @return The abbreviated version of the given name. The name is made
-         *         small enough to fit within the bounds the
-         *         <code>DeclarationDialog</code>.
+         * @return The abbreviated version of the given name.  The name
+         *     is made small enough to fit within the bounds the
+         *     <code>DeclarationPanel</code>.
          */
         private String getAbbreviatedName(String name) {
-            if (!isTooLarge(name)) {
-                return name;
-            }
+            if (!isTooLarge(name)) return name;
 
             String[] partNames = name.split(" ");
 
             // Abbreviate middle names:
-            for (int i = 1; i < partNames.length - 1 && isTooLarge(Utils.join(" ", partNames)); i++) {
+            for (int i = 1; i < partNames.length - 1
+                     && isTooLarge(Utils.join(" ", partNames)); i++) {
                 partNames[i] = partNames[i].charAt(0) + ".";
             }
 
             // Remove middle names:
-            while (partNames.length > 2 && isTooLarge(Utils.join(" ", partNames))) {
+            while (partNames.length > 2
+                && isTooLarge(Utils.join(" ", partNames))) {
                 String[] newPartNames = new String[partNames.length - 1];
                 newPartNames[0] = partNames[0];
                 for (int i = 1; i < newPartNames.length; i++) {
@@ -199,11 +206,11 @@ public final class DeclarationDialog extends FreeColDialog<Boolean> {
          * 
          * @param name The string to be tested.
          * @return <code>true</code> if the given string was to large to be
-         *         fully displayed.
+         *     fully displayed.
          */
         private boolean isTooLarge(String name) {
             Dimension d = faFile.getDimension(name);
-            return (d.width > theDialog.getWidth() - 10);
+            return (d.width > DeclarationPanel.this.getWidth() - 10);
         }
 
         /**
@@ -221,7 +228,7 @@ public final class DeclarationDialog extends FreeColDialog<Boolean> {
 
         /**
          * Adds an <code>ActionListener</code> to this
-         * <code>SignaturePanel</code>. An event gets fired when the
+         * <code>SignaturePanel</code>.  An event gets fired when the
          * animation is stopped.
          * 
          * @param al The <code>ActionListener</code>.
@@ -235,19 +242,19 @@ public final class DeclarationDialog extends FreeColDialog<Boolean> {
 
         private void notifyStopped() {
             for (int i = 0; i < actionListeners.size(); i++) {
-                actionListeners.get(i).actionPerformed(
-                        new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "AnimationStopped"));
+                actionListeners.get(i).actionPerformed(new ActionEvent(this,
+                        ActionEvent.ACTION_PERFORMED, ANIMATION_STOPPED));
             }
         }
 
         /**
-         * Starts the animation of the signature. An <code>ActionEvent</code>
-         * gets sent to the registered listeners when the animation has stopped.
+         * Starts the animation of the signature.  An
+         * <code>ActionEvent</code> gets sent to the registered
+         * listeners when the animation has stopped.
          * 
          * @see #addActionListener(ActionListener)
          */
         public void startAnimation() {
-            int delay = 50; // milliseconds
             ActionListener taskPerformer = new ActionListener() {
                 public void actionPerformed(ActionEvent evt) {
                     if (counter < points.length - 1) {
@@ -260,17 +267,21 @@ public final class DeclarationDialog extends FreeColDialog<Boolean> {
                         validate();
                         repaint();
                     } else {
-                        ((Timer) evt.getSource()).stop();
+                        ((Timer)evt.getSource()).stop();
                         notifyStopped();
                     }
                 }
             };
-            new Timer(delay, taskPerformer).start();
+            new Timer(ANIMATION_DELAY, taskPerformer).start();
         }
 
+
+        // Override JComponent
+        
         /**
-         * Paints the signature.
+         * {@inheritDoc}
          */
+        @Override
         public void paintComponent(Graphics g) {
             if (points == null || points.length == 0) {
                 return;
@@ -280,7 +291,8 @@ public final class DeclarationDialog extends FreeColDialog<Boolean> {
             }
 
             g.setColor(Color.BLACK);
-            ((Graphics2D) g).setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.75f));
+            ((Graphics2D)g).setComposite(AlphaComposite
+                .getInstance(AlphaComposite.SRC_OVER, 0.75f));
 
             for (int i = 0; i < counter-1; i++) {
                 Point p1 = points[i];

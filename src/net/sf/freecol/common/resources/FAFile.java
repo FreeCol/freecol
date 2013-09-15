@@ -33,7 +33,7 @@ import java.util.StringTokenizer;
 /**
  * Represents the data within a Font Animation File.
  * 
- * @see net.sf.freecol.client.gui.panel.DeclarationDialog
+ * @see net.sf.freecol.client.gui.panel.DeclarationPanel
  */
 public class FAFile {
 

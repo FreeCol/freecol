@@ -65,7 +65,7 @@ import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.ColopediaPanel;
 import net.sf.freecol.client.gui.panel.CompactLabourReport;
 import net.sf.freecol.client.gui.panel.ConfirmDeclarationDialog;
-import net.sf.freecol.client.gui.panel.DeclarationDialog;
+import net.sf.freecol.client.gui.panel.DeclarationPanel;
 import net.sf.freecol.client.gui.panel.DifficultyDialog;
 import net.sf.freecol.client.gui.panel.DumpCargoDialog;
 import net.sf.freecol.client.gui.panel.EditOptionDialog;
@@ -440,11 +440,11 @@ public final class Canvas extends JDesktopPane {
                 p = null;
             }
         }
-        int x, y;
+        int x = 0, y = 0;
         if (p != null) {
             x = (int)p.getX();
             y = (int)p.getY();
-        } else {
+        } else if (popupPosition != null) {
             switch (popupPosition) {
             case CENTERED:
                 x = (getWidth() - f.getWidth()) / 2;
@@ -459,7 +459,6 @@ public final class Canvas extends JDesktopPane {
                 y = (getHeight() - f.getHeight()) / 2;
                 break;
             case ORIGIN:
-            default:
                 x = y = 0;
                 break;
             }
@@ -1477,10 +1476,12 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Display a dialog following declaration of independence.
+     * Display a panel showing the declaration of independence with
+     * animated signature.
      */
-    public void showDeclarationDialog() {
-        showFreeColDialog(new DeclarationDialog(freeColClient), null, true);
+    public void showDeclarationPanel() {
+        showSubPanel(new DeclarationPanel(freeColClient),
+                     PopupPosition.CENTERED, false);
     }
 
     /**
