@@ -341,8 +341,8 @@ public final class InGameController extends Controller {
     public ServerPlayer createREFPlayer(ServerPlayer serverPlayer) {
         Nation refNation = serverPlayer.getNation().getREFNation();
         Monarch monarch = serverPlayer.getMonarch();
-        Europe europe = serverPlayer.getEurope();
         ServerPlayer refPlayer = getFreeColServer().addAIPlayer(refNation);
+        Europe europe = refPlayer.getEurope();
         refPlayer.setEntryLocation(null); // Trigger initial placement routine
         Player.makeContact(serverPlayer, refPlayer); // Will change, setup only
 
