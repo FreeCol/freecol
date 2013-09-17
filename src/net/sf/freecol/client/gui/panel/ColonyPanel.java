@@ -829,9 +829,9 @@ public final class ColonyPanel extends PortPanel
         final Colony colony = getColony();
         boolean abandon = false;
         if (colony.getUnitCount() == 0) {
-            if (!getGUI().showConfirmDialog("abandonColony.text",
-                                            "abandonColony.yes",
-                                            "abandonColony.no")) return;
+            if (!getGUI().showConfirmDialog(null,
+                    StringTemplate.key("abandonColony.text"), this,
+                    "abandonColony.yes", "abandonColony.no")) return;
             abandon = true;
         }                
         if (!abandon) {
@@ -843,7 +843,7 @@ public final class ColonyPanel extends PortPanel
                         .addName("%colony%", colony.getName())
                         .addAmount("%number%", buildable.getRequiredPopulation())
                         .add("%buildable%", buildable.getNameKey()),
-                    "ok", "cancel")) {
+                    this, "ok", "cancel")) {
                 return;
             }
         }

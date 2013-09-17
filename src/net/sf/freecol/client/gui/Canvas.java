@@ -1403,68 +1403,24 @@ public final class Canvas extends JDesktopPane {
     /**
      * Displays a dialog with a text and a ok/cancel option.
      *
-     * @param text The text that explains the choice for the user.
-     * @param okText The text displayed on the "ok"-button.
-     * @param cancelText The text displayed on the "cancel"-button.
-     * @return <i>true</i> if the user clicked the "ok"-button and <i>false</i>
-     *         otherwise.
-     * @see FreeColDialog
-     */
-    public boolean showConfirmDialog(String text, String okText, 
-                                     String cancelText) {
-        return showFreeColDialog(FreeColDialog
-            .createConfirmDialog(freeColClient, Messages.message(text),
-                                 Messages.message(okText),
-                                 Messages.message(cancelText)),
-                                 null, true);
-    }
-
-    /**
-     * Displays a dialog with a text and a ok/cancel option.
-     *
      * @param tile An optional <code>Tile</code> to make visible (not
      *     under the dialog!)
-     * @param messages The messages that explains the choice for the user.
+     * @param text The text that explains the choice for the user (should
+     *     have been i18n-expanded in GUI).
+     * @param icon An optional icon to display.
      * @param okText The text displayed on the "ok"-button.
      * @param cancelText The text displayed on the "cancel"-button.
      * @return <i>true</i> if the user clicked the "ok"-button and <i>false</i>
      *     otherwise.
      * @see FreeColDialog
      */
-    public boolean showConfirmDialog(Tile tile, ModelMessage[] messages,
+    public boolean showConfirmDialog(Tile tile, String text, ImageIcon icon,
                                      String okText, String cancelText) {
-        String[] texts = new String[messages.length];
-        ImageIcon[] images = new ImageIcon[messages.length];
-        for (int i = 0; i < messages.length; i++) {
-            texts[i] = Messages.message(messages[i]);
-            images[i] = gui.getImageIcon(freeColClient.getGame()
-                .getMessageDisplay(messages[i]), false);
-        }
-
-        FreeColDialog<Boolean> confirmDialog
-            = FreeColDialog.createConfirmDialog(freeColClient, texts, images,
-                    Messages.message(okText), Messages.message(cancelText));
-        return showFreeColDialog(confirmDialog, tile, true);
-    }
-
-    /**
-     * Displays a dialog with a text and a ok/cancel option.
-     *
-     * @param tile A <code>Tile</code> to make visible (not under the dialog!)
-     * @param text The text that explains the choice for the user.
-     * @param okText The text displayed on the "ok"-button.
-     * @param cancelText The text displayed on the "cancel"-button.
-     * @return <i>true</i> if the user clicked the "ok"-button and <i>false</i>
-     *         otherwise.
-     * @see FreeColDialog
-     */
-    public boolean showConfirmDialog(Tile tile, StringTemplate text,
-                                     String okText, String cancelText) {
-        return showFreeColDialog(FreeColDialog
-            .createConfirmDialog(freeColClient, Messages.message(text),
-                                 Messages.message(okText),
-                                 Messages.message(cancelText)),
-                                 tile, true);
+        FreeColDialog<Boolean> dialog
+            = FreeColDialog.createConfirmDialog(freeColClient, text, icon,
+                Messages.message(okText),
+                Messages.message(cancelText));
+        return showFreeColDialog(dialog, tile, true);
     }
 
     /**

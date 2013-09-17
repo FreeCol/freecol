@@ -999,7 +999,8 @@ public class DebugUtils {
             int val = server.getInGameController().stepRandom();
             more = gui.showConfirmDialog(null,
                 StringTemplate.template("menuBar.debug.randomValue")
-                .addAmount("%value%", val), "more", "ok");
+                    .addAmount("%value%", val),
+                null, "more", "ok");
         }
     }
 

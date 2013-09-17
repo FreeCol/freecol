@@ -698,18 +698,17 @@ public class GUI {
         return canvas.showConfirmDeclarationDialog();
     }
 
-    public boolean showConfirmDialog(String text, String okText, String cancelText) {
-        return canvas.showConfirmDialog(text, okText, cancelText);
+    public boolean showConfirmDialog(String text,
+                                     String okText, String cancelText) {
+        return canvas.showConfirmDialog(null, Messages.message(text),
+                                        null, okText, cancelText);
     }
 
-    public boolean showConfirmDialog(Tile tile, ModelMessage[] messages,
-            String okText, String cancelText) {
-        return canvas.showConfirmDialog(tile, messages, okText, cancelText);
-    }
-
-    public boolean showConfirmDialog(Tile tile, StringTemplate text,
-            String okText, String cancelText) {
-        return canvas.showConfirmDialog(tile, text, okText, cancelText);
+    public boolean showConfirmDialog(Tile tile,
+                                     StringTemplate template, Object obj,
+                                     String okText, String cancelText) {
+        return canvas.showConfirmDialog(tile, Messages.message(template),
+            getImageIcon(obj, false), okText, cancelText);
     }
 
     public void showDeclarationPanel() {
@@ -1156,7 +1155,7 @@ public class GUI {
         }
         StringTemplate template = unit.getAbandonEducationMessage(true);
         return template == null
-            || showConfirmDialog(unit.getTile(), template,
+            || showConfirmDialog(unit.getTile(), template, unit,
                 "abandonEducation.yes", "abandonEducation.no");
     }
 

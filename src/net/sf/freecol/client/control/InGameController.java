@@ -261,8 +261,8 @@ public final class InGameController implements NetworkConstants {
         }
         return gui.showConfirmDialog(attacker.getTile(),
             StringTemplate.template(messageID)
-            .addStringTemplate("%nation%", enemy.getNationName()),
-            "model.diplomacy.attack.confirm", "cancel");
+                .addStringTemplate("%nation%", enemy.getNationName()),
+            attacker, "model.diplomacy.attack.confirm", "cancel");
     }
 
     /**
@@ -749,7 +749,7 @@ public final class InGameController implements NetworkConstants {
                         .addName("%amount%", overflow)
                         .add("%goods%", goods.getNameKey());
                     if (!gui.showConfirmDialog(colony.getTile(), template,
-                            "yes", "no")) {
+                                               unit, "yes", "no")) {
                         amount = atStop;
                     }
                     break;
@@ -1637,44 +1637,38 @@ public final class InGameController implements NetworkConstants {
             }
         }
 
-        ArrayList<ModelMessage> messages = new ArrayList<ModelMessage>();
+        StringBuilder sb = new StringBuilder(256);
         if (landLocked) {
-            messages.add(new ModelMessage(MessageType.MISSING_GOODS,
-                    "buildColony.landLocked", unit,
-                    getSpecification().getGoodsType("model.goods.fish")));
+            sb.append(Messages.message("buildColony.landLocked")).append("\n");
         }
         if (food < 8) {
-            messages.add(new ModelMessage(MessageType.MISSING_GOODS,
-                    "buildColony.noFood", unit,
-                    getSpecification().getPrimaryFoodType()));
+            sb.append(Messages.message("buildColony.noFood")).append("\n");
         }
         for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
-            if (!entry.getKey().isFoodType() && entry.getValue().intValue() < 4) {
-                messages.add(new ModelMessage(MessageType.MISSING_GOODS,
-                        "buildColony.noBuildingMaterials",
-                        unit, entry.getKey())
-                    .add("%goods%", entry.getKey().getNameKey()));
+            if (!entry.getKey().isFoodType()
+                && entry.getValue().intValue() < 4) {
+                sb.append(Messages.message(StringTemplate
+                        .template("buildColony.noBuildingMaterials")
+                        .add("%goods%", entry.getKey().getNameKey())))
+                    .append("\n");
             }
         }
 
         if (ownedBySelf) {
-            messages.add(new ModelMessage(MessageType.WARNING,
-                    "buildColony.ownLand", unit));
+            sb.append(Messages.message("buildColony.ownLand")).append("\n");
         }
         if (ownedByEuropeans) {
-            messages.add(new ModelMessage(MessageType.WARNING,
-                    "buildColony.EuropeanLand", unit));
+            sb.append(Messages.message("buildColony.EuropeanLand"))
+                .append("\n");
         }
         if (ownedByIndians) {
-            messages.add(new ModelMessage(MessageType.WARNING,
-                    "buildColony.IndianLand", unit));
+            sb.append(Messages.message("buildColony.IndianLand")).append("\n");
         }
 
-        if (messages.isEmpty()) return true;
-        ModelMessage[] modelMessages
-            = messages.toArray(new ModelMessage[messages.size()]);
-        return gui.showConfirmDialog(unit.getTile(),
-            modelMessages, "buildColony.yes", "buildColony.no");
+        return (sb.length() == 0) ? true
+            : gui.showConfirmDialog(unit.getTile(), 
+                StringTemplate.label(sb.toString()), unit,
+                "buildColony.yes", "buildColony.no");
     }
 
 
@@ -1852,7 +1846,7 @@ public final class InGameController implements NetworkConstants {
                 template = StringTemplate.template("cashInTreasureTrain.pay")
                     .addAmount("%fee%", percent);
             }
-            cash = gui.showConfirmDialog(unit.getTile(), template,
+            cash = gui.showConfirmDialog(unit.getTile(), template, unit,
                 "cashInTreasureTrain.yes", "cashInTreasureTrain.no");
         }
 
@@ -1917,8 +1911,8 @@ public final class InGameController implements NetworkConstants {
         if (unit.getState() == UnitState.IMPROVING
             && !gui.showConfirmDialog(unit.getTile(),
                 StringTemplate.template("model.unit.confirmCancelWork")
-                .addAmount("%turns%", unit.getWorkTurnsLeft()),
-                "yes", "no")) {
+                    .addAmount("%turns%", unit.getWorkTurnsLeft()),
+                unit, "yes", "no")) {
             return false;
         }
 
@@ -1948,9 +1942,9 @@ public final class InGameController implements NetworkConstants {
         Tile tile = (gui.isShowingSubPanel()) ? null : unit.getTile();
         if (!gui.showConfirmDialog(tile,
                 StringTemplate.template("clearSpeciality.areYouSure")
-                .addStringTemplate("%oldUnit%", unit.getFullLabel())
-                .add("%unit%", newType.getNameKey()),
-                "yes", "no")) {
+                   .addStringTemplate("%oldUnit%", unit.getFullLabel())
+                   .add("%unit%", newType.getNameKey()),
+                unit, "yes", "no")) {
             return;
         }
 
@@ -2025,7 +2019,7 @@ public final class InGameController implements NetworkConstants {
             : unit.getTile();
         if (!gui.showConfirmDialog(tile,
                 StringTemplate.key("disbandUnit.text"),
-                "disbandUnit.yes", "disbandUnit.no")) {
+                unit, "disbandUnit.yes", "disbandUnit.no")) {
             return;
         }
 
@@ -2630,7 +2624,9 @@ public final class InGameController implements NetworkConstants {
 
         while (disembarkable.size() > 0) {
             if (disembarkable.size() == 1) {
-                if (gui.showConfirmDialog("disembark.text", "yes", "no")) {
+                if (gui.showConfirmDialog(tile,
+                        StringTemplate.key("disembark.text"),
+                        disembarkable.get(0), "yes", "no")) {
                     move(disembarkable.get(0), direction);
                 }
                 break;
@@ -2732,14 +2728,14 @@ public final class InGameController implements NetworkConstants {
     private boolean moveExplore(Unit unit, Direction direction) {
         Tile tile = unit.getTile().getNeighbourOrNull(direction);
         if (!gui.showConfirmDialog(unit.getTile(),
-                StringTemplate.key("exploreLostCityRumour.text"),
+                StringTemplate.key("exploreLostCityRumour.text"), unit,
                 "exploreLostCityRumour.yes", "exploreLostCityRumour.no")) {
             return true;
         }
         if (tile.getLostCityRumour().getType()
             == LostCityRumour.RumourType.MOUNDS
             && !gui.showConfirmDialog(unit.getTile(),
-                StringTemplate.key("exploreMoundsRumour.text"),
+                StringTemplate.key("exploreMoundsRumour.text"), unit,
                 "exploreLostCityRumour.yes", "exploreLostCityRumour.no")) {
             askServer().declineMounds(unit, direction);
         }
@@ -2777,8 +2773,8 @@ public final class InGameController implements NetworkConstants {
             } else {
                 if (gui.showConfirmDialog(oldTile,
                         StringTemplate.template("highseas.text")
-                                      .addAmount("%number%", unit.getSailTurns()),
-                        "highseas.yes", "highseas.no")) {
+                            .addAmount("%number%", unit.getSailTurns()),
+                        unit, "highseas.yes", "highseas.no")) {
                     moveTo(unit, unit.getOwner().getEurope());
                     return false;
                 }
@@ -2818,8 +2814,8 @@ public final class InGameController implements NetworkConstants {
                 .add("%skill%", skill.getNameKey()));
         } else if (gui.showConfirmDialog(unit.getTile(),
                 StringTemplate.template("learnSkill.text")
-                .add("%skill%", skill.getNameKey()),
-                "learnSkill.yes", "learnSkill.no")) {
+                    .add("%skill%", skill.getNameKey()),
+                unit, "learnSkill.yes", "learnSkill.no")) {
             if (askServer().learnSkill(unit, direction)) {
                 if (unit.isDisposed()) {
                     gui.showInformationMessage(settlement, "learnSkill.die");
@@ -3395,9 +3391,9 @@ public final class InGameController implements NetworkConstants {
             } else {
                 if (gui.showConfirmDialog(unit.getTile(),
                         StringTemplate.template("missionarySettlement.inciteConfirm")
-                        .add("%player%", enemy.getName())
-                        .addAmount("%amount%", gold),
-                        "yes", "no")) {
+                            .add("%player%", enemy.getName())
+                            .addAmount("%amount%", gold),
+                        unit, "yes", "no")) {
                     if (askServer().incite(unit, direction, enemy, gold) >= 0) {
                         gui.updateMenuBar();
                     }
@@ -3505,8 +3501,8 @@ public final class InGameController implements NetworkConstants {
         }
         if (gui.showConfirmDialog(null,
                 StringTemplate.template("model.europe.payArrears")
-                .addAmount("%amount%", arrears),
-                "ok", "cancel")
+                    .addAmount("%amount%", arrears),
+                type, "ok", "cancel")
             && askServer().payArrears(type)
             && player.canTrade(type)) {
             gui.updateMenuBar();
@@ -3531,8 +3527,8 @@ public final class InGameController implements NetworkConstants {
         int price = colony.getPriceForBuilding();
         if (!gui.showConfirmDialog(null,
                 StringTemplate.template("payForBuilding.text")
-                .addAmount("%amount%", price),
-                "payForBuilding.yes", "payForBuilding.no")) {
+                    .addAmount("%amount%", price),
+                colony, "payForBuilding.yes", "payForBuilding.no")) {
             return;
         }
 
@@ -3810,7 +3806,7 @@ public final class InGameController implements NetworkConstants {
                 .addStringTemplate("%unit%", unit.getFullLabel())
                 .addName("%route%", unit.getTradeRoute().getName());
             if (!gui.showConfirmDialog(unit.getTile(), template,
-                    "yes", "no")) return false;
+                    unit, "yes", "no")) return false;
         }
         return askServer().setDestination(unit, destination)
             && unit.getDestination() == destination;
@@ -3986,7 +3982,7 @@ public final class InGameController implements NetworkConstants {
         if (unit.getStudent() != null
             && (template = unit.getAbandonEducationMessage(false)) != null
             && !gui.showConfirmDialog(unit.getTile(), template,
-                "abandonTeaching.yes", "abandonTeaching.no")) return;
+                unit, "abandonTeaching.yes", "abandonTeaching.no")) return;
 
         Colony colony = workLocation.getColony();
         if (workLocation instanceof ColonyTile) {

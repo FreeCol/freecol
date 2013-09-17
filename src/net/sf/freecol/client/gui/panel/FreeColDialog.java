@@ -174,23 +174,15 @@ public class FreeColDialog<T> extends FreeColPanel {
      * {@link #setResponse setResponse(new Boolean(false))}.
      *
      * @param text The text that explains the choice for the user.
+     * @param icon An optional icon to display.
      * @param okText The text displayed on the "ok"-button.
      * @param cancelText The text displayed on the "cancel"-button.
      * @return The <code>FreeColDialog</code>.
      */
     public static FreeColDialog<Boolean>
-        createConfirmDialog(final FreeColClient freeColClient, String text,
+        createConfirmDialog(final FreeColClient freeColClient,
+                            String text, ImageIcon icon,
                             String okText, String cancelText) {
-        return createConfirmDialog(freeColClient, new String[] {text}, null,
-                                   okText, cancelText);
-    }
-
-
-    public static FreeColDialog<Boolean>
-        createConfirmDialog(FreeColClient freeColClient, String[] texts,
-                            ImageIcon[] icons,
-                            String okText, String cancelText) {
-        // create the dialog
         final FreeColDialog<Boolean> confirmDialog
             = new FreeColDialog<Boolean>(freeColClient,
                 new MigLayout("wrap 2", "[][fill]", ""));
@@ -210,16 +202,11 @@ public class FreeColDialog<T> extends FreeColPanel {
                 }
             });
 
-        for (int i = 0; i < texts.length; i++) {
-            if (icons != null && icons[i] != null) {
-                confirmDialog.add(new JLabel(icons[i]));
-                confirmDialog.add(getDefaultTextArea(texts[i]));
-            } else {
-                confirmDialog.add(getDefaultTextArea(texts[i]), "skip");
-            }
-        }
+        if (icon != null) confirmDialog.add(new JLabel(icon));
+        confirmDialog.add(getDefaultTextArea(text));
 
-        confirmDialog.add(confirmDialog.okButton, "newline 20, span, split 2, tag ok");
+        confirmDialog.add(confirmDialog.okButton,
+            "newline 20, span, split 2, tag ok");
         confirmDialog.add(confirmDialog.cancelButton, "tag cancel");
 
         return confirmDialog;

@@ -199,8 +199,8 @@ public final class InGameInputHandler extends InputHandler {
     private Element reconnect(Element element) {
         logger.finest("Entered reconnect...");
         if (new ShowConfirmDialogSwingTask(null,
-                                           StringTemplate.key("reconnect.text"),
-                                           "reconnect.yes", "reconnect.no").confirm()) {
+                StringTemplate.key("reconnect.text"),
+                "reconnect.yes", "reconnect.no").confirm()) {
             logger.finest("User wants to reconnect, do it!");
             new ReconnectSwingTask().invokeLater();
         } else {
@@ -570,7 +570,8 @@ public final class InGameInputHandler extends InputHandler {
                     freeColClient.quit();
                 }
             } else {
-                if (!new ShowConfirmDialogSwingTask(null, StringTemplate.key("defeated.text"),
+                if (!new ShowConfirmDialogSwingTask(null,
+                        StringTemplate.key("defeated.text"),
                         "defeated.yes", "defeated.no").confirm()) {
                     freeColClient.quit();
                 }
@@ -773,9 +774,9 @@ public final class InGameInputHandler extends InputHandler {
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ASK:
                 accepted = new ShowConfirmDialogSwingTask(colony.getTile(),
                     StringTemplate.template("indianDemand.gold.text")
-                    .addName("%nation%", nation)
-                    .addName("%colony%", colony.getName())
-                    .addAmount("%amount%", amount),
+                        .addName("%nation%", nation)
+                        .addName("%colony%", colony.getName())
+                        .addAmount("%amount%", amount),
                     "indianDemand.gold.yes",
                     "indianDemand.gold.no").confirm();
                 break;
@@ -804,18 +805,18 @@ public final class InGameInputHandler extends InputHandler {
                 if (type.isFoodType()) {
                     accepted = new ShowConfirmDialogSwingTask(colony.getTile(),
                         StringTemplate.template("indianDemand.food.text")
-                        .addName("%nation%", nation)
-                        .addName("%colony%", colony.getName())
-                        .addAmount("%amount%", amount),
+                            .addName("%nation%", nation)
+                            .addName("%colony%", colony.getName())
+                            .addAmount("%amount%", amount),
                         "indianDemand.food.yes",
                         "indianDemand.food.no").confirm();
                 } else {
                     accepted = new ShowConfirmDialogSwingTask(colony.getTile(),
                         StringTemplate.template("indianDemand.other.text")
-                        .addName("%nation%", nation)
-                        .addName("%colony%", colony.getName())
-                        .addAmount("%amount%", amount)
-                        .add("%goods%", type.getNameKey()),
+                            .addName("%nation%", nation)
+                            .addName("%colony%", colony.getName())
+                            .addAmount("%amount%", amount)
+                            .add("%goods%", type.getNameKey()),
                         "indianDemand.other.yes",
                         "indianDemand.other.no").confirm();
                 }
@@ -1498,7 +1499,7 @@ public final class InGameInputHandler extends InputHandler {
                         .addStringTemplate("%nation%", welcomer.getNationName())
                         .addName("%camps%", camps)
                         .add("%settlementType%", type),
-                    "welcome.yes", "welcome.no");
+                    welcomer, "welcome.yes", "welcome.no");
             }
 
             // Respond to the server.
@@ -1763,7 +1764,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected Object doWork() {
-            boolean choice = getGUI().showConfirmDialog(tile, text,
+            boolean choice = getGUI().showConfirmDialog(tile, text, null,
                                                         okText, cancelText);
             return Boolean.valueOf(choice);
         }

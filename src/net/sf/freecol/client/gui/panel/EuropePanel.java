@@ -539,7 +539,7 @@ public final class EuropePanel extends PortPanel {
                         StringTemplate.template("europe.leaveColonists")
                             .addStringTemplate("%newWorld%",
                                 destination.getLocationNameFor(unit.getOwner())),
-                        "yes", "no");
+                        unit, "yes", "no");
                     if (!leave) return null; // Colonists remain in Europe.
                 }
 
