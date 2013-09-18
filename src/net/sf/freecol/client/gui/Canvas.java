@@ -1748,28 +1748,21 @@ public final class Canvas extends JDesktopPane {
     public void showInformationMessage(FreeColObject displayObject,
                                        StringTemplate template) {
         String text = Messages.message(template);
-        ImageIcon icon = null;
-        if (displayObject != null) {
-            icon = gui.getImageIcon(displayObject, false);
-        }
-        Tile tile = null;
-        if (displayObject instanceof Tile) {
-            tile = (Tile) displayObject;
-        } else {
-            try { // If the displayObject has a "getTile" method, invoke it.
-                tile = (Tile) displayObject.getClass().getMethod("getTile")
-                    .invoke(displayObject);
-            } catch (Exception e) { /* Ignore failure */ }
-        }
+        ImageIcon icon = (displayObject == null) ? null
+            : gui.getImageIcon(displayObject, false);
+        Tile tile = (displayObject instanceof Location)
+            ? ((Location)displayObject).getTile()
+            : null;
 
-        // plays an alert sound on each information message if the
+        // Plays an alert sound on each information message if the
         // option for it is turned on
         if (freeColClient.getClientOptions()
             .getBoolean(ClientOptions.AUDIO_ALERTS)) {
             gui.playSound("sound.event.alertSound");
         }
 
-        showFreeColPanel(new InformationPanel(freeColClient, text, icon),
+        showFreeColPanel(new InformationPanel(freeColClient, text, 
+                                              displayObject, icon),
                          tile, true);
     }
 
@@ -1951,44 +1944,26 @@ public final class Canvas extends JDesktopPane {
      */
     public void showModelMessages(ModelMessage... modelMessages) {
         List<ModelMessage> messages = filterEventPanels(modelMessages);
-        if (messages.size() <= 0) return;
-        Game game = freeColClient.getGame();
-        String[] messageText = new String[messages.size()];
-        ImageIcon[] messageIcon = new ImageIcon[messages.size()];
-        for (int i = 0; i < messages.size(); i++) {
-            messageText[i] = Messages.message(messages.get(i));
-            messageIcon[i] = gui.getImageIcon(game
-                .getMessageDisplay(messages.get(i)), false);
+        final int n = messages.size();
+        if (n <= 0) return;
+        final Game game = freeColClient.getGame();
+        String[] texts = new String[n];
+        FreeColObject[] fcos = new FreeColObject[n];
+        ImageIcon[] icons = new ImageIcon[n];
+        Tile tile = null;
+        for (int i = 0; i < n; i++) {
+            ModelMessage m = messages.get(i);
+            texts[i] = Messages.message(m);
+            fcos[i] = game.getMessageSource(m);
+            icons[i] = gui.getImageIcon(game.getMessageDisplay(m), false);
+            if (tile == null && fcos[i] instanceof Location) {
+                tile = ((Location)fcos[i]).getTile();
+            }
         }
 
-        // source should be the same for all messages
-        FreeColGameObject source = game.getMessageSource(messages.get(0));
-        if ((source instanceof Europe && !europePanel.isShowing())
-            || (source instanceof Colony || source instanceof WorkLocation)) {
-            FreeColDialog<Boolean> confirmDialog
-                = FreeColDialog.createConfirmDialog(freeColClient,
-                    messageText, messageIcon,
-                    Messages.message("ok"), Messages.message("display"));
-            if (showFreeColDialog(confirmDialog, null, true)) {
-                if (!isShowingSubPanel()) {
-                    freeColClient.getInGameController().nextModelMessage();
-                }
-            } else {
-                if (source instanceof Europe) {
-                    showEuropePanel();
-                } else if (source instanceof Colony) {
-                    showColonyPanel((Colony) source);
-                } else if (source instanceof WorkLocation) {
-                    showColonyPanel(((WorkLocation) source).getColony());
-                }
-            }
-        } else {
-            showSubPanel(new InformationPanel(freeColClient, messageText,
-                                               messageIcon), true);
-            if (!isShowingSubPanel()) {
-                freeColClient.getInGameController().nextModelMessage();
-            }
-        }
+        showFreeColPanel(new InformationPanel(freeColClient, texts, fcos,
+                                              icons),
+                         tile, true);
     }
 
     /**

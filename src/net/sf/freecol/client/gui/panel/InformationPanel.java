@@ -25,6 +25,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -32,7 +33,18 @@ import javax.swing.JScrollPane;
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.MigPanel;
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.FreeColObject;
+import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.resources.ResourceManager;
 
 
@@ -54,8 +66,9 @@ public class InformationPanel extends FreeColPanel {
      * @param image The image to be displayed in the panel.
      */
     public InformationPanel(FreeColClient freeColClient,
-                            String text, ImageIcon image) {
-        this(freeColClient, new String[] { text }, new ImageIcon[] { image });
+                            String text, FreeColObject fco, ImageIcon image) {
+        this(freeColClient, new String[] { text }, new FreeColObject[] { fco },
+             new ImageIcon[] { image });
     }
 
     /**
@@ -64,28 +77,36 @@ public class InformationPanel extends FreeColPanel {
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param texts The texts to be displayed in the panel.
+     * @param fcos The source <code>FreeColObject</code> for the text.
      * @param images The images to be displayed in the panel.
      */
-    public InformationPanel(FreeColClient freeColClient,
-                             String[] texts, ImageIcon[] images) {
+    public InformationPanel(FreeColClient freeColClient, String[] texts,
+                            FreeColObject[] fcos, ImageIcon[] images) {
         super(freeColClient, new MigLayout("wrap 1, insets 200 10 10 10",
                 "[510]", "[242]20[20]"));
 
+        final GUI gui = getGUI();
         textPanel = new MigPanel();
         textPanel.setOpaque(false);
-        if (images == null) {
-            for (String text : texts) {
-                textPanel.add(getDefaultTextArea(text, 30));
+        textPanel.setLayout(new MigLayout("wrap 2", "", ""));
+        for (int i = 0; i < texts.length; i++) {
+            if (images != null && images[i] != null) {
+                textPanel.add(new JLabel(images[i]));
+                textPanel.add(getDefaultTextArea(texts[i], 30));
+            } else {
+                textPanel.add(getDefaultTextArea(texts[i], 30), "skip");
             }
-        } else {
-            textPanel.setLayout(new MigLayout("wrap 2", "", ""));
-            for (int i = 0; i < texts.length; i++) {
-                if (images[i] == null) {
-                    textPanel.add(getDefaultTextArea(texts[i], 30), "skip");
-                } else {
-                    textPanel.add(new JLabel(images[i]));
-                    textPanel.add(getDefaultTextArea(texts[i], 30));
-                }
+            String disp = (fcos == null) ? null : displayLabel(fcos[i]);
+            if (disp != null) {
+                JButton button = new JButton(Messages.message("display")
+                    + " " + disp);
+                final FreeColObject fco = fcos[i];
+                button.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            displayFCO(gui, fco);
+                        }
+                    });
+                textPanel.add(button, "skip");
             }
         }
 
@@ -99,6 +120,59 @@ public class InformationPanel extends FreeColPanel {
 
         add(scrollPane);
         add(okButton, "tag ok");
+    }
+
+    /**
+     * A label for an FCO that can meaningfully be displayed.
+     * Keep this routine synchronized with {@link #displayFCO}.
+     *
+     * @param fco The <code>FreeColObject</code> to check.
+     * @return An i18n-compliant label.
+     */
+    private String displayLabel(FreeColObject fco) {
+        return (fco instanceof Colony)
+            ? Messages.message(((Colony)fco).getLocationName())
+
+            : (fco instanceof Europe)
+            ? Messages.message(((Europe)fco).getLocationName())
+
+            : (fco instanceof IndianSettlement)
+            ? Messages.message(((IndianSettlement)fco).getLocationName())
+
+            : (fco instanceof Tile)
+            ? Messages.message(StringTemplate.template("tile")
+                .addAmount("%x%", ((Tile)fco).getX())
+                .addAmount("%y%", ((Tile)fco).getY()))
+
+            : (fco instanceof Unit)
+            ? displayLabel((FreeColObject)((Unit)fco).getLocation())
+
+            : (fco instanceof WorkLocation)
+            ? Messages.message(((WorkLocation)fco).getColony()
+                .getLocationName())
+            : null;
+    }
+
+    /**
+     * Handler for the display buttons on this panel.
+     *
+     * @param gui The <code>GUI</code> to display on.
+     * @param fco The <code>FreeColObject</code> to display.
+     */
+    private void displayFCO(GUI gui, FreeColObject fco) {
+        if (fco instanceof Colony) {
+            gui.showColonyPanel((Colony)fco);
+        } else if (fco instanceof Europe) {
+            gui.showEuropePanel();
+        } else if (fco instanceof IndianSettlement) {
+            gui.showIndianSettlementPanel((IndianSettlement)fco);
+        } else if (fco instanceof Tile) {
+            gui.setFocus((Tile)fco);
+        } else if (fco instanceof Unit) {
+            displayFCO(gui, (FreeColObject)(((Unit)fco).getLocation()));
+        } else if (fco instanceof WorkLocation) {
+            gui.showColonyPanel(((WorkLocation)fco).getColony());
+        }
     }
 
 
