@@ -1013,9 +1013,10 @@ public final class ColonyPanel extends PortPanel
     public void removeNotify() {
         super.removeNotify();
 
-        if (nameBox == null) return; // Been here already
+        if (colony == null) return; // Been here already
 
         // Alas, ColonyPanel is often leaky.
+        nameBox = null;
         unloadButton = null;
         fillButton = null;
         warehouseButton = null;
@@ -1047,6 +1048,8 @@ public final class ColonyPanel extends PortPanel
         //defaultTransferHandler = null;
         //pressListener = null;
         //selectedUnitLabel = null;
+
+        colony = null; // Now Canvas.getColonyPanel will no longer find this
     }
 
 

@@ -353,7 +353,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
      */
     @Override
     public void requestFocus() {
-        okButton.requestFocus();
+        if (okButton != null) okButton.requestFocus();
     }
 
     /**
