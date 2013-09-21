@@ -290,8 +290,6 @@ public final class Canvas extends JDesktopPane {
 
     private final StartGamePanel startGamePanel;
 
-    private final EuropePanel europePanel;
-
     private final StatusPanel statusPanel;
 
     private final ChatPanel chatPanel;
@@ -338,7 +336,6 @@ public final class Canvas extends JDesktopPane {
         startGamePanel = new StartGamePanel(freeColClient);
         serverListPanel = new ServerListPanel(freeColClient,
             freeColClient.getConnectController());
-        europePanel = new EuropePanel(freeColClient, this);
         statusPanel = new StatusPanel(freeColClient);
         chatPanel = new ChatPanel(freeColClient);
         clientOptionsDialog = new ClientOptionsDialog(freeColClient);
@@ -1583,8 +1580,11 @@ public final class Canvas extends JDesktopPane {
         if (freeColClient.getGame() == null) {
             errorMessage("europe.noGame");
         } else {
-            europePanel.initialize(freeColClient.getMyPlayer().getEurope());
-            showSubPanel(europePanel, true);
+            EuropePanel panel = getExistingFreeColPanel(EuropePanel.class);
+            if (panel == null) {
+                panel = new EuropePanel(freeColClient, this);
+            }
+            showSubPanel(panel, false);
         }
     }
 

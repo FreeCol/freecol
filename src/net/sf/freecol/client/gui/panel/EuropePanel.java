@@ -251,6 +251,8 @@ public final class EuropePanel extends PortPanel {
         addMouseListener(new MouseAdapter() {});
 
         restoreSavedSize(1000, (canvas.getHeight() > 750) ? 700 : 600);
+
+        initialize(freeColClient.getMyPlayer().getEurope());
     }
 
     /**
