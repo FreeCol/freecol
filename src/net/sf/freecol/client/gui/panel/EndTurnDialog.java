@@ -99,7 +99,7 @@ public final class EndTurnDialog extends FreeColDialog<Boolean> implements ListS
      */
     @SuppressWarnings("unchecked") // FIXME in Java7
     public EndTurnDialog(FreeColClient freeColClient, List<Unit> units) {
-        super(freeColClient, new MigLayout("wrap 1", "[align center]"));
+        super(freeColClient, new MigLayout("wrap 1, fill", "[400, align center]"));
 
         JLabel header = new JLabel(Messages.message("endTurnDialog.name"));
         header.setFont(smallHeaderFont);
@@ -115,7 +115,7 @@ public final class EndTurnDialog extends FreeColDialog<Boolean> implements ListS
         unitList.setCellRenderer(new UnitCellRenderer());
         unitList.setFixedCellHeight(48);
         JScrollPane listScroller = new JScrollPane(unitList);
-        listScroller.setPreferredSize(new Dimension(250, 250));
+        //unitList.setPreferredSize(new Dimension(450, 250));
         unitList.addListSelectionListener(this);
 
         Action selectAction = new AbstractAction() {
@@ -145,8 +145,8 @@ public final class EndTurnDialog extends FreeColDialog<Boolean> implements ListS
         unitList.addMouseListener(mouseListener);
 
         add(header);
-        add(getDefaultTextArea(Messages.message(t)), "newline 30");
-        add(listScroller, "width max(200, 100%), height max(300, 100%), newline 20");
+        add(getDefaultTextArea(Messages.message(t)), "newline 30, growx");
+        add(listScroller, "newline 20, growx");
 
         add(cancelButton, "newline 20, span, split 2, tag cancel");
         add(okButton, "tag ok");
