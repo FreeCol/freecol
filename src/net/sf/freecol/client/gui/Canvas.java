@@ -931,7 +931,15 @@ public final class Canvas extends JDesktopPane {
         if (frame != null && frame != comp) {
             frame.dispose();
         } else {
-            super.remove(comp);
+            // Java 1.7.0 as seen on Fedora with:
+            //   Java version: 1.7.0_40
+            //   Java WM version: 24.0-b56
+            // crashes here deep in the java libraries.
+            try {
+                super.remove(comp);
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Java crash", e);
+            }
         }
         repaint(updateBounds.x, updateBounds.y,
                 updateBounds.width, updateBounds.height);

@@ -23,6 +23,8 @@ import java.awt.Insets;
 import java.awt.event.MouseListener;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JPanel;
 import javax.swing.border.Border;
@@ -37,6 +39,8 @@ import com.fluendo.player.Cortado;
  * A component for playing video.
  */
 public class VideoComponent extends JPanel {
+
+    private static final Logger logger = Logger.getLogger(VideoComponent.class.getName());
 
     private final Cortado applet;
     private List<VideoListener> videoListeners = new LinkedList<VideoListener>();
@@ -135,5 +139,25 @@ public class VideoComponent extends JPanel {
 
     private Border createBorder() {
         return FreeColImageBorder.imageBorder;
+    }
+
+    // Override Component
+
+    /**
+     * {@inheritDoc}
+     */
+    public void removeNotify() {
+        applet.stop();
+        applet.destroy();
+
+        // Java 1.7.0 as seen on Fedora with:
+        //   Java version: 1.7.0_40
+        //   Java WM version: 24.0-b56
+        // crashes here deep in the java libraries.
+        try {
+            super.removeNotify();
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Mystery crash", e);
+        }
     }
 }
