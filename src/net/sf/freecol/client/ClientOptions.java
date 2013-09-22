@@ -99,6 +99,12 @@ public class ClientOptions extends OptionGroup {
         = "model.option.languageOption";
 
     /**
+     * Value for automatic language selection.
+     */
+    public static final String AUTOMATIC
+        = "automatic";
+
+    /**
      * Used by GUI, the number will be displayed when a group of goods are
      * higher than this number.
      *
@@ -180,7 +186,7 @@ public class ClientOptions extends OptionGroup {
      */
     public static final String DISPLAY_BORDERS
         = "model.option.displayBorders";
-    
+
     /**
      * Whether to delay on a unit's last move or not.
      */
@@ -297,7 +303,7 @@ public class ClientOptions extends OptionGroup {
 
 
     // clientOptions.messages
-    
+
    /**
      * Used by GUI, this defines the grouping of ModelMessages. Possible values
      * include nothing, type and source.
@@ -477,7 +483,7 @@ public class ClientOptions extends OptionGroup {
     public static final int UNLOAD_OVERFLOW_RESPONSE_ALWAYS = 2;
 
     // clientOptions.mods
-    
+
     /**
      * The mods.
      */
@@ -541,17 +547,17 @@ public class ClientOptions extends OptionGroup {
                 }
             }
        };
-    
-   
+
+
     private class MessageSourceComparator implements Comparator<ModelMessage> {
         private Game game;
 
         // sort according to message source
-        
+
         private MessageSourceComparator(Game game) {
             this.game = game;
         }
-        
+
         public int compare(ModelMessage message1, ModelMessage message2) {
             String sourceId1 = message1.getSourceId();
             String sourceId2 = message2.getSourceId();
@@ -585,7 +591,7 @@ public class ClientOptions extends OptionGroup {
             }
         }
     }
-    
+
 
     private Comparator<ModelMessage> messageTypeComparator
         = new Comparator<ModelMessage>() {

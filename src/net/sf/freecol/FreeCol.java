@@ -252,8 +252,11 @@ public final class FreeCol {
         // Now we can find the client options, allow the options
         // setting to override the locale.  We have users whose
         // machines default to Finnish but play FreeCol in English.
+        // If the user has selected automatic language selection, do
+        // nothing, since we have already set up the default locale.
         String clientLanguage = ClientOptions.getLanguageOption();
-        if (clientLanguage != null) {
+        if (!(clientLanguage == null
+              || clientLanguage.equalsIgnoreCase(ClientOptions.AUTOMATIC))) {
             locale = Messages.getLocale(clientLanguage);
             if (!Locale.getDefault().equals(locale)) {
                 Messages.setMessageBundle(locale);

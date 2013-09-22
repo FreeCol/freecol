@@ -38,6 +38,7 @@ import java.util.logging.Logger;
 
 import javax.swing.UIManager;
 
+import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.common.ObjectWithId;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColDataFile;
@@ -197,7 +198,7 @@ public class Messages {
             }
         }
 
-        if (!"automatic".equalsIgnoreCase(locale.getLanguage())) {
+        if (!ClientOptions.AUTOMATIC.equalsIgnoreCase(locale.getLanguage())) {
             setGrammaticalNumber(NumberRules.getNumberForLanguage(locale.getLanguage()));
         }
         for (String name : getMessageFileNames(locale)) {
