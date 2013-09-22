@@ -197,7 +197,9 @@ public class Messages {
             }
         }
 
-        setGrammaticalNumber(NumberRules.getNumberForLanguage(locale.getLanguage()));
+        if (!"automatic".equalsIgnoreCase(locale.getLanguage())) {
+            setGrammaticalNumber(NumberRules.getNumberForLanguage(locale.getLanguage()));
+        }
         for (String name : getMessageFileNames(locale)) {
             File file = new File(i18nDirectory, name);
             if (!file.exists()) continue; // Expected
