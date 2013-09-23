@@ -383,7 +383,7 @@ public final class DefaultTransferHandler extends TransferHandler {
             dragAction = NONE;
         }
 
-        if (dragAction != NONE && !GraphicsEnvironment.isHeadless()) {
+        if (dragAction != NONE) {
             if (recognizer == null) {
                 recognizer = new FreeColDragGestureRecognizer(new FreeColDragHandler());
             }

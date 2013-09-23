@@ -45,6 +45,7 @@ import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
 import net.sf.freecol.client.networking.UserServerAPI;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.FreeColSeed;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.io.FreeColDataFile;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColModFile;
@@ -155,17 +156,19 @@ public final class FreeColClient {
                          final String fontName,
                          final String userMsg,
                          final Specification spec) {
-        // Headless mode is enabled for the test suite, where it now
-        // works again.
-        // TODO: It would be nice to have it useful for running full
-        // automated debug games without GUI, but that is untested and
-        // probably still borked.  Fix.
-        headless = "true".equals(System.getProperty("java.awt.headless",
-                                                    "false"));
-
-        gui = new GUI(this);
-        serverAPI = new UserServerAPI(gui);
-
+        this.mapEditor = false;
+        this.headless = "true".equals(System.getProperty("java.awt.headless",
+                                                        "false"));
+        if (headless) {
+            if (!FreeColDebugger.isInDebugMode()
+                || FreeColDebugger.getDebugRunTurns() <= 0) {
+                fatal("Headless mode requires a debug run.");
+            }                
+            if (savedGame == null) {
+                fatal("Headless mode requires a saved game.");
+            }
+        }
+ 
         // Look for base data directory.  Failure is fatal.
         File baseDirectory = FreeColDirectories.getBaseDirectory();
         FreeColDataFile baseData = null;
@@ -182,10 +185,12 @@ public final class FreeColClient {
                           .addName("%dir%", baseDirectory.getName()))
                 + ((ioeMessage == null) ? "" : "\n" + ioeMessage));
         }
+        ResourceManager.setBaseMapping(baseData.getResourceMapping());
 
-        mapEditor = false;
-
-        gui.displaySplashScreen(splashFilename);
+        // Once the basic resources are in place the GUI can be started.
+        gui = new GUI(this);
+        serverAPI = new UserServerAPI(gui);
+        if (!headless) gui.displaySplashScreen(splashFilename);
 
         // Determine the window size.
         if (size == null && !GUI.checkFullScreen()) {
@@ -218,7 +223,6 @@ public final class FreeColClient {
         // TODO: probably should not need to load "classic", but there
         // are a bunch of things in there (e.g. orderButton) that first
         // need to move to base because the action manager requires them.
-        ResourceManager.setBaseMapping(baseData.getResourceMapping());
         try {
             FreeColTcFile tcData = new FreeColTcFile("classic");
             ResourceManager.setTcMapping(tcData.getResourceMapping());
@@ -231,24 +235,28 @@ public final class FreeColClient {
         // resources specified in the active mods.
         loadClientOptions(savedGame);
 
-        // Work out the main font now that resources are loaded.
-        Font font = null;
-        if (fontName != null) {
-            font = Font.decode(fontName);
-            if (font == null) logger.warning("Font not found: " + fontName);
-        }
-        if (font == null) font = ResourceManager.getFont("NormalFont");
+        if (!headless) {
+            // Work out the main font now that resources are loaded.
+            Font font = null;
+            if (fontName != null) {
+                font = Font.decode(fontName);
+                if (font == null) {
+                    logger.warning("Font not found: " + fontName);
+                }
+            }
+            if (font == null) font = ResourceManager.getFont("NormalFont");
 
-        // Swing system and look-and-feel initialization.
-        try {
-            FreeColLookAndFeel fclaf = new FreeColLookAndFeel();
-            FreeColLookAndFeel.install(fclaf, font);
-        } catch (Exception e) {
-            fatal(Messages.message("client.laf") + "\n" + e.getMessage());
-        }
+            // Swing system and look-and-feel initialization.
+            try {
+                FreeColLookAndFeel fclaf = new FreeColLookAndFeel();
+                FreeColLookAndFeel.install(fclaf, font);
+            } catch (Exception e) {
+                fatal(Messages.message("client.laf") + "\n" + e.getMessage());
+            }
 
-        // Once resources are in place, get preloading started.
-        if (!headless) ResourceManager.preload(windowSize);
+            // Once resources are in place, get preloading started.
+            ResourceManager.preload(windowSize);
+        }
 
         // Start the GUI.
         gui.hideSplashScreen();
