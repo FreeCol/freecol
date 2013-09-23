@@ -183,7 +183,7 @@ public final class TradeRouteDialog extends FreeColDialog<Boolean>
         add(okButton, "newline 20, span, split 2, tag ok");
         add(cancelButton, "tag cancel");
 
-        restoreSavedSize(getPreferredSize());
+        getGUI().restoreSavedSize(this, getPreferredSize());
     }
 
     public void updateButtons() {

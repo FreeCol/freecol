@@ -100,7 +100,7 @@ public final class ColopediaPanel extends FreeColPanel
 
         add(okButton, "newline 20, span, tag ok");
 
-        restoreSavedSize(850, 600);
+        getGUI().restoreSavedSize(this, 850, 600);
         tree = buildTree();
 
         select(id);

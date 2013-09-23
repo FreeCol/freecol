@@ -128,7 +128,7 @@ public final class FindSettlementDialog<T> extends FreeColDialog<T> implements L
 
         add(okButton, "tag ok");
 
-        restoreSavedSize(getPreferredSize());
+        getGUI().restoreSavedSize(this, getPreferredSize());
     }
 
     private void selectSettlement() {

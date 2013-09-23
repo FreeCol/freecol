@@ -277,7 +277,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
         // set name of trade route
         tradeRouteName.setText(tradeRoute.getName());
 
-        restoreSavedSize(getPreferredSize());
+        getGUI().restoreSavedSize(this, getPreferredSize());
     }
 
     private void deleteCurrentlySelectedStops() {

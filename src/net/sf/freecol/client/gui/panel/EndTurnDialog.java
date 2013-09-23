@@ -152,7 +152,7 @@ public final class EndTurnDialog extends FreeColDialog<Boolean> implements ListS
         add(cancelButton, "newline 20, span, split 2, tag cancel");
         add(okButton, "tag ok");
 
-        restoreSavedSize(getPreferredSize());
+        getGUI().restoreSavedSize(this, getPreferredSize());
     }
 
     private void selectUnit() {

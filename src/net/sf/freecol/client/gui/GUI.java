@@ -1078,6 +1078,16 @@ public class GUI {
         return canvas.requestFocusInWindow();
     }
 
+    public void restoreSavedSize(Component comp, int w, int h) {
+        if (canvas == null) return;
+        canvas.restoreSavedSize(comp, new Dimension(w, h));
+    }
+
+    public void restoreSavedSize(Component comp, Dimension size) {
+        if (canvas == null) return;
+        canvas.restoreSavedSize(comp, size);
+    }
+
     public void returnToTitle() {
         if (canvas == null) return;
         canvas.returnToTitle();

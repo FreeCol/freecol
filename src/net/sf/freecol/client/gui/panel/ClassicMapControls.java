@@ -96,7 +96,7 @@ public final class ClassicMapControls extends MapControls {
         int width = (int) panel.getPreferredSize().getWidth();
         panel.setSize(width, component.getHeight());
         panel.setLocation(component.getWidth() - width, 0);
-        component.addToCanvas(panel, CONTROLS_LAYER);
+        component.add(panel, CONTROLS_LAYER);
     }
 
     public boolean isShowing() {

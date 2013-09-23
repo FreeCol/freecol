@@ -164,16 +164,16 @@ public final class CornerMapControls extends MapControls {
         //
         // Add the GUI Objects to the container
         //
-        component.addToCanvas(infoPanel, CONTROLS_LAYER);
-        component.addToCanvas(miniMapPanel, CONTROLS_LAYER);
+        component.add(infoPanel, CONTROLS_LAYER);
+        component.add(miniMapPanel, CONTROLS_LAYER);
         if (freeColClient.getClientOptions()
             .getBoolean(ClientOptions.DISPLAY_COMPASS_ROSE)) {
-            component.addToCanvas(compassRose, CONTROLS_LAYER);
+            component.add(compassRose, CONTROLS_LAYER);
         }
 
         if (!freeColClient.isMapEditor()) {
             for (UnitButton button : unitButtons) {
-                component.addToCanvas(button, CONTROLS_LAYER);
+                component.add(button, CONTROLS_LAYER);
                 button.refreshAction();
             }
         }

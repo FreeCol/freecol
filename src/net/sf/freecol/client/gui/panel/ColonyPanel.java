@@ -357,7 +357,7 @@ public final class ColonyPanel extends PortPanel
         //addMouseListener(new MouseAdapter() {});
 
         initialize(colony);
-        restoreSavedSize(850, 600);
+        getGUI().restoreSavedSize(this, 850, 600);
     }
 
 

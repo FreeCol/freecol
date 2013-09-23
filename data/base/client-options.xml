@@ -54,6 +54,8 @@
       <booleanOption id="model.option.usePixmaps" defaultValue="true"/>
       <!-- Remember panel positions? -->
       <booleanOption id="model.option.rememberPanelPositions" defaultValue="false"/>
+      <!-- Remember panel sizes? -->
+      <booleanOption id="model.option.rememberPanelSizes" defaultValue="true"/>
       <!-- Map controls -->
       <stringOption id="model.option.mapControls" defaultValue="CornerMapControls">
         <choice value="CornerMapControls"/>

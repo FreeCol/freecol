@@ -2108,7 +2108,7 @@ public final class MapViewer {
 
             if (greyLayer == null) greyLayer = new GrayLayer(lib, freeColClient);
             if (greyLayer.getParent() == null) { // Not added to the canvas yet.
-                canvas.addToCanvas(greyLayer, JLayeredPane.DEFAULT_LAYER);
+                canvas.add(greyLayer, JLayeredPane.DEFAULT_LAYER);
                 canvas.moveToFront(greyLayer);
             }
 
@@ -2618,7 +2618,7 @@ public final class MapViewer {
             unitLabel.setLocation(getUnitLabelPositionInTile(unitLabel,
                     getTilePosition(sourceTile)));
             unitsOutForAnimationLabels.put(unit, unitLabel);
-            gui.getCanvas().addToCanvas(unitLabel, UNIT_LABEL_LAYER);
+            gui.getCanvas().add(unitLabel, UNIT_LABEL_LAYER);
         } else {
             i++;
         }

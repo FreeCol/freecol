@@ -200,10 +200,16 @@ public class ClientOptions extends OptionGroup {
         = "model.option.usePixmaps";
 
     /**
-     * Whether to remember the positions of various panels.
+     * Whether to remember the positions of various dialogs and panels.
      */
     public static final String REMEMBER_PANEL_POSITIONS
         = "model.option.rememberPanelPositions";
+
+    /**
+     * Whether to remember the sizes of various dialogs and panels.
+     */
+    public static final String REMEMBER_PANEL_SIZES
+        = "model.option.rememberPanelSizes";
 
     /**
      * Style of map controls.
@@ -836,6 +842,8 @@ public class ClientOptions extends OptionGroup {
             "clientOptions.savegames", false);
         addBooleanOption(DISABLE_GRAY_LAYER,
             "clientOptions.gui", false);
+        addBooleanOption(REMEMBER_PANEL_SIZES,
+            "clientOptions.gui", true);
         // end @compat 0.10.7
     }
 

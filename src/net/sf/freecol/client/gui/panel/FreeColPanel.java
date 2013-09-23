@@ -72,8 +72,6 @@ import net.sf.freecol.common.model.Scope;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Turn;
-import net.sf.freecol.common.option.IntegerOption;
-import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.resources.ResourceManager;
 
 
@@ -292,129 +290,6 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
 
         Action cancelAction = cancelButton.getAction();
         getActionMap().put("release", cancelAction);
-    }
-
-    /**
-     * Get an <code>int</code> associated with the name of the
-     * panel's class plus the given key from the saved ClientOptions.
-     *
-     * @param key a <code>String</code> value
-     * @return an <code>int</code> value
-     */
-    private int getInteger(String key) {
-        return freeColClient.getClientOptions()
-            .getInteger(getClass().getName() + key);
-    }
-
-    /**
-     * Save an <code>int</code> value to the saved ClientOptions,
-     * using the name of the panel's class plus the given key as and
-     * identifier.
-     *
-     * @param key a <code>String</code> value
-     * @param value an <code>int</code> value
-     */
-    private void saveInteger(String key, int value) {
-        if (freeColClient != null
-            && freeColClient.getClientOptions() != null) {
-            Option o = freeColClient.getClientOptions()
-                .getOption(getClass().getName() + key);
-            if (o == null) {
-                Specification specification = (freeColClient.getGame() == null)
-                    ? null : getSpecification();
-                IntegerOption io = new IntegerOption(getClass().getName()+key,
-                                                     specification);
-                io.setValue(value);
-                freeColClient.getClientOptions().add(io);
-            } else if (o instanceof IntegerOption) {
-                ((IntegerOption) o).setValue(value);
-            }
-        }
-    }
-
-    /**
-     * Save the position of this panel.
-     *
-     * @param position The position to save.
-     */
-    public void savePosition(Point position) {
-        saveInteger(".x", position.x);
-        saveInteger(".y", position.y);
-    }
-
-    /**
-     * Gets the saved position of this panel.
-     *
-     * @return The saved position as a <code>Point</code>, or null if no
-     *     saved position is found.
-     */
-    public Point getSavedPosition() {
-        try {
-            return new Point(getInteger(".x"), getInteger(".y"));
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    /**
-     * Save the given Dimension as size of the panel.
-     *
-     * @param size a <code>Dimension</code> value
-     */
-    public void saveSize(Dimension size) {
-        saveInteger(".w", size.width);
-        saveInteger(".h", size.height);
-    }
-
-    /**
-     * Save the current size of the panel.
-     */
-    private void saveSize() {
-        saveSize(getSize());
-    }
-
-    /**
-     * Get the saved size of this panel, null by default.
-     *
-     * @return A <code>Dimension</code> for the panel size.
-     */
-    protected final Dimension getSavedSize() {
-        try {
-            return new Dimension(getInteger(".w"), getInteger(".h"));
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    /**
-     * Set preferred size to saved size, or to the given
-     * <code>Dimension</code> if no saved size was found. Call this
-     * method in the constructor of a FreeColPanel in order to
-     * remember its size and position.
-     *
-     * @param d The <code>Dimension</code> to restore from.
-     */
-    protected void restoreSavedSize(Dimension d) {
-        Dimension size = getSavedSize();
-        if (size == null) {
-            size = d;
-            saveSize(size);
-        }
-        if (!getPreferredSize().equals(size)) {
-            setPreferredSize(size);
-        }
-    }
-
-    /**
-     * Set preferred size to saved size, or to [w, h] if no saved size
-     * was found.  Call this method in the constructor of a
-     * FreeColPanel in order to remember its size and position.
-     *
-     * @param w The width.
-     * @param h The height.
-     */
-    protected void restoreSavedSize(int w, int h) {
-        restoreSavedSize(new Dimension(w, h));
     }
 
     /**

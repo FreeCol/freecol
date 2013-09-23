@@ -155,6 +155,7 @@ import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -426,9 +427,7 @@ public final class Canvas extends JDesktopPane {
         f.setSize(width, height);
         Point p = null;
         if (comp instanceof FreeColPanel
-            && freeColClient.getClientOptions()
-                .getBoolean(ClientOptions.REMEMBER_PANEL_POSITIONS)
-            && (p = ((FreeColPanel)comp).getSavedPosition()) != null) {
+            && (p = getSavedPosition(comp)) != null) {
             // Sanity check stuff coming out of client options.
             if (p.getX() < 0
                 || p.getX() >= getWidth() - f.getWidth()
@@ -489,6 +488,32 @@ public final class Canvas extends JDesktopPane {
                          (getHeight() - comp.getHeight()) / 2);
 
         add(comp, i);
+    }
+
+    /**
+     * Adds a component to this Canvas.  Removes the statusPanel if
+     * visible (and <code>comp != statusPanel</code>).
+     *
+     * @param comp The <code>Component</code> to add to this canvas.
+     * @param i The layer to add the component to (see JLayeredPane).
+     */
+    private void addToCanvas(Component comp, Integer i) {
+        if (comp != statusPanel && !(comp instanceof JMenuItem)
+            && !(comp instanceof FreeColDialog<?>)
+            && statusPanel.isVisible()) {
+            removeFromCanvas(statusPanel);
+        }
+
+        try {
+            if (i == null) {
+                super.add(comp);
+            } else {
+                super.add(comp, i);
+            }
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "addToCanvas(" + comp + ", " + i
+                + ") failed.", e);
+        }
     }
 
     /**
@@ -612,12 +637,61 @@ public final class Canvas extends JDesktopPane {
      * @return A <code>PopupPosition</code> for a panel to be displayed.
      */
     private PopupPosition getPopupPosition(Tile tile) {
-        if (tile == null)
-            return PopupPosition.CENTERED;
+        if (tile == null) return PopupPosition.CENTERED;
         int where = mapViewer.setOffsetFocus(tile);
         return (where > 0) ? PopupPosition.CENTERED_LEFT
             : (where < 0) ? PopupPosition.CENTERED_RIGHT
             : PopupPosition.CENTERED;
+    }
+
+    /**
+     * Gets the saved position of a component.
+     *
+     * @param comp The <code>Component</code> to use.
+     * @return The saved position as a <code>Point</code>, or null if no
+     *     saved position is found.
+     */
+    private Point getSavedPosition(Component comp) {
+        final ClientOptions co = freeColClient.getClientOptions();
+        if (co == null) return null;
+        try {
+            if (!co.getBoolean(ClientOptions.REMEMBER_PANEL_POSITIONS)) {
+                return null;
+            }
+        } catch (Exception e) {}
+
+        String className = comp.getClass().getName();
+        try {
+            return new Point(co.getInteger(className + ".x"),
+                             co.getInteger(className + ".y"));
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * Get the saved size of a component.
+     *
+     * @param comp The <code>Component</code> to use.
+     * @return A <code>Dimension</code> for the component or null if
+     *     no saved size is found.
+     */
+    private Dimension getSavedSize(Component comp) {
+        final ClientOptions co = freeColClient.getClientOptions();
+        if (co == null) return null;
+        try {
+            if (!co.getBoolean(ClientOptions.REMEMBER_PANEL_SIZES)) {
+                return null;
+            }
+        } catch (Exception e) {}
+
+        String className = comp.getClass().getName();
+        try {
+            return new Dimension(co.getInteger(className + ".w"),
+                                 co.getInteger(className + ".h"));
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /**
@@ -631,18 +705,73 @@ public final class Canvas extends JDesktopPane {
         if (frame == null) return;
 
         if (c instanceof FreeColPanel) {
-            final ClientOptions options = freeColClient.getClientOptions();
             FreeColPanel fcp = (FreeColPanel)c;
             fcp.firePropertyChange("closing", false, true);
             
-            if (options != null
-                && options.getBoolean(ClientOptions.REMEMBER_PANEL_POSITIONS)) {
-                fcp.savePosition(frame.getLocation());
-            }
-            if (options != null) {
-                fcp.saveSize(fcp.getSize());
-            }                    
+            savePosition(fcp, frame.getLocation());
+            saveSize(fcp, fcp.getSize());
         }
+    }
+
+    /**
+     * Save an <code>int</code> value to the saved ClientOptions,
+     * using the name of the components class plus the given key as
+     * and identifier.
+     *
+     * @param className The class name for the component.
+     * @param key The key to save.
+     * @param value The value to save.
+     */
+    private void saveInteger(String className, String key, int value) {
+        if (freeColClient != null
+            && freeColClient.getClientOptions() != null) {
+            Option o = freeColClient.getClientOptions()
+                .getOption(className + key);
+            if (o == null) {
+                Specification specification = (freeColClient.getGame() == null)
+                    ? null : freeColClient.getGame().getSpecification();
+                IntegerOption io = new IntegerOption(className + key,
+                                                     specification);
+                io.setValue(value);
+                freeColClient.getClientOptions().add(io);
+            } else if (o instanceof IntegerOption) {
+                ((IntegerOption)o).setValue(value);
+            }
+        }
+    }
+
+    /**
+     * Save the position of a component.
+     *
+     * @param comp The <code>Component</code> to use.
+     * @param position The position to save.
+     */
+    private void savePosition(Component comp, Point position) {
+        try {
+            if (!freeColClient.getClientOptions()
+                .getBoolean(ClientOptions.REMEMBER_PANEL_POSITIONS)) return;
+        } catch (Exception e) {}
+
+        String className = comp.getClass().getName();
+        saveInteger(className, ".x", position.x);
+        saveInteger(className, ".y", position.y);
+    }
+
+    /**
+     * Save the size of a component.
+     *
+     * @param comp The <code>Component</code> to use.
+     * @param size The <code>Dimension</code> to save.
+     */
+    private void saveSize(Component comp, Dimension size) {
+        try {
+            if (!freeColClient.getClientOptions()
+                .getBoolean(ClientOptions.REMEMBER_PANEL_SIZES)) return;
+        } catch (Exception e) {}
+
+        String className = comp.getClass().getName();
+        saveInteger(className, ".w", size.width);
+        saveInteger(className, ".h", size.height);
     }
 
     /**
@@ -725,32 +854,6 @@ public final class Canvas extends JDesktopPane {
         addToCanvas(comp, i);
         gui.updateMenuBar();
         freeColClient.updateActions();
-    }
-
-    /**
-     * Adds a component to this Canvas.  Removes the statusPanel if
-     * visible (and <code>comp != statusPanel</code>).
-     *
-     * @param comp The <code>Component</code> to add to this canvas.
-     * @param i The layer to add the component to (see JLayeredPane).
-     */
-    public void addToCanvas(Component comp, Integer i) {
-        if (comp != statusPanel && !(comp instanceof JMenuItem)
-            && !(comp instanceof FreeColDialog<?>)
-            && statusPanel.isVisible()) {
-            removeFromCanvas(statusPanel);
-        }
-
-        try {
-            if (i == null) {
-                super.add(comp);
-            } else {
-                super.add(comp, i);
-            }
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "addToCanvas(" + comp + ", " + i
-                + ") failed.", e);
-        }
     }
 
     /**
@@ -991,6 +1094,26 @@ public final class Canvas extends JDesktopPane {
 
         for (Component c : getComponents()) {
             removeFromCanvas(c);
+        }
+    }
+
+    /**
+     * Set preferred size to saved size, or to the given
+     * <code>Dimension</code> if no saved size was found. Call this
+     * method in the constructor of a FreeColPanel in order to
+     * remember its size and position.
+     *
+     * @param comp The <code>Component</code> to use.
+     * @param d The <code>Dimension</code> to restore from.
+     */
+    public void restoreSavedSize(Component comp, Dimension d) {
+        Dimension size = getSavedSize(comp);
+        if (size == null) {
+            size = d;
+            saveSize(comp, size);
+        }
+        if (!comp.getPreferredSize().equals(size)) {
+            comp.setPreferredSize(size);
         }
     }
 
