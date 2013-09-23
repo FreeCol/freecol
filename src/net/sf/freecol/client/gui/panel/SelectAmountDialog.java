@@ -60,7 +60,7 @@ public final class SelectAmountDialog extends FreeColDialog<Integer> implements 
 
         setFocusCycleRoot(true);
 
-        question = getDefaultTextArea(Messages.message("goodsTransfer.text"));
+        question = GUI.getDefaultTextArea(Messages.message("goodsTransfer.text"));
 
         if (needToPay) {
             final int gold = getMyPlayer().getGold();

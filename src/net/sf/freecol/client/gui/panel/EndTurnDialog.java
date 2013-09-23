@@ -102,7 +102,7 @@ public final class EndTurnDialog extends FreeColDialog<Boolean> implements ListS
         super(freeColClient, new MigLayout("wrap 1, fill", "[400, align center]"));
 
         JLabel header = new JLabel(Messages.message("endTurnDialog.name"));
-        header.setFont(smallHeaderFont);
+        header.setFont(GUI.SMALL_HEADER_FONT);
 
         StringTemplate t = StringTemplate.template("endTurnDialog.areYouSure")
             .addAmount("%number%", units.size());
@@ -145,7 +145,8 @@ public final class EndTurnDialog extends FreeColDialog<Boolean> implements ListS
         unitList.addMouseListener(mouseListener);
 
         add(header);
-        add(getDefaultTextArea(Messages.message(t)), "newline 30, growx");
+        add(GUI.getDefaultTextArea(Messages.message(t)),
+            "newline 30, growx");
         add(listScroller, "newline 20, growx");
 
         add(cancelButton, "newline 20, span, split 2, tag cancel");

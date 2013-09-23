@@ -102,23 +102,23 @@ public final class ReportIndianPanel extends ReportPanel {
         villageLabel.setIcon(new ImageIcon(lib.getSettlementImage(opponent.getNationType().getCapitalType(), 0.66)));
         reportPanel.add(villageLabel, "span, split 2");
         JLabel headline = localizedLabel(opponent.getNationName());
-        headline.setFont(smallHeaderFont);
+        headline.setFont(GUI.SMALL_HEADER_FONT);
         reportPanel.add(headline, "wrap 20");
         JLabel label = localizedLabel("report.indian.chieftain");
-        label.setFont(boldFont);
+        label.setFont(GUI.DEFAULT_BOLD_FONT);
         reportPanel.add(label);
         reportPanel.add(new JLabel(Messages.message(opponent.getName())), "left, wrap");
         label = localizedLabel("report.indian.typeOfSettlements");
-        label.setFont(boldFont);
+        label.setFont(GUI.DEFAULT_BOLD_FONT);
         reportPanel.add(label);
         reportPanel.add(localizedLabel(opponent.getNationType().getCapitalType().getId() + ".name"), "left, wrap");
         label = localizedLabel("report.indian.numberOfSettlements");
         reportPanel.add(label);
-        label.setFont(boldFont);
+        label.setFont(GUI.DEFAULT_BOLD_FONT);
         reportPanel.add(new JLabel(numSettlements), "left, wrap");
         label = localizedLabel("report.indian.tribeTension");
         reportPanel.add(label);
-        label.setFont(boldFont);
+        label.setFont(GUI.DEFAULT_BOLD_FONT);
         reportPanel.add(new JLabel(Messages.message(opponent.getTension(player).getKey())
                 + "/" + Messages.message(opponent.getStance(player).getKey())),
             "left, wrap 20");
@@ -126,7 +126,7 @@ public final class ReportIndianPanel extends ReportPanel {
         if (!nativeSettlements.isEmpty()) {
             for (String key : headlines) {
                 JLabel head = localizedLabel(key);
-                head.setFont(boldFont);
+                head.setFont(GUI.DEFAULT_BOLD_FONT);
                 reportPanel.add(head);
             }
             List<IndianSettlement> settlements
@@ -146,7 +146,7 @@ public final class ReportIndianPanel extends ReportPanel {
                 if (known && settlement.isCapital()) {
                     locationName += "*";
                 }
-                JButton settlementButton = getLinkButton(locationName, null,
+                JButton settlementButton = GUI.getLinkButton(locationName, null,
                     settlement.getTile().getId());
                 settlementButton.addActionListener(this);
                 reportPanel.add(settlementButton, "newline 15");

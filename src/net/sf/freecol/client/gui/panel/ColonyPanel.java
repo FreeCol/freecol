@@ -289,7 +289,7 @@ public final class ColonyPanel extends PortPanel
 
         // Make the colony label
         nameBox = new JComboBox();
-        nameBox.setFont(smallHeaderFont);
+        nameBox.setFont(GUI.SMALL_HEADER_FONT);
         for (Colony aColony : freeColClient.getMySortedColonies()) {
             nameBox.addItem(aColony);
         }

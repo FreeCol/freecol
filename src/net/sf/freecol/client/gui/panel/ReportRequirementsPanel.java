@@ -91,7 +91,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
         // Display Panel
 
         // create a text pane
-        JTextPane textPane = getDefaultTextPane();
+        JTextPane textPane = GUI.getDefaultTextPane();
         StyledDocument doc = textPane.getStyledDocument();
 
         // check which colonies can train which units
@@ -398,9 +398,10 @@ public final class ReportRequirementsPanel extends ReportPanel {
     }
 
     private JButton createColonyButton(Colony colony, String info, boolean headline) {
-        JButton button = getLinkButton(colony.getName() + info, null, colony.getId());
+        JButton button = GUI.getLinkButton(colony.getName() + info, null,
+            colony.getId());
         if (headline) {
-            button.setFont(smallHeaderFont);
+            button.setFont(GUI.SMALL_HEADER_FONT);
         }
         button.addActionListener(this);
         return button;

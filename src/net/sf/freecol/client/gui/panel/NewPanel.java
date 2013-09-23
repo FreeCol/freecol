@@ -179,7 +179,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
         group.add(start);
         group.add(meta);
 
-        add(getDefaultHeader(Messages.message("newGamePanel")),
+        add(GUI.getDefaultHeader(Messages.message("newGamePanel")),
             "span 6, center");
 
         add(single, "newline, span 3");

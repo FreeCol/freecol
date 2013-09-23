@@ -171,7 +171,7 @@ public final class TradeRouteDialog extends FreeColDialog<Boolean>
         }
         updateButtons();
 
-        add(getDefaultHeader(Messages.message("traderouteDialog.name")),
+        add(GUI.getDefaultHeader(Messages.message("traderouteDialog.name")),
             "span, align center");
 
         add(tradeRouteView, "height 360:400, width 250:");

@@ -19,13 +19,10 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -45,7 +42,6 @@ import java.util.logging.Logger;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
-import javax.swing.Icon;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -53,16 +49,10 @@ import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
-import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
@@ -92,84 +82,35 @@ import net.sf.freecol.common.resources.ResourceManager;
  */
 public abstract class FreeColPanel extends MigPanel implements ActionListener {
 
-    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(FreeColPanel.class.getName());
 
     protected static final String CANCEL = "CANCEL";
     protected static final String OK = "OK";
     protected static final String HELP = "HELP";
 
-    public static final Insets emptyMargin = new Insets(0,0,0,0);
-
-    private static final int cancelKeyCode = KeyEvent.VK_ESCAPE;
-
-    // Font to use for text areas
-    protected static final Font defaultFont
-        = ResourceManager.getFont("NormalFont", 13f);
-    protected static final Font boldFont = defaultFont.deriveFont(Font.BOLD);
-
-    // Fonts to use for report headers, etc.
-    protected static final Font  smallHeaderFont
-        = ResourceManager.getFont("HeaderFont", 24f);
-    protected static final Font mediumHeaderFont
-        = ResourceManager.getFont("HeaderFont", 36f);
-    protected static final Font bigHeaderFont
-        = ResourceManager.getFont("HeaderFont", 48f);
-
-    // How many columns (em-widths) to use in the text area
-    protected static final int COLUMNS = 20;
-
     // The margin to use.
-    protected static final int margin = 3;
-
-    // The color to use for things the player probably shouldn't do
-    protected static final Color WARNING_COLOR
-        = ResourceManager.getColor("lookAndFeel.warning.color");
-
-    // The color to use for links
-    protected static final Color LINK_COLOR
-        = ResourceManager.getColor("lookAndFeel.link.color");
-
-    // The color to use for borders
-    protected static final Color BORDER_COLOR
-        = ResourceManager.getColor("lookAndFeel.border.color");
+    protected static final int MARGIN = 3;
 
     // The borders to use for table cells
     public static final Border TOPCELLBORDER
         = BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(1, 0, 1, 1, BORDER_COLOR),
+            BorderFactory.createMatteBorder(1, 0, 1, 1, GUI.BORDER_COLOR),
             BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
     public static final Border CELLBORDER
         = BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(0, 0, 1, 1, BORDER_COLOR),
+            BorderFactory.createMatteBorder(0, 0, 1, 1, GUI.BORDER_COLOR),
             BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
     public static final Border LEFTCELLBORDER
         = BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(0, 1, 1, 1, BORDER_COLOR),
+            BorderFactory.createMatteBorder(0, 1, 1, 1, GUI.BORDER_COLOR),
             BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
     public static final Border TOPLEFTCELLBORDER
         = BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(1, 1, 1, 1, BORDER_COLOR),
+            BorderFactory.createMatteBorder(1, 1, 1, 1, GUI.BORDER_COLOR),
             BorderFactory.createEmptyBorder(2, 2, 2, 2));
-
-    protected static StyleContext styleContext = new StyleContext();
-    static {
-        Style defaultStyle = StyleContext.getDefaultStyleContext()
-            .getStyle(StyleContext.DEFAULT_STYLE);
-
-        Style regular = styleContext.addStyle("regular", defaultStyle);
-        StyleConstants.setFontFamily(regular, "NormalFont");
-        StyleConstants.setFontSize(regular, 13);
-
-        Style buttonStyle = styleContext.addStyle("button", regular);
-        StyleConstants.setForeground(buttonStyle, LINK_COLOR);
-
-        Style right = styleContext.addStyle("right", regular);
-        StyleConstants.setAlignment(right, StyleConstants.ALIGN_RIGHT);
-    }
 
 
     private FreeColClient freeColClient;
@@ -316,44 +257,24 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
     }
 
     /**
-     * Create a button for a colony.
-     *
-     * @param colony The <code>Colony</code> to create a button for.
-     * @return The new button.
-     */
-    protected JButton createColonyButton(Colony colony) {
-        JButton button = getLinkButton(colony.getName(), null, colony.getId());
-        button.addActionListener(this);
-        return button;
-    }
-
-    /**
-     * Return a button suitable for linking to another panel
-     * (e.g. ColopediaPanel).
-     *
-     * @param text a <code>String</code> value
-     * @param icon an <code>Icon</code> value
-     * @param action a <code>String</code> value
-     * @return a <code>JButton</code> value
-     */
-    public static JButton getLinkButton(String text, Icon icon, String action) {
-        JButton button = new JButton(text, icon);
-        button.setMargin(emptyMargin);
-        button.setOpaque(false);
-        button.setForeground(LINK_COLOR);
-        button.setAlignmentY(0.8f);
-        button.setBorder(BorderFactory.createEmptyBorder());
-        button.setActionCommand(action);
-        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        return button;
-    }
-
-    /**
      * The OK button requests focus.
      */
     @Override
     public void requestFocus() {
         if (okButton != null) okButton.requestFocus();
+    }
+
+    /**
+     * Create a button for a colony.
+     *
+     * @param colony The <code>Colony</code> to create a button for.
+     * @return The new button.
+     */
+    public JButton createColonyButton(Colony colony) {
+        JButton button = GUI.getLinkButton(colony.getName(), null,
+                                           colony.getId());
+        button.addActionListener(this);
+        return button;
     }
 
     /**
@@ -366,7 +287,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
 
         InputMap inputMap
             = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-        inputMap.put(KeyStroke.getKeyStroke(cancelKeyCode, 0, true),
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, true),
                      "release");
 
         Action cancelAction = cancelButton.getAction();
@@ -412,20 +333,13 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
     }
 
     /**
-     * Save the given Dimension as size of the panel.
+     * Save the position of this panel.
      *
-     * @param size a <code>Dimension</code> value
+     * @param position The position to save.
      */
-    private void saveSize(Dimension size) {
-        saveInteger(".w", size.width);
-        saveInteger(".h", size.height);
-    }
-
-    /**
-     * Save the current size of the panel.
-     */
-    private void saveSize() {
-        saveSize(getSize());
+    public void savePosition(Point position) {
+        saveInteger(".x", position.x);
+        saveInteger(".y", position.y);
     }
 
     /**
@@ -440,6 +354,23 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    /**
+     * Save the given Dimension as size of the panel.
+     *
+     * @param size a <code>Dimension</code> value
+     */
+    public void saveSize(Dimension size) {
+        saveInteger(".w", size.width);
+        saveInteger(".h", size.height);
+    }
+
+    /**
+     * Save the current size of the panel.
+     */
+    private void saveSize() {
+        saveSize(getSize());
     }
 
     /**
@@ -488,40 +419,19 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
 
     /**
      * Add a routine to be called when this panel closes.
-     * Triggered by notifyClose() above.
+     * Triggered by Canvas.notifyClose.
      *
      * @param runnable Some code to run on close.
      */
     public void addClosingCallback(final Runnable runnable) {
-        final FreeColPanel fcp = this;
         addPropertyChangeListener(new PropertyChangeListener() {
                 public void propertyChange(PropertyChangeEvent e) {
                     if ("closing".equals(e.getPropertyName())) {
                         runnable.run();
-                        fcp.removePropertyChangeListener(this);
+                        FreeColPanel.this.removePropertyChangeListener(this);
                     }
                 }
             });
-    }
-
-    /**
-     * Notify this panel that it is being removed from the
-     * canvas.  Saves the current size and position of the panel to the
-     * ClientOptions, which are included in the savegame file.
-     *
-     * @see net.sf.freecol.client.gui.Canvas#remove(Component)
-     */
-    public void notifyClose() {
-        firePropertyChange("closing", false, true);
-        Component frame
-            = SwingUtilities.getAncestorOfClass(JInternalFrame.class, this);
-        if (frame != null
-            && getClientOptions() != null
-            && getClientOptions().getBoolean(ClientOptions.REMEMBER_PANEL_POSITIONS)) {
-            saveInteger(".x", frame.getLocation().x);
-            saveInteger(".y", frame.getLocation().y);
-        }
-        saveSize();
     }
 
     /**
@@ -539,95 +449,6 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
                 KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true)),
             KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, true),
             JComponent.WHEN_FOCUSED);
-    }
-
-    /**
-     * Get a JTextPane with default styles.
-     *
-     * @return a <code>JTextPane</code> value
-     */
-    public static JTextPane getDefaultTextPane() {
-        return getDefaultTextPane(null);
-    }
-
-    /**
-     * Get a JTextPane with default styles and given text.
-     *
-     * @param text a <code>String</code> value
-     * @return a <code>JTextPane</code> value
-     */
-    public static JTextPane getDefaultTextPane(String text) {
-
-        DefaultStyledDocument document = new DefaultStyledDocument(styleContext) {
-             @Override
-             public Font getFont(AttributeSet attr) {
-                 Font font = ResourceManager.getFont(StyleConstants.getFontFamily(attr),
-                                                     StyleConstants.getFontSize(attr));
-                 if (font == null) {
-                     return super.getFont(attr);
-                 } else {
-                     int fontStyle = Font.PLAIN;
-                     if (StyleConstants.isBold(attr)) fontStyle |= Font.BOLD;
-                     if (StyleConstants.isItalic(attr)) fontStyle |= Font.ITALIC;
-                     return (fontStyle == Font.PLAIN) ? font : font.deriveFont(fontStyle);
-                 }
-             }
-         };
-
-        JTextPane textPane = new JTextPane(document);
-        textPane.setOpaque(false);
-        textPane.setEditable(false);
-        textPane.setLogicalStyle(styleContext.getStyle("regular"));
-
-        textPane.setText(text);
-        return textPane;
-    }
-
-    /**
-     * Returns the default header for panels.
-     *
-     * @param text a <code>String</code> value
-     * @return a <code>JLabel</code> value
-     */
-    protected static JLabel getDefaultHeader(String text) {
-        JLabel header = new JLabel(text, JLabel.CENTER);
-        header.setFont(bigHeaderFont);
-        header.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
-        return header;
-    }
-
-    /**
-     * Returns a text area with standard settings suitable for use in FreeCol
-     * dialogs.
-     *
-     * @param text The text to display in the text area.
-     * @return a text area with standard settings suitable for use in FreeCol
-     *         dialogs.
-     */
-    protected static JTextArea getDefaultTextArea(String text) {
-        return getDefaultTextArea(text, COLUMNS);
-    }
-
-    /**
-     * Returns a text area with standard settings suitable for use in FreeCol
-     * dialogs.
-     *
-     * @param text The text to display in the text area.
-     * @param columns an <code>int</code> value
-     * @return a text area with standard settings suitable for use in FreeCol
-     *         dialogs.
-     */
-    protected static JTextArea getDefaultTextArea(String text, int columns) {
-        JTextArea textArea = new JTextArea(text);
-        textArea.setColumns(columns);
-        textArea.setOpaque(false);
-        textArea.setLineWrap(true);
-        textArea.setWrapStyleWord(true);
-        textArea.setFocusable(false);
-        textArea.setFont(defaultFont);
-        // necessary because of resizing
-        textArea.setSize(textArea.getPreferredSize());
-        return textArea;
     }
 
     /**

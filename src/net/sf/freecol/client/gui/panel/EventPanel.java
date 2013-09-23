@@ -83,7 +83,7 @@ public final class EventPanel extends FreeColPanel {
         }
 
         JLabel header = new JLabel(text);
-        header.setFont(mediumHeaderFont);
+        header.setFont(GUI.MEDIUM_HEADER_FONT);
 
         JLabel imageLabel
             = new JLabel(new ImageIcon(ResourceManager.getImage(image)));

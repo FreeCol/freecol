@@ -65,7 +65,7 @@ public final class DumpCargoDialog extends FreeColDialog<List<Goods>> {
         super(freeColClient, new MigLayout("wrap 1", "", ""));
 
         header = new JLabel(Messages.message("dumpCargo"));
-        header.setFont(smallHeaderFont);
+        header.setFont(GUI.SMALL_HEADER_FONT);
         add(header);
 
         cancelButton = new JButton(Messages.message("cancel"));

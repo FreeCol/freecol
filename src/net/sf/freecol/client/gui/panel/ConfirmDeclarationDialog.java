@@ -71,10 +71,10 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>> {
         StringTemplate sure
             = StringTemplate.template("declareIndependence.areYouSure.text")
                 .add("%monarch%", player.getMonarch().getNameKey());
-        add(getDefaultTextArea(Messages.message(sure)));
-        add(getDefaultTextArea(Messages.message("declareIndependence.enterCountry")));
+        add(GUI.getDefaultTextArea(Messages.message(sure)));
+        add(GUI.getDefaultTextArea(Messages.message("declareIndependence.enterCountry")));
         add(countryField);
-        add(getDefaultTextArea(Messages.message("declareIndependence.enterNation")));
+        add(GUI.getDefaultTextArea(Messages.message("declareIndependence.enterNation")));
         add(nationField);
         add(okButton, "newline 20, split 2, tag ok");
         add(cancelButton, "tag cancel");

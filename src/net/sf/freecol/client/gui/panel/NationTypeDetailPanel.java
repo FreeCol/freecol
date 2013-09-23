@@ -124,7 +124,7 @@ public class NationTypeDetailPanel extends ColopediaGameObjectTypePanel<NationTy
         panel.setLayout(new MigLayout("wrap 2, gapx 20"));
 
         JLabel label = localizedLabel(nationType.getNameKey());
-        label.setFont(smallHeaderFont);
+        label.setFont(GUI.SMALL_HEADER_FONT);
         panel.add(label, "span, align center, wrap 40");
 
         label = localizedLabel("colopedia.nationType.units");
@@ -179,7 +179,7 @@ public class NationTypeDetailPanel extends ColopediaGameObjectTypePanel<NationTy
         panel.setLayout(new MigLayout("wrap 2, gapx 20", "", ""));
 
         JLabel name = localizedLabel(nationType.getNameKey());
-        name.setFont(smallHeaderFont);
+        name.setFont(GUI.SMALL_HEADER_FONT);
         panel.add(name, "span, align center, wrap 40");
 
         panel.add(localizedLabel("colopedia.nationType.aggression"));

@@ -58,7 +58,7 @@ public final class VictoryPanel extends FreeColPanel {
 
         okButton.setText(Messages.message("victory.yes"));
 
-        add(getDefaultHeader(Messages.message("victory.text")),
+        add(GUI.getDefaultHeader(Messages.message("victory.text")),
             "align center, wrap 20");
 
         Image tempImage = ResourceManager.getImage("VictoryImage");

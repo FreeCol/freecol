@@ -123,7 +123,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         collectDestinations(unit, goodsTypes);
 
         JLabel header = new JLabel(Messages.message("selectDestination.text"));
-        header.setFont(smallHeaderFont);
+        header.setFont(GUI.SMALL_HEADER_FONT);
         add(header);
 
         DefaultListModel model = new DefaultListModel();

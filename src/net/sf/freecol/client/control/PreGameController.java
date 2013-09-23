@@ -195,7 +195,7 @@ public final class PreGameController {
             igc.nextActiveUnit();
         }
 
-        gui.setUpMouseListenersForCanvas();
+        gui.setupMouseListeners();
 
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
             && FreeColDebugger.getDebugRunTurns() > 0) {

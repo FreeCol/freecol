@@ -97,7 +97,7 @@ public final class EuropePanel extends PortPanel {
     private JButton exitButton, trainButton, purchaseButton,
                     recruitButton, unloadButton, sailButton;
 
-    private final JLabel header = getDefaultHeader("");
+    private final JLabel header = GUI.getDefaultHeader("");
 
     private Europe europe;
 

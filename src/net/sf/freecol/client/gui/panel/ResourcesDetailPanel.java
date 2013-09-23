@@ -86,7 +86,7 @@ public class ResourcesDetailPanel extends ColopediaGameObjectTypePanel<ResourceT
         panel.setLayout(new MigLayout("wrap 2", "[]20[]"));
 
         JLabel name = localizedLabel(type.getNameKey());
-        name.setFont(smallHeaderFont);
+        name.setFont(GUI.SMALL_HEADER_FONT);
         panel.add(name, "span, align center, wrap 40");
 
         panel.add(localizedLabel("colopedia.resource.bonusProduction"));
@@ -115,7 +115,7 @@ public class ResourcesDetailPanel extends ColopediaGameObjectTypePanel<ResourceT
         panel.add(goodsPanel);
 
         panel.add(localizedLabel("colopedia.resource.description"), "newline 20");
-        panel.add(getDefaultTextArea(Messages.message(type.getDescriptionKey()), 30), "growx");
+        panel.add(GUI.getDefaultTextArea(Messages.message(type.getDescriptionKey()), 30), "growx");
     }
 
 }

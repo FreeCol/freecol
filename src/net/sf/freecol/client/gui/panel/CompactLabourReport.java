@@ -565,7 +565,7 @@ public final class CompactLabourReport extends ReportPanel {
         button.setMargin(new Insets(0, 0, 0, 0));
         button.setOpaque(false);
         button.setHorizontalAlignment(SwingConstants.LEADING);
-        button.setForeground(LINK_COLOR);
+        button.setForeground(GUI.LINK_COLOR);
         button.setBorder(LEFTCELLBORDER);
         button.addActionListener(listener);
         return button;

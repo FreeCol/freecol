@@ -229,7 +229,7 @@ public final class ReportTradePanel extends ReportPanel {
         }
         button.setText(name);
         button.setOpaque(false);
-        button.setForeground(LINK_COLOR);
+        button.setForeground(GUI.LINK_COLOR);
         button.setHorizontalAlignment(SwingConstants.LEADING);
         button.setAlignmentY(0.8f);
         if (index == 0) {

@@ -141,11 +141,11 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
         panel.setLayout(new MigLayout("wrap 7, gapx 20", "", ""));
 
         JLabel name = localizedLabel(buildingType.getNameKey());
-        name.setFont(smallHeaderFont);
+        name.setFont(GUI.SMALL_HEADER_FONT);
         panel.add(name, "span, align center, wrap 40");
 
         // Requires - prerequisites to build
-        JTextPane textPane = getDefaultTextPane();
+        JTextPane textPane = GUI.getDefaultTextPane();
         StyledDocument doc = textPane.getStyledDocument();
 
         try {
@@ -274,7 +274,7 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
 
         // Notes
         panel.add(localizedLabel("colopedia.buildings.notes"), "newline 20, top");
-        panel.add(getDefaultTextArea(Messages.message(buildingType.getDescriptionKey()), 20),
+        panel.add(GUI.getDefaultTextArea(Messages.message(buildingType.getDescriptionKey()), 20),
                   "span, growx");
     }
 

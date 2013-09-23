@@ -97,7 +97,7 @@ public class TerrainDetailPanel extends ColopediaGameObjectTypePanel<TileType> {
         }
 
         JLabel nameLabel = localizedLabel(tileType.getNameKey());
-        nameLabel.setFont(smallHeaderFont);
+        nameLabel.setFont(GUI.SMALL_HEADER_FONT);
         panel.add(nameLabel, "span, align center");
 
         panel.add(localizedLabel("colopedia.terrain.terrainImage"), "spany 3");
@@ -145,7 +145,7 @@ public class TerrainDetailPanel extends ColopediaGameObjectTypePanel<TileType> {
         }
 
         panel.add(localizedLabel("colopedia.terrain.description"));
-        panel.add(getDefaultTextArea(Messages.message(tileType.getDescriptionKey()), 20),
+        panel.add(GUI.getDefaultTextArea(Messages.message(tileType.getDescriptionKey()), 20),
                   "span, growx");
     }
 

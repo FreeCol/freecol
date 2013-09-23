@@ -80,7 +80,7 @@ public final class LoadingSavegameDialog extends FreeColDialog<Boolean> implemen
 
         // Header:
         header = new JLabel(Messages.message("LoadingSavegame.title"), JLabel.CENTER);
-        header.setFont(mediumHeaderFont);
+        header.setFont(GUI.MEDIUM_HEADER_FONT);
         header.setBorder(new EmptyBorder(20, 0, 0, 0));
         add(header, BorderLayout.NORTH);
 

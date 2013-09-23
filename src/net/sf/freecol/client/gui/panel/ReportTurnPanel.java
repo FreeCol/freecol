@@ -138,7 +138,7 @@ public final class ReportTurnPanel extends ReportPanel {
                 && message.getMessageType() != type) {
                 type = message.getMessageType();
                 JLabel headline = localizedLabel(message.getMessageTypeName());
-                headline.setFont(smallHeaderFont);
+                headline.setFont(GUI.SMALL_HEADER_FONT);
                 reportPanel.add(headline, "newline 20, skip, span");
             }
             
@@ -177,7 +177,7 @@ public final class ReportTurnPanel extends ReportPanel {
             
             reportPanel.add(component, "newline");
             
-            final JTextPane textPane = getDefaultTextPane();
+            final JTextPane textPane = GUI.getDefaultTextPane();
             
             insertMessage(textPane.getStyledDocument(), message, getMyPlayer());
             reportPanel.add(textPane);
@@ -297,9 +297,9 @@ public final class ReportTurnPanel extends ReportPanel {
             headline = new JLabel(source.toString());
         }
 
-        headline.setFont(smallHeaderFont);
+        headline.setFont(GUI.SMALL_HEADER_FONT);
         headline.setOpaque(false);
-        headline.setForeground(LINK_COLOR);
+        headline.setForeground(GUI.LINK_COLOR);
         headline.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
         return headline;
     }
@@ -406,7 +406,7 @@ public final class ReportTurnPanel extends ReportPanel {
 
     private void insertLinkButton(StyledDocument document, FreeColGameObject object, String name)
         throws Exception {
-        JButton button = getLinkButton(name, null, object.getId());
+        JButton button = GUI.getLinkButton(name, null, object.getId());
         button.addActionListener(this);
         StyleConstants.setComponent(document.getStyle("button"), button);
         document.insertString(document.getLength(), " ", document.getStyle("button"));

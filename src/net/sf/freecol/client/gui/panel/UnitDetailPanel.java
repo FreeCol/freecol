@@ -109,7 +109,7 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
         panel.setLayout(new MigLayout("wrap 4", "[]20[]40[]20[]"));
 
         JLabel name = localizedLabel(type.getNameKey());
-        name.setFont(smallHeaderFont);
+        name.setFont(GUI.SMALL_HEADER_FONT);
         panel.add(name, "span, align center, wrap 40");
 
         panel.add(localizedLabel("colopedia.unit.offensivePower"));
@@ -197,7 +197,7 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
             panel.add(localizedLabel("colopedia.unit.requirements"), "newline, top");
             String key = abilities.keySet().iterator().next();
             try {
-                JTextPane textPane = getDefaultTextPane();
+                JTextPane textPane = GUI.getDefaultTextPane();
                 StyledDocument doc = textPane.getStyledDocument();
                 appendRequiredAbilities(doc, type);
                 panel.add(textPane, "span, width 60%");
@@ -244,7 +244,7 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
 
         panel.add(localizedLabel("colopedia.unit.description"),
                   "newline 20");
-        panel.add(getDefaultTextArea(Messages.message(type.getDescriptionKey()), 30), "span");
+        panel.add(GUI.getDefaultTextArea(Messages.message(type.getDescriptionKey()), 30), "span");
     }
 
 }

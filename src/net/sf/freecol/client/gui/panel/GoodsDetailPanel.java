@@ -91,7 +91,7 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
         panel.setLayout(new MigLayout("wrap 4", "[]20[]"));
 
         JLabel name = localizedLabel(type.getNameKey());
-        name.setFont(smallHeaderFont);
+        name.setFont(GUI.SMALL_HEADER_FONT);
         panel.add(name, "span, align center, wrap 40");
 
         if (type.isFarmed()) {
@@ -204,7 +204,7 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
         }
 
         panel.add(localizedLabel("colopedia.goods.description"), "newline 20");
-        panel.add(getDefaultTextArea(Messages.message(type.getDescriptionKey()), 30), "span, growx");
+        panel.add(GUI.getDefaultTextArea(Messages.message(type.getDescriptionKey()), 30), "span, growx");
     }
 
 

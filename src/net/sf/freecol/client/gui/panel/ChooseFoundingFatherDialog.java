@@ -87,7 +87,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
                         .getFreeColAction("colopediaAction.FATHERS"));
         helpButton.setText(Messages.message("help"));
 
-        add(getDefaultHeader(Messages.message("foundingFatherDialog.nominate")));
+        add(GUI.getDefaultHeader(Messages.message("foundingFatherDialog.nominate")));
         add(tb, "width 100%");
         add(okButton, "newline 20, split 2, tag ok");
         add(helpButton, "tag help");

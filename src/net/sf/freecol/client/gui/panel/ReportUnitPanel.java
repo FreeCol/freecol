@@ -185,7 +185,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
         if (location == null) {
             component = new JLabel(locationName);
         } else {
-            JButton button = getLinkButton(locationName, null, location.getId());
+            JButton button = GUI.getLinkButton(locationName, null, location.getId());
             button.addActionListener(this);
             component = button;
         }
@@ -219,7 +219,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
     protected JButton getUnitButton(Unit unit) {
         ImageIcon icon = getLibrary().getUnitImageIcon(unit.getType(),
                                                        unit.getRole().getId());
-        JButton button = getLinkButton("", icon, unit.getLocation().getId());
+        JButton button = GUI.getLinkButton("", icon, unit.getLocation().getId());
         button.addActionListener(this);
         String toolTip = Messages.getLabel(unit);
         if (unit.getDestination() != null) {

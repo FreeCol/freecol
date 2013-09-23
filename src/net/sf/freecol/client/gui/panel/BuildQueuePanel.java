@@ -217,7 +217,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         buildingList.getActionMap().put("add", addAction);
 
         JLabel headLine = new JLabel(Messages.message("colonyPanel.buildQueue"));
-        headLine.setFont(bigHeaderFont);
+        headLine.setFont(GUI.BIG_HEADER_FONT);
 
         buyBuilding = new JButton(Messages.message("colonyPanel.buyBuilding"));
         buyBuilding.setActionCommand(BUY);

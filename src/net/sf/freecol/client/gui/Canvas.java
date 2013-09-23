@@ -621,6 +621,31 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
+     * A component is closing.  Some components need position and size
+     * to be saved.
+     *
+     * @param c The closing <code>Component</code>.
+     * @param frame The enclosing <code>JInternalFrame</code>.
+     */
+    private void notifyClose(Component c, JInternalFrame frame) {
+        if (frame == null) return;
+
+        if (c instanceof FreeColPanel) {
+            final ClientOptions options = freeColClient.getClientOptions();
+            FreeColPanel fcp = (FreeColPanel)c;
+            fcp.firePropertyChange("closing", false, true);
+            
+            if (options != null
+                && options.getBoolean(ClientOptions.REMEMBER_PANEL_POSITIONS)) {
+                fcp.savePosition(frame.getLocation());
+            }
+            if (options != null) {
+                fcp.saveSize(fcp.getSize());
+            }                    
+        }
+    }
+
+    /**
      * Displays the given dialog, making sure a tile is visible.
      *
      * @param freeColDialog The dialog to be displayed
@@ -734,9 +759,7 @@ public final class Canvas extends JDesktopPane {
     public void closeMenus() {
         for (JInternalFrame frame : getAllFrames()) {
             for (Component c : frame.getContentPane().getComponents()) {
-                if (c instanceof FreeColPanel) {
-                    ((FreeColPanel) c).notifyClose();
-                }
+                notifyClose(c, frame);
             }
             frame.dispose();
         }
@@ -920,14 +943,11 @@ public final class Canvas extends JDesktopPane {
      * @param comp The <code>Component</code> to remove.
      */
     public void removeFromCanvas(Component comp) {
-        if (comp == null) {
-            return;
-        } else if (comp instanceof FreeColPanel) {
-            ((FreeColPanel)comp).notifyClose();
-        }
+        if (comp == null) return;
 
         final Rectangle updateBounds = comp.getBounds();
         final JInternalFrame frame = getInternalFrame(comp);
+        notifyClose(comp, frame);
         if (frame != null && frame != comp) {
             frame.dispose();
         } else {
@@ -988,6 +1008,12 @@ public final class Canvas extends JDesktopPane {
         showMainPanel(null);
         gui.playSound("sound.intro.general");
         repaint();
+    }
+
+    public void setupMouseListeners(MapViewer mapViewer) {
+        addMouseListener(new CanvasMouseListener(freeColClient, this,
+                                                 mapViewer));
+        addMouseMotionListener(new CanvasMouseMotionListener(freeColClient));
     }
 
     /**
@@ -1861,7 +1887,7 @@ public final class Canvas extends JDesktopPane {
      */
     public void showMainPanel(String userMsg) {
         closeMenus();
-        gui.setupMenuBarToNull();
+        gui.getFrame().setJMenuBar(null);
         mainPanel = new MainPanel(freeColClient);
         addCentered(mainPanel, MAIN_LAYER);
         if (userMsg != null) showInformationMessage(userMsg);

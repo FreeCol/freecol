@@ -132,7 +132,7 @@ public final class ReportLabourPanel extends ReportPanel {
             } else {
                 JLabel unitIcon = new JLabel(getLibrary().getUnitImageIcon(unitType, roleId, false, 0.8));
                 JLabel unitCount = new JLabel("" + unitTypeCount);
-                JButton linkButton = getLinkButton(Messages.message(unitType.getNameKey()),
+                JButton linkButton = GUI.getLinkButton(Messages.message(unitType.getNameKey()),
                                                    null, unitType.getId());
                 linkButton.addActionListener(this);
                 reportPanel.add(unitIcon);

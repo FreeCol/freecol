@@ -19,13 +19,17 @@
 
 package net.sf.freecol.client.gui;
 
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
@@ -35,18 +39,29 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.BorderFactory;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
+import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.DefaultStyledDocument;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
@@ -115,48 +130,104 @@ public class GUI {
 
     private static final Logger logger = Logger.getLogger(GUI.class.getName());
 
-    /**
-     * The space not being used in windowed mode.
-     */
+    /** How many columns (em-widths) to use in the text area. */
+    private static final int DEFAULT_TEXT_COLUMNS = 20;
+
+    /** The space not being used in windowed mode. */
     private static final int DEFAULT_SCREEN_INSET_WIDTH  = 0;
     private static final int DEFAULT_SCREEN_INSET_HEIGHT = 32;
     private static final int DEFAULT_WINDOW_INSET_WIDTH  = 6;
     private static final int DEFAULT_WINDOW_INSET_HEIGHT = 30;
 
-
-
+    /** View modes. */
     public static final int MOVE_UNITS_MODE = 0;
-
     public static final int VIEW_TERRAIN_MODE = 1;
 
+    /** The color to use for borders. */
+    public static final Color BORDER_COLOR
+        = ResourceManager.getColor("lookAndFeel.border.color");
+
+    /** The color to use for links. */
+    public static final Color LINK_COLOR
+        = ResourceManager.getColor("lookAndFeel.link.color");
+
+    /** The color to use for things the player probably should not do. */
+    public static final Color WARNING_COLOR
+        = ResourceManager.getColor("lookAndFeel.warning.color");
+
+    /** Font to use for text areas. */
+    public static final Font DEFAULT_FONT
+        = ResourceManager.getFont("NormalFont", 13f);
+    /** Bold version of the default font. */
+    public static final Font DEFAULT_BOLD_FONT
+        = DEFAULT_FONT.deriveFont(Font.BOLD);
+    /** Header fonts for reports etc. */
+    public static final Font SMALL_HEADER_FONT
+        = ResourceManager.getFont("HeaderFont", 24f);
+    public static final Font MEDIUM_HEADER_FONT
+        = ResourceManager.getFont("HeaderFont", 36f);
+    public static final Font BIG_HEADER_FONT
+        = ResourceManager.getFont("HeaderFont", 48f);
+
+    /** The margin to use for a link button. */
+    public static final Insets EMPTY_MARGIN = new Insets(0, 0, 0, 0);
+
+    /** A style context to use for panels and dialogs. */
+    public static StyleContext STYLE_CONTEXT = new StyleContext();
+    static {
+        Style defaultStyle = StyleContext.getDefaultStyleContext()
+            .getStyle(StyleContext.DEFAULT_STYLE);
+
+        Style regular = STYLE_CONTEXT.addStyle("regular", defaultStyle);
+        StyleConstants.setFontFamily(regular, "NormalFont");
+        StyleConstants.setFontSize(regular, 13);
+
+        Style buttonStyle = STYLE_CONTEXT.addStyle("button", regular);
+        StyleConstants.setForeground(buttonStyle, LINK_COLOR);
+
+        Style right = STYLE_CONTEXT.addStyle("right", regular);
+        StyleConstants.setAlignment(right, StyleConstants.ALIGN_RIGHT);
+    }
+
+
+
+    /** The client for the game. */
     private FreeColClient freeColClient;
 
-    private GraphicsDevice gd;
-
-    private FreeColFrame frame;
-
+    /** The canvas that implements much of the functionality. */
     private Canvas canvas;
 
+    /**
+     * This is the MapViewer instance used to paint the colony tiles
+     * in the ColonyPanel and other panels.  It should not be scaled
+     * along with the default MapViewer.
+     */
+    private MapViewer colonyTileGUI;
+
+    /** The parent frame, either a window or the full screen. */
+    private FreeColFrame frame;
+
+    /** The graphics device for the screen. */
+    private GraphicsDevice gd;
+
+    /** An image library to use. */
+    private ImageLibrary imageLibrary;
+
+    /**
+     * The MapViewer instance used to paint the main map.
+     * This does need to be scaled.
+     */
     private MapViewer mapViewer;
 
     private MapControls mapControls;
 
-    /**
-     * This is the MapViewer instance used to paint the colony tiles in the
-     * ColonyPanel and other panels.  It should not be scaled along
-     * with the default MapViewer.
-     */
-    private MapViewer colonyTileGUI;
-
-    private ImageLibrary imageLibrary;
-
     private SoundPlayer soundPlayer;
+
+    private JWindow splash;
 
     private boolean windowed;
 
     private Rectangle windowBounds;
-
-    private JWindow splash;
 
 
     /**
@@ -170,12 +241,66 @@ public class GUI {
     }
 
 
+    // Simple accessors
+
+    public Canvas getCanvas() {
+        return canvas;
+    }
+
+    public FreeColFrame getFrame() {
+        return frame;
+    }
+
+    public ImageLibrary getImageLibrary() {
+        return imageLibrary;
+    }
+
+    public MapViewer getMapViewer() {
+        return mapViewer;
+    }
+
+    /**
+     * Can this client play sounds?
+     *
+     * @return True if there is a sound player present.
+     */
+    public boolean canPlaySound() {
+        return soundPlayer != null;
+    }
+
+    /**
+     * Get the sound player.
+     * Needed for access to the mixer by {@link #AudioMixerOptionUI}.
+     *
+     * @return The current <code>SoundPlayer</code>.
+     */
+    public SoundPlayer getSoundPlayer() {
+        return soundPlayer;
+    }
+
+    public boolean isWindowed() {
+        return windowed;
+    }
+
+    public void setWindowed(boolean windowed) {
+        this.windowed = windowed;
+    }
+
+    public Rectangle getWindowBounds() {
+        return windowBounds;
+    }
+
+
+    // Non-trivial public routines.
+
+    /**
+     * Start/stop the goto path display.
+     */
     public void activateGotoPath() {
         Unit unit = getActiveUnit();
 
         // Action should be disabled if there is no active unit, but make sure
-        if (unit == null)
-            return;
+        if (unit == null || mapViewer == null) return;
 
         // Enter "goto mode" if not already activated; otherwise cancel it
         if (mapViewer.isGotoStarted()) {
@@ -185,7 +310,7 @@ public class GUI {
 
             // Draw the path to the current mouse position, if the
             // mouse is over the screen; see also
-            // CanvaseMouseMotionListener
+            // CanvasMouseMotionListener.
             Point pt = canvas.getMousePosition();
             if (pt != null) {
                 Tile tile = mapViewer.convertToMapTile(pt.x, pt.y);
@@ -198,21 +323,10 @@ public class GUI {
     }
 
     /**
-     * Verifies if the client can play sounds.
-     * @return boolean <b>true</b> if and only if client sound player has an instance
-     */
-    public boolean canPlaySound() {
-        return soundPlayer != null;
-    }
-
-    public void centerActiveUnit() {
-        mapViewer.centerActiveUnit();
-    }
-
-    /**
      * Change the windowed mode.
+     *
      * @param windowed Use <code>true</code> for windowed mode
-     *      and <code>false</code> for fullscreen mode.
+     *     and <code>false</code> for fullscreen mode.
      */
     public void changeWindowedMode(boolean windowed) {
         JMenuBar menuBar = null;
@@ -226,8 +340,8 @@ public class GUI {
         }
         setWindowed(windowed);
 
-        this.frame = FreeColFrame.createFreeColFrame(freeColClient, canvas, gd, windowed);
-
+        this.frame = FreeColFrame.createFreeColFrame(freeColClient, canvas, gd,
+                                                     windowed);
         frame.setJMenuBar(menuBar);
         frame.setCanvas(canvas);
         frame.updateBounds(getWindowBounds());
@@ -237,103 +351,30 @@ public class GUI {
         frame.setVisible(true);
     }
 
-    public void closeMainPanel() {
-        canvas.closeMainPanel();
-    }
-
-    public void closeMenus() {
-        canvas.closeMenus();
-    }
-
-    public void closeStatusPanel() {
-        canvas.closeStatusPanel();
-    }
-
-    public boolean containsInGameComponents() {
-        return canvas.containsInGameComponents();
-    }
-
     /**
-     * Get the default screen device.
-     *
-     * @return The default screen device, or null if none available
-     *     (as in headless mode).
+     * Create a thumbnail for the minimap.
      */
-    private static GraphicsDevice getDefaultScreenDevice() {
-        final GraphicsEnvironment lge
-            = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        final GraphicsDevice gd;
-        try {
-            return lge.getDefaultScreenDevice();
-        } catch (HeadlessException he) {}
-        return null;
-    }
+    public BufferedImage createMiniMapThumbNail() {
+        MiniMap miniMap = new MiniMap(freeColClient);
+        miniMap.setTileSize(MiniMap.MAX_TILE_SIZE);
+        int width = freeColClient.getGame().getMap().getWidth()
+            * MiniMap.MAX_TILE_SIZE + MiniMap.MAX_TILE_SIZE/2;
+        int height = freeColClient.getGame().getMap().getHeight()
+            * MiniMap.MAX_TILE_SIZE / 4;
+        BufferedImage image = new BufferedImage(width, height,
+                                                BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = image.createGraphics();
+        miniMap.paintMap(g2d);
 
-    /**
-     * Determine whether full screen mode can be used.
-     *
-     * @return True if full screen is available.
-     */
-    public static boolean checkFullScreen() {
-        GraphicsDevice gd = getDefaultScreenDevice();
-        return gd != null && gd.isFullScreenSupported();
-    }
-
-    /**
-     * Estimate size of client area when using the full screen.
-     *
-     * @return A suitable window size.
-     */
-    public static Dimension determineFullScreenSize() {
-        GraphicsDevice gd = getDefaultScreenDevice();
-        Rectangle bounds = gd.getDefaultConfiguration().getBounds();
-        return new Dimension(bounds.width - bounds.x,
-                             bounds.height - bounds.y);
-    }
-
-    /**
-     * Estimate size of client area for a window of maximum size.
-     *
-     * @return A suitable window size.
-     */
-    public static Dimension determineWindowSize() {
-        final GraphicsEnvironment lge
-            = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        final GraphicsDevice gd = getDefaultScreenDevice();
-        if (gd == null) return null;
-
-        // Get max size of window including border.
-        Rectangle bounds = lge.getMaximumWindowBounds();
-
-        // Do we trust getMaximumWindowBounds?
-        // Check the insets for evidence the taskbar has been missed.
-        Insets insets = Toolkit.getDefaultToolkit()
-            .getScreenInsets(gd.getDefaultConfiguration());
-        if (insets != null && insets.top <= 0 && insets.bottom <= 0) {
-            bounds.height -= DEFAULT_SCREEN_INSET_HEIGHT;
-        }
-        if (insets != null && insets.left <= 0 && insets.right <= 0) {
-            bounds.width -= DEFAULT_SCREEN_INSET_WIDTH;
-        }
-
-        // TODO: find better way to get size of window title and
-        // border.  The information is only available from getInsets
-        // when a window is already displayable.
-        Dimension size
-            = new Dimension(bounds.width - DEFAULT_WINDOW_INSET_WIDTH,
-                            bounds.height - DEFAULT_WINDOW_INSET_HEIGHT);
-        logger.info("Screen = " + Toolkit.getDefaultToolkit().getScreenSize()
-            + "\nBounds = " + gd.getDefaultConfiguration().getBounds()
-            + "\nMaxBounds = " + lge.getMaximumWindowBounds()
-            + "\nInsets = " + insets
-            + "\n => " + size);
-        return size;
-    }
-
-
-    public void displayChat(String senderNme, String message,
-                            boolean privateChat) {
-        canvas.displayChat(senderNme, message, privateChat);
+        // TODO: this can probably done more efficiently
+        // by applying a suitable AffineTransform to the
+        // Graphics2D
+        double scaledWidth = Math.min((64 * width) / height, 128);
+        BufferedImage scaledImage = new BufferedImage((int) scaledWidth, 64,
+            BufferedImage.TYPE_INT_ARGB);
+        scaledImage.createGraphics().drawImage(image, 0, 0,
+            (int)scaledWidth, 64, null);
+        return scaledImage;
     }
 
     /**
@@ -347,159 +388,69 @@ public class GUI {
      */
     public void displayChatMessage(Player player, String message,
                                    boolean privateChat) {
+        if (mapViewer == null || canvas == null) return;
         mapViewer.addMessage(new GUIMessage(player.getName() + ": " + message,
                                             player.getNationColor()));
-
         canvas.repaint(0, 0, canvas.getWidth(), canvas.getHeight());
     }
 
+    /**
+     * Delegate the colony tile display to the colony tile GUI.
+     *
+     * @param g The <code>Graphics</code> to display on.
+     * @param tile The <code>Tile</code> to display.
+     * @param colony The <code>Colony</code> using the tile.
+     */
     public void displayColonyTile(Graphics2D g, Tile tile, Colony colony) {
+        if (colonyTileGUI == null) return;
         colonyTileGUI.displayColonyTile(g, tile, colony);
     }
 
+    /**
+     * Display the splash screen.
+     *
+     * @param splashFilename The name of the file to find the image in.
+     */
     public void displaySplashScreen(final String splashFilename) {
         splash = null;
-        if (splashFilename != null) {
-            try {
-                Image im = Toolkit.getDefaultToolkit()
-                    .getImage(splashFilename);
-                splash = new JWindow();
-                splash.getContentPane().add(new JLabel(new ImageIcon(im)));
-                splash.pack();
-                Point center = GraphicsEnvironment
-                    .getLocalGraphicsEnvironment().getCenterPoint();
-                splash.setLocation(center.x - splash.getWidth() / 2,
-                                   center.y - splash.getHeight() / 2);
-                splash.setVisible(true);
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Splash fail", e);
-                splash = null;
-            }
+        if (splashFilename == null) return;
+        try {
+            Image im = Toolkit.getDefaultToolkit().getImage(splashFilename);
+            splash = new JWindow();
+            splash.getContentPane().add(new JLabel(new ImageIcon(im)));
+            splash.pack();
+            Point center = GraphicsEnvironment
+                .getLocalGraphicsEnvironment().getCenterPoint();
+            splash.setLocation(center.x - splash.getWidth() / 2,
+                               center.y - splash.getHeight() / 2);
+            splash.setVisible(true);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Splash fail", e);
+            splash = null;
         }
     }
 
-    public void errorMessage(StringTemplate template) {
-        canvas.errorMessage(Messages.message(template));
-    }
-
-    public void errorMessage(String messageId) {
-        canvas.errorMessage(messageId);
-    }
-
-    public void errorMessage(String messageID, String message) {
-        canvas.errorMessage(messageID, message);
-
-    }
-
-    public void executeWithUnitOutForAnimation(final Unit unit,
-            final Tile sourceTile,
-            final OutForAnimationCallback r) {
-        mapViewer.executeWithUnitOutForAnimation(unit, sourceTile, r);
-    }
-
-    public Unit getActiveUnit() {
-        if (mapViewer == null)
-            return null;
-        return mapViewer.getActiveUnit();
-    }
-
-    public Canvas getCanvas() {
-        return canvas;
-    }
-
-    public MapViewer getColonyTileGUI() {
-        return colonyTileGUI;
-    }
-
-    public int getCurrentViewMode() {
-        return mapViewer.getView();
-    }
-
-    public Tile getFocus() {
-        if (mapViewer == null)
-            return null;
-        return mapViewer.getFocus();
-    }
-
-
+    /**
+     * Simple delegation of image icon retrieval.
+     *
+     * @param display The object to find an icon for.
+     * @param small Choose a small icon?
+     * @return The <code>ImageIcon</code> found.
+     */
     public ImageIcon getImageIcon(Object display, boolean small) {
         return imageLibrary.getImageIcon(display, small);
     }
 
-    public ImageLibrary getImageLibrary() {
-        return imageLibrary;
-    }
-
-    public LoadingSavegameDialog getLoadingSavegameDialog() {
-        return canvas.getLoadingSavegameDialog();
-    }
-
-
-    public float getMapScale() {
-        return mapViewer.getMapScale();
-    }
-
-    public MapViewer getMapViewer() {
-        return mapViewer;
-    }
-
-    public Tile getSelectedTile() {
-        return mapViewer.getSelectedTile();
-    }
-
-    public SoundPlayer getSoundPlayer() {
-        return soundPlayer;
-    }
-
-    public Rectangle getTileBounds(Tile tile) {
-        return mapViewer.getTileBounds(tile);
-    }
-
-    public Point getTilePosition(Tile tile) {
-        return mapViewer.getTilePosition(tile);
-    }
-
-    public Rectangle getWindowBounds() {
-        return windowBounds;
-    }
-
+    /**
+     * Hide the splash screen.
+     */
     public void hideSplashScreen() {
         if (splash != null) {
             splash.setVisible(false);
             splash.dispose();
+            splash = null;
         }
     }
-
-    public boolean isClientOptionsDialogShowing() {
-        return canvas != null && !canvas.isClientOptionsDialogShowing();
-    }
-
-
-    public boolean isMapboardActionsEnabled() {
-        return canvas != null && canvas.isMapboardActionsEnabled();
-    }
-
-    public boolean isShowingSubPanel() {
-        return canvas.isShowingSubPanel();
-    }
-
-    public boolean isWindowed() {
-        return windowed;
-    }
-
-
-    public boolean onScreen(Tile tileToCheck) {
-        return mapViewer.onScreen(tileToCheck);
-    }
-
-    public void paintImmediatelyCanvasIn(Rectangle rectangle) {
-        canvas.paintImmediately(rectangle);
-    }
-
-    public void paintImmediatelyCanvasInItsBounds() {
-        canvas.paintImmediately(canvas.getBounds());
-    }
-
 
     /**
      * Plays some sound. Parameter == null stops playing a sound.
@@ -507,524 +458,99 @@ public class GUI {
      * @param sound The sound resource to play or <b>null</b>
      */
     public void playSound(String sound) {
-        if (canPlaySound()) {
-            if (sound == null) {
-               soundPlayer.stop();
-            } else {
-               File file = ResourceManager.getAudio(sound);
-               if (file != null) {
-                   soundPlayer.playOnce(file);
-               }
-               logger.finest(((file == null) ? "Could not load" : "Playing")
-                             + " sound: " + sound);
+        if (!canPlaySound()) return;
+        if (sound == null) {
+            soundPlayer.stop();
+        } else {
+            File file = ResourceManager.getAudio(sound);
+            if (file != null) {
+                soundPlayer.playOnce(file);
             }
+            logger.finest(((file == null) ? "Could not load" : "Playing")
+                + " sound: " + sound);
         }
     }
 
-
+    /**
+     * Quit the GUI.  All that is required is to exit the full screen.
+     */
     public void quit() throws Exception {
-        if (!isWindowed()) {
-                gd.setFullScreenWindow(null);
-        }
+        if (gd == null) return;
+        if (!isWindowed()) gd.setFullScreenWindow(null);
     }
 
+    /**
+     * Refresh the GUI.
+     */
     public void refresh() {
+        if (mapViewer == null || canvas == null) return;
         mapViewer.forceReposition();
         canvas.refresh();
-    }
-
-    public void refreshPlayersTable() {
-        canvas.refreshPlayersTable();
     }
 
     /**
      * Refreshes the screen at the specified Tile.
      *
-     * @param t The tile to refresh.
+     * @param tile The <code>Tile</code> to refresh.
      */
-    public void refreshTile(Tile t) {
-        if (t.getX() >= 0 && t.getY() >= 0) {
-            canvas.repaint(mapViewer.getTileBounds(t));
+    public void refreshTile(Tile tile) {
+        if (mapViewer == null || canvas == null) return;
+        if (tile.getX() >= 0 && tile.getY() >= 0) {
+            canvas.repaint(mapViewer.getTileBounds(tile));
         }
     }
 
-    public void removeFromCanvas(Component component) {
-        canvas.remove(component);
-    }
-
-    public void removeInGameComponents() {
-        canvas.removeInGameComponents();
-    }
-
-    public void requestFocusForSubPanel() {
-        canvas.getShowingSubPanel().requestFocus();
-    }
-
-    public boolean requestFocusInWindow() {
-        return canvas.requestFocusInWindow();
-    }
-
+    /**
+     * Reset the menu bar.
+     */
     public void resetMenuBar() {
+        if (frame == null) return;
         JMenuBar menuBar = frame.getJMenuBar();
         if (menuBar != null) {
-            ((FreeColMenuBar) menuBar).reset();
+            ((FreeColMenuBar)menuBar).reset();
         }
     }
 
-    public void returnToTitle() {
-        canvas.returnToTitle();
-    }
-
-    public void scaleMap(float delta) {
-        mapViewer.scaleMap(delta);
+    /**
+     * Scale the map.
+     *
+     * @param scale The scale factor to apply.
+     */
+    public void scaleMap(float scale) {
+        if (mapViewer == null) return;
+        mapViewer.scaleMap(scale);
         refresh();
     }
 
-    public void setActiveUnit(Unit unitToActivate) {
-        mapViewer.setActiveUnit(unitToActivate);
-        if (unitToActivate != null
-            && !freeColClient.getMyPlayer().owns(unitToActivate)) {
+    /**
+     * Set the active unit.
+     *
+     * @param unit The <code>Unit</code> to activate.
+     */
+    public void setActiveUnit(Unit unit) {
+        if (mapViewer == null || canvas == null) return;
+        mapViewer.setActiveUnit(unit);
+        if (unit != null
+            && !freeColClient.getMyPlayer().owns(unit)) {
             canvas.repaint(0, 0, canvas.getWidth(), canvas.getHeight());
         }
     }
 
-    public void setFocus(Tile tileToFocus) {
-        mapViewer.setFocus(tileToFocus);
-    }
-
-    public void setFocusImmediately(Tile tileToFocus) {
-        mapViewer.setFocusImmediately(tileToFocus);
-    }
-
-    public boolean setSelectedTile(Tile newTileToSelect, boolean clearGoToOrders) {
-        return mapViewer.setSelectedTile(newTileToSelect, clearGoToOrders);
-    }
-
+    /**
+     * Set up the menu bar once in game.
+     */
     public void setupInGameMenuBar() {
+        if (frame == null || canvas == null) return;
         frame.setJMenuBar(new InGameMenuBar(freeColClient));
         frame.paintAll(canvas.getGraphics());
     }
 
-    public void setupMenuBarToNull() {
-        frame.setJMenuBar(null);
-    }
-
-    public void setUpMouseListenersForCanvas(){
-        canvas.addMouseListener(new CanvasMouseListener(freeColClient, canvas, mapViewer));
-        canvas.addMouseMotionListener(new CanvasMouseMotionListener(freeColClient));
-    }
-
-    public void setWindowed(boolean windowed) {
-        this.windowed = windowed;
-
-    }
-
-    public void showAboutPanel() {
-        canvas.showAboutPanel();
-    }
-
-    public ScoutIndianSettlementAction showArmedUnitIndianSettlementDialog(IndianSettlement settlement) {
-        return canvas.showArmedUnitIndianSettlementDialog(settlement);
-    }
-
-    public BoycottAction showBoycottedGoodsDialog(Goods goods, Europe europe) {
-        return canvas.showBoycottedGoodsDialog(goods, europe);
-    }
-
-    public void showBuildQueuePanel(Colony colony) {
-        canvas.showBuildQueuePanel(colony);
-    }
-
-    public void showBuildQueuePanel(Colony colony, Runnable callBack) {
-        canvas.showBuildQueuePanel(colony, callBack);
-    }
-
-    public BuyAction showBuyDialog(Unit unit, Settlement settlement,
-            Goods goods, int gold, boolean canBuy) {
-        return canvas.showBuyDialog(unit, settlement, goods, gold, canBuy);
-    }
-
-    public List<Goods> showCaptureGoodsDialog(Unit winner, List<Goods> loot) {
-        return canvas.showCaptureGoodsDialog(winner, loot);
-    }
-
-    public void showChatPanel() {
-        canvas.showChatPanel();
-    }
-
-    public <T> T showChoiceDialog(Tile tile, String text, String cancelText,
-            List<ChoiceItem<T>> choices) {
-        return canvas.showChoiceDialog(tile, text, cancelText, choices);
-    }
-
-    public MonarchAction showChooseMonarchActionDialog(String monarchTitle, List<ChoiceItem<MonarchAction>> actions) {
-        return canvas.showChooseMonarchActionDialog(monarchTitle, actions);
-    }
-
-    public FoundingFather showChooseFoundingFatherDialog(List<ChoiceItem<FoundingFather>> fathers, String fatherTitle) {
-        return canvas.showChooseFoundingFatherDialog(fathers, fatherTitle);
-    }
-
-    public FoundingFather showChooseFoundingFatherDialog(List<FoundingFather> ffs) {
-        return canvas.showChooseFoundingFatherDialog(ffs);
-    }
-
-    public ClaimAction showClaimDialog(Tile tile, Player player, int price,
-            Player owner, boolean canAccept) {
-        return canvas.showClaimDialog(tile, player, price, owner, canAccept);
-    }
-
-    public OptionGroup showClientOptionsDialog() {
-        return canvas.showClientOptionsDialog();
-    }
-
-    public ColonyPanel showColonyPanel(Colony colony) {
-        return canvas.showColonyPanel(colony);
-    }
-
-    public void showColopediaPanel(String nodeId) {
-        canvas.showColopediaPanel(nodeId);
-    }
-
-    public void showCompactLabourReport() {
-        canvas.showCompactLabourReport();
-    }
-
-    public void showCompactLabourReport(UnitData unitData) {
-        canvas.showCompactLabourReport(unitData);
-    }
-
-    public List<String> showConfirmDeclarationDialog() {
-        return canvas.showConfirmDeclarationDialog();
-    }
-
-    public boolean showConfirmDialog(String text,
-                                     String okText, String cancelText) {
-        return canvas.showConfirmDialog(null, Messages.message(text),
-                                        null, okText, cancelText);
-    }
-
-    public boolean showConfirmDialog(Tile tile,
-                                     StringTemplate template, Object obj,
-                                     String okText, String cancelText) {
-        return canvas.showConfirmDialog(tile, Messages.message(template),
-            getImageIcon(obj, false), okText, cancelText);
-    }
-
-    public void showDeclarationPanel() {
-        canvas.showDeclarationPanel();
-    }
-
-    public void showDifficultyDialog(boolean editable) {
-        canvas.showDifficultyDialog(editable);
-    }
-
-    public void showDifficultyDialog(Specification spec, OptionGroup group) {
-        canvas.showDifficultyDialog(spec, group);
-    }
-
-    public List<Goods> showDumpCargoDialog(Unit unit) {
-        return canvas.showDumpCargoDialog(unit);
-    }
-
-
-    public boolean showEditOptionDialog(Option option) {
-        return canvas.showEditOptionDialog(option);
-    }
-
-    public int showEmigrationDialog(boolean fountainOfYouth) {
-        return canvas.showEmigrationDialog(fountainOfYouth);
-    }
-
-    public boolean showEndTurnDialog(List<Unit> units) {
-        return canvas.showEndTurnDialog(units);
-    }
-
-    public int showEuropeDialog(EuropePanel.EuropeAction europeAction) {
-        return canvas.showEuropeDialog(europeAction);
-    }
-
-    public void showEuropePanel() {
-        canvas.showEuropePanel();
-    }
-
-    public void showEventPanel(EventType type) {
-        canvas.showEventPanel(type);
-    }
-
-    public void showFindSettlementDialog() {
-        canvas.showFindSettlementDialog();
-    }
-
-    public void showGameOptionsDialog(boolean editable, boolean loadCustomOptions) {
-        canvas.showGameOptionsDialog(editable, loadCustomOptions);
-    }
-
-    public void showHighScoresPanel(String messageId) {
-        canvas.showHighScoresPanel(messageId);
-    }
-
-    public void showIndianSettlementPanel(IndianSettlement indianSettlement) {
-        canvas.showIndianSettlementPanel(indianSettlement);
-    }
-
-
-    public TradeAction showIndianSettlementTradeDialog(Settlement settlement,
-            boolean canBuy,
-            boolean canSell,
-            boolean canGift) {
-        return canvas.showIndianSettlementTradeDialog(settlement, canBuy, canSell, canGift);
-    }
-
-    public void showInformationMessage(FreeColObject displayObject, String messageId) {
-        canvas.showInformationMessage(displayObject, messageId);
-    }
-
-    public void showInformationMessage(FreeColObject displayObject, StringTemplate template) {
-        canvas.showInformationMessage(displayObject, template);
-    }
-
-    public void showInformationMessage(ModelMessage message) {
-        canvas.showInformationMessage(message);
-    }
-
-    public void showInformationMessage(String messageId) {
-        canvas.showInformationMessage(messageId);
-    }
-
-    public void showInformationMessage(StringTemplate template) {
-        canvas.showInformationMessage(template);
-    }
-
-    public String showInputDialog(Tile tile, StringTemplate text, String defaultValue,
-            String okText, String cancelText,
-            boolean rejectEmptyString) {
-        return canvas.showInputDialog(tile, text, defaultValue, okText, cancelText, rejectEmptyString);
-    }
-
-    public File showLoadDialog(File directory) {
-        return canvas.showLoadDialog(directory);
-    }
-
-    public File showLoadDialog(File directory, FileFilter[] fileFilters) {
-        return canvas.showLoadDialog(directory, fileFilters);
-    }
-
-    public boolean showLoadingSavegameDialog(boolean publicServer, boolean singlePlayer) {
-        return canvas.showLoadingSavegameDialog(publicServer, singlePlayer);
-    }
-
-
-    public void showLogFilePanel() {
-        canvas.showLogFilePanel();
-    }
-
-    public void showMainPanel(String userMsg) {
-        canvas.showMainPanel(userMsg);
-    }
-
-    public OptionGroup showMapGeneratorOptionsDialog(OptionGroup mgo, boolean editable, boolean loadCustomOptions){
-        return canvas.showMapGeneratorOptionsDialog(mgo, editable, loadCustomOptions);
-    }
-
-    public Dimension showMapSizeDialog() {
-        return canvas.showMapSizeDialog();
-    }
-
-    public void showModelMessages(ModelMessage... modelMessages) {
-        canvas.showModelMessages(modelMessages);
-    }
-
-    public boolean showMonarchDialog(MonarchAction action, StringTemplate replace) {
-        return canvas.showMonarchDialog(action, replace);
-    }
-
-    public DiplomaticTrade showNegotiationDialog(Unit unit, Settlement settlement, DiplomaticTrade agreement) {
-        return canvas.showNegotiationDialog(unit, settlement, agreement);
-    }
-
-    public void showNewPanel() {
-        canvas.showNewPanel();
-    }
-
-    public void showNewPanel(Specification specification) {
-        canvas.showNewPanel(specification);
-    }
-
-    public void showOpeningVideoPanel() {
-        canvas.showOpeningVideoPanel();
-    }
-
-    public boolean showPreCombatDialog(FreeColGameObject attacker,
-            FreeColGameObject defender,
-            Tile tile) {
-        return canvas.showPreCombatDialog(attacker, defender, tile);
-    }
-
-    public void showReportCargoPanel() {
-        canvas.showReportCargoPanel();
-    }
-
-    public void showReportColonyPanel() {
-        canvas.showReportColonyPanel();
-    }
-
-    public void showReportContinentalCongressPanel() {
-        canvas.showReportContinentalCongressPanel();
-    }
-
-    public void showReportEducationPanel() {
-        canvas.showReportEducationPanel();
-    }
-
-    public void showReportExplorationPanel() {
-        canvas.showReportExplorationPanel();
-    }
-
-    public void showReportForeignAffairPanel() {
-        canvas.showReportForeignAffairPanel();
-    }
-
-    public void showReportHistoryPanel() {
-        canvas.showReportHistoryPanel();
-    }
-
-    public void showReportIndianPanel() {
-        canvas.showReportIndianPanel();
-    }
-
-    public void showReportLabourDetailPanel(UnitType unitType, Map<UnitType, Map<Location, Integer>> data,
-            TypeCountMap<UnitType> unitCount, List<Colony> colonies) {
-        canvas.showReportLabourDetailPanel(unitType, data, unitCount, colonies);
-
-    }
-
-
-    public void showReportLabourPanel() {
-        canvas.showReportLabourPanel();
-    }
-
-    public void showReportMilitaryPanel() {
-        canvas.showReportMilitaryPanel();
-    }
-
-    public void showReportNavalPanel() {
-        canvas.showReportNavalPanel();
-    }
-
-    public void showReportProductionPanel() {
-        canvas.showReportProductionPanel();
-    }
-
-    public void showReportReligiousPanel() {
-        canvas.showReportReligiousPanel();
-    }
-
-    public void showReportRequirementsPanel() {
-        canvas.showReportRequirementsPanel();
-    }
-
-    public void showReportTradePanel() {
-        canvas.showReportTradePanel();
-    }
-
-    public void showReportTurnPanel(ModelMessage... messages) {
-        canvas.showReportTurnPanel(messages);
-    }
-
-    public File showSaveDialog(File directory, String defaultName) {
-        return canvas.showSaveDialog(directory, defaultName);
-    }
-
-    public File showSaveDialog(File directory, String standardName, FileFilter[] fileFilters, String defaultName) {
-        return canvas.showSaveDialog(directory, standardName, fileFilters, defaultName);
-    }
-
-    public ScoutColonyAction showScoutForeignColonyDialog(Colony colony,
-            Unit unit,
-            boolean canNegotiate) {
-        return canvas.showScoutForeignColonyDialog(colony, unit, canNegotiate);
-    }
-
-
-
-
-    public ScoutIndianSettlementAction showScoutIndianSettlementDialog(IndianSettlement settlement, String number) {
-        return canvas.showScoutIndianSettlementDialog(settlement, number);
-    }
-
-    public int showSelectAmountDialog(GoodsType goodsType, int available, int defaultAmount, boolean needToPay) {
-        return canvas.showSelectAmountDialog(goodsType, available, defaultAmount, needToPay);
-    }
-
-    public Location showSelectDestinationDialog(Unit unit) {
-        return canvas.showSelectDestinationDialog(unit);
-    }
-
-    public SellAction showSellDialog(Unit unit, Settlement settlement,
-            Goods goods, int gold) {
-        return canvas.showSellDialog(unit, settlement, goods, gold);
-    }
-
-    public void showServerListPanel(List<ServerInfo> serverList) {
-        canvas.showServerListPanel(serverList);
-
-    }
-
-    public <T> T showSimpleChoiceDialog(Tile tile,
-            String text, String cancelText,
-            List<T> objects) {
-        return canvas.showSimpleChoiceDialog(tile, text, cancelText, objects);
-    }
-
-    public void showStartGamePanel(Game game, Player player, boolean singlePlayerMode) {
-        canvas.showStartGamePanel(game, player, singlePlayerMode);
-    }
-
-
-    public void showStatisticsPanel() {
-        canvas.showStatisticsPanel();
-    }
-
-    public void showStatusPanel(String message) {
-        canvas.showStatusPanel(message);
-    }
-
-    public void showTilePanel(Tile tile) {
-        canvas.showTilePanel(tile);
-    }
-
-    public void showTilePopUpAtSelectedTile() {
-        canvas.showTilePopup(getSelectedTile(),
-                mapViewer.getCursor().getCanvasX(),
-                mapViewer.getCursor().getCanvasY());
-    }
-
-    public boolean showTradeRouteDialog(Unit unit) {
-        return canvas.showTradeRouteDialog(unit);
-    }
-
-    public boolean showTradeRouteInputDialog(TradeRoute newRoute) {
-        return canvas.showTradeRouteInputDialog(newRoute);
-    }
-
-    public MissionaryAction showUseMissionaryDialog(Unit unit,
-            IndianSettlement settlement,
-            boolean canEstablish,
-            boolean canDenounce) {
-        return canvas.showUseMissionaryDialog(unit, settlement, canEstablish, canDenounce);
-    }
-
-    public void showVictoryPanel() {
-        canvas.showVictoryPanel();
-    }
-
-    public boolean showWarehouseDialog(Colony colony) {
-        return canvas.showWarehouseDialog(colony);
-    }
-
-    public void showWorkProductionPanel(Unit unit) {
-        canvas.showWorkProductionPanel(unit);
+    /**
+     * Set up the mouse listeners for the canvas and map viewer.
+     */
+    public void setupMouseListeners() {
+        if (canvas == null || mapViewer == null) return;
+        canvas.setupMouseListeners(mapViewer);
     }
 
     /**
@@ -1095,9 +621,11 @@ public class GUI {
                 }
             });
 
-        this.mapViewer = new MapViewer(freeColClient, innerWindowSize, imageLibrary);
+        this.mapViewer = new MapViewer(freeColClient, innerWindowSize,
+                                       imageLibrary);
         this.canvas = new Canvas(freeColClient, innerWindowSize, mapViewer);
-        this.colonyTileGUI = new MapViewer(freeColClient, innerWindowSize, imageLibrary);
+        this.colonyTileGUI = new MapViewer(freeColClient, innerWindowSize,
+                                           imageLibrary);
 
         changeWindowedMode(isWindowed());
         frame.setIconImage(ResourceManager.getImage("FrameIcon.image"));
@@ -1124,86 +652,287 @@ public class GUI {
         mapViewer.startCursorBlinking();
     }
 
+    /**
+     * Start the GUI for the map editor.
+     */
     public void startMapEditorGUI() {
+        if (frame == null || canvas == null) return;
+
         // We may need to reset the zoom value to the default value
         scaleMap(2f);
 
-        setupMapEditorMenuBar();
+        frame.setJMenuBar(new MapEditorMenuBar(freeColClient));
         canvas.showMapEditorTransformPanel();
 
-        setupMouseListenerForMapEditor();
-    }
-
-    public void toggleViewMode() {
-        mapViewer.toggleViewMode();
-    }
-
-    /**
-     * Try to remove a unit from a colony.
-     * - Check for population limit.
-     * - Query if education should be abandoned.
-     *
-     * @param unit The <code>Unit</code> that is leaving the colony.
-     * @return True if the unit is allowed to leave.
-     */
-    public boolean tryLeaveColony(Unit unit) {
-        Colony colony = unit.getColony();
-        String message = colony.getReducePopulationMessage();
-        if (message != null) {
-            showInformationMessage(message);
-            return false;
-        }
-        StringTemplate template = unit.getAbandonEducationMessage(true);
-        return template == null
-            || showConfirmDialog(unit.getTile(), template, unit,
-                "abandonEducation.yes", "abandonEducation.no");
-    }
-
-    public void updateGameOptions() {
-        canvas.updateGameOptions();
-    }
-
-    public void updateMapGeneratorOptions() {
-        canvas.updateMapGeneratorOptions();
-    }
-
-    public void updateMenuBar() {
-        if (frame != null && frame.getJMenuBar() != null) {
-            ((FreeColMenuBar) frame.getJMenuBar()).update();
-        }
-    }
-
-
-    private void setupMapEditorMenuBar() {
-        frame.setJMenuBar(new MapEditorMenuBar(freeColClient));
-    }
-
-    private void setupMouseListenerForMapEditor() {
         CanvasMapEditorMouseListener listener
             = new CanvasMapEditorMouseListener(freeColClient, canvas);
         canvas.addMouseListener(listener);
         canvas.addMouseMotionListener(listener);
     }
 
-    public Parameters showParametersDialog() {
-        return canvas.showParametersDialog();
+    /**
+     * Update the menu bar.
+     */
+    public void updateMenuBar() {
+        if (frame != null && frame.getJMenuBar() != null) {
+            ((FreeColMenuBar)frame.getJMenuBar()).update();
+        }
     }
 
-    public Dimension showScaleMapSizeDialog() {
-        return canvas.showScaleMapSizeDialog();
+
+    // Static utilities.
+
+    /**
+     * Determine whether full screen mode can be used.
+     *
+     * @return True if full screen is available.
+     */
+    public static boolean checkFullScreen() {
+        GraphicsDevice gd = getDefaultScreenDevice();
+        return gd != null && gd.isFullScreenSupported();
     }
 
+    /**
+     * Estimate size of client area when using the full screen.
+     *
+     * @return A suitable window size.
+     */
+    public static Dimension determineFullScreenSize() {
+        GraphicsDevice gd = getDefaultScreenDevice();
+        if (gd == null) return null;
+        Rectangle bounds = gd.getDefaultConfiguration().getBounds();
+        return new Dimension(bounds.width - bounds.x,
+                             bounds.height - bounds.y);
+    }
+
+    /**
+     * Estimate size of client area for a window of maximum size.
+     *
+     * @return A suitable window size.
+     */
+    public static Dimension determineWindowSize() {
+        final GraphicsEnvironment lge
+            = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        final GraphicsDevice gd = getDefaultScreenDevice();
+        if (gd == null) return null;
+
+        // Get max size of window including border.
+        Rectangle bounds = lge.getMaximumWindowBounds();
+
+        // Do we trust getMaximumWindowBounds?
+        // Check the insets for evidence the taskbar has been missed.
+        Insets insets = Toolkit.getDefaultToolkit()
+            .getScreenInsets(gd.getDefaultConfiguration());
+        if (insets != null && insets.top <= 0 && insets.bottom <= 0) {
+            bounds.height -= DEFAULT_SCREEN_INSET_HEIGHT;
+        }
+        if (insets != null && insets.left <= 0 && insets.right <= 0) {
+            bounds.width -= DEFAULT_SCREEN_INSET_WIDTH;
+        }
+
+        // TODO: find better way to get size of window title and
+        // border.  The information is only available from getInsets
+        // when a window is already displayable.
+        Dimension size
+            = new Dimension(bounds.width - DEFAULT_WINDOW_INSET_WIDTH,
+                            bounds.height - DEFAULT_WINDOW_INSET_HEIGHT);
+        logger.info("Screen = " + Toolkit.getDefaultToolkit().getScreenSize()
+            + "\nBounds = " + gd.getDefaultConfiguration().getBounds()
+            + "\nMaxBounds = " + lge.getMaximumWindowBounds()
+            + "\nInsets = " + insets
+            + "\n => " + size);
+        return size;
+    }
+
+    /**
+     * Gets a default header for panels.
+     *
+     * @param text The text to display.
+     * @return A suitable <code>JLabel</code>.
+     */
+    public static JLabel getDefaultHeader(String text) {
+        JLabel header = new JLabel(text, JLabel.CENTER);
+        header.setFont(BIG_HEADER_FONT);
+        header.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+        return header;
+    }
+
+    /**
+     * Get the default screen device.
+     *
+     * @return The default screen device, or null if none available
+     *     (as in headless mode).
+     */
+    public static GraphicsDevice getDefaultScreenDevice() {
+        final GraphicsEnvironment lge
+            = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        try {
+            return lge.getDefaultScreenDevice();
+        } catch (HeadlessException he) {}
+        return null;
+    }
+
+    /**
+     * Return a button suitable for linking to another panel
+     * (e.g. ColopediaPanel).
+     *
+     * @param text a <code>String</code> value
+     * @param icon an <code>Icon</code> value
+     * @param action a <code>String</code> value
+     * @return a <code>JButton</code> value
+     */
+    public static JButton getLinkButton(String text, Icon icon, String action) {
+        JButton button = new JButton(text, icon);
+        button.setMargin(EMPTY_MARGIN);
+        button.setOpaque(false);
+        button.setForeground(LINK_COLOR);
+        button.setAlignmentY(0.8f);
+        button.setBorder(BorderFactory.createEmptyBorder());
+        button.setActionCommand(action);
+        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        return button;
+    }
+
+    /**
+     * Gets a text area with standard settings suitable for use in FreeCol
+     * panels.
+     *
+     * @param text The text to display in the text area.
+     * @return A suitable text area.
+     */
+    public static JTextArea getDefaultTextArea(String text) {
+        return getDefaultTextArea(text, DEFAULT_TEXT_COLUMNS);
+    }
+
+    /**
+     * Gets a text area with standard settings suitable for use in FreeCol
+     * panels.
+     *
+     * @param text The text to display in the text area.
+     * @param columns The em-width number of columns to display the text in.
+     * @return A suitable text area.
+     */
+    public static JTextArea getDefaultTextArea(String text, int columns) {
+        JTextArea textArea = new JTextArea(text);
+        textArea.setColumns(columns);
+        textArea.setOpaque(false);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        textArea.setFocusable(false);
+        textArea.setFont(DEFAULT_FONT);
+        // necessary because of resizing
+        textArea.setSize(textArea.getPreferredSize());
+        return textArea;
+    }
+
+    /**
+     * Get a <code>JTextPane</code> with default styles.
+     *
+     * @return The default <code>JTextPane</code> to use.
+     */
+    public static JTextPane getDefaultTextPane() {
+        return getDefaultTextPane(null);
+    }
+
+    /**
+     * Get a <code>JTextPane</code> with default styles and given text.
+     *
+     * @param text The text to display.
+     * @return A suitable <code>JTextPane</code>.
+     */
+    public static JTextPane getDefaultTextPane(String text) {
+        DefaultStyledDocument document
+            = new DefaultStyledDocument(GUI.STYLE_CONTEXT) {
+                    @Override
+                    public Font getFont(AttributeSet attr) {
+                        Font font = ResourceManager.getFont(StyleConstants
+                            .getFontFamily(attr),
+                            StyleConstants.getFontSize(attr));
+                        if (font == null) return super.getFont(attr);
+                        int fontStyle = Font.PLAIN;
+                        if (StyleConstants.isBold(attr)) {
+                            fontStyle |= Font.BOLD;
+                        }
+                        if (StyleConstants.isItalic(attr)) {
+                            fontStyle |= Font.ITALIC;
+                        }
+                        return (fontStyle == Font.PLAIN) ? font
+                            : font.deriveFont(fontStyle);
+                    }
+                };
+
+        JTextPane textPane = new JTextPane(document);
+        textPane.setOpaque(false);
+        textPane.setEditable(false);
+        textPane.setLogicalStyle(STYLE_CONTEXT.getStyle("regular"));
+
+        textPane.setText(text);
+        return textPane;
+    }
+
+
+    // Animation handling
+
+    /**
+     * Common utility routine to retrieve animation speed.
+     *
+     * @param unit The <code>Unit</code> to be animated.
+     * @return The animation speed.
+     */
+    public int getAnimationSpeed(Unit unit) {
+        String key = (freeColClient.getMyPlayer() == unit.getOwner())
+            ? ClientOptions.MOVE_ANIMATION_SPEED
+            : ClientOptions.ENEMY_MOVE_ANIMATION_SPEED;
+        return freeColClient.getClientOptions().getInteger(key);
+    }
+
+    /**
+     * Animate a unit attack.
+     *
+     * @param attacker The attacking <code>Unit</code>.
+     * @param defender The defending <code>Unit</code>.
+     * @param attackerTile The <code>Tile</code> to show the attacker on.
+     * @param defenderTile The <code>Tile</code> to show the defender on.
+     * @param success Did the attack succeed?
+     */
+    public void animateUnitAttack(Unit attacker, Unit defender,
+                                  Tile attackerTile, Tile defenderTile,
+                                  boolean success) {
+        if (canvas == null) return;
+        Animations.unitAttack(this, attacker, defender,
+                              attackerTile, defenderTile, success);
+    }
+
+    /**
+     * Animate a unit move.
+     *
+     * @param unit The <code>Unit</code> that is moving.
+     * @param srcTile The <code>Tile</code> the unit starts at.
+     * @param dstTile The <code>Tile</code> the unit moves to.
+     */
+    public void animateUnitMove(Unit unit, Tile srcTile, Tile dstTile) {
+        if (canvas == null) return;
+        Animations.unitMove(this, unit, srcTile, dstTile);
+    }
+
+
+    // MapControls handling
 
     public void showMapControls(boolean value) {
+        if (canvas == null) return;
+
         if (value && freeColClient.isInGame()) {
             if (mapControls == null) {
                 try {
                     String className = freeColClient.getClientOptions()
                         .getString(ClientOptions.MAP_CONTROLS);
-                    Class<?> controls = Class.forName("net.sf.freecol.client.gui.panel." + className);
-                    mapControls = (MapControls) controls.getConstructor(FreeColClient.class, GUI.class)
+                    String panelName = "net.sf.freecol.client.gui.panel."
+                        + className;
+                    Class<?> controls = Class.forName(panelName);
+                    mapControls = (MapControls)controls
+                        .getConstructor(FreeColClient.class, GUI.class)
                         .newInstance(freeColClient, this);
-                } catch(Exception e) {
+                } catch (Exception e) {
                     mapControls = new CornerMapControls(freeColClient);
                 }
             }
@@ -1224,8 +953,7 @@ public class GUI {
     }
 
     public void updateMapControls() {
-        if (mapControls != null)
-            mapControls.update();
+        if (mapControls != null) mapControls.update();
     }
 
     public void updateMapControlsInCanvas() {
@@ -1235,13 +963,13 @@ public class GUI {
         }
     }
 
-
-
     public void zoomInMapControls() {
+        if (mapControls == null) return;
         mapControls.zoomIn();
     }
 
     public void zoomOutMapControls() {
+        if (mapControls == null) return;
         mapControls.zoomOut();
     }
 
@@ -1254,51 +982,713 @@ public class GUI {
     }
 
 
-    /**
-     * Common utility routine to retrieve animation speed.
-     *
-     * @param unit The <code>Unit</code> to be animated.
-     * @return The animation speed.
-     */
-    public int getAnimationSpeed(Unit unit) {
-        String key = (freeColClient.getMyPlayer() == unit.getOwner())
-            ? ClientOptions.MOVE_ANIMATION_SPEED
-            : ClientOptions.ENEMY_MOVE_ANIMATION_SPEED;
-        return freeColClient.getClientOptions().getInteger(key);
+    // Trivial delegations to Canvas
+
+    public void closeMainPanel() {
+        if (canvas == null) return;
+        canvas.closeMainPanel();
     }
 
-    public void animateUnitAttack(Unit attacker, Unit defender,
-                                  Tile attackerTile, Tile defenderTile,
-                                  boolean success) {
-        Animations.unitAttack(this, attacker, defender,
-                              attackerTile, defenderTile, success);
-
+    public void closeMenus() {
+        if (canvas == null) return;
+        canvas.closeMenus();
     }
 
-    public void animateUnitMove(Unit unit, Tile sourceTile, Tile destinationTile) {
-        Animations.unitMove(this, unit, sourceTile, destinationTile);
-
+    public void closeStatusPanel() {
+        if (canvas == null) return;
+        canvas.closeStatusPanel();
     }
 
-    public BufferedImage createMiniMapThumbNail() {
-        MiniMap miniMap = new MiniMap(freeColClient);
-        miniMap.setTileSize(MiniMap.MAX_TILE_SIZE);
-        int width = freeColClient.getGame().getMap().getWidth()
-            * MiniMap.MAX_TILE_SIZE + MiniMap.MAX_TILE_SIZE/2;
-        int height = freeColClient.getGame().getMap().getHeight()
-            * MiniMap.MAX_TILE_SIZE / 4;
-        BufferedImage image = new BufferedImage(width, height,
-                                                BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2d = image.createGraphics();
-        miniMap.paintMap(g2d);
+    public boolean containsInGameComponents() {
+        if (canvas == null) return false;
+        return canvas.containsInGameComponents();
+    }
 
-        // TODO: this can probably done more efficiently
-        // by applying a suitable AffineTransform to the
-        // Graphics2D
-        double scaledWidth = Math.min((64 * width) / height, 128);
-        BufferedImage scaledImage = new BufferedImage((int) scaledWidth, 64,
-                                                      BufferedImage.TYPE_INT_ARGB);
-        scaledImage.createGraphics().drawImage(image, 0, 0, (int) scaledWidth, 64, null);
-        return scaledImage;
+    public void displayChat(String senderName, String message,
+                            boolean privateChat) {
+        if (canvas == null) return;
+        canvas.displayChat(senderName, message, privateChat);
+    }
+
+    public void errorMessage(StringTemplate template) {
+        if (canvas == null) return;
+        canvas.errorMessage(Messages.message(template));
+    }
+
+    public void errorMessage(String messageId) {
+        if (canvas == null) return;
+        canvas.errorMessage(messageId);
+    }
+
+    public void errorMessage(String messageID, String message) {
+        if (canvas == null) return;
+        canvas.errorMessage(messageID, message);
+    }
+
+    public LoadingSavegameDialog getLoadingSavegameDialog() {
+        if (canvas == null) return null;
+        return canvas.getLoadingSavegameDialog();
+    }
+
+    public boolean isClientOptionsDialogShowing() {
+        return canvas != null && !canvas.isClientOptionsDialogShowing();
+    }
+
+    public boolean isMapboardActionsEnabled() {
+        return canvas != null && canvas.isMapboardActionsEnabled();
+    }
+
+    public boolean isShowingSubPanel() {
+        if (canvas == null) return false;
+        return canvas.isShowingSubPanel();
+    }
+
+    public void paintImmediatelyCanvasIn(Rectangle rectangle) {
+        if (canvas == null) return;
+        canvas.paintImmediately(rectangle);
+    }
+
+    public void paintImmediatelyCanvasInItsBounds() {
+        if (canvas == null) return;
+        canvas.paintImmediately(canvas.getBounds());
+    }
+
+    public void refreshPlayersTable() {
+        if (canvas == null) return;
+        canvas.refreshPlayersTable();
+    }
+
+    public void removeFromCanvas(Component component) {
+        if (canvas == null) return;
+        canvas.remove(component);
+    }
+
+    public void removeInGameComponents() {
+        if (canvas == null) return;
+        canvas.removeInGameComponents();
+    }
+
+    public void requestFocusForSubPanel() {
+        if (canvas == null) return;
+        canvas.getShowingSubPanel().requestFocus();
+    }
+
+    public boolean requestFocusInWindow() {
+        if (canvas == null) return false;
+        return canvas.requestFocusInWindow();
+    }
+
+    public void returnToTitle() {
+        if (canvas == null) return;
+        canvas.returnToTitle();
+    }
+
+    public void showAboutPanel() {
+        if (canvas == null) return;
+        canvas.showAboutPanel();
+    }
+
+    public ScoutIndianSettlementAction
+        showArmedUnitIndianSettlementDialog(IndianSettlement settlement) {
+        if (canvas == null) return ScoutIndianSettlementAction.CANCEL;
+        return canvas.showArmedUnitIndianSettlementDialog(settlement);
+    }
+
+    public BoycottAction showBoycottedGoodsDialog(Goods goods, Europe europe) {
+        if (canvas == null) return BoycottAction.CANCEL;
+        return canvas.showBoycottedGoodsDialog(goods, europe);
+    }
+
+    public void showBuildQueuePanel(Colony colony) {
+        if (canvas == null) return;
+        canvas.showBuildQueuePanel(colony);
+    }
+
+    public void showBuildQueuePanel(Colony colony, Runnable callBack) {
+        if (canvas == null) return;
+        canvas.showBuildQueuePanel(colony, callBack);
+    }
+
+    public BuyAction showBuyDialog(Unit unit, Settlement settlement,
+            Goods goods, int gold, boolean canBuy) {
+        if (canvas == null) return BuyAction.CANCEL;
+        return canvas.showBuyDialog(unit, settlement, goods, gold, canBuy);
+    }
+
+    public List<Goods> showCaptureGoodsDialog(Unit winner, List<Goods> loot) {
+        if (canvas == null) return Collections.emptyList();
+        return canvas.showCaptureGoodsDialog(winner, loot);
+    }
+
+    public void showChatPanel() {
+        if (canvas == null) return;
+        canvas.showChatPanel();
+    }
+
+    public <T> T showChoiceDialog(Tile tile, String text, String cancelText,
+                                  List<ChoiceItem<T>> choices) {
+        if (canvas == null) return null;
+        return canvas.showChoiceDialog(tile, text, cancelText, choices);
+    }
+
+    public MonarchAction showChooseMonarchActionDialog(String monarchTitle,
+        List<ChoiceItem<MonarchAction>> actions) {
+        if (canvas == null) return MonarchAction.NO_ACTION;
+        return canvas.showChooseMonarchActionDialog(monarchTitle, actions);
+    }
+
+    public FoundingFather showChooseFoundingFatherDialog(List<ChoiceItem<FoundingFather>> fathers,
+                                                         String fatherTitle) {
+        if (canvas == null) return null;
+        return canvas.showChooseFoundingFatherDialog(fathers, fatherTitle);
+    }
+
+    public FoundingFather
+        showChooseFoundingFatherDialog(List<FoundingFather> ffs) {
+        if (canvas == null) return null;
+        return canvas.showChooseFoundingFatherDialog(ffs);
+    }
+
+    public ClaimAction showClaimDialog(Tile tile, Player player, int price,
+            Player owner, boolean canAccept) {
+        if (canvas == null) return ClaimAction.CANCEL;
+        return canvas.showClaimDialog(tile, player, price, owner, canAccept);
+    }
+
+    public OptionGroup showClientOptionsDialog() {
+        if (canvas == null) return null;
+        return canvas.showClientOptionsDialog();
+    }
+
+    public ColonyPanel showColonyPanel(Colony colony) {
+        if (canvas == null) return null;
+        return canvas.showColonyPanel(colony);
+    }
+
+    public void showColopediaPanel(String nodeId) {
+        if (canvas == null) return;
+        canvas.showColopediaPanel(nodeId);
+    }
+
+    public void showCompactLabourReport() {
+        if (canvas == null) return;
+        canvas.showCompactLabourReport();
+    }
+
+    public void showCompactLabourReport(UnitData unitData) {
+        if (canvas == null) return;
+        canvas.showCompactLabourReport(unitData);
+    }
+
+    public List<String> showConfirmDeclarationDialog() {
+        if (canvas == null) return Collections.emptyList();
+        return canvas.showConfirmDeclarationDialog();
+    }
+
+    public boolean showConfirmDialog(String text,
+                                     String okText, String cancelText) {
+        if (canvas == null) return false;
+        return canvas.showConfirmDialog(null, Messages.message(text),
+                                        null, okText, cancelText);
+    }
+
+    public boolean showConfirmDialog(Tile tile,
+                                     StringTemplate template, Object obj,
+                                     String okText, String cancelText) {
+        if (canvas == null) return false;
+        return canvas.showConfirmDialog(tile, Messages.message(template),
+                                        getImageIcon(obj, false),
+                                        okText, cancelText);
+    }
+
+    public void showDeclarationPanel() {
+        if (canvas == null) return;
+        canvas.showDeclarationPanel();
+    }
+
+    public void showDifficultyDialog(boolean editable) {
+        if (canvas == null) return;
+        canvas.showDifficultyDialog(editable);
+    }
+
+    public void showDifficultyDialog(Specification spec, OptionGroup group) {
+        if (canvas == null) return;
+        canvas.showDifficultyDialog(spec, group);
+    }
+
+    public List<Goods> showDumpCargoDialog(Unit unit) {
+        if (canvas == null) return Collections.emptyList();
+        return canvas.showDumpCargoDialog(unit);
+    }
+
+    public boolean showEditOptionDialog(Option option) {
+        if (canvas == null) return false;
+        return canvas.showEditOptionDialog(option);
+    }
+
+    public int showEmigrationDialog(boolean fountainOfYouth) {
+        if (canvas == null) return 0;
+        return canvas.showEmigrationDialog(fountainOfYouth);
+    }
+
+    public boolean showEndTurnDialog(List<Unit> units) {
+        if (canvas == null) return false;
+        return canvas.showEndTurnDialog(units);
+    }
+
+    public int showEuropeDialog(EuropePanel.EuropeAction europeAction) {
+        if (canvas == null) return -1;
+        return canvas.showEuropeDialog(europeAction);
+    }
+
+    public void showEuropePanel() {
+        if (canvas == null) return;
+        canvas.showEuropePanel();
+    }
+
+    public void showEventPanel(EventType type) {
+        if (canvas == null) return;
+        canvas.showEventPanel(type);
+    }
+
+    public void showFindSettlementDialog() {
+        if (canvas == null) return;
+        canvas.showFindSettlementDialog();
+    }
+
+    public void showGameOptionsDialog(boolean editable,
+                                      boolean loadCustomOptions) {
+        if (canvas == null) return;
+        canvas.showGameOptionsDialog(editable, loadCustomOptions);
+    }
+
+    public void showHighScoresPanel(String messageId) {
+        if (canvas == null) return;
+        canvas.showHighScoresPanel(messageId);
+    }
+
+    public void showIndianSettlementPanel(IndianSettlement indianSettlement) {
+        if (canvas == null) return;
+        canvas.showIndianSettlementPanel(indianSettlement);
+    }
+
+    public TradeAction showIndianSettlementTradeDialog(Settlement settlement,
+        boolean canBuy, boolean canSell, boolean canGift) {
+        if (canvas == null) return TradeAction.CANCEL;
+        return canvas.showIndianSettlementTradeDialog(settlement,
+                                                      canBuy, canSell, canGift);
+    }
+
+    public void showInformationMessage(FreeColObject displayObject,
+                                       String messageId) {
+        if (canvas == null) return;
+        canvas.showInformationMessage(displayObject, messageId);
+    }
+
+    public void showInformationMessage(FreeColObject displayObject,
+                                       StringTemplate template) {
+        if (canvas == null) return;
+        canvas.showInformationMessage(displayObject, template);
+    }
+
+    public void showInformationMessage(ModelMessage message) {
+        if (canvas == null) return;
+        canvas.showInformationMessage(message);
+    }
+
+    public void showInformationMessage(String messageId) {
+        if (canvas == null) return;
+        canvas.showInformationMessage(messageId);
+    }
+
+    public void showInformationMessage(StringTemplate template) {
+        if (canvas == null) return;
+        canvas.showInformationMessage(template);
+    }
+
+    public String showInputDialog(Tile tile, StringTemplate text,
+                                  String defaultValue,
+                                  String okText, String cancelText,
+                                  boolean rejectEmptyString) {
+        if (canvas == null) return null;
+        return canvas.showInputDialog(tile, text, defaultValue,
+                                      okText, cancelText, rejectEmptyString);
+    }
+
+    public File showLoadDialog(File directory) {
+        if (canvas == null) return null;
+        return canvas.showLoadDialog(directory);
+    }
+
+    public File showLoadDialog(File directory, FileFilter[] fileFilters) {
+        if (canvas == null) return null;
+        return canvas.showLoadDialog(directory, fileFilters);
+    }
+
+    public boolean showLoadingSavegameDialog(boolean publicServer,
+                                             boolean singlePlayer) {
+        if (canvas == null) return false;
+        return canvas.showLoadingSavegameDialog(publicServer, singlePlayer);
+    }
+
+    public void showLogFilePanel() {
+        if (canvas == null) return;
+        canvas.showLogFilePanel();
+    }
+
+    public void showMainPanel(String userMsg) {
+        if (canvas == null) return;
+        canvas.showMainPanel(userMsg);
+    }
+
+    public OptionGroup showMapGeneratorOptionsDialog(OptionGroup mgo,
+                                                     boolean editable,
+                                                     boolean loadCustom) {
+        if (canvas == null) return null;
+        return canvas.showMapGeneratorOptionsDialog(mgo, editable, loadCustom);
+    }
+
+    public Dimension showMapSizeDialog() {
+        if (canvas == null) return null;
+        return canvas.showMapSizeDialog();
+    }
+
+    public void showModelMessages(ModelMessage... modelMessages) {
+        if (canvas == null) return;
+        canvas.showModelMessages(modelMessages);
+    }
+
+    public boolean showMonarchDialog(MonarchAction action,
+                                     StringTemplate replace) {
+        if (canvas == null) return false;
+        return canvas.showMonarchDialog(action, replace);
+    }
+
+    public DiplomaticTrade showNegotiationDialog(Unit unit,
+                                                 Settlement settlement,
+                                                 DiplomaticTrade agreement) {
+        if (canvas == null) return null;
+        return canvas.showNegotiationDialog(unit, settlement, agreement);
+    }
+
+    public void showNewPanel() {
+        if (canvas == null) return;
+        canvas.showNewPanel();
+    }
+
+    public void showNewPanel(Specification specification) {
+        if (canvas == null) return;
+        canvas.showNewPanel(specification);
+    }
+
+    public void showOpeningVideoPanel() {
+        if (canvas == null) return;
+        canvas.showOpeningVideoPanel();
+    }
+
+    public Parameters showParametersDialog() {
+        if (canvas == null) return null;
+        return canvas.showParametersDialog();
+    }
+
+    public boolean showPreCombatDialog(FreeColGameObject attacker,
+                                       FreeColGameObject defender, Tile tile) {
+        if (canvas == null) return false;
+        return canvas.showPreCombatDialog(attacker, defender, tile);
+    }
+
+    public void showReportCargoPanel() {
+        if (canvas == null) return;
+        canvas.showReportCargoPanel();
+    }
+
+    public void showReportColonyPanel() {
+        if (canvas == null) return;
+        canvas.showReportColonyPanel();
+    }
+
+    public void showReportContinentalCongressPanel() {
+        if (canvas == null) return;
+        canvas.showReportContinentalCongressPanel();
+    }
+
+    public void showReportEducationPanel() {
+        if (canvas == null) return;
+        canvas.showReportEducationPanel();
+    }
+
+    public void showReportExplorationPanel() {
+        if (canvas == null) return;
+        canvas.showReportExplorationPanel();
+    }
+
+    public void showReportForeignAffairPanel() {
+        if (canvas == null) return;
+        canvas.showReportForeignAffairPanel();
+    }
+
+    public void showReportHistoryPanel() {
+        if (canvas == null) return;
+        canvas.showReportHistoryPanel();
+    }
+
+    public void showReportIndianPanel() {
+        if (canvas == null) return;
+        canvas.showReportIndianPanel();
+    }
+
+    public void showReportLabourDetailPanel(UnitType unitType,
+        Map<UnitType, Map<Location, Integer>> data,
+        TypeCountMap<UnitType> unitCount, List<Colony> colonies) {
+        if (canvas == null) return;
+        canvas.showReportLabourDetailPanel(unitType, data, unitCount,
+                                           colonies);
+    }
+
+    public void showReportLabourPanel() {
+        if (canvas == null) return;
+        canvas.showReportLabourPanel();
+    }
+
+    public void showReportMilitaryPanel() {
+        if (canvas == null) return;
+        canvas.showReportMilitaryPanel();
+    }
+
+    public void showReportNavalPanel() {
+        if (canvas == null) return;
+        canvas.showReportNavalPanel();
+    }
+
+    public void showReportProductionPanel() {
+        if (canvas == null) return;
+        canvas.showReportProductionPanel();
+    }
+
+    public void showReportReligiousPanel() {
+        if (canvas == null) return;
+        canvas.showReportReligiousPanel();
+    }
+
+    public void showReportRequirementsPanel() {
+        if (canvas == null) return;
+        canvas.showReportRequirementsPanel();
+    }
+
+    public void showReportTradePanel() {
+        if (canvas == null) return;
+        canvas.showReportTradePanel();
+    }
+
+    public void showReportTurnPanel(ModelMessage... messages) {
+        if (canvas == null) return;
+        canvas.showReportTurnPanel(messages);
+    }
+
+    public File showSaveDialog(File directory, String defaultName) {
+        if (canvas == null) return null;
+        return canvas.showSaveDialog(directory, defaultName);
+    }
+
+    public File showSaveDialog(File directory, String standardName,
+                               FileFilter[] fileFilters, String defaultName) {
+        if (canvas == null) return null;
+        return canvas.showSaveDialog(directory, standardName,
+                                     fileFilters, defaultName);
+    }
+
+    public Dimension showScaleMapSizeDialog() {
+        if (canvas == null) return null;
+        return canvas.showScaleMapSizeDialog();
+    }
+
+    public ScoutColonyAction showScoutForeignColonyDialog(Colony colony,
+        Unit unit, boolean canNegotiate) {
+        if (canvas == null) return ScoutColonyAction.CANCEL;
+        return canvas.showScoutForeignColonyDialog(colony, unit, canNegotiate);
+    }
+
+    public ScoutIndianSettlementAction
+        showScoutIndianSettlementDialog(IndianSettlement settlement,
+                                        String number) {
+        if (canvas == null) return ScoutIndianSettlementAction.CANCEL;
+        return canvas.showScoutIndianSettlementDialog(settlement, number);
+    }
+
+    public int showSelectAmountDialog(GoodsType goodsType, int available,
+                                      int defaultAmount, boolean needToPay) {
+        if (canvas == null) return -1;
+        return canvas.showSelectAmountDialog(goodsType, available,
+                                             defaultAmount, needToPay);
+    }
+
+    public Location showSelectDestinationDialog(Unit unit) {
+        if (canvas == null) return null;
+        return canvas.showSelectDestinationDialog(unit);
+    }
+
+    public SellAction showSellDialog(Unit unit, Settlement settlement,
+                                     Goods goods, int gold) {
+        if (canvas == null) return SellAction.CANCEL;
+        return canvas.showSellDialog(unit, settlement, goods, gold);
+    }
+
+    public void showServerListPanel(List<ServerInfo> serverList) {
+        if (canvas == null) return;
+        canvas.showServerListPanel(serverList);
+    }
+
+    public <T> T showSimpleChoiceDialog(Tile tile, String text,
+                                        String cancelText, List<T> objects) {
+        if (canvas == null) return null;
+        return canvas.showSimpleChoiceDialog(tile, text, cancelText, objects);
+    }
+
+    public void showStartGamePanel(Game game, Player player,
+                                   boolean singlePlayerMode) {
+        if (canvas == null) return;
+        canvas.showStartGamePanel(game, player, singlePlayerMode);
+    }
+
+    public void showStatisticsPanel() {
+        if (canvas == null) return;
+        canvas.showStatisticsPanel();
+    }
+
+    public void showStatusPanel(String message) {
+        if (canvas == null) return;
+        canvas.showStatusPanel(message);
+    }
+
+    public void showTilePanel(Tile tile) {
+        if (canvas == null) return;
+        canvas.showTilePanel(tile);
+    }
+
+    public void showTilePopUpAtSelectedTile() {
+        if (canvas == null || mapViewer == null) return;
+        canvas.showTilePopup(getSelectedTile(),
+                mapViewer.getCursor().getCanvasX(),
+                mapViewer.getCursor().getCanvasY());
+    }
+
+    public boolean showTradeRouteDialog(Unit unit) {
+        if (canvas == null) return false;
+        return canvas.showTradeRouteDialog(unit);
+    }
+
+    public boolean showTradeRouteInputDialog(TradeRoute newRoute) {
+        if (canvas == null) return false;
+        return canvas.showTradeRouteInputDialog(newRoute);
+    }
+
+    public MissionaryAction showUseMissionaryDialog(Unit unit,
+                                                    IndianSettlement settlement,
+                                                    boolean canEstablish,
+                                                    boolean canDenounce) {
+        if (canvas == null) return MissionaryAction.CANCEL;
+        return canvas.showUseMissionaryDialog(unit, settlement,
+                                              canEstablish, canDenounce);
+    }
+
+    public void showVictoryPanel() {
+        if (canvas == null) return;
+        canvas.showVictoryPanel();
+    }
+
+    public boolean showWarehouseDialog(Colony colony) {
+        if (canvas == null) return false;
+        return canvas.showWarehouseDialog(colony);
+    }
+
+    public void showWorkProductionPanel(Unit unit) {
+        if (canvas == null) return;
+        canvas.showWorkProductionPanel(unit);
+    }
+
+    public void updateGameOptions() {
+        if (canvas == null) return;
+        canvas.updateGameOptions();
+    }
+
+    public void updateMapGeneratorOptions() {
+        if (canvas == null) return;
+        canvas.updateMapGeneratorOptions();
+    }
+
+
+    // Trivial delegations to MapViewer
+    
+    public void centerActiveUnit() {
+        if (mapViewer == null) return;
+        mapViewer.centerActiveUnit();
+    }
+
+    public void executeWithUnitOutForAnimation(final Unit unit,
+                                               final Tile sourceTile,
+                                               final OutForAnimationCallback r) {
+        if (mapViewer == null) return;
+        mapViewer.executeWithUnitOutForAnimation(unit, sourceTile, r);
+    }
+
+    public Unit getActiveUnit() {
+        if (mapViewer == null) return null;
+        return mapViewer.getActiveUnit();
+    }
+
+    public int getCurrentViewMode() {
+        if (mapViewer == null) return -1;
+        return mapViewer.getView();
+    }
+
+    public Tile getFocus() {
+        if (mapViewer == null) return null;
+        return mapViewer.getFocus();
+    }
+
+    public float getMapScale() {
+        if (mapViewer == null) return 1.0f;
+        return mapViewer.getMapScale();
+    }
+
+    public Tile getSelectedTile() {
+        if (mapViewer == null) return null;
+        return mapViewer.getSelectedTile();
+    }
+
+    public Rectangle getTileBounds(Tile tile) {
+        if (mapViewer == null) return null;
+        return mapViewer.getTileBounds(tile);
+    }
+
+    public Point getTilePosition(Tile tile) {
+        if (mapViewer == null) return null;
+        return mapViewer.getTilePosition(tile);
+    }
+
+    public boolean onScreen(Tile tileToCheck) {
+        if (mapViewer == null) return true; // Lets pretend.
+        return mapViewer.onScreen(tileToCheck);
+    }
+
+    public void setFocus(Tile tileToFocus) {
+        if (mapViewer == null) return;
+        mapViewer.setFocus(tileToFocus);
+    }
+
+    public void setFocusImmediately(Tile tileToFocus) {
+        if (mapViewer == null) return;
+        mapViewer.setFocusImmediately(tileToFocus);
+    }
+
+    public boolean setSelectedTile(Tile newTileToSelect,
+                                   boolean clearGoToOrders) {
+        if (mapViewer == null) return true; // Pretending again.
+        return mapViewer.setSelectedTile(newTileToSelect, clearGoToOrders);
+    }
+
+    public void toggleViewMode() {
+        if (mapViewer == null) return;
+        mapViewer.toggleViewMode();
     }
 }

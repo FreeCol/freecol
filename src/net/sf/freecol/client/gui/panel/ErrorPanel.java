@@ -66,7 +66,7 @@ public final class ErrorPanel extends FreeColPanel {
         showButton.setActionCommand(SHOW);
         showButton.addActionListener(this);
 
-        add(getDefaultTextArea(message, 40), "wrap 20");
+        add(GUI.getDefaultTextArea(message, 40), "wrap 20");
         add(okButton, "split 2, tag ok");
         add(showButton);
     }
@@ -99,7 +99,7 @@ public final class ErrorPanel extends FreeColPanel {
             }
         }
 
-        JTextArea textArea = getDefaultTextArea(message, 40);
+        JTextArea textArea = GUI.getDefaultTextArea(message, 40);
         textArea.setFocusable(true);
         textArea.setEditable(false);
         

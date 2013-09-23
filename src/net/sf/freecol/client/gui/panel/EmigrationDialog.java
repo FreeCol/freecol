@@ -45,7 +45,7 @@ public final class EmigrationDialog extends FreeColDialog<Integer> {
 
     private static final JButton[] person = new JButton[NUMBER_OF_PERSONS];
 
-    private JTextArea question = getDefaultTextArea(Messages.message("chooseImmigrant"));
+    private JTextArea question;
 
 
     /**
@@ -77,7 +77,7 @@ public final class EmigrationDialog extends FreeColDialog<Integer> {
      * @param fountainOfYouth a <code>boolean</code> value
      */
     public void initialize(Europe europe, boolean fountainOfYouth) {
-
+        question = GUI.getDefaultTextArea(Messages.message("chooseImmigrant"));
         if (fountainOfYouth) {
             question.insert(Messages.message("lostCityRumour.fountainOfYouth")
                             + "\n\n", 0);

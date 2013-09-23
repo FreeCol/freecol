@@ -76,7 +76,7 @@ public final class WarehouseDialog extends FreeColDialog<Boolean> {
 
         setLayout(new MigLayout("fill, wrap 1", "", ""));
 
-        add(getDefaultHeader(Messages.message("warehouseDialog.name")),
+        add(GUI.getDefaultHeader(Messages.message("warehouseDialog.name")),
             "align center");
         add(scrollPane, "grow");
         add(okButton, "newline 20, split 2, tag ok");

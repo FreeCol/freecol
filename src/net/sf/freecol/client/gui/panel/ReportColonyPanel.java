@@ -162,7 +162,7 @@ public final class ReportColonyPanel extends ReportPanel
         for (Colony colony : colonies) {
 
             // Name
-            JButton button = getLinkButton(colony.getName(), null,
+            JButton button = GUI.getLinkButton(colony.getName(), null,
                 colony.getId());
             button.addActionListener(this);
             reportPanel.add(button, "newline 20, split 2");
@@ -769,7 +769,7 @@ public final class ReportColonyPanel extends ReportPanel
         if (h != null) {
             if (Messages.containsKey(h)) h = Messages.message(h);
         }
-        JButton b = getLinkButton(h, i, action);
+        JButton b = GUI.getLinkButton(h, i, action);
         b.setForeground((c == null) ? Color.BLACK : c);
         if (t != null) {
             b.setToolTipText(Messages.message(t));

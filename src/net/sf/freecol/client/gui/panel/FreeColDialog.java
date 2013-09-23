@@ -22,10 +22,11 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.AWTEvent;
 import java.awt.ActiveEvent;
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.LayoutManager;
 import java.awt.MenuComponent;
@@ -50,6 +51,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
 
 import net.miginfocom.swing.MigLayout;
+
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -98,7 +100,7 @@ public class FreeColDialog<T> extends FreeColPanel {
                 }
             };
 
-        JTextArea textArea = getDefaultTextArea(text);
+        JTextArea textArea = GUI.getDefaultTextArea(text);
 
         choiceDialog.add(textArea);
 
@@ -203,7 +205,7 @@ public class FreeColDialog<T> extends FreeColPanel {
             });
 
         if (icon != null) confirmDialog.add(new JLabel(icon));
-        confirmDialog.add(getDefaultTextArea(text));
+        confirmDialog.add(GUI.getDefaultTextArea(text));
 
         confirmDialog.add(confirmDialog.okButton,
             "newline 20, span, split 2, tag ok");
@@ -254,7 +256,7 @@ public class FreeColDialog<T> extends FreeColPanel {
 
         input.selectAll();
 
-        inputDialog.add(getDefaultTextArea(text));
+        inputDialog.add(GUI.getDefaultTextArea(text));
         inputDialog.add(input, "width 180:, growx");
 
         if (cancelText == null) {

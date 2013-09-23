@@ -64,12 +64,12 @@ public final class MonarchDialog extends FreeColDialog<Boolean> implements Actio
         }
 
         JLabel header = new JLabel(Messages.message("aMessageFromTheCrown"));
-        header.setFont(mediumHeaderFont);
+        header.setFont(GUI.MEDIUM_HEADER_FONT);
         add(header, "span, align center, wrap 20");
 
         Nation nation = getMyPlayer().getNation();
         add(new JLabel(getLibrary().getMonarchImageIcon(nation)));
-        add(getDefaultTextArea((template == null)
+        add(GUI.getDefaultTextArea((template == null)
                 ? Messages.message(messageId)
                 : Messages.message(new StringTemplate(messageId, template))));
 

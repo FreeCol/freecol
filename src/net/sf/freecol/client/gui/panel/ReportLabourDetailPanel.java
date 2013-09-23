@@ -100,22 +100,24 @@ public final class ReportLabourDetailPanel extends ReportPanel implements Action
                     canTrain = true;
                     colonyName += "*";
                 }
-                JButton colonyButton = getLinkButton(colonyName, null, colony.getId());
+                JButton colonyButton = GUI.getLinkButton(colonyName, null,
+                    colony.getId());
                 colonyButton.addActionListener(this);
                 detailPanel.add(colonyButton);
                 JLabel countLabel = new JLabel(unitLocations.get(colony).toString());
-                countLabel.setForeground(LINK_COLOR);
+                countLabel.setForeground(GUI.LINK_COLOR);
                 detailPanel.add(countLabel);
             }
         }
         for (Entry<Location, Integer> entry : unitLocations.entrySet()) {
             if (!(entry.getKey() instanceof Colony)) {
                 String locationName = Messages.message(entry.getKey().getLocationName());
-                JButton linkButton = getLinkButton(locationName, null, entry.getKey().getId());
+                JButton linkButton = GUI.getLinkButton(locationName, null,
+                    entry.getKey().getId());
                 linkButton.addActionListener(this);
                 detailPanel.add(linkButton);
                 JLabel countLabel = new JLabel(entry.getValue().toString());
-                countLabel.setForeground(LINK_COLOR);
+                countLabel.setForeground(GUI.LINK_COLOR);
                 detailPanel.add(countLabel);
             }
         }

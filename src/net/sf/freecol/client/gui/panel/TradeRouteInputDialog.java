@@ -221,7 +221,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
                 }
             });
 
-        add(getDefaultHeader(Messages.message("traderouteDialog.editRoute")),
+        add(GUI.getDefaultHeader(Messages.message("traderouteDialog.editRoute")),
             "span, align center");
         add(tradeRouteView, "span 1 5, grow");
         add(nameLabel);
@@ -415,7 +415,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
     public class GoodsPanel extends JPanel {
 
         public GoodsPanel() {
-            super(new GridLayout(0, 4, margin, margin));
+            super(new GridLayout(0, 4, MARGIN, MARGIN));
             for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
                 if (goodsType.isStorable()) {
                     CargoLabel label = new CargoLabel(goodsType);

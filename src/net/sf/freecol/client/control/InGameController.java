@@ -2013,7 +2013,7 @@ public final class InGameController implements NetworkConstants {
 
         Unit unit = gui.getActiveUnit();
         if (unit == null) return;
-        if (unit.getColony() != null && !gui.tryLeaveColony(unit)) return;
+        if (unit.getColony() != null && !tryLeaveColony(unit)) return;
 
         Tile tile = (gui.isShowingSubPanel()) ? null
             : unit.getTile();
@@ -2677,7 +2677,7 @@ public final class InGameController implements NetworkConstants {
      */
     private boolean moveEmbark(Unit unit, Direction direction) {
         if (unit.getColony() != null
-            && !gui.tryLeaveColony(unit)) return false;
+            && !tryLeaveColony(unit)) return false;
 
         Tile sourceTile = unit.getTile();
         Tile destinationTile = sourceTile.getNeighbourOrNull(direction);
@@ -3553,7 +3553,7 @@ public final class InGameController implements NetworkConstants {
         if (colony == null) {
             throw new IllegalStateException("Unit is not in colony.");
         }
-        if (!gui.tryLeaveColony(unit)) return false;
+        if (!tryLeaveColony(unit)) return false;
 
         ColonyWas colonyWas = new ColonyWas(colony);
         UnitWas unitWas = new UnitWas(unit);
@@ -3868,6 +3868,27 @@ public final class InGameController implements NetworkConstants {
                 gui.setActiveUnit(newUnit);
             }
         }
+    }
+
+    /**
+     * Try to remove a unit from a colony.
+     * - Check for population limit.
+     * - Query if education should be abandoned.
+     *
+     * @param unit The <code>Unit</code> that is leaving the colony.
+     * @return True if the unit is allowed to leave.
+     */
+    public boolean tryLeaveColony(Unit unit) {
+        Colony colony = unit.getColony();
+        String message = colony.getReducePopulationMessage();
+        if (message != null) {
+            gui.showInformationMessage(message);
+            return false;
+        }
+        StringTemplate template = unit.getAbandonEducationMessage(true);
+        return template == null
+            || gui.showConfirmDialog(unit.getTile(), template, unit,
+                "abandonEducation.yes", "abandonEducation.no");
     }
 
     /**

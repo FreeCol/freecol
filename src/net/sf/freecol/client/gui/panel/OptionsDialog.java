@@ -120,7 +120,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
         removeAll();
 
         // Header:
-        add(getDefaultHeader(header), "center");
+        add(GUI.getDefaultHeader(header), "center");
 
         // Additional component, if any
         if (component != null) {

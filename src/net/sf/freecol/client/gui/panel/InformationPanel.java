@@ -92,9 +92,9 @@ public class InformationPanel extends FreeColPanel {
         for (int i = 0; i < texts.length; i++) {
             if (images != null && images[i] != null) {
                 textPanel.add(new JLabel(images[i]));
-                textPanel.add(getDefaultTextArea(texts[i], 30));
+                textPanel.add(GUI.getDefaultTextArea(texts[i], 30));
             } else {
-                textPanel.add(getDefaultTextArea(texts[i], 30), "skip");
+                textPanel.add(GUI.getDefaultTextArea(texts[i], 30), "skip");
             }
             String disp = (fcos == null) ? null : displayLabel(fcos[i]);
             if (disp != null) {

@@ -213,7 +213,8 @@ public final class DefaultTransferHandler extends TransferHandler {
 
                     if ((comp instanceof ColonyPanel.OutsideColonyPanel
                          || comp instanceof ColonyPanel.ColonyCargoPanel)
-                        && !gui.tryLeaveColony(unit)) {
+                        && !freeColClient.getInGameController()
+                            .tryLeaveColony(unit)) {
                         return false;
                     }
                     target.add(data, true);

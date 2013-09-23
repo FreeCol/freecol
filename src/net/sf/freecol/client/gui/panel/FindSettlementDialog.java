@@ -88,7 +88,7 @@ public final class FindSettlementDialog<T> extends FreeColDialog<T> implements L
         Collections.sort(knownSettlements, settlementComparator);
 
         JLabel header = new JLabel(Messages.message("findSettlementDialog.name"));
-        header.setFont(smallHeaderFont);
+        header.setFont(GUI.SMALL_HEADER_FONT);
         add(header);
 
         settlementList = new JList(knownSettlements.toArray(new Settlement[knownSettlements.size()]));

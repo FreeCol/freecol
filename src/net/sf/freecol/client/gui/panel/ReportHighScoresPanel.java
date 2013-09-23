@@ -64,7 +64,7 @@ public final class ReportHighScoresPanel extends ReportPanel {
 
         for (HighScore highScore : highScores) {
             JLabel scoreValue = new JLabel(String.valueOf(highScore.getScore()));
-            scoreValue.setFont(smallHeaderFont);
+            scoreValue.setFont(GUI.SMALL_HEADER_FONT);
             reportPanel.add(scoreValue);
 
             String messageID = null;
@@ -77,7 +77,7 @@ public final class ReportHighScoresPanel extends ReportPanel {
             JLabel headline = localizedLabel(Messages.message(StringTemplate.template(messageID)
                                                               .addName("%name%", highScore.getPlayerName())
                                                               .addName("%nation%", country)));
-            headline.setFont(smallHeaderFont);
+            headline.setFont(GUI.SMALL_HEADER_FONT);
             reportPanel.add(headline, "span, wrap 10");
 
             reportPanel.add(new JLabel(Messages.message("report.highScores.turn")), "skip");

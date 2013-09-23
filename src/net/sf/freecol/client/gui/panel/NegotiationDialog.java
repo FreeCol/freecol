@@ -347,9 +347,9 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade>
         }
         JButton button = new JButton(new RemoveAction(item));
         button.setText(description);
-        button.setMargin(emptyMargin);
+        button.setMargin(GUI.EMPTY_MARGIN);
         button.setOpaque(false);
-        button.setForeground(LINK_COLOR);
+        button.setForeground(GUI.LINK_COLOR);
         button.setBorder(BorderFactory.createEmptyBorder());
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         return button;

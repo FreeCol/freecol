@@ -77,7 +77,7 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>>
         maxCargo = winner.getSpaceLeft();
 
         JLabel header = new JLabel(Messages.message("lootCargo.header"));
-        header.setFont(mediumHeaderFont);
+        header.setFont(GUI.MEDIUM_HEADER_FONT);
         add(header);
 
         goodsList = new JList();

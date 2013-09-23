@@ -63,14 +63,14 @@ public final class RecruitDialog extends FreeColDialog<Integer> implements Actio
 
         setFocusCycleRoot(true);
 
-        question = getDefaultTextArea(Messages.message("recruitDialog.clickOn"));
+        question = GUI.getDefaultTextArea(Messages.message("recruitDialog.clickOn"));
 
         for (int index = 0; index < NUMBER_OF_PERSONS; index++) {
             person[index] = new JButton();
             person[index].setActionCommand(String.valueOf(index));
             enterPressesWhenFocused(person[index]);
             person[index].addActionListener(this);
-            person[index].setIconTextGap(margin);
+            person[index].setIconTextGap(MARGIN);
         }
 
         initialize();

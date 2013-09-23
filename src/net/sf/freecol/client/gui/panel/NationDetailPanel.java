@@ -90,7 +90,7 @@ public class NationDetailPanel extends ColopediaGameObjectTypePanel<Nation> {
         panel.setLayout(new MigLayout("wrap 3, fillx, gapx 20", "", ""));
 
         JLabel name = localizedLabel(nation.getNameKey());
-        name.setFont(smallHeaderFont);
+        name.setFont(GUI.SMALL_HEADER_FONT);
         panel.add(name, "span, align center, wrap 40");
 
         JLabel artLabel = new JLabel(getLibrary().getMonarchImageIcon(nation));

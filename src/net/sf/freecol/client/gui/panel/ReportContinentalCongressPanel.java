@@ -79,7 +79,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
         } else {
             FoundingFather father = player.getCurrentFather();
             String name = Messages.message(father.getNameKey());
-            JButton button = getLinkButton(name, null, father.getId());
+            JButton button = GUI.getLinkButton(name, null, father.getId());
             button.addActionListener(this);
             recruitingPanel.add(button);
             JLabel currentFatherLabel = new JLabel(new ImageIcon(getLibrary().getFoundingFatherImage(father)));
@@ -122,7 +122,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
                 image = ResourceManager.getGrayscaleImage(father.getId() + ".image", 1);
             }
             panel.add(new JLabel(new ImageIcon(image)), "newline");
-            JButton button = getLinkButton(name, null, father.getId());
+            JButton button = GUI.getLinkButton(name, null, father.getId());
             button.addActionListener(this);
             panel.add(button);
             if (turn != null) {
