@@ -30,6 +30,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +45,7 @@ import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JLayeredPane;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
@@ -76,6 +78,7 @@ import net.sf.freecol.client.gui.panel.ErrorPanel;
 import net.sf.freecol.client.gui.panel.EuropePanel;
 import net.sf.freecol.client.gui.panel.EventPanel;
 import net.sf.freecol.client.gui.panel.FindSettlementDialog;
+import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.client.gui.panel.FreeColOldDialog;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.GameOptionsDialog;
@@ -172,24 +175,7 @@ import net.sf.freecol.common.resources.Video;
  * <br>
  * <code>Canvas</code> contains methods to display various panels and dialogs.
  * Most of these methods use {@link net.sf.freecol.client.gui.i18n i18n} to get
- * localized text. Here is an example: <br>
- *
- * <PRE>
- *
- * if (canvas.showConfirmDialog("choice.text", "choice.yes", "choice.no")) { //
- * DO SOMETHING. }
- *
- * </PRE>
- *
- * <br>
- * where "choice.text", "choice.yes" and "choice.no" are keys for a localized
- * message. See {@link net.sf.freecol.client.gui.i18n i18n} for more
- * information. <br>
- * <b>The difference between a panel and a dialog</b> <br>
- * <br>
- * When displaying a dialog, using a <code>showXXXDialog</code>, the calling
- * thread will wait until that dialog is dismissed before returning. In
- * contrast, a <code>showXXXPanel</code>-method returns immediately.
+ * localized text.  Dialogs return results, and may be modal or non-modal.
  */
 public final class Canvas extends JDesktopPane {
 
@@ -379,8 +365,8 @@ public final class Canvas extends JDesktopPane {
      * @return The <code>JInternalFrame</code> that was created and added.
      */
     private JInternalFrame addAsFrame(JComponent comp, boolean toolBox,
-                                     PopupPosition popupPosition,
-                                     boolean resizable) {
+                                      PopupPosition popupPosition,
+                                      boolean resizable) {
         final int FRAME_EMPTY_SPACE = 60;
 
         final JInternalFrame f = (toolBox) ? new ToolBoxFrame()
@@ -425,43 +411,7 @@ public final class Canvas extends JDesktopPane {
             height = Math.min(height, getHeight());
         }
         f.setSize(width, height);
-        Point p = null;
-        if (comp instanceof FreeColPanel
-            && (p = getSavedPosition(comp)) != null) {
-            // Sanity check stuff coming out of client options.
-            if (p.getX() < 0
-                || p.getX() >= getWidth() - f.getWidth()
-                || p.getY() < 0
-                || p.getY() >= getHeight() - f.getHeight()) {
-                p = null;
-            }
-        }
-        int x = 0, y = 0;
-        if (p != null) {
-            x = (int)p.getX();
-            y = (int)p.getY();
-        } else if (popupPosition != null) {
-            switch (popupPosition) {
-            case CENTERED:
-                x = (getWidth() - f.getWidth()) / 2;
-                y = (getHeight() - f.getHeight()) / 2;
-                break;
-            case CENTERED_LEFT:
-                x = (getWidth() - f.getWidth()) / 4;
-                y = (getHeight() - f.getHeight()) / 2;
-                break;
-            case CENTERED_RIGHT:
-                x = ((getWidth() - f.getWidth()) * 3) / 4;
-                y = (getHeight() - f.getHeight()) / 2;
-                break;
-            case ORIGIN:
-                x = y = 0;
-                break;
-            }
-        }
-        if ((p = getClearSpace(comp, x, y, MAXTRY)) == null) {
-            p = new Point(x, y);
-        }
+        Point p = chooseLocation(comp, width, height, popupPosition);
         f.setLocation(p);
         add(f, MODAL_LAYER);
         f.setName(comp.getClass().getSimpleName());
@@ -514,6 +464,61 @@ public final class Canvas extends JDesktopPane {
             logger.log(Level.WARNING, "addToCanvas(" + comp + ", " + i
                 + ") failed.", e);
         }
+    }
+
+    /**
+     * Choose a location for a component.
+     *
+     * @param comp The <code>Component</code> to place.
+     * @param width The component width to use.
+     * @param height The component height to use.
+     * @param popupPosition An optional <code>PopupPosition</code> hint.
+     * @return A suitable <code>Point</code> to place the component.
+     */
+    private Point chooseLocation(Component comp, int width, int height, 
+                                 PopupPosition popupPosition) {
+        Point p = null;
+        if ((comp instanceof FreeColPanel || comp instanceof FreeColDialog<?>)
+            && (p = getSavedPosition(comp)) != null) {
+            // Sanity check stuff coming out of client options.
+            if (p.getX() < 0
+                || p.getX() >= getWidth() - width
+                || p.getY() < 0
+                || p.getY() >= getHeight() - height) {
+                p = null;
+            }
+        }
+        int x = 0, y = 0;
+        if (p != null) {
+            x = (int)p.getX();
+            y = (int)p.getY();
+        } else if (popupPosition != null) {
+            switch (popupPosition) {
+            case CENTERED:
+                x = (getWidth() - width) / 2;
+                y = (getHeight() - height) / 2;
+                break;
+            case CENTERED_LEFT:
+                x = (getWidth() - width) / 4;
+                y = (getHeight() - height) / 2;
+                break;
+            case CENTERED_RIGHT:
+                x = ((getWidth() - width) * 3) / 4;
+                y = (getHeight() - height) / 2;
+                break;
+            case ORIGIN:
+                x = y = 0;
+                break;
+            }
+        }
+        if (comp instanceof JComponent
+            && (p = getClearSpace((JComponent)comp, x, y, MAXTRY)) != null
+            && p.x >= 0 && p.x < getWidth()
+            && p.y >= 0 && p.y < getHeight()) {
+            x = p.x;
+            y = p.y;
+        }
+        return new Point(x, y);
     }
 
     /**
@@ -786,6 +791,28 @@ public final class Canvas extends JDesktopPane {
     private <T> T showFreeColOldDialog(FreeColOldDialog<T> freeColDialog, Tile tile,
                                     boolean resizable) {
         showFreeColPanel(freeColDialog, tile, resizable);
+        T response = freeColDialog.getResponse();
+        remove(freeColDialog);
+        return response;
+    }
+
+    /**
+     * Displays the given dialog, optionally making sure a tile is visible.
+     *
+     * @param freeColDialog The dialog to be displayed
+     * @param tile An optional <code>Tile</code> to make visible (not
+     *     under the dialog!)
+     * @return The {@link FreeColDialog#getResponse reponse} returned by
+     *         the dialog.
+     */
+    private <T> T showFreeColDialog(FreeColDialog<T> freeColDialog,
+                                    Tile tile) {
+        if (tile != null) {
+            freeColDialog.setLocation(chooseLocation(freeColDialog,
+                    freeColDialog.getWidth(), freeColDialog.getHeight(),
+                    getPopupPosition(tile)));
+        }
+        freeColDialog.setVisible(true);
         T response = freeColDialog.getResponse();
         remove(freeColDialog);
         return response;
@@ -1568,7 +1595,7 @@ public final class Canvas extends JDesktopPane {
      *     otherwise.
      * @see FreeColOldDialog
      */
-    public boolean showConfirmDialog(Tile tile, String text, ImageIcon icon,
+    public boolean showOldConfirmDialog(Tile tile, String text, ImageIcon icon,
                                      String okText, String cancelText) {
         FreeColOldDialog<Boolean> dialog
             = FreeColOldDialog.createConfirmDialog(freeColClient, text, icon,
@@ -1578,13 +1605,35 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
+     * Displays a dialog with a text and a ok/cancel option.
+     *
+     * @param tile An optional <code>Tile</code> to make visible (not
+     *     under the dialog!)
+     * @param text The text that explains the choice for the user (should
+     *     have been i18n-expanded in GUI).
+     * @param icon An optional icon to display.
+     * @param okText The text displayed on the "ok"-button.
+     * @param cancelText The text displayed on the "cancel"-button.
+     * @return True if the user clicked the "ok"-button.
+     */
+    public boolean showModalConfirmDialog(Tile tile,
+                                          String text, ImageIcon icon,
+                                          String okText, String cancelText) {
+        FreeColDialog<Boolean> dialog
+            = FreeColDialog.createConfirmDialog(freeColClient, true,
+                                                text, icon,
+                                                okText, cancelText);
+        return showFreeColDialog(dialog, tile);
+    }
+
+    /**
      * Display a dialog to confirm a declaration of independence.
      *
      * @return A list of names for a new nation.
      */
     public List<String> showConfirmDeclarationDialog() {
         return showFreeColOldDialog(new ConfirmDeclarationDialog(freeColClient),
-            null, true);
+                                 null, true);
     }
 
     /**

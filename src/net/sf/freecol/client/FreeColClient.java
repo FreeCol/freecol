@@ -708,9 +708,9 @@ public final class FreeColClient {
         if (getGame() != null) {
             if (isMapEditor()) {
                 specification = getGame().getSpecification();
-            } else if (gui.showConfirmDialog("stopCurrentGame.text",
-                                             "stopCurrentGame.yes",
-                                             "stopCurrentGame.no")) {
+            } else if (gui.showModalConfirmDialog("stopCurrentGame.text",
+                                                  "stopCurrentGame.yes",
+                                                  "stopCurrentGame.no")) {
                 getConnectController().quitGame(true);
                 FreeColSeed.incrementFreeColSeed();
             } else {
@@ -742,21 +742,18 @@ public final class FreeColClient {
 
     /**
      * Quits the application.
-     *
-     * Uses {@link net.sf.freecol.client.gui.GUI#showConfirmDialog} in
-     * order to get a "Are you sure"-confirmation from the user.
      */
     public void askToQuit() {
-        if (gui.showConfirmDialog("quitDialog.areYouSure.text",
-                                  "ok", "cancel")) quit();
+        if (gui.showModalConfirmDialog("quitDialog.areYouSure.text",
+                                       "ok", "cancel")) quit();
     }
 
     /**
      * Retire from the game.
      */
     public void retire() {
-        if (gui.showConfirmDialog("retireDialog.areYouSure.text",
-                                  "ok", "cancel")) {
+        if (gui.showModalConfirmDialog("retireDialog.areYouSure.text",
+                                       "ok", "cancel")) {
             Player player = getMyPlayer();
             player.setPlayerType(Player.PlayerType.RETIRED);
             askServer().retire();

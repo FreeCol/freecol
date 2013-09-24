@@ -97,8 +97,8 @@ public final class ConnectController {
         FreeColServer freeColServer = freeColClient.getFreeColServer();
         if (freeColServer != null
             && freeColServer.getServer().getPort() == port) {
-            if (gui.showConfirmDialog("stopServer.text",
-                                      "stopServer.yes", "stopServer.no")) {
+            if (gui.showModalConfirmDialog("stopServer.text",
+                                           "stopServer.yes", "stopServer.no")) {
                 freeColServer.getController().shutdown();
             } else {
                 return false;

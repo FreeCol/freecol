@@ -1195,20 +1195,36 @@ public class GUI {
         return canvas.showConfirmDeclarationDialog();
     }
 
-    public boolean showConfirmDialog(String text,
-                                     String okText, String cancelText) {
+    public boolean showModalConfirmDialog(String text,
+                                          String okText, String cancelText) {
         if (canvas == null) return false;
-        return canvas.showConfirmDialog(null, Messages.message(text),
-                                        null, okText, cancelText);
+        return canvas.showModalConfirmDialog(null, Messages.message(text),
+                                             null, okText, cancelText);
     }
 
-    public boolean showConfirmDialog(Tile tile,
-                                     StringTemplate template, Object obj,
-                                     String okText, String cancelText) {
+    public boolean showModalConfirmDialog(Tile tile,
+                                          StringTemplate template, Object obj,
+                                          String okText, String cancelText) {
         if (canvas == null) return false;
-        return canvas.showConfirmDialog(tile, Messages.message(template),
-                                        getImageIcon(obj, false),
-                                        okText, cancelText);
+        return canvas.showModalConfirmDialog(tile, Messages.message(template),
+                                             getImageIcon(obj, false),
+                                             okText, cancelText);
+    }
+
+    public boolean showOldConfirmDialog(String text,
+                                        String okText, String cancelText) {
+        if (canvas == null) return false;
+        return canvas.showOldConfirmDialog(null, Messages.message(text),
+                                           null, okText, cancelText);
+    }
+
+    public boolean showOldConfirmDialog(Tile tile,
+                                        StringTemplate template, Object obj,
+                                        String okText, String cancelText) {
+        if (canvas == null) return false;
+        return canvas.showOldConfirmDialog(tile, Messages.message(template),
+                                           getImageIcon(obj, false),
+                                           okText, cancelText);
     }
 
     public void showDeclarationPanel() {

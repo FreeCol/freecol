@@ -249,23 +249,23 @@ public final class InGameController implements NetworkConstants {
             enemy = defender.getOwner();
         }
 
-        String messageID = null;
+        String messageId = null;
         switch (attacker.getOwner().getStance(enemy)) {
         case WAR:
             logger.finest("Player at war, no confirmation needed");
             return true;
         case UNCONTACTED: case PEACE:
-            messageID = "model.diplomacy.attack.peace";
+            messageId = "model.diplomacy.attack.peace";
             break;
         case CEASE_FIRE:
-            messageID = "model.diplomacy.attack.ceaseFire";
+            messageId = "model.diplomacy.attack.ceaseFire";
             break;
         case ALLIANCE:
-            messageID = "model.diplomacy.attack.alliance";
+            messageId = "model.diplomacy.attack.alliance";
             break;
         }
-        return gui.showConfirmDialog(attacker.getTile(),
-            StringTemplate.template(messageID)
+        return gui.showOldConfirmDialog(attacker.getTile(),
+            StringTemplate.template(messageId)
                 .addStringTemplate("%nation%", enemy.getNationName()),
             attacker, "model.diplomacy.attack.confirm", "cancel");
     }
@@ -753,7 +753,7 @@ public final class InGameController implements NetworkConstants {
                         .addName("%colony%", locName)
                         .addName("%amount%", overflow)
                         .add("%goods%", goods.getNameKey());
-                    if (!gui.showConfirmDialog(colony.getTile(), template,
+                    if (!gui.showOldConfirmDialog(colony.getTile(), template,
                                                unit, "yes", "no")) {
                         amount = atStop;
                     }
@@ -1095,7 +1095,7 @@ public final class InGameController implements NetworkConstants {
             return;
         }
         if (freeColClient.isInGame()
-            && !gui.showConfirmDialog("stopCurrentGame.text",
+            && !gui.showModalConfirmDialog("stopCurrentGame.text",
                 "stopCurrentGame.yes", "stopCurrentGame.no")) {
             return;
         }
@@ -1158,10 +1158,10 @@ public final class InGameController implements NetworkConstants {
         
         final boolean confirm = freeColClient.getClientOptions()
             .getBoolean(ClientOptions.CONFIRM_SAVE_OVERWRITE);
-        if (!confirm 
+        if (!confirm
             || !file.exists()
-            || gui.showConfirmDialog("saveConfirmationDialog.areYouSure.text",
-                                     "yes", "no")) {
+            || gui.showModalConfirmDialog("saveConfirmationDialog.areYouSure.text",
+                                          "ok", "cancel")) {
             FreeColDirectories.setSaveDirectory(file.getParentFile());
             return saveGame(file);
         }
@@ -1671,7 +1671,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         return (sb.length() == 0) ? true
-            : gui.showConfirmDialog(unit.getTile(), 
+            : gui.showModalConfirmDialog(unit.getTile(),
                 StringTemplate.label(sb.toString()), unit,
                 "buildColony.yes", "buildColony.no");
     }
@@ -1851,7 +1851,7 @@ public final class InGameController implements NetworkConstants {
                 template = StringTemplate.template("cashInTreasureTrain.pay")
                     .addAmount("%fee%", percent);
             }
-            cash = gui.showConfirmDialog(unit.getTile(), template, unit,
+            cash = gui.showOldConfirmDialog(unit.getTile(), template, unit,
                 "cashInTreasureTrain.yes", "cashInTreasureTrain.no");
         }
 
@@ -1926,7 +1926,7 @@ public final class InGameController implements NetworkConstants {
             || !unit.checkSetState(UnitState.ACTIVE)) return false;
 
         if (unit.getState() == UnitState.IMPROVING
-            && !gui.showConfirmDialog(unit.getTile(),
+            && !gui.showModalConfirmDialog(unit.getTile(),
                 StringTemplate.template("model.unit.confirmCancelWork")
                     .addAmount("%turns%", unit.getWorkTurnsLeft()),
                 unit, "yes", "no")) {
@@ -1957,7 +1957,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         Tile tile = (gui.isShowingSubPanel()) ? null : unit.getTile();
-        if (!gui.showConfirmDialog(tile,
+        if (!gui.showModalConfirmDialog(tile,
                 StringTemplate.template("clearSpeciality.areYouSure")
                    .addStringTemplate("%oldUnit%", unit.getFullLabel())
                    .add("%unit%", newType.getNameKey()),
@@ -2085,7 +2085,7 @@ public final class InGameController implements NetworkConstants {
 
         Tile tile = (gui.isShowingSubPanel()) ? null
             : unit.getTile();
-        if (!gui.showConfirmDialog(tile,
+        if (!gui.showModalConfirmDialog(tile,
                 StringTemplate.key("disbandUnit.text"),
                 unit, "disbandUnit.yes", "disbandUnit.no")) {
             return;
@@ -2276,7 +2276,7 @@ public final class InGameController implements NetworkConstants {
         if (type == null) {
             switch (opt) {
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ASK:
-                accepted = gui.showConfirmDialog(colony.getTile(),
+                accepted = gui.showModalConfirmDialog(colony.getTile(),
                     StringTemplate.template("indianDemand.gold.text")
                         .addName("%nation%", nation)
                         .addName("%colony%", colony.getName())
@@ -2308,7 +2308,7 @@ public final class InGameController implements NetworkConstants {
             switch (opt) {
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ASK:
                 if (type.isFoodType()) {
-                    accepted = gui.showConfirmDialog(colony.getTile(),
+                    accepted = gui.showModalConfirmDialog(colony.getTile(),
                         StringTemplate.template("indianDemand.food.text")
                             .addName("%nation%", nation)
                             .addName("%colony%", colony.getName())
@@ -2317,7 +2317,7 @@ public final class InGameController implements NetworkConstants {
                         "indianDemand.food.yes",
                         "indianDemand.food.no");
                 } else {
-                    accepted = gui.showConfirmDialog(colony.getTile(),
+                    accepted = gui.showModalConfirmDialog(colony.getTile(),
                         StringTemplate.template("indianDemand.other.text")
                             .addName("%nation%", nation)
                             .addName("%colony%", colony.getName())
@@ -2836,7 +2836,7 @@ public final class InGameController implements NetworkConstants {
 
         while (disembarkable.size() > 0) {
             if (disembarkable.size() == 1) {
-                if (gui.showConfirmDialog(tile,
+                if (gui.showOldConfirmDialog(tile,
                         StringTemplate.key("disembark.text"),
                         disembarkable.get(0), "yes", "no")) {
                     move(disembarkable.get(0), direction);
@@ -2939,14 +2939,14 @@ public final class InGameController implements NetworkConstants {
      */
     private boolean moveExplore(Unit unit, Direction direction) {
         Tile tile = unit.getTile().getNeighbourOrNull(direction);
-        if (!gui.showConfirmDialog(unit.getTile(),
+        if (!gui.showModalConfirmDialog(unit.getTile(),
                 StringTemplate.key("exploreLostCityRumour.text"), unit,
                 "exploreLostCityRumour.yes", "exploreLostCityRumour.no")) {
             return true;
         }
         if (tile.getLostCityRumour().getType()
             == LostCityRumour.RumourType.MOUNDS
-            && !gui.showConfirmDialog(unit.getTile(),
+            && !gui.showModalConfirmDialog(unit.getTile(),
                 StringTemplate.key("exploreMoundsRumour.text"), unit,
                 "exploreLostCityRumour.yes", "exploreLostCityRumour.no")) {
             askServer().declineMounds(unit, direction);
@@ -2983,7 +2983,7 @@ public final class InGameController implements NetworkConstants {
                 moveTo(unit, unit.getDestination());
                 return false;
             } else {
-                if (gui.showConfirmDialog(oldTile,
+                if (gui.showModalConfirmDialog(oldTile,
                         StringTemplate.template("highseas.text")
                             .addAmount("%number%", unit.getSailTurns()),
                         unit, "highseas.yes", "highseas.no")) {
@@ -3024,7 +3024,7 @@ public final class InGameController implements NetworkConstants {
                 StringTemplate.template("indianSettlement.cantLearnSkill")
                 .addStringTemplate("%unit%", unit.getFullLabel())
                 .add("%skill%", skill.getNameKey()));
-        } else if (gui.showConfirmDialog(unit.getTile(),
+        } else if (gui.showOldConfirmDialog(unit.getTile(),
                 StringTemplate.template("learnSkill.text")
                     .add("%skill%", skill.getNameKey()),
                 unit, "learnSkill.yes", "learnSkill.no")) {
@@ -3601,7 +3601,7 @@ public final class InGameController implements NetworkConstants {
                     .add("%player%", enemy.getName())
                     .addAmount("%amount%", gold));
             } else {
-                if (gui.showConfirmDialog(unit.getTile(),
+                if (gui.showOldConfirmDialog(unit.getTile(),
                         StringTemplate.template("missionarySettlement.inciteConfirm")
                             .add("%player%", enemy.getName())
                             .addAmount("%amount%", gold),
@@ -3660,7 +3660,7 @@ public final class InGameController implements NetworkConstants {
                 ? "welcomeOffer.text" : "welcomeSimple.text";
             String type = ((IndianNationType)welcomer.getNationType())
                 .getSettlementTypeKey(true);
-            accept = gui.showConfirmDialog(tile,
+            accept = gui.showOldConfirmDialog(tile,
                 StringTemplate.template(messageId)
                 .addStringTemplate("%nation%", welcomer.getNationName())
                 .addName("%camps%", camps)
@@ -3802,7 +3802,7 @@ public final class InGameController implements NetworkConstants {
                 .addAmount("%amount%", arrears));
             return false;
         }
-        if (gui.showConfirmDialog(null,
+        if (gui.showOldConfirmDialog(null,
                 StringTemplate.template("model.europe.payArrears")
                     .addAmount("%amount%", arrears),
                 type, "ok", "cancel")
@@ -3828,7 +3828,7 @@ public final class InGameController implements NetworkConstants {
             return;
         }
         int price = colony.getPriceForBuilding();
-        if (!gui.showConfirmDialog(null,
+        if (!gui.showOldConfirmDialog(null,
                 StringTemplate.template("payForBuilding.text")
                     .addAmount("%amount%", price),
                 colony, "payForBuilding.yes", "payForBuilding.no")) {
@@ -3872,7 +3872,7 @@ public final class InGameController implements NetworkConstants {
      * Query whether the user wants to reconnect?
      */
     public void reconnect() {
-        if (gui.showConfirmDialog("reconnect.text",
+        if (gui.showModalConfirmDialog("reconnect.text",
                 "reconnect.yes", "reconnect.no")) {
             logger.finest("Reconnect accepted.");
             freeColClient.getConnectController().reconnect();
@@ -4129,16 +4129,16 @@ public final class InGameController implements NetworkConstants {
                     ; // Do nothing, retire routine will quit
 
                 } else if (player.getPlayerType() != Player.PlayerType.UNDEAD
-                    && gui.showConfirmDialog("defeatedSinglePlayer.text",
-                                             "defeatedSinglePlayer.yes",
-                                             "defeatedSinglePlayer.no")) {
+                    && gui.showModalConfirmDialog("defeatedSinglePlayer.text",
+                                                  "defeatedSinglePlayer.yes",
+                                                  "defeatedSinglePlayer.no")) {
                     freeColClient.askServer().enterRevengeMode();
                 } else {
                     freeColClient.quit();
                 }
             } else {
-                if (!gui.showConfirmDialog("defeated.text",
-                                           "defeated.yes", "defeated.no")) {
+                if (!gui.showModalConfirmDialog("defeated.text",
+                        "defeated.yes", "defeated.no")) {
                     freeColClient.quit();
                 }
             }
@@ -4161,7 +4161,7 @@ public final class InGameController implements NetworkConstants {
                 = StringTemplate.template("traderoute.reassignRoute")
                 .addStringTemplate("%unit%", unit.getFullLabel())
                 .addName("%route%", unit.getTradeRoute().getName());
-            if (!gui.showConfirmDialog(unit.getTile(), template,
+            if (!gui.showOldConfirmDialog(unit.getTile(), template,
                     unit, "yes", "no")) return false;
         }
         return askServer().setDestination(unit, destination)
@@ -4267,7 +4267,7 @@ public final class InGameController implements NetworkConstants {
         }
         StringTemplate template = unit.getAbandonEducationMessage(true);
         return template == null
-            || gui.showConfirmDialog(unit.getTile(), template, unit,
+            || gui.showOldConfirmDialog(unit.getTile(), template, unit,
                 "abandonEducation.yes", "abandonEducation.no");
     }
 
@@ -4382,7 +4382,7 @@ public final class InGameController implements NetworkConstants {
 
         if (unit.getStudent() != null
             && (template = unit.getAbandonEducationMessage(false)) != null
-            && !gui.showConfirmDialog(unit.getTile(), template,
+            && !gui.showOldConfirmDialog(unit.getTile(), template,
                 unit, "abandonTeaching.yes", "abandonTeaching.no")) return;
 
         Colony colony = workLocation.getColony();

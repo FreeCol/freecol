@@ -997,10 +997,10 @@ public class DebugUtils {
         boolean more = true;
         while (more) {
             int val = server.getInGameController().stepRandom();
-            more = gui.showConfirmDialog(null,
+            more = gui.showModalConfirmDialog(null,
                 StringTemplate.template("menuBar.debug.randomValue")
                     .addAmount("%value%", val),
-                null, "more", "ok");
+                null, "more", "cancel");
         }
     }
 

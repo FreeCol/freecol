@@ -538,11 +538,11 @@ public final class EuropePanel extends PortPanel {
                     && !(destination instanceof Europe)
                     && docksPanel.getComponentCount() > 0
                     && unit.hasSpaceLeft()) {
-                    boolean leave = getGUI().showConfirmDialog(null,
+                    boolean leave = getGUI().showOldConfirmDialog(null,
                         StringTemplate.template("europe.leaveColonists")
                             .addStringTemplate("%newWorld%",
                                 destination.getLocationNameFor(unit.getOwner())),
-                        unit, "yes", "no");
+                        unit, "ok", "cancel");
                     if (!leave) return null; // Colonists remain in Europe.
                 }
 
