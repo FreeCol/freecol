@@ -37,7 +37,7 @@ import net.sf.freecol.common.model.UnitType;
 /**
  * The panel that allows a user to choose which unit will emigrate from Europe.
  */
-public final class EmigrationDialog extends FreeColDialog<Integer> {
+public final class EmigrationDialog extends FreeColOldDialog<Integer> {
 
     private static final Logger logger = Logger.getLogger(EmigrationDialog.class.getName());
 

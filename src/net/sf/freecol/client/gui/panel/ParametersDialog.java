@@ -37,7 +37,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 /**
  * A dialog for editing parameters.
  */
-public class ParametersDialog extends FreeColDialog<Parameters> {
+public class ParametersDialog extends FreeColOldDialog<Parameters> {
     
     final int COLUMNS = 5;
 

@@ -45,7 +45,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 /**
  * Dialog for setting some options when loading a game.
  */
-public final class LoadingSavegameDialog extends FreeColDialog<Boolean> implements ActionListener {
+public final class LoadingSavegameDialog extends FreeColOldDialog<Boolean> implements ActionListener {
 
     private static final Logger logger = Logger.getLogger(LoadingSavegameDialog.class.getName());
 

@@ -79,7 +79,7 @@ import net.sf.freecol.common.util.Utils;
 /**
  * Centers the map on a known settlement or colony.
  */
-public final class SelectDestinationDialog extends FreeColDialog<Location>
+public final class SelectDestinationDialog extends FreeColOldDialog<Location>
     implements ActionListener, ChangeListener, ItemListener {
 
     @SuppressWarnings("unused")

@@ -61,23 +61,23 @@ import net.sf.freecol.client.gui.i18n.Messages;
  * Superclass for all dialogs in FreeCol. This class also contains
  * methods to create simple dialogs.
  */
-public class FreeColDialog<T> extends FreeColPanel {
+public class FreeColOldDialog<T> extends FreeColPanel {
 
-    private static final Logger logger = Logger.getLogger(FreeColDialog.class.getName());
+    private static final Logger logger = Logger.getLogger(FreeColOldDialog.class.getName());
 
 
     /**
-     * Creates a new <code>FreeColDialog</code> with a text and a
+     * Creates a new <code>FreeColOldDialog</code> with a text and a
      * cancel-button, in addition to buttons for each of the objects
      * in the given array.
      *
      * @param text String, text that explains the choice for the user
      * @param cancelText String, text displayed on the "cancel"-button
      * @param choices List of <code>ChoiceItem<T> <code> the choice items
-     * @return <code>FreeColDialog</code>
+     * @return <code>FreeColOldDialog</code>
      * @see ChoiceItem
      */
-    public static <T> FreeColDialog<ChoiceItem<T>>
+    public static <T> FreeColOldDialog<ChoiceItem<T>>
         createChoiceDialog(FreeColClient freeColClient, String text,
             String cancelText, List<ChoiceItem<T>> choices) {
 
@@ -86,8 +86,8 @@ public class FreeColDialog<T> extends FreeColPanel {
         }
 
         final List<JButton> choiceBtnLst = new ArrayList<JButton>();
-        final FreeColDialog<ChoiceItem<T>> choiceDialog
-            = new FreeColDialog<ChoiceItem<T>>(freeColClient,
+        final FreeColOldDialog<ChoiceItem<T>> choiceDialog
+            = new FreeColOldDialog<ChoiceItem<T>>(freeColClient,
                 new MigLayout("fillx, wrap 1", "[align center]", "")) {
                 @Override
                 public void requestFocus() {
@@ -170,7 +170,7 @@ public class FreeColDialog<T> extends FreeColPanel {
     }
 
     /**
-     * Creates a new <code>FreeColDialog</code> with a text and a
+     * Creates a new <code>FreeColOldDialog</code> with a text and a
      * ok/cancel option.  The "ok"-option calls {@link #setResponse
      * setResponse(new Boolean(true))} and the "cancel"-option calls
      * {@link #setResponse setResponse(new Boolean(false))}.
@@ -179,14 +179,14 @@ public class FreeColDialog<T> extends FreeColPanel {
      * @param icon An optional icon to display.
      * @param okText The text displayed on the "ok"-button.
      * @param cancelText The text displayed on the "cancel"-button.
-     * @return The <code>FreeColDialog</code>.
+     * @return The <code>FreeColOldDialog</code>.
      */
-    public static FreeColDialog<Boolean>
+    public static FreeColOldDialog<Boolean>
         createConfirmDialog(final FreeColClient freeColClient,
                             String text, ImageIcon icon,
                             String okText, String cancelText) {
-        final FreeColDialog<Boolean> confirmDialog
-            = new FreeColDialog<Boolean>(freeColClient,
+        final FreeColOldDialog<Boolean> confirmDialog
+            = new FreeColOldDialog<Boolean>(freeColClient,
                 new MigLayout("wrap 2", "[][fill]", ""));
 
         confirmDialog.okButton.setText(okText);
@@ -215,7 +215,7 @@ public class FreeColDialog<T> extends FreeColPanel {
     }
 
     /**
-     * Creates a new <code>FreeColDialog</code> with a text field and a
+     * Creates a new <code>FreeColOldDialog</code> with a text field and a
      * ok/cancel option.  The "ok"-option calls {@link #setResponse
      * setResponse(textField.getText())} and the "cancel"-option calls
      * {@link #setResponse setResponse(null)}.
@@ -224,16 +224,16 @@ public class FreeColDialog<T> extends FreeColPanel {
      * @param defaultValue The default value appearing in the text field.
      * @param okText The text displayed on the "ok"-button.
      * @param cancelText The text displayed on the "cancel"-button.
-     * @return The <code>FreeColDialog</code>.
+     * @return The <code>FreeColOldDialog</code>.
      */
-    public static FreeColDialog<String>
+    public static FreeColOldDialog<String>
         createInputDialog(FreeColClient freeColClient, String text,
                           String defaultValue,
                           String okText, String cancelText) {
 
         final JTextField input = new JTextField(defaultValue);
-        final FreeColDialog<String> inputDialog
-            = new FreeColDialog<String>(freeColClient,
+        final FreeColOldDialog<String> inputDialog
+            = new FreeColOldDialog<String>(freeColClient,
                 new MigLayout("wrap 1, gapy 20", "", ""))  {
                 @Override
                 public void requestFocus() {
@@ -284,19 +284,19 @@ public class FreeColDialog<T> extends FreeColPanel {
     }
 
     /**
-     * Creates a new <code>FreeColDialog</code> in which the user
+     * Creates a new <code>FreeColOldDialog</code> in which the user
      * may choose a savegame to load.
      *
      * @param directory The directory to display when choosing the file.
      * @param fileFilters The available file filters in the
      *       dialog.
-     * @return The <code>FreeColDialog</code>.
+     * @return The <code>FreeColOldDialog</code>.
      */
-    public static FreeColDialog<File>
+    public static FreeColOldDialog<File>
         createLoadDialog(FreeColClient freeColClient, File directory,
                          FileFilter[] fileFilters) {
-        final FreeColDialog<File> loadDialog
-            = new FreeColDialog<File>(freeColClient);
+        final FreeColOldDialog<File> loadDialog
+            = new FreeColOldDialog<File>(freeColClient);
         final JFileChooser fileChooser = new JFileChooser(directory);
         if (fileFilters.length > 0) {
             for (FileFilter fileFilter : fileFilters) {
@@ -316,7 +316,7 @@ public class FreeColDialog<T> extends FreeColPanel {
         return loadDialog;
     }
 
-    public static FreeColDialog<Dimension>
+    public static FreeColOldDialog<Dimension>
         createMapSizeDialog(final FreeColClient freeColClient) {
 
         final int defaultHeight = 100;
@@ -329,8 +329,8 @@ public class FreeColDialog<T> extends FreeColPanel {
         final JTextField inputWidth = new JTextField(Integer.toString(defaultWidth), COLUMNS);
         final JTextField inputHeight = new JTextField(Integer.toString(defaultHeight), COLUMNS);
 
-        final FreeColDialog<Dimension> mapSizeDialog
-            = new FreeColDialog<Dimension>(freeColClient,
+        final FreeColOldDialog<Dimension> mapSizeDialog
+            = new FreeColOldDialog<Dimension>(freeColClient,
                                            new MigLayout("wrap 2"));
 
         mapSizeDialog.okButton.setText(Messages.message("ok"));
@@ -375,7 +375,7 @@ public class FreeColDialog<T> extends FreeColPanel {
     }
 
     /**
-     * Creates a new <code>FreeColDialog</code> in which the user
+     * Creates a new <code>FreeColOldDialog</code> in which the user
      * may choose the destination of the savegame.
      *
      * @param directory The directory to display when choosing the name.
@@ -384,15 +384,15 @@ public class FreeColDialog<T> extends FreeColPanel {
      * @param fileFilters The available file filters in the
      *       dialog.
      * @param defaultName Default filename for the savegame.
-     * @return The <code>FreeColDialog</code>.
+     * @return The <code>FreeColOldDialog</code>.
      */
-    public static FreeColDialog<File>
+    public static FreeColOldDialog<File>
         createSaveDialog(FreeColClient freeColClient, File directory,
                          final String standardName, FileFilter[] fileFilters,
                          String defaultName) {
 
-        final FreeColDialog<File> saveDialog
-            = new FreeColDialog<File>(freeColClient);
+        final FreeColOldDialog<File> saveDialog
+            = new FreeColOldDialog<File>(freeColClient);
         final JFileChooser fileChooser = new JFileChooser(directory);
         final File defaultFile = new File(defaultName);
 
@@ -432,7 +432,7 @@ public class FreeColDialog<T> extends FreeColPanel {
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public FreeColDialog(FreeColClient freeColClient) {
+    public FreeColOldDialog(FreeColClient freeColClient) {
         this(freeColClient, new FlowLayout());
     }
 
@@ -442,7 +442,7 @@ public class FreeColDialog<T> extends FreeColPanel {
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param layout The <code>LayoutManager</code> to be used.
      */
-    public FreeColDialog(FreeColClient freeColClient, LayoutManager layout) {
+    public FreeColOldDialog(FreeColClient freeColClient, LayoutManager layout) {
         super(freeColClient, layout);
 
         cancelButton.setActionCommand(CANCEL);

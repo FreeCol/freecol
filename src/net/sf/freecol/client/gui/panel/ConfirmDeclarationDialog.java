@@ -37,7 +37,7 @@ import net.sf.freecol.common.model.StringTemplate;
 /**
  * A dialog used to confirm the declaration of independence.
  */
-public class ConfirmDeclarationDialog extends FreeColDialog<List<String>> {
+public class ConfirmDeclarationDialog extends FreeColOldDialog<List<String>> {
 
     private JTextField nationField;
     private JTextField countryField;

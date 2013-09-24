@@ -55,7 +55,7 @@ import net.sf.freecol.common.model.Unit;
  * Centers the map on a known settlement or colony. Pressing ENTER
  * opens a panel if appropriate.
  */
-public final class EndTurnDialog extends FreeColDialog<Boolean> implements ListSelectionListener {
+public final class EndTurnDialog extends FreeColOldDialog<Boolean> implements ListSelectionListener {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(EndTurnDialog.class.getName());

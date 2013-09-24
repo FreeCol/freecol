@@ -50,7 +50,7 @@ import net.sf.freecol.common.model.Unit;
 /**
  * Allows the user to edit trade routes.
  */
-public final class TradeRouteDialog extends FreeColDialog<Boolean>
+public final class TradeRouteDialog extends FreeColOldDialog<Boolean>
     implements ActionListener {
 
     @SuppressWarnings("unused")

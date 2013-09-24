@@ -41,7 +41,7 @@ import net.sf.freecol.common.model.FoundingFather;
  *
  * @see FoundingFather
  */
-public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFather> implements ActionListener {
+public final class ChooseFoundingFatherDialog extends FreeColOldDialog<FoundingFather> implements ActionListener {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ChooseFoundingFatherDialog.class.getName());

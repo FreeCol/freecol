@@ -55,7 +55,7 @@ import net.sf.freecol.server.model.ServerPlayer;
 /**
  * This dialog is used to edit an Indian settlement (map editor only).
  */
-public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
+public final class EditSettlementDialog extends FreeColOldDialog<IndianSettlement>
     implements ItemListener {
 
     @SuppressWarnings("unused")

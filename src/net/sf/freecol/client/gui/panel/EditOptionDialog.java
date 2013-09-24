@@ -31,7 +31,7 @@ import net.sf.freecol.common.option.Option;
 /**
  * Dialog to edit options with.
  */
-public class EditOptionDialog extends FreeColDialog<Boolean> {
+public class EditOptionDialog extends FreeColOldDialog<Boolean> {
 
     private OptionUI ui;
 

@@ -66,7 +66,7 @@ import net.sf.freecol.common.model.UnitTradeItem;
 /**
  * The panel that allows negotiations between players.
  */
-public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade>
+public final class NegotiationDialog extends FreeColOldDialog<DiplomaticTrade>
     implements ActionListener {
 
     private static Logger logger = Logger.getLogger(NegotiationDialog.class.getName());

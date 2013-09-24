@@ -40,7 +40,7 @@ import net.sf.freecol.common.model.UnitType;
 /**
  * The panel that allows a user to recruit people in Europe.
  */
-public final class RecruitDialog extends FreeColDialog<Integer> implements ActionListener {
+public final class RecruitDialog extends FreeColOldDialog<Integer> implements ActionListener {
 
     private static Logger logger = Logger.getLogger(RecruitDialog.class.getName());
 

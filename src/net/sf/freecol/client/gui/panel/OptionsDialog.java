@@ -51,7 +51,7 @@ import net.sf.freecol.common.option.OptionGroup;
 /**
  * Dialog for changing the options of an {@link OptionGroup}.
  */
-public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
+public abstract class OptionsDialog extends FreeColOldDialog<OptionGroup>  {
 
     private static final Logger logger = Logger.getLogger(OptionsDialog.class.getName());
 

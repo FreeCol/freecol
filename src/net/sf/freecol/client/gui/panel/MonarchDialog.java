@@ -38,7 +38,7 @@ import net.sf.freecol.common.model.StringTemplate;
 /**
  * This panel is used to show monarch actions.
  */
-public final class MonarchDialog extends FreeColDialog<Boolean> implements ActionListener {
+public final class MonarchDialog extends FreeColOldDialog<Boolean> implements ActionListener {
 
     private static final Logger logger = Logger.getLogger(MonarchDialog.class.getName());
 

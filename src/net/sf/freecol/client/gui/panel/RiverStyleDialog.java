@@ -41,7 +41,7 @@ import net.sf.freecol.common.resources.ResourceManager;
  * This panel is only used when running in
  * {@link net.sf.freecol.client.FreeColClient#isMapEditor() map editor mode}.
  */
-public final class RiverStyleDialog extends FreeColDialog<String> {
+public final class RiverStyleDialog extends FreeColOldDialog<String> {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(RiverStyleDialog.class.getName());

@@ -46,7 +46,7 @@ import net.sf.freecol.common.model.GoodsType;
 /**
  * A dialog to display a colony warehouse.
  */
-public final class WarehouseDialog extends FreeColDialog<Boolean> {
+public final class WarehouseDialog extends FreeColOldDialog<Boolean> {
 
     private static final Logger logger = Logger.getLogger(WarehouseDialog.class.getName());
 

@@ -57,7 +57,7 @@ import net.sf.freecol.common.model.StringTemplate;
  * Centers the map on a known settlement or colony. Pressing ENTER
  * opens a panel if appropriate.
  */
-public final class FindSettlementDialog<T> extends FreeColDialog<T> implements ListSelectionListener {
+public final class FindSettlementDialog<T> extends FreeColOldDialog<T> implements ListSelectionListener {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(FindSettlementDialog.class.getName());

@@ -46,7 +46,7 @@ import net.sf.freecol.common.model.Unit;
 /**
  * Panel for choosing the goods to capture.
  */
-public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>>
+public final class CaptureGoodsDialog extends FreeColOldDialog<List<Goods>>
     implements ActionListener {
 
     private static final Logger logger = Logger.getLogger(CaptureGoodsDialog.class.getName());

@@ -73,7 +73,7 @@ import net.sf.freecol.common.model.TradeRouteStop;
 /**
  * Allows the user to edit trade routes.
  */
-public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implements ActionListener {
+public final class TradeRouteInputDialog extends FreeColOldDialog<Boolean> implements ActionListener {
 
     private static final Logger logger = Logger.getLogger(TradeRouteInputDialog.class.getName());
 
