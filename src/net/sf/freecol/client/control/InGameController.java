@@ -39,6 +39,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas.TradeAction;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.option.FreeColActionUI;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.io.FreeColDirectories;
@@ -56,6 +57,7 @@ import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.EuropeWas;
 import net.sf.freecol.common.model.Event;
+import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
@@ -63,6 +65,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HighScore;
+import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Limit;
 import net.sf.freecol.common.model.Location;
@@ -72,6 +75,7 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.ModelMessage.MessageType;
+import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Nameable;
 import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.Ownable;
@@ -81,6 +85,7 @@ import net.sf.freecol.common.model.Player.NoClaimReason;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.ProductionType;
+import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
@@ -1864,6 +1869,18 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
+     * Choose a founding father from an offered list.
+     *
+     * @param A list of <code>FoundingFather</code>s to choose from.
+     * @return The chosen <code>FoundingFather</code> (may be null).
+     */
+    public FoundingFather chooseFoundingFather(List<FoundingFather> ffs) {
+        FoundingFather ff = gui.showChooseFoundingFatherDialog(ffs);
+        if (ff != null) freeColClient.getMyPlayer().setCurrentFather(ff);
+        return ff;
+    }
+
+    /**
      * Claim a tile.
      *
      * @param tile The <code>Tile</code> to claim.
@@ -2003,6 +2020,57 @@ public final class InGameController implements NetworkConstants {
             nextModelMessage();
             gui.showDeclarationPanel();
         }
+    }
+
+    /**
+     * Handle a diplomatic offer.
+     *
+     * @param unit The offering <code>Unit</code>.
+     * @param settlement The <code>Settlement</code> that is negotiating.
+     * @param agreement The <code>DiplomaticTrade</code> agreement.
+     * @return A counter agreement, a rejected agreement, or null if
+     *     the original agreement was already decided.
+     */
+    public DiplomaticTrade diplomacy(Unit unit, Settlement settlement,
+                                     DiplomaticTrade agreement) {
+        final Player player = freeColClient.getMyPlayer();
+        String nation = Messages.message(unit.getOwner().getNationName());
+        
+        switch (agreement.getStatus()) {
+        case ACCEPT_TRADE:
+            boolean visibilityChange = false;
+            for (Colony c : agreement.getColoniesGivenBy(player)) {
+                player.removeSettlement(c);//-vis(player)
+                visibilityChange = true;
+            }
+            for (Unit u : agreement.getUnitsGivenBy(player)) {
+                player.removeUnit(u);//-vis(player)
+                visibilityChange = true;
+            }
+            if (visibilityChange) player.invalidateCanSeeTiles();//+vis(player)
+            gui.showInformationMessage(null, StringTemplate
+                .template("negotiationDialog.offerAccepted")
+                .addName("%nation%", nation));
+            break;
+        case REJECT_TRADE:
+            gui.showInformationMessage(null, StringTemplate
+                .template("negotiationDialog.offerRejected")
+                .addName("%nation%", nation));
+            break;
+        case PROPOSE_TRADE:
+            DiplomaticTrade ourAgreement
+                = gui.showNegotiationDialog(unit, settlement, agreement);
+            if (ourAgreement == null) {
+                agreement.setStatus(TradeStatus.REJECT_TRADE);
+            } else {
+                agreement = ourAgreement;
+            }
+            return agreement;
+        default:
+            logger.warning("Bogus trade status: " + agreement.getStatus());
+            break;
+        }
+        return null;
     }
 
     /**
@@ -2188,6 +2256,124 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
+     * Handle a native demand at a colony.
+     *
+     * @param unit The native <code>Unit</code> making the demand.
+     * @param colony The <code>Colony</code> demanded of.
+     * @param type The <code>GoodsType</code> demanded (null means gold).
+     * @param amount The amount of goods/gold demanded.
+     * @return Whether the demand was accepted or not.
+     */
+    public boolean indianDemand(Unit unit, Colony colony,
+                                GoodsType type, int amount) {
+        final Player player = freeColClient.getMyPlayer();
+        final int opt = freeColClient.getClientOptions()
+            .getInteger(ClientOptions.INDIAN_DEMAND_RESPONSE);
+
+        boolean accepted;
+        ModelMessage m = null;
+        String nation = Messages.message(unit.getOwner().getNationName());
+        if (type == null) {
+            switch (opt) {
+            case ClientOptions.INDIAN_DEMAND_RESPONSE_ASK:
+                accepted = gui.showConfirmDialog(colony.getTile(),
+                    StringTemplate.template("indianDemand.gold.text")
+                        .addName("%nation%", nation)
+                        .addName("%colony%", colony.getName())
+                        .addAmount("%amount%", amount),
+                    unit,
+                    "indianDemand.gold.yes",
+                    "indianDemand.gold.no");
+                break;
+            case ClientOptions.INDIAN_DEMAND_RESPONSE_ACCEPT:
+                m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
+                    "indianDemand.gold.text", colony, unit)
+                    .addName("%nation%", nation)
+                    .addName("%colony%", colony.getName())
+                    .addAmount("%amount%", amount);
+                accepted = true;
+                break;
+            case ClientOptions.INDIAN_DEMAND_RESPONSE_REJECT:
+                m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
+                    "indianDemand.gold.text", colony, unit)
+                    .addName("%nation%", nation)
+                    .addName("%colony%", colony.getName())
+                    .addAmount("%amount%", amount);
+                accepted = false;
+                break;
+            default:
+                throw new IllegalArgumentException("Impossible option value.");
+            }
+        } else {
+            switch (opt) {
+            case ClientOptions.INDIAN_DEMAND_RESPONSE_ASK:
+                if (type.isFoodType()) {
+                    accepted = gui.showConfirmDialog(colony.getTile(),
+                        StringTemplate.template("indianDemand.food.text")
+                            .addName("%nation%", nation)
+                            .addName("%colony%", colony.getName())
+                            .addAmount("%amount%", amount),
+                        unit,
+                        "indianDemand.food.yes",
+                        "indianDemand.food.no");
+                } else {
+                    accepted = gui.showConfirmDialog(colony.getTile(),
+                        StringTemplate.template("indianDemand.other.text")
+                            .addName("%nation%", nation)
+                            .addName("%colony%", colony.getName())
+                            .addAmount("%amount%", amount)
+                            .add("%goods%", type.getNameKey()),
+                        unit,
+                        "indianDemand.other.yes",
+                        "indianDemand.other.no");
+                }
+                break;
+            case ClientOptions.INDIAN_DEMAND_RESPONSE_ACCEPT:
+                if (type.isFoodType()) {
+                    m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
+                        "indianDemand.food.text", colony, unit)
+                        .addName("%nation%", nation)
+                        .addName("%colony%", colony.getName())
+                        .addAmount("%amount%", amount);
+                } else {
+                    m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
+                        "indianDemand.other.text", colony, unit)
+                        .addName("%nation%", nation)
+                        .addName("%colony%", colony.getName())
+                        .addAmount("%amount%", amount)
+                        .add("%goods%", type.getNameKey());
+                }
+                accepted = true;
+                break;
+            case ClientOptions.INDIAN_DEMAND_RESPONSE_REJECT:
+                if (type.isFoodType()) {
+                    m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
+                        "indianDemand.food.text", colony, unit)
+                        .addName("%nation%", nation)
+                        .addName("%colony%", colony.getName())
+                        .addAmount("%amount%", amount);
+                } else {
+                    m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
+                        "indianDemand.other.text", colony, unit)
+                        .addName("%nation%", nation)
+                        .addName("%colony%", colony.getName())
+                        .addAmount("%amount%", amount)
+                        .add("%goods%", type.getNameKey());
+                }
+                accepted = false;
+                break;
+            default:
+                throw new IllegalArgumentException("Impossible option value.");
+            }
+        }
+        if (m != null) {
+            player.addModelMessage(m);
+            nextModelMessage();
+        }
+        return accepted;
+    }
+
+    /**
      * Leave a ship.  The ship must be in harbour.
      *
      * @param unit The <code>Unit</code> which is to leave the ship.
@@ -2241,6 +2427,32 @@ public final class InGameController implements NetworkConstants {
         if (loadGoods(goods, carrier)) {
             gui.playSound("sound.event.loadCargo");
         }
+    }
+
+    /**
+     * Loot some cargo.
+     *
+     * @param unit The <code>Unit</code> that is looting.
+     * @param goods A list of <code>Goods</code> to choose from.
+     * @param defenderId The identifier of the defender unit (may have sunk).
+     */
+    public void lootCargo(Unit unit, List<Goods> goods, String defenderId) {
+        goods = gui.showCaptureGoodsDialog(unit, goods);
+        if (!goods.isEmpty()) {
+            askServer().loot(unit, defenderId, goods);
+        }
+    }
+
+    /**
+     * Handle a message from the monarch.
+     *
+     * @param action The <code>MonarchAction</code> performed.
+     * @param template A <code>StringTemplate</code> describing the action.
+     * @return True if the action was accepted.
+     */
+    public boolean monarchAction(MonarchAction action,
+                                 StringTemplate template) {
+        return gui.showMonarchDialog(action, template);
     }
 
     /**
@@ -3426,6 +3638,97 @@ public final class InGameController implements NetworkConstants {
     } 
 
     /**
+     * A player names the New World.
+     *
+     * @param unit The <code>Unit</code> that landed.
+     * @param defaultName The default name to offer.
+     * @param welcomer An optional native <code>Player</code> present at the
+     *     landing.
+     * @param camps The number of camps for the welcoming message.
+     */
+    public void nameNewLand(Unit unit, String defaultName, Player welcomer,
+                            String camps) {
+        Tile tile = unit.getTile();
+        String name = gui.showInputDialog(tile,
+            StringTemplate.template("newLand.text"), defaultName,
+            "newLand.yes", null, true);
+
+        // Check if there is a welcoming native offering land.
+        boolean accept = false;
+        if (welcomer != null) {
+            String messageId = (welcomer.owns(tile))
+                ? "welcomeOffer.text" : "welcomeSimple.text";
+            String type = ((IndianNationType)welcomer.getNationType())
+                .getSettlementTypeKey(true);
+            accept = gui.showConfirmDialog(tile,
+                StringTemplate.template(messageId)
+                .addStringTemplate("%nation%", welcomer.getNationName())
+                .addName("%camps%", camps)
+                .add("%settlementType%", type),
+                welcomer, "welcome.yes", "welcome.no");
+        }
+
+        // Respond to the server.
+        askServer().newLandName(unit, name, welcomer, accept);
+
+        // Add tutorial message.
+        Player player = unit.getOwner();
+        String key = FreeColActionUI.getHumanKeyStrokeText(freeColClient
+            .getActionManager().getFreeColAction("buildColonyAction")
+            .getAccelerator());
+        player.addModelMessage(new ModelMessage(ModelMessage.MessageType.TUTORIAL,
+                "tutorial.buildColony", player)
+            .addName("%build_colony_key%", key)
+            .add("%build_colony_menu_item%", "buildColonyAction.name")
+            .add("%orders_menu_item%", "menuBar.orders"));
+        nextModelMessage();
+    }
+
+    /**
+     * The player names a new region.
+     *
+     * @param tile The <code>Tile</code> within the region.
+     * @param unit The <code>Unit</code> that has discovered the region.
+     * @param region The <code>Region</code> to name.
+     * @param defaultName The default name to offer.
+     */
+    public void nameNewRegion(Tile tile, Unit unit, Region region,
+                              String defaultName) {
+        String name = gui.showInputDialog(tile,
+            StringTemplate.template("nameRegion.text")
+            .addStringTemplate("%type%", region.getLabel()),
+            defaultName, "ok", null, false);
+        if (name == null || "".equals(name)) name = defaultName;
+        askServer().newRegionName(region, tile, unit, name);
+    }
+
+    /**
+     * Switch to a new turn.
+     *
+     * @param turnString The turn.
+     */
+    public void newTurn(String turnString) {
+        final Game game = freeColClient.getGame();
+        try {
+            int turnNumber = Integer.parseInt(turnString);
+            game.setTurn(new Turn(turnNumber));
+        } catch (NumberFormatException e) {
+            logger.warning("Bad turn in newTurn: " + turnString);
+        }
+
+        final boolean alert = freeColClient.getClientOptions()
+            .getBoolean(ClientOptions.AUDIO_ALERTS);
+        if (alert) gui.playSound("sound.event.alertSound");
+
+        Turn currTurn = game.getTurn();
+        if (currTurn.isFirstSeasonTurn()) {
+            gui.showInformationMessage(null,
+                StringTemplate.template("twoTurnsPerYear")
+                              .addName("%year%", turnString));
+        }
+    }
+
+    /**
      * Makes a new unit active.
      */
     public void nextActiveUnit() {
@@ -3563,6 +3866,20 @@ public final class InGameController implements NetworkConstants {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Query whether the user wants to reconnect?
+     */
+    public void reconnect() {
+        if (gui.showConfirmDialog("reconnect.text",
+                "reconnect.yes", "reconnect.no")) {
+            logger.finest("Reconnect accepted.");
+            freeColClient.getConnectController().reconnect();
+        } else {
+            logger.finest("Reconnect rejected, quit.");
+            freeColClient.quit();
+        }
     }
 
     /**
@@ -3745,9 +4062,13 @@ public final class InGameController implements NetworkConstants {
      */
     public void setCurrentPlayer(Player player) {
         logger.finest("Entering client setCurrentPlayer: " + player.getName());
+
+        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
+            && freeColClient.currentPlayerIsMyPlayer()) gui.closeMenus();
+        FreeColDebugger.finishDebugRun(freeColClient, false);
+
         Game game = freeColClient.getGame();
         game.setCurrentPlayer(player);
-
         if (freeColClient.getMyPlayer().equals(player)) {
             player.removeDisplayedModelMessages();
             player.invalidateCanSeeTiles();
@@ -3788,7 +4109,42 @@ public final class InGameController implements NetworkConstants {
             }
             displayModelMessages(true, true);
         }
+        freeColClient.updateActions();
+
         logger.finest("Exiting client setCurrentPlayer: " + player.getName());
+    }
+
+    /**
+     * Set a player to be dead.
+     *
+     * @param dead The dead <code>Player</code>.
+     */
+    public void setDead(Player dead) {
+        final Player player = freeColClient.getMyPlayer();
+        
+        if (player == dead) {
+            FreeColDebugger.finishDebugRun(freeColClient, true);
+            if (freeColClient.isSinglePlayer()) {
+                if (player.getPlayerType() == Player.PlayerType.RETIRED) {
+                    ; // Do nothing, retire routine will quit
+
+                } else if (player.getPlayerType() != Player.PlayerType.UNDEAD
+                    && gui.showConfirmDialog("defeatedSinglePlayer.text",
+                                             "defeatedSinglePlayer.yes",
+                                             "defeatedSinglePlayer.no")) {
+                    freeColClient.askServer().enterRevengeMode();
+                } else {
+                    freeColClient.quit();
+                }
+            } else {
+                if (!gui.showConfirmDialog("defeated.text",
+                                           "defeated.yes", "defeated.no")) {
+                    freeColClient.quit();
+                }
+            }
+        } else {
+            player.setStance(dead, null);
+        }
     }
 
     /**
@@ -3821,6 +4177,30 @@ public final class InGameController implements NetworkConstants {
     public void setGoodsLevels(Colony colony, GoodsType goodsType) {
         askServer().setGoodsLevels(colony,
             colony.getExportData(goodsType));
+    }
+
+    /**
+     * Notify the player that the stance between two players has changed.
+     *
+     * @param stance The changed <code>Stance</code>.
+     * @param first The first <code>Player</code>.
+     * @param second The second <code>Player</code>.
+     */
+    public void setStance(Stance stance, Player first, Player second) {
+        Player player = freeColClient.getMyPlayer();
+
+        Stance old = first.getStance(second);
+        try {
+            first.setStance(second, stance);
+        } catch (IllegalStateException e) {
+            logger.log(Level.WARNING, "Illegal stance transition", e);
+            return;
+        }
+        logger.info("Stance transition: " + old.toString()
+            + " -> " + stance.toString());
+        if (player == first && old == Stance.UNCONTACTED) {
+            gui.playSound("sound.event.meet." + second.getNationId());
+        }
     }
 
     /**

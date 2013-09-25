@@ -31,7 +31,6 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.client.gui.option.FreeColActionUI;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
@@ -44,7 +43,6 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HistoryEvent;
-import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.LastSale;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Modifier;
@@ -76,12 +74,61 @@ import org.w3c.dom.NodeList;
 
 
 /**
- * Handles the network messages that arrives while in the getGame().
+ * Handles the network messages that arrives while in the game.
+ *
+ * Usually delegate to the real handlers in InGameController, making
+ * sure anything non-trivial that touches the GUI is doing so inside
+ * the EDT.  Usually this is done with SwingUtilities.invokeLater, but
+ * some messages demand a response which requires invokeAndWait.
+ *
+ * Note that the EDT often calls the controller, which queries the
+ * server, which results in handling the reply here, still within the
+ * EDT.  invokeAndWait is illegal within the EDT, but none of messages
+ * that require a response are client-initiated so the problem does
+ * not arise...
+ *
+ * ...except for the special case of the animations.  These have to be
+ * done in series but are sometimes in the EDT (our unit moves) and
+ * sometimes not (other nation unit moves).  Hence the hack in the
+ * local invokeAndWait wrapper.
  */
 public final class InGameInputHandler extends InputHandler {
 
     private static final Logger logger = Logger.getLogger(InGameInputHandler.class.getName());
 
+    // A bunch of predefined non-closure runnables.
+    private final Runnable closeMenusRunnable = new Runnable() {
+            public void run() {
+                getGUI().closeMenus();
+            }
+        };
+    private final Runnable deselectActiveUnitRunnable = new Runnable() {
+            public void run() {
+                getGUI().setActiveUnit(null);
+            }
+        };
+    private final Runnable displayModelMessagesRunnable = new Runnable() {
+            public void run() {
+                igc().displayModelMessages(false);
+            }
+        };
+    private final Runnable reconnectRunnable = new Runnable() {
+            public void run() {
+                igc().reconnect();
+            }
+        };
+    private final Runnable showVictoryPanelRunnable = new Runnable() {
+            public void run() {
+                getGUI().showVictoryPanel();
+            }
+        };
+    private final Runnable updateMenuBarRunnable = new Runnable() {
+            public void run() {
+                getGUI().updateMenuBar();
+            }
+        };
+
+    /** The unit last appearing in an animation. */
     private Unit lastAnimatedUnit = null;
 
 
@@ -96,205 +143,46 @@ public final class InGameInputHandler extends InputHandler {
 
 
     /**
-     * Deals with incoming messages that have just been received.
+     * Shorthand to get the controller.
      *
-     * @param connection The <code>Connection</code> the message was received
-     *            on.
-     * @param element The root element of the message.
-     * @return The reply.
+     * @return The in-game controller.
      */
-    @Override
-    public Element handle(Connection connection, Element element) {
-        if (element == null) {
-            throw new RuntimeException("Received empty (null) message!");
-        }
+    private InGameController igc() {
+        return getFreeColClient().getInGameController();
+    }
 
-        Element reply;
-        String type = element.getTagName();
-        logger.log(Level.FINEST, "Received message: " + type);
-
-        if (type.equals("update")) {
-            reply = update(element);
-        } else if (type.equals("remove")) {
-            reply = remove(element);
-        } else if (type.equals("animateMove")) {
-            reply = animateMove(element);
-        } else if (type.equals("animateAttack")) {
-            reply = animateAttack(element);
-        } else if (type.equals("setCurrentPlayer")) {
-            reply = setCurrentPlayer(element);
-        } else if (type.equals("newTurn")) {
-            reply = newTurn(element);
-        } else if (type.equals("setDead")) {
-            reply = setDead(element);
-        } else if (type.equals("gameEnded")) {
-            reply = gameEnded(element);
-        } else if (type.equals("chat")) {
-            reply = chat(element);
-        } else if (type.equals("disconnect")) {
-            reply = disconnect(element);
-        } else if (type.equals("error")) {
-            reply = error(element);
-        } else if (type.equals("chooseFoundingFather")) {
-            reply = chooseFoundingFather(element);
-        } else if (type.equals("indianDemand")) {
-            reply = indianDemand(element);
-        } else if (type.equals("spyResult")) {
-            reply = spyResult(element);
-        } else if (type.equals("reconnect")) {
-            reply = reconnect(element);
-        } else if (type.equals("setAI")) {
-            reply = setAI(element);
-        } else if (type.equals("monarchAction")) {
-            reply = monarchAction(element);
-        } else if (type.equals("setStance")) {
-            reply = setStance(element);
-        } else if (type.equals("diplomacy")) {
-            reply = diplomacy(element);
-        } else if (type.equals("addPlayer")) {
-            reply = addPlayer(element);
-        } else if (type.equals("addObject")) {
-            reply = addObject(element);
-        } else if (type.equals("featureChange")) {
-            reply = featureChange(element);
-        } else if (type.equals("newLandName")) {
-            reply = newLandName(element);
-        } else if (type.equals("newRegionName")) {
-            reply = newRegionName(element);
-        } else if (type.equals("fountainOfYouth")) {
-            reply = fountainOfYouth(element);
-        } else if (type.equals("lootCargo")) {
-            reply = lootCargo(element);
-        } else if (type.equals("closeMenus")) {
-            reply = closeMenus();
-        } else if (type.equals("multiple")) {
-            reply = multiple(connection, element);
+    /**
+     * Wrapper for SwingUtilities.invokeAndWait.  This has to handle the
+     * case where we are already in the EDT.
+     *
+     * @param runnable A <code>Runnable</code> to run.
+     */
+    private void invokeAndWait(Runnable runnable) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            runnable.run();
         } else {
-            logger.warning("Unsupported message type: " + type);
-            return null;
+            try {
+                SwingUtilities.invokeAndWait(runnable);
+            } catch (Exception e) {}
         }
-        logger.log(Level.FINEST, "Handled message: " + type
-            + " replying with: "
-            + ((reply == null) ? "null" : reply.getTagName()));
+    }
 
-        final FreeColClient fcc = getFreeColClient();
-        if (Boolean.TRUE.toString().equals(element.getAttribute("flush"))
-            && fcc.currentPlayerIsMyPlayer()) {
-            SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        fcc.getInGameController().displayModelMessages(false);
+    /**
+     * Refresh the canvas.
+     *
+     * @param focus If true, request the focus.
+     */
+    private void refreshCanvas(final boolean focus) {
+        SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    getGUI().refresh();
+
+                    if (focus && !getGUI().isShowingSubPanel()) {
+                        getGUI().requestFocusInWindow();
                     }
-                });
-        }
-
-        return reply;
-    }
-
-    /**
-     * Handles an "reconnect"-message.
-     *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *            holds all the information.
-     */
-    private Element reconnect(Element element) {
-        logger.finest("Entered reconnect...");
-        if (new ShowConfirmDialogSwingTask(null,
-                StringTemplate.key("reconnect.text"),
-                "reconnect.yes", "reconnect.no").confirm()) {
-            logger.finest("User wants to reconnect, do it!");
-            new ReconnectSwingTask().invokeLater();
-        } else {
-            // This fairly drastic operation can be done in any thread,
-            // no need to use SwingUtilities.
-            logger.finest("No reconnect, quit.");
-            getFreeColClient().quit();
-        }
-        return null;
-    }
-
-    /**
-     * Handles an "update"-message.
-     *
-     * @param updateElement The element (root element in a DOM-parsed XML tree)
-     *            that holds all the information.
-     * @return The reply.
-     */
-    public Element update(Element updateElement) {
-        final Player player = getFreeColClient().getMyPlayer();
-        boolean visibilityChange = false;
-        NodeList nodeList = updateElement.getChildNodes();
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            Element element = (Element) nodeList.item(i);
-            String id = FreeColObject.readId(element);
-            FreeColGameObject fcgo = getGame().getFreeColGameObject(id);
-            if (fcgo == null) {
-                logger.warning("Update object not present in client: " + id);
-            } else {
-                fcgo.readFromXMLElement(element);
-            }
-            if ((fcgo instanceof Player && ((Player)fcgo == player))
-                || ((fcgo instanceof Settlement || fcgo instanceof Unit)
-                    && player.owns((Ownable)fcgo))) {
-                visibilityChange = true;//-vis(player)
-            }
-        }
-
-        if (visibilityChange) player.invalidateCanSeeTiles();//+vis(player)
-        new RefreshCanvasSwingTask().invokeLater();
-        return null;
-    }
-
-    /**
-     * Handles a "remove"-message.
-     *
-     * @param removeElement The element (root element in a DOM-parsed XML tree)
-     *            that holds all the information.
-     */
-    private Element remove(Element removeElement) {
-        Game game = getGame();
-        String ds = removeElement.getAttribute("divert");
-        FreeColGameObject divert = game.getFreeColGameObject(ds);
-        Player player = getFreeColClient().getMyPlayer();
-        boolean visibilityChange = false;
-        NodeList nodeList = removeElement.getChildNodes();
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            Element element = (Element) nodeList.item(i);
-            String idString = FreeColObject.readId(element);
-            FreeColGameObject fcgo = game.getFreeColGameObject(idString);
-            if (fcgo == null) {
-                logger.warning("Could not find FreeColGameObject: "
-                               + idString);
-            } else {
-                if (divert != null) {
-                    player.divertModelMessages(fcgo, divert);
                 }
-                if (fcgo instanceof Settlement) {
-                    player.removeSettlement((Settlement)fcgo);
-                    visibilityChange = true;//-vis(player)
-
-                } else if (fcgo instanceof Unit) {
-                    // Deselect the object if it is the current active unit.
-                    Unit u = (Unit)fcgo;
-                    if (u == getGUI().getActiveUnit()) {
-                        getGUI().setActiveUnit(null);
-                    }
-                    // Temporary hack until we have real containers.
-                    player.removeUnit(u);
-                    visibilityChange = true;//-vis(player)
-                }
-
-                // Do just the low level dispose that removes
-                // reference to this object in the client.  The other
-                // updates should have done the rest.
-                fcgo.fundamentalDispose();
-            }
-        }
-
-        if (visibilityChange) player.invalidateCanSeeTiles();//+vis(player)
-        new RefreshCanvasSwingTask().invokeLater();
-        return null;
+            });
     }
-
 
     /**
      * Select a child element with the given object identifier from a
@@ -302,7 +190,8 @@ public final class InGameInputHandler extends InputHandler {
      *
      * @param parent The parent <code>Element</code>.
      * @param key The key to search for.
-     * @return An <code>Element</code> with matching key, or null if none found.
+     * @return An <code>Element</code> with matching key,
+     *     or null if none found.
      */
     private static Element selectElement(Element parent, String key) {
         NodeList nodes = parent.getChildNodes();
@@ -330,75 +219,168 @@ public final class InGameInputHandler extends InputHandler {
         if (e != null) {
             u = new Unit(game, e);
             if (u.getLocation() == null) {
-                throw new IllegalStateException("NULL LOC: " + u);
-                /*String locId = e.getAttribute("location");
-                  if (locId.startsWith("unit:")) {
-                  selectUnitFromElement(game, element, locId);
-                  }*/
+                throw new IllegalStateException("Null location: " + u);
             }
         }
         return u;
     }
 
+
+    // Override InputHandler
+
     /**
-     * Handles an "animateMove"-message.  This only performs
-     * animation, if required.  It does not actually change unit
-     * positions, which happens in an "update".
+     * {@inheritDoc}
+     */
+    @Override
+    public Element handle(Connection connection, Element element) {
+        if (element == null) {
+            throw new RuntimeException("Received empty (null) message!");
+        }
+
+        Element reply;
+        String type = element.getTagName();
+        logger.log(Level.FINEST, "Received message: " + type);
+
+        if (type.equals("disconnect")) { // Inherited
+            reply = disconnect(element);
+        } else if (type.equals("addObject")) {
+            reply = addObject(element);
+        } else if (type.equals("addPlayer")) {
+            reply = addPlayer(element);
+        } else if (type.equals("animateAttack")) {
+            reply = animateAttack(element);
+        } else if (type.equals("animateMove")) {
+            reply = animateMove(element);
+        } else if (type.equals("chat")) {
+            reply = chat(element);
+        } else if (type.equals("chooseFoundingFather")) {
+            reply = chooseFoundingFather(element);
+        } else if (type.equals("closeMenus")) {
+            reply = closeMenus();
+        } else if (type.equals("diplomacy")) {
+            reply = diplomacy(element);
+        } else if (type.equals("error")) {
+            reply = error(element);
+        } else if (type.equals("featureChange")) {
+            reply = featureChange(element);
+        } else if (type.equals("fountainOfYouth")) {
+            reply = fountainOfYouth(element);
+        } else if (type.equals("gameEnded")) {
+            reply = gameEnded(element);
+        } else if (type.equals("indianDemand")) {
+            reply = indianDemand(element);
+        } else if (type.equals("lootCargo")) {
+            reply = lootCargo(element);
+        } else if (type.equals("monarchAction")) {
+            reply = monarchAction(element);
+        } else if (type.equals("multiple")) {
+            reply = multiple(connection, element);
+        } else if (type.equals("newLandName")) {
+            reply = newLandName(element);
+        } else if (type.equals("newRegionName")) {
+            reply = newRegionName(element);
+        } else if (type.equals("newTurn")) {
+            reply = newTurn(element);
+        } else if (type.equals("reconnect")) {
+            reply = reconnect(element);
+        } else if (type.equals("remove")) {
+            reply = remove(element);
+        } else if (type.equals("setAI")) {
+            reply = setAI(element);
+        } else if (type.equals("setCurrentPlayer")) {
+            reply = setCurrentPlayer(element);
+        } else if (type.equals("setDead")) {
+            reply = setDead(element);
+        } else if (type.equals("setStance")) {
+            reply = setStance(element);
+        } else if (type.equals("spyResult")) {
+            reply = spyResult(element);
+        } else if (type.equals("update")) {
+            reply = update(element);
+        } else {
+            logger.warning("Unsupported message type: " + type);
+            return null;
+        }
+        logger.log(Level.FINEST, "Handled message: " + type
+            + " replying with: "
+            + ((reply == null) ? "null" : reply.getTagName()));
+
+        // If there is a "flush" attribute present, encourage the client
+        // to display any new messages.
+        final FreeColClient fcc = getFreeColClient();
+        if (Boolean.TRUE.toString().equals(element.getAttribute("flush"))
+            && fcc.currentPlayerIsMyPlayer()) {
+            SwingUtilities.invokeLater(displayModelMessagesRunnable);
+        }
+
+        return reply;
+    }
+
+
+    // Individual message handlers
+
+    /**
+     * Add the objects which are the children of this Element.
      *
-     * @param element An element (root element in a DOM-parsed XML
-     *     tree) that holds attributes for the old and new tiles and
-     *     an element for the unit that is moving (which are used
-     *     solely to operate the animation).
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *            holds all the information.
      * @return Null.
      */
-    private Element animateMove(Element element) {
-        FreeColClient client = getFreeColClient();
-        if (client.isHeadless()) return null;
-
+    public Element addObject(Element element) {
         final Game game = getGame();
-        String unitId = element.getAttribute("unit");
-        Unit unit;
-        if (unitId == null
-            || ((unit = game.getFreeColGameObject(unitId, Unit.class)) == null
-                && (unit = selectUnitFromElement(game, element, unitId)) == null)) {
-            throw new IllegalStateException("Animation"
-                + " for: " + client.getMyPlayer().getId()
-                + " missing unit:" + unitId);
-        }
-
-        Player player = client.getMyPlayer();
-        String oldTileId = element.getAttribute("oldTile");
-        String newTileId = element.getAttribute("newTile");
-        Tile oldTile, newTile;
-        if (oldTileId == null
-            || (oldTile = game.getFreeColGameObject(oldTileId, Tile.class)) == null) {
-            throw new IllegalStateException("Animation for: " + player.getId()
-                + " missing oldTile: " + oldTileId);
-        }
-        if (newTileId == null
-            || (newTile = game.getFreeColGameObject(newTileId, Tile.class)) == null) {
-            throw new IllegalStateException("Animation for: " + player.getId()
-                + " missing newTile: " + newTileId);
-        }
-
-        if (getGUI().getAnimationSpeed(unit) > 0) {
-            // All is well, queue the animation.
-            // Use lastAnimatedUnit as a filter to avoid excessive refocussing.
-            try {
-                new UnitMoveAnimationCanvasSwingTask(unit, oldTile, newTile,
-                    unit != lastAnimatedUnit).invokeSpecial();
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "UnitMoveAnimation", e);
+        final Specification spec = game.getSpecification();
+        NodeList nodes = element.getChildNodes();
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Element e = (Element) nodes.item(i);
+            String owner = e.getAttribute("owner");
+            Player player = game.getFreeColGameObject(owner, Player.class);
+            if (player == null) {
+                logger.warning("addObject with broken owner: " + owner);
+                continue;
             }
+
+            final String tag = e.getTagName();
+            if (FoundingFather.getXMLElementTagName().equals(tag)) {
+                FoundingFather father = spec.getFoundingFather(FreeColObject.readId(e));
+                if (father != null) player.addFather(father);
+                player.invalidateCanSeeTiles();// Might be coronado?
+                
+            } else if (HistoryEvent.getXMLElementTagName().equals(tag)) {
+                player.getHistory().add(new HistoryEvent(e));
+
+            } else if (LastSale.getXMLElementTagName().equals(tag)) {
+                player.addLastSale(new LastSale(e));
+
+            } else if (ModelMessage.getXMLElementTagName().equals(tag)) {
+                player.addModelMessage(new ModelMessage(e));
+
+            } else if (TradeRoute.getXMLElementTagName().equals(tag)) {
+                player.getTradeRoutes().add(new TradeRoute(game, e));
+
+            } else {
+                logger.warning("addObject unrecognized: " + tag);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Handles an "addPlayer"-message.
+     *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *            holds all the information.
+     * @return Null.
+     */
+    private Element addPlayer(Element element) {
+        final Game game = getGame();
+        Element playerElement = (Element)element
+            .getElementsByTagName(Player.getXMLElementTagName()).item(0);
+        String id = FreeColObject.readId(playerElement);
+        if (game.getFreeColGameObject(id, Player.class) == null) {
+            game.addPlayer(new Player(game, playerElement));
         } else {
-            // Not animating, but if the centering option is enabled at least
-            // refocus so we can see the move happen.
-            if (!getGUI().onScreen(oldTile) && client.getClientOptions()
-                .getBoolean(ClientOptions.ALWAYS_CENTER)) {
-                getGUI().setFocus(oldTile);
-            }
+            game.getFreeColGameObject(id).readFromXMLElement(playerElement);
         }
-        lastAnimatedUnit = unit;
         return null;
     }
 
@@ -413,191 +395,153 @@ public final class InGameInputHandler extends InputHandler {
      * @return Null.
      */
     private Element animateAttack(Element element) {
-        FreeColClient client = getFreeColClient();
-        if (client.isHeadless()) return null;
+        FreeColClient freeColClient = getFreeColClient();
+        if (freeColClient.isHeadless()) return null;
         final Game game = getGame();
+        final Player player = freeColClient.getMyPlayer();
         String str;
-        Unit attacker, defender;
-        Tile attackerTile, defenderTile;
+        Unit u;
 
         if ((str = element.getAttribute("attacker")) == null) {
-            logger.warning("animateAttack null attacker");
-            return null;
-        } else {
-            if ((attacker = game.getFreeColGameObject(str, Unit.class)) == null
-                && (attacker = selectUnitFromElement(game, element, str)) == null) {
-                logger.warning("Attack animation"
-                    + " for: " + client.getMyPlayer().getId()
-                    + " incorrectly omitted attacker: " + str);
-                return null;
-            }
+            throw new IllegalStateException("Attack animation for: "
+                + player.getId() + " missing attacker attribute.");
         }
+        if ((u = game.getFreeColGameObject(str, Unit.class)) == null
+            && (u = selectUnitFromElement(game, element, str)) == null) {
+            throw new IllegalStateException("Attack animation for: "
+                + player.getId() + " omitted attacker: " + str);
+        }
+        final Unit attacker = u;
 
         if ((str = element.getAttribute("defender")) == null) {
-            logger.warning("animateAttack null defender");
-            return null;
-        } else {
-            if ((defender = game.getFreeColGameObject(str, Unit.class)) == null
-                && (defender = selectUnitFromElement(game, element, str)) == null) {
-                logger.warning("Attack animation"
-                    + " for: " + client.getMyPlayer().getId()
-                    + " incorrectly omitted defender: " + str);
-                return null;
-            }
+            throw new IllegalStateException("Attack animation for: "
+                + player.getId() + " missing defender attribute.");
         }
+        if ((u = game.getFreeColGameObject(str, Unit.class)) == null
+            && (u = selectUnitFromElement(game, element, str)) == null) {
+            throw new IllegalStateException("Attack animation for: "
+                + player.getId() + " omitted defender: " + str);
+        }
+        final Unit defender = u;
 
         if ((str = element.getAttribute("attackerTile")) == null) {
-            logger.warning("animateAttack null attackerTile");
-            return null;
-        } else {
-            attackerTile = game.getFreeColGameObject(str, Tile.class);
-            if (attackerTile == null) {
-                logger.warning("Attack animation"
-                    + " for: " + client.getMyPlayer().getId()
-                    + " can not find attacker tile: " + str);
-                return null;
-            }
+            throw new IllegalStateException("Attack animation for: "
+                + player.getId() + " missing attacker tile attribute.");
+        }
+        final Tile attackerTile = game.getFreeColGameObject(str, Tile.class);
+        if (attackerTile == null) {
+            throw new IllegalStateException("Attack animation for: "
+                + player.getId() + " omitted attacker tile: " + str);
         }
 
         if ((str = element.getAttribute("defenderTile")) == null) {
-            logger.warning("animateAttack null defenderTile");
-            return null;
-        } else {
-            defenderTile = game.getFreeColGameObject(str, Tile.class);
-            if (defenderTile == null) {
-                logger.warning("Attack animation"
-                    + " for: " + client.getMyPlayer().getId()
-                    + " can not find defender tile: " + str);
-                return null;
-            }
+            throw new IllegalStateException("Attack animation for: "
+                + player.getId() + " missing defender tile attribute.");
+        }
+        final Tile defenderTile = game.getFreeColGameObject(str, Tile.class);
+        if (defenderTile == null) {
+            throw new IllegalStateException("Attack animation for: "
+                + player.getId() + " omitted defender tile: " + str);
         }
 
-        boolean success = Boolean.parseBoolean(element.getAttribute("success"));
-        // All is well, queue the animation.
+        final boolean success
+            = Boolean.parseBoolean(element.getAttribute("success"));
+
+        // All is well, do the animation.
         // Use lastAnimatedUnit as a filter to avoid excessive refocussing.
-        try {
-            new UnitAttackAnimationCanvasSwingTask(attacker, defender,
-                attackerTile, defenderTile, success,
-                attacker != lastAnimatedUnit).invokeSpecial();
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Attack animation fail", e);
-        }
+        final boolean focus = lastAnimatedUnit != attacker;
         lastAnimatedUnit = attacker;
-        return null;
-    }
-
-    /**
-     * Handles a "setCurrentPlayer"-message.
-     *
-     * @param element The element (root element in a DOM-parsed XML
-     *            tree) that holds all the information.
-     * @return an <code>Element</code> value
-     */
-    private Element setCurrentPlayer(Element element) {
-        final FreeColClient fcc = getFreeColClient();
-        final Player player = fcc.getMyPlayer();
-        final Player newPlayer = getGame()
-            .getFreeColGameObject(element.getAttribute("player"), Player.class);
-        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
-            && fcc.currentPlayerIsMyPlayer()) closeMenus();
-        FreeColDebugger.finishDebugRun(fcc, false);
-        
-        fcc.getInGameController().setCurrentPlayer(newPlayer);
-        fcc.updateActions();
-
-        new RefreshCanvasSwingTask(true).invokeLater();
-        return null;
-    }
-
-    /**
-     * Handles a "newTurn"-message.
-     *
-     * @param element The element (root element in a DOM-parsed XML tree)
-     *            that holds all the information.
-     */
-    private Element newTurn(Element element) {
-        Game game = getGame();
-        String turnString = element.getAttribute("turn");
-        try {
-            int turnNumber = Integer.parseInt(turnString);
-            game.setTurn(new Turn(turnNumber));
-        } catch (NumberFormatException e) {
-            logger.warning("Bad turn in newTurn: " + turnString);
-        }
-        Turn currTurn = game.getTurn();
-
-        // plays an alert sound on each new turn if the option for it
-        // is turned on
-        if (getFreeColClient().getClientOptions()
-            .getBoolean(ClientOptions.AUDIO_ALERTS)) {
-            getGUI().playSound("sound.event.alertSound");
-        }
-
-
-        if (currTurn.isFirstSeasonTurn()) {
-            new ShowInformationMessageSwingTask(
-                StringTemplate.template("twoTurnsPerYear")
-                    .addName("%year%", Integer.toString(currTurn.getYear())))
-                .invokeLater();
-        }
-        new UpdateMenuBarSwingTask().invokeLater();
-        return null;
-    }
-
-    /**
-     * Handles a "setDead"-message.
-     *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *            holds all the information.
-     */
-    private Element setDead(Element element) {
-        FreeColClient freeColClient = getFreeColClient();
-        Player player = getGame().getFreeColGameObject(element.getAttribute("player"),
-                                                       Player.class);
-        Player myPlayer = freeColClient.getMyPlayer();
-        if (player == myPlayer) {
-            FreeColDebugger.finishDebugRun(freeColClient, true);
-            if (freeColClient.isSinglePlayer()) {
-                if (myPlayer.getPlayerType() == Player.PlayerType.RETIRED) {
-                    ; // Do nothing, retire routine will quit
-                } else if (myPlayer.getPlayerType() != Player.PlayerType.UNDEAD
-                    && new ShowConfirmDialogSwingTask(null,
-                        StringTemplate.key("defeatedSinglePlayer.text"),
-                        "defeatedSinglePlayer.yes",
-                        "defeatedSinglePlayer.no").confirm()) {
-                    freeColClient.askServer().enterRevengeMode();
-                } else {
-                    freeColClient.quit();
+        invokeAndWait(new Runnable() {
+                public void run() {
+                    if (focus || !getGUI().onScreen(attackerTile)
+                        || !getGUI().onScreen(defenderTile)) {
+                        getGUI().setFocusImmediately(attackerTile);
+                    }
+                    getGUI().animateUnitAttack(attacker, defender,
+                        attackerTile, defenderTile, success);
+                    refreshCanvas(false);
                 }
-            } else {
-                if (!new ShowConfirmDialogSwingTask(null,
-                        StringTemplate.key("defeated.text"),
-                        "defeated.yes", "defeated.no").confirm()) {
-                    freeColClient.quit();
-                }
-            }
-        } else {
-            myPlayer.setStance(player, null);
-        }
-
+            });
         return null;
     }
 
     /**
-     * Handles a "gameEnded"-message.
+     * Handles an "animateMove"-message.  This only performs
+     * animation, if required.  It does not actually change unit
+     * positions, which happens in an "update".
      *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *            holds all the information.
+     * @param element An element (root element in a DOM-parsed XML
+     *     tree) that holds attributes for the old and new tiles and
+     *     an element for the unit that is moving (which are used
+     *     solely to operate the animation).
+     * @return Null.
      */
-    private Element gameEnded(Element element) {
+    private Element animateMove(Element element) {
         FreeColClient freeColClient = getFreeColClient();
-        FreeColDebugger.finishDebugRun(freeColClient, true);
-        String str = element.getAttribute("winner");
-        Player winner = (str == null) ? null
-            : getGame().getFreeColGameObject(str, Player.class);
-        if (winner == freeColClient.getMyPlayer()) {
-            new ShowVictoryPanelSwingTask().invokeLater();
-        } // else: The client has already received the message of defeat.
+        if (freeColClient.isHeadless()) return null;
+        final Game game = getGame();
+        final Player player = freeColClient.getMyPlayer();
+
+        String unitId = element.getAttribute("unit");
+        if (unitId == null) {
+            throw new IllegalStateException("Animation for: " + player.getId()
+                + " missing unitId.");
+        }
+        Unit u = game.getFreeColGameObject(unitId, Unit.class);
+        if (u == null) u = selectUnitFromElement(game, element, unitId);
+        if (u == null) {
+            throw new IllegalStateException("Animation for: " + player.getId()
+                + " missing unit:" + unitId);
+        }
+        final Unit unit = u;
+
+        String oldTileId = element.getAttribute("oldTile");
+        if (oldTileId == null) {
+            throw new IllegalStateException("Animation for: " + player.getId()
+                + " missing oldTileId");
+        }
+        final Tile oldTile = game.getFreeColGameObject(oldTileId, Tile.class);
+        if (oldTile == null) {
+            throw new IllegalStateException("Animation for: " + player.getId()
+                + " missing oldTile: " + oldTileId);
+        }
+
+        String newTileId = element.getAttribute("newTile");
+        if (newTileId == null) {
+            throw new IllegalStateException("Animation for: " + player.getId()
+                + " missing newTileId");
+        }
+        final Tile newTile = game.getFreeColGameObject(newTileId, Tile.class);
+        if (newTile == null) {
+            throw new IllegalStateException("Animation for: " + player.getId()
+                + " missing newTile: " + newTileId);
+        }
+
+        final boolean focus = unit != lastAnimatedUnit;
+        lastAnimatedUnit = unit;
+        invokeAndWait(new Runnable() {
+                public void run() {
+                    if (getGUI().getAnimationSpeed(unit) > 0) {
+                        // All is well, queue the animation.  Use
+                        // lastAnimatedUnit as a filter to avoid
+                        // excessive refocussing.
+                        if (focus || !getGUI().onScreen(oldTile)) {
+                            getGUI().setFocusImmediately(oldTile);
+                        }
+                        getGUI().animateUnitMove(unit, oldTile, newTile);
+                        refreshCanvas(false);
+                    } else {
+                        // Not animating, but if the centering
+                        // option is enabled at least refocus so
+                        // we can see the move happen.
+                        if (!getGUI().onScreen(oldTile)
+                            && getFreeColClient().getClientOptions()
+                            .getBoolean(ClientOptions.ALWAYS_CENTER)) {
+                            getGUI().setFocus(oldTile);
+                        }
+                    }
+                }
+            });
         return null;
     }
 
@@ -606,6 +550,7 @@ public final class InGameInputHandler extends InputHandler {
      *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information.
+     * @return Null.
      */
     private Element chat(Element element) {
         final Game game = getGame();
@@ -622,53 +567,40 @@ public final class InGameInputHandler extends InputHandler {
     }
 
     /**
-     * Handles an "error"-message.
-     *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *            holds all the information.
-     */
-    private Element error(Element element) {
-        try {
-            new ShowErrorMessageSwingTask(element.getAttribute("messageID"),
-                                          element.getAttribute("message"))
-                .invokeSpecial();
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "error() raised exception", e);
-        }
-        return null;
-    }
-
-    /**
-     * Handles a "setAI"-message.
-     *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *            holds all the information.
-     */
-    private Element setAI(Element element) {
-
-        Player p = getGame().getFreeColGameObject(element.getAttribute("player"),
-                                                  Player.class);
-        p.setAI(Boolean.valueOf(element.getAttribute("ai")).booleanValue());
-
-        return null;
-    }
-
-    /**
      * Handles an "chooseFoundingFather"-request.
      *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information.
+     * @return A <code>ChooseFoundingFatherMessage</code> containing the
+     *     response.
      */
     private Element chooseFoundingFather(Element element) {
-        ChooseFoundingFatherMessage message
+        final ChooseFoundingFatherMessage message
             = new ChooseFoundingFatherMessage(getGame(), element);
-        List<FoundingFather> ffs = message.getFathers();
-        FoundingFather ff = getGUI().showChooseFoundingFatherDialog(ffs);
-        if (ff != null) {
-            message.setResult(ff);
-            getFreeColClient().getMyPlayer().setCurrentFather(ff);
-        }
+        final List<FoundingFather> ffs = message.getFathers();
+
+        invokeAndWait(new Runnable() {
+                public void run() {
+                    FoundingFather ff = igc().chooseFoundingFather(ffs);
+                    if (ff != null) message.setResult(ff);
+                }
+            });
         return message.toXMLElement();
+    }
+
+    /**
+     * Trivial handler to allow the server to signal to the client
+     * that an offer that caused a popup (for example, a native demand
+     * or diplomacy proposal) has not been answered quickly enough and
+     * that the offering player has assumed this player has
+     * refused-by-inaction, and therefore, the popup needs to be
+     * closed.
+     *
+     * @return Null.
+     */
+    public Element closeMenus() {
+        invokeAndWait(closeMenusRunnable);
+        return null;
     }
 
     /**
@@ -682,306 +614,33 @@ public final class InGameInputHandler extends InputHandler {
      * @return A diplomacy response, or null if none required.
      */
     private Element diplomacy(Element element) {
-        Player player = getFreeColClient().getMyPlayer();
-        DiplomacyMessage message = new DiplomacyMessage(getGame(), element);
-        Unit unit = message.getUnit();
+        final DiplomacyMessage message
+            = new DiplomacyMessage(getGame(), element);
+
+        final Unit unit = message.getUnit();
         if (unit == null) {
             logger.warning("Unit omitted from diplomacy message.");
             return null;
         }
-        Settlement settlement = message.getSettlement();
+
+        final Settlement settlement = message.getSettlement();
         if (settlement == null) {
             logger.warning("Settlement omitted from diplomacy message.");
             return null;
         }
-        Player other = (player.owns(unit)) ? settlement.getOwner()
-            : unit.getOwner();
-        String nation = Messages.message(other.getNationName());
-        DiplomaticTrade agreement = message.getAgreement();
 
-        switch (agreement.getStatus()) {
-        case ACCEPT_TRADE:
-            boolean visibilityChange = false;
-            for (Colony c : agreement.getColoniesGivenBy(player)) {
-                player.removeSettlement(c);//-vis(player)
-                visibilityChange = true;
-            }
-            for (Unit u : agreement.getUnitsGivenBy(player)) {
-                player.removeUnit(u);//-vis(player)
-                visibilityChange = true;
-            }
-            if (visibilityChange) player.invalidateCanSeeTiles();//+vis(player)
-            new ShowInformationMessageSwingTask(StringTemplate
-                .template("negotiationDialog.offerAccepted")
-                    .addName("%nation%", nation)).show();
-            new UpdateMenuBarSwingTask().invokeLater();
-            break;
-        case REJECT_TRADE:
-            new ShowInformationMessageSwingTask(StringTemplate
-                .template("negotiationDialog.offerRejected")
-                    .addName("%nation%", nation)).show();
-            new UpdateMenuBarSwingTask().invokeLater();
-            break;
-        case PROPOSE_TRADE:
-            DiplomaticTrade ourAgreement
-                = getGUI().showNegotiationDialog(unit, settlement, agreement);
-            if (ourAgreement == null) {
-                agreement.setStatus(TradeStatus.REJECT_TRADE);
-            } else {
-                agreement = ourAgreement;
-            }
-            return new DiplomacyMessage(unit, settlement, agreement)
+        final DiplomaticTrade agreement = message.getAgreement();
+
+        invokeAndWait(new Runnable() {
+                public void run() {
+                    message.setAgreement(igc().diplomacy(unit, settlement,
+                                                         agreement));
+                }
+            });
+        SwingUtilities.invokeLater(updateMenuBarRunnable);
+        return (message.getAgreement() == null) ? null
+            : new DiplomacyMessage(unit, settlement, message.getAgreement())
                 .toXMLElement();
-        default:
-            logger.warning("Bogus trade status: " + agreement.getStatus());
-            break;
-        }
-        return null;
-    }
-
-    /**
-     * Handles an "indianDemand"-request.
-     *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *            holds all the information.
-     */
-    private Element indianDemand(Element element) {
-        Game game = getGame();
-        Player player = getFreeColClient().getMyPlayer();
-        IndianDemandMessage message = new IndianDemandMessage(game, element);
-
-        Unit unit = message.getUnit(game);
-        if (unit == null) {
-            logger.warning("IndianDemand with null unit: " + element.getAttribute("unit"));
-            return null;
-        }
-        Colony colony = message.getColony(game);
-        if (colony == null) {
-            logger.warning("IndianDemand with null colony: " + element.getAttribute("colony"));
-            return null;
-        } else if (!player.owns(colony)) {
-            throw new IllegalArgumentException("Demand to anothers colony");
-        }
-        boolean accepted;
-        ModelMessage m = null;
-        GoodsType type = message.getType(game);
-        int amount = message.getAmount();
-        String nation = Messages.message(unit.getOwner().getNationName());
-        int opt = getFreeColClient().getClientOptions()
-            .getInteger(ClientOptions.INDIAN_DEMAND_RESPONSE);
-        if (type == null) {
-            switch (opt) {
-            case ClientOptions.INDIAN_DEMAND_RESPONSE_ASK:
-                accepted = new ShowConfirmDialogSwingTask(colony.getTile(),
-                    StringTemplate.template("indianDemand.gold.text")
-                        .addName("%nation%", nation)
-                        .addName("%colony%", colony.getName())
-                        .addAmount("%amount%", amount),
-                    "indianDemand.gold.yes",
-                    "indianDemand.gold.no").confirm();
-                break;
-            case ClientOptions.INDIAN_DEMAND_RESPONSE_ACCEPT:
-                m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
-                    "indianDemand.gold.text", colony, unit)
-                    .addName("%nation%", nation)
-                    .addName("%colony%", colony.getName())
-                    .addAmount("%amount%", amount);
-                accepted = true;
-                break;
-            case ClientOptions.INDIAN_DEMAND_RESPONSE_REJECT:
-                m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
-                    "indianDemand.gold.text", colony, unit)
-                    .addName("%nation%", nation)
-                    .addName("%colony%", colony.getName())
-                    .addAmount("%amount%", amount);
-                accepted = false;
-                break;
-            default:
-                throw new IllegalArgumentException("Impossible option value.");
-            }
-        } else {
-            switch (opt) {
-            case ClientOptions.INDIAN_DEMAND_RESPONSE_ASK:
-                if (type.isFoodType()) {
-                    accepted = new ShowConfirmDialogSwingTask(colony.getTile(),
-                        StringTemplate.template("indianDemand.food.text")
-                            .addName("%nation%", nation)
-                            .addName("%colony%", colony.getName())
-                            .addAmount("%amount%", amount),
-                        "indianDemand.food.yes",
-                        "indianDemand.food.no").confirm();
-                } else {
-                    accepted = new ShowConfirmDialogSwingTask(colony.getTile(),
-                        StringTemplate.template("indianDemand.other.text")
-                            .addName("%nation%", nation)
-                            .addName("%colony%", colony.getName())
-                            .addAmount("%amount%", amount)
-                            .add("%goods%", type.getNameKey()),
-                        "indianDemand.other.yes",
-                        "indianDemand.other.no").confirm();
-                }
-                break;
-            case ClientOptions.INDIAN_DEMAND_RESPONSE_ACCEPT:
-                if (type.isFoodType()) {
-                    m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
-                        "indianDemand.food.text", colony, unit)
-                        .addName("%nation%", nation)
-                        .addName("%colony%", colony.getName())
-                        .addAmount("%amount%", amount);
-                } else {
-                    m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
-                        "indianDemand.other.text", colony, unit)
-                        .addName("%nation%", nation)
-                        .addName("%colony%", colony.getName())
-                        .addAmount("%amount%", amount)
-                        .add("%goods%", type.getNameKey());
-                }
-                accepted = true;
-                break;
-            case ClientOptions.INDIAN_DEMAND_RESPONSE_REJECT:
-                if (type.isFoodType()) {
-                    m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
-                        "indianDemand.food.text", colony, unit)
-                        .addName("%nation%", nation)
-                        .addName("%colony%", colony.getName())
-                        .addAmount("%amount%", amount);
-                } else {
-                    m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
-                        "indianDemand.other.text", colony, unit)
-                        .addName("%nation%", nation)
-                        .addName("%colony%", colony.getName())
-                        .addAmount("%amount%", amount)
-                        .add("%goods%", type.getNameKey());
-                }
-                accepted = false;
-                break;
-            default:
-                throw new IllegalArgumentException("Impossible option value.");
-            }
-        }
-        if (m != null) {
-            player.addModelMessage(m);
-            getFreeColClient().getInGameController().nextModelMessage();
-        }
-        message.setResult(accepted);
-        return message.toXMLElement();
-    }
-
-    /**
-     * Handles a "spyResult" message.
-     *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *            holds all the information.
-     */
-    private Element spyResult(Element element) {
-        // The element contains two children, being the full and
-        // normal versions of the settlement-being-spied-upon's tile.
-        // It has to be the tile, as otherwise we do not see the units
-        // defending the settlement.  So, we have to unpack, update
-        // with the first, display, then update with the second.  This
-        // is hacky as the client could retain the settlement
-        // information, but the potential abuses are limited.
-        NodeList nodeList = element.getChildNodes();
-        if (nodeList.getLength() != 2) {
-            logger.warning("spyResult length = " + nodeList.getLength());
-            return null;
-        }
-        Game game = getGame();
-        final Element fullTile = (Element) nodeList.item(0);
-        final Element normalTile = (Element) nodeList.item(1);
-        String tileId = element.getAttribute("tile");
-        final Tile tile = game.getFreeColGameObject(tileId, Tile.class);
-        if (tile == null) {
-            logger.warning("spyResult bad tile = " + tileId);
-            return null;
-        }
-        tile.readFromXMLElement(fullTile);
-        Colony colony = tile.getColony();
-        if (colony == null) {
-            tile.readFromXMLElement(normalTile);
-        } else {
-            new SpyColonySwingTask(colony, normalTile).invokeLater();
-        }
-        return null;
-    }
-
-
-    /**
-     * Handles a "monarchAction"-request.
-     *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *            holds all the information.
-     */
-    private Element monarchAction(Element element) {
-        Game game = getGame();
-        MonarchActionMessage message = new MonarchActionMessage(game, element);
-        MonarchAction action = message.getAction();
-        boolean accept = new ShowMonarchSwingTask(action,
-            message.getTemplate()).confirm();
-        message.setResult(accept);
-
-        Element reply; // Some actions require an answer.
-        switch (action) {
-        case RAISE_TAX_ACT: case RAISE_TAX_WAR: case OFFER_MERCENARIES:
-            reply = message.toXMLElement();
-            break;
-        default:
-            reply = null;
-            break;
-        }
-
-        new UpdateMenuBarSwingTask().invokeLater();
-        return reply;
-    }
-
-    /**
-     * Handles a "setStance"-request.
-     *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *            holds all the information.
-     */
-    private Element setStance(Element element) {
-        final FreeColClient freeColClient = getFreeColClient();
-        Player player = freeColClient.getMyPlayer();
-        Game game = getGame();
-        Stance stance = Enum.valueOf(Stance.class, element.getAttribute("stance"));
-        Player first = game.getFreeColGameObject(element.getAttribute("first"),
-                                                 Player.class);
-        Player second = game.getFreeColGameObject(element.getAttribute("second"),
-                                                  Player.class);
-
-        Stance old = first.getStance(second);
-        try {
-            first.setStance(second, stance);
-        } catch (IllegalStateException e) {
-            logger.log(Level.WARNING, "Illegal stance transition", e);
-            return null;
-        }
-        logger.info("Stance transition: " + old.toString()
-            + " -> " + stance.toString());
-        if (player == first && old == Stance.UNCONTACTED) {
-            getGUI().playSound("sound.event.meet." + second.getNationId());
-        }
-        return null;
-    }
-
-    /**
-     * Handles an "addPlayer"-message.
-     *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *            holds all the information.
-     */
-    private Element addPlayer(Element element) {
-        Element playerElement = (Element) element.getElementsByTagName(Player.getXMLElementTagName()).item(0);
-        Game game = getGame();
-        String id = FreeColObject.readId(playerElement);
-        if (game.getFreeColGameObject(id, Player.class) == null) {
-            game.addPlayer(new Player(game, playerElement));
-        } else {
-            game.getFreeColGameObject(id).readFromXMLElement(playerElement);
-        }
-
-        return null;
     }
 
     /**
@@ -990,6 +649,7 @@ public final class InGameInputHandler extends InputHandler {
      *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information.
+     * @return Null.
      */
     public Element disposeUnits(Element element) {
         Game game = getGame();
@@ -1013,46 +673,21 @@ public final class InGameInputHandler extends InputHandler {
     }
 
     /**
-     * Add the objects which are the children of this Element.
+     * Handles an "error"-message.
      *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information.
+     * @return Null.
      */
-    public Element addObject(Element element) {
-        Game game = getGame();
-        Specification spec = game.getSpecification();
-        NodeList nodes = element.getChildNodes();
-        for (int i = 0; i < nodes.getLength(); i++) {
-            Element e = (Element) nodes.item(i);
-            String owner = e.getAttribute("owner");
-            Player player = game.getFreeColGameObject(owner, Player.class);
-            if (player == null) {
-                logger.warning("addObject with broken owner: " + owner);
-                continue;
-            }
+    private Element error(Element element) {
+        final String messageId = element.getAttribute("messageID");
+        final String message = element.getAttribute("message");
 
-            final String tag = e.getTagName();
-            if (FoundingFather.getXMLElementTagName() == tag) {
-                FoundingFather father = spec.getFoundingFather(FreeColObject.readId(e));
-                if (father != null) player.addFather(father);
-                player.invalidateCanSeeTiles();// Might be coronado?
-                
-            } else if (HistoryEvent.getXMLElementTagName() == tag) {
-                player.getHistory().add(new HistoryEvent(e));
-
-            } else if (LastSale.getXMLElementTagName() == tag) {
-                player.addLastSale(new LastSale(e));
-
-            } else if (ModelMessage.getXMLElementTagName() == tag) {
-                player.addModelMessage(new ModelMessage(e));
-
-            } else if (TradeRoute.getXMLElementTagName() == tag) {
-                player.getTradeRoutes().add(new TradeRoute(game, e));
-
-            } else {
-                logger.warning("addObject unrecognized: " + tag);
-            }
-        }
+        SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    getGUI().errorMessage(messageId, message);
+                }
+            });
         return null;
     }
 
@@ -1061,10 +696,11 @@ public final class InGameInputHandler extends InputHandler {
      *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information.
+     * @return Null.
      */
     public Element featureChange(Element element) {
-        Game game = getGame();
-        Specification spec = game.getSpecification();
+        final Game game = getGame();
+        final Specification spec = game.getSpecification();
         boolean add = "add".equalsIgnoreCase(element.getAttribute("add"));
         String id = FreeColObject.readId(element);
         FreeColGameObject object = game.getFreeColGameObject(id);
@@ -1078,14 +714,14 @@ public final class InGameInputHandler extends InputHandler {
             Element e = (Element) nodes.item(i);
 
             final String tag = e.getTagName();
-            if (Ability.getXMLElementTagName() == tag) {
+            if (Ability.getXMLElementTagName().equals(tag)) {
                 if (add) {
                     object.addAbility(new Ability(e, spec));
                 } else {
                     object.removeAbility(new Ability(e, spec));
                 }
 
-            } else if (Modifier.getXMLElementTagName() == tag) {
+            } else if (Modifier.getXMLElementTagName().equals(tag)) {
                 if (add) {
                     object.addModifier(new Modifier(e, spec));
                 } else {
@@ -1099,54 +735,12 @@ public final class InGameInputHandler extends InputHandler {
         return null;
     }
 
-
-
-    /**
-     * Ask the player to name the new land.
-     *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *            holds all the information.
-     */
-    public Element newLandName(Element element) {
-        Game game = getGame();
-        NewLandNameMessage message = new NewLandNameMessage(game, element);
-        Unit unit = message.getUnit(game);
-        String defaultName = message.getNewLandName();
-        if (unit == null || defaultName == null
-            || !unit.hasTile()) return null;
-
-        // Offer to name the land.
-        new NewLandNameSwingTask(unit, defaultName, message.getWelcomer(game),
-            message.getCamps()).invokeLater();
-        return null;
-    }
-
-    /**
-     * Ask the player to name a new region.
-     *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *            holds all the information.
-     */
-    public Element newRegionName(Element element) {
-        Game game = getGame();
-        NewRegionNameMessage message = new NewRegionNameMessage(game, element);
-        String name = message.getNewRegionName();
-        Region region = message.getRegion(game);
-        Tile tile = message.getTile(game);
-        Unit unit = message.getUnit(game);
-        if (name == null || region == null) return null;
-
-        // Offer to name the region.
-        new NewRegionNameSwingTask(tile, unit, region,
-                                   message.getNewRegionName()).invokeLater();
-        return null;
-    }
-
     /**
      * Ask the player to choose migrants from a fountain of youth event.
      *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information.
+     * @return Null.
      */
     public Element fountainOfYouth(Element element) {
         String migrants = element.getAttribute("migrants");
@@ -1154,11 +748,10 @@ public final class InGameInputHandler extends InputHandler {
         try {
             n = Integer.parseInt(migrants);
         } catch (NumberFormatException e) {
+            logger.warning("Invalid foY migrant count: " + migrants);
             n = -1;
         }
         if (n > 0) {
-            // Without Brewster, the migrants have already been selected
-            // and were updated to the European docks by the server.
             final int m = n;
             SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
@@ -1173,35 +766,118 @@ public final class InGameInputHandler extends InputHandler {
     }
 
     /**
+     * Handles a "gameEnded"-message.
+     *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *            holds all the information.
+     * @return Null.
+     */
+    private Element gameEnded(Element element) {
+        FreeColClient freeColClient = getFreeColClient();
+        FreeColDebugger.finishDebugRun(freeColClient, true);
+        final Player winner
+            = getGame().getFreeColGameObject(element.getAttribute("winner"),
+                                             Player.class);
+
+        if (winner == freeColClient.getMyPlayer()) {
+            SwingUtilities.invokeLater(showVictoryPanelRunnable);
+        } // else: The client has already received the message of defeat.
+        return null;
+    }
+
+    /**
+     * Handles an "indianDemand"-request.
+     *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *            holds all the information.
+     * @return An <code>IndianDemand</code> message containing the response,
+     *     or null on error.
+     */
+    private Element indianDemand(Element element) {
+        final Game game = getGame();
+        final Player player = getFreeColClient().getMyPlayer();
+        final IndianDemandMessage message
+            = new IndianDemandMessage(game, element);
+
+        final Unit unit = message.getUnit(game);
+        if (unit == null) {
+            logger.warning("IndianDemand with null unit: "
+                + element.getAttribute("unit"));
+            return null;
+        }
+
+        final Colony colony = message.getColony(game);
+        if (colony == null) {
+            logger.warning("IndianDemand with null colony: "
+                + element.getAttribute("colony"));
+            return null;
+        } else if (!player.owns(colony)) {
+            throw new IllegalArgumentException("Demand to anothers colony");
+        }
+
+        invokeAndWait(new Runnable() {
+                public void run() {
+                    boolean accepted = igc().indianDemand(unit, colony,
+                        message.getType(game), message.getAmount());
+                    message.setResult(accepted);
+                }
+            });
+        return message.toXMLElement();
+    }
+
+    /**
      * Ask the player to choose something to loot.
      *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information.
      */
     public Element lootCargo(Element element) {
-        Game game = getGame();
-        LootCargoMessage message = new LootCargoMessage(game, element);
-        Unit unit = message.getUnit(game);
-        List<Goods> goods = message.getGoods();
+        final Game game = getGame();
+        final LootCargoMessage message = new LootCargoMessage(game, element);
+        final Unit unit = message.getUnit(game);
+        final String defenderId = message.getDefenderId();
+        final List<Goods> goods = message.getGoods();
         if (unit == null || goods == null) return null;
-        new LootCargoSwingTask(unit, message.getDefenderId(), goods)
-            .invokeLater();
+
+        SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    igc().lootCargo(unit, goods, defenderId);
+                }
+            });
         return null;
     }
 
     /**
-     * Trivial handler to allow the server to signal to the client
-     * that an offer that caused a popup (for example, a native demand
-     * or diplomacy proposal) has not been answered quickly enough and
-     * that the offering player has assumed this player has
-     * refused-by-inaction, and therefore, the popup needs to be
-     * closed.
+     * Handles a "monarchAction"-request.
      *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *            holds all the information.
      * @return Null.
      */
-    public Element closeMenus() {
-        getGUI().closeMenus();
-        return null;
+    private Element monarchAction(Element element) {
+        final Game game = getGame();
+        final MonarchActionMessage message
+            = new MonarchActionMessage(game, element);
+        final MonarchAction action = message.getAction();
+
+        invokeAndWait(new Runnable() {
+                public void run() {
+                    boolean accept
+                        = igc().monarchAction(action, message.getTemplate());
+                    message.setResult(accept);
+                }
+            });
+        Element reply = null; // Not all actions require an answer.
+        switch (action) {
+        case RAISE_TAX_ACT: case RAISE_TAX_WAR: case OFFER_MERCENARIES:
+            reply = message.toXMLElement();
+            break;
+        default:
+            break;
+        }
+
+        SwingUtilities.invokeLater(updateMenuBarRunnable);
+        return reply;
     }
 
     /**
@@ -1228,707 +904,299 @@ public final class InGameInputHandler extends InputHandler {
     }
 
     /**
+     * Ask the player to name the new land.
      *
-     * Handler methods end here.
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *            holds all the information.
+     * @return Null.
+     */
+    public Element newLandName(Element element) {
+        final Game game = getGame();
+        NewLandNameMessage message = new NewLandNameMessage(game, element);
+        final Unit unit = message.getUnit(game);
+        final String defaultName = message.getNewLandName();
+        if (unit == null || defaultName == null 
+            || !unit.hasTile()) return null;
+        final Player welcomer = message.getWelcomer(game);
+        final String camps = message.getCamps();
+
+        SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    igc().nameNewLand(unit, defaultName, welcomer, camps);
+                }
+            });
+        return null;
+    }
+
+    /**
+     * Ask the player to name a new region.
      *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *            holds all the information.
+     * @return Null.
      */
+    public Element newRegionName(Element element) {
+        final Game game = getGame();
+        NewRegionNameMessage message = new NewRegionNameMessage(game, element);
+        final Tile tile = message.getTile(game);
+        final Unit unit = message.getUnit(game);
+        final Region region = message.getRegion(game);
+        final String defaultName = message.getNewRegionName();
+        if (defaultName == null || region == null) return null;
 
-    /**
-     * This utility class is the base class for tasks that need to run in the
-     * event dispatch thread.
-     */
-    static abstract class SwingTask implements Runnable {
-        private static final Logger taskLogger = Logger.getLogger(SwingTask.class.getName());
-
-
-        /**
-         * Run the task and wait for it to complete.
-         *
-         * @return return value from {@link #doWork()}.
-         * @throws InvocationTargetException on unexpected exceptions.
-         */
-        public Object invokeAndWait() throws InvocationTargetException {
-            verifyNotStarted();
-            markStarted(true);
-            try {
-                SwingUtilities.invokeAndWait(this);
-            } catch (InterruptedException e) {
-                throw new InvocationTargetException(e);
-            }
-            return _result;
-        }
-
-        /**
-         * Run the task at some later time. Any exceptions will occur in the
-         * event dispatch thread. The return value will be set, but at present
-         * there is no good way to know if it is valid yet.
-         */
-        public void invokeLater() {
-            verifyNotStarted();
-            markStarted(false);
-            SwingUtilities.invokeLater(this);
-        }
-
-        /*
-         * Some calls can be required from both within the EventDispatchThread
-         * (when the client controller calls InGameInputHandler.handle() with
-         * replies to its requests to the server), and from outside of the
-         * thread when handling other player moves. The former case must be done
-         * right now, the latter needs to be queued and waited for.
-         */
-        public Object invokeSpecial() throws InvocationTargetException {
-            return (SwingUtilities.isEventDispatchThread())
-                ? doWork()
-                : invokeAndWait();
-        }
-
-        /**
-         * Mark started and set the synchronous flag.
-         *
-         * @param synchronous The synch/asynch flag.
-         */
-        private synchronized void markStarted(boolean synchronous) {
-            _synchronous = synchronous;
-            _started = true;
-        }
-
-        /**
-         * Mark finished.
-         */
-        private synchronized void markDone() {
-            _started = false;
-        }
-
-        /**
-         * Throw an exception if the task is started.
-         */
-        private synchronized void verifyNotStarted() {
-            if (_started) {
-                throw new IllegalStateException("Swing task already started!");
-            }
-        }
-
-        /**
-         * Check if the client is waiting.
-         *
-         * @return true if client is waiting for a result.
-         */
-        private synchronized boolean isSynchronous() {
-            return _synchronous;
-        }
-
-        /**
-         * Run method, call {@link #doWork()} and save the return value. Also
-         * catch any exceptions. In synchronous mode they will be rethrown to
-         * the original thread, in asynchronous mode they will be logged and
-         * ignored. Nothing is gained by crashing the event dispatch thread.
-         */
-        public final void run() {
-            try {
-                taskLogger.log(Level.FINEST, "Running Swing task "
-                               + getClass().getName() + "...");
-
-                setResult(doWork());
-
-                taskLogger.log(Level.FINEST, "Swing task "
-                               + getClass().getName()
-                               + " returned " + _result);
-            } catch (RuntimeException e) {
-                taskLogger.log(Level.WARNING, "Swing task "
-                               + getClass().getName() + " failed!", e);
-                // Let the exception bubble up if the calling thread is waiting
-                if (isSynchronous()) {
-                    throw e;
+        SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    igc().nameNewRegion(tile, unit, region, defaultName);
                 }
-            } finally {
-                markDone();
-            }
-        }
-
-        /**
-         * Get the return vale from {@link #doWork()}.
-         *
-         * @return result.
-         */
-        public synchronized Object getResult() {
-            return _result;
-        }
-
-        /**
-         * Save result.
-         *
-         * @param r The result.
-         */
-        private synchronized void setResult(Object r) {
-            _result = r;
-        }
-
-        /**
-         * Override this method to do the actual work.
-         *
-         * @return result.
-         */
-        protected abstract Object doWork();
-
-
-        private Object _result;
-
-        private boolean _synchronous;
-
-        private boolean _started;
+            });
+        return null;
     }
 
     /**
-     * Base class for Swing tasks that need to do a simple update
-     * without return value, and use the canvas.
+     * Handles a "newTurn"-message.
+     *
+     * @param element The element (root element in a DOM-parsed XML tree)
+     *            that holds all the information.
+     * @return Null.
      */
-    abstract class NoResultCanvasSwingTask extends SwingTask {
+    private Element newTurn(Element element) {
+        final String turnString = element.getAttribute("turn");
 
-        protected Object doWork() {
-            doNoResultWork();
+        SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    igc().newTurn(turnString);
+                }
+            });
+
+        SwingUtilities.invokeLater(updateMenuBarRunnable);
+        return null;
+    }
+
+    /**
+     * Handles an "reconnect"-message.
+     *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *            holds all the information.
+     * @return Null.
+     */
+    private Element reconnect(Element element) {
+        logger.finest("Entered reconnect.");
+
+        SwingUtilities.invokeLater(reconnectRunnable);
+        return null;
+    }
+
+    /**
+     * Handles a "remove"-message.
+     *
+     * @param removeElement The element (root element in a DOM-parsed XML tree)
+     *            that holds all the information.
+     * @return Null.
+     */
+    private Element remove(Element removeElement) {
+        final Game game = getGame();
+        String ds = removeElement.getAttribute("divert");
+        FreeColGameObject divert = game.getFreeColGameObject(ds);
+        Player player = getFreeColClient().getMyPlayer();
+        boolean visibilityChange = false;
+
+        NodeList nodeList = removeElement.getChildNodes();
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Element element = (Element) nodeList.item(i);
+            String idString = FreeColObject.readId(element);
+            FreeColGameObject fcgo = game.getFreeColGameObject(idString);
+            if (fcgo == null) {
+                logger.warning("Could not find FreeColGameObject: "
+                               + idString);
+                continue;
+            }
+            if (divert != null) {
+                player.divertModelMessages(fcgo, divert);
+            }
+            if (fcgo instanceof Settlement) {
+                player.removeSettlement((Settlement)fcgo);
+                visibilityChange = true;//-vis(player)
+                
+            } else if (fcgo instanceof Unit) {
+                // Deselect the object if it is the current active unit.
+                Unit u = (Unit)fcgo;
+                if (u == getGUI().getActiveUnit()) {
+                    invokeAndWait(deselectActiveUnitRunnable);
+                }
+                // Temporary hack until we have real containers.
+                player.removeUnit(u);
+                visibilityChange = true;//-vis(player)
+            }
+
+            // Do just the low level dispose that removes
+            // reference to this object in the client.  The other
+            // updates should have done the rest.
+            fcgo.fundamentalDispose();
+        }
+        if (visibilityChange) player.invalidateCanSeeTiles();//+vis(player)
+
+        refreshCanvas(false);
+        return null;
+    }
+
+    /**
+     * Handles a "setAI"-message.
+     *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *            holds all the information.
+     * @return Null.
+     */
+    private Element setAI(Element element) {
+        final Game game = getGame();
+        Player p = game.getFreeColGameObject(element.getAttribute("player"),
+                                             Player.class);
+        p.setAI(Boolean.valueOf(element.getAttribute("ai")).booleanValue());
+
+        return null;
+    }
+
+    /**
+     * Handles a "setCurrentPlayer"-message.
+     *
+     * @param element The element (root element in a DOM-parsed XML
+     *            tree) that holds all the information.
+     * @return Null.
+     */
+    private Element setCurrentPlayer(Element element) {
+        Player player
+            = getGame().getFreeColGameObject(element.getAttribute("player"),
+                                             Player.class);
+        
+        igc().setCurrentPlayer(player);
+
+        refreshCanvas(true);
+        return null;
+    }
+
+    /**
+     * Handles a "setDead"-message.
+     *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *            holds all the information.
+     * @return Null.
+     */
+    private Element setDead(Element element) {
+        final Player player = getGame()
+            .getFreeColGameObject(element.getAttribute("player"),Player.class);
+
+        SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    igc().setDead(player);
+                }
+            });
+        return null;
+    }
+
+    /**
+     * Handles a "setStance"-request.
+     *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *            holds all the information.
+     * @return Null.
+     */
+    private Element setStance(Element element) {
+        final Game game = getGame();
+        final Stance stance = Enum.valueOf(Stance.class,
+                                           element.getAttribute("stance"));
+        final Player p1 = game
+            .getFreeColGameObject(element.getAttribute("first"), Player.class);
+        final Player p2 = game
+            .getFreeColGameObject(element.getAttribute("second"),Player.class);
+
+        SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    igc().setStance(stance, p1, p2);
+                }
+            });
+        return null;
+    }
+
+    /**
+     * Handles a "spyResult" message.
+     *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *            holds all the information.
+     * @return Null.
+     */
+    private Element spyResult(Element element) {
+        // The element contains two children, being the full and
+        // normal versions of the settlement-being-spied-upon's tile.
+        // It has to be the tile, as otherwise we do not see the units
+        // defending the settlement.  So, we have to unpack, update
+        // with the first, display, then update with the second.  This
+        // is hacky as the client could retain the settlement
+        // information, but the potential abuses are limited.
+        NodeList nodeList = element.getChildNodes();
+        if (nodeList.getLength() != 2) {
+            logger.warning("spyResult length = " + nodeList.getLength());
             return null;
         }
 
-        protected abstract void doNoResultWork();
-    }
-
-    /**
-     * This task refreshes the entire canvas.
-     */
-    class RefreshCanvasSwingTask extends NoResultCanvasSwingTask {
-
-        private final boolean requestFocus;
-
-
-        /**
-         * Default constructor, simply refresh canvas.
-         */
-        public RefreshCanvasSwingTask() {
-            this(false);
-        }
-
-        /**
-         * Constructor.
-         *
-         * @param requestFocus True to request focus after refresh.
-         */
-        public RefreshCanvasSwingTask(boolean requestFocus) {
-            this.requestFocus = requestFocus;
-        }
-
-        protected void doNoResultWork() {
-            getGUI().refresh();
-
-            if (requestFocus && !getGUI().isShowingSubPanel()) {
-                getGUI().requestFocusInWindow();
-            }
-        }
-    }
-
-    /**
-     * This class displays a dialog that lets the player choose goods to loot.
-     */
-    class LootCargoSwingTask extends NoResultCanvasSwingTask {
-
-        private Unit unit;
-        private String defenderId;
-        private List<Goods> goods;
-
-
-        /**
-         * Constructor.
-         *
-         * @param goods A list of <code>Goods</code> to choose from.
-         */
-        public LootCargoSwingTask(Unit unit, String defenderId,
-                                  List<Goods> goods) {
-            this.unit = unit;
-            this.defenderId = defenderId;
-            this.goods = goods;
-        }
-
-        protected void doNoResultWork() {
-            goods = getGUI().showCaptureGoodsDialog(unit, goods);
-            if (!goods.isEmpty()) {
-                getFreeColClient().askServer().loot(unit, defenderId, goods);
-            }
-        }
-    }
-
-    class NewLandNameSwingTask extends NoResultCanvasSwingTask {
-
-        private Unit unit;
-        private String defaultName;
-        private Player welcomer;
-        private String camps;
-
-
-        /**
-         * Constructor.
-         *
-         * @param unit The <code>Unit</code> that has come ashore.
-         * @param defaultName The default new land name.
-         * @param welcomer An optional <code>Player</code> that is welcoming
-         *     this player to the new world.
-         * @param camps The number of camps of the welcomer.
-         */
-        public NewLandNameSwingTask(Unit unit, String defaultName,
-            Player welcomer, String camps) {
-            this.unit = unit;
-            this.defaultName = defaultName;
-            this.welcomer = welcomer;
-            this.camps = camps;
-        }
-
-        protected void doNoResultWork() {
-            // Player names the land.
-            Tile tile = unit.getTile();
-            String name = getGUI().showInputDialog(tile,
-                StringTemplate.template("newLand.text"), defaultName,
-                "newLand.yes", null, true);
-
-            // Check if there is a welcoming native offering land.
-            boolean accept = false;
-            if (welcomer != null) {
-                String messageId = (welcomer.owns(tile))
-                    ? "welcomeOffer.text" : "welcomeSimple.text";
-                String type = ((IndianNationType) welcomer
-                    .getNationType()).getSettlementTypeKey(true);
-                accept = getGUI().showConfirmDialog(tile,
-                    StringTemplate.template(messageId)
-                        .addStringTemplate("%nation%", welcomer.getNationName())
-                        .addName("%camps%", camps)
-                        .add("%settlementType%", type),
-                    welcomer, "welcome.yes", "welcome.no");
-            }
-
-            // Respond to the server.
-            FreeColClient fcc = getFreeColClient();
-            fcc.askServer().newLandName(unit, name, welcomer, accept);
-
-            // Add tutorial message.
-            Player player = unit.getOwner();
-            String key = FreeColActionUI.getHumanKeyStrokeText(fcc
-                .getActionManager().getFreeColAction("buildColonyAction")
-                .getAccelerator());
-            player.addModelMessage(new ModelMessage(ModelMessage.MessageType.TUTORIAL,
-                    "tutorial.buildColony", player)
-                .addName("%build_colony_key%", key)
-                .add("%build_colony_menu_item%", "buildColonyAction.name")
-                .add("%orders_menu_item%", "menuBar.orders"));
-            fcc.getInGameController().nextModelMessage();
-        }
-    }
-
-    class NewRegionNameSwingTask extends NoResultCanvasSwingTask {
-
-        private Tile tile;
-        private Unit unit;
-        private Region region;
-        private String defaultName;
-
-
-        /**
-         * Constructor.
-         *
-         * @param tile The <code>Tile</code> where the region is discovered.
-         * @param unit The <code>Unit</code> discovering the region.
-         * @param region The <code>Region</code> that is discovered.
-         * @param defaultName The default name of the new region.
-         */
-        public NewRegionNameSwingTask(Tile tile, Unit unit, Region region,
-                                      String defaultName) {
-            this.tile = tile;
-            this.unit = unit;
-            this.region = region;
-            this.defaultName = defaultName;
-        }
-
-        protected void doNoResultWork() {
-            String name = getGUI().showInputDialog(tile,
-                StringTemplate.template("nameRegion.text")
-                    .addStringTemplate("%type%", region.getLabel()),
-                defaultName, "ok", null, false);
-            if (name == null || "".equals(name)) name = defaultName;
-            getFreeColClient().askServer().newRegionName(region, tile, unit,
-                                                         name);
-        }
-    }
-
-    class RefreshTilesSwingTask extends NoResultCanvasSwingTask {
-
-        public RefreshTilesSwingTask(Tile oldTile, Tile newTile) {
-            super();
-            _oldTile = oldTile;
-            _newTile = newTile;
-        }
-
-        protected void doNoResultWork() {
-            getGUI().refreshTile(_oldTile);
-            getGUI().refreshTile(_newTile);
-        }
-
-
-        private final Tile _oldTile;
-
-        private final Tile _newTile;
-
-    }
-
-    /**
-     * This task plays an unit movement animation in the Canvas.
-     */
-    class UnitMoveAnimationCanvasSwingTask extends NoResultCanvasSwingTask {
-
-        private final Unit unit;
-        private final Tile destinationTile;
-        private final Tile sourceTile;
-        private boolean focus;
-
-
-        /**
-         * Constructor.
-         * Play the unit movement animation, optionally focusing on
-         * the source tile.
-         *
-         * @param unit The <code>Unit</code> that is moving.
-         * @param sourceTile The <code>Tile</code> from which to move.
-         * @param destinationTile The <code>Tile</code> to move to.
-         * @param focus Focus on the source tile before the animation.
-         */
-        public UnitMoveAnimationCanvasSwingTask(Unit unit, Tile sourceTile,
-                                                Tile destinationTile,
-                                                boolean focus) {
-            this.unit = unit;
-            this.sourceTile = sourceTile;
-            this.destinationTile = destinationTile;
-            this.focus = focus;
-        }
-
-        protected void doNoResultWork() {
-            if (focus || !getGUI().onScreen(sourceTile)) {
-                getGUI().setFocusImmediately(sourceTile);
-            }
-
-            getGUI().animateUnitMove(unit, sourceTile, destinationTile);
-            getGUI().refresh();
-        }
-    }
-
-    /**
-     * This task plays an unit attack animation in the Canvas.
-     */
-    class UnitAttackAnimationCanvasSwingTask extends NoResultCanvasSwingTask {
-
-        private final Unit attacker;
-        private final Unit defender;
-        private final Tile attackerTile;
-        private final Tile defenderTile;
-        private final boolean success;
-
-        private boolean focus;
-
-
-        /**
-         * Constructor - Play the unit attack animation, optionally focusing on
-         * the source tile.
-         *
-         * @param attacker The <code>Unit</code> that is attacking.
-         * @param defender The <code>Unit</code> that is defending.
-         * @param attackerTile The <code>Tile</code> the attack comes from.
-         * @param defenderTile The <code>Tile</code> the attack goes to.
-         * @param success Did the attack succeed?
-         * @param focus Focus on the source tile before the animation.
-         */
-        public UnitAttackAnimationCanvasSwingTask(Unit attacker, Unit defender,
-            Tile attackerTile, Tile defenderTile, boolean success,
-            boolean focus) {
-            this.attacker = attacker;
-            this.defender = defender;
-            this.attackerTile = attackerTile;
-            this.defenderTile = defenderTile;
-            this.success = success;
-            this.focus = focus;
-        }
-
-        protected void doNoResultWork() {
-            if (focus || !getGUI().onScreen(attackerTile)
-                || !getGUI().onScreen(defenderTile)) {
-                getGUI().setFocusImmediately(attackerTile);
-            }
-
-            getGUI().animateUnitAttack(attacker, defender,
-                                       attackerTile, defenderTile, success);
-            getGUI().refresh();
-        }
-    }
-
-    /**
-     * This task shows an enhanced colony panel, then restores the
-     * normal information when it closes.
-     */
-    class SpyColonySwingTask extends NoResultCanvasSwingTask {
-        private Colony colony;
-        private Element normalTile;
-
-        public SpyColonySwingTask(Colony colony, Element normalTile) {
-            this.colony = colony;
-            this.normalTile = normalTile;
-        }
-
-        protected void doNoResultWork() {
-            final Tile tile = colony.getTile();
-            getGUI().showColonyPanel(colony)
-                .addClosingCallback(new Runnable() {
-                        public void run() {
-                            tile.readFromXMLElement(normalTile);
-                        }
-                    });
-        }
-    }
-
-    /**
-     * This task reconnects to the server.
-     */
-    class ReconnectSwingTask extends SwingTask {
-        protected Object doWork() {
-            getFreeColClient().getConnectController().reconnect();
+        final Game game = getGame();
+        final Element fullTile = (Element) nodeList.item(0);
+        final Element normalTile = (Element) nodeList.item(1);
+        String tileId = element.getAttribute("tile");
+        final Tile tile = game.getFreeColGameObject(tileId, Tile.class);
+        if (tile == null) {
+            logger.warning("spyResult bad tile = " + tileId);
             return null;
         }
-    }
-
-    /**
-     * This task updates the menu bar.
-     */
-    class UpdateMenuBarSwingTask extends NoResultCanvasSwingTask {
-        protected void doNoResultWork() {
-            getGUI().updateMenuBar();
-        }
-    }
-
-    /**
-     * This task shows the victory panel.
-     */
-    class ShowVictoryPanelSwingTask extends NoResultCanvasSwingTask {
-        protected void doNoResultWork() {
-            getGUI().showVictoryPanel();
-        }
-    }
-
-    /**
-     * This class shows a dialog and saves the answer (ok/cancel).
-     */
-    class ShowConfirmDialogSwingTask extends SwingTask {
-
-        private Tile tile;
-
-        private StringTemplate text;
-
-        private String okText;
-
-        private String cancelText;
-
-
-        /**
-         * Constructor.
-         *
-         * @param tile An optional tile to make visible.
-         * @param text The key for the question.
-         * @param okText The key for the OK button.
-         * @param cancelText The key for the Cancel button.
-         */
-        public ShowConfirmDialogSwingTask(Tile tile, StringTemplate text,
-                                          String okText, String cancelText) {
-            this.tile = tile;
-            this.text = text;
-            this.okText = okText;
-            this.cancelText = cancelText;
-        }
-
-        /**
-         * Show dialog and wait for selection.
-         *
-         * @return true if OK, false if Cancel.
-         */
-        public boolean confirm() {
-            try {
-                Object result = invokeSpecial();
-                return ((Boolean) result).booleanValue();
-            } catch (InvocationTargetException e) {
-                if (e.getCause() instanceof RuntimeException) {
-                    throw (RuntimeException) e.getCause();
-                } else {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-
-        protected Object doWork() {
-            boolean choice = getGUI().showConfirmDialog(tile, text, null,
-                                                        okText, cancelText);
-            return Boolean.valueOf(choice);
-        }
-    }
-
-    /**
-     * Base class for dialog SwingTasks.
-     */
-    abstract class ShowMessageSwingTask extends SwingTask {
-        /**
-         * Show dialog and wait for the user to dismiss it.
-         */
-        public void show() {
-            try {
-                invokeSpecial();
-            } catch (InvocationTargetException e) {
-                if (e.getCause() instanceof RuntimeException) {
-                    throw (RuntimeException) e.getCause();
-                } else {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-    }
-
-    /**
-     * This class shows a model message.
-     */
-    class ShowModelMessageSwingTask extends ShowMessageSwingTask {
-
-        /**
-         * Constructor.
-         *
-         * @param modelMessage The model message to show.
-         */
-        public ShowModelMessageSwingTask(ModelMessage modelMessage) {
-            _modelMessage = modelMessage;
-        }
-
-        protected Object doWork() {
-            getGUI().showModelMessages(_modelMessage);
+        tile.readFromXMLElement(fullTile);
+        final Colony colony = tile.getColony();
+        if (colony == null) {
+            tile.readFromXMLElement(normalTile);
             return null;
         }
 
-
-        private ModelMessage _modelMessage;
-    }
-
-    /**
-     * This class shows an informational dialog.
-     */
-    class ShowInformationMessageSwingTask extends ShowMessageSwingTask {
-
-        private StringTemplate message;
-
-
-        /**
-         * Constructor.
-         *
-         * @param message the StringTemplate
-         */
-        public ShowInformationMessageSwingTask(StringTemplate message) {
-            this.message = message;
-        }
-
-        protected Object doWork() {
-            getGUI().showInformationMessage(null, message);
-            return null;
-        }
-    }
-
-    /**
-     * This class shows an error dialog.
-     */
-    class ShowErrorMessageSwingTask extends ShowMessageSwingTask {
-
-        /**
-         * Constructor.
-         *
-         * @param messageId The i18n-keyname of the error message to display.
-         * @param message An alternative message to display if the resource
-         *            specified by <code>messageID</code> is unavailable.
-         */
-        public ShowErrorMessageSwingTask(String messageId, String message) {
-            _messageId = messageId;
-            _message = message;
-        }
-
-        protected Object doWork() {
-            getGUI().errorMessage(_messageId, _message);
-            return null;
-        }
-
-        private String _messageId;
-
-        private String _message;
-    }
-
-    /**
-     * This class displays a dialog that lets the player pick a Founding Father.
-     */
-    abstract class ShowSelectSwingTask extends SwingTask {
-        /**
-         * Show dialog and wait for selection.
-         *
-         * @return selection.
-         */
-        public int select() {
-            try {
-                Object result = invokeAndWait();
-                return ((Integer) result).intValue();
-            } catch (InvocationTargetException e) {
-                if (e.getCause() instanceof RuntimeException) {
-                    throw (RuntimeException) e.getCause();
-                } else {
-                    throw new RuntimeException(e);
+        SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    final Tile tile = colony.getTile();
+                    getGUI().showColonyPanel(colony)
+                        .addClosingCallback(new Runnable() {
+                                public void run() {
+                                    tile.readFromXMLElement(normalTile);
+                                }
+                            });
                 }
+            });
+        return null;
+    }
+
+    /**
+     * Handles an "update"-message.
+     *
+     * @param updateElement The element (root element in a DOM-parsed XML tree)
+     *            that holds all the information.
+     * @return Null.
+     */
+    public Element update(Element updateElement) {
+        final Player player = getFreeColClient().getMyPlayer();
+        boolean visibilityChange = false;
+
+        NodeList nodeList = updateElement.getChildNodes();
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Element element = (Element) nodeList.item(i);
+            String id = FreeColObject.readId(element);
+            FreeColGameObject fcgo = getGame().getFreeColGameObject(id);
+            if (fcgo == null) {
+                logger.warning("Update object not present in client: " + id);
+            } else {
+                fcgo.readFromXMLElement(element);
+            }
+            if ((fcgo instanceof Player && ((Player)fcgo == player))
+                || ((fcgo instanceof Settlement || fcgo instanceof Unit)
+                    && player.owns((Ownable)fcgo))) {
+                visibilityChange = true;//-vis(player)
             }
         }
-    }
+        if (visibilityChange) player.invalidateCanSeeTiles();//+vis(player)
 
-    /**
-     * This class shows the monarch dialog.
-     */
-    class ShowMonarchSwingTask extends SwingTask {
-
-        private MonarchAction action;
-
-        private StringTemplate replace;
-
-
-        /**
-         * Constructor.
-         *
-         * @param action The action key.
-         * @param replace The replacement values.
-         */
-        public ShowMonarchSwingTask(MonarchAction action,
-                                    StringTemplate replace) {
-            this.action = action;
-            this.replace = replace;
-        }
-
-        /**
-         * Show dialog and wait for selection.
-         *
-         * @return true if OK, false if Cancel.
-         */
-        public boolean confirm() {
-            try {
-                Object result = invokeAndWait();
-                return ((Boolean) result).booleanValue();
-            } catch (InvocationTargetException e) {
-                if (e.getCause() instanceof RuntimeException) {
-                    throw (RuntimeException) e.getCause();
-                } else {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-
-        protected Object doWork() {
-            boolean choice = getGUI().showMonarchDialog(action, replace);
-            return Boolean.valueOf(choice);
-        }
+        refreshCanvas(false);
+        return null;
     }
 }
