@@ -57,9 +57,6 @@ public class NationOptions extends FreeColObject {
      */
     public static enum NationState { AVAILABLE, AI_ONLY, NOT_AVAILABLE }
 
-    /** The default number of European nations. */
-    public static final int DEFAULT_NO_OF_EUROPEANS = 4;
-
     /** The specification to refer to. */
     private Specification specification;
 
@@ -80,13 +77,13 @@ public class NationOptions extends FreeColObject {
         this.specification = specification;
         this.nationalAdvantages = FreeCol.getAdvantages();
         if (specification != null) {
-            int counter = 0;
+            int counter = 0, maxEuropeans = FreeCol.getEuropeanCount();
             for (Nation nation : specification.getNations()) {
                 if (nation.getType().isREF()) {
                     continue;
                 } else if (nation.getType().isEuropean()
                     && nation.isSelectable()) {
-                    if (counter < DEFAULT_NO_OF_EUROPEANS) {
+                    if (counter < maxEuropeans) {
                         nations.put(nation, NationState.AVAILABLE);
                         counter++;
                     } else {

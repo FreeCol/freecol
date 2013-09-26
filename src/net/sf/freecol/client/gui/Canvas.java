@@ -2136,8 +2136,10 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Shows the <code>VideoPanel</code>.
+     *
+     * @param userMsg An optional user message.
      */
-    public void showOpeningVideoPanel() {
+    public void showOpeningVideoPanel(final String userMsg) {
         closeMenus();
         final Video video = ResourceManager.getVideo("Opening.video");
         boolean muteAudio = !gui.canPlaySound();
@@ -2163,9 +2165,11 @@ public final class Canvas extends JDesktopPane {
             public void mouseExited(MouseEvent e) {}
             public void mousePressed(MouseEvent e) {}
             public void mouseReleased(MouseEvent e) {}
+
             public void stopped() {
                 execute();
             }
+
             private void execute() {
                 removeKeyListener(this);
                 removeMouseListener(this);
@@ -2173,8 +2177,8 @@ public final class Canvas extends JDesktopPane {
                 vp.removeVideoListener(this);
                 vp.stop();
                 Canvas.this.remove(vp);
-                showMainPanel(null);
                 gui.playSound("sound.intro.general");
+                showMainPanel(userMsg);
             }
         }
 
@@ -2495,19 +2499,19 @@ public final class Canvas extends JDesktopPane {
      *
      * @param game The <code>Game</code> that is about to start.
      * @param player The <code>Player</code> using this client.
-     * @param singlePlayerMode 'true' if the user wants to start a
-     *     single player game, 'false' otherwise.
+     * @param singlePlayerMode True to start a single player game.
      * @see StartGamePanel
      */
     public void showStartGamePanel(Game game, Player player,
                                    boolean singlePlayerMode) {
-        closeMenus();
-
-        if (game != null && player != null) {
+        if (game == null) {
+            logger.warning("StartGamePanel requires game != null.");
+        } else if (player == null) {
+            logger.warning("StartGamePanel requires player != null.");
+        } else {
+            closeMenus();
             startGamePanel.initialize(singlePlayerMode);
             showSubPanel(startGamePanel, false);
-        } else {
-            logger.warning("Tried to open 'StartGamePanel' without having 'game' and/or 'player' set.");
         }
     }
 

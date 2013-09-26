@@ -162,7 +162,7 @@ public final class FreeColClient {
         if (headless) {
             if (!FreeColDebugger.isInDebugMode()
                 || FreeColDebugger.getDebugRunTurns() <= 0) {
-                fatal("Headless mode requires a debug run.");
+                fatal(Messages.message("client.headlessDebug"));
             }                
             if (savedGame == null) {
                 fatal("Headless mode requires a saved game.");
@@ -188,8 +188,8 @@ public final class FreeColClient {
         ResourceManager.setBaseMapping(baseData.getResourceMapping());
 
         // Once the basic resources are in place the GUI can be started.
-        gui = new GUI(this);
-        serverAPI = new UserServerAPI(gui);
+        this.gui = new GUI(this);
+        this.serverAPI = new UserServerAPI(gui);
         if (!headless) gui.displaySplashScreen(splashFilename);
 
         // Determine the window size.
@@ -206,15 +206,15 @@ public final class FreeColClient {
         logger.info("Window size is " + windowSize);
 
         // Control.  Controllers expect GUI to be available.
-        connectController = new ConnectController(this);
-        preGameController = new PreGameController(this);
-        preGameInputHandler = new PreGameInputHandler(this);
-        inGameController = new InGameController(this);
-        inGameInputHandler = new InGameInputHandler(this);
-        mapEditorController = new MapEditorController(this);
-        actionManager = new ActionManager(this);
-        worker = new Worker();
-        worker.start();
+        this.connectController = new ConnectController(this);
+        this.preGameController = new PreGameController(this);
+        this.preGameInputHandler = new PreGameInputHandler(this);
+        this.inGameController = new InGameController(this);
+        this.inGameInputHandler = new InGameInputHandler(this);
+        this.mapEditorController = new MapEditorController(this);
+        this.actionManager = new ActionManager(this);
+        this.worker = new Worker();
+        this.worker.start();
 
         // Load resources.
         //   - base resources
@@ -256,10 +256,11 @@ public final class FreeColClient {
 
             // Once resources are in place, get preloading started.
             ResourceManager.preload(windowSize);
+
+            gui.hideSplashScreen();
         }
 
-        // Start the GUI.
-        gui.hideSplashScreen();
+        // Start the GUI (headless-safe)
         gui.startGUI(windowSize, sound);
 
         // Now the GUI is going, either:
@@ -271,32 +272,34 @@ public final class FreeColClient {
         //   - display the main panel and let the user choose what to
         //     do (which will often be to progress through the
         //     NewPanel to a call to the connect controller to start a game)
-        if (showOpeningVideo) {
-            SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        gui.showOpeningVideoPanel();
-                    }
-                });
-        } else {
-            gui.playSound("sound.intro.general");
-        }
         if (savedGame != null) {
+            gui.playSound("sound.intro.general");
             SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        if (!connectController.startSavedGame(savedGame, userMsg)) {
-                            gui.showMainPanel(null);
-                        }
-                    }
-                });
-        } else if (spec != null) {
-            SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        if (!connectController.startSinglePlayerGame(spec, true)) {
+                        if (!connectController.startSavedGame(savedGame,
+                                                              userMsg)) {
                             gui.showMainPanel(userMsg);
                         }
                     }
                 });
+        } else if (spec != null) { // Debug start
+            gui.playSound("sound.intro.general");
+            SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        if (!connectController.startSinglePlayerGame(spec, 
+                                                                     true)) {
+                            gui.showMainPanel(userMsg);
+                        }
+                    }
+                });
+        } else if (showOpeningVideo) {
+            SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        gui.showOpeningVideoPanel(userMsg);
+                    }
+                });
         } else {
+            gui.playSound("sound.intro.general");
             SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         gui.showMainPanel(userMsg);

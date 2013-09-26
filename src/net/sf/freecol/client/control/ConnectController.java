@@ -241,7 +241,7 @@ public final class ConnectController {
         if (!login("127.0.0.1", freeColServer.getPort())) return false;
 
         if (freeColClient.getClientOptions()
-                        .getBoolean(ClientOptions.AUTOSAVE_DELETE)) {
+                         .getBoolean(ClientOptions.AUTOSAVE_DELETE)) {
             FreeColServer.removeAutosaves(Messages.message("clientOptions.savegames.autosave.fileprefix"));
         }
         freeColClient.getPreGameController().setReady(true);

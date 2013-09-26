@@ -268,6 +268,7 @@ public final class StartGamePanel extends FreeColPanel {
      */
     public void actionPerformed(ActionEvent event) {
         final String command = event.getActionCommand();
+        final FreeColClient fcc = getFreeColClient();
         try {
             switch (Integer.valueOf(command).intValue()) {
             case START:
@@ -285,36 +286,34 @@ public final class StartGamePanel extends FreeColPanel {
                     getMyPlayer().setReady(true);
                 }
 
-                getFreeColClient().getPreGameController().requestLaunch();
+                fcc.getPreGameController().requestLaunch();
                 break;
             case CANCEL:
-                getFreeColClient().getConnectController().quitGame(true);
+                fcc.getConnectController().quitGame(true);
                 getGUI().removeFromCanvas(this);
                 getGUI().showNewPanel();
                 break;
             case READY:
-                getFreeColClient().getPreGameController()
-                    .setReady(readyBox.isSelected());
+                fcc.getPreGameController().setReady(readyBox.isSelected());
                 refreshPlayersTable();
                 break;
             case CHAT:
                 if (chat.getText().trim().length() > 0) {
-                    getFreeColClient().getPreGameController()
-                        .chat(chat.getText());
-                    displayChat(getMyPlayer().getName(), chat.getText(), false);
+                    fcc.getPreGameController().chat(chat.getText());
+                    displayChat(getMyPlayer().getName(), chat.getText(),
+                                false);
                     chat.setText("");
                 }
                 break;
             case GAME_OPTIONS:
-                getGUI().showGameOptionsDialog(getFreeColClient().isAdmin(), true);
+                getGUI().showGameOptionsDialog(fcc.isAdmin(), true);
                 break;
             case MAP_GENERATOR_OPTIONS:
-                OptionGroup mgo = getFreeColClient().getGame()
-                    .getMapGeneratorOptions();
-                FileOption importFile = (FileOption) mgo.getOption(MapGeneratorOptions.IMPORT_FILE);
-                boolean loadCustomOptions = (importFile.getValue() == null);
-                getGUI().showMapGeneratorOptionsDialog(mgo, getFreeColClient().isAdmin(),
-                                                                            loadCustomOptions);
+                OptionGroup mgo = fcc.getGame().getMapGeneratorOptions();
+                FileOption importFile = (FileOption)mgo.getOption(MapGeneratorOptions.IMPORT_FILE);
+                boolean loadCustomOptions = importFile.getValue() == null;
+                getGUI().showMapGeneratorOptionsDialog(mgo, fcc.isAdmin(),
+                                                       loadCustomOptions);
                 break;
             default:
                 super.actionPerformed(event);

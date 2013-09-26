@@ -90,6 +90,8 @@ public final class FreeCol {
 
     private static final Advantages ADVANTAGES_DEFAULT = Advantages.SELECTABLE;
     private static final String DIFFICULTY_DEFAULT = "model.difficulty.medium";
+    private static final int    EUROPEANS_DEFAULT = 4;
+    private static final int    EUROPEANS_MIN = 1;
     private static final Level  LOGLEVEL_DEFAULT = Level.INFO;
     private static final String JAVA_VERSION_MIN = "1.6";
     private static final int    MEMORY_MIN = 128; // Mbytes
@@ -118,6 +120,9 @@ public final class FreeCol {
 
     /** The difficulty level id. */
     private static String difficulty = null;
+
+    /** The number of European nations to enable by default. */
+    private static int europeanCount = EUROPEANS_DEFAULT;
 
     /** A font override. */
     private static String fontName = null;
@@ -211,15 +216,15 @@ public final class FreeCol {
         // Do the potentially fatal system checks as early as possible.
         String version = System.getProperty("java.version");
         if (javaCheck && version.compareTo(JAVA_VERSION_MIN) < 0) {
-            fatal(Messages.message(StringTemplate.template("main.javaVersion")
-                    .addName("%version%", version)
-                    .addName("%minVersion%", JAVA_VERSION_MIN)));
+            fatal(StringTemplate.template("main.javaVersion")
+                .addName("%version%", version)
+                .addName("%minVersion%", JAVA_VERSION_MIN));
         }
         long memory = Runtime.getRuntime().maxMemory();
         if (memoryCheck && memory < MEMORY_MIN * 1000000) {
-            fatal(Messages.message(StringTemplate.template("main.memory")
-                    .addAmount("%memory%", memory)
-                    .addAmount("%minMemory%", MEMORY_MIN)));
+            fatal(StringTemplate.template("main.memory")
+                .addAmount("%memory%", memory)
+                .addAmount("%minMemory%", MEMORY_MIN));
         }
 
         // Having parsed the command line args, we know where the user
@@ -319,6 +324,15 @@ public final class FreeCol {
     /**
      * Exit printing fatal error message.
      *
+     * @param template A <code>StringTemplate</code> to print.
+     */
+    public static void fatal(StringTemplate template) {
+        fatal(Messages.message(template));
+    }
+
+    /**
+     * Exit printing fatal error message.
+     *
      * @param err The error message to print.
      */
     public static void fatal(String err) {
@@ -328,6 +342,24 @@ public final class FreeCol {
         }
         System.err.println(err);
         System.exit(1);
+    }
+
+    /**
+     * Just gripe to System.err.
+     *
+     * @param template A <code>StringTemplate</code> to print.
+     */
+    public static void gripe(StringTemplate template) {
+        System.err.println(Messages.message(template));
+    }
+
+    /**
+     * Just gripe to System.err.
+     *
+     * @param key A message key.
+     */
+    public static void gripe(String key) {
+        System.err.println(Messages.message(key));
     }
 
     /**
@@ -395,21 +427,14 @@ public final class FreeCol {
                           .withArgName(Messages.message("cli.arg.difficulty"))
                           .hasArg()
                           .create());
+        options.addOption(OptionBuilder.withLongOpt("europeans")
+                          .withDescription(Messages.message("cli.european-count"))
+                          .withArgName(Messages.message("cli.arg.europeans"))
+                          .hasArg()
+                          .create());
         options.addOption(OptionBuilder.withLongOpt("font")
                           .withDescription(Messages.message("cli.font"))
                           .withArgName(Messages.message("cli.arg.font"))
-                          .hasArg()
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("user-config-directory")
-                          .withDescription(Messages.message("cli.user-config-directory"))
-                          .withArgName(Messages.message("cli.arg.directory"))
-                          .withType(new File("dummy"))
-                          .hasArg()
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("user-data-directory")
-                          .withDescription(Messages.message("cli.user-data-directory"))
-                          .withArgName(Messages.message("cli.arg.directory"))
-                          .withType(new File("dummy"))
                           .hasArg()
                           .create());
         options.addOption(OptionBuilder.withLongOpt("load-savegame")
@@ -480,6 +505,18 @@ public final class FreeCol {
                           .withArgName(Messages.message("cli.arg.timeout"))
                           .hasArg()
                           .create());
+        options.addOption(OptionBuilder.withLongOpt("user-config-directory")
+                          .withDescription(Messages.message("cli.user-config-directory"))
+                          .withArgName(Messages.message("cli.arg.directory"))
+                          .withType(new File("dummy"))
+                          .hasArg()
+                          .create());
+        options.addOption(OptionBuilder.withLongOpt("user-data-directory")
+                          .withDescription(Messages.message("cli.user-data-directory"))
+                          .withArgName(Messages.message("cli.arg.directory"))
+                          .withType(new File("dummy"))
+                          .hasArg()
+                          .create());
         options.addOption(OptionBuilder.withLongOpt("version")
                           .withDescription(Messages.message("cli.version"))
                           .create());
@@ -508,17 +545,17 @@ public final class FreeCol {
                 String arg = line.getOptionValue("advantages");
                 Advantages a = selectAdvantages(arg);
                 if (a == null) {
-                    fatal(Messages.message(StringTemplate.template("cli.error.advantages")
-                            .addName("%advantages%", getValidAdvantages())
-                            .addName("%arg%", arg)));
+                    fatal(StringTemplate.template("cli.error.advantages")
+                        .addName("%advantages%", getValidAdvantages())
+                        .addName("%arg%", arg));
                 }
             }
 
             if (line.hasOption("check-savegame")) {
                 String arg = line.getOptionValue("check-savegame");
                 if (!FreeColDirectories.setSavegameFile(arg)) {
-                    fatal(Messages.message(StringTemplate.template("cli.err.save")
-                            .addName("%string%", arg)));
+                    fatal(StringTemplate.template("cli.err.save")
+                        .addName("%string%", arg));
                 }
                 checkIntegrity = true;
                 standAloneServer = true;
@@ -528,8 +565,8 @@ public final class FreeCol {
                 String fileName = line.getOptionValue("clientOptions");
                 if (!FreeColDirectories.setClientOptionsFile(fileName)) {
                     // Not fatal.
-                    System.err.println(Messages.message(StringTemplate.template("cli.error.clientOptions")
-                            .addName("%string%", fileName)));
+                    gripe(StringTemplate.template("cli.error.clientOptions")
+                        .addName("%string%", fileName));
                 }
             }                    
 
@@ -541,8 +578,8 @@ public final class FreeCol {
                     arg = FreeColDebugger.DebugMode.MENUS.toString();
                 }
                 if (!FreeColDebugger.setDebugModes(arg)) { // Not fatal.
-                    System.err.println(Messages.message(StringTemplate.template("cli.error.debug")
-                            .addName("%modes", FreeColDebugger.getDebugModes())));
+                    gripe(StringTemplate.template("cli.error.debug")
+                        .addName("%modes", FreeColDebugger.getDebugModes()));
                 }
                 // user set log level has precedence
                 if (!line.hasOption("log-level")) logLevel = Level.FINEST;
@@ -560,26 +597,17 @@ public final class FreeCol {
                 String arg = line.getOptionValue("difficulty");
                 String difficulty = selectDifficulty(arg);
                 if (difficulty == null) {
-                    fatal(Messages.message(StringTemplate.template("cli.error.difficulties")
-                            .addName("%difficulties%", getValidDifficulties())
-                            .addName("%arg%", arg)));
+                    fatal(StringTemplate.template("cli.error.difficulties")
+                        .addName("%difficulties%", getValidDifficulties())
+                        .addName("%arg%", arg));
                 }
             }
 
-            if (line.hasOption("user-data-directory")) {
-                String arg = line.getOptionValue("user-data-directory");
-                String errMsg = FreeColDirectories.setUserDataDirectory(arg);
-                if (errMsg != null) { // Fatal, unable to save.
-                    fatal(Messages.message(StringTemplate.template(errMsg)
-                            .addName("%string%", arg)));
-                }
-            }
-
-            if (line.hasOption("user-config-directory")) {
-                String arg = line.getOptionValue("user-config-directory");
-                String errMsg = FreeColDirectories.setUserConfigDirectory(arg);
-                if (errMsg != null) { // Not fatal.
-                    System.err.println(Messages.message(errMsg));
+            if (line.hasOption("europeans")) {
+                int e = selectEuropeanCount(line.getOptionValue("europeans"));
+                if (e < 0) {
+                    gripe(StringTemplate.template("cli.error.europeans")
+                        .addAmount("%min%", EUROPEANS_MIN));
                 }
             }
 
@@ -590,8 +618,8 @@ public final class FreeCol {
             if (line.hasOption("load-savegame")) {
                 String arg = line.getOptionValue("load-savegame");
                 if (!FreeColDirectories.setSavegameFile(arg)) {
-                    fatal(Messages.message(StringTemplate.template("cli.error.save")
-                            .addName("%string%", arg)));
+                    fatal(StringTemplate.template("cli.error.save")
+                        .addName("%string%", arg));
                 }
             }
 
@@ -629,8 +657,8 @@ public final class FreeCol {
             if (line.hasOption("server")) {
                 String arg = line.getOptionValue("server");
                 if (!setServerPort(arg)) {
-                    fatal(Messages.message(StringTemplate.template("cli.error.serverPort")
-                            .addName("%string%", arg)));
+                    fatal(StringTemplate.template("cli.error.serverPort")
+                        .addName("%string%", arg));
                 }
                 standAloneServer = true;
             }
@@ -653,10 +681,25 @@ public final class FreeCol {
             if (line.hasOption("timeout")) {
                 String arg = line.getOptionValue("timeout");
                 if (!setTimeout(arg)) { // Not fatal
-                    System.err.println(Messages.message(StringTemplate.template("cli.error.timeout")
-                            .addName("%string%", arg)
-                            .addName("%minimum%", Integer.toString(TIMEOUT_MIN))));
+                    gripe(StringTemplate.template("cli.error.timeout")
+                        .addName("%string%", arg)
+                        .addName("%minimum%", Integer.toString(TIMEOUT_MIN)));
                 }
+            }
+
+            if (line.hasOption("user-data-directory")) {
+                String arg = line.getOptionValue("user-data-directory");
+                String errMsg = FreeColDirectories.setUserDataDirectory(arg);
+                if (errMsg != null) { // Fatal, unable to save.
+                    fatal(StringTemplate.template(errMsg)
+                        .addName("%string%", arg));
+                }
+            }
+
+            if (line.hasOption("user-config-directory")) {
+                String arg = line.getOptionValue("user-config-directory");
+                String errMsg = FreeColDirectories.setUserConfigDirectory(arg);
+                if (errMsg != null) gripe(errMsg); // Not fatal.
             }
 
             if (line.hasOption("version")) {
@@ -713,7 +756,7 @@ public final class FreeCol {
      */
     private static Advantages selectAdvantages(String advantages) {
         for (Advantages a : Advantages.values()) {
-            String msg = Messages.message(a.getId());
+            String msg = Messages.getName(a);
             if (msg.equals(advantages)) {
                 setAdvantages(a);
                 return a;
@@ -805,6 +848,39 @@ public final class FreeCol {
             s += "," + value;
         }
         return s.substring(1);
+    }
+
+    /**
+     * Get the number of European nations to enable by default.
+     */
+    public static int getEuropeanCount() {
+        return europeanCount;
+    }
+
+    /**
+     * Sets the number of enabled European nations.
+     *
+     * @param n The number of nations to enable.
+     */
+    public static void setEuropeanCount(int n) {
+        europeanCount = n;
+    }
+
+    /**
+     * Selects a European nation count.
+     *
+     * @param arg The supplied count argument.
+     * @return A valid nation number, or negative on error.
+     */
+    public static int selectEuropeanCount(String arg) {
+        try {
+            int n = Integer.parseInt(arg);
+            if (n >= EUROPEANS_MIN) {
+                setEuropeanCount(n);
+                return n;
+            }
+        } catch (NumberFormatException nfe) {}
+        return -1;
     }
 
     /**
@@ -981,8 +1057,8 @@ public final class FreeCol {
             try {
                 FreeColTcFile tcf = getTCFile();
                 if (tcf == null) {
-                    fatal(Messages.message(StringTemplate.template("cli.error.badTC")
-                            .addName("%tc%", getTC())));
+                    fatal(StringTemplate.template("cli.error.badTC")
+                        .addName("%tc%", getTC()));
                 }
                 spec = tcf.getSpecification();
                 spec.applyDifficultyLevel(FreeCol.getDifficulty());
@@ -1008,16 +1084,13 @@ public final class FreeCol {
                                                   serverPort, serverName);
                 if (checkIntegrity) {
                     boolean integrityOK = freeColServer.getIntegrity() > 0;
-                    System.err.println(Messages.message((integrityOK)
-                            ? "cli.check-savegame.success"
-                            : "cli.check-savegame.failure"));
+                    gripe((integrityOK)
+                        ? "cli.check-savegame.success"
+                        : "cli.check-savegame.failure");
                     System.exit((integrityOK) ? 0 : 1);
                 }
             } catch (Exception e) {
-                if (checkIntegrity) {
-                    String msg = Messages.message("cli.check-savegame.failure");
-                    System.err.println(msg);
-                }
+                if (checkIntegrity) gripe("cli.check-savegame.failure");
                 fatal(Messages.message("server.load")
                     + ": " + e.getMessage());
                 return;
@@ -1025,8 +1098,8 @@ public final class FreeCol {
         } else {
             FreeColTcFile tcf = FreeCol.getTCFile();
             if (tcf == null) {
-                fatal(Messages.message(StringTemplate.template("cli.error.badTC")
-                        .addName("%tc%", tc)));
+                fatal(StringTemplate.template("cli.error.badTC")
+                    .addName("%tc%", tc));
             }
             try {
                 // TODO: command line advantages setting?

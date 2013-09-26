@@ -1391,9 +1391,9 @@ public class GUI {
         canvas.showNewPanel(specification);
     }
 
-    public void showOpeningVideoPanel() {
+    public void showOpeningVideoPanel(String userMsg) {
         if (canvas == null) return;
-        canvas.showOpeningVideoPanel();
+        canvas.showOpeningVideoPanel(userMsg);
     }
 
     public Parameters showParametersDialog() {

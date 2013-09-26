@@ -367,8 +367,21 @@ be special effects.
   printed which lists the available choices.
 \item\verb$--clientOptions FILE$ Override the client options file
   (normally \texttt{options.xml} in the freecol directory).
+\item\verb$--difficulty DIFFICULTY$ Set the default difficulty level.
+\item\verb$--europeans EUROPEANS$ Set the default number of enabled
+  European colonial nations (normally the classic four: Dutch,
+  English, French, Spanish).
 \item\verb$--font FONTSPEC$ Override the default font with a Java
 font specifier (e.g. Arial-BOLD-12).
+\item\verb$--name NAME$ Specify a player name.
+\item\verb$--server PORT$ Start a stand-alone server on the specified
+port. If you don't know what that means, you will not need the option.
+\item\verb$--server-help$ Display a help screen for the more advanced
+server options.
+\item\verb$--timeout TIMEOUT$ Specifies the number of seconds the
+  server should wait for a player to answer a question (e.g. demands
+  from natives).  This is `infinite' by default in single player mode,
+  and 60 seconds in multiplayer.
 \item\verb$--user-config-directory DIRECTORY$ Use the given directory
   instead of your default FreeCol user configuration directory to load
   client and custom options. You can use this in order to run the
@@ -381,15 +394,6 @@ font specifier (e.g. Arial-BOLD-12).
   game from a USB stick\index{USB stick}, for example. Please note
   that specifying a save game file on the command line will override
   the save game directory.
-\item\verb$--name NAME$ Specify a player name.
-\item\verb$--server PORT$ Start a stand-alone server on the specified
-port. If you don't know what that means, you will not need the option.
-\item\verb$--server-help$ Display a help screen for the more advanced
-server options.
-\item\verb$--timeout TIMEOUT$ Specifies the number of seconds the
-  server should wait for a player to answer a question (e.g. demands
-  from natives).  This is `infinite' by default in single player mode,
-  and 60 seconds in multiplayer.
 \item\verb$--windowed[[=]WIDTHxHEIGHT]$ Run FreeCol in windowed mode
   instead of full screen mode and set the window width and height. You
   will need this if your window manager or Java Virtual Machine do not
