@@ -164,8 +164,8 @@ public final class FreeColClient {
                 || FreeColDebugger.getDebugRunTurns() <= 0) {
                 fatal(Messages.message("client.headlessDebug"));
             }                
-            if (savedGame == null) {
-                fatal("Headless mode requires a saved game.");
+            if (savedGame == null && spec == null) {
+                fatal(Messages.message("client.headlessRequires"));
             }
         }
  
