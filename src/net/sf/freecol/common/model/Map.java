@@ -1193,6 +1193,15 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
+     * Gets the search tracing status.
+     *
+     * @return The search tracing status.
+     */
+    public boolean getSearchTrace() {
+        return traceSearch;
+    }
+
+    /**
      * Sets the search tracing status.
      *
      * @param trace The new search tracing status.

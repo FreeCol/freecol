@@ -135,6 +135,19 @@ public class DebugMenu extends JMenu {
             });
         hide.setEnabled(hasServer);
 
+        // Search tracing
+        final JCheckBoxMenuItem searchTrace = new JCheckBoxMenuItem(
+            Messages.message("menuBar.debug.searchTrace"),
+            game.getMap().getSearchTrace());
+        searchTrace.setOpaque(false);
+        this.add(searchTrace);
+        searchTrace.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    boolean val = ((JCheckBoxMenuItem)e.getSource()).isSelected();
+                    game.getMap().setSearchTrace(val);
+                }
+            });
+
         final JMenu cvpMenu = new JMenu(
             Messages.message("menuBar.debug.showColonyValue"));
         cvpMenu.setOpaque(false);
