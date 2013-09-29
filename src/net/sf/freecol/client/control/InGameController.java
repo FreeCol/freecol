@@ -3872,8 +3872,7 @@ public final class InGameController implements NetworkConstants {
      * Query whether the user wants to reconnect?
      */
     public void reconnect() {
-        if (gui.showModalConfirmDialog("reconnect.text",
-                "reconnect.yes", "reconnect.no")) {
+        if (gui.showModalConfirmDialog("reconnect.text", "ok", "cancel")) {
             logger.finest("Reconnect accepted.");
             freeColClient.getConnectController().reconnect();
         } else {
