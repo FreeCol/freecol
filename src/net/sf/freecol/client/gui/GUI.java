@@ -530,10 +530,12 @@ public class GUI {
     public void setActiveUnit(Unit unit) {
         if (mapViewer == null || canvas == null) return;
         mapViewer.setActiveUnit(unit);
-        if (unit != null
-            && !freeColClient.getMyPlayer().owns(unit)) {
-            canvas.repaint(0, 0, canvas.getWidth(), canvas.getHeight());
+        unit = mapViewer.getActiveUnit();
+        showMapControls(unit != null);
+        if (unit != null && !freeColClient.getMyPlayer().owns(unit)) {
+            canvas.refresh();
         }
+        updateMenuBar();
     }
 
     /**
@@ -921,23 +923,23 @@ public class GUI {
     public void showMapControls(boolean value) {
         if (canvas == null) return;
 
-        if (value && freeColClient.isInGame()) {
-            if (mapControls == null) {
-                try {
-                    String className = freeColClient.getClientOptions()
-                        .getString(ClientOptions.MAP_CONTROLS);
-                    String panelName = "net.sf.freecol.client.gui.panel."
-                        + className;
-                    Class<?> controls = Class.forName(panelName);
-                    mapControls = (MapControls)controls
-                        .getConstructor(FreeColClient.class, GUI.class)
-                        .newInstance(freeColClient, this);
-                } catch (Exception e) {
-                    mapControls = new CornerMapControls(freeColClient);
-                }
+        if (value && freeColClient.isInGame() && mapControls == null) {
+            try {
+                String className = freeColClient.getClientOptions()
+                    .getString(ClientOptions.MAP_CONTROLS);
+                String panelName = "net.sf.freecol.client.gui.panel."
+                    + className;
+                Class<?> controls = Class.forName(panelName);
+                mapControls = (MapControls)controls
+                    .getConstructor(FreeColClient.class)
+                    .newInstance(freeColClient);
+                logger.info("Instantiated " + panelName);
+            } catch (Exception e) {
+                logger.log(Level.INFO, "Fallback to CornerMapControls.", e);
+                mapControls = new CornerMapControls(freeColClient);
             }
-            mapControls.update();
         }
+
         if (mapControls != null) {
             if (value) {
                 if (!mapControls.isShowing()) {

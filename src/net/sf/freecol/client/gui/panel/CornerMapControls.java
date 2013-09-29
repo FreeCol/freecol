@@ -140,10 +140,12 @@ public final class CornerMapControls extends MapControls {
         //
         // Relocate GUI Objects
         //
-        
-        infoPanel.setLocation(component.getWidth() - infoPanel.getWidth(), component.getHeight() - infoPanel.getHeight());
-        miniMapPanel.setLocation(0, component.getHeight() - miniMapPanel.getHeight());
-        compassRose.setLocation(component.getWidth() - compassRose.getWidth() - 20, 20);
+        infoPanel.setLocation(component.getWidth() - infoPanel.getWidth(),
+                              component.getHeight() - infoPanel.getHeight());
+        miniMapPanel.setLocation(0, 
+            component.getHeight() - miniMapPanel.getHeight());
+        compassRose.setLocation(component.getWidth() - compassRose.getWidth()
+                                - 20, 20);
 
         if (!unitButtons.isEmpty()) {
             final int WIDTH = this.unitButtons.get(0).getWidth();
@@ -179,6 +181,11 @@ public final class CornerMapControls extends MapControls {
         }
     }
 
+    /**
+     * Are these map controls showing?
+     *
+     * @return True if the map controls are showing.
+     */
     public boolean isShowing() {
         return infoPanel.getParent() != null;
     }
@@ -186,7 +193,7 @@ public final class CornerMapControls extends MapControls {
     /**
      * Removes the map controls from the parent canvas component.
      *
-     * @param canvas <code>Canvas</code> parent
+     * @param canvas The parent <code>Canvas</code>.
      */
     public void removeFromComponent(Canvas canvas) {
         canvas.removeFromCanvas(infoPanel);
@@ -201,5 +208,4 @@ public final class CornerMapControls extends MapControls {
     public void repaint() {
         miniMapPanel.repaint();
     }
-
 }

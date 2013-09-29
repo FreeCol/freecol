@@ -1168,8 +1168,6 @@ public final class MapViewer {
 
         if (activeUnit == null || tile == null) {
             freeColClient.updateActions();
-            gui.updateMenuBar();
-            gui.updateMapControls();
         } else {
             updateGotoPathForActiveUnit();
             if (!setSelectedTile(tile, false)
@@ -3202,31 +3200,25 @@ public final class MapViewer {
 
 
     public void toggleViewMode() {
-        logger.warning("Changing view");
+        logger.warning("Toggling view");
         changeViewMode(1 - currentMode);
     }
 
     public void changeViewMode(int newViewMode) {
-
-        if (newViewMode == currentMode) {
-            logger.warning("Trying to change to the same view mode");
-            return;
+        if (newViewMode != currentMode) {
+            logger.fine("Changed to " + ((newViewMode == GUI.MOVE_UNITS_MODE)
+                    ? "Move Units" : "View Terrain") + " mode");
+            currentMode = newViewMode;
         }
-
-        currentMode = newViewMode;
 
         switch (currentMode) {
         case GUI.MOVE_UNITS_MODE:
-            if (getActiveUnit() == null) {
-                setActiveUnit(savedActiveUnit);
-            }
+            if (getActiveUnit() == null) setActiveUnit(savedActiveUnit);
             savedActiveUnit = null;
-            logger.warning("Change view to Move Units Mode");
             break;
         case GUI.VIEW_TERRAIN_MODE:
             savedActiveUnit = activeUnit;
             setActiveUnit(null);
-            logger.warning("Change view to View Terrain Mode");
             break;
         }
     }

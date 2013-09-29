@@ -1115,10 +1115,6 @@ public final class Canvas extends JDesktopPane {
             removeMouseMotionListener(mouseMotionListeners[i]);
         }
 
-        // change to default view mode
-        // Must be done before removing jMenuBar to prevent exception (crash)
-        gui.getMapViewer().changeViewMode(GUI.MOVE_UNITS_MODE);
-
         for (Component c : getComponents()) {
             removeFromCanvas(c);
         }

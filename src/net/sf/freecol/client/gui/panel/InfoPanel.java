@@ -176,7 +176,8 @@ public final class InfoPanel extends FreeColPanel {
             if (p != null) {
                 p.setOpaque(false);
                 final Dimension d = p.getPreferredSize();
-                p.setBounds(0, (mapEditorPanel.getHeight() - d.height)/2, mapEditorPanel.getWidth(), d.height);
+                p.setBounds(0, (mapEditorPanel.getHeight() - d.height)/2,
+                            mapEditorPanel.getWidth(), d.height);
                 mapEditorPanel.removeAll();
                 mapEditorPanel.add(p, BorderLayout.CENTER);
                 mapEditorPanel.validate();
@@ -342,7 +343,7 @@ public final class InfoPanel extends FreeColPanel {
     /**
      * Panel for displaying <code>Unit</code>-information.
      */
-    public class UnitInfoPanel extends MigPanel {
+    public class UnitInfoPanel extends JPanel {
 
         /** The unit to display. */
         private Unit unit;
@@ -370,7 +371,7 @@ public final class InfoPanel extends FreeColPanel {
             if (unit != null) {
                 add(new JLabel(lib.getUnitImageIcon(unit)),
                     "spany, gapafter 5px");
-                String name = Messages.message(unit.getFullLabel());
+                String name = Messages.getLabel(unit);
 
                 // TODO: this is too brittle!
                 int index = name.indexOf(" (");
@@ -386,15 +387,9 @@ public final class InfoPanel extends FreeColPanel {
                     : Messages.message("moves") +" "+ unit.getMovesAsString();
                 add(new JLabel(text), "span");
 
-                // Handle the special cases.
-                // TODO: make this more generic
-                ImageIcon icon;
-                JLabel label;
-                if (unit.canCarryTreasure()) {
-                    text = unit.getTreasureAmount() + " "
-                        + Messages.message("gold");
-                    add(new JLabel(text), "span");
-                } else if (unit.isCarrier()) {
+                if (unit.isCarrier()) {
+                    ImageIcon icon;
+                    JLabel label;
                     for (Goods goods : unit.getGoodsList()) {
                         icon = lib.getScaledGoodsImageIcon(goods.getType(), 0.66f);
                         label = new JLabel(icon);
@@ -410,22 +405,6 @@ public final class InfoPanel extends FreeColPanel {
                         text = Messages.getLabel(carriedUnit);
                         label.setToolTipText(text);
                         add(label);
-                    }
-                } else {
-                    for (EquipmentType et : unit.getEquipment().keySet()) {
-                        for (AbstractGoods ag : et.getRequiredGoods()) {
-                            int amount = ag.getAmount()
-                                * unit.getEquipment().getCount(et);
-                            icon = lib.getScaledGoodsImageIcon(ag.getType(), 0.66f);
-
-                            label = new JLabel(Integer.toString(amount),
-                                               icon, JLabel.CENTER);
-                            text = Messages.message(StringTemplate.template("model.goods.goodsAmount")
-                                .addAmount("%amount%", amount)
-                                .add("%goods%", ag.getNameKey()));
-                            label.setToolTipText(text);
-                            add(label);
-                        }
                     }
                 }
             }

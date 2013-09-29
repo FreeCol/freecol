@@ -465,6 +465,7 @@ public final class ConnectController {
                 : player.getEntryLocation().getTile();
             freeColClient.setSinglePlayer(msg.isSinglePlayer());
             freeColClient.getPreGameController().startGame();
+            gui.setActiveUnit(null);
 
             if (msg.isCurrentPlayer()) {
                 freeColClient.getInGameController()
