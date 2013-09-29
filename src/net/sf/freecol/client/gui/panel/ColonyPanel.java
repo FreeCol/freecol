@@ -320,6 +320,7 @@ public final class ColonyPanel extends PortPanel
         constructionPanel = new ConstructionPanel(freeColClient, colony, true);
 
         inPortPanel = new ColonyInPortPanel();
+        GUI.setTitledBorder(inPortPanel, "inPort");
         inPortScroll = new JScrollPane(inPortPanel);
         inPortScroll.getVerticalScrollBar().setUnitIncrement(16);
         inPortScroll.setBorder(BorderFactory.createEtchedBorder());
@@ -1224,8 +1225,7 @@ public final class ColonyPanel extends PortPanel
             super(ColonyPanel.this, null, ColonyPanel.this.isEditable());
 
             setLayout(new MigLayout("wrap 4, fill, insets 0"));
-            setBorder(BorderFactory.createTitledBorder(BorderFactory
-                    .createEmptyBorder(), Messages.message("outsideColony")));
+            GUI.setTitledBorder(this, "outsideColony");
         }
 
 
@@ -1356,7 +1356,6 @@ public final class ColonyPanel extends PortPanel
             super(ColonyPanel.this, null, ColonyPanel.this.isEditable());
 
             setLayout(new MigLayout("wrap 3, fill, insets 0"));
-            setTitledBorder("inPort");
         }
 
 

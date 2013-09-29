@@ -52,7 +52,6 @@ import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
-import javax.swing.border.TitledBorder;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
@@ -324,18 +323,6 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
                 KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true)),
             KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, true),
             JComponent.WHEN_FOCUSED);
-    }
-
-    /**
-     * Put a titled border on this panel.
-     *
-     * @param key A message key to use to look up the title.
-     */
-    protected TitledBorder setTitledBorder(String key) {
-        TitledBorder border = BorderFactory.createTitledBorder(BorderFactory
-            .createEmptyBorder(), Messages.message(key));
-        setBorder(border);
-        return border;
     }
 
 

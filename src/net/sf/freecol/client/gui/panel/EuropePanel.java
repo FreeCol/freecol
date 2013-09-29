@@ -193,23 +193,12 @@ public final class EuropePanel extends PortPanel {
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         logScroll.getVerticalScrollBar().setUnitIncrement(16);
 
-        toAmericaPanel.setBorder(BorderFactory
-            .createTitledBorder(BorderFactory.createEmptyBorder(),
-                                Messages.message("goingToAmerica")));
-        toEuropePanel.setBorder(BorderFactory
-            .createTitledBorder(BorderFactory.createEmptyBorder(),
-                                Messages.message("goingToEurope")));
-        docksPanel.setBorder(BorderFactory
-            .createTitledBorder(BorderFactory.createEmptyBorder(),
-                                Messages.message("docks")));
-        inPortPanel.setBorder(BorderFactory
-            .createTitledBorder(BorderFactory.createEmptyBorder(),
-                                Messages.message("inPort")));
+        GUI.setTitledBorder(toAmericaPanel, "goingToAmerica");
+        GUI.setTitledBorder(toEuropePanel, "goingToEurope");
+        GUI.setTitledBorder(docksPanel, "docks");
+        GUI.setTitledBorder(inPortPanel, "inPort");
         marketPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-        log.setBorder(BorderFactory
-            .createTitledBorder(BorderFactory.createEmptyBorder(),
-                                Messages.message("sales")));
+        GUI.setTitledBorder(log, "sales");
 
         toAmericaScroll.getViewport().setOpaque(false);
         toAmericaPanel.setOpaque(false);

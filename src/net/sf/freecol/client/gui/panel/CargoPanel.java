@@ -70,7 +70,7 @@ public class CargoPanel extends FreeColPanel
     public CargoPanel(FreeColClient freeColClient, boolean withTitle) {
         super(freeColClient, new MigLayout("wrap 6, fill, insets 0"));
 
-        this.border = (withTitle) ? setTitledBorder("cargoOnCarrier")
+        this.border = (withTitle) ? GUI.setTitledBorder(this, "cargoOnCarrier")
             : null;
 
         this.carrier = null;

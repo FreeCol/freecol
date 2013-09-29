@@ -50,12 +50,14 @@ import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
+import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.DefaultStyledDocument;
@@ -870,6 +872,20 @@ public class GUI {
 
         textPane.setText(text);
         return textPane;
+    }
+
+    /**
+     * Put a titled border on a component.
+     *
+     * @param component The <code>JComponent</code> to put the border on.
+     * @param key A message key to use to look up the title.
+     */
+    public static TitledBorder setTitledBorder(JComponent component,
+                                               String key) {
+        TitledBorder border = BorderFactory.createTitledBorder(BorderFactory
+            .createEmptyBorder(), Messages.message(key));
+        component.setBorder(border);
+        return border;
     }
 
 
