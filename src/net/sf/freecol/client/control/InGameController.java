@@ -1929,7 +1929,7 @@ public final class InGameController implements NetworkConstants {
             && !gui.showModalConfirmDialog(unit.getTile(),
                 StringTemplate.template("model.unit.confirmCancelWork")
                     .addAmount("%turns%", unit.getWorkTurnsLeft()),
-                unit, "yes", "no")) {
+                unit, "ok", "cancel")) {
             return false;
         }
 
@@ -1961,7 +1961,7 @@ public final class InGameController implements NetworkConstants {
                 StringTemplate.template("clearSpeciality.areYouSure")
                    .addStringTemplate("%oldUnit%", unit.getFullLabel())
                    .add("%unit%", newType.getNameKey()),
-                unit, "yes", "no")) {
+                unit, "ok", "cancel")) {
             return;
         }
 
@@ -3872,12 +3872,13 @@ public final class InGameController implements NetworkConstants {
      * Query whether the user wants to reconnect?
      */
     public void reconnect() {
-        if (gui.showModalConfirmDialog("reconnect.text", "ok", "cancel")) {
+        if (gui.showModalConfirmDialog("reconnect.text",
+                                       "reconnect.quit", "reconnect.yes")) {
+            logger.finest("Reconnect quit.");
+            freeColClient.quit();
+        } else {
             logger.finest("Reconnect accepted.");
             freeColClient.getConnectController().reconnect();
-        } else {
-            logger.finest("Reconnect rejected, quit.");
-            freeColClient.quit();
         }
     }
 
