@@ -24,6 +24,9 @@ import java.awt.event.MouseEvent;
 import java.awt.Graphics;
 import java.awt.Image;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.swing.border.BevelBorder;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -47,8 +50,12 @@ import net.sf.freecol.common.resources.ResourceManager;
  */
 public final class CornerMapControls extends MapControls {
 
-    public class MiniMapPanel extends JPanel {
+    private static final Logger logger = Logger.getLogger(CornerMapControls.class.getName());
 
+    public class MiniMapPanel extends JPanel {
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void paintComponent(Graphics graphics) {
             if (miniMapSkin != null) {
@@ -56,9 +63,10 @@ public final class CornerMapControls extends MapControls {
             }
             super.paintComponent(graphics);
         }
-
     }
+
     private final JLabel compassRose;
+
     private final MiniMapPanel miniMapPanel;
 
     private Image miniMapSkin;
@@ -76,6 +84,9 @@ public final class CornerMapControls extends MapControls {
         compassRose.setFocusable(false);
         compassRose.setSize(compassRose.getPreferredSize());
         compassRose.addMouseListener(new MouseAdapter() {
+                /**
+                 * {@inheritDoc}
+                 */
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     int x = e.getX() - compassRose.getWidth()/2;
@@ -84,8 +95,8 @@ public final class CornerMapControls extends MapControls {
                     if (theta < 0) {
                         theta += 2*Math.PI;
                     }
-                    Direction direction = Direction.values()[(int) Math.floor(theta / (Math.PI/4))];
-                    freeColClient.getInGameController().moveActiveUnit(direction);
+                    freeColClient.getInGameController()
+                        .moveActiveUnit(Direction.angleToDirection(theta));
                 }
             });
 
@@ -108,9 +119,11 @@ public final class CornerMapControls extends MapControls {
 
         if (miniMapSkin != null) {
             miniMapPanel.setBorder(null);
-            miniMapPanel.setSize(miniMapSkin.getWidth(null), miniMapSkin.getHeight(null));
+            miniMapPanel.setSize(miniMapSkin.getWidth(null),
+                                 miniMapSkin.getHeight(null));
             miniMapPanel.setOpaque(false);
-            // TODO-LATER: The values below should be specified by a skin-configuration-file:
+            // TODO-LATER: The values below should be specified by a
+            // skin-configuration-file.
             miniMap.setLocation(38, 75);
             miniMapZoomInButton.setLocation(4, 174);
             miniMapZoomOutButton.setLocation(264, 174);
@@ -120,32 +133,39 @@ public final class CornerMapControls extends MapControls {
             miniMapPanel.setOpaque(true);
             miniMap.setBorder(new BevelBorder(BevelBorder.RAISED));
             miniMap.setLocation(width/2, GAP);
-            miniMapZoomInButton.setLocation(GAP, MAP_HEIGHT + GAP - miniMapZoomInButton.getHeight());
-            miniMapZoomOutButton.setLocation(miniMapZoomInButton.getWidth() + MAP_WIDTH + 3 * GAP,
-                                             MAP_HEIGHT + GAP - miniMapZoomOutButton.getHeight());
+            miniMapZoomInButton.setLocation(GAP, 
+                MAP_HEIGHT + GAP - miniMapZoomInButton.getHeight());
+            miniMapZoomOutButton.setLocation(
+                miniMapZoomInButton.getWidth() + MAP_WIDTH + 3 * GAP,
+                MAP_HEIGHT + GAP - miniMapZoomOutButton.getHeight());
         }
-
     }
 
     /**
-     * Adds the map controls to the given component.
-     * @param component The component to add the map controls to.
+     * Adds the map controls to the given canvas.
+     *
+     * @param canvas The parent <code>Canvas</code>.
      */
-    public void addToComponent(Canvas component) {
+    public void addToComponent(Canvas canvas) {
         if (freeColClient.getGame() == null
             || freeColClient.getGame().getMap() == null) {
             return;
         }
 
+        final boolean rose = freeColClient.getClientOptions()
+            .getBoolean(ClientOptions.DISPLAY_COMPASS_ROSE);
+
         //
         // Relocate GUI Objects
         //
-        infoPanel.setLocation(component.getWidth() - infoPanel.getWidth(),
-                              component.getHeight() - infoPanel.getHeight());
-        miniMapPanel.setLocation(0, 
-            component.getHeight() - miniMapPanel.getHeight());
-        compassRose.setLocation(component.getWidth() - compassRose.getWidth()
-                                - 20, 20);
+        final int cw = canvas.getWidth();
+        final int ch = canvas.getHeight();
+        infoPanel.setLocation(cw - infoPanel.getWidth(),
+                              ch - infoPanel.getHeight());
+        miniMapPanel.setLocation(0, ch - miniMapPanel.getHeight());
+        if (rose) {
+            compassRose.setLocation(cw - compassRose.getWidth() - 20, 20);
+        }
 
         if (!unitButtons.isEmpty()) {
             final int WIDTH = this.unitButtons.get(0).getWidth();
@@ -154,7 +174,7 @@ public final class CornerMapControls extends MapControls {
             int x = miniMapPanel.getWidth() + 1 +
                 ((infoPanel.getX() - miniMapPanel.getWidth() -
                   length * WIDTH - (length - 1) * SPACE - WIDTH) / 2);
-            int y = component.getHeight() - 40;
+            int y = canvas.getHeight() - 40;
             int step = WIDTH + SPACE;
 
             for (UnitButton button : unitButtons) {
@@ -166,16 +186,18 @@ public final class CornerMapControls extends MapControls {
         //
         // Add the GUI Objects to the container
         //
-        component.add(infoPanel, CONTROLS_LAYER);
-        component.add(miniMapPanel, CONTROLS_LAYER);
-        if (freeColClient.getClientOptions()
-            .getBoolean(ClientOptions.DISPLAY_COMPASS_ROSE)) {
-            component.add(compassRose, CONTROLS_LAYER);
+        canvas.add(infoPanel, CONTROLS_LAYER);
+        try {
+            canvas.add(miniMapPanel, CONTROLS_LAYER);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Minimap add fail: "
+                + miniMapPanel.getLocation(), e);
         }
+        if (rose) canvas.add(compassRose, CONTROLS_LAYER);
 
         if (!freeColClient.isMapEditor()) {
             for (UnitButton button : unitButtons) {
-                component.add(button, CONTROLS_LAYER);
+                canvas.add(button, CONTROLS_LAYER);
                 button.refreshAction();
             }
         }
@@ -191,7 +213,7 @@ public final class CornerMapControls extends MapControls {
     }
 
     /**
-     * Removes the map controls from the parent canvas component.
+     * Removes the map controls from the parent canvas.
      *
      * @param canvas The parent <code>Canvas</code>.
      */

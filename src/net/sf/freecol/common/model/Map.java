@@ -251,6 +251,16 @@ public class Map extends FreeColGameObject implements Location {
             ret[NUMBER_OF_DIRECTIONS-1] = this.getReverseDirection();
             return ret;
         }
+
+        /**
+         * Convert an angle (radians) to a direction.
+         *
+         * @param angle The angle to convert.
+         * @return An equivalent <code>Direction</code>.
+         */
+        public static Direction angleToDirection(double angle) {
+            return Direction.values()[(int)Math.floor(angle / (Math.PI/4))];
+        }
     }
 
     /** A position on the Map. */
