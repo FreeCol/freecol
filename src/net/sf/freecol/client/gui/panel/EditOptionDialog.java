@@ -21,47 +21,56 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionEvent;
 
-import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.OptionUI;
+import net.sf.freecol.client.gui.panel.MigPanel;
+
 import net.sf.freecol.common.option.Option;
+
+import net.miginfocom.swing.MigLayout;
 
 
 /**
  * Dialog to edit options with.
  */
-public class EditOptionDialog extends FreeColOldDialog<Boolean> {
+public class EditOptionDialog extends FreeColDialog<Boolean> {
 
     private OptionUI ui;
 
 
+    /**
+     * Create an EditOptionDialog.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param option The <code>Option</code> to operate on.
+     */
     public EditOptionDialog(FreeColClient freeColClient, Option option) {
-        super(freeColClient, new MigLayout());
+        super(freeColClient);
 
-        ui = OptionUI.getOptionUI(getGUI(), option, editable);
-        if (ui.getLabel() == null) {
-            add(ui.getLabel(), "split 2");
-        }
-        add(ui.getComponent());
+        ui = OptionUI.getOptionUI(freeColClient.getGUI(), option, true);
 
-        add(okButton, "newline, split 2, tag ok");
-        add(cancelButton, "tag cancel");
+        MigPanel panel = new MigPanel(new MigLayout());
+        if (ui.getLabel() == null) panel.add(ui.getLabel(), "split 2");
+        panel.add(ui.getComponent());
+
+        initialize(true, panel, null, new String[] {
+                Messages.message("ok"),
+                Messages.message("cancel")
+            });
     }
 
-
-    // Interface ActionListener
 
     /**
      * {@inheritDoc}
      */
-    public void actionPerformed(ActionEvent event) {
-        final String command = event.getActionCommand();
-        if (OK.equals(command)) {
+    public Boolean getResponse() {
+        Object value = getValue();
+        if (value == options[0]) {
             ui.updateOption();
-            setResponse(true);
-        } else {
-            setResponse(false);
+            return Boolean.TRUE;
         }
+        return Boolean.FALSE;
     }
 }

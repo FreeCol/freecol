@@ -940,9 +940,9 @@ public class GUI {
         if (canvas == null) return;
 
         if (value && freeColClient.isInGame() && mapControls == null) {
+            String className = freeColClient.getClientOptions()
+                .getString(ClientOptions.MAP_CONTROLS);
             try {
-                String className = freeColClient.getClientOptions()
-                    .getString(ClientOptions.MAP_CONTROLS);
                 String panelName = "net.sf.freecol.client.gui.panel."
                     + className;
                 Class<?> controls = Class.forName(panelName);
@@ -951,7 +951,8 @@ public class GUI {
                     .newInstance(freeColClient);
                 logger.info("Instantiated " + panelName);
             } catch (Exception e) {
-                logger.log(Level.INFO, "Fallback to CornerMapControls.", e);
+                logger.log(Level.INFO, "Fallback to CornerMapControls from "
+                    + className, e);
                 mapControls = new CornerMapControls(freeColClient);
             }
         }
