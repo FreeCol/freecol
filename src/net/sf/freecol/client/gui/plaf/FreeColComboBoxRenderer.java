@@ -99,8 +99,10 @@ public class FreeColComboBoxRenderer implements ListCellRenderer, UIResource {
      * @return a <code>String</code> value
      */
     public String getId(Object value) {
-        return (value instanceof ObjectWithId)
-            ? prefix + ((ObjectWithId) value).getId()
+        return (value instanceof String)
+            ? (String)value
+            : (value instanceof ObjectWithId)
+            ? prefix + ((ObjectWithId)value).getId()
             : null;
     }
 
