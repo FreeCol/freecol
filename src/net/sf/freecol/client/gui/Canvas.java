@@ -1628,8 +1628,8 @@ public final class Canvas extends JDesktopPane {
      * @return A list of names for a new nation.
      */
     public List<String> showConfirmDeclarationDialog() {
-        return showFreeColOldDialog(new ConfirmDeclarationDialog(freeColClient),
-                                 null, true);
+        return showFreeColDialog(new ConfirmDeclarationDialog(freeColClient),
+                                 null);
     }
 
     /**

@@ -24,12 +24,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.swing.ImageIcon;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 
@@ -37,13 +40,14 @@ import net.sf.freecol.common.model.StringTemplate;
 /**
  * A dialog used to confirm the declaration of independence.
  */
-public class ConfirmDeclarationDialog extends FreeColOldDialog<List<String>> {
-
-    private JTextField nationField;
-    private JTextField countryField;
+public class ConfirmDeclarationDialog extends FreeColDialog<List<String>> {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ConfirmDeclarationDialog.class.getName());
+
+    private JTextField nationField;
+
+    private JTextField countryField;
 
 
     /**
@@ -52,51 +56,60 @@ public class ConfirmDeclarationDialog extends FreeColOldDialog<List<String>> {
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public ConfirmDeclarationDialog(FreeColClient freeColClient) {
-        super(freeColClient, new MigLayout("wrap 1", "", ""));
+        super(freeColClient);
 
-        Player player = getMyPlayer();
+        final Player player = freeColClient.getMyPlayer();
 
-        StringTemplate nation
-            = StringTemplate.template("declareIndependence.defaultNation")
-                .addStringTemplate("%nation%", player.getNationName());
-        nationField = new JTextField(Messages.message(nation), 20);
-        StringTemplate country
-            = StringTemplate.template("declareIndependence.defaultCountry")
-                .add("%nation%", player.getNewLandName());
-        countryField = new JTextField(Messages.message(country), 20);
-
-        okButton.setText(Messages.message("declareIndependence.areYouSure.yes"));
-        cancelButton.setText(Messages.message("declareIndependence.areYouSure.no"));
+        // Create the main panel
+        MigPanel panel = new MigPanel(new MigLayout("wrap 1", "", ""));
 
         StringTemplate sure
             = StringTemplate.template("declareIndependence.areYouSure.text")
                 .add("%monarch%", player.getMonarch().getNameKey());
-        add(GUI.getDefaultTextArea(Messages.message(sure)));
-        add(GUI.getDefaultTextArea(Messages.message("declareIndependence.enterCountry")));
-        add(countryField);
-        add(GUI.getDefaultTextArea(Messages.message("declareIndependence.enterNation")));
-        add(nationField);
-        add(okButton, "newline 20, split 2, tag ok");
-        add(cancelButton, "tag cancel");
 
+        StringTemplate country
+            = StringTemplate.template("declareIndependence.defaultCountry")
+                .add("%nation%", player.getNewLandName());
+        JTextField countryField = new JTextField(Messages.message(country), 20);
+        String cPrompt = Messages.message("declareIndependence.enterCountry");
+
+        StringTemplate nation
+            = StringTemplate.template("declareIndependence.defaultNation")
+                .addStringTemplate("%nation%", player.getNationName());
+        JTextField nationField = new JTextField(Messages.message(nation), 20);
+        String nPrompt = Messages.message("declareIndependence.enterNation");
+
+        panel.add(GUI.getDefaultTextArea(Messages.message(sure)));
+        panel.add(GUI.getDefaultTextArea(cPrompt));
+        panel.add(countryField);
+        panel.add(GUI.getDefaultTextArea(nPrompt));
+        panel.add(nationField);
+        panel.setPreferredSize(panel.getPreferredSize()); // Prevent NPE
+
+        // Use the coat of arms image icon.  Is there something better?
+        ImageIcon icon = freeColClient.getGUI().getImageLibrary()
+            .getImageIcon(player, true);
+
+        initialize(true, panel, icon, new String[] {
+                Messages.message("declareIndependence.areYouSure.yes"),
+                Messages.message("declareIndependence.areYouSure.no")
+            });
+        setInitialValue(1);
     }
 
-
-    // Interface ActionListener
 
     /**
      * {@inheritDoc}
      */
-    public void actionPerformed(ActionEvent event) {
-        final String command = event.getActionCommand();
-        if (OK.equals(command)) {
+    public List<String> getResponse() {
+        Object value = getValue();
+        if (options[0].equals(value)) {
             List<String> result = new ArrayList<String>();
             // Sanitize user input, used in save file name
             result.add(nationField.getText().replaceAll("[^\\s\\w]", ""));
             result.add(countryField.getText());
-            setResponse(result);
-        } else {
-            super.actionPerformed(event);
+            return result;
         }
+        return null;
     }
 }
