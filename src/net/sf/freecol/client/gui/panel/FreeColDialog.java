@@ -72,7 +72,7 @@ public abstract class FreeColDialog<T> extends JDialog
         
 
     /** The enclosing client. */
-    private FreeColClient freeColClient;
+    protected FreeColClient freeColClient;
 
     /** The options to choose from. */
     protected String[] options;

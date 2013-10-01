@@ -43,11 +43,12 @@ import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.common.util.RandomChoice;
+import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -55,43 +56,38 @@ import net.sf.freecol.server.model.ServerPlayer;
 /**
  * This dialog is used to edit an Indian settlement (map editor only).
  */
-public final class EditSettlementDialog extends FreeColOldDialog<IndianSettlement>
+public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
     implements ItemListener {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(EditSettlementDialog.class.getName());
 
-    private static final String REMOVE = "REMOVE";
-
     private final IndianSettlement settlement;
 
-    private final JCheckBox capital;
+    private final JTextField name;
     private final JComboBox owner;
+    private final JCheckBox capital;
     private final JComboBox skill;
     private final JSpinner units;
-    private final JTextField name;
 
 
     /**
-     * The constructor that will add the items to this panel.
+     * Create an EditSettlementDialog.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param settlement the IndianSettlement to edit
+     * @param settlement The <code>IndianSettlement</code> to edit.
      */
     @SuppressWarnings("unchecked") // FIXME in Java7
     public EditSettlementDialog(FreeColClient freeColClient,
                                 final IndianSettlement settlement) {
-        super(freeColClient, new MigLayout("wrap 2, gapx 20"));
+        super(freeColClient);
 
         this.settlement = settlement;
 
-        okButton.addActionListener(this);
+        MigPanel panel = new MigPanel(new MigLayout("wrap 2, gapx 20"));
 
-        add(new JLabel(Messages.message("name")));
         name = new JTextField(settlement.getName(), 30);
-        add(name);
 
-        add(new JLabel(Messages.message("nation")));
         DefaultComboBoxModel nationModel = new DefaultComboBoxModel();
         for (Player player : settlement.getGame().getPlayers()) {
             if (player.isAI() && player.isIndian()) {
@@ -102,34 +98,38 @@ public final class EditSettlementDialog extends FreeColOldDialog<IndianSettlemen
         owner.setSelectedItem(settlement.getOwner().getNation());
         owner.addItemListener(this);
         owner.setRenderer(new FreeColComboBoxRenderer());
-        add(owner);
 
-        add(new JLabel(Messages.message("capital")));
         capital = new JCheckBox();
         capital.setSelected(settlement.isCapital());
-        add(capital);
 
-        add(new JLabel(Messages.message("report.indian.skillTaught")));
         skill = new JComboBox(getSkillModel());
         skill.setSelectedItem(settlement.getLearnableSkill());
         skill.setRenderer(new FreeColComboBoxRenderer());
-        add(skill);
 
-        add(new JLabel(Messages.message("report.units")));
         int unitCount = settlement.getUnitCount();
-        SpinnerNumberModel spinnerModel = new SpinnerNumberModel(unitCount, 1, 20, 1);
+        SpinnerNumberModel spinnerModel
+            = new SpinnerNumberModel(unitCount, 1, 20, 1);
         units = new JSpinner(spinnerModel);
-        add(units);
 
-        JButton remove = new JButton(Messages.message("editor.removeSettlement"));
-        remove.setActionCommand(REMOVE);
-        remove.addActionListener(this);
+        panel.add(new JLabel(Messages.message("name")));
+        panel.add(name);
+        panel.add(new JLabel(Messages.message("nation")));
+        panel.add(owner);
+        panel.add(new JLabel(Messages.message("capital")));
+        panel.add(capital);
+        panel.add(new JLabel(Messages.message("report.indian.skillTaught")));
+        panel.add(skill);
+        panel.add(new JLabel(Messages.message("report.units")));
+        panel.add(units);
 
-        add(okButton, "newline 20, span, split 3, tag ok");
-        add(remove, "");
-        add(cancelButton, "tag cancel");
-
-        setSize(getPreferredSize());
+        initialize(true, panel,
+            freeColClient.getGUI().getImageLibrary()
+                .getImageIcon(settlement, true),
+            new String[] {
+                Messages.message("ok"),
+                Messages.message("editor.removeSettlement"),
+                Messages.message("cancel")
+            });
     }
 
     @SuppressWarnings("unchecked") // FIXME in Java7
@@ -150,18 +150,18 @@ public final class EditSettlementDialog extends FreeColOldDialog<IndianSettlemen
     }
 
 
-    // Interface ActionListener
-
     /**
      * {@inheritDoc}
      */
-    public void actionPerformed(ActionEvent event) {
-        final String command = event.getActionCommand();
-        if (OK.equals(command)) {
+    public IndianSettlement getResponse() {
+        final Specification spec = freeColClient.getGame().getSpecification();
+        Object value = getValue();
+        if (options[0].equals(value)) { // OK
             settlement.setName(name.getText());
             Nation newNation = (Nation) owner.getSelectedItem();
             if (newNation != settlement.getOwner().getNation()) {
-                Player newPlayer = settlement.getGame().getPlayer(newNation.getId());
+                Player newPlayer = settlement.getGame()
+                    .getPlayer(newNation.getId());
                 // TODO: recalculate tile ownership properly, taking
                 // settlement radius into account
                 settlement.changeOwner(newPlayer);
@@ -169,43 +169,47 @@ public final class EditSettlementDialog extends FreeColOldDialog<IndianSettlemen
             }
             if (capital.isSelected() && !settlement.isCapital()) {
                 // make sure we downgrade the old capital
-                for (IndianSettlement indianSettlement : settlement.getOwner().getIndianSettlements()) {
+                for (IndianSettlement indianSettlement
+                         : settlement.getOwner().getIndianSettlements()) {
                     indianSettlement.setCapital(false);
                 }
                 settlement.setCapital(true);
             } else if (!capital.isSelected() && settlement.isCapital()) {
                 settlement.setCapital(false);
             }
-            settlement.setLearnableSkill((UnitType) skill.getSelectedItem());
-            int numberOfUnits = (Integer) units.getValue() - settlement.getUnitCount();
+            settlement.setLearnableSkill((UnitType)skill.getSelectedItem());
+            int numberOfUnits = (Integer)units.getValue()
+                - settlement.getUnitCount();
             if (numberOfUnits > 0) {
-                UnitType BRAVE = getSpecification().getUnitType("model.unit.brave");
+                UnitType brave = spec.getUnitType("model.unit.brave");
                 for (int index = 0; index < numberOfUnits; index++) {
                     settlement.add(new ServerUnit(settlement.getGame(),
-                                                  settlement, settlement.getOwner(), BRAVE));
+                            settlement, settlement.getOwner(), brave));
                 }
             } else if (numberOfUnits < 0) {
-                List<Unit> unitList = settlement.getUnitList().subList(0, -numberOfUnits);
+                List<Unit> unitList
+                    = settlement.getUnitList().subList(0, -numberOfUnits);
                 for (Unit unit : unitList) {
                     unit.dispose();
                 }
             }
-        } else if (REMOVE.equals(command)) {
-            if (!getGUI().showModalConfirmDialog("editor.removeSettlement.text",
-                                                 "ok", "cancel")) {
-                return;
+            return settlement;
+
+        } else if (options[1].equals(value)) {
+            if (!freeColClient.getGUI()
+                .showModalConfirmDialog("editor.removeSettlement.text",
+                                        "ok", "cancel")) {
+                return settlement;
             }
             // Dispose of units and settlement on tile
             Tile tile = settlement.getTile();
             for (Unit unit : tile.getUnitList()) {
                 unit.dispose();
             }
-            /*
-             * TODO: improve recalculation of tile ownership
-             */
+            // TODO: improve recalculation of tile ownership
             ((ServerPlayer)settlement.getOwner())
                 .csDisposeSettlement(settlement, new ChangeSet());
         }
-        getGUI().removeFromCanvas(this);
+        return null;
     }
 }

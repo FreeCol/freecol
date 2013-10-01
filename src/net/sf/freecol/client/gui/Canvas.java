@@ -1694,8 +1694,8 @@ public final class Canvas extends JDesktopPane {
      * @param settlement The <code>IndianSettlement</code> to edit.
      */
     public void showEditSettlementDialog(IndianSettlement settlement) {
-        showFreeColOldDialog(new EditSettlementDialog(freeColClient, settlement),
-            null, true);
+        showFreeColDialog(new EditSettlementDialog(freeColClient, settlement),
+                          null);
     }
 
     /**
