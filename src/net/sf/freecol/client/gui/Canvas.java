@@ -78,6 +78,7 @@ import net.sf.freecol.client.gui.panel.ErrorPanel;
 import net.sf.freecol.client.gui.panel.EuropePanel;
 import net.sf.freecol.client.gui.panel.EventPanel;
 import net.sf.freecol.client.gui.panel.FindSettlementDialog;
+import net.sf.freecol.client.gui.panel.FreeColConfirmDialog;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.client.gui.panel.FreeColOldDialog;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
@@ -1615,11 +1616,10 @@ public final class Canvas extends JDesktopPane {
     public boolean showModalConfirmDialog(Tile tile,
                                           String text, ImageIcon icon,
                                           String okText, String cancelText) {
-        FreeColDialog<Boolean> dialog
-            = FreeColDialog.createConfirmDialog(freeColClient, true,
-                                                text, icon,
-                                                okText, cancelText);
-        return showFreeColDialog(dialog, tile);
+        return showFreeColDialog(new FreeColConfirmDialog(freeColClient,
+                                                          text, icon,
+                                                          okText, cancelText),
+                                 tile);
     }
 
     /**
