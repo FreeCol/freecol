@@ -2032,8 +2032,8 @@ public final class Canvas extends JDesktopPane {
      */
     public boolean showLoadingSavegameDialog(boolean publicServer,
                                              boolean singlePlayer) {
-        loadingSavegameDialog.initialize(publicServer, singlePlayer);
-        return showFreeColOldDialog(loadingSavegameDialog, null, true);
+        loadingSavegameDialog.reset(publicServer, singlePlayer);
+        return showFreeColDialog(loadingSavegameDialog, null);
     }
 
     /**
@@ -2279,8 +2279,7 @@ public final class Canvas extends JDesktopPane {
      * @param tile An optional tile to make visible (not under the dialog).
      */
     public String showRiverStyleDialog(Tile tile) {
-        return showFreeColDialog(new RiverStyleDialog(freeColClient),
-                                 tile);
+        return showFreeColDialog(new RiverStyleDialog(freeColClient), tile);
     }
 
     /**
@@ -2703,93 +2702,124 @@ public final class Canvas extends JDesktopPane {
     // Singleton specialist reports
 
     public void showReportCargoPanel() {
-        ReportCargoPanel r = getExistingFreeColPanel(ReportCargoPanel.class);
-        if (r == null) showSubPanel(new ReportCargoPanel(freeColClient),
-                                    true);
+        ReportCargoPanel r
+            = getExistingFreeColPanel(ReportCargoPanel.class);
+        if (r == null) {
+            showSubPanel(new ReportCargoPanel(freeColClient), true);
+        }
     }
 
     public void showReportColonyPanel() {
-        ReportColonyPanel r = getExistingFreeColPanel(ReportColonyPanel.class);
-        if (r == null) showSubPanel(new ReportColonyPanel(freeColClient),
-                                    true);
+        ReportColonyPanel r
+            = getExistingFreeColPanel(ReportColonyPanel.class);
+        if (r == null) {
+            showSubPanel(new ReportColonyPanel(freeColClient), true);
+        }
     }
 
     public void showReportContinentalCongressPanel() {
-        ReportContinentalCongressPanel r = getExistingFreeColPanel(ReportContinentalCongressPanel.class);
-        if (r == null) showSubPanel(new ReportContinentalCongressPanel(freeColClient),
-                                    true);
+        ReportContinentalCongressPanel
+            r = getExistingFreeColPanel(ReportContinentalCongressPanel.class);
+        if (r == null) {
+            showSubPanel(new ReportContinentalCongressPanel(freeColClient),
+                         true);
+        }
     }
 
     public void showReportEducationPanel() {
-        ReportEducationPanel r = getExistingFreeColPanel(ReportEducationPanel.class);
-        if (r == null) showSubPanel(new ReportEducationPanel(freeColClient),
-                                    true);
+        ReportEducationPanel r
+            = getExistingFreeColPanel(ReportEducationPanel.class);
+        if (r == null) {
+            showSubPanel(new ReportEducationPanel(freeColClient), true);
+        }
     }
 
     public void showReportExplorationPanel() {
-        ReportExplorationPanel r = getExistingFreeColPanel(ReportExplorationPanel.class);
-        if (r == null) showSubPanel(new ReportExplorationPanel(freeColClient),
-                                    true);
+        ReportExplorationPanel r
+            = getExistingFreeColPanel(ReportExplorationPanel.class);
+        if (r == null) {
+            showSubPanel(new ReportExplorationPanel(freeColClient), true);
+        }
     }
 
     public void showReportForeignAffairPanel() {
-        ReportForeignAffairPanel r = getExistingFreeColPanel(ReportForeignAffairPanel.class);
-        if (r == null) showSubPanel(new ReportForeignAffairPanel(freeColClient),
-                                    true);
+        ReportForeignAffairPanel r
+            = getExistingFreeColPanel(ReportForeignAffairPanel.class);
+        if (r == null) {
+            showSubPanel(new ReportForeignAffairPanel(freeColClient), true);
+        }
     }
 
     public void showReportHistoryPanel() {
-        ReportHistoryPanel r = getExistingFreeColPanel(ReportHistoryPanel.class);
-        if (r == null) showSubPanel(new ReportHistoryPanel(freeColClient),
-                                    true);
+        ReportHistoryPanel r
+            = getExistingFreeColPanel(ReportHistoryPanel.class);
+        if (r == null) {
+            showSubPanel(new ReportHistoryPanel(freeColClient), true);
+        }
     }
 
     public void showReportIndianPanel() {
-        ReportIndianPanel r = getExistingFreeColPanel(ReportIndianPanel.class);
-        if (r == null) showSubPanel(new ReportIndianPanel(freeColClient),
-                                    true);
+        ReportIndianPanel r
+            = getExistingFreeColPanel(ReportIndianPanel.class);
+        if (r == null) {
+            showSubPanel(new ReportIndianPanel(freeColClient), true);
+        }
     }
 
     public void showReportLabourPanel() {
-        ReportLabourPanel r = getExistingFreeColPanel(ReportLabourPanel.class);
-        if (r == null) showSubPanel(new ReportLabourPanel(freeColClient),
-                                    true);
+        ReportLabourPanel r
+            = getExistingFreeColPanel(ReportLabourPanel.class);
+        if (r == null) {
+            showSubPanel(new ReportLabourPanel(freeColClient), true);
+        }
     }
 
     public void showReportMilitaryPanel() {
-        ReportMilitaryPanel r = getExistingFreeColPanel(ReportMilitaryPanel.class);
-        if (r == null) showSubPanel(new ReportMilitaryPanel(freeColClient),
-                                    true);
+        ReportMilitaryPanel r
+            = getExistingFreeColPanel(ReportMilitaryPanel.class);
+        if (r == null) {
+            showSubPanel(new ReportMilitaryPanel(freeColClient), true);
+        }
     }
 
     public void showReportNavalPanel() {
-        ReportNavalPanel r = getExistingFreeColPanel(ReportNavalPanel.class);
-        if (r == null) showSubPanel(new ReportNavalPanel(freeColClient),
-                                    true);
+        ReportNavalPanel r
+            = getExistingFreeColPanel(ReportNavalPanel.class);
+        if (r == null) {
+            showSubPanel(new ReportNavalPanel(freeColClient), true);
+        }
     }
 
     public void showReportProductionPanel() {
-        ReportProductionPanel r = getExistingFreeColPanel(ReportProductionPanel.class);
-        if (r == null) showSubPanel(new ReportProductionPanel(freeColClient),
-                                    true);
+        ReportProductionPanel r
+            = getExistingFreeColPanel(ReportProductionPanel.class);
+        if (r == null) {
+            showSubPanel(new ReportProductionPanel(freeColClient), true);
+        }
     }
 
     public void showReportReligiousPanel() {
-        ReportReligiousPanel r = getExistingFreeColPanel(ReportReligiousPanel.class);
-        if (r == null) showSubPanel(new ReportReligiousPanel(freeColClient),
-                                    true);
+        ReportReligiousPanel r
+            = getExistingFreeColPanel(ReportReligiousPanel.class);
+        if (r == null) {
+            showSubPanel(new ReportReligiousPanel(freeColClient), true);
+        }
     }
 
     public void showReportRequirementsPanel() {
-        ReportRequirementsPanel r = getExistingFreeColPanel(ReportRequirementsPanel.class);
-        if (r == null) showSubPanel(new ReportRequirementsPanel(freeColClient),
-                                    true);
+        ReportRequirementsPanel r
+            = getExistingFreeColPanel(ReportRequirementsPanel.class);
+        if (r == null) {
+            showSubPanel(new ReportRequirementsPanel(freeColClient), true);
+        }
     }
 
     public void showReportTradePanel() {
-        ReportTradePanel r = getExistingFreeColPanel(ReportTradePanel.class);
-        if (r == null) showSubPanel(new ReportTradePanel(freeColClient),
-                                    true);
+        ReportTradePanel r
+            = getExistingFreeColPanel(ReportTradePanel.class);
+        if (r == null) {
+            showSubPanel(new ReportTradePanel(freeColClient), true);
+        }
     }
 
     /**
@@ -2800,8 +2830,7 @@ public final class Canvas extends JDesktopPane {
     public void showReportTurnPanel(ModelMessage... messages) {
         ReportTurnPanel r = getExistingFreeColPanel(ReportTurnPanel.class);
         if (r == null) {
-            showSubPanel(new ReportTurnPanel(freeColClient, messages),
-                         true);
+            showSubPanel(new ReportTurnPanel(freeColClient, messages), true);
         } else {
             r.setMessages(messages);
         }

@@ -342,7 +342,7 @@ public final class ConnectController {
                 return false;
             LoadingSavegameDialog lsd = gui.getLoadingSavegameDialog();
             singlePlayer = lsd.isSinglePlayer();
-            name = lsd.getName();
+            name = lsd.getServerName();
             port = lsd.getPort();
         } else {
             singlePlayer = defaultSinglePlayer;

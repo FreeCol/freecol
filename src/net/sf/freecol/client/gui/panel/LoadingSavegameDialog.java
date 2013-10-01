@@ -45,12 +45,10 @@ import net.sf.freecol.client.gui.i18n.Messages;
 /**
  * Dialog for setting some options when loading a game.
  */
-public final class LoadingSavegameDialog extends FreeColOldDialog<Boolean> implements ActionListener {
+public final class LoadingSavegameDialog extends FreeColDialog<Boolean> {
 
     private static final Logger logger = Logger.getLogger(LoadingSavegameDialog.class.getName());
 
-
-    private JPanel buttons = new JPanel(new FlowLayout());
 
     private JLabel header;
 
@@ -73,75 +71,99 @@ public final class LoadingSavegameDialog extends FreeColOldDialog<Boolean> imple
     public LoadingSavegameDialog(FreeColClient freeColClient) {
         super(freeColClient);
 
-        setLayout(new BorderLayout());
-
-        buttons.add(okButton);
-        buttons.add(cancelButton);
-
-        // Header:
-        header = new JLabel(Messages.message("LoadingSavegame.title"), JLabel.CENTER);
-        header.setFont(GUI.MEDIUM_HEADER_FONT);
-        header.setBorder(new EmptyBorder(20, 0, 0, 0));
-        add(header, BorderLayout.NORTH);
-
-        // Panel:
         JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setOpaque(false);
 
+        header = new JLabel(Messages.message("LoadingSavegame.title"),
+                            JLabel.CENTER);
+        header.setFont(GUI.MEDIUM_HEADER_FONT);
+        header.setBorder(new EmptyBorder(20, 0, 0, 0));
+
         JPanel p1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        p1.add(new JLabel(Messages.message("LoadingSavegame.serverName"), JLabel.LEFT));
-        panel.add(p1);
+        p1.add(new JLabel(Messages.message("LoadingSavegame.serverName"),
+                          JLabel.LEFT));
+
         serverNameField = new JTextField();
-        panel.add(serverNameField);
 
         JPanel p2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        p2.add(new JLabel(Messages.message("LoadingSavegame.port"), JLabel.LEFT));
-        panel.add(p2);
-        portField = new JSpinner(new SpinnerNumberModel(FreeCol.getServerPort(), 1, 65536, 1));
-        panel.add(portField);
+        p2.add(new JLabel(Messages.message("LoadingSavegame.port"),
+                          JLabel.LEFT));
 
+        portField = new JSpinner(new SpinnerNumberModel(FreeCol.getServerPort(),
+                                                        1, 65536, 1));
         ButtonGroup bg = new ButtonGroup();
-        singlePlayer = new JRadioButton(Messages.message("LoadingSavegame.singlePlayer"));
+        String str = Messages.message("LoadingSavegame.singlePlayer");
+        singlePlayer = new JRadioButton(str);
         bg.add(singlePlayer);
-        panel.add(singlePlayer);
-        privateMultiplayer = new JRadioButton(Messages.message("LoadingSavegame.privateMultiplayer"));
+        str = Messages.message("LoadingSavegame.privateMultiplayer");
+        privateMultiplayer = new JRadioButton(str);
         bg.add(privateMultiplayer);
-        panel.add(privateMultiplayer);
-        publicMultiplayer = new JRadioButton(Messages.message("LoadingSavegame.publicMultiplayer"));
+        str = Messages.message("LoadingSavegame.publicMultiplayer");
+        publicMultiplayer = new JRadioButton(str);
         bg.add(publicMultiplayer);
+
+        panel.add(header);
+        panel.add(p1);
+        panel.add(serverNameField);
+        panel.add(p2);
+        panel.add(portField);
+        panel.add(singlePlayer);
+        panel.add(privateMultiplayer);
         panel.add(publicMultiplayer);
+        panel.setSize(panel.getPreferredSize());
 
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        add(panel, BorderLayout.CENTER);
-
-        // Buttons:
-        add(buttons, BorderLayout.SOUTH);
-
-        setSize(getPreferredSize());
-
+        initialize(true, panel, null, new String[] {
+                Messages.message("ok"),
+                Messages.message("cancel")
+            });
     }
 
 
+    /**
+     * Is a single player game selected?
+     *
+     * @return True if single player is selected.
+     */
     public boolean isSinglePlayer() {
         return singlePlayer.isSelected();
     }
 
+    /**
+     * Is a public server game selected?
+     *
+     * @return True if public server is selected.
+     */
     public boolean isPublic() {
         return publicMultiplayer.isSelected();
     }
 
+    /**
+     * Get the selected port number.
+     *
+     * @return The port number.
+     */
     public int getPort() {
         return ((Integer) portField.getValue()).intValue();
     }
 
-    @Override
-    public String getName() {
+    /**
+     * Get the specified server name.
+     *
+     * @return The server name.
+     */
+    public String getServerName() {
         return serverNameField.getName();
     }
 
-    public void initialize(boolean publicServer, boolean singlePlayer) {
-
+    /**
+     * Reset the dialog to a given state.
+     *
+     * @param publicServer The public server state.
+     * @param singlePlayer The single player state.
+     */
+    public void reset(boolean publicServer, boolean singlePlayer) {
         this.singlePlayer.setSelected(false);
         this.privateMultiplayer.setSelected(false);
         this.publicMultiplayer.setSelected(false);
@@ -153,26 +175,15 @@ public final class LoadingSavegameDialog extends FreeColOldDialog<Boolean> imple
         } else {
             this.privateMultiplayer.setSelected(true);
         }
-
         this.serverNameField.setText("");
     }
 
 
-    // Interface ActionListener
-
     /**
      * {@inheritDoc}
      */
-    public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
-        if (OK.equals(command)) {
-            getGUI().removeFromCanvas(this);
-            setResponse(Boolean.TRUE);
-        } else if (CANCEL.equals(command)) {
-            getGUI().removeFromCanvas(this);
-            setResponse(Boolean.FALSE);
-        } else {
-            super.actionPerformed(event);
-        }
+    public Boolean getResponse() {
+        Object value = getValue();
+        return (options[0].equals(value)) ? Boolean.TRUE : Boolean.FALSE;
     }
 }

@@ -365,22 +365,23 @@ public class ClientOptions extends OptionGroup {
 
     /**
      * A possible value for the {@link SelectOption}:
-     * {@link #SHOW_SAVEGAME_SETTINGS}. Specifies that the dialog should never
-     * be enabled.
+     * {@link #SHOW_SAVEGAME_SETTINGS}. 
+     * Specifies that the dialog should never be enabled.
      */
     public static final int SHOW_SAVEGAME_SETTINGS_NEVER = 0;
 
     /**
      * A possible value for the {@link SelectOption}:
-     * {@link #SHOW_SAVEGAME_SETTINGS}. Specifies that the dialog should only
-     * be enabled when loading savegames being marked as multiplayer..
+     * {@link #SHOW_SAVEGAME_SETTINGS}.
+     * Specifies that the dialog should only be enabled when loading
+     * savegames being marked as multiplayer.
      */
     public static final int SHOW_SAVEGAME_SETTINGS_MULTIPLAYER = 1;
 
     /**
      * A possible value for the {@link SelectOption}:
-     * {@link #SHOW_SAVEGAME_SETTINGS}. Specifies that the dialog should always
-     * be enabled.
+     * {@link #SHOW_SAVEGAME_SETTINGS}.
+     * Specifies that the dialog should always be enabled.
      */
     public static final int SHOW_SAVEGAME_SETTINGS_ALWAYS = 2;
 
