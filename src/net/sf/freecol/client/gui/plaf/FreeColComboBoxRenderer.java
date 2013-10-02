@@ -91,36 +91,33 @@ public class FreeColComboBoxRenderer implements ListCellRenderer, UIResource {
     }
 
     /**
-     * Returns the concatenation of the renderer's prefix and the id
-     * of the given Object, or null if the latter can not be
-     * determined.
+     * Set the text to place in a label.
      *
-     * @param value an <code>Object</code> value
-     * @return a <code>String</code> value
+     * @param c The <code>JLabel</code> to assign.
+     * @param value The object to derive a text value from.
      */
-    public String getId(Object value) {
-        return (value instanceof String)
-            ? (String)value
-            : (value instanceof ObjectWithId)
-            ? prefix + ((ObjectWithId)value).getId()
-            : null;
-    }
-
     public void setLabelValues(JLabel c, Object value) {
-        String id = getId(value);
-        if (id == null) {
-            c.setText((value == null) ? null : value.toString());
+        if (value == null) {
+            c.setText(null);
         } else {
-            String name = Messages.getName(id);
-            String description = Messages.getBestDescription(id);
-            if (value instanceof Nameable) {
-                String realname = ((Nameable) value).getName();
-                if (realname != null) {
-                    name = realname;
+            String id = (value instanceof ObjectWithId)
+                ? prefix + ((ObjectWithId)value).getId()
+                : (value instanceof String
+                    && Messages.getName((String)value) != null)
+                ? (String)value
+                : null;
+            if (id == null) {
+                c.setText(value.toString());
+            } else {
+                String name = Messages.getName(id);
+                String description = Messages.getBestDescription(id);
+                if (value instanceof Nameable) {
+                    String realname = ((Nameable)value).getName();
+                    if (realname != null) name = realname;
                 }
+                c.setText(name);
+                c.setToolTipText(description);
             }
-            c.setText(name);
-            c.setToolTipText(description);
         }
     }
 

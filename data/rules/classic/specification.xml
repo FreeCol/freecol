@@ -3118,10 +3118,10 @@ resources of 400, lost city rumours of 500
         <integerOption id="model.option.landMass" value="25" minimumValue="15" maximumValue="50"/>
         <!-- Option for setting the type of land generator to be used -->
         <selectOption id="model.option.landGeneratorType" defaultValue="0" localizedLabels="true">
-          <selectValue label="Classic" value="0"/>
-          <selectValue label="Continent" value="1"/>
-          <selectValue label="Archipelago" value="2"/>
-          <selectValue label="Islands" value="3"/>
+          <selectValue label="model.option.landGeneratorType.classic" value="0"/>
+          <selectValue label="model.option.landGeneratorType.continent" value="1"/>
+          <selectValue label="model.option.landGeneratorType.archipelago" value="2"/>
+          <selectValue label="model.option.landGeneratorType.islands" value="3"/>
         </selectOption>
         <integerOption id="model.option.preferredDistanceToEdge" defaultValue="5"
                        minimumValue="1" maximumValue="10"/>
