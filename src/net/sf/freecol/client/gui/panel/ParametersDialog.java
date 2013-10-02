@@ -29,6 +29,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import net.miginfocom.swing.MigLayout;
+
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -37,19 +39,24 @@ import net.sf.freecol.client.gui.i18n.Messages;
 /**
  * A dialog for editing parameters.
  */
-public class ParametersDialog extends FreeColOldDialog<Parameters> {
+public class ParametersDialog extends FreeColDialog<Parameters> {
     
-    final int COLUMNS = 5;
+    private final int COLUMNS = 5;
 
-    final int DEFAULT_distToLandFromHighSeas = 4;
+    private final int DEFAULT_distToLandFromHighSeas = 4;
 
-    final int DEFAULT_maxDistanceToEdge = 12;
+    private final int DEFAULT_maxDistanceToEdge = 12;
 
-    final JTextField inputD = new JTextField(Integer.toString(DEFAULT_distToLandFromHighSeas), COLUMNS);
+    private final JTextField inputD;
 
-    final JTextField inputM = new JTextField(Integer.toString(DEFAULT_maxDistanceToEdge), COLUMNS);
+    private final JTextField inputM;
 
 
+    /**
+     * Create a new parameters dialog.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     */
     public ParametersDialog(FreeColClient freeColClient) {
         super(freeColClient);
         /*
@@ -60,65 +67,88 @@ public class ParametersDialog extends FreeColOldDialog<Parameters> {
          *       the scaling (old size, new size etc).
          */        
 
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        MigPanel panel = new MigPanel(new MigLayout("wrap 1, center"));
+        JPanel widthPanel = new JPanel(new FlowLayout());
+        JPanel heightPanel = new JPanel(new FlowLayout());
+        String str;
+        
+        str = Integer.toString(DEFAULT_distToLandFromHighSeas);
+        inputD = new JTextField(str, COLUMNS);
+        str = Integer.toString(DEFAULT_maxDistanceToEdge);
+        inputM = new JTextField(str, COLUMNS);
 
-        JPanel buttons = new JPanel();
-        buttons.setOpaque(false);
-
-        final ActionListener al = new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                try {
-                    int d = Integer.parseInt(inputD.getText());
-                    int m = Integer.parseInt(inputM.getText());
-                    if (d <= 0 || m <= 0) {
-                        throw new NumberFormatException();
-                    }
-                    setResponse(new Parameters(d, m));
-                } catch (NumberFormatException nfe) {
-                    getGUI().errorMessage("integerAboveZero");
-                }
-            }
-        };
-        JButton okButton = new JButton(Messages.message("ok"));
-        buttons.add(okButton);
-
-        JButton cancelButton = new JButton(Messages.message("cancel"));
-        cancelButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                setResponse(null);
-            }
-        });
-        buttons.add(cancelButton);
-        setCancelComponent(cancelButton);
-
-        okButton.addActionListener(al);
-        inputD.addActionListener(al);
-        inputM.addActionListener(al);
-
-        JLabel widthLabel = new JLabel(Messages.message("menuBar.tools.determineHighSeas.distToLandFromHighSeas"));
+        str = Messages.message("menuBar.tools.determineHighSeas.distToLandFromHighSeas");
+        JLabel widthLabel = new JLabel(str);
         widthLabel.setLabelFor(inputD);
-        JLabel heightLabel = new JLabel(Messages.message("menuBar.tools.determineHighSeas.maxDistanceToEdge"));
+        str = Messages.message("menuBar.tools.determineHighSeas.maxDistanceToEdge");
+        JLabel heightLabel = new JLabel(str);
         heightLabel.setLabelFor(inputM);
 
-        JPanel widthPanel = new JPanel(new FlowLayout());
         widthPanel.setOpaque(false);
         widthPanel.add(widthLabel);
         widthPanel.add(inputD);
-        JPanel heightPanel = new JPanel(new FlowLayout());
         heightPanel.setOpaque(false);
         heightPanel.add(heightLabel);
         heightPanel.add(inputM);
 
-        add(widthPanel);
-        add(heightPanel);
-        add(buttons);
+        panel.add(widthPanel);
+        panel.add(heightPanel);
+        panel.setSize(getPreferredSize());
+        
+        final ActionListener al = new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    ParametersDialog.this.checkFields();
+                }
+            };
+        inputD.addActionListener(al);
+        inputM.addActionListener(al);
 
-        setSize(getPreferredSize());
+        initialize(true, panel, null, new String[] {
+                Messages.message("ok"),
+                Messages.message("cancel")
+            });
     }
 
+
+    /**
+     * Force the text fields to contain non-negative integers.
+     */
+    private void checkFields() {
+        try {
+            int d = Integer.parseInt(inputD.getText());
+            if (d <= 0) throw new NumberFormatException();
+        } catch (NumberFormatException nfe) {
+            inputD.setText(Integer.toString(DEFAULT_distToLandFromHighSeas));
+        }
+        try {
+            int m = Integer.parseInt(inputM.getText());
+            if (m <= 0) throw new NumberFormatException();
+        } catch (NumberFormatException nfe) {
+            inputM.setText(Integer.toString(DEFAULT_maxDistanceToEdge));
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Parameters getResponse() {
+        Object value = getValue();
+        if (options[0].equals(value)) {
+            checkFields();
+            return new Parameters(Integer.parseInt(inputD.getText()),
+                                  Integer.parseInt(inputM.getText()));
+        }
+        return null;
+    }
+
+
+    // Override Component
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void requestFocus() {
         inputD.requestFocus();
     }
-
 }

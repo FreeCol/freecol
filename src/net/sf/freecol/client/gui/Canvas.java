@@ -2235,8 +2235,8 @@ public final class Canvas extends JDesktopPane {
      * Display the parameters dialog.
      */
     public Parameters showParametersDialog() {
-        return showFreeColOldDialog(new ParametersDialog(freeColClient),
-                                 null, false);
+        return showFreeColDialog(new ParametersDialog(freeColClient),
+                                 null);
     }
 
     /**
