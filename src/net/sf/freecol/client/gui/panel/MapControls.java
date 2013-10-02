@@ -38,18 +38,21 @@ import net.sf.freecol.client.gui.action.SentryAction;
 import net.sf.freecol.client.gui.action.SkipUnitAction;
 import net.sf.freecol.client.gui.action.WaitAction;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
+
+import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
 
 
 /**
- * A collection of panels and buttons that are used to provide
- * the user with a more detailed view of certain elements on the
- * map and also to provide a means of input in case the user
- * can't use the keyboard.
+ * A collection of panels and buttons that are used to provide the
+ * user with a more detailed view of certain elements on the map and
+ * also to provide a means of input in case the user can't use the
+ * keyboard.
  *
- * The MapControls are useless by themselves, this object needs to
- * be placed on a JComponent in order to be usable.
+ * The MapControls are useless by themselves, this object needs to be
+ * placed on a JComponent in order to be usable.
  */
 public abstract class MapControls {
 
@@ -77,23 +80,29 @@ public abstract class MapControls {
         infoPanel = new InfoPanel(freeColClient, useSkin);
         miniMap = new MiniMap(freeColClient);
         final ActionManager am = freeColClient.getActionManager();
-
         unitButtons = new ArrayList<UnitButton>();
-        unitButtons.add(new UnitButton(am, WaitAction.id));
-        unitButtons.add(new UnitButton(am, SkipUnitAction.id));
-        unitButtons.add(new UnitButton(am, SentryAction.id));
-        unitButtons.add(new UnitButton(am, FortifyAction.id));
-        for (TileImprovementType type : freeColClient.getGame().getSpecification()
-                 .getTileImprovementTypeList()) {
-            FreeColAction action = am.getFreeColAction(type.getSuffix()
-                                                       + "Action");
-            if (!type.isNatural() && action != null
-                && action.hasOrderButtons()) {
-                unitButtons.add(new UnitButton(am, type.getSuffix() + "Action"));
+
+        final Game game = freeColClient.getGame();
+        if (game != null) {
+            unitButtons.add(new UnitButton(am, WaitAction.id));
+            unitButtons.add(new UnitButton(am, SkipUnitAction.id));
+            unitButtons.add(new UnitButton(am, SentryAction.id));
+            unitButtons.add(new UnitButton(am, FortifyAction.id));
+            
+            final Specification spec = game.getSpecification();
+            if (spec != null) {
+                for (TileImprovementType type : spec.getTileImprovementTypeList()) {
+                    FreeColAction action = am.getFreeColAction(type.getSuffix()
+                                                               + "Action");
+                    if (!type.isNatural() && action != null
+                        && action.hasOrderButtons()) {
+                        unitButtons.add(new UnitButton(am, type.getSuffix() + "Action"));
+                    }
+                }
             }
+            unitButtons.add(new UnitButton(am, BuildColonyAction.id));
+            unitButtons.add(new UnitButton(am, DisbandUnitAction.id));
         }
-        unitButtons.add(new UnitButton(am, BuildColonyAction.id));
-        unitButtons.add(new UnitButton(am, DisbandUnitAction.id));
 
         miniMapZoomOutButton = new UnitButton(am, MiniMapZoomOutAction.id);
         miniMapZoomInButton = new UnitButton(am, MiniMapZoomInAction.id);
