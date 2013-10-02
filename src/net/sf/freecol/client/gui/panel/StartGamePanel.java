@@ -81,7 +81,6 @@ public final class StartGamePanel extends FreeColPanel {
 
 
     public void initialize(boolean singlePlayer) {
-
         removeAll();
         this.singlePlayerGame = singlePlayer;
 
@@ -331,13 +330,14 @@ public final class StartGamePanel extends FreeColPanel {
      */
     @Override
     public void removeNotify() {
-        super.removeNotify();
+        // Do not propagate to superclass.  This panel is reused so
+        // avoid the destructive cleanups in FreeColPanel.removeNotify.
 
-        removeAll();
-        start = null;
-        cancel = null;
-        readyBox = null;
-        gameOptions = null;
-        mapGeneratorOptions = null;
+        start.removeActionListener(this);
+        cancel.removeActionListener(this);
+        readyBox.removeActionListener(this);
+        gameOptions.removeActionListener(this);
+        mapGeneratorOptions.removeActionListener(this);
+        if (chat != null) chat.removeActionListener(this);
     }
 }
