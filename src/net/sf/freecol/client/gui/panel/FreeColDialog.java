@@ -190,6 +190,15 @@ public abstract class FreeColDialog<T> extends JDialog
     }
 
     /**
+     * Set the value of this dialog.
+     *
+     * @param value The new value.
+     */
+    protected void setValue(Object value) {
+        this.pane.setValue(value);
+    }
+
+    /**
      * Set the initial selected option.
      *
      * Useful for subclasses when the default initial value (the last

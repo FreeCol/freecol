@@ -19,9 +19,9 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -39,14 +39,13 @@ import net.sf.freecol.common.resources.ResourceManager;
  * A panel for adjusting the river style.
  *
  * This panel is only used when running in
- * {@link net.sf.freecol.client.FreeColClient#isMapEditor() map editor mode}.
+ * {@link net.sf.freecol.client.FreeColClient#isMapEditor()} map editor mode.
  */
-public final class RiverStyleDialog extends FreeColOldDialog<String> {
+public final class RiverStyleDialog extends FreeColDialog<String> {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(RiverStyleDialog.class.getName());
 
-    public static final String CANCEL = "CANCEL";
     public static final String DELETE = "DELETE";
 
     private static final String PREFIX = "model.tile.river";
@@ -60,39 +59,49 @@ public final class RiverStyleDialog extends FreeColOldDialog<String> {
     public RiverStyleDialog(FreeColClient freeColClient) {
         super(freeColClient);
 
-        setLayout(new BorderLayout());
+        JPanel panel = new JPanel(new GridLayout(9, 9));
 
-        JPanel stylesPanel = new JPanel(new GridLayout(9, 9));
-        JButton deleteButton = new JButton(new ImageIcon(getLibrary().getMiscImage(ImageLibrary.DELETE, 0.5)));
-        deleteButton.setActionCommand(DELETE);
-        deleteButton.addActionListener(this);
-        stylesPanel.add(deleteButton);
+        final ActionListener al = new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    final String key = event.getActionCommand();
+                    if (key == null) {
+                        RiverStyleDialog.this.setValue(null);
+                    } else if (key.equals(DELETE)) {
+                        RiverStyleDialog.this.setValue(DELETE);
+                    } else if (key.startsWith(PREFIX)) {
+                        RiverStyleDialog.this
+                            .setValue(key.substring(PREFIX.length()));
+                    }
+                }
+            };
+        JButton button;
         for (String key : ResourceManager.getKeys(PREFIX)) {
-            JButton riverButton = new JButton(new ImageIcon(ResourceManager.getImage(key, 0.5)));
-            riverButton.setActionCommand(key);
-            riverButton.addActionListener(this);
-            stylesPanel.add(riverButton);
+            button = new JButton(new ImageIcon(ResourceManager.getImage(key,
+                                                                        0.5)));
+            button.setActionCommand(key);
+            button.addActionListener(al);
+            panel.add(button);
         }
-        this.add(stylesPanel, BorderLayout.CENTER);
-        JButton cancelButton = new JButton(Messages.message("cancel"));
-        cancelButton.setActionCommand(CANCEL);
-        cancelButton.addActionListener(this);
-        cancelButton.setMnemonic('C');
-        this.add(cancelButton, BorderLayout.SOUTH);
-        setSize(getPreferredSize());
+        button = new JButton(new ImageIcon(freeColClient.getGUI()
+                .getImageLibrary().getMiscImage(ImageLibrary.DELETE, 0.5)));
+        button.setActionCommand(DELETE);
+        button.addActionListener(al);
+        panel.add(button);
+        panel.setSize(panel.getPreferredSize());
+
+        initialize(true, panel, null, new String[] {
+                Messages.message("cancel")
+            });
     }
 
-
-    // Interface ActionListener
 
     /**
      * {@inheritDoc}
      */
-    public void actionPerformed(ActionEvent event) {
-        String style = event.getActionCommand();
-        if (style.startsWith(PREFIX)) {
-            style = style.substring(PREFIX.length());
-        }
-        setResponse(style);
+    public String getResponse() {
+        Object value = getValue();
+        return (options[0].equals(value)) ? null
+            : (value instanceof String) ? (String)value
+            : null;
     }
 }

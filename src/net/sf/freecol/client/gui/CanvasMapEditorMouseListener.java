@@ -141,16 +141,27 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
             return;
         }
         try {
-            if (e.getButton() == MouseEvent.BUTTON3 || e.isPopupTrigger()) {
+            if (e.getButton() == MouseEvent.BUTTON1) {
+                startPoint = e.getPoint();
+                oldPoint = e.getPoint();
+                JComponent component = (JComponent)e.getSource();
+                drawBox(component, startPoint, oldPoint);
+
+            } else if (e.getButton() == MouseEvent.BUTTON2) {
+                Tile tile = mapViewer.convertToMapTile(e.getX(), e.getY());
+                if (tile != null) getGUI().setSelectedTile(tile, false);
+
+            } else if (e.getButton() == MouseEvent.BUTTON3
+                || e.isPopupTrigger()) {
                 Tile tile = mapViewer.convertToMapTile(e.getX(), e.getY());
                 if (tile != null) {
                     if (tile.hasRiver()) {
                         TileImprovement river = tile.getRiver();
-                        String style = canvas.showRiverStyleDialog();
+                        String style = canvas.showRiverStyleDialog(tile);
                         if (style == null) {
+                            // cancelled
+                        } else if (style.equals(RiverStyleDialog.DELETE)) {
                             tile.getTileItemContainer().removeTileItem(river);
-                        } else if (style.equals(RiverStyleDialog.CANCEL)) {
-                            // user canceled
                         } else {
                             river.updateRiverConnections(style);
                         }
@@ -162,11 +173,6 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
                     getGUI().setSelectedTile(null,
                         tile.getX() >= 0 && tile.getY() >= 0);
                 }
-            } else if (e.getButton() == MouseEvent.BUTTON1) {
-                startPoint = e.getPoint();
-                oldPoint = e.getPoint();
-                JComponent component = (JComponent)e.getSource();
-                drawBox(component, startPoint, oldPoint);
             }
         } catch (Exception ex) {
             logger.log(Level.WARNING, "Error in mousePressed!", ex);
