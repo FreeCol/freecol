@@ -90,30 +90,23 @@ public class FreeColComboBoxRenderer implements ListCellRenderer, UIResource {
         return c;
     }
 
-    /**
-     * Set the text to place in a label.
-     *
-     * @param c The <code>JLabel</code> to assign.
-     * @param value The object to derive a text value from.
-     */
     public void setLabelValues(JLabel c, Object value) {
         if (value == null) {
             c.setText(null);
-        } else {
-            String id = (value instanceof ObjectWithId)
-                ? prefix + ((ObjectWithId)value).getId()
-                : (value instanceof String
-                    && Messages.getName((String)value) != null)
-                ? (String)value
-                : null;
+        } else if (value instanceof String) {
+            c.setText((String)value);
+        } else if (value instanceof ObjectWithId) {
+            String id = prefix + ((ObjectWithId)value).getId();
             if (id == null) {
                 c.setText(value.toString());
             } else {
                 String name = Messages.getName(id);
                 String description = Messages.getBestDescription(id);
                 if (value instanceof Nameable) {
-                    String realname = ((Nameable)value).getName();
-                    if (realname != null) name = realname;
+                    String realname = ((Nameable) value).getName();
+                    if (realname != null) {
+                        name = realname;
+                    }
                 }
                 c.setText(name);
                 c.setToolTipText(description);

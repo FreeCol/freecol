@@ -170,6 +170,19 @@ public class SelectOption extends IntegerOption {
     /**
      * {@inheritDoc}
      */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(16);
+        sb.append("[").append(getId())
+            .append(" value=").append(getValue())
+            .append(" localized=").append(localizedLabels)
+            .append("]");
+        return sb.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

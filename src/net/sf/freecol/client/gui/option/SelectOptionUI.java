@@ -32,23 +32,27 @@ import net.sf.freecol.common.option.SelectOption;
  * {@link net.sf.freecol.common.option.SelectOption} in order to enable
  * values to be both seen and changed.
  */
-public final class SelectOptionUI extends OptionUI<SelectOption>  {
+public final class SelectOptionUI extends OptionUI<SelectOption> {
 
     private JComboBox box = new JComboBox();
 
     /**
-     * Creates a new <code>SelectOptionUI</code> for the given <code>SelectOption</code>.
+     * Creates a new <code>SelectOptionUI</code> for the given
+     * <code>SelectOption</code>.
      *
-     * @param option The <code>SelectOption</code> to make a user interface for
-     * @param editable boolean whether user can modify the setting
+     * @param option The <code>SelectOption</code> to make a user
+     *     interface for.
+     * @param editable Whether user can modify the setting.
      */
     @SuppressWarnings("unchecked") // FIXME in Java7
-    public SelectOptionUI(GUI gui, final SelectOption option, boolean editable) {
+    public SelectOptionUI(GUI gui, final SelectOption option,
+                          boolean editable) {
         super(gui, option, editable);
         DefaultComboBoxModel model = new DefaultComboBoxModel();
 
         for (String string : option.getItemValues().values()) {
-            model.addElement(option.localizeLabels() ? Messages.message(string) : string);
+            model.addElement(option.localizeLabels() ? Messages.message(string)
+                : string);
         }
 
         box.setModel(model);

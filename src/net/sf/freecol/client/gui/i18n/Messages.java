@@ -292,9 +292,8 @@ public class Messages {
 
         // return key as value if there is no mapping found
         String message = messageBundle.get(messageId);
-        if (message == null) {
-            return messageId;
-        }
+        if (message == null) return messageId;
+
         // otherwise replace variables in the text
         message = replaceChoices(message, null);
         return message.trim();

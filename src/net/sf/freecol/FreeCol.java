@@ -265,6 +265,7 @@ public final class FreeCol {
             locale = Messages.getLocale(clientLanguage);
             if (!Locale.getDefault().equals(locale)) {
                 Messages.setMessageBundle(locale);
+                logger.info("Loaded message for " + locale);
             }
         }
 
