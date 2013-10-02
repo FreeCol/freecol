@@ -24,11 +24,12 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+
+import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
@@ -39,21 +40,25 @@ import net.sf.freecol.common.model.Map;
 /**
  * A dialog to allow resizing of the map.
  */
-public class ScaleMapSizeDialog extends FreeColOldDialog<Dimension> {
+public class ScaleMapSizeDialog extends FreeColDialog<Dimension> {
 
     private static final int COLUMNS = 5;
 
-    private Map oldMap;
+    final Map oldMap;
 
-    final JTextField inputWidth = new JTextField(Integer.toString(oldMap.getWidth()), COLUMNS);
+    final JTextField inputWidth;
 
-    final JTextField inputHeight = new JTextField(Integer.toString(oldMap.getHeight()), COLUMNS);
+    final JTextField inputHeight;
 
 
+    /**
+     * Create a ScaleMapSizeDialog.
+     *
+     * @param freeColDialog The <code>FreeColDialog</code> for the game.
+     */
     public ScaleMapSizeDialog(final FreeColClient freeColClient) {
         super(freeColClient);
 
-        oldMap = freeColClient.getGame().getMap();
         /*
          * TODO: Extend this dialog. It should be possible to specify the sizes
          * using percentages.
@@ -62,65 +67,84 @@ public class ScaleMapSizeDialog extends FreeColOldDialog<Dimension> {
          * size etc).
          */
 
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        MigPanel panel = new MigPanel(new MigLayout("wrap 1, center"));
+        JPanel widthPanel = new JPanel(new FlowLayout());
+        JPanel heightPanel = new JPanel(new FlowLayout());
+        String str;
 
-        JPanel buttons = new JPanel();
-        buttons.setOpaque(false);
-
-        final ActionListener al = new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                try {
-                    int width = Integer.parseInt(inputWidth.getText());
-                    int height = Integer.parseInt(inputHeight.getText());
-                    if (width <= 0 || height <= 0) {
-                        throw new NumberFormatException();
-                    }
-                    setResponse(new Dimension(width, height));
-                } catch (NumberFormatException nfe) {
-                    freeColClient.getGUI().errorMessage("integerAboveZero");
-                }
-            }
-        };
-        JButton okButton = new JButton(Messages.message("ok"));
-        buttons.add(okButton);
-
-        JButton cancelButton = new JButton(Messages.message("cancel"));
-        cancelButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                setResponse(null);
-            }
-        });
-        buttons.add(cancelButton);
-        setCancelComponent(cancelButton);
-
-        okButton.addActionListener(al);
-        inputWidth.addActionListener(al);
-        inputHeight.addActionListener(al);
+        oldMap = freeColClient.getGame().getMap();
+        str = Integer.toString(oldMap.getWidth());
+        inputWidth = new JTextField(str, COLUMNS);
+        str = Integer.toString(oldMap.getHeight());
+        inputHeight = new JTextField(str, COLUMNS);
 
         JLabel widthLabel = new JLabel(Messages.message("width"));
         widthLabel.setLabelFor(inputWidth);
         JLabel heightLabel = new JLabel(Messages.message("height"));
         heightLabel.setLabelFor(inputHeight);
 
-        JPanel widthPanel = new JPanel(new FlowLayout());
         widthPanel.setOpaque(false);
         widthPanel.add(widthLabel);
         widthPanel.add(inputWidth);
-        JPanel heightPanel = new JPanel(new FlowLayout());
         heightPanel.setOpaque(false);
         heightPanel.add(heightLabel);
         heightPanel.add(inputHeight);
 
-        add(widthPanel);
-        add(heightPanel);
-        add(buttons);
+        panel.add(widthPanel);
+        panel.add(heightPanel);
+        panel.setSize(panel.getPreferredSize());
 
-        setSize(getPreferredSize());
+        final ActionListener al = new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    ScaleMapSizeDialog.this.checkFields();
+                }
+            };
+
+        inputWidth.addActionListener(al);
+        inputHeight.addActionListener(al);
+
+        initialize(true, panel, null, new String[] {
+                Messages.message("ok"),
+                Messages.message("cancel")
+            });
     }
+
+    /**
+     * Force the text fields to contain non-negative integers.
+     */
+    private void checkFields() {
+        try {
+            int w = Integer.parseInt(inputWidth.getText());
+            if (w <= 0) throw new NumberFormatException();
+        } catch (NumberFormatException nfe) {
+            inputWidth.setText(Integer.toString(oldMap.getWidth()));
+        } 
+        try {
+            int h = Integer.parseInt(inputHeight.getText());
+            if (h <= 0) throw new NumberFormatException();
+        } catch (NumberFormatException nfe) {
+            inputHeight.setText(Integer.toString(oldMap.getHeight()));
+        } 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Dimension getResponse() {
+        Object value = getValue();
+        if (options[0].equals(value)) {
+            checkFields();
+            return new Dimension(Integer.parseInt(inputHeight.getText()),
+                                 Integer.parseInt(inputWidth.getText()));
+        }
+        return null;
+    }
+
+
+    // Override Component
 
     @Override
     public void requestFocus() {
         inputWidth.requestFocus();
     }
-
 }

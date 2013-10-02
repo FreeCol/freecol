@@ -2321,8 +2321,8 @@ public final class Canvas extends JDesktopPane {
      * Display the scale map size dialog.
      */
     public Dimension showScaleMapSizeDialog() {
-        return showFreeColOldDialog(new ScaleMapSizeDialog(freeColClient),
-                                 null, false);
+        return showFreeColDialog(new ScaleMapSizeDialog(freeColClient),
+                                 null);
     }
 
     /**

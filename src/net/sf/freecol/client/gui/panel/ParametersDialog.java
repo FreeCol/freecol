@@ -23,7 +23,6 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -93,7 +92,7 @@ public class ParametersDialog extends FreeColDialog<Parameters> {
 
         panel.add(widthPanel);
         panel.add(heightPanel);
-        panel.setSize(getPreferredSize());
+        panel.setSize(panel.getPreferredSize());
         
         final ActionListener al = new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
