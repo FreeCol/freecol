@@ -49,7 +49,7 @@ public class EditOptionDialog extends FreeColDialog<Boolean> {
     public EditOptionDialog(FreeColClient freeColClient, Option option) {
         super(freeColClient);
 
-        ui = OptionUI.getOptionUI(freeColClient.getGUI(), option, true);
+        ui = OptionUI.getOptionUI(getGUI(), option, true);
 
         MigPanel panel = new MigPanel(new MigLayout());
         if (ui.getLabel() == null) panel.add(ui.getLabel(), "split 2");

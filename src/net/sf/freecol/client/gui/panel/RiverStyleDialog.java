@@ -82,8 +82,8 @@ public final class RiverStyleDialog extends FreeColDialog<String> {
             button.addActionListener(al);
             panel.add(button);
         }
-        button = new JButton(new ImageIcon(freeColClient.getGUI()
-                .getImageLibrary().getMiscImage(ImageLibrary.DELETE, 0.5)));
+        button = new JButton(new ImageIcon(getGUI().getImageLibrary()
+                .getMiscImage(ImageLibrary.DELETE, 0.5)));
         button.setActionCommand(DELETE);
         button.addActionListener(al);
         panel.add(button);

@@ -123,7 +123,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      * @return The name as provided in the constructor.
      */
     public String getName() {
-        return Messages.message(getId() + ".name");
+        return Messages.getName(getId());
     }
 
     /**
@@ -133,7 +133,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      * @return A short description of this <code>Option</code>.
      */
     public String getShortDescription() {
-        return Messages.message(getId() + ".shortDescription");
+        return Messages.getShortDescription(getId());
     }
 
     /**

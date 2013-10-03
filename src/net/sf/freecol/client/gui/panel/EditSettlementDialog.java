@@ -122,9 +122,8 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         panel.add(new JLabel(Messages.message("report.units")));
         panel.add(units);
 
-        initialize(DialogType.QUESTION, true, panel,
-            freeColClient.getGUI().getImageLibrary()
-                .getImageIcon(settlement, true),
+        initialize(DialogType.QUESTION, true, panel, getGUI().getImageLibrary()
+            .getImageIcon(settlement, true),
             new String[] {
                 Messages.message("ok"),
                 Messages.message("editor.removeSettlement"),
@@ -196,9 +195,8 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
             return settlement;
 
         } else if (options[1].equals(value)) {
-            if (!freeColClient.getGUI()
-                .showModalConfirmDialog("editor.removeSettlement.text",
-                                        "ok", "cancel")) {
+            if (!getGUI().showModalConfirmDialog("editor.removeSettlement.text",
+                                                 "ok", "cancel")) {
                 return settlement;
             }
             // Dispose of units and settlement on tile

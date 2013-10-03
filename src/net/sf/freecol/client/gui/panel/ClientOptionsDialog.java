@@ -27,9 +27,11 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.option.OptionGroup;
 
 
 /**
@@ -39,8 +41,6 @@ public final class ClientOptionsDialog extends OptionsDialog  {
 
     private static final Logger logger = Logger.getLogger(ClientOptionsDialog.class.getName());
 
-    public static final String OPTION_GROUP_ID = "clientOptions";
-
 
     /**
      * The constructor that will add the items to this panel.
@@ -48,50 +48,29 @@ public final class ClientOptionsDialog extends OptionsDialog  {
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public ClientOptionsDialog(FreeColClient freeColClient) {
-        super(freeColClient, true);
+        super(freeColClient, true, freeColClient.getClientOptions(),
+            freeColClient.getClientOptions().getName(),
+            "options.xml", "clientOptions");
 
-        getButtons().clear();
-        initialize(getClientOptions(), getClientOptions().getName(), null);
+        initialize();
     }
 
 
     /**
      * {@inheritDoc}
      */
-    public String getDefaultFileName() {
-        return "options.xml";
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getOptionGroupId() {
-        return OPTION_GROUP_ID;
-    }
-
-
-    // Interface ActionListener
-
-    /**
-     * {@inheritDoc}
-     */
-    public void actionPerformed(ActionEvent event) {
-        super.actionPerformed(event);
-        String command = event.getActionCommand();
-        if (OK.equals(command)) {
+    public OptionGroup getResponse() {
+        Object value = getValue();
+        if (options[0].equals(value)) {
             File file = FreeColDirectories.getClientOptionsFile();
+            OptionGroup group = getGroup();
             try {
-                getGroup().save(file);
-                getFreeColClient().updateActions();
-                getGUI().resetMenuBar();
-                // Immediately redraw the minimap if that was updated.
-                getGUI().updateMapControls();
+                group.save(file);
             } catch (FileNotFoundException e) {
                 logger.log(Level.WARNING, "Save failure", e);
-                StringTemplate t = StringTemplate.template("failedToSave")
-                    .addName("%name%", file.getPath());
-                getGUI().showInformationMessage(t);
             }
+            return group;
         }
+        return null;
     }
 }

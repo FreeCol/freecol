@@ -54,6 +54,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.FreeColImageBorder;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 
 
@@ -141,25 +142,25 @@ public abstract class FreeColDialog<T> extends JDialog
         }
         this.pane = new JOptionPane(obj, paneType, JOptionPane.YES_NO_OPTION,
             icon, options, options[options.length - 1]);
-        pane.setBorder(dialogBorder);
+        this.pane.setBorder(dialogBorder);
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout());
-        contentPane.add(pane, BorderLayout.CENTER);
+        contentPane.add(this.pane, BorderLayout.CENTER);
 
         setFocusCycleRoot(true);
-        setComponentOrientation(pane.getComponentOrientation());
+        setComponentOrientation(this.pane.getComponentOrientation());
         setResizable(false);
         setUndecorated(true);
         setModal(modal);
         pack();
-        setLocationRelativeTo(freeColClient.getGUI().getFrame());
+        setLocationRelativeTo(getGUI().getFrame());
 
         WindowAdapter adapter = new WindowAdapter() {
                 private boolean gotFocus = false;
 
                 public void windowClosing(WindowEvent we) {
-                    pane.setValue(null);
+                    FreeColDialog.this.pane.setValue(null);
                 }
                 public void windowGainedFocus(WindowEvent we) {
                     if (!gotFocus) { // Once window gets focus, initialize.
@@ -177,16 +178,26 @@ public abstract class FreeColDialog<T> extends JDialog
                         .setValue(JOptionPane.UNINITIALIZED_VALUE);
                 }
             });
-        pane.addPropertyChangeListener(this);
+        this.pane.addPropertyChangeListener(this);
     }
 
+    /**
+     * Get the GUI.
+     *
+     * @return The <code>GUI</code>.
+     */
+    protected GUI getGUI() {
+        return freeColClient.getGUI();
+    }
 
     /**
-     * Get the response from this dialog.
+     * Gets the specification.
      *
-     * @return The response from this dialog.
+     * @return The specification from the game.
      */
-    public abstract T getResponse();
+    protected Specification getSpecification() {
+        return freeColClient.getGame().getSpecification();
+    }
 
     /**
      * Get the response that was set by {@link JOptionPane#setValue} and
@@ -221,6 +232,13 @@ public abstract class FreeColDialog<T> extends JDialog
         this.pane.setInitialValue(options[index]);
     }
 
+    /**
+     * Get the response from this dialog.
+     *
+     * @return The response from this dialog.
+     */
+    public abstract T getResponse();
+
 
     // Interface PropertyChangeListener
 
@@ -248,7 +266,7 @@ public abstract class FreeColDialog<T> extends JDialog
      * {@inheritDoc}
      */
     public void setVisible(boolean val) {
-        if (val) pane.selectInitialValue();
+        if (val) this.pane.selectInitialValue();
         super.setVisible(val); // This is where the thread blocks when modal.
     }
 
@@ -263,8 +281,8 @@ public abstract class FreeColDialog<T> extends JDialog
         super.removeNotify();
 
         removeAll();
-        pane.removePropertyChangeListener(this);
-        pane = null;
+        this.pane.removePropertyChangeListener(this);
+        this.pane = null;
 
         for (MouseListener listener : getMouseListeners()) {
             removeMouseListener(listener);

@@ -142,10 +142,9 @@ public final class WarehouseDialog extends FreeColDialog<Boolean> {
             ExportData exportData = colony.getExportData(goodsType);
 
             // goods label
-            final GUI gui = freeColClient.getGUI();
             Goods goods = new Goods(colony.getGame(), colony, goodsType,
                                     colony.getGoodsCount(goodsType));
-            GoodsLabel goodsLabel = new GoodsLabel(goods, gui);
+            GoodsLabel goodsLabel = new GoodsLabel(goods, getGUI());
             goodsLabel.setHorizontalAlignment(JLabel.LEADING);
             add(goodsLabel, "span 1 2");
 

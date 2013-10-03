@@ -87,8 +87,7 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>> {
         panel.setPreferredSize(panel.getPreferredSize()); // Prevent NPE
 
         // Use the coat of arms image icon.  Is there something better?
-        ImageIcon icon = freeColClient.getGUI().getImageLibrary()
-            .getImageIcon(player, true);
+        ImageIcon icon = getGUI().getImageLibrary().getImageIcon(player, true);
 
         initialize(DialogType.QUESTION, true, panel, icon, new String[] {
                 Messages.message("declareIndependence.areYouSure.yes"),

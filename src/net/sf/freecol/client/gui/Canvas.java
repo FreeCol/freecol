@@ -286,16 +286,14 @@ public final class Canvas extends JDesktopPane {
 
     private final ServerListPanel serverListPanel;
 
-    private final ClientOptionsDialog clientOptionsDialog;
-
     private final LoadingSavegameDialog loadingSavegameDialog;    
-
-    private boolean clientOptionsDialogShowing = false;
 
     /** Used to detect resizing. */
     private Dimension oldSize = null;
 
     private Dimension initialSize = null;
+
+    private boolean clientOptionsDialogShowing = false;
 
 
     /**
@@ -326,7 +324,6 @@ public final class Canvas extends JDesktopPane {
             freeColClient.getConnectController());
         statusPanel = new StatusPanel(freeColClient);
         chatPanel = new ChatPanel(freeColClient);
-        clientOptionsDialog = new ClientOptionsDialog(freeColClient);
         loadingSavegameDialog = new LoadingSavegameDialog(freeColClient);
 
         setFocusable(true);
@@ -804,7 +801,7 @@ public final class Canvas extends JDesktopPane {
      * @param tile An optional <code>Tile</code> to make visible (not
      *     under the dialog!)
      * @return The {@link FreeColDialog#getResponse reponse} returned by
-     *         the dialog.
+     *     the dialog.
      */
     private <T> T showFreeColDialog(FreeColDialog<T> freeColDialog,
                                     Tile tile) {
@@ -1031,9 +1028,9 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Checks if the <code>ClientOptionsDialog</code> is visible.
+     * Checks if a client options dialog is present.
      *
-     * @return <code>true</code> if no internal frames are open.
+     * @return True if the client options are showing.
      */
     public boolean isClientOptionsDialogShowing() {
         return clientOptionsDialogShowing;
@@ -1497,15 +1494,19 @@ public final class Canvas extends JDesktopPane {
     /**
      * Displays a dialog for setting client options.
      *
-     * @return <code>true</code> if the client options have been modified, and
-     *         <code>false</code> otherwise.
+     * @return The modified <code>OptionGroup</code>, or null if not modified.
      */
     public OptionGroup showClientOptionsDialog() {
-        clientOptionsDialog.initialize();
-        clientOptionsDialogShowing = true;
-        OptionGroup group = showFreeColOldDialog(clientOptionsDialog, null, true);
+        ClientOptionsDialog dialog = new ClientOptionsDialog(freeColClient);
+        //clientOptionsDialogShowing = true;
+        OptionGroup group = showFreeColDialog(dialog, null);
         clientOptionsDialogShowing = false;
-        freeColClient.updateActions();
+        if (group != null) {
+            freeColClient.updateActions();
+            gui.resetMenuBar();
+            // Immediately redraw the minimap if that was updated.
+            gui.updateMapControls();
+        }
         return group;
     }
 
@@ -1649,9 +1650,10 @@ public final class Canvas extends JDesktopPane {
     public void showDifficultyDialog(boolean editable) {
         Game game = freeColClient.getGame();
         Specification spec = game.getSpecification();
-        showSubPanel(new DifficultyDialog(freeColClient, spec,
-                                          spec.getDifficultyLevel(), editable),
-                     false);
+        showFreeColDialog(new DifficultyDialog(freeColClient, spec,
+                                               spec.getDifficultyLevel(),
+                                               editable),
+                          null);
     }
 
     /**
@@ -1661,9 +1663,9 @@ public final class Canvas extends JDesktopPane {
      * @param group The <code>OptionGroup</code> containing the difficulty.
      */
     public void showDifficultyDialog(Specification spec, OptionGroup group) {
-        showSubPanel(new DifficultyDialog(freeColClient, spec, 
-                                          group, group.isEditable()),
-                     false);
+        showFreeColDialog(new DifficultyDialog(freeColClient, spec, 
+                                               group, group.isEditable()),
+                          null);
     }
 
     /**
@@ -1826,8 +1828,9 @@ public final class Canvas extends JDesktopPane {
      */
     public void showGameOptionsDialog(boolean editable,
                                       boolean loadCustomOptions) {
-        showSubPanel(new GameOptionsDialog(freeColClient, editable,
-                                           loadCustomOptions), false);
+        showFreeColDialog(new GameOptionsDialog(freeColClient, editable,
+                                                loadCustomOptions),
+                          null);
     }
 
     /**
@@ -2079,8 +2082,8 @@ public final class Canvas extends JDesktopPane {
      */
     public OptionGroup showMapGeneratorOptionsDialog(OptionGroup mgo,
         boolean editable, boolean loadCustomOptions) {
-        return showFreeColOldDialog(new MapGeneratorOptionsDialog(freeColClient,
-                mgo, editable, loadCustomOptions), null, false);
+        return showFreeColDialog(new MapGeneratorOptionsDialog(freeColClient,
+                mgo, editable, loadCustomOptions), null);
     }
 
     /**

@@ -26,6 +26,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.BooleanOptionUI;
 import net.sf.freecol.common.model.GameOptions;
+import net.sf.freecol.common.option.OptionGroup;
 
 
 /**
@@ -45,19 +46,16 @@ public final class GameOptionsDialog extends OptionsDialog {
      */
     public GameOptionsDialog(FreeColClient freeColClient,
                              boolean editable, boolean loadCustomOptions) {
-        super(freeColClient, editable);
+        super(freeColClient, editable,
+            freeColClient.getGame().getSpecification().getGameOptions(),
+            Messages.message(OPTION_GROUP_ID),
+            "game_options.xml", OPTION_GROUP_ID);
 
-        if (editable && loadCustomOptions) {
-            loadCustomOptions();
-        }
-
-        initialize(getSpecification().getGameOptions(),
-                   Messages.message(OPTION_GROUP_ID), null);
-
+        if (isEditable() && loadCustomOptions) loadCustomOptions();
         // Set special cases
         // Disable victory option "All humans defeated"
         // when playing single player
-        if (editable && getFreeColClient().isSinglePlayer()) {
+        if (isEditable() && freeColClient.isSinglePlayer()) {
             BooleanOptionUI comp = (BooleanOptionUI) getOptionUI()
                 .getOptionUI(GameOptions.VICTORY_DEFEAT_HUMANS);
             if (comp != null) {
@@ -65,30 +63,20 @@ public final class GameOptionsDialog extends OptionsDialog {
                 comp.getComponent().setEnabled(false);
             }
         }
+
+        initialize();
     }
 
-
-    public String getDefaultFileName() {
-        return "game_options.xml";
-    }
-
-    public String getOptionGroupId() {
-        return OPTION_GROUP_ID;
-    }
-
-
-    // Interface ActionListener
 
     /**
      * {@inheritDoc}
      */
-    public void actionPerformed(ActionEvent event) {
-        super.actionPerformed(event);
-        final String command = event.getActionCommand();
-        if (OK.equals(command)) {
-            if (!getFreeColClient().isMapEditor()) {
-                getFreeColClient().getPreGameController().sendGameOptions();
-            }
+    public OptionGroup getResponse() {
+        Object value = getValue();
+        if (options[0].equals(value) && !freeColClient.isMapEditor()) {
+            freeColClient.getPreGameController().sendGameOptions();
+            return getGroup();
         }
+        return null;
     }
 }

@@ -197,7 +197,12 @@ public final class CornerMapControls extends MapControls {
 
         if (!freeColClient.isMapEditor()) {
             for (UnitButton button : unitButtons) {
-                canvas.add(button, CONTROLS_LAYER);
+                try {
+                    canvas.add(button, CONTROLS_LAYER);
+                } catch (Exception e) {
+                    logger.log(Level.WARNING, "Button add fail: "
+                        + button.getLocation(), e);
+                }
                 button.refreshAction();
             }
         }

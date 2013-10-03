@@ -33,7 +33,6 @@ import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.filechooser.FileFilter;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
@@ -51,35 +50,19 @@ import net.sf.freecol.common.option.OptionGroup;
 /**
  * Dialog for changing the options of an {@link OptionGroup}.
  */
-public abstract class OptionsDialog extends FreeColOldDialog<OptionGroup>  {
+public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
 
     private static final Logger logger = Logger.getLogger(OptionsDialog.class.getName());
 
-    private static final String RESET = "RESET";
-    private static final String SAVE = "SAVE";
-    protected static final String LOAD = "LOAD";
-
-    private OptionGroupUI ui;
+    private boolean editable;
     private OptionGroup group;
-    private JButton reset = new JButton(Messages.message("reset"));
-    private JButton load = new JButton(Messages.message("load"));
-    protected JButton save = new JButton(Messages.message("save"));
-    private JPanel optionPanel;
-
-    private List<JButton> buttons = new ArrayList<JButton>();
-    private String header = null;
-    private Component component = null;
-
-    protected static final FileFilter[] filters = new FileFilter[] {
-        new FileFilter() {
-            public boolean accept(File file) {
-                return file.isDirectory() || file.getName().endsWith(".xml");
-            }
-            public String getDescription() {
-                return Messages.message("filter.xml");
-            }
-        }
-    };
+    private String header;
+    private OptionGroupUI ui;
+    private String defaultFileName;
+    private String optionGroupId;
+    private JScrollPane scrollPane;
+    private MigPanel optionPanel;
+    protected MigPanel panel;
 
 
     /**
@@ -88,118 +71,107 @@ public abstract class OptionsDialog extends FreeColOldDialog<OptionGroup>  {
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param editable Whether the dialog is editable.
      */
-    public OptionsDialog(FreeColClient freeColClient, boolean editable) {
-        super(freeColClient, new MigLayout("wrap 1, fill"));
+    public OptionsDialog(FreeColClient freeColClient, boolean editable,
+                         OptionGroup group, String header,
+                         String defaultFileName, String optionGroupId) {
+        super(freeColClient);
 
         this.editable = editable;
-
-        reset.setActionCommand(RESET);
-        reset.addActionListener(this);
-
-        load.setActionCommand(LOAD);
-        load.addActionListener(this);
-
-        save.setActionCommand(SAVE);
-        save.addActionListener(this);
-
-        buttons.add(reset);
-        buttons.add(load);
-        buttons.add(save);
-
-        setCancelComponent(cancelButton);
-
-        setSize(850, 600);
-    }
-
-
-    protected void initialize(OptionGroup group, String header, Component component) {
         this.group = group;
         this.header = header;
-        this.component = component;
+        this.ui = new OptionGroupUI(getGUI(), this.group, this.editable);
+        this.defaultFileName = defaultFileName;
+        this.optionGroupId = optionGroupId;
+        preparePanel(this.header, this.ui);
+    }
 
-        removeAll();
 
-        // Header:
-        add(GUI.getDefaultHeader(header), "center");
+    /**
+     * Is this dialog editable?
+     *
+     * @return True if the dialog is editable.
+     */
+    protected boolean isEditable() {
+        return this.editable;
+    }
 
-        // Additional component, if any
-        if (component != null) {
-            add(component);
-        }
+    /**
+     * Get the option group being displayed by this dialog.
+     *
+     * @return The <code>OptionGroup</code>.
+     */
+    protected OptionGroup getGroup() {
+        return this.group;
+    }
 
-        // Options:
-        ui = new OptionGroupUI(getGUI(), group, editable);
+    /**
+     * Get the option group UI controlling this dialog.
+     *
+     * @return The <code>OptionGroupUI</code>.
+     */
+    protected OptionGroupUI getOptionUI() {
+        return this.ui;
+    }
+
+    /**
+     * Get the default name of the file to save the <code>OptionGroup</code>.
+     *
+     * @return A default file name.
+     */
+    protected String getDefaultFileName() {
+        return this.defaultFileName;
+    }
+
+    /**
+     * Get the identifier of the <code>OptionGroup</code>.
+     *
+     * @return The option group identifier.
+     */
+    protected String getOptionGroupId() {
+        return this.optionGroupId;
+    }
+
+    /**
+     * Load the panel.
+     */
+    private void preparePanel(String header, OptionGroupUI ui) {
         optionPanel = new MigPanel("ReportPanelUI");
+        optionPanel.setPreferredSize(new Dimension(800, 500));
         optionPanel.setOpaque(true);
         optionPanel.add(ui);
-        JScrollPane scrollPane = new JScrollPane(optionPanel,
-                                                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.getVerticalScrollBar().setUnitIncrement( 16 );
-        add(scrollPane, "height 100%, width 100%");
+        optionPanel.setSize(optionPanel.getPreferredSize());
+        this.scrollPane = new JScrollPane(optionPanel,
+            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+            JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        this.scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        
+        this.panel = new MigPanel(new MigLayout("wrap 1, fill"));
+        this.panel.add(GUI.getDefaultHeader(header), "center");
+    }
 
-        // Buttons:
-        if ( isEditable() ) {
-            int cells = buttons.size() + 2;
-            add(okButton, "newline 20, tag ok, split " + cells);
-            add(cancelButton, "tag cancel");
-            for (JButton button : buttons) {
-                add(button);
+    /**
+     * Initialize this dialog.
+     */
+    protected void initialize() {
+        this.panel.add(this.scrollPane, "grow"); //"height 100%, width 100%"
+        this.panel.setPreferredSize(new Dimension(850, 650));
+        this.panel.setSize(this.panel.getPreferredSize());
+
+        initialize(DialogType.PLAIN, true, this.panel, null,
+            (isEditable()) ? new String[] {
+                Messages.message("ok"),
+                Messages.message("cancel")
             }
-        } else {
-            add(okButton, "newline 20, tag ok");
-        }
-    }
-
-    @Override
-    public Dimension getMinimumSize() {
-        return new Dimension(850, 700);
-    }
-
-    @Override
-    public Dimension getPreferredSize() {
-        return getMinimumSize();
-    }
-
-    protected OptionGroupUI getOptionUI() {
-        return ui;
-    }
-
-    protected List<JButton> getButtons() {
-        return buttons;
-    }
-
-    protected void updateUI(OptionGroup group) {
-        this.group = group;
-        optionPanel.removeAll();
-        ui = new OptionGroupUI(getGUI(), group, editable);
-        optionPanel.add(ui);
-        revalidate();
-        repaint();
-    }
-
-    protected OptionGroup getGroup() {
-        return group;
+            : new String[] {
+                Messages.message("ok")
+            });
     }
 
     /**
-     * Returns the default name of the file to save the
-     * <code>OptionGroup</code>.
-     * @return String
-     */
-    public abstract String getDefaultFileName();
-
-    /**
-     * Returns the identifier of the <code>OptionGroup</code>.
-     * @return String
-     */
-    public abstract String getOptionGroupId();
-
-
-    /**
-     * Load OptionGroup from given File.
+     * Load an option group from given File.
      *
-     * @param file a <code>File</code> value
+     * @param file A <code>File</code> to load from.
+     * @return True if the load succeeded.
      */
     protected boolean load(File file) {
         boolean ret = false;
@@ -215,15 +187,14 @@ public abstract class OptionsDialog extends FreeColOldDialog<OptionGroup>  {
                 try {
                     group = group.getOptionGroup(expect);
                 } catch (Exception e) {
-                    group = null;
-                    logger.warning("Options file " + file.getPath()
-                        + " does not contain expected group " + expect);
+                    logger.log(Level.WARNING, "Options file " + file.getPath()
+                        + " does not contain expected group " + expect, e);
                 }
             }
             if (group != null) {
                 getSpecification().getOptionGroup(expect).setValue(group);
                 logger.info("Loaded options from file " + file.getPath());
-                initialize(group, this.header, this.component);
+                reset(group);
                 ret = true;
             }
         } catch (Exception e) {
@@ -236,63 +207,46 @@ public abstract class OptionsDialog extends FreeColOldDialog<OptionGroup>  {
     }
 
     /**
-     * Load custom OptionGroup from default file.
+     * Reset the group for this panel.
      *
-     * @return true if custom options were loaded
+     * @param group The new <code>OptionGroup</code>.
      */
-    protected boolean loadCustomOptions() {
-        File customFile = new File(FreeColDirectories.getOptionsDirectory(),
-                                   getDefaultFileName());
-        if (customFile.exists()) {
-            load(customFile);
+    private void reset(OptionGroup group) {
+        this.group = group;
+        this.optionPanel.removeAll();
+        this.ui = new OptionGroupUI(getGUI(), this.group, this.editable);
+        this.optionPanel.add(this.ui);
+        revalidate();
+        repaint();
+    }
+
+    /**
+     * Save an option group to a given File.
+     *
+     * @param file The <code>File</code> to save to.
+     * @return True if the save succeeded.
+     */
+    protected boolean save(File file) {
+        try {
+            group.save(file);
             return true;
-        } else {
+        } catch (FileNotFoundException e) {
+            logger.log(Level.WARNING, "Save failed", e);
+            StringTemplate t = StringTemplate.template("failedToSave")
+                .addName("%name%", file.getPath());
+            getGUI().showInformationMessage(t);
             return false;
         }
     }
 
-
-    // Interface ActionListener
-
     /**
-     * {@inheritDoc}
+     * Load a custom option group from the default file.
+     *
+     * @return True if the options were loaded.
      */
-    public void actionPerformed(ActionEvent event) {
-        final String command = event.getActionCommand();
-        if (OK.equals(command)) {
-            ui.updateOption();
-            getGUI().removeFromCanvas(this);
-            setResponse(group);
-        } else if (CANCEL.equals(command)) {
-            ui.reset();
-            getGUI().removeFromCanvas(this);
-            setResponse(null);
-        } else if (RESET.equals(command)) {
-            ui.reset();
-            revalidate();
-            repaint();
-        } else if (SAVE.equals(command)) {
-            File saveFile = getGUI().showSaveDialog(FreeColDirectories.getOptionsDirectory(), ".xml",
-                                                       filters, getDefaultFileName());
-            if (saveFile != null) {
-                ui.updateOption();
-                try {
-                    group.save(saveFile);
-                } catch (FileNotFoundException e) {
-                    logger.log(Level.WARNING, "Save failed", e);
-                    StringTemplate t = StringTemplate.template("failedToSave")
-                        .addName("%name%", saveFile.getPath());
-                    getGUI().showInformationMessage(t);
-                }
-            }
-        } else if (LOAD.equals(command)) {
-            File loadFile = getGUI().showLoadDialog(FreeColDirectories.getOptionsDirectory(), filters);
-            if (loadFile != null && load(loadFile)) {
-                revalidate();
-                repaint();
-            }
-        } else {
-            super.actionPerformed(event);
-        }
+    protected boolean loadCustomOptions() {
+        File customFile = new File(FreeColDirectories.getOptionsDirectory(),
+                                   getDefaultFileName());
+        return (customFile.exists()) ? load(customFile) : false;
     }
 }

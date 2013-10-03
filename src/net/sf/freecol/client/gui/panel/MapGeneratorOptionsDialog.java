@@ -54,13 +54,18 @@ import net.sf.freecol.common.option.OptionGroup;
  * @see MapGeneratorOptions
  * @see OptionGroup
  */
-public final class MapGeneratorOptionsDialog extends OptionsDialog implements ActionListener {
+public final class MapGeneratorOptionsDialog extends OptionsDialog {
 
     private static final Logger logger = Logger.getLogger(MapGeneratorOptionsDialog.class.getName());
 
-    public static final String OPTION_GROUP_ID = MapGeneratorOptions.getXMLElementTagName();
+    private static final FileFilter fsgFilter = new FileFilter() {
+            public boolean accept(File file) {
+                return file.isFile() && file.getName().endsWith(".fsg");
+            }
+        };
 
-    private JScrollPane scrollPane = null;
+    private static final String OPTION_GROUP_ID
+        = MapGeneratorOptions.getXMLElementTagName();
 
 
     /**
@@ -74,45 +79,18 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog implements Ac
     public MapGeneratorOptionsDialog(FreeColClient freeColClient,
                                      OptionGroup mgo, boolean editable,
                                      boolean loadCustomOptions) {
-        super(freeColClient, editable);
+        super(freeColClient, editable, mgo, mgo.getName(),
+            "map_generator_options.xml", OPTION_GROUP_ID);
+        
+        if (isEditable() && loadCustomOptions) loadCustomOptions();
 
-        if (editable && loadCustomOptions) {
-            loadCustomOptions();
-        }
-
-        if (editable) {
-            JPanel mapPanel = new JPanel();
-            /*
-             * TODO: The update should be solved by PropertyEvent.
-             */
+        if (isEditable()) {
+            // TODO: The update should be solved by PropertyEvent.
             File mapDirectory = FreeColDirectories.getMapsDirectory();
             if (mapDirectory.isDirectory()) {
-                for (final File file : mapDirectory.listFiles(new FileFilter() {
-                        public boolean accept(File file) {
-                            return file.isFile() && file.getName().endsWith(".fsg");
-                        }
-                    })) {
-                    String mapName = file.getName().substring(0, file.getName().lastIndexOf('.'));
-                    JButton mapButton = new JButton(Messages.message("freecol.map." + mapName));
-                    try {
-                        FreeColSavegameFile savegame = new FreeColSavegameFile(file);
-                        Image thumbnail = ImageIO.read(savegame.getInputStream(FreeColSavegameFile.THUMBNAIL_FILE));
-                        mapButton.setIcon(new ImageIcon(thumbnail));
-                        try {
-                            Properties properties = new Properties();
-                            properties.load(savegame.getInputStream(FreeColSavegameFile.SAVEGAME_PROPERTIES));
-                            mapButton.setToolTipText(properties.getProperty("map.width")
-                                                     + "\u00D7"
-                                                     + properties.getProperty("map.height"));
-                        } catch (Exception e) {
-                            logger.log(Level.WARNING, "Unable to load savegame properties.", e);
-                        }
-                        mapButton.setHorizontalTextPosition(JButton.CENTER);
-                        mapButton.setVerticalTextPosition(JButton.BOTTOM);
-                    } catch (Exception e) {
-                        logger.log(Level.WARNING, "Failed to read thumbnail.", e);
-                    }
-
+                JPanel mapPanel = new JPanel();
+                for (final File file : mapDirectory.listFiles(fsgFilter)) {
+                    JButton mapButton = makeMapButton(file);
                     mapButton.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent e) {
                                 setFile(file);
@@ -120,35 +98,56 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog implements Ac
                         });
                     mapPanel.add(mapButton);
                 }
-            }
 
-            if (mapPanel.getComponentCount() > 0) {
-                scrollPane = new JScrollPane(mapPanel,
-                                             JScrollPane.VERTICAL_SCROLLBAR_NEVER,
-                                             JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                JScrollPane scrollPane = new JScrollPane(mapPanel,
+                    JScrollPane.VERTICAL_SCROLLBAR_NEVER,
+                    JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
                 scrollPane.getVerticalScrollBar().setUnitIncrement(16);
                 scrollPane.getViewport().setOpaque(false);
                 // TODO: find out how to do this properly
                 scrollPane.setMinimumSize(new Dimension(400, 110));
+
+                panel.add(scrollPane);
             }
         }
-
-        initialize(mgo, mgo.getName(), scrollPane);
-
+        initialize();
     }
 
 
-    public String getDefaultFileName() {
-        return "map_generator_options.xml";
-    }
+    // Internals
 
-    public String getOptionGroupId() {
-        return OPTION_GROUP_ID;
+    private JButton makeMapButton(File file) {
+        String mapName = file.getName().substring(0, file.getName()
+                                                         .lastIndexOf('.'));
+        JButton mapButton = new JButton(Messages.message("freecol.map."
+                + mapName));
+        try {
+            FreeColSavegameFile savegame = new FreeColSavegameFile(file);
+            Image thumbnail = ImageIO.read(savegame
+                .getInputStream(FreeColSavegameFile.THUMBNAIL_FILE));
+            mapButton.setIcon(new ImageIcon(thumbnail));
+            try {
+                Properties properties = new Properties();
+                properties.load(savegame
+                    .getInputStream(FreeColSavegameFile.SAVEGAME_PROPERTIES));
+                mapButton.setToolTipText(properties.getProperty("map.width")
+                    + "\u00D7"
+                    + properties.getProperty("map.height"));
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Unable to load savegame.", e);
+            }
+            mapButton.setHorizontalTextPosition(JButton.CENTER);
+            mapButton.setVerticalTextPosition(JButton.BOTTOM);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Failed to read thumbnail.", e);
+        }
+        return mapButton;
     }
 
     private void setFile(File file) {
         OptionGroup group = getGroup();
-        ((FileOption) group.getOption(MapGeneratorOptions.IMPORT_FILE)).setValue(file);
+        ((FileOption)group.getOption(MapGeneratorOptions.IMPORT_FILE))
+            .setValue(file);
 
         group.setBoolean(MapGeneratorOptions.IMPORT_RUMOURS, false);
         group.setBoolean(MapGeneratorOptions.IMPORT_TERRAIN, true);
@@ -157,22 +156,17 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog implements Ac
     }
 
 
-    // Interface ActionListener
+    // Implement FreeColDialog
 
     /**
      * {@inheritDoc}
      */
-    public void actionPerformed(ActionEvent event) {
-        super.actionPerformed(event);
-        final String command = event.getActionCommand();
-        if (OK.equals(command)) {
-            if (!getFreeColClient().isMapEditor()) {
-                getFreeColClient().getPreGameController()
-                    .sendMapGeneratorOptions();
-                //getClient().getCanvas().getStartGamePanel().updateMapGeneratorOptions();
-            }
-        } else {
-            initialize(getGroup(), getGroup().getName(), scrollPane);
+    public OptionGroup getResponse() {
+        Object value = getValue();
+        if (options[0].equals(value) && !freeColClient.isMapEditor()) {
+            freeColClient.getPreGameController().sendMapGeneratorOptions();
+            return getGroup();
         }
+        return null;
     }
 }

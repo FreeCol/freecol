@@ -19,7 +19,9 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.logging.Logger;
 
@@ -27,6 +29,7 @@ import javax.swing.JButton;
 import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
@@ -45,17 +48,23 @@ import net.sf.freecol.common.option.OptionGroup;
  *
  * @see OptionGroup
  */
-public final class DifficultyDialog extends OptionsDialog implements TreeSelectionListener {
+public final class DifficultyDialog extends OptionsDialog
+    implements TreeSelectionListener {
 
     private static final Logger logger = Logger.getLogger(DifficultyDialog.class.getName());
 
-    private static final String EDIT = "EDIT";
+    private static final FileFilter[] filters = new FileFilter[] {
+        new FileFilter() {
+            public boolean accept(File file) {
+                return file.isDirectory() || file.getName().endsWith(".xml");
+            }
+            public String getDescription() {
+                return Messages.message("filter.xml");
+            }
+        }
+    };
 
-
-    private JButton edit = new JButton(Messages.message("edit"));
-
-    private String CUSTOM_LEVEL = "model.difficulty.custom";
-
+    /** The currently selected subgroup. */
     private OptionGroup selected;
 
     /**
@@ -74,100 +83,126 @@ public final class DifficultyDialog extends OptionsDialog implements TreeSelecti
      *     difficulty on.
      * @param level An <code>OptionGroup</code> encapsulating the difficulty
      *     level to display.
-     * @param editable a <code>boolean</code> value
+     * @param editable Is the dialog editable?
      */
     public DifficultyDialog(FreeColClient freeColClient,
                             Specification specification,
                             OptionGroup level, boolean editable) {
-        super(freeColClient, editable);
+        super(freeColClient, editable, level, Messages.message("difficulty"),
+            "custom.xml", "model.difficulty.custom");
 
         this.specification = specification;
-        selected = level;
-        initialize(level, Messages.message("difficulty"), null);
+        this.selected = level;
+
         getOptionUI().getTree().addTreeSelectionListener(this);
+
+        if (isEditable()) {
+            JButton resetButton = new JButton(Messages.message("reset"));
+            addResetAction(resetButton);
+            
+            JButton loadButton = new JButton(Messages.message("load"));
+            addLoadAction(loadButton);
+                    
+            JButton saveButton = new JButton(Messages.message("save"));
+            addSaveAction(saveButton);
+
+            this.panel.add(resetButton, "span, split 3");
+            this.panel.add(loadButton);
+            this.panel.add(saveButton);
+        }
+        initialize();
     }
 
-    private boolean isGroupEditable() {
-        return selected != null && selected.isEditable();
-    }
-
-    @Override
-    public String getOptionGroupId() {
-        return CUSTOM_LEVEL;
-    }
 
     /**
-     * Returns this dialog's instance of the <code>Specification</code>.
+     * Gets this dialog's instance of the <code>Specification</code>.
      *
-     * @return a <code>Specification</code> value
+     * @return The <code>Specification</code>.
      */
     @Override
     public Specification getSpecification() {
         return specification;
     }
 
-    private void selectLevel(JTree tree, String id) {
-        DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree.getModel().getRoot();
-        for (int index = 0; index < root.getChildCount(); index++) {
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode) root.getChildAt(index);
-            OptionGroup group = (OptionGroup) node.getUserObject();
-            if (id.equals(group.getId())) {
-                TreeNode[] nodes = new TreeNode[] { root, node, node.getFirstChild() };
-                tree.setSelectionPath(new TreePath(nodes));
-                break;
-            }
-        }
-    }
 
-    public OptionGroup getSelectedGroup(TreePath path) {
-        if (path.getPathCount() < 2) {
-            return null;
-        } else {
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getPathComponent(1);
-            return (OptionGroup) node.getUserObject();
-        }
-    }
-
-    public void valueChanged(TreeSelectionEvent event) {
-        selected = getSelectedGroup(event.getPath());
-        edit.setEnabled(!isGroupEditable());
-        save.setEnabled(isGroupEditable());
-    }
-
+    // Internals
 
     /**
-     * Returns the default file name to save the custom difficulty
-     * level.
+     * Add a reset action to a button.
      *
-     * @return "custom.xml"
+     * @param button The <code>JButton</code> to add the action to.
      */
-    public String getDefaultFileName() {
-        return "custom.xml";
+    private void addResetAction(JButton button) {
+        button.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    getOptionUI().reset();
+                }
+            });
+    }
+
+    /**
+     * Add a load action to a button.
+     *
+     * @param button The <code>JButton</code> to add the action to.
+     */
+    private void addLoadAction(JButton button) {
+        button.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    File file = getGUI().showLoadDialog(FreeColDirectories
+                        .getOptionsDirectory(), filters);
+                    if (file != null && load(file)) {
+                        revalidate();
+                        repaint();
+                    }
+                }
+            });
+    }
+
+    /**
+     * Add a save action to a button.
+     *
+     * @param button The <code>JButton</code> to add the action to.
+     */
+    private void addSaveAction(JButton button) {
+        button.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    File file = getGUI().showSaveDialog(FreeColDirectories
+                        .getOptionsDirectory(), ".xml", filters,
+                        getDefaultFileName());
+                    if (file != null) {
+                        getOptionUI().updateOption();
+                        save(file);
+                    }
+                }
+            });
     }
 
 
-    // Interface ActionListener
+    // Implement TreeSelectionListener
+
+    public void valueChanged(TreeSelectionEvent event) {
+        TreePath path = event.getPath();
+        if (path.getPathCount() >= 2) {
+            DefaultMutableTreeNode node
+                = (DefaultMutableTreeNode)path.getPathComponent(1);
+            this.selected = (OptionGroup)node.getUserObject();
+        }
+    }
+
+
+    // Implement FreeColDialog
 
     /**
      * {@inheritDoc}
      */
-    public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
-        if (OK.equals(command)) {
+    public OptionGroup getResponse() {
+        Object value = getValue();
+        if (options[0].equals(value)) {
             getOptionUI().updateOption();
-            getGUI().removeFromCanvas(this);
-            setResponse(selected);
             FreeCol.setDifficulty(selected);
-        } else if (EDIT.equals(command)) {
-            OptionGroup custom = specification.getOptionGroup(CUSTOM_LEVEL);
-            custom.setValue(selected);
-            JTree tree = getOptionUI().getTree();
-            for (int row = tree.getRowCount() - 1; row >= 0; row--) {
-                tree.collapseRow(row);
-            }
-            selectLevel(tree, CUSTOM_LEVEL);
-        } else {
-            super.actionPerformed(event);
+            return selected;
         }
+        getOptionUI().reset();
+        return null;
     }
 }

@@ -231,10 +231,10 @@ public abstract class FreeColAction extends AbstractAction
      * Checks if this action should be enabled.
      *
      * @return <code>false</code> if the
-     *         {@link net.sf.freecol.client.gui.panel.ClientOptionsDialog} is
-     *         visible and <code>true</code> otherwise. This method should be
-     *         extended by subclasses if the action should be disabled in other
-     *         cases.
+     *     {@link net.sf.freecol.client.gui.panel.ClientOptionsDialog} is
+     *     visible and <code>true</code> otherwise. This method should
+     *     be extended by subclasses if the action should be disabled
+     *     in other cases.
      */
     protected boolean shouldBeEnabled() {
         return getGUI().isClientOptionsDialogShowing();
