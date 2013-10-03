@@ -46,11 +46,11 @@ import net.sf.freecol.common.model.GoodsType;
 /**
  * A dialog to display a colony warehouse.
  */
-public final class WarehouseDialog extends FreeColOldDialog<Boolean> {
+public final class WarehouseDialog extends FreeColDialog<Boolean> {
 
     private static final Logger logger = Logger.getLogger(WarehouseDialog.class.getName());
 
-    private JPanel warehouseDialog = new MigPanel();
+    private JPanel warehouseDialog;
 
 
     /**
@@ -62,60 +62,54 @@ public final class WarehouseDialog extends FreeColOldDialog<Boolean> {
     public WarehouseDialog(FreeColClient freeColClient, Colony colony) {
         super(freeColClient);
 
-        warehouseDialog.setLayout(new MigLayout("wrap 4"));
+        warehouseDialog = new MigPanel(new MigLayout("wrap 4"));
         warehouseDialog.setOpaque(false);
+        for (GoodsType type : freeColClient.getGame().getSpecification()
+                 .getGoodsTypeList()) {
+            if (type.isStorable()) {
+                warehouseDialog.add(new WarehouseGoodsPanel(freeColClient,
+                                                            colony, type));
+            }
+        }
 
         JScrollPane scrollPane = new JScrollPane(warehouseDialog,
             JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
             JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.getVerticalScrollBar().setUnitIncrement( 16 );
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         scrollPane.getViewport().setOpaque(false);
         scrollPane.setBorder(null);
 
-        setCancelComponent(cancelButton);
+        MigPanel panel = new MigPanel(new MigLayout("fill, wrap 1", "", ""));
+        String str = Messages.message("warehouseDialog.name");
+        panel.add(GUI.getDefaultHeader(str), "align center");
+        panel.add(scrollPane, "grow");
+        panel.setSize(panel.getPreferredSize());
 
-        setLayout(new MigLayout("fill, wrap 1", "", ""));
-
-        add(GUI.getDefaultHeader(Messages.message("warehouseDialog.name")),
-            "align center");
-        add(scrollPane, "grow");
-        add(okButton, "newline 20, split 2, tag ok");
-        add(cancelButton, "tag cancel");
-
-        for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
-            if (goodsType.isStorable()) {
-                warehouseDialog.add(new WarehouseGoodsPanel(colony, goodsType));
-            }
-        }
-
-        setSize(getPreferredSize());
+        initialize(DialogType.PLAIN, true, panel, null, new String[] {
+                Messages.message("ok"),
+                Messages.message("cancel"),
+            });
     }
 
-
-    // Interface ActionListener
 
     /**
      * {@inheritDoc}
      */
-    public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
-        if (OK.equals(command)) {
-            setResponse(Boolean.TRUE);
+    public Boolean getResponse() {
+        Object value = getValue();
+        if (options[0].equals(value)) {
             for (Component c : warehouseDialog.getComponents()) {
                 if (c instanceof WarehouseGoodsPanel) {
-                    ((WarehouseGoodsPanel) c).saveSettings();
+                    ((WarehouseGoodsPanel)c).saveSettings();
                 }
             }
-        } else if (CANCEL.equals(command)) {
-            getGUI().removeFromCanvas(this);
-            setResponse(Boolean.FALSE);
-        } else {
-            super.actionPerformed(event);
+            return Boolean.TRUE;
         }
+        return Boolean.FALSE;
     }
 
 
-    public class WarehouseGoodsPanel extends MigPanel {
+    private class WarehouseGoodsPanel extends MigPanel {
 
         private final Colony colony;
 
@@ -130,7 +124,8 @@ public final class WarehouseDialog extends FreeColOldDialog<Boolean> {
         private final JSpinner exportLevel;
 
 
-        public WarehouseGoodsPanel(Colony colony, GoodsType goodsType) {
+        public WarehouseGoodsPanel(FreeColClient freeColClient, Colony colony,
+                                   GoodsType goodsType) {
             super("WarehouseGoodsPanelUI");
 
             this.colony = colony;
@@ -139,52 +134,67 @@ public final class WarehouseDialog extends FreeColOldDialog<Boolean> {
             setLayout(new MigLayout("wrap 2", "", ""));
             setOpaque(false);
             String goodsName = Messages.message(goodsType.getNameKey());
-            setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(goodsName),
+
+            setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createTitledBorder(goodsName),
                     BorderFactory.createEmptyBorder(6, 6, 6, 6)));
 
             ExportData exportData = colony.getExportData(goodsType);
 
             // goods label
+            final GUI gui = freeColClient.getGUI();
             Goods goods = new Goods(colony.getGame(), colony, goodsType,
                                     colony.getGoodsCount(goodsType));
-            GoodsLabel goodsLabel = new GoodsLabel(goods, getGUI());
+            GoodsLabel goodsLabel = new GoodsLabel(goods, gui);
             goodsLabel.setHorizontalAlignment(JLabel.LEADING);
             add(goodsLabel, "span 1 2");
 
             // low level settings
-            SpinnerNumberModel lowLevelModel = new SpinnerNumberModel(exportData.getLowLevel(), 0, 100, 1);
+            String str;
+            SpinnerNumberModel lowLevelModel
+                = new SpinnerNumberModel(exportData.getLowLevel(), 0, 100, 1);
             lowLevel = new JSpinner(lowLevelModel);
-            lowLevel.setToolTipText(Messages.message("warehouseDialog.lowLevel.shortDescription"));
+            str = Messages.message("warehouseDialog.lowLevel.shortDescription");
+            lowLevel.setToolTipText(str);
             add(lowLevel);
 
             // high level settings
-            SpinnerNumberModel highLevelModel = new SpinnerNumberModel(exportData.getHighLevel(), 0, 100, 1);
+            SpinnerNumberModel highLevelModel
+                = new SpinnerNumberModel(exportData.getHighLevel(), 0, 100, 1);
             highLevel = new JSpinner(highLevelModel);
-            highLevel.setToolTipText(Messages.message("warehouseDialog.highLevel.shortDescription"));
+            str = Messages.message("warehouseDialog.highLevel.shortDescription");
+            highLevel.setToolTipText(str);
             add(highLevel);
 
             // export checkbox
-            export = new JCheckBox(Messages.message("warehouseDialog.export"), exportData.isExported());
-            export.setToolTipText(Messages.message("warehouseDialog.export.shortDescription"));
+            export = new JCheckBox(Messages.message("warehouseDialog.export"),
+                                   exportData.isExported());
+            str = Messages.message("warehouseDialog.export.shortDescription");
+            export.setToolTipText(str);
             if (!colony.hasAbility(Ability.EXPORT)) {
                 export.setEnabled(false);
             }
             add(export);
 
             // export level settings
-            SpinnerNumberModel exportLevelModel = new SpinnerNumberModel(exportData.getExportLevel(), 0, colony
-                    .getWarehouseCapacity(), 1);
+            SpinnerNumberModel exportLevelModel
+                = new SpinnerNumberModel(exportData.getExportLevel(), 0,
+                                         colony.getWarehouseCapacity(), 1);
             exportLevel = new JSpinner(exportLevelModel);
-            exportLevel.setToolTipText(Messages.message("warehouseDialog.exportLevel.shortDescription"));
+            str = Messages.message("warehouseDialog.exportLevel.shortDescription");
+            exportLevel.setToolTipText(str);
             add(exportLevel);
 
             setSize(getPreferredSize());
         }
 
         public void saveSettings() {
-            int lowLevelValue = ((SpinnerNumberModel) lowLevel.getModel()).getNumber().intValue();
-            int highLevelValue = ((SpinnerNumberModel) highLevel.getModel()).getNumber().intValue();
-            int exportLevelValue = ((SpinnerNumberModel) exportLevel.getModel()).getNumber().intValue();
+            int lowLevelValue = ((SpinnerNumberModel)lowLevel.getModel())
+                .getNumber().intValue();
+            int highLevelValue = ((SpinnerNumberModel)highLevel.getModel())
+                .getNumber().intValue();
+            int exportLevelValue = ((SpinnerNumberModel)exportLevel.getModel())
+                .getNumber().intValue();
             ExportData exportData = colony.getExportData(goodsType);
             boolean changed = (export.isSelected() != exportData.isExported())
                 || (lowLevelValue != exportData.getLowLevel())
@@ -196,7 +206,8 @@ public final class WarehouseDialog extends FreeColOldDialog<Boolean> {
             exportData.setHighLevel(highLevelValue);
             exportData.setExportLevel(exportLevelValue);
             if (changed) {
-                getController().setGoodsLevels(colony, goodsType);
+                freeColClient.getInGameController()
+                    .setGoodsLevels(colony, goodsType);
             }
         }
     }

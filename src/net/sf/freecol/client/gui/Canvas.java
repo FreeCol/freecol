@@ -2683,11 +2683,13 @@ public final class Canvas extends JDesktopPane {
     /**
      * Display the warehouse dialog for a colony.
      *
+     * Run out of ColonyPanel, so the tile is already displayed.
+     *
      * @param colony The <code>Colony</code> to display.
      */
     public boolean showWarehouseDialog(Colony colony) {
-        return showFreeColOldDialog(new WarehouseDialog(freeColClient, colony),
-            null, true);
+        return showFreeColDialog(new WarehouseDialog(freeColClient, colony),
+                                 null);
     }
 
     /**
