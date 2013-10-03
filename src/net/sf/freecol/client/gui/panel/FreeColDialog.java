@@ -65,11 +65,15 @@ public abstract class FreeColDialog<T> extends JDialog
 
     private static final Logger logger = Logger.getLogger(FreeColDialog.class.getName());
 
+    public static enum DialogType {
+        PLAIN,
+        QUESTION,
+    };
+
     private static final Border dialogBorder
         = BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(Color.BLACK),
                 BorderFactory.createEmptyBorder(10, 20, 10, 20));
-        
 
     /** The enclosing client. */
     protected FreeColClient freeColClient;
@@ -100,17 +104,19 @@ public abstract class FreeColDialog<T> extends JDialog
      * JOptionPane.createDialog.  We needed a way to control modality.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param type The <code>DialogType</code> to create.
+     * @param modal Should this dialog be modal?
      * @param obj The main object that explains the choice for the user,
      *     usually just a string, but may be more complex.
      * @param icon An optional icon to display.
-     * @param modal Should this dialog be modal?
      * @param options The options to choose from.
      */
-    public FreeColDialog(FreeColClient freeColClient, boolean modal,
-                         Object obj, ImageIcon icon, String[] options) {
+    public FreeColDialog(FreeColClient freeColClient, DialogType type,
+                         boolean modal, Object obj, ImageIcon icon,
+                         String[] options) {
         this(freeColClient);
 
-        initialize(modal, obj, icon, options);
+        initialize(type, modal, obj, icon, options);
     }
 
 
@@ -118,17 +124,22 @@ public abstract class FreeColDialog<T> extends JDialog
      * Complete the initialization.  Useful for subclasses that need
      * to construct a non-trivial object to display in the JOptionPane.
      *
+     * @param type The <code>DialogType</code> to create.
+     * @param modal Should this dialog be modal?
      * @param obj The main object that explains the choice for the user,
      *     usually just a string, but may be more complex.
      * @param icon An optional icon to display.
-     * @param modal Should this dialog be modal?
      * @param options The options to choose from.
      */
-    protected void initialize(boolean modal, Object obj, ImageIcon icon,
-                              String[] options) {
+    protected void initialize(DialogType type, boolean modal, Object obj, 
+                              ImageIcon icon, String[] options) {
         this.options = options;
-        this.pane = new JOptionPane(obj,
-            JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION,
+        int paneType = JOptionPane.QUESTION_MESSAGE;
+        switch (type) {
+        case PLAIN:    paneType = JOptionPane.PLAIN_MESSAGE; break;
+        case QUESTION: paneType = JOptionPane.QUESTION_MESSAGE; break;
+        }
+        this.pane = new JOptionPane(obj, paneType, JOptionPane.YES_NO_OPTION,
             icon, options, options[options.length - 1]);
         pane.setBorder(dialogBorder);
 

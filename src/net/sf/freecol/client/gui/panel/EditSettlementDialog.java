@@ -122,7 +122,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         panel.add(new JLabel(Messages.message("report.units")));
         panel.add(units);
 
-        initialize(true, panel,
+        initialize(DialogType.QUESTION, true, panel,
             freeColClient.getGUI().getImageLibrary()
                 .getImageIcon(settlement, true),
             new String[] {

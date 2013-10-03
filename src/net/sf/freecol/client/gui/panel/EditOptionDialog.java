@@ -55,7 +55,7 @@ public class EditOptionDialog extends FreeColDialog<Boolean> {
         if (ui.getLabel() == null) panel.add(ui.getLabel(), "split 2");
         panel.add(ui.getComponent());
 
-        initialize(true, panel, null, new String[] {
+        initialize(DialogType.QUESTION, true, panel, null, new String[] {
                 Messages.message("ok"),
                 Messages.message("cancel")
             });

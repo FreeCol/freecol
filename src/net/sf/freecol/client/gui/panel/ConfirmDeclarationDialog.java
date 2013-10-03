@@ -90,7 +90,7 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>> {
         ImageIcon icon = freeColClient.getGUI().getImageLibrary()
             .getImageIcon(player, true);
 
-        initialize(true, panel, icon, new String[] {
+        initialize(DialogType.QUESTION, true, panel, icon, new String[] {
                 Messages.message("declareIndependence.areYouSure.yes"),
                 Messages.message("declareIndependence.areYouSure.no")
             });

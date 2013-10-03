@@ -51,7 +51,7 @@ public class FreeColConfirmDialog extends FreeColDialog<Boolean> {
                                 String okText, String cancelText) {
         super(freeColClient);
 
-        initialize(true, text, icon, new String[] {
+        initialize(DialogType.QUESTION, true, text, icon, new String[] {
                 Messages.message(okText),
                 Messages.message(cancelText)
             });

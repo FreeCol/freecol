@@ -89,7 +89,7 @@ public final class RiverStyleDialog extends FreeColDialog<String> {
         panel.add(button);
         panel.setSize(panel.getPreferredSize());
 
-        initialize(true, panel, null, new String[] {
+        initialize(DialogType.PLAIN, true, panel, null, new String[] {
                 Messages.message("cancel")
             });
     }

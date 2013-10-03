@@ -102,7 +102,7 @@ public class ParametersDialog extends FreeColDialog<Parameters> {
         inputD.addActionListener(al);
         inputM.addActionListener(al);
 
-        initialize(true, panel, null, new String[] {
+        initialize(DialogType.QUESTION, true, panel, null, new String[] {
                 Messages.message("ok"),
                 Messages.message("cancel")
             });

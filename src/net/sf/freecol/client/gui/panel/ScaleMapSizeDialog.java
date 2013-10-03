@@ -103,7 +103,7 @@ public class ScaleMapSizeDialog extends FreeColDialog<Dimension> {
         inputWidth.addActionListener(al);
         inputHeight.addActionListener(al);
 
-        initialize(true, panel, null, new String[] {
+        initialize(DialogType.QUESTION, true, panel, null, new String[] {
                 Messages.message("ok"),
                 Messages.message("cancel")
             });

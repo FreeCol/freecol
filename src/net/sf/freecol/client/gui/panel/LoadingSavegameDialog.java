@@ -114,7 +114,7 @@ public final class LoadingSavegameDialog extends FreeColDialog<Boolean> {
         panel.add(publicMultiplayer);
         panel.setSize(panel.getPreferredSize());
 
-        initialize(true, panel, null, new String[] {
+        initialize(DialogType.PLAIN, true, panel, null, new String[] {
                 Messages.message("ok"),
                 Messages.message("cancel")
             });
