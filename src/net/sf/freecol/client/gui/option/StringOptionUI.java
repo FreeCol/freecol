@@ -54,7 +54,7 @@ public final class StringOptionUI extends OptionUI<StringOption>  {
 
         box.setModel(new DefaultComboBoxModel(choices.toArray(new String[choices.size()])));
         box.setSelectedItem(option.getValue());
-        box.setRenderer(new FreeColComboBoxRenderer());
+        box.setRenderer(new FreeColComboBoxRenderer("", true));
 
         initialize();
     }

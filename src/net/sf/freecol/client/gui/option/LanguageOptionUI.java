@@ -23,6 +23,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.option.LanguageOption.Language;
 
@@ -34,7 +35,8 @@ import net.sf.freecol.common.option.LanguageOption.Language;
  */
 public final class LanguageOptionUI extends OptionUI<LanguageOption>  {
 
-    JComboBox box = new JComboBox();
+    private JComboBox box = new JComboBox();
+
 
     /**
      * Creates a new <code>LanguageOptionUI</code> for the given
@@ -45,11 +47,14 @@ public final class LanguageOptionUI extends OptionUI<LanguageOption>  {
      * @param editable boolean whether user can modify the setting
      */
     @SuppressWarnings("unchecked") // FIXME in Java7
-    public LanguageOptionUI(GUI gui, final LanguageOption option, boolean editable) {
+    public LanguageOptionUI(GUI gui, final LanguageOption option,
+                            boolean editable) {
         super(gui, option, editable);
 
-        box.setModel(new DefaultComboBoxModel(option.getChoices().toArray(new Language[0])));
+        Language[] languages = option.getChoices().toArray(new Language[0]);
+        box.setModel(new DefaultComboBoxModel(languages));
         box.setSelectedItem(option.getValue());
+        box.setRenderer(new FreeColComboBoxRenderer("", false));
 
         initialize();
     }

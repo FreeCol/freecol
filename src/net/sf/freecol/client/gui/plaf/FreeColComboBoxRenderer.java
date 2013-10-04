@@ -19,6 +19,8 @@
 
 package net.sf.freecol.client.gui.plaf;
 
+import java.util.logging.Logger;
+
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Component;
@@ -34,6 +36,7 @@ import javax.swing.ListCellRenderer;
 
 import net.sf.freecol.common.ObjectWithId;
 import net.sf.freecol.common.model.Nameable;
+import net.sf.freecol.common.option.LanguageOption.Language;
 import net.sf.freecol.client.gui.i18n.Messages;
 
 
@@ -44,11 +47,13 @@ import net.sf.freecol.client.gui.i18n.Messages;
  */
 public class FreeColComboBoxRenderer implements ListCellRenderer, UIResource {
 
+    private static final Logger logger = Logger.getLogger(FreeColComboBoxRenderer.class.getName());
+
     private final SelectedComponent SELECTED_COMPONENT = new SelectedComponent();
     private final NormalComponent NORMAL_COMPONENT = new NormalComponent();
 
     private final String prefix;
-
+    private boolean localize = true;
 
     /**
      * Creates a new <code>FreeColComboBoxRenderer</code> instance
@@ -66,7 +71,20 @@ public class FreeColComboBoxRenderer implements ListCellRenderer, UIResource {
      * @param prefix a <code>String</code> value
      */
     public FreeColComboBoxRenderer(String prefix) {
+        this(prefix, true);
+    }
+
+
+    /**
+     * Creates a new <code>FreeColComboBoxRenderer</code> instance
+     * with a given prefix.
+     *
+     * @param prefix a <code>String</code> value
+     * @param localize a <code>boolean</code> value
+     */
+    public FreeColComboBoxRenderer(String prefix, boolean localize) {
         this.prefix = prefix;
+        this.localize = localize;
     }
 
 
@@ -90,27 +108,38 @@ public class FreeColComboBoxRenderer implements ListCellRenderer, UIResource {
         return c;
     }
 
+    /**
+     * Set the text to place in a label.
+     *
+     * @param c The <code>JLabel</code> to assign.
+     * @param value The object to derive a text value from.
+     */
     public void setLabelValues(JLabel c, Object value) {
         if (value == null) {
             c.setText(null);
+        } else if (value instanceof Language) {
+            c.setText(value.toString());
         } else if (value instanceof String) {
-            c.setText((String)value);
-        } else if (value instanceof ObjectWithId) {
-            String id = prefix + ((ObjectWithId)value).getId();
-            if (id == null) {
-                c.setText(value.toString());
+            String string = (String)value;
+            if (localize) {
+                String[] nd = Messages.getBestNameAndDescription(string);
+                c.setText(nd[0]);
+                if (nd[1] != null) c.setToolTipText(nd[1]);
             } else {
-                String name = Messages.getName(id);
-                String description = Messages.getBestDescription(id);
-                if (value instanceof Nameable) {
-                    String realname = ((Nameable) value).getName();
-                    if (realname != null) {
-                        name = realname;
-                    }
-                }
-                c.setText(name);
-                c.setToolTipText(description);
+                c.setText(string);
             }
+        } else if (value instanceof ObjectWithId) {
+            String id = ((prefix == null) ? "" : prefix)
+                + ((ObjectWithId)value).getId();
+            String[] nd = Messages.getBestNameAndDescription(id);
+            if (value instanceof Nameable) {
+                String realname = ((Nameable)value).getName();
+                if (realname != null) nd[0] = realname;
+            }
+            c.setText(nd[0]);
+            if (nd[1] != null) c.setToolTipText(nd[1]);
+        } else {
+            logger.warning("What is this?: " + value);
         }
     }
 

@@ -603,8 +603,12 @@ public class Messages {
         return getBestDescription(object.getId());
     }
 
+    private static String nameKey(String id) {
+        return id + NAME_SUFFIX;
+    }
+
     public static String getName(String id) {
-        return message(id + NAME_SUFFIX);
+        return message(nameKey(id));
     }
 
     public static String getDescription(String id) {
@@ -623,6 +627,28 @@ public class Messages {
             }
         }
         return id;
+    }
+
+    /**
+     * Get the name and best description for a given identifier.
+     *
+     * Favour the .name form, but degrade gracefully if it is not present.
+     * If .name is present, also look for a description.
+     *
+     * @param id The identifier to look up.
+     * @return A 2-element array of name and description found.
+     */
+    public static String[] getBestNameAndDescription(String id) {
+        String name = (containsKey(nameKey(id))) ? getName(id) : null;
+        String desc = null;
+        if (name == null) {
+            name = (containsKey(id)) ? message(id) : null;
+            if (name == null) name = id;
+        } else {
+            desc = getBestDescription(id);
+            if (id.equals(desc)) desc = null;
+        }
+        return new String[] { name, desc };
     }
 
     /**
