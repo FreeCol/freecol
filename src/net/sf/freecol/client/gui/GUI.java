@@ -1160,6 +1160,14 @@ public class GUI {
         return canvas.showChoiceDialog(tile, text, cancelText, choices);
     }
 
+    public <T> T showModalChoiceDialog(Tile tile, String text, ImageIcon icon,
+                                       String cancelText,
+                                       List<ChoiceItem<T>> choices) {
+        if (canvas == null) return null;
+        return canvas.showModalChoiceDialog(tile, text, icon, cancelText,
+                                            choices);
+    }
+
     public MonarchAction showChooseMonarchActionDialog(String monarchTitle,
         List<ChoiceItem<MonarchAction>> actions) {
         if (canvas == null) return MonarchAction.NO_ACTION;

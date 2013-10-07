@@ -44,6 +44,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
@@ -84,6 +85,9 @@ public abstract class FreeColDialog<T> extends JDialog
 
     /** The JOptionPane to embed in this dialog. */
     private JOptionPane pane;
+
+    /** An optional ScrollPane if there are many options. */
+    private JScrollPane scrollPane;
 
 
     /**
@@ -144,10 +148,15 @@ public abstract class FreeColDialog<T> extends JDialog
             icon, options, options[options.length - 1]);
         this.pane.setBorder(dialogBorder);
         this.pane.setName("FreeColDialog");
+        this.scrollPane = (options.length <= 20) ? null
+            : new JScrollPane(this.pane,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout());
-        contentPane.add(this.pane, BorderLayout.CENTER);
+        contentPane.add((this.scrollPane != null) ? this.scrollPane : this.pane,
+                        BorderLayout.CENTER);
 
         setFocusCycleRoot(true);
         setComponentOrientation(this.pane.getComponentOrientation());
@@ -284,6 +293,7 @@ public abstract class FreeColDialog<T> extends JDialog
         removeAll();
         this.pane.removePropertyChangeListener(this);
         this.pane = null;
+        this.scrollPane = null;
 
         for (MouseListener listener : getMouseListeners()) {
             removeMouseListener(listener);

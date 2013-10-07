@@ -85,12 +85,12 @@ public class ChoiceItem<T> {
 
     /**
      * Gets the <code>Object</code> contained by this choice.
+     *
      * @return The <code>Object</code>.
      */
     public T getObject() {
         return object;
     }
-
 
     /**
      * Gets the choice as an <code>int</code>.
@@ -104,11 +104,12 @@ public class ChoiceItem<T> {
     }
     
     /**
-     * Checks if the option should be enabled or not
-     * @return enable status
+     * Should this item be enabled or not?
+     *
+     * @return The enable status.
      */
-    public boolean isEnabled(){
-    	return this.enabled;
+    public boolean isEnabled() {
+        return this.enabled;
     }
 
     /**

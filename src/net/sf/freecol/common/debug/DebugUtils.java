@@ -134,8 +134,10 @@ public class DebugUtils {
             String msg = Messages.message(b.getNameKey());
             buildings.add(new ChoiceItem<BuildingType>(msg, b));
         }
+        
         BuildingType buildingType
-            = gui.showChoiceDialog(null, buildingTitle, "Cancel", buildings);
+            = gui.showModalChoiceDialog(null, buildingTitle, null, "cancel",
+                                        buildings);
         if (buildingType == null) return;
 
         final Game sGame = server.getGame();

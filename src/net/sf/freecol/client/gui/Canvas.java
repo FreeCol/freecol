@@ -77,6 +77,7 @@ import net.sf.freecol.client.gui.panel.ErrorPanel;
 import net.sf.freecol.client.gui.panel.EuropePanel;
 import net.sf.freecol.client.gui.panel.EventPanel;
 import net.sf.freecol.client.gui.panel.FindSettlementDialog;
+import net.sf.freecol.client.gui.panel.FreeColChoiceDialog;
 import net.sf.freecol.client.gui.panel.FreeColConfirmDialog;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.client.gui.panel.FreeColOldDialog;
@@ -1599,6 +1600,29 @@ public final class Canvas extends JDesktopPane {
                 Messages.message(okText),
                 Messages.message(cancelText));
         return showFreeColOldDialog(dialog, tile, true);
+    }
+
+    /**
+     * Displays a dialog with text and a choice of options.
+     *
+     * @param tile An optional <code>Tile</code> to make visible (not
+     *     under the dialog!)
+     * @param text The text that explains the choice for the user (should
+     *     have been i18n-expanded in GUI).
+     * @param icon An optional icon to display.
+     * @param cancelText Optional text for a cancel option that returns null.
+     * @param choices The <code>List</code> containing the ChoiceItems to
+     *            create buttons for.
+     * @return The corresponding member of the values array to the selected
+     *     option.
+     */
+    public <T> T showModalChoiceDialog(Tile tile, String text, ImageIcon icon,
+                                       String cancelText,
+                                       List<ChoiceItem<T>> choices) {
+        
+        return showFreeColDialog(new FreeColChoiceDialog<T>(freeColClient,
+                                 text, icon, cancelText, choices),
+                                 tile);
     }
 
     /**

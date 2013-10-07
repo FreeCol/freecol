@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui.plaf;
 
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
@@ -37,6 +38,7 @@ import javax.swing.plaf.basic.BasicOptionPaneUI;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.MigPanel;
 
 
@@ -54,6 +56,22 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
     }
 
 
+    /**
+     * Choose the number of columns for the OptionPane buttons.
+     *
+     * @param nButtons The number of buttons.
+     * @return A suitable number of columns.
+     */
+    private int getColumns(int nButtons) {
+        return ((nButtons % 4) == 0 && nButtons > 12) ? 4
+            :  ((nButtons % 3) == 0 && nButtons > 6)  ? 3
+            :  ((nButtons % 2) == 0 && nButtons > 4)  ? 2
+            :  (nButtons > 21) ? 4
+            :  (nButtons > 5)  ? 2
+            :  1;
+    }
+
+
     // Override BasicOptionPaneUI
 
     /**
@@ -61,10 +79,12 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
      */
     @Override
     protected Container createButtonArea() {
-        MigPanel bottom = new MigPanel(new MigLayout("wrap 4"));
+        Object[] buttons = getButtons();
+        String wrap = "wrap " + getColumns(buttons.length);
+        MigPanel bottom = new MigPanel(new MigLayout(wrap));
         bottom.setOpaque(false);
         bottom.setName("OptionPane.buttonArea");
-        addButtonComponents(bottom, getButtons(), getInitialValueIndex());
+        addButtonComponents(bottom, buttons, getInitialValueIndex());
         return bottom;
     }
 
@@ -76,32 +96,68 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
                                        int initialIndex) {
         if (buttons == null) return;
 
+        final String okLabel = Messages.message("ok");
+        final String cancelLabel = Messages.message("cancel");
+        int okIndex = -1, cancelIndex = -1;
+        int maxWidth = 0;
+        JButton[] newButtons = new JButton[buttons.length];
         for (int i = 0; i < buttons.length; i++) {
             JButton b;
             if (buttons[i] instanceof Icon) {
                 b = new JButton((Icon)buttons[i]);
                 b.setName("OptionPane.button.withIcon");
             } else {
-                b = new JButton(buttons[i].toString());
-                b.setName("OptionPane.button." + buttons[i].toString());
+                String label = buttons[i].toString();
+                b = new JButton(label);
+                b.setName("OptionPane.button." + label);
+                if (okLabel.equals(label)) okIndex = i;
+                else if (cancelLabel.equals(label)) cancelIndex = i;
+                maxWidth = Math.max(maxWidth, b.getMinimumSize().width);
             }
-            String tag = (i == 0) ? "tag ok, span, split " + buttons.length
-                : (i == buttons.length-1) ? "tag cancel"
-                : "";
-            container.add(b, tag);
             ActionListener buttonListener = createButtonActionListener(i);
             if (buttonListener != null) b.addActionListener(buttonListener);
-
-            if (i != initialIndex) continue;
-            b.addHierarchyListener(new HierarchyListener() {
-                    public void hierarchyChanged(HierarchyEvent e) {
-                        if ((e.getChangeFlags() & HierarchyEvent.PARENT_CHANGED) != 0) {
-                            JButton b = (JButton)e.getComponent();
-                            JRootPane root = SwingUtilities.getRootPane(b);
-                            if (root != null) root.setDefaultButton(b);
+            newButtons[i] = b;
+            if (initialIndex == i) {
+                b.addHierarchyListener(new HierarchyListener() {
+                        public void hierarchyChanged(HierarchyEvent e) {
+                            if ((e.getChangeFlags() & HierarchyEvent.PARENT_CHANGED) != 0) {
+                                JButton b = (JButton)e.getComponent();
+                                JRootPane root = SwingUtilities.getRootPane(b);
+                                if (root != null) root.setDefaultButton(b);
+                            }
                         }
-                    }
-                });
+                    });
+            }
+        }
+        if (okIndex >= 0) {
+            // If OK is present this is a confirm-dialog.  Put everything
+            // in the same span especially the Cancel.
+            container.add(newButtons[okIndex],
+                          "tag ok, span, split " + buttons.length);
+            if (cancelIndex >= 0) {
+                container.add(newButtons[cancelIndex], "tag cancel");
+            }
+            for (int i = 0; i < buttons.length; i++) {
+                if (i == okIndex || i == cancelIndex) continue;
+                container.add(newButtons[i]);
+            }
+        } else {
+            // This must be a choice dialog.  The wrap argument to the
+            // MigLayout constructor will do the work for us.
+            for (int i = 0; i < buttons.length; i++) {
+                if (i == cancelIndex) continue;
+                container.add(newButtons[i]);
+            }
+            if (cancelIndex >= 0) {
+                container.add(newButtons[cancelIndex], "newline 20, tag cancel");
+            }
+            if (maxWidth > 0) {
+                for (int i = 0; i < buttons.length; i++) {
+                    if (buttons[i] instanceof Icon) continue;
+                    newButtons[i].setPreferredSize(new Dimension(maxWidth,
+                            newButtons[i].getHeight()));
+                }
+            }
         }
     }
 
