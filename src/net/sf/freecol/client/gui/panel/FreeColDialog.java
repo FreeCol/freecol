@@ -143,6 +143,7 @@ public abstract class FreeColDialog<T> extends JDialog
         this.pane = new JOptionPane(obj, paneType, JOptionPane.YES_NO_OPTION,
             icon, options, options[options.length - 1]);
         this.pane.setBorder(dialogBorder);
+        this.pane.setName("FreeColDialog");
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout());
