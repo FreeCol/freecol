@@ -26,14 +26,18 @@
     <property name="freecol.overview.file"
               value="${freecol.src.dir}/overview.html"/>
     <property name="test" value="AllTests"/>
-    <property name="miglayout.jar" value="jars/miglayout-4.0-swing.jar"/>
+    <property name="miglayout-swing.jar"
+              value="jars/miglayout-swing-4.2.jar"/>
+    <property name="miglayout-core.jar"
+              value="jars/miglayout-core-4.2.jar"/>
     <property name="cli.jar" value="jars/commons-cli-1.1.jar"/>
     <property name="cortado.jar" value="jars/cortado-0.6.0.jar"/>
 
 
     <path id="libraries.classpath">
         <!-- MigLayout manager -->
-        <pathelement location="${basedir}/${miglayout.jar}"/>
+        <pathelement location="${basedir}/${miglayout-swing.jar}"/>
+        <pathelement location="${basedir}/${miglayout-core.jar}"/>
         <!-- Command line processor -->
         <pathelement location="${basedir}/${cli.jar}"/>
         <!-- Cortado Video Applet -->
