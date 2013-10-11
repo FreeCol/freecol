@@ -1359,8 +1359,9 @@ public final class MapViewer {
             public void actionPerformed(ActionEvent event) {
                 if (!blinkingMarqueeEnabled)
                     return;
-                if (getActiveUnit() != null && getActiveUnit().hasTile()) {
-                    Tile tile = getActiveUnit().getTile();
+                Unit unit = getActiveUnit();
+                if (unit != null) {
+                    Tile tile = unit.getTile();
                     if (isTileVisible(tile)) {
                         gui.refreshTile(tile);
                     }
