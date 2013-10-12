@@ -60,7 +60,6 @@ public final class EmigrationDialog extends FreeColOldDialog<Integer> {
             person[index] = new JButton();
             person[index].setActionCommand(String.valueOf(index));
             person[index].addActionListener(this);
-            enterPressesWhenFocused(person[index]);
         }
     }
 
@@ -71,7 +70,7 @@ public final class EmigrationDialog extends FreeColOldDialog<Integer> {
     /**
      * Updates this panel's labels so that the information it displays is up to
      * date.
-     * 
+     *
      * @param europe The Europe Object where we can find the units that are
      *            prepared to emigrate.
      * @param fountainOfYouth a <code>boolean</code> value

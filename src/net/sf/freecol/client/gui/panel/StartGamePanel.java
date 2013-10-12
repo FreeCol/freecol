@@ -147,9 +147,6 @@ public final class StartGamePanel extends FreeColPanel {
             chatArea.setText("");
         }
 
-        enterPressesWhenFocused(start);
-        enterPressesWhenFocused(cancel);
-
         start.addActionListener(this);
         cancel.addActionListener(this);
         readyBox.addActionListener(this);

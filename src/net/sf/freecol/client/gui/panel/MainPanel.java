@@ -74,13 +74,6 @@ public final class MainPanel extends FreeColPanel {
                 ? ContinueAction.id
                 : NewAction.id));
 
-        enterPressesWhenFocused(okButton);
-        enterPressesWhenFocused(newButton);
-        enterPressesWhenFocused(mapEditorButton);
-        enterPressesWhenFocused(openButton);
-        enterPressesWhenFocused(optionsButton);
-        enterPressesWhenFocused(quitButton);
-
         Image tempImage = ResourceManager.getImage("TitleImage");
 
         if (tempImage != null) {

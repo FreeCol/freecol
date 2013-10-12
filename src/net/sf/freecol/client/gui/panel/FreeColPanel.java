@@ -146,7 +146,6 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
 
         okButton.setActionCommand(OK);
         okButton.addActionListener(this);
-        enterPressesWhenFocused(okButton);
         setCancelComponent(okButton);
     }
 
@@ -307,24 +306,6 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
                 }
             });
     }
-
-    /**
-     * Registers enter key for a JButton.
-     *
-     * @param button
-     */
-    public static void enterPressesWhenFocused(JButton button) {
-        button.registerKeyboardAction(button.getActionForKeyStroke(
-                KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false)),
-            KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false),
-            JComponent.WHEN_FOCUSED);
-
-        button.registerKeyboardAction(button.getActionForKeyStroke(
-                KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true)),
-            KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, true),
-            JComponent.WHEN_FOCUSED);
-    }
-
 
     // Interface ActionListener
 

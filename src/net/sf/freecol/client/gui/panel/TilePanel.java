@@ -82,7 +82,6 @@ public final class TilePanel extends FreeColPanel {
         JButton colopediaButton = new JButton(Messages.message("menuBar.colopedia"));
         colopediaButton.setActionCommand(tile.getType().getId());
         colopediaButton.addActionListener(this);
-        enterPressesWhenFocused(colopediaButton);
 
         // Use ESCAPE for closing the panel:
         InputMap inputMap = new ComponentInputMap(okButton);

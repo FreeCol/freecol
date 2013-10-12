@@ -169,19 +169,16 @@ public final class NegotiationDialog extends FreeColOldDialog<DiplomaticTrade>
         sendButton = new JButton(Messages.message("negotiationDialog.send"));
         sendButton.addActionListener(this);
         sendButton.setActionCommand(SEND);
-        FreeColPanel.enterPressesWhenFocused(sendButton);
 
         acceptButton = new JButton(Messages.message("negotiationDialog.accept"));
         acceptButton.addActionListener(this);
         acceptButton.setActionCommand(ACCEPT);
-        FreeColPanel.enterPressesWhenFocused(acceptButton);
         acceptButton.setEnabled(canAccept);
 
         cancelButton = new JButton(Messages.message("negotiationDialog.cancel"));
         cancelButton.addActionListener(this);
         cancelButton.setActionCommand(CANCEL);
         setCancelComponent(cancelButton);
-        FreeColPanel.enterPressesWhenFocused(cancelButton);
 
         stancePanel = new StanceTradeItemPanel(this, player, otherPlayer);
         goldDemandPanel = new GoldTradeItemPanel(this, otherPlayer,

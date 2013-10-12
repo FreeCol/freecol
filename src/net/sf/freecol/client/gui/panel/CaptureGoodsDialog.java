@@ -101,13 +101,11 @@ public final class CaptureGoodsDialog extends FreeColOldDialog<List<Goods>>
 
         allButton = new JButton(Messages.message(ALL));
         allButton.addActionListener(this);
-        enterPressesWhenFocused(allButton);
         allButton.setMnemonic('a');
         allButton.setActionCommand(ALL);
 
         noneButton = new JButton(Messages.message(NONE));
         noneButton.addActionListener(this);
-        enterPressesWhenFocused(noneButton);
         noneButton.setMnemonic('n');
         noneButton.setActionCommand(NONE);
 

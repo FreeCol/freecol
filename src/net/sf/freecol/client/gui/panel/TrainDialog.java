@@ -128,7 +128,6 @@ public final class TrainDialog extends FreeColOldDialog<Integer> implements Acti
             newButton.add(unitPrice);
             newButton.setActionCommand(unitType.getId());
             newButton.addActionListener(this);
-            enterPressesWhenFocused(newButton);
             buttons.add(newButton);
             add(newButton, "grow");
         }

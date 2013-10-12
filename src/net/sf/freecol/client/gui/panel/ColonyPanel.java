@@ -224,7 +224,6 @@ public final class ColonyPanel extends PortPanel
         SwingUtilities.replaceUIInputMap(unloadButton,
             JComponent.WHEN_IN_FOCUSED_WINDOW, unloadIM);
         unloadButton.setActionCommand(String.valueOf(UNLOAD));
-        enterPressesWhenFocused(unloadButton);
 
         InputMap fillIM = new ComponentInputMap(fillButton);
         fillIM.put(KeyStroke.getKeyStroke(KeyEvent.VK_L, 0, false),
@@ -234,7 +233,6 @@ public final class ColonyPanel extends PortPanel
         SwingUtilities.replaceUIInputMap(fillButton,
             JComponent.WHEN_IN_FOCUSED_WINDOW, fillIM);
         fillButton.setActionCommand(String.valueOf(FILL));
-        enterPressesWhenFocused(fillButton);
 
         InputMap warehouseIM = new ComponentInputMap(warehouseButton);
         warehouseIM.put(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0, false),
@@ -244,7 +242,6 @@ public final class ColonyPanel extends PortPanel
         SwingUtilities.replaceUIInputMap(warehouseButton,
             JComponent.WHEN_IN_FOCUSED_WINDOW, warehouseIM);
         warehouseButton.setActionCommand(String.valueOf(WAREHOUSE));
-        enterPressesWhenFocused(warehouseButton);
 
         InputMap buildQueueIM = new ComponentInputMap(buildQueueButton);
         buildQueueIM.put(KeyStroke.getKeyStroke(KeyEvent.VK_B, 0, false),
@@ -254,7 +251,6 @@ public final class ColonyPanel extends PortPanel
         SwingUtilities.replaceUIInputMap(buildQueueButton,
             JComponent.WHEN_IN_FOCUSED_WINDOW, buildQueueIM);
         buildQueueButton.setActionCommand(String.valueOf(BUILDQUEUE));
-        enterPressesWhenFocused(buildQueueButton);
 
         InputMap colonyUnitsIM = new ComponentInputMap(colonyUnitsButton);
         colonyUnitsIM.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0, false),
@@ -264,11 +260,9 @@ public final class ColonyPanel extends PortPanel
         SwingUtilities.replaceUIInputMap(colonyUnitsButton,
             JComponent.WHEN_IN_FOCUSED_WINDOW, colonyUnitsIM);
         colonyUnitsButton.setActionCommand(String.valueOf(COLONY_UNITS));
-        enterPressesWhenFocused(colonyUnitsButton);
 
         if (setGoodsButton != null) {
             setGoodsButton.setActionCommand(String.valueOf(SETGOODS));
-            enterPressesWhenFocused(setGoodsButton);
         }
 
         defaultTransferHandler
@@ -620,7 +614,7 @@ public final class ColonyPanel extends PortPanel
                     + " " + Messages.message("producing.name")
                     + " " + producing + " " + nominative);
             } else if (workingInBuilding != null && goodsType != null) {
-                int producing = workingInBuilding.getProductionOf(unit, 
+                int producing = workingInBuilding.getProductionOf(unit,
                                                                   goodsType);
                 String nominative = Messages.message(
                     StringTemplate.template(goodsType.getNameKey())
@@ -834,7 +828,7 @@ public final class ColonyPanel extends PortPanel
                     StringTemplate.key("abandonColony.text"), this,
                     "abandonColony.yes", "abandonColony.no")) return;
             abandon = true;
-        }                
+        }
         if (!abandon) {
             BuildableType buildable = colony.getCurrentlyBuilding();
             if (buildable != null
@@ -1031,8 +1025,8 @@ public final class ColonyPanel extends PortPanel
         cargoScroll = null;
         constructionPanel = null;
         inPortScroll = null;
-        outsideColonyPanel = null; 
-        outsideColonyScroll = null; 
+        outsideColonyPanel = null;
+        outsideColonyScroll = null;
         populationPanel = null;
         tilesPanel = null;
         tilesScroll = null;
@@ -1198,14 +1192,14 @@ public final class ColonyPanel extends PortPanel
 
 
         // Override Component
-        
+
         /**
          * {@inheritDoc}
          */
         @Override
         public void removeNotify() {
             super.removeNotify();
-            
+
             removeAll();
             setLayout(null);
         }
@@ -1560,14 +1554,14 @@ public final class ColonyPanel extends PortPanel
 
 
         // Override Component
-        
+
         /**
          * {@inheritDoc}
          */
         @Override
         public void removeNotify() {
             super.removeNotify();
-            
+
             removeAll();
             setLayout(null);
         }
@@ -1644,14 +1638,14 @@ public final class ColonyPanel extends PortPanel
 
 
         // Override Component
-        
+
         /**
          * {@inheritDoc}
          */
         @Override
         public void removeNotify() {
             super.removeNotify();
-            
+
             removeAll();
             setLayout(null);
         }

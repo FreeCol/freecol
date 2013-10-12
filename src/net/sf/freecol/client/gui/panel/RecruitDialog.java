@@ -68,7 +68,6 @@ public final class RecruitDialog extends FreeColOldDialog<Integer> implements Ac
         for (int index = 0; index < NUMBER_OF_PERSONS; index++) {
             person[index] = new JButton();
             person[index].setActionCommand(String.valueOf(index));
-            enterPressesWhenFocused(person[index]);
             person[index].addActionListener(this);
             person[index].setIconTextGap(MARGIN);
         }

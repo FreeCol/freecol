@@ -830,7 +830,6 @@ public final class EuropePanel extends PortPanel {
             SwingUtilities.replaceUIInputMap(this,
                                              JComponent.WHEN_IN_FOCUSED_WINDOW,
                                              closeInputMap);
-            enterPressesWhenFocused(this);
         }
     }
 }

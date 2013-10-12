@@ -138,7 +138,6 @@ public class FreeColOldDialog<T> extends FreeColPanel {
                         choiceDialog.setResponse(object);
                     }
                 });
-                enterPressesWhenFocused(objectButton);
             }
             objectButton.setEnabled(object.isEnabled());
             choiceBtnLst.add(objectButton);
@@ -447,7 +446,6 @@ public class FreeColOldDialog<T> extends FreeColPanel {
 
         cancelButton.setActionCommand(CANCEL);
         cancelButton.addActionListener(this);
-        enterPressesWhenFocused(cancelButton);
         setCancelComponent(cancelButton);
     }
 

@@ -98,7 +98,6 @@ public final class TradeRouteDialog extends FreeColOldDialog<Boolean>
         deassignRouteButton.addActionListener(this);
         deassignRouteButton.setToolTipText(Messages.message("traderouteDialog.deassign.tooltip"));
         deassignRouteButton.setActionCommand(Action.DEASSIGN.toString());
-        enterPressesWhenFocused(deassignRouteButton);
 
         tradeRoutes.addListSelectionListener(new ListSelectionListener() {
                 public void valueChanged(ListSelectionEvent e) {
