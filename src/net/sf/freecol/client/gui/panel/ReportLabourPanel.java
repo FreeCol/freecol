@@ -21,7 +21,6 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,6 +56,10 @@ public final class ReportLabourPanel extends ReportPanel {
      */
     public ReportLabourPanel(FreeColClient freeColClient) {
         super(freeColClient, Messages.message("reportLabourAction.name"));
+
+        reportPanel.setLayout(new MigLayout("wrap 9", "[center]10[right]10[left]30"
+                                            + "[center]10[right]10[left]30"
+                                            + "[center]10[right]10[left]"));
 
         colonies = freeColClient.getMySortedColonies();
         gatherData();
@@ -97,47 +100,28 @@ public final class ReportLabourPanel extends ReportPanel {
 
     public void displayData() {
 
-        List<UnitType> unitTypes = getSpecification().getUnitTypeList();
-        ArrayList<UnitType> colonists = new ArrayList<UnitType>();
-        for (UnitType unitType : unitTypes) {
-            if (unitType.hasSkill()) {
-                colonists.add(unitType);
-            }
-        }
+        for (UnitType unitType : getSpecification().getUnitTypeList()) {
+            if (unitType.isPerson() && unitType.isAvailableTo(getMyPlayer())) {
 
-        reportPanel.setLayout(new MigLayout("wrap 9", "[]10[]10[]30[]10[]10[]30[]10[]10[]", ""));
+                String roleId = "model.role.default";
+                if (unitType.hasAbility(Ability.EXPERT_PIONEER)) {
+                    roleId = "model.role.pioneer";
+                } else if (unitType.hasAbility(Ability.EXPERT_MISSIONARY)) {
+                    roleId = "model.role.missionary";
+                }
 
-        for (UnitType unitType : colonists) {
-            if(!unitType.isAvailableTo(getMyPlayer())) {
-                continue;
-            }
-
-            String roleId = "model.role.default";
-            if (unitType.hasAbility(Ability.EXPERT_PIONEER)) {
-                roleId = "model.role.pioneer";
-            } else if (unitType.hasAbility(Ability.EXPERT_MISSIONARY)) {
-                roleId = "model.role.missionary";
-            }
-
-            int unitTypeCount = unitCount.getCount(unitType);
-            if (unitTypeCount == 0) {
-                JLabel unitIcon = new JLabel(getLibrary().getUnitImageIcon(unitType, roleId, true, 0.8));
-                JLabel unitCount = new JLabel("0");
-                JLabel unitName = localizedLabel(unitType.getNameKey());
-                unitCount.setForeground(Color.GRAY);
-                unitName.setForeground(Color.GRAY);
-                reportPanel.add(unitIcon);
-                reportPanel.add(unitCount);
-                reportPanel.add(unitName);
-            } else {
-                JLabel unitIcon = new JLabel(getLibrary().getUnitImageIcon(unitType, roleId, false, 0.8));
-                JLabel unitCount = new JLabel("" + unitTypeCount);
-                JButton linkButton = GUI.getLinkButton(Messages.message(unitType.getNameKey()),
-                                                   null, unitType.getId());
-                linkButton.addActionListener(this);
-                reportPanel.add(unitIcon);
-                reportPanel.add(unitCount);
-                reportPanel.add(linkButton);
+                int unitTypeCount = unitCount.getCount(unitType);
+                boolean greyscale = (unitTypeCount == 0);
+                reportPanel.add(new JLabel(getLibrary().getUnitImageIcon(unitType, roleId, greyscale, 0.8)));
+                reportPanel.add(new JLabel(Integer.toString(unitTypeCount)));
+                if (unitTypeCount == 0) {
+                    reportPanel.add(localizedLabel(unitType.getNameKey()));
+                } else {
+                    JButton linkButton = GUI.getLinkButton(Messages.message(unitType.getNameKey()),
+                                                           null, unitType.getId());
+                    linkButton.addActionListener(this);
+                    reportPanel.add(linkButton);
+                }
             }
         }
     }

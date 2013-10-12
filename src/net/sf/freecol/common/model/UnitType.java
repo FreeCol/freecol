@@ -551,6 +551,15 @@ public final class UnitType extends BuildableType
     }
 
     /**
+     * Is this a person, not a ship or wagon?
+     *
+     * @return True if this unit type represents a person
+     */
+    public boolean isPerson() {
+        return hasAbility(Ability.PERSON);
+    }
+
+    /**
      * Can this unit type move to the High Seas?
      *
      * ATM this is synonymous with being a naval unit, but we should use
