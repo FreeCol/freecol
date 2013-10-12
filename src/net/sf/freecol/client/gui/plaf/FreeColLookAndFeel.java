@@ -182,6 +182,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
         throws FreeColException {
         try {
             UIManager.setLookAndFeel(fclaf);
+            UIManager.put("Button.defaultButtonFollowsFocus", Boolean.TRUE);
         } catch (UnsupportedLookAndFeelException e) {
             throw new FreeColException(e.getMessage());
         }

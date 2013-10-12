@@ -62,6 +62,7 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
     @Override
     protected Container createButtonArea() {
         MigPanel bottom = new MigPanel(new MigLayout("wrap 4"));
+        bottom.setOpaque(false);
         bottom.setName("OptionPane.buttonArea");
         addButtonComponents(bottom, getButtons(), getInitialValueIndex());
         return bottom;
