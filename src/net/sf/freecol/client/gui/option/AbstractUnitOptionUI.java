@@ -19,12 +19,7 @@
 
 package net.sf.freecol.client.gui.option;
 
-import java.awt.AlphaComposite;
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.Composite;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.Locale;
@@ -41,6 +36,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
+import net.sf.freecol.client.gui.renderer.PanelCellRenderer;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Role;
@@ -169,31 +165,11 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
         return new AbstractUnitRenderer();
     }
 
-    private class AbstractUnitRenderer implements ListCellRenderer {
-
-        private JPanel normal = new MigPanel();
-        private JPanel selected = new MigPanel() {
-                @Override
-                public void paintComponent(Graphics g) {
-                    Graphics2D g2d = (Graphics2D) g;
-                    Composite oldComposite = g2d.getComposite();
-                    Color oldColor = g2d.getColor();
-                    g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.1f));
-                    g2d.setColor(Color.BLACK);
-                    g2d.fillRect(0, 0, getWidth(), getHeight());
-                    g2d.setComposite(oldComposite);
-                    g2d.setColor(oldColor);
-
-                    super.paintComponent(g);
-                }
-            };
+    private class AbstractUnitRenderer extends PanelCellRenderer implements ListCellRenderer {
 
         public AbstractUnitRenderer() {
-            super();
-            normal.setOpaque(false);
-            normal.setLayout(new MigLayout("", "[40, align right][]"));
-            selected.setOpaque(false);
-            selected.setLayout(new MigLayout("", "[40, align right][]"));
+            setOpaque(false);
+            setLayout(new MigLayout("", "[40, align right][]"));
         }
 
 
@@ -211,10 +187,7 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
         public Component getListCellRendererComponent(JList list, Object value, int index,
                                                       boolean isSelected, boolean hasFocus) {
 
-            JPanel c = isSelected ? selected : normal;
-            c.removeAll();
-            c.setForeground(list.getForeground());
-            c.setFont(list.getFont());
+            JPanel c = getPanel(list, isSelected);
             final Specification spec = getOption().getSpecification();
             AbstractUnit au = (AbstractUnit)((AbstractUnitOption)value)
                 .getValue();
