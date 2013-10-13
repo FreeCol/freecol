@@ -165,29 +165,10 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
         return new AbstractUnitRenderer();
     }
 
-    private class AbstractUnitRenderer extends PanelCellRenderer implements ListCellRenderer {
+    private class AbstractUnitRenderer extends FreeColComboBoxRenderer {
 
-        public AbstractUnitRenderer() {
-            setOpaque(false);
-            setLayout(new MigLayout("", "[40, align right][]"));
-        }
-
-
-        /**
-         * Returns a <code>ListCellRenderer</code> for the given
-         * <code>JList</code>.
-         *
-         * @param list The <code>JList</code>.
-         * @param value The list cell.
-         * @param index The index in the list.
-         * @param isSelected <code>true</code> if the given list cell is selected.
-         * @param hasFocus <code>false</code> if the given list cell has the focus.
-         * @return The <code>ListCellRenderer</code>
-         */
-        public Component getListCellRendererComponent(JList list, Object value, int index,
-                                                      boolean isSelected, boolean hasFocus) {
-
-            JPanel c = getPanel(list, isSelected);
+        @Override
+        public void setLabelValues(JLabel label, Object value) {
             final Specification spec = getOption().getSpecification();
             AbstractUnit au = (AbstractUnit)((AbstractUnitOption)value)
                 .getValue();
@@ -199,13 +180,8 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
             StringTemplate template = StringTemplate.template(key + ".name")
                 .addAmount("%number%", au.getNumber())
                 .add("%unit%", au.getId() + ".name");
-            /*
-            c.add(new JLabel(new ImageIcon(ResourceManager.getImage(unit.getId() + ".image", 0.5))),
-                  "width 80, align center");
-            */
-            c.add(new JLabel(Integer.toString(au.getNumber())));
-            c.add(new JLabel(Messages.message(template)));
-            return c;
+            label.setText(Integer.toString(au.getNumber()) + " "
+                          + Messages.message(template));
         }
     }
 }
