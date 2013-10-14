@@ -22,24 +22,24 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import java.awt.event.ItemListener;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
@@ -57,22 +57,21 @@ import net.sf.freecol.common.model.StringTemplate;
  * Centers the map on a known settlement or colony. Pressing ENTER
  * opens a panel if appropriate.
  */
-public final class FindSettlementDialog<T> extends FreeColOldDialog<T> implements ListSelectionListener {
+public final class FindSettlementDialog<T> extends FreeColOldDialog<T> implements ListSelectionListener, ItemListener {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(FindSettlementDialog.class.getName());
 
-    private static Comparator<Settlement> settlementComparator = new Comparator<Settlement>() {
-        public int compare(Settlement s1, Settlement s2) {
-            return s1.getName().compareTo(s2.getName());
-        }
-    };
-
-    private List<Settlement> knownSettlements = new ArrayList<Settlement>();
+    private final JComboBox displayOptionBox;
 
     private JList settlementList;
 
-
+    private static enum displayListOption {
+        ALL,
+        ONLY_NATIVES,
+        ONLY_EUROPEAN
+    }
+    
     /**
      * The constructor to use.
      */
@@ -80,18 +79,13 @@ public final class FindSettlementDialog<T> extends FreeColOldDialog<T> implement
     public FindSettlementDialog(FreeColClient freeColClient) {
         super(freeColClient, new MigLayout("wrap 1", "[align center]",
                                            "[]30[]30[]"));
-
-        for (Player player : getGame().getPlayers()) {
-            knownSettlements.addAll(player.getSettlements());
-        }
-
-        Collections.sort(knownSettlements, settlementComparator);
-
+        
         JLabel header = new JLabel(Messages.message("findSettlementDialog.name"));
         header.setFont(GUI.SMALL_HEADER_FONT);
         add(header);
-
-        settlementList = new JList(knownSettlements.toArray(new Settlement[knownSettlements.size()]));
+        
+        settlementList = new JList();
+        updateSearch(displayListOption.valueOf("ALL"));
         settlementList.setCellRenderer(new SettlementRenderer());
         settlementList.setFixedCellHeight(48);
         JScrollPane listScroller = new JScrollPane(settlementList);
@@ -126,11 +120,41 @@ public final class FindSettlementDialog<T> extends FreeColOldDialog<T> implement
 
         add(listScroller, "width max(300, 100%), height max(300, 100%)");
 
+        displayOptionBox = new JComboBox(new String[] {
+                Messages.message("findSettlementDialog.displayAll"),
+                Messages.message("findSettlementDialog.displayOnlyNatives"),
+                Messages.message("findSettlementDialog.displayOnlyEuropean"),
+            });
+        displayOptionBox.addItemListener(this);
+        add(displayOptionBox);
+        
         add(okButton, "tag ok");
-
+        
         getGUI().restoreSavedSize(this, getPreferredSize());
     }
 
+    @SuppressWarnings("unchecked") // FIXME in Java7
+    private void updateSearch(displayListOption displayListOption) {
+        DefaultListModel model = new DefaultListModel();
+        Object selected = settlementList.getSelectedValue();
+
+        for (Player player : getGame().getPlayers()) {
+            if ((player.isIndian() && displayListOption.equals(displayListOption.ONLY_NATIVES)) ||
+                    (player.isEuropean() && displayListOption.equals(displayListOption.ONLY_EUROPEAN)) ||
+                    (displayListOption.equals(displayListOption.ALL))) {
+                for (Settlement s : player.getSettlements()) {
+                    model.addElement(s);
+                }
+            }
+        }
+
+        settlementList.setModel(model);
+        settlementList.setSelectedValue(selected, true);
+        if (settlementList.getSelectedIndex() == -1) {
+            settlementList.setSelectedIndex(0);
+        }
+    }
+    
     private void selectSettlement() {
         Settlement settlement = (Settlement) settlementList.getSelectedValue();
         if (settlement instanceof Colony
@@ -176,6 +200,19 @@ public final class FindSettlementDialog<T> extends FreeColOldDialog<T> implement
         settlementList = null;
     }
 
+    public void itemStateChanged(ItemEvent event) {
+        switch(displayOptionBox.getSelectedIndex()) {
+            case 0:
+            default:
+                updateSearch(displayListOption.valueOf("ALL"));
+                break;
+            case 1:
+                updateSearch(displayListOption.valueOf("ONLY_NATIVES"));
+                break;
+            case 2:
+                updateSearch(displayListOption.valueOf("ONLY_EUROPEAN"));
+        }
+    }
 
     private class SettlementRenderer extends FreeColComboBoxRenderer {
 
