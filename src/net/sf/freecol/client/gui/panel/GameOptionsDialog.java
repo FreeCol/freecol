@@ -68,15 +68,21 @@ public final class GameOptionsDialog extends OptionsDialog {
     }
 
 
+    // Override OptionsDialog
+
     /**
      * {@inheritDoc}
      */
+    @Override
     public OptionGroup getResponse() {
-        Object value = getValue();
-        if (options[0].equals(value) && !freeColClient.isMapEditor()) {
-            freeColClient.getPreGameController().sendGameOptions();
-            return getGroup();
+        OptionGroup value = super.getResponse();
+        if (value != null) {
+            if (freeColClient.isMapEditor()) {
+                value = null;
+            } else {
+                freeColClient.getPreGameController().sendGameOptions();
+            }
         }
-        return null;
+        return value;
     }
 }

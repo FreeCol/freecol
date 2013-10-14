@@ -156,17 +156,21 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
     }
 
 
-    // Implement FreeColDialog
+    // Override OptionsDialog
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public OptionGroup getResponse() {
-        Object value = getValue();
-        if (options[0].equals(value) && !freeColClient.isMapEditor()) {
-            freeColClient.getPreGameController().sendMapGeneratorOptions();
-            return getGroup();
+        OptionGroup value = super.getResponse();
+        if (value != null) {
+            if (freeColClient.isMapEditor()) {
+                value = null;
+            } else {
+                freeColClient.getPreGameController().sendMapGeneratorOptions();
+            }
         }
-        return null;
+        return value;
     }
 }

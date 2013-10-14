@@ -19,14 +19,11 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.logging.Logger;
-
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JPanel;
+
+import java.util.List;
+import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
@@ -41,7 +38,7 @@ import net.sf.freecol.common.resources.ResourceManager;
  * This panel is only used when running in
  * {@link net.sf.freecol.client.FreeColClient#isMapEditor()} map editor mode.
  */
-public final class RiverStyleDialog extends FreeColDialog<String> {
+public final class RiverStyleDialog extends FreeColChoiceDialog<String> {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(RiverStyleDialog.class.getName());
@@ -59,49 +56,19 @@ public final class RiverStyleDialog extends FreeColDialog<String> {
     public RiverStyleDialog(FreeColClient freeColClient) {
         super(freeColClient);
 
-        JPanel panel = new JPanel(new GridLayout(9, 9));
+        JPanel panel = new JPanel();
+        String str = Messages.message("riverStyleDialog.text");
+        panel.add(GUI.getDefaultHeader(str), "align center");
 
-        final ActionListener al = new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    final String key = event.getActionCommand();
-                    if (key == null) {
-                        RiverStyleDialog.this.setValue(null);
-                    } else if (key.equals(DELETE)) {
-                        RiverStyleDialog.this.setValue(DELETE);
-                    } else if (key.startsWith(PREFIX)) {
-                        RiverStyleDialog.this
-                            .setValue(key.substring(PREFIX.length()));
-                    }
-                }
-            };
-        JButton button;
+        List<ChoiceItem<String>> c = choices();
+        c.add(new ChoiceItem<String>(DELETE, DELETE)
+            .setIcon(new ImageIcon(getGUI().getImageLibrary()
+                    .getMiscImage(ImageLibrary.DELETE, 0.5))));
         for (String key : ResourceManager.getKeys(PREFIX)) {
-            button = new JButton(new ImageIcon(ResourceManager.getImage(key,
-                                                                        0.5)));
-            button.setActionCommand(key);
-            button.addActionListener(al);
-            panel.add(button);
+            c.add(new ChoiceItem<String>(key, key)
+                .setIcon(new ImageIcon(ResourceManager.getImage(key, 0.5))));
         }
-        button = new JButton(new ImageIcon(getGUI().getImageLibrary()
-                .getMiscImage(ImageLibrary.DELETE, 0.5)));
-        button.setActionCommand(DELETE);
-        button.addActionListener(al);
-        panel.add(button);
-        panel.setSize(panel.getPreferredSize());
-
-        initialize(DialogType.PLAIN, true, panel, null, new String[] {
-                Messages.message("cancel")
-            });
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getResponse() {
-        Object value = getValue();
-        return (options[0].equals(value)) ? null
-            : (value instanceof String) ? (String)value
-            : null;
+       
+        initialize(panel, null, "cancel", c);
     }
 }

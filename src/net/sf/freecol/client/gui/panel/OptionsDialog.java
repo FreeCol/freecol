@@ -50,7 +50,7 @@ import net.sf.freecol.common.option.OptionGroup;
 /**
  * Dialog for changing the options of an {@link OptionGroup}.
  */
-public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
+public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
 
     private static final Logger logger = Logger.getLogger(OptionsDialog.class.getName());
 
@@ -157,14 +157,13 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
         this.panel.setPreferredSize(new Dimension(850, 650));
         this.panel.setSize(this.panel.getPreferredSize());
 
-        initialize(DialogType.PLAIN, true, this.panel, null,
-            (isEditable()) ? new String[] {
-                Messages.message("ok"),
-                Messages.message("cancel")
-            }
-            : new String[] {
-                Messages.message("ok")
-            });
+        List<ChoiceItem<OptionGroup>> c = choices();
+        c.add(new ChoiceItem<OptionGroup>(Messages.message("ok"),
+                this.group).okOption());
+        c.add(new ChoiceItem<OptionGroup>(Messages.message("cancel"),
+                (OptionGroup)null,
+                isEditable()).cancelOption().defaultOption());
+        initialize(DialogType.PLAIN, true, this.panel, null, c);
     }
 
     /**
@@ -248,5 +247,22 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
         File customFile = new File(FreeColDirectories.getOptionsDirectory(),
                                    getDefaultFileName());
         return (customFile.exists()) ? load(customFile) : false;
+    }
+
+
+    // Override FreeColDialog
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public OptionGroup getResponse() {
+        OptionGroup value = super.getResponse();
+        if (value == null) {
+            getOptionUI().reset();
+        } else {
+            getOptionUI().updateOption();
+        }
+        return value;
     }
 }

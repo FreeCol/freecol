@@ -21,7 +21,6 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
-import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
@@ -31,7 +30,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
+import java.util.logging.Logger;
+
 import net.miginfocom.swing.MigLayout;
+
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -46,11 +48,11 @@ import net.sf.freecol.common.model.GoodsType;
 /**
  * A dialog to display a colony warehouse.
  */
-public final class WarehouseDialog extends FreeColDialog<Boolean> {
+public final class WarehouseDialog extends FreeColConfirmDialog {
 
     private static final Logger logger = Logger.getLogger(WarehouseDialog.class.getName());
 
-    private JPanel warehouseDialog;
+    private JPanel warehousePanel;
 
 
     /**
@@ -62,17 +64,17 @@ public final class WarehouseDialog extends FreeColDialog<Boolean> {
     public WarehouseDialog(FreeColClient freeColClient, Colony colony) {
         super(freeColClient);
 
-        warehouseDialog = new MigPanel(new MigLayout("wrap 4"));
-        warehouseDialog.setOpaque(false);
+        warehousePanel = new MigPanel(new MigLayout("wrap 4"));
+        warehousePanel.setOpaque(false);
         for (GoodsType type : freeColClient.getGame().getSpecification()
                  .getGoodsTypeList()) {
             if (type.isStorable()) {
-                warehouseDialog.add(new WarehouseGoodsPanel(freeColClient,
-                                                            colony, type));
+                warehousePanel.add(new WarehouseGoodsPanel(freeColClient,
+                                                           colony, type));
             }
         }
 
-        JScrollPane scrollPane = new JScrollPane(warehouseDialog,
+        JScrollPane scrollPane = new JScrollPane(warehousePanel,
             JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
             JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
@@ -85,27 +87,27 @@ public final class WarehouseDialog extends FreeColDialog<Boolean> {
         panel.add(scrollPane, "grow");
         panel.setSize(panel.getPreferredSize());
 
-        initialize(DialogType.PLAIN, true, panel, null, new String[] {
-                Messages.message("ok"),
-                Messages.message("cancel"),
-            });
+        initialize(panel,
+            getGUI().getImageLibrary().getImageIcon(colony, true),
+            "ok", "cancel");
     }
 
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public Boolean getResponse() {
-        Object value = getValue();
-        if (options[0].equals(value)) {
-            for (Component c : warehouseDialog.getComponents()) {
+        Boolean result = super.getResponse();
+        if (result) {
+            for (Component c : warehousePanel.getComponents()) {
                 if (c instanceof WarehouseGoodsPanel) {
                     ((WarehouseGoodsPanel)c).saveSettings();
                 }
             }
-            return Boolean.TRUE;
         }
-        return Boolean.FALSE;
+        warehousePanel = null;
+        return result;
     }
 
 

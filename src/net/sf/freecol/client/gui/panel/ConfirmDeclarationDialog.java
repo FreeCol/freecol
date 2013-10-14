@@ -89,11 +89,13 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>> {
         // Use the coat of arms image icon.  Is there something better?
         ImageIcon icon = getGUI().getImageLibrary().getImageIcon(player, true);
 
-        initialize(DialogType.QUESTION, true, panel, icon, new String[] {
-                Messages.message("declareIndependence.areYouSure.yes"),
-                Messages.message("declareIndependence.areYouSure.no")
-            });
-        setInitialValue(1);
+        final List<String> fake = null;
+        List<ChoiceItem<List<String>>> c = choices();
+        c.add(new ChoiceItem<List<String>>(Messages.message("declareIndependence.areYouSure.yes"),
+                fake).okOption());
+        c.add(new ChoiceItem<List<String>>(Messages.message("declareIndependence.areYouSure.no"),
+                fake).cancelOption().defaultOption());
+        initialize(DialogType.QUESTION, true, panel, icon, c);
     }
 
 
@@ -102,7 +104,7 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>> {
      */
     public List<String> getResponse() {
         Object value = getValue();
-        if (options[0].equals(value)) {
+        if (options.get(0).equals(value)) {
             List<String> result = new ArrayList<String>();
             // Sanitize user input, used in save file name
             result.add(nationField.getText().replaceAll("[^\\s\\w]", ""));

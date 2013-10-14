@@ -190,19 +190,17 @@ public final class DifficultyDialog extends OptionsDialog
     }
 
 
-    // Implement FreeColDialog
+    // Override OptionsDialog
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public OptionGroup getResponse() {
-        Object value = getValue();
-        if (options[0].equals(value)) {
-            getOptionUI().updateOption();
-            FreeCol.setDifficulty(selected);
-            return selected;
+        OptionGroup value = super.getResponse();
+        if (value != null) {
+            FreeCol.setDifficulty(value);
         }
-        getOptionUI().reset();
-        return null;
+        return value;
     }
 }

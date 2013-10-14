@@ -35,7 +35,7 @@ import net.miginfocom.swing.MigLayout;
 /**
  * Dialog to edit options with.
  */
-public class EditOptionDialog extends FreeColDialog<Boolean> {
+public class EditOptionDialog extends FreeColConfirmDialog {
 
     private OptionUI ui;
 
@@ -55,22 +55,6 @@ public class EditOptionDialog extends FreeColDialog<Boolean> {
         if (ui.getLabel() == null) panel.add(ui.getLabel(), "split 2");
         panel.add(ui.getComponent());
 
-        initialize(DialogType.QUESTION, true, panel, null, new String[] {
-                Messages.message("ok"),
-                Messages.message("cancel")
-            });
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    public Boolean getResponse() {
-        Object value = getValue();
-        if (value == options[0]) {
-            ui.updateOption();
-            return Boolean.TRUE;
-        }
-        return Boolean.FALSE;
+        initialize(panel, null, "ok", "cancel");
     }
 }

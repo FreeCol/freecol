@@ -19,18 +19,11 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
-import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.option.OptionGroup;
 
 
@@ -38,9 +31,6 @@ import net.sf.freecol.common.option.OptionGroup;
  * Dialog for changing the {@link net.sf.freecol.client.ClientOptions}.
  */
 public final class ClientOptionsDialog extends OptionsDialog  {
-
-    private static final Logger logger = Logger.getLogger(ClientOptionsDialog.class.getName());
-
 
     /**
      * The constructor that will add the items to this panel.
@@ -56,21 +46,18 @@ public final class ClientOptionsDialog extends OptionsDialog  {
     }
 
 
+    // Override OptionsDialog
+
     /**
      * {@inheritDoc}
      */
+    @Override
     public OptionGroup getResponse() {
-        Object value = getValue();
-        if (options[0].equals(value)) {
+        OptionGroup value = super.getResponse();
+        if (value != null) {
             File file = FreeColDirectories.getClientOptionsFile();
-            OptionGroup group = getGroup();
-            try {
-                group.save(file);
-            } catch (FileNotFoundException e) {
-                logger.log(Level.WARNING, "Save failure", e);
-            }
-            return group;
+            if (!save(file)) value = null;
         }
-        return null;
+        return value;
     }
 }

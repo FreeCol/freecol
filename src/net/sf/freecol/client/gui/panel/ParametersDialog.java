@@ -28,6 +28,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import java.util.List;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -102,10 +104,13 @@ public class ParametersDialog extends FreeColDialog<Parameters> {
         inputD.addActionListener(al);
         inputM.addActionListener(al);
 
-        initialize(DialogType.QUESTION, true, panel, null, new String[] {
-                Messages.message("ok"),
-                Messages.message("cancel")
-            });
+        final Parameters fake = null;
+        List<ChoiceItem<Parameters>> c = choices();
+        c.add(new ChoiceItem<Parameters>(Messages.message("ok"),
+                fake).okOption());
+        c.add(new ChoiceItem<Parameters>(Messages.message("cancel"),
+                fake).cancelOption().defaultOption());
+        initialize(DialogType.QUESTION, true, panel, null, c);
     }
 
 
@@ -132,7 +137,7 @@ public class ParametersDialog extends FreeColDialog<Parameters> {
      */
     public Parameters getResponse() {
         Object value = getValue();
-        if (options[0].equals(value)) {
+        if (options.get(0).equals(value)) {
             checkFields();
             return new Parameters(Integer.parseInt(inputD.getText()),
                                   Integer.parseInt(inputM.getText()));

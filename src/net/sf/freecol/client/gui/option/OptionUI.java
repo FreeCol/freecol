@@ -83,7 +83,6 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
      * Set up component.
      */
     protected void initialize() {
-
         JComponent component = getComponent();
         component.setToolTipText(label.getToolTipText());
         component.setEnabled(editable);

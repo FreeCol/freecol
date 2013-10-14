@@ -19,6 +19,11 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import javax.swing.ImageIcon;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
@@ -33,7 +38,11 @@ public class ChoiceItem<T> {
 
     private String text;
     private T object;
+    private ImageIcon icon;
     private boolean enabled;
+    private boolean optionOK = false;
+    private boolean optionCancel = false;
+    private boolean optionDefault = false;
 
 
     /**
@@ -47,9 +56,10 @@ public class ChoiceItem<T> {
     public ChoiceItem(String text, T object, boolean enable) {
         this.text = text;
         this.object = object;
+        this.icon = null;
         this.enabled = enable;
+        this.optionOK = this.optionCancel = this.optionDefault = false;
     }
-
 
     /**
      * Creates a new <code>ChoiceItem</code> with the
@@ -61,7 +71,6 @@ public class ChoiceItem<T> {
     public ChoiceItem(String text, T object) {
         this(text, object, true);
     }
-
 
     /**
      * Creates a new <code>ChoiceItem</code> with the
@@ -118,5 +127,82 @@ public class ChoiceItem<T> {
     @Override
     public String toString() {
         return text;
+    }
+
+    /**
+     * Get any icon associated with this choice.
+     *
+     * @return An icon if present, or null if not found.
+     */
+    public ImageIcon getIcon() {
+        return icon;
+    }
+
+    /**
+     * Add an icon to this choice.
+     *
+     * @param icon The <code>ImageIcon</code> to add.
+     * @return This choice.
+     */
+    public ChoiceItem<T> setIcon(ImageIcon icon) {
+        this.icon = icon;
+        return this;
+    }
+
+    /**
+     * Is this choice the "OK" choice?
+     *
+     * @return True if this is the "OK" choice.
+     */
+    public boolean isOK() {
+        return optionOK;
+    }
+
+    /**
+     * Make this choice the "OK" option.
+     *
+     * @return This choice.
+     */
+    public ChoiceItem<T> okOption() {
+        optionOK = true;
+        return this;
+    }
+
+    /**
+     * Is this choice the "cancel" choice?
+     *
+     * @return True if this is the "cancel" choice.
+     */
+    public boolean isCancel() {
+        return false;
+    }
+
+    /**
+     * Make this choice the "cancel" option.
+     *
+     * @return This choice.
+     */
+    public ChoiceItem<T> cancelOption() {
+        optionCancel = true;
+        return this;
+    }
+
+    /**
+     * Is this choice the default choice?
+     *
+     * @return True if this is the default choice.
+     */
+    public boolean isDefault() {
+        return optionDefault;
+    }
+
+    /**
+     * Make this choice the default.
+     *
+     * @return This choice.
+     */
+    public ChoiceItem<T> defaultOption() {
+        optionDefault = true;
+        return this;
     }
 }

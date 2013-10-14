@@ -34,8 +34,12 @@ import net.sf.freecol.client.gui.panel.FreeColDialog;
  */
 public class FreeColChoiceDialog<T> extends FreeColDialog<T> {
 
-    private final List<ChoiceItem<T>> choices;
-
+    /**
+     * {@inheritDoc}
+     */
+    protected FreeColChoiceDialog(FreeColClient freeColClient) {
+        super(freeColClient);
+    }
 
     /**
      * Create a new <code>FreeColChoiceDialog</code> with a text and a
@@ -45,38 +49,30 @@ public class FreeColChoiceDialog<T> extends FreeColDialog<T> {
      * @param text The text that explains the choice for the user.
      * @param icon An optional icon to display.
      * @param cancelText Optional text for a cancel option that returns null.
-     * @param choices The <code>List</code> containing the ChoiceItems to
-     *            create buttons for.
+     * @param choices A list of <code>ChoiceItem</code>s to create buttons for.
      * @return The <code>FreeColChoiceDialog</code> created.
      */
     public FreeColChoiceDialog(final FreeColClient freeColClient,
-                                String text, ImageIcon icon, String cancelText,
-                                List<ChoiceItem<T>> choices) {
-        super(freeColClient);
+                               String text, ImageIcon icon, String cancelText,
+                               List<ChoiceItem<T>> choices) {
+        this(freeColClient);
 
-        this.choices = choices;
-
-        int len = choices.size() + ((cancelText == null) ? 0 : 1);
-        String[] options = new String[len];
-        for (int i = 0; i < choices.size(); i++) {
-            options[i] = choices.get(i).toString();
-        }
-        if (cancelText != null) {
-            options[len-1] = Messages.message(cancelText);
-        }
-        initialize(DialogType.PLAIN, true, text, icon, options);
+        initialize(text, icon, cancelText, choices);
     }
 
 
     /**
-     * {@inheritDoc}
+     * @param text An object that explains the choice for the user.
+     * @param icon An optional icon to display.
+     * @param cancelText Optional text for a cancel option that returns null.
+     * @param choices A list of <code>ChoiceItem</code>s to create buttons for.
      */
-    public T getResponse() {
-        Object value = getValue();
-        for (int i = 0; i < options.length; i++) {
-            ChoiceItem<T> c = choices.get(i);
-            if (c.toString().equals(value)) return c.getObject();
+    protected void initialize(Object text, ImageIcon icon, String cancelText,
+                              List<ChoiceItem<T>> choices) {
+        if (cancelText != null) {
+            choices.add(new ChoiceItem<T>(Messages.message(cancelText),
+                    (T)null).cancelOption().defaultOption());
         }
-        return null;
+        initialize(DialogType.PLAIN, true, text, icon, choices);
     }
 }

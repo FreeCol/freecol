@@ -21,19 +21,26 @@ package net.sf.freecol.client.gui.panel;
 
 import javax.swing.ImageIcon;
 
+import java.util.List;
+
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
 
 
 /**
- * A simple modal yes/no or ok/cancel dialog.
+ * A simple modal ok/cancel dialog.
  */
 public class FreeColConfirmDialog extends FreeColDialog<Boolean> {
 
-    private static final Boolean values[] = { Boolean.TRUE, Boolean.FALSE };
-
+    /**
+     * {@inheritDoc}
+     */
+    protected FreeColConfirmDialog(FreeColClient freeColClient) {
+        super(freeColClient);
+    }
 
     /**
      * Create a new <code>FreeColConfirmDialog</code> with a text and a
@@ -49,23 +56,27 @@ public class FreeColConfirmDialog extends FreeColDialog<Boolean> {
     public FreeColConfirmDialog(final FreeColClient freeColClient,
                                 String text, ImageIcon icon,
                                 String okText, String cancelText) {
-        super(freeColClient);
+        this(freeColClient);
 
-        initialize(DialogType.QUESTION, true, text, icon, new String[] {
-                Messages.message(okText),
-                Messages.message(cancelText)
-            });
+        initialize(text, icon, okText, cancelText);
     }
 
 
     /**
-     * {@inheritDoc}
+     * Initialize this confirm dialog.
+     *
+     * @param text The object that explains the choice for the user.
+     * @param icon An optional icon to display.
+     * @param okText The text displayed on the "ok"-button.
+     * @param cancelText The text displayed on the "cancel"-button.
      */
-    public Boolean getResponse() {
-        Object value = getValue();
-        for (int i = 0; i < options.length; i++) {
-            if (options[i].equals(value)) return values[i];
-        }
-        return null;
+    protected void initialize(Object text, ImageIcon icon,
+                              String okText, String cancelText) {
+        List<ChoiceItem<Boolean>> c = choices();
+        c.add(new ChoiceItem<Boolean>(Messages.message(okText),
+                Boolean.TRUE).okOption());
+        c.add(new ChoiceItem<Boolean>(Messages.message(cancelText),
+                Boolean.FALSE).cancelOption().defaultOption());
+        initialize(DialogType.QUESTION, true, text, icon, c);
     }
 }

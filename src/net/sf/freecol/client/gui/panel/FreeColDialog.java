@@ -36,6 +36,8 @@ import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractButton;
@@ -54,6 +56,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.FreeColImageBorder;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
@@ -62,8 +65,7 @@ import net.sf.freecol.common.model.StringTemplate;
 /**
  * Superclass for all dialogs in FreeCol.
  */
-public abstract class FreeColDialog<T> extends JDialog 
-    implements PropertyChangeListener {
+public class FreeColDialog<T> extends JDialog implements PropertyChangeListener {
 
     private static final Logger logger = Logger.getLogger(FreeColDialog.class.getName());
 
@@ -81,7 +83,7 @@ public abstract class FreeColDialog<T> extends JDialog
     protected FreeColClient freeColClient;
 
     /** The options to choose from. */
-    protected String[] options;
+    protected List<ChoiceItem<T>> options;
 
     /** The JOptionPane to embed in this dialog. */
     private JOptionPane pane;
@@ -114,16 +116,34 @@ public abstract class FreeColDialog<T> extends JDialog
      * @param obj The main object that explains the choice for the user,
      *     usually just a string, but may be more complex.
      * @param icon An optional icon to display.
-     * @param options The options to choose from.
+     * @param options A list of options to choose from.
      */
     public FreeColDialog(FreeColClient freeColClient, DialogType type,
                          boolean modal, Object obj, ImageIcon icon,
-                         String[] options) {
+                         List<ChoiceItem<T>> options) {
         this(freeColClient);
 
         initialize(type, modal, obj, icon, options);
     }
 
+
+    /**
+     * Select the default option from the supplied options.
+     *
+     * @param options A list of options to choose from.
+     * @return The option to select initially.
+     */
+    private int selectDefault(List<ChoiceItem<T>> options) {
+        int def = -1, can = -1, ok = -1, i = 0;
+        for (ChoiceItem<T> ci : options) {
+            if (ci.isDefault()) def = i;
+            else if (ci.isCancel()) can = i;
+            else if (ci.isOK()) ok = i;
+            i++;
+        }
+        return (def >= 0) ? def : (can >= 0) ? can : (ok >= 0) ? ok
+            : options.size() - 1;
+    }
 
     /**
      * Complete the initialization.  Useful for subclasses that need
@@ -134,29 +154,37 @@ public abstract class FreeColDialog<T> extends JDialog
      * @param obj The main object that explains the choice for the user,
      *     usually just a string, but may be more complex.
      * @param icon An optional icon to display.
-     * @param options The options to choose from.
+     * @param options A list of options to choose from.
      */
     protected void initialize(DialogType type, boolean modal, Object obj, 
-                              ImageIcon icon, String[] options) {
+                              ImageIcon icon, List<ChoiceItem<T>> options) {
         this.options = options;
         int paneType = JOptionPane.QUESTION_MESSAGE;
         switch (type) {
         case PLAIN:    paneType = JOptionPane.PLAIN_MESSAGE; break;
         case QUESTION: paneType = JOptionPane.QUESTION_MESSAGE; break;
         }
+        int def = selectDefault(options);
         this.pane = new JOptionPane(obj, paneType, JOptionPane.YES_NO_OPTION,
-            icon, options, options[options.length - 1]);
+                                    icon, options.toArray(), options.get(def));
         this.pane.setBorder(dialogBorder);
         this.pane.setName("FreeColDialog");
-        this.scrollPane = (options.length <= 20) ? null
-            : new JScrollPane(this.pane,
+        this.pane.setInitialSelectionValue(options.get(def));
+        this.pane.addPropertyChangeListener(this);
+        if (options.size() <= 20) {
+            this.scrollPane = null;
+        } else {
+            this.scrollPane = new JScrollPane(this.pane,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-
+            this.scrollPane.setOpaque(false);
+            this.scrollPane.setBorder(null);
+            this.scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        }
         Container contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout());
-        contentPane.add((this.scrollPane != null) ? this.scrollPane : this.pane,
-                        BorderLayout.CENTER);
+        contentPane.add((this.scrollPane != null) ? this.scrollPane
+            : this.pane, BorderLayout.CENTER);
 
         setFocusCycleRoot(true);
         setComponentOrientation(this.pane.getComponentOrientation());
@@ -188,7 +216,6 @@ public abstract class FreeColDialog<T> extends JDialog
                         .setValue(JOptionPane.UNINITIALIZED_VALUE);
                 }
             });
-        this.pane.addPropertyChangeListener(this);
     }
 
     /**
@@ -231,23 +258,26 @@ public abstract class FreeColDialog<T> extends JDialog
     }
 
     /**
-     * Set the initial selected option.
-     *
-     * Useful for subclasses when the default initial value (the last
-     * one) is not desired.
-     *
-     * @param index An index into the supplied options array.
-     */
-    protected void setInitialValue(int index) {
-        this.pane.setInitialValue(options[index]);
-    }
-
-    /**
      * Get the response from this dialog.
      *
      * @return The response from this dialog.
      */
-    public abstract T getResponse();
+    public T getResponse() {
+        Object value = getValue();
+        for (ChoiceItem<T> ci : this.options) {
+            if (ci.equals(value)) return ci.getObject();
+        }
+        return null;
+    }
+
+    /**
+     * Create a list of choices.
+     *
+     * @return An empty list of choices.
+     */
+    public static <T> List<ChoiceItem<T>> choices() {
+        return new ArrayList<ChoiceItem<T>>();
+    }        
 
 
     // Interface PropertyChangeListener

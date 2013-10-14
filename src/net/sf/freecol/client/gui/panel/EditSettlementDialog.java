@@ -122,13 +122,16 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         panel.add(new JLabel(Messages.message("report.units")));
         panel.add(units);
 
-        initialize(DialogType.QUESTION, true, panel, getGUI().getImageLibrary()
-            .getImageIcon(settlement, true),
-            new String[] {
-                Messages.message("ok"),
-                Messages.message("editor.removeSettlement"),
-                Messages.message("cancel")
-            });
+        final IndianSettlement fake = null;
+        List<ChoiceItem<IndianSettlement>> c = choices();
+        c.add(new ChoiceItem<IndianSettlement>(Messages.message("ok"), 
+                settlement).okOption());
+        c.add(new ChoiceItem<IndianSettlement>(Messages.message("editor.removeSettlement"),
+                fake));
+        c.add(new ChoiceItem<IndianSettlement>(Messages.message("cancel"),
+                fake).cancelOption().defaultOption());
+        initialize(DialogType.QUESTION, true, panel,
+            getGUI().getImageLibrary().getImageIcon(settlement, true), c);
     }
 
     @SuppressWarnings("unchecked") // FIXME in Java7
@@ -155,7 +158,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
     public IndianSettlement getResponse() {
         final Specification spec = freeColClient.getGame().getSpecification();
         Object value = getValue();
-        if (options[0].equals(value)) { // OK
+        if (options.get(0).equals(value)) { // OK
             settlement.setName(name.getText());
             Nation newNation = (Nation) owner.getSelectedItem();
             if (newNation != settlement.getOwner().getNation()) {
@@ -194,7 +197,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
             }
             return settlement;
 
-        } else if (options[1].equals(value)) {
+        } else if (options.get(1).equals(value)) {
             if (!getGUI().showModalConfirmDialog("editor.removeSettlement.text",
                                                  "ok", "cancel")) {
                 return settlement;

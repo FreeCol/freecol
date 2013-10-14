@@ -45,7 +45,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 /**
  * Dialog for setting some options when loading a game.
  */
-public final class LoadingSavegameDialog extends FreeColDialog<Boolean> {
+public final class LoadingSavegameDialog extends FreeColConfirmDialog {
 
     private static final Logger logger = Logger.getLogger(LoadingSavegameDialog.class.getName());
 
@@ -114,10 +114,7 @@ public final class LoadingSavegameDialog extends FreeColDialog<Boolean> {
         panel.add(publicMultiplayer);
         panel.setSize(panel.getPreferredSize());
 
-        initialize(DialogType.PLAIN, true, panel, null, new String[] {
-                Messages.message("ok"),
-                Messages.message("cancel")
-            });
+        initialize(panel, null, "ok", "cancel");
     }
 
 
@@ -176,14 +173,5 @@ public final class LoadingSavegameDialog extends FreeColDialog<Boolean> {
             this.privateMultiplayer.setSelected(true);
         }
         this.serverNameField.setText("");
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    public Boolean getResponse() {
-        Object value = getValue();
-        return (options[0].equals(value)) ? Boolean.TRUE : Boolean.FALSE;
     }
 }

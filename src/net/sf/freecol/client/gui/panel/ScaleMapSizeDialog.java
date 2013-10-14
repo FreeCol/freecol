@@ -29,6 +29,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import java.util.List;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -103,10 +105,13 @@ public class ScaleMapSizeDialog extends FreeColDialog<Dimension> {
         inputWidth.addActionListener(al);
         inputHeight.addActionListener(al);
 
-        initialize(DialogType.QUESTION, true, panel, null, new String[] {
-                Messages.message("ok"),
-                Messages.message("cancel")
-            });
+        final Dimension fake = null;
+        List<ChoiceItem<Dimension>> c = choices();
+        c.add(new ChoiceItem<Dimension>(Messages.message("ok"),
+                fake).okOption());
+        c.add(new ChoiceItem<Dimension>(Messages.message("cancel"),
+                fake).cancelOption().defaultOption());
+        initialize(DialogType.QUESTION, true, panel, null, c);
     }
 
     /**
@@ -132,7 +137,7 @@ public class ScaleMapSizeDialog extends FreeColDialog<Dimension> {
      */
     public Dimension getResponse() {
         Object value = getValue();
-        if (options[0].equals(value)) {
+        if (options.get(0).equals(value)) {
             checkFields();
             return new Dimension(Integer.parseInt(inputHeight.getText()),
                                  Integer.parseInt(inputWidth.getText()));
