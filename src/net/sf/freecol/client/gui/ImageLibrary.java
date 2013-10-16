@@ -122,7 +122,7 @@ public final class ImageLibrary {
         BufferedImage bi = new BufferedImage(100, 100,
                                              BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = bi.createGraphics();
-        TextLayout label = new TextLayout(text, font, 
+        TextLayout label = new TextLayout(text, font,
                                           g2.getFontRenderContext());
         float padding = 6 * getScalingFactor();
         int width = (int)(label.getBounds().getWidth() + padding);
@@ -159,7 +159,7 @@ public final class ImageLibrary {
         BufferedImage bi = new BufferedImage(100, 100,
                                              BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = bi.createGraphics();
-        TextLayout label = new TextLayout(text, font, 
+        TextLayout label = new TextLayout(text, font,
                                           g2.getFontRenderContext());
         float padding = 6 * getScalingFactor();
         int width = (int)(label.getBounds().getWidth() + padding);
@@ -379,7 +379,7 @@ public final class ImageLibrary {
     /**
      * Returns the bonus-image for the given tile.
      *
-     * @param tile The <code>Tile</code> with the image on it. 
+     * @param tile The <code>Tile</code> with the image on it.
      * @return The bonus-image for the given tile.
      */
     public Image getBonusImage(Tile tile) {
@@ -475,7 +475,7 @@ public final class ImageLibrary {
             g.drawImage(terrainImage, 0,
                         height - terrainImage.getHeight(null), null);
             if (overlayImage != null) {
-                g.drawImage(overlayImage, 0, 
+                g.drawImage(overlayImage, 0,
                             height - overlayImage.getHeight(null), null);
             }
             if (forestImage != null) {
@@ -1128,7 +1128,7 @@ public final class ImageLibrary {
                 nativeEthnicity = false;
             }
         }
-        
+
         // try to get an image matching the key
         String roleQual = ("model.role.default".equals(roleId)) ? ""
             : "." + Utils.lastPart(roleId, ".");

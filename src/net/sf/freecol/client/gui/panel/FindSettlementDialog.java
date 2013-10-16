@@ -71,7 +71,7 @@ public final class FindSettlementDialog<T> extends FreeColOldDialog<T> implement
         ONLY_NATIVES,
         ONLY_EUROPEAN
     }
-    
+
     /**
      * The constructor to use.
      */
@@ -79,11 +79,11 @@ public final class FindSettlementDialog<T> extends FreeColOldDialog<T> implement
     public FindSettlementDialog(FreeColClient freeColClient) {
         super(freeColClient, new MigLayout("wrap 1", "[align center]",
                                            "[]30[]30[]"));
-        
+
         JLabel header = new JLabel(Messages.message("findSettlementDialog.name"));
         header.setFont(GUI.SMALL_HEADER_FONT);
         add(header);
-        
+
         settlementList = new JList();
         updateSearch(displayListOption.valueOf("ALL"));
         settlementList.setCellRenderer(new SettlementRenderer());
@@ -127,9 +127,9 @@ public final class FindSettlementDialog<T> extends FreeColOldDialog<T> implement
             });
         displayOptionBox.addItemListener(this);
         add(displayOptionBox);
-        
+
         add(okButton, "tag ok");
-        
+
         getGUI().restoreSavedSize(this, getPreferredSize());
     }
 
@@ -154,7 +154,7 @@ public final class FindSettlementDialog<T> extends FreeColOldDialog<T> implement
             settlementList.setSelectedIndex(0);
         }
     }
-    
+
     private void selectSettlement() {
         Settlement settlement = (Settlement) settlementList.getSelectedValue();
         if (settlement instanceof Colony
