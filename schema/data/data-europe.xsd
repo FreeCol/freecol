@@ -29,29 +29,36 @@
   <xs:element name="europe">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-	      <xs:element name="units">
-	        <xs:complexType>
-	          <xs:choice minOccurs="0" maxOccurs="unbounded">
-	            <xs:element ref="unit"></xs:element>
-	          </xs:choice>
-	        </xs:complexType>
-	      </xs:element>
-	      <xs:element name="unitPrice">
-	        <xs:complexType>
-	          <xs:attribute name="unitType" type="xs:string" use="required"/>
-	          <xs:attribute name="price" type="xs:int" use="required"/>
-	        </xs:complexType>
-	      </xs:element>
-	      <xs:element ref="ability" />
-	      <xs:element ref="modifier" />
+        <xs:element name="units">
+          <xs:complexType>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+              <xs:element ref="unit"></xs:element>
+            </xs:choice>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="unitPrice">
+          <xs:complexType>
+            <xs:attribute name="unitType" type="xs:string" use="required"/>
+            <xs:attribute name="price" type="xs:int" use="required"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element ref="ability" />
+        <xs:element ref="modifier" />
+        <xs:element name="recruit">
+          <xs:complexType>
+            <xs:attribute name="id" type="UnitTypeId" />
+          </xs:complexType>
+        </xs:element>
       </xs:choice>
       <xs:attribute name="id" type="EuropeId" use="required"/>
       <!-- @compat 0.10.x -->
       <xs:attribute name="ID" type="EuropeId" use="optional"/>
       <!-- end @compat -->
+      <!-- @compat 0.10.7 -->
       <xs:attribute name="recruit0" type="UnitTypeId" use="optional"/>
       <xs:attribute name="recruit1" type="UnitTypeId" use="optional"/>
       <xs:attribute name="recruit2" type="UnitTypeId" use="optional"/>
+      <!-- end @compat -->
       <xs:attribute name="owner" type="PlayerId" use="required"/>
 
       <xs:attribute name="recruitPrice" type="xs:int" use="optional"

@@ -1892,7 +1892,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         UnitType newType = RandomChoice
                             .getWeightedRandom(logger,
                                 "Replace recruit", recruits, random);
-                        europe.setRecruitable(i, newType);
+                        europe.replaceRecruitable(i, newType);
                         europeDirty = true;
                     }
                 }
@@ -1962,7 +1962,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     public void csEmigrate(int slot, MigrationType type, Random random,
                            ChangeSet cs) {
-        // Valid slots are in [1,3], recruitable indices are in [0,2].
         // An invalid slot is normal when the player has no control over
         // recruit type.
         boolean selected = 1 <= slot && slot <= Europe.RECRUIT_COUNT;
@@ -2002,10 +2001,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // Replace the recruit we used.  Shuffle them down first
         // as AI is always recruiting slot 0.
         for (int i = index; i < Europe.RECRUIT_COUNT-1; i++) {
-            europe.setRecruitable(i, europe.getRecruitable(i+1));
+            europe.replaceRecruitable(i, europe.getRecruitable(i+1));
         }
         List<RandomChoice<UnitType>> recruits = generateRecruitablesList();
-        europe.setRecruitable(Europe.RECRUIT_COUNT-1,
+        europe.replaceRecruitable(Europe.RECRUIT_COUNT-1,
             RandomChoice.getWeightedRandom(logger, "Replace recruit", recruits,
                                            random));
         cs.add(See.only(this), europe);

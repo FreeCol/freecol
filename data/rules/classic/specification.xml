@@ -2224,6 +2224,11 @@ resources of 400, lost city rumours of 500
               <role value="model.role.default" />
               <number value="1"/>
             </unitOption>
+            <unitOption id="model.option.immigrants.4">
+              <unitType value="model.unit.jesuitMissionary"/>
+              <role value="model.role.missionary" />
+              <number value="1"/>
+            </unitOption>
           </unitListOption>
         </optionGroup>
         <optionGroup id="model.difficulty.natives">

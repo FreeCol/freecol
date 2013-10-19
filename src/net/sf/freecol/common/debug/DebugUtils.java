@@ -134,7 +134,7 @@ public class DebugUtils {
             String msg = Messages.message(b.getNameKey());
             buildings.add(new ChoiceItem<BuildingType>(msg, b));
         }
-        
+
         BuildingType buildingType
             = gui.showModalChoiceDialog(null, buildingTitle, null, "cancel",
                                         buildings);
@@ -346,7 +346,7 @@ public class DebugUtils {
         UnitType unitChoice = gui.showChoiceDialog(null, "Select Unit Type",
                                                    "Cancel", uts);
         if (unitChoice == null) return;
-        
+
         Unit carrier = null, sCarrier = null;
         if (!sTile.isLand() && !unitChoice.isNaval()) {
             for (Unit u : sTile.getUnitList()) {
@@ -397,7 +397,7 @@ public class DebugUtils {
                                                    "Cancel", gtl);
         if (goodsType == null) return;
 
-        String amount = gui.showInputDialog(null, 
+        String amount = gui.showInputDialog(null,
             StringTemplate.name("Select Goods Amount"),
             "20", "ok", "cancel", true);
         if (amount == null) return;
@@ -432,7 +432,7 @@ public class DebugUtils {
             = sGame.getFreeColGameObject(settlement.getId(), Settlement.class);
         final GUI gui = freeColClient.getGUI();
         final Game game = freeColClient.getGame();
-            
+
         List<ChoiceItem<Player>> pcs = new ArrayList<ChoiceItem<Player>>();
         for (Player p : game.getPlayers()) {
             if ((settlement instanceof Colony) == p.isEuropean()) {
@@ -642,7 +642,7 @@ public class DebugUtils {
         if (value < 0) {
             return Player.NoValueType.fromValue(value).toString();
         }
-        return Integer.toString(value);          
+        return Integer.toString(value);
     }
 
     /**
@@ -709,6 +709,13 @@ public class DebugUtils {
                     sb.append('\n');
                 }
             }
+            sb.append("\n->Recruitable units\n\n");
+            for (UnitType unitType : p.getEurope().getRecruitables()) {
+                sb.append(Messages.getName(unitType));
+                sb.append('\n');
+            }
+            sb.append('\n');
+
         }
         freeColClient.getGUI().showInformationMessage(sb.toString());
     }
@@ -841,13 +848,13 @@ public class DebugUtils {
         final Game game = freeColClient.getGame();
 
         server.exploreMapForAllPlayers(reveal);
-        
+
         // Removes fog of war when revealing the whole map
         // Restores previous setting when hiding it back again
         BooleanOption fogOfWarSetting = game.getSpecification().getBooleanOption(GameOptions.FOG_OF_WAR);
         if(reveal){
         	FreeColDebugger.setNormalGameFogOfWar(fogOfWarSetting.getValue());
-        	fogOfWarSetting.setValue(false); 
+        	fogOfWarSetting.setValue(false);
         }
         else{
         	fogOfWarSetting.setValue(FreeColDebugger.getNormalGameFogOfWar());
@@ -1077,7 +1084,7 @@ public class DebugUtils {
                 sb.append(" " + Utils.lastPart(m.getClass().getName(), "."));
             }
             sb.append("\n");
-        }            
+        }
         sb.append("\nUnits owned\n");
         for (Unit u : sis.getOwnedUnits()) {
             Mission m = aiMain.getAIUnit(u).getMission();

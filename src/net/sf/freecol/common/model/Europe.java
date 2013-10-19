@@ -19,7 +19,9 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -67,12 +69,10 @@ public class Europe extends UnitLocation implements Ownable, Named {
     public static final int RECRUIT_COUNT = 3;
 
     /**
-     * This array represents the types of the units that can be recruited in
-     * Europe. They correspond to the slots that can be seen in the gui and that
-     * can be used to communicate with the server/client.  The array holds
-     * exactly 3 elements and element 0 corresponds to recruit `slot' 1.
+     * This list represents the types of the units that can be
+     * recruited in Europe.
      */
-    private UnitType[] recruitables = { null, null, null };
+    private List<UnitType> recruitables = new ArrayList<UnitType>();
 
     /** Prices for trainable or purchasable units. */
     protected java.util.Map<UnitType, Integer> unitPrices
@@ -125,36 +125,58 @@ public class Europe extends UnitLocation implements Ownable, Named {
      * @return True if the recruitables are not all of the same type.
      */
     public boolean recruitablesDiffer() {
-        return !(recruitables[0].equals(recruitables[1])
-            && recruitables[0].equals(recruitables[2]));
+        UnitType template = null;
+        for (UnitType unitType : recruitables) {
+            if (template == null) {
+                template = unitType;
+            } else if (template != unitType) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public List<UnitType> getRecruitables() {
+        return recruitables;
     }
 
     /**
      * Gets the type of the recruitable in Europe at the given slot.
      *
      * @param slot The slot of the recruitable whose type needs to be
-     *     returned.  Should be 0, 1 or 2.  Note: this used to be 1, 2
-     *     or 3 and was called with 1-3 by some classes and 0-2 by
-     *     others, the method itself expected 0-2.
+     *     returned.
      * @return The type of the recruitable in Europe at the given slot.
      * @exception IllegalArgumentException if the given <code>slot</code> does
      *                not exist.
      */
     public UnitType getRecruitable(int slot) {
-        if (slot >= 0 && slot < RECRUIT_COUNT) return recruitables[slot];
-        throw new IllegalArgumentException("Invalid recruitment slot: " + slot);
+        if (slot >= 0 && slot < RECRUIT_COUNT && slot < recruitables.size()) {
+            return recruitables.get(slot);
+        } else {
+            throw new IllegalArgumentException("Invalid recruitment slot: " + slot);
+        }
     }
 
     /**
-     * Sets the type of the recruitable in Europe at the given slot to the given
-     * type.
+     * Only used by ServerEurope.
+     */
+    protected void addRecruitable(UnitType unitType) {
+        recruitables.add(unitType);
+    }
+
+    /**
+     * Removes the UnitType at the given index from the list of
+     * recruitable unit types and adds another.
      *
-     * @param slot The slot of the recruitable whose type needs to be set.
+     * @param slot The index of the recruitable to be replaced
      * @param type The new type for the unit at the given slot in Europe.
      */
-    public void setRecruitable(int slot, UnitType type) {
-        if (slot >= 0 && slot < RECRUIT_COUNT) {
-            recruitables[slot] = type;
+    public void replaceRecruitable(int slot, UnitType type) {
+        if (slot >= 0 && slot < RECRUIT_COUNT && slot < recruitables.size()) {
+            recruitables.remove(slot);
+            if (type != null) {
+                recruitables.add(type);
+            }
         } else {
             throw new IllegalArgumentException("Invalid recruitment slot: "
                 + slot);
@@ -311,7 +333,7 @@ public class Europe extends UnitLocation implements Ownable, Named {
     }
 
 
-    // Interface Ownable 
+    // Interface Ownable
 
     /**
      * {@inheritDoc}
@@ -349,6 +371,7 @@ public class Europe extends UnitLocation implements Ownable, Named {
     private static final String OWNER_TAG = "owner";
     private static final String PRICE_TAG = "price";
     private static final String RECRUIT_TAG = "recruit";
+    private static final String RECRUIT_ID_TAG = "id";
     private static final String RECRUIT_LOWER_CAP_TAG = "recruitLowerCap";
     private static final String RECRUIT_PRICE_TAG = "recruitPrice";
     private static final String UNIT_PRICE_TAG = "unitPrice";
@@ -363,12 +386,6 @@ public class Europe extends UnitLocation implements Ownable, Named {
         super.writeAttributes(xw);
 
         if (xw.validFor(getOwner())) {
-            for (int index = 0; index < recruitables.length; index++) {
-                if (recruitables[index] != null) {
-                    xw.writeAttribute(RECRUIT_TAG + index, recruitables[index]);
-                }
-            }
-
             xw.writeAttribute(RECRUIT_PRICE_TAG, recruitPrice);
 
             xw.writeAttribute(RECRUIT_LOWER_CAP_TAG, recruitLowerCap);
@@ -396,15 +413,24 @@ public class Europe extends UnitLocation implements Ownable, Named {
 
             for (UnitType unitType : getSortedCopy(unitPrices.keySet())) {
                 xw.writeStartElement(UNIT_PRICE_TAG);
-                
+
                 xw.writeAttribute(UNIT_TYPE_TAG, unitType);
-                
+
                 xw.writeAttribute(PRICE_TAG, unitPrices.get(unitType).intValue());
-                
+
+                xw.writeEndElement();
+            }
+
+            for (UnitType unitType : recruitables) {
+                xw.writeStartElement(RECRUIT_TAG);
+                xw.writeAttribute(RECRUIT_ID_TAG, unitType.getId());
                 xw.writeEndElement();
             }
         }
     }
+
+    // @compat 0.10.7
+    private boolean clearRecruitables = true;
 
     /**
      * {@inheritDoc}
@@ -415,11 +441,16 @@ public class Europe extends UnitLocation implements Ownable, Named {
 
         final Specification spec = getSpecification();
 
-        for (int index = 0; index < recruitables.length; index++) {
+        // @compat 0.10.7
+        for (int index = 0; index < 3; index++) {
             UnitType unitType = xr.getType(spec, RECRUIT_TAG + index,
                                            UnitType.class, (UnitType)null);
-            if (unitType != null) recruitables[index] = unitType;
+            if (unitType != null) {
+                recruitables.add(unitType);
+                clearRecruitables = false;
+            }
         }
+        // end @compat
 
         owner = xr.findFreeColGameObject(getGame(), OWNER_TAG,
                                          Player.class, (Player)null, true);
@@ -439,6 +470,13 @@ public class Europe extends UnitLocation implements Ownable, Named {
         // Clear containers.
         unitPrices.clear();
         featureContainer.clear();
+
+        // @compat 0.10.7
+        if (clearRecruitables) {
+            // in future, always clear
+            recruitables.clear();
+        }
+        // end @compat
 
         super.readChildren(xr);
 
@@ -474,6 +512,10 @@ public class Europe extends UnitLocation implements Ownable, Named {
         } else if (Modifier.getXMLElementTagName().equals(tag)) {
             addModifier(new Modifier(xr, spec));
 
+        } else if (RECRUIT_TAG.equals(tag)) {
+            UnitType unitType = xr.getType(spec, RECRUIT_ID_TAG, UnitType.class, (UnitType)null);
+            recruitables.add(unitType);
+            xr.closeTag(RECRUIT_TAG);
         } else {
             super.readChild(xr);
         }

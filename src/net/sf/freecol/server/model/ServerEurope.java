@@ -120,26 +120,25 @@ public class ServerEurope extends Europe implements ServerModelObject {
         if (spec.hasOption(GameOptions.IMMIGRANTS)) {
             UnitListOption option
                 = (UnitListOption)spec.getOption(GameOptions.IMMIGRANTS);
-            List<AbstractUnit> immigrants = option.getOptionValues();
-            for (int index = 0; index < Europe.RECRUIT_COUNT; index++) {
-                UnitType immigrant = (index < immigrants.size())
-                    ? immigrants.get(index).getUnitType(getSpecification())
-                    : RandomChoice.getWeightedRandom(logger, "Initial recruits",
-                                                     recruits, random);
-                setRecruitable(index, immigrant);
+            for (AbstractUnit immigrant : option.getOptionValues()) {
+                addRecruitable(immigrant.getUnitType(getSpecification()));
+            }
+            for (int index = 0; index < RECRUIT_COUNT - option.getOptionValues().size(); index++) {
+                addRecruitable(RandomChoice.getWeightedRandom(logger, "Initial recruits",
+                                                              recruits, random));
             }
         } else {
             // @compat 0.10.3
-            for (int index = 0; index < Europe.RECRUIT_COUNT; index++) {
+            for (int index = 0; index < RECRUIT_COUNT; index++) {
                 String optionId = "model.option.recruitable.slot" + index;
                 if (spec.hasOption(optionId)) {
                     String unitTypeId = spec.getString(optionId);
                     if (unitTypeId != null) {
-                        setRecruitable(index, spec.getUnitType(unitTypeId));
+                        replaceRecruitable(index, spec.getUnitType(unitTypeId));
                         continue;
                     }
                 }
-                setRecruitable(index, RandomChoice.getWeightedRandom(logger,
+                replaceRecruitable(index, RandomChoice.getWeightedRandom(logger,
                         "Old initial recruits", recruits, random));
             }
             // end @compat
