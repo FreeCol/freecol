@@ -820,7 +820,7 @@ public class SimpleMapGenerator implements MapGenerator {
             List<AbstractUnit> unitList = ((EuropeanNationType) player.getNationType())
                 .getStartingUnits();
             for (AbstractUnit startingUnit : unitList) {
-                UnitType type = startingUnit.getUnitType(spec);
+                UnitType type = spec.getUnitType(startingUnit.getId());
                 Unit newUnit = new ServerUnit(game, null, player, type,
                                               startingUnit.getEquipment(spec));
                 newUnit.setName(player.getNameForUnit(type, random));

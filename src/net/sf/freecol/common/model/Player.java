@@ -2026,7 +2026,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public int getPrice(AbstractUnit au) {
         Specification spec = getSpecification();
-        UnitType unitType = au.getUnitType(spec);
+        UnitType unitType = spec.getUnitType(au.getId());
         if (unitType.hasPrice()) {
             int price = getEurope().getUnitPrice(unitType);
             for (EquipmentType equip : au.getEquipment(spec)) {

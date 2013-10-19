@@ -469,8 +469,8 @@ public final class Monarch extends FreeColGameObject implements Named {
                 boolean progress = false;
                 for (AbstractUnit ship : interventionForce.getNavalUnits()) {
                     // add ships until all units can be transported at once
-                    if (ship.getUnitType(spec).canCarryUnits()
-                        && ship.getUnitType(spec).getSpace() > 0) {
+                    if (spec.getUnitType(ship.getId()).canCarryUnits()
+                        && spec.getUnitType(ship.getId()).getSpace() > 0) {
                         int value = ship.getNumber() + 1;
                         ship.setNumber(value);
                         progress = true;
@@ -660,7 +660,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         public Force(UnitListOption option, String ability) {
             List<AbstractUnit> units = option.getOptionValues();
             for (AbstractUnit unit : units) {
-                UnitType unitType = unit.getUnitType(getSpecification());
+                UnitType unitType = getSpecification().getUnitType(unit.getId());
                 if (ability == null || unitType.hasAbility(ability)) {
                     if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
                         navalUnits.add(unit);
@@ -690,13 +690,13 @@ public final class Monarch extends FreeColGameObject implements Named {
             Specification spec = getSpecification();
             capacity = 0;
             for (AbstractUnit nu : navalUnits) {
-                if (nu.getUnitType(spec).canCarryUnits()) {
-                    capacity += nu.getUnitType(spec).getSpace() * nu.getNumber();
+                if (spec.getUnitType(nu.getId()).canCarryUnits()) {
+                    capacity += spec.getUnitType(nu.getId()).getSpace() * nu.getNumber();
                 }
             }
             spaceRequired = 0;
             for (AbstractUnit lu : landUnits) {
-                spaceRequired += lu.getUnitType(spec).getSpaceTaken() * lu.getNumber();
+                spaceRequired += spec.getUnitType(lu.getId()).getSpaceTaken() * lu.getNumber();
             }
         }
 
@@ -745,12 +745,12 @@ public final class Monarch extends FreeColGameObject implements Named {
          */
         public void add(AbstractUnit units) {
             Specification spec = getSpecification();
-            UnitType unitType = units.getUnitType(spec);
+            UnitType unitType = spec.getUnitType(units.getId());
             int n = units.getNumber();
             boolean added = false;
             if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
                 for (AbstractUnit refUnit : navalUnits) {
-                    if (refUnit.getUnitType(spec) == unitType) {
+                    if (spec.getUnitType(refUnit.getId()) == unitType) {
                         refUnit.setNumber(refUnit.getNumber() + n);
                         if (unitType.canCarryUnits()) {
                             capacity += unitType.getSpace() * n;
@@ -762,7 +762,7 @@ public final class Monarch extends FreeColGameObject implements Named {
                 if (!added) navalUnits.add(units);
             } else {
                 for (AbstractUnit refUnit : landUnits) {
-                    if (refUnit.getUnitType(spec) == unitType
+                    if (spec.getUnitType(refUnit.getId()) == unitType
                         && refUnit.getRoleId().equals(units.getRoleId())) {
                         refUnit.setNumber(refUnit.getNumber() + n);
                         spaceRequired += unitType.getSpaceTaken() * n;

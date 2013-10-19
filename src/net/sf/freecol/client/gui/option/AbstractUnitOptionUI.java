@@ -172,7 +172,7 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
             AbstractUnit au = (AbstractUnit)((AbstractUnitOption)value)
                 .getValue();
             String key = au.getId();
-            if (au.getUnitType(spec).hasAbility(Ability.CAN_BE_EQUIPPED)
+            if (spec.getUnitType(au.getId()).hasAbility(Ability.CAN_BE_EQUIPPED)
                 && !"model.role.default".equals(au.getRoleId())) {
                 key = au.getRoleId();
             }

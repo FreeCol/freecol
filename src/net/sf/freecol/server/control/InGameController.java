@@ -1084,7 +1084,7 @@ public final class InGameController extends Controller {
             monarch.getExpeditionaryForce().add(refAdditions);
             template = StringTemplate.template(messageId)
                 .addAmount("%number%", refAdditions.getNumber())
-                .add("%unit%", refAdditions.getUnitType(getGame().getSpecification())
+                .add("%unit%", getGame().getSpecification().getUnitType(refAdditions.getId())
                      .getNameKey());
             cs.add(See.only(serverPlayer), monarch);
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,

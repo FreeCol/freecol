@@ -90,27 +90,6 @@ public class AbstractUnit extends FreeColObject {
         return new AbstractUnit(getId(), getRoleId(), getNumber());
     }
 
-
-    /**
-     * Get the <code>UnitType</code> value.
-     *
-     * @param specification The <code>Specification</code> to refer to.
-     * @return The unit type.
-     */
-    public final UnitType getUnitType(Specification specification) {
-        return specification.getUnitType(getId());
-    }
-
-    /**
-     * Get the <code>Role</code> value.
-     *
-     * @param specification The <code>Specification</code> to refer to.
-     * @return The unit role.
-     */
-    public final Role getRole(Specification specification) {
-        return specification.getRole(roleId);
-    }
-
     /**
      * Get the role identifier.
      *

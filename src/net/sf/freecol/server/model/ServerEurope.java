@@ -121,7 +121,7 @@ public class ServerEurope extends Europe implements ServerModelObject {
             UnitListOption option
                 = (UnitListOption)spec.getOption(GameOptions.IMMIGRANTS);
             for (AbstractUnit immigrant : option.getOptionValues()) {
-                addRecruitable(immigrant.getUnitType(getSpecification()));
+                addRecruitable(getSpecification().getUnitType(immigrant.getId()));
             }
             for (int index = 0; index < RECRUIT_COUNT - option.getOptionValues().size(); index++) {
                 addRecruitable(RandomChoice.getWeightedRandom(logger, "Initial recruits",

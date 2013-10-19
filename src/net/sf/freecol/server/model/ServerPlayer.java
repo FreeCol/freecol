@@ -896,7 +896,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         for (AbstractUnit au : abstractUnits) {
             for (int i = 0; i < au.getNumber(); i++) {
                 units.add(new ServerUnit(game, location, this,
-                                         au.getUnitType(spec),
+                                         spec.getUnitType(au.getId()),
                                          au.getEquipment(spec)));//-vis(this)
             }
         }
