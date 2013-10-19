@@ -62,7 +62,7 @@ public class REFTest extends FreeColTestCase {
         int artilleryBeforeIndependence = 0;
         int shipsBeforeIndependence = 0;
         for (AbstractUnit au : refUnitsBeforeIndependence) {
-            UnitType unitType = au.getUnitType(spec());
+            UnitType unitType = spec().getUnitType(au.getId());
             if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
                 shipsBeforeIndependence += au.getNumber();
                 continue;

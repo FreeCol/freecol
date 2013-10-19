@@ -325,7 +325,7 @@ public abstract class Settlement extends GoodsLocation
         }
         return best;
     }
-        
+
     /**
      * Returns the number of goods of a given type used by the settlement
      * each turn.
@@ -549,7 +549,7 @@ public abstract class Settlement extends GoodsLocation
         }
         return super.getNoAddReason(locatable);
     }
-  
+
     /**
      * {@inheritDoc}
      */
@@ -568,10 +568,8 @@ public abstract class Settlement extends GoodsLocation
      */
     @Override
     public int canBuildRoleEquipment(Role role) {
-        for (EquipmentType et : role.getRoleEquipment()) {
-            for (AbstractGoods ag : et.getRequiredGoods()) {
-                if (getGoodsCount(ag.getType()) < ag.getAmount()) return -1;
-            }
+        for (AbstractGoods ag : role.getRequiredGoods()) {
+            if (getGoodsCount(ag.getType()) < ag.getAmount()) return -1;
         }
         return 0;
     }
@@ -589,7 +587,7 @@ public abstract class Settlement extends GoodsLocation
         // Process adding equipment first, so as to settle what has to
         // be removed.
         List<EquipmentType> remove = null;
-        for (EquipmentType et : role.getRoleEquipment()) {
+        for (EquipmentType et : getSpecification().getRoleEquipment(role.getId())) {
             for (AbstractGoods ag : et.getRequiredGoods()) {
                 removeGoods(ag);
             }

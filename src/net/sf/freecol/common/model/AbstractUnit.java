@@ -146,7 +146,7 @@ public class AbstractUnit extends FreeColObject {
      * @param spec A <code>Specification<code> to query.
      * @return An array of equipment types.
      */
-    public EquipmentType[] getEquipment(Specification spec) {
+    public EquipmentType[] getXEquipment(Specification spec) {
         List<EquipmentType> equipment = new ArrayList<EquipmentType>();
         EquipmentType[] types = {
             ("model.role.armedBrave".equals(roleId))

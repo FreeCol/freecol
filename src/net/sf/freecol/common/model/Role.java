@@ -80,34 +80,6 @@ public class Role extends BuildableType implements Comparable<Role> {
         };
 
 
-    // and this, too
-    public List<EquipmentType> getRoleEquipment() {
-        Specification spec = getSpecification();
-        List<EquipmentType> result = new ArrayList<EquipmentType>();
-        if (getRequiredGoods().isEmpty()) {
-            result.add(spec.getEquipmentType("model.equipment.missionary"));
-        } else {
-            for (AbstractGoods goods : getRequiredGoods()) {
-                if ("model.goods.horses".equals(goods.getType().getId())) {
-                    if (requiresAbility(Ability.NATIVE)) {
-                        result.add(spec.getEquipmentType("model.equipment.indian.horses"));
-                    } else {
-                        result.add(spec.getEquipmentType("model.equipment.horses"));
-                    }
-                } else if ("model.goods.muskets".equals(goods.getType().getId())) {
-                    if (requiresAbility(Ability.NATIVE)) {
-                        result.add(spec.getEquipmentType("model.equipment.indian.muskets"));
-                    } else {
-                        result.add(spec.getEquipmentType("model.equipment.muskets"));
-                    }
-                } else if ("model.goods.tools".equals(goods.getType().getId())) {
-                    result.add(spec.getEquipmentType("model.equipment.tools"));
-                }
-            }
-        }
-        return result;
-    }
-
     /**
      * Creates a new <code>Role</code> instance.
      *

@@ -1315,6 +1315,46 @@ public final class Specification {
         return getType(id, Role.class);
     }
 
+    /**
+     * This is compatibility code to be removed as soon as
+     * EquipmentType has been completely replaced by Role.
+     */
+    public List<EquipmentType> getRoleEquipment(String roleId) {
+        return getRoleEquipment(roleId, false);
+    }
+
+    public List<EquipmentType> getRoleEquipment(String roleId, boolean max) {
+        Role role = getRole(roleId);
+        List<EquipmentType> result = new ArrayList<EquipmentType>();
+        if (role.getRequiredGoods().isEmpty()) {
+            result.add(getEquipmentType("model.equipment.missionary"));
+        } else {
+            for (AbstractGoods goods : role.getRequiredGoods()) {
+                if ("model.goods.horses".equals(goods.getType().getId())) {
+                    if (role.requiresAbility(Ability.NATIVE)) {
+                        result.add(getEquipmentType("model.equipment.indian.horses"));
+                    } else {
+                        result.add(getEquipmentType("model.equipment.horses"));
+                    }
+                } else if ("model.goods.muskets".equals(goods.getType().getId())) {
+                    if (role.requiresAbility(Ability.NATIVE)) {
+                        result.add(getEquipmentType("model.equipment.indian.muskets"));
+                    } else {
+                        result.add(getEquipmentType("model.equipment.muskets"));
+                    }
+                } else if ("model.goods.tools".equals(goods.getType().getId())) {
+                    int equipmentCount = max ? role.getMaximumCount() : 1;
+                    for (int index = 0; index < equipmentCount; index++) {
+                        result.add(getEquipmentType("model.equipment.tools"));
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+
+
     // -- EquipmentTypes --
 
     public List<EquipmentType> getEquipmentTypeList() {

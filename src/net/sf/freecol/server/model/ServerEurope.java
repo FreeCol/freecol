@@ -79,7 +79,7 @@ public class ServerEurope extends Europe implements ServerModelObject {
         // Process adding equipment first, so as to settle what has to
         // be removed.
         List<EquipmentType> remove = null;
-        for (EquipmentType et : role.getRoleEquipment()) {
+        for (EquipmentType et : getSpecification().getRoleEquipment(role.getId())) {
             for (AbstractGoods ag : et.getRequiredGoods()) {
                 int m = owner.buy(null, ag.getType(), ag.getAmount());
                 if (m > 0) {

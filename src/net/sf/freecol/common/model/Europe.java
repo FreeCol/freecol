@@ -302,13 +302,11 @@ public class Europe extends UnitLocation implements Ownable, Named {
         Player player = getOwner();
         Market market = player.getMarket();
         int price = 0;
-        for (EquipmentType et : role.getRoleEquipment()) {
-            for (AbstractGoods ag : et.getRequiredGoods()) {
-                GoodsType goodsType = ag.getType();
-                // Refuse to trade in boycotted goods
-                if (!player.canTrade(goodsType)) return -1;
-                price += market.getBidPrice(goodsType, ag.getAmount());
-            }
+        for (AbstractGoods ag : role.getRequiredGoods()) {
+            GoodsType goodsType = ag.getType();
+            // Refuse to trade in boycotted goods
+            if (!player.canTrade(goodsType)) return -1;
+            price += market.getBidPrice(goodsType, ag.getAmount());
         }
         return price;
     }

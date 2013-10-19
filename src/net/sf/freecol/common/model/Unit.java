@@ -1761,7 +1761,7 @@ public class Unit extends GoodsLocation
      * @return A list of <code>EquipmentType</code>s.
      */
     public List<EquipmentType> getRoleEquipment(Role role) {
-        List<EquipmentType> equipment = role.getRoleEquipment();
+        List<EquipmentType> equipment = getSpecification().getRoleEquipment(role.getId());
         Iterator<EquipmentType> i = equipment.iterator();
         while (i.hasNext()) {
             EquipmentType et = i.next();

@@ -42,6 +42,7 @@ import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.EuropeanNationType;
+import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
@@ -821,8 +822,9 @@ public class SimpleMapGenerator implements MapGenerator {
                 .getStartingUnits();
             for (AbstractUnit startingUnit : unitList) {
                 UnitType type = spec.getUnitType(startingUnit.getId());
-                Unit newUnit = new ServerUnit(game, null, player, type,
-                                              startingUnit.getEquipment(spec));
+                EquipmentType[] equipment = spec.getRoleEquipment(startingUnit.getRoleId(), true)
+                    .toArray(new EquipmentType[0]);
+                Unit newUnit = new ServerUnit(game, null, player, type, equipment);
                 newUnit.setName(player.getNameForUnit(type, random));
                 if (newUnit.isNaval()) {
                     if (newUnit.canCarryUnits()) {

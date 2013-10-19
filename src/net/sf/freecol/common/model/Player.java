@@ -2027,13 +2027,12 @@ public class Player extends FreeColGameObject implements Nameable {
     public int getPrice(AbstractUnit au) {
         Specification spec = getSpecification();
         UnitType unitType = spec.getUnitType(au.getId());
+        Role role = spec.getRole(au.getRoleId());
         if (unitType.hasPrice()) {
             int price = getEurope().getUnitPrice(unitType);
-            for (EquipmentType equip : au.getEquipment(spec)) {
-                for (AbstractGoods goods : equip.getRequiredGoods()) {
-                    price += getMarket().getBidPrice(goods.getType(),
-                                                     goods.getAmount());
-                }
+            for (AbstractGoods goods : role.getRequiredGoods()) {
+                int amount = goods.getAmount() * role.getMaximumCount();
+                price += getMarket().getBidPrice(goods.getType(), amount);
             }
             return price * au.getNumber();
         } else {

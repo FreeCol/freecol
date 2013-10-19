@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.List;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 
@@ -27,13 +28,13 @@ public class AbstractUnitTest extends FreeColTestCase {
     public void testEquipment() {
         AbstractUnit newUnit
             = new AbstractUnit("newUnit", "model.role.pioneer", 1);
-        EquipmentType[] equipment = newUnit.getEquipment(spec());
-        assertEquals(5, equipment.length);
-        assertEquals("model.equipment.tools", equipment[0].getId());
-        assertEquals("model.equipment.tools", equipment[1].getId());
-        assertEquals("model.equipment.tools", equipment[2].getId());
-        assertEquals("model.equipment.tools", equipment[3].getId());
-        assertEquals("model.equipment.tools", equipment[4].getId());
+        List<EquipmentType> equipment = spec().getRoleEquipment(newUnit.getRoleId(), true);
+        assertEquals(5, equipment.size());
+        assertEquals("model.equipment.tools", equipment.get(0).getId());
+        assertEquals("model.equipment.tools", equipment.get(1).getId());
+        assertEquals("model.equipment.tools", equipment.get(2).getId());
+        assertEquals("model.equipment.tools", equipment.get(3).getId());
+        assertEquals("model.equipment.tools", equipment.get(4).getId());
     }
 
 }
