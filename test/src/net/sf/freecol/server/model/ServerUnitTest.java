@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
@@ -422,8 +423,9 @@ public class ServerUnitTest extends FreeColTestCase {
         tile.setExplored(dutch, true);
 
         // Almost clear the tile
+        Role pioneerRole = spec().getRole("model.role.pioneer");
         ServerUnit hardyPioneer = new ServerUnit(game, tile, dutch,
-                                                 pioneerType, toolsType);
+                                                 pioneerType, pioneerRole);
         //TileImprovement clearImprovement
         //    = new TileImprovement(game, tile, clear);
         //tile.add(clearImprovement);

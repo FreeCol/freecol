@@ -76,6 +76,27 @@ public class InGameControllerTest extends FreeColTestCase {
     private static final BuildingType stockadeType
         = spec().getBuildingType("model.building.stockade");
 
+    private static final Role scoutRole
+        = spec().getRole("model.role.scout");
+    private static final Role soldierRole
+        = spec().getRole("model.role.soldier");
+    private static final Role dragoonRole
+        = spec().getRole("model.role.dragoon");
+    private static final Role pioneerRole
+        = spec().getRole("model.role.pioneer");
+    private static final Role missionaryRole
+        = spec().getRole("model.role.missionary");
+    private static final Role infantryRole
+        = spec().getRole("model.role.infantry");
+    private static final Role cavalryRole
+        = spec().getRole("model.role.cavalry");
+    private static final Role armedBraveRole
+        = spec().getRole("model.role.armedBrave");
+    private static final Role mountedBraveRole
+        = spec().getRole("model.role.mountedBrave");
+    private static final Role nativeDragoonRole
+        = spec().getRole("model.role.nativeDragoon");
+
     private static final EquipmentType tools
         = spec().getEquipmentType("model.equipment.tools");
     private static final EquipmentType horses
@@ -188,6 +209,7 @@ public class InGameControllerTest extends FreeColTestCase {
         = spec().getUnitType("model.unit.damagedArtillery");
     private static final UnitType treasureTrainType
         = spec().getUnitType("model.unit.treasureTrain");
+
 
     SimpleCombatModel combatModel = new SimpleCombatModel();
 
@@ -526,8 +548,7 @@ public class InGameControllerTest extends FreeColTestCase {
         tile2.setExplored(dutch, true);
         tile2.setExplored(french, true);
         // Create Colonial Regular with default equipment
-        Unit colonial = new ServerUnit(game, tile1, dutch, colonialType,
-                                       EquipmentType.NO_EQUIPMENT);
+        Unit colonial = new ServerUnit(game, tile1, dutch, colonialType);
         assertEquals("Must be Colonial Regular",
                      colonialType, colonial.getType());
         assertEquals("Only has default offence",
@@ -601,9 +622,9 @@ public class InGameControllerTest extends FreeColTestCase {
         assertEquals("Colonist should be Colonial Regular",
                      colonialType, colonist.getType());
         Unit defender = new ServerUnit(getGame(), colony.getTile(), dutch,
-                                       veteranType, horses, muskets);
+                                       veteranType, dragoonRole);
         Unit attacker = new ServerUnit(getGame(), tile2, french, veteranType,
-                                       horses, muskets);
+                                       dragoonRole);
         assertEquals("Colony defender is Veteran Soldier",
                      defender, colony.getTile().getDefendingUnit(attacker));
 
@@ -716,9 +737,9 @@ public class InGameControllerTest extends FreeColTestCase {
         tile2.setExplored(dutch, true);
         Unit colonist = colony.getUnitIterator().next();
         Unit defender = new ServerUnit(getGame(), colony.getTile(), dutch,
-                                       veteranType, horses, muskets);
+                                       veteranType, dragoonRole);
         Unit attacker = new ServerUnit(getGame(), tile2, inca, braveType,
-                                       indianHorses, indianMuskets);
+                                       nativeDragoonRole);
         assertTrue("Attacker should be armed",
                    attacker.isArmed());
         assertTrue("Attacker should be mounted",
@@ -941,8 +962,7 @@ public class InGameControllerTest extends FreeColTestCase {
         Tile tile2 = map.getTile(4, 8);
         tile2.setExplored(dutch, true);
         Unit colonist = colony.getUnitIterator().next();
-        Unit attacker = new ServerUnit(getGame(), tile2, inca, braveType,
-                                       indianHorses, indianMuskets);
+        Unit attacker = new ServerUnit(getGame(), tile2, inca, braveType, nativeDragoonRole);
         assertEquals("Colonist should be the colony best defender",
                      colonist, colony.getDefendingUnit(attacker));
         dutch.addFather(spec()
@@ -989,9 +1009,8 @@ public class InGameControllerTest extends FreeColTestCase {
         Tile tile2 = map.getTile(4, 8);
         tile2.setExplored(dutch, true);
         tile2.setExplored(french, true);
-        Unit pioneer = new ServerUnit(game, tile1, dutch, colonistType, tools);
-        Unit soldier = new ServerUnit(game, tile2, french, veteranType,
-                                      muskets, horses);
+        Unit pioneer = new ServerUnit(game, tile1, dutch, colonistType, pioneerRole);
+        Unit soldier = new ServerUnit(game, tile2, french, veteranType, dragoonRole);
         soldier.setMovesLeft(1);
 
         // Soldier wins and kills the pioneer
@@ -1020,8 +1039,8 @@ public class InGameControllerTest extends FreeColTestCase {
         Tile tile2 = map.getTile(4, 8);
         tile2.setExplored(dutch, true);
         tile2.setExplored(french, true);
-        Unit scout = new ServerUnit(game, tile1, dutch, colonistType, horses);
-        Unit soldier = new ServerUnit(game, tile2, french, veteranType, horses, muskets);
+        Unit scout = new ServerUnit(game, tile1, dutch, colonistType, scoutRole);
+        Unit soldier = new ServerUnit(game, tile2, french, veteranType, dragoonRole);
         scout.setMovesLeft(1);
 
         // Soldier wins and kills the scout
@@ -1076,8 +1095,8 @@ public class InGameControllerTest extends FreeColTestCase {
         Tile tile2 = map.getTile(4, 8);
         tile2.setExplored(dutch, true);
         tile2.setExplored(french, true);
-        Unit unit = new ServerUnit(game, tile1, dutch, pettyCriminalType, muskets);
-        Unit soldier = new ServerUnit(game, tile2, french, colonistType, muskets);
+        Unit unit = new ServerUnit(game, tile1, dutch, pettyCriminalType, soldierRole);
+        Unit soldier = new ServerUnit(game, tile2, french, colonistType, soldierRole);
         // Enable automatic promotion
         dutch.addAbility(new Ability(Ability.AUTOMATIC_PROMOTION));
 
@@ -1210,8 +1229,8 @@ public class InGameControllerTest extends FreeColTestCase {
         Tile tile2 = map.getTile(4, 8);
         tile2.setExplored(dutch, true);
         tile2.setExplored(french, true);
-        Unit soldier1 = new ServerUnit(game, tile1, dutch, colonistType, muskets);
-        Unit soldier2 = new ServerUnit(game, tile2, french, colonistType, muskets);
+        Unit soldier1 = new ServerUnit(game, tile1, dutch, colonistType, soldierRole);
+        Unit soldier2 = new ServerUnit(game, tile2, french, colonistType, soldierRole);
 
         // Soldier loses and loses muskets
         crs = fakeAttackResult(CombatResult.LOSE, soldier1, soldier2);
@@ -1259,14 +1278,14 @@ public class InGameControllerTest extends FreeColTestCase {
         Tile tile2 = map.getTile(4, 8);
         tile2.setExplored(dutch, true);
         tile2.setExplored(french, true);
-        Unit dragoon = new ServerUnit(game, tile1, dutch, colonistType, horses, muskets);
+        Unit dragoon = new ServerUnit(game, tile1, dutch, colonistType, dragoonRole);
         ServerTestHelper.newTurn();
 
         assertEquals("Dragoon has 12 moves",
                      12, dragoon.getInitialMovesLeft());
         assertEquals("Dragoon has 12 moves left",
                      12, dragoon.getMovesLeft());
-        Unit soldier = new ServerUnit(game, tile2, french, colonistType, muskets);
+        Unit soldier = new ServerUnit(game, tile2, french, colonistType, soldierRole);
 
         // Dragoon loses and loses horses
         crs = fakeAttackResult(CombatResult.LOSE, dragoon, soldier);
@@ -1341,7 +1360,7 @@ public class InGameControllerTest extends FreeColTestCase {
         builder.reset().player(inca).settlementTile(map.getTile(8, 8))
             .skillToTeach(null);
         IndianSettlement settlement2 = builder.build();
-        Unit dragoon = new ServerUnit(game, tile1, dutch, colonistType, horses, muskets);
+        Unit dragoon = new ServerUnit(game, tile1, dutch, colonistType, dragoonRole);
         Unit brave = new ServerUnit(game, tile2, inca, braveType);
         brave.setHomeIndianSettlement(settlement1);
 
@@ -1422,8 +1441,8 @@ public class InGameControllerTest extends FreeColTestCase {
         Tile tile2 = map.getTile(4, 8);
         tile2.setExplored(dutch, true);
         tile2.setExplored(french, true);
-        Unit scout = new ServerUnit(game, tile1, dutch, colonistType, horses);
-        Unit soldier = new ServerUnit(game, tile2, french, colonistType, muskets);
+        Unit scout = new ServerUnit(game, tile1, dutch, colonistType, scoutRole);
+        Unit soldier = new ServerUnit(game, tile2, french, colonistType, scoutRole);
 
         // Scout loses and is slaughtered
         crs = fakeAttackResult(CombatResult.LOSE, scout, soldier);
@@ -1450,8 +1469,8 @@ public class InGameControllerTest extends FreeColTestCase {
         Tile tile2 = map.getTile(4, 8);
         tile2.setExplored(dutch, true);
         tile2.setExplored(french, true);
-        Unit soldier1 = new ServerUnit(game, tile1, dutch, veteranType, muskets);
-        Unit soldier2 = new ServerUnit(game, tile2, french, colonistType, muskets);
+        Unit soldier1 = new ServerUnit(game, tile1, dutch, veteranType, soldierRole);
+        Unit soldier2 = new ServerUnit(game, tile2, french, colonistType, soldierRole);
         assertEquals("Veterans should become colonists on capture",
                      colonistType, veteranType
                      .getTargetType(ChangeType.CAPTURE, dutch));
@@ -1502,7 +1521,7 @@ public class InGameControllerTest extends FreeColTestCase {
         tile2.setExplored(dutch, true);
         tile2.setExplored(french, true);
         Unit artillery = new ServerUnit(game, tile1, dutch, artilleryType);
-        Unit soldier = new ServerUnit(game, tile2, french, colonistType, muskets);
+        Unit soldier = new ServerUnit(game, tile2, french, colonistType, soldierRole);
         assertEquals("Artillery should demote to damaged artillery",
                      damagedArtilleryType, artilleryType
                      .getTargetType(ChangeType.DEMOTION, dutch));
@@ -1985,8 +2004,7 @@ public class InGameControllerTest extends FreeColTestCase {
         Tile tile = game.getMap().getTile(3, 3);
         assertEquals(tile.getType(), tileType);
 
-        Unit unit = new ServerUnit(game, tile, dutch, unitType,
-                                   tools, tools, tools, tools, tools);
+        Unit unit = new ServerUnit(game, tile, dutch, unitType, pioneerRole);
         tile.setOwner(dutch);
         tile.setExplored(dutch, true);
         igc.changeWorkImprovementType(dutch, unit, whichWork);

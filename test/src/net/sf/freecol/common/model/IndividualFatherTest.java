@@ -297,8 +297,9 @@ public class IndividualFatherTest extends FreeColTestCase {
             = new FreeColTestCase.IndianSettlementBuilder(game);
         IndianSettlement camp = builder.build();
 
+        Role missionaryRole = spec().getRole("model.role.missionary");
         Unit missionary = new ServerUnit(game, null, dutch, colonistType,
-                                         bibleType);
+                                         missionaryRole);
         camp.setMissionary(missionary);
 
         assertTrue(bibleType.hasAbility(Ability.MISSIONARY));

@@ -57,6 +57,7 @@ import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
@@ -716,7 +717,7 @@ public class SimpleMapGenerator implements MapGenerator {
         for (int i = 0; i < unitCount; i++) {
             UnitType unitType = map.getSpecification().getUnitType("model.unit.brave");
             Unit unit = new ServerUnit(map.getGame(), settlement, player,
-                unitType, unitType.getDefaultEquipment());
+                unitType, unitType.getDefaultRole());
             unit.setHomeIndianSettlement(settlement);
 
             if (i == 0) {
@@ -822,9 +823,8 @@ public class SimpleMapGenerator implements MapGenerator {
                 .getStartingUnits();
             for (AbstractUnit startingUnit : unitList) {
                 UnitType type = spec.getUnitType(startingUnit.getId());
-                EquipmentType[] equipment = spec.getRoleEquipment(startingUnit.getRoleId(), true)
-                    .toArray(new EquipmentType[0]);
-                Unit newUnit = new ServerUnit(game, null, player, type, equipment);
+                Role role = spec.getRole(startingUnit.getRoleId());
+                Unit newUnit = new ServerUnit(game, null, player, type, role);
                 newUnit.setName(player.getNameForUnit(type, random));
                 if (newUnit.isNaval()) {
                     if (newUnit.canCarryUnits()) {

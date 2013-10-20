@@ -26,6 +26,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -70,8 +71,8 @@ public class ScoutingMissionTest extends FreeColTestCase {
         Player.makeContact(inca, dutch);
 
         Tile unitTile = map.getTile(2, 2);
-        Unit scout = new ServerUnit(game, unitTile, dutch, scoutType,
-                                    horsesEqType);
+        Role scoutRole = spec().getRole("model.role.scout");
+        Unit scout = new ServerUnit(game, unitTile, dutch, scoutType, scoutRole);
 
         AIUnit aiUnit = aiMain.getAIUnit(scout);
         aiUnit.abortMission("test");

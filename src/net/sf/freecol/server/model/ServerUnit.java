@@ -53,6 +53,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Resource;
 import net.sf.freecol.common.model.ResourceType;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
@@ -109,7 +110,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
      */
     public ServerUnit(Game game, Location location, Player owner,
                       UnitType type) {
-        this(game, location, owner, type, type.getDefaultEquipment());
+        this(game, location, owner, type, type.getDefaultRole());
     }
 
     /**
@@ -158,10 +159,10 @@ public class ServerUnit extends Unit implements ServerModelObject {
      * @param location The <code>Location</code> to place this at.
      * @param owner The <code>Player</code> owning this unit.
      * @param type The type of the unit.
-     * @param initialEquipment The list of initial EquimentTypes
+     * @param role The role of the unit.
      */
     public ServerUnit(Game game, Location location, Player owner,
-                      UnitType type, EquipmentType... initialEquipment) {
+                      UnitType type, Role role) {
         super(game);
 
 
@@ -184,12 +185,16 @@ public class ServerUnit extends Unit implements ServerModelObject {
         this.movesLeft = getInitialMovesLeft();
         this.hitPoints = unitType.getHitPoints();
 
-        for (EquipmentType equipmentType : initialEquipment) {
-            if (EquipmentType.NO_EQUIPMENT.equals(equipmentType)) {
-                this.equipment.clear();
-                break;
+        if (role != null) {
+            List<EquipmentType> initialEquipment = getSpecification()
+                .getRoleEquipment(role.getId(), true);
+            for (EquipmentType equipmentType : initialEquipment) {
+                if (EquipmentType.NO_EQUIPMENT.equals(equipmentType)) {
+                    this.equipment.clear();
+                    break;
+                }
+                this.equipment.incrementCount(equipmentType, 1);
             }
-            this.equipment.incrementCount(equipmentType, 1);
         }
         setRole();
         setStateUnchecked(state);

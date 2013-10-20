@@ -101,7 +101,8 @@ public class CombatTest extends FreeColTestCase {
 
         Unit colonist = new ServerUnit(game, tile1, dutch, colonistType);
         colonist.setStateUnchecked(Unit.UnitState.FORTIFIED);
-        Unit soldier = new ServerUnit(game, tile2, french, veteranType, muskets, horses);
+        Role dragoonRole = spec().getRole("model.role.dragoon");
+        Unit soldier = new ServerUnit(game, tile2, french, veteranType, dragoonRole);
         soldier.setMovesLeft(1);
 
         Modifier bigMovementPenalty = spec().getModifiers(Modifier.BIG_MOVEMENT_PENALTY)
@@ -268,9 +269,10 @@ public class CombatTest extends FreeColTestCase {
         Tile tile2 = map.getTile(4, 8);
         tile2.setExplored(dutch, true);
 
+        Role soldierRole = spec().getRole("model.role.armedBrave");
         Unit colonist = colony.getUnitIterator().next();
         Unit attacker = new ServerUnit(getGame(), tile2, inca, braveType,
-                                       indianHorses, indianMuskets);
+                                       soldierRole);
 
         assertEquals(colonist, colony.getDefendingUnit(attacker));
         assertEquals(colonist, colony.getTile().getDefendingUnit(attacker));
@@ -297,7 +299,8 @@ public class CombatTest extends FreeColTestCase {
         tile2.setExplored(dutch, true);
 
         Unit colonist = colony.getUnitIterator().next();
-        Unit attacker = new ServerUnit(getGame(), tile2, inca, braveType, indianHorses, indianMuskets);
+        Role soldierRole = spec().getRole("model.role.armedBrave");
+        Unit attacker = new ServerUnit(getGame(), tile2, inca, braveType, soldierRole);
 
         assertEquals(colonist, colony.getDefendingUnit(attacker));
 
@@ -338,7 +341,8 @@ public class CombatTest extends FreeColTestCase {
 
         //IndianSettlement settlement = new IndianSettlement(game, inca, tile1, true, null, false, null);
         Unit defender = new ServerUnit(game, settlement, inca, braveType);
-        Unit attacker = new ServerUnit(game, tile2, dutch, colonistType, horses, muskets);
+        Role dragoonRole = spec().getRole("model.role.dragoon");
+        Unit attacker = new ServerUnit(game, tile2, dutch, colonistType, dragoonRole);
 
         for (EquipmentType equipment : dragoonEquipment) {
             for (AbstractGoods goods : equipment.getRequiredGoods()) {
@@ -372,8 +376,9 @@ public class CombatTest extends FreeColTestCase {
 
         Unit colonist = new ServerUnit(game, tile1, dutch, colonistType);
         colonist.setStateUnchecked(Unit.UnitState.FORTIFIED);
+        Role dragoonRole = spec().getRole("model.role.dragoon");
         Unit soldier = new ServerUnit(game, tile2, french, veteranType,
-                                      muskets, horses);
+                                      dragoonRole);
         soldier.setStateUnchecked(Unit.UnitState.FORTIFIED);
 
         assertEquals(tile1, colonist.getLocation());
@@ -406,8 +411,9 @@ public class CombatTest extends FreeColTestCase {
         spanish.setStance(tupi, Player.Stance.WAR);
         tupi.setStance(spanish, Player.Stance.WAR);
 
+        Role soldierRole = spec().getRole("model.role.soldier");
         Unit soldier = new ServerUnit(game, tile1, spanish, colonistType,
-                                      muskets);
+                                      soldierRole);
         Unit brave = new ServerUnit(game, tile2, tupi, braveType);
 
         assertEquals(tile1, soldier.getLocation());
@@ -490,10 +496,13 @@ public class CombatTest extends FreeColTestCase {
         Tile tile1 = map.getTile(5, 8);
         Tile tile2 = map.getTile(4, 8);
 
+        Role dragoonRole = spec().getRole("model.role.dragoon");
         Unit colonial = new ServerUnit(game, tile1, french, colonialRegularType,
-                                       muskets, horses);
+                                       dragoonRole);
+
+        Role cavalryRole = spec().getRole("model.role.cavalry");
         Unit regular = new ServerUnit(game, tile2, refPlayer, kingsRegularType,
-                                      muskets, horses);
+                                      cavalryRole);
 
         // (regular + muskets + horses) * attack bonus
         float offence = (4 + 2 + 1) * 1.5f;
@@ -519,7 +528,7 @@ public class CombatTest extends FreeColTestCase {
                      CombatResult.SLAUGHTER_UNIT, result.get(1));
 
         regular = new ServerUnit(game, tile2, french, kingsRegularType,
-                                 muskets, horses);
+                                 cavalryRole);
 
         result = combatModel.generateAttackResult(random, regular, colonial);
         assertEquals(CombatResult.WIN, result.get(0));

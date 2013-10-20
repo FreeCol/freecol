@@ -37,6 +37,16 @@ public class RoleTest extends FreeColTestCase {
         = spec().getRole("model.role.pioneer");
     private static final Role missionary
         = spec().getRole("model.role.missionary");
+    private static final Role infantry
+        = spec().getRole("model.role.infantry");
+    private static final Role cavalry
+        = spec().getRole("model.role.cavalry");
+    private static final Role armedBrave
+        = spec().getRole("model.role.armedBrave");
+    private static final Role mountedBrave
+        = spec().getRole("model.role.mountedBrave");
+    private static final Role nativeDragoon
+        = spec().getRole("model.role.nativeDragoon");
 
 
     public void testComparators() {
@@ -92,41 +102,34 @@ public class RoleTest extends FreeColTestCase {
         UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
         Unit colonist = new ServerUnit(game, null, dutch, colonistType);
         assertEquals(none, colonist.getRole());
-        colonist = new ServerUnit(game, null, dutch, colonistType, muskets);
+        colonist = new ServerUnit(game, null, dutch, colonistType, soldier);
         assertEquals(soldier, colonist.getRole());
-        colonist = new ServerUnit(game, null, dutch, colonistType, horses);
+        colonist = new ServerUnit(game, null, dutch, colonistType, scout);
         assertEquals(scout, colonist.getRole());
-        colonist = new ServerUnit(game, null, dutch, colonistType, horses, muskets);
+        colonist = new ServerUnit(game, null, dutch, colonistType, dragoon);
         assertEquals(dragoon, colonist.getRole());
-        colonist = new ServerUnit(game, null, dutch, colonistType,
-                                  spec().getEquipmentType("model.equipment.tools"));
+        colonist = new ServerUnit(game, null, dutch, colonistType, pioneer);
         assertEquals(pioneer, colonist.getRole());
-        colonist = new ServerUnit(game, null, dutch, colonistType,
-                                  spec().getEquipmentType("model.equipment.missionary"));
+        colonist = new ServerUnit(game, null, dutch, colonistType, missionary);
         assertEquals(missionary, colonist.getRole());
 
         UnitType regularType = spec().getUnitType("model.unit.kingsRegular");
         Unit regular = new ServerUnit(game, null, dutchREF, regularType);
         assertEquals(none, regular.getRole());
-        regular = new ServerUnit(game, null, dutchREF, regularType, muskets);
-        assertEquals(spec().getRole("model.role.infantry"), regular.getRole());
-        regular = new ServerUnit(game, null, dutchREF, regularType, horses);
-        assertEquals(none, regular.getRole());
-        regular = new ServerUnit(game, null, dutchREF, regularType, horses, muskets);
-        assertEquals(spec().getRole("model.role.cavalry"), regular.getRole());
-
-        muskets = spec().getEquipmentType("model.equipment.indian.muskets");
-        horses = spec().getEquipmentType("model.equipment.indian.horses");
+        regular = new ServerUnit(game, null, dutchREF, regularType, infantry);
+        assertEquals(infantry, regular.getRole());
+        regular = new ServerUnit(game, null, dutchREF, regularType, cavalry);
+        assertEquals(cavalry, regular.getRole());
 
         UnitType braveType = spec().getUnitType("model.unit.brave");
         Unit brave = new ServerUnit(game, null, sioux, braveType);
         assertEquals(none, brave.getRole());
-        brave = new ServerUnit(game, null, sioux, braveType, muskets);
-        assertEquals(spec().getRole("model.role.armedBrave"), brave.getRole());
-        brave = new ServerUnit(game, null, sioux, braveType, horses);
-        assertEquals(spec().getRole("model.role.mountedBrave"), brave.getRole());
-        brave = new ServerUnit(game, null, sioux, braveType, muskets, horses);
-        assertEquals(spec().getRole("model.role.nativeDragoon"), brave.getRole());
+        brave = new ServerUnit(game, null, sioux, braveType, armedBrave);
+        assertEquals(armedBrave, brave.getRole());
+        brave = new ServerUnit(game, null, sioux, braveType, mountedBrave);
+        assertEquals(mountedBrave, brave.getRole());
+        brave = new ServerUnit(game, null, sioux, braveType, nativeDragoon);
+        assertEquals(nativeDragoon, brave.getRole());
     }
 
 }

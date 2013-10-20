@@ -895,11 +895,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
         Specification spec = game.getSpecification();
         for (AbstractUnit au : abstractUnits) {
             for (int i = 0; i < au.getNumber(); i++) {
-                EquipmentType[] equipment = spec.getRoleEquipment(au.getRoleId(), true)
-                    .toArray(new EquipmentType[0]);
                 units.add(new ServerUnit(game, location, this,
                                          spec.getUnitType(au.getId()),
-                                         equipment));//-vis(this)
+                                         spec.getRole(au.getRoleId())));//-vis(this)
             }
         }
         return units;

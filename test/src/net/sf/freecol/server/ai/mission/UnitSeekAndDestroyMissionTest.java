@@ -23,6 +23,7 @@ import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -48,13 +49,13 @@ public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
         ServerTestHelper.stopServerGame();
         super.tearDown();
     }
-	
-	
+
+
     public void testCapturedUnitsLoseMission() {
         Game game = ServerTestHelper.startServerGame(getTestMap());
         Map map = game.getMap();
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
-        
+
         // Create attacking player and unit
         ServerPlayer player1
             = (ServerPlayer)game.getPlayer("model.nation.dutch");
@@ -62,34 +63,35 @@ public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
         Unit attacker = new ServerUnit(game, tile1, player1, veteranType);
         AIUnit aiUnit = aiMain.getAIUnit(attacker);
         assertNotNull(aiUnit);
-        
+
         // Create defending player and unit
         ServerPlayer player2
             = (ServerPlayer)game.getPlayer("model.nation.french");
         Tile tile2 = map.getTile(2, 1);
+        Role soldierRole = spec().getRole("model.role.soldier");
         Unit defender = new ServerUnit(game, tile2, player2,
-                                       veteranType, muskets);
-        
+                                       veteranType, soldierRole);
+
         player1.setStance(player2, Stance.WAR);
         player2.setStance(player1, Stance.WAR);
-        
+
         UnitSeekAndDestroyMission mission
             = new UnitSeekAndDestroyMission(aiMain,aiUnit,defender);
         aiUnit.setMission(mission);
         assertTrue("Attacker should have a UnitSeekAndDestroyMission",
                    aiUnit.getMission() instanceof UnitSeekAndDestroyMission);
-                
+
         // simulate capture
         attacker.changeOwner(player2);
         assertEquals("Attacking unit should have been captured",
                      attacker.getOwner(), player2);
-        
+
         // re-check unit mission
         aiUnit = aiMain.getAIUnit(attacker);
         assertNull("Captured unit should lose previous mission",
                    aiUnit.getMission());
     }
-	
+
     public void testDoNotPursueUnitsInColonies(){
         Game game = ServerTestHelper.startServerGame(getTestMap());
         Map map = game.getMap();
@@ -101,21 +103,22 @@ public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
         Unit attacker = new ServerUnit(game, tile1, player1, veteranType);
         AIUnit aiUnit = aiMain.getAIUnit(attacker);
         assertNotNull(aiUnit);
-        
+
         // Create defending player and unit
         ServerPlayer player2 = (ServerPlayer) game.getPlayer("model.nation.french");
         Tile defenderTile = map.getTile(2, 1);
-        Unit defender = new ServerUnit(game, defenderTile, player2, veteranType, muskets);
-        
+        Role soldierRole = spec().getRole("model.role.soldier");
+        Unit defender = new ServerUnit(game, defenderTile, player2, veteranType, soldierRole);
+
         player1.setStance(player2, Stance.WAR);
         player2.setStance(player1, Stance.WAR);
-        
+
         UnitSeekAndDestroyMission mission = new UnitSeekAndDestroyMission(aiMain,aiUnit,defender);
         aiUnit.setMission(mission);
         boolean isSeekAndDestroyMission = aiUnit.getMission() instanceof UnitSeekAndDestroyMission;
         assertTrue("Attacker should have a UnitSeekAndDestroyMission", isSeekAndDestroyMission);
         assertTrue("UnitSeekAndDestroyMission should be valid", aiUnit.getMission().isValid());
-        
+
         // add colony to the defender tile, to simulate the unit entering it
         getStandardColony(1, defenderTile.getX(),defenderTile.getY());
         String errMsg = "UnitSeekAndDestroyMission should NOT be valid anymore, defender in colony";

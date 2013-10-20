@@ -410,8 +410,9 @@ public class ColonyTest extends FreeColTestCase {
 
         assertTrue("At war with the Iroquois.", colony.isUnderSiege());
 
+        Role soldierRole = spec().getRole("model.role.soldier");
         Unit soldier = new ServerUnit(game, colony.getTile(), colony.getOwner(),
-                                      freeColonistType, muskets);
+                                      freeColonistType, soldierRole);
         assertFalse("Equal number of friendly and enemy combat units.",
                     colony.isUnderSiege());
 
