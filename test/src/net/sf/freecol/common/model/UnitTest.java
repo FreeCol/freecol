@@ -361,36 +361,6 @@ public class UnitTest extends FreeColTestCase {
         assertTrue(colonialRegularType.isAvailableTo(european));
     }
 
-    public void testDefaultEquipment() {
-        assertEquals("Colonist defaults to no equipment",
-                     EquipmentType.NO_EQUIPMENT,
-                     colonistType.getDefaultEquipment());
-
-        assertEquals("Pioneer type defaults to having tools",
-                     spec().getRole("model.role.pioneer"),
-                     hardyPioneerType.getDefaultRole());
-        assertEquals("Pioneer type default equipment", 5,
-                     hardyPioneerType.getDefaultEquipment().length);
-
-        assertEquals("Soldier type defaults to having muskets",
-                     spec().getRole("model.role.soldier"),
-                     veteranSoldierType.getDefaultRole());
-        assertEquals("Soldier type default equipment", 1,
-                     veteranSoldierType.getDefaultEquipment().length);
-
-        assertEquals("Missionary type defaults to missionary dress",
-                     spec().getRole("model.role.missionary"),
-                     jesuitMissionaryType.getDefaultRole());
-        assertEquals("Missionary type default equipment", 1,
-                     jesuitMissionaryType.getDefaultEquipment().length);
-
-        assertEquals("Scout type defaults to having horses",
-                     spec().getRole("model.role.scout"),
-                     seasonedScoutType.getDefaultRole());
-        assertEquals("Scout type default equipment", 1,
-                     seasonedScoutType.getDefaultEquipment().length);
-    }
-
     public void testChangeEquipment() {
         Game game = getGame();
         game.setMap(getTestMap(true));

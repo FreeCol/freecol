@@ -354,24 +354,6 @@ public final class UnitType extends BuildableType
     }
 
     /**
-     * Gets the default equipment to equip a unit of this type with.
-     *
-     * @return The default equipment.
-     */
-    public EquipmentType[] getDefaultEquipment() {
-        List<EquipmentType> result = null;
-        if (hasAbility(Ability.CAN_BE_EQUIPPED) && defaultRole != null) {
-            result = getSpecification().getRoleEquipment(defaultRole.getId(), true);
-        }
-
-        if (result == null || result.isEmpty()) {
-            return EquipmentType.NO_EQUIPMENT;
-        } else {
-            return result.toArray(new EquipmentType[result.size()]);
-        }
-    }
-
-    /**
      * Returns a list of roles for which a unit of this type is an
      * expert.
      *
