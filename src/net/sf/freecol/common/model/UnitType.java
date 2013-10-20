@@ -98,8 +98,8 @@ public final class UnitType extends BuildableType
     /** The skill this UnitType teaches, mostly its own. */
     private UnitType skillTaught = null;
 
-    /** The default equipment for a unit of this type. */
-    private EquipmentType defaultEquipment = null;
+    /** The default role for a unit of this type. */
+    private Role defaultRole = null;
 
     /** The possible type changes for this unit type. */
     private List<UnitTypeChange> typeChanges = null;
@@ -344,12 +344,13 @@ public final class UnitType extends BuildableType
     }
 
     /**
-     * Gets the default equipment type this unit type is equipped with.
+     * Gets the default role of this unit type, mostly
+     * "model.role.default".
      *
-     * @return The default <code>EquipmentType</code>.
+     * @return The default <code>Role</code>.
      */
-    public EquipmentType getDefaultEquipmentType() {
-        return defaultEquipment;
+    public Role getDefaultRole() {
+        return defaultRole;
     }
 
     /**
@@ -358,15 +359,15 @@ public final class UnitType extends BuildableType
      * @return The default equipment.
      */
     public EquipmentType[] getDefaultEquipment() {
-        if (hasAbility(Ability.CAN_BE_EQUIPPED) && defaultEquipment != null) {
-            int count = defaultEquipment.getMaximumCount();
-            EquipmentType[] result = new EquipmentType[count];
-            for (int index = 0; index < count; index++) {
-                result[index] = defaultEquipment;
-            }
-            return result;
-        } else {
+        List<EquipmentType> result = null;
+        if (hasAbility(Ability.CAN_BE_EQUIPPED) && defaultRole != null) {
+            result = getSpecification().getRoleEquipment(defaultRole.getId(), true);
+        }
+
+        if (result == null || result.isEmpty()) {
             return EquipmentType.NO_EQUIPMENT;
+        } else {
+            return result.toArray(new EquipmentType[result.size()]);
         }
     }
 
@@ -665,7 +666,10 @@ public final class UnitType extends BuildableType
     // Serialization
 
     private static final String CONSUMES_TAG = "consumes";
+    // @compat 0.10.7
     private static final String DEFAULT_EQUIPMENT_TAG = "default-equipment";
+    // end @compat
+    private static final String DEFAULT_ROLE_TAG = "default-role";
 
     private static final String DEFENCE_TAG = "defence";
     private static final String EXPERT_PRODUCTION_TAG = "expert-production";
@@ -741,10 +745,10 @@ public final class UnitType extends BuildableType
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        if (defaultEquipment != null) {
-            xw.writeStartElement(DEFAULT_EQUIPMENT_TAG);
+        if (defaultRole != null) {
+            xw.writeStartElement(DEFAULT_ROLE_TAG);
 
-            xw.writeAttribute(ID_ATTRIBUTE_TAG, defaultEquipment);
+            xw.writeAttribute(ID_ATTRIBUTE_TAG, defaultRole);
 
             xw.writeEndElement();
         }
@@ -825,14 +829,14 @@ public final class UnitType extends BuildableType
         // Clear containers.
         if (xr.shouldClearContainers()) {
             consumption = null;
-            defaultEquipment = null;
+            defaultRole = null;
             typeChanges = null;
         }
 
         final Specification spec = getSpecification();
         UnitType parent = xr.getType(spec, EXTENDS_TAG, UnitType.class, this);
         if (parent != this) {
-            defaultEquipment = parent.defaultEquipment;
+            defaultRole = parent.defaultRole;
 
             if (parent.typeChanges != null) {
                 if (typeChanges == null) {
@@ -888,10 +892,27 @@ public final class UnitType extends BuildableType
                            xr.getAttribute(VALUE_TAG, UNDEFINED));
             xr.closeTag(CONSUMES_TAG);
 
+        // @compat 0.10.7
         } else if (DEFAULT_EQUIPMENT_TAG.equals(tag)) {
-            defaultEquipment = xr.getType(spec, ID_ATTRIBUTE_TAG,
-                                          EquipmentType.class, (EquipmentType)null);
+            String id = xr.getAttribute(ID_ATTRIBUTE_TAG, null);
+            String roleId = Role.DEFAULT;
+            if ("model.equipment.horses".equals(id)) {
+                roleId = "model.role.scout";
+            } else if ("model.equipment.muskets".equals(id)) {
+                roleId = "model.role.soldier";
+            } else if ("model.equipment.tools".equals(id)) {
+                roleId = "model.role.pioneer";
+            } else if ("model.equipment.missionary".equals(id)) {
+                roleId = "model.role.missionary";
+            }
+            defaultRole = spec.getRole(roleId);
             xr.closeTag(DEFAULT_EQUIPMENT_TAG);
+        // end @compat
+
+        } else if (DEFAULT_ROLE_TAG.equals(tag)) {
+            defaultRole = xr.getType(spec, ID_ATTRIBUTE_TAG,
+                                     Role.class, spec.getRole(Role.DEFAULT));
+            xr.closeTag(DEFAULT_ROLE_TAG);
 
         } else if (DOWNGRADE_TAG.equals(tag) || UPGRADE_TAG.equals(tag)) {
             if (xr.getAttribute(DELETE_TAG, false)) {

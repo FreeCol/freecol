@@ -56,6 +56,7 @@
      0.78: added production-weight, low-production-threshold,
            zero-production-factor to goods-type
      0.79: upgrade role from enum to role
+     0.80: replace unit type default equipment with default role
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:annotation>
@@ -388,7 +389,10 @@
         <xs:element ref="downgrade"/>
         <xs:element ref="required-ability"/>
         <xs:element ref="required-goods"/>
+        <!-- @compat 0.10.7 -->
         <xs:element ref="default-equipment"/>
+        <!-- end @compat -->
+        <xs:element ref="default-role"/>
         <xs:element ref="limit"/>
         <xs:element ref="consumes"/>
       </xs:choice>
@@ -1049,9 +1053,17 @@
     </xs:complexType>
   </xs:element>
 
+  <!-- @compat 0.10.7 -->
   <xs:element name="default-equipment">
     <xs:complexType>
       <xs:attribute name="id" use="required" type="EquipmentTypeId"/>
+    </xs:complexType>
+  </xs:element>
+  <!-- end @compat -->
+
+  <xs:element name="default-role">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="RoleId"/>
     </xs:complexType>
   </xs:element>
 

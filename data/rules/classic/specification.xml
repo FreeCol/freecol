@@ -20,7 +20,7 @@
     In case of incompatible changes, please update version number and
     XSD schema for validation.
 -->
-<freecol-specification id="classic" version="0.79">
+<freecol-specification id="classic" version="0.80">
 
   <!-- Modifiers that are not attached to other game object
        types. They may be modified, but MUST NOT be removed. -->
@@ -1155,17 +1155,17 @@ resources of 400, lost city rumours of 500
     </unit-type>
     <unit-type id="model.unit.seasonedScout" extends="colonist"
                skill="1" recruitProbability="1" scoreValue="4" >
-      <default-equipment id="model.equipment.horses"/>
+      <default-role id="model.role.scout"/>
       <ability id="model.ability.expertScout" value="true"/>
     </unit-type>
     <unit-type id="model.unit.hardyPioneer" extends="colonist" price="1200"
                skill="1" recruitProbability="1" scoreValue="4" >
-      <default-equipment id="model.equipment.tools"/>
+      <default-role id="model.role.pioneer"/>
       <ability id="model.ability.expertPioneer" value="true"/>
     </unit-type>
     <unit-type id="model.unit.veteranSoldier" extends="colonist" price="2000"
                skill="2" recruitProbability="1" scoreValue="5" >
-      <default-equipment id="model.equipment.muskets"/>
+      <default-role id="model.role.soldier"/>
       <ability id="model.ability.mercenaryUnit" value="true"/>
       <ability id="model.ability.expertSoldier" value="true"/>
       <ability id="model.ability.supportUnit" value="true"/>
@@ -1176,7 +1176,7 @@ resources of 400, lost city rumours of 500
     </unit-type>
     <unit-type id="model.unit.jesuitMissionary" extends="colonist" price="1400"
                skill="3" recruitProbability="1" scoreValue="5" >
-      <default-equipment id="model.equipment.missionary"/>
+      <default-role id="model.role.missionary"/>
       <downgrade unit="model.unit.freeColonist" capture="100" clearSkill="100"/>
       <ability id="model.ability.expertMissionary" value="true"/>
       <modifier id="model.modifier.conversionSkill" type="additive" value="5"/>

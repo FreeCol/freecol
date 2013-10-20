@@ -407,10 +407,10 @@ public class MessagesTest extends FreeColTestCase {
         // Veteran Soldiers
         unit = new ServerUnit(game, null, dutch, veteranSoldier);
         assertEquals(1, unit.getEquipment().getCount(muskets));
-        assertEquals("Veteran Soldier", Messages.message(unit.getFullLabel()));
+        assertEquals("Dutch Veteran Soldier", Messages.message(unit.getFullLabel()));
 
         unit.changeEquipment(muskets, -1);
-        assertEquals("Veteran Soldier (no muskets)",
+        assertEquals("Dutch Veteran Soldier (no muskets)",
                      Messages.message(unit.getFullLabel()));
 
         unit.changeEquipment(horses, 1);
@@ -434,7 +434,7 @@ public class MessagesTest extends FreeColTestCase {
         assertEquals("Hardy Pioneer", Messages.message(unit.getLabel()));
 
         unit.changeEquipment(tools, -5);
-        assertEquals("Hardy Pioneer (no tools)",
+        assertEquals("Dutch Hardy Pioneer (no tools)",
                      Messages.message(unit.getFullLabel()));
 
         // Jesuit Missionaries
@@ -443,7 +443,7 @@ public class MessagesTest extends FreeColTestCase {
         assertEquals("Jesuit Missionary", Messages.message(unit.getLabel()));
 
         unit.changeEquipment(bible, -1);
-        assertEquals("Jesuit Missionary (not commissioned)",
+        assertEquals("Dutch Jesuit Missionary (not commissioned)",
                      Messages.message(unit.getFullLabel()));
 
         // REF addition message

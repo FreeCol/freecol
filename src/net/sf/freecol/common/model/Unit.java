@@ -284,18 +284,7 @@ public class Unit extends GoodsLocation
      * @return The <code>StringTemplate</code> to describe the given unit.
      */
     public StringTemplate getFullLabel() {
-        StringTemplate result = getLabel();
-        String infoKey = (canCarryTreasure())
-            ? Integer.toString(getTreasureAmount())
-            : (getEquipment().isEmpty())
-            ? ((getType().getDefaultEquipmentType() == null)
-                ? null
-                : getType().getDefaultEquipmentType().getId() + ".none")
-            : null;
-        if (infoKey != null) {
-            result.addName(" (").add(infoKey).addName(")");
-        }
-        return result;
+        return Messages.getLabelTemplate(this);
     }
 
     /**
@@ -626,7 +615,7 @@ public class Unit extends GoodsLocation
      */
     public void setRole() {
         Role oldRole = role;
-        role = getSpecification().getRole("model.role.default");
+        role = getSpecification().getRole(Role.DEFAULT);
         boolean horses = false, muskets = false;
         for (EquipmentType type : equipment.keySet()) {
             if ("model.equipment.horses".equals(type.getId())

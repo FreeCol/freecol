@@ -37,6 +37,11 @@ import net.sf.freecol.common.util.Utils;
 public class Role extends BuildableType implements Comparable<Role> {
 
     /**
+     * The ID of the default role.
+     */
+    public static final String DEFAULT = "model.role.default";
+
+    /**
      * The Role to downgrade to after losing a battle. Defaults to
      * <code>null</code>. Note that some UnitTypes and Roles may be
      * disposed instead of downgraded when losing a battle.

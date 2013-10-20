@@ -367,26 +367,26 @@ public class UnitTest extends FreeColTestCase {
                      colonistType.getDefaultEquipment());
 
         assertEquals("Pioneer type defaults to having tools",
-                     toolsEquipmentType,
-                     hardyPioneerType.getDefaultEquipmentType());
+                     spec().getRole("model.role.pioneer"),
+                     hardyPioneerType.getDefaultRole());
         assertEquals("Pioneer type default equipment", 5,
                      hardyPioneerType.getDefaultEquipment().length);
 
         assertEquals("Soldier type defaults to having muskets",
-                     musketsEquipmentType,
-                     veteranSoldierType.getDefaultEquipmentType());
+                     spec().getRole("model.role.soldier"),
+                     veteranSoldierType.getDefaultRole());
         assertEquals("Soldier type default equipment", 1,
                      veteranSoldierType.getDefaultEquipment().length);
 
         assertEquals("Missionary type defaults to missionary dress",
-                     missionaryEquipmentType,
-                     jesuitMissionaryType.getDefaultEquipmentType());
+                     spec().getRole("model.role.missionary"),
+                     jesuitMissionaryType.getDefaultRole());
         assertEquals("Missionary type default equipment", 1,
                      jesuitMissionaryType.getDefaultEquipment().length);
 
         assertEquals("Scout type defaults to having horses",
-                     horsesEquipmentType,
-                     seasonedScoutType.getDefaultEquipmentType());
+                     spec().getRole("model.role.scout"),
+                     seasonedScoutType.getDefaultRole());
         assertEquals("Scout type default equipment", 1,
                      seasonedScoutType.getDefaultEquipment().length);
     }

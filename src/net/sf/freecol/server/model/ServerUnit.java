@@ -484,9 +484,10 @@ public class ServerUnit extends Unit implements ServerModelObject {
             ServerPlayer owner = (ServerPlayer) getOwner();
             StringTemplate locName
                 = getLocation().getLocationNameFor(owner);
-            String messageId = (getType().getDefaultEquipmentType() == type)
-                ? getType() + ".noMoreTools"
-                : "model.unit.noMoreTools";
+            String messageId = getType() + ".noMoreTools";
+            if (!Messages.containsKey(messageId)) {
+                messageId = "model.unit.noMoreTools";
+            }
             cs.addMessage(See.only(owner),
                 new ModelMessage(ModelMessage.MessageType.WARNING,
                     messageId, this)
