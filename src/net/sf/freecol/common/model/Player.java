@@ -2789,39 +2789,45 @@ public class Player extends FreeColGameObject implements Nameable {
                 cST[t.getX()][t.getY()] = true;
                 t.seeTile(this);
             }
-            // All the settlements.
-            for (Settlement settlement : getSettlements()) {
-                for (Tile t : settlement.getTile().getSurroundingTiles(0,
-                        settlement.getLineOfSight())) {
-                    cST[t.getX()][t.getY()] = true;
-                    t.seeTile(this);
-                }
+        }
+        // All the settlements.
+        for (Settlement settlement : getSettlements()) {
+            for (Tile t : settlement.getTile().getSurroundingTiles(0,
+                    settlement.getLineOfSight())) {
+                cST[t.getX()][t.getY()] = true;
+                t.seeTile(this);
             }
-            // All missions if using enhanced missionaries.
-            if (isEuropean()
+        }
+        // All missions if using enhanced missionaries.
+        if (isEuropean()
                 && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
-                for (Player other : getGame().getPlayers()) {
-                    if (this.equals(other) || !other.isIndian()) continue;
-                    for (IndianSettlement is : other.getIndianSettlements()) {
-                        if (!is.hasMissionary(this)) continue;
-                        for (Tile t : is.getTile().getSurroundingTiles(0,
-                                is.getLineOfSight())) {
-                            cST[t.getX()][t.getY()] = true;
-                            t.seeTile(this);
-                        }
+            for (Player other : getGame().getPlayers()) {
+                if (this.equals(other) || !other.isIndian()) {
+                    continue;
+                }
+                for (IndianSettlement is : other.getIndianSettlements()) {
+                    if (!is.hasMissionary(this)) {
+                        continue;
+                    }
+                    for (Tile t : is.getTile().getSurroundingTiles(0,
+                            is.getLineOfSight())) {
+                        cST[t.getX()][t.getY()] = true;
+                        t.seeTile(this);
                     }
                 }
             }
-            // All other European settlements if can see all colonies.
-            if (isEuropean() && hasAbility(Ability.SEE_ALL_COLONIES)) {
-                for (Player other : getGame().getPlayers()) {
-                    if (this.equals(other) || !other.isEuropean()) continue;
-                    for (Colony colony : other.getColonies()) {
-                        for (Tile t : colony.getTile().getSurroundingTiles(0,
-                                colony.getLineOfSight())) {
-                            cST[t.getX()][t.getY()] = true;
-                            t.seeTile(this);
-                        }
+        }
+        // All other European settlements if can see all colonies.
+        if (isEuropean() && hasAbility(Ability.SEE_ALL_COLONIES)) {
+            for (Player other : getGame().getPlayers()) {
+                if (this.equals(other) || !other.isEuropean()) {
+                    continue;
+                }
+                for (Colony colony : other.getColonies()) {
+                    for (Tile t : colony.getTile().getSurroundingTiles(0,
+                            colony.getLineOfSight())) {
+                        cST[t.getX()][t.getY()] = true;
+                        t.seeTile(this);
                     }
                 }
             }
