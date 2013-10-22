@@ -9,3 +9,6 @@ FreeCol.jar
 src/MANIFEST.MF
 build/
 doc/specification_*.html
+dist/
+a/
+b/
