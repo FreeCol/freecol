@@ -146,45 +146,6 @@ public class AbstractUnit extends FreeColObject {
      * @param spec A <code>Specification<code> to query.
      * @return An array of equipment types.
      */
-    public EquipmentType[] getXEquipment(Specification spec) {
-        List<EquipmentType> equipment = new ArrayList<EquipmentType>();
-        EquipmentType[] types = {
-            ("model.role.armedBrave".equals(roleId))
-            ? spec.getEquipmentType("model.equipment.indian.muskets")
-            : ("model.role.mountedBrave".equals(roleId))
-            ? spec.getEquipmentType("model.equipment.indian.horses")
-            : ("model.role.nativeDragoon".equals(roleId))
-            ? spec.getEquipmentType("model.equipment.indian.muskets")
-            : ("model.role.pioneer".equals(roleId))
-            ? spec.getEquipmentType("model.equipment.tools")
-            : ("model.role.missionary".equals(roleId))
-            ? spec.getEquipmentType("model.equipment.missionary")
-            : ("model.role.scout".equals(roleId))
-            ? spec.getEquipmentType("model.equipment.horses")
-            : ("model.role.soldier".equals(roleId)
-                || "model.role.infantry".equals(roleId))
-            ? spec.getEquipmentType("model.equipment.muskets")
-            : ("model.role.dragoon".equals(roleId)
-                || "model.role.cavalry".equals(roleId))
-            ? spec.getEquipmentType("model.equipment.muskets")
-            : null,
-            ("model.role.dragoon".equals(roleId)
-                || "model.role.cavalry".equals(roleId))
-            ? spec.getEquipmentType("model.equipment.horses")
-            : ("model.role.nativeDragoon".equals(roleId))
-            ? spec.getEquipmentType("model.equipment.indian.horses")
-            : null
-        };
-        for (EquipmentType et : types) {
-            if (et == null) continue;
-            for (int count = 0; count < et.getMaximumCount(); count++) {
-                equipment.add(et);
-            }
-        }
-        return equipment.toArray(new EquipmentType[equipment.size()]);
-    }
-
-
     // Serialization
 
     private static final String ROLE_TAG = "role";
