@@ -45,7 +45,6 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
 import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.model.AbstractGoods;
-import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.StringTemplate;

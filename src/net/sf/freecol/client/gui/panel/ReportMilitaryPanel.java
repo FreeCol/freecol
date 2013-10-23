@@ -42,32 +42,6 @@ import net.sf.freecol.common.model.UnitType;
  */
 public final class ReportMilitaryPanel extends ReportUnitPanel {
 
-    /*
-     * In the future, we should consider all possible combinations of
-     * military equipment, rather than fixed roles.
-
-     public static final Comparator<EquipmentType> equipmentTypeComparator =
-     new Comparator<EquipmentType>() {
-     public int compare(EquipmentType type1, EquipmentType type2) {
-     return type2.getId().compareTo(type1.getId());
-     }
-     };
-
-     public class EquippedUnitType {
-     private final UnitType unitType;
-     private final List<EquipmentType> equipment;
-
-     public EquippedUnitType(UnitType unitType, List<EquipmentType> equipment) {
-     this.unitType = unitType;
-     this.equipment = new ArrayList<EquipmentType>(equipment);
-     Collections.sort(this.equipment, equipmentTypeComparator);
-     }
-     }
-
-     private Map<EquippedUnitType, Integer> unitMap;
-    */
-
-
     /**
      * The constructor that will add the items to this panel.
      *

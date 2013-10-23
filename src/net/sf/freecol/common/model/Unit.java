@@ -1791,12 +1791,18 @@ public class Unit extends GoodsLocation
      *     goods.
      */
     public void clearEquipment(Settlement settlement) {
-        TypeCountMap<EquipmentType> eq = getEquipment();
-        for (EquipmentType et : eq.keySet()) {
-            settlement.addEquipmentGoods(et, eq.getCount(et));
+        for (Entry<EquipmentType, Integer> entry : getEquipment().getValues().entrySet()) {
+            addOrRemoveEquipment(entry.getKey(), entry.getValue(), settlement);
         }
         clearEquipment();
-        setRole(getSpecification().getRole("model.role.default"));
+        setRole(getSpecification().getRole(Role.DEFAULT));
+    }
+
+    private void addOrRemoveEquipment(EquipmentType et, int count, Settlement settlement) {
+        for (AbstractGoods goods : et.getRequiredGoods()) {
+            AbstractGoods ag = new AbstractGoods(goods.getType(), goods.getAmount() * count);
+            settlement.addGoods(ag);
+        }
     }
 
     /**
@@ -1829,7 +1835,7 @@ public class Unit extends GoodsLocation
             int count = entry.getValue().intValue();
             if (count < 0) {
                 changeEquipment(et, count); // can not fail
-                settlement.addEquipmentGoods(et, -count);
+                addOrRemoveEquipment(et, -count, settlement);
             }
         }
         for (Entry<EquipmentType, Integer> entry
@@ -1838,7 +1844,7 @@ public class Unit extends GoodsLocation
             int count = entry.getValue().intValue();
             if (count > 0) {
                 changeEquipment(et, count); // should not fail!
-                settlement.addEquipmentGoods(et, -count);
+                addOrRemoveEquipment(et, -count, settlement);
             }
         }
         setRole(role);
