@@ -428,14 +428,12 @@ public class PioneeringMission extends Mission {
      *     none found.
      */
     private static String invalidColonyReason(AIUnit aiUnit, Colony colony) {
-        String reason = invalidTargetReason(colony,
-                                            aiUnit.getUnit().getOwner());
+        String reason = invalidTargetReason(colony, aiUnit.getUnit().getOwner());
+        Role role = aiUnit.getUnit().getSpecification().getRole("model.role.pioneer");
         return (reason != null)
             ? reason
             : (!hasTools(aiUnit)
-                && !colony.canProvideEquipment(aiUnit.getUnit()
-                    .getRoleEquipment(aiUnit.getUnit().getSpecification()
-                        .getRole("model.role.pioneer"))))
+               && !colony.canProvideEquipment(role.getRequiredGoods()))
             ? "colony-can-not-provide-equipment"
             : null;
     }

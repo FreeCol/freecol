@@ -33,11 +33,11 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Ability;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTradeItem;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.DiplomaticTrade;
-import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.GoldTradeItem;
@@ -167,7 +167,7 @@ public class NativeAIPlayer extends AIPlayer {
     private void initializeMissions() {
         AIMain aiMain = getAIMain();
         Player player = getPlayer();
-        
+
         // Give defensive missions up to the minimum expected defence,
         // leave the rest with the default wander-hostile mission.
         List<Unit> units = new ArrayList<Unit>();
@@ -183,7 +183,7 @@ public class NativeAIPlayer extends AIPlayer {
             }
         }
     }
-    
+
     /**
      * Takes the necessary actions to secure the settlements.
      * This is done by making new military units or to give existing
@@ -363,7 +363,7 @@ public class NativeAIPlayer extends AIPlayer {
         final Comparator<Unit> isComparator
             = new Comparator<Unit>() {
                 public int compare(Unit u1, Unit u2) {
-                    Tile t1 = u1.getTile(); 
+                    Tile t1 = u1.getTile();
                     int s1 = t1.getDistanceTo(isTile);
                     Tile t2 = u2.getTile();
                     int s2 = t2.getDistanceTo(isTile);
@@ -439,10 +439,10 @@ public class NativeAIPlayer extends AIPlayer {
         final int turnNumber = getGame().getTurn().getNumber();
         List<AIUnit> aiUnits = getAIUnits();
         final int allUnits = aiUnits.size();
-        final List<EquipmentType> scoutEq = aiUnits.get(0).getUnit()
-            .getRoleEquipment(spec.getRole("model.role.mountedBrave"));
-        final List<EquipmentType> soldierEq = aiUnits.get(0).getUnit()
-            .getRoleEquipment(spec.getRole("model.role.armedBrave"));
+        final List<AbstractGoods> scoutEq = spec.getRole("model.role.mountedBrave")
+            .getRequiredGoods();
+        final List<AbstractGoods> soldierEq = spec.getRole("model.role.armedBrave")
+            .getRequiredGoods();
 
         StringBuffer sb = new StringBuffer(256);
         Iterator<AIUnit> ai = aiUnits.iterator();
@@ -488,7 +488,7 @@ public class NativeAIPlayer extends AIPlayer {
                         || (!unit.isArmed() && is.canProvideEquipment(soldierEq)))
                     && (m = new DefendSettlementMission(aiMain, aiUnit,
                             is)) != null)
-                
+
                 // Go out looking for trouble
                 || (UnitWanderHostileMission.invalidReason(aiUnit) == null
                     && (m = new UnitWanderHostileMission(aiMain, aiUnit))
@@ -592,7 +592,7 @@ public class NativeAIPlayer extends AIPlayer {
                 nearbyColonies.add(new RandomChoice<Colony>(c,
                         1000000 / alarm / path.getTotalTurns()));
             }
-        
+
             // If there are any suitable colonies, pick a random one
             // to send a gift to.
             if (nearbyColonies.isEmpty()) {

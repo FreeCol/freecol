@@ -372,12 +372,12 @@ public abstract class Settlement extends GoodsLocation
      * Unlike canBuildEquipment, this takes goods "reserved"
      * for other purposes into account (e.g. breeding).
      *
-     * @param equipmentType an <code>EquipmentType</code> value
+     * @param goods A list of <code>AbstractGoods</code>
      * @return True if the settlement can provide the equipment.
      * @see Settlement#canBuildEquipment(EquipmentType equipmentType)
      */
-    public boolean canProvideEquipment(EquipmentType equipmentType) {
-        for (AbstractGoods ag : equipmentType.getRequiredGoods()) {
+    public boolean canProvideEquipment(List<AbstractGoods> goods) {
+        for (AbstractGoods ag : goods) {
             int available = getGoodsCount(ag.getType());
 
             int breedingNumber = ag.getType().getBreedingNumber();
@@ -397,12 +397,14 @@ public abstract class Settlement extends GoodsLocation
      * @param equipment A list of <code>EquipmentType</code>s to build.
      * @return True if the settlement can provide all the equipment.
      */
+    /*
     public boolean canProvideEquipment(List<EquipmentType> equipment) {
         for (EquipmentType e : equipment) {
             if (!canProvideEquipment(e)) return false;
         }
         return true;
     }
+    */
 
     /**
      * Gets the storage capacity of this settlement.

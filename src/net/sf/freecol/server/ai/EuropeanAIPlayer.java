@@ -34,10 +34,10 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Ability;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTradeItem;
 import net.sf.freecol.common.model.DiplomaticTrade;
-import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.FoundingFather;
@@ -173,13 +173,12 @@ public class EuropeanAIPlayer extends AIPlayer {
                 } else if (unit.hasAbility(Ability.EXPERT_SCOUT)) {
                     return 600;
                 }
-                Specification spec = unit.getSpecification();
-                List<EquipmentType> scoutEquipment
-                    = unit.getRoleEquipment(spec.getRole("model.role.scout"));
+                List<AbstractGoods> roleEquipment = unit.getSpecification()
+                .getRole("model.role.scout").getRequiredGoods();
                 int base = (unit.isInEurope()) ? 500
                     : (unit.getLocation().getColony() != null
                         && unit.getLocation().getColony()
-                        .canProvideEquipment(scoutEquipment)) ? 400
+                        .canProvideEquipment(roleEquipment)) ? 400
                     : -1000;
                 if (!unit.getEquipment().isEmpty()) {
                     base -= 400;
@@ -217,13 +216,12 @@ public class EuropeanAIPlayer extends AIPlayer {
                 } else if (unit.hasAbility(Ability.EXPERT_PIONEER)) {
                     return 600;
                 }
-                Specification spec = unit.getSpecification();
-                List<EquipmentType> pioneerEquipment
-                    = unit.getRoleEquipment(spec.getRole("model.role.pioneer"));
+                List<AbstractGoods> roleEquipment = unit.getSpecification()
+                .getRole("model.role.pioneer").getRequiredGoods();
                 int base = (unit.isInEurope()) ? 500
                     : (unit.getLocation().getColony() != null
                         && unit.getLocation().getColony()
-                        .canProvideEquipment(pioneerEquipment)) ? 400
+                        .canProvideEquipment(roleEquipment)) ? 400
                     : -1000;
                 if (!unit.getEquipment().isEmpty()) {
                     base -= 400;

@@ -2589,11 +2589,11 @@ public class Colony extends Settlement implements Nameable {
      * {@inheritDoc}
      */
     @Override
-    public boolean canProvideEquipment(EquipmentType equipmentType) {
+    public boolean canProvideEquipment(List<AbstractGoods> requiredGoods) {
         // Unlike canBuildEquipment, this takes goods "reserved"
         // for other purposes into account.
         BuildableType buildable = getCurrentlyBuilding();
-        for (AbstractGoods goods : equipmentType.getRequiredGoods()) {
+        for (AbstractGoods goods : requiredGoods) {
             int available = getGoodsCount(goods.getType());
 
             int breedingNumber = goods.getType().getBreedingNumber();
