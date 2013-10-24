@@ -54,6 +54,7 @@ public class AllTests {
         suite.addTestSuite(PlayerTest.class);
         suite.addTestSuite(ProductionTypeTest.class);
         suite.addTestSuite(RandomRangeTest.class);
+        suite.addTestSuite(RoleTest.class);
         suite.addTestSuite(SchoolTest.class);
         suite.addTestSuite(ScopeTest.class);
         suite.addTestSuite(SerializationTest.class);

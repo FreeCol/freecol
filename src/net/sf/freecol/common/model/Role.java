@@ -258,11 +258,26 @@ public class Role extends BuildableType implements Comparable<Role> {
 
 
     public List<AbstractGoods> getDowngradeGoods() {
+        return getGoodsDifference(this, downgrade);
+    }
+
+    /**
+     * Returns a list of goods required to change from the first role
+     * to the second. The first role may be <code>null</code>, the
+     * second must not.
+     *
+     * @param from The current role.
+     * @param to The role to assume.
+     * @return The goods required to make the change.
+     */
+    public static List<AbstractGoods> getGoodsDifference(Role from, Role to) {
         List<AbstractGoods> result = new ArrayList<AbstractGoods>();
-        if (downgrade != null) {
-            for (AbstractGoods ag : getRequiredGoods()) {
+        if (from == null || from.getRequiredGoods().isEmpty()) {
+            result.addAll(to.getRequiredGoods());
+        } else if (to != from) {
+            for (AbstractGoods ag : to.getRequiredGoods()) {
                 int amount = ag.getAmount()
-                    - downgrade.getRequiredAmountOf(ag.getType());
+                    - from.getRequiredAmountOf(ag.getType());
                 if (amount > 0) {
                     result.add(new AbstractGoods(ag.getType(), amount));
                 }
