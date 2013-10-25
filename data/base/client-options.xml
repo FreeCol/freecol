@@ -65,6 +65,10 @@
       <booleanOption id="model.option.smoothRendering" defaultValue="false"/>
       <!-- Option to disable end turn grey background. -->
       <booleanOption id="model.option.disableGrayLayer" defaultValue="false"/>
+	  <!-- If selected: Draws the fog of war on the minimap. -->
+	  <booleanOption id="model.option.miniMapToggleFogOfWar" defaultValue="true"/>
+	  <!-- If selected: Draws the borders on the minimap. -->
+	  <booleanOption id="model.option.miniMapToggleBorders" defaultValue="true"/>
       <!-- The color to fill in around the actual map on the minimap. -->
       <selectOption id="model.option.color.background" defaultValue="0" localizedLabels="true">
         <selectValue label="clientOptions.minimap.color.background.black" value="0"/>

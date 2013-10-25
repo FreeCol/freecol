@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JLayeredPane;
+import net.sf.freecol.client.ClientOptions;
+import static net.sf.freecol.client.ClientOptions.MINIMAP_TOGGLE_FOG_OF_WAR;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
@@ -32,6 +34,8 @@ import net.sf.freecol.client.gui.action.BuildColonyAction;
 import net.sf.freecol.client.gui.action.DisbandUnitAction;
 import net.sf.freecol.client.gui.action.FortifyAction;
 import net.sf.freecol.client.gui.action.FreeColAction;
+import net.sf.freecol.client.gui.action.MiniMapToggleViewAction;
+import net.sf.freecol.client.gui.action.MiniMapToggleFogOfWarAction;
 import net.sf.freecol.client.gui.action.MiniMapZoomInAction;
 import net.sf.freecol.client.gui.action.MiniMapZoomOutAction;
 import net.sf.freecol.client.gui.action.SentryAction;
@@ -64,6 +68,8 @@ public abstract class MapControls {
     protected final FreeColClient freeColClient;
     protected final InfoPanel infoPanel;
     protected MiniMap miniMap;
+    protected final UnitButton miniMapToggleBorders;
+    protected final UnitButton miniMapToggleFogOfWarButton;
     protected final UnitButton miniMapZoomOutButton;
     protected final UnitButton miniMapZoomInButton;
     protected final List<UnitButton> unitButtons;
@@ -103,10 +109,13 @@ public abstract class MapControls {
             unitButtons.add(new UnitButton(am, BuildColonyAction.id));
             unitButtons.add(new UnitButton(am, DisbandUnitAction.id));
         }
-
+        miniMapToggleBorders = new UnitButton(am, MiniMapToggleViewAction.id);
+        miniMapToggleFogOfWarButton = new UnitButton(am, MiniMapToggleFogOfWarAction.id);
         miniMapZoomOutButton = new UnitButton(am, MiniMapZoomOutAction.id);
         miniMapZoomInButton = new UnitButton(am, MiniMapZoomInAction.id);
 
+        miniMapToggleBorders.setFocusable(false);
+        miniMapToggleFogOfWarButton.setFocusable(false);
         miniMapZoomOutButton.setFocusable(false);
         miniMapZoomInButton.setFocusable(false);
 
@@ -185,6 +194,24 @@ public abstract class MapControls {
 
     public void zoomOut() {
         miniMap.zoomOut();
+        repaint();
+    }
+    
+    public void toggleView() {
+        if (freeColClient.getClientOptions().getBoolean(ClientOptions.MINIMAP_TOGGLE_BORDERS)) {
+            miniMap.setToogleBordersOption(false);
+        } else {
+            miniMap.setToogleBordersOption(true);
+        }
+        repaint();
+    }
+    
+    public void toogleFogOfWar() {
+        if (freeColClient.getClientOptions().getBoolean(ClientOptions.MINIMAP_TOGGLE_FOG_OF_WAR)) {
+            miniMap.setToogleFogOfWarOption(false);
+        } else {
+            miniMap.setToogleFogOfWarOption(true);
+        }
         repaint();
     }
 

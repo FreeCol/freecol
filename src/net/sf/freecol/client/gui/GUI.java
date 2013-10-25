@@ -999,6 +999,16 @@ public class GUI {
     public boolean canZoomOutMapControls() {
         return mapControls != null && mapControls.canZoomOutMapControls();
     }
+    
+    public void miniMapToggleViewControls() {
+        if (mapControls == null) return;
+        mapControls.toggleView();
+    }
+    
+    public void miniMapToggleFogOfWarControls() {
+        if (mapControls == null) return;
+        mapControls.toogleFogOfWar();
+    }
 
 
     // Trivial delegations to Canvas

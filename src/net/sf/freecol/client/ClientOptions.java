@@ -232,6 +232,18 @@ public class ClientOptions extends OptionGroup {
         = "model.option.disableGrayLayer";
 
     /**
+     * If selected: Draws the borders on the minimap.
+     */
+    public static final String MINIMAP_TOGGLE_BORDERS
+        = "model.option.miniMapToggleBorders";
+    
+    /**
+     * If selected: Draws the fog of war on the minimap.
+     */
+    public static final String MINIMAP_TOGGLE_FOG_OF_WAR
+        = "model.option.miniMapToggleFogOfWar";
+    
+    /**
      * The color to fill in around the actual map on the
      * minimap.  Typically only visible when the minimap is at full
      * zoom-out, but at the default 'black' you can't differentiate
@@ -846,6 +858,12 @@ public class ClientOptions extends OptionGroup {
         addBooleanOption(REMEMBER_PANEL_SIZES,
             "clientOptions.gui", true);
         // end @compat 0.10.7
+        // @compact 0.10.8
+        addBooleanOption(MINIMAP_TOGGLE_BORDERS,
+            "clientOptions.gui", true);    
+        addBooleanOption(MINIMAP_TOGGLE_FOG_OF_WAR,
+            "clientOptions.gui", true);
+        // end @compact 0.10.8
     }
 
     private void addBooleanOption(String id, String gr, boolean val) {

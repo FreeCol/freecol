@@ -34,10 +34,18 @@ import javax.swing.JPanel;
 import javax.swing.event.MouseInputListener;
 
 import net.sf.freecol.client.ClientOptions;
+import static net.sf.freecol.client.ClientOptions.MINIMAP_TOGGLE_BORDERS;
+import static net.sf.freecol.client.ClientOptions.MINIMAP_TOGGLE_FOG_OF_WAR;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.common.model.Map;
+import static net.sf.freecol.common.model.Map.Direction.N;
+import static net.sf.freecol.common.model.Map.Direction.E;
+import static net.sf.freecol.common.model.Map.Direction.S;
+import static net.sf.freecol.common.model.Map.Direction.W;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
@@ -158,7 +166,14 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         freeColClient.getClientOptions().setInteger(ClientOptions.DEFAULT_MINIMAP_ZOOM, zoom);
     }
 
-
+    public void setToogleBordersOption(boolean toggle) {
+        freeColClient.getClientOptions().setBoolean(MINIMAP_TOGGLE_BORDERS, toggle);
+    }
+    
+    public void setToogleFogOfWarOption(boolean toggle) {
+        freeColClient.getClientOptions().setBoolean(MINIMAP_TOGGLE_FOG_OF_WAR, toggle);
+    }
+    
     /**
      * Paints this component.
      * @param graphics The <code>Graphics</code> context in which
@@ -175,11 +190,15 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         paintMap(graphics);
      }
 
-    private Color getMinimapColor(TileType type) {
-        return ResourceManager.getColor(type.getId() + ".color");
+    private Color getMinimapEconomicColor(TileType type) {
+        return ResourceManager.getColor(type.getId() + ".economicColor");
     }
 
-
+    private Color getMinimapPoliticsColor(TileType type) {
+        return ResourceManager.getColor(type.getId() + ".politicsColor");
+    }
+    
+    
     /**
      * Paints a representation of the mapboard onto this component.
      * @param graphics The <code>Graphics</code> context in which
@@ -265,12 +284,18 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         tilePath.lineTo(halfWidth, tileHeight);
         tilePath.lineTo(0, halfHeight);
         tilePath.closePath();
+        
         GeneralPath settlementPath = new GeneralPath(tilePath);
         settlementPath.transform(AffineTransform.getScaleInstance(0.7, 0.7));
         settlementPath.transform(AffineTransform.getTranslateInstance(0.15 * tileWidth, 0.15 * tileHeight));
+        
         GeneralPath unitPath = new GeneralPath(tilePath);
         unitPath.transform(AffineTransform.getScaleInstance(0.5, 0.5));
         unitPath.transform(AffineTransform.getTranslateInstance(0.25 * tileWidth, 0.25 * tileHeight));
+        
+        GeneralPath paintFull = new GeneralPath(tilePath);
+        paintFull.transform(AffineTransform.getScaleInstance(1, 1));;
+        
         g.setStroke(new BasicStroke(1f));
 
         AffineTransform baseTransform = g.getTransform();
@@ -291,8 +316,21 @@ public final class MiniMap extends JPanel implements MouseInputListener {
             for (int column = firstColumn; column <= lastColumn; column++) {
                 Tile tile = map.getTile(column, row);
                 if (tile.isExplored()) {
-                    g.setColor(getMinimapColor(tile.getType()));
-                    g.fill(tilePath);
+                    if (freeColClient.getClientOptions().getBoolean(ClientOptions.MINIMAP_TOGGLE_BORDERS)) {
+                        g.setColor(getMinimapPoliticsColor(tile.getType()));
+                        g.fill(tilePath);
+                        
+                        if (tile.getOwner() != null) {
+                            Color nationOwner = tile.getOwner().getNationColor();
+                            Color colorTransparent =
+                                    new Color(nationOwner.getRed(), nationOwner.getGreen(), nationOwner.getBlue(), 100);
+                            g.setColor(colorTransparent);
+                            g.fill(paintFull);
+                        }
+                    } else {
+                        g.setColor(getMinimapEconomicColor(tile.getType()));
+                        g.fill(tilePath);
+                    }
                     if (!tile.hasSettlement()) {
                         Unit unit = tile.getFirstUnit();
                         if (unit != null) {
@@ -307,7 +345,14 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                         g.setColor(tile.getSettlement().getOwner().getNationColor());
                         g.fill(settlementPath);
                     }
-                }
+                    if (!freeColClient.getMyPlayer().canSee(tile)
+                            && freeColClient.getClientOptions().getBoolean(ClientOptions.MINIMAP_TOGGLE_FOG_OF_WAR)) {
+                        Color blackTransparent = new Color(0, 0, 0, 100);
+                        g.setColor(blackTransparent);
+                        g.fill(paintFull);
+                    }
+
+                 }
                 g.translate(tileWidth, 0);
             }
             g.setTransform(rowTransform);

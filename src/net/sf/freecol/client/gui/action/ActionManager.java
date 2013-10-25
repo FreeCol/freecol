@@ -100,6 +100,10 @@ public class ActionManager extends OptionGroup {
         add(new LoadAction(freeColClient));
         add(new MapControlsAction(freeColClient));
         add(new MapEditorAction(freeColClient));
+        add(new MiniMapToggleViewAction(freeColClient));
+        add(new MiniMapToggleViewAction(freeColClient, true));
+        add(new MiniMapToggleFogOfWarAction(freeColClient));
+        add(new MiniMapToggleFogOfWarAction(freeColClient, true));
         add(new MiniMapZoomInAction(freeColClient));
         add(new MiniMapZoomInAction(freeColClient, true));
         add(new MiniMapZoomOutAction(freeColClient));

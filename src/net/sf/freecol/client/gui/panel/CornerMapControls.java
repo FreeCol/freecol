@@ -113,6 +113,8 @@ public final class CornerMapControls extends MapControls {
         miniMapPanel.setLayout(null);
         miniMap.setSize(MAP_WIDTH, MAP_HEIGHT);
         // Add buttons:
+        miniMapPanel.add(miniMapToggleBorders);
+        miniMapPanel.add(miniMapToggleFogOfWarButton);
         miniMapPanel.add(miniMapZoomInButton);
         miniMapPanel.add(miniMapZoomOutButton);
         miniMapPanel.add(miniMap);
@@ -125,6 +127,8 @@ public final class CornerMapControls extends MapControls {
             // TODO-LATER: The values below should be specified by a
             // skin-configuration-file.
             miniMap.setLocation(38, 75);
+            miniMapToggleBorders.setLocation(4,114);
+            miniMapToggleFogOfWarButton.setLocation(4, 144);
             miniMapZoomInButton.setLocation(4, 174);
             miniMapZoomOutButton.setLocation(264, 174);
         } else {
