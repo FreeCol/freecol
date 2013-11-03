@@ -151,7 +151,8 @@ public final class DifficultyDialog extends OptionsDialog
                     File file = getGUI().showLoadDialog(FreeColDirectories
                         .getOptionsDirectory(), filters);
                     if (file != null && load(file)) {
-                        revalidate();
+			invalidate();
+			validate();
                         repaint();
                     }
                 }

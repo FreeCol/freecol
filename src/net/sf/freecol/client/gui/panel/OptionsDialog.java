@@ -215,7 +215,8 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
         this.optionPanel.removeAll();
         this.ui = new OptionGroupUI(getGUI(), this.group, this.editable);
         this.optionPanel.add(this.ui);
-        revalidate();
+	invalidate();
+	validate();
         repaint();
     }
 
