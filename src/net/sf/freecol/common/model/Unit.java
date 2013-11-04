@@ -1594,7 +1594,7 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * After winning a battle, can this unit the loser equipment?
+     * After winning a battle, can this unit capture the loser's equipment?
      *
      * @param equip The <code>EquipmentType</code> to consider.
      * @param loser The loser <code>Unit</code>.
