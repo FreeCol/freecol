@@ -238,5 +238,32 @@
       <ability id="model.ability.ambushTerrain" value="true"/>
     </tile-type>
   </tile-types>
-
+  <unit-types>
+    <unit-type id="model.unit.indianConvert" offence="0"  defence="1"
+               movement="3" lineOfSight="1" maximumAttrition="10"
+               scoreValue="3" skill="0">
+      <ability id="model.ability.person" value="true"/>
+      <ability id="model.ability.convert" value="true"/>
+      <ability id="model.ability.foundColony" value="false"/>
+      <modifier id="model.goods.grain" type="additive" value="1"/>
+      <modifier id="model.goods.sugar" type="additive" value="1"/>
+      <modifier id="model.goods.tobacco" type="additive" value="1"/>
+      <modifier id="model.goods.cotton" type="additive" value="1"/>
+      <modifier id="model.goods.furs" type="additive" value="2"/>
+      <modifier id="model.goods.fish" type="additive" value="1" />
+      <modifier id="model.goods.rum" type="additive" value="-2" />
+      <modifier id="model.goods.cigars" type="additive" value="-2" />
+      <modifier id="model.goods.cloth" type="additive" value="-2" />
+      <modifier id="model.goods.coats" type="additive" value="-2" />
+      <modifier id="model.goods.muskets" type="additive" value="-2" />
+      <modifier id="model.goods.bells" type="additive" value="-2" />
+      <modifier id="model.goods.crosses" type="additive" value="-2" />
+      <modifier id="model.goods.hammers" type="additive" value="-2" />
+      <modifier id="model.goods.tools" type="additive" value="-2" />
+      <downgrade unit="model.unit.freeColonist" delete="true" />
+      <upgrade unit="model.unit.freeColonist" learnInSchool="0"/>
+      <consumes id="model.goods.food" value="2" />
+      <consumes id="model.goods.bells" value="1" />
+    </unit-type>
+  </unit-types>
 </freecol-specification>
