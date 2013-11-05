@@ -42,5 +42,12 @@
       </optionGroup>
     </optionGroup>
   </options>
-    
+
+  <goods-types>
+    <goods-type id="model.goods.furs" is-farmed="true"
+                new-world-goods="true" production-weight="2.5">
+      <market initial-amount="500"  initial-price="5"  price-difference="5" />
+    </goods-type>
+  </goods-types>
+
 </freecol-specification>
