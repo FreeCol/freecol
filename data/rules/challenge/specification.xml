@@ -73,6 +73,126 @@
       <resource   type="model.resource.furs" probability="100"/>
       <ability id="model.ability.ambushTerrain" value="true"/>
     </tile-type>
+    <tile-type id="model.tile.coniferForest" basic-move-cost="6" basic-work-turns="4" is-forest="true">
+      <gen humidityMin="25" humidityMax="70" temperatureMin="10" temperatureMax="25" altitudeMin="1" altitudeMax="1"/>
+      <modifier id="model.modifier.defence" type="percentage" value="50"/>
+      <production unattended="true">
+        <output goods-type="model.goods.grain" value="2"/>
+	</production>
+      <production>
+        <output goods-type="model.goods.grain"       value="2"/>
+	</production>
+      <production>
+        <output goods-type="model.goods.tobacco"    value="1"/>
+	</production>
+      <production>
+        <output goods-type="model.goods.furs"       value="1"/>
+	</production>
+      <production>
+        <output goods-type="model.goods.lumber"     value="6"/>
+	</production>
+      <resource   type="model.resource.lumber"        probability="100"/>
+      <ability id="model.ability.ambushTerrain" value="true"/>
+    </tile-type>
+    <tile-type id="model.tile.broadleafForest" basic-move-cost="6" basic-work-turns="4" is-forest="true">
+      <gen humidityMin="20" humidityMax="50" temperatureMin="15" temperatureMax="30" altitudeMin="1" altitudeMax="1"/>
+      <modifier id="model.modifier.defence" type="percentage" value="50"/>
+      <production unattended="true">
+        <output goods-type="model.goods.grain" value="2"/>
+	</production>
+      <production>
+        <output goods-type="model.goods.grain"       value="2"/>
+	</production>
+      <production>
+        <output goods-type="model.goods.cotton"     value="1"/>
+	</production>
+      <production>
+        <output goods-type="model.goods.furs"       value="1"/>
+	</production>
+      <production>
+        <output goods-type="model.goods.lumber"     value="4"/>
+	</production>
+      <resource   type="model.resource.game"          probability="100"/>
+      <ability id="model.ability.ambushTerrain" value="true"/>
+    </tile-type>
+    <tile-type id="model.tile.tropicalForest" basic-move-cost="6" basic-work-turns="6" is-forest="true">
+      <modifier id="model.modifier.defence" type="percentage" value="50"/>
+      <gen humidityMin="25" humidityMax="70" temperatureMin="30" temperatureMax="40" altitudeMin="1" altitudeMax="1"/>
+      <production unattended="true">
+        <output goods-type="model.goods.grain" value="3"/>
+	</production>
+      <production>
+        <output goods-type="model.goods.grain"       value="3"/>
+	</production>
+      <production>
+        <output goods-type="model.goods.sugar"      value="1"/>
+	</production>
+      <production>
+        <output goods-type="model.goods.furs"       value="1"/>
+	</production>
+      <production>
+        <output goods-type="model.goods.lumber"     value="4"/>
+	</production>
+      <resource   type="model.resource.lumber"        probability="100"/>
+      <disaster id="model.disaster.hurricane" probability="100"/>
+      <ability id="model.ability.ambushTerrain" value="true"/>
+    </tile-type>
+    <tile-type id="model.tile.wetlandForest" basic-move-cost="9" basic-work-turns="6" is-forest="true">
+      <gen humidityMin="50" humidityMax="100" temperatureMin="5" temperatureMax="15" altitudeMin="2" altitudeMax="2"/>
+      <modifier id="model.modifier.defence" type="percentage" value="50"/>
+      <production unattended="true">
+        <output goods-type="model.goods.grain" value="2"/>
+	</production>
+      <production>
+        <output goods-type="model.goods.grain"       value="2"/>
+	</production>
+      <production>
+        <output goods-type="model.goods.tobacco"    value="1"/>
+	</production>
+      <production>
+        <output goods-type="model.goods.furs"       value="1"/>
+	</production>
+      <production>
+        <output goods-type="model.goods.lumber"     value="4"/>
+	</production>
+      <production>
+        <output goods-type="model.goods.ore"        value="1"/>
+	</production>
+      <resource   type="model.resource.minerals"      probability="100"/>
+      <ability id="model.ability.ambushTerrain" value="true"/>
+    </tile-type>
+    <tile-type id="model.tile.scrubForest" basic-move-cost="3" basic-work-turns="4" is-forest="true">
+      <gen humidityMin="0" humidityMax="25" temperatureMin="10" temperatureMax="40" altitudeMin="1" altitudeMax="2"/>
+      <modifier id="model.modifier.defence" type="percentage" value="50"/>
+      <production unattended="true" productionLevel="veryHigh">
+        <output goods-type="model.goods.grain" value="3"/>
+      </production>
+      <production unattended="true">
+        <output goods-type="model.goods.grain" value="2"/>
+      </production>
+      <production unattended="true" productionLevel="veryLow">
+        <output goods-type="model.goods.grain" value="1"/>
+      </production>
+      <production>
+        <output goods-type="model.goods.grain"       value="2"/>
+      </production>
+      <production>
+        <output goods-type="model.goods.cotton"     value="1"/>
+      </production>
+      <production>
+        <output goods-type="model.goods.furs"       value="1"/>
+      </production>
+      <production>
+        <output goods-type="model.goods.lumber"     value="2"/>
+      </production>
+      <production>
+        <output goods-type="model.goods.ore"        value="1"/>
+      </production>
+      <resource   type="model.resource.oasis"         probability="100"/>
+      <disaster id="model.disaster.brushfire" probability="50"/>
+      <disaster id="model.disaster.drought" probability="50"/>
+      <ability id="model.ability.ambushTerrain" value="true"/>
+    </tile-type>
     <tile-type id="model.tile.borealForest" basic-move-cost="6" basic-work-turns="4" is-forest="true">
       <gen humidityMin="0" humidityMax="100" temperatureMin="-5" temperatureMax="5" altitudeMin="1" altitudeMax="3"/>
       <modifier id="model.modifier.defence" type="percentage" value="50"/>
