@@ -238,6 +238,18 @@
       <ability id="model.ability.ambushTerrain" value="true"/>
     </tile-type>
   </tile-types>
+
+  <tileimprovement-types>
+    <tileimprovement-type id="model.improvement.road" add-work-turns="0"
+                          expended-equipment-type="model.equipment.tools" expended-amount="1" magnitude="1"
+                          movement-cost="1" zIndex="350">
+      <scope method-name="isWater" method-value="false" />
+      <modifier id="model.goods.lumber" type="additive" value="2"/>
+      <modifier id="model.goods.ore" type="additive" value="1"/>
+      <modifier id="model.goods.silver" type="additive" value="1"/>
+    </tileimprovement-type>
+  </tileimprovement-types>
+
   <unit-types>
     <unit-type id="model.unit.indianConvert" offence="0"  defence="1"
                movement="3" lineOfSight="1" maximumAttrition="10"
