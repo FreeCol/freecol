@@ -21,5 +21,26 @@
 <!-- in case of incompatible changes, please update version number and
      XSD schema for validation. -->
 <freecol-specification id="challenge" extends="freecol" version="0.77">
+
+  <options>
+    <optionGroup id="gameOptions">
+      <optionGroup id="gameOptions.colony">
+	<!-- Does the Custom House sell boycotted goods -->
+        <booleanOption id="model.option.customIgnoreBoycott" defaultValue="false"/>
+        <!-- Whether experts have connections, producing without raw materials in factories -->
+        <booleanOption id="model.option.expertsHaveConnections" defaultValue="false"/>
+        <booleanOption id="model.option.saveProductionOverflow" defaultValue="true"/>
+        <!-- Whether to educate the least skilled unit first -->
+        <booleanOption id="model.option.allowStudentSelection" defaultValue="true"/>
+        <!-- Enable upkeep requirement on buildings. -->
+        <booleanOption id="model.option.enableUpkeep" defaultValue="true"/>
+        <!-- Toggle special production rules for secondary goods. -->
+        <booleanOption id="model.option.onlyNaturalImprovements" defaultValue="true" />
+        <!-- Enable natural disasters striking colonies. -->
+        <integerOption id="model.option.naturalDisasters" defaultValue="10"
+                       minimumValue="0" maximumValue="100" />
+      </optionGroup>
+    </optionGroup>
+  </options>
     
 </freecol-specification>
