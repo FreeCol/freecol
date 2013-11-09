@@ -20,7 +20,7 @@
   -->
 <!-- in case of incompatible changes, please update version number and
      XSD schema for validation. -->
-<freecol-specification id="challenge" extends="freecol" version="0.77">
+<freecol-specification id="bryce" extends="freecol" version="0.80">
 
   <options>
     <optionGroup id="gameOptions">
