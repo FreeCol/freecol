@@ -288,8 +288,9 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     }
 
     /**
-     * Adds, Removes or Cycles through the available resources for this Tile
-     * Cycles through the ResourceTypeList and picks the next valid, or removes if end of list
+     * Adds, removes or cycles through the available resources for
+     * this Tile.  Cycles through the ResourceTypeList and picks the
+     * next valid, or removes if end of list.
      */
     private class ResourceTransform extends MapTransform {
         public void transform(Tile t) {
@@ -302,26 +303,28 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                 t.getTileItemContainer().removeTileItem(resource);
             } else {
                 List<ResourceType> resList = t.getType().getResourceTypes();
-                switch(resList.size()) {
+                switch (resList.size()) {
                 case 0:
                     return;
                 case 1:
                     ResourceType resourceType = resList.get(0);
                     // TODO: create GUI for setting the quantity
-                    t.addResource(new Resource(t.getGame(), t, resourceType, resourceType.getMaxValue()));
+                    t.addResource(new Resource(t.getGame(), t, resourceType,
+                                  resourceType.getMaxValue()));
                     return;
                 default:
-                    List<ChoiceItem<ResourceType>> choices = new ArrayList<ChoiceItem<ResourceType>>();
-                    for (ResourceType resType : resList) {
-                        String name = Messages.message(resType.getNameKey());
-                        choices.add(new ChoiceItem<ResourceType>(name, resType));
+                    List<ChoiceItem<ResourceType>> choices
+                        = new ArrayList<ChoiceItem<ResourceType>>();
+                    for (ResourceType rt : resList) {
+                        String name = Messages.message(rt.getNameKey());
+                        choices.add(new ChoiceItem<ResourceType>(name, rt));
                     }
-                    ResourceType choice = getGUI().showChoiceDialog(null,
-                                                                       Messages.message("ok"),
-                                                                       Messages.message("cancel"),
-                                                                       choices);
+                    ResourceType choice = getGUI().showModalChoiceDialog(null, 
+                        Messages.message("editor.chooseResource"), null,
+                        "cancel", choices);
                     if (choice != null) {
-                        t.addResource(new Resource(t.getGame(), t, choice, choice.getMaxValue()));
+                        t.addResource(new Resource(t.getGame(), t, choice,
+                                      choice.getMaxValue()));
                     }
                 }
             }
