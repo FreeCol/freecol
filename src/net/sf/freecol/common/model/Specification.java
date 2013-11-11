@@ -1327,9 +1327,9 @@ public final class Specification {
         Role role = getRole(roleId);
         List<EquipmentType> result = new ArrayList<EquipmentType>();
         if (role.getRequiredGoods().isEmpty()) {
-	    if (roleId == "model.role.missionary") {
-		result.add(getEquipmentType("model.equipment.missionary"));
-	    }
+            if ("model.role.missionary".equals(roleId)) {
+                result.add(getEquipmentType("model.equipment.missionary"));
+            }
         } else {
             for (AbstractGoods goods : role.getRequiredGoods()) {
                 if ("model.goods.horses".equals(goods.getType().getId())) {
