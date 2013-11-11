@@ -934,7 +934,8 @@ public class DebugUtils {
             actions.add(new ChoiceItem<MonarchAction>(action));
         }
         MonarchAction action
-            = gui.showChooseMonarchActionDialog(monarchTitle, actions);
+            = gui.showModalChoiceDialog(null, monarchTitle, null,
+                                        "cancel", actions);
         server.getInGameController().setMonarchAction(sPlayer, action);
     }
 

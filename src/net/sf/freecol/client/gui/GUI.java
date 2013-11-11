@@ -1175,12 +1175,6 @@ public class GUI {
         return canvas.showChooseFoundingFatherDialog(ffs);
     }
 
-    public MonarchAction showChooseMonarchActionDialog(String monarchTitle,
-        List<ChoiceItem<MonarchAction>> actions) {
-        if (canvas == null) return MonarchAction.NO_ACTION;
-        return canvas.showChooseMonarchActionDialog(monarchTitle, actions);
-    }
-
     public ClaimAction showClaimDialog(Tile tile, Player player, int price,
             Player owner, boolean canAccept) {
         if (canvas == null) return ClaimAction.CANCEL;

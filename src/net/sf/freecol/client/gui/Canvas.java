@@ -1433,18 +1433,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Choose a monarch action.
-     *
-     * @param monarchTitle The header to display.
-     * @param actions A list of monarch action choices.
-     * @return The chosen <code>MonarchAction</code>.
-     */
-    public MonarchAction showChooseMonarchActionDialog(String monarchTitle,
-        List<ChoiceItem<MonarchAction>> actions) {
-        return showChoiceDialog(null, monarchTitle, "Cancel", actions);
-    }
-
-    /**
      * Choose a founding father.
      *
      * @param fathers A list of <code>FoundingFather</code>s on offer.
