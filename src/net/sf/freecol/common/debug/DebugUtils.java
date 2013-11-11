@@ -343,8 +343,9 @@ public class DebugUtils {
             String msg = Messages.message(t.getNameKey());
             uts.add(new ChoiceItem<UnitType>(msg, t));
         }
-        UnitType unitChoice = gui.showChoiceDialog(null, "Select Unit Type",
-                                                   "Cancel", uts);
+        UnitType unitChoice
+            = gui.showModalChoiceDialog(null, "Select Unit Type", null,
+                                        "cancel", uts);
         if (unitChoice == null) return;
 
         Unit carrier = null, sCarrier = null;
@@ -393,8 +394,9 @@ public class DebugUtils {
             String msg = Messages.message(t.getNameKey());
             gtl.add(new ChoiceItem<GoodsType>(msg, t));
         }
-        GoodsType goodsType = gui.showChoiceDialog(null, "Select Goods Type",
-                                                   "Cancel", gtl);
+        GoodsType goodsType
+            = gui.showModalChoiceDialog(null, "Select Goods Type", null,
+                                        "cancel", gtl);
         if (goodsType == null) return;
 
         String amount = gui.showInputDialog(null,
@@ -440,8 +442,8 @@ public class DebugUtils {
                 pcs.add(new ChoiceItem<Player>(msg, p));
             }
         }
-        Player player = gui.showChoiceDialog(null, "Select owner", "Cancel",
-                                             pcs);
+        Player player = gui.showModalChoiceDialog(null, "Select owner", null,
+                                                  "cancel", pcs);
         if (player == null || player == settlement.getOwner()) return;
 
         ServerPlayer sPlayer = sGame.getFreeColGameObject(player.getId(),
@@ -479,8 +481,8 @@ public class DebugUtils {
                 pcs.add(new ChoiceItem<Player>(msg, p));
             }
         }
-        Player player = gui.showChoiceDialog(null, "Select owner", "Cancel",
-                                             pcs);
+        Player player = gui.showModalChoiceDialog(null, "Select owner", null,
+                                                  "cancel", pcs);
         if (player == null || unit.getOwner() == player) return;
 
         final Game sGame = server.getGame();
@@ -515,8 +517,8 @@ public class DebugUtils {
         for (Role role : sGame.getSpecification().getRoles()) {
             rcs.add(new ChoiceItem<Role>(role.getId(), role));
         }
-        Role roleChoice = gui.showChoiceDialog(null, "Select role",
-                                                    "Cancel", rcs);
+        Role roleChoice = gui.showModalChoiceDialog(null, "Select role", null,
+                                                    "cancel", rcs);
         if (roleChoice == null) return;
 
         sUnit.clearEquipment();
@@ -879,8 +881,9 @@ public class DebugUtils {
             String msg = Messages.message(t.getNameKey());
             gtl.add(new ChoiceItem<GoodsType>(msg, t));
         }
-        GoodsType goodsType = freeColClient.getGUI().showChoiceDialog(null,
-            "Select Goods Type", "Cancel", gtl);
+        GoodsType goodsType = freeColClient.getGUI()
+            .showModalChoiceDialog(null, "Select Goods Type", null,
+                                   "cancel", gtl);
         if (goodsType == null) return;
 
         String amount = freeColClient.getGUI().showInputDialog(null,
@@ -956,8 +959,8 @@ public class DebugUtils {
             rumours.add(new ChoiceItem<RumourType>(rumour.toString(), rumour));
         }
         RumourType rumourChoice = freeColClient.getGUI()
-            .showChoiceDialog(null, "Select Lost City Rumour", "Cancel",
-                              rumours);
+            .showModalChoiceDialog(null, "Select Lost City Rumour", null,
+                                   "cancel", rumours);
         tile.getTileItemContainer().getLostCityRumour().setType(rumourChoice);
         sTile.getTileItemContainer().getLostCityRumour()
             .setType(rumourChoice);
