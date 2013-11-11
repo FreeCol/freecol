@@ -1170,30 +1170,15 @@ public class GUI {
         return canvas.showChoiceDialog(tile, text, cancelText, choices);
     }
 
-    public <T> T showModalChoiceDialog(Tile tile, String text, ImageIcon icon,
-                                       String cancelText,
-                                       List<ChoiceItem<T>> choices) {
+    public FoundingFather showChooseFoundingFatherDialog(List<FoundingFather> ffs) {
         if (canvas == null) return null;
-        return canvas.showModalChoiceDialog(tile, text, icon, cancelText,
-                                            choices);
+        return canvas.showChooseFoundingFatherDialog(ffs);
     }
 
     public MonarchAction showChooseMonarchActionDialog(String monarchTitle,
         List<ChoiceItem<MonarchAction>> actions) {
         if (canvas == null) return MonarchAction.NO_ACTION;
         return canvas.showChooseMonarchActionDialog(monarchTitle, actions);
-    }
-
-    public FoundingFather showChooseFoundingFatherDialog(List<ChoiceItem<FoundingFather>> fathers,
-                                                         String fatherTitle) {
-        if (canvas == null) return null;
-        return canvas.showChooseFoundingFatherDialog(fathers, fatherTitle);
-    }
-
-    public FoundingFather
-        showChooseFoundingFatherDialog(List<FoundingFather> ffs) {
-        if (canvas == null) return null;
-        return canvas.showChooseFoundingFatherDialog(ffs);
     }
 
     public ClaimAction showClaimDialog(Tile tile, Player player, int price,
@@ -1230,6 +1215,14 @@ public class GUI {
     public List<String> showConfirmDeclarationDialog() {
         if (canvas == null) return Collections.emptyList();
         return canvas.showConfirmDeclarationDialog();
+    }
+
+    public <T> T showModalChoiceDialog(Tile tile, String text, ImageIcon icon,
+                                       String cancelText,
+                                       List<ChoiceItem<T>> choices) {
+        if (canvas == null) return null;
+        return canvas.showModalChoiceDialog(tile, text, icon, cancelText,
+                                            choices);
     }
 
     public boolean showModalConfirmDialog(String text,

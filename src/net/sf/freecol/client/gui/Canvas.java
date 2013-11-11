@@ -1445,18 +1445,7 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Choose a founding father (debug menu version).
-     *
-     * @param fathers A list of <code>FoundingFather</code>s on offer.
-     * @param fatherTitle A header to display.
-     * @return The chosen <code>FoundingFather</code>.
-     */
-    public FoundingFather showChooseFoundingFatherDialog(List<ChoiceItem<FoundingFather>> fathers, String fatherTitle) {
-        return showChoiceDialog(null, fatherTitle, "Cancel", fathers);
-    }
-
-    /**
-     * Choose a founding father (full game version).
+     * Choose a founding father.
      *
      * @param fathers A list of <code>FoundingFather</code>s on offer.
      * @return The chosen <code>FoundingFather</code>.

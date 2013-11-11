@@ -197,7 +197,8 @@ public class DebugUtils {
         }
 
         FoundingFather father
-            = gui.showChooseFoundingFatherDialog(fathers, fatherTitle);
+            = gui.showModalChoiceDialog(null, fatherTitle, null,
+                                        "cancel", fathers);
         if (father != null) {
             server.getInGameController()
                 .addFoundingFather((ServerPlayer)sPlayer, father);
