@@ -1211,12 +1211,13 @@ public class GUI {
         return canvas.showConfirmDeclarationDialog();
     }
 
-    public <T> T showModalChoiceDialog(Tile tile, String text, ImageIcon icon,
+    public <T> T showModalChoiceDialog(Tile tile, String text, Object obj,
                                        String cancelText,
                                        List<ChoiceItem<T>> choices) {
         if (canvas == null) return null;
-        return canvas.showModalChoiceDialog(tile, text, icon, cancelText,
-                                            choices);
+        return canvas.showModalChoiceDialog(tile, text,
+                                            getImageIcon(obj, false),
+                                            cancelText, choices);
     }
 
     public boolean showModalConfirmDialog(String text,
