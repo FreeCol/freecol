@@ -36,6 +36,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient; 
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.ServerInfo;
@@ -179,14 +180,17 @@ public final class ConnectController {
 
         if (freeColClient.isLoggedIn()) logout(true);
 
-        List<String> vacantPlayers = getVacantPlayers(host, port);
-        if (vacantPlayers != null) {
-            String choice = gui.showSimpleChoiceDialog(null,
-                "connectController.choicePlayer", "cancel",
-                vacantPlayers);
-            if (choice == null) return false;
-            FreeCol.setName(choice);
+        List<ChoiceItem<String>> vacantPlayers
+            = new ArrayList<ChoiceItem<String>>();
+        for (String player : getVacantPlayers(host, port)) {
+            vacantPlayers.add(new ChoiceItem<String>(player, player));
         }
+        if (vacantPlayers.isEmpty()) return false;
+        String choice = gui.showModalChoiceDialog(null,
+            Messages.message("connectController.choicePlayer"), null,
+            "cancel", vacantPlayers);
+        if (choice == null) return false;
+        FreeCol.setName(choice);
 
         freeColClient.setSinglePlayer(false);
         if (!login(host, port)) return false;

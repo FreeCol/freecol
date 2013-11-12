@@ -67,12 +67,9 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
             browse.addActionListener(new ActionListener() {
                public void actionPerformed(ActionEvent e) {
                    File file = gui.showLoadDialog(FreeColDirectories.getSaveDirectory());
-
                    if (file == null) {
                        return;
-                   }
-
-                   if (!file.isFile()) {
+                   } else if (!file.isFile()) {
                        gui.errorMessage("fileNotFound");
                        return;
                    }
