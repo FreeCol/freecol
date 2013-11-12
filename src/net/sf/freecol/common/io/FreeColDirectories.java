@@ -694,7 +694,8 @@ public class FreeColDirectories {
      * @return The directory to save user options in.
      */
     public static File getOptionsDirectory() {
-        return new File(getUserConfigDirectory(), FreeCol.getTC());
+        File dir = new File(getUserConfigDirectory(), FreeCol.getTC());
+        return (insistDirectory(dir)) ? dir : null;
     }
 
     /**
