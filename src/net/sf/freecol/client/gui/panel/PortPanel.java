@@ -22,6 +22,8 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.LayoutManager;
 import java.awt.event.MouseListener;
 
+import javax.swing.TransferHandler;
+
 import java.util.List;
 
 import net.sf.freecol.client.gui.GUI;
@@ -110,6 +112,16 @@ public abstract class PortPanel extends FreeColPanel {
      * @return A list of <code>Unit</code>s.
      */
     public abstract List<Unit> getUnitList();
+
+
+    // Override JComponent
+
+    /**
+     * {@inheritDoc}
+     */
+    public TransferHandler getTransferHandler() {
+        return defaultTransferHandler;
+    }
 
 
     // Override Component

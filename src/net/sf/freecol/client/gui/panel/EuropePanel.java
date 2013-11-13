@@ -582,7 +582,7 @@ public final class EuropePanel extends PortPanel {
     }
 
     /**
-     * A panel that holds UnitsLabels that represent Units that are
+     * A panel that holds UnitLabels that represent Units that are
      * waiting on the docks in Europe.
      */
     public final class DocksPanel extends UnitPanel implements DropTarget {

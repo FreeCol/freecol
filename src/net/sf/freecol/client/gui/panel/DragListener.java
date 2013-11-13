@@ -50,8 +50,6 @@ public final class DragListener extends MouseAdapter {
 
     private final FreeColClient freeColClient;
 
-    private final GUI gui;
-
 
     /**
      * The constructor to use.
@@ -63,7 +61,6 @@ public final class DragListener extends MouseAdapter {
     public DragListener(FreeColClient freeColClient,
                         FreeColPanel parentPanel) {
         this.freeColClient = freeColClient;
-        this.gui = freeColClient.getGUI();
         this.parentPanel = parentPanel;
     }
 
@@ -75,13 +72,16 @@ public final class DragListener extends MouseAdapter {
      * @param e The event that holds the information about the mouse click.
      */
     public void mousePressed(MouseEvent e) {
-        JComponent comp = (JComponent) e.getSource();
+        JComponent comp = (JComponent)e.getSource();
         // Does not work on some platforms:
         // if (e.isPopupTrigger() && (comp instanceof UnitLabel)) {
 
         if (e.getButton() == MouseEvent.BUTTON3 || e.isPopupTrigger()) {
-            // Popup mustn't be shown when panel is not editable
-            if (parentPanel.isEditable()) {
+            // Popup must not be shown when panel is not editable
+            if (!parentPanel.isEditable()) {
+                logger.warning("Button3 disabled on non-editable panel: "
+                    + parentPanel);
+            } else {
                 QuickActionMenu menu = null;
                 if (comp instanceof UnitLabel) {
                     menu = new QuickActionMenu(freeColClient, parentPanel);
@@ -110,6 +110,7 @@ public final class DragListener extends MouseAdapter {
                         if (menu.getComponent(lastIndex) instanceof JPopupMenu.Separator) {
                             menu.remove(lastIndex);
                         }
+                        GUI gui = freeColClient.getGUI();
                         boolean windows = System.getProperty("os.name")
                             .startsWith("Windows");
                         boolean small = Toolkit.getDefaultToolkit()
@@ -136,7 +137,7 @@ public final class DragListener extends MouseAdapter {
             }
         } else {
             if (comp instanceof AbstractGoodsLabel) {
-                AbstractGoodsLabel label = (AbstractGoodsLabel) comp;
+                AbstractGoodsLabel label = (AbstractGoodsLabel)comp;
                 if (e.isShiftDown()) {
                     label.setPartialChosen(true);
                 } else if (e.isAltDown()) {
@@ -146,7 +147,7 @@ public final class DragListener extends MouseAdapter {
                     label.setDefaultAmount();
                 }
             } else if (comp instanceof UnitLabel) {
-                Unit u = ((UnitLabel) comp).getUnit();
+                Unit u = ((UnitLabel)comp).getUnit();
                 if (u.isCarrier()
                     && !u.isAtSea()
                     && parentPanel instanceof PortPanel) {
