@@ -885,6 +885,13 @@ public class Messages {
                 + player.getSpecification().getId() + ".", names);
         }
 
+        // If still empty and not using the "freecol" ruleset, try
+        // those names.
+        if (names.isEmpty()) {
+            collectNames(player.getNationId() + ".settlementName."
+                + "freecol.", names);
+        }
+
         return names;
     }
 
