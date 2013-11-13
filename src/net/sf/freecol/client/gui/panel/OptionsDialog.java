@@ -136,7 +136,6 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
      */
     private void preparePanel(String header, OptionGroupUI ui) {
         optionPanel = new MigPanel("ReportPanelUI");
-        optionPanel.setPreferredSize(new Dimension(800, 500));
         optionPanel.setOpaque(true);
         optionPanel.add(ui);
         optionPanel.setSize(optionPanel.getPreferredSize());
@@ -153,7 +152,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
      * Initialize this dialog.
      */
     protected void initialize() {
-        this.panel.add(this.scrollPane, "grow"); //"height 100%, width 100%"
+        this.panel.add(this.scrollPane, "height 100%, width 100%");
         this.panel.setPreferredSize(new Dimension(850, 650));
         this.panel.setSize(this.panel.getPreferredSize());
 
