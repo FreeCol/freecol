@@ -89,6 +89,7 @@ import net.sf.freecol.client.gui.panel.LabourData.UnitData;
 import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.gui.panel.MainPanel;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
+import net.sf.freecol.client.gui.panel.MapSizeDialog;
 import net.sf.freecol.client.gui.panel.MapGeneratorOptionsDialog;
 import net.sf.freecol.client.gui.panel.MonarchDialog;
 import net.sf.freecol.client.gui.panel.NegotiationDialog;
@@ -2090,9 +2091,7 @@ public final class Canvas extends JDesktopPane {
      * Display the map size dialog.
      */
     public Dimension showMapSizeDialog() {
-        return showFreeColOldDialog(FreeColOldDialog
-            .createMapSizeDialog(freeColClient), null, true);
-
+        return showFreeColDialog(new MapSizeDialog(freeColClient), null);
     }
 
     /**
