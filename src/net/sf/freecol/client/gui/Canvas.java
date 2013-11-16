@@ -86,6 +86,7 @@ import net.sf.freecol.client.gui.panel.GameOptionsDialog;
 import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
 import net.sf.freecol.client.gui.panel.InformationPanel;
 import net.sf.freecol.client.gui.panel.LabourData.UnitData;
+import net.sf.freecol.client.gui.panel.LoadDialog;
 import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.gui.panel.MainPanel;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
@@ -295,6 +296,9 @@ public final class Canvas extends JDesktopPane {
     private Dimension initialSize = null;
 
     private boolean clientOptionsDialogShowing = false;
+
+    /** Filters for loadable game files. */
+    private FileFilter[] loadFilters = null;
 
 
     /**
@@ -1994,9 +1998,14 @@ public final class Canvas extends JDesktopPane {
      * @see FreeColOldDialog
      */
     public File showLoadDialog(File directory) {
-        return showLoadDialog(directory, new FileFilter[] {
+        if (loadFilters == null) {
+            loadFilters = new FileFilter[] {
                 FreeColFileFilter.getFSGFileFilter()
-            });
+            };
+        }
+        return showFreeColDialog(new LoadDialog(freeColClient, directory,
+                                                loadFilters),
+                                 null);
     }
 
     /**
