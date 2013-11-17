@@ -40,9 +40,9 @@ import net.sf.freecol.client.gui.panel.FreeColDialog;
 
 
 /**
- * A dialog for choosing a file to load.
+ * A dialog for choosing a file to save.
  */
-public final class LoadDialog extends FreeColDialog<File> {
+public final class SaveDialog extends FreeColDialog<File> {
 
     /**
      * Creates a dialog to choose a file to load.
@@ -50,12 +50,16 @@ public final class LoadDialog extends FreeColDialog<File> {
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param directory The directory to display when choosing the file.
      * @param fileFilters The available file filters in the dialog.
+     * @param defaultName Name of the default save game file.
+     * @param extension The default extension to add to user specified
+     *     file names.
      */
-    public LoadDialog(FreeColClient freeColClient, File directory,
-                      FileFilter[] fileFilters) {
+    public SaveDialog(FreeColClient freeColClient, File directory,
+                      FileFilter[] fileFilters, String defaultName,
+                      final String extension) {
         super(freeColClient);
 
-        JFileChooser fileChooser = new JFileChooser(directory);
+        final JFileChooser fileChooser = new JFileChooser(directory);
         if (fileFilters.length > 0) {
             for (FileFilter fileFilter : fileFilters) {
                 fileChooser.addChoosableFileFilter(fileFilter);
@@ -63,16 +67,22 @@ public final class LoadDialog extends FreeColDialog<File> {
             fileChooser.setFileFilter(fileFilters[0]);
             fileChooser.setAcceptAllFileFilterUsed(false);
         }
-        fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
+        fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fileChooser.setFileHidingEnabled(false);
+        fileChooser.setSelectedFile(new File(defaultName));
         fileChooser.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
                     final String cmd = event.getActionCommand();
-                    setValue((JFileChooser.APPROVE_SELECTION.equals(cmd))
-                        ? ((JFileChooser)event.getSource())
-                            .getSelectedFile()
-                        : null);
+                    if (JFileChooser.APPROVE_SELECTION.equals(cmd)) {
+                        File file = fileChooser.getSelectedFile();
+                        if (!file.getName().endsWith(extension)) {
+                            file = new File(file.getAbsolutePath() + extension);
+                        }
+                        setValue(file);
+                    } else {
+                        setValue(null);
+                    }
                 }
             });
 

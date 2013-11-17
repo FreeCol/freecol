@@ -118,6 +118,7 @@ import net.sf.freecol.client.gui.panel.ReportRequirementsPanel;
 import net.sf.freecol.client.gui.panel.ReportTradePanel;
 import net.sf.freecol.client.gui.panel.ReportTurnPanel;
 import net.sf.freecol.client.gui.panel.RiverStyleDialog;
+import net.sf.freecol.client.gui.panel.SaveDialog;
 import net.sf.freecol.client.gui.panel.ScaleMapSizeDialog;
 import net.sf.freecol.client.gui.panel.SelectAmountDialog;
 import net.sf.freecol.client.gui.panel.SelectDestinationDialog;
@@ -183,9 +184,6 @@ import net.sf.freecol.common.resources.Video;
 public final class Canvas extends JDesktopPane {
 
     private static final Logger logger = Logger.getLogger(Canvas.class.getName());
-
-    /** Number of tries to find a clear spot on the canvas. */
-    private final int MAXTRY = 3;
 
     public static enum BoycottAction {
         CANCEL,
@@ -256,6 +254,12 @@ public final class Canvas extends JDesktopPane {
         GIFT
     }
 
+    /** The extension for FreeCol save files. */
+    private static final String FSG_EXTENSION = ".fsg";
+
+    /** Number of tries to find a clear spot on the canvas. */
+    private static final int MAXTRY = 3;
+
     private static final Integer MAIN_LAYER = JLayeredPane.DEFAULT_LAYER;
 
     private static final Integer STATUS_LAYER = JLayeredPane.POPUP_LAYER;
@@ -298,7 +302,7 @@ public final class Canvas extends JDesktopPane {
     private boolean clientOptionsDialogShowing = false;
 
     /** Filters for loadable game files. */
-    private FileFilter[] loadFilters = null;
+    private FileFilter[] fileFilters = null;
 
 
     /**
@@ -1994,17 +1998,16 @@ public final class Canvas extends JDesktopPane {
      * Displays a dialog where the user may choose a file.
      *
      * @param directory The directory containing the files.
-     * @return The <code>File</code>.
-     * @see FreeColOldDialog
+     * @return The selected <code>File</code>.
      */
     public File showLoadDialog(File directory) {
-        if (loadFilters == null) {
-            loadFilters = new FileFilter[] {
+        if (fileFilters == null) {
+            fileFilters = new FileFilter[] {
                 FreeColFileFilter.getFSGFileFilter()
             };
         }
         return showFreeColDialog(new LoadDialog(freeColClient, directory,
-                                                loadFilters),
+                                                fileFilters),
                                  null);
     }
 
@@ -2014,27 +2017,22 @@ public final class Canvas extends JDesktopPane {
      * @param directory The directory containing the files.
      * @param fileFilters The file filters which the user can select in the
      *     dialog.
-     * @return The <code>File</code>.
-     * @see FreeColOldDialog
+     * @return The selected <code>File</code>.
      */
     public File showLoadDialog(File directory, FileFilter[] fileFilters) {
-        FreeColOldDialog<File> loadDialog = FreeColOldDialog
-            .createLoadDialog(freeColClient, directory, fileFilters);
-
         File response = null;
-        showSubPanel(loadDialog, true);
         for (;;) {
-            response = (File) loadDialog.getResponse();
+            response = showFreeColDialog(new LoadDialog(freeColClient,
+                                                        directory, fileFilters),
+                                         null);
             if (response == null || response.isFile()) break;
             errorMessage("noSuchFile");
         }
-        remove(loadDialog);
-
         return response;
     }
 
     /**
-     * Displays a dialog for setting options when loading a savegame. The
+     * Displays a dialog for setting options when loading a savegame.  The
      * settings can be retrieved directly from {@link LoadingSavegameDialog}
      * after calling this method.
      *
@@ -2299,13 +2297,16 @@ public final class Canvas extends JDesktopPane {
      * @param directory The directory containing the files in which
      *     the user may overwrite.
      * @param defaultName Default filename for the savegame.
-     * @return The <code>File</code>.
-     * @see FreeColOldDialog
+     * @return The selected <code>File</code>.
      */
     public File showSaveDialog(File directory, String defaultName) {
-        return showSaveDialog(directory, ".fsg",
-            new FileFilter[] { FreeColFileFilter.getFSGFileFilter() },
-            defaultName);
+        if (fileFilters == null) {
+            fileFilters = new FileFilter[] {
+                FreeColFileFilter.getFSGFileFilter()
+            };
+        }
+        return showSaveDialog(directory, fileFilters, defaultName,
+                              FSG_EXTENSION);
     }
 
     /**
@@ -2313,19 +2314,18 @@ public final class Canvas extends JDesktopPane {
      *
      * @param directory The directory containing the files in which
      *     the user may overwrite.
-     * @param standardName This extension will be added to the specified
-     *            filename (if not added by the user).
      * @param fileFilters The available file filters in the dialog.
      * @param defaultName Default filename for the savegame.
-     * @return The <code>File</code>.
-     * @see FreeColOldDialog
+     * @param extension This extension will be added to the specified
+     *     filename (if not added by the user).
+     * @return The selected <code>File</code>.
      */
-    public File showSaveDialog(File directory, String standardName,
-                               FileFilter[] fileFilters, String defaultName) {
-        FreeColOldDialog<File> saveDialog = FreeColOldDialog
-            .createSaveDialog(freeColClient, directory, standardName,
-                              fileFilters, defaultName);
-        return showFreeColOldDialog(saveDialog, null, true);
+    public File showSaveDialog(File directory, FileFilter[] fileFilters,
+                               String defaultName, String extension) {
+        return showFreeColDialog(new SaveDialog(freeColClient, directory,
+                                                fileFilters, defaultName,
+                                                extension),
+                                 null);
     }
 
     /**

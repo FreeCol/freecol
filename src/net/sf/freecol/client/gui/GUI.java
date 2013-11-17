@@ -1541,11 +1541,11 @@ public class GUI {
         return canvas.showSaveDialog(directory, defaultName);
     }
 
-    public File showSaveDialog(File directory, String standardName,
-                               FileFilter[] fileFilters, String defaultName) {
+    public File showSaveDialog(File directory, FileFilter[] fileFilters,
+                               String defaultName, String extension) {
         if (canvas == null) return null;
-        return canvas.showSaveDialog(directory, standardName,
-                                     fileFilters, defaultName);
+        return canvas.showSaveDialog(directory, fileFilters, defaultName,
+                                     extension);
     }
 
     public Dimension showScaleMapSizeDialog() {

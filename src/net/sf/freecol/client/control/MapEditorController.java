@@ -238,11 +238,7 @@ public final class MapEditorController {
      */
     public void loadGame() {
         File file = gui.showLoadDialog(FreeColDirectories.getSaveDirectory());
-
-        if (file == null) {
-            return;
-        }
-
+        if (file == null) return;
         if (!file.isFile()) {
             gui.errorMessage("fileNotFound");
             return;

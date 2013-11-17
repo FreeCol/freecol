@@ -148,11 +148,11 @@ public final class DifficultyDialog extends OptionsDialog
     private void addLoadAction(JButton button) {
         button.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    File file = getGUI().showLoadDialog(FreeColDirectories
-                        .getOptionsDirectory(), filters);
+                    File dir = FreeColDirectories.getOptionsDirectory();
+                    File file = getGUI().showLoadDialog(dir, filters);
                     if (file != null && load(file)) {
-			invalidate();
-			validate();
+                        invalidate();
+                        validate();
                         repaint();
                     }
                 }
@@ -167,9 +167,9 @@ public final class DifficultyDialog extends OptionsDialog
     private void addSaveAction(JButton button) {
         button.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    File file = getGUI().showSaveDialog(FreeColDirectories
-                        .getOptionsDirectory(), ".xml", filters,
-                        getDefaultFileName());
+                    File dir = FreeColDirectories.getOptionsDirectory();
+                    File file = getGUI().showSaveDialog(dir, filters,
+                        getDefaultFileName(), ".xml");
                     if (file != null) {
                         getOptionUI().updateOption();
                         save(file);
