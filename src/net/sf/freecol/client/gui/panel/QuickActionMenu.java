@@ -84,11 +84,12 @@ public final class QuickActionMenu extends JPopupMenu {
 
     private final GUI gui;
 
+
     /**
      * Creates a standard empty menu
      */
-    public QuickActionMenu(FreeColClient freeColClient, FreeColPanel freeColPanel)
-    {
+    public QuickActionMenu(FreeColClient freeColClient,
+                           FreeColPanel freeColPanel) {
         this.freeColClient = freeColClient;
         this.gui = freeColClient.getGUI();
         this.parentPanel = freeColPanel;
@@ -98,38 +99,31 @@ public final class QuickActionMenu extends JPopupMenu {
      * Creates a popup menu for a Unit.
      */
     public void createUnitMenu(final UnitLabel unitLabel) {
-        ImageLibrary imageLibrary = parentPanel.getLibrary();
-        final Unit tempUnit = unitLabel.getUnit();
-        this.setLabel("Unit");
-        ImageIcon unitIcon = imageLibrary.getUnitImageIcon(tempUnit, 0.66);
+        final ImageLibrary imageLibrary = parentPanel.getLibrary();
+        final Unit unit = unitLabel.getUnit();
 
-        JMenuItem name = new JMenuItem(Messages.getLabel(tempUnit) + " (" +
-                                       Messages.message("menuBar.colopedia") + ")",
-                                       unitIcon);
+        this.setLabel("Unit");
+        ImageIcon unitIcon = imageLibrary.getUnitImageIcon(unit, 0.66);
+        JMenuItem name = new JMenuItem(Messages.getLabel(unit)
+            + " (" + Messages.message("menuBar.colopedia") + ")", unitIcon);
         name.setActionCommand(UnitAction.COLOPEDIA.toString());
         name.addActionListener(unitLabel);
         this.add(name);
         this.addSeparator();
 
-        if (tempUnit.isCarrier()) {
-            if (addCarrierItems(unitLabel)) {
-                this.addSeparator();
-            }
-        }
+        if (addCarrierItems(unitLabel)) this.addSeparator();
 
-        if (tempUnit.hasTile()) {
-            Colony colony = tempUnit.getLocation().getTile().getColony();
+        if (unit.isInEurope()) {
+            if (addCommandItems(unitLabel)) this.addSeparator();
+            if (addBoardItems(unitLabel,
+                    unit.getOwner().getEurope())) this.addSeparator();
+        } else if (unit.hasTile()) {
+            Colony colony = unit.getLocation().getTile().getColony();
             if (colony != null) {
-            	if (addTileItem(unitLabel)) {
-                    this.addSeparator();
-                }
-            	if (addWorkItems(unitLabel)) {
-                    this.addSeparator();
-                }
-                if (addEducationItems(unitLabel)) {
-                    this.addSeparator();
-                }
-                if (tempUnit.getLocation() instanceof WorkLocation
+                if (addTileItem(unitLabel)) this.addSeparator();
+                if (addWorkItems(unitLabel)) this.addSeparator();
+                if (addEducationItems(unitLabel)) this.addSeparator();
+                if (unit.getLocation() instanceof WorkLocation
                     && colony.canReducePopulation()) {
                     JMenuItem menuItem = new JMenuItem(Messages.message("leaveTown"));
                     menuItem.setActionCommand(UnitAction.LEAVE_TOWN.toString());
@@ -138,30 +132,18 @@ public final class QuickActionMenu extends JPopupMenu {
                     addBoardItems(unitLabel, colony.getTile());
                     this.addSeparator();
                 } else {
-                    if (addCommandItems(unitLabel)) {
-                        this.addSeparator();
-                    }
+                    if (addCommandItems(unitLabel)) this.addSeparator();
                     if (addBoardItems(unitLabel, colony.getTile())) {
                         this.addSeparator();
                     }
                 }
             } else {
-                if (addCommandItems(unitLabel)) {
-                    this.addSeparator();
-                }
-            }
-        } else if (tempUnit.isInEurope()) {
-            if (addCommandItems(unitLabel)) {
-                this.addSeparator();
-            }
-            if (addBoardItems(unitLabel, tempUnit.getOwner().getEurope())) {
-                this.addSeparator();
+                if (addCommandItems(unitLabel)) this.addSeparator();
             }
         }
-        if (tempUnit.hasAbility(Ability.CAN_BE_EQUIPPED)) {
-            if (addEquipmentItems(unitLabel)) {
-                this.addSeparator();
-            }
+
+        if (unit.hasAbility(Ability.CAN_BE_EQUIPPED)) {
+            if (addEquipmentItems(unitLabel)) this.addSeparator();
         }
     }
 
@@ -249,26 +231,25 @@ public final class QuickActionMenu extends JPopupMenu {
     }
 
     private boolean addCarrierItems(final UnitLabel unitLabel) {
-        final Unit tempUnit = unitLabel.getUnit();
+        final Unit unit = unitLabel.getUnit();
+        if (!unit.isCarrier() || !unit.hasCargo()) return false;
 
-        if (tempUnit.hasCargo()) {
-            JMenuItem cargo = new JMenuItem(Messages.message("cargoOnCarrier"));
-            this.add(cargo);
+        JMenuItem cargo = new JMenuItem(Messages.message("cargoOnCarrier"));
+        this.add(cargo);
 
-            for (Unit passenger : tempUnit.getUnitList()) {
-                JMenuItem menuItem = new JMenuItem("    " + Messages.getLabel(passenger));
-                menuItem.setFont(menuItem.getFont().deriveFont(Font.ITALIC));
-                this.add(menuItem);
-            }
-            for (Goods goods : tempUnit.getGoodsList()) {
-                JMenuItem menuItem = new JMenuItem("    " + Messages.message(goods.getLabel(true)));
-                menuItem.setFont(menuItem.getFont().deriveFont(Font.ITALIC));
-                this.add(menuItem);
-            }
-            return true;
-        } else {
-            return false;
+        for (Unit passenger : unit.getUnitList()) {
+            JMenuItem menuItem = new JMenuItem("    "
+                + Messages.getLabel(passenger));
+            menuItem.setFont(menuItem.getFont().deriveFont(Font.ITALIC));
+            this.add(menuItem);
         }
+        for (Goods goods : unit.getGoodsList()) {
+            JMenuItem menuItem = new JMenuItem("    "
+                + Messages.message(goods.getLabel(true)));
+            menuItem.setFont(menuItem.getFont().deriveFont(Font.ITALIC));
+            this.add(menuItem);
+        }
+        return true;
     }
 
     private List<JMenuItem> descendingList(final Map<JMenuItem, Integer> map) {
@@ -306,6 +287,8 @@ public final class QuickActionMenu extends JPopupMenu {
 
     private boolean addWorkItems(final UnitLabel unitLabel) {
         final Unit unit = unitLabel.getUnit();
+        if (unit.isCarrier()) return false;
+
         final UnitType unitType = unit.getType();
         final GoodsType expertGoods = unitType.getExpertProduction();
         final Colony colony = unit.getLocation().getColony();
