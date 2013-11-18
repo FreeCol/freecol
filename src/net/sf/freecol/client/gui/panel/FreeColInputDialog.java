@@ -54,16 +54,16 @@ public abstract class FreeColInputDialog<T> extends FreeColDialog<T> {
      * @param obj The object containing the input fields and
      *     explanation to the user.
      * @param icon An optional icon to display.
-     * @param okText The text displayed on the "ok"-button.
-     * @param cancelText The text displayed on the optional "cancel"-button.
+     * @param okKey The key displayed on the "ok"-button.
+     * @param cancelKey The key displayed on the optional "cancel"-button.
      * @return The <code>FreeColDialog</code> created.
      */
     public FreeColInputDialog(final FreeColClient freeColClient,
                               Object obj, ImageIcon icon,
-                              String okText, String cancelText) {
+                              String okKey, String cancelKey) {
         this(freeColClient);
 
-        initialize(obj, icon, okText, cancelText);
+        initialize(obj, icon, okKey, cancelKey);
     }
 
 
@@ -73,16 +73,16 @@ public abstract class FreeColInputDialog<T> extends FreeColDialog<T> {
      * @param obj The object containing the input fields and
      *     explanation to the user.
      * @param icon An optional icon to display.
-     * @param okText The text displayed on the "ok"-button.
-     * @param cancelText The text displayed on the optional "cancel"-button.
+     * @param okKey The key displayed on the "ok"-button.
+     * @param cancelKey The key displayed on the optional "cancel"-button.
      */
     protected void initialize(Object obj, ImageIcon icon,
-                              String okText, String cancelText) {
+                              String okKey, String cancelKey) {
         List<ChoiceItem<T>> c = choices();
-        c.add(new ChoiceItem<T>(Messages.message(okText),
+        c.add(new ChoiceItem<T>(Messages.message(okKey),
                 (T)null).okOption());
-        if (cancelText != null) {
-            c.add(new ChoiceItem<T>(Messages.message(cancelText),
+        if (cancelKey != null) {
+            c.add(new ChoiceItem<T>(Messages.message(cancelKey),
                     (T)null).cancelOption().defaultOption());
         }
         initialize(DialogType.QUESTION, true, obj, icon, c);

@@ -1543,7 +1543,7 @@ public final class InGameController implements NetworkConstants {
 
         // Get and check the name.
         String name = player.getSettlementName(null);
-        name = gui.showInputDialog(tile,
+        name = gui.showOldInputDialog(tile,
             StringTemplate.key("nameColony.text"), name,
             "nameColony.yes", "nameColony.no", true);
         if (name == null) return; // User cancelled, 0-length invalid.
@@ -3647,7 +3647,7 @@ public final class InGameController implements NetworkConstants {
     public void nameNewLand(Unit unit, String defaultName, Player welcomer,
                             String camps) {
         Tile tile = unit.getTile();
-        String name = gui.showInputDialog(tile,
+        String name = gui.showOldInputDialog(tile,
             StringTemplate.template("newLand.text"), defaultName,
             "newLand.yes", null, true);
 
@@ -3692,7 +3692,7 @@ public final class InGameController implements NetworkConstants {
      */
     public void nameNewRegion(Tile tile, Unit unit, Region region,
                               String defaultName) {
-        String name = gui.showInputDialog(tile,
+        String name = gui.showOldInputDialog(tile,
             StringTemplate.template("nameRegion.text")
             .addStringTemplate("%type%", region.getLabel()),
             defaultName, "ok", null, false);
@@ -3917,7 +3917,7 @@ public final class InGameController implements NetworkConstants {
         String name = null;
         if (object instanceof Colony) {
             Colony colony = (Colony) object;
-            name = gui.showInputDialog(colony.getTile(),
+            name = gui.showOldInputDialog(colony.getTile(),
                 StringTemplate.key("renameColony.text"), colony.getName(),
                 "renameColony.yes", "renameColony.no", true);
             if (name == null) {
@@ -3935,7 +3935,7 @@ public final class InGameController implements NetworkConstants {
             }
         } else if (object instanceof Unit) {
             Unit unit = (Unit) object;
-            name = gui.showInputDialog(unit.getTile(),
+            name = gui.showOldInputDialog(unit.getTile(),
                 StringTemplate.key("renameUnit.text"), unit.getName(),
                 "renameUnit.yes", "renameUnit.no", false);
             if (name == null) return; // User cancelled, 0-length clears name.

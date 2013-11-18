@@ -82,6 +82,7 @@ import net.sf.freecol.client.gui.panel.FreeColConfirmDialog;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.client.gui.panel.FreeColOldDialog;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
+import net.sf.freecol.client.gui.panel.FreeColStringInputDialog;
 import net.sf.freecol.client.gui.panel.GameOptionsDialog;
 import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
 import net.sf.freecol.client.gui.panel.InformationPanel;
@@ -1271,6 +1272,183 @@ public final class Canvas extends JDesktopPane {
     }
 
 
+    // Dialog display
+
+    /**
+     * Displays a dialog with text and a choice of options.
+     *
+     * @param tile An optional <code>Tile</code> to make visible (not
+     *     under the dialog!)
+     * @param text The text that explains the choice for the user.
+     * @param icon An optional icon to display.
+     * @param cancelKey Key for the text of the optional cancel button.
+     * @param choices The <code>List</code> containing the ChoiceItems to
+     *            create buttons for.
+     * @return The corresponding member of the values array to the selected
+     *     option.
+     */
+    public <T> T showModalChoiceDialog(Tile tile, String text, ImageIcon icon,
+                                       String cancelKey,
+                                       List<ChoiceItem<T>> choices) {
+        FreeColChoiceDialog<T> fcd
+            = new FreeColChoiceDialog<T>(freeColClient, text, icon,
+                                         cancelKey, choices);
+        return showFreeColDialog(fcd, tile);
+    }
+
+    /**
+     * Displays a dialog with a text and a cancel-button, in addition
+     * to buttons for each of the objects returned for the given list.
+     *
+     * @param tile An optional tile to make visible (not under the dialog).
+     * @param text The text that explains the choice for the user.
+     * @param cancelText The text displayed on the "cancel"-button.
+     * @param choices The <code>List</code> containing the ChoiceItems to
+     *            create buttons for.
+     * @return The chosen object, or <i>null</i> for the cancel-button.
+     */
+    public <T> T showOldChoiceDialog(Tile tile, String text, String cancelText,
+                                     List<ChoiceItem<T>> choices) {
+        FreeColOldDialog<ChoiceItem<T>> choiceDialog
+            = FreeColOldDialog.createChoiceDialog(freeColClient, text,
+                                                  cancelText, choices);
+        if (choiceDialog.getHeight() > getHeight() / 3) {
+            choiceDialog.setSize(choiceDialog.getWidth(), (getHeight() * 2)/3);
+        }
+        ChoiceItem<T> response = showFreeColOldDialog(choiceDialog, tile, true);
+        return (response == null) ? null : response.getObject();
+    }
+
+    /**
+     * Displays a dialog with a text and a cancel-button, in addition
+     * to buttons for each of the objects in the list.
+     *
+     * @param tile An optional tile to make visible (not under the dialog).
+     * @param textKey A key for text that explains the choice for the user.
+     * @param cancelKey A key for the text displayed on the "cancel"-button.
+     * @param objects The List containing the objects to create buttons for.
+     * @return The chosen object, or <i>null</i> for the cancel-button.
+     */
+    public <T> T showSimpleChoiceDialog(Tile tile, String textKey,
+                                        String cancelKey, List<T> objects) {
+        List<ChoiceItem<T>> choices = new ArrayList<ChoiceItem<T>>();
+        for (T object : objects) {
+            choices.add(new ChoiceItem<T>(object));
+        }
+        return showOldChoiceDialog(tile,
+                                   Messages.message(textKey),
+                                   Messages.message(cancelKey),
+                                   choices);
+    }
+
+    /**
+     * Displays a dialog with a text and a ok/cancel option.
+     *
+     * @param tile An optional <code>Tile</code> to make visible (not
+     *     under the dialog!)
+     * @param text The text that explains the choice for the user.
+     * @param icon An optional icon to display.
+     * @param okKey The text displayed on the "ok"-button.
+     * @param cancelKey The text displayed on the "cancel"-button.
+     * @return True if the user clicked the "ok"-button.
+     */
+    public boolean showModalConfirmDialog(Tile tile,
+                                          String text, ImageIcon icon,
+                                          String okKey, String cancelKey) {
+        FreeColConfirmDialog fcd
+            = new FreeColConfirmDialog(freeColClient, text, icon,
+                                       okKey, cancelKey);
+        return showFreeColDialog(fcd, tile);
+    }
+
+    /**
+     * Displays a dialog with a text and a ok/cancel option.
+     *
+     * @param tile An optional <code>Tile</code> to make visible (not
+     *     under the dialog!)
+     * @param text The text that explains the choice for the user (should
+     *     have been i18n-expanded in GUI).
+     * @param icon An optional icon to display.
+     * @param okText The text displayed on the "ok"-button.
+     * @param cancelText The text displayed on the "cancel"-button.
+     * @return <i>true</i> if the user clicked the "ok"-button and <i>false</i>
+     *     otherwise.
+     * @see FreeColOldDialog
+     */
+    public boolean showOldConfirmDialog(Tile tile, String text, ImageIcon icon,
+                                     String okText, String cancelText) {
+        FreeColOldDialog<Boolean> dialog
+            = FreeColOldDialog.createConfirmDialog(freeColClient, text, icon,
+                Messages.message(okText),
+                Messages.message(cancelText));
+        return showFreeColOldDialog(dialog, tile, true);
+    }
+
+    /**
+     * Displays a dialog with a text field and a ok/cancel option.
+     *
+     * @param tile An optional tile to make visible (not under the dialog).
+     * @param template A <code>StringTemplate</code> that explains the
+     *     action to the user.
+     * @param defaultValue The default value appearing in the text field.
+     * @param okKey A key displayed on the "ok"-button.
+     * @param cancelKey A key displayed on the optional "cancel"-button.
+     * @param rejectEmpty If true, do not accept empty strings.
+     * @return The text the user entered, or null if cancelled.
+     */
+    public String showModalInputDialog(Tile tile, StringTemplate template,
+                                       String defaultValue,
+                                       String okKey, String cancelKey,
+                                       boolean rejectEmpty) {
+        FreeColStringInputDialog fcd;
+        String response = null;
+        for (;;) {
+            fcd = new FreeColStringInputDialog(freeColClient,
+                                               Messages.message(template),
+                                               defaultValue, okKey, cancelKey);
+            response = showFreeColDialog(fcd, tile);
+            if (!rejectEmpty || response == null
+                || response.length() > 0) break;
+            errorMessage("enterSomeText");
+        }
+        return response;
+    }
+
+    /**
+     * Displays a dialog with a text field and a ok/cancel option.
+     *
+     * @param tile An optional tile to make visible (not under the dialog).
+     * @param text The text that explains the action to the user.
+     * @param defaultValue The default value appearing in the text field.
+     * @param okText The text displayed on the "ok"-button.
+     * @param cancelText The text displayed on the
+     *     "cancel"-button. Use <i>null</i> to disable the cancel-option.
+     * @param rejectEmptyString a <code>boolean</code> value
+     * @return The text the user have entered or <i>null</i> if the user chose
+     *     to cancel the action.
+     * @see FreeColOldDialog
+     */
+    public String showOldInputDialog(Tile tile, StringTemplate text,
+                                     String defaultValue,
+                                     String okText, String cancelText,
+                                     boolean rejectEmptyString) {
+        FreeColOldDialog<String> inputDialog
+            = FreeColOldDialog.createInputDialog(freeColClient,
+                Messages.message(text), defaultValue,
+                Messages.message(okText),
+               (cancelText == null) ? null : Messages.message(cancelText));
+        String response = null;
+        for (;;) {
+            response = showFreeColOldDialog(inputDialog, tile, true);
+            if (!rejectEmptyString || response == null
+                || response.length() > 0) break;
+            errorMessage("enterSomeText");
+        }
+        return response;
+    }
+
+
+
     // Simple front ends to display each panel or dialog.
 
     /**
@@ -1298,11 +1476,11 @@ public final class Canvas extends JDesktopPane {
                 ScoutIndianSettlementAction.INDIAN_SETTLEMENT_ATTACK));
         String messageId = settlement.getAlarmLevelMessageId(freeColClient.getMyPlayer());
         ScoutIndianSettlementAction result
-            = showChoiceDialog(settlement.getTile(),
-                               Messages.message(StringTemplate.template(messageId)
-                                                .addStringTemplate("%nation%", settlement.getOwner().getNationName())),
-                               Messages.message("cancel"),
-                               choices);
+            = showOldChoiceDialog(settlement.getTile(),
+                Messages.message(StringTemplate.template(messageId)
+                    .addStringTemplate("%nation%", settlement.getOwner().getNationName())),
+                Messages.message("cancel"),
+                choices);
         return (result == null) ? ScoutIndianSettlementAction.CANCEL : result;
     }
 
@@ -1325,7 +1503,7 @@ public final class Canvas extends JDesktopPane {
         choices.add(new ChoiceItem<BoycottAction>(
                 Messages.message("boycottedGoods.dumpGoods"),
                 BoycottAction.DUMP_CARGO));
-        BoycottAction result = showChoiceDialog(null,
+        BoycottAction result = showOldChoiceDialog(null,
             Messages.message(StringTemplate.template("boycottedGoods.text")
                 .add("%goods%", goods.getNameKey())
                 .add("%europe%", europe.getNameKey())
@@ -1382,7 +1560,7 @@ public final class Canvas extends JDesktopPane {
         choices.add(new ChoiceItem<BuyAction>(
                 Messages.message("buy.moreGold"),
                 BuyAction.HAGGLE));
-        BuyAction result = showChoiceDialog(unit.getTile(),
+        BuyAction result = showOldChoiceDialog(unit.getTile(),
                 Messages.message(StringTemplate.template("buy.text")
                                  .addStringTemplate("%nation%", nation)
                                  .addStringTemplate("%goods%", goodsTemplate)
@@ -1419,29 +1597,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Displays a dialog with a text and a cancel-button, in addition
-     * to buttons for each of the objects returned for the given list.
-     *
-     * @param tile An optional tile to make visible (not under the dialog).
-     * @param text The text that explains the choice for the user.
-     * @param cancelText The text displayed on the "cancel"-button.
-     * @param choices The <code>List</code> containing the ChoiceItems to
-     *            create buttons for.
-     * @return The chosen object, or <i>null</i> for the cancel-button.
-     */
-    public <T> T showChoiceDialog(Tile tile, String text, String cancelText,
-                                  List<ChoiceItem<T>> choices) {
-        FreeColOldDialog<ChoiceItem<T>> choiceDialog
-            = FreeColOldDialog.createChoiceDialog(freeColClient, text,
-                                               cancelText, choices);
-        if (choiceDialog.getHeight() > getHeight() / 3) {
-            choiceDialog.setSize(choiceDialog.getWidth(), (getHeight() * 2) / 3);
-        }
-        ChoiceItem<T> response = showFreeColOldDialog(choiceDialog, tile, true);
-        return (response == null) ? null : response.getObject();
-    }
-
-    /**
      * Choose a founding father.
      *
      * @param fathers A list of <code>FoundingFather</code>s on offer.
@@ -1470,7 +1625,7 @@ public final class Canvas extends JDesktopPane {
                 ClaimAction.ACCEPT, canAccept));
         choices.add(new ChoiceItem<ClaimAction>(Messages.message("indianLand.take"),
                 ClaimAction.STEAL));
-        ClaimAction result = showChoiceDialog(tile,
+        ClaimAction result = showOldChoiceDialog(tile,
             Messages.message(StringTemplate.template("indianLand.text")
                 .addStringTemplate("%player%", owner.getNationName())),
             Messages.message("indianLand.cancel"), choices);
@@ -1563,73 +1718,6 @@ public final class Canvas extends JDesktopPane {
                                                               unitData);
         details.initialize();
         showSubPanel(details, false);
-    }
-
-    /**
-     * Displays a dialog with a text and a ok/cancel option.
-     *
-     * @param tile An optional <code>Tile</code> to make visible (not
-     *     under the dialog!)
-     * @param text The text that explains the choice for the user (should
-     *     have been i18n-expanded in GUI).
-     * @param icon An optional icon to display.
-     * @param okText The text displayed on the "ok"-button.
-     * @param cancelText The text displayed on the "cancel"-button.
-     * @return <i>true</i> if the user clicked the "ok"-button and <i>false</i>
-     *     otherwise.
-     * @see FreeColOldDialog
-     */
-    public boolean showOldConfirmDialog(Tile tile, String text, ImageIcon icon,
-                                     String okText, String cancelText) {
-        FreeColOldDialog<Boolean> dialog
-            = FreeColOldDialog.createConfirmDialog(freeColClient, text, icon,
-                Messages.message(okText),
-                Messages.message(cancelText));
-        return showFreeColOldDialog(dialog, tile, true);
-    }
-
-    /**
-     * Displays a dialog with text and a choice of options.
-     *
-     * @param tile An optional <code>Tile</code> to make visible (not
-     *     under the dialog!)
-     * @param text The text that explains the choice for the user (should
-     *     have been i18n-expanded in GUI).
-     * @param icon An optional icon to display.
-     * @param cancelText Optional text for a cancel option that returns null.
-     * @param choices The <code>List</code> containing the ChoiceItems to
-     *            create buttons for.
-     * @return The corresponding member of the values array to the selected
-     *     option.
-     */
-    public <T> T showModalChoiceDialog(Tile tile, String text, ImageIcon icon,
-                                       String cancelText,
-                                       List<ChoiceItem<T>> choices) {
-        
-        return showFreeColDialog(new FreeColChoiceDialog<T>(freeColClient,
-                                 text, icon, cancelText, choices),
-                                 tile);
-    }
-
-    /**
-     * Displays a dialog with a text and a ok/cancel option.
-     *
-     * @param tile An optional <code>Tile</code> to make visible (not
-     *     under the dialog!)
-     * @param text The text that explains the choice for the user (should
-     *     have been i18n-expanded in GUI).
-     * @param icon An optional icon to display.
-     * @param okText The text displayed on the "ok"-button.
-     * @param cancelText The text displayed on the "cancel"-button.
-     * @return True if the user clicked the "ok"-button.
-     */
-    public boolean showModalConfirmDialog(Tile tile,
-                                          String text, ImageIcon icon,
-                                          String okText, String cancelText) {
-        return showFreeColDialog(new FreeColConfirmDialog(freeColClient,
-                                                          text, icon,
-                                                          okText, cancelText),
-                                 tile);
     }
 
     /**
@@ -1887,7 +1975,7 @@ public final class Canvas extends JDesktopPane {
         choices.add(new ChoiceItem<TradeAction>(
                 Messages.message("tradeProposition.toGift"),
                 TradeAction.GIFT, canGift));
-        TradeAction result = showChoiceDialog(settlement.getTile(),
+        TradeAction result = showOldChoiceDialog(settlement.getTile(),
             Messages.message(StringTemplate.template("tradeProposition.welcome")
                 .addStringTemplate("%nation%", settlement.getOwner().getNationName())
                 .addName("%settlement%", settlement.getName())),
@@ -1959,39 +2047,6 @@ public final class Canvas extends JDesktopPane {
      */
     public void showInformationMessage(StringTemplate template) {
         showInformationMessage(null, template);
-    }
-
-    /**
-     * Displays a dialog with a text field and a ok/cancel option.
-     *
-     * @param tile An optional tile to make visible (not under the dialog).
-     * @param text The text that explains the action to the user.
-     * @param defaultValue The default value appearing in the text field.
-     * @param okText The text displayed on the "ok"-button.
-     * @param cancelText The text displayed on the
-     *     "cancel"-button. Use <i>null</i> to disable the cancel-option.
-     * @param rejectEmptyString a <code>boolean</code> value
-     * @return The text the user have entered or <i>null</i> if the user chose
-     *     to cancel the action.
-     * @see FreeColOldDialog
-     */
-    public String showInputDialog(Tile tile, StringTemplate text,
-                                  String defaultValue,
-                                  String okText, String cancelText,
-                                  boolean rejectEmptyString) {
-        FreeColOldDialog<String> inputDialog
-            = FreeColOldDialog.createInputDialog(freeColClient,
-                Messages.message(text), defaultValue,
-                Messages.message(okText),
-                (cancelText == null) ? null : Messages.message(cancelText));
-        String response = null;
-        for (;;) {
-            response = showFreeColOldDialog(inputDialog, tile, true);
-            if (!rejectEmptyString || response == null
-                || response.length() > 0) break;
-            errorMessage("enterSomeText");
-        }
-        return response;
     }
 
     /**
@@ -2364,7 +2419,7 @@ public final class Canvas extends JDesktopPane {
             .addStringTemplate("%unit%", unit.getFullLabel())
             .addName("%colony%", colony.getName());
         ScoutColonyAction result =
-            showChoiceDialog(unit.getTile(), Messages.message(template),
+            showOldChoiceDialog(unit.getTile(), Messages.message(template),
         Messages.message("cancel"), choices);
         return (result == null) ? ScoutColonyAction.CANCEL : result;
     }
@@ -2420,7 +2475,8 @@ public final class Canvas extends JDesktopPane {
         choices.add(new ChoiceItem<ScoutIndianSettlementAction>(
                 Messages.message("scoutSettlement.attack"),
                 ScoutIndianSettlementAction.INDIAN_SETTLEMENT_ATTACK));
-        ScoutIndianSettlementAction result = showChoiceDialog(settlement.getTile(),
+        ScoutIndianSettlementAction result
+            = showOldChoiceDialog(settlement.getTile(),
                 text.toString(),
                 Messages.message("cancel"),
                 choices);
@@ -2482,7 +2538,7 @@ public final class Canvas extends JDesktopPane {
                 Messages.message(StringTemplate.template("sell.gift")
                                  .addStringTemplate("%goods%", goodsTemplate)),
                 SellAction.GIFT));
-        SellAction result = showChoiceDialog(unit.getTile(),
+        SellAction result = showOldChoiceDialog(unit.getTile(),
                 Messages.message(StringTemplate.template("sell.text")
                                  .addStringTemplate("%nation%", nation)
                                  .addStringTemplate("%goods%", goodsTemplate)
@@ -2523,29 +2579,6 @@ public final class Canvas extends JDesktopPane {
         } else {
             throw new IllegalStateException("Bogus settlement");
         }
-    }
-
-    /**
-     * Displays a dialog with a text and a cancel-button, in addition
-     * to buttons for each of the objects in the list.
-     *
-     * @param tile An optional tile to make visible (not under the dialog).
-     * @param text The text that explains the choice for the user.
-     * @param cancelText The text displayed on the "cancel"-button.
-     * @param objects The List containing the objects to create buttons for.
-     * @return The chosen object, or <i>null</i> for the cancel-button.
-     */
-    public <T> T showSimpleChoiceDialog(Tile tile,
-                                        String text, String cancelText,
-                                        List<T> objects) {
-        List<ChoiceItem<T>> choices = new ArrayList<ChoiceItem<T>>();
-        for (T object : objects) {
-            choices.add(new ChoiceItem<T>(object));
-        }
-        return showChoiceDialog(tile,
-                                Messages.message(text),
-                                Messages.message(cancelText),
-                                choices);
     }
 
     /**
@@ -2677,7 +2710,7 @@ public final class Canvas extends JDesktopPane {
         introText.append("\n\n");
         introText.append(Messages.message(StringTemplate.template("missionarySettlement.question")
                 .addName("%settlement%", settlement.getName())));
-        MissionaryAction result = showChoiceDialog(unit.getTile(),
+        MissionaryAction result = showOldChoiceDialog(unit.getTile(),
                 introText.toString(),
                 Messages.message("cancel"),
                 choices);

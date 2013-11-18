@@ -48,29 +48,29 @@ public class FreeColChoiceDialog<T> extends FreeColDialog<T> {
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param obj The obj that explains the choice for the user.
      * @param icon An optional icon to display.
-     * @param cancelText Optional text for a cancel option that returns null.
+     * @param cancelKey Key for the text of the optional cancel button.
      * @param choices A list of <code>ChoiceItem</code>s to create buttons for.
      * @return The <code>FreeColChoiceDialog</code> created.
      */
     public FreeColChoiceDialog(final FreeColClient freeColClient,
-                               String obj, ImageIcon icon, String cancelText,
+                               String obj, ImageIcon icon, String cancelKey,
                                List<ChoiceItem<T>> choices) {
         this(freeColClient);
 
-        initialize(obj, icon, cancelText, choices);
+        initialize(obj, icon, cancelKey, choices);
     }
 
 
     /**
      * @param obj An object that explains the choice for the user.
      * @param icon An optional icon to display.
-     * @param cancelText Optional text for a cancel option that returns null.
+     * @param cancelKey Key for the text of the optional cancel button.
      * @param choices A list of <code>ChoiceItem</code>s to create buttons for.
      */
-    protected void initialize(Object obj, ImageIcon icon, String cancelText,
+    protected void initialize(Object obj, ImageIcon icon, String cancelKey,
                               List<ChoiceItem<T>> choices) {
-        if (cancelText != null) {
-            choices.add(new ChoiceItem<T>(Messages.message(cancelText),
+        if (cancelKey != null) {
+            choices.add(new ChoiceItem<T>(Messages.message(cancelKey),
                     (T)null).cancelOption().defaultOption());
         }
         initialize(DialogType.PLAIN, true, obj, icon, choices);

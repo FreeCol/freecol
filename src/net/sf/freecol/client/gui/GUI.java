@@ -1164,12 +1164,6 @@ public class GUI {
         canvas.showChatPanel();
     }
 
-    public <T> T showChoiceDialog(Tile tile, String text, String cancelText,
-                                  List<ChoiceItem<T>> choices) {
-        if (canvas == null) return null;
-        return canvas.showChoiceDialog(tile, text, cancelText, choices);
-    }
-
     public FoundingFather showChooseFoundingFatherDialog(List<FoundingFather> ffs) {
         if (canvas == null) return null;
         return canvas.showChooseFoundingFatherDialog(ffs);
@@ -1209,47 +1203,6 @@ public class GUI {
     public List<String> showConfirmDeclarationDialog() {
         if (canvas == null) return Collections.emptyList();
         return canvas.showConfirmDeclarationDialog();
-    }
-
-    public <T> T showModalChoiceDialog(Tile tile, String text, Object obj,
-                                       String cancelText,
-                                       List<ChoiceItem<T>> choices) {
-        if (canvas == null) return null;
-        return canvas.showModalChoiceDialog(tile, text,
-                                            getImageIcon(obj, false),
-                                            cancelText, choices);
-    }
-
-    public boolean showModalConfirmDialog(String text,
-                                          String okText, String cancelText) {
-        if (canvas == null) return false;
-        return canvas.showModalConfirmDialog(null, Messages.message(text),
-                                             null, okText, cancelText);
-    }
-
-    public boolean showModalConfirmDialog(Tile tile,
-                                          StringTemplate template, Object obj,
-                                          String okText, String cancelText) {
-        if (canvas == null) return false;
-        return canvas.showModalConfirmDialog(tile, Messages.message(template),
-                                             getImageIcon(obj, false),
-                                             okText, cancelText);
-    }
-
-    public boolean showOldConfirmDialog(String text,
-                                        String okText, String cancelText) {
-        if (canvas == null) return false;
-        return canvas.showOldConfirmDialog(null, Messages.message(text),
-                                           null, okText, cancelText);
-    }
-
-    public boolean showOldConfirmDialog(Tile tile,
-                                        StringTemplate template, Object obj,
-                                        String okText, String cancelText) {
-        if (canvas == null) return false;
-        return canvas.showOldConfirmDialog(tile, Messages.message(template),
-                                           getImageIcon(obj, false),
-                                           okText, cancelText);
     }
 
     public void showDeclarationPanel() {
@@ -1357,15 +1310,6 @@ public class GUI {
         canvas.showInformationMessage(template);
     }
 
-    public String showInputDialog(Tile tile, StringTemplate text,
-                                  String defaultValue,
-                                  String okText, String cancelText,
-                                  boolean rejectEmptyString) {
-        if (canvas == null) return null;
-        return canvas.showInputDialog(tile, text, defaultValue,
-                                      okText, cancelText, rejectEmptyString);
-    }
-
     public File showLoadDialog(File directory) {
         if (canvas == null) return null;
         return canvas.showLoadDialog(directory);
@@ -1404,6 +1348,40 @@ public class GUI {
         return canvas.showMapSizeDialog();
     }
 
+    public <T> T showModalChoiceDialog(Tile tile, String text, Object obj,
+                                       String cancelKey,
+                                       List<ChoiceItem<T>> choices) {
+        if (canvas == null) return null;
+        return canvas.showModalChoiceDialog(tile, text,
+                                            getImageIcon(obj, false),
+                                            cancelKey, choices);
+    }
+
+    public boolean showModalConfirmDialog(String textKey,
+                                          String okKey, String cancelKey) {
+        if (canvas == null) return false;
+        return canvas.showModalConfirmDialog(null, Messages.message(textKey),
+                                             null, okKey, cancelKey);
+    }
+
+    public boolean showModalConfirmDialog(Tile tile,
+                                          StringTemplate template, Object obj,
+                                          String okKey, String cancelKey) {
+        if (canvas == null) return false;
+        return canvas.showModalConfirmDialog(tile, Messages.message(template),
+                                             getImageIcon(obj, false),
+                                             okKey, cancelKey);
+    }
+
+    public String showModalInputDialog(Tile tile, StringTemplate template,
+                                       String defaultValue,
+                                       String okKey, String cancelKey,
+                                       boolean rejectEmpty) {
+        if (canvas == null) return null;
+        return canvas.showModalInputDialog(tile, template, defaultValue,
+                                           okKey, cancelKey, rejectEmpty);
+    }
+
     public void showModelMessages(ModelMessage... modelMessages) {
         if (canvas == null) return;
         canvas.showModelMessages(modelMessages);
@@ -1430,6 +1408,37 @@ public class GUI {
     public void showNewPanel(Specification specification) {
         if (canvas == null) return;
         canvas.showNewPanel(specification);
+    }
+
+    public <T> T showOldChoiceDialog(Tile tile, String text, String cancelText,
+                                     List<ChoiceItem<T>> choices) {
+        if (canvas == null) return null;
+        return canvas.showOldChoiceDialog(tile, text, cancelText, choices);
+    }
+
+    public boolean showOldConfirmDialog(String text,
+                                        String okText, String cancelText) {
+        if (canvas == null) return false;
+        return canvas.showOldConfirmDialog(null, Messages.message(text),
+                                           null, okText, cancelText);
+    }
+
+    public boolean showOldConfirmDialog(Tile tile,
+                                        StringTemplate template, Object obj,
+                                        String okText, String cancelText) {
+        if (canvas == null) return false;
+        return canvas.showOldConfirmDialog(tile, Messages.message(template),
+                                           getImageIcon(obj, false),
+                                           okText, cancelText);
+    }
+
+    public String showOldInputDialog(Tile tile, StringTemplate textKey,
+                                     String defaultValue,
+                                     String okKey, String cancelKey,
+                                     boolean rejectEmpty) {
+        if (canvas == null) return null;
+        return canvas.showOldInputDialog(tile, textKey, defaultValue,
+                                         okKey, cancelKey, rejectEmpty);
     }
 
     public void showOpeningVideoPanel(String userMsg) {
@@ -1589,10 +1598,10 @@ public class GUI {
         canvas.showServerListPanel(serverList);
     }
 
-    public <T> T showSimpleChoiceDialog(Tile tile, String text,
-                                        String cancelText, List<T> objects) {
+    public <T> T showSimpleChoiceDialog(Tile tile, String textKey,
+                                        String cancelKey, List<T> objects) {
         if (canvas == null) return null;
-        return canvas.showSimpleChoiceDialog(tile, text, cancelText, objects);
+        return canvas.showSimpleChoiceDialog(tile, textKey, cancelKey, objects);
     }
 
     public void showStartGamePanel(Game game, Player player,

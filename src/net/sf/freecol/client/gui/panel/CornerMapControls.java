@@ -205,7 +205,7 @@ public final class CornerMapControls extends MapControls {
                     canvas.add(button, CONTROLS_LAYER);
                 } catch (Exception e) {
                     logger.log(Level.WARNING, "Button add fail: "
-                        + button.getLocation(), e);
+                        + button.getLocation() + " in " + canvas.getSize(), e);
                 }
                 button.refreshAction();
             }

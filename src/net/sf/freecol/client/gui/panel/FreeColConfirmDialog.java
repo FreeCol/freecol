@@ -49,16 +49,16 @@ public class FreeColConfirmDialog extends FreeColDialog<Boolean> {
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param text The text that explains the choice for the user.
      * @param icon An optional icon to display.
-     * @param okText The text displayed on the "ok"-button.
-     * @param cancelText The text displayed on the "cancel"-button.
+     * @param okKey A key for the text displayed on the "ok"-button.
+     * @param cancelKey A key for the text displayed on the "cancel"-button.
      * @return The <code>FreeColDialog</code> created.
      */
     public FreeColConfirmDialog(final FreeColClient freeColClient,
                                 String text, ImageIcon icon,
-                                String okText, String cancelText) {
+                                String okKey, String cancelKey) {
         this(freeColClient);
 
-        initialize(text, icon, okText, cancelText);
+        initialize(text, icon, okKey, cancelKey);
     }
 
 
@@ -67,15 +67,15 @@ public class FreeColConfirmDialog extends FreeColDialog<Boolean> {
      *
      * @param text The object that explains the choice for the user.
      * @param icon An optional icon to display.
-     * @param okText The text displayed on the "ok"-button.
-     * @param cancelText The text displayed on the "cancel"-button.
+     * @param okKey The text displayed on the "ok"-button.
+     * @param cancelKey The text displayed on the "cancel"-button.
      */
     protected void initialize(Object text, ImageIcon icon,
-                              String okText, String cancelText) {
+                              String okKey, String cancelKey) {
         List<ChoiceItem<Boolean>> c = choices();
-        c.add(new ChoiceItem<Boolean>(Messages.message(okText),
+        c.add(new ChoiceItem<Boolean>(Messages.message(okKey),
                 Boolean.TRUE).okOption());
-        c.add(new ChoiceItem<Boolean>(Messages.message(cancelText),
+        c.add(new ChoiceItem<Boolean>(Messages.message(cancelKey),
                 Boolean.FALSE).cancelOption().defaultOption());
         initialize(DialogType.QUESTION, true, text, icon, c);
     }

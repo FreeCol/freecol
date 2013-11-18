@@ -221,7 +221,7 @@ public class DebugUtils {
         final Player sPlayer = sGame.getFreeColGameObject(player.getId(),
                                                           Player.class);
 
-        String response = gui.showInputDialog(null,
+        String response = gui.showModalInputDialog(null,
             StringTemplate.key("menuBar.debug.addGold"),
             Integer.toString(1000), "ok", "cancel", true);
         int gold;
@@ -250,7 +250,7 @@ public class DebugUtils {
         final Player sPlayer = sGame.getFreeColGameObject(player.getId(),
                                                           Player.class);
 
-        String response = gui.showInputDialog(null,
+        String response = gui.showModalInputDialog(null,
             StringTemplate.key("menuBar.debug.addImmigration"),
             Integer.toString(100), "ok", "cancel", true);
         int crosses;
@@ -279,7 +279,7 @@ public class DebugUtils {
         final Player sPlayer = sGame.getFreeColGameObject(player.getId(),
                                                           Player.class);
 
-        String response = gui.showInputDialog(null,
+        String response = gui.showModalInputDialog(null,
             StringTemplate.key("menuBar.debug.addLiberty"),
             Integer.toString(100), "ok", "cancel", true);
         int liberty;
@@ -400,7 +400,7 @@ public class DebugUtils {
                                         "cancel", gtl);
         if (goodsType == null) return;
 
-        String amount = gui.showInputDialog(null,
+        String amount = gui.showModalInputDialog(null,
             StringTemplate.name("Select Goods Amount"),
             "20", "ok", "cancel", true);
         if (amount == null) return;
@@ -887,7 +887,7 @@ public class DebugUtils {
                                    "cancel", gtl);
         if (goodsType == null) return;
 
-        String amount = freeColClient.getGUI().showInputDialog(null,
+        String amount = freeColClient.getGUI().showModalInputDialog(null,
                 StringTemplate.name("Select Goods Amount"),
                 Integer.toString(colony.getGoodsCount(goodsType)),
                 "ok", "cancel", true);
@@ -983,7 +983,7 @@ public class DebugUtils {
             return;
         }
 
-        String response = freeColClient.getGUI().showInputDialog(null,
+        String response = freeColClient.getGUI().showModalInputDialog(null,
             StringTemplate.key("menuBar.debug.skipTurns"),
             Integer.toString(10), "ok", "cancel", true);
         if (response == null) return;
