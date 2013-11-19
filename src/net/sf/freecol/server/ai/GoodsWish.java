@@ -191,6 +191,7 @@ public class GoodsWish extends Wish {
 
     private static final String AMOUNT_REQUESTED_TAG = "amountRequested";
     private static final String GOODS_TYPE_TAG = "goodsType";
+    private static final String TRANSPORTABLE_TAG = "transportable";
 
 
     /**
@@ -212,7 +213,14 @@ public class GoodsWish extends Wish {
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
+        final AIMain aiMain = getAIMain();
         final Specification spec = getSpecification();
+
+        // Delegated from Wish
+        transportable = (xr.hasAttribute(TRANSPORTABLE_TAG))
+            ? xr.makeAIObject(aiMain, TRANSPORTABLE_TAG,
+                              AIGoods.class, (AIGoods)null, true)
+            : null;
 
         goodsType = xr.getType(spec, GOODS_TYPE_TAG,
                                GoodsType.class, (GoodsType)null);

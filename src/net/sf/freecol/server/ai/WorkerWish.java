@@ -178,6 +178,7 @@ public class WorkerWish extends Wish {
     // Serialization
 
     private static final String EXPERT_NEEDED_TAG = "expertNeeded";
+    private static final String TRANSPORTABLE_TAG = "transportable";
     private static final String UNIT_TYPE_TAG = "unitType";
 
 
@@ -200,7 +201,14 @@ public class WorkerWish extends Wish {
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
+        final AIMain aiMain = getAIMain();
         final Specification spec = getSpecification();
+
+        // Delegated from Wish
+        transportable = (xr.hasAttribute(TRANSPORTABLE_TAG))
+            ? xr.makeAIObject(aiMain, TRANSPORTABLE_TAG,
+                              AIUnit.class, (AIUnit)null, true)
+            : null;
 
         unitType = xr.getType(spec, UNIT_TYPE_TAG,
                               UnitType.class, (UnitType)null);
