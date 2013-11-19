@@ -223,7 +223,8 @@ public class DebugUtils {
 
         String response = gui.showModalInputDialog(null,
             StringTemplate.key("menuBar.debug.addGold"),
-            Integer.toString(1000), "ok", "cancel", true);
+            Integer.toString(1000), "ok", "cancel");
+        if (response == null || response.length() == 0) return;
         int gold;
         try {
             gold = Integer.parseInt(response);
@@ -252,7 +253,8 @@ public class DebugUtils {
 
         String response = gui.showModalInputDialog(null,
             StringTemplate.key("menuBar.debug.addImmigration"),
-            Integer.toString(100), "ok", "cancel", true);
+            Integer.toString(100), "ok", "cancel");
+        if (response == null || response.length() == 0) return;
         int crosses;
         try {
             crosses = Integer.parseInt(response);
@@ -281,7 +283,8 @@ public class DebugUtils {
 
         String response = gui.showModalInputDialog(null,
             StringTemplate.key("menuBar.debug.addLiberty"),
-            Integer.toString(100), "ok", "cancel", true);
+            Integer.toString(100), "ok", "cancel");
+        if (response == null || response.length() == 0) return;
         int liberty;
         try {
             liberty = Integer.parseInt(response);
@@ -402,7 +405,7 @@ public class DebugUtils {
 
         String amount = gui.showModalInputDialog(null,
             StringTemplate.name("Select Goods Amount"),
-            "20", "ok", "cancel", true);
+            "20", "ok", "cancel");
         if (amount == null) return;
 
         int a;
@@ -887,15 +890,14 @@ public class DebugUtils {
                                    "cancel", gtl);
         if (goodsType == null) return;
 
-        String amount = freeColClient.getGUI().showModalInputDialog(null,
+        String response = freeColClient.getGUI().showModalInputDialog(null,
                 StringTemplate.name("Select Goods Amount"),
                 Integer.toString(colony.getGoodsCount(goodsType)),
-                "ok", "cancel", true);
-        if (amount == null) return;
-
+                "ok", "cancel");
+        if (response == null || response.length() == 0) return;
         int a;
         try {
-            a = Integer.parseInt(amount);
+            a = Integer.parseInt(response);
         } catch (NumberFormatException nfe) {
             return;
         }
@@ -985,9 +987,8 @@ public class DebugUtils {
 
         String response = freeColClient.getGUI().showModalInputDialog(null,
             StringTemplate.key("menuBar.debug.skipTurns"),
-            Integer.toString(10), "ok", "cancel", true);
-        if (response == null) return;
-
+            Integer.toString(10), "ok", "cancel");
+        if (response == null || response.length() == 0) return;
         int skip;
         try {
             skip = Integer.parseInt(response);

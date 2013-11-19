@@ -1091,7 +1091,7 @@ public final class InGameController implements NetworkConstants {
         File file = gui.showLoadDialog(FreeColDirectories.getSaveDirectory());
         if (file == null) return;
         if (!file.isFile()) {
-            gui.errorMessage("fileNotFound");
+            gui.showErrorMessage("fileNotFound");
             return;
         }
         if (freeColClient.isInGame()
@@ -1184,7 +1184,7 @@ public final class InGameController implements NetworkConstants {
             gui.closeStatusPanel();
             result = true;
         } catch (IOException e) {
-            gui.errorMessage("couldNotSaveGame");
+            gui.showErrorMessage("couldNotSaveGame");
         }
         gui.requestFocusInWindow();
         return result;
@@ -1718,7 +1718,7 @@ public final class InGameController implements NetworkConstants {
         // Check that the purchase is funded.
         Market market = player.getMarket();
         if (!player.checkGold(market.getBidPrice(type, toBuy))) {
-            gui.errorMessage("notEnoughGold");
+            gui.showErrorMessage("notEnoughGold");
             return false;
         }
 
@@ -3822,7 +3822,7 @@ public final class InGameController implements NetworkConstants {
         if (!requireOurTurn()) return;
 
         if (!colony.canPayToFinishBuilding()) {
-            gui.errorMessage("notEnoughGold");
+            gui.showErrorMessage("notEnoughGold");
             return;
         }
         int price = colony.getPriceForBuilding();
@@ -3890,7 +3890,7 @@ public final class InGameController implements NetworkConstants {
 
         Player player = freeColClient.getMyPlayer();
         if (!player.checkGold(player.getRecruitPrice())) {
-            gui.errorMessage("notEnoughGold");
+            gui.showErrorMessage("notEnoughGold");
             return;
         }
 
@@ -3917,14 +3917,14 @@ public final class InGameController implements NetworkConstants {
         String name = null;
         if (object instanceof Colony) {
             Colony colony = (Colony) object;
-            name = gui.showOldInputDialog(colony.getTile(),
+            name = gui.showModalInputDialog(colony.getTile(),
                 StringTemplate.key("renameColony.text"), colony.getName(),
-                "renameColony.yes", "renameColony.no", true);
-            if (name == null) {
-                // User cancelled, 0-length invalid.
+                "renameColony.yes", "renameColony.no");
+            if (name == null) { // User cancelled
                 return;
-            } else if (colony.getName().equals(name)) {
-                // No change
+            } else if (name.length() == 0) { // Zero length invalid
+                gui.showErrorMessage("enterSomeText");
+            } else if (colony.getName().equals(name)) { // No change
                 return;
             } else if (player.getSettlementByName(name) != null) {
                 // Colony name must be unique.
@@ -3935,9 +3935,9 @@ public final class InGameController implements NetworkConstants {
             }
         } else if (object instanceof Unit) {
             Unit unit = (Unit) object;
-            name = gui.showOldInputDialog(unit.getTile(),
+            name = gui.showModalInputDialog(unit.getTile(),
                 StringTemplate.key("renameUnit.text"), unit.getName(),
-                "renameUnit.yes", "renameUnit.no", false);
+                "renameUnit.yes", "renameUnit.no");
             if (name == null) return; // User cancelled, 0-length clears name.
         } else {
             logger.warning("Tried to rename an unsupported Nameable: "
@@ -4232,7 +4232,7 @@ public final class InGameController implements NetworkConstants {
         Player player = freeColClient.getMyPlayer();
         Europe europe = player.getEurope();
         if (!player.checkGold(europe.getUnitPrice(unitType))) {
-            gui.errorMessage("notEnoughGold");
+            gui.showErrorMessage("notEnoughGold");
             return;
         }
 

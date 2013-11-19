@@ -1039,21 +1039,6 @@ public class GUI {
         canvas.displayChat(senderName, message, privateChat);
     }
 
-    public void errorMessage(StringTemplate template) {
-        if (canvas == null) return;
-        canvas.errorMessage(Messages.message(template));
-    }
-
-    public void errorMessage(String messageId) {
-        if (canvas == null) return;
-        canvas.errorMessage(messageId);
-    }
-
-    public void errorMessage(String messageID, String message) {
-        if (canvas == null) return;
-        canvas.errorMessage(messageID, message);
-    }
-
     public LoadingSavegameDialog getLoadingSavegameDialog() {
         if (canvas == null) return null;
         return canvas.getLoadingSavegameDialog();
@@ -1240,6 +1225,21 @@ public class GUI {
         return canvas.showEndTurnDialog(units);
     }
 
+    public void showErrorMessage(StringTemplate template) {
+        if (canvas == null) return;
+        canvas.showErrorMessage(Messages.message(template));
+    }
+
+    public void showErrorMessage(String messageId) {
+        if (canvas == null) return;
+        canvas.showErrorMessage(messageId);
+    }
+
+    public void showErrorMessage(String messageID, String message) {
+        if (canvas == null) return;
+        canvas.showErrorMessage(messageID, message);
+    }
+
     public int showEuropeDialog(EuropePanel.EuropeAction europeAction) {
         if (canvas == null) return -1;
         return canvas.showEuropeDialog(europeAction);
@@ -1375,11 +1375,10 @@ public class GUI {
 
     public String showModalInputDialog(Tile tile, StringTemplate template,
                                        String defaultValue,
-                                       String okKey, String cancelKey,
-                                       boolean rejectEmpty) {
+                                       String okKey, String cancelKey) {
         if (canvas == null) return null;
         return canvas.showModalInputDialog(tile, template, defaultValue,
-                                           okKey, cancelKey, rejectEmpty);
+                                           okKey, cancelKey);
     }
 
     public void showModelMessages(ModelMessage... modelMessages) {

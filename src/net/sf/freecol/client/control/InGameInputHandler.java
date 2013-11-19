@@ -685,7 +685,7 @@ public final class InGameInputHandler extends InputHandler {
 
         SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    getGUI().errorMessage(messageId, message);
+                    getGUI().showErrorMessage(messageId, message);
                 }
             });
         return null;

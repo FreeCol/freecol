@@ -222,7 +222,7 @@ public final class StartGamePanel extends FreeColPanel {
                     && e.getValue() != NationState.NOT_AVAILABLE) n++;
             }
             if (n == 0) {
-                getGUI().errorMessage("victory.noEuropeans");
+                getGUI().showErrorMessage("victory.noEuropeans");
                 return false;
             }
         }

@@ -951,34 +951,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Displays an error message.
-     *
-     * @param messageId The i18n-keyname of the error message to display.
-     */
-    public void errorMessage(String messageId) {
-        errorMessage(messageId, "Unspecified error: " + messageId);
-    }
-
-    /**
-     * Displays an error message.
-     *
-     * @param messageId The i18n-keyname of the error message to display.
-     * @param message An alternative (possibly non-i18n) message to
-     *     display if the resource specified by <code>messageId</code>
-     *     is unavailable.
-     */
-    public void errorMessage(String messageId, String message) {
-        String display = null;
-        if (messageId != null) {
-            display = Messages.message(messageId);
-        }
-        if (display == null || "".equals(display))
-            display = message;
-        ErrorPanel errorPanel = new ErrorPanel(freeColClient, display);
-        showSubPanel(errorPanel, true);
-    }
-
-    /**
      * Gets a currently displayed FreeColPanel of a given type.
      *
      * @param type The type of <code>FreeColPanel</code> to look for.
@@ -1395,25 +1367,16 @@ public final class Canvas extends JDesktopPane {
      * @param defaultValue The default value appearing in the text field.
      * @param okKey A key displayed on the "ok"-button.
      * @param cancelKey A key displayed on the optional "cancel"-button.
-     * @param rejectEmpty If true, do not accept empty strings.
      * @return The text the user entered, or null if cancelled.
      */
     public String showModalInputDialog(Tile tile, StringTemplate template,
                                        String defaultValue,
-                                       String okKey, String cancelKey,
-                                       boolean rejectEmpty) {
-        FreeColStringInputDialog fcd;
-        String response = null;
-        for (;;) {
-            fcd = new FreeColStringInputDialog(freeColClient,
-                                               Messages.message(template),
-                                               defaultValue, okKey, cancelKey);
-            response = showFreeColDialog(fcd, tile);
-            if (!rejectEmpty || response == null
-                || response.length() > 0) break;
-            errorMessage("enterSomeText");
-        }
-        return response;
+                                       String okKey, String cancelKey) {
+        FreeColStringInputDialog fcd
+            = new FreeColStringInputDialog(freeColClient,
+                                           Messages.message(template),
+                                           defaultValue, okKey, cancelKey);
+        return showFreeColDialog(fcd, tile);
     }
 
     /**
@@ -1444,7 +1407,7 @@ public final class Canvas extends JDesktopPane {
             response = showFreeColOldDialog(inputDialog, tile, true);
             if (!rejectEmptyString || response == null
                 || response.length() > 0) break;
-            errorMessage("enterSomeText");
+            showErrorMessage("enterSomeText");
         }
         return response;
     }
@@ -1826,6 +1789,34 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
+     * Displays an error message.
+     *
+     * @param messageId The i18n-keyname of the error message to display.
+     */
+    public void showErrorMessage(String messageId) {
+        showErrorMessage(messageId, "Unspecified error: " + messageId);
+    }
+
+    /**
+     * Displays an error message.
+     *
+     * @param messageId The i18n-keyname of the error message to display.
+     * @param message An alternative (possibly non-i18n) message to
+     *     display if the resource specified by <code>messageId</code>
+     *     is unavailable.
+     */
+    public void showErrorMessage(String messageId, String message) {
+        String display = null;
+        if (messageId != null) {
+            display = Messages.message(messageId);
+        }
+        if (display == null || "".equals(display))
+            display = message;
+        ErrorPanel errorPanel = new ErrorPanel(freeColClient, display);
+        showSubPanel(errorPanel, true);
+    }
+
+    /**
      * Displays one of the Europe Dialogs for Recruit, Purchase, Train.
      * Closes any currently open Dialogs.
      * Does not return from this method before the panel is closed.
@@ -1878,7 +1869,7 @@ public final class Canvas extends JDesktopPane {
      */
     public void showEuropePanel() {
         if (freeColClient.getGame() == null) {
-            errorMessage("europe.noGame");
+            showErrorMessage("europe.noGame");
         } else {
             EuropePanel panel = getExistingFreeColPanel(EuropePanel.class);
             if (panel == null) {
@@ -2083,7 +2074,7 @@ public final class Canvas extends JDesktopPane {
                                                         directory, fileFilters),
                                          null);
             if (response == null || response.isFile()) break;
-            errorMessage("noSuchFile");
+            showErrorMessage("noSuchFile");
         }
         return response;
     }
@@ -2239,7 +2230,7 @@ public final class Canvas extends JDesktopPane {
      * Shows the <code>OpenGamePanel</code>.
      */
     public void showOpenGamePanel() {
-        errorMessage("openGame.unimplemented");
+        showErrorMessage("openGame.unimplemented");
     }
 
     /**

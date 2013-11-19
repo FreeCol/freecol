@@ -157,10 +157,10 @@ public final class PreGameInputHandler extends InputHandler {
      */
     private Element error(Element element)  {
         if (element.hasAttribute("messageID")) {
-            getGUI().errorMessage(element.getAttribute("messageID"),
+            getGUI().showErrorMessage(element.getAttribute("messageID"),
                                   element.getAttribute("message"));
         } else {
-            getGUI().errorMessage(null, element.getAttribute("message"));
+            getGUI().showErrorMessage(null, element.getAttribute("message"));
         }
         return null;
     }

@@ -70,7 +70,7 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
                    if (file == null) {
                        return;
                    } else if (!file.isFile()) {
-                       gui.errorMessage("fileNotFound");
+                       gui.showErrorMessage("fileNotFound");
                        return;
                    }
 

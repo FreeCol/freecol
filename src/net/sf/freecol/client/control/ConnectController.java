@@ -155,11 +155,11 @@ public final class ConnectController {
             freeColServer = new FreeColServer(publicServer, false,
                                               specification, port, null);
         } catch (NoRouteToServerException e) {
-            gui.errorMessage("server.noRouteToServer");
+            gui.showErrorMessage("server.noRouteToServer");
             logger.log(Level.WARNING, "No route to server.", e);
             return false;
         } catch (IOException e) {
-            gui.errorMessage("server.couldNotStart");
+            gui.showErrorMessage("server.couldNotStart");
             logger.log(Level.WARNING, "Could not start server.", e);
             return false;
         }
@@ -230,12 +230,12 @@ public final class ConnectController {
             freeColServer = new FreeColServer(false, true, specification,
                                               -1, null);
         } catch (NoRouteToServerException e) {
-            gui.errorMessage("server.noRouteToServer");
+            gui.showErrorMessage("server.noRouteToServer");
             logger.log(Level.WARNING, "No route to server (single player!).",
                 e);
             return false;
         } catch (IOException e) {
-            gui.errorMessage("server.couldNotStart");
+            gui.showErrorMessage("server.couldNotStart");
             logger.log(Level.WARNING, "Could not start server.", e);
             return false;
         }
@@ -277,7 +277,7 @@ public final class ConnectController {
 
             public void run() {
                 gui.closeMenus();
-                gui.errorMessage(message);
+                gui.showErrorMessage(message);
             }
         }
 
@@ -438,7 +438,7 @@ public final class ConnectController {
             freeColClient.askServer().connect(FreeCol.CLIENT_THREAD + userName,
                     host, port, freeColClient.getPreGameInputHandler());
         } catch (Exception e) {
-            gui.errorMessage("server.couldNotConnect", e.getMessage());
+            gui.showErrorMessage("server.couldNotConnect", e.getMessage());
             return false;
         }
 
@@ -620,7 +620,7 @@ public final class ConnectController {
                                 FreeCol.META_SERVER_PORT, null,
                                 FreeCol.CLIENT_THREAD);
         } catch (IOException e) {
-            gui.errorMessage("metaServer.couldNotConnect");
+            gui.showErrorMessage("metaServer.couldNotConnect");
             logger.log(Level.WARNING, "Could not connect to meta-server.", e);
             return null;
         }
@@ -628,7 +628,7 @@ public final class ConnectController {
         try {
             Element reply = mc.askDumping(DOMMessage.createMessage("getServerList"));
             if (reply == null) {
-                gui.errorMessage("metaServer.communicationError");
+                gui.showErrorMessage("metaServer.communicationError");
                 logger.warning("The meta-server did not return a list.");
                 return null;
             } else {
@@ -640,7 +640,7 @@ public final class ConnectController {
                 return items;
             }
         } catch (IOException e) {
-            gui.errorMessage("metaServer.communicationError");
+            gui.showErrorMessage("metaServer.communicationError");
             logger.log(Level.WARNING, "Network error with meta-server.", e);
             return null;
         } finally {

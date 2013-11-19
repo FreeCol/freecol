@@ -343,7 +343,7 @@ public class FreeColOldDialog<T> extends FreeColPanel {
                         }
                         mapSizeDialog.setResponse(new Dimension(width, height));
                     } catch (NumberFormatException nfe) {
-                        freeColClient.getGUI().errorMessage("integerAboveZero");
+                        freeColClient.getGUI().showErrorMessage("integerAboveZero");
                     }
                 }
             });

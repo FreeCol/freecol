@@ -340,7 +340,7 @@ public class DebugMenu extends JMenu {
             Messages.message("menuBar.debug.displayErrorMessage"));
         errorMessage.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    gui.errorMessage(ERROR_MESSAGE);
+                    gui.showErrorMessage(ERROR_MESSAGE);
                 }
             });
         panelMenu.add(errorMessage);

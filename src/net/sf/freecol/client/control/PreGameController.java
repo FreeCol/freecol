@@ -95,7 +95,7 @@ public final class PreGameController {
             freeColClient.askServer().requestLaunch();
 
         } else {
-            gui.errorMessage("server.notAllReady");
+            gui.showErrorMessage("server.notAllReady");
         }
     }
 

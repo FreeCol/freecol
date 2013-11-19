@@ -329,14 +329,14 @@ public final class TradeRouteInputDialog extends FreeColOldDialog<Boolean> imple
                 StringTemplate template
                     = StringTemplate.template("traderouteDialog.duplicateName")
                         .addName("%name%", newName);
-                getGUI().errorMessage(template);
+                getGUI().showErrorMessage(template);
                 return false;
             }
         }
 
         // Verify that it has at least two stops
         if (stopListModel.getSize() < 2) {
-            getGUI().errorMessage("traderouteDialog.notEnoughStops");
+            getGUI().showErrorMessage("traderouteDialog.notEnoughStops");
             return false;
         }
 
@@ -348,7 +348,7 @@ public final class TradeRouteInputDialog extends FreeColOldDialog<Boolean> imple
                 StringTemplate template
                     = StringTemplate.template("traderouteDialog.invalidStop")
                         .addName("%name%", badStop);
-                getGUI().errorMessage(template);
+                getGUI().showErrorMessage(template);
                 return false;
             }
         }

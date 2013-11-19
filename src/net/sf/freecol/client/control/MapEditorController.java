@@ -102,10 +102,10 @@ public final class MapEditorController {
 
             gui.startMapEditorGUI();
         } catch (NoRouteToServerException e) {
-            gui.errorMessage("server.noRouteToServer");
+            gui.showErrorMessage("server.noRouteToServer");
             return;
         } catch (IOException e) {
-            gui.errorMessage("server.couldNotStart");
+            gui.showErrorMessage("server.couldNotStart");
             return;
         }
     }
@@ -182,7 +182,7 @@ public final class MapEditorController {
             gui.refresh();
         } catch (FreeColException e) {
             gui.closeMenus();
-            gui.errorMessage(e.getMessage());
+            gui.showErrorMessage(e.getMessage());
         }
     }
 
@@ -223,7 +223,7 @@ public final class MapEditorController {
                 } catch (IOException e) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            gui.errorMessage("couldNotSaveGame");
+                            gui.showErrorMessage("couldNotSaveGame");
                         }
                     });
                 }
@@ -240,7 +240,7 @@ public final class MapEditorController {
         File file = gui.showLoadDialog(FreeColDirectories.getSaveDirectory());
         if (file == null) return;
         if (!file.isFile()) {
-            gui.errorMessage("fileNotFound");
+            gui.showErrorMessage("fileNotFound");
             return;
         }
 
@@ -265,7 +265,7 @@ public final class MapEditorController {
 
             public void run() {
                 gui.closeMenus();
-                gui.errorMessage(message);
+                gui.showErrorMessage(message);
             }
         }
 
