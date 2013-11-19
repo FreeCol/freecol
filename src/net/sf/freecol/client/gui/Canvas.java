@@ -435,8 +435,7 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Adds a component centered on this Canvas.  Removes the statusPanel if
-     * visible (and <code>comp != statusPanel</code>).
+     * Adds a component centered on this Canvas.
      *
      * @param comp The <code>Component</code> to add to this canvas.
      * @param i The layer to add the component to (see JLayeredPane).
@@ -519,8 +518,8 @@ public final class Canvas extends JDesktopPane {
                 break;
             }
         }
-        if (comp instanceof JComponent
-            && (p = getClearSpace((JComponent)comp, x, y, MAXTRY)) != null
+        if (comp instanceof Component
+            && (p = getClearSpace((Component)comp, x, y, MAXTRY)) != null
             && p.x >= 0 && p.x < getWidth()
             && p.y >= 0 && p.y < getHeight()) {
             x = p.x;
@@ -570,35 +569,40 @@ public final class Canvas extends JDesktopPane {
      * Try to find some free space on the canvas for a component,
      * starting at x,y.
      *
-     * @param comp The <code>JComponent</code> to place.
+     * @param comp The <code>Component</code> to place.
      * @param x A starting x coordinate.
      * @param y A starting y coordinate.
      * @return A <code>Point</code> to place the component at or null
      *     on failure.
      */
-    private Point getClearSpace(JComponent comp, int x, int y, int tries) {
+    private Point getClearSpace(Component comp, int x, int y, int tries) {
         if (!this.getBounds().contains(x, y)) return null;
-        final int w = comp.getWidth();
-        final int h = comp.getHeight();
 
-        Rectangle r = new Rectangle(x, y, w, h);
-        Component c = null;
-        for (Component child : this.getComponents()) {
-            if (child.getBounds().intersects(r)) {
-                c = child;
-                break;
+        tries = 3 * tries + 1; // 3 new candidates per level
+        List<Point> todo = new ArrayList<Point>();
+        Point p = new Point(x, y);
+        todo.add(p);
+        while (!todo.isEmpty()) {
+            p = todo.remove(0);
+            Rectangle r = new Rectangle(p.x, p.y, 
+                                        comp.getWidth(), comp.getHeight());
+            Component c = null;
+            for (Component child : this.getComponents()) {
+                if (child.getBounds().intersects(r)) {
+                    c = child;
+                    break;
+                }
             }
+            if (c == null) return p;
+            if (--tries <= 0) break;
+
+            int n = todo.size();
+            todo.add(n, new Point(c.getX() + c.getWidth() + 1,
+                                  c.getY() + c.getHeight() + 1));
+            todo.add(n, new Point(x, c.getY() + c.getHeight() + 1));
+            todo.add(n, new Point(c.getX() + c.getWidth() + 1, y));
         }
-        if (c == null) return new Point(x, y);
-        if (tries <= 0) return null;
-        Point p;
-        p = getClearSpace(comp, c.getX() + c.getWidth() + 1, y, tries - 1);
-        if (p != null) return p;
-        p = getClearSpace(comp, x, c.getY() + c.getHeight() + 1, tries - 1);
-        if (p != null) return p;
-        p = getClearSpace(comp, c.getX() + c.getWidth() + 1, 
-                          c.getY() + c.getHeight() + 1, tries - 1);
-        return p;
+        return new Point(x, y);
     }
 
     /**
@@ -815,11 +819,9 @@ public final class Canvas extends JDesktopPane {
      */
     private <T> T showFreeColDialog(FreeColDialog<T> freeColDialog,
                                     Tile tile) {
-        if (tile != null) {
-            freeColDialog.setLocation(chooseLocation(freeColDialog,
-                    freeColDialog.getWidth(), freeColDialog.getHeight(),
-                    getPopupPosition(tile)));
-        }
+        freeColDialog.setLocation(chooseLocation(freeColDialog,
+                freeColDialog.getWidth(), freeColDialog.getHeight(),
+                getPopupPosition(tile)));
         freeColDialog.setVisible(true);
         T response = freeColDialog.getResponse();
         remove(freeColDialog);
