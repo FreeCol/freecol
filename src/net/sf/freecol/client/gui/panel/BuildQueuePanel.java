@@ -912,8 +912,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
 
     class DefaultBuildQueueCellRenderer implements ListCellRenderer {
 
-        JPanel itemPanel = new MigPanel();
-        JPanel selectedPanel = new MigPanel();
+        JPanel itemPanel = new JPanel();
+        JPanel selectedPanel = new JPanel();
         JLabel imageLabel = new JLabel(new ImageIcon());
         JLabel nameLabel = new JLabel();
 
