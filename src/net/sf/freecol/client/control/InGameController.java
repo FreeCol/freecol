@@ -1543,10 +1543,13 @@ public final class InGameController implements NetworkConstants {
 
         // Get and check the name.
         String name = player.getSettlementName(null);
-        name = gui.showOldInputDialog(tile,
+        name = gui.showModalInputDialog(tile,
             StringTemplate.key("nameColony.text"), name,
-            "nameColony.yes", "nameColony.no", true);
-        if (name == null) return; // User cancelled, 0-length invalid.
+            "nameColony.yes", "nameColony.no");
+        if (name == null) return; else if (name.length() == 0) {
+            gui.showErrorMessage("enterSomeText");
+            return; // 0-length invalid.
+        }
 
         if (player.getSettlementByName(name) != null) {
             // Colony name must be unique.
