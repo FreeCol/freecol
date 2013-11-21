@@ -319,7 +319,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                         String name = Messages.message(rt.getNameKey());
                         choices.add(new ChoiceItem<ResourceType>(name, rt));
                     }
-                    ResourceType choice = getGUI().showModalChoiceDialog(null, 
+                    ResourceType choice = getGUI().showChoiceDialog(true, null, 
                         Messages.message("editor.chooseResource"), null,
                         "cancel", choices);
                     if (choice != null) {

@@ -87,7 +87,7 @@ public final class WarehouseDialog extends FreeColConfirmDialog {
         panel.add(scrollPane, "grow");
         panel.setSize(panel.getPreferredSize());
 
-        initialize(panel,
+        initialize(true, panel,
             getGUI().getImageLibrary().getImageIcon(colony, true),
             "ok", "cancel");
     }

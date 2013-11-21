@@ -1251,6 +1251,7 @@ public final class Canvas extends JDesktopPane {
     /**
      * Displays a dialog with text and a choice of options.
      *
+     * @param modal True if this dialog should be modal.
      * @param tile An optional <code>Tile</code> to make visible (not
      *     under the dialog!)
      * @param text The text that explains the choice for the user.
@@ -1261,11 +1262,11 @@ public final class Canvas extends JDesktopPane {
      * @return The corresponding member of the values array to the selected
      *     option.
      */
-    public <T> T showModalChoiceDialog(Tile tile, String text, ImageIcon icon,
-                                       String cancelKey,
-                                       List<ChoiceItem<T>> choices) {
+    public <T> T showChoiceDialog(boolean modal, Tile tile, String text,
+                                  ImageIcon icon, String cancelKey,
+                                  List<ChoiceItem<T>> choices) {
         FreeColChoiceDialog<T> fcd
-            = new FreeColChoiceDialog<T>(freeColClient, text, icon,
+            = new FreeColChoiceDialog<T>(freeColClient, modal, text, icon,
                                          cancelKey, choices);
         return showFreeColDialog(fcd, tile);
     }
@@ -1318,6 +1319,7 @@ public final class Canvas extends JDesktopPane {
     /**
      * Displays a dialog with a text and a ok/cancel option.
      *
+     * @param modal True if this dialog should be modal.
      * @param tile An optional <code>Tile</code> to make visible (not
      *     under the dialog!)
      * @param text The text that explains the choice for the user.
@@ -1326,11 +1328,11 @@ public final class Canvas extends JDesktopPane {
      * @param cancelKey The text displayed on the "cancel"-button.
      * @return True if the user clicked the "ok"-button.
      */
-    public boolean showModalConfirmDialog(Tile tile,
-                                          String text, ImageIcon icon,
-                                          String okKey, String cancelKey) {
+    public boolean showConfirmDialog(boolean modal, Tile tile,
+                                     String text, ImageIcon icon,
+                                     String okKey, String cancelKey) {
         FreeColConfirmDialog fcd
-            = new FreeColConfirmDialog(freeColClient, text, icon,
+            = new FreeColConfirmDialog(freeColClient, modal, text, icon,
                                        okKey, cancelKey);
         return showFreeColDialog(fcd, tile);
     }
@@ -1350,7 +1352,7 @@ public final class Canvas extends JDesktopPane {
      * @see FreeColOldDialog
      */
     public boolean showOldConfirmDialog(Tile tile, String text, ImageIcon icon,
-                                     String okText, String cancelText) {
+                                        String okText, String cancelText) {
         FreeColOldDialog<Boolean> dialog
             = FreeColOldDialog.createConfirmDialog(freeColClient, text, icon,
                 Messages.message(okText),
@@ -1361,6 +1363,7 @@ public final class Canvas extends JDesktopPane {
     /**
      * Displays a dialog with a text field and a ok/cancel option.
      *
+     * @param modal True if this dialog should be modal.
      * @param tile An optional tile to make visible (not under the dialog).
      * @param template A <code>StringTemplate</code> that explains the
      *     action to the user.
@@ -1369,11 +1372,11 @@ public final class Canvas extends JDesktopPane {
      * @param cancelKey A key displayed on the optional "cancel"-button.
      * @return The text the user entered, or null if cancelled.
      */
-    public String showModalInputDialog(Tile tile, StringTemplate template,
-                                       String defaultValue,
-                                       String okKey, String cancelKey) {
+    public String showInputDialog(boolean modal, Tile tile,
+                                  StringTemplate template, String defaultValue,
+                                  String okKey, String cancelKey) {
         FreeColStringInputDialog fcd
-            = new FreeColStringInputDialog(freeColClient,
+            = new FreeColStringInputDialog(freeColClient, modal,
                                            Messages.message(template),
                                            defaultValue, okKey, cancelKey);
         return showFreeColDialog(fcd, tile);
@@ -1388,30 +1391,20 @@ public final class Canvas extends JDesktopPane {
      * @param okText The text displayed on the "ok"-button.
      * @param cancelText The text displayed on the
      *     "cancel"-button. Use <i>null</i> to disable the cancel-option.
-     * @param rejectEmptyString a <code>boolean</code> value
      * @return The text the user have entered or <i>null</i> if the user chose
      *     to cancel the action.
      * @see FreeColOldDialog
      */
     public String showOldInputDialog(Tile tile, StringTemplate text,
                                      String defaultValue,
-                                     String okText, String cancelText,
-                                     boolean rejectEmptyString) {
+                                     String okText, String cancelText) {
         FreeColOldDialog<String> inputDialog
             = FreeColOldDialog.createInputDialog(freeColClient,
                 Messages.message(text), defaultValue,
                 Messages.message(okText),
-               (cancelText == null) ? null : Messages.message(cancelText));
-        String response = null;
-        for (;;) {
-            response = showFreeColOldDialog(inputDialog, tile, true);
-            if (!rejectEmptyString || response == null
-                || response.length() > 0) break;
-            showErrorMessage("enterSomeText");
-        }
-        return response;
+                (cancelText == null) ? null : Messages.message(cancelText));
+        return showFreeColOldDialog(inputDialog, tile, true);
     }
-
 
 
     // Simple front ends to display each panel or dialog.

@@ -51,6 +51,7 @@ public abstract class FreeColInputDialog<T> extends FreeColDialog<T> {
      * a ok/cancel option.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param modal True if this dialog should be modal.
      * @param obj The object containing the input fields and
      *     explanation to the user.
      * @param icon An optional icon to display.
@@ -58,25 +59,26 @@ public abstract class FreeColInputDialog<T> extends FreeColDialog<T> {
      * @param cancelKey The key displayed on the optional "cancel"-button.
      * @return The <code>FreeColDialog</code> created.
      */
-    public FreeColInputDialog(final FreeColClient freeColClient,
+    public FreeColInputDialog(final FreeColClient freeColClient, boolean modal,
                               Object obj, ImageIcon icon,
                               String okKey, String cancelKey) {
         this(freeColClient);
 
-        initialize(obj, icon, okKey, cancelKey);
+        initialize(modal, obj, icon, okKey, cancelKey);
     }
 
 
     /**
      * Initialize this input dialog.
      *
+     * @param modal True if this dialog should be modal.
      * @param obj The object containing the input fields and
      *     explanation to the user.
      * @param icon An optional icon to display.
      * @param okKey The key displayed on the "ok"-button.
      * @param cancelKey The key displayed on the optional "cancel"-button.
      */
-    protected void initialize(Object obj, ImageIcon icon,
+    protected void initialize(boolean modal, Object obj, ImageIcon icon,
                               String okKey, String cancelKey) {
         List<ChoiceItem<T>> c = choices();
         c.add(new ChoiceItem<T>(Messages.message(okKey),
@@ -85,7 +87,7 @@ public abstract class FreeColInputDialog<T> extends FreeColDialog<T> {
             c.add(new ChoiceItem<T>(Messages.message(cancelKey),
                     (T)null).cancelOption().defaultOption());
         }
-        initialize(DialogType.QUESTION, true, obj, icon, c);
+        initialize(DialogType.QUESTION, modal, obj, icon, c);
     }
 
     /**

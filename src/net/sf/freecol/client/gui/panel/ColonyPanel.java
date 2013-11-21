@@ -824,7 +824,7 @@ public final class ColonyPanel extends PortPanel
         final Colony colony = getColony();
         boolean abandon = false;
         if (colony.getUnitCount() == 0) {
-            if (!getGUI().showModalConfirmDialog(null,
+            if (!getGUI().showConfirmDialog(true, null,
                     StringTemplate.key("abandonColony.text"), this,
                     "abandonColony.yes", "abandonColony.no")) return;
             abandon = true;
@@ -833,7 +833,7 @@ public final class ColonyPanel extends PortPanel
             BuildableType buildable = colony.getCurrentlyBuilding();
             if (buildable != null
                 && buildable.getRequiredPopulation() > colony.getUnitCount()
-                && !getGUI().showModalConfirmDialog(null,
+                && !getGUI().showConfirmDialog(true, null,
                     StringTemplate.template("colonyPanel.reducePopulation")
                         .addName("%colony%", colony.getName())
                         .addAmount("%number%", buildable.getRequiredPopulation())

@@ -98,8 +98,8 @@ public final class ConnectController {
         FreeColServer freeColServer = freeColClient.getFreeColServer();
         if (freeColServer != null
             && freeColServer.getServer().getPort() == port) {
-            if (gui.showModalConfirmDialog("stopServer.text",
-                                           "stopServer.yes", "stopServer.no")) {
+            if (gui.showSimpleConfirmDialog("stopServer.text", "stopServer.yes",
+                                            "stopServer.no")) {
                 freeColServer.getController().shutdown();
             } else {
                 return false;
@@ -186,7 +186,7 @@ public final class ConnectController {
             vacantPlayers.add(new ChoiceItem<String>(player, player));
         }
         if (vacantPlayers.isEmpty()) return false;
-        String choice = gui.showModalChoiceDialog(null,
+        String choice = gui.showChoiceDialog(true, null,
             Messages.message("connectController.choicePlayer"), null,
             "cancel", vacantPlayers);
         if (choice == null) return false;

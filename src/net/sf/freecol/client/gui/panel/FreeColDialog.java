@@ -278,7 +278,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
      */
     public static <T> List<ChoiceItem<T>> choices() {
         return new ArrayList<ChoiceItem<T>>();
-    }        
+    }
 
 
     // Interface PropertyChangeListener

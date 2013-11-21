@@ -46,6 +46,7 @@ public class FreeColChoiceDialog<T> extends FreeColDialog<T> {
      * ok/cancel option.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param modal True if this dialog should be modal.
      * @param obj The obj that explains the choice for the user.
      * @param icon An optional icon to display.
      * @param cancelKey Key for the text of the optional cancel button.
@@ -53,26 +54,27 @@ public class FreeColChoiceDialog<T> extends FreeColDialog<T> {
      * @return The <code>FreeColChoiceDialog</code> created.
      */
     public FreeColChoiceDialog(final FreeColClient freeColClient,
-                               String obj, ImageIcon icon, String cancelKey,
-                               List<ChoiceItem<T>> choices) {
+                               boolean modal, String obj, ImageIcon icon,
+                               String cancelKey, List<ChoiceItem<T>> choices) {
         this(freeColClient);
 
-        initialize(obj, icon, cancelKey, choices);
+        initialize(modal, obj, icon, cancelKey, choices);
     }
 
 
     /**
+     * @param modal True if this dialog should be modal.
      * @param obj An object that explains the choice for the user.
      * @param icon An optional icon to display.
      * @param cancelKey Key for the text of the optional cancel button.
      * @param choices A list of <code>ChoiceItem</code>s to create buttons for.
      */
-    protected void initialize(Object obj, ImageIcon icon, String cancelKey,
-                              List<ChoiceItem<T>> choices) {
+    protected void initialize(boolean modal, Object obj, ImageIcon icon,
+                              String cancelKey, List<ChoiceItem<T>> choices) {
         if (cancelKey != null) {
             choices.add(new ChoiceItem<T>(Messages.message(cancelKey),
                     (T)null).cancelOption().defaultOption());
         }
-        initialize(DialogType.PLAIN, true, obj, icon, choices);
+        initialize(DialogType.PLAIN, modal, obj, icon, choices);
     }
 }

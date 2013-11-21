@@ -47,6 +47,7 @@ public class FreeColConfirmDialog extends FreeColDialog<Boolean> {
      * ok/cancel option.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param modal True if this dialog should be modal.
      * @param text The text that explains the choice for the user.
      * @param icon An optional icon to display.
      * @param okKey A key for the text displayed on the "ok"-button.
@@ -54,29 +55,30 @@ public class FreeColConfirmDialog extends FreeColDialog<Boolean> {
      * @return The <code>FreeColDialog</code> created.
      */
     public FreeColConfirmDialog(final FreeColClient freeColClient,
-                                String text, ImageIcon icon,
+                                boolean modal, String text, ImageIcon icon,
                                 String okKey, String cancelKey) {
         this(freeColClient);
 
-        initialize(text, icon, okKey, cancelKey);
+        initialize(modal, text, icon, okKey, cancelKey);
     }
 
 
     /**
      * Initialize this confirm dialog.
      *
+     * @param modal True if this dialog should be modal.
      * @param text The object that explains the choice for the user.
      * @param icon An optional icon to display.
      * @param okKey The text displayed on the "ok"-button.
      * @param cancelKey The text displayed on the "cancel"-button.
      */
-    protected void initialize(Object text, ImageIcon icon,
+    protected void initialize(boolean modal, Object text, ImageIcon icon,
                               String okKey, String cancelKey) {
         List<ChoiceItem<Boolean>> c = choices();
         c.add(new ChoiceItem<Boolean>(Messages.message(okKey),
                 Boolean.TRUE).okOption());
         c.add(new ChoiceItem<Boolean>(Messages.message(cancelKey),
                 Boolean.FALSE).cancelOption().defaultOption());
-        initialize(DialogType.QUESTION, true, text, icon, c);
+        initialize(DialogType.QUESTION, modal, text, icon, c);
     }
 }

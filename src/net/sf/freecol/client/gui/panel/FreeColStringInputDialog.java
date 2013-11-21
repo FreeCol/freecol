@@ -42,12 +42,14 @@ public final class FreeColStringInputDialog extends FreeColInputDialog<String> {
      * Creates a dialog to input a string field.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param modal True if this dialog should be modal.
      * @param text Text that explains the action to the user.
      * @param defaultValue The default value appearing in the text field.
      * @param okKey A key displayed on the "ok"-button.
      * @param cancelKey A key displayed on the optional "cancel"-button.
      */
     public FreeColStringInputDialog(FreeColClient freeColClient,
+                                    boolean modal,
                                     String text, String defaultValue,
                                     String okKey, String cancelKey) {
         super(freeColClient);
@@ -63,7 +65,7 @@ public final class FreeColStringInputDialog extends FreeColInputDialog<String> {
         panel.add(GUI.getDefaultTextArea(text));
         panel.add(textField, BorderLayout.SOUTH);
 
-        initialize(panel, null, okKey, cancelKey);
+        initialize(modal, panel, null, okKey, cancelKey);
     }
 
     /**
