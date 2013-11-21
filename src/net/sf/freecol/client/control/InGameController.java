@@ -3602,7 +3602,7 @@ public final class InGameController implements NetworkConstants {
                     .add("%player%", enemy.getName())
                     .addAmount("%amount%", gold));
             } else {
-                if (gui.showOldConfirmDialog(unit.getTile(),
+                if (gui.showModalConfirmDialog(unit.getTile(),
                         StringTemplate.template("missionarySettlement.inciteConfirm")
                             .add("%player%", enemy.getName())
                             .addAmount("%amount%", gold),
