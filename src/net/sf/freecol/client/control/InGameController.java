@@ -2839,9 +2839,9 @@ public final class InGameController implements NetworkConstants {
 
         while (disembarkable.size() > 0) {
             if (disembarkable.size() == 1) {
-                if (gui.showOldConfirmDialog(tile,
+                if (gui.showModalConfirmDialog(tile,
                         StringTemplate.key("disembark.text"),
-                        disembarkable.get(0), "yes", "no")) {
+                        disembarkable.get(0), "ok", "cancel")) {
                     move(disembarkable.get(0), direction);
                 }
                 break;
