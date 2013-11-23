@@ -3692,15 +3692,10 @@ public final class InGameController implements NetworkConstants {
      * @param tile The <code>Tile</code> within the region.
      * @param unit The <code>Unit</code> that has discovered the region.
      * @param region The <code>Region</code> to name.
-     * @param defaultName The default name to offer.
+     * @param name The name to offer.
      */
-    public void nameNewRegion(Tile tile, Unit unit, Region region,
-                              String defaultName) {
-        String name = gui.showOldInputDialog(tile,
-            StringTemplate.template("nameRegion.text")
-            .addStringTemplate("%type%", region.getLabel()),
-            defaultName, "ok", null);
-        if (name == null || name.length() == 0) name = defaultName;
+    public void nameNewRegion(final Tile tile, final Unit unit,
+                              final Region region, final String name) {
         askServer().newRegionName(region, tile, unit, name);
     }
 

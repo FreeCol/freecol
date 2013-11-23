@@ -31,6 +31,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.FreeColStringInputDialog;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
@@ -943,10 +944,16 @@ public final class InGameInputHandler extends InputHandler {
         final Region region = message.getRegion(game);
         final String defaultName = message.getNewRegionName();
         if (defaultName == null || region == null) return null;
-
-        SwingUtilities.invokeLater(new Runnable() {
+        final FreeColStringInputDialog fcd
+            = new FreeColStringInputDialog(getFreeColClient(), false,
+                Messages.message(StringTemplate.template("nameRegion.text")
+                    .addStringTemplate("%type%", region.getLabel())),
+                defaultName, "ok", null);
+        getGUI().viewFreeColDialog(fcd, null, new Runnable() {
                 public void run() {
-                    igc().nameNewRegion(tile, unit, region, defaultName);
+                    String name = fcd.getResponse();
+                    if (name == null || name.length() == 0) name = defaultName;
+                    igc().nameNewRegion(tile, unit, region, name);
                 }
             });
         return null;
