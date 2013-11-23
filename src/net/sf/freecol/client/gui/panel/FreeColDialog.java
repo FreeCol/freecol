@@ -24,12 +24,14 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
+import java.awt.Point;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -47,6 +49,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
@@ -217,11 +220,42 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
             };
         addWindowListener(adapter);
         addWindowFocusListener(adapter);
+
         addComponentListener(new ComponentAdapter() {
                 public void componentShown(ComponentEvent ce) {
                     // Reset value to ensure closing works properly.
                     FreeColDialog.this.pane
                         .setValue(JOptionPane.UNINITIALIZED_VALUE);
+                }
+            });
+
+        addMouseListener(new MouseAdapter() {
+                private Point loc;
+
+                @Override
+                public void mouseDragged(MouseEvent e) {}
+
+                @Override
+                public void mouseMoved(MouseEvent e) {}
+
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    loc = SwingUtilities
+                        .convertPoint((Component)e.getSource(),
+                            e.getX(), e.getY(), null);
+                }
+
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    if (loc == null) return;
+                    Point now = SwingUtilities
+                        .convertPoint((Component)e.getSource(),
+                            e.getX(), e.getY(), null);
+                    int dx = now.x - loc.x;
+                    int dy = now.y - loc.y;
+                    Point p = FreeColDialog.this.getLocation();
+                    FreeColDialog.this.setLocation(p.x + dx, p.y + dy);
+                    loc = null;
                 }
             });
     }
@@ -290,6 +324,15 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
     }
 
     /**
+     * Is this a modal dialog?
+     *
+     * @return True if this is a modal dialog.
+     */
+    public boolean isModal() {
+        return modal;
+    }
+
+    /**
      * Create a list of choices.
      *
      * @return An empty list of choices.
@@ -338,6 +381,9 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
     @Override
     public void removeNotify() {
         super.removeNotify();
+
+        freeColClient.getGUI().getCanvas()
+            .dialogRemove(FreeColDialog.this);
 
         removeAll();
         this.pane.removePropertyChangeListener(this);

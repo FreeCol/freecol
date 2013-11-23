@@ -305,6 +305,10 @@ public final class Canvas extends JDesktopPane {
     /** Filters for loadable game files. */
     private FileFilter[] fileFilters = null;
 
+    /** The dialogs in view. */
+    private final List<FreeColDialog<?>> dialogs
+        = new ArrayList<FreeColDialog<?>>();
+
 
     /**
      * The constructor to use.
@@ -518,8 +522,7 @@ public final class Canvas extends JDesktopPane {
                 break;
             }
         }
-        if (comp instanceof Component
-            && (p = getClearSpace((Component)comp, x, y, MAXTRY)) != null
+        if ((p = getClearSpace((Component)comp, x, y, MAXTRY)) != null
             && p.x >= 0 && p.x < getWidth()
             && p.y >= 0 && p.y < getHeight()) {
             x = p.x;
@@ -591,6 +594,14 @@ public final class Canvas extends JDesktopPane {
                 if (child.getBounds().intersects(r)) {
                     c = child;
                     break;
+                }
+            }
+            if (c == null) {
+                for (FreeColDialog<?> fcd : dialogs) {
+                    if (fcd.getBounds().intersects(r)) {
+                        c = fcd;
+                        break;
+                    }
                 }
             }
             if (c == null) return p;
@@ -822,6 +833,7 @@ public final class Canvas extends JDesktopPane {
         viewFreeColDialog(freeColDialog, tile);
         T response = freeColDialog.getResponse();
         remove(freeColDialog);
+        dialogRemove(freeColDialog);
         return response;
     }
 
@@ -860,23 +872,6 @@ public final class Canvas extends JDesktopPane {
         repaint();
         addAsFrame(panel, false, popupPosition, resizable);
         panel.requestFocus();
-    }
-
-    /**
-     * Displays the given dialog, optionally making sure a tile is visible.
-     *
-     * @param freeColDialog The dialog to be displayed
-     * @param tile An optional <code>Tile</code> to make visible (not
-     *     under the dialog!)
-     * @return The {@link FreeColDialog#getResponse reponse} returned by
-     *     the dialog.
-     */
-    public <T> void viewFreeColDialog(final FreeColDialog<T> freeColDialog,
-                                      Tile tile) {
-        freeColDialog.setLocation(chooseLocation(freeColDialog,
-                freeColDialog.getWidth(), freeColDialog.getHeight(),
-                getPopupPosition(tile)));
-        freeColDialog.setVisible(true);
     }
 
 
@@ -962,6 +957,24 @@ public final class Canvas extends JDesktopPane {
         }
 
         return false;
+    }
+
+    /**
+     * Add a dialog to the current dialog list.
+     *
+     * @param fcd The dialog to add.
+     */
+    public void dialogAdd(FreeColDialog<?> fcd) {
+        dialogs.add(fcd);
+    }
+
+    /**
+     * Remove a dialog from the current dialog list.
+     *
+     * @param fcd The dialog to remove.
+     */
+    public void dialogRemove(FreeColDialog<?> fcd) {
+        dialogs.remove(fcd);
     }
 
     /**
@@ -1418,6 +1431,22 @@ public final class Canvas extends JDesktopPane {
                 Messages.message(okText),
                 (cancelText == null) ? null : Messages.message(cancelText));
         return showFreeColOldDialog(inputDialog, tile, true);
+    }
+
+    /**
+     * Displays the given dialog, optionally making sure a tile is visible.
+     *
+     * @param freeColDialog The dialog to be displayed
+     * @param tile An optional <code>Tile</code> to make visible (not
+     *     under the dialog!)
+     */
+    public <T> void viewFreeColDialog(final FreeColDialog<T> freeColDialog,
+                                      Tile tile) {
+        freeColDialog.setLocation(chooseLocation(freeColDialog,
+                freeColDialog.getWidth(), freeColDialog.getHeight(),
+                getPopupPosition(tile)));
+        dialogAdd(freeColDialog);
+        freeColDialog.setVisible(true);
     }
 
 

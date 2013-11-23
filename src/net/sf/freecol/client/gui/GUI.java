@@ -1081,11 +1081,11 @@ public class GUI {
                                       final Tile tile,
                                       final Runnable runnable) {
         if (canvas == null) return;
-        SwingUtilities.invokeLater(new Runnable() {
+        Runnable now = new Runnable() {
                 public void run() {
                     canvas.viewFreeColDialog(fcd, tile);
+                    if (runnable == null) return;
                     new Thread(fcd.toString()) {
-                        @Override
                         public void run() {
                             while (!fcd.responded()) {
                                 try {
@@ -1096,8 +1096,10 @@ public class GUI {
                         }
                     }.start();
                 }
-            });
+            };
+        SwingUtilities.invokeLater(now);
     }
+
 
     // Trivial delegations to Canvas
 
