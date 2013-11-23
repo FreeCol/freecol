@@ -921,9 +921,15 @@ public final class InGameInputHandler extends InputHandler {
         final Player welcomer = message.getWelcomer(game);
         final String camps = message.getCamps();
 
-        SwingUtilities.invokeLater(new Runnable() {
+        final FreeColStringInputDialog fcd
+            = new FreeColStringInputDialog(getFreeColClient(), false,
+                Messages.message(StringTemplate.template("newLand.text")),
+                defaultName, "newLand.yes", null);
+        getGUI().viewFreeColDialog(fcd, unit.getTile(), new Runnable() {
                 public void run() {
-                    igc().nameNewLand(unit, defaultName, welcomer, camps);
+                    String name = fcd.getResponse();
+                    if (name == null || name.length() == 0) name = defaultName;
+                    igc().nameNewLand(unit, name, welcomer, camps);
                 }
             });
         return null;
@@ -944,12 +950,13 @@ public final class InGameInputHandler extends InputHandler {
         final Region region = message.getRegion(game);
         final String defaultName = message.getNewRegionName();
         if (defaultName == null || region == null) return null;
+
         final FreeColStringInputDialog fcd
             = new FreeColStringInputDialog(getFreeColClient(), false,
                 Messages.message(StringTemplate.template("nameRegion.text")
                     .addStringTemplate("%type%", region.getLabel())),
                 defaultName, "ok", null);
-        getGUI().viewFreeColDialog(fcd, null, new Runnable() {
+        getGUI().viewFreeColDialog(fcd, unit.getTile(), new Runnable() {
                 public void run() {
                     String name = fcd.getResponse();
                     if (name == null || name.length() == 0) name = defaultName;

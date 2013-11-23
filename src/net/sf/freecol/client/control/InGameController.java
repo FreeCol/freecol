@@ -3642,20 +3642,15 @@ public final class InGameController implements NetworkConstants {
      * A player names the New World.
      *
      * @param unit The <code>Unit</code> that landed.
-     * @param defaultName The default name to offer.
+     * @param name The name to use.
      * @param welcomer An optional native <code>Player</code> present at the
      *     landing.
      * @param camps The number of camps for the welcoming message.
      */
-    public void nameNewLand(Unit unit, String defaultName, Player welcomer,
+    public void nameNewLand(Unit unit, String name, Player welcomer,
                             String camps) {
-        Tile tile = unit.getTile();
-        String name = gui.showOldInputDialog(tile,
-            StringTemplate.template("newLand.text"), defaultName,
-            "newLand.yes", null);
-        if (name == null || name.length() == 0) name = defaultName;
-
         // Check if there is a welcoming native offering land.
+        Tile tile = unit.getTile();
         boolean accept = false;
         if (welcomer != null) {
             String messageId = (welcomer.owns(tile))
