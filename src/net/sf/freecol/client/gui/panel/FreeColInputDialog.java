@@ -95,8 +95,11 @@ public abstract class FreeColInputDialog<T> extends FreeColDialog<T> {
      */
     @Override
     public T getResponse() {
-        Object value = getValue();
-        return (value == this.options.get(0)) ? getInputValue() : (T)null;
+        if (responded()) {
+            Object value = getValue();
+            if (value == this.options.get(0)) return getInputValue();
+        }
+        return (T)null;
     }
 
 

@@ -82,6 +82,9 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
     /** The enclosing client. */
     protected FreeColClient freeColClient;
 
+    /** Is this dialog modal? */
+    protected boolean modal;
+
     /** The options to choose from. */
     protected List<ChoiceItem<T>> options;
 
@@ -158,6 +161,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
      */
     protected void initialize(DialogType type, boolean modal, Object obj, 
                               ImageIcon icon, List<ChoiceItem<T>> options) {
+        this.modal = modal;
         this.options = options;
         int paneType = JOptionPane.QUESTION_MESSAGE;
         switch (type) {
@@ -170,6 +174,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
                                     icon, options.toArray(), ci);
         this.pane.setBorder(dialogBorder);
         this.pane.setName("FreeColDialog");
+        this.pane.setValue(JOptionPane.UNINITIALIZED_VALUE);
         if (ci != null) this.pane.setInitialSelectionValue(ci);
         this.pane.addPropertyChangeListener(this);
         if (options.size() <= 20) {
@@ -199,7 +204,9 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
                 private boolean gotFocus = false;
 
                 public void windowClosing(WindowEvent we) {
-                    FreeColDialog.this.pane.setValue(null);
+                    if (!FreeColDialog.this.responded()) {
+                        FreeColDialog.this.setValue(null);
+                    }
                 }
                 public void windowGainedFocus(WindowEvent we) {
                     if (!gotFocus) { // Once window gets focus, initialize.
@@ -254,8 +261,17 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
      *
      * @param value The new value.
      */
-    protected void setValue(Object value) {
+    protected synchronized void setValue(Object value) {
         this.pane.setValue(value);
+    }
+
+    /**
+     * Has this dialog been given a response.
+     *
+     * @return True if the dialog has a response.
+     */
+    public synchronized boolean responded() {
+        return this.pane.getValue() != JOptionPane.UNINITIALIZED_VALUE;
     }
 
     /**
@@ -264,9 +280,11 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
      * @return The response from this dialog.
      */
     public T getResponse() {
-        Object value = getValue();
-        for (ChoiceItem<T> ci : this.options) {
-            if (ci.equals(value)) return ci.getObject();
+        if (responded()) {
+            Object value = getValue();
+            for (ChoiceItem<T> ci : this.options) {
+                if (ci.equals(value)) return ci.getObject();
+            }
         }
         return null;
     }

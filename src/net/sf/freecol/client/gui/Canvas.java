@@ -800,8 +800,8 @@ public final class Canvas extends JDesktopPane {
      * @return The {@link FreeColOldDialog#getResponse reponse} returned by
      *         the dialog.
      */
-    private <T> T showFreeColOldDialog(FreeColOldDialog<T> freeColDialog, Tile tile,
-                                    boolean resizable) {
+    private <T> T showFreeColOldDialog(FreeColOldDialog<T> freeColDialog,
+                                       Tile tile, boolean resizable) {
         showFreeColPanel(freeColDialog, tile, resizable);
         T response = freeColDialog.getResponse();
         remove(freeColDialog);
@@ -819,10 +819,7 @@ public final class Canvas extends JDesktopPane {
      */
     private <T> T showFreeColDialog(FreeColDialog<T> freeColDialog,
                                     Tile tile) {
-        freeColDialog.setLocation(chooseLocation(freeColDialog,
-                freeColDialog.getWidth(), freeColDialog.getHeight(),
-                getPopupPosition(tile)));
-        freeColDialog.setVisible(true);
+        viewFreeColDialog(freeColDialog, tile);
         T response = freeColDialog.getResponse();
         remove(freeColDialog);
         return response;
@@ -863,6 +860,23 @@ public final class Canvas extends JDesktopPane {
         repaint();
         addAsFrame(panel, false, popupPosition, resizable);
         panel.requestFocus();
+    }
+
+    /**
+     * Displays the given dialog, optionally making sure a tile is visible.
+     *
+     * @param freeColDialog The dialog to be displayed
+     * @param tile An optional <code>Tile</code> to make visible (not
+     *     under the dialog!)
+     * @return The {@link FreeColDialog#getResponse reponse} returned by
+     *     the dialog.
+     */
+    public <T> void viewFreeColDialog(final FreeColDialog<T> freeColDialog,
+                                      Tile tile) {
+        freeColDialog.setLocation(chooseLocation(freeColDialog,
+                freeColDialog.getWidth(), freeColDialog.getHeight(),
+                getPopupPosition(tile)));
+        freeColDialog.setVisible(true);
     }
 
 

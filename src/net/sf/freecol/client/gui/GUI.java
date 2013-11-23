@@ -85,6 +85,7 @@ import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.CornerMapControls;
 import net.sf.freecol.client.gui.panel.EuropePanel;
+import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.client.gui.panel.MiniMap;
 import net.sf.freecol.client.gui.panel.LabourData.UnitData;
 import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
@@ -1076,6 +1077,27 @@ public class GUI {
                                          okKey, cancelKey);
     }
 
+    public <T> void viewFreeColDialog(final FreeColDialog<T> fcd,
+                                      final Tile tile,
+                                      final Runnable runnable) {
+        if (canvas == null) return;
+        SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    canvas.viewFreeColDialog(fcd, tile);
+                    new Thread(fcd.toString()) {
+                        @Override
+                        public void run() {
+                            while (!fcd.responded()) {
+                                try {
+                                    Thread.sleep(500);
+                                } catch (InterruptedException e) {}
+                            }
+                            runnable.run();
+                        }
+                    }.start();
+                }
+            });
+    }
 
     // Trivial delegations to Canvas
 
