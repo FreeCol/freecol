@@ -28,6 +28,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
 
@@ -37,7 +38,10 @@ import org.w3c.dom.Element;
  */
 public class ChooseFoundingFatherMessage extends DOMMessage {
 
+    /** The fathers to offer. */
     private List<FoundingFather> fathers;
+
+    /** The selected father. */
     private FoundingFather foundingFather;
 
 
@@ -46,10 +50,12 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
      * fathers.
      *
      * @param fathers The <code>FoundingFather</code>s to choose from.
+     * @param ff The <code>FoundingFather</code> to select.
      */
-    public ChooseFoundingFatherMessage(List<FoundingFather> fathers) {
+    public ChooseFoundingFatherMessage(List<FoundingFather> fathers,
+                                       FoundingFather ff) {
         this.fathers = fathers;
-        this.foundingFather = null;
+        this.foundingFather = ff;
     }
 
     /**
@@ -115,6 +121,20 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
+        List<FoundingFather> offered = serverPlayer.getOfferedFathers();
+
+        if (!serverPlayer.canRecruitFoundingFather()) {
+            return DOMMessage.clientError("Player can not recruit fathers: "
+                + serverPlayer.getId());
+        } else if (foundingFather == null) {
+            return DOMMessage.clientError("No founding father selected");
+        } else if (!offered.contains(foundingFather)) {
+            return DOMMessage.clientError("Founding father not offered: "
+                + foundingFather.getId());
+        }
+        serverPlayer.setCurrentFather(foundingFather);
+        serverPlayer.clearOfferedFathers();
         return null;
     }
 

@@ -31,6 +31,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.client.gui.panel.FreeColStringInputDialog;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.Ability;
@@ -580,13 +581,22 @@ public final class InGameInputHandler extends InputHandler {
             = new ChooseFoundingFatherMessage(getGame(), element);
         final List<FoundingFather> ffs = message.getFathers();
 
-        invokeAndWait(new Runnable() {
+        final FreeColDialog<FoundingFather> fcd = new net.sf.freecol.client.gui.panel.ChooseFoundingFatherDialog(getFreeColClient(), ffs);
+        
+        getGUI().viewFreeColDialog(fcd, null, new Runnable() {
                 public void run() {
-                    FoundingFather ff = igc().chooseFoundingFather(ffs);
-                    if (ff != null) message.setResult(ff);
+                    FoundingFather ff = fcd.getResponse();
+                    igc().chooseFoundingFather(ffs, ff);
                 }
             });
-        return message.toXMLElement();
+        return null;
+        //invokeAndWait(new Runnable() {
+        //        public void run() {
+        //            FoundingFather ff = igc().chooseFoundingFather(ffs);
+        //            if (ff != null) message.setResult(ff);
+        //        }
+        //    });
+        //return message.toXMLElement();
     }
 
     /**

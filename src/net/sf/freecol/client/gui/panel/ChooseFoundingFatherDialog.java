@@ -19,12 +19,14 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
@@ -41,7 +43,8 @@ import net.sf.freecol.common.model.FoundingFather;
  *
  * @see FoundingFather
  */
-public final class ChooseFoundingFatherDialog extends FreeColOldDialog<FoundingFather> implements ActionListener {
+public final class ChooseFoundingFatherDialog
+    extends FreeColDialog<FoundingFather> {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ChooseFoundingFatherDialog.class.getName());
@@ -63,51 +66,67 @@ public final class ChooseFoundingFatherDialog extends FreeColOldDialog<FoundingF
      */
     public ChooseFoundingFatherDialog(FreeColClient freeColClient,
         List<FoundingFather> possibleFoundingFathers) {
-        super(freeColClient, new MigLayout("wrap 1", "align center"));
+        super(freeColClient);
 
         this.possibleFathers = possibleFoundingFathers;
 
         setFocusCycleRoot(false);
 
-        tb = new JTabbedPane(JTabbedPane.TOP);
+        MigPanel panel = new MigPanel(new MigLayout("wrap 1", "align center"));
 
-        FatherDetailPanel details = new FatherDetailPanel(getFreeColClient(),
-            new ColopediaPanel(getFreeColClient()));
+        tb = new JTabbedPane(JTabbedPane.TOP);
+        FatherDetailPanel details = new FatherDetailPanel(freeColClient,
+            new ColopediaPanel(freeColClient));
         for (int index = 0; index < possibleFoundingFathers.size(); index++) {
             FoundingFather father = possibleFoundingFathers.get(index);
-            JPanel panel = new MigPanel();
-            details.buildDetail(father, panel);
-            panel.validate();
-            tb.addTab(Messages.message(father.getTypeKey()), panel);
+            JPanel jp = new MigPanel();
+            details.buildDetail(father, jp);
+            jp.validate();
+            tb.addTab(Messages.message(father.getTypeKey()), jp);
         }
         tb.setSelectedIndex(0);
 
-        JButton helpButton =
-            new JButton(getFreeColClient().getActionManager()
-                        .getFreeColAction("colopediaAction.FATHERS"));
+        JButton helpButton = new JButton(freeColClient.getActionManager()
+            .getFreeColAction("colopediaAction.FATHERS"));
         helpButton.setText(Messages.message("help"));
 
-        add(GUI.getDefaultHeader(Messages.message("foundingFatherDialog.nominate")));
-        add(tb, "width 100%");
-        add(okButton, "newline 20, split 2, tag ok");
-        add(helpButton, "tag help");
+        String nominate = Messages.message("foundingFatherDialog.nominate");
+        JLabel header = GUI.getDefaultHeader(nominate);
 
-        setSize(tb.getPreferredSize());
+        Dimension size = new Dimension(0, 0), tbSize = tb.getPreferredSize(),
+            hSize = header.getPreferredSize(),
+            hbSize = helpButton.getPreferredSize();
+        size.setSize(Math.max(tbSize.getWidth(), hSize.getWidth()),
+            tbSize.getHeight() + hSize.getHeight() + hbSize.getHeight() + 50);
+        panel.setPreferredSize(size);
+
+        panel.add(header);
+        panel.add(helpButton, "tag help");
+        panel.add(tb, "width 100%");
+
+        List<ChoiceItem<FoundingFather>> c = choices();
+        c.add(new ChoiceItem<FoundingFather>(Messages.message("ok"),
+                (FoundingFather)null).okOption().defaultOption());
+        initialize(DialogType.QUESTION, false, panel, null, c);
     }
 
-
-    @Override
-    public void requestFocus() {
-        tb.requestFocus();
-    }
-
-
-    // Interface ActionListener
 
     /**
      * {@inheritDoc}
      */
-    public void actionPerformed(ActionEvent event) {
-        setResponse(possibleFathers.get(tb.getSelectedIndex()));
+    public FoundingFather getResponse() {
+        Object value = getValue();
+        if (options.get(0).equals(value)) {
+            return possibleFathers.get(tb.getSelectedIndex());
+        }
+        return null;
+    }
+
+
+    // Override Component
+
+    @Override
+    public void requestFocus() {
+        tb.requestFocus();
     }
 }

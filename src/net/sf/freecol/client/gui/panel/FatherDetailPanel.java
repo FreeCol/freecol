@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Dimension;
 import java.awt.Image;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -105,7 +106,7 @@ public class FatherDetailPanel extends ColopediaGameObjectTypePanel<FoundingFath
         try {
             FoundingFather father = getSpecification().getFoundingFather(id);
             buildDetail(father, panel);
-        } catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             // this is not a founding father
             panel.setLayout(new MigLayout("wrap 1, align center", "align center"));
             JLabel header = localizedLabel(id + ".name");
@@ -136,11 +137,9 @@ public class FatherDetailPanel extends ColopediaGameObjectTypePanel<FoundingFath
         String type = Messages.message(father.getTypeKey());
         JLabel header = new JLabel(name + " (" + type + ")");
         header.setFont(GUI.SMALL_HEADER_FONT);
-        panel.add(header, "span, align center, wrap 40");
 
         Image image = getLibrary().getFoundingFatherImage(father);
-
-        panel.add(new JLabel(new ImageIcon(image)), "top");
+        JLabel label = new JLabel(new ImageIcon(image));
 
         StringBuilder text = new StringBuilder();
         text.append(Messages.message(father.getDescriptionKey()));
@@ -148,7 +147,6 @@ public class FatherDetailPanel extends ColopediaGameObjectTypePanel<FoundingFath
         text.append(Messages.message(father.getId() + ".birthAndDeath"));
         text.append("] ");
         text.append(Messages.message(father.getId() + ".text"));
-
         Turn turn = getMyPlayer().getElectionTurns().get(name);
         if (turn != null) {
             text.append("\n\n");
@@ -156,9 +154,18 @@ public class FatherDetailPanel extends ColopediaGameObjectTypePanel<FoundingFath
             text.append(" ");
             text.append(Messages.message(turn.getLabel()));
         }
-
         JTextArea description = GUI.getDefaultTextArea(text.toString(), 20);
+
+        panel.add(header, "span, align center, wrap 40");
+        panel.add(label, "top");
         panel.add(description, "top, growx");
+
+        Dimension hSize = header.getPreferredSize(),
+            lSize = label.getPreferredSize(),
+            dSize = description.getPreferredSize(), size = new Dimension();
+        size.setSize(lSize.getWidth() + dSize.getWidth() + 20,
+            hSize.getHeight() + lSize.getHeight() + 10);
+        panel.setPreferredSize(size);            
     }
 
 }

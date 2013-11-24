@@ -40,6 +40,7 @@ import java.beans.PropertyChangeListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractButton;
@@ -200,7 +201,11 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
         setResizable(false);
         setUndecorated(true);
         setModal(modal);
-        pack();
+        try { // Layout failures might not get logged.
+            pack();
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Packing failure", e);
+        }
         setLocationRelativeTo(getGUI().getFrame());
 
         WindowAdapter adapter = new WindowAdapter() {

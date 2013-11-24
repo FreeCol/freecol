@@ -1874,13 +1874,19 @@ public final class InGameController implements NetworkConstants {
     /**
      * Choose a founding father from an offered list.
      *
-     * @param A list of <code>FoundingFather</code>s to choose from.
-     * @return The chosen <code>FoundingFather</code> (may be null).
+     * @param ffs A list of <code>FoundingFather</code>s to choose from.
+     * @param ff The chosen <code>FoundingFather</code> (may be null).
      */
-    public FoundingFather chooseFoundingFather(List<FoundingFather> ffs) {
-        FoundingFather ff = gui.showChooseFoundingFatherDialog(ffs);
-        if (ff != null) freeColClient.getMyPlayer().setCurrentFather(ff);
-        return ff;
+    public void chooseFoundingFather(List<FoundingFather> ffs,
+                                     FoundingFather ff) {
+        Player player = freeColClient.getMyPlayer();
+        player.setCurrentFather(ff);
+        askServer().chooseFoundingFather(ffs, ff);
+
+    //public FoundingFather chooseFoundingFather(List<FoundingFather> ffs) {
+        //FoundingFather ff = gui.showChooseFoundingFatherDialog(ffs);
+        //if (ff != null) freeColClient.getMyPlayer().setCurrentFather(ff);
+        //return ff;
     }
 
     /**

@@ -38,6 +38,7 @@ import net.sf.freecol.common.networking.CashInTreasureTrainMessage;
 import net.sf.freecol.common.networking.ChangeStateMessage;
 import net.sf.freecol.common.networking.ChangeWorkImprovementTypeMessage;
 import net.sf.freecol.common.networking.ChangeWorkTypeMessage;
+import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
 import net.sf.freecol.common.networking.ClaimLandMessage;
 import net.sf.freecol.common.networking.ClearSpecialityMessage;
 import net.sf.freecol.common.networking.CloseTransactionMessage;
@@ -213,6 +214,14 @@ public final class InGameInputHandler extends InputHandler
             public Element handle(Player player, Connection connection,
                                   Element element) {
                 return new ChangeWorkTypeMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(ChooseFoundingFatherMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new ChooseFoundingFatherMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
         register(ClaimLandMessage.getXMLElementTagName(),

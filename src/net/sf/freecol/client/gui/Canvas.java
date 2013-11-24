@@ -1604,7 +1604,9 @@ public final class Canvas extends JDesktopPane {
      * @return The chosen <code>FoundingFather</code>.
      */
     public FoundingFather showChooseFoundingFatherDialog(List<FoundingFather> ffs) {
-        return showFreeColOldDialog(new ChooseFoundingFatherDialog(freeColClient, ffs), null, true);
+        ChooseFoundingFatherDialog cffd
+            = new ChooseFoundingFatherDialog(freeColClient, ffs);
+        return showFreeColDialog(cffd, null);
     }
 
     /**

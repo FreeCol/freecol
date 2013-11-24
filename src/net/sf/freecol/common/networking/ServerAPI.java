@@ -40,6 +40,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.ExportData;
+import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
@@ -581,6 +582,18 @@ public abstract class ServerAPI {
             && results.get("highScore") != null)
             ? Boolean.parseBoolean(results.get("highScore"))
             : false;
+    }
+
+    /**
+     * Send a chooseFoundingFather message.
+     *
+     * @param ffs A list of <code>FoundingFather</code>s to choose from.
+     * @param ff The chosen <code>FoundingFather</code> (may be null).
+     * @return True if the send succeeded.
+     */
+    public boolean chooseFoundingFather(List<FoundingFather> ffs,
+                                        FoundingFather ff) {
+        return send(new ChooseFoundingFatherMessage(ffs, ff));
     }
 
     /**

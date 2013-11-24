@@ -853,23 +853,10 @@ public final class InGameController extends Controller {
         }
         final List<FoundingFather> ffs = serverPlayer.getOfferedFathers();
         if (ffs.isEmpty()) return;
-        askThisTurn(serverPlayer, new ChooseFoundingFatherMessage(ffs),
+        askThisTurn(serverPlayer, new ChooseFoundingFatherMessage(ffs, null),
             new DOMMessageHandler() {
-                public DOMMessage handle(DOMMessage request) {
-                    ChooseFoundingFatherMessage message
-                        = (ChooseFoundingFatherMessage)request;
-                    FoundingFather ff = message.getResult();
-                    if (ff == null) {
-                        logger.warning("No founding father selected");
-                    } else if (!ffs.contains(ff)) {
-                        logger.warning("Invalid founding father: "
-                            + ff.getId());
-                    } else {
-                        serverPlayer.setCurrentFather(ff);
-                        serverPlayer.clearOfferedFathers();
-                        logger.info("Selected founding father: " + ff);
-                    }
-                    return null;
+                public DOMMessage handle(DOMMessage message) {
+                    return message;
                 }
             }, null);
     }
