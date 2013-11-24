@@ -31,6 +31,8 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.CaptureGoodsDialog;
+import net.sf.freecol.client.gui.panel.ChooseFoundingFatherDialog;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.client.gui.panel.FreeColStringInputDialog;
 import net.sf.freecol.common.debug.FreeColDebugger;
@@ -581,8 +583,8 @@ public final class InGameInputHandler extends InputHandler {
             = new ChooseFoundingFatherMessage(getGame(), element);
         final List<FoundingFather> ffs = message.getFathers();
 
-        final FreeColDialog<FoundingFather> fcd = new net.sf.freecol.client.gui.panel.ChooseFoundingFatherDialog(getFreeColClient(), ffs);
-        
+        final FreeColDialog<FoundingFather> fcd
+            = new ChooseFoundingFatherDialog(getFreeColClient(), ffs);
         getGUI().viewFreeColDialog(fcd, null, new Runnable() {
                 public void run() {
                     FoundingFather ff = fcd.getResponse();
@@ -590,13 +592,6 @@ public final class InGameInputHandler extends InputHandler {
                 }
             });
         return null;
-        //invokeAndWait(new Runnable() {
-        //        public void run() {
-        //            FoundingFather ff = igc().chooseFoundingFather(ffs);
-        //            if (ff != null) message.setResult(ff);
-        //        }
-        //    });
-        //return message.toXMLElement();
     }
 
     /**
@@ -850,9 +845,11 @@ public final class InGameInputHandler extends InputHandler {
         final List<Goods> goods = message.getGoods();
         if (unit == null || goods == null) return null;
 
-        SwingUtilities.invokeLater(new Runnable() {
+        final FreeColDialog<List<Goods>> fcd
+            = new CaptureGoodsDialog(getFreeColClient(), unit, goods);
+        getGUI().viewFreeColDialog(fcd, unit.getTile(), new Runnable() {
                 public void run() {
-                    igc().lootCargo(unit, goods, defenderId);
+                    igc().lootCargo(unit, fcd.getResponse(), defenderId);
                 }
             });
         return null;

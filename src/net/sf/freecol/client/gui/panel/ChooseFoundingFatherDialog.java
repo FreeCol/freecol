@@ -93,16 +93,10 @@ public final class ChooseFoundingFatherDialog
         String nominate = Messages.message("foundingFatherDialog.nominate");
         JLabel header = GUI.getDefaultHeader(nominate);
 
-        Dimension size = new Dimension(0, 0), tbSize = tb.getPreferredSize(),
-            hSize = header.getPreferredSize(),
-            hbSize = helpButton.getPreferredSize();
-        size.setSize(Math.max(tbSize.getWidth(), hSize.getWidth()),
-            tbSize.getHeight() + hSize.getHeight() + hbSize.getHeight() + 50);
-        panel.setPreferredSize(size);
-
         panel.add(header);
         panel.add(helpButton, "tag help");
         panel.add(tb, "width 100%");
+        panel.setPreferredSize(panel.getPreferredSize());
 
         List<ChoiceItem<FoundingFather>> c = choices();
         c.add(new ChoiceItem<FoundingFather>(Messages.message("ok"),

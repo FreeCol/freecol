@@ -57,10 +57,8 @@ import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.AboutPanel;
 import net.sf.freecol.client.gui.panel.BuildQueuePanel;
-import net.sf.freecol.client.gui.panel.CaptureGoodsDialog;
 import net.sf.freecol.client.gui.panel.ChatPanel;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
-import net.sf.freecol.client.gui.panel.ChooseFoundingFatherDialog;
 import net.sf.freecol.client.gui.panel.ClientOptionsDialog;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.ColopediaPanel;
@@ -1572,19 +1570,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Displays the <code>LootCargoDialog</code>.
-     *
-     * @param winner The <code>Unit</code> that is looting.
-     * @param loot list of <code>Goods</code> to select from
-     * @return list of <code>Goods</code> to loot
-     */
-    public List<Goods> showCaptureGoodsDialog(Unit winner, List<Goods> loot) {
-        CaptureGoodsDialog dialog
-            = new CaptureGoodsDialog(freeColClient, winner, loot);
-        return showFreeColOldDialog(dialog, winner.getTile(), true);
-    }
-
-    /**
      * Displays the <code>ChatPanel</code>.
      *
      * @see ChatPanel
@@ -1595,18 +1580,6 @@ public final class Canvas extends JDesktopPane {
             return; // In single player, no chat available
         }
         showSubPanel(chatPanel, true);
-    }
-
-    /**
-     * Choose a founding father.
-     *
-     * @param fathers A list of <code>FoundingFather</code>s on offer.
-     * @return The chosen <code>FoundingFather</code>.
-     */
-    public FoundingFather showChooseFoundingFatherDialog(List<FoundingFather> ffs) {
-        ChooseFoundingFatherDialog cffd
-            = new ChooseFoundingFatherDialog(freeColClient, ffs);
-        return showFreeColDialog(cffd, null);
     }
 
     /**

@@ -1229,19 +1229,9 @@ public class GUI {
         return canvas.showBuyDialog(unit, settlement, goods, gold, canBuy);
     }
 
-    public List<Goods> showCaptureGoodsDialog(Unit winner, List<Goods> loot) {
-        if (canvas == null) return Collections.emptyList();
-        return canvas.showCaptureGoodsDialog(winner, loot);
-    }
-
     public void showChatPanel() {
         if (canvas == null) return;
         canvas.showChatPanel();
-    }
-
-    public FoundingFather showChooseFoundingFatherDialog(List<FoundingFather> ffs) {
-        if (canvas == null) return null;
-        return canvas.showChooseFoundingFatherDialog(ffs);
     }
 
     public ClaimAction showClaimDialog(Tile tile, Player player, int price,

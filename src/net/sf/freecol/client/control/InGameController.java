@@ -1882,11 +1882,6 @@ public final class InGameController implements NetworkConstants {
         Player player = freeColClient.getMyPlayer();
         player.setCurrentFather(ff);
         askServer().chooseFoundingFather(ffs, ff);
-
-    //public FoundingFather chooseFoundingFather(List<FoundingFather> ffs) {
-        //FoundingFather ff = gui.showChooseFoundingFatherDialog(ffs);
-        //if (ff != null) freeColClient.getMyPlayer().setCurrentFather(ff);
-        //return ff;
     }
 
     /**
@@ -2446,7 +2441,6 @@ public final class InGameController implements NetworkConstants {
      * @param defenderId The identifier of the defender unit (may have sunk).
      */
     public void lootCargo(Unit unit, List<Goods> goods, String defenderId) {
-        goods = gui.showCaptureGoodsDialog(unit, goods);
         if (!goods.isEmpty()) {
             askServer().loot(unit, defenderId, goods);
         }
