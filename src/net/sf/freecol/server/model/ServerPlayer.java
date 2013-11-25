@@ -3514,12 +3514,22 @@ public class ServerPlayer extends Player implements ServerModelObject {
         Tile copied = colony.getTile().getTileToCache();
         int unitCount = colony.getUnitCount();
         boolean changed = false;
-        if (building.getType().getUpgradesFrom() == null) {
+        BuildingType type = building.getType();
+        if (type.getUpgradesFrom() == null) {
             changed = colony.ejectUnits(building, building.getUnitList());//-til
             colony.removeBuilding(building);//-til
             changed |= building.getType().isDefenceType();
             cs.addDispose(See.only((ServerPlayer)colony.getOwner()), colony, 
                           building);//-vis: safe, buildings are ok
+            // Have any abilities been removed that gate other production,
+            // e.g. removing docks should shut down fishing.
+            for (WorkLocation wl : colony.getAllWorkLocations()) {
+                if (!wl.isEmpty() && !wl.canBeWorked()) {
+                    changed |= colony.ejectUnits(wl, wl.getUnitList());//-til
+                    logger.warning("Units ejected from workLocation "
+                        + wl.getId() + " on loss of " + building.getId());
+                }
+            }
         } else if (building.canBeDamaged()) {
             changed = colony.ejectUnits(building, building.downgrade());//-til
             changed |= building.getType().isDefenceType();
