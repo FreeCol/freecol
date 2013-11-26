@@ -1328,9 +1328,19 @@ public class GUI {
         return canvas.showEditOptionDialog(option);
     }
 
-    public int showEmigrationDialog(boolean fountainOfYouth) {
-        if (canvas == null) return 0;
-        return canvas.showEmigrationDialog(fountainOfYouth);
+    public void showEmigrationDialog(final Player player, final int n,
+                                     final boolean fountainOfYouth) {
+        if (canvas == null) return;
+        canvas.showEmigrationDialog(player, fountainOfYouth,
+            new DialogHandler<Integer>() {
+                public void handle(Integer value) {
+                    int i = (value == null) ? 0 : value.intValue();
+                    igc().emigrate(player, i);
+                    if (n > 1) {
+                        showEmigrationDialog(player, n-1, fountainOfYouth);
+                    }
+                }
+            });
     }
 
     public boolean showEndTurnDialog(List<Unit> units) {

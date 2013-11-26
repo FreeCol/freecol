@@ -19,116 +19,68 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.event.ActionEvent;
-import java.util.logging.Logger;
-
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JTextArea;
 
-import net.miginfocom.swing.MigLayout;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.UnitType;
+
+import net.miginfocom.swing.MigLayout;
 
 
 /**
  * The panel that allows a user to choose which unit will emigrate from Europe.
  */
-public final class EmigrationDialog extends FreeColOldDialog<Integer> {
-
-    private static final Logger logger = Logger.getLogger(EmigrationDialog.class.getName());
-
-    private static final int NUMBER_OF_PERSONS = 3;
-
-    private static final JButton[] person = new JButton[NUMBER_OF_PERSONS];
-
-    private JTextArea question;
-
+public final class EmigrationDialog extends FreeColChoiceDialog<Integer> {
 
     /**
      * The constructor to use.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param europe The <code>Europe</code> where we can find the
+     *     units that are prepared to emigrate.
+     * @param foy Is this emigration due to a fountain of youth?
      */
-    public EmigrationDialog(FreeColClient freeColClient) {
-        super(freeColClient, new MigLayout("wrap 1", "[fill]", ""));
+    public EmigrationDialog(FreeColClient freeColClient, Europe europe,
+                            boolean foy) {
+        super(freeColClient);
 
-        for (int index = 0; index < NUMBER_OF_PERSONS; index++) {
-            person[index] = new JButton();
-            person[index].setActionCommand(String.valueOf(index));
-            person[index].addActionListener(this);
-        }
-    }
+        final ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
+        final List<UnitType> recruitables
+            = new ArrayList<UnitType>(europe.getRecruitables());
 
-    public void requestFocus() {
-        person[0].requestFocus();
-    }
-
-    /**
-     * Updates this panel's labels so that the information it displays is up to
-     * date.
-     *
-     * @param europe The Europe Object where we can find the units that are
-     *            prepared to emigrate.
-     * @param fountainOfYouth a <code>boolean</code> value
-     */
-    public void initialize(Europe europe, boolean fountainOfYouth) {
-        question = GUI.getDefaultTextArea(Messages.message("chooseImmigrant"));
-        if (fountainOfYouth) {
-            question.insert(Messages.message("lostCityRumour.fountainOfYouth")
-                            + "\n\n", 0);
+        String hdr = Messages.message("chooseImmigrant");
+        JTextArea header = GUI.getDefaultTextArea(hdr);
+        if (foy) {
+            header.insert(Messages.message("lostCityRumour.fountainOfYouth")
+                          + "\n\n", 0);
         }
 
-        add(question, "wrap 20");
+        MigPanel panel = new MigPanel(new MigLayout("wrap 1", "[fill]", ""));
+        panel.add(header, "wrap 20");
+        panel.setSize(panel.getPreferredSize());
 
-        for (int index = 0; index < NUMBER_OF_PERSONS; index++) {
-            UnitType unitType = europe.getRecruitable(index);
-            ImageIcon unitIcon = getLibrary().getUnitImageIcon(unitType, 0.66);
-            person[index].setText(Messages.message(unitType.getNameKey()));
-            person[index].setIcon(unitIcon);
-
-            add(person[index]);
+        List<ChoiceItem<Integer>> c = choices();
+        int i = 1;
+        UnitType u0 = recruitables.remove(0);
+        c.add(new ChoiceItem<Integer>(Messages.message(u0.getNameKey()),
+                new Integer(i++)).defaultOption()
+            .setIcon(lib.getUnitImageIcon(u0, 0.66)));
+        for (UnitType ut : recruitables) {
+            c.add(new ChoiceItem<Integer>(Messages.message(ut.getNameKey()),
+                    new Integer(i++))
+                .setIcon(lib.getUnitImageIcon(ut, 0.66)));
         }
 
-        setSize(getPreferredSize());
-    }
-
-
-    // Interface ActionListener
-
-    /**
-     * {@inheritDoc}
-     */
-    public void actionPerformed(ActionEvent event) {
-        final String command = event.getActionCommand();
-        try {
-            int action = Integer.valueOf(command).intValue();
-            if (action >= 0 && action < NUMBER_OF_PERSONS) {
-                setResponse(new Integer(action));
-            } else {
-                super.actionPerformed(event);
-            }
-        } catch (NumberFormatException e) {
-            logger.warning("Invalid ActionEvent, not a number: " + command);
-        }
-    }
-
-
-    // Override Component
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void removeNotify() {
-        super.removeNotify();
-
-        removeAll();
-        if (person != null) {
-            for (int i = 0; i < person.length; i++) person[i] = null;
-        }
+        initialize(false, panel, lib.getImageIcon(europe, true), null, c);
     }
 }

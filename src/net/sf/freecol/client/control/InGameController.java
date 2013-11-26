@@ -876,24 +876,6 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Emigrate a unit from Europe.
-     *
-     * @param player The <code>Player</code> that owns the unit.
-     * @param slot The slot to emigrate from.
-     * @return The unit that emigrated, or null on failure.
-     */
-    private Unit emigrate(Player player, int slot) {
-        Europe europe = player.getEurope();
-        EuropeWas europeWas = new EuropeWas(europe);
-        if (askServer().emigrate(slot)) {
-            europeWas.fireChanges();
-            gui.updateMenuBar();
-            return europeWas.getNewUnit();
-        }
-        return null;
-    }
-
-    /**
      * Follow a path.
      *
      * @param unit The <code>Unit</code> to move.
@@ -2099,6 +2081,24 @@ public final class InGameController implements NetworkConstants {
         if (askServer().disbandUnit(unit)) {
             nextActiveUnit();
         }
+    }
+
+    /**
+     * Emigrate a unit from Europe.
+     *
+     * @param player The <code>Player</code> that owns the unit.
+     * @param slot The slot to emigrate from.
+     * @return The unit that emigrated, or null on failure.
+     */
+    public Unit emigrate(Player player, int slot) {
+        Europe europe = player.getEurope();
+        EuropeWas europeWas = new EuropeWas(europe);
+        if (askServer().emigrate(slot)) {
+            europeWas.fireChanges();
+            gui.updateMenuBar();
+            return europeWas.getNewUnit();
+        }
+        return null;
     }
 
     /**
@@ -4070,14 +4070,11 @@ public final class InGameController implements NetworkConstants {
                 && turnsPlayed > 0) autosave_game();
 
             // Check for emigration.
-            while (player.checkEmigrate()) {
-                if (player.hasAbility(Ability.SELECT_RECRUIT)
-                    && player.getEurope().recruitablesDiffer()) {
-                    int index = gui.showEmigrationDialog(false);
-                    emigrate(player, index + 1);
-                } else {
-                    emigrate(player, 0);
-                }
+            if (player.hasAbility(Ability.SELECT_RECRUIT)
+                && player.getEurope().recruitablesDiffer()) {
+                gui.showEmigrationDialog(player, 1, false);
+            } else {
+                while (player.checkEmigrate()) emigrate(player, 0);
             }
             
             try {

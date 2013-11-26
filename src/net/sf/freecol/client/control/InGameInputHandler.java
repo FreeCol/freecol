@@ -746,15 +746,8 @@ public final class InGameInputHandler extends InputHandler {
             n = -1;
         }
         if (n > 0) {
-            final int m = n;
-            SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        for (int i = 0; i < m; i++) {
-                            int index = getGUI().showEmigrationDialog(true);
-                            getFreeColClient().askServer().emigrate(index + 1);
-                        }
-                    }
-                });
+            getGUI().showEmigrationDialog(getFreeColClient().getMyPlayer(),
+                                          n, true);
         }
         return null;
     }

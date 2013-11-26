@@ -1857,15 +1857,18 @@ public final class Canvas extends JDesktopPane {
      * from Europe.  This method may only be called if the user has William
      * Brewster in congress.
      *
+     * @param player The <code>Player</code> whose unit is emigrating.
      * @param fountainOfYouth Is this dialog displayed as a result of a
      *     fountain of youth.
-     * @return The emigrant that was chosen by the user.
+     * @param handler A <code>DialogHandler</code> for the dialog response.
      */
-    public int showEmigrationDialog(boolean fountainOfYouth) {
-        EmigrationDialog emigrationDialog = new EmigrationDialog(freeColClient);
-        emigrationDialog.initialize(freeColClient.getMyPlayer().getEurope(),
-                                   fountainOfYouth);
-        return showFreeColOldDialog(emigrationDialog, null, true);
+    public void showEmigrationDialog(Player player, boolean fountainOfYouth,
+                                     DialogHandler<Integer> handler) {
+        SwingUtilities.invokeLater(
+            new DialogCallback<Integer>(
+                new EmigrationDialog(freeColClient, player.getEurope(),
+                                     fountainOfYouth),
+                null, handler));
     }
 
     /**

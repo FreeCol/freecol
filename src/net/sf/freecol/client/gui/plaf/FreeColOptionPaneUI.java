@@ -111,7 +111,9 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
                 ChoiceItem ci = (ChoiceItem)buttons[i];
                 String label = ci.toString();
                 Icon icon = ci.getIcon();
-                b = (icon != null) ? new JButton(icon) : new JButton(label);
+                b = (icon == null) ? new JButton(label)
+                    : (label == null) ? new JButton(icon)
+                    : new JButton(label, icon);
                 b.setName("OptionPane.button." + label);
                 if (ci.isOK()) okIndex = i;
                 else if (ci.isCancel()) cancelIndex = i;

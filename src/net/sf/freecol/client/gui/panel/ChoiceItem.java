@@ -82,12 +82,14 @@ public class ChoiceItem<T> {
         this(Messages.message(object.toString()), object, true);
         
         // Check to see if we can improve upon object.toString()
-        if(object instanceof AbstractGoods) {
-            this.text = ((AbstractGoods)object).getAmount() + " " + Messages.message(((AbstractGoods)object).getNameKey());
+        if (object instanceof AbstractGoods) {
+            this.text = ((AbstractGoods)object).getAmount()
+                + " " + Messages.message(((AbstractGoods)object).getNameKey());
         } else if (object instanceof AbstractUnit) {
             this.text = Messages.message(((AbstractUnit)object).getId());
         } else if (object instanceof Player) {
-            this.text = Messages.message(((Player)object).getRulerNameKey()) + " (" + Messages.message(((Player)object).getNationName()) + ")";
+            this.text = Messages.message(((Player)object).getRulerNameKey())
+                + " (" + Messages.message(((Player)object).getNationName()) + ")";
         }
     }
 
