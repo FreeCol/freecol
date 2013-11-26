@@ -41,7 +41,6 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.FreeColActionUI;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
-import net.sf.freecol.client.gui.panel.DialogHandler;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.model.Ability;
@@ -4299,14 +4298,7 @@ public final class InGameController implements NetworkConstants {
             }
             // Goods left here must be dumped.
             if (unit.hasGoodsCargo()) {
-                gui.showDumpCargoDialog(unit,
-                    new DialogHandler<List<Goods>>() {
-                        public void handle(List<Goods> gl) {
-                            for (Goods goods : gl) {
-                                unloadCargo(goods, true);
-                            }
-                        }
-                    });
+                gui.showDumpCargoDialog(unit);
             }
         }
     }

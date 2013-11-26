@@ -67,6 +67,7 @@ import javax.swing.text.StyleContext;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas.BoycottAction;
 import net.sf.freecol.client.gui.Canvas.BuyAction;
 import net.sf.freecol.client.gui.Canvas.ClaimAction;
@@ -109,6 +110,7 @@ import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
@@ -246,6 +248,10 @@ public class GUI {
 
 
     // Simple accessors
+
+    private InGameController igc() {
+        return freeColClient.getInGameController();
+    }
 
     public Canvas getCanvas() {
         return canvas;
@@ -1230,10 +1236,15 @@ public class GUI {
         return canvas.showBuyDialog(unit, settlement, goods, gold, canBuy);
     }
 
-    public void showCaptureGoodsDialog(Unit unit, List<Goods> gl,
-                                       DialogHandler<List<Goods>> handler) {
+    public void showCaptureGoodsDialog(final Unit unit, List<Goods> gl,
+                                       final String defenderId) {
         if (canvas == null) return;
-        canvas.showCaptureGoodsDialog(unit, gl, handler);
+        canvas.showCaptureGoodsDialog(unit, gl, 
+            new DialogHandler<List<Goods>>() {
+                public void handle(List<Goods> gl) {
+                    igc().lootCargo(unit, gl, defenderId);
+                }
+            });
     }
 
     public void showChatPanel() {
@@ -1241,10 +1252,14 @@ public class GUI {
         canvas.showChatPanel();
     }
 
-    public void showChooseFoundingFatherDialog(List<FoundingFather> ffs,
-                                               DialogHandler<FoundingFather> handler) {
+    public void showChooseFoundingFatherDialog(final List<FoundingFather> ffs) {
         if (canvas == null) return;
-        canvas.showChooseFoundingFatherDialog(ffs, handler);
+        canvas.showChooseFoundingFatherDialog(ffs, 
+            new DialogHandler<FoundingFather>() {
+                public void handle(FoundingFather ff) {
+                    igc().chooseFoundingFather(ffs, ff);
+                }
+            });
     }
 
     public ClaimAction showClaimDialog(Tile tile, Player player, int price,
@@ -1298,10 +1313,14 @@ public class GUI {
         canvas.showDifficultyDialog(spec, group);
     }
 
-    public void showDumpCargoDialog(Unit unit,
-                                    DialogHandler<List<Goods>> handler) {
+    public void showDumpCargoDialog(Unit unit) {
         if (canvas == null) return;
-        canvas.showDumpCargoDialog(unit, handler);
+        canvas.showDumpCargoDialog(unit,
+            new DialogHandler<List<Goods>>() {
+                public void handle(List<Goods> goodsList) {
+                    for (Goods g : goodsList) igc().unloadCargo(g, true);
+                }
+            });
     }
 
     public boolean showEditOptionDialog(Option option) {
@@ -1453,17 +1472,31 @@ public class GUI {
         return canvas.showMonarchDialog(action, replace);
     }
 
-    public void showNameNewLandDialog(String key, String defaultName, Unit unit,
-                                      DialogHandler<String> handler) {
+    public void showNameNewLandDialog(String key, final String defaultName,
+                                      final Unit unit, final Player welcomer,
+                                      final String camps) {
         if (canvas == null) return;
-        canvas.showNameNewLandDialog(key, defaultName, unit, handler);
+        canvas.showNameNewLandDialog(key, defaultName, unit,
+            new DialogHandler<String>() {
+                public void handle(String name) {
+                    if (name == null || name.length() == 0) name = defaultName;
+                    igc().nameNewLand(unit, name, welcomer, camps);
+                }
+            });
     }
 
     public void showNameNewRegionDialog(StringTemplate template,
-                                        String defaultName, Unit unit,
-                                        DialogHandler<String> handler) {
+                                        final String defaultName,
+                                        final Unit unit, final Tile tile,
+                                        final Region region) {
         if (canvas == null) return;
-        canvas.showNameNewRegionDialog(template, defaultName, unit, handler);
+        canvas.showNameNewRegionDialog(template, defaultName, unit, 
+            new DialogHandler<String>() {
+                public void handle(String name) {
+                    if (name == null || name.length() == 0) name = defaultName;
+                    igc().nameNewRegion(tile, unit, region, name);
+                }
+            });
     }
 
     public DiplomaticTrade showNegotiationDialog(Unit unit,

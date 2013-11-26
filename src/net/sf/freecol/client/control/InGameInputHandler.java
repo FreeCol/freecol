@@ -30,7 +30,6 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.client.gui.panel.DialogHandler;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
@@ -579,12 +578,7 @@ public final class InGameInputHandler extends InputHandler {
             = new ChooseFoundingFatherMessage(getGame(), element);
         final List<FoundingFather> ffs = message.getFathers();
 
-        getGUI().showChooseFoundingFatherDialog(ffs,
-            new DialogHandler<FoundingFather>() {
-                public void handle(FoundingFather ff) {
-                    igc().chooseFoundingFather(ffs, ff);
-                }
-            });
+        getGUI().showChooseFoundingFatherDialog(ffs);
         return null;
     }
 
@@ -839,12 +833,7 @@ public final class InGameInputHandler extends InputHandler {
         final List<Goods> goods = message.getGoods();
         if (unit == null || goods == null) return null;
 
-        getGUI().showCaptureGoodsDialog(unit, goods,
-            new DialogHandler<List<Goods>>() {
-                public void handle(List<Goods> gl) {
-                    igc().lootCargo(unit, gl, defenderId);
-                }
-            });
+        getGUI().showCaptureGoodsDialog(unit, goods, defenderId);
         return null;
     }
 
@@ -922,12 +911,7 @@ public final class InGameInputHandler extends InputHandler {
         final String camps = message.getCamps();
 
         getGUI().showNameNewLandDialog("newLand.text", defaultName, unit,
-            new DialogHandler<String>() {
-                public void handle(String name) {
-                    if (name == null || name.length() == 0) name = defaultName;
-                    igc().nameNewLand(unit, name, welcomer, camps);
-                }
-            });
+                                       welcomer, camps);
         return null;
     }
 
@@ -947,15 +931,10 @@ public final class InGameInputHandler extends InputHandler {
         final String defaultName = message.getNewRegionName();
         if (defaultName == null || region == null) return null;
 
-        getGUI().showNameNewRegionDialog(StringTemplate.template("nameRegion.text")
-                .addStringTemplate("%type%", region.getLabel()),
-            defaultName, unit,
-            new DialogHandler<String>() {
-                public void handle(String name) {
-                    if (name == null || name.length() == 0) name = defaultName;
-                    igc().nameNewRegion(tile, unit, region, name);
-                }
-            });
+        StringTemplate template = StringTemplate.template("nameRegion.text")
+            .addStringTemplate("%type%", region.getLabel());
+        getGUI().showNameNewRegionDialog(template, defaultName, unit,
+                                         tile, region);
         return null;
     }
 
