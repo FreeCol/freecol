@@ -57,14 +57,17 @@ import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.AboutPanel;
 import net.sf.freecol.client.gui.panel.BuildQueuePanel;
+import net.sf.freecol.client.gui.panel.CaptureGoodsDialog;
 import net.sf.freecol.client.gui.panel.ChatPanel;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
+import net.sf.freecol.client.gui.panel.ChooseFoundingFatherDialog;
 import net.sf.freecol.client.gui.panel.ClientOptionsDialog;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.ColopediaPanel;
 import net.sf.freecol.client.gui.panel.CompactLabourReport;
 import net.sf.freecol.client.gui.panel.ConfirmDeclarationDialog;
 import net.sf.freecol.client.gui.panel.DeclarationPanel;
+import net.sf.freecol.client.gui.panel.DialogHandler;
 import net.sf.freecol.client.gui.panel.DifficultyDialog;
 import net.sf.freecol.client.gui.panel.DumpCargoDialog;
 import net.sf.freecol.client.gui.panel.EditOptionDialog;
@@ -183,6 +186,51 @@ import net.sf.freecol.common.resources.Video;
 public final class Canvas extends JDesktopPane {
 
     private static final Logger logger = Logger.getLogger(Canvas.class.getName());
+
+    /** A wrapper class for non-modal dialogs. */
+    private class DialogCallback<T> implements Runnable {
+        
+        /** The dialog to show. */
+        private final FreeColDialog<T> fcd;
+
+        /** An optional tile to guide the dialog placement. */
+        private final Tile tile;
+
+        /** The handler for the dialog response. */
+        private final DialogHandler<T> handler;
+
+
+        /**
+         * Constructor.
+         */
+        public DialogCallback(FreeColDialog<T> fcd, Tile tile,
+                              DialogHandler<T> handler) {
+            this.fcd = fcd;
+            this.tile = tile;
+            this.handler = handler;
+        }
+
+
+        // Implement Runnable
+
+        public void run() {
+            // Display the dialog...
+            viewFreeColDialog(fcd, tile);
+            // ...and use another thread to wait for a dialog response...
+            new Thread(fcd.toString()) {
+                public void run() {
+                    while (!fcd.responded()) {
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e) {}
+                    }
+                    // ...before handling the result.
+                    handler.handle(fcd.getResponse());
+                }
+            }.start();
+        }
+    };
+
 
     public static enum BoycottAction {
         CANCEL,
