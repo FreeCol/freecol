@@ -1298,9 +1298,10 @@ public class GUI {
         canvas.showDifficultyDialog(spec, group);
     }
 
-    public List<Goods> showDumpCargoDialog(Unit unit) {
-        if (canvas == null) return Collections.emptyList();
-        return canvas.showDumpCargoDialog(unit);
+    public void showDumpCargoDialog(Unit unit,
+                                    DialogHandler<List<Goods>> handler) {
+        if (canvas == null) return;
+        canvas.showDumpCargoDialog(unit, handler);
     }
 
     public boolean showEditOptionDialog(Option option) {

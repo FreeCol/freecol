@@ -1822,12 +1822,14 @@ public final class Canvas extends JDesktopPane {
      * Displays the <code>DumpCargoDialog</code>.
      *
      * @param unit The <code>Unit</code> that is dumping.
-     * @return A list of <code>Goods</code> to dump.
+     * @param handler A <code>DialogHandler</code> for the dialog response.
      */
-    public List<Goods> showDumpCargoDialog(Unit unit) {
-        DumpCargoDialog dumpDialog
-            = new DumpCargoDialog(freeColClient, unit);
-        return showFreeColOldDialog(dumpDialog, unit.getTile(), true);
+    public void showDumpCargoDialog(Unit unit,
+                                    DialogHandler<List<Goods>> handler) {
+        SwingUtilities.invokeLater(
+            new DialogCallback<List<Goods>>(
+                new DumpCargoDialog(freeColClient, unit),
+                unit.getTile(), handler));
     }
 
     /**

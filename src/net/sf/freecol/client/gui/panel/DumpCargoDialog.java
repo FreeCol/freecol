@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -31,6 +30,7 @@ import javax.swing.JLabel;
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Unit;
@@ -39,20 +39,16 @@ import net.sf.freecol.common.model.Unit;
 /**
  * This panel is used to handle dumping cargo.
  */
-public final class DumpCargoDialog extends FreeColOldDialog<List<Goods>> {
+public final class DumpCargoDialog extends FreeColDialog<List<Goods>> {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(DumpCargoDialog.class.getName());
 
-    private static final String CANCEL = "CANCEL";
+    /** The list of goods to choose what to dump from. */
+    private final List<Goods> goodsList;
 
-    private final JLabel header;
-
-    private final JButton cancelButton;
-
-    private List<Goods> goodsList;
-
-    private List<JCheckBox> checkBoxes;
+    /** Check boxes corresponding to the goods list. */
+    private final List<JCheckBox> checkBoxes;
 
 
     /**
@@ -62,54 +58,53 @@ public final class DumpCargoDialog extends FreeColOldDialog<List<Goods>> {
      * @param unit The <code>Unit</code> that is dumping cargo.
      */
     public DumpCargoDialog(FreeColClient freeColClient, Unit unit) {
-        super(freeColClient, new MigLayout("wrap 1", "", ""));
+        super(freeColClient);
 
-        header = new JLabel(Messages.message("dumpCargo"));
+        final ImageLibrary lib = getGUI().getImageLibrary();
+
+        this.goodsList = unit.getGoodsList();
+        this.checkBoxes = new ArrayList<JCheckBox>(goodsList.size());
+
+        JLabel header = GUI.getDefaultHeader(Messages.message("dumpCargo"));
         header.setFont(GUI.SMALL_HEADER_FONT);
-        add(header);
-
-        cancelButton = new JButton(Messages.message("cancel"));
-        cancelButton.setActionCommand(CANCEL);
-        cancelButton.addActionListener(this);
-
-        goodsList = unit.getGoodsList();
-        checkBoxes = new ArrayList<JCheckBox>(goodsList.size());
 
         for (Goods goods : goodsList) {
             // TODO: find out why check box is not displayed when icon
             // is present
             JCheckBox checkBox
                 = new JCheckBox(Messages.message(goods.getLabel(true)),
-                                //getLibrary().getGoodsImageIcon(goods.getType()),
+                                //lib.getImageIcon(goods.getType(), true),
                                 true);
             checkBoxes.add(checkBox);
-            add(checkBox);
         }
 
-        add(okButton, "newline 20, span, split 2, tag ok");
-        add(cancelButton, "tag cancel");
+        MigPanel panel = new MigPanel(new MigLayout("wrap 1", "", ""));
+        panel.add(header);
+        for (JCheckBox c : checkBoxes) panel.add(c);
+        panel.setSize(panel.getPreferredSize());
 
-        setSize(getPreferredSize());
+        List<Goods> fake = null;
+        List<ChoiceItem<List<Goods>>> c = choices();
+        c.add(new ChoiceItem<List<Goods>>(Messages.message("ok"), fake)
+            .okOption().defaultOption());
+        c.add(new ChoiceItem<List<Goods>>(Messages.message("cancel"), fake)
+            .cancelOption());
+        initialize(DialogType.QUESTION, false, panel,
+            lib.getImageIcon(unit, false), c);
     }
 
-
-    // Interface ActionListener
 
     /**
      * {@inheritDoc}
      */
-    public void actionPerformed(ActionEvent event) {
-        final String command = event.getActionCommand();
-        if (OK.equals(command)) {
-            List<Goods> dump = new ArrayList<Goods>();
-            for (int index = 0; index < checkBoxes.size(); index++) {
-                if (checkBoxes.get(index).isSelected()) {
-                    dump.add(goodsList.get(index));
-                }
+    public List<Goods> getResponse() {
+        Object value = getValue();
+        List<Goods> gl = new ArrayList<Goods>();
+        if (options.get(0).equals(value)) {
+            for (int i = 0; i < checkBoxes.size(); i++) {
+                if (checkBoxes.get(i).isSelected()) gl.add(goodsList.get(i));
             }
-            setResponse(dump);
-        } else {
-            setResponse(null);
         }
-    }
+        return gl;
+    }            
 }
