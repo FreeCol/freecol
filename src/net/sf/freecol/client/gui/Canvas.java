@@ -1618,6 +1618,21 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
+     * Display the <code>CaptureGoodsDialog</code>.
+     *
+     * @param unit The <code>Unit</code> capturing goods.
+     * @param gl The list of <code>Goods</code> to choose from.
+     * @param handler A <code>DialogHandler</code> for the dialog response.
+     */
+    public void showCaptureGoodsDialog(Unit unit, List<Goods> gl,
+                                       DialogHandler<List<Goods>> handler) {
+        SwingUtilities.invokeLater(
+            new DialogCallback<List<Goods>>(
+                new CaptureGoodsDialog(freeColClient, unit, gl),
+                null, handler));
+    }
+
+    /**
      * Displays the <code>ChatPanel</code>.
      *
      * @see ChatPanel
@@ -1628,6 +1643,20 @@ public final class Canvas extends JDesktopPane {
             return; // In single player, no chat available
         }
         showSubPanel(chatPanel, true);
+    }
+
+    /**
+     * Displays the <code>ChooseFoundingFatherDialog</code>.
+     *
+     * @param ffs The <code>FoundingFather</code>s to choose from.
+     * @param handler A <code>DialogHandler</code> for the dialog response.
+     */
+    public void showChooseFoundingFatherDialog(List<FoundingFather> ffs,
+                                               DialogHandler<FoundingFather> handler) {
+        SwingUtilities.invokeLater(
+            new DialogCallback<FoundingFather>(
+                new ChooseFoundingFatherDialog(freeColClient, ffs),
+                null, handler));
     }
 
     /**
@@ -2249,6 +2278,45 @@ public final class Canvas extends JDesktopPane {
                                      StringTemplate replace) {
         return showFreeColOldDialog(new MonarchDialog(freeColClient, action,
                                                    replace), null, true);
+    }
+
+    /**
+     * Display a dialog to set a new land name.
+     *
+     * @param key A key for the message to explain the dialog.
+     * @param defaultName The default name for the new land.
+     * @param unit The <code>Unit</code> discovering the new land.
+     * @param handler A <code>DialogHandler</code> for the dialog response.
+     */
+    public void showNameNewLandDialog(String key, String defaultName,
+                                      Unit unit,
+                                      DialogHandler<String> handler) {
+        SwingUtilities.invokeLater(
+            new DialogCallback<String>(
+                new FreeColStringInputDialog(freeColClient, false,
+                                             Messages.message(key),
+                                             defaultName, "ok", null),
+                unit.getTile(), handler));
+    }
+
+    /**
+     * Display a dialog to set a new region name.
+     *
+     * @param template A <code>StringTemplate</code> for the message
+     *     to explain the dialog.
+     * @param defaultName The default name for the new region.
+     * @param unit The <code>Unit</code> discovering the new region.
+     * @param handler A <code>DialogHandler</code> for the dialog response.
+     */
+    public void showNameNewRegionDialog(StringTemplate template,
+                                        String defaultName, Unit unit,
+                                        DialogHandler<String> handler) {
+        SwingUtilities.invokeLater(
+            new DialogCallback<String>(
+                new FreeColStringInputDialog(freeColClient, false,
+                                             Messages.message(template),
+                                             defaultName, "ok", null),
+                unit.getTile(), handler));
     }
 
     /**

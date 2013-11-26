@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.control;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -31,10 +30,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.client.gui.panel.CaptureGoodsDialog;
-import net.sf.freecol.client.gui.panel.ChooseFoundingFatherDialog;
-import net.sf.freecol.client.gui.panel.FreeColDialog;
-import net.sf.freecol.client.gui.panel.FreeColStringInputDialog;
+import net.sf.freecol.client.gui.panel.DialogHandler;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
@@ -583,11 +579,9 @@ public final class InGameInputHandler extends InputHandler {
             = new ChooseFoundingFatherMessage(getGame(), element);
         final List<FoundingFather> ffs = message.getFathers();
 
-        final FreeColDialog<FoundingFather> fcd
-            = new ChooseFoundingFatherDialog(getFreeColClient(), ffs);
-        getGUI().viewFreeColDialog(fcd, null, new Runnable() {
-                public void run() {
-                    FoundingFather ff = fcd.getResponse();
+        getGUI().showChooseFoundingFatherDialog(ffs,
+            new DialogHandler<FoundingFather>() {
+                public void handle(FoundingFather ff) {
                     igc().chooseFoundingFather(ffs, ff);
                 }
             });
@@ -845,11 +839,10 @@ public final class InGameInputHandler extends InputHandler {
         final List<Goods> goods = message.getGoods();
         if (unit == null || goods == null) return null;
 
-        final FreeColDialog<List<Goods>> fcd
-            = new CaptureGoodsDialog(getFreeColClient(), unit, goods);
-        getGUI().viewFreeColDialog(fcd, unit.getTile(), new Runnable() {
-                public void run() {
-                    igc().lootCargo(unit, fcd.getResponse(), defenderId);
+        getGUI().showCaptureGoodsDialog(unit, goods,
+            new DialogHandler<List<Goods>>() {
+                public void handle(List<Goods> gl) {
+                    igc().lootCargo(unit, gl, defenderId);
                 }
             });
         return null;
@@ -928,13 +921,9 @@ public final class InGameInputHandler extends InputHandler {
         final Player welcomer = message.getWelcomer(game);
         final String camps = message.getCamps();
 
-        final FreeColStringInputDialog fcd
-            = new FreeColStringInputDialog(getFreeColClient(), false,
-                Messages.message(StringTemplate.template("newLand.text")),
-                defaultName, "newLand.yes", null);
-        getGUI().viewFreeColDialog(fcd, unit.getTile(), new Runnable() {
-                public void run() {
-                    String name = fcd.getResponse();
+        getGUI().showNameNewLandDialog("newLand.text", defaultName, unit,
+            new DialogHandler<String>() {
+                public void handle(String name) {
                     if (name == null || name.length() == 0) name = defaultName;
                     igc().nameNewLand(unit, name, welcomer, camps);
                 }
@@ -958,14 +947,11 @@ public final class InGameInputHandler extends InputHandler {
         final String defaultName = message.getNewRegionName();
         if (defaultName == null || region == null) return null;
 
-        final FreeColStringInputDialog fcd
-            = new FreeColStringInputDialog(getFreeColClient(), false,
-                Messages.message(StringTemplate.template("nameRegion.text")
-                    .addStringTemplate("%type%", region.getLabel())),
-                defaultName, "ok", null);
-        getGUI().viewFreeColDialog(fcd, unit.getTile(), new Runnable() {
-                public void run() {
-                    String name = fcd.getResponse();
+        getGUI().showNameNewRegionDialog(StringTemplate.template("nameRegion.text")
+                .addStringTemplate("%type%", region.getLabel()),
+            defaultName, unit,
+            new DialogHandler<String>() {
+                public void handle(String name) {
                     if (name == null || name.length() == 0) name = defaultName;
                     igc().nameNewRegion(tile, unit, region, name);
                 }

@@ -179,15 +179,14 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
      */
     public List<Goods> getResponse() {
         Object value = getValue();
+        List<Goods> gl = new ArrayList<Goods>();
         if (options.get(0).equals(value)) {
-            ArrayList<Goods> gl = new ArrayList<Goods>();
             for (int i = 0; i < goodsList.getModel().getSize(); i++) {
                 GoodsItem gi = (GoodsItem)goodsList.getModel().getElementAt(i);
                 if (gi.isSelected()) gl.add(gi.getGoods());
             }
-            return gl;
         }
-        return null;
+        return gl;
     }            
 
 

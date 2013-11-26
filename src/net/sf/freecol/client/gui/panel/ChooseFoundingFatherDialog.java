@@ -69,12 +69,16 @@ public final class ChooseFoundingFatherDialog
         super(freeColClient);
 
         this.possibleFathers = possibleFoundingFathers;
-
+        this.tb = new JTabbedPane(JTabbedPane.TOP);
         setFocusCycleRoot(false);
 
-        MigPanel panel = new MigPanel(new MigLayout("wrap 1", "align center"));
+        String nominate = Messages.message("foundingFatherDialog.nominate");
+        JLabel header = GUI.getDefaultHeader(nominate);
 
-        tb = new JTabbedPane(JTabbedPane.TOP);
+        JButton helpButton = new JButton(freeColClient.getActionManager()
+            .getFreeColAction("colopediaAction.FATHERS"));
+        helpButton.setText(Messages.message("help"));
+
         FatherDetailPanel details = new FatherDetailPanel(freeColClient,
             new ColopediaPanel(freeColClient));
         for (int index = 0; index < possibleFoundingFathers.size(); index++) {
@@ -86,13 +90,7 @@ public final class ChooseFoundingFatherDialog
         }
         tb.setSelectedIndex(0);
 
-        JButton helpButton = new JButton(freeColClient.getActionManager()
-            .getFreeColAction("colopediaAction.FATHERS"));
-        helpButton.setText(Messages.message("help"));
-
-        String nominate = Messages.message("foundingFatherDialog.nominate");
-        JLabel header = GUI.getDefaultHeader(nominate);
-
+        MigPanel panel = new MigPanel(new MigLayout("wrap 1", "align center"));
         panel.add(header);
         panel.add(helpButton, "tag help");
         panel.add(tb, "width 100%");

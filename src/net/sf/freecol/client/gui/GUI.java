@@ -1230,9 +1230,21 @@ public class GUI {
         return canvas.showBuyDialog(unit, settlement, goods, gold, canBuy);
     }
 
+    public void showCaptureGoodsDialog(Unit unit, List<Goods> gl,
+                                       DialogHandler<List<Goods>> handler) {
+        if (canvas == null) return;
+        canvas.showCaptureGoodsDialog(unit, gl, handler);
+    }
+
     public void showChatPanel() {
         if (canvas == null) return;
         canvas.showChatPanel();
+    }
+
+    public void showChooseFoundingFatherDialog(List<FoundingFather> ffs,
+                                               DialogHandler<FoundingFather> handler) {
+        if (canvas == null) return;
+        canvas.showChooseFoundingFatherDialog(ffs, handler);
     }
 
     public ClaimAction showClaimDialog(Tile tile, Player player, int price,
@@ -1438,6 +1450,19 @@ public class GUI {
                                      StringTemplate replace) {
         if (canvas == null) return false;
         return canvas.showMonarchDialog(action, replace);
+    }
+
+    public void showNameNewLandDialog(String key, String defaultName, Unit unit,
+                                      DialogHandler<String> handler) {
+        if (canvas == null) return;
+        canvas.showNameNewLandDialog(key, defaultName, unit, handler);
+    }
+
+    public void showNameNewRegionDialog(StringTemplate template,
+                                        String defaultName, Unit unit,
+                                        DialogHandler<String> handler) {
+        if (canvas == null) return;
+        canvas.showNameNewRegionDialog(template, defaultName, unit, handler);
     }
 
     public DiplomaticTrade showNegotiationDialog(Unit unit,
