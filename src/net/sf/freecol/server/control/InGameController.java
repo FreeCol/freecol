@@ -3690,6 +3690,7 @@ public final class InGameController extends Controller {
     public Element setBuildQueue(ServerPlayer serverPlayer, Colony colony,
                                  List<BuildableType> queue) {
         colony.setBuildQueue(queue);
+        colony.invalidateCache();
 
         // Only visible to player.
         ChangeSet cs = new ChangeSet();
