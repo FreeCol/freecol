@@ -395,6 +395,9 @@ public final class InGameController implements NetworkConstants {
      * Really end the turn.
      */
     private void doEndTurn() {
+        // Clean up lingering menus.
+        gui.closeMenus();
+
         // Clear active unit if any.
         gui.setActiveUnit(null);
 

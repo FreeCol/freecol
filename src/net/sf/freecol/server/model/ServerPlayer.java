@@ -77,6 +77,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
@@ -1551,6 +1552,16 @@ public class ServerPlayer extends Player implements ServerModelObject {
             if (father != null) {
                 csAddFoundingFather(father, random, cs);
                 clearOfferedFathers();
+            }
+
+            List<FoundingFather> ffs = getOfferedFathers();
+            if (canRecruitFoundingFather() && ffs.isEmpty()) {
+                ffs = getRandomFoundingFathers(random);
+                setOfferedFathers(ffs);
+            }
+            if (!ffs.isEmpty()) {
+                cs.add(See.only(this), ChangePriority.CHANGE_EARLY,
+                    new ChooseFoundingFatherMessage(ffs, null));
             }
 
             if (updateScore()) {

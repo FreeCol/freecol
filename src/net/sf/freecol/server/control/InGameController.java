@@ -100,7 +100,6 @@ import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.ChatMessage;
-import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
@@ -793,7 +792,6 @@ public final class InGameController extends Controller {
                 }
             }
             player.csStartTurn(random, cs);
-            nextFoundingFather(player);
 
             cs.addTrivial(See.all(), "setCurrentPlayer",
                           ChangePriority.CHANGE_LATE,
@@ -838,27 +836,6 @@ public final class InGameController extends Controller {
             }
             return cs.build(serverPlayer);
         }
-    }
-
-    /**
-     * Queries a player to choose their next founding father in a future.
-     *
-     * @param serverPlayer The <code>ServerPlayer</code> to ask.
-     */
-    private void nextFoundingFather(final ServerPlayer serverPlayer) {
-        if (!serverPlayer.canRecruitFoundingFather()) return;
-        if (serverPlayer.getOfferedFathers().isEmpty()) {
-            serverPlayer.setOfferedFathers(serverPlayer
-                .getRandomFoundingFathers(random));
-        }
-        final List<FoundingFather> ffs = serverPlayer.getOfferedFathers();
-        if (ffs.isEmpty()) return;
-        askThisTurn(serverPlayer, new ChooseFoundingFatherMessage(ffs, null),
-            new DOMMessageHandler() {
-                public DOMMessage handle(DOMMessage message) {
-                    return message;
-                }
-            }, null);
     }
 
     /**

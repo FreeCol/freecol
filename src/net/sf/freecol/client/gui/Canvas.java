@@ -958,6 +958,10 @@ public final class Canvas extends JDesktopPane {
             }
             frame.dispose();
         }
+        while (!dialogs.isEmpty()) {
+            FreeColDialog<?> dialog = dialogs.remove(0);
+            dialog.dispose();
+        }
     }
 
     /**
