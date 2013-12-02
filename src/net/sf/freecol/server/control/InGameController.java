@@ -435,36 +435,59 @@ public final class InGameController extends Controller {
         return executor.submit(callable);
     }
 
-    // A place to stash queries that need to be resolved at some point.
-    private static final List<FutureQuery> outstandingQueries
-        = new ArrayList<FutureQuery>();
+    /**
+     * A trivial class to associate a future with a runnable that resolves it.
+     */
+    private static class FutureQuery {
 
-    // Trivial way to associate a future with a runnable to resolve it.
-    private class FutureQuery {
+        /** A place to stash queries that need to be resolved at some point. */
+        private static final List<FutureQuery> outstandingQueries
+            = new ArrayList<FutureQuery>();
 
-        public Future<DOMMessage> future;
-        public Runnable runnable;
+        /** The future to keep. */
+        private Future<?> future;
 
-        public FutureQuery(Future<DOMMessage> future, Runnable runnable) {
+        /**
+         * The runnable that resolves the problem if the future is unresolved.
+         */
+        private Runnable runnable;
+
+
+        /**
+         * Create a new future query.
+         *
+         * @param future The <code>Future</code> to save.
+         * @param runnable The <code>Runnable</code> that resolves the future.
+         */
+        public FutureQuery(Future<?> future, Runnable runnable) {
             this.future = future;
             this.runnable = runnable;
-            outstandingQueries.add(this);
+            addOutstandingQuery(this);
         }
-    };
 
-    /**
-     * Resolves and clears any outstanding queries.
-     */
-    public void resolveOutstandingQueries() {
-        FutureQuery fq;
-        while (!outstandingQueries.isEmpty()) {
-            fq = outstandingQueries.remove(0);
-            if (!fq.future.isDone()) {
-                if (fq.runnable != null) fq.runnable.run();
-                fq.future.cancel(true);
+        /**
+         * Add an outstanding query.
+         *
+         * @param fq The <code>FutureQuery</code> to add.
+         */
+        public static void addOutstandingQuery(FutureQuery fq) {
+            outstandingQueries.add(fq);
+        }
+
+        /**
+         * Resolves and clears any outstanding queries.
+         */
+        public static void resolveOutstandingQueries() {
+            FutureQuery fq;
+            while (!outstandingQueries.isEmpty()) {
+                fq = outstandingQueries.remove(0);
+                if (!fq.future.isDone()) {
+                    if (fq.runnable != null) fq.runnable.run();
+                    fq.future.cancel(true);
+                }
             }
         }
-    }
+    };
 
     /**
      * Asks a question that must be answered this turn.
@@ -711,7 +734,7 @@ public final class InGameController extends Controller {
             }
 
             // Clean up futures from the current player.
-            resolveOutstandingQueries();
+            FutureQuery.resolveOutstandingQueries();
 
             // Check for new turn
             ChangeSet cs = new ChangeSet();
