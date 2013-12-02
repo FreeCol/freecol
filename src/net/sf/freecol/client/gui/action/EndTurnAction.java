@@ -44,8 +44,6 @@ public class EndTurnAction extends MapboardAction {
      */
     public EndTurnAction(FreeColClient freeColClient) {
         super(freeColClient, id);
-
-        setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
     }
 
 
