@@ -84,7 +84,7 @@ public class ClientOptions extends OptionGroup {
     // Keep these in sync with data/base/client-options.xml.
     //
 
-    // clientOptions.gui
+    // clientOptions.personal
 
     /**
      * Option for the player's preferred name
@@ -92,17 +92,16 @@ public class ClientOptions extends OptionGroup {
     public static final String NAME
         = "model.option.playerName";
 
+
+    // clientOptions.gui
+
     /**
      * Option for setting the language.
      */
     public static final String LANGUAGE
         = "model.option.languageOption";
-
-    /**
-     * Value for automatic language selection.
-     */
-    public static final String AUTOMATIC
-        = "automatic";
+    // Value for automatic language selection.
+    public static final String AUTOMATIC = "automatic";
 
     /**
      * Used by GUI, the number will be displayed when a group of goods are
@@ -142,8 +141,8 @@ public class ClientOptions extends OptionGroup {
         = "model.option.alwaysCenter";
 
     /**
-     * If this option is enabled, the display will recenter in order to display
-     * the active unit if it is not
+     * If this option is enabled, the display will recenter in order
+     * to display the active unit if it is not
      * {@link net.sf.freecol.client.gui.GUI#onScreen(Tile)}).
      *
      * @see net.sf.freecol.client.gui.GUI
@@ -232,16 +231,16 @@ public class ClientOptions extends OptionGroup {
         = "model.option.disableGrayLayer";
 
     /**
-     * If selected: Draws the borders on the minimap.
-     */
-    public static final String MINIMAP_TOGGLE_BORDERS
-        = "model.option.miniMapToggleBorders";
-    
-    /**
      * If selected: Draws the fog of war on the minimap.
      */
     public static final String MINIMAP_TOGGLE_FOG_OF_WAR
         = "model.option.miniMapToggleFogOfWar";
+    
+    /**
+     * If selected: Draws the borders on the minimap.
+     */
+    public static final String MINIMAP_TOGGLE_BORDERS
+        = "model.option.miniMapToggleBorders";
     
     /**
      * The color to fill in around the actual map on the
@@ -274,7 +273,6 @@ public class ClientOptions extends OptionGroup {
      */
     public static final String DISPLAY_TILE_TEXT
         = "model.option.displayTileText";
-
     public static final int DISPLAY_TILE_TEXT_EMPTY = 0,
         DISPLAY_TILE_TEXT_NAMES = 1,
         DISPLAY_TILE_TEXT_OWNERS = 2,
@@ -294,7 +292,6 @@ public class ClientOptions extends OptionGroup {
      */
     public static final String COLONY_COMPARATOR
         = "model.option.colonyComparator";
-
     public static final int COLONY_COMPARATOR_NAME = 0,
         COLONY_COMPARATOR_AGE = 1,
         COLONY_COMPARATOR_POSITION = 2,
@@ -323,15 +320,14 @@ public class ClientOptions extends OptionGroup {
     // clientOptions.messages
 
    /**
-     * Used by GUI, this defines the grouping of ModelMessages. Possible values
-     * include nothing, type and source.
+     * Used by GUI, this defines the grouping of ModelMessages.
+     * Possible values include nothing, type and source.
      *
      * @see net.sf.freecol.client.gui.MapViewer
      * @see net.sf.freecol.common.model.ModelMessage
      */
     public static final String MESSAGES_GROUP_BY
         = "model.option.guiMessagesGroupBy";
-
     public static final int MESSAGES_GROUP_BY_NOTHING = 0,
         MESSAGES_GROUP_BY_TYPE = 1,
         MESSAGES_GROUP_BY_SOURCE = 2;
@@ -360,6 +356,7 @@ public class ClientOptions extends OptionGroup {
     public static final String SHOW_NOT_BEST_TILE
         = "model.option.guiShowNotBestTile";
 
+
     // clientOptions.savegames
 
     /**
@@ -374,28 +371,9 @@ public class ClientOptions extends OptionGroup {
      */
     public static final String SHOW_SAVEGAME_SETTINGS
         = "model.option.showSavegameSettings";
-
-    /**
-     * A possible value for the {@link SelectOption}:
-     * {@link #SHOW_SAVEGAME_SETTINGS}. 
-     * Specifies that the dialog should never be enabled.
-     */
-    public static final int SHOW_SAVEGAME_SETTINGS_NEVER = 0;
-
-    /**
-     * A possible value for the {@link SelectOption}:
-     * {@link #SHOW_SAVEGAME_SETTINGS}.
-     * Specifies that the dialog should only be enabled when loading
-     * savegames being marked as multiplayer.
-     */
-    public static final int SHOW_SAVEGAME_SETTINGS_MULTIPLAYER = 1;
-
-    /**
-     * A possible value for the {@link SelectOption}:
-     * {@link #SHOW_SAVEGAME_SETTINGS}.
-     * Specifies that the dialog should always be enabled.
-     */
-    public static final int SHOW_SAVEGAME_SETTINGS_ALWAYS = 2;
+    public static final int SHOW_SAVEGAME_SETTINGS_NEVER = 0,
+        SHOW_SAVEGAME_SETTINGS_MULTIPLAYER = 1,
+        SHOW_SAVEGAME_SETTINGS_ALWAYS = 2;
 
     /**
      * Option for setting the period of autosaves. The value 0 signals that
@@ -425,6 +403,7 @@ public class ClientOptions extends OptionGroup {
     public static final String CONFIRM_SAVE_OVERWRITE
         = "model.option.confirmSaveOverwrite";
 
+
     // clientOptions.warehouse
 
     /**
@@ -445,6 +424,7 @@ public class ClientOptions extends OptionGroup {
     public static final String HIGH_LEVEL
         = "model.option.highLevel";
 
+
     // clientOptions.audio
 
     /**
@@ -461,6 +441,7 @@ public class ClientOptions extends OptionGroup {
      * Play an alert sound on message arrival.
      */
     public static final String AUDIO_ALERTS = "model.option.audioAlerts";
+
 
     // clientOptions.other
 
@@ -500,6 +481,7 @@ public class ClientOptions extends OptionGroup {
     public static final int UNLOAD_OVERFLOW_RESPONSE_ASK = 0;
     public static final int UNLOAD_OVERFLOW_RESPONSE_NEVER = 1;
     public static final int UNLOAD_OVERFLOW_RESPONSE_ALWAYS = 2;
+
 
     // clientOptions.mods
 
@@ -858,12 +840,12 @@ public class ClientOptions extends OptionGroup {
         addBooleanOption(REMEMBER_PANEL_SIZES,
             "clientOptions.gui", true);
         // end @compat 0.10.7
-        // @compact 0.10.8
+        // @compact 0.11.0
         addBooleanOption(MINIMAP_TOGGLE_BORDERS,
             "clientOptions.gui", true);    
         addBooleanOption(MINIMAP_TOGGLE_FOG_OF_WAR,
             "clientOptions.gui", true);
-        // end @compact 0.10.8
+        // end @compact 0.11.0
     }
 
     private void addBooleanOption(String id, String gr, boolean val) {

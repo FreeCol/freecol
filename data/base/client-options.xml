@@ -25,52 +25,80 @@
     </optionGroup>
     <optionGroup id="clientOptions.gui" >
       <!-- Option for setting the language -->
-      <languageOption id="model.option.languageOption" defaultValue="automatic" />
-      <!-- Used by GUI, the number will be displayed when a group of goods are higher than this number. -->
-      <integerOption id="model.option.guiMinNumberToDisplayGoodsCount" defaultValue="7" minimumValue="0" maximumValue="10"/>
-      <!-- Used by GUI, this is the most repetitions drawn of a goods image for a single goods grouping. -->
-      <integerOption id="model.option.guiMaxNumberOfGoodsImages" defaultValue="7" minimumValue="1" maximumValue="10"/>
-      <!-- Used by GUI, the good will be displayed in the warehouse panel when its quantity is at least this number. -->
-      <integerOption id="model.option.guiMinNumberToDisplayGoods" defaultValue="0" minimumValue="0" maximumValue="100"/>
-      <!-- Selected tiles always gets centered if this option is enabled -->
-      <booleanOption id="model.option.alwaysCenter" defaultValue="false"/>
-      <!-- If this option is enabled, the display will recenter in order to display the active unit -->
-      <booleanOption id="model.option.jumpToActiveUnit" defaultValue="true"/>
-      <!-- Option for activating autoscroll when dragging units on the mapboard. -->
-      <booleanOption id="model.option.mapScrollOnDrag" defaultValue="true"/>
-      <!-- Option for autoscrolling when hitting the boundaries of the mapboard -->
-      <booleanOption id="model.option.autoScroll" defaultValue="false"/>
+      <languageOption id="model.option.languageOption"
+                      defaultValue="automatic" />
+      <!-- Used by GUI, the number will be displayed when a group of
+           goods are higher than this number. -->
+      <integerOption id="model.option.guiMinNumberToDisplayGoodsCount"
+                     defaultValue="7" minimumValue="0" maximumValue="10"/>
+      <!-- Used by GUI, this is the most repetitions drawn of a goods
+           image for a single goods grouping. -->
+      <integerOption id="model.option.guiMaxNumberOfGoodsImages"
+                     defaultValue="7" minimumValue="1" maximumValue="10"/>
+      <!-- Used by GUI, the good will be displayed in the warehouse
+           panel when its quantity is at least this number. -->
+      <integerOption id="model.option.guiMinNumberToDisplayGoods"
+                     defaultValue="0" minimumValue="0" maximumValue="100"/>
+      <!-- Selected tiles always gets centered if this option is enabled. -->
+      <booleanOption id="model.option.alwaysCenter"
+                     defaultValue="false"/>
+      <!-- If this option is enabled, the display will recenter in
+           order to display the active unit. -->
+      <booleanOption id="model.option.jumpToActiveUnit"
+                     defaultValue="true"/>
+      <!-- Option for activating autoscroll when dragging units on the
+           mapboard. -->
+      <booleanOption id="model.option.mapScrollOnDrag"
+                     defaultValue="true"/>
+      <!-- Option for autoscrolling when hitting the boundaries of the
+           mapboard. -->
+      <booleanOption id="model.option.autoScroll"
+                     defaultValue="false"/>
       <!-- Whether to display a compass rose or not. -->
-      <booleanOption id="model.option.displayCompassRose" defaultValue="false"/>
+      <booleanOption id="model.option.displayCompassRose"
+                     defaultValue="false"/>
       <!-- Whether to display the map controls by default or not. -->
-      <booleanOption id="model.option.displayMapControls" defaultValue="true"/>
+      <booleanOption id="model.option.displayMapControls"
+                     defaultValue="true"/>
       <!-- Whether to display the grid by default or not. -->
-      <booleanOption id="model.option.displayGrid" defaultValue="false"/>
+      <booleanOption id="model.option.displayGrid"
+                     defaultValue="false"/>
       <!-- Whether to display borders by default or not. -->
-      <booleanOption id="model.option.displayBorders" defaultValue="false"/>
+      <booleanOption id="model.option.displayBorders"
+                     defaultValue="false"/>
       <!-- Whether to have a delay on a unit's last move or not. -->
-      <booleanOption id="model.option.unitLastMoveDelay" defaultValue="true"/>
+      <booleanOption id="model.option.unitLastMoveDelay"
+                     defaultValue="true"/>
       <!-- Use pixmaps or not? -->
-      <booleanOption id="model.option.usePixmaps" defaultValue="true"/>
+      <booleanOption id="model.option.usePixmaps"
+                     defaultValue="true"/>
       <!-- Remember panel positions? -->
-      <booleanOption id="model.option.rememberPanelPositions" defaultValue="false"/>
+      <booleanOption id="model.option.rememberPanelPositions"
+                     defaultValue="false"/>
       <!-- Remember panel sizes? -->
-      <booleanOption id="model.option.rememberPanelSizes" defaultValue="true"/>
+      <booleanOption id="model.option.rememberPanelSizes"
+                     defaultValue="true"/>
       <!-- Map controls -->
-      <stringOption id="model.option.mapControls" defaultValue="CornerMapControls">
+      <stringOption id="model.option.mapControls"
+                    defaultValue="CornerMapControls">
         <choice value="CornerMapControls"/>
         <choice value="ClassicMapControls"/>
       </stringOption>
-      <!-- If selected: Enables smooth rendering of the minimap when zoomed out. -->
-      <booleanOption id="model.option.smoothRendering" defaultValue="false"/>
+      <!-- Enable smooth rendering of the minimap when zoomed out? -->
+      <booleanOption id="model.option.smoothRendering"
+                     defaultValue="false"/>
       <!-- Option to disable end turn grey background. -->
-      <booleanOption id="model.option.disableGrayLayer" defaultValue="false"/>
-	  <!-- If selected: Draws the fog of war on the minimap. -->
-	  <booleanOption id="model.option.miniMapToggleFogOfWar" defaultValue="true"/>
-	  <!-- If selected: Draws the borders on the minimap. -->
-	  <booleanOption id="model.option.miniMapToggleBorders" defaultValue="true"/>
+      <booleanOption id="model.option.disableGrayLayer"
+                     defaultValue="false"/>
+      <!-- Draw the fog of war on the minimap. -->
+      <booleanOption id="model.option.miniMapToggleFogOfWar"
+                     defaultValue="true"/>
+      <!-- Draw the borders on the minimap. -->
+      <booleanOption id="model.option.miniMapToggleBorders"
+                     defaultValue="true"/>
       <!-- The color to fill in around the actual map on the minimap. -->
-      <selectOption id="model.option.color.background" defaultValue="0" localizedLabels="true">
+      <selectOption id="model.option.color.background"
+                    defaultValue="0" localizedLabels="true">
         <selectValue label="clientOptions.minimap.color.background.black" value="0"/>
         <selectValue label="clientOptions.minimap.color.background.gray.dark.very" value="1"/>
         <selectValue label="clientOptions.minimap.color.background.gray.dark" value="2"/>
@@ -80,53 +108,60 @@
         <selectValue label="clientOptions.minimap.color.background.blue.light" value="6"/>
       </selectOption>
       <!-- Type of colony report. -->
-      <selectOption id="model.option.colonyReport" defaultValue="0" localizedLabels="true">
+      <selectOption id="model.option.colonyReport"
+                    defaultValue="0" localizedLabels="true">
         <selectValue label="clientOptions.colonyReport.classic" value="0"/>
         <selectValue label="clientOptions.colonyReport.compact" value="1"/>
       </selectOption>
       <!-- Type of labour report. -->
-      <selectOption id="model.option.labourReport" defaultValue="0" localizedLabels="true">
+      <selectOption id="model.option.labourReport"
+                    defaultValue="0" localizedLabels="true">
         <selectValue label="clientOptions.labourReport.classic" value="0"/>
         <selectValue label="clientOptions.labourReport.compact" value="1"/>
       </selectOption>
       <!-- Option for in tile text display -->
-      <selectOption id="model.option.displayTileText" defaultValue="0" localizedLabels="true">
+      <selectOption id="model.option.displayTileText"
+                    defaultValue="0" localizedLabels="true">
         <selectValue label="clientOptions.gui.displayTileText.empty" value="0"/>
-        <!-- Whether to display the tile names. -->
         <selectValue label="clientOptions.gui.displayTileText.names" value="1"/>
-        <!-- Whether to display the tile owners. -->
         <selectValue label="clientOptions.gui.displayTileText.owners" value="2"/>
-        <!-- Whether to display the tile regions. -->
         <selectValue label="clientOptions.gui.displayTileText.regions" value="3"/>
       </selectOption>
-      <selectOption id="model.option.displayColonyLabels" defaultValue="1" localizedLabels="true">
+      <!-- The type of colony labels on the map. -->
+      <selectOption id="model.option.displayColonyLabels"
+                    defaultValue="1" localizedLabels="true">
         <selectValue label="clientOptions.gui.displayColonyLabels.none" value="0"/>
         <selectValue label="clientOptions.gui.displayColonyLabels.classic" value="1"/>
         <selectValue label="clientOptions.gui.displayColonyLabels.modern" value="2"/>
       </selectOption>
       <!-- Used by GUI to sort colonies. -->
-      <selectOption id="model.option.colonyComparator" defaultValue="0" localizedLabels="true">
+      <selectOption id="model.option.colonyComparator"
+                    defaultValue="0" localizedLabels="true">
         <selectValue label="clientOptions.gui.colonyComparator.byName" value="0"/>
         <selectValue label="clientOptions.gui.colonyComparator.byAge" value="1"/>
         <selectValue label="clientOptions.gui.colonyComparator.byPosition" value="2"/>
         <selectValue label="clientOptions.gui.colonyComparator.bySize" value="3"/>
         <selectValue label="clientOptions.gui.colonyComparator.bySoL" value="4"/>
       </selectOption>
-      <rangeOption id="model.option.defaultZoomLevel" defaultValue="2" localizedLabels="false">
+      <!-- The default zoom level. -->
+      <rangeOption id="model.option.defaultZoomLevel"
+                   defaultValue="2" localizedLabels="false">
         <rangeValue label="1" value="1"/>
         <rangeValue label="2" value="2"/>
         <rangeValue label="3" value="3"/>
         <rangeValue label="4" value="4"/>
       </rangeOption>
       <!-- Animation speed for friendly units. -->
-      <rangeOption id="model.option.moveAnimationSpeed" defaultValue="0" localizedLabels="true">
+      <rangeOption id="model.option.moveAnimationSpeed"
+                   defaultValue="0" localizedLabels="true">
         <rangeValue label="clientOptions.gui.moveAnimationSpeed.off" value="0"/>
         <rangeValue label="clientOptions.gui.moveAnimationSpeed.slow" value="1"/>
         <rangeValue label="clientOptions.gui.moveAnimationSpeed.normal" value="2"/>
         <rangeValue label="clientOptions.gui.moveAnimationSpeed.fast" value="3"/>
       </rangeOption>
       <!-- Animation speed for enemy units. -->
-      <rangeOption id="model.option.enemyMoveAnimationSpeed" defaultValue="3" localizedLabels="true">
+      <rangeOption id="model.option.enemyMoveAnimationSpeed"
+                   defaultValue="3" localizedLabels="true">
         <rangeValue label="clientOptions.gui.enemyMoveAnimationSpeed.off" value="0"/>
         <rangeValue label="clientOptions.gui.enemyMoveAnimationSpeed.slow" value="1"/>
         <rangeValue label="clientOptions.gui.enemyMoveAnimationSpeed.normal" value="2"/>
@@ -136,79 +171,133 @@
 
     <optionGroup id="clientOptions.messages" >
       <!-- Used by GUI, this defines the grouping of ModelMessages. -->
-      <selectOption id="model.option.guiMessagesGroupBy" defaultValue="0" localizedLabels="true">
+      <selectOption id="model.option.guiMessagesGroupBy"
+                    defaultValue="0" localizedLabels="true">
         <selectValue label="clientOptions.messages.guiMessagesGroupBy.nothing" value="0"/>
         <selectValue label="clientOptions.messages.guiMessagesGroupBy.type" value="1"/>
         <selectValue label="clientOptions.messages.guiMessagesGroupBy.source" value="2"/>
       </selectOption>
-      <booleanOption id="model.option.guiShowWarning" defaultValue="true"/>
-      <booleanOption id="model.option.guiShowSonsOfLiberty" defaultValue="true"/>
-      <booleanOption id="model.option.guiShowGovernmentEfficiency" defaultValue="true"/>
-      <booleanOption id="model.option.guiShowWarehouseCapacity" defaultValue="true"/>
-      <booleanOption id="model.option.guiShowUnitImproved" defaultValue="true"/>
-      <booleanOption id="model.option.guiShowUnitDemoted" defaultValue="true"/>
-      <booleanOption id="model.option.guiShowUnitLost" defaultValue="true"/>
-      <booleanOption id="model.option.guiShowUnitAdded" defaultValue="true"/>
-      <booleanOption id="model.option.guiShowBuildingCompleted" defaultValue="true"/>
-      <booleanOption id="model.option.guiShowForeignDiplomacy" defaultValue="true"/>
-      <booleanOption id="model.option.guiShowMarketPrices" defaultValue="true"/>
-      <booleanOption id="model.option.guiShowMissingGoods" defaultValue="true"/>
-      <booleanOption id="model.option.guiShowTutorial" defaultValue="true"/>
-      <booleanOption id="model.option.guiShowGifts" defaultValue="true"/>
-      <booleanOption id="model.option.guiShowDemands" defaultValue="true"/>
-      <booleanOption id="model.option.guiShowGoodsMovement" defaultValue="false"/>
-      <booleanOption id="model.option.guiShowColonyWarnings" defaultValue="true"/>
-      <booleanOption id="model.option.guiShowPreCombat" defaultValue="true"/>
-      <booleanOption id="model.option.guiShowNotBestTile" defaultValue="true"/>
+      <!-- Switches to enable display of particular message types. -->
+      <booleanOption id="model.option.guiShowWarning"
+                     defaultValue="true"/>
+      <booleanOption id="model.option.guiShowSonsOfLiberty"
+                     defaultValue="true"/>
+      <booleanOption id="model.option.guiShowGovernmentEfficiency"
+                     defaultValue="true"/>
+      <booleanOption id="model.option.guiShowWarehouseCapacity"
+                     defaultValue="true"/>
+      <booleanOption id="model.option.guiShowUnitImproved"
+                     defaultValue="true"/>
+      <booleanOption id="model.option.guiShowUnitDemoted"
+                     defaultValue="true"/>
+      <booleanOption id="model.option.guiShowUnitLost"
+                     defaultValue="true"/>
+      <booleanOption id="model.option.guiShowUnitAdded"
+                     defaultValue="true"/>
+      <booleanOption id="model.option.guiShowBuildingCompleted"
+                     defaultValue="true"/>
+      <booleanOption id="model.option.guiShowForeignDiplomacy"
+                     defaultValue="true"/>
+      <booleanOption id="model.option.guiShowMarketPrices"
+                     defaultValue="true"/>
+      <booleanOption id="model.option.guiShowMissingGoods"
+                     defaultValue="true"/>
+      <booleanOption id="model.option.guiShowTutorial"
+                     defaultValue="true"/>
+      <booleanOption id="model.option.guiShowGifts"
+                     defaultValue="true"/>
+      <booleanOption id="model.option.guiShowDemands"
+                     defaultValue="true"/>
+      <booleanOption id="model.option.guiShowGoodsMovement"
+                     defaultValue="false"/>
+      <!-- Show warnings about colony sites. -->
+      <booleanOption id="model.option.guiShowColonyWarnings"
+                     defaultValue="true"/>
+      <!-- Show the pre-combat dialog. -->
+      <booleanOption id="model.option.guiShowPreCombat"
+                     defaultValue="true"/>
+      <!-- Show the warnings about poor choice of tile worker. -->
+      <booleanOption id="model.option.guiShowNotBestTile"
+                     defaultValue="true"/>
     </optionGroup>
 
     <optionGroup id="clientOptions.savegames" >
-      <!-- Use default values for savegames instead of displaying a dialog. -->
-      <selectOption id="model.option.showSavegameSettings" defaultValue="1" localizedLabels="true">
+      <!-- Use default values for savegames instead of displaying a
+           dialog. -->
+      <selectOption id="model.option.showSavegameSettings"
+                    defaultValue="1" localizedLabels="true">
         <selectValue label="clientOptions.savegames.showSavegameSettings.never" value="0"/>
         <selectValue label="clientOptions.savegames.showSavegameSettings.multiplayer" value="1"/>
         <selectValue label="clientOptions.savegames.showSavegameSettings.always" value="2"/>
       </selectOption>
-      <!-- Option for setting the period of autosaves. The value 0 signals that autosaving is disabled -->
-      <integerOption id="model.option.autosavePeriod" defaultValue="0" minimumValue="0" maximumValue="100"/>
-      <!-- Option for setting the number of days autosaves are kept (valid time). 0 to ignore this condition. -->
-      <integerOption id="model.option.autosaveValidity" defaultValue="30" minimumValue="0" maximumValue="360"/>
-      <!-- Option to delete old save games when a new game is started -->
-      <booleanOption id="model.option.autosaveDelete" defaultValue="false"/>
+      <!-- Option for setting the period of autosaves.  The value 0
+           signals that autosaving is disabled -->
+      <integerOption id="model.option.autosavePeriod"
+                     defaultValue="0" minimumValue="0" maximumValue="100"/>
+      <!-- Option for setting the number of days autosaves are kept
+           (valid time).  0 to ignore this condition. -->
+      <integerOption id="model.option.autosaveValidity"
+                     defaultValue="30" minimumValue="0" maximumValue="360"/>
+      <!-- Option to delete old save games when a new game is started. -->
+      <booleanOption id="model.option.autosaveDelete"
+                     defaultValue="false"/>
       <!-- Option to confirm the overwrite of existing save files. -->
-      <booleanOption id="model.option.confirmSaveOverwrite" defaultValue="false"/>
+      <booleanOption id="model.option.confirmSaveOverwrite"
+                     defaultValue="false"/>
     </optionGroup>
     <optionGroup id="clientOptions.warehouse" >
       <!-- The Stock the custom house should keep when selling goods. -->
-      <integerOption id="model.option.customStock" defaultValue="50" minimumValue="0" maximumValue="300"/>
-      <!-- Generate warning of stock drops below this percentage of capacity. -->
-      <integerOption id="model.option.lowLevel" defaultValue="10" minimumValue="0" maximumValue="100"/>
+      <integerOption id="model.option.customStock"
+                     defaultValue="50" minimumValue="0" maximumValue="300"/>
+      <!-- Generate warning of stock drops below this percentage of
+           capacity. -->
+      <integerOption id="model.option.lowLevel"
+                     defaultValue="10" minimumValue="0" maximumValue="100"/>
       <!-- Generate warning of stock exceeds this percentage of capacity. -->
-      <integerOption id="model.option.highLevel" defaultValue="90" minimumValue="0" maximumValue="100"/>
+      <integerOption id="model.option.highLevel"
+                     defaultValue="90" minimumValue="0" maximumValue="100"/>
     </optionGroup>
+
     <optionGroup id="clientOptions.audio">
-      <audioMixerOption id="model.option.audioMixer" defaultValue="AUTO" />
-      <percentageOption id="model.option.audioVolume" defaultValue="100" previewEnabled="true"/>
-      <booleanOption id="model.option.audioAlerts" defaultValue="false"/>
+      <!-- Which mixer to use by default. -->
+      <audioMixerOption id="model.option.audioMixer"
+                        defaultValue="AUTO" />
+      <!-- The default volume percent. -->
+      <percentageOption id="model.option.audioVolume"
+                        defaultValue="100" previewEnabled="true"/>
+      <!-- Play an alert sound on message arrival. -->
+      <booleanOption id="model.option.audioAlerts"
+                     defaultValue="false"/>
     </optionGroup>
+
     <optionGroup id="clientOptions.other" >
       <!-- Option for autoload emigrants on sailing to america. -->
-      <booleanOption id="model.option.autoloadEmigrants" defaultValue="false"/>
-      <!-- If enabled: Automatically ends the turn when no units can be made active. -->
-      <booleanOption id="model.option.autoEndTurn" defaultValue="false"/>
-      <booleanOption id="model.option.showEndTurnDialog" defaultValue="true"/>
-      <selectOption id="model.option.indianDemandResponse" defaultValue="0" localizedLabels="true">
+      <booleanOption id="model.option.autoloadEmigrants"
+                     defaultValue="false"/>
+      <!-- Automatically ends the turn when no units can be made active. -->
+      <booleanOption id="model.option.autoEndTurn"
+                     defaultValue="false"/>
+      <!-- Show the end turn dialog. -->
+      <booleanOption id="model.option.showEndTurnDialog"
+                     defaultValue="true"/>
+      <!-- What to do when the natives make a demand. -->
+      <selectOption id="model.option.indianDemandResponse"
+                    defaultValue="0" localizedLabels="true">
         <selectValue label="clientOptions.indianDemandResponse.ask" value="0"/>
         <selectValue label="clientOptions.indianDemandResponse.accept" value="1"/>
         <selectValue label="clientOptions.indianDemandResponse.reject" value="2"/>
       </selectOption>
-      <selectOption id="model.option.unloadOverflowResponse" defaultValue="0" localizedLabels="true">
+      <!-- The action to take on warehouse overflow. -->
+      <selectOption id="model.option.unloadOverflowResponse"
+                    defaultValue="0" localizedLabels="true">
         <selectValue label="clientOptions.unloadOverflowResponse.ask" value="0"/>
         <selectValue label="clientOptions.unloadOverflowResponse.never" value="1"/>
         <selectValue label="clientOptions.unloadOverflowResponse.always" value="2"/>
       </selectOption>
     </optionGroup>
+
     <optionGroup id="clientOptions.mods">
+      <!-- Which mods are enabled. -->
       <modListOption id="userMods">
         <template>
           <modOption id="model.option.mod" />
