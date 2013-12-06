@@ -54,6 +54,8 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
      */
     public ChooseFoundingFatherMessage(List<FoundingFather> fathers,
                                        FoundingFather ff) {
+        super(getXMLElementTagName());
+
         this.fathers = fathers;
         this.foundingFather = ff;
     }
@@ -66,6 +68,8 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public ChooseFoundingFatherMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         Specification spec = game.getSpecification();
         String id;
         FoundingFather f;

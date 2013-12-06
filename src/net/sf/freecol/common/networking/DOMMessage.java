@@ -41,6 +41,8 @@ import javax.xml.transform.stream.StreamResult;
 
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.debug.FreeColDebugger;
+import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.util.Introspector;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -66,20 +68,11 @@ public class DOMMessage {
 
 
     /**
-     * Deliberately empty constructor for the benefit of the subclasses.
+     * Protected constructor for the benefit of the subclasses.
      */
-    protected DOMMessage() {}
-
-    /**
-     * Constructs a new DOMMessage with data from the given
-     * String.  The constructor to use if this is an INCOMING message.
-     *
-     * @param msg The raw message data.
-     * @exception IOException should not be thrown.
-     * @exception SAXException if thrown during parsing.
-     */
-    public DOMMessage(String msg) throws SAXException, IOException {
-        this(new InputSource(new StringReader(msg)));
+    protected DOMMessage(String tag) {
+        this.document = createNewDocument();
+        this.document.createElement(tag);
     }
 
     /**
@@ -159,6 +152,32 @@ public class DOMMessage {
      */
     public DOMMessage(Document document) {
         this.document = document;
+    }
+
+    /**
+     * Create a DOMMessage from an element.
+     * TODO: make this into a constructor?
+     *
+     * @param game The <code>Game</code> to create the message in.
+     * @param element The <code>Element</code> to create the message from.
+     * @return The message created, or null on failure.
+     */
+    public static DOMMessage createMessage(Game game, Element element) {
+        if (element == null) return null;
+        String tag = element.getTagName();
+        tag = "net.sf.freecol.common.networking."
+            + tag.substring(0, 1).toUpperCase() + tag.substring(1)
+            + "Message";
+        Class[] types = new Class[] { Game.class, Element.class };
+        Object[] params = new Object[] { game, element };
+        DOMMessage message;
+        try {
+            message = (DOMMessage)Introspector.instantiate(tag, types, params);
+        } catch (IllegalArgumentException e) {
+            logger.log(Level.WARNING, "Instantiation fail", e);
+            message = null;
+        }
+        return message;
     }
 
 

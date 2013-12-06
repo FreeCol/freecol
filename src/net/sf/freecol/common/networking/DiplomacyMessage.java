@@ -67,6 +67,8 @@ public class DiplomacyMessage extends DOMMessage {
      */
     public DiplomacyMessage(Unit unit, Settlement settlement,
                             DiplomaticTrade agreement) {
+        super(getXMLElementTagName());
+
         this.unit = unit;
         this.settlement = settlement;
         this.agreement = agreement;
@@ -81,6 +83,8 @@ public class DiplomacyMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public DiplomacyMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         String settlementId = element.getAttribute("settlement");
         settlement = game.getFreeColGameObject(settlementId,
                                                Settlement.class);

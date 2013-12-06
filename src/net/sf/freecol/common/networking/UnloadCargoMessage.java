@@ -47,6 +47,8 @@ public class UnloadCargoMessage extends DOMMessage {
      * @param goods The <code>Goods</code> to unload.
      */
     public UnloadCargoMessage(Goods goods) {
+        super(getXMLElementTagName());
+
         this.goods = goods;
     }
 
@@ -58,6 +60,8 @@ public class UnloadCargoMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public UnloadCargoMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         this.goods = new Goods(game, (Element) element.getChildNodes().item(0));
     }
 

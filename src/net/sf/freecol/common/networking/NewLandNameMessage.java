@@ -71,6 +71,8 @@ public class NewLandNameMessage extends DOMMessage {
      */
     public NewLandNameMessage(Unit unit, String newLandName,
                               Player welcomer, int camps, boolean accept) {
+        super(getXMLElementTagName());
+
         this.unitId = unit.getId();
         this.newLandName = newLandName;
         if (welcomer == null) {
@@ -91,6 +93,8 @@ public class NewLandNameMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public NewLandNameMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         this.unitId = element.getAttribute("unit");
         this.newLandName = element.getAttribute("newLandName");
         if (element.hasAttribute("welcomer")) {

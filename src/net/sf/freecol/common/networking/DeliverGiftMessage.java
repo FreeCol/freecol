@@ -57,6 +57,8 @@ public class DeliverGiftMessage extends DOMMessage {
      * @param goods The <code>Goods</code> to deliverGift.
      */
     public DeliverGiftMessage(Unit unit, Settlement settlement, Goods goods) {
+        super(getXMLElementTagName());
+
         this.unitId = unit.getId();
         this.settlementId = settlement.getId();
         this.goods = goods;
@@ -70,6 +72,8 @@ public class DeliverGiftMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public DeliverGiftMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         this.unitId = element.getAttribute("unit");
         this.settlementId = element.getAttribute("settlement");
         this.goods = new Goods(game,

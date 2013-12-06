@@ -67,6 +67,8 @@ public class GoodsForSaleMessage extends DOMMessage {
      */
     public GoodsForSaleMessage(Unit unit, Settlement settlement,
                                List<Goods> sellGoods) {
+        super(getXMLElementTagName());
+
         this.unitId = unit.getId();
         this.settlementId = settlement.getId();
         this.sellGoods = sellGoods;
@@ -80,6 +82,8 @@ public class GoodsForSaleMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public GoodsForSaleMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         this.unitId = element.getAttribute("unit");
         this.settlementId = element.getAttribute("settlement");
         this.sellGoods = new ArrayList<Goods>();

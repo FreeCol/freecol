@@ -78,6 +78,8 @@ public class LoginMessage extends DOMMessage {
                         boolean startGame, boolean singlePlayer,
                         boolean currentPlayer, Unit activeUnit,
                         Game game) {
+        super(getXMLElementTagName());
+
         this.player = player;
         this.userName = userName;
         this.version = version;
@@ -96,6 +98,8 @@ public class LoginMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public LoginMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         String str;
         this.player = null; // Should not be used on client side
         this.userName = element.getAttribute("userName");

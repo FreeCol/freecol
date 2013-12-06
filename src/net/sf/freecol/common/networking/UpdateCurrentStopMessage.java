@@ -44,6 +44,8 @@ public class UpdateCurrentStopMessage extends DOMMessage {
      * @param unit A <code>Unit</code> whose stop is to be updated.
      */
     public UpdateCurrentStopMessage(Unit unit) {
+        super(getXMLElementTagName());
+
         this.unitId = unit.getId();
     }
 
@@ -55,6 +57,8 @@ public class UpdateCurrentStopMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public UpdateCurrentStopMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         this.unitId = element.getAttribute("unit");
     }
 

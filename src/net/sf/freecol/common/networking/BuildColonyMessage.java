@@ -53,6 +53,8 @@ public class BuildColonyMessage extends DOMMessage {
      * @param builder The <code>Unit</code> to do the building.
      */
     public BuildColonyMessage(String colonyName, Unit builder) {
+        super(getXMLElementTagName());
+
         this.colonyName = colonyName;
         this.builderId = builder.getId();
     }
@@ -64,6 +66,8 @@ public class BuildColonyMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public BuildColonyMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         this.colonyName = element.getAttribute("name");
         this.builderId = element.getAttribute("unit");
     }

@@ -45,6 +45,8 @@ public class PutOutsideColonyMessage extends DOMMessage {
      * @param unit The <code>Unit</code> to put outside.
      */
     public PutOutsideColonyMessage(Unit unit) {
+        super(getXMLElementTagName());
+
         unitId = unit.getId();
     }
 
@@ -56,6 +58,8 @@ public class PutOutsideColonyMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public PutOutsideColonyMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         unitId = element.getAttribute("unit");
     }
 

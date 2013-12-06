@@ -52,6 +52,8 @@ public class MoveToMessage extends DOMMessage {
      * @param destination The <code>Location</code> to move to.
      */
     public MoveToMessage(Unit unit, Location destination) {
+        super(getXMLElementTagName());
+
         this.unitId = unit.getId();
         this.destinationId = destination.getId();
     }
@@ -64,6 +66,8 @@ public class MoveToMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public MoveToMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         this.unitId = element.getAttribute("unit");
         this.destinationId = element.getAttribute("destination");
     }

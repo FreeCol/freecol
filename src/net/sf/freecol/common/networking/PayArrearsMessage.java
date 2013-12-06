@@ -45,6 +45,8 @@ public class PayArrearsMessage extends DOMMessage {
      * @param type The <code>GoodsType</code> to pay arrears for.
      */
     public PayArrearsMessage(GoodsType type) {
+        super(getXMLElementTagName());
+
         this.goodsTypeId = type.getId();
     }
 
@@ -56,6 +58,8 @@ public class PayArrearsMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public PayArrearsMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         this.goodsTypeId = element.getAttribute("goodsType");
     }
 

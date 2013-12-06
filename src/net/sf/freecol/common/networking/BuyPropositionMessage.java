@@ -66,6 +66,8 @@ public class BuyPropositionMessage extends DOMMessage {
      */
     public BuyPropositionMessage(Unit unit, Settlement settlement,
                                  Goods goods, int gold) {
+        super(getXMLElementTagName());
+
         this.unitId = unit.getId();
         this.settlementId = settlement.getId();
         this.goods = goods;
@@ -80,6 +82,8 @@ public class BuyPropositionMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public BuyPropositionMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         this.unitId = element.getAttribute("unit");
         this.settlementId = element.getAttribute("settlement");
         this.goods = new Goods(game,

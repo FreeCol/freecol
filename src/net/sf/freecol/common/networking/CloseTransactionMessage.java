@@ -52,6 +52,8 @@ public class CloseTransactionMessage extends DOMMessage {
      *        transaction occurs.
      */
     public CloseTransactionMessage(Unit unit, Settlement settlement) {
+        super(getXMLElementTagName());
+
         this.unitId = unit.getId();
         this.settlementId = settlement.getId();
     }
@@ -64,6 +66,8 @@ public class CloseTransactionMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public CloseTransactionMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         this.unitId = element.getAttribute("unit");
         this.settlementId = element.getAttribute("settlement");
     }

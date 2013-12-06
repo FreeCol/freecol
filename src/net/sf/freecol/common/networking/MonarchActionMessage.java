@@ -53,6 +53,8 @@ public class MonarchActionMessage extends DOMMessage {
      * @param action The <code>MonarchAction</code> to do.
      */
     public MonarchActionMessage(MonarchAction action, StringTemplate template) {
+        super(getXMLElementTagName());
+
         this.action = action;
         this.template = template;
         this.tax = null;
@@ -67,6 +69,8 @@ public class MonarchActionMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public MonarchActionMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         this.action = Enum.valueOf(MonarchAction.class,
                                    element.getAttribute("action"));
         this.tax = element.getAttribute("tax");

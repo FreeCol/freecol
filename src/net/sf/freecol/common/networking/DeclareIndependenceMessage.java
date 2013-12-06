@@ -53,6 +53,8 @@ public class DeclareIndependenceMessage extends DOMMessage {
      * @param countryName The new name for the rebelling country.
      */
     public DeclareIndependenceMessage(String nationName, String countryName) {
+        super(getXMLElementTagName());
+
         this.nationName = nationName;
         this.countryName = countryName;
     }
@@ -65,6 +67,8 @@ public class DeclareIndependenceMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public DeclareIndependenceMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         this.nationName = element.getAttribute("nationName");
         this.countryName = element.getAttribute("countryName");
     }

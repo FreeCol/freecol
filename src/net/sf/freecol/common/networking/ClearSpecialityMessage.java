@@ -45,6 +45,8 @@ public class ClearSpecialityMessage extends DOMMessage {
      * @param unit The <code>Unit</code> to clear.
      */
     public ClearSpecialityMessage(Unit unit) {
+        super(getXMLElementTagName());
+
         this.unitId = unit.getId();
     }
 
@@ -56,6 +58,8 @@ public class ClearSpecialityMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public ClearSpecialityMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         this.unitId = element.getAttribute("unit");
     }
 

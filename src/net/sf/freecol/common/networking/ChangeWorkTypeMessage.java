@@ -52,6 +52,8 @@ public class ChangeWorkTypeMessage extends DOMMessage {
      * @param workType The <code>GoodsType</code> to produce.
      */
     public ChangeWorkTypeMessage(Unit unit, GoodsType workType) {
+        super(getXMLElementTagName());
+
         this.unitId = unit.getId();
         this.workTypeId = workType.getId();
     }
@@ -64,6 +66,8 @@ public class ChangeWorkTypeMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public ChangeWorkTypeMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         this.unitId = element.getAttribute("unit");
         this.workTypeId = element.getAttribute("workType");
     }

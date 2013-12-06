@@ -57,6 +57,8 @@ public class BuyGoodsMessage extends DOMMessage {
      * @param amount The amount of goods to buy.
      */
     public BuyGoodsMessage(Unit carrier, GoodsType type, int amount) {
+        super(getXMLElementTagName());
+
         this.carrierId = carrier.getId();
         this.goodsTypeId = type.getId();
         this.amountString = Integer.toString(amount);
@@ -70,6 +72,8 @@ public class BuyGoodsMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public BuyGoodsMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         this.carrierId = element.getAttribute("carrier");
         this.goodsTypeId = element.getAttribute("type");
         this.amountString = element.getAttribute("amount");

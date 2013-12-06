@@ -46,6 +46,8 @@ public class EmigrateUnitMessage extends DOMMessage {
      * @param slot The slot to select the migrant from.
      */
     public EmigrateUnitMessage(int slot) {
+        super(getXMLElementTagName());
+
         this.slotString = Integer.toString(slot);
     }
 
@@ -56,6 +58,8 @@ public class EmigrateUnitMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public EmigrateUnitMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         this.slotString = element.getAttribute("slot");
     }
 

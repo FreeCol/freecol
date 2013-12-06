@@ -56,6 +56,8 @@ public class ChangeWorkImprovementTypeMessage extends DOMMessage {
      */
     public ChangeWorkImprovementTypeMessage(Unit unit,
                                             TileImprovementType type) {
+        super(getXMLElementTagName());
+
         this.unitId = unit.getId();
         this.improvementId = type.getId();
     }
@@ -68,6 +70,8 @@ public class ChangeWorkImprovementTypeMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public ChangeWorkImprovementTypeMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         this.unitId = element.getAttribute("unit");
         this.improvementId = element.getAttribute("improvementType");
     }

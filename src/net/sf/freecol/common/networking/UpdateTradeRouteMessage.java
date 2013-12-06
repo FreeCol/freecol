@@ -44,6 +44,8 @@ public class UpdateTradeRouteMessage extends DOMMessage {
      * @param tradeRoute The <code>TradeRoute</code> to update.
      */
     public UpdateTradeRouteMessage(TradeRoute tradeRoute) {
+        super(getXMLElementTagName());
+
         this.tradeRoute = tradeRoute;
     }
 
@@ -55,6 +57,8 @@ public class UpdateTradeRouteMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public UpdateTradeRouteMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         tradeRoute = (element.getChildNodes().getLength() != 1) ? null
             : SetTradeRoutesMessage.tradeRouteFromElement(game,
                   (Element) element.getChildNodes().item(0));

@@ -33,6 +33,8 @@ class TrivialMessage extends DOMMessage {
 
 
     public TrivialMessage(String tag, String... attributes) {
+        super(tag);
+
         this.tag = tag;
         this.attributes = attributes;
     }

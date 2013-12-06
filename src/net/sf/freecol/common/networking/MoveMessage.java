@@ -54,6 +54,8 @@ public class MoveMessage extends DOMMessage {
      * @param direction The <code>Direction</code> to move in.
      */
     public MoveMessage(Unit unit, Direction direction) {
+        super(getXMLElementTagName());
+
         this.unitId = unit.getId();
         this.directionString = String.valueOf(direction);
     }
@@ -66,6 +68,8 @@ public class MoveMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public MoveMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         this.unitId = element.getAttribute("unit");
         this.directionString = element.getAttribute("direction");
     }

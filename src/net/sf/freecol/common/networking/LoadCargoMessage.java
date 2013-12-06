@@ -52,6 +52,8 @@ public class LoadCargoMessage extends DOMMessage {
      * @param carrier The <code>Unit</code> to load onto.
      */
     public LoadCargoMessage(Goods goods, Unit carrier) {
+        super(getXMLElementTagName());
+
         this.goods = goods;
         this.carrierId = carrier.getId();
     }
@@ -64,6 +66,8 @@ public class LoadCargoMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public LoadCargoMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         this.carrierId = element.getAttribute("carrier");
         this.goods = new Goods(game, (Element) element.getChildNodes().item(0));
     }

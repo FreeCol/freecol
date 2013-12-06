@@ -63,6 +63,8 @@ public class IndianDemandMessage extends DOMMessage {
      */
     public IndianDemandMessage(Unit unit, Colony colony,
                                GoodsType type, int amount) {
+        super(getXMLElementTagName());
+
         this.unitId = unit.getId();
         this.colonyId = colony.getId();
         this.typeId = (type == null) ? null : type.getId();
@@ -78,6 +80,8 @@ public class IndianDemandMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public IndianDemandMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         this.unitId = element.getAttribute("unit");
         this.colonyId = element.getAttribute("colony");
         this.typeId = (!element.hasAttribute("type")) ? null

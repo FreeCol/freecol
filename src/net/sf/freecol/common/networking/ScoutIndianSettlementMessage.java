@@ -53,6 +53,8 @@ public class ScoutIndianSettlementMessage extends DOMMessage {
      * @param direction The <code>Direction</code> the unit is looking.
      */
     public ScoutIndianSettlementMessage(Unit unit, Direction direction) {
+        super(getXMLElementTagName());
+
         this.unitId = unit.getId();
         this.directionString = String.valueOf(direction);
     }
@@ -65,6 +67,8 @@ public class ScoutIndianSettlementMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public ScoutIndianSettlementMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         this.unitId = element.getAttribute("unitId");
         this.directionString = element.getAttribute("direction");
     }

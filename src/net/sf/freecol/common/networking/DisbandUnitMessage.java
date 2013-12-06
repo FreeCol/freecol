@@ -45,6 +45,8 @@ public class DisbandUnitMessage extends DOMMessage {
      * @param unit The <code>Unit</code> to clear.
      */
     public DisbandUnitMessage(Unit unit) {
+        super(getXMLElementTagName());
+
         this.unitId = unit.getId();
     }
 
@@ -56,6 +58,8 @@ public class DisbandUnitMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public DisbandUnitMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         this.unitId = element.getAttribute("unit");
     }
 

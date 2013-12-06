@@ -45,6 +45,8 @@ public class DisembarkMessage extends DOMMessage {
      * @param unit The <code>Unit</code> that is disembarking.
      */
     public DisembarkMessage(Unit unit) {
+        super(getXMLElementTagName());
+
         this.unitId = unit.getId();
     }
 
@@ -56,6 +58,8 @@ public class DisembarkMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public DisembarkMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         this.unitId = element.getAttribute("unit");
     }
 

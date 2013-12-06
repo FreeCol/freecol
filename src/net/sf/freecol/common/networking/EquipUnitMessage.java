@@ -58,6 +58,8 @@ public class EquipUnitMessage extends DOMMessage {
      * @param amount The amount of equipment.
      */
     public EquipUnitMessage(Unit unit, EquipmentType type, int amount) {
+        super(getXMLElementTagName());
+
         this.unitId = unit.getId();
         this.typeId = type.getId();
         this.amountString = Integer.toString(amount);
@@ -70,6 +72,8 @@ public class EquipUnitMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public EquipUnitMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         this.unitId = element.getAttribute("unit");
         this.typeId = element.getAttribute("type");
         this.amountString = element.getAttribute("amount");

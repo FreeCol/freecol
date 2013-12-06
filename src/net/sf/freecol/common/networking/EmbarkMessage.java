@@ -62,6 +62,8 @@ public class EmbarkMessage extends DOMMessage {
      * @param direction An option direction to embark in.
      */
     public EmbarkMessage(Unit unit, Unit carrier, Direction direction) {
+        super(getXMLElementTagName());
+
         this.unitId = unit.getId();
         this.carrierId = carrier.getId();
         this.directionString = (direction == null) ? null
@@ -76,6 +78,8 @@ public class EmbarkMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public EmbarkMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         this.unitId = element.getAttribute("unit");
         this.carrierId = element.getAttribute("carrier");
         this.directionString = (!element.hasAttribute("direction")) ? null

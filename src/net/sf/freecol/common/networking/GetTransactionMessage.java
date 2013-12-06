@@ -53,6 +53,8 @@ public class GetTransactionMessage extends DOMMessage {
      *        transaction occurs.
      */
     public GetTransactionMessage(Unit unit, Settlement settlement) {
+        super(getXMLElementTagName());
+
         this.unitId = unit.getId();
         this.settlementId = settlement.getId();
     }
@@ -65,6 +67,8 @@ public class GetTransactionMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public GetTransactionMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         this.unitId = element.getAttribute("unit");
         this.settlementId = element.getAttribute("settlement");
     }

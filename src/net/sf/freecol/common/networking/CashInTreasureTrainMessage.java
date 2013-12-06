@@ -45,6 +45,8 @@ public class CashInTreasureTrainMessage extends DOMMessage {
      * @param unit The <code>Unit</code> to cash in.
      */
     public CashInTreasureTrainMessage(Unit unit) {
+        super(getXMLElementTagName());
+
         this.unitId = unit.getId();
     }
 
@@ -56,6 +58,8 @@ public class CashInTreasureTrainMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public CashInTreasureTrainMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         this.unitId = element.getAttribute("unit");
     }
 

@@ -135,6 +135,8 @@ public class RearrangeColonyMessage extends DOMMessage {
      * @param colony The <code>Colony</code> that is rearranging.
      */
     public RearrangeColonyMessage(Colony colony) {
+        super(getXMLElementTagName());
+
         this.colonyId = colony.getId();
         this.unitChanges = new ArrayList<UnitChange>();
     }
@@ -147,6 +149,8 @@ public class RearrangeColonyMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public RearrangeColonyMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         this.colonyId = element.getAttribute("colony");
         int n = Integer.parseInt(element.getAttribute(FreeColObject.ARRAY_SIZE_TAG));
         this.unitChanges = new ArrayList<UnitChange>();

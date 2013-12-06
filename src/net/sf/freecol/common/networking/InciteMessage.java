@@ -68,6 +68,8 @@ public class InciteMessage extends DOMMessage {
      *             initial inquiry).
      */
     public InciteMessage(Unit unit, Direction direction, Player enemy, int gold) {
+        super(getXMLElementTagName());
+
         this.unitId = unit.getId();
         this.directionString = String.valueOf(direction);
         this.enemyId = enemy.getId();
@@ -82,6 +84,8 @@ public class InciteMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public InciteMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         this.unitId = element.getAttribute("unitId");
         this.directionString = element.getAttribute("direction");
         this.enemyId = element.getAttribute("enemyId");

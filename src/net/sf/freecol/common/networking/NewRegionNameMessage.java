@@ -59,6 +59,8 @@ public class NewRegionNameMessage extends DOMMessage {
      */
     public NewRegionNameMessage(Region region, Tile tile, Unit unit,
                                 String newRegionName) {
+        super(getXMLElementTagName());
+
         this.regionId = region.getId();
         this.tileId = tile.getId();
         this.unitId = unit.getId();
@@ -73,6 +75,8 @@ public class NewRegionNameMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public NewRegionNameMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         this.regionId = element.getAttribute("region");
         this.tileId = element.getAttribute("tile");
         this.unitId = element.getAttribute("unit");

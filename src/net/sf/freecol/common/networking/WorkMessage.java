@@ -54,6 +54,8 @@ public class WorkMessage extends DOMMessage {
      * @param workLocation The <code>WorkLocation</code> to change to.
      */
     public WorkMessage(Unit unit, WorkLocation workLocation) {
+        super(getXMLElementTagName());
+
         this.unitId = unit.getId();
         this.workLocationId = workLocation.getId();
     }
@@ -65,6 +67,8 @@ public class WorkMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public WorkMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         this.unitId = element.getAttribute("unit");
         this.workLocationId = element.getAttribute("workLocation");
     }

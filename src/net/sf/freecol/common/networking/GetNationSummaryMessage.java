@@ -52,6 +52,8 @@ public class GetNationSummaryMessage extends DOMMessage {
      * @param player The <code>Player</code> to summarize.
      */
     public GetNationSummaryMessage(Player player) {
+        super(getXMLElementTagName());
+
         playerId = player.getId();
         summary = null;
     }
@@ -63,6 +65,8 @@ public class GetNationSummaryMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public GetNationSummaryMessage(Element element) {
+        super(getXMLElementTagName());
+
         playerId = element.getAttribute("player");
         NodeList nodes = element.getChildNodes();
         summary = (nodes == null || nodes.getLength() != 1) ? null

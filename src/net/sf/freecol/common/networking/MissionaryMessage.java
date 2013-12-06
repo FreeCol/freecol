@@ -62,6 +62,8 @@ public class MissionaryMessage extends DOMMessage {
      * @param denounce True if this is a denunciation.
      */
     public MissionaryMessage(Unit unit, Direction direction, boolean denounce) {
+        super(getXMLElementTagName());
+
         this.unitId = unit.getId();
         this.directionString = String.valueOf(direction);
         this.denounce = denounce;
@@ -75,6 +77,8 @@ public class MissionaryMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public MissionaryMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         this.unitId = element.getAttribute("unitId");
         this.directionString = element.getAttribute("direction");
         this.denounce = Boolean.valueOf(element.getAttribute("denounce")).booleanValue();

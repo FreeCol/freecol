@@ -57,6 +57,8 @@ public class SetBuildQueueMessage extends DOMMessage {
      * @param queue A list of <code>BuildableType</code>s to build.
      */
     public SetBuildQueueMessage(Colony colony, List<BuildableType> queue) {
+        super(getXMLElementTagName());
+
         this.colonyId = colony.getId();
         this.queue = new String[queue.size()];
         for (int i = 0; i < queue.size(); i++) {
@@ -72,6 +74,8 @@ public class SetBuildQueueMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public SetBuildQueueMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         this.colonyId = element.getAttribute("colony");
         int size;
         try {

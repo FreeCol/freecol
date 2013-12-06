@@ -48,6 +48,8 @@ public class EquipForRoleMessage extends DOMMessage {
      * @param role The <code>Role</code> to equip for.
      */
     public EquipForRoleMessage(Unit unit, Role role) {
+        super(getXMLElementTagName());
+
         this.unitId = unit.getId();
         this.roleId = role.getId();
     }
@@ -59,6 +61,8 @@ public class EquipForRoleMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public EquipForRoleMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         this.unitId = element.getAttribute("unit");
         this.roleId = element.getAttribute("role");
     }

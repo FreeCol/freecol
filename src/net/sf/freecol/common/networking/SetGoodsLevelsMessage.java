@@ -52,6 +52,8 @@ public class SetGoodsLevelsMessage extends DOMMessage {
      * @param data The new <code>ExportData</code>.
      */
     public SetGoodsLevelsMessage(Colony colony, ExportData data) {
+        super(getXMLElementTagName());
+
         this.colonyId = colony.getId();
         this.data = data;
     }
@@ -64,6 +66,8 @@ public class SetGoodsLevelsMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public SetGoodsLevelsMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         colonyId = element.getAttribute("colony");
         data = new ExportData((Element)element.getChildNodes().item(0));
     }

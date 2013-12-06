@@ -52,6 +52,8 @@ public class AssignTeacherMessage extends DOMMessage {
      * @param teacher The teacher <code>Unit</code>.
      */
     public AssignTeacherMessage(Unit student, Unit teacher) {
+        super(getXMLElementTagName());
+
         this.studentId = student.getId();
         this.teacherId = teacher.getId();
     }
@@ -64,6 +66,8 @@ public class AssignTeacherMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public AssignTeacherMessage(Game game, Element element) {
+        super(getXMLElementTagName());
+
         this.studentId = element.getAttribute("student");
         this.teacherId = element.getAttribute("teacher");
     }
