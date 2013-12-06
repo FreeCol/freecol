@@ -841,26 +841,9 @@ public final class InGameInputHandler extends InputHandler {
         final Game game = getGame();
         final MonarchActionMessage message
             = new MonarchActionMessage(game, element);
-        final MonarchAction action = message.getAction();
 
-        invokeAndWait(new Runnable() {
-                public void run() {
-                    boolean accept
-                        = igc().monarchAction(action, message.getTemplate());
-                    message.setResult(accept);
-                }
-            });
-        Element reply = null; // Not all actions require an answer.
-        switch (action) {
-        case RAISE_TAX_ACT: case RAISE_TAX_WAR: case OFFER_MERCENARIES:
-            reply = message.toXMLElement();
-            break;
-        default:
-            break;
-        }
-
-        SwingUtilities.invokeLater(updateMenuBarRunnable);
-        return reply;
+        getGUI().showMonarchDialog(message.getAction(), message.getTemplate());
+        return null;
     }
 
     /**

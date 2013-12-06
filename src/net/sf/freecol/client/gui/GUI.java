@@ -1476,10 +1476,16 @@ public class GUI {
         canvas.showModelMessages(modelMessages);
     }
 
-    public boolean showMonarchDialog(MonarchAction action,
-                                     StringTemplate replace) {
-        if (canvas == null) return false;
-        return canvas.showMonarchDialog(action, replace);
+    public void showMonarchDialog(final MonarchAction action,
+                                  StringTemplate template) {
+        if (canvas == null) return;
+        canvas.showMonarchDialog(action, template,
+            new DialogHandler<Boolean>() {
+                public void handle(Boolean b) {
+                    igc().monarchAction(action, b.booleanValue());
+                    updateMenuBar();
+                }
+            });
     }
 
     public void showNameNewLandDialog(String key, final String defaultName,

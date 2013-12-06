@@ -21,28 +21,36 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JTextArea;
 
-import net.miginfocom.swing.MigLayout;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.StringTemplate;
 
+import net.miginfocom.swing.MigLayout;
+
 
 /**
  * This panel is used to show monarch actions.
+ *
+ * Generally monarch actions require a choice to accept or reject, but
+ * some do not.  Therefore the value of the dialog is boolean, but
+ * there may not be a meaningful accept option in some cases.  This
+ * prevents just extending FreeColConfirmDialog. 
  */
-public final class MonarchDialog extends FreeColOldDialog<Boolean> implements ActionListener {
+public final class MonarchDialog extends FreeColDialog<Boolean> {
 
-    private static final Logger logger = Logger.getLogger(MonarchDialog.class.getName());
-
- 
     /**
      * Creates a dialog to handle monarch interactions.
      *
@@ -52,68 +60,50 @@ public final class MonarchDialog extends FreeColOldDialog<Boolean> implements Ac
      */
     public MonarchDialog(FreeColClient freeColClient,
                          MonarchAction action, StringTemplate template) {
-        super(freeColClient, new MigLayout("wrap 2, insets 10", "[]20[]"));
+        super(freeColClient);
 
-        String messageId = "model.monarch.action." + action.toString();
-        String yesId = messageId + ".yes";
-        String noId = messageId + ".no";
-
+        final ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
+        final Nation nation = freeColClient.getMyPlayer().getNation();
+        final String messageId = "model.monarch.action." + action.toString();
         if (!Messages.containsKey(messageId)) {
-            logger.warning("Unrecognized monarch action: " + action);
-            return;
+            throw new IllegalStateException("Unrecognized monarch action: "
+                + action);
         }
+        String yesId = messageId + ".yes";
+        if (!Messages.containsKey(yesId)) yesId = null;        
+        String noId = messageId + ".no";
+        if (!Messages.containsKey(noId)) noId = "close";
 
-        JLabel header = new JLabel(Messages.message("aMessageFromTheCrown"));
+        String hdr = Messages.message("aMessageFromTheCrown");
+        JTextArea header = GUI.getDefaultTextArea(hdr);
         header.setFont(GUI.MEDIUM_HEADER_FONT);
-        add(header, "span, align center, wrap 20");
 
-        Nation nation = getMyPlayer().getNation();
-        add(new JLabel(getLibrary().getMonarchImageIcon(nation)));
-        add(GUI.getDefaultTextArea((template == null)
+        MigPanel panel = new MigPanel(new MigLayout("wrap 2, insets 10",
+                                                    "[]20[]"));
+        panel.add(header, "span, align center, wrap 20");
+        if (action == MonarchAction.RAISE_TAX_ACT
+            || action == MonarchAction.RAISE_TAX_WAR) {
+            JButton helpButton = new JButton(Messages.message("help"));
+            helpButton.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        getGUI().showColopediaPanel("colopedia.concepts.taxes");
+                    }
+                });
+            panel.add(helpButton, "tag help");
+        }
+        panel.add(GUI.getDefaultTextArea((template == null)
                 ? Messages.message(messageId)
                 : Messages.message(new StringTemplate(messageId, template))));
+        panel.setSize(panel.getPreferredSize());
 
-        boolean haveOK = false;
-        if (Messages.containsKey(yesId)) {
-            okButton.setText(Messages.message(yesId));
-            haveOK = true;
+        List<ChoiceItem<Boolean>> c = choices();
+        if (yesId != null) {
+            c.add(new ChoiceItem<Boolean>(Messages.message(yesId), Boolean.TRUE)
+                .okOption());
         }
-        if (!Messages.containsKey(noId)) noId = "close";
-        cancelButton.setText(Messages.message(noId));
-        if (haveOK) {
-            if (action == MonarchAction.RAISE_TAX_ACT
-                || action == MonarchAction.RAISE_TAX_WAR) {
-                add(okButton, "newline 20, span, tag ok, split 3");
-                JButton helpButton = new JButton(Messages.message("help"));
-                helpButton.setActionCommand(HELP);
-                helpButton.addActionListener(this);
-                add(helpButton, "tag help");
-            } else {
-                add(okButton, "newline 20, span, tag ok, split 2");
-            }
-            add(cancelButton, "tag cancel");
-        } else {
-            add(cancelButton, "newline 20, span, tag cancel");
-        }
-        setSize(getPreferredSize());
-    }
-
-
-    // Interface ActionListener
-
-    /**
-     * {@inheritDoc}
-     */
-    public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
-        if (OK.equals(command)) {
-            setResponse(Boolean.TRUE);
-        } else if (CANCEL.equals(command)) {
-            setResponse(Boolean.FALSE);
-        } else if (HELP.equals(command)) {
-            getGUI().showColopediaPanel("colopedia.concepts.taxes");
-        } else {
-            super.actionPerformed(event);
-        }
+        c.add(new ChoiceItem<Boolean>(Messages.message(noId), Boolean.FALSE)
+            .cancelOption().defaultOption());
+        initialize(DialogType.QUESTION, false, panel,
+                   lib.getMonarchImageIcon(nation), c);
     }
 }

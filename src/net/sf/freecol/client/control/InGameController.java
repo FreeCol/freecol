@@ -2450,15 +2450,15 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Handle a message from the monarch.
+     * Accept or reject a monarch action.
      *
      * @param action The <code>MonarchAction</code> performed.
-     * @param template A <code>StringTemplate</code> describing the action.
-     * @return True if the action was accepted.
+     * @param accept If true, accept the action.
      */
-    public boolean monarchAction(MonarchAction action,
-                                 StringTemplate template) {
-        return gui.showMonarchDialog(action, template);
+    public void monarchAction(MonarchAction action, boolean accept) {
+        // Strictly only needed for:
+        //    case RAISE_TAX_ACT: case RAISE_TAX_WAR: case OFFER_MERCENARIES:
+        askServer().answerMonarch(action, accept);
     }
 
     /**

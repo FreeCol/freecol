@@ -2279,14 +2279,17 @@ public final class Canvas extends JDesktopPane {
      * Display the monarch dialog.
      *
      * @param action The <code>MonarchAction</code> underway.
-     * @param replace The <code>StringTemplate</code> describing the
+     * @param template The <code>StringTemplate</code> describing the
      *     situation.
-     * @return Whether the player accepted the monarch action.
+     * @param handler A <code>DialogHandler</code> for the dialog response.
      */
-    public boolean showMonarchDialog(MonarchAction action,
-                                     StringTemplate replace) {
-        return showFreeColOldDialog(new MonarchDialog(freeColClient, action,
-                                                   replace), null, true);
+    public void showMonarchDialog(MonarchAction action,
+                                  StringTemplate template,
+                                  DialogHandler<Boolean> handler) {
+        SwingUtilities.invokeLater(
+            new DialogCallback<Boolean>(
+                new MonarchDialog(freeColClient, action, template),
+                null, handler));
     }
 
     /**

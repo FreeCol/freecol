@@ -310,7 +310,8 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
      * @return True if the dialog has a response.
      */
     public synchronized boolean responded() {
-        return this.pane.getValue() != JOptionPane.UNINITIALIZED_VALUE;
+        return this.pane != null
+            && this.pane.getValue() != JOptionPane.UNINITIALIZED_VALUE;
     }
 
     /**
