@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
+import net.sf.freecol.common.networking.NetworkRequestHandler;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.server.FreeColServer;

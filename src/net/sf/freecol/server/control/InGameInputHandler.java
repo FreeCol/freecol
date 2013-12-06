@@ -43,6 +43,7 @@ import net.sf.freecol.common.networking.ClaimLandMessage;
 import net.sf.freecol.common.networking.ClearSpecialityMessage;
 import net.sf.freecol.common.networking.CloseTransactionMessage;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.CurrentPlayerNetworkRequestHandler;
 import net.sf.freecol.common.networking.DeclareIndependenceMessage;
 import net.sf.freecol.common.networking.DeclineMoundsMessage;
 import net.sf.freecol.common.networking.DeliverGiftMessage;
@@ -68,6 +69,7 @@ import net.sf.freecol.common.networking.MissionaryMessage;
 import net.sf.freecol.common.networking.MoveMessage;
 import net.sf.freecol.common.networking.MoveToMessage;
 import net.sf.freecol.common.networking.NetworkConstants;
+import net.sf.freecol.common.networking.NetworkRequestHandler;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.networking.NoRouteToServerException;
@@ -121,7 +123,7 @@ public final class InGameInputHandler extends InputHandler
         // Messages that are not specialized are trivial elements identified
         // by tag name only.
         register(AbandonColonyMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -129,7 +131,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(AskSkillMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -137,7 +139,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(AssignTeacherMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -145,7 +147,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(AttackMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -153,7 +155,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(BuildColonyMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -161,7 +163,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(BuyMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -169,7 +171,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(BuyGoodsMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -177,7 +179,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(BuyPropositionMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -185,7 +187,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(CashInTreasureTrainMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -193,7 +195,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(ChangeStateMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -201,7 +203,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(ChangeWorkImprovementTypeMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -209,7 +211,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(ChangeWorkTypeMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -217,7 +219,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(ChooseFoundingFatherMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -225,7 +227,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(ClaimLandMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -233,7 +235,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(ClearSpecialityMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -241,7 +243,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(CloseTransactionMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -249,7 +251,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(DeclareIndependenceMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -257,7 +259,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(DeclineMoundsMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -265,7 +267,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(DeliverGiftMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -273,7 +275,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(DemandTributeMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -281,7 +283,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(DisbandUnitMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -289,7 +291,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(DisembarkMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -297,7 +299,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(EmbarkMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -305,14 +307,15 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(EmigrateUnitMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
                 return new EmigrateUnitMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register("endTurn", new CurrentPlayerNetworkRequestHandler() {
+        register("endTurn",
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -320,7 +323,7 @@ public final class InGameInputHandler extends InputHandler
                     .endTurn(freeColServer.getPlayer(connection));
             }});
         register(EquipForRoleMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -328,7 +331,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(EquipUnitMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -336,7 +339,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register("getREFUnits",
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -344,7 +347,7 @@ public final class InGameInputHandler extends InputHandler
                     .getREFUnits(freeColServer.getPlayer(connection));
             }});
         register(GetTransactionMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -352,7 +355,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(GoodsForSaleMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -360,7 +363,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(InciteMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -368,7 +371,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(IndianDemandMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -376,7 +379,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(JoinColonyMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -384,7 +387,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(LearnSkillMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -392,7 +395,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(LoadCargoMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -400,7 +403,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(LootCargoMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -408,7 +411,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(MissionaryMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -416,7 +419,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(MoveMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -424,7 +427,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(MoveToMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -432,7 +435,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(NewLandNameMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -440,7 +443,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(NewRegionNameMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -448,7 +451,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(PayArrearsMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -456,7 +459,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(PayForBuildingMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -464,7 +467,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(PutOutsideColonyMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -472,7 +475,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(RearrangeColonyMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -480,7 +483,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(RenameMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -488,7 +491,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(ScoutIndianSettlementMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -496,7 +499,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(ScoutSpeakToChiefMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -504,7 +507,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(SellMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -512,7 +515,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(SellGoodsMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -520,7 +523,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(SellPropositionMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -528,7 +531,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(SetBuildQueueMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -536,7 +539,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(SetGoodsLevelsMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -544,7 +547,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(TrainUnitInEuropeMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -552,7 +555,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(UnloadCargoMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -560,7 +563,7 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
         register(WorkMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
@@ -569,7 +572,7 @@ public final class InGameInputHandler extends InputHandler
             }});
 
         register("multiple",
-                 new CurrentPlayerNetworkRequestHandler() {
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {

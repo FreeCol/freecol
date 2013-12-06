@@ -32,6 +32,7 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.MessageHandler;
+import net.sf.freecol.common.networking.NetworkRequestHandler;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.networking.Server;
@@ -89,6 +90,18 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
     }
 
     /**
+     * Unregister a network request handler.
+     * 
+     * @param name The name.
+     * @param handler The handler.
+     * @return True if the supplied handler was actually removed.
+     */
+    protected boolean unregister(String name, NetworkRequestHandler handler) {
+        // _handlerMap.remove(name, handler) would be better?
+        return _handlerMap.remove(name) == handler;
+    }
+
+    /**
      * Deals with incoming messages that have just been received.
      * 
      * @param connection The <code>Connection</code> the message was received
@@ -101,6 +114,7 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
         NetworkRequestHandler handler = _handlerMap.get(tagName);
         if (handler != null) {
             try {
+                logger.log(Level.FINEST, "Handling " + tagName);
                 return handler.handle(connection, element);
             } catch (Exception e) {
                 // TODO: should we really catch Exception? The old code did.
@@ -151,74 +165,8 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
     protected abstract Element logout(Connection connection, Element element);
 
 
-    /**
-     * A network request handler knows how to handle in a given request type.
-     */
-    interface NetworkRequestHandler {
-        /**
-         * Handle a request represented by an {@link Element} and return another
-         * {@link Element} or null as the answer.
-         * 
-         * @param connection The message's <code>Connection</code>.
-         * @param element The root element of the message.
-         * @return reply element, may be null.
-         */
-        Element handle(Connection connection, Element element);
-    }
-
-    /**
-     * A network request handler for the current player will automatically
-     * return an error (&quot;not your turn&quot;) if called by a connection
-     * other than that of the currently active player. If no game is active or
-     * if the player is unknown the same error is returned.
-     */
-    public abstract class CurrentPlayerNetworkRequestHandler
-        implements NetworkRequestHandler {
-        public final Element handle(Connection conn, Element element) {
-            ServerPlayer player = getFreeColServer().getPlayer(conn);
-            if (isCurrentPlayer(player)) {
-                try {
-                    return handle(player, conn, element);
-                } catch (Exception e) {
-                    logger.log(Level.WARNING, "Handler failure.", e);
-                    sendReconnectSafely(conn);
-                    return null;
-                }
-            } else {
-                logger.warning("Received message out of turn from " 
-                        + player.getNation()
-                        + " player:"
-                        + element.getTagName());
-                return createErrorReply("Not your turn.");
-            }
-        }
-
-        /**
-         * Check if a player is the current player.
-         * 
-         * @param player The player.
-         * @return true if a game is active and the player is the current one.
-         */
-        private boolean isCurrentPlayer(Player player) {
-            Game game = getFreeColServer().getGame();
-            if (player != null && game != null) {
-                return player.equals(game.getCurrentPlayer());
-            }
-            return false;
-        }
-
-        /**
-         * Handle a request for the current player.
-         * 
-         * @param player The player.
-         * @param conn The connection.
-         * @param element The element with the request.
-         * @return answer element, may be null.
-         */
-        protected abstract Element handle(Player player, Connection conn, Element element);
-    }
-
     private class DisconnectHandler implements NetworkRequestHandler {
+
         public Element handle(Connection connection, Element disconnectElement) {
             // The player should be logged out by now, but just in case:
             ServerPlayer player = getFreeColServer().getPlayer(connection);

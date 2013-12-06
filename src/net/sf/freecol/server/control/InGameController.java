@@ -101,15 +101,16 @@ import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.CurrentPlayerNetworkRequestHandler;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.GoodsForSaleMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
+import net.sf.freecol.common.networking.NetworkRequestHandler;
 import net.sf.freecol.common.networking.RearrangeColonyMessage;
 import net.sf.freecol.common.networking.RearrangeColonyMessage.UnitChange;
-import net.sf.freecol.common.util.Introspector;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.FreeColServer;
@@ -117,6 +118,7 @@ import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.REFAIPlayer;
 import net.sf.freecol.server.control.ChangeSet.ChangePriority;
 import net.sf.freecol.server.control.ChangeSet.See;
+import net.sf.freecol.server.control.InputHandler;
 import net.sf.freecol.server.model.DiplomacySession;
 import net.sf.freecol.server.model.LootSession;
 import net.sf.freecol.server.model.ServerColony;
@@ -395,22 +397,9 @@ public final class InGameController extends Controller {
             } catch (IOException e) {
                 return null;
             }
-            if (reply == null) return null;
-            String tag = reply.getTagName();
-            tag = "net.sf.freecol.common.networking."
-                + tag.substring(0, 1).toUpperCase() + tag.substring(1)
-                + "Message";
-            Class[] types = new Class[] { Game.class, Element.class };
-            Object[] params = new Object[] { game, reply };
-            DOMMessage message;
-            try {
-                message = (DOMMessage)Introspector.instantiate(tag, types,
-                                                               params);
-            } catch (IllegalArgumentException e) {
-                logger.log(Level.WARNING, "Instantiation fail", e);
-                message = null;
-            }
-            return (message == null) ? null : handler.handle(message);
+            DOMMessage replyMessage = DOMMessage.createMessage(game, reply);
+            return (replyMessage == null) ? null
+                : handler.handle(replyMessage);
         }
     };
 
@@ -481,27 +470,62 @@ public final class InGameController extends Controller {
             FutureQuery fq;
             while (!outstandingQueries.isEmpty()) {
                 fq = outstandingQueries.remove(0);
-                if (!fq.future.isDone()) {
-                    if (fq.runnable != null) fq.runnable.run();
-                    fq.future.cancel(true);
+                if (fq.future == null || !fq.future.isDone()) {
+                    if (fq.runnable != null) {
+                        fq.runnable.run();
+                    }
+                    if (fq.future != null) fq.future.cancel(true);
                 }
             }
         }
     };
 
+    // A handler interface to pass to handleThisTurn().
+    // This will change from DOMMessage to Message when DOM goes away.
+    private interface CSMessageHandler {
+        public ChangeSet handle(DOMMessage message);
+    };
+
     /**
-     * Asks a question that must be answered this turn.
+     * Handle a new message type in this turn only for a given player.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> to ask.
-     * @param message The <code>DOMMessage</code> question.
+     * Registers a new message handler which unregisters itself when run,
+     * or by a FutureQuery at the end of turn.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> to handle for.
+     * @param messageType The <code>DOMMessage</code> question.
      * @param handler The <code>DOMMessageHandler</code> handler to process
      *     the reply with.
      * @param runnable An optional <code>Runnable</code> to run if the
      *     question was not answered.
      */
-    private void askThisTurn(ServerPlayer serverPlayer, DOMMessage message,
-                             DOMMessageHandler handler, Runnable runnable) {
-        new FutureQuery(askFuture(serverPlayer, message, handler), runnable);
+    private void handleThisTurn(final ServerPlayer serverPlayer,
+                                final String messageType,
+                                final CSMessageHandler handler,
+                                final Runnable runnable) {
+        final InGameInputHandler igih = getFreeColServer()
+            .getInGameInputHandler();
+        final Game game = getGame();
+        final NetworkRequestHandler nwh
+            = new CurrentPlayerNetworkRequestHandler(getFreeColServer()) {
+                protected Element handle(Player player, Connection conn,
+                                         Element element) {
+                    if (!serverPlayer.equals((ServerPlayer)player)) {
+                        return DOMMessage.clientError("Wrong player, expected "
+                            + serverPlayer.getName());
+                    }
+                    igih.unregister(messageType, this);
+                    DOMMessage m = DOMMessage.createMessage(game, element);
+                    ChangeSet cs = handler.handle(m);
+                    return (cs == null) ? null : cs.build(serverPlayer);
+                }
+            };
+        igih.register(messageType, nwh);
+        new FutureQuery(null, new Runnable() {
+                public void run() {
+                    if (igih.unregister(messageType, nwh)) runnable.run();
+                }
+            });
     }
 
     /**
@@ -1025,17 +1049,20 @@ public final class InGameController extends Controller {
                     Utils.randomInt(logger, "Tax act goods", random, 6))
                     .addName("%newWorld%", serverPlayer.getNewLandName());
             }
-            message = new MonarchActionMessage(action, template);
-            message.setTax(taxRaise);
-            askThisTurn(serverPlayer, message,
-                new DOMMessageHandler() {
-                    public DOMMessage handle(DOMMessage message) {
+            message = new MonarchActionMessage(action, template)
+                .setTax(taxRaise);
+            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_EARLY,
+                   message);
+            handleThisTurn(serverPlayer, message.getType(),
+                new CSMessageHandler() {
+                    public ChangeSet handle(DOMMessage message) {
                         boolean result
                             = (message instanceof MonarchActionMessage)
                                 ? ((MonarchActionMessage)message).getResult()
                                 : false;
-                        raiseTax(serverPlayer, taxRaise, goods, result);
-                        return null;
+                        ChangeSet cs = new ChangeSet();
+                        serverPlayer.csRaiseTax(taxRaise, goods, result, cs);
+                        return cs;
                     }
                 },
                 new Runnable() {
@@ -1124,9 +1151,11 @@ public final class InGameController extends Controller {
                     .addAmount("%gold%", mercPrice)
                     .addStringTemplate("%mercenaries%",
                         abstractUnitTemplate(", ", mercenaries)));
-            askThisTurn(serverPlayer, message,
-                new DOMMessageHandler() {
-                    public DOMMessage handle(DOMMessage message) {
+            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_EARLY,
+                   message);
+            handleThisTurn(serverPlayer, message.getType(),
+                new CSMessageHandler() {
+                    public ChangeSet handle(DOMMessage message) {
                         boolean result
                             = (message instanceof MonarchActionMessage)
                                 ? ((MonarchActionMessage)message).getResult()
@@ -1135,7 +1164,7 @@ public final class InGameController extends Controller {
                             ChangeSet cs = new ChangeSet();
                             serverPlayer.csAddMercenaries(mercenaries,
                                                           mercPrice, cs);
-                            sendElement(serverPlayer, cs);
+                            return cs;
                         }
                         return null;
                     }

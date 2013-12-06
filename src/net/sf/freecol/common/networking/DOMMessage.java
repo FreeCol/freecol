@@ -72,7 +72,7 @@ public class DOMMessage {
      */
     protected DOMMessage(String tag) {
         this.document = createNewDocument();
-        this.document.createElement(tag);
+        this.document.appendChild(this.document.createElement(tag));
     }
 
     /**

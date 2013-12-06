@@ -119,9 +119,11 @@ public class MonarchActionMessage extends DOMMessage {
      * Sets the tax amount attached to this message.
      *
      * @param tax The tax amount.
+     * @return This message.
      */
-    public void setTax(int tax) {
+    public MonarchActionMessage setTax(int tax) {
         this.tax = Integer.toString(tax);
+        return this;
     }
 
     /**
@@ -137,9 +139,11 @@ public class MonarchActionMessage extends DOMMessage {
      * Sets the result.
      *
      * @param accept The new result.
+     * @return This message.
      */
-    public void setResult(boolean accept) {
+    public MonarchActionMessage setResult(boolean accept) {
         this.resultString = Boolean.toString(accept);
+        return this;
     }
 
     /**
@@ -166,7 +170,9 @@ public class MonarchActionMessage extends DOMMessage {
             "action", action.toString());
         if (tax != null) result.setAttribute("tax", tax);
         if (resultString != null) result.setAttribute("result", resultString);
-        result.appendChild(template.toXMLElement(result.getOwnerDocument()));
+        if (template != null) {
+            result.appendChild(template.toXMLElement(result.getOwnerDocument()));
+        }
         return result;
     }
 

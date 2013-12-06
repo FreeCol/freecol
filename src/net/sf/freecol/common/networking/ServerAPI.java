@@ -397,9 +397,8 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean answerMonarch(MonarchAction action, boolean accept) {
-        return askHandling(new TrivialMessage("monarchAction",
-                "action", action.toString(),
-                "accepted", Boolean.toString(accept)),
+        return askHandling(new MonarchActionMessage(action, null)
+            .setResult(accept),
             null, null);
     }
 
