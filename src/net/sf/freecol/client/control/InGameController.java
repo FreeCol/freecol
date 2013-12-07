@@ -285,8 +285,7 @@ public final class InGameController implements NetworkConstants {
             // Don't tell the player how a settlement is defended!
             FreeColGameObject defender = (settlement != null) ? settlement
                 : tile.getDefendingUnit(attacker);
-            return gui.showPreCombatDialog(attacker, defender,
-                                                       tile);
+            return gui.showPreCombatDialog(attacker, defender, tile);
         }
         return true;
     }

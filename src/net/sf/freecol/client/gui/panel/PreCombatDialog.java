@@ -29,9 +29,9 @@ import java.util.List;
 import java.util.Set;
 
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JSeparator;
 
-import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -44,11 +44,13 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 
+import net.miginfocom.swing.MigLayout;
+
 
 /**
  * The dialog that is shown prior to a possible combat.
  */
-public class PreCombatDialog extends FreeColOldDialog<Boolean> {
+public class PreCombatDialog extends FreeColConfirmDialog {
 
     /**
      * Create a new pre-combat dialog.
@@ -61,19 +63,20 @@ public class PreCombatDialog extends FreeColOldDialog<Boolean> {
     public PreCombatDialog(FreeColClient freeColClient,
                            FreeColGameObject attacker,
                            FreeColGameObject defender) {
-        super(freeColClient, new MigLayout("wrap 6",
-                "[sg label]20[sg value, right]1px[sg percent]40"
-                + "[sg label]20[sg value, right]1px[sg percent]", ""));
+        super(freeColClient);
 
-        CombatModel combatModel = attacker.getGame().getCombatModel();
-        Set<Modifier> offence = sortModifiers(combatModel
+        final CombatModel combatModel = attacker.getGame().getCombatModel();
+        final Set<Modifier> offence = sortModifiers(combatModel
                 .getOffensiveModifiers(attacker, defender));
-        Set<Modifier> defence = sortModifiers(combatModel
+        final Set<Modifier> defence = sortModifiers(combatModel
                 .getDefensiveModifiers(attacker, defender));
 
+        MigPanel panel = new MigPanel(new MigLayout("wrap 6",
+                "[sg label]20[sg value, right]1px[sg percent]40"
+                + "[sg label]20[sg value, right]1px[sg percent]", ""));
         // left hand side: attacker
         // right hand side: defender
-        Unit attackerUnit = (Unit) attacker;
+        Unit attackerUnit = (Unit)attacker;
         String attackerName = Messages.getLabel(attackerUnit);
         JLabel attackerLabel = new UnitLabel(freeColClient, attackerUnit,
                                              false, true);
@@ -92,61 +95,63 @@ public class PreCombatDialog extends FreeColOldDialog<Boolean> {
             throw new IllegalStateException("Bogus attack");
         }
 
-        add(new JLabel(attackerName), "span 3, align center");
-        add(new JLabel(defenderName), "span 3, align center");
-        add(attackerLabel, "span 3, align center");
-        add(defenderLabel, "span 3, align center");
-        add(new JSeparator(JSeparator.HORIZONTAL), "newline, span 3, growx");
-        add(new JSeparator(JSeparator.HORIZONTAL), "span 3, growx");
+        panel.add(new JLabel(attackerName), "span 3, align center");
+        panel.add(new JLabel(defenderName), "span 3, align center");
+        panel.add(attackerLabel, "span 3, align center");
+        panel.add(defenderLabel, "span 3, align center");
+        panel.add(new JSeparator(JSeparator.HORIZONTAL), "newline, span 3, growx");
+        panel.add(new JSeparator(JSeparator.HORIZONTAL), "span 3, growx");
 
         Iterator<Modifier> offenceModifiers = offence.iterator();
         Iterator<Modifier> defenceModifiers = defence.iterator();
-
         while (offenceModifiers.hasNext() || defenceModifiers.hasNext()) {
             int skip = 0;
             boolean hasOffence = offenceModifiers.hasNext();
             if (hasOffence) {
-                if (!addModifier(offenceModifiers.next(), true, 0)) {
+                if (!addModifier(panel, offenceModifiers.next(), true, 0)) {
                     skip = 1;
                 }
             } else {
                 skip = 3;
             }
             if (defenceModifiers.hasNext()) {
-                addModifier(defenceModifiers.next(), !hasOffence, skip);
+                addModifier(panel, defenceModifiers.next(), !hasOffence, skip);
             }
         }
 
         Font bigFont = getFont().deriveFont(Font.BOLD, 20f);
-
-        float offenceResult = FeatureContainer.applyModifierSet(0, attacker.getGame().getTurn(), offence);
-        JLabel finalOffenceLabel = new JLabel(Messages.message("model.source.finalResult.name"));
+        float offenceResult = FeatureContainer.applyModifierSet(0,
+            attacker.getGame().getTurn(), offence);
+        JLabel finalOffenceLabel
+            = new JLabel(Messages.message("model.source.finalResult.name"));
         finalOffenceLabel.setFont(bigFont);
-
-        add(new JSeparator(JSeparator.HORIZONTAL), "newline, span 3, growx");
-        add(new JSeparator(JSeparator.HORIZONTAL), "span 3, growx");
-        add(finalOffenceLabel);
-        JLabel finalOffenceResult = new JLabel(ModifierFormat.format(offenceResult));
+        panel.add(new JSeparator(JSeparator.HORIZONTAL),
+                  "newline, span 3, growx");
+        panel.add(new JSeparator(JSeparator.HORIZONTAL), "span 3, growx");
+        panel.add(finalOffenceLabel);
+        JLabel finalOffenceResult
+            = new JLabel(ModifierFormat.format(offenceResult));
         finalOffenceResult.setFont(bigFont);
-        add(finalOffenceResult);
+        panel.add(finalOffenceResult);
 
-        float defenceResult = FeatureContainer.applyModifierSet(0, attacker.getGame().getTurn(), defence);
-        JLabel finalDefenceLabel = new JLabel(Messages.message("model.source.finalResult.name"));
+        float defenceResult = FeatureContainer.applyModifierSet(0,
+            attacker.getGame().getTurn(), defence);
+        JLabel finalDefenceLabel
+            = new JLabel(Messages.message("model.source.finalResult.name"));
         finalDefenceLabel.setFont(bigFont);
-        add(finalDefenceLabel, "skip");
+        panel.add(finalDefenceLabel, "skip");
         JLabel finalDefenceResult = (defenceResult == Modifier.UNKNOWN)
             ? new JLabel("???")
             : new JLabel(ModifierFormat.format(defenceResult));
         finalDefenceResult.setFont(bigFont);
-        add(finalDefenceResult);
+        panel.add(finalDefenceResult);
+        panel.setSize(panel.getPreferredSize());
 
-        add(okButton, "newline 20, span, split 2, tag ok");
-        add(cancelButton, "tag cancel");
-
-        setSize(getPreferredSize());
+        initialize(true, panel, null, "ok", "cancel");
     }
 
-    private boolean addModifier(Modifier modifier, boolean newline, int skip) {
+    private boolean addModifier(JPanel panel, Modifier modifier,
+                                boolean newline, int skip) {
         String constraint = null;
         if (newline) {
             constraint = "newline";
@@ -163,13 +168,13 @@ public class PreCombatDialog extends FreeColOldDialog<Boolean> {
         if (source != null) {
             sourceName = Messages.getName(source);
         }
-        add(new JLabel(sourceName), constraint);
+        panel.add(new JLabel(sourceName), constraint);
         String[] bonus = ModifierFormat.getModifierStrings(modifier);
-        add(new JLabel(bonus[0] + bonus[1]));
+        panel.add(new JLabel(bonus[0] + bonus[1]));
         if (bonus[2] == null) {
             return false;
         } else {
-            add(new JLabel(bonus[2]));
+            panel.add(new JLabel(bonus[2]));
             return true;
         }
     }
@@ -197,22 +202,5 @@ public class PreCombatDialog extends FreeColOldDialog<Boolean> {
             sortedResult.addAll(modifierMap.get(type));
         }
         return sortedResult;
-    }
-
-
-    // Interface ActionListener
-
-    /**
-     * {@inheritDoc}
-     */
-    public void actionPerformed(ActionEvent event) {
-        final String command = event.getActionCommand();
-        if (OK.equals(command)) {
-            setResponse(Boolean.TRUE);
-        } else if (CANCEL.equals(command)) {
-            setResponse(Boolean.FALSE);
-        } else {
-            super.actionPerformed(event);
-        }
     }
 }

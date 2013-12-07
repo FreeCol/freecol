@@ -2446,9 +2446,9 @@ public final class Canvas extends JDesktopPane {
     public boolean showPreCombatDialog(FreeColGameObject attacker,
                                        FreeColGameObject defender,
                                        Tile tile) {
-        return showFreeColOldDialog(new PreCombatDialog(freeColClient,
+        return showFreeColDialog(new PreCombatDialog(freeColClient,
                                                      attacker, defender),
-                                 tile, true);
+                                 tile);
     }
 
     /**
