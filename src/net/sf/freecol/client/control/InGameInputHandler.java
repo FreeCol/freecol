@@ -570,8 +570,7 @@ public final class InGameInputHandler extends InputHandler {
      *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information.
-     * @return A <code>ChooseFoundingFatherMessage</code> containing the
-     *     response.
+     * @return Null.  The choice is returned asynchronously.
      */
     private Element chooseFoundingFather(Element element) {
         final ChooseFoundingFatherMessage message
@@ -817,6 +816,7 @@ public final class InGameInputHandler extends InputHandler {
      *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information.
+     * @return Null.  The choice is returned asynchronously.
      */
     public Element lootCargo(Element element) {
         final Game game = getGame();
@@ -835,7 +835,7 @@ public final class InGameInputHandler extends InputHandler {
      *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information.
-     * @return Null.
+     * @return Null.  The response is returned asynchronously.
      */
     private Element monarchAction(Element element) {
         final Game game = getGame();
@@ -874,7 +874,7 @@ public final class InGameInputHandler extends InputHandler {
      *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information.
-     * @return Null.
+     * @return Null.  The name is returned asynchronously.
      */
     public Element newLandName(Element element) {
         final Game game = getGame();
@@ -896,7 +896,7 @@ public final class InGameInputHandler extends InputHandler {
      *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information.
-     * @return Null.
+     * @return Null.  The name is returned asynchronously.
      */
     public Element newRegionName(Element element) {
         final Game game = getGame();

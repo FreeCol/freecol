@@ -1378,9 +1378,9 @@ public class GUI {
         canvas.showEventPanel(type);
     }
 
-    public void showFindSettlementDialog() {
+    public void showFindSettlementPanel() {
         if (canvas == null) return;
-        canvas.showFindSettlementDialog();
+        canvas.showFindSettlementPanel();
     }
 
     public void showGameOptionsDialog(boolean editable,

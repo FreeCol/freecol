@@ -41,7 +41,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.event.ItemListener;
 
-import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -52,15 +51,18 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.StringTemplate;
 
+import net.miginfocom.swing.MigLayout;
+
 
 /**
- * Centers the map on a known settlement or colony. Pressing ENTER
+ * Centers the map on a known settlement or colony.  Pressing ENTER
  * opens a panel if appropriate.
  */
-public final class FindSettlementDialog<T> extends FreeColOldDialog<T> implements ListSelectionListener, ItemListener {
+public final class FindSettlementPanel extends FreeColPanel
+    implements ListSelectionListener, ItemListener {
 
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(FindSettlementDialog.class.getName());
+    private static final Logger logger = Logger.getLogger(FindSettlementPanel.class.getName());
 
     private final JComboBox displayOptionBox;
 
@@ -72,15 +74,16 @@ public final class FindSettlementDialog<T> extends FreeColOldDialog<T> implement
         ONLY_EUROPEAN
     }
 
+
     /**
      * The constructor to use.
      */
     @SuppressWarnings("unchecked") // FIXME in Java7
-    public FindSettlementDialog(FreeColClient freeColClient) {
+    public FindSettlementPanel(FreeColClient freeColClient) {
         super(freeColClient, new MigLayout("wrap 1", "[align center]",
                                            "[]30[]30[]"));
 
-        JLabel header = new JLabel(Messages.message("findSettlementDialog.name"));
+        JLabel header = new JLabel(Messages.message("findSettlementPanel.name"));
         header.setFont(GUI.SMALL_HEADER_FONT);
         add(header);
 
@@ -100,7 +103,7 @@ public final class FindSettlementDialog<T> extends FreeColOldDialog<T> implement
 
         Action quitAction = new AbstractAction() {
                 public void actionPerformed(ActionEvent e) {
-                    getGUI().removeFromCanvas(FindSettlementDialog.this);
+                    getGUI().removeFromCanvas(FindSettlementPanel.this);
                 }
             };
 
@@ -121,9 +124,9 @@ public final class FindSettlementDialog<T> extends FreeColOldDialog<T> implement
         add(listScroller, "width max(300, 100%), height max(300, 100%)");
 
         displayOptionBox = new JComboBox(new String[] {
-                Messages.message("findSettlementDialog.displayAll"),
-                Messages.message("findSettlementDialog.displayOnlyNatives"),
-                Messages.message("findSettlementDialog.displayOnlyEuropean"),
+                Messages.message("findSettlementPanel.displayAll"),
+                Messages.message("findSettlementPanel.displayOnlyNatives"),
+                Messages.message("findSettlementPanel.displayOnlyEuropean"),
             });
         displayOptionBox.addItemListener(this);
         add(displayOptionBox);
@@ -159,20 +162,12 @@ public final class FindSettlementDialog<T> extends FreeColOldDialog<T> implement
         Settlement settlement = (Settlement) settlementList.getSelectedValue();
         if (settlement instanceof Colony
             && settlement.getOwner() == getMyPlayer()) {
-            getGUI().removeFromCanvas(FindSettlementDialog.this);
+            getGUI().removeFromCanvas(FindSettlementPanel.this);
             getGUI().showColonyPanel((Colony) settlement);
         } else if (settlement instanceof IndianSettlement) {
-            getGUI().removeFromCanvas(FindSettlementDialog.this);
+            getGUI().removeFromCanvas(FindSettlementPanel.this);
             getGUI().showIndianSettlementPanel((IndianSettlement) settlement);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void requestFocus() {
-        settlementList.requestFocus();
     }
 
     /**
@@ -186,31 +181,17 @@ public final class FindSettlementDialog<T> extends FreeColOldDialog<T> implement
         getGUI().setFocus(settlement.getTile());
     }
 
-
-    // Override Component
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void removeNotify() {
-        super.removeNotify();
-
-        removeAll();
-        settlementList = null;
-    }
-
     public void itemStateChanged(ItemEvent event) {
         switch(displayOptionBox.getSelectedIndex()) {
-            case 0:
-            default:
-                updateSearch(displayListOption.valueOf("ALL"));
-                break;
-            case 1:
-                updateSearch(displayListOption.valueOf("ONLY_NATIVES"));
-                break;
-            case 2:
-                updateSearch(displayListOption.valueOf("ONLY_EUROPEAN"));
+        case 0:
+        default:
+            updateSearch(displayListOption.valueOf("ALL"));
+            break;
+        case 1:
+            updateSearch(displayListOption.valueOf("ONLY_NATIVES"));
+            break;
+        case 2:
+            updateSearch(displayListOption.valueOf("ONLY_EUROPEAN"));
         }
     }
 
@@ -230,5 +211,25 @@ public final class FindSettlementDialog<T> extends FreeColOldDialog<T> implement
         }
     }
 
-}
 
+    // Override Component
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void requestFocus() {
+        settlementList.requestFocus();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeNotify() {
+        super.removeNotify();
+
+        removeAll();
+        settlementList = null;
+    }
+}

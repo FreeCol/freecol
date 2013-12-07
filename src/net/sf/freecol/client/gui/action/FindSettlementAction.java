@@ -48,6 +48,6 @@ public class FindSettlementAction extends MapboardAction {
      * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) {
-        getGUI().showFindSettlementDialog();
+        getGUI().showFindSettlementPanel();
     }
 }

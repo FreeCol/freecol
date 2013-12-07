@@ -77,7 +77,7 @@ import net.sf.freecol.client.gui.panel.EndTurnDialog;
 import net.sf.freecol.client.gui.panel.ErrorPanel;
 import net.sf.freecol.client.gui.panel.EuropePanel;
 import net.sf.freecol.client.gui.panel.EventPanel;
-import net.sf.freecol.client.gui.panel.FindSettlementDialog;
+import net.sf.freecol.client.gui.panel.FindSettlementPanel;
 import net.sf.freecol.client.gui.panel.FreeColChoiceDialog;
 import net.sf.freecol.client.gui.panel.FreeColConfirmDialog;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
@@ -1987,10 +1987,10 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Display the FindSettlementDialog.
+     * Display the FindSettlementPanel.
      */
-    public void showFindSettlementDialog() {
-        showSubPanel(new FindSettlementDialog<Canvas>(freeColClient),
+    public void showFindSettlementPanel() {
+        showSubPanel(new FindSettlementPanel(freeColClient),
                      PopupPosition.ORIGIN, true);
     }
 
