@@ -382,24 +382,29 @@ public final class EuropePanel extends PortPanel {
      */
     public void actionPerformed(ActionEvent event) {
         final String command = event.getActionCommand();
-        // Close any open Europe Dialog, and show new one if required
         EuropeAction act = EuropeAction.valueOf(command);
-        getGUI().showEuropeDialog(act);
         switch (act) {
         case EXIT:
             exitAction();
             break;
-        case RECRUIT: case PURCHASE: case TRAIN:
-            requestFocus(); // handled by docks panel
+        case PURCHASE:
+            getGUI().showPurchasePanel();
             break;
-        case UNLOAD:
-            unloadAction();
+        case RECRUIT:
+            getGUI().showRecruitPanel();
             break;
         case SAIL:
             sailAction();
             break;
+        case TRAIN:
+            getGUI().showTrainPanel();
+            break;
+        case UNLOAD:
+            unloadAction();
+            break;
         default:
             super.actionPerformed(event);
+            break;
         }
     }
 

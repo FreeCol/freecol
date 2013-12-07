@@ -1363,11 +1363,6 @@ public class GUI {
         canvas.showErrorMessage(messageID, message);
     }
 
-    public int showEuropeDialog(EuropePanel.EuropeAction europeAction) {
-        if (canvas == null) return -1;
-        return canvas.showEuropeDialog(europeAction);
-    }
-
     public void showEuropePanel() {
         if (canvas == null) return;
         canvas.showEuropePanel();
@@ -1546,6 +1541,16 @@ public class GUI {
                                        FreeColGameObject defender, Tile tile) {
         if (canvas == null) return false;
         return canvas.showPreCombatDialog(attacker, defender, tile);
+    }
+
+    public void showPurchasePanel() {
+        if (canvas == null) return;
+        canvas.showPurchasePanel();
+    }
+
+    public void showRecruitPanel() {
+        if (canvas == null) return;
+        canvas.showRecruitPanel();
     }
 
     public void showReportCargoPanel() {
@@ -1733,6 +1738,11 @@ public class GUI {
         return canvas.showTradeRouteInputDialog(newRoute);
     }
 
+    public void showTrainPanel() {
+        if (canvas == null) return;
+        canvas.showTrainPanel();
+    }
+
     public MissionaryAction showUseMissionaryDialog(Unit unit,
                                                     IndianSettlement settlement,
                                                     boolean canEstablish,
@@ -1757,6 +1767,11 @@ public class GUI {
         canvas.showWorkProductionPanel(unit);
     }
 
+    public void updateEuropeanSubpanels() {
+        if (canvas == null) return;
+        canvas.updateEuropeanSubpanels();
+    }
+
     public void updateGameOptions() {
         if (canvas == null) return;
         canvas.updateGameOptions();
@@ -1766,7 +1781,6 @@ public class GUI {
         if (canvas == null) return;
         canvas.updateMapGeneratorOptions();
     }
-
 
     // Trivial delegations to MapViewer
     

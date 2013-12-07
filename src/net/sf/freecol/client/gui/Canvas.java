@@ -100,7 +100,8 @@ import net.sf.freecol.client.gui.panel.NewPanel;
 import net.sf.freecol.client.gui.panel.Parameters;
 import net.sf.freecol.client.gui.panel.ParametersDialog;
 import net.sf.freecol.client.gui.panel.PreCombatDialog;
-import net.sf.freecol.client.gui.panel.RecruitDialog;
+import net.sf.freecol.client.gui.panel.PurchasePanel;
+import net.sf.freecol.client.gui.panel.RecruitPanel;
 import net.sf.freecol.client.gui.panel.ReportCargoPanel;
 import net.sf.freecol.client.gui.panel.ReportColonyPanel;
 import net.sf.freecol.client.gui.panel.ReportContinentalCongressPanel;
@@ -131,7 +132,7 @@ import net.sf.freecol.client.gui.panel.StatusPanel;
 import net.sf.freecol.client.gui.panel.TilePanel;
 import net.sf.freecol.client.gui.panel.TradeRouteDialog;
 import net.sf.freecol.client.gui.panel.TradeRouteInputDialog;
-import net.sf.freecol.client.gui.panel.TrainDialog;
+import net.sf.freecol.client.gui.panel.TrainPanel;
 import net.sf.freecol.client.gui.panel.VictoryPanel;
 import net.sf.freecol.client.gui.panel.WarehouseDialog;
 import net.sf.freecol.client.gui.panel.WorkProductionPanel;
@@ -319,13 +320,6 @@ public final class Canvas extends JDesktopPane {
 
     /** The parent GUI. */
     private GUI gui;
-
-    /**
-     * Save the most recently open dialog in Europe
-     * (<code>RecruitDialog</code>, <code>PurchaseDialog</code>,
-     * <code>TrainDialog</code>)
-     */
-    private FreeColOldDialog<Integer> europeOpenDialog = null;
 
     private MainPanel mainPanel;
 
@@ -785,6 +779,19 @@ public final class Canvas extends JDesktopPane {
             savePosition(fcp, frame.getLocation());
             saveSize(fcp, fcp.getSize());
         }
+    }
+
+    /**
+     * Remove the panels derived from the EuropePanel.
+     */
+    private void removeEuropeanSubpanels() {
+        FreeColPanel panel;
+        if ((panel = getExistingFreeColPanel(RecruitPanel.class)) != null)
+            removeFromCanvas(panel);
+        if ((panel = getExistingFreeColPanel(PurchasePanel.class)) != null)
+            removeFromCanvas(panel);
+        if ((panel = getExistingFreeColPanel(TrainPanel.class)) != null)
+            removeFromCanvas(panel);
     }
 
     /**
@@ -1907,56 +1914,9 @@ public final class Canvas extends JDesktopPane {
         if (messageId != null) {
             display = Messages.message(messageId);
         }
-        if (display == null || "".equals(display))
-            display = message;
+        if (display == null || "".equals(display)) display = message;
         ErrorPanel errorPanel = new ErrorPanel(freeColClient, display);
         showSubPanel(errorPanel, true);
-    }
-
-    /**
-     * Displays one of the Europe Dialogs for Recruit, Purchase, Train.
-     * Closes any currently open Dialogs.
-     * Does not return from this method before the panel is closed.
-     *
-     * @param europeAction the type of panel to display
-     * @return <code>FreeColOldDialog.getResponseInt</code>.
-     */
-    public int showEuropeDialog(EuropePanel.EuropeAction europeAction) {
-        // Close any open Europe Dialog (Recruit, Purchase, Train)
-        try {
-            if (europeOpenDialog != null) {
-                europeOpenDialog.setResponse(new Integer(-1));
-            }
-        } catch (NumberFormatException e) {
-            logger.warning("Canvas.showEuropeDialog: Invalid europeDialogType");
-        }
-
-        FreeColOldDialog<Integer> localDialog = null;
-
-        // Open new Dialog
-        switch (europeAction) {
-        case EXIT:
-        case UNLOAD:
-        case SAIL:
-            return -1;
-        case RECRUIT:
-            localDialog = new RecruitDialog(freeColClient);
-            break;
-        case PURCHASE:
-        case TRAIN:
-            localDialog = new TrainDialog(freeColClient, europeAction);
-            break;
-        }
-        localDialog.initialize();
-        europeOpenDialog = localDialog; // Set the open dialog to the class variable
-
-        int response = showFreeColOldDialog(localDialog, null, false);
-
-        if (europeOpenDialog == localDialog) {
-            europeOpenDialog = null; // Clear class variable when it's closed
-        }
-
-        return response;
     }
 
     /**
@@ -1971,6 +1931,11 @@ public final class Canvas extends JDesktopPane {
             EuropePanel panel = getExistingFreeColPanel(EuropePanel.class);
             if (panel == null) {
                 panel = new EuropePanel(freeColClient, this);
+                panel.addClosingCallback(new Runnable() {
+                        public void run() {
+                            removeEuropeanSubpanels();
+                        }
+                    });
             }
             showSubPanel(panel, false);
         }
@@ -2452,6 +2417,28 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
+     * Displays the purchase panel.
+     */
+    public void showPurchasePanel() {
+        PurchasePanel panel = getExistingFreeColPanel(PurchasePanel.class);
+        if (panel == null) {
+            panel = new PurchasePanel(freeColClient);
+        }
+        showFreeColPanel(panel, null, false);
+    }
+
+    /**
+     * Displays the recruit panel.
+     */
+    public void showRecruitPanel() {
+        RecruitPanel panel = getExistingFreeColPanel(RecruitPanel.class);
+        if (panel == null) {
+            panel = new RecruitPanel(freeColClient);
+        }
+        showFreeColPanel(panel, null, false);
+    }
+
+    /**
      * Display the labour detail panel.
      *
      * @param unitType The <code>UnitType</code> to display.
@@ -2810,6 +2797,17 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
+     * Displays the training panel.
+     */
+    public void showTrainPanel() {
+        TrainPanel panel = getExistingFreeColPanel(TrainPanel.class);
+        if (panel == null) {
+            panel = new TrainPanel(freeColClient);
+        }
+        showFreeColPanel(panel, null, false);
+    }
+
+    /**
      * Displays a dialog that asks the user what he wants to do with his
      * missionary in the indian settlement.
      *
@@ -2875,6 +2873,21 @@ public final class Canvas extends JDesktopPane {
      */
     public void showWorkProductionPanel(Unit unit) {
         showSubPanel(new WorkProductionPanel(freeColClient, unit), true);
+    }
+
+    /**
+     * Update all panels derived from the EuropePanel.
+     */
+    public void updateEuropeanSubpanels() {
+        RecruitPanel rp
+            = (RecruitPanel)getExistingFreeColPanel(RecruitPanel.class);
+        if (rp != null) rp.update();
+        PurchasePanel pp
+            = (PurchasePanel)getExistingFreeColPanel(PurchasePanel.class);
+        if (pp != null) pp.update();
+        TrainPanel tp
+            = (TrainPanel)getExistingFreeColPanel(TrainPanel.class);
+        if (tp != null) tp.update();
     }
 
     // Singleton specialist reports
