@@ -62,6 +62,8 @@ import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.FreeColImageBorder;
+import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 
@@ -275,12 +277,39 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
     }
 
     /**
+     * Get the Image library.
+     *
+     * @return The <code>ImageLibrary</code>.
+     */
+    protected ImageLibrary getImageLibrary() {
+        return getGUI().getImageLibrary();
+    }
+
+    /**
+     * Get the game.
+     *
+     * @return The <code>Game</code>.
+     */
+    protected Game getGame() {
+        return freeColClient.getGame();
+    }
+
+    /**
      * Gets the specification.
      *
      * @return The specification from the game.
      */
     protected Specification getSpecification() {
-        return freeColClient.getGame().getSpecification();
+        return getGame().getSpecification();
+    }
+
+    /**
+     * Get the player.
+     *
+     * @return The current <code>Player</code>.
+     */
+    protected Player getMyPlayer() {
+        return freeColClient.getMyPlayer();
     }
 
     /**

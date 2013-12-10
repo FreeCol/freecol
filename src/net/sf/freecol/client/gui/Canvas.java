@@ -2625,8 +2625,8 @@ public final class Canvas extends JDesktopPane {
      * @return A destination for the unit, or null.
      */
     public Location showSelectDestinationDialog(Unit unit) {
-        return showFreeColOldDialog(new SelectDestinationDialog(freeColClient,
-                unit), unit.getTile(), true);
+        return showFreeColDialog(new SelectDestinationDialog(freeColClient,
+                unit), unit.getTile());
     }
 
     /**

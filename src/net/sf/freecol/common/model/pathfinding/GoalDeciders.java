@@ -19,6 +19,10 @@
 
 package net.sf.freecol.common.model.pathfinding;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
@@ -176,5 +180,55 @@ public final class GoalDeciders {
             }
         };
     }
-}
 
+    /**
+     * A class to wrap a goal decider that searches for paths to an adjacent
+     * tile to a set of locations, and the results of such a search.
+     */
+    public static class MultipleDecider {
+
+        private final GoalDecider gd;
+
+        private final HashMap<Location, PathNode> results
+            = new HashMap<Location, PathNode>();
+
+
+        /**
+         * Create a multiple decider.
+         *
+         * @param locs The list of <code>Location</code>s to search for
+         *     paths to an adjacent location for.
+         */
+        public MultipleDecider(final List<Location> locs) {
+            this.gd = new GoalDecider() {
+
+                    private List<Location> done = new ArrayList<Location>();
+
+                    public PathNode getGoal() { return null; }
+                    public boolean hasSubGoals() { return true; }
+                    public boolean check(Unit u, PathNode path) {
+                        Tile tile = path.getTile();
+                        if (tile == null) return false;
+                        for (Location loc : locs) {
+                            if (tile.isAdjacent(loc.getTile())) {
+                                results.put(loc, path);
+                                done.add(loc);
+                            }
+                        }
+                        while (!done.isEmpty()) {
+                            locs.remove(done.remove(0));
+                        }
+                        return false;
+                    }
+                };
+        }
+
+        public GoalDecider getGoalDecider() {
+            return gd;
+        }
+
+        public HashMap<Location, PathNode> getResults() {
+            return results;
+        }
+    };
+}

@@ -106,6 +106,7 @@ public final class ChooseFoundingFatherDialog
     /**
      * {@inheritDoc}
      */
+    @Override
     public FoundingFather getResponse() {
         Object value = getValue();
         if (options.get(0).equals(value)) {
@@ -117,6 +118,9 @@ public final class ChooseFoundingFatherDialog
 
     // Override Component
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void requestFocus() {
         tb.requestFocus();
