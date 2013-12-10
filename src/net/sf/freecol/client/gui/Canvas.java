@@ -45,6 +45,7 @@ import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JLayeredPane;
 import javax.swing.JMenuItem;
+import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
@@ -53,6 +54,8 @@ import javax.swing.plaf.basic.BasicInternalFrameUI;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI.ScoutColonyAction;
+import net.sf.freecol.client.gui.GUI.ScoutIndianSettlementAction;
 import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.AboutPanel;
@@ -272,20 +275,6 @@ public final class Canvas extends JDesktopPane {
         CENTERED,
         CENTERED_LEFT,
         CENTERED_RIGHT,
-    }
-
-    public static enum ScoutColonyAction {
-        CANCEL,
-        FOREIGN_COLONY_NEGOTIATE,
-        FOREIGN_COLONY_SPY,
-        FOREIGN_COLONY_ATTACK
-    }
-
-    public static enum ScoutIndianSettlementAction {
-        CANCEL,
-        INDIAN_SETTLEMENT_SPEAK,
-        INDIAN_SETTLEMENT_TRIBUTE,
-        INDIAN_SETTLEMENT_ATTACK
     }
 
     public static enum SellAction {
@@ -1338,7 +1327,7 @@ public final class Canvas extends JDesktopPane {
      * @param modal True if this dialog should be modal.
      * @param tile An optional <code>Tile</code> to make visible (not
      *     under the dialog!)
-     * @param text The text that explains the choice for the user.
+     * @param obj An object that explains the choice for the user.
      * @param icon An optional icon to display.
      * @param cancelKey Key for the text of the optional cancel button.
      * @param choices The <code>List</code> containing the ChoiceItems to
@@ -1346,11 +1335,11 @@ public final class Canvas extends JDesktopPane {
      * @return The corresponding member of the values array to the selected
      *     option.
      */
-    public <T> T showChoiceDialog(boolean modal, Tile tile, String text,
+    public <T> T showChoiceDialog(boolean modal, Tile tile, Object obj,
                                   ImageIcon icon, String cancelKey,
                                   List<ChoiceItem<T>> choices) {
         FreeColChoiceDialog<T> fcd
-            = new FreeColChoiceDialog<T>(freeColClient, modal, text, icon,
+            = new FreeColChoiceDialog<T>(freeColClient, modal, obj, icon,
                                          cancelKey, choices);
         return showFreeColDialog(fcd, tile);
     }
@@ -1523,7 +1512,15 @@ public final class Canvas extends JDesktopPane {
      * @param settlement The <code>IndianSettlement</code> to consider.
      * @return The chosen action, tribute, attack or cancel.
      */
-    public ScoutIndianSettlementAction showArmedUnitIndianSettlementDialog(IndianSettlement settlement) {
+    public ScoutIndianSettlementAction
+        showArmedUnitIndianSettlementDialog(IndianSettlement settlement) {
+        final Player player = freeColClient.getMyPlayer();
+
+        StringTemplate nation = settlement.getOwner().getNationName();
+        JTextArea text = GUI.getDefaultTextArea(Messages.message(StringTemplate
+                .template(settlement.getAlarmLevelMessageId(player))
+                    .addStringTemplate("%nation%", nation)));
+
         List<ChoiceItem<ScoutIndianSettlementAction>> choices
             = new ArrayList<ChoiceItem<ScoutIndianSettlementAction>>();
         choices.add(new ChoiceItem<ScoutIndianSettlementAction>(
@@ -1532,14 +1529,10 @@ public final class Canvas extends JDesktopPane {
         choices.add(new ChoiceItem<ScoutIndianSettlementAction>(
                 Messages.message("scoutSettlement.attack"),
                 ScoutIndianSettlementAction.INDIAN_SETTLEMENT_ATTACK));
-        String messageId = settlement.getAlarmLevelMessageId(freeColClient.getMyPlayer());
-        ScoutIndianSettlementAction result
-            = showOldChoiceDialog(settlement.getTile(),
-                Messages.message(StringTemplate.template(messageId)
-                    .addStringTemplate("%nation%", settlement.getOwner().getNationName())),
-                Messages.message("cancel"),
-                choices);
-        return (result == null) ? ScoutIndianSettlementAction.CANCEL : result;
+
+        return showChoiceDialog(true, settlement.getTile(), text,
+                                gui.getImageIcon(settlement, false),
+                                "cancel", choices);
     }
 
     /**
@@ -2516,31 +2509,32 @@ public final class Canvas extends JDesktopPane {
      *
      * @param colony The <code>Colony</code> to be scouted.
      * @param unit The <code>Unit</code> that is scouting.
-     * @param canNegotiate True if negotation is a valid choice.
+     * @param neg True if negotation is a valid choice.
      * @return The selected action, either negotiate, spy, attack or cancel.
      */
     public ScoutColonyAction showScoutForeignColonyDialog(Colony colony,
                                                           Unit unit,
-                                                          boolean canNegotiate) {
+                                                          boolean neg) {
+        JTextArea text = GUI.getDefaultTextArea(Messages.message(StringTemplate
+                .template("scoutColony.text")
+                    .addStringTemplate("%unit%", unit.getFullLabel())
+                    .addName("%colony%", colony.getName())));
+
         List<ChoiceItem<ScoutColonyAction>> choices
             = new ArrayList<ChoiceItem<ScoutColonyAction>>();
-        // We cannot negotiate with the REF
         choices.add(new ChoiceItem<ScoutColonyAction>(
                 Messages.message("scoutColony.negotiate"),
-                ScoutColonyAction.FOREIGN_COLONY_NEGOTIATE, canNegotiate));
+                ScoutColonyAction.FOREIGN_COLONY_NEGOTIATE, neg));
         choices.add(new ChoiceItem<ScoutColonyAction>(
                 Messages.message("scoutColony.spy"),
                 ScoutColonyAction.FOREIGN_COLONY_SPY));
         choices.add(new ChoiceItem<ScoutColonyAction>(
                 Messages.message("scoutColony.attack"),
                 ScoutColonyAction.FOREIGN_COLONY_ATTACK));
-        StringTemplate template = StringTemplate.template("scoutColony.text")
-            .addStringTemplate("%unit%", unit.getFullLabel())
-            .addName("%colony%", colony.getName());
-        ScoutColonyAction result =
-            showOldChoiceDialog(unit.getTile(), Messages.message(template),
-        Messages.message("cancel"), choices);
-        return (result == null) ? ScoutColonyAction.CANCEL : result;
+
+        return showChoiceDialog(true, unit.getTile(), text,
+                                gui.getImageIcon(colony, false),
+                                "cancel", choices);
     }
 
     /**
@@ -2551,22 +2545,32 @@ public final class Canvas extends JDesktopPane {
      * @param number The number of settlements in the settlement owner nation.
      * @return The chosen action, speak, tribute, attack or cancel.
      */
-    public ScoutIndianSettlementAction showScoutIndianSettlementDialog(IndianSettlement settlement, String number) {
-        StringBuilder text = new StringBuilder(400);
-        Player owner = settlement.getOwner();
-        text.append(Messages.message(StringTemplate.template(settlement.getAlarmLevelMessageId(freeColClient.getMyPlayer()))
-                .addStringTemplate("%nation%", owner.getNationName())));
-        text.append("\n\n");
-        text.append(Messages.message(StringTemplate.template("scoutSettlement.greetings")
-                .addStringTemplate("%nation%", settlement.getOwner().getNationName())
-                .addName("%settlement%", settlement.getName())
-                .add("%number%", number)
-                .add("%settlementType%", ((IndianNationType) owner.getNationType()).getSettlementTypeKey(true))));
-        text.append(" ");
+    public ScoutIndianSettlementAction
+        showScoutIndianSettlementDialog(IndianSettlement settlement,
+                                        String number) {
+        final Player player = freeColClient.getMyPlayer();
+        final Player owner = settlement.getOwner();
+
+        StringBuilder sb = new StringBuilder(400);
+        sb.append(Messages.message(StringTemplate
+                .template(settlement.getAlarmLevelMessageId(player))
+                    .addStringTemplate("%nation%", owner.getNationName())));
+        sb.append("\n\n");
+        String key = ((IndianNationType)owner.getNationType())
+            .getSettlementTypeKey(true);
+        sb.append(Messages.message(StringTemplate
+                .template("scoutSettlement.greetings")
+                    .addStringTemplate("%nation%", owner.getNationName())
+                    .addName("%settlement%", settlement.getName())
+                    .add("%number%", number)
+                    .add("%settlementType%", key)));
+        sb.append(" ");
         if (settlement.getLearnableSkill() != null) {
-            text.append(Messages.message(StringTemplate.template("scoutSettlement.skill")
-                    .add("%skill%", settlement.getLearnableSkill().getNameKey())));
-            text.append(" ");
+            key = settlement.getLearnableSkill().getNameKey();
+            sb.append(Messages.message(StringTemplate
+                    .template("scoutSettlement.skill")
+                        .add("%skill%", key)));
+            sb.append(" ");
         }
         GoodsType[] wantedGoods = settlement.getWantedGoods();
         int present = 0;
@@ -2580,8 +2584,9 @@ public final class Canvas extends JDesktopPane {
                 t.add("%goods" + Integer.toString(i+1) + "%",
                     wantedGoods[i].getNameKey());
             }
-            text.append(Messages.message(t) + "\n\n");
+            sb.append(Messages.message(t) + "\n\n");
         }
+        JTextArea text = GUI.getDefaultTextArea(sb.toString());
 
         List<ChoiceItem<ScoutIndianSettlementAction>> choices
             = new ArrayList<ChoiceItem<ScoutIndianSettlementAction>>();
@@ -2594,12 +2599,10 @@ public final class Canvas extends JDesktopPane {
         choices.add(new ChoiceItem<ScoutIndianSettlementAction>(
                 Messages.message("scoutSettlement.attack"),
                 ScoutIndianSettlementAction.INDIAN_SETTLEMENT_ATTACK));
-        ScoutIndianSettlementAction result
-            = showOldChoiceDialog(settlement.getTile(),
-                text.toString(),
-                Messages.message("cancel"),
-                choices);
-        return (result == null) ? ScoutIndianSettlementAction.CANCEL : result;
+
+        return showChoiceDialog(true, settlement.getTile(), text,
+                                gui.getImageIcon(settlement, false),
+                                "cancel", choices);
     }
 
     /**

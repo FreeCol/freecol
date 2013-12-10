@@ -54,7 +54,7 @@ public class FreeColChoiceDialog<T> extends FreeColDialog<T> {
      * @return The <code>FreeColChoiceDialog</code> created.
      */
     public FreeColChoiceDialog(final FreeColClient freeColClient,
-                               boolean modal, String obj, ImageIcon icon,
+                               boolean modal, Object obj, ImageIcon icon,
                                String cancelKey, List<ChoiceItem<T>> choices) {
         this(freeColClient);
 

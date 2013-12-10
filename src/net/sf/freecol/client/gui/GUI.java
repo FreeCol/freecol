@@ -73,8 +73,6 @@ import net.sf.freecol.client.gui.Canvas.BuyAction;
 import net.sf.freecol.client.gui.Canvas.ClaimAction;
 import net.sf.freecol.client.gui.Canvas.EventType;
 import net.sf.freecol.client.gui.Canvas.MissionaryAction;
-import net.sf.freecol.client.gui.Canvas.ScoutColonyAction;
-import net.sf.freecol.client.gui.Canvas.ScoutIndianSettlementAction;
 import net.sf.freecol.client.gui.Canvas.SellAction;
 import net.sf.freecol.client.gui.Canvas.TradeAction;
 import net.sf.freecol.client.gui.animation.Animations;
@@ -135,6 +133,20 @@ import net.sf.freecol.common.resources.ResourceManager;
 public class GUI {
 
     private static final Logger logger = Logger.getLogger(GUI.class.getName());
+
+    /** Actions in scouting a colony. */
+    public static enum ScoutColonyAction {
+        FOREIGN_COLONY_NEGOTIATE,
+        FOREIGN_COLONY_SPY,
+        FOREIGN_COLONY_ATTACK
+    }
+
+    /** Actions in scouting a native settlement. */
+    public static enum ScoutIndianSettlementAction {
+        INDIAN_SETTLEMENT_SPEAK,
+        INDIAN_SETTLEMENT_TRIBUTE,
+        INDIAN_SETTLEMENT_ATTACK
+    }
 
     /** How many columns (em-widths) to use in the text area. */
     private static final int DEFAULT_TEXT_COLUMNS = 20;
@@ -1211,7 +1223,7 @@ public class GUI {
 
     public ScoutIndianSettlementAction
         showArmedUnitIndianSettlementDialog(IndianSettlement settlement) {
-        if (canvas == null) return ScoutIndianSettlementAction.CANCEL;
+        if (canvas == null) return null;
         return canvas.showArmedUnitIndianSettlementDialog(settlement);
     }
 
@@ -1658,16 +1670,16 @@ public class GUI {
         return canvas.showScaleMapSizeDialog();
     }
 
-    public ScoutColonyAction showScoutForeignColonyDialog(Colony colony,
-        Unit unit, boolean canNegotiate) {
-        if (canvas == null) return ScoutColonyAction.CANCEL;
-        return canvas.showScoutForeignColonyDialog(colony, unit, canNegotiate);
+    public ScoutColonyAction
+        showScoutForeignColonyDialog(Colony colony, Unit unit, boolean neg) {
+        if (canvas == null) return null;
+        return canvas.showScoutForeignColonyDialog(colony, unit, neg);
     }
 
     public ScoutIndianSettlementAction
         showScoutIndianSettlementDialog(IndianSettlement settlement,
                                         String number) {
-        if (canvas == null) return ScoutIndianSettlementAction.CANCEL;
+        if (canvas == null) return null;
         return canvas.showScoutIndianSettlementDialog(settlement, number);
     }
 

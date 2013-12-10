@@ -38,6 +38,8 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas.TradeAction;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.GUI.ScoutColonyAction;
+import net.sf.freecol.client.gui.GUI.ScoutIndianSettlementAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.FreeColActionUI;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
@@ -2785,26 +2787,26 @@ public final class InGameController implements NetworkConstants {
         Tile target = tile.getNeighbourOrNull(direction);
         IndianSettlement is = target.getIndianSettlement();
         if (is != null && unit.isArmed()) {
-            switch (gui.showArmedUnitIndianSettlementDialog(is)) {
-            case CANCEL:
-                return true;
+            ScoutIndianSettlementAction act
+                = gui.showArmedUnitIndianSettlementDialog(is);
+            if (act == null) return true; // Cancelled
+            switch (act) {
             case INDIAN_SETTLEMENT_ATTACK:
-                break; // Go on to usual attack confirmation.
+                if (confirmHostileAction(unit, target)
+                    && confirmPreCombat(unit, target)) {
+                    askServer().attack(unit, direction);
+                    nextActiveUnit();
+                    return false;
+                }
+                break;
             case INDIAN_SETTLEMENT_TRIBUTE:
                 moveTribute(unit, direction);
                 return false;
             default:
-                logger.warning("showArmedUnitIndianSettlementDialog failure.");
-                return false;
+                logger.warning("showArmedUnitIndianSettlementDialog fail: "
+                    + act);
+                break;
             }
-        }
-
-        // Normal attack confirmation.
-        if (confirmHostileAction(unit, target)
-            && confirmPreCombat(unit, target)) {
-            askServer().attack(unit, direction);
-            nextActiveUnit();
-            return false;
         }
         return true;
     }
@@ -3125,9 +3127,10 @@ public final class InGameController implements NetworkConstants {
         boolean canNeg = colony.getOwner() != unit.getOwner().getREFPlayer();
         clearGotoOrders(unit);
 
-        switch (gui.showScoutForeignColonyDialog(colony, unit, canNeg)) {
-        case CANCEL:
-            return true;
+        ScoutColonyAction act = gui.showScoutForeignColonyDialog(colony, 
+                                                                 unit, canNeg);
+        if (act == null) return true; // Cancelled
+        switch (act) {
         case FOREIGN_COLONY_ATTACK:
             return moveAttack(unit, direction);
         case FOREIGN_COLONY_NEGOTIATE:
@@ -3135,8 +3138,10 @@ public final class InGameController implements NetworkConstants {
         case FOREIGN_COLONY_SPY:
             return moveSpy(unit, direction);
         default:
-            throw new IllegalArgumentException("showScoutForeignColonyDialog fail");
+            logger.warning("showScoutForeignColonyDialog fail: " + act);
+            break;
         }
+        return true;
     }
 
     /**
@@ -3160,9 +3165,10 @@ public final class InGameController implements NetworkConstants {
         // Offer the choices.
         String number = askServer().scoutSettlement(unit, direction);
         if (number == null) number = Messages.message("many");
-        switch (gui.showScoutIndianSettlementDialog(settlement, number)) {
-        case CANCEL:
-            return true;
+        ScoutIndianSettlementAction act
+            = gui.showScoutIndianSettlementDialog(settlement, number);
+        if (act == null) return true; // Cancelled
+        switch (act) {
         case INDIAN_SETTLEMENT_ATTACK:
             if (!confirmPreCombat(unit, tile)) return true;
             askServer().attack(unit, direction);
@@ -3201,8 +3207,10 @@ public final class InGameController implements NetworkConstants {
         case INDIAN_SETTLEMENT_TRIBUTE:
             return moveTribute(unit, direction);
         default:
-            throw new IllegalArgumentException("showScoutIndianSettlementDialog fail");
+            logger.warning("showScoutIndianSettlementDialog fail: " + act);
+            break;
         }
+        return true;
     }
 
     /**
