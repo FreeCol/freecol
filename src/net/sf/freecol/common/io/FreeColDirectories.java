@@ -229,6 +229,7 @@ public class FreeColDirectories {
         String[][] xdg = { { XDG_CONFIG_HOME_ENV, XDG_CONFIG_HOME_DEFAULT },
                            { XDG_DATA_HOME_ENV,   XDG_DATA_HOME_DEFAULT },
                            { XDG_CACHE_HOME_ENV,  XDG_CACHE_HOME_DEFAULT } };
+        File[] todo = new File[xdg.length];
         for (int i = 0; i < xdg.length; i++) {
             String env = System.getenv(xdg[i][0]);
             File d = (env != null) ? new File(home, env)
@@ -237,7 +238,6 @@ public class FreeColDirectories {
                 if (!d.isDirectory() || !d.canWrite()) {
                     return -1; // Fail hard if something is broken
                 }
-                dirs[i] = d;
                 ret = Math.max(ret, 0);
                 File f = new File(d, FREECOL_DIRECTORY);
                 if (f.exists()) {
@@ -245,21 +245,29 @@ public class FreeColDirectories {
                         return -1; // Again, fail hard
                     }
                     dirs[i] = f;
+                    todo[i] = null;
                     ret++;
+                } else {
+                    dirs[i] = d;
+                    todo[i] = f;
                 }
             } else {
                 dirs[i] = null;
+                todo[i] = d;
             }
         }
         if (ret < 0) return -1; // No evidence of interest in XDG standard
         if (ret == xdg.length) return 1; // Already fully XDG compliant
-        // Create directories for migration
-        for (int i = 0; i < dirs.length; i++) {
-            File d = dirs[i];
-            if (!d.getPath().endsWith(FREECOL_DIRECTORY)) {
-                File f = new File(d, FREECOL_DIRECTORY);
-                if (!f.mkdir()) return -1; // Again, fail hard
-                dirs[i] = f;
+
+        // Create the directories for migration
+        for (int i = 0; i < xdg.length; i++) {
+            if (todo[i] != null) {
+                if (!todo[i].getPath().endsWith(FREECOL_DIRECTORY)) {
+                    if (!todo[i].mkdir()) return -1;
+                    todo[i] = new File(todo[i], FREECOL_DIRECTORY);
+                }
+                if (!todo[i].mkdir()) return -1;
+                dirs[i] = todo[i];
             }
         }
         return 0;
