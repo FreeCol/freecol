@@ -3667,11 +3667,11 @@ public final class InGameController implements NetworkConstants {
                 ? "welcomeOffer.text" : "welcomeSimple.text";
             String type = ((IndianNationType)welcomer.getNationType())
                 .getSettlementTypeKey(true);
-            accept = gui.showOldConfirmDialog(tile,
+            accept = gui.showConfirmDialog(true, tile,
                 StringTemplate.template(messageId)
-                .addStringTemplate("%nation%", welcomer.getNationName())
-                .addName("%camps%", camps)
-                .add("%settlementType%", type),
+                    .addStringTemplate("%nation%", welcomer.getNationName())
+                    .addName("%camps%", camps)
+                    .add("%settlementType%", type),
                 welcomer, "welcome.yes", "welcome.no");
         }
 

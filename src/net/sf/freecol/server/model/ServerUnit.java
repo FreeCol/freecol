@@ -938,8 +938,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
 
             // Check for first landing
             String newLand = null;
-            if (serverPlayer.isEuropean()
-                && !serverPlayer.isNewLandNamed()) {
+            boolean landNamed = serverPlayer.isNewLandNamed();
+            if (serverPlayer.isEuropean() && !landNamed) {
                 newLand = Messages.getNewLandName(serverPlayer);
                 cs.addMessage(See.only(serverPlayer),
                     new ModelMessage(ModelMessage.MessageType.DEFAULT,
@@ -967,7 +967,9 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 if (other == null
                     || other == serverPlayer) continue; // No contact
 
-                if (serverPlayer.csContact(other, newTile, cs) != null) {
+                if (serverPlayer.csContact(other, newTile, cs)
+                    && !landNamed && other.isIndian()
+                    && newTile.getOwner() == other) {
                     welcomer = other;
                 }
                 // Initialize alarm for native settlements or units and

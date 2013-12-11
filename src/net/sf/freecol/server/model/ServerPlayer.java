@@ -3883,10 +3883,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param other The other <code>ServerPlayer</code>.
      * @param tile The <code>Tile</code> contact is made at.
      * @param cs A <code>ChangeSet</code> to update.
-     * @return The other nation if it is welcoming this nation on first landing.
+     * @return True if this was a first contact.
      */
-    public ServerPlayer csContact(ServerPlayer other, Tile tile, ChangeSet cs) {
-        if (hasContacted(other)) return null;
+    public boolean csContact(ServerPlayer other, Tile tile, ChangeSet cs) {
+        if (hasContacted(other)) return false;
 
         // Must be a first contact!
         Game game = getGame();
@@ -3894,7 +3894,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
         ServerPlayer welcomer = null;
         if (isIndian()) {
             // Ignore native-to-native contacts.
-            if (!other.isIndian()) {
+            if (other.isIndian()) {
+                return false;
+            } else {
                 String key = other.getContactKey(this);
                 if (key != null) {
                     cs.addMessage(See.only(other),
@@ -3917,12 +3919,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
             cs.addHistory(this, new HistoryEvent(turn,
                     HistoryEvent.EventType.MEET_NATION)
                 .addStringTemplate("%nation%", other.getNationName()));
-
-            // Extra special meeting on first landing!
-            if (other.isIndian() && !isNewLandNamed()
-                && tile != null && tile.getOwner() == other) {
-                welcomer = other;
-            }
         }
 
         // Now make the contact properly.
@@ -3930,9 +3926,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         setTension(other, new Tension(Tension.TENSION_MIN));
         other.setTension(this, new Tension(Tension.TENSION_MIN));
         logger.finest("First contact between " + this + " and " + other
-            + " at " + tile);
-
-        return welcomer;
+                      + " at " + tile);
+        return true;
     }
 
 
