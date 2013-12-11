@@ -54,6 +54,7 @@ import javax.swing.plaf.basic.BasicInternalFrameUI;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI.MissionaryAction;
 import net.sf.freecol.client.gui.GUI.ScoutColonyAction;
 import net.sf.freecol.client.gui.GUI.ScoutIndianSettlementAction;
 import net.sf.freecol.client.gui.action.FreeColAction;
@@ -261,13 +262,6 @@ public final class Canvas extends JDesktopPane {
         MEETING_AZTEC,
         MEETING_INCA,
         DISCOVER_PACIFIC
-    }
-
-    public static enum MissionaryAction {
-        CANCEL,
-        ESTABLISH_MISSION,
-        DENOUNCE_HERESY,
-        INCITE_INDIANS
     }
 
     public static enum PopupPosition {
@@ -2821,10 +2815,20 @@ public final class Canvas extends JDesktopPane {
      * @return The chosen action, establish mission, denounce, incite
      *         or cancel.
      */
-    public MissionaryAction showUseMissionaryDialog(Unit unit,
-                                                    IndianSettlement settlement,
-                                                    boolean canEstablish,
-                                                    boolean canDenounce) {
+    public MissionaryAction
+        showUseMissionaryDialog(Unit unit, IndianSettlement settlement,
+                                boolean canEstablish, boolean canDenounce) {
+        String messageId = settlement.getAlarmLevelMessageId(unit.getOwner());
+        StringBuilder sb = new StringBuilder(256);
+        sb.append(Messages.message(StringTemplate.template(messageId)
+                .addStringTemplate("%nation%",
+                    settlement.getOwner().getNationName())));
+        sb.append("\n\n");
+        sb.append(Messages.message(StringTemplate
+                .template("missionarySettlement.question")
+                    .addName("%settlement%", settlement.getName())));
+        JTextArea text = GUI.getDefaultTextArea(sb.toString());
+
         List<ChoiceItem<MissionaryAction>> choices
             = new ArrayList<ChoiceItem<MissionaryAction>>();
         choices.add(new ChoiceItem<MissionaryAction>(
@@ -2836,18 +2840,10 @@ public final class Canvas extends JDesktopPane {
         choices.add(new ChoiceItem<MissionaryAction>(
                 Messages.message("missionarySettlement.incite"),
                 MissionaryAction.INCITE_INDIANS));
-        String messageId = settlement.getAlarmLevelMessageId(unit.getOwner());
-        StringBuilder introText
-            = new StringBuilder(Messages.message(StringTemplate.template(messageId)
-                    .addStringTemplate("%nation%", settlement.getOwner().getNationName())));
-        introText.append("\n\n");
-        introText.append(Messages.message(StringTemplate.template("missionarySettlement.question")
-                .addName("%settlement%", settlement.getName())));
-        MissionaryAction result = showOldChoiceDialog(unit.getTile(),
-                introText.toString(),
-                Messages.message("cancel"),
-                choices);
-        return (result == null) ? MissionaryAction.CANCEL : result;
+
+        return showChoiceDialog(true, unit.getTile(), text,
+                                gui.getImageIcon(settlement, false),
+                                "cancel", choices);
     }
 
     /**

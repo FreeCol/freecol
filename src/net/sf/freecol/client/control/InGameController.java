@@ -38,6 +38,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas.TradeAction;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.GUI.MissionaryAction;
 import net.sf.freecol.client.gui.GUI.ScoutColonyAction;
 import net.sf.freecol.client.gui.GUI.ScoutIndianSettlementAction;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -3573,10 +3574,11 @@ public final class InGameController implements NetworkConstants {
         clearGotoOrders(unit);
 
         // Offer the choices.
-        switch (gui.showUseMissionaryDialog(unit, settlement,
-                canEstablish, canDenounce)) {
-        case CANCEL:
-            return true;
+        MissionaryAction act
+            = gui.showUseMissionaryDialog(unit, settlement,
+                                          canEstablish, canDenounce);
+        if (act == null) return true;
+        switch (act) {
         case ESTABLISH_MISSION:
             if (askServer().missionary(unit, direction, false)) {
                 if (settlement.hasMissionary(player)) {

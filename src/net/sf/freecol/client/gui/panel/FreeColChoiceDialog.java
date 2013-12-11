@@ -47,7 +47,7 @@ public class FreeColChoiceDialog<T> extends FreeColDialog<T> {
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param modal True if this dialog should be modal.
-     * @param obj The obj that explains the choice for the user.
+     * @param obj An object that explains the choice for the user.
      * @param icon An optional icon to display.
      * @param cancelKey Key for the text of the optional cancel button.
      * @param choices A list of <code>ChoiceItem</code>s to create buttons for.

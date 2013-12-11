@@ -72,7 +72,6 @@ import net.sf.freecol.client.gui.Canvas.BoycottAction;
 import net.sf.freecol.client.gui.Canvas.BuyAction;
 import net.sf.freecol.client.gui.Canvas.ClaimAction;
 import net.sf.freecol.client.gui.Canvas.EventType;
-import net.sf.freecol.client.gui.Canvas.MissionaryAction;
 import net.sf.freecol.client.gui.Canvas.SellAction;
 import net.sf.freecol.client.gui.Canvas.TradeAction;
 import net.sf.freecol.client.gui.animation.Animations;
@@ -133,6 +132,12 @@ import net.sf.freecol.common.resources.ResourceManager;
 public class GUI {
 
     private static final Logger logger = Logger.getLogger(GUI.class.getName());
+
+    public static enum MissionaryAction {
+        ESTABLISH_MISSION,
+        DENOUNCE_HERESY,
+        INCITE_INDIANS
+    }
 
     /** Actions in scouting a colony. */
     public static enum ScoutColonyAction {
@@ -1037,7 +1042,8 @@ public class GUI {
                                   Object obj, String cancelKey,
                                   List<ChoiceItem<T>> choices) {
         if (canvas == null) return null;
-        return canvas.showChoiceDialog(modal, tile, text,
+        return canvas.showChoiceDialog(modal, tile, 
+                                       getDefaultTextArea(text),
                                        getImageIcon(obj, false),
                                        cancelKey, choices);
     }
@@ -1053,8 +1059,8 @@ public class GUI {
                                      String okKey, String cancelKey) {
         if (canvas == null) return false;
         return canvas.showConfirmDialog(modal, tile,
-            getDefaultTextArea(Messages.message(template)),
-            getImageIcon(obj, false), okKey, cancelKey);
+                                        getDefaultTextArea(Messages.message(template)),
+                                        getImageIcon(obj, false), okKey, cancelKey);
     }
 
     public boolean showSimpleConfirmDialog(String textKey,
@@ -1755,11 +1761,10 @@ public class GUI {
         canvas.showTrainPanel();
     }
 
-    public MissionaryAction showUseMissionaryDialog(Unit unit,
-                                                    IndianSettlement settlement,
-                                                    boolean canEstablish,
-                                                    boolean canDenounce) {
-        if (canvas == null) return MissionaryAction.CANCEL;
+    public MissionaryAction
+        showUseMissionaryDialog(Unit unit, IndianSettlement settlement,
+                                boolean canEstablish, boolean canDenounce) {
+        if (canvas == null) return null;
         return canvas.showUseMissionaryDialog(unit, settlement,
                                               canEstablish, canDenounce);
     }
