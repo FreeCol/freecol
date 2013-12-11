@@ -72,7 +72,7 @@ public class Europe extends UnitLocation implements Ownable, Named {
      * This list represents the types of the units that can be
      * recruited in Europe.
      */
-    private List<UnitType> recruitables = new ArrayList<UnitType>();
+    protected List<UnitType> recruitables = new ArrayList<UnitType>();
 
     /** Prices for trainable or purchasable units. */
     protected java.util.Map<UnitType, Integer> unitPrices

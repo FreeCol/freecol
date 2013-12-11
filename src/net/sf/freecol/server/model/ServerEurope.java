@@ -113,7 +113,7 @@ public class ServerEurope extends Europe implements ServerModelObject {
      * @param random A pseudo-random number source.
      */
     public void initializeMigration(Random random) {
-        Specification spec = getGame().getSpecification();
+        final Specification spec = getGame().getSpecification();
         ServerPlayer player = (ServerPlayer) getOwner();
         List<RandomChoice<UnitType>> recruits
             = player.generateRecruitablesList();
@@ -121,11 +121,7 @@ public class ServerEurope extends Europe implements ServerModelObject {
             UnitListOption option
                 = (UnitListOption)spec.getOption(GameOptions.IMMIGRANTS);
             for (AbstractUnit immigrant : option.getOptionValues()) {
-                addRecruitable(getSpecification().getUnitType(immigrant.getId()));
-            }
-            for (int index = 0; index < RECRUIT_COUNT - option.getOptionValues().size(); index++) {
-                addRecruitable(RandomChoice.getWeightedRandom(logger, "Initial recruits",
-                                                              recruits, random));
+                addRecruitable(spec.getUnitType(immigrant.getId()));
             }
         } else {
             // @compat 0.10.3
@@ -134,14 +130,15 @@ public class ServerEurope extends Europe implements ServerModelObject {
                 if (spec.hasOption(optionId)) {
                     String unitTypeId = spec.getString(optionId);
                     if (unitTypeId != null) {
-                        replaceRecruitable(index, spec.getUnitType(unitTypeId));
-                        continue;
+                        addRecruitable(spec.getUnitType(unitTypeId));
                     }
                 }
-                replaceRecruitable(index, RandomChoice.getWeightedRandom(logger,
-                        "Old initial recruits", recruits, random));
             }
             // end @compat
+        }
+        while (recruitables.size() < RECRUIT_COUNT) {
+            addRecruitable(RandomChoice
+                .getWeightedRandom(logger, "Recruits", recruits, random));
         }
     }
 
