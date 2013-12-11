@@ -36,11 +36,13 @@ import javax.swing.SwingUtilities;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas.TradeAction;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.GUI.BuyAction;
 import net.sf.freecol.client.gui.GUI.MissionaryAction;
 import net.sf.freecol.client.gui.GUI.ScoutColonyAction;
 import net.sf.freecol.client.gui.GUI.ScoutIndianSettlementAction;
+import net.sf.freecol.client.gui.GUI.SellAction;
+import net.sf.freecol.client.gui.GUI.TradeAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.FreeColActionUI;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
@@ -3338,9 +3340,8 @@ public final class InGameController implements NetworkConstants {
     private boolean moveTradeIndianSettlement(Unit unit, Direction direction) {
         Settlement settlement = getSettlementAt(unit.getTile(), direction);
         boolean[] results;
-        boolean done = false;
 
-        while (!done) {
+        for (;;) {
             results = askServer().openTransactionSession(unit, settlement);
             if (results == null) break;
             // The session tracks buy/sell/gift events and disables
@@ -3351,11 +3352,11 @@ public final class InGameController implements NetworkConstants {
             boolean gif = results[2] && unit.hasGoodsCargo();
             if (!buy && !sel && !gif) break;
 
-            switch (gui.showIndianSettlementTradeDialog(settlement,
-                    buy, sel, gif)) {
-            case CANCEL:
-                done = true;
-                break;
+            TradeAction act
+                = gui.showIndianSettlementTradeDialog(settlement, 
+                                                      buy, sel, gif);
+            if (act == null) break;
+            switch (act) {
             case BUY:
                 attemptBuyFromSettlement(unit, settlement);
                 break;
@@ -3366,7 +3367,8 @@ public final class InGameController implements NetworkConstants {
                 attemptGiftToSettlement(unit, settlement);
                 break;
             default:
-                throw new IllegalArgumentException("showIndianSettlementTradeDialog fail");
+                logger.warning("showIndianSettlementTradeDialog fail: " + act);
+                break;
             }
         }
 
@@ -3455,10 +3457,10 @@ public final class InGameController implements NetworkConstants {
 
                 // Show dialog for buy proposal
                 boolean canBuy = player.checkGold(gold);
-                switch (gui.showBuyDialog(unit, settlement, goods, gold,
-                        canBuy)) {
-                case CANCEL: // User cancelled
-                    return;
+                BuyAction act
+                    = gui.showBuyDialog(unit, settlement, goods, gold, canBuy);
+                if (act == null) return; // User cancelled
+                switch (act) {
                 case BUY: // Accept price, make purchase
                     if (askServer().buyFromSettlement(unit,
                             settlement, goods, gold)) {
@@ -3469,7 +3471,8 @@ public final class InGameController implements NetworkConstants {
                     gold = gold * 9 / 10;
                     break;
                 default:
-                    throw new IllegalStateException("showBuyDialog fail");
+                    logger.warning("showBuyDialog fail: " + act);
+                    return;
                 }
             }
         }
@@ -3501,9 +3504,10 @@ public final class InGameController implements NetworkConstants {
                 }
 
                 // Show dialog for sale proposal
-                switch (gui.showSellDialog(unit, settlement, goods, gold)) {
-                case CANCEL:
-                    return;
+                SellAction act
+                    = gui.showSellDialog(unit, settlement, goods, gold);
+                if (act == null) return; // Cancelled
+                switch (act) {
                 case SELL: // Accepted price, make the sale
                     if (askServer().sellToSettlement(unit,
                             settlement, goods, gold)) {
@@ -3518,7 +3522,8 @@ public final class InGameController implements NetworkConstants {
                         settlement, goods);
                     return;
                 default:
-                    throw new IllegalStateException("showSellDialog fail");
+                    logger.warning("showSellDialog fail: " + act);
+                    return;
                 }
             }
         }

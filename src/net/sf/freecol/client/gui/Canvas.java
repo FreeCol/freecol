@@ -54,9 +54,12 @@ import javax.swing.plaf.basic.BasicInternalFrameUI;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI.BuyAction;
 import net.sf.freecol.client.gui.GUI.MissionaryAction;
 import net.sf.freecol.client.gui.GUI.ScoutColonyAction;
 import net.sf.freecol.client.gui.GUI.ScoutIndianSettlementAction;
+import net.sf.freecol.client.gui.GUI.SellAction;
+import net.sf.freecol.client.gui.GUI.TradeAction;
 import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.AboutPanel;
@@ -243,12 +246,6 @@ public final class Canvas extends JDesktopPane {
         DUMP_CARGO
     }
 
-    public static enum BuyAction {
-        CANCEL,
-        BUY,
-        HAGGLE
-    }
-
     public static enum ClaimAction {
         CANCEL,
         ACCEPT,
@@ -269,20 +266,6 @@ public final class Canvas extends JDesktopPane {
         CENTERED,
         CENTERED_LEFT,
         CENTERED_RIGHT,
-    }
-
-    public static enum SellAction {
-        CANCEL,
-        SELL,
-        HAGGLE,
-        GIFT
-    }
-
-    public static enum TradeAction {
-        CANCEL,
-        BUY,
-        SELL,
-        GIFT
     }
 
     /** The extension for FreeCol save files. */
@@ -1574,6 +1557,12 @@ public final class Canvas extends JDesktopPane {
             .add("%goods%", goods.getType().getNameKey())
             .addAmount("%amount%", goods.getAmount());
         StringTemplate nation = settlement.getOwner().getNationName();
+        StringTemplate template = StringTemplate.template("buy.text")
+            .addStringTemplate("%nation%", nation)
+            .addStringTemplate("%goods%", goodsTemplate)
+            .addAmount("%gold%", gold);
+        JTextArea text = GUI.getDefaultTextArea(Messages.message(template));
+
         List<ChoiceItem<BuyAction>> choices
             = new ArrayList<ChoiceItem<BuyAction>>();
         choices.add(new ChoiceItem<BuyAction>(
@@ -1582,14 +1571,10 @@ public final class Canvas extends JDesktopPane {
         choices.add(new ChoiceItem<BuyAction>(
                 Messages.message("buy.moreGold"),
                 BuyAction.HAGGLE));
-        BuyAction result = showOldChoiceDialog(unit.getTile(),
-                Messages.message(StringTemplate.template("buy.text")
-                                 .addStringTemplate("%nation%", nation)
-                                 .addStringTemplate("%goods%", goodsTemplate)
-                                 .addAmount("%gold%", gold)),
-                Messages.message("buyProposition.cancel"),
-                choices);
-        return (result == null) ? BuyAction.CANCEL : result;
+
+        return showChoiceDialog(true, unit.getTile(), text,
+                                gui.getImageIcon(goods, false),
+                                "buyProposition.cancel", choices);
     }
 
     /**
@@ -1983,6 +1968,13 @@ public final class Canvas extends JDesktopPane {
                                                        boolean canBuy,
                                                        boolean canSell,
                                                        boolean canGift) {
+        StringTemplate template
+            = StringTemplate.template("tradeProposition.welcome")
+                .addStringTemplate("%nation%",
+                    settlement.getOwner().getNationName())
+                .addName("%settlement%", settlement.getName());
+        JTextArea text = GUI.getDefaultTextArea(Messages.message(template));
+
         ArrayList<ChoiceItem<TradeAction>> choices
             = new ArrayList<ChoiceItem<TradeAction>>();
         choices.add(new ChoiceItem<TradeAction>(
@@ -1994,12 +1986,10 @@ public final class Canvas extends JDesktopPane {
         choices.add(new ChoiceItem<TradeAction>(
                 Messages.message("tradeProposition.toGift"),
                 TradeAction.GIFT, canGift));
-        TradeAction result = showOldChoiceDialog(settlement.getTile(),
-            Messages.message(StringTemplate.template("tradeProposition.welcome")
-                .addStringTemplate("%nation%", settlement.getOwner().getNationName())
-                .addName("%settlement%", settlement.getName())),
-            Messages.message("tradeProposition.cancel"), choices);
-        return (result == null) ? TradeAction.CANCEL : result;
+
+        return showChoiceDialog(true, settlement.getTile(), text,
+                                gui.getImageIcon(settlement, false),
+                                "tradeProposition.cancel", choices);
     }
 
     /**
@@ -2619,6 +2609,12 @@ public final class Canvas extends JDesktopPane {
             .add("%goods%", goods.getType().getNameKey())
             .addAmount("%amount%", goods.getAmount());
         StringTemplate nation = settlement.getOwner().getNationName();
+        StringTemplate template = StringTemplate.template("sell.text")
+            .addStringTemplate("%nation%", nation)
+            .addStringTemplate("%goods%", goodsTemplate)
+            .addAmount("%gold%", gold);
+        JTextArea text = GUI.getDefaultTextArea(Messages.message(template));
+
         List<ChoiceItem<SellAction>> choices
             = new ArrayList<ChoiceItem<SellAction>>();
         choices.add(new ChoiceItem<SellAction>(
@@ -2631,14 +2627,10 @@ public final class Canvas extends JDesktopPane {
                 Messages.message(StringTemplate.template("sell.gift")
                                  .addStringTemplate("%goods%", goodsTemplate)),
                 SellAction.GIFT));
-        SellAction result = showOldChoiceDialog(unit.getTile(),
-                Messages.message(StringTemplate.template("sell.text")
-                                 .addStringTemplate("%nation%", nation)
-                                 .addStringTemplate("%goods%", goodsTemplate)
-                                 .addAmount("%gold%", gold)),
-                Messages.message("sellProposition.cancel"),
-                choices);
-        return (result == null) ? SellAction.CANCEL : result;
+
+        return showChoiceDialog(true, unit.getTile(), text,
+                                gui.getImageIcon(goods, false),
+                                "sellProposition.cancel", choices);
     }
 
     /**

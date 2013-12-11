@@ -69,11 +69,8 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas.BoycottAction;
-import net.sf.freecol.client.gui.Canvas.BuyAction;
 import net.sf.freecol.client.gui.Canvas.ClaimAction;
 import net.sf.freecol.client.gui.Canvas.EventType;
-import net.sf.freecol.client.gui.Canvas.SellAction;
-import net.sf.freecol.client.gui.Canvas.TradeAction;
 import net.sf.freecol.client.gui.animation.Animations;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.menu.FreeColMenuBar;
@@ -133,6 +130,13 @@ public class GUI {
 
     private static final Logger logger = Logger.getLogger(GUI.class.getName());
 
+    /** Actions when buying from the natives. */
+    public static enum BuyAction {
+        BUY,
+        HAGGLE
+    }
+
+    /** Actions with a missionary at a native settlement. */
     public static enum MissionaryAction {
         ESTABLISH_MISSION,
         DENOUNCE_HERESY,
@@ -151,6 +155,20 @@ public class GUI {
         INDIAN_SETTLEMENT_SPEAK,
         INDIAN_SETTLEMENT_TRIBUTE,
         INDIAN_SETTLEMENT_ATTACK
+    }
+
+    /** Actions when selling to the natives. */
+    public static enum SellAction {
+        SELL,
+        HAGGLE,
+        GIFT
+    }
+
+    /** Choice of sales action at a native settlement. */
+    public static enum TradeAction {
+        BUY,
+        SELL,
+        GIFT
     }
 
     /** How many columns (em-widths) to use in the text area. */
@@ -1233,8 +1251,8 @@ public class GUI {
     }
 
     public BuyAction showBuyDialog(Unit unit, Settlement settlement,
-            Goods goods, int gold, boolean canBuy) {
-        if (canvas == null) return BuyAction.CANCEL;
+                                   Goods goods, int gold, boolean canBuy) {
+        if (canvas == null) return null;
         return canvas.showBuyDialog(unit, settlement, goods, gold, canBuy);
     }
 
@@ -1398,7 +1416,7 @@ public class GUI {
 
     public TradeAction showIndianSettlementTradeDialog(Settlement settlement,
         boolean canBuy, boolean canSell, boolean canGift) {
-        if (canvas == null) return TradeAction.CANCEL;
+        if (canvas == null) return null;
         return canvas.showIndianSettlementTradeDialog(settlement,
                                                       canBuy, canSell, canGift);
     }
@@ -1687,7 +1705,7 @@ public class GUI {
 
     public SellAction showSellDialog(Unit unit, Settlement settlement,
                                      Goods goods, int gold) {
-        if (canvas == null) return SellAction.CANCEL;
+        if (canvas == null) return null;
         return canvas.showSellDialog(unit, settlement, goods, gold);
     }
 

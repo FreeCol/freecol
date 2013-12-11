@@ -46,6 +46,7 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObjectType;
+import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -621,6 +622,8 @@ public final class ImageLibrary {
      */
     public ImageIcon getImageIcon(Object display, boolean small) {
         Image image = null;
+        if (display instanceof Goods) display = ((Goods)display).getType();
+
         if (display == null) {
             return new ImageIcon();
         } else if (display instanceof GoodsType) {
