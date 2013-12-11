@@ -1052,9 +1052,9 @@ public class GUI {
                                      StringTemplate template, Object obj,
                                      String okKey, String cancelKey) {
         if (canvas == null) return false;
-        return canvas.showConfirmDialog(modal, tile, Messages.message(template),
-                                        getImageIcon(obj, false),
-                                        okKey, cancelKey);
+        return canvas.showConfirmDialog(modal, tile,
+            getDefaultTextArea(Messages.message(template)),
+            getImageIcon(obj, false), okKey, cancelKey);
     }
 
     public boolean showSimpleConfirmDialog(String textKey,

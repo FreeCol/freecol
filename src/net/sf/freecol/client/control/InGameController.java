@@ -3805,7 +3805,7 @@ public final class InGameController implements NetworkConstants {
                     .addAmount("%amount%", arrears));
             return false;
         }
-        if (gui.showOldConfirmDialog(null,
+        if (gui.showConfirmDialog(true, null,
                 StringTemplate.template("model.europe.payArrears")
                     .addAmount("%amount%", arrears),
                 type, "ok", "cancel")

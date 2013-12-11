@@ -1395,17 +1395,17 @@ public final class Canvas extends JDesktopPane {
      * @param modal True if this dialog should be modal.
      * @param tile An optional <code>Tile</code> to make visible (not
      *     under the dialog!)
-     * @param text The text that explains the choice for the user.
+     * @param obj An object that explains the choice for the user.
      * @param icon An optional icon to display.
      * @param okKey The text displayed on the "ok"-button.
      * @param cancelKey The text displayed on the "cancel"-button.
      * @return True if the user clicked the "ok"-button.
      */
     public boolean showConfirmDialog(boolean modal, Tile tile,
-                                     String text, ImageIcon icon,
+                                     Object obj, ImageIcon icon,
                                      String okKey, String cancelKey) {
         FreeColConfirmDialog fcd
-            = new FreeColConfirmDialog(freeColClient, modal, text, icon,
+            = new FreeColConfirmDialog(freeColClient, modal, obj, icon,
                                        okKey, cancelKey);
         return showFreeColDialog(fcd, tile);
     }
