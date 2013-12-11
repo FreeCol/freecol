@@ -3800,8 +3800,9 @@ public final class InGameController implements NetworkConstants {
         int arrears = player.getArrears(type);
         if (arrears <= 0) return false;
         if (!player.checkGold(arrears)) {
-            gui.showInformationMessage(StringTemplate.template("model.europe.cantPayArrears")
-                .addAmount("%amount%", arrears));
+            gui.showInformationMessage(StringTemplate
+                .template("model.europe.cantPayArrears")
+                    .addAmount("%amount%", arrears));
             return false;
         }
         if (gui.showOldConfirmDialog(null,

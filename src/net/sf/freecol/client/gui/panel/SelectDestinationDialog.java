@@ -350,6 +350,14 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
                     recenter((Destination)destinationList.getSelectedValue());
                 }
             });
+        this.destinationList.addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent e) {
+                    if (e.getClickCount() != 2) return;
+                    Destination d
+                        = (Destination)destinationList.getSelectedValue();
+                    if (d != null) setValue(options.get(0));
+                }
+            });
         update();
 
         JScrollPane listScroller = new JScrollPane(destinationList);
