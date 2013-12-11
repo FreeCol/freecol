@@ -325,7 +325,7 @@ public final class InGameInputHandler extends InputHandler {
      *            holds all the information.
      * @return Null.
      */
-    public Element addObject(Element element) {
+    private Element addObject(Element element) {
         final Game game = getGame();
         final Specification spec = game.getSpecification();
         NodeList nodes = element.getChildNodes();
@@ -591,7 +591,7 @@ public final class InGameInputHandler extends InputHandler {
      *
      * @return Null.
      */
-    public Element closeMenus() {
+    private Element closeMenus() {
         invokeAndWait(closeMenusRunnable);
         return null;
     }
@@ -644,7 +644,7 @@ public final class InGameInputHandler extends InputHandler {
      *            holds all the information.
      * @return Null.
      */
-    public Element disposeUnits(Element element) {
+    private Element disposeUnits(Element element) {
         Game game = getGame();
         NodeList nodes = element.getChildNodes();
 
@@ -691,7 +691,7 @@ public final class InGameInputHandler extends InputHandler {
      *            holds all the information.
      * @return Null.
      */
-    public Element featureChange(Element element) {
+    private Element featureChange(Element element) {
         final Game game = getGame();
         final Specification spec = game.getSpecification();
         boolean add = "add".equalsIgnoreCase(element.getAttribute("add"));
@@ -735,7 +735,7 @@ public final class InGameInputHandler extends InputHandler {
      *            holds all the information.
      * @return Null.
      */
-    public Element fountainOfYouth(Element element) {
+    private Element fountainOfYouth(Element element) {
         String migrants = element.getAttribute("migrants");
         int n;
         try {
@@ -818,7 +818,7 @@ public final class InGameInputHandler extends InputHandler {
      *            holds all the information.
      * @return Null.  The choice is returned asynchronously.
      */
-    public Element lootCargo(Element element) {
+    private Element lootCargo(Element element) {
         final Game game = getGame();
         final LootCargoMessage message = new LootCargoMessage(game, element);
         final Unit unit = message.getUnit(game);
@@ -853,7 +853,7 @@ public final class InGameInputHandler extends InputHandler {
      * @param element The <code>Element</code> to process.
      * @return An <code>Element</code> containing the response/s.
      */
-    public Element multiple(Connection connection, Element element) {
+    private Element multiple(Connection connection, Element element) {
         NodeList nodes = element.getChildNodes();
         List<Element> results = new ArrayList<Element>();
 
@@ -876,7 +876,7 @@ public final class InGameInputHandler extends InputHandler {
      *            holds all the information.
      * @return Null.  The name is returned asynchronously.
      */
-    public Element newLandName(Element element) {
+    private Element newLandName(Element element) {
         final Game game = getGame();
         NewLandNameMessage message = new NewLandNameMessage(game, element);
         final Unit unit = message.getUnit(game);
@@ -898,7 +898,7 @@ public final class InGameInputHandler extends InputHandler {
      *            holds all the information.
      * @return Null.  The name is returned asynchronously.
      */
-    public Element newRegionName(Element element) {
+    private Element newRegionName(Element element) {
         final Game game = getGame();
         NewRegionNameMessage message = new NewRegionNameMessage(game, element);
         final Tile tile = message.getTile(game);
@@ -1136,7 +1136,7 @@ public final class InGameInputHandler extends InputHandler {
      *            that holds all the information.
      * @return Null.
      */
-    public Element update(Element updateElement) {
+    private Element update(Element updateElement) {
         final Player player = getFreeColClient().getMyPlayer();
         boolean visibilityChange = false;
 
