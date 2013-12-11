@@ -1070,22 +1070,6 @@ public class GUI {
                                         null, okKey, cancelKey);
     }
 
-    public boolean showOldConfirmDialog(String text,
-                                        String okText, String cancelText) {
-        if (canvas == null) return false;
-        return canvas.showOldConfirmDialog(null, Messages.message(text),
-                                           null, okText, cancelText);
-    }
-
-    public boolean showOldConfirmDialog(Tile tile,
-                                        StringTemplate template, Object obj,
-                                        String okText, String cancelText) {
-        if (canvas == null) return false;
-        return canvas.showOldConfirmDialog(tile, Messages.message(template),
-                                           getImageIcon(obj, false),
-                                           okText, cancelText);
-    }
-
     public String showInputDialog(boolean modal, Tile tile,
                                   StringTemplate template, String defaultValue,
                                   String okKey, String cancelKey) {

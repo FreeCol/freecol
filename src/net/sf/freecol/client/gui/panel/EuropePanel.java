@@ -518,7 +518,7 @@ public final class EuropePanel extends PortPanel {
                     logger.warning("Invalid component: " + comp);
                     return null;
                 }
-                final Unit unit = ((UnitLabel) comp).getUnit();
+                final Unit unit = ((UnitLabel)comp).getUnit();
 
                 Location dest = destination;
                 if (unit.isInEurope()) {
@@ -532,12 +532,12 @@ public final class EuropePanel extends PortPanel {
                     && !(destination instanceof Europe)
                     && docksPanel.getComponentCount() > 0
                     && unit.hasSpaceLeft()) {
-                    boolean leave = getGUI().showOldConfirmDialog(null,
-                        StringTemplate.template("europe.leaveColonists")
-                            .addStringTemplate("%newWorld%",
-                                destination.getLocationNameFor(unit.getOwner())),
-                        unit, "ok", "cancel");
-                    if (!leave) return null; // Colonists remain in Europe.
+                    StringTemplate locName = destination
+                        .getLocationNameFor(unit.getOwner());
+                    if (!getGUI().showConfirmDialog(true, null,
+                            StringTemplate.template("europe.leaveColonists")
+                                .addStringTemplate("%newWorld%", locName),
+                            unit, "ok", "cancel")) return null;
                 }
 
                 comp.getParent().remove(comp);
@@ -545,7 +545,9 @@ public final class EuropePanel extends PortPanel {
                 inPortPanel.update();
                 docksPanel.update();
                 cargoPanel.update();
-                if (unit == cargoPanel.getCarrier()) cargoPanel.setCarrier(null);
+                if (unit == cargoPanel.getCarrier()) {
+                    cargoPanel.setCarrier(null);
+                }
             }
 
             Component c = add(comp);

@@ -267,7 +267,7 @@ public final class InGameController implements NetworkConstants {
             messageId = "model.diplomacy.attack.alliance";
             break;
         }
-        return gui.showOldConfirmDialog(attacker.getTile(),
+        return gui.showConfirmDialog(true, attacker.getTile(),
             StringTemplate.template(messageId)
                 .addStringTemplate("%nation%", enemy.getNationName()),
             attacker, "model.diplomacy.attack.confirm", "cancel");
@@ -758,7 +758,7 @@ public final class InGameController implements NetworkConstants {
                         .addName("%colony%", locName)
                         .addName("%amount%", overflow)
                         .add("%goods%", goods.getNameKey());
-                    if (!gui.showOldConfirmDialog(colony.getTile(), template,
+                    if (!gui.showConfirmDialog(true, colony.getTile(), template,
                                                unit, "yes", "no")) {
                         amount = atStop;
                     }
@@ -1841,7 +1841,7 @@ public final class InGameController implements NetworkConstants {
                 template = StringTemplate.template("cashInTreasureTrain.pay")
                     .addAmount("%fee%", percent);
             }
-            cash = gui.showOldConfirmDialog(unit.getTile(), template, unit,
+            cash = gui.showConfirmDialog(true, unit.getTile(), template, unit,
                 "cashInTreasureTrain.yes", "cashInTreasureTrain.no");
         }
 
@@ -3015,22 +3015,20 @@ public final class InGameController implements NetworkConstants {
         clearGotoOrders(unit);
         // Refresh knowledge of settlement skill.  It may have been
         // learned by another player.
-        if (!askServer().askSkill(unit, direction)) {
-            return false;
-        }
+        if (!askServer().askSkill(unit, direction)) return false;
 
         IndianSettlement settlement
-            = (IndianSettlement) getSettlementAt(unit.getTile(), direction);
+            = (IndianSettlement)getSettlementAt(unit.getTile(), direction);
         UnitType skill = settlement.getLearnableSkill();
         if (skill == null) {
             gui.showInformationMessage(settlement,
-                                          "indianSettlement.noMoreSkill");
+                                       "indianSettlement.noMoreSkill");
         } else if (!unit.getType().canBeUpgraded(skill, ChangeType.NATIVES)) {
             gui.showInformationMessage(settlement,
                 StringTemplate.template("indianSettlement.cantLearnSkill")
-                .addStringTemplate("%unit%", unit.getFullLabel())
-                .add("%skill%", skill.getNameKey()));
-        } else if (gui.showOldConfirmDialog(unit.getTile(),
+                    .addStringTemplate("%unit%", unit.getFullLabel())
+                    .add("%skill%", skill.getNameKey()));
+        } else if (gui.showConfirmDialog(true, unit.getTile(),
                 StringTemplate.template("learnSkill.text")
                     .add("%skill%", skill.getNameKey()),
                 unit, "learnSkill.yes", "learnSkill.no")) {
@@ -3833,7 +3831,7 @@ public final class InGameController implements NetworkConstants {
             return;
         }
         int price = colony.getPriceForBuilding();
-        if (!gui.showOldConfirmDialog(null,
+        if (!gui.showConfirmDialog(true, null,
                 StringTemplate.template("payForBuilding.text")
                     .addAmount("%amount%", price),
                 colony, "payForBuilding.yes", "payForBuilding.no")) {
@@ -4165,8 +4163,8 @@ public final class InGameController implements NetworkConstants {
                 = StringTemplate.template("traderoute.reassignRoute")
                 .addStringTemplate("%unit%", unit.getFullLabel())
                 .addName("%route%", unit.getTradeRoute().getName());
-            if (!gui.showOldConfirmDialog(unit.getTile(), template,
-                    unit, "yes", "no")) return false;
+            if (!gui.showConfirmDialog(true, unit.getTile(), template,
+                                       unit, "yes", "no")) return false;
         }
         return askServer().setDestination(unit, destination)
             && unit.getDestination() == destination;
@@ -4271,7 +4269,7 @@ public final class InGameController implements NetworkConstants {
         }
         StringTemplate template = unit.getAbandonEducationMessage(true);
         return template == null
-            || gui.showOldConfirmDialog(unit.getTile(), template, unit,
+            || gui.showConfirmDialog(true, unit.getTile(), template, unit,
                 "abandonEducation.yes", "abandonEducation.no");
     }
 
@@ -4381,7 +4379,7 @@ public final class InGameController implements NetworkConstants {
 
         if (unit.getStudent() != null
             && (template = unit.getAbandonEducationMessage(false)) != null
-            && !gui.showOldConfirmDialog(unit.getTile(), template,
+            && !gui.showConfirmDialog(true, unit.getTile(), template,
                 unit, "abandonTeaching.yes", "abandonTeaching.no")) return;
 
         Colony colony = workLocation.getColony();

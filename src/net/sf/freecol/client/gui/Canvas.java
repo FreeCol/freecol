@@ -1405,29 +1405,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Displays a dialog with a text and a ok/cancel option.
-     *
-     * @param tile An optional <code>Tile</code> to make visible (not
-     *     under the dialog!)
-     * @param text The text that explains the choice for the user (should
-     *     have been i18n-expanded in GUI).
-     * @param icon An optional icon to display.
-     * @param okText The text displayed on the "ok"-button.
-     * @param cancelText The text displayed on the "cancel"-button.
-     * @return <i>true</i> if the user clicked the "ok"-button and <i>false</i>
-     *     otherwise.
-     * @see FreeColOldDialog
-     */
-    public boolean showOldConfirmDialog(Tile tile, String text, ImageIcon icon,
-                                        String okText, String cancelText) {
-        FreeColOldDialog<Boolean> dialog
-            = FreeColOldDialog.createConfirmDialog(freeColClient, text, icon,
-                Messages.message(okText),
-                Messages.message(cancelText));
-        return showFreeColOldDialog(dialog, tile, true);
-    }
-
-    /**
      * Displays a dialog with a text field and a ok/cancel option.
      *
      * @param modal True if this dialog should be modal.
