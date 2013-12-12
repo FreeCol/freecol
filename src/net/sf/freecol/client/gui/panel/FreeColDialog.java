@@ -421,8 +421,10 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
             .dialogRemove(FreeColDialog.this);
 
         removeAll();
-        this.pane.removePropertyChangeListener(this);
-        this.pane = null;
+        if (this.pane != null) {
+            this.pane.removePropertyChangeListener(this);
+            this.pane = null;
+        }
         this.scrollPane = null;
 
         for (MouseListener listener : getMouseListeners()) {
