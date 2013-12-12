@@ -68,7 +68,6 @@ import javax.swing.text.StyleContext;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
-import net.sf.freecol.client.gui.Canvas.ClaimAction;
 import net.sf.freecol.client.gui.Canvas.EventType;
 import net.sf.freecol.client.gui.animation.Animations;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -139,6 +138,12 @@ public class GUI {
     public static enum BuyAction {
         BUY,
         HAGGLE
+    }
+
+    /** Actions when claiming land. */
+    public static enum ClaimAction {
+        ACCEPT,
+        STEAL
     }
 
     /** Actions with a missionary at a native settlement. */
@@ -1288,8 +1293,8 @@ public class GUI {
     }
 
     public ClaimAction showClaimDialog(Tile tile, Player player, int price,
-            Player owner, boolean canAccept) {
-        if (canvas == null) return ClaimAction.CANCEL;
+                                       Player owner, boolean canAccept) {
+        if (canvas == null) return null;
         return canvas.showClaimDialog(tile, player, price, owner, canAccept);
     }
 

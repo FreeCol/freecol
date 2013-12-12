@@ -56,6 +56,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI.BoycottAction;
 import net.sf.freecol.client.gui.GUI.BuyAction;
+import net.sf.freecol.client.gui.GUI.ClaimAction;
 import net.sf.freecol.client.gui.GUI.MissionaryAction;
 import net.sf.freecol.client.gui.GUI.ScoutColonyAction;
 import net.sf.freecol.client.gui.GUI.ScoutIndianSettlementAction;
@@ -239,13 +240,6 @@ public final class Canvas extends JDesktopPane {
             }.start();
         }
     };
-
-
-    public static enum ClaimAction {
-        CANCEL,
-        ACCEPT,
-        STEAL
-    }
 
     public static enum EventType {
         FIRST_LANDING,
@@ -1628,18 +1622,22 @@ public final class Canvas extends JDesktopPane {
      */
     public ClaimAction showClaimDialog(Tile tile, Player player, int price,
                                        Player owner, boolean canAccept) {
+        StringTemplate template = StringTemplate.template("indianLand.text")
+            .addStringTemplate("%player%", owner.getNationName());
+        JTextArea text = GUI.getDefaultTextArea(Messages.message(template));
+
         List<ChoiceItem<ClaimAction>> choices
             = new ArrayList<ChoiceItem<ClaimAction>>();
-        choices.add(new ChoiceItem<ClaimAction>(Messages.message(StringTemplate.template("indianLand.pay")
-                    .addAmount("%amount%", price)),
+        StringTemplate pay = StringTemplate.template("indianLand.pay")
+            .addAmount("%amount%", price);
+        choices.add(new ChoiceItem<ClaimAction>(Messages.message(pay),
                 ClaimAction.ACCEPT, canAccept));
         choices.add(new ChoiceItem<ClaimAction>(Messages.message("indianLand.take"),
                 ClaimAction.STEAL));
-        ClaimAction result = showOldChoiceDialog(tile,
-            Messages.message(StringTemplate.template("indianLand.text")
-                .addStringTemplate("%player%", owner.getNationName())),
-            Messages.message("indianLand.cancel"), choices);
-        return (result == null) ? ClaimAction.CANCEL : result;
+
+        return showChoiceDialog(true, tile, text,
+                                gui.getImageIcon(owner, false),
+                                "indianLand.cancel", choices);
     }
 
     /**

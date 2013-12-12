@@ -851,18 +851,19 @@ public final class InGameController implements NetworkConstants {
             } else if (offer < 0) { // plan to steal
                 price = NetworkConstants.STEAL_LAND;
             } else {
-                boolean canAccept = player.checkGold(price);
-                switch (gui.showClaimDialog(tile, player, price,
-                        owner, canAccept)) {
-                case CANCEL:
-                    return false;
+                GUI.ClaimAction act
+                    = gui.showClaimDialog(tile, player, price, owner,
+                                          player.checkGold(price));
+                if (act == null) return false; // Cancelled
+                switch (act) {
                 case ACCEPT: // accepted price
                     break;
                 case STEAL:
                     price = NetworkConstants.STEAL_LAND;
                     break;
                 default:
-                    throw new IllegalStateException("showClaimDialog fail");
+                    logger.warning("showClaimDialog fail: " + act);
+                    return false;
                 }
             }
         } // else price == 0 and we can just proceed
