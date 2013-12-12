@@ -363,7 +363,7 @@ public final class Ability extends Feature implements Comparable<Ability> {
 
     /** LCRs always yield positive results (deSoto). */
     public static final String RUMOURS_ALWAYS_POSITIVE
-        = "model.ability.repairUnits";
+        = "model.ability.rumoursAlwaysPositive";
 
     /** The ability to scout native settlements. */
     public static final String SCOUT_INDIAN_SETTLEMENT
