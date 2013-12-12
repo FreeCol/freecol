@@ -37,12 +37,6 @@ import javax.swing.SwingUtilities;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.GUI.BuyAction;
-import net.sf.freecol.client.gui.GUI.MissionaryAction;
-import net.sf.freecol.client.gui.GUI.ScoutColonyAction;
-import net.sf.freecol.client.gui.GUI.ScoutIndianSettlementAction;
-import net.sf.freecol.client.gui.GUI.SellAction;
-import net.sf.freecol.client.gui.GUI.TradeAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.FreeColActionUI;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
@@ -2790,7 +2784,7 @@ public final class InGameController implements NetworkConstants {
         Tile target = tile.getNeighbourOrNull(direction);
         IndianSettlement is = target.getIndianSettlement();
         if (is != null && unit.isArmed()) {
-            ScoutIndianSettlementAction act
+            GUI.ScoutIndianSettlementAction act
                 = gui.showArmedUnitIndianSettlementDialog(is);
             if (act == null) return true; // Cancelled
             switch (act) {
@@ -3128,8 +3122,8 @@ public final class InGameController implements NetworkConstants {
         boolean canNeg = colony.getOwner() != unit.getOwner().getREFPlayer();
         clearGotoOrders(unit);
 
-        ScoutColonyAction act = gui.showScoutForeignColonyDialog(colony, 
-                                                                 unit, canNeg);
+        GUI.ScoutColonyAction act
+            = gui.showScoutForeignColonyDialog(colony, unit, canNeg);
         if (act == null) return true; // Cancelled
         switch (act) {
         case FOREIGN_COLONY_ATTACK:
@@ -3166,7 +3160,7 @@ public final class InGameController implements NetworkConstants {
         // Offer the choices.
         String number = askServer().scoutSettlement(unit, direction);
         if (number == null) number = Messages.message("many");
-        ScoutIndianSettlementAction act
+        GUI.ScoutIndianSettlementAction act
             = gui.showScoutIndianSettlementDialog(settlement, number);
         if (act == null) return true; // Cancelled
         switch (act) {
@@ -3352,7 +3346,7 @@ public final class InGameController implements NetworkConstants {
             boolean gif = results[2] && unit.hasGoodsCargo();
             if (!buy && !sel && !gif) break;
 
-            TradeAction act
+            GUI.TradeAction act
                 = gui.showIndianSettlementTradeDialog(settlement, 
                                                       buy, sel, gif);
             if (act == null) break;
@@ -3457,7 +3451,7 @@ public final class InGameController implements NetworkConstants {
 
                 // Show dialog for buy proposal
                 boolean canBuy = player.checkGold(gold);
-                BuyAction act
+                GUI.BuyAction act
                     = gui.showBuyDialog(unit, settlement, goods, gold, canBuy);
                 if (act == null) return; // User cancelled
                 switch (act) {
@@ -3504,7 +3498,7 @@ public final class InGameController implements NetworkConstants {
                 }
 
                 // Show dialog for sale proposal
-                SellAction act
+                GUI.SellAction act
                     = gui.showSellDialog(unit, settlement, goods, gold);
                 if (act == null) return; // Cancelled
                 switch (act) {
@@ -3577,7 +3571,7 @@ public final class InGameController implements NetworkConstants {
         clearGotoOrders(unit);
 
         // Offer the choices.
-        MissionaryAction act
+        GUI.MissionaryAction act
             = gui.showUseMissionaryDialog(unit, settlement,
                                           canEstablish, canDenounce);
         if (act == null) return true;

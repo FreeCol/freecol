@@ -54,6 +54,7 @@ import javax.swing.plaf.basic.BasicInternalFrameUI;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI.BoycottAction;
 import net.sf.freecol.client.gui.GUI.BuyAction;
 import net.sf.freecol.client.gui.GUI.MissionaryAction;
 import net.sf.freecol.client.gui.GUI.ScoutColonyAction;
@@ -239,12 +240,6 @@ public final class Canvas extends JDesktopPane {
         }
     };
 
-
-    public static enum BoycottAction {
-        CANCEL,
-        PAY_ARREARS,
-        DUMP_CARGO
-    }
 
     public static enum ClaimAction {
         CANCEL,
@@ -1500,6 +1495,12 @@ public final class Canvas extends JDesktopPane {
      */
     public BoycottAction showBoycottedGoodsDialog(Goods goods, Europe europe) {
         int arrears = europe.getOwner().getArrears(goods.getType());
+        StringTemplate template = StringTemplate.template("boycottedGoods.text")
+            .add("%goods%", goods.getNameKey())
+            .add("%europe%", europe.getNameKey())
+            .addAmount("%amount%", arrears);
+        JTextArea text = GUI.getDefaultTextArea(Messages.message(template));
+
         List<ChoiceItem<BoycottAction>> choices
             = new ArrayList<ChoiceItem<BoycottAction>>();
         choices.add(new ChoiceItem<BoycottAction>(
@@ -1508,14 +1509,10 @@ public final class Canvas extends JDesktopPane {
         choices.add(new ChoiceItem<BoycottAction>(
                 Messages.message("boycottedGoods.dumpGoods"),
                 BoycottAction.DUMP_CARGO));
-        BoycottAction result = showOldChoiceDialog(null,
-            Messages.message(StringTemplate.template("boycottedGoods.text")
-                .add("%goods%", goods.getNameKey())
-                .add("%europe%", europe.getNameKey())
-                .addAmount("%amount%", arrears)),
-            Messages.message("cancel"),
-            choices);
-        return (result == null) ? BoycottAction.CANCEL : result;
+
+        return showChoiceDialog(true, null, text,
+                                gui.getImageIcon(goods, false),
+                                "cancel", choices);
     }
 
     /**

@@ -713,20 +713,25 @@ public final class EuropePanel extends PortPanel {
                     return null;
                 }
 
-                Goods goods = ((GoodsLabel) comp).getGoods();
+                Goods goods = ((GoodsLabel)comp).getGoods();
                 if (getMyPlayer().canTrade(goods.getType())) {
                     getController().sellGoods(goods);
                 } else {
-                    switch (getGUI().showBoycottedGoodsDialog(goods, europe)) {
-                    case PAY_ARREARS:
-                        getController().payArrears(goods.getType());
-                        break;
-                    case DUMP_CARGO:
-                        getController().unloadCargo(goods, true);
-                        break;
-                    case CANCEL:
-                    default:
-                        break;
+                    GUI.BoycottAction act
+                        = getGUI().showBoycottedGoodsDialog(goods, europe);
+                    if (act != null) {
+                        switch (act) {
+                        case PAY_ARREARS:
+                            getController().payArrears(goods.getType());
+                            break;
+                        case DUMP_CARGO:
+                            getController().unloadCargo(goods, true);
+                            break;
+                        default:
+                            logger.warning("showBoycottedGoodsDialog fail: "
+                                + act);
+                            break;
+                        }
                     }
                 }
                 cargoPanel.revalidate();

@@ -68,7 +68,6 @@ import javax.swing.text.StyleContext;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
-import net.sf.freecol.client.gui.Canvas.BoycottAction;
 import net.sf.freecol.client.gui.Canvas.ClaimAction;
 import net.sf.freecol.client.gui.Canvas.EventType;
 import net.sf.freecol.client.gui.animation.Animations;
@@ -129,6 +128,12 @@ import net.sf.freecol.common.resources.ResourceManager;
 public class GUI {
 
     private static final Logger logger = Logger.getLogger(GUI.class.getName());
+
+    /** Actions when dealing with a boycott. */
+    public static enum BoycottAction {
+        PAY_ARREARS,
+        DUMP_CARGO
+    }
 
     /** Actions when buying from the natives. */
     public static enum BuyAction {
@@ -1236,7 +1241,7 @@ public class GUI {
     }
 
     public BoycottAction showBoycottedGoodsDialog(Goods goods, Europe europe) {
-        if (canvas == null) return BoycottAction.CANCEL;
+        if (canvas == null) return null;
         return canvas.showBoycottedGoodsDialog(goods, europe);
     }
 
