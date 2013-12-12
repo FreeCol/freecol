@@ -24,6 +24,9 @@ import java.awt.Rectangle;
 
 import javax.swing.JFrame;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import net.sf.freecol.client.FreeColClient;
 
 
@@ -31,6 +34,8 @@ import net.sf.freecol.client.FreeColClient;
  * The base frame for FreeCol panels.
  */
 public abstract class FreeColFrame extends JFrame {
+
+    private static final Logger logger = Logger.getLogger(FreeColFrame.class.getName());
 
     private FreeColClient freeColClient;
     
@@ -54,8 +59,17 @@ public abstract class FreeColFrame extends JFrame {
 
     public void setCanvas(Canvas canvas) {
         addWindowListener(new WindowedFrameListener(freeColClient));
-        getContentPane().add(canvas);
-        
+        // This crashes deep in the Java libraries when changing full screen
+        // mode during the opening video
+        //   Java version: 1.7.0_45
+        //   Java WM name: OpenJDK 64-Bit Server VM
+        //   Java WM version: 24.45-b08
+        // arch linux, reported by Lone Wolf
+        try {
+            getContentPane().add(canvas);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Java crash", e);
+        }        
     }
    
     public abstract void updateBounds(Rectangle rectangle);
