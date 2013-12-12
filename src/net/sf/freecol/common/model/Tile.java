@@ -2106,9 +2106,15 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                 Tile tile = xr.readFreeColGameObject(game, Tile.class);
                 setCachedTile(player, tile);
                 xr.setReadScope(scope);
+                if (tile.getIndianSettlement() != null) {
+                    tile.updateIndianSettlement(player);
+                }
 
             } else {
                 setCachedTile(player, this);
+                if (this.getIndianSettlement() != null) {
+                    this.updateIndianSettlement(player);
+                }
             }
             xr.closeTag(CACHED_TILE_TAG);
 
