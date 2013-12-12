@@ -1070,8 +1070,7 @@ public class GUI {
                                   Object obj, String cancelKey,
                                   List<ChoiceItem<T>> choices) {
         if (canvas == null) return null;
-        return canvas.showChoiceDialog(modal, tile, 
-                                       getDefaultTextArea(text),
+        return canvas.showChoiceDialog(modal, tile, text, 
                                        getImageIcon(obj, false),
                                        cancelKey, choices);
     }
