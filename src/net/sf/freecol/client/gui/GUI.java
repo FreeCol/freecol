@@ -1075,12 +1075,6 @@ public class GUI {
                                        cancelKey, choices);
     }
 
-    public <T> T showOldChoiceDialog(Tile tile, String text, String cancelText,
-                                     List<ChoiceItem<T>> choices) {
-        if (canvas == null) return null;
-        return canvas.showOldChoiceDialog(tile, text, cancelText, choices);
-    }
-
     public boolean showConfirmDialog(boolean modal, Tile tile,
                                      StringTemplate template, Object obj,
                                      String okKey, String cancelKey) {
@@ -1103,37 +1097,6 @@ public class GUI {
         if (canvas == null) return null;
         return canvas.showInputDialog(modal, tile, template, defaultValue,
                                       okKey, cancelKey);
-    }
-
-    public String showOldInputDialog(Tile tile, StringTemplate textKey,
-                                     String defaultValue,
-                                     String okKey, String cancelKey) {
-        if (canvas == null) return null;
-        return canvas.showOldInputDialog(tile, textKey, defaultValue,
-                                         okKey, cancelKey);
-    }
-
-    public <T> void viewFreeColDialog(final FreeColDialog<T> fcd,
-                                      final Tile tile,
-                                      final Runnable runnable) {
-        if (canvas == null) return;
-        Runnable now = new Runnable() {
-                public void run() {
-                    canvas.viewFreeColDialog(fcd, tile);
-                    if (runnable == null) return;
-                    new Thread(fcd.toString()) {
-                        public void run() {
-                            while (!fcd.responded()) {
-                                try {
-                                    Thread.sleep(500);
-                                } catch (InterruptedException e) {}
-                            }
-                            runnable.run();
-                        }
-                    }.start();
-                }
-            };
-        SwingUtilities.invokeLater(now);
     }
 
 
