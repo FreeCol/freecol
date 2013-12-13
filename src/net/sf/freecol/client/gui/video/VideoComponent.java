@@ -148,7 +148,6 @@ public class VideoComponent extends JPanel {
      */
     public void removeNotify() {
         applet.stop();
-        applet.destroy();
 
         // Java 1.7.0 as seen on Fedora with:
         //   Java version: 1.7.0_40
@@ -159,5 +158,7 @@ public class VideoComponent extends JPanel {
         } catch (Exception e) {
             logger.log(Level.WARNING, "Mystery crash", e);
         }
+
+        applet.destroy();
     }
 }
