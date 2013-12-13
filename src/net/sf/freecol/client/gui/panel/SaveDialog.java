@@ -45,18 +45,24 @@ import net.sf.freecol.client.gui.panel.FreeColDialog;
 public final class SaveDialog extends FreeColDialog<File> {
 
     /**
+     * We need a magic cookie to use for the cancel response, as
+     * the JFileChooser does not tolerate setValue(null).
+     */
+    private static final File cancelFile = new File(".");
+
+
+    /**
      * Creates a dialog to choose a file to load.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param directory The directory to display when choosing the file.
      * @param fileFilters The available file filters in the dialog.
      * @param defaultName Name of the default save game file.
-     * @param extension The default extension to add to user specified
-     *     file names.
+     * @param ext The default extension to add to user specified file names.
      */
     public SaveDialog(FreeColClient freeColClient, File directory,
                       FileFilter[] fileFilters, String defaultName,
-                      final String extension) {
+                      final String ext) {
         super(freeColClient);
 
         final JFileChooser fileChooser = new JFileChooser(directory);
@@ -76,12 +82,12 @@ public final class SaveDialog extends FreeColDialog<File> {
                     final String cmd = event.getActionCommand();
                     if (JFileChooser.APPROVE_SELECTION.equals(cmd)) {
                         File file = fileChooser.getSelectedFile();
-                        if (!file.getName().endsWith(extension)) {
-                            file = new File(file.getAbsolutePath() + extension);
+                        if (!file.getName().endsWith(ext)) {
+                            file = new File(file.getAbsolutePath() + ext);
                         }
                         setValue(file);
                     } else {
-                        setValue(null);
+                        setValue(cancelFile);
                     }
                 }
             });
@@ -95,6 +101,13 @@ public final class SaveDialog extends FreeColDialog<File> {
      * {@inheritDoc}
      */
     public File getResponse() {
-        return (File)getValue();
+        if (responded()) {
+            File value = (File)getValue();
+            return (value == cancelFile) ? null : value;
+        }
+        return null;
     }
+
+
+    // TODO: add a requestFocus override that focuses on the cancel button
 }
