@@ -878,6 +878,21 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
+     * End the turn command.
+     *
+     * Called out of the end turn dialog and by endMyTurn below.
+     */
+    public void endTurn() {
+        // Ensure end-turn mode sticks.
+        if (moveMode < MODE_END_TURN) moveMode = MODE_END_TURN;
+
+        // Make sure all goto orders are complete before ending turn.
+        if (!doExecuteGotoOrders()) return;
+
+        doEndTurn();
+    }
+
+    /**
      * Follow a path.
      *
      * @param unit The <code>Unit</code> to move.
@@ -2103,10 +2118,13 @@ public final class InGameController implements NetworkConstants {
         return null;
     }
 
+
     /**
      * End the turn command.
+     *
+     * Called from the end turn action.
      */
-    public void endTurn() {
+    public void endMyTurn() {
         if (!requireOurTurn()) return;
 
         // Show the end turn dialog, or not.
@@ -2116,16 +2134,12 @@ public final class InGameController implements NetworkConstants {
             for (Unit unit : freeColClient.getMyPlayer().getUnits()) {
                 if (unit.couldMove()) units.add(unit);
             }
-            if (!units.isEmpty() && !gui.showEndTurnDialog(units)) return;
+            if (!units.isEmpty()) {
+                gui.showEndTurnDialog(units); // Modal dialog ends turn
+                return;
+            }
         }
-
-        // Ensure end-turn mode sticks.
-        if (moveMode < MODE_END_TURN) moveMode = MODE_END_TURN;
-
-        // Make sure all goto orders are complete before ending turn.
-        if (!doExecuteGotoOrders()) return;
-
-        doEndTurn();
+        endTurn();
     }
 
     /**
@@ -3783,7 +3797,7 @@ public final class InGameController implements NetworkConstants {
         if (tile != null) {
             gui.setSelectedTile(tile, false);
         } else if (options.getBoolean(ClientOptions.AUTO_END_TURN)) {
-            endTurn();
+            endMyTurn();
         }
     }
 

@@ -1372,9 +1372,14 @@ public class GUI {
             });
     }
 
-    public boolean showEndTurnDialog(List<Unit> units) {
-        if (canvas == null) return false;
-        return canvas.showEndTurnDialog(units);
+    public void showEndTurnDialog(final List<Unit> units) {
+        if (canvas == null) return;
+        canvas.showEndTurnDialog(units,
+            new DialogHandler<Boolean>() {
+                public void handle(Boolean result) {
+                    if (result) igc().endTurn();
+                }
+            });
     }
 
     public void showErrorMessage(StringTemplate template) {

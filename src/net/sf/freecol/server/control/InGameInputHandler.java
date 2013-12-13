@@ -728,9 +728,10 @@ public final class InGameInputHandler extends InputHandler
          * setDeadElement.setAttribute("player", player.getId());
          * freeColServer.getServer().sendToAll(setDeadElement, connection);
          */
+
         /*
-         * TODO: Setting the player dead directly should be a server option, but
-         * for now - allow the player to reconnect:
+         * TODO: Setting the player dead directly should be a server
+         * option, but for now - allow the player to reconnect:
          */
         Element reply = null;
         player.setConnected(false);

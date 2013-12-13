@@ -1831,9 +1831,12 @@ public final class Canvas extends JDesktopPane {
      *
      * @param units A list of <code>Unit</code>s that could still move.
      */
-    public boolean showEndTurnDialog(List<Unit> units) {
-        return showFreeColOldDialog(new EndTurnDialog(freeColClient, units),
-                                 null, true);
+    public void showEndTurnDialog(List<Unit> units,
+                                  DialogHandler<Boolean> handler) {
+        SwingUtilities.invokeLater(
+            new DialogCallback<Boolean>(
+                new EndTurnDialog(freeColClient, units),
+                null, handler));
     }
 
     /**
