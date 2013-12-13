@@ -2572,8 +2572,11 @@ public final class Canvas extends JDesktopPane {
      */
     public int showSelectAmountDialog(GoodsType goodsType, int available,
                                       int defaultAmount, boolean needToPay) {
-        return showFreeColOldDialog(new SelectAmountDialog(freeColClient,
-                goodsType, available, defaultAmount, needToPay), null, true);
+        FreeColDialog<Integer> fcd
+            = new SelectAmountDialog(freeColClient, goodsType, available,
+                                     defaultAmount, needToPay);
+        Integer result = showFreeColDialog(fcd, null);
+        return (result == null) ? -1 : result.intValue();
     }
 
     /**

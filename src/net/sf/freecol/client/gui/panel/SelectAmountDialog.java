@@ -19,54 +19,61 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.swing.JComboBox;
 import javax.swing.JTextArea;
 
-import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Player;
+
+import net.miginfocom.swing.MigLayout;
 
 
 /**
  * The panel that allows a choice of goods amount.
  */
-public final class SelectAmountDialog extends FreeColOldDialog<Integer> implements ActionListener {
+public final class SelectAmountDialog extends FreeColInputDialog<Integer> {
 
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(SelectAmountDialog.class.getName());
 
     private static final int SELECT_CANCEL = -1;
 
-    private static final int[] amounts = {20, 40, 50, 60, 80, 100};
+    /** The default amounts to try. */
+    private static final int[] amounts = { 20, 40, 50, 60, 80, 100 };
 
-    private final JTextArea question;
-
+    /** The combo box to input the amount through. */
     private final JComboBox comboBox;
+
 
     /**
      * The constructor to use.
+     *
+     * @param freeColClient The enclosing <code>FreeColClient</code>.
+     * @param goodsType The <code>GoodsType</code> to select an amount of.
+     * @param available The amount of goods available.
+     * @param defaultAmount The amount to select to start with.
+     * @param needToPay If true, check the player has sufficient funds.
      */
     @SuppressWarnings("unchecked") // FIXME in Java7
     public SelectAmountDialog(FreeColClient freeColClient, GoodsType goodsType,
-        int available, int defaultAmount, boolean needToPay) {
-        super(freeColClient, new MigLayout("wrap 1", "", ""));
+                              int available, int defaultAmount, boolean pay) {
+        super(freeColClient);
 
-        setFocusCycleRoot(true);
-
-        question = GUI.getDefaultTextArea(Messages.message("goodsTransfer.text"));
-
-        if (needToPay) {
-            final int gold = getMyPlayer().getGold();
-            int price = getMyPlayer().getMarket().getCostToBuy(goodsType);
+        if (pay) {
+            final Player player = getMyPlayer();
+            final int gold = player.getGold();
+            int price = player.getMarket().getCostToBuy(goodsType);
             available = Math.min(available, gold/price);
         }
+
+        JTextArea question
+            = GUI.getDefaultTextArea(Messages.message("goodsTransfer.text"));
 
         int defaultIndex = -1;
         Vector<Integer> values = new Vector<Integer>();
@@ -89,52 +96,31 @@ public final class SelectAmountDialog extends FreeColOldDialog<Integer> implemen
                 }
             }
         }
+        this.comboBox = new JComboBox(values);
+        this.comboBox.setEditable(true);
+        if (defaultIndex >= 0) this.comboBox.setSelectedIndex(defaultIndex);
 
-        comboBox = new JComboBox(values);
-        comboBox.setEditable(true);
-        if (defaultIndex >= 0) comboBox.setSelectedIndex(defaultIndex);
+        MigPanel panel = new MigPanel(new MigLayout("wrap 1", "", ""));
+        panel.add(question);
+        panel.add(this.comboBox, "wrap 20, growx");
+        panel.setSize(panel.getPreferredSize());
+        setFocusCycleRoot(true);
 
-        okButton.addActionListener(this);
-
-        cancelButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    setResponse(new Integer(SELECT_CANCEL));
-                }
-            });
-
-        add(question);
-        add(comboBox, "wrap 20, growx");
-        add(okButton, "span, split 2, tag ok");
-        add(cancelButton, "tag cancel");
-        
-        setSize(getPreferredSize());
-
+        initialize(true, panel, null, "ok", "cancel");
     }
-
-    public void requestFocus() {
-        cancelButton.requestFocus();
-    }
-
-
-    // Interface ActionListener
 
     /**
      * {@inheritDoc}
      */
-    public void actionPerformed(ActionEvent event) {
-        if (OK.equals(event.getActionCommand())) {
-            Object item = comboBox.getSelectedItem();
-            if (item instanceof Integer) {
-                setResponse((Integer) item);
-            } else if (item instanceof String) {
-                try {
-                    setResponse(Integer.valueOf((String) item));
-                } catch (NumberFormatException e) {
-                    // do nothing
-                }
-            }
-        } else {
-            super.actionPerformed(event);
+    protected Integer getInputValue() {
+        Object value = this.comboBox.getSelectedItem();
+        if (value instanceof Integer) {
+            return (Integer)value;
+        } else if (value instanceof String) {
+            try {
+                return Integer.valueOf((String)value);
+            } catch (NumberFormatException e) {}
         }
+        return -1;
     }
 }

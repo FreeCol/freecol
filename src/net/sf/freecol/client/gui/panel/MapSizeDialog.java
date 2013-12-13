@@ -59,8 +59,6 @@ public final class MapSizeDialog extends FreeColInputDialog<Dimension> {
     public MapSizeDialog(FreeColClient freeColClient) {
         super(freeColClient);
 
-        MigPanel panel = new MigPanel(new MigLayout("wrap 2"));
-
         String widthText = Messages.message("width");
         JLabel widthLabel = new JLabel(widthText);
         widthLabel.setLabelFor(inputWidth);
@@ -68,6 +66,7 @@ public final class MapSizeDialog extends FreeColInputDialog<Dimension> {
         JLabel heightLabel = new JLabel(heightText);
         heightLabel.setLabelFor(inputHeight);
 
+        MigPanel panel = new MigPanel(new MigLayout("wrap 2"));
         panel.add(new JLabel(Messages.message("editor.mapSize")),
                   "span, align center");
         panel.add(widthLabel, "newline 20");

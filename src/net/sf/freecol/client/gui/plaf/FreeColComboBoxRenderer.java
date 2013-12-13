@@ -138,6 +138,9 @@ public class FreeColComboBoxRenderer implements ListCellRenderer, UIResource {
             }
             c.setText(nd[0]);
             if (nd[1] != null) c.setToolTipText(nd[1]);
+        } else if (value instanceof Integer) {
+            // partial load values from SelectAmountDialog
+            c.setText(value.toString());
         } else {
             logger.warning("What is this?: " + value);
         }

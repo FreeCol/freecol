@@ -358,21 +358,17 @@ public final class DefaultTransferHandler extends TransferHandler {
     }
 
     /**
-     * Displays an input dialog box where the user should specify a goods transfer amount.
+     * Displays an input dialog box where the user should specify a
+     * goods transfer amount.
      */
-    private int getAmount(GoodsType goodsType, int available, int defaultAmount, boolean needToPay) {
-        return gui.showSelectAmountDialog(goodsType, available, defaultAmount, needToPay);
+    private int getAmount(GoodsType goodsType, int available, int defaultAmount,
+                          boolean needToPay) {
+        return gui.showSelectAmountDialog(goodsType, available, defaultAmount,
+                                          needToPay);
     }
 
-
-
-
-    /*__________________________________________________
-      Methods/inner-classes below have been copied from
-      TransferHandler in order to allow partial loading.
-      --------------------------------------------------
-    */
-
+    // Methods/inner-classes below have been copied from
+    // TransferHandler in order to allow partial loading.
 
     private static FreeColDragGestureRecognizer recognizer = null;
 
