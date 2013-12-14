@@ -1625,7 +1625,6 @@ public class ChangeSet {
     public ChangeSet addTradeRoute(ServerPlayer serverPlayer,
                                    TradeRoute tradeRoute) {
         changes.add(new OwnedChange(See.only(serverPlayer), tradeRoute));
-        serverPlayer.getTradeRoutes().add(tradeRoute);
         return this;
     }
 

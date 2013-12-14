@@ -3962,11 +3962,10 @@ public final class InGameController extends Controller {
      * @return An <code>Element</code> encapsulating this action.
      */
     public Element getNewTradeRoute(ServerPlayer serverPlayer) {
-        List<TradeRoute> routes
-            = new ArrayList<TradeRoute>(serverPlayer.getTradeRoutes());
-        TradeRoute route = new TradeRoute(getGame(), "", serverPlayer);
+        List<TradeRoute> routes = serverPlayer.getTradeRoutes();
+        TradeRoute route = new TradeRoute(getGame(), 
+            serverPlayer.getNewTradeRouteName(), serverPlayer);
         routes.add(route);
-        serverPlayer.setTradeRoutes(routes);
         return new ChangeSet().addTradeRoute(serverPlayer, route)
             .build(serverPlayer);
     }

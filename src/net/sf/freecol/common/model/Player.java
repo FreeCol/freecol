@@ -2255,6 +2255,18 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Get a trade route by name.
+     *
+     * @param name The trade route name.
+     */
+    public TradeRoute getTradeRoute(String name) {
+        for (TradeRoute t : tradeRoutes) {
+            if (t.getName().equals(name)) return t;
+        }
+        return null;
+    }
+
+    /**
      * Set the players trade routes.
      *
      * @param newTradeRoutes The new list of <code>TradeRoute</code>s.
@@ -2262,6 +2274,20 @@ public class Player extends FreeColGameObject implements Nameable {
     public final void setTradeRoutes(final List<TradeRoute> newTradeRoutes) {
         tradeRoutes.clear();
         tradeRoutes.addAll(newTradeRoutes);
+    }
+
+    /**
+     * Get a unique name for a new trade route.
+     */
+    public String getNewTradeRouteName() {
+        String base = Messages.message("tradeRoute.newRoute");
+        if (getTradeRoute(base) == null) return base;
+        String name;
+        int i = 1;
+        while (getTradeRoute(name = base + Integer.toString(i)) != null) {
+            i++;
+        }
+        return name;
     }
 
     /**

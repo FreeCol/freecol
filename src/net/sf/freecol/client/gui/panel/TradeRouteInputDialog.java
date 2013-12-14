@@ -102,7 +102,7 @@ public final class TradeRouteInputDialog extends FreeColOldDialog<Boolean> imple
     private final JComboBox destinationSelector = new JComboBox();
 
     private final JTextField tradeRouteName
-        = new JTextField(Messages.message("traderouteDialog.newRoute"));
+        = new JTextField(Messages.message("tradeRoute.newRoute"));
 
     private final DefaultListModel stopListModel = new DefaultListModel();
 

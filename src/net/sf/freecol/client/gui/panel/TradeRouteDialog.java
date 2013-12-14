@@ -61,7 +61,7 @@ public final class TradeRouteDialog extends FreeColOldDialog<Boolean>
     private final JButton editRouteButton
         = new JButton(Messages.message("traderouteDialog.editRoute"));
     private final JButton newRouteButton
-        = new JButton(Messages.message("traderouteDialog.newRoute"));
+        = new JButton(Messages.message("tradeRoute.newRoute"));
     private final JButton removeRouteButton
         = new JButton(Messages.message("traderouteDialog.removeRoute"));
     private final JButton deassignRouteButton
@@ -110,7 +110,6 @@ public final class TradeRouteDialog extends FreeColOldDialog<Boolean>
                 public void actionPerformed(ActionEvent e) {
                     Player player = getMyPlayer();
                     TradeRoute newRoute = getController().getNewTradeRoute(player);
-                    newRoute.setName(Messages.message("traderouteDialog.newRoute"));
                     if (getGUI().showTradeRouteInputDialog(newRoute)) {
                         listModel.addElement(newRoute);
                         tradeRoutes.setSelectedValue(newRoute, true);
