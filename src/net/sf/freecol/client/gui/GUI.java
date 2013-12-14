@@ -1767,9 +1767,10 @@ public class GUI {
         return canvas.showTradeRouteDialog(unit);
     }
 
-    public boolean showTradeRouteInputDialog(TradeRoute newRoute) {
-        if (canvas == null) return false;
-        return canvas.showTradeRouteInputDialog(newRoute);
+    public void showTradeRouteInputPanel(TradeRoute newRoute,
+                                         Runnable callBack) {
+        if (canvas == null) return;
+        canvas.showTradeRouteInputPanel(newRoute, callBack);
     }
 
     public void showTrainPanel() {

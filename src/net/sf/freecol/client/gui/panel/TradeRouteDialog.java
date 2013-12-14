@@ -28,6 +28,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.DefaultListCellRenderer;
@@ -43,6 +44,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 
@@ -58,26 +60,31 @@ public final class TradeRouteDialog extends FreeColOldDialog<Boolean>
 
     private static enum Action { OK, CANCEL, DEASSIGN, DELETE }
 
-    private final JButton editRouteButton
-        = new JButton(Messages.message("traderouteDialog.editRoute"));
-    private final JButton newRouteButton
-        = new JButton(Messages.message("tradeRoute.newRoute"));
-    private final JButton removeRouteButton
-        = new JButton(Messages.message("traderouteDialog.removeRoute"));
-    private final JButton deassignRouteButton
-        = new JButton(Messages.message("traderouteDialog.deassignRoute"));
-
-    private final DefaultListModel listModel = new DefaultListModel();
-    @SuppressWarnings("unchecked") // FIXME in Java7
-    private final JList tradeRoutes = new JList(listModel);
-    private final JScrollPane tradeRouteView = new JScrollPane(tradeRoutes);
-
+    /** Compare trade routes by name. */
     private static final Comparator<TradeRoute> tradeRouteComparator
         = new Comparator<TradeRoute>() {
             public int compare(TradeRoute r1, TradeRoute r2) {
                 return r1.getName().compareTo(r2.getName());
             }
         };
+
+    private final JButton editRouteButton
+        = new JButton(Messages.message("tradeRouteDialog.editRoute"));
+    private final JButton newRouteButton
+        = new JButton(Messages.message("tradeRoute.newRoute"));
+    private final JButton removeRouteButton
+        = new JButton(Messages.message("tradeRouteDialog.removeRoute"));
+    private final JButton deassignRouteButton
+        = new JButton(Messages.message("tradeRouteDialog.deassignRoute"));
+
+    private final DefaultListModel listModel = new DefaultListModel();
+    @SuppressWarnings("unchecked") // FIXME in Java7
+    private final JList tradeRoutes = new JList(listModel);
+    private final JScrollPane tradeRouteView = new JScrollPane(tradeRoutes);
+
+    /** A map of trade route to the number of units using it. */
+    private final Map<TradeRoute, Integer> counts
+        = new HashMap<TradeRoute, Integer>();
 
     /** The unit to assign/deassign trade routes for. */
     private Unit unit = null;
@@ -93,10 +100,12 @@ public final class TradeRouteDialog extends FreeColOldDialog<Boolean>
     public TradeRouteDialog(FreeColClient freeColClient, Unit unit) {
         super(freeColClient, new MigLayout("wrap 2", "[fill][fill]"));
 
+        final Player player = getMyPlayer();
+
         this.unit = unit;
 
         deassignRouteButton.addActionListener(this);
-        deassignRouteButton.setToolTipText(Messages.message("traderouteDialog.deassign.tooltip"));
+        deassignRouteButton.setToolTipText(Messages.message("tradeRouteDialog.deassign.tooltip"));
         deassignRouteButton.setActionCommand(Action.DEASSIGN.toString());
 
         tradeRoutes.addListSelectionListener(new ListSelectionListener() {
@@ -108,43 +117,50 @@ public final class TradeRouteDialog extends FreeColOldDialog<Boolean>
         // button for adding new TradeRoute
         newRouteButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    Player player = getMyPlayer();
-                    TradeRoute newRoute = getController().getNewTradeRoute(player);
-                    if (getGUI().showTradeRouteInputDialog(newRoute)) {
-                        listModel.addElement(newRoute);
-                        tradeRoutes.setSelectedValue(newRoute, true);
-                    }
+                    final TradeRoute newRoute
+                        = getController().getNewTradeRoute(player);
+                    getGUI().showTradeRouteInputPanel(newRoute,
+                        new Runnable() {
+                            public void run() {
+try {
+                                if (newRoute.getName() == null) {
+                                    return; // cancelled
+                                }
+                                StringTemplate err = newRoute.verify();
+                                if (err == null) {
+                                    getController().updateTradeRoute(newRoute);
+                                    updateList();
+                                    TradeRouteDialog.this.tradeRoutes
+                                        .setSelectedValue(newRoute, true);
+                                } else {
+                                    getGUI().showErrorMessage(err);
+                                }
+}catch (Exception e) { logger.log(Level.WARNING, "foo", e); }
+                            }
+                        });
                 }
             });
 
         // button for editing TradeRoute
         editRouteButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    getGUI().showTradeRouteInputDialog((TradeRoute) tradeRoutes.getSelectedValue());
+                    final TradeRoute selected
+                        = (TradeRoute)tradeRoutes.getSelectedValue();
+                    getGUI().showTradeRouteInputPanel(selected,
+                        new Runnable() {
+                            public void run() {
+                                if (selected.verify() == null) {
+                                    TradeRouteDialog.this.tradeRoutes
+                                        .setSelectedValue(selected, true);
+                                }
+                            }
+                        });
                 }
             });
 
         // button for deleting TradeRoute
         removeRouteButton.addActionListener(this);
         removeRouteButton.setActionCommand(Action.DELETE.toString());
-
-        Player player = getMyPlayer();
-
-        final Map<TradeRoute, Integer> counts
-            = new HashMap<TradeRoute, Integer>();
-        for (Unit u : player.getUnits()) {
-            TradeRoute tradeRoute = u.getTradeRoute();
-            if (tradeRoute != null) {
-                Integer i = counts.get(tradeRoute);
-                int value = (i == null) ? 0 : i.intValue();
-                counts.put(tradeRoute, new Integer(value + 1));
-            }
-        }
-        List<TradeRoute> routes = new ArrayList<TradeRoute>(counts.keySet());
-        Collections.sort(routes, tradeRouteComparator);
-        for (TradeRoute route : routes) {
-            listModel.addElement(route);
-        }
 
         tradeRoutes.setCellRenderer(new DefaultListCellRenderer() {
                 public Component getListCellRendererComponent(JList list,
@@ -153,23 +169,23 @@ public final class TradeRouteDialog extends FreeColOldDialog<Boolean>
                         value, index, selected, focus);
                     TradeRoute tradeRoute = (TradeRoute)value;
                     String name = tradeRoute.getName();
-                    int n = counts.get(tradeRoute).intValue();
-
-                    if (n > 0) {
-                        setText(name + "  (" + n + ")");
-                    } else {
+                    Integer n = counts.get(tradeRoute);
+                    if (n == null || n.intValue() <= 0) {
                         setText(name);
+                    } else {
+                        setText(name + "  (" + n + ")");
                     }
                     return ret;
                 }
             });
 
+        updateList();
         if (unit != null && unit.getTradeRoute() != null) {
             tradeRoutes.setSelectedValue(unit.getTradeRoute(), true);
         }
         updateButtons();
 
-        add(GUI.getDefaultHeader(Messages.message("traderouteDialog.name")),
+        add(GUI.getDefaultHeader(Messages.message("tradeRouteDialog.name")),
             "span, align center");
 
         add(tradeRouteView, "height 360:400, width 250:");
@@ -196,6 +212,31 @@ public final class TradeRouteDialog extends FreeColOldDialog<Boolean>
         }
     }
 
+    @SuppressWarnings("unchecked") // FIXME in Java7
+    private void updateList() {
+        final Player player = getMyPlayer();
+        // First update the counts
+        this.counts.clear();
+        for (Unit u : player.getUnits()) {
+            TradeRoute tradeRoute = u.getTradeRoute();
+            if (tradeRoute != null) {
+                Integer i = counts.get(tradeRoute);
+                int value = (i == null) ? 0 : i.intValue();
+                counts.put(tradeRoute, new Integer(value + 1));
+            }
+        }
+
+        // Now create a sorted list of routes
+        List<TradeRoute> routes
+            = new ArrayList<TradeRoute>(player.getTradeRoutes());
+        Collections.sort(routes, tradeRouteComparator);
+
+        // Then add the routes to the list model.
+        this.listModel.clear();
+        for (TradeRoute route : routes) {
+            this.listModel.addElement(route);
+        }
+    }
 
     // Interface ActionListener
 
@@ -212,7 +253,7 @@ public final class TradeRouteDialog extends FreeColOldDialog<Boolean>
                 List<TradeRoute> routes = new ArrayList<TradeRoute>();
                 for (int index = 0; index < listModel.getSize(); index++) {
                     routes.add((TradeRoute)listModel.getElementAt(index));
-                    System.err.println(index + " : " + routes.get(index).getName());
+                    //System.err.println(index + " : " + routes.get(index).getName());
                 }
                 getController().setTradeRoutes(routes);
                 if (unit != null) unit.setTradeRoute(route);
@@ -228,10 +269,10 @@ public final class TradeRouteDialog extends FreeColOldDialog<Boolean>
                 for (Unit u : route.getAssignedUnits()) {
                     getController().clearOrders(u);
                 }
-                listModel.removeElementAt(tradeRoutes.getSelectedIndex());
-                Player player = getMyPlayer();
+                final Player player = getMyPlayer();
                 player.getTradeRoutes().remove(route);
                 getController().setTradeRoutes(player.getTradeRoutes());
+                updateList();
                 return; // Continue, do not set response
             case CANCEL: default:
                 ret = false;

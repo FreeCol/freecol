@@ -140,7 +140,7 @@ import net.sf.freecol.client.gui.panel.StatisticsPanel;
 import net.sf.freecol.client.gui.panel.StatusPanel;
 import net.sf.freecol.client.gui.panel.TilePanel;
 import net.sf.freecol.client.gui.panel.TradeRouteDialog;
-import net.sf.freecol.client.gui.panel.TradeRouteInputDialog;
+import net.sf.freecol.client.gui.panel.TradeRouteInputPanel;
 import net.sf.freecol.client.gui.panel.TrainPanel;
 import net.sf.freecol.client.gui.panel.VictoryPanel;
 import net.sf.freecol.client.gui.panel.WarehouseDialog;
@@ -2754,14 +2754,17 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Display the trade route input dialog for a given trade route.
+     * Display the trade route input panel for a given trade route.
      *
      * @param newRoute The <code>TradeRoute</code> to display.
-     * @return True if a new route was added.
+     * @param callBack The <code>Runnable</code> that is run when the
+     *     panel closes.
      */
-    public boolean showTradeRouteInputDialog(TradeRoute newRoute) {
-        return showFreeColOldDialog(new TradeRouteInputDialog(freeColClient,
-                newRoute), null, true);
+    public void showTradeRouteInputPanel(TradeRoute newRoute,
+                                         Runnable callBack) {
+        FreeColPanel panel = new TradeRouteInputPanel(freeColClient, newRoute);
+        panel.addClosingCallback(callBack);
+        showSubPanel(panel, null, true);
     }
 
     /**

@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.TradeRouteStop;
 
 import org.w3c.dom.Element;
@@ -207,6 +208,45 @@ public class TradeRoute extends FreeColGameObject
         return (stop == null) ? false : stop.isValid(player);
     }
 
+    /**
+     * Check that the trade route is valid.
+     *
+     * @return Null if the route is valid, or a <code>StringTemplate</code>
+     *     explaining the problem if invalid.
+     */
+    public StringTemplate verify() {
+        if (owner == null) {
+            return StringTemplate.template("tradeRoute.nullOwner");
+        }
+
+        // Check that the name is unique
+        for (TradeRoute route : owner.getTradeRoutes()) {
+            if (route == this) continue;
+            if (route.getName().equals(name)) {
+                return StringTemplate.template("tradeRoute.duplicateName")
+                    .addName("%name%", name);
+            }
+        }
+
+        // Verify that it has at least two stops
+        if (stops.size() < 2) {
+            return StringTemplate.template("tradeRoute.notEnoughStops");
+        }
+
+        // Check that all stops are valid
+        for (TradeRouteStop stop : stops) {
+            if (!TradeRoute.isStopValid(owner, stop)) {
+                String badStop = Messages.message(stop.getLocation()
+                    .getLocationNameFor(owner));
+                return StringTemplate.template("tradeRoute.invalidStop")
+                    .addName("%name%", badStop);
+            }
+        }
+
+        return null;
+    }
+
+
     // Interface Ownable
 
     /**
@@ -306,7 +346,10 @@ public class TradeRoute extends FreeColGameObject
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
-        sb.append("[").append(getXMLTagName()).append(" ").append(getName());
+        sb.append("[").append(getXMLTagName())
+            .append(" \"").append(getName()).append("\"")
+            .append(" owner=").append(owner.getId())
+            .append(" silent=").append(Boolean.toString(silent));
         for (TradeRouteStop stop : getStops()) {
             sb.append(" ").append(stop.toString());
         }
