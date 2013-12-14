@@ -246,6 +246,10 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         add(okButton, "tag ok");
     }
 
+    public Colony getColony() {
+        return this.colony;
+    }
+
     private void removeBuildable(Object type) {
         DefaultListModel model = (DefaultListModel) buildQueueList.getModel();
         model.removeElement(type);

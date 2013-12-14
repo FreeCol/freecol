@@ -1515,7 +1515,10 @@ public final class Canvas extends JDesktopPane {
      * @param colony The <code>Colony</code> to show the build queue of.
      */
     public void showBuildQueuePanel(Colony colony) {
-        showSubPanel(new BuildQueuePanel(freeColClient, colony), true);
+        BuildQueuePanel panel = getExistingFreeColPanel(BuildQueuePanel.class);
+        if (panel == null || panel.getColony() != colony) {
+            showSubPanel(new BuildQueuePanel(freeColClient, colony), true);
+        }
     }
 
     /**
@@ -1883,8 +1886,8 @@ public final class Canvas extends JDesktopPane {
                             removeEuropeanSubpanels();
                         }
                     });
+                showSubPanel(panel, false);
             }
-            showSubPanel(panel, false);
         }
     }
 
@@ -2374,9 +2377,8 @@ public final class Canvas extends JDesktopPane {
     public void showPurchasePanel() {
         PurchasePanel panel = getExistingFreeColPanel(PurchasePanel.class);
         if (panel == null) {
-            panel = new PurchasePanel(freeColClient);
+            showFreeColPanel(new PurchasePanel(freeColClient), null, false);
         }
-        showFreeColPanel(panel, null, false);
     }
 
     /**
@@ -2385,9 +2387,8 @@ public final class Canvas extends JDesktopPane {
     public void showRecruitPanel() {
         RecruitPanel panel = getExistingFreeColPanel(RecruitPanel.class);
         if (panel == null) {
-            panel = new RecruitPanel(freeColClient);
+            showFreeColPanel(new RecruitPanel(freeColClient), null, false);
         }
-        showFreeColPanel(panel, null, false);
     }
 
     /**
@@ -2769,9 +2770,8 @@ public final class Canvas extends JDesktopPane {
     public void showTrainPanel() {
         TrainPanel panel = getExistingFreeColPanel(TrainPanel.class);
         if (panel == null) {
-            panel = new TrainPanel(freeColClient);
+            showFreeColPanel(new TrainPanel(freeColClient), null, false);
         }
-        showFreeColPanel(panel, null, false);
     }
 
     /**
