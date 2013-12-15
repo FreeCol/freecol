@@ -1762,9 +1762,9 @@ public class GUI {
                 mapViewer.getCursor().getCanvasY());
     }
 
-    public boolean showTradeRouteDialog(Unit unit) {
-        if (canvas == null) return false;
-        return canvas.showTradeRouteDialog(unit);
+    public void showTradeRoutePanel(Unit unit) {
+        if (canvas == null) return;
+        canvas.showTradeRoutePanel(unit);
     }
 
     public void showTradeRouteInputPanel(TradeRoute newRoute,

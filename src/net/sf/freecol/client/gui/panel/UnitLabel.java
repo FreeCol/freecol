@@ -445,7 +445,7 @@ public final class UnitLabel extends JLabel
             inGameController.clearOrders(unit);
             break;
         case ASSIGN_TRADE_ROUTE:
-            inGameController.assignTradeRoute(unit);
+            gui.showTradeRoutePanel(unit);
             break;
         case LEAVE_SHIP:
             inGameController.leaveShip(unit);

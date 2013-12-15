@@ -67,8 +67,6 @@ public class AssignTradeRouteAction extends UnitAction {
      */
     public void actionPerformed(ActionEvent e) {
         Unit unit = getGUI().getActiveUnit();
-        if (unit != null) {
-            getInGameController().assignTradeRoute(unit);
-        }
+        if (unit != null) getGUI().showTradeRoutePanel(unit);
     }
 }

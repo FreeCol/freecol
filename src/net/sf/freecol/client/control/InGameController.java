@@ -1423,32 +1423,15 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Assigns a trade route to a unit using the trade route dialog.
-     *
-     * @param unit The <code>Unit</code> to assign a trade route to.
-     */
-    public void assignTradeRoute(Unit unit) {
-        TradeRoute oldRoute = unit.getTradeRoute();
-        if (!gui.showTradeRouteDialog(unit)) return; // Cancelled
-
-        // Delete or deassign of trade route removes the route from the unit
-        TradeRoute route = unit.getTradeRoute();
-        if (oldRoute != route) assignTradeRoute(unit, route);
-    }
-
-    /**
      * Assigns a trade route to a unit.
      *
      * @param unit The <code>Unit</code> to assign a trade route to.
      * @param tradeRoute The <code>TradeRoute</code> to assign.
+     * @return True if the route was successfully assigned.
      */
-    public void assignTradeRoute(Unit unit, TradeRoute tradeRoute) {
-        if (askServer().assignTradeRoute(unit, tradeRoute)) {
-            if ((tradeRoute = unit.getTradeRoute()) != null
-                && freeColClient.currentPlayerIsMyPlayer()) {
-                moveToDestination(unit, null);
-            }
-        }
+    public boolean assignTradeRoute(Unit unit, TradeRoute tradeRoute) {
+        return askServer().assignTradeRoute(unit, tradeRoute)
+            && unit.getTradeRoute() == tradeRoute;
     }
 
     /**
@@ -1936,8 +1919,11 @@ public final class InGameController implements NetworkConstants {
             return false;
         }
 
-        if (unit.getTradeRoute() != null) assignTradeRoute(unit, null);
-        clearGotoOrders(unit);
+        if (unit.getTradeRoute() != null) {
+            assignTradeRoute(unit, null);
+        } else {
+            clearGotoOrders(unit);
+        }
         return askServer().changeState(unit, UnitState.ACTIVE);
     }
 

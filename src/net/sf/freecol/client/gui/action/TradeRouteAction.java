@@ -48,6 +48,6 @@ public class TradeRouteAction extends MapboardAction {
      * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) {
-        getGUI().showTradeRouteDialog(null);
+        getGUI().showTradeRoutePanel(null);
     }
 }

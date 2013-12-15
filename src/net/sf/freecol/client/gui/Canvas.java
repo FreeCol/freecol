@@ -139,7 +139,7 @@ import net.sf.freecol.client.gui.panel.StartGamePanel;
 import net.sf.freecol.client.gui.panel.StatisticsPanel;
 import net.sf.freecol.client.gui.panel.StatusPanel;
 import net.sf.freecol.client.gui.panel.TilePanel;
-import net.sf.freecol.client.gui.panel.TradeRouteDialog;
+import net.sf.freecol.client.gui.panel.TradeRoutePanel;
 import net.sf.freecol.client.gui.panel.TradeRouteInputPanel;
 import net.sf.freecol.client.gui.panel.TrainPanel;
 import net.sf.freecol.client.gui.panel.VictoryPanel;
@@ -2743,14 +2743,13 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Display a dialog to select a trade route for a unit.
+     * Display a panel to select a trade route for a unit.
      *
-     * @param unit The <code>Unit</code> to select a trade route for.
-     * @return True if the trade route changed.
+     * @param unit An optional <code>Unit</code> to select a trade route for.
      */
-    public boolean showTradeRouteDialog(Unit unit) {
-        return showFreeColOldDialog(new TradeRouteDialog(freeColClient, unit),
-                                 (unit == null) ? null : unit.getTile(), true);
+    public void showTradeRoutePanel(Unit unit) {
+        showFreeColPanel(new TradeRoutePanel(freeColClient, unit),
+                         (unit == null) ? null : unit.getTile(), true);
     }
 
     /**
