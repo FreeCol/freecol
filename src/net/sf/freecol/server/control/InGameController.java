@@ -2486,7 +2486,13 @@ public final class InGameController extends Controller {
      */
     public Element setDestination(ServerPlayer serverPlayer, Unit unit,
                                   Location destination) {
-        if (unit.getTradeRoute() != null) unit.setTradeRoute(null);
+        if (unit.getTradeRoute() != null) {
+            // Override destination to bring the unit to port.
+            if (destination == null && unit.isAtSea()) {
+                destination = unit.getStop().getLocation();
+            }
+            unit.setTradeRoute(null);
+        }
         unit.setDestination(destination);
 
         // Others can not see a destination change.
@@ -3918,8 +3924,14 @@ public final class InGameController extends Controller {
      */
     public Element assignTradeRoute(ServerPlayer serverPlayer, Unit unit,
                                     TradeRoute tradeRoute) {
+        // If clearing a trade route and the unit is at sea, set
+        // the destination to the next stop.  Otherwise just clear
+        // the destination.
+        TradeRouteStop stop;
+        unit.setDestination((tradeRoute == null && unit.isAtSea()
+                && (stop = unit.getStop()) != null) ? stop.getLocation()
+            : null);
         unit.setTradeRoute(tradeRoute);
-        unit.setDestination(null);
         if (tradeRoute != null) {
             List<TradeRouteStop> stops = tradeRoute.getStops();
             int found = -1;
