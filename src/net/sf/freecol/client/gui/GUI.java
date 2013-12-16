@@ -1728,12 +1728,6 @@ public class GUI {
         canvas.showServerListPanel(serverList);
     }
 
-    public <T> T showSimpleChoiceDialog(Tile tile, String textKey,
-                                        String cancelKey, List<T> objects) {
-        if (canvas == null) return null;
-        return canvas.showSimpleChoiceDialog(tile, textKey, cancelKey, objects);
-    }
-
     public void showStartGamePanel(Game game, Player player,
                                    boolean singlePlayerMode) {
         if (canvas == null) return;

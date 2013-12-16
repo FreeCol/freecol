@@ -1334,28 +1334,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Displays a dialog with a text and a cancel-button, in addition
-     * to buttons for each of the objects in the list.
-     *
-     * @param tile An optional tile to make visible (not under the dialog).
-     * @param textKey A key for text that explains the choice for the user.
-     * @param cancelKey A key for the text displayed on the "cancel"-button.
-     * @param objects The List containing the objects to create buttons for.
-     * @return The chosen object, or <i>null</i> for the cancel-button.
-     */
-    public <T> T showSimpleChoiceDialog(Tile tile, String textKey,
-                                        String cancelKey, List<T> objects) {
-        List<ChoiceItem<T>> choices = new ArrayList<ChoiceItem<T>>();
-        for (T object : objects) {
-            choices.add(new ChoiceItem<T>(object));
-        }
-        return showOldChoiceDialog(tile,
-                                   Messages.message(textKey),
-                                   Messages.message(cancelKey),
-                                   choices);
-    }
-
-    /**
      * Displays a dialog with a text and a ok/cancel option.
      *
      * @param modal True if this dialog should be modal.

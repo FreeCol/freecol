@@ -3437,8 +3437,15 @@ public final class InGameController implements NetworkConstants {
             }
 
             // Choose goods to buy
-            goods = gui.showSimpleChoiceDialog(unit.getTile(),
-                "buyProposition.text", "buyProposition.nothing", forSale);
+            List<ChoiceItem<Goods>> choices
+                = new ArrayList<ChoiceItem<Goods>>();
+            for (Goods g : forSale) {
+                String label = Messages.message(g.getLabel(true));
+                choices.add(new ChoiceItem<Goods>(label, g));
+            }
+            goods = gui.showChoiceDialog(true, unit.getTile(),
+                Messages.message("buyProposition.text"), settlement,
+                "buyProposition.nothing", choices);
             if (goods == null) break; // Trade aborted by the player
 
             int gold = -1; // Initially ask for a price
@@ -3483,9 +3490,15 @@ public final class InGameController implements NetworkConstants {
         Goods goods = null;
         for (;;) {
             // Choose goods to sell
-            goods = gui.showSimpleChoiceDialog(unit.getTile(),
-                "sellProposition.text", "sellProposition.nothing",
-                unit.getGoodsList());
+            List<ChoiceItem<Goods>> choices
+                = new ArrayList<ChoiceItem<Goods>>();
+            for (Goods g : unit.getGoodsList()) {
+                String label = Messages.message(g.getLabel(true));
+                choices.add(new ChoiceItem<Goods>(label, g));
+            }
+            goods = gui.showChoiceDialog(true, unit.getTile(),
+                Messages.message("sellProposition.text"), settlement,
+                "sellProposition.nothing", choices);
             if (goods == null) break; // Trade aborted by the player
 
             int gold = -1; // Initially ask for a price
@@ -3531,8 +3544,13 @@ public final class InGameController implements NetworkConstants {
      * @param settlement The <code>Settlement</code> that is trading.
      */
     private void attemptGiftToSettlement(Unit unit, Settlement settlement) {
-        Goods goods = gui.showSimpleChoiceDialog(unit.getTile(),
-            "gift.text", "cancel", unit.getGoodsList());
+        List<ChoiceItem<Goods>> choices = new ArrayList<ChoiceItem<Goods>>();
+        for (Goods g : unit.getGoodsList()) {
+            String label = Messages.message(g.getLabel(true));
+            choices.add(new ChoiceItem<Goods>(label, g));
+        }
+        Goods goods = gui.showChoiceDialog(true, unit.getTile(),
+            Messages.message("gift.text"), settlement, "cancel", choices);
         if (goods != null) {
             askServer().deliverGiftToSettlement(unit, settlement, goods);
         }
@@ -3598,10 +3616,15 @@ public final class InGameController implements NetworkConstants {
             List<Player> enemies = new ArrayList<Player>(freeColClient
                 .getGame().getLiveEuropeanPlayers());
             enemies.remove(player);
-            Player enemy = gui.showSimpleChoiceDialog(unit.getTile(),
-                "missionarySettlement.inciteQuestion",
-                "missionarySettlement.cancel",
-                enemies);
+            List<ChoiceItem<Player>> choices
+                = new ArrayList<ChoiceItem<Player>>();
+            for (Player p : enemies) {
+                String label = Messages.message(p.getNationName());
+                choices.add(new ChoiceItem<Player>(label, p));
+            }
+            Player enemy = gui.showChoiceDialog(true, unit.getTile(),
+                Messages.message("missionarySettlement.inciteQuestion"), unit,
+                "missionarySettlement.cancel", choices);
             if (enemy == null) return true;
             int gold = askServer().incite(unit, direction, enemy, -1);
             if (gold < 0) {
