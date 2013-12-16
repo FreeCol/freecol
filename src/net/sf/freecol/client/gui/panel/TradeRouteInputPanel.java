@@ -98,6 +98,7 @@ public final class TradeRouteInputPanel extends FreeColPanel {
             super(getLibrary().getGoodsImageIcon(type));
 
             this.goodsType = type;
+            setDisabledIcon(getDisabledIcon());
             setTransferHandler(TradeRouteInputPanel.this.cargoHandler);
             addMouseListener(TradeRouteInputPanel.this.dragListener);
         }
@@ -125,6 +126,19 @@ public final class TradeRouteInputPanel extends FreeColPanel {
             setBorder(BorderFactory
                 .createTitledBorder(Messages.message("goods")));
             addMouseListener(TradeRouteInputPanel.this.dropListener);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void setEnabled(boolean enable) {
+            super.setEnabled(enable);
+            for (Component child : getComponents()) {
+                if (child instanceof CargoLabel) {
+                    ((CargoLabel)child).setEnabled(enable);
+                }
+            }
         }
     }
 
@@ -434,34 +448,37 @@ public final class TradeRouteInputPanel extends FreeColPanel {
     private final TradeRoute newRoute;
 
     /** A TransferHandler for the cargo labels. */
-    private final CargoHandler cargoHandler;
+    private CargoHandler cargoHandler;
 
     /** Mouse listeners to use throughout. */
-    private final MouseListener dragListener, dropListener;
+    private MouseListener dragListener, dropListener;
 
     /** Model to contain the current stops. */
-    private final DefaultListModel stopListModel;
+    private DefaultListModel stopListModel;
 
     /** The list of stops to show. */
-    private final JList stopList;
+    private JList stopList;
 
     /** The user-editable name of the trade route. */
-    private final JTextField tradeRouteName;
+    private JTextField tradeRouteName;
 
     /** A box to select stops to add. */
-    private final JComboBox destinationSelector;
+    private JComboBox destinationSelector;
 
     /** Toggle message display. */
-    private final JCheckBox messagesBox;
+    private JCheckBox messagesBox;
 
     /** A button to add stops with. */
-    private final JButton addStopButton;
+    private JButton addStopButton;
 
     /** A button to remove stops with. */
-    private final JButton removeStopButton;
+    private JButton removeStopButton;
+
+    /** The panel displaying the goods that could be transported. */
+    private GoodsPanel goodsPanel;
 
     /** The panel displaying the cargo at the selected stop. */
-    private final CargoPanel cargoPanel;
+    private CargoPanel cargoPanel;
 
 
     /**
@@ -520,7 +537,10 @@ public final class TradeRouteInputPanel extends FreeColPanel {
                     if (idx.length > 0) {
                         TradeRouteStop stop = (TradeRouteStop)
                             TradeRouteInputPanel.this.stopListModel.get(idx[0]);
-                        cargoPanel.initialize(stop);
+                        TradeRouteInputPanel.this.cargoPanel.initialize(stop);
+                        TradeRouteInputPanel.this.goodsPanel.setEnabled(true);
+                    } else {
+                        TradeRouteInputPanel.this.goodsPanel.setEnabled(false);
                     }
                     updateButtons();
                 }
@@ -569,8 +589,9 @@ public final class TradeRouteInputPanel extends FreeColPanel {
                 }
             });
 
-        GoodsPanel goodsPanel = new GoodsPanel();
-        goodsPanel.setTransferHandler(this.cargoHandler);
+        this.goodsPanel = new GoodsPanel();
+        this.goodsPanel.setTransferHandler(this.cargoHandler);
+        this.goodsPanel.setEnabled(false);
         this.cargoPanel = new CargoPanel();
         this.cargoPanel.setTransferHandler(this.cargoHandler);
 
@@ -589,7 +610,7 @@ public final class TradeRouteInputPanel extends FreeColPanel {
         add(this.messagesBox);
         add(this.addStopButton);
         add(this.removeStopButton, "span");
-        add(goodsPanel, "span");
+        add(this.goodsPanel, "span");
         add(this.cargoPanel, "span, height 80:, growy");
         add(okButton, "newline 20, span, split 2, tag ok");
         add(cancelButton, "tag cancel");
@@ -688,6 +709,7 @@ public final class TradeRouteInputPanel extends FreeColPanel {
         // Check that the name is unique
         String newName = this.tradeRouteName.getText();
         for (TradeRoute route : player.getTradeRoutes()) {
+            if (route.getName() == null) continue;
             if (route.getName().equals(this.newRoute.getName())) continue;
             if (route.getName().equals(newName)) {
                 StringTemplate template
@@ -738,7 +760,7 @@ public final class TradeRouteInputPanel extends FreeColPanel {
                     .get(index));
             }
             this.newRoute.setSilent(this.messagesBox.isSelected());
-            // Return to TradeRouteDialog, which will add the route
+            // Return to TradeRoutePanel, which will add the route
             // if needed, and it is valid.
             super.actionPerformed(event);
 
@@ -750,5 +772,29 @@ public final class TradeRouteInputPanel extends FreeColPanel {
         } else {
             super.actionPerformed(event);
         }
+    }
+
+
+    // Override Component
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeNotify() {
+        this.cargoHandler = null;
+        this.dragListener = null;
+        this.dropListener = null;
+        this.stopListModel.clear();
+        this.stopListModel = null;
+        this.stopList = null;
+        this.tradeRouteName = null;
+        this.destinationSelector = null;
+        this.messagesBox = null;
+        this.addStopButton = null;
+        this.removeStopButton = null;
+        this.cargoPanel = null;
+
+        super.removeNotify();
     }
 }
