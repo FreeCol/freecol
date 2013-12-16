@@ -57,6 +57,7 @@ import javax.swing.border.EmptyBorder;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -268,12 +269,30 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
     }
 
     /**
+     * Get the FreeColClient.
+     *
+     * @return The <code>FreeColClient</code>.
+     */
+    protected FreeColClient getFreeColClient() {
+        return freeColClient;
+    }
+
+    /**
      * Get the GUI.
      *
      * @return The <code>GUI</code>.
      */
     protected GUI getGUI() {
         return freeColClient.getGUI();
+    }
+
+    /**
+     * Get the controller.
+     *
+     * @return The <code>InGameController</code>.
+     */
+    protected InGameController getController() {
+        return freeColClient.getInGameController();
     }
 
     /**

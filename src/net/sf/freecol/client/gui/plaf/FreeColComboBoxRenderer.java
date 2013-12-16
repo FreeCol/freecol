@@ -19,8 +19,6 @@
 
 package net.sf.freecol.client.gui.plaf;
 
-import java.util.logging.Logger;
-
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Component;
@@ -33,6 +31,10 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
+
+import java.lang.reflect.Method;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.freecol.common.ObjectWithId;
 import net.sf.freecol.common.model.Nameable;
@@ -139,10 +141,19 @@ public class FreeColComboBoxRenderer implements ListCellRenderer, UIResource {
             c.setText(nd[0]);
             if (nd[1] != null) c.setToolTipText(nd[1]);
         } else if (value instanceof Integer) {
-            // partial load values from SelectAmountDialog
+            // partial load values from SelectAmountDialog are Integers
             c.setText(value.toString());
         } else {
-            logger.warning("What is this?: " + value);
+            try {
+                Method m = value.getClass().getMethod("comboBoxLabel");
+                c.setText((String)m.invoke(value));
+                return;
+            } catch (NoSuchMethodException nsme) {
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "comboBoxLabel fail", e);
+            }
+            logger.warning("What is this?: " + value
+                + " (" + value.getClass() + ")");
         }
     }
 
@@ -173,5 +184,4 @@ public class FreeColComboBoxRenderer implements ListCellRenderer, UIResource {
             setOpaque(false);
         }
     }
-
 }

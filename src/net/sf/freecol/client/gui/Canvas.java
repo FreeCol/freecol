@@ -2241,10 +2241,8 @@ public final class Canvas extends JDesktopPane {
     public DiplomaticTrade showNegotiationDialog(Unit unit,
                                                  Settlement settlement,
                                                  DiplomaticTrade agreement) {
-        NegotiationDialog negotiationDialog
-            = new NegotiationDialog(freeColClient, unit, settlement, agreement);
-        negotiationDialog.initialize();
-        return showFreeColOldDialog(negotiationDialog, unit.getTile(), true);
+        return showFreeColDialog(new NegotiationDialog(freeColClient, unit,
+                settlement, agreement), unit.getTile());
     }
 
     /**

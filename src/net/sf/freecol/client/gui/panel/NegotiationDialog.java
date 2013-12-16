@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -66,8 +67,7 @@ import net.sf.freecol.common.model.UnitTradeItem;
 /**
  * The panel that allows negotiations between players.
  */
-public final class NegotiationDialog extends FreeColOldDialog<DiplomaticTrade>
-    implements ActionListener {
+public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
 
     private static Logger logger = Logger.getLogger(NegotiationDialog.class.getName());
 
@@ -76,387 +76,6 @@ public final class NegotiationDialog extends FreeColOldDialog<DiplomaticTrade>
     private static final String SEND = "send";
 
     private static final int HUGE_DEMAND = 100000;
-
-    private DiplomaticTrade agreement;
-
-    private JButton acceptButton, cancelButton, sendButton;
-    private StanceTradeItemPanel stancePanel;
-    private GoldTradeItemPanel goldOfferPanel, goldDemandPanel;
-    private ColonyTradeItemPanel colonyOfferPanel, colonyDemandPanel;
-    private GoodsTradeItemPanel goodsOfferPanel, goodsDemandPanel;
-    //private UnitTradeItemPanel unitOffer, unitDemand;
-    private JPanel summary;
-
-    private final Unit unit;
-    private final Settlement settlement;
-    private Player player;
-    private Player otherPlayer;
-    private Player sender;
-    private Player recipient;
-    private boolean canAccept;
-
-    private String demandMessage;
-    private String offerMessage;
-    private String exchangeMessage;
-
-
-    /**
-     * Creates a new <code>NegotiationDialog</code> instance.
-     *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param unit The <code>Unit</code> that is trading.
-     * @param settlement The <code>Settlement</code> that is trading.
-     */
-    public NegotiationDialog(FreeColClient freeColClient, Unit unit,
-                             Settlement settlement) {
-        this(freeColClient, unit, settlement, null);
-    }
-
-    /**
-     * Creates a new <code>NegotiationDialog</code> instance.
-     *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param unit The <code>Unit</code> that is trading.
-     * @param settlement The <code>Settlement</code> that is trading.
-     * @param agreement The <code>DiplomaticTrade</code> agreement that
-     *     is being negotiated.
-     */
-    public NegotiationDialog(FreeColClient freeColClient, Unit unit,
-                             Settlement settlement,
-                             DiplomaticTrade agreement) {
-        super(freeColClient, new MigLayout("wrap 3",
-                "[200, fill][300, fill][200, fill]", ""));
-
-        setFocusCycleRoot(true);
-
-        this.unit = unit;
-        this.settlement = settlement;
-        this.player = getMyPlayer();
-        this.sender = unit.getOwner();
-        this.recipient = settlement.getOwner();
-        this.otherPlayer = (sender == player) ? recipient : sender;
-        this.canAccept = agreement != null; // a new offer can't be accepted
-        this.agreement = (agreement != null) ? agreement
-            : new DiplomaticTrade(unit.getGame(), sender, recipient);
-
-        demandMessage = Messages
-            .message(StringTemplate.template("negotiationDialog.demand")
-                     .addStringTemplate("%nation%", sender.getNationName()));
-        offerMessage = Messages
-            .message(StringTemplate.template("negotiationDialog.offer")
-                     .addStringTemplate("%nation%", sender.getNationName()));
-        exchangeMessage = Messages
-            .message(StringTemplate.template("negotiationDialog.exchange")
-                     .addStringTemplate("%nation%", sender.getNationName()));
-
-        if (player.atWarWith(otherPlayer)) {
-            if (getStance() == null) {
-                this.agreement.add(new StanceTradeItem(getGame(), player,
-                        otherPlayer, Stance.PEACE));
-            }
-        }
-
-        summary = new MigPanel();
-        summary.setLayout(new MigLayout("wrap 2", "[20px][]"));
-        summary.setOpaque(false);
-    }
-
-    /**
-     * Set up the dialog.
-     */
-    @Override
-    public void initialize() {
-        sendButton = new JButton(Messages.message("negotiationDialog.send"));
-        sendButton.addActionListener(this);
-        sendButton.setActionCommand(SEND);
-
-        acceptButton = new JButton(Messages.message("negotiationDialog.accept"));
-        acceptButton.addActionListener(this);
-        acceptButton.setActionCommand(ACCEPT);
-        acceptButton.setEnabled(canAccept);
-
-        cancelButton = new JButton(Messages.message("negotiationDialog.cancel"));
-        cancelButton.addActionListener(this);
-        cancelButton.setActionCommand(CANCEL);
-        setCancelComponent(cancelButton);
-
-        stancePanel = new StanceTradeItemPanel(this, player, otherPlayer);
-        goldDemandPanel = new GoldTradeItemPanel(this, otherPlayer,
-                                                 HUGE_DEMAND);
-        goldOfferPanel = new GoldTradeItemPanel(this, player,
-            ((player.getGold() == Player.GOLD_NOT_ACCOUNTED) ? HUGE_DEMAND
-                : player.getGold()));
-        colonyDemandPanel = new ColonyTradeItemPanel(this, otherPlayer);
-        colonyOfferPanel = new ColonyTradeItemPanel(this, player);
-        /** TODO: UnitTrade
-            unitDemand = new UnitTradeItemPanel(this, otherPlayer);
-            unitOffer = new UnitTradeItemPanel(this, player);
-        */
-
-        add(new JLabel(demandMessage), "center");
-        add(new JLabel(offerMessage), "skip, center");
-
-        add(goldDemandPanel);
-        add(summary, "spany, top");
-        add(goldOfferPanel);
-        if (unit.isCarrier()) {
-            List<Goods> unitGoods = unit.getGoodsList();
-            goodsDemandPanel = new GoodsTradeItemPanel(this, otherPlayer,
-                                                       getAnyGoods());
-            add(goodsDemandPanel);
-            goodsOfferPanel = new GoodsTradeItemPanel(this, player,
-                ((unit.getOwner() == player) ? unit.getGoodsList()
-                    : settlement.getCompactGoods()));
-            add(goodsOfferPanel);
-        } else {
-            add(colonyDemandPanel);
-            add(colonyOfferPanel);
-        }
-        add(stancePanel, "skip");
-        /** TODO: UnitTrade
-            add(unitDemand, higConst.rc(row, demandColumn));
-            add(unitOffer, higConst.rc(row, offerColumn));
-        */
-        add(sendButton, "newline 20, span, split 3");
-        add(acceptButton, "tag ok");
-        add(cancelButton, "tag cancel");
-
-        updateDialog();
-    }
-
-    /**
-     * Gets a list of all possible storable goods (one cargo load).
-     * Note that these goods are fictional.  They are the goods that
-     * *might* be in the other player's store.  Therefore they have a
-     * null location (using the other player unit or settlement is not
-     * valid on the client side, as there may not even be a
-     * GoodsContainer present).
-     *
-     * @return A list of storable <code>Goods</code>.
-     */
-    private List<Goods> getAnyGoods() {
-        List<Goods> goodsList = new ArrayList<Goods>();
-        for (GoodsType type : getSpecification().getGoodsTypeList()) {
-            if (type.isStorable()) {
-                goodsList.add(new Goods(getGame(), null, type,
-                                        GoodsContainer.CARGO_SIZE));
-            }
-        }
-        return goodsList;
-    }
-
-    /**
-     * Update the entire dialog.
-     */
-    private void updateDialog() {
-        stancePanel.updateStanceBox();
-        updateOfferItems();
-        updateDemandItems();
-        updateSummary();
-    }
-
-    /**
-     * Update the items being offered.
-     */
-    private void updateOfferItems() {
-        goldOfferPanel.setAvailableGold(player.getGold());
-
-        if (unit.isCarrier()) {
-            List<Goods> goodsAvail = new ArrayList<Goods>();
-            if (unit.getOwner() == player) {
-                goodsAvail.addAll(unit.getCompactGoodsList());
-            } else {
-                goodsAvail.addAll(settlement.getCompactGoods());
-            }
-            for (Goods g : goodsAvail) {
-                if (g.getAmount() > GoodsContainer.CARGO_SIZE) {
-                    g.setAmount(GoodsContainer.CARGO_SIZE);
-                }
-            }
-
-            for (Goods goods : agreement.getGoodsGivenBy(player)) {
-                // Remove the ones already on the table
-                for (int i = 0; i < goodsAvail.size(); i++) {
-                    Goods g = goodsAvail.get(i);
-                    if (g.getType() == goods.getType()) {
-                        if (g.getAmount() <= goods.getAmount()) {
-                            goodsAvail.remove(i);
-                        } else {
-                            g.setAmount(g.getAmount() - goods.getAmount());
-                        }
-                        break;
-                    }
-                }
-            }
-            goodsOfferPanel.updateGoodsBox(goodsAvail);
-
-        } else {
-            colonyOfferPanel.updateColonyBox();
-        }
-    }
-
-    /**
-     * Update the items being demanded.
-     */
-    private void updateDemandItems() {
-        NationSummary ns = getController().getNationSummary(otherPlayer);
-        int foreignGold = (ns == null) ? 0 : ns.getGold();
-        goldDemandPanel.setAvailableGold(foreignGold);
-
-        if (unit.isCarrier()) {
-            goodsDemandPanel.updateGoodsBox(agreement.getGoodsGivenBy(otherPlayer));
-
-        } else {
-            colonyDemandPanel.updateColonyBox();
-        }
-    }
-
-    /**
-     * Gets a trade item button for a given item.
-     *
-     * @param item The <code>TradeItem</code> to make a button for.
-     * @return A new <code>JButton</code> for the item.
-     */
-    private JButton getTradeItemButton(TradeItem item) {
-        String description = null;
-        if (item instanceof StanceTradeItem) {
-            StanceTradeItem i = (StanceTradeItem)item;
-            description = Messages.message(i.getStance().getKey());
-        } else if (item instanceof GoldTradeItem) {
-            int gold = ((GoldTradeItem)item).getGold();
-            description = Messages
-                .message(StringTemplate.template("tradeItem.gold.long")
-                    .addAmount("%amount%", gold));
-        } else if (item instanceof ColonyTradeItem) {
-            ColonyTradeItem i = (ColonyTradeItem)item;
-            description = Messages
-                .message(StringTemplate.template("tradeItem.colony.long")
-                    .addName("%colony%", i.getColonyName()));
-        } else if (item instanceof GoodsTradeItem) {
-            GoodsTradeItem i = (GoodsTradeItem)item;
-            description = Messages
-                .message(StringTemplate.template("model.goods.goodsAmount")
-                    .addAmount("%amount%", i.getGoods().getAmount())
-                    .add("%goods%", i.getGoods().getNameKey()));
-        } else if (item instanceof UnitTradeItem) {
-            UnitTradeItem i = (UnitTradeItem)item;
-            description = Messages.getLabel(i.getUnit());
-        }
-        JButton button = new JButton(new RemoveAction(item));
-        button.setText(description);
-        button.setMargin(GUI.EMPTY_MARGIN);
-        button.setOpaque(false);
-        button.setForeground(GUI.LINK_COLOR);
-        button.setBorder(BorderFactory.createEmptyBorder());
-        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        return button;
-    }
-
-    /**
-     * Update the text summary of the proposed transaction.
-     */
-    private void updateSummary() {
-        summary.removeAll();
-
-        List<TradeItem> offers = agreement.getItemsGivenBy(player);
-        if (!offers.isEmpty()) {
-            summary.add(new JLabel(offerMessage), "span");
-            for (TradeItem item : offers) {
-                summary.add(getTradeItemButton(item), "skip");
-            }
-        }
-
-        List<TradeItem> demands = agreement.getItemsGivenBy(otherPlayer);
-        if (!demands.isEmpty()) {
-            if (demands.isEmpty()) {
-                summary.add(new JLabel(demandMessage), "span");
-            } else {
-                summary.add(new JLabel(exchangeMessage), "newline 20, span");
-            }
-            for (TradeItem item : demands) {
-                summary.add(getTradeItemButton(item), "skip");
-            }
-        }
-    }
-
-
-    /**
-     * Adds a <code>ColonyTradeItem</code> to the list of TradeItems.
-     *
-     * @param source a <code>Player</code> value
-     * @param colony a <code>Colony</code> value
-     */
-    public void addColonyTradeItem(Player source, Colony colony) {
-        Player destination = (source == otherPlayer) ? player : otherPlayer;
-        agreement.add(new ColonyTradeItem(getGame(), source, destination,
-                                          colony));
-    }
-
-    /**
-     * Adds a <code>GoldTradeItem</code> to the list of TradeItems.
-     *
-     * @param source a <code>Player</code> value
-     * @param amount an <code>int</code> value
-     */
-    public void addGoldTradeItem(Player source, int amount) {
-        Player destination = (source == otherPlayer) ? player : otherPlayer;
-        agreement.add(new GoldTradeItem(getGame(), source, destination,
-                                        amount));
-    }
-
-    /**
-     * Adds a <code>GoodsTradeItem</code> to the list of TradeItems.
-     *
-     * @param source a <code>Player</code> value
-     * @param goods a <code>Goods</code> value
-     */
-    public void addGoodsTradeItem(Player source, Goods goods) {
-        Player destination = (source == otherPlayer) ? player : otherPlayer;
-        agreement.add(new GoodsTradeItem(getGame(), source, destination,
-                                         goods, settlement));
-    }
-
-    /**
-     * Trade a stance change between the players.
-     *
-     * @param stance The <code>Stance</code> to trade.
-     */
-    public void setStance(Stance stance) {
-        agreement.add(new StanceTradeItem(getGame(), otherPlayer, player,
-                                          stance));
-    }
-
-    /**
-     * Returns the stance being offered.
-     *
-     * @return a <code>Stance</code> value
-     */
-    public Stance getStance() {
-        return agreement.getStance();
-    }
-
-
-    // Interface ActionListener
-
-    /**
-     * {@inheritDoc}
-     */
-    public void actionPerformed(ActionEvent event) {
-        final String command = event.getActionCommand();
-        if (command.equals(CANCEL)) {
-            agreement.setStatus(TradeStatus.REJECT_TRADE);
-            setResponse(agreement);
-        } else if (command.equals(ACCEPT)) {
-            agreement.setStatus(TradeStatus.ACCEPT_TRADE);
-            setResponse(agreement);
-        } else if (command.equals(SEND)) {
-            agreement.setStatus(TradeStatus.PROPOSE_TRADE);
-            setResponse(agreement);
-        } else {
-            super.actionPerformed(event);
-        }
-    }
-
 
     private class RemoveAction extends AbstractAction {
         private TradeItem item;
@@ -525,8 +144,10 @@ public final class NegotiationDialog extends FreeColOldDialog<DiplomaticTrade>
 
             colonyBox.removeAllItems();
 
-            Iterator<Colony> coloniesInAgreement = agreement.getColoniesGivenBy(player).iterator();
-            List<Colony> coloniesAvail = getClientOptions().getSortedColonies(player);
+            Iterator<Colony> coloniesInAgreement
+                = agreement.getColoniesGivenBy(player).iterator();
+            List<Colony> coloniesAvail = NegotiationDialog.this
+                .getFreeColClient().getClientOptions().getSortedColonies(player);
 
             //remove the ones already on the table
             while(coloniesInAgreement.hasNext()){
@@ -677,7 +298,6 @@ public final class NegotiationDialog extends FreeColOldDialog<DiplomaticTrade>
         private NegotiationDialog negotiationDialog;
         private JLabel label;
 
-
         /**
          * Creates a new <code>GoodsTradeItemPanel</code> instance.
          *
@@ -749,10 +369,14 @@ public final class NegotiationDialog extends FreeColOldDialog<DiplomaticTrade>
         }
     }
 
-    private class StanceTradeItemPanel extends JPanel
+    /**
+     * Class for the stance trade panel.  Access needs to be public so
+     * that comboBoxLabel() is externally visible.
+     */
+    public class StanceTradeItemPanel extends JPanel
         implements ActionListener {
 
-        private class StanceItem {
+        public class StanceItem {
             private Stance value;
 
             public StanceItem(Stance value) {
@@ -782,6 +406,14 @@ public final class NegotiationDialog extends FreeColOldDialog<DiplomaticTrade>
             @Override
             public int hashCode() {
                 return value.hashCode();
+            }
+
+            /**
+             * Method to handle display in
+             * FreeColComboBoxRenderer.setLabelValues.
+             */
+            public String comboBoxLabel() {
+                return toString();
             }
         }
 
@@ -845,24 +477,6 @@ public final class NegotiationDialog extends FreeColOldDialog<DiplomaticTrade>
         }
 
 
-        // Override Component
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void removeNotify() {
-            super.removeNotify();
-
-            removeAll();
-            acceptButton = cancelButton = sendButton = null;
-            stancePanel = null;
-            goldOfferPanel = goldDemandPanel = null;
-            colonyOfferPanel = colonyDemandPanel = null;
-            goodsOfferPanel = goodsDemandPanel = null;
-        }
-
-
         // Interface ActionListener
 
         /**
@@ -878,5 +492,415 @@ public final class NegotiationDialog extends FreeColOldDialog<DiplomaticTrade>
                 logger.warning("Bad command: " + command);
             }
         }
+    }
+
+    /** The unit negotiating the agreement. */
+    private final Unit unit;
+
+    /** The settlement to negotiate with. */
+    private final Settlement settlement;
+
+    /** The other player in the negotiation (!= getMyPlayer()). */
+    private Player otherPlayer;
+
+    /** The agreement under negotiation. */
+    private DiplomaticTrade agreement;
+
+    /** The panels for various negotiable data. */
+    private StanceTradeItemPanel stancePanel;
+    private GoldTradeItemPanel goldOfferPanel, goldDemandPanel;
+    private ColonyTradeItemPanel colonyOfferPanel, colonyDemandPanel;
+    private GoodsTradeItemPanel goodsOfferPanel, goodsDemandPanel;
+    //private UnitTradeItemPanel unitOffer, unitDemand;
+
+    /** A panel showing a summary of the current agreement. */
+    private JPanel summary;
+
+    /** Useful internal messages. */
+    private String demandMessage, offerMessage, exchangeMessage;
+
+
+    /**
+     * Creates a new <code>NegotiationDialog</code> instance.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param unit The <code>Unit</code> that is trading.
+     * @param settlement The <code>Settlement</code> that is trading.
+     */
+    public NegotiationDialog(FreeColClient freeColClient, Unit unit,
+                             Settlement settlement) {
+        this(freeColClient, unit, settlement, null);
+    }
+
+    /**
+     * Creates a new <code>NegotiationDialog</code> instance.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param unit The <code>Unit</code> that is trading.
+     * @param settlement The <code>Settlement</code> that is trading.
+     * @param agreement The <code>DiplomaticTrade</code> agreement that
+     *     is being negotiated.
+     */
+    public NegotiationDialog(FreeColClient freeColClient, Unit unit,
+                             Settlement settlement,
+                             DiplomaticTrade agreement) {
+        super(freeColClient);
+
+        final Player player = getMyPlayer();
+        final Player unitPlayer = unit.getOwner();
+        final Player colonyPlayer = settlement.getOwner();
+
+        setFocusCycleRoot(true);
+
+        this.unit = unit;
+        this.settlement = settlement;
+        this.otherPlayer = (unitPlayer == player) ? colonyPlayer
+            : unitPlayer;
+        this.agreement = (agreement != null) ? agreement
+            : new DiplomaticTrade(unit.getGame(), unitPlayer, colonyPlayer);
+        boolean canAccept = agreement != null; // a new offer can't be accepted
+        this.demandMessage = Messages
+            .message(StringTemplate.template("negotiationDialog.demand")
+                .addStringTemplate("%nation%", unitPlayer.getNationName()));
+        this.offerMessage = Messages
+            .message(StringTemplate.template("negotiationDialog.offer")
+                .addStringTemplate("%nation%", unitPlayer.getNationName()));
+        this.exchangeMessage = Messages
+            .message(StringTemplate.template("negotiationDialog.exchange")
+                .addStringTemplate("%nation%", unitPlayer.getNationName()));
+
+
+        if (player.atWarWith(otherPlayer)) {
+            if (getStance() == null) {
+                this.agreement.add(new StanceTradeItem(getGame(), player,
+                        otherPlayer, Stance.PEACE));
+            }
+        }
+
+        this.stancePanel = new StanceTradeItemPanel(this, player, otherPlayer);
+        this.goldDemandPanel = new GoldTradeItemPanel(this, otherPlayer,
+                                                      HUGE_DEMAND);
+        this.goldOfferPanel = new GoldTradeItemPanel(this, player,
+            ((player.getGold() == Player.GOLD_NOT_ACCOUNTED) ? HUGE_DEMAND
+                : player.getGold()));
+        this.colonyDemandPanel = new ColonyTradeItemPanel(this, otherPlayer);
+        this.colonyOfferPanel = new ColonyTradeItemPanel(this, player);
+        /** TODO: UnitTrade
+            unitDemand = new UnitTradeItemPanel(this, otherPlayer);
+            unitOffer = new UnitTradeItemPanel(this, player);
+        */
+
+        summary = new MigPanel();
+        summary.setLayout(new MigLayout("wrap 2", "[20px][]"));
+        summary.setOpaque(false);
+
+        MigPanel panel = new MigPanel(new MigLayout("wrap 3",
+                "[200, fill][300, fill][200, fill]", ""));
+        panel.add(new JLabel(demandMessage), "center");
+        panel.add(new JLabel(offerMessage), "skip, center");
+
+        panel.add(goldDemandPanel);
+        panel.add(summary, "spany, top");
+        panel.add(goldOfferPanel);
+        if (unit.isCarrier()) {
+            List<Goods> unitGoods = unit.getGoodsList();
+            this.goodsDemandPanel = new GoodsTradeItemPanel(this, otherPlayer,
+                                                            getAnyGoods());
+            panel.add(goodsDemandPanel);
+            this.goodsOfferPanel = new GoodsTradeItemPanel(this, player,
+                ((unit.getOwner() == player) ? unit.getGoodsList()
+                    : settlement.getCompactGoods()));
+            panel.add(goodsOfferPanel);
+        } else {
+            panel.add(colonyDemandPanel);
+            panel.add(colonyOfferPanel);
+        }
+        panel.add(stancePanel, "skip");
+        /** TODO: UnitTrade
+            add(unitDemand, higConst.rc(row, demandColumn));
+            add(unitOffer, higConst.rc(row, offerColumn));
+        */
+
+        DiplomaticTrade bogus = null;
+        String str;
+        List<ChoiceItem<DiplomaticTrade>> c = choices();
+        if (canAccept) {
+            str = Messages.message("negotiationDialog.accept");
+            c.add(new ChoiceItem<DiplomaticTrade>(str, bogus));
+        }
+        str = Messages.message("negotiationDialog.send");
+        c.add(new ChoiceItem<DiplomaticTrade>(str, bogus)
+            .okOption());
+        str = Messages.message("negotiationDialog.cancel");
+        c.add(new ChoiceItem<DiplomaticTrade>(str, bogus)
+            .cancelOption().defaultOption());
+        ImageIcon icon = getImageLibrary()
+            .getImageIcon((otherPlayer == unitPlayer) ? unit : settlement,
+                          false);
+        initialize(DialogType.QUESTION, true, panel, icon, c);
+
+        updateDialog();
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public DiplomaticTrade getResponse() {
+        Object value = getValue();
+        agreement.setStatus((options.size()==3 && options.get(0).equals(value))
+            ? TradeStatus.ACCEPT_TRADE
+            : (options.size() == 3 && options.get(1).equals(value))
+            ? TradeStatus.PROPOSE_TRADE
+            : (options.size() == 2 && options.get(0).equals(value))
+            ? TradeStatus.PROPOSE_TRADE
+            : TradeStatus.REJECT_TRADE);
+        return agreement;
+    }
+
+    /**
+     * Gets a list of all possible storable goods (one cargo load).
+     * Note that these goods are fictional.  They are the goods that
+     * *might* be in the other player's store.  Therefore they have a
+     * null location (using the other player unit or settlement is not
+     * valid on the client side, as there may not even be a
+     * GoodsContainer present).
+     *
+     * @return A list of storable <code>Goods</code>.
+     */
+    private List<Goods> getAnyGoods() {
+        List<Goods> goodsList = new ArrayList<Goods>();
+        for (GoodsType type : getSpecification().getGoodsTypeList()) {
+            if (type.isStorable()) {
+                goodsList.add(new Goods(getGame(), null, type,
+                                        GoodsContainer.CARGO_SIZE));
+            }
+        }
+        return goodsList;
+    }
+
+    /**
+     * Update the entire dialog.
+     */
+    private void updateDialog() {
+        stancePanel.updateStanceBox();
+        updateOfferItems();
+        updateDemandItems();
+        updateSummary();
+    }
+
+    /**
+     * Update the items being offered.
+     */
+    private void updateOfferItems() {
+        final Player player = getMyPlayer();
+
+        goldOfferPanel.setAvailableGold(player.getGold());
+
+        if (unit.isCarrier()) {
+            List<Goods> goodsAvail = new ArrayList<Goods>();
+            if (unit.getOwner() == player) {
+                goodsAvail.addAll(unit.getCompactGoodsList());
+            } else {
+                goodsAvail.addAll(settlement.getCompactGoods());
+            }
+            for (Goods g : goodsAvail) {
+                if (g.getAmount() > GoodsContainer.CARGO_SIZE) {
+                    g.setAmount(GoodsContainer.CARGO_SIZE);
+                }
+            }
+
+            for (Goods goods : agreement.getGoodsGivenBy(player)) {
+                // Remove the ones already on the table
+                for (int i = 0; i < goodsAvail.size(); i++) {
+                    Goods g = goodsAvail.get(i);
+                    if (g.getType() == goods.getType()) {
+                        if (g.getAmount() <= goods.getAmount()) {
+                            goodsAvail.remove(i);
+                        } else {
+                            g.setAmount(g.getAmount() - goods.getAmount());
+                        }
+                        break;
+                    }
+                }
+            }
+            goodsOfferPanel.updateGoodsBox(goodsAvail);
+
+        } else {
+            colonyOfferPanel.updateColonyBox();
+        }
+    }
+
+    /**
+     * Update the items being demanded.
+     */
+    private void updateDemandItems() {
+        final Player player = getMyPlayer();
+
+        NationSummary ns = getController().getNationSummary(otherPlayer);
+        int foreignGold = (ns == null) ? 0 : ns.getGold();
+        goldDemandPanel.setAvailableGold(foreignGold);
+
+        if (unit.isCarrier()) {
+            goodsDemandPanel.updateGoodsBox(agreement.getGoodsGivenBy(otherPlayer));
+
+        } else {
+            colonyDemandPanel.updateColonyBox();
+        }
+    }
+
+    /**
+     * Gets a trade item button for a given item.
+     *
+     * @param item The <code>TradeItem</code> to make a button for.
+     * @return A new <code>JButton</code> for the item.
+     */
+    private JButton getTradeItemButton(TradeItem item) {
+        String description = null;
+        if (item instanceof StanceTradeItem) {
+            StanceTradeItem i = (StanceTradeItem)item;
+            description = Messages.message(i.getStance().getKey());
+        } else if (item instanceof GoldTradeItem) {
+            int gold = ((GoldTradeItem)item).getGold();
+            description = Messages
+                .message(StringTemplate.template("tradeItem.gold.long")
+                    .addAmount("%amount%", gold));
+        } else if (item instanceof ColonyTradeItem) {
+            ColonyTradeItem i = (ColonyTradeItem)item;
+            description = Messages
+                .message(StringTemplate.template("tradeItem.colony.long")
+                    .addName("%colony%", i.getColonyName()));
+        } else if (item instanceof GoodsTradeItem) {
+            GoodsTradeItem i = (GoodsTradeItem)item;
+            description = Messages
+                .message(StringTemplate.template("model.goods.goodsAmount")
+                    .addAmount("%amount%", i.getGoods().getAmount())
+                    .add("%goods%", i.getGoods().getNameKey()));
+        } else if (item instanceof UnitTradeItem) {
+            UnitTradeItem i = (UnitTradeItem)item;
+            description = Messages.getLabel(i.getUnit());
+        }
+        JButton button = new JButton(new RemoveAction(item));
+        button.setText(description);
+        button.setMargin(GUI.EMPTY_MARGIN);
+        button.setOpaque(false);
+        button.setForeground(GUI.LINK_COLOR);
+        button.setBorder(BorderFactory.createEmptyBorder());
+        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        return button;
+    }
+
+    /**
+     * Update the text summary of the proposed transaction.
+     */
+    private void updateSummary() {
+        final Player player = getMyPlayer();
+
+        summary.removeAll();
+
+        List<TradeItem> offers = agreement.getItemsGivenBy(player);
+        if (!offers.isEmpty()) {
+            summary.add(new JLabel(offerMessage), "span");
+            for (TradeItem item : offers) {
+                summary.add(getTradeItemButton(item), "skip");
+            }
+        }
+
+        List<TradeItem> demands = agreement.getItemsGivenBy(otherPlayer);
+        if (!demands.isEmpty()) {
+            if (demands.isEmpty()) {
+                summary.add(new JLabel(demandMessage), "span");
+            } else {
+                summary.add(new JLabel(exchangeMessage), "newline 20, span");
+            }
+            for (TradeItem item : demands) {
+                summary.add(getTradeItemButton(item), "skip");
+            }
+        }
+    }
+
+
+    /**
+     * Adds a <code>ColonyTradeItem</code> to the list of TradeItems.
+     *
+     * @param source a <code>Player</code> value
+     * @param colony a <code>Colony</code> value
+     */
+    public void addColonyTradeItem(Player source, Colony colony) {
+        final Player player = getMyPlayer();
+
+        Player destination = (source == otherPlayer) ? player : otherPlayer;
+        agreement.add(new ColonyTradeItem(getGame(), source, destination,
+                                          colony));
+    }
+
+    /**
+     * Adds a <code>GoldTradeItem</code> to the list of TradeItems.
+     *
+     * @param source a <code>Player</code> value
+     * @param amount an <code>int</code> value
+     */
+    public void addGoldTradeItem(Player source, int amount) {
+        final Player player = getMyPlayer();
+
+        Player destination = (source == otherPlayer) ? player : otherPlayer;
+        agreement.add(new GoldTradeItem(getGame(), source, destination,
+                                        amount));
+    }
+
+    /**
+     * Adds a <code>GoodsTradeItem</code> to the list of TradeItems.
+     *
+     * @param source a <code>Player</code> value
+     * @param goods a <code>Goods</code> value
+     */
+    public void addGoodsTradeItem(Player source, Goods goods) {
+        final Player player = getMyPlayer();
+
+        Player destination = (source == otherPlayer) ? player : otherPlayer;
+        agreement.add(new GoodsTradeItem(getGame(), source, destination,
+                                         goods, settlement));
+    }
+
+    /**
+     * Trade a stance change between the players.
+     *
+     * @param stance The <code>Stance</code> to trade.
+     */
+    public void setStance(Stance stance) {
+        final Player player = getMyPlayer();
+
+        agreement.add(new StanceTradeItem(getGame(), otherPlayer, player,
+                                          stance));
+    }
+
+    /**
+     * Returns the stance being offered.
+     *
+     * @return a <code>Stance</code> value
+     */
+    public Stance getStance() {
+        return agreement.getStance();
+    }
+
+
+    // Override Component
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeNotify() {
+        super.removeNotify();
+        
+        removeAll();
+
+        this.stancePanel = null;
+        this.goldOfferPanel = this.goldDemandPanel = null;
+        this.colonyOfferPanel = this.colonyDemandPanel = null;
+        this.goodsOfferPanel = this.goodsDemandPanel = null;
+        this.summary = null;
+        this.demandMessage = this.offerMessage = this.exchangeMessage = null;
     }
 }
