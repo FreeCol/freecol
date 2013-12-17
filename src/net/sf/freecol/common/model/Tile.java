@@ -1676,20 +1676,22 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             Settlement nearSettlement = null;
             for (Tile tile: getSurroundingTiles(NEAR_RADIUS)) {
                 nearSettlement = tile.getSettlement();
-                if (nearSettlement != null) {
+                if (nearSettlement != null
+                    && nearSettlement.getName() != null) {
+                    String name = nearSettlement.getName();
                     int x = getX() - tile.getX();
                     int y = getY() - tile.getY();
                     double theta = Math.atan2(y, x) + Math.PI/2 + Math.PI/8;
                     if (theta < 0) {
                         theta += 2*Math.PI;
                     }
-                    Direction direction = Direction.values()[(int)Math.floor(theta / (Math.PI/4))];
-
+                    Direction d = Direction.angleToDirection(theta);
+                    StringTemplate l = StringTemplate.template("nearLocation")
+                        .add("%direction%", "direction." + d.toString())
+                        .addName("%location%", name);
                     return StringTemplate.template("nameLocation")
                         .add("%name%", type.getNameKey())
-                        .addStringTemplate("%location%", StringTemplate.template("nearLocation")
-                            .add("%direction%", "direction." + direction.toString())
-                            .addName("%location%", nearSettlement.getName()));
+                        .addStringTemplate("%location%", l);
                 }
             }
             if (region != null && region.getName() != null) {

@@ -540,11 +540,11 @@ public class Messages {
                 result = messageBundle.get(template.getDefaultId());
             }
             result = replaceChoices(result, template);
-	    for (int index = 0; index < template.getKeys().size(); index++) {
+            for (int index = 0; index < template.getKeys().size(); index++) {
                 result = result.replace(template.getKeys().get(index),
-                                        message(template.getReplacements().get(index)));
-	    }
-	    return result;
+                    message(template.getReplacements().get(index)));
+            }
+            return result;
         case KEY:
             String key = messageBundle.get(template.getId());
             if (key == null) {

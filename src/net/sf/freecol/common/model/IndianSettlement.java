@@ -1201,7 +1201,9 @@ public class IndianSettlement extends Settlement {
 
         } else if (client != null && hasContacted(client)) {
             // Delegated from Settlement
-            xw.writeAttribute(NAME_TAG, getName());
+            if (getName() != null) {
+                xw.writeAttribute(NAME_TAG, getName());
+            }
 
             // Special handling for skill and wanted goods which are
             // only visible when in close contact with the settlement.
@@ -1362,7 +1364,11 @@ public class IndianSettlement extends Settlement {
             Player player = xr.findFreeColGameObject(game, PLAYER_TAG,
                 Player.class, (Player)null, true);
             // @compat 0.10.5
-            setContacted(player); // Alarm used to imply contact
+            if (getName() != null) {
+                // Alarm used to imply contact, but only set contacted if
+                // we also have a valid name for the settlement.
+                setContacted(player);
+            }
             // end @compat
             alarm.put(player, new Tension(xr.getAttribute(VALUE_TAG, 0)));
             xr.closeTag(ALARM_TAG);
