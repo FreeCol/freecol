@@ -111,7 +111,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
         }
         String sale;
         add(localizedLabel("indianSettlement.highlyWanted"), "newline");
-        if (contacted) {
+        if (visited) {
             if (wantedGoods[0] == null) {
                 add(localizedLabel("indianSettlement.wantedGoodsNone"));
             } else {
@@ -127,7 +127,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
         }
 
         add(localizedLabel("indianSettlement.otherWanted"), "newline");
-        if (contacted) {
+        if (visited) {
             if (n == 0) {
                 add(localizedLabel("indianSettlement.wantedGoodsNone"));
             } else {
