@@ -2624,6 +2624,7 @@ public class Colony extends Settlement implements Nameable {
     private static final String LAND_LOCKED_TAG = "landLocked";
     private static final String LIBERTY_TAG = "liberty";
     private static final String PRODUCTION_BONUS_TAG = "productionBonus";
+    private static final String NAME_TAG = "name";
     private static final String OLD_SONS_OF_LIBERTY_TAG = "oldSonsOfLiberty";
     private static final String OLD_TORIES_TAG = "oldTories";
     private static final String POPULATION_QUEUE_TAG = "populationQueueItem";
@@ -2639,6 +2640,9 @@ public class Colony extends Settlement implements Nameable {
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
 
         super.writeAttributes(xw);
+
+        // Delegated from Settlement
+        xw.writeAttribute(NAME_TAG, getName());
 
         xw.writeAttribute(ESTABLISHED_TAG, established.getNumber());
 

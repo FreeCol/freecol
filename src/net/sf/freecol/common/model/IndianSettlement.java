@@ -1162,6 +1162,7 @@ public class IndianSettlement extends Settlement {
     private static final String LEVEL_TAG = "level";
     private static final String MISSIONARY_TAG = "missionary";
     private static final String MOST_HATED_TAG = "mostHated";
+    private static final String NAME_TAG = "name";
     private static final String OWNED_UNITS_TAG = "ownedUnits";
     private static final String PLAYER_TAG = "player";
     // Public for now while 0.10.7 backward compatibility code in Tile
@@ -1177,10 +1178,12 @@ public class IndianSettlement extends Settlement {
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
-        Player hated = getMostHated();
-        if (hated != null) xw.writeAttribute(MOST_HATED_TAG, hated);
+        final Player client = xw.getClientPlayer();
 
         if (xw.validFor(getOwner())) {
+
+            // Delegated from Settlement
+            xw.writeAttribute(NAME_TAG, getName());
 
             xw.writeAttribute(LAST_TRIBUTE_TAG, lastTribute);
 
@@ -1196,15 +1199,18 @@ public class IndianSettlement extends Settlement {
                 }
             }
 
-        } else {
+        } else if (client != null && hasContacted(client)) {
+            // Delegated from Settlement
+            xw.writeAttribute(NAME_TAG, getName());
+
             // Special handling for skill and wanted goods which are
             // only visible when in close contact with the settlement.
-            UnitType skill = getTile().getLearnableSkill(xw.getClientPlayer());
+            UnitType skill = getTile().getLearnableSkill(client);
             if (skill != null) {
                 xw.writeAttribute(LEARNABLE_SKILL_TAG, skill);
             }
 
-            GoodsType[] wanted = getTile().getWantedGoods(xw.getClientPlayer());
+            GoodsType[] wanted = getTile().getWantedGoods(client);
             if (wanted != null) {
                 int i, j = 0;
                 for (i = 0; i < wanted.length; i++) {
@@ -1215,6 +1221,10 @@ public class IndianSettlement extends Settlement {
                 }
             }
         }
+
+        // Most hated is on the chip, and thus always visible.
+        final Player hated = getMostHated();
+        if (hated != null) xw.writeAttribute(MOST_HATED_TAG, hated);
     }
 
     /**
@@ -1263,24 +1273,24 @@ public class IndianSettlement extends Settlement {
             }
 
         } else {
-            Player player = xw.getClientPlayer();
+            Player client = xw.getClientPlayer();
 
-            ContactLevel cl = contactLevels.get(player);
+            ContactLevel cl = contactLevels.get(client);
             if (cl != null) {
                 xw.writeStartElement(CONTACT_LEVEL_TAG);
 
                 xw.writeAttribute(LEVEL_TAG, cl);
 
-                xw.writeAttribute(PLAYER_TAG, player);
+                xw.writeAttribute(PLAYER_TAG, client);
 
                 xw.writeEndElement();
             }
 
-            Tension alarm = getAlarm(player);
+            Tension alarm = getAlarm(client);
             if (alarm != null) {
                 xw.writeStartElement(ALARM_TAG);
 
-                xw.writeAttribute(PLAYER_TAG, player);
+                xw.writeAttribute(PLAYER_TAG, client);
 
                 xw.writeAttribute(VALUE_TAG, alarm.getValue());
 

@@ -690,7 +690,8 @@ public abstract class Settlement extends GoodsLocation
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
-        xw.writeAttribute(NAME_TAG, getName());
+        // Delegate writing of name to subclass, as it is not
+        // available for uncontacted native settlements.
 
         xw.writeAttribute(OWNER_TAG, owner);
 
