@@ -2627,6 +2627,7 @@ public final class Canvas extends JDesktopPane {
      * @param tile The <code>Tile</code> to display.
      */
     public void showTilePanel(Tile tile) {
+        if (tile == null || !tile.isExplored()) return;
         showSubPanel(new TilePanel(freeColClient, tile), false);
     }
 

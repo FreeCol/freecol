@@ -162,7 +162,7 @@ public final class TilePopup extends JPopupMenu {
             if (hasAnItem) addSeparator();
         }
 
-        addTile(tile);
+        if (tile.isExplored()) addTile(tile);
         addSeparator();
 
         int lineCount = 0;
