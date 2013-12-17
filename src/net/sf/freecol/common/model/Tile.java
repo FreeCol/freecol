@@ -1884,21 +1884,36 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         //    copy or <code>this</code>.
         Player player = xw.getClientPlayer();
         Tile tile = (player == null) ? this : getCachedTile(player);
-        
-        xw.writeStartElement(tag);
 
         if (tile == null) {
+            xw.writeStartElement(tag);
+
             xw.writeAttribute(ID_ATTRIBUTE_TAG, getId());
 
             xw.writeAttribute(X_TAG, this.x);
 
             xw.writeAttribute(Y_TAG, this.y);
 
+            xw.writeEndElement();
         } else {
-            tile.writeAttributes(xw);
-
-            tile.writeChildren(xw);
+            tile.internalToXML(xw, tag);
         }
+    }
+
+    /**
+     * Fundamental (post-cache) version of toXML.
+     *
+     * @param xw The <code>FreeColXMLWriter</code> to write to.
+     * @param tag The tag to use.
+     * @exception XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    public void internalToXML(FreeColXMLWriter xw, String tag) throws XMLStreamException {
+        xw.writeStartElement(tag);
+
+        writeAttributes(xw);
+
+        writeChildren(xw);
 
         xw.writeEndElement();
     }
@@ -1980,16 +1995,25 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                 Tile t = getCachedTile(p);
                 if (t == null) continue;
 
+                if (t == this && getIndianSettlement() != null) {
+                    // Always save client view of native settlements
+                    // because of the hidden information.
+                    t = getTileToCache();
+                }
+
                 xw.writeStartElement(CACHED_TILE_TAG);
 
                 xw.writeAttribute(PLAYER_TAG, p);
 
                 xw.writeAttribute(COPIED_TAG, t != this);
 
-                if (t != this) { // Only write copied tiles, with limited scope
+                if (t != this) {
+                    // Only write copied tiles, with limited scope.
                     FreeColXMLWriter.WriteScope scope = xw.getWriteScope();
                     xw.setWriteScope(FreeColXMLWriter.WriteScope.toClient(p));
-                    t.toXML(xw);
+                    // Do not call toXML!  It will look for a cached tile,
+                    // inside t which is already a cached copy!
+                    t.internalToXML(xw, getXMLElementTagName());
                     xw.setWriteScope(scope);
                 }
 
@@ -2106,15 +2130,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                 Tile tile = xr.readFreeColGameObject(game, Tile.class);
                 setCachedTile(player, tile);
                 xr.setReadScope(scope);
-                if (tile.getIndianSettlement() != null) {
-                    tile.updateIndianSettlement(player);
-                }
 
             } else {
                 setCachedTile(player, this);
-                if (this.getIndianSettlement() != null) {
-                    this.updateIndianSettlement(player);
-                }
             }
             xr.closeTag(CACHED_TILE_TAG);
 
