@@ -34,8 +34,5 @@ public class HighSeasTest extends FreeColTestCase {
         Unit unit = new ServerUnit(game, highSeas, dutch, caravel);
 
         dutch.dumpObject();
-
     }
-
-
 }

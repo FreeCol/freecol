@@ -47,6 +47,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.io.FreeColXMLWriter.WriteScope;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
@@ -804,11 +805,15 @@ public class DebugUtils {
                                 final Tile tile) {
         final FreeColServer server = freeColClient.getFreeColServer();
         final Game sGame = server.getGame();
+        final Player player = freeColClient.getMyPlayer();
 
-        System.err.println("\nClient side:");
-        tile.dumpObject();
-        System.err.println("\n\nServer side:");
-        sGame.getFreeColGameObject(tile.getId()).dumpObject();
+        System.err.println("\nClient (" + player.getId() + "):");
+        tile.save(System.err, WriteScope.toClient(player));
+        System.err.println("\n\nServer:");
+        Tile sTile = sGame.getFreeColGameObject(tile.getId(), Tile.class);
+        sTile.save(System.err, WriteScope.toServer());
+        System.err.println("\n\nSave:");
+        sTile.save(System.err, WriteScope.toSave());
         System.err.println("\n");
     }
 

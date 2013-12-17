@@ -840,7 +840,7 @@ public abstract class FreeColObject implements ObjectWithId {
      * Debugging tool, dump object XML to System.err.
      */
     public void dumpObject() {
-        save(System.err);
+        save(System.err, WriteScope.toSave());
     }
 
     /**
@@ -859,18 +859,30 @@ public abstract class FreeColObject implements ObjectWithId {
      * @exception FileNotFoundException
      */
     public void save(File file) throws FileNotFoundException {
-        save(new FileOutputStream(file));
+        save(new FileOutputStream(file), WriteScope.toSave());
+    }
+
+    /**
+     * Writes the object to the given file.
+     *
+     * @param file The <code>File</code> to write to.
+     * @param scope The <code>WriteScope</code> to use.
+     * @exception FileNotFoundException
+     */
+    public void save(File file, WriteScope scope) throws FileNotFoundException {
+        save(new FileOutputStream(file), scope);
     }
 
     /**
      * Writes the object to the given output stream
      *
      * @param out The <code>OutputStream</code> to write to.
+     * @param scope The <code>WriteScope</code> to use.
      */
-    public void save(OutputStream out) {
+    public void save(OutputStream out, WriteScope scope) {
         FreeColXMLWriter xw = null;
         try {
-            xw = new FreeColXMLWriter(out, WriteScope.toSave(), true);
+            xw = new FreeColXMLWriter(out, scope, true);
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Error creating FreeColXMLWriter.", ioe);
             return;
