@@ -183,7 +183,8 @@ public final class ConnectController {
         List<ChoiceItem<String>> vacantPlayers
             = new ArrayList<ChoiceItem<String>>();
         for (String player : getVacantPlayers(host, port)) {
-            vacantPlayers.add(new ChoiceItem<String>(player, player));
+            vacantPlayers.add(new ChoiceItem<String>(Messages.message(player),
+                                                     player));
         }
         if (vacantPlayers.isEmpty()) return false;
         String choice = gui.showChoiceDialog(true, null,
