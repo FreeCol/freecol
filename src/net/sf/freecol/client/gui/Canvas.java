@@ -337,20 +337,16 @@ public final class Canvas extends JDesktopPane {
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
         // takeFocus();
-
-        // chatDisplayThread = new ChatDisplayThread();
-        // chatDisplayThread.start();
+        createKeyBindings();
 
         // TODO: move shutdown hook from GUI to (say) client!
         Runtime runtime = Runtime.getRuntime();
-        runtime.addShutdownHook(new Thread(FreeCol.CLIENT_THREAD+"Quitting Game") {
-            @Override
-            public void run() {
-                freeColClient.getConnectController().quitGame(true);
-            }
-        });
-
-        createKeyBindings();
+        runtime.addShutdownHook(new Thread(FreeCol.CLIENT_THREAD+"Quit Game") {
+                @Override
+                public void run() {
+                    freeColClient.getConnectController().quitGame(true);
+                }
+            });
 
         logger.info("Canvas created.");
     }

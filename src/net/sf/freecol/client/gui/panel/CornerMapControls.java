@@ -172,19 +172,20 @@ public final class CornerMapControls extends MapControls {
         }
 
         if (!unitButtons.isEmpty()) {
-            final int WIDTH = this.unitButtons.get(0).getWidth();
-            final int HEIGHT = this.unitButtons.get(0).getHeight();
             final int SPACE = 5;
+            int width = -SPACE, height = 0;
+            for (UnitButton ub : unitButtons) {
+                height = Math.max(height, ub.getHeight());
+                width += SPACE + ub.getWidth();
+            }
             int length = unitButtons.size();
             int x = miniMapPanel.getWidth() + 1
-                + (infoPanel.getX() - miniMapPanel.getWidth()
-                    - (length - 1) * (WIDTH + SPACE)) / 2;
-            int y = ch - HEIGHT - SPACE;
-            int step = WIDTH + SPACE;
+                + (infoPanel.getX() - miniMapPanel.getWidth() - width) / 2;
+            int y = ch - height - SPACE;
 
-            for (UnitButton button : unitButtons) {
-                button.setLocation(x, y);
-                x += step;
+            for (UnitButton ub : unitButtons) {
+                ub.setLocation(x, y);
+                x += SPACE + ub.getWidth();
             }
         }
 
