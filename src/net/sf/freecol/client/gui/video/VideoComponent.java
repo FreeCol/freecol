@@ -43,7 +43,9 @@ public class VideoComponent extends JPanel {
     private static final Logger logger = Logger.getLogger(VideoComponent.class.getName());
 
     private final Cortado applet;
-    private List<VideoListener> videoListeners = new LinkedList<VideoListener>();
+    private List<VideoListener> videoListeners
+        = new LinkedList<VideoListener>();
+
 
     /**
      * Creates a component for displaying the given video.
@@ -141,6 +143,7 @@ public class VideoComponent extends JPanel {
         return FreeColImageBorder.imageBorder;
     }
 
+
     // Override Component
 
     /**
@@ -158,7 +161,5 @@ public class VideoComponent extends JPanel {
         } catch (Exception e) {
             logger.log(Level.WARNING, "Mystery crash", e);
         }
-
-        applet.destroy();
     }
 }
