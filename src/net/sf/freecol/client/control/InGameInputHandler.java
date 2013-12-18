@@ -1109,21 +1109,12 @@ public final class InGameInputHandler extends InputHandler {
             return null;
         }
         tile.readFromXMLElement(fullTile);
-        final Colony colony = tile.getColony();
-        if (colony == null) {
-            tile.readFromXMLElement(normalTile);
-            return null;
-        }
+        final Colony colony = tile.getColony().copy(game, Colony.class);
+        tile.readFromXMLElement(normalTile);
 
         SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    final Tile tile = colony.getTile();
-                    getGUI().showColonyPanel(colony)
-                        .addClosingCallback(new Runnable() {
-                                public void run() {
-                                    tile.readFromXMLElement(normalTile);
-                                }
-                            });
+                    getGUI().showColonyPanel(colony);
                 }
             });
         return null;

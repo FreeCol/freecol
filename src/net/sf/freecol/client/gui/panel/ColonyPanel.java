@@ -144,10 +144,7 @@ public final class ColonyPanel extends PortPanel
     private JButton colonyUnitsButton
         = new JButton(Messages.message("colonyPanel.colonyUnits"));
 
-    private JButton setGoodsButton
-        = (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS))
-            ? new JButton("Set Goods")
-            : null;
+    private JButton setGoodsButton = null;
 
     /** The <code>Colony</code> this panel is displaying. */
     private Colony colony = null;
@@ -205,6 +202,17 @@ public final class ColonyPanel extends PortPanel
                           + "[growprio 150,shrinkprio 50]"));
 
         setFocusCycleRoot(true);
+
+        // Do not just use colony.getOwner() == getMyPlayer() because
+        // in debug mode we are in the *server* colony, and the equality
+        // will fail.
+        editable = colony.getOwner().getId().equals(getMyPlayer().getId());
+
+        // Only enable the set goods button in debug mode when not spying
+        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
+            && editable) {
+            setGoodsButton = new JButton("Set Goods");
+        }
 
         // Use ESCAPE for closing the ColonyPanel:
         InputMap closeIM = new ComponentInputMap(okButton);
@@ -284,8 +292,12 @@ public final class ColonyPanel extends PortPanel
         // Make the colony label
         nameBox = new JComboBox();
         nameBox.setFont(GUI.SMALL_HEADER_FONT);
-        for (Colony aColony : freeColClient.getMySortedColonies()) {
-            nameBox.addItem(aColony);
+        if (editable) {
+            for (Colony aColony : freeColClient.getMySortedColonies()) {
+                nameBox.addItem(aColony);
+            }
+        } else { // When spying, only add the given colony.
+            nameBox.addItem(colony);
         }
         nameBox.setSelectedItem(colony);
         nameBox.getInputMap().put(KeyStroke.getKeyStroke("LEFT"),
@@ -378,10 +390,6 @@ public final class ColonyPanel extends PortPanel
         cleanup();
 
         setColony(colony);
-        // Do not just use colony.getOwner() == getMyPlayer() because
-        // in debug mode we are in the *server* colony, and the equality
-        // will fail.
-        editable = colony.getOwner().getId().equals(getMyPlayer().getId());
 
         addPropertyChangeListeners();
         addMouseListeners();
@@ -393,7 +401,9 @@ public final class ColonyPanel extends PortPanel
         warehouseButton.addActionListener(this);
         buildQueueButton.addActionListener(this);
         colonyUnitsButton.addActionListener(this);
-        if (setGoodsButton != null) setGoodsButton.addActionListener(this);
+        if (setGoodsButton != null) {
+            setGoodsButton.addActionListener(this);
+        }
 
         unloadButton.setEnabled(isEditable());
         fillButton.setEnabled(isEditable());
