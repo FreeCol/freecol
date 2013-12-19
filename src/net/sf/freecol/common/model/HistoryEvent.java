@@ -23,6 +23,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.Player.Stance;
 
 import org.w3c.dom.Element;
 
@@ -49,7 +50,11 @@ public class HistoryEvent extends StringTemplate {
         FOUNDING_FATHER,
         DECLARE_INDEPENDENCE,
         INDEPENDENCE,
-        SPANISH_SUCCESSION
+        SPANISH_SUCCESSION,
+        DECLARE_WAR,
+        CEASE_FIRE,
+        MAKE_PEACE,
+        FORM_ALLIANCE
     }
 
 
@@ -118,6 +123,28 @@ public class HistoryEvent extends StringTemplate {
      */
     public final EventType getEventType() {
         return eventType;
+    }
+
+    /**
+     * Given a new stance, get the appropriate event type.
+     *
+     * @param stance The new <code>Stance</code>.
+     * @return The corresponding event type.
+     */
+    public static final EventType getEventTypeFromStance(Stance stance) {
+        switch (stance) {
+        case WAR:
+            return EventType.DECLARE_WAR;
+        case CEASE_FIRE:
+            return EventType.CEASE_FIRE;
+        case PEACE:
+            return EventType.MAKE_PEACE;
+        case ALLIANCE:
+            return EventType.FORM_ALLIANCE;
+        default:
+            break;
+        }
+        return null;
     }
 
     /**

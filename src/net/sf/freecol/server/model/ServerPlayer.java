@@ -1062,6 +1062,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
             if (modifier != 0) {
                 csModifyTension(otherPlayer, modifier, cs);//+til
             }
+            cs.addHistory(this, new HistoryEvent(getGame().getTurn(),
+                    HistoryEvent.getEventTypeFromStance(stance), otherPlayer)
+                .addStringTemplate("%nation%", otherPlayer.getNationName()));
             logger.info("Stance modification " + getName()
                 + " " + old.toString() + " -> " + stance.toString()
                 + " wrt " + otherPlayer.getName());
@@ -1080,6 +1083,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
             if (modifier != 0) {
                 other.csModifyTension(this, modifier, cs);//+til
             }
+            cs.addHistory(otherPlayer, new HistoryEvent(getGame().getTurn(),
+                    HistoryEvent.getEventTypeFromStance(stance), this)
+                .addStringTemplate("%nation%", this.getNationName()));
             logger.info("Stance modification " + otherPlayer.getName()
                 + " " + old.toString() + " -> " + stance.toString()
                 + " wrt " + getName() + " (symmetric)");
