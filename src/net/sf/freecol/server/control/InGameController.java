@@ -902,8 +902,9 @@ public final class InGameController extends Controller {
         Turn turn = game.getTurn();
         independent.setTax(0);
         independent.reinitialiseMarket();
-        HistoryEvent h = new HistoryEvent(turn, HistoryEvent.EventType.INDEPENDENCE);
-        h.setPlayerId(independent.getId());
+        HistoryEvent h = new HistoryEvent(turn,
+            HistoryEvent.EventType.INDEPENDENCE, independent);
+
         // The score for actual independence is actually a percentage
         // bonus depending on how many other nations are independent.
         // If we ever go for a more complex scoring algorithm it might
@@ -1292,7 +1293,7 @@ public final class InGameController extends Controller {
     /**
      * Declare independence.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is naming.
+     * @param serverPlayer The <code>ServerPlayer</code> that is declaring.
      * @param nationName The new name for the independent nation.
      * @param countryName The new name for its residents.
      * @return An <code>Element</code> encapsulating this action.
@@ -1310,8 +1311,8 @@ public final class InGameController extends Controller {
         // Do not add history event to cs as we are going to update the
         // entire player.  Likewise clear model messages.
         Turn turn = getGame().getTurn();
-        HistoryEvent h = new HistoryEvent(turn, HistoryEvent.EventType.DECLARE_INDEPENDENCE);
-        h.setPlayerId(serverPlayer.getId());
+        HistoryEvent h = new HistoryEvent(turn,
+            HistoryEvent.EventType.DECLARE_INDEPENDENCE, serverPlayer);
         h.setScore(Math.max(0, Turn.yearToTurn(SCORE_INDEPENDENCE_YEAR,
                                                SCORE_INDEPENDENCE_SEASON)
                 - turn.getNumber()));
@@ -1766,9 +1767,10 @@ public final class InGameController extends Controller {
         // Update the name and note the history.
         cs.addPartial(See.only(serverPlayer), serverPlayer, "newLandName");
         Turn turn = serverPlayer.getGame().getTurn();
-        cs.addHistory(serverPlayer,
-            new HistoryEvent(turn, HistoryEvent.EventType.DISCOVER_NEW_WORLD)
-                .addName("%name%", name));
+        HistoryEvent h = new HistoryEvent(turn,
+            HistoryEvent.EventType.DISCOVER_NEW_WORLD, serverPlayer)
+                .addName("%name%", name);
+        cs.addHistory(serverPlayer, h);
 
         // Only the tile change is not private.
         sendToOthers(serverPlayer, cs);
@@ -2911,7 +2913,7 @@ public final class InGameController extends Controller {
                    serverPlayer.exploreForSettlement(settlement));
 
             cs.addHistory(serverPlayer, new HistoryEvent(game.getTurn(),
-                    HistoryEvent.EventType.FOUND_COLONY)
+                    HistoryEvent.EventType.FOUND_COLONY, serverPlayer)
                 .addName("%colony%", settlement.getName()));
 
             // Remove equipment from founder in case role confuses
@@ -3020,7 +3022,7 @@ public final class InGameController extends Controller {
         if (settlement instanceof Colony) {
             cs.addHistory(serverPlayer,
                 new HistoryEvent(getGame().getTurn(),
-                                 HistoryEvent.EventType.ABANDON_COLONY)
+                    HistoryEvent.EventType.ABANDON_COLONY, serverPlayer)
                     .addName("%colony%", settlement.getName()));
         }
 

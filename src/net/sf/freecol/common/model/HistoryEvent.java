@@ -71,12 +71,14 @@ public class HistoryEvent extends StringTemplate {
      *
      * @param turn The <code>Turn</code> of the event.
      * @param eventType The <code>EventType</code>.
+     * @param player An optional <code>Player</code> responsible for
+     *     this event.
      */
-    public HistoryEvent(Turn turn, EventType eventType) {
+    public HistoryEvent(Turn turn, EventType eventType, Player player) {
         super("model.history." + eventType.toString(), TemplateType.TEMPLATE);
         this.turn = turn;
         this.eventType = eventType;
-        this.playerId = null;
+        this.playerId = (player == null) ? null : player.getId();
         this.score = 0;
     }
 

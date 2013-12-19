@@ -360,7 +360,7 @@ public class ServerGame extends Game implements ServerModelObject {
                                  .addStringTemplate("%nation%", winner));
             cs.addGlobalHistory(this,
                 new HistoryEvent(getTurn(),
-                                 HistoryEvent.EventType.SPANISH_SUCCESSION)
+                    HistoryEvent.EventType.SPANISH_SUCCESSION, null)
                                  .addStringTemplate("%loserNation%", loser)
                                  .addStringTemplate("%nation%", winner));
             setSpanishSuccession(true);

@@ -410,10 +410,10 @@ public class Region extends FreeColGameObject implements Nameable {
             : 0;
         discoverable = false;
         for (Region r : getChildren()) r.setDiscoverable(false);
-        HistoryEvent h = new HistoryEvent(turn, HistoryEvent.EventType.DISCOVER_REGION)
+        HistoryEvent h = new HistoryEvent(turn,
+            HistoryEvent.EventType.DISCOVER_REGION, player)
             .addStringTemplate("%nation%", player.getNationName())
             .addName("%region%", newName);
-        h.setPlayerId(player.getId());
         h.setScore(getScoreValue());
         return h;
     }

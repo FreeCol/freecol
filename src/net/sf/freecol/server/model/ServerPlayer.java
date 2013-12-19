@@ -593,7 +593,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         Game game = getGame();
         cs.addGlobalHistory(game,
             new HistoryEvent(game.getTurn(),
-                HistoryEvent.EventType.NATION_DESTROYED)
+                HistoryEvent.EventType.NATION_DESTROYED, null)
             .addStringTemplate("%nation%", getNationName()));
         csKill(cs);
     }
@@ -1813,8 +1813,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                       .add("%description%", father.getDescriptionKey()));
         cs.addHistory(this,
             new HistoryEvent(getGame().getTurn(),
-                             HistoryEvent.EventType.FOUNDING_FATHER)
-                      .add("%father%", father.getNameKey()));
+                HistoryEvent.EventType.FOUNDING_FATHER, this)
+                .add("%father%", father.getNameKey()));
 
         List<AbstractUnit> units = father.getUnits();
         if (units != null && !units.isEmpty() && europe != null) {
@@ -2646,13 +2646,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         // Handle history and messages before colony handover
         cs.addHistory(attackerPlayer,
-                      new HistoryEvent(game.getTurn(),
-                                       HistoryEvent.EventType.CONQUER_COLONY)
-                      .addStringTemplate("%nation%", colonyNation)
-                      .addName("%colony%", colony.getName()));
+            new HistoryEvent(game.getTurn(),
+                HistoryEvent.EventType.CONQUER_COLONY, attackerPlayer)
+                .addStringTemplate("%nation%", colonyNation)
+                .addName("%colony%", colony.getName()));
         cs.addHistory(colonyPlayer,
-                      new HistoryEvent(game.getTurn(),
-                                       HistoryEvent.EventType.COLONY_CONQUERED)
+            new HistoryEvent(game.getTurn(),
+                HistoryEvent.EventType.COLONY_CONQUERED, attackerPlayer)
                       .addStringTemplate("%nation%", attackerNation)
                       .addName("%colony%", colony.getName()));
         cs.addMessage(See.only(attackerPlayer),
@@ -3049,7 +3049,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // Handle history and messages before colony destruction.
         cs.addHistory(colonyPlayer,
             new HistoryEvent(game.getTurn(),
-                HistoryEvent.EventType.COLONY_DESTROYED)
+                HistoryEvent.EventType.COLONY_DESTROYED, attackerPlayer)
             .addStringTemplate("%nation%", attackerNation)
             .addName("%colony%", colony.getName()));
         cs.addMessage(See.only(colonyPlayer),
@@ -3123,10 +3123,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // This is an atrocity.
         int score = spec.getInteger(GameOptions.DESTROY_SETTLEMENT_SCORE);
         HistoryEvent h = new HistoryEvent(game.getTurn(),
-            HistoryEvent.EventType.DESTROY_SETTLEMENT)
+            HistoryEvent.EventType.DESTROY_SETTLEMENT, this)
             .addStringTemplate("%nation%", nativeNation)
             .addName("%settlement%", settlementName);
-        h.setPlayerId(getId());
         h.setScore(score);
         cs.addHistory(attackerPlayer, h);
 
@@ -3145,10 +3144,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
         if (nativePlayer.checkForDeath() == IS_DEAD) {
             h = new HistoryEvent(game.getTurn(),
-                                 HistoryEvent.EventType.DESTROY_NATION)
+                HistoryEvent.EventType.DESTROY_NATION, this)
                 .addStringTemplate("%nation%", attackerNation)
                 .addStringTemplate("%nativeNation%", nativeNation);
-            h.setPlayerId(getId());
             h.setScore(SCORE_NATION_DESTROYED);
             cs.addGlobalHistory(game, h);
         }
@@ -3719,7 +3717,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             StringTemplate nativeNation = loserPlayer.getNationName();
             cs.addGlobalHistory(getGame(),
                 new HistoryEvent(getGame().getTurn(),
-                                 HistoryEvent.EventType.DESTROY_NATION)
+                    HistoryEvent.EventType.DESTROY_NATION, winnerPlayer)
                 .addStringTemplate("%nation%", winnerNation)
                 .addStringTemplate("%nativeNation%", nativeNation));
         }
@@ -3904,7 +3902,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                             key, other, this));
                 }
                 cs.addHistory(other, new HistoryEvent(turn,
-                        HistoryEvent.EventType.MEET_NATION)
+                        HistoryEvent.EventType.MEET_NATION, other)
                     .addStringTemplate("%nation%", getNationName()));
             }
         } else { // (serverPlayer.isEuropean)
@@ -3917,7 +3915,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
             // History event for European players.
             cs.addHistory(this, new HistoryEvent(turn,
-                    HistoryEvent.EventType.MEET_NATION)
+                    HistoryEvent.EventType.MEET_NATION, other)
                 .addStringTemplate("%nation%", other.getNationName()));
         }
 

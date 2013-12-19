@@ -752,7 +752,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     .addAmount("%money%", treasureAmount));
                 cs.addGlobalHistory(game,
                     new HistoryEvent(game.getTurn(),
-                        HistoryEvent.EventType.CITY_OF_GOLD)
+                        HistoryEvent.EventType.CITY_OF_GOLD, serverPlayer)
                     .addStringTemplate("%nation%", serverPlayer.getNationName())
                     .add("%city%", cityKey)
                     .addAmount("%treasure%", treasureAmount));
