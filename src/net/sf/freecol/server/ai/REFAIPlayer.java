@@ -28,6 +28,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -218,6 +219,18 @@ public class REFAIPlayer extends EuropeanAIPlayer {
             return;
         }
         super.startWorking();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Stance determineStance(Player other) {
+        Player player = getPlayer();
+        // The REF is always at war with rebels.
+        return (other.getREFPlayer() == player
+            && other.getPlayerType() == Player.PlayerType.REBEL) ? Stance.WAR
+            : super.determineStance(other);
     }
 
     /**

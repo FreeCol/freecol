@@ -84,6 +84,10 @@ public class GameOptions {
     public static final int STARTING_POSITIONS_RANDOM = 1;
     public static final int STARTING_POSITIONS_HISTORICAL = 2;
 
+    /** Percent chance peace will hold if there is a recent treaty. */
+    public static final String PEACE_PROBABILITY
+        = "model.option.peaceProbability";
+
 
     // Colony group
 

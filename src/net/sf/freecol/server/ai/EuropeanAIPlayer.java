@@ -42,11 +42,13 @@ import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.GoldTradeItem;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsTradeItem;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
@@ -70,8 +72,9 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitTradeItem;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
-import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
+import net.sf.freecol.common.networking.NetworkConstants;
+import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
@@ -1896,6 +1899,38 @@ public class EuropeanAIPlayer extends AIPlayer {
         }
     }
 
+    /**
+     * See if a recent peace treaty still has force.
+     *
+     * @param p The <code>Player</code> to check for a peace treaty with.
+     * @return True if peace gets another chance.
+     */
+    private boolean peaceHolds(Player p) {
+        final Player player = getPlayer();
+        final Turn turn = getGame().getTurn();
+        final double peaceProb = getSpecification()
+            .getInteger(GameOptions.PEACE_PROBABILITY) / 100.0;
+
+        int peaceTurn = -1;
+        for (HistoryEvent h : player.getHistory()) {
+            if (h.getEventType() == HistoryEvent.EventType.MAKE_PEACE
+                && p.getId().equals(h.getPlayerId())
+                && h.getTurn().getNumber() > peaceTurn) {
+                peaceTurn = h.getTurn().getNumber();
+            }
+        }
+        if (peaceTurn < 0) return false;
+
+        int n = turn.getNumber() - peaceTurn;
+        float prob = 100.0f * (float)Math.pow(peaceProb, n);
+        // Apply Franklin's modifier
+        prob = FeatureContainer.applyModifierSet(prob, turn,
+            p.getModifierSet(Modifier.PEACE_TREATY));
+        return prob > 0.0
+            && Utils.randomInt(logger, "Peace holds?", 
+                               getAIRandom(), 100) < (int)prob;
+    }
+
     // AIPlayer interface
 
     /**
@@ -1940,6 +1975,28 @@ public class EuropeanAIPlayer extends AIPlayer {
         wagonsNeeded.clear();
         goodsWishes.clear();
         workerWishes.clear();
+    }
+
+    /**
+     * Determines the stances towards each player.
+     * That is: should we declare war?
+     */
+    public void determineStances() {
+        final Player player = getPlayer();
+
+        for (Player p : getGame().getPlayers()) {
+            if (p != player && !p.isDead()) {
+                Stance newStance = determineStance(p);
+                if (newStance != player.getStance(p)) {
+                    if (newStance == Stance.WAR && peaceHolds(p)) {
+                        ; // Peace treaty holds for now
+                    } else {
+                        getAIMain().getFreeColServer().getInGameController()
+                            .changeStance(player, newStance, p, true);
+                    }
+                }
+            }
+        }
     }
 
     /**

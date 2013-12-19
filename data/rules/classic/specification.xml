@@ -1866,6 +1866,7 @@ resources of 400, lost city rumours of 500
                      weight1="5" weight2="5" weight3="5">
       <ability id="model.ability.ignoreEuropeanWars" value="true"/>
       <ability id="model.ability.alwaysOfferedPeace" value="true"/>
+      <modifier id="model.modifier.peaceTreaty" type="percentage" value="50"/>
     </founding-father>
     <founding-father id="model.foundingFather.williamBrewster" type="religious"
                      weight1="7" weight2="4" weight3="1">
@@ -3065,6 +3066,10 @@ resources of 400, lost city rumours of 500
           <selectValue label="model.option.startingPositions.random" value="1"/>
           <selectValue label="model.option.startingPositions.historical" value="2"/>
         </selectOption>
+        <!-- Per turn probability that an angry AI will continue to
+             honour a recent peace treaty -->
+        <integerOption id="model.option.peaceProbability" defaultValue="90"
+                       minimumValue="0" maximumValue="99"/>
       </optionGroup>
       <optionGroup id="gameOptions.colony">
         <!-- Does the Custom House sell boycotted goods -->

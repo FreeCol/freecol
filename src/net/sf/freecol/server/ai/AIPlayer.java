@@ -283,27 +283,15 @@ public abstract class AIPlayer extends AIObject {
     }
 
     /**
-     * Standard stance change determination.  If a change occurs,
-     * contact the server and propagate.
+     * Standard stance change determination.
      *
      * @param other The <code>Player</code> wrt consider stance.
-     * @return The stance, which may have been updated.
+     * @return The new <code>Stance</code>.
      */
     protected Stance determineStance(Player other) {
         Player player = getPlayer();
-        Stance newStance;
-        if (other.getREFPlayer() == player
-            && other.getPlayerType() == PlayerType.REBEL) {
-            newStance = Stance.WAR;
-        } else {
-            newStance = player.getStance(other)
-                .getStanceFromTension(player.getTension(other));
-        }
-        if (newStance != player.getStance(other)) {
-            getAIMain().getFreeColServer().getInGameController()
-                .changeStance(player, newStance, other, true);
-        }
-        return player.getStance(other);
+        return player.getStance(other)
+            .getStanceFromTension(player.getTension(other));
     }
 
     /**
@@ -559,19 +547,6 @@ public abstract class AIPlayer extends AIObject {
      */
     public boolean acceptMercenaries() {
         return false;
-    }
-
-    /**
-     * Determines the stances towards each player.
-     * That is: should we declare war?
-     * TODO: something better, that includes peacemaking.
-     */
-    public void determineStances() {
-        logger.finest("Entering method determineStances");
-        Player player = getPlayer();
-        for (Player p : getGame().getPlayers()) {
-            if (p != player && !p.isDead()) determineStance(p);
-        }
     }
 
     /**

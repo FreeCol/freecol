@@ -87,6 +87,8 @@ public class Modifier extends Feature implements Comparable<Modifier> {
         = "model.modifier.offence";
     public static final String OFFENCE_AGAINST
         = "model.modifier.offenceAgainst";
+    public static final String PEACE_TREATY
+        = "model.modifier.peaceTreaty";
     public static final String RELIGIOUS_UNREST_BONUS
         = "model.modifier.religiousUnrestBonus";
     public static final String SAIL_HIGH_SEAS

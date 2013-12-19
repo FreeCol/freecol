@@ -161,6 +161,23 @@ public class NativeAIPlayer extends AIPlayer {
     }
 
     /**
+     * Determines the stances towards each player.
+     * That is: should we declare war?
+     */
+    private void determineStances() {
+        Player player = getPlayer();
+        for (Player p : getGame().getPlayers()) {
+            if (p != player && !p.isDead()) {
+                Stance newStance = determineStance(p);
+                if (newStance != player.getStance(p)) {
+                    getAIMain().getFreeColServer().getInGameController()
+                        .changeStance(player, newStance, p, true);
+                }
+            }
+        }
+    }
+
+    /**
      * Simple initialization of AI missions given that we know the starting
      * conditions.
      */

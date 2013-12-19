@@ -1168,6 +1168,8 @@ public final class FreeColServer {
             "model.difficulty.natives", -5, true);
         addBooleanOption(GameOptions.ONLY_NATURAL_IMPROVEMENTS,
             "gameOptions.colony", true, false);
+        addIntegerOption(GameOptions.PEACE_PROBABILITY,
+            "gameOptions.map", 90, false);
     }
 
     private void addOptionGroup(String id, boolean difficulty) {
