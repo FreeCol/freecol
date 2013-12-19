@@ -65,24 +65,31 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         /** The goods the settlement is interested in. */
         public GoodsType[] wantedGoods = null;
 
-        /** Update the internal information from a native settlement. */
+
+        /**
+         * Update the internal information from a native settlement.
+         *
+         * @param indianSettlement The <code>IndianSettlement</code> to update.
+         */
         public void update(IndianSettlement indianSettlement) {
-            this.skill = indianSettlement.getLearnableSkill();
-            if (this.wantedGoods == null) {
-                this.wantedGoods = new GoodsType[IndianSettlement.WANTED_GOODS_COUNT];
-            }
             setValues(indianSettlement.getLearnableSkill(),
                       indianSettlement.getWantedGoods());
         }
 
-        /** Set the internal values. */
+        /**
+         * Set the internal values.
+         *
+         * @param skill The skill taught.
+         * @param wanted The wanted goods.
+         */
         public void setValues(UnitType skill, GoodsType[] wanted) {
             this.skill = skill;
             if (wanted == null) {
                 this.wantedGoods = null;
             } else {
                 if (this.wantedGoods == null) {
-                    this.wantedGoods = new GoodsType[IndianSettlement.WANTED_GOODS_COUNT];
+                    this.wantedGoods
+                        = new GoodsType[IndianSettlement.WANTED_GOODS_COUNT];
                 }
                 System.arraycopy(wanted, 0, this.wantedGoods, 0,
                     Math.min(wanted.length, this.wantedGoods.length));
@@ -1428,7 +1435,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         IndianSettlementInternals isi = getPlayerIndianSettlement(player);
         IndianSettlement is = getIndianSettlement();
         if (is == null) {
-            if (isi != null) playerIndianSettlements.remove(player);
+            if (isi != null) removeIndianSettlementInternals(player);
         } else {
             if (isi == null) {
                 isi = new IndianSettlementInternals();
@@ -1436,6 +1443,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             }
             isi.update(is);
         }
+    }
+
+    public void removeIndianSettlementInternals(Player player) {
+        playerIndianSettlements.remove(player);
     }
 
     public UnitType getLearnableSkill(Player player) {
@@ -1448,11 +1459,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         return (isi == null) ? null : isi.wantedGoods;
     }
 
-    // @compat 0.10.7
     /**
-     * Backward compatibility hack to set native settlement
-     * information.  Do not check the current map state as we might
-     * leak destruction information.
+     * Set native settlement information.  Do not check the current
+     * map state as we might leak destruction information.
      *
      * @param player The <code>Player</code> to pet belonged to.
      * @param skill The skill taught by the settlement.
@@ -1467,7 +1476,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         }
         isi.setValues(skill, wanted);
     }
-    // end @compat 0.10.7
 
     /**
      * Checks if this <code>Tile</code> has been explored by the given
@@ -2001,6 +2009,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                     // Always save client view of native settlements
                     // because of the hidden information.
                     t = getTileToCache();
+                    t.setIndianSettlementInternals(p, getLearnableSkill(p),
+                                                   getWantedGoods(p));
                 }
 
                 xw.writeStartElement(CACHED_TILE_TAG);
@@ -2133,6 +2143,13 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                 setCachedTile(player, tile);
                 xr.setReadScope(scope);
 
+                IndianSettlement is = tile.getIndianSettlement();
+                if (is == null) {
+                    removeIndianSettlementInternals(player);
+                } else {
+                    setIndianSettlementInternals(player, is.getLearnableSkill(),
+                                                 is.getWantedGoods());
+                }
             } else {
                 setCachedTile(player, this);
             }

@@ -40,6 +40,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 
@@ -139,15 +140,18 @@ public final class ReportIndianPanel extends ReportPanel {
                 }
             }
             for (IndianSettlement settlement : settlements) {
-                boolean known = settlement.getTile().isExplored();
-                boolean contacted = settlement.hasContacted(player);
-                boolean visited = settlement.hasVisited(player);
-                String locationName = Messages.message(settlement.getLocationNameFor(player));
+                final Tile tile = settlement.getTile();
+                final boolean known = tile.isExplored();
+                final boolean contacted = settlement.hasContacted(player);
+                final boolean visited = settlement.hasVisited(player);
+                final boolean scouted = settlement.hasScouted(player);
+                String locationName
+                    = Messages.message(settlement.getLocationNameFor(player));
                 if (known && settlement.isCapital()) {
                     locationName += "*";
                 }
-                JButton settlementButton = GUI.getLinkButton(locationName, null,
-                    settlement.getTile().getId());
+                JButton settlementButton = GUI.getLinkButton(locationName,
+                    null, settlement.getTile().getId());
                 settlementButton.addActionListener(this);
                 reportPanel.add(settlementButton, "newline 15");
 
@@ -171,7 +175,8 @@ public final class ReportIndianPanel extends ReportPanel {
                 }
                 reportPanel.add(missionLabel);
 
-                String messageId = settlement.getShortAlarmLevelMessageId(player);
+                String messageId
+                    = settlement.getShortAlarmLevelMessageId(player);
                 reportPanel.add(localizedLabel(messageId));
 
                 JLabel skillLabel = new JLabel();
@@ -184,7 +189,8 @@ public final class ReportIndianPanel extends ReportPanel {
                         skillString = "indianSettlement.skillNone";
                     } else {
                         skillString = skillType.getNameKey();
-                        ImageIcon skillImage = getLibrary().getUnitImageIcon(skillType, 0.66);
+                        ImageIcon skillImage = getLibrary()
+                            .getUnitImageIcon(skillType, 0.66);
                         skillLabel.setIcon(skillImage);
                     }
                 } else {
@@ -193,34 +199,33 @@ public final class ReportIndianPanel extends ReportPanel {
                 skillLabel.setText(Messages.message(skillString));
                 reportPanel.add(skillLabel);
 
-                JLabel mostHatedLabel;
                 Player mostHated = settlement.getMostHated();
-                if (contacted) {
-                    if (mostHated == null) {
-                        mostHatedLabel = localizedLabel("indianSettlement.mostHatedNone");
-                    } else {
-                        mostHatedLabel = localizedLabel(mostHated.getNationName());
-                    }
-                } else {
-                    mostHatedLabel = localizedLabel("indianSettlement.mostHatedUnknown");
-                }
+                JLabel mostHatedLabel = (contacted)
+                    ? (mostHated == null)
+                        ? localizedLabel("indianSettlement.mostHatedNone")
+                        : localizedLabel(mostHated.getNationName())
+                    : localizedLabel("indianSettlement.mostHatedUnknown");
                 reportPanel.add(mostHatedLabel);
 
                 GoodsType[] wantedGoods = settlement.getWantedGoods();
-                if (contacted) {
+                if (visited) {
                     if (wantedGoods[0] == null) {
                         reportPanel.add(localizedLabel("indianSettlement.wantedGoodsNone"));
                     } else {
-                        JLabel goodsLabel = localizedLabel(wantedGoods[0].getNameKey());
-                        goodsLabel.setIcon(new ImageIcon(getLibrary().getGoodsImage(wantedGoods[0], 0.66)));
-                        String split = "flowy, split " + String.valueOf(wantedGoods.length);
+                        JLabel goodsLabel
+                            = localizedLabel(wantedGoods[0].getNameKey());
+                        goodsLabel.setIcon(new ImageIcon(getLibrary()
+                                .getGoodsImage(wantedGoods[0], 0.66)));
+                        String split = "flowy, split "
+                            + String.valueOf(wantedGoods.length);
                         reportPanel.add(goodsLabel, split);
                         for (int i = 1; i < wantedGoods.length; i++) {
                             if (wantedGoods[i] != null) {
                                 String sale = player.getLastSaleString(settlement, wantedGoods[i]);
                                 goodsLabel = new JLabel(Messages.message(wantedGoods[i].getNameKey())
                                     + ((sale == null) ? "" : " " + sale));
-                                goodsLabel.setIcon(getLibrary().getScaledGoodsImageIcon(wantedGoods[i], 0.5));
+                                goodsLabel.setIcon(getLibrary()
+                                    .getScaledGoodsImageIcon(wantedGoods[i], 0.5));
                                 reportPanel.add(goodsLabel);
                             }
                         }
