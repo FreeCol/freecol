@@ -1913,22 +1913,30 @@ public class EuropeanAIPlayer extends AIPlayer {
 
         int peaceTurn = -1;
         for (HistoryEvent h : player.getHistory()) {
-            if (h.getEventType() == HistoryEvent.EventType.MAKE_PEACE
-                && p.getId().equals(h.getPlayerId())
+            if (p.getId().equals(h.getPlayerId())
                 && h.getTurn().getNumber() > peaceTurn) {
-                peaceTurn = h.getTurn().getNumber();
+                switch (h.getEventType()) {
+                case MAKE_PEACE: case FORM_ALLIANCE:
+                    peaceTurn = h.getTurn().getNumber();
+                    break;
+                case DECLARE_WAR:
+                    peaceTurn = -1;
+                    break;
+                default:
+                    break;
+                }
             }
         }
         if (peaceTurn < 0) return false;
 
         int n = turn.getNumber() - peaceTurn;
-        float prob = 100.0f * (float)Math.pow(peaceProb, n);
+        float prob = (float)Math.pow(peaceProb, n);
         // Apply Franklin's modifier
         prob = FeatureContainer.applyModifierSet(prob, turn,
             p.getModifierSet(Modifier.PEACE_TREATY));
-        return prob > 0.0
+        return prob > 0.0f
             && Utils.randomInt(logger, "Peace holds?", 
-                               getAIRandom(), 100) < (int)prob;
+                               getAIRandom(), 100) < (int)(100.0f * prob);
     }
 
     // AIPlayer interface
@@ -1979,9 +1987,8 @@ public class EuropeanAIPlayer extends AIPlayer {
 
     /**
      * Determines the stances towards each player.
-     * That is: should we declare war?
      */
-    public void determineStances() {
+    private void determineStances() {
         final Player player = getPlayer();
 
         for (Player p : getGame().getPlayers()) {
