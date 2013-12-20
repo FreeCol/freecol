@@ -307,9 +307,9 @@ public final class ImageLibrary {
             if (amount == 0) amount = 1; // Show *something*!
         }
         Color foreground = getForegroundColor(enemyColor);
-        String text = Messages.message((is.hasScouted(player))
-                                       ? "indianSettlement.scouted"
-                                       : "indianSettlement.contacted");
+        String text = Messages.message((is.worthScouting(player))
+                                       ? "indianSettlement.contacted"
+                                       : "indianSettlement.scouted");
         String key = "dynamic.alarm." + text + "." + ownerColor.getRGB()
             + "." + amount + "." + enemyColor.getRGB();
         Image img = (Image)ResourceManager.getImage(key);

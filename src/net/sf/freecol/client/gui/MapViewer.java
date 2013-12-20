@@ -2236,6 +2236,7 @@ public final class MapViewer {
      * @param withNumber Whether to display the number of units present.
      */
     private void displaySettlement(Graphics2D g, Tile tile, boolean withNumber) {
+        final Player player = freeColClient.getMyPlayer();
         final Settlement settlement = tile.getSettlement();
 
         if (settlement != null) {
@@ -2298,7 +2299,6 @@ public final class MapViewer {
                 }
 
                 // Draw the alarm chip if needed.
-                Player player = freeColClient.getMyPlayer();
                 if ((chip = lib.getAlarmChip(is, player)) != null) {
                     g.drawImage(chip, (int)xOffset, (int)yOffset, null);
                 }

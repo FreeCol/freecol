@@ -511,6 +511,28 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
+     * Is this settlement worth scouting?
+     * That is, has it been contacted, but not scouted already, or
+     * visited when the "Chief contact" option is set.
+     *
+     * @param player The <code>Player</code> contemplating scouting.
+     * @return Whether it might be worth the player scouting this settlement.
+     */
+    public boolean worthScouting(Player player) {
+        ContactLevel cl = getContactLevel(player);
+        switch (cl) {
+        case CONTACTED:
+            return true;
+        case VISITED:
+            return !getSpecification()
+                .getBoolean(GameOptions.SETTLEMENT_ACTIONS_CONTACT_CHIEF);
+        case UNCONTACTED: case SCOUTED: default:
+            break;
+        }
+        return false;
+    }
+
+    /**
      * Gets the alarm level towards the given player.
      *
      * @param player The <code>Player</code> to get the alarm level for.

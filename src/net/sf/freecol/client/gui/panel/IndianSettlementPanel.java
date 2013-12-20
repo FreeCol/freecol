@@ -27,6 +27,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Player;
@@ -66,7 +67,11 @@ public final class IndianSettlementPanel extends FreeColPanel {
                                                        : "indianSettlement")
                 .addStringTemplate("%nation%", indian.getNationName()));
         String messageId = settlement.getShortAlarmLevelMessageId(player);
-        text += " (" + Messages.message(messageId) + ")";
+        text += " (" + Messages.message(messageId);
+        if (settlement.worthScouting(player)) {
+            text += "," + Messages.message("indianSettlement.unscouted");
+        }
+        text += ")";
         settlementLabel.setText(text);
         add(settlementLabel);
 
