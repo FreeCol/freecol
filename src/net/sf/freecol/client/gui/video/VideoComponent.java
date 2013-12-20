@@ -151,11 +151,23 @@ public class VideoComponent extends JPanel {
      */
     public void removeNotify() {
         applet.stop();
+        applet.destroy();
 
-        // Java 1.7.0 as seen on Fedora with:
-        //   Java version: 1.7.0_40
-        //   Java WM version: 24.0-b56
-        // crashes here deep in the java libraries.
+        // Java crashes here deep in the libraries, typically including:
+        //   sun.awt.X11.XBaseMenuWindow.dispose(XBaseMenuWindow.java:907)
+        // so it is probably X11-dependent.
+        //
+        // Sighted:
+        //   (Fedora, 1.7.0_40, 24.0-b56)
+        //   (Arch, 1.7.0_45, 24.45-b08)
+        //
+        // Switching windowed mode seems to hit is particularly badly on
+        // arch, although not seeing that on Fedora (BR#2611).
+        //
+        // This routine was introduced to fix a different Java crash,
+        // so disabling it and/or replacing it with a stub just moves
+        // the problem around.  Even the following does not help in
+        // all cases:
         try {
             super.removeNotify();
         } catch (Exception e) {
