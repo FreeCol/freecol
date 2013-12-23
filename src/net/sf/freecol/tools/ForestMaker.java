@@ -43,10 +43,12 @@ import javax.imageio.ImageIO;
  */
 public class ForestMaker {
 
+    private static String DESTDIR = "data/rules/classic/resources/images/forest";
+
     private static int BASE_WIDTH = 128;
     private static int BASE_HEIGHT = 64;
     private static int MARGIN = 20;
-    private static int TREES = 40;
+    private static int TREES = 60;
     private static int RIVER_MARGIN = 4;
 
     private static int HALF_WIDTH = BASE_WIDTH / 2;
@@ -64,8 +66,8 @@ public class ForestMaker {
         = new int[] { 1, 2, 4, 8 };
 
 
-    private static boolean drawBorders = true;
-    private static boolean drawRivers = true;
+    private static boolean drawBorders = false;
+    private static boolean drawRivers = false;
     private static boolean drawTrees = true;
 
 
@@ -98,6 +100,8 @@ public class ForestMaker {
 
         if (args.length == 0) {
             System.out.println("Usage: ForestMaker <directory>...");
+            System.out.println("Directory name should match a directory in");
+            System.out.println("   " + DESTDIR);
             System.exit(1);
         }
 
@@ -114,6 +118,13 @@ public class ForestMaker {
             File sourceDirectory = new File(arg);
             if (!sourceDirectory.exists()) {
                 System.out.println("Source directory " + arg + " does not exist.");
+                continue;
+            }
+            String baseName = sourceDirectory.getName();
+            File destinationDirectory = new File(DESTDIR, baseName);
+            if (!destinationDirectory.exists()) {
+                System.out.println("Destination directory " + destinationDirectory.getPath()
+                                   + " does not exist.");
                 continue;
             }
             File[] imageFiles = sourceDirectory.listFiles();
@@ -239,7 +250,8 @@ public class ForestMaker {
 
                 }
 
-                ImageIO.write(base, "png", new File(sourceDirectory.getName() + counter + ".png"));
+                ImageIO.write(base, "png", new File(destinationDirectory,
+                                                    sourceDirectory.getName() + counter + ".png"));
 
             }
         }
