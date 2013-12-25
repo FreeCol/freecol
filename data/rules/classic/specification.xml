@@ -2203,8 +2203,8 @@ resources of 400, lost city rumours of 500
   <options>
     <optionGroup id="difficultyLevels" recursive="false">
       <optionGroup id="model.difficulty.veryEasy" editable="false">
-        <optionGroup id="model.difficulty.immigration">
-          <integerOption id="model.option.crossesIncrement" value="6"/>
+        <optionGroup id="model.difficulty.immigration" editable="false">
+          <integerOption id="model.option.crossesIncrement" value="2"/>
           <integerOption id="model.option.recruitPriceIncrease" value="20"/>
           <integerOption id="model.option.lowerCapIncrease" value="0"/>
           <integerOption id="model.option.priceIncrease.artillery" value="100"/>
@@ -2233,7 +2233,7 @@ resources of 400, lost city rumours of 500
             </unitOption>
           </unitListOption>
         </optionGroup>
-        <optionGroup id="model.difficulty.natives">
+        <optionGroup id="model.difficulty.natives" editable="false">
           <integerOption id="model.option.landPriceFactor" value="40"/>
           <integerOption id="model.option.nativeConvertProbability" value="50"/>
           <integerOption id="model.option.burnProbability" value="2"/>
@@ -2250,7 +2250,7 @@ resources of 400, lost city rumours of 500
             <rangeValue label="veryLarge" value="5"/>
           </rangeOption>
         </optionGroup>
-        <optionGroup id="model.difficulty.monarch">
+        <optionGroup id="model.difficulty.monarch" editable="false">
           <integerOption id="model.option.monarchMeddling" value="0"/>
           <integerOption id="model.option.taxAdjustment" value="0"/>
           <integerOption id="model.option.mercenaryPrice" value="50"/>
@@ -2326,7 +2326,7 @@ resources of 400, lost city rumours of 500
             </unitOption>
           </unitListOption>
         </optionGroup>
-        <optionGroup id="model.difficulty.government">
+        <optionGroup id="model.difficulty.government" editable="false">
           <integerOption id="model.option.badGovernmentLimit" value="8"/>
           <integerOption id="model.option.veryBadGovernmentLimit" value="12"/>
           <integerOption id="model.option.goodGovernmentLimit" value="50"/>
@@ -2339,7 +2339,7 @@ resources of 400, lost city rumours of 500
           <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
           <stringOption  id="model.option.tileProduction" value="veryHigh" />
         </optionGroup>
-        <optionGroup id="model.difficulty.cheat">
+        <optionGroup id="model.difficulty.cheat" editable="false">
           <integerOption id="model.option.liftBoycottCheat" value="1"/>
           <integerOption id="model.option.equipScoutCheat" value="1"/>
           <integerOption id="model.option.landUnitCheat" value="1"/>
@@ -2348,8 +2348,8 @@ resources of 400, lost city rumours of 500
         </optionGroup>
       </optionGroup>
       <optionGroup id="model.difficulty.easy" editable="false">
-        <optionGroup id="model.difficulty.immigration">
-          <integerOption id="model.option.crossesIncrement" value="8"/>
+        <optionGroup id="model.difficulty.immigration" editable="false">
+          <integerOption id="model.option.crossesIncrement" value="2"/>
           <integerOption id="model.option.recruitPriceIncrease" value="30"/>
           <integerOption id="model.option.lowerCapIncrease" value="0"/>
           <integerOption id="model.option.priceIncrease.artillery" value="100"/>
@@ -2368,7 +2368,7 @@ resources of 400, lost city rumours of 500
             </unitOption>
           </unitListOption>
         </optionGroup>
-        <optionGroup id="model.difficulty.natives">
+        <optionGroup id="model.difficulty.natives" editable="false">
           <integerOption id="model.option.landPriceFactor" value="50"/>
           <integerOption id="model.option.nativeConvertProbability" value="40"/>
           <integerOption id="model.option.burnProbability" value="4"/>
@@ -2385,7 +2385,7 @@ resources of 400, lost city rumours of 500
             <rangeValue label="veryLarge" value="5"/>
           </rangeOption>
         </optionGroup>
-        <optionGroup id="model.difficulty.monarch">
+        <optionGroup id="model.difficulty.monarch" editable="false">
           <integerOption id="model.option.monarchMeddling" value="1"/>
           <integerOption id="model.option.taxAdjustment" value="1"/>
           <integerOption id="model.option.mercenaryPrice" value="60"/>
@@ -2461,20 +2461,20 @@ resources of 400, lost city rumours of 500
             </unitOption>
           </unitListOption>
         </optionGroup>
-        <optionGroup id="model.difficulty.government">
+        <optionGroup id="model.difficulty.government" editable="false">
           <integerOption id="model.option.badGovernmentLimit" value="7"/>
           <integerOption id="model.option.veryBadGovernmentLimit" value="11"/>
           <integerOption id="model.option.goodGovernmentLimit" value="50"/>
           <integerOption id="model.option.veryGoodGovernmentLimit" value="100"/>
         </optionGroup>
-        <optionGroup id="model.difficulty.other">
+        <optionGroup id="model.difficulty.other" editable="false">
           <integerOption id="model.option.startingMoney" value="300"/>
           <integerOption id="model.option.foundingFatherFactor" value="32"/>
           <integerOption id="model.option.arrearsFactor" value="400"/>
           <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
           <stringOption  id="model.option.tileProduction" value="high" />
         </optionGroup>
-        <optionGroup id="model.difficulty.cheat">
+        <optionGroup id="model.difficulty.cheat" editable="false">
           <integerOption id="model.option.liftBoycottCheat" value="5"/>
           <integerOption id="model.option.equipScoutCheat" value="5"/>
           <integerOption id="model.option.landUnitCheat" value="5"/>
@@ -2483,8 +2483,8 @@ resources of 400, lost city rumours of 500
         </optionGroup>
       </optionGroup>
       <optionGroup id="model.difficulty.medium" editable="false">
-        <optionGroup id="model.difficulty.immigration">
-          <integerOption id="model.option.crossesIncrement" value="10"/>
+        <optionGroup id="model.difficulty.immigration" editable="false">
+          <integerOption id="model.option.crossesIncrement" value="2"/>
           <integerOption id="model.option.recruitPriceIncrease" value="30"/>
           <integerOption id="model.option.lowerCapIncrease" value="0"/>
           <integerOption id="model.option.priceIncrease.artillery" value="100"/>
@@ -2498,7 +2498,7 @@ resources of 400, lost city rumours of 500
             </unitOption>
           </unitListOption>
         </optionGroup>
-        <optionGroup id="model.difficulty.natives">
+        <optionGroup id="model.difficulty.natives" editable="false">
           <integerOption id="model.option.landPriceFactor" value="60"/>
           <integerOption id="model.option.nativeConvertProbability" value="30"/>
           <integerOption id="model.option.burnProbability" value="6"/>
@@ -2515,7 +2515,7 @@ resources of 400, lost city rumours of 500
             <rangeValue label="veryLarge" value="5"/>
           </rangeOption>
         </optionGroup>
-        <optionGroup id="model.difficulty.monarch">
+        <optionGroup id="model.difficulty.monarch" editable="false">
           <integerOption id="model.option.monarchMeddling" value="2"/>
           <integerOption id="model.option.taxAdjustment" value="2"/>
           <integerOption id="model.option.mercenaryPrice" value="65"/>
@@ -2591,20 +2591,20 @@ resources of 400, lost city rumours of 500
             </unitOption>
           </unitListOption>
         </optionGroup>
-        <optionGroup id="model.difficulty.government">
+        <optionGroup id="model.difficulty.government" editable="false">
           <integerOption id="model.option.badGovernmentLimit" value="6"/>
           <integerOption id="model.option.veryBadGovernmentLimit" value="10"/>
           <integerOption id="model.option.goodGovernmentLimit" value="50"/>
           <integerOption id="model.option.veryGoodGovernmentLimit" value="100"/>
         </optionGroup>
-        <optionGroup id="model.difficulty.other">
+        <optionGroup id="model.difficulty.other" editable="false">
           <integerOption id="model.option.startingMoney" value="0"/>
           <integerOption id="model.option.foundingFatherFactor" value="40"/>
           <integerOption id="model.option.arrearsFactor" value="500"/>
           <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
           <stringOption  id="model.option.tileProduction" value="medium" />
         </optionGroup>
-        <optionGroup id="model.difficulty.cheat">
+        <optionGroup id="model.difficulty.cheat" editable="false">
           <integerOption id="model.option.liftBoycottCheat" value="10"/>
           <integerOption id="model.option.equipScoutCheat" value="10"/>
           <integerOption id="model.option.landUnitCheat" value="10"/>
@@ -2613,15 +2613,15 @@ resources of 400, lost city rumours of 500
         </optionGroup>
       </optionGroup>
       <optionGroup id="model.difficulty.hard" editable="false">
-        <optionGroup id="model.difficulty.immigration">
-          <integerOption id="model.option.crossesIncrement" value="12"/>
+        <optionGroup id="model.difficulty.immigration" editable="false">
+          <integerOption id="model.option.crossesIncrement" value="2"/>
           <integerOption id="model.option.recruitPriceIncrease" value="30"/>
           <integerOption id="model.option.lowerCapIncrease" value="0"/>
           <integerOption id="model.option.priceIncrease.artillery" value="100"/>
           <booleanOption id="model.option.priceIncreasePerType" value="true"/>
           <booleanOption id="model.option.expertStartingUnits" value="false" />
         </optionGroup>
-        <optionGroup id="model.difficulty.natives">
+        <optionGroup id="model.difficulty.natives" editable="false">
           <integerOption id="model.option.landPriceFactor" value="70"/>
           <integerOption id="model.option.nativeConvertProbability" value="20"/>
           <integerOption id="model.option.burnProbability" value="8"/>
@@ -2638,7 +2638,7 @@ resources of 400, lost city rumours of 500
             <rangeValue label="veryLarge" value="5"/>
           </rangeOption>
         </optionGroup>
-        <optionGroup id="model.difficulty.monarch">
+        <optionGroup id="model.difficulty.monarch" editable="false">
           <integerOption id="model.option.monarchMeddling" value="3"/>
           <integerOption id="model.option.taxAdjustment" value="3"/>
           <integerOption id="model.option.mercenaryPrice" value="70"/>
@@ -2714,20 +2714,20 @@ resources of 400, lost city rumours of 500
             </unitOption>
           </unitListOption>
         </optionGroup>
-        <optionGroup id="model.difficulty.government">
+        <optionGroup id="model.difficulty.government" editable="false">
           <integerOption id="model.option.badGovernmentLimit" value="5"/>
           <integerOption id="model.option.veryBadGovernmentLimit" value="9"/>
           <integerOption id="model.option.goodGovernmentLimit" value="50"/>
           <integerOption id="model.option.veryGoodGovernmentLimit" value="100"/>
         </optionGroup>
-        <optionGroup id="model.difficulty.other">
+        <optionGroup id="model.difficulty.other" editable="false">
           <integerOption id="model.option.startingMoney" value="0"/>
           <integerOption id="model.option.foundingFatherFactor" value="48"/>
           <integerOption id="model.option.arrearsFactor" value="600"/>
           <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
           <stringOption  id="model.option.tileProduction" value="low" />
         </optionGroup>
-        <optionGroup id="model.difficulty.cheat">
+        <optionGroup id="model.difficulty.cheat" editable="false">
           <integerOption id="model.option.liftBoycottCheat" value="15"/>
           <integerOption id="model.option.equipScoutCheat" value="15"/>
           <integerOption id="model.option.landUnitCheat" value="15"/>
@@ -2736,15 +2736,15 @@ resources of 400, lost city rumours of 500
         </optionGroup>
       </optionGroup>
       <optionGroup id="model.difficulty.veryHard" editable="false">
-        <optionGroup id="model.difficulty.immigration">
-          <integerOption id="model.option.crossesIncrement" value="14"/>
+        <optionGroup id="model.difficulty.immigration" editable="false">
+          <integerOption id="model.option.crossesIncrement" value="2"/>
           <integerOption id="model.option.recruitPriceIncrease" value="30"/>
           <integerOption id="model.option.lowerCapIncrease" value="0"/>
           <integerOption id="model.option.priceIncrease.artillery" value="100"/>
           <booleanOption id="model.option.priceIncreasePerType" value="true"/>
           <booleanOption id="model.option.expertStartingUnits" value="false" />
         </optionGroup>
-        <optionGroup id="model.difficulty.natives">
+        <optionGroup id="model.difficulty.natives" editable="false">
           <integerOption id="model.option.landPriceFactor" value="80"/>
           <integerOption id="model.option.nativeConvertProbability" value="10"/>
           <integerOption id="model.option.burnProbability" value="10"/>
@@ -2761,7 +2761,7 @@ resources of 400, lost city rumours of 500
             <rangeValue label="veryLarge" value="5"/>
           </rangeOption>
         </optionGroup>
-        <optionGroup id="model.difficulty.monarch">
+        <optionGroup id="model.difficulty.monarch" editable="false">
           <integerOption id="model.option.monarchMeddling" value="4"/>
           <integerOption id="model.option.taxAdjustment" value="4"/>
           <integerOption id="model.option.mercenaryPrice" value="75"/>
@@ -2837,20 +2837,20 @@ resources of 400, lost city rumours of 500
             </unitOption>
           </unitListOption>
         </optionGroup>
-        <optionGroup id="model.difficulty.government">
+        <optionGroup id="model.difficulty.government" editable="false">
           <integerOption id="model.option.badGovernmentLimit" value="4"/>
           <integerOption id="model.option.veryBadGovernmentLimit" value="8"/>
           <integerOption id="model.option.goodGovernmentLimit" value="50"/>
           <integerOption id="model.option.veryGoodGovernmentLimit" value="100"/>
         </optionGroup>
-        <optionGroup id="model.difficulty.other">
+        <optionGroup id="model.difficulty.other" editable="false">
           <integerOption id="model.option.startingMoney" value="0"/>
           <integerOption id="model.option.foundingFatherFactor" value="56"/>
           <integerOption id="model.option.arrearsFactor" value="700"/>
           <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
           <stringOption  id="model.option.tileProduction" value="veryLow" />
         </optionGroup>
-        <optionGroup id="model.difficulty.cheat">
+        <optionGroup id="model.difficulty.cheat" editable="false">
           <integerOption id="model.option.liftBoycottCheat" value="20"/>
           <integerOption id="model.option.equipScoutCheat" value="20"/>
           <integerOption id="model.option.landUnitCheat" value="20"/>
@@ -2860,7 +2860,7 @@ resources of 400, lost city rumours of 500
       </optionGroup>
       <optionGroup id="model.difficulty.custom">
         <optionGroup id="model.difficulty.immigration">
-          <integerOption id="model.option.crossesIncrement" value="14" minimumValue="0" maximumValue="100"/>
+          <integerOption id="model.option.crossesIncrement" value="2" minimumValue="0" maximumValue="100"/>
           <integerOption id="model.option.recruitPriceIncrease" value="30" minimumValue="0" maximumValue="100"/>
           <integerOption id="model.option.lowerCapIncrease" value="0" minimumValue="0" maximumValue="100"/>
           <integerOption id="model.option.priceIncrease.artillery" value="100" minimumValue="0" maximumValue="1000"/>
@@ -3066,10 +3066,19 @@ resources of 400, lost city rumours of 500
           <selectValue label="model.option.startingPositions.random" value="1"/>
           <selectValue label="model.option.startingPositions.historical" value="2"/>
         </selectOption>
+        <!-- Initial immigration target. -->
+        <integerOption id="model.option.initialImmigration" defaultValue="15"
+                       minimumValue="0" maximumValue="99"/>
         <!-- Per turn probability that an angry AI will continue to
              honour a recent peace treaty -->
         <integerOption id="model.option.peaceProbability" defaultValue="90"
                        minimumValue="0" maximumValue="99"/>
+        <!-- Per turn immigration penalty for units in Europe. -->
+        <integerOption id="model.option.europeanUnitImmigrationPenalty"
+                       defaultValue="-4" minimumValue="-100" maximumValue="0"/>
+        <!-- Per turn player immigration bonus. -->
+        <integerOption id="model.option.playerImmigrationBonus"
+                       defaultValue="2" minimumValue="0" />
       </optionGroup>
       <optionGroup id="gameOptions.colony">
         <!-- Does the Custom House sell boycotted goods -->

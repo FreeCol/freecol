@@ -3916,7 +3916,9 @@ public final class InGameController implements NetworkConstants {
     public void recruitUnitInEurope(int index) {
         if (!requireOurTurn()) return;
 
-        Player player = freeColClient.getMyPlayer();
+        final Player player = freeColClient.getMyPlayer();
+        if (!player.isColonial()) return;
+
         if (!player.checkGold(player.getRecruitPrice())) {
             gui.showErrorMessage("notEnoughGold");
             return;

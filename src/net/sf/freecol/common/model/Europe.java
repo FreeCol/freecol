@@ -201,11 +201,36 @@ public class Europe extends UnitLocation implements Ownable, Named {
      * @return The current price of the recruit in this <code>Europe</code>.
      */
     public int getRecruitPrice() {
+        if (!owner.isColonial()) return -1;
         int required = owner.getImmigrationRequired();
         int immigration = owner.getImmigration();
         int difference = Math.max(required - immigration, 0);
         return Math.max((recruitPrice * difference) / required,
                         recruitLowerCap);
+    }
+
+    /**
+     * Get any immigration produced in Europe.
+     *
+     * Col1 penalizes immigration by -4 per unit in Europe per turn,
+     * but there is a +2 player bonus, which we might as well add
+     * here.  Total immigration per turn can not be negative, but that
+     * is handled in ServerPlayer.
+     *
+     * @param production The current total colony production.
+     * @return Immigration produced this turn in Europe.
+     */
+    public int getImmigration(int production) {
+        final Specification spec = getSpecification();
+        int n = 0;
+        for (Unit u : getUnitList()) {
+            if (u.isPerson()) n++;
+        }
+        n *= spec.getInteger(GameOptions.EUROPEAN_UNIT_IMMIGRATION_PENALTY);
+        n += spec.getInteger(GameOptions.PLAYER_IMMIGRATION_BONUS);
+        // Do not allow total production to be negative.
+        if (n + production < 0) n = -production;
+        return n;
     }
 
 

@@ -531,9 +531,9 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * The amount of immigration needed until the next unit decides
-     * to migrate.  TODO: Magic Number!
+     * to migrate.
      */
-    protected int immigrationRequired = 12;
+    protected int immigrationRequired;
 
     /**
      * The number of liberty points.  Liberty points are an
@@ -1455,7 +1455,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The immigration points required to trigger emigration.
      */
     public int getImmigrationRequired() {
-        return (isColonial()) ? immigrationRequired : 0;
+        return immigrationRequired;
     }
 
     /**
@@ -1465,7 +1465,6 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param immigrationRequired The new number of immigration points.
      */
     public void setImmigrationRequired(int immigrationRequired) {
-        if (!isColonial()) return;
         this.immigrationRequired = immigrationRequired;
     }
 
@@ -1477,31 +1476,17 @@ public class Player extends FreeColGameObject implements Nameable {
         if (!isColonial()) return;
 
         final Specification spec = getSpecification();
+        final int current = immigrationRequired;
         int base = spec.getInteger(GameOptions.CROSSES_INCREMENT);
-        immigrationRequired += (int)applyModifier(base,
-            Modifier.RELIGIOUS_UNREST_BONUS);
-        // The book I have tells me the crosses needed is:
-        // [(colonist count in colonies + total colonist count) * 2] + 8.
-        // So every unit counts as 2 unless they're in a colony,
-        // wherein they count as 4.
-        /*
-         * int count = 8; Map map = getGame().getMap(); Iterator<Position>
-         * tileIterator = map.getWholeMapIterator(); while
-         * (tileIterator.hasNext()) { Tile t = map.getTile(tileIterator.next());
-         * if (t != null && t.getFirstUnit() != null &&
-         * t.getFirstUnit().getOwner().equals(this)) { Iterator<Unit>
-         * unitIterator = t.getUnitIterator(); while (unitIterator.hasNext()) {
-         * Unit u = unitIterator.next(); Iterator<Unit> childUnitIterator =
-         * u.getUnitIterator(); while (childUnitIterator.hasNext()) { // Unit
-         * childUnit = (Unit) childUnitIterator.next();
-         * childUnitIterator.next(); count += 2; } count += 2; } } if (t != null &&
-         * t.getColony() != null && t.getColony().getOwner() == this) { count +=
-         * t.getColony().getUnitCount() * 4; // Units in colonies // count
-         * doubly. // -sjm } } Iterator<Unit> europeUnitIterator =
-         * getEurope().getUnitIterator(); while (europeUnitIterator.hasNext()) {
-         * europeUnitIterator.next(); count += 2; } if (nation == ENGLISH) {
-         * count = (count * 2) / 3; } setCrossesRequired(count);
-         */
+        // If the religious unrest bonus is present, immigrationRequired
+        // has already been reduced.  We want to apply the bonus to the
+        // sum of the *unreduced* immigration target and the increment.
+        int unreduced = (int)Math.round(current
+            / applyModifier(1.0f, Modifier.RELIGIOUS_UNREST_BONUS));
+        immigrationRequired = (int)applyModifier(unreduced + base,
+            Modifier.RELIGIOUS_UNREST_BONUS);;
+        logger.finest("Immigration for " + getId() + " updated " + current
+            + " -> " + immigrationRequired);
     }
 
     /**

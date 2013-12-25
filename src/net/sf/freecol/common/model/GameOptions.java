@@ -88,6 +88,17 @@ public class GameOptions {
     public static final String PEACE_PROBABILITY
         = "model.option.peaceProbability";
 
+    /** Initial immigration target value. */
+    public static final String INITIAL_IMMIGRATION
+        = "model.option.initialImmigration";
+
+    /** Per turn immigration penalty for units in Europe. */
+    public static final String EUROPEAN_UNIT_IMMIGRATION_PENALTY
+        = "model.option.europeanUnitImmigrationPenalty";
+
+    /** Per turn player immigration bonus. */
+    public static final String PLAYER_IMMIGRATION_BONUS
+        = "model.option.playerImmigrationBonus";
 
     // Colony group
 

@@ -1170,6 +1170,12 @@ public final class FreeColServer {
             "gameOptions.colony", true, false);
         addIntegerOption(GameOptions.PEACE_PROBABILITY,
             "gameOptions.map", 90, false);
+        addIntegerOption(GameOptions.INITIAL_IMMIGRATION,
+            "gameOptions.map", 15, false);
+        addIntegerOption(GameOptions.EUROPEAN_UNIT_IMMIGRATION_PENALTY,
+            "gameOptions.map", -4, false);
+        addIntegerOption(GameOptions.PLAYER_IMMIGRATION_BONUS,
+            "gameOptions.map", 2, false);
     }
 
     private void addOptionGroup(String id, boolean difficulty) {

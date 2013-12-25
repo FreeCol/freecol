@@ -29,6 +29,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
@@ -71,6 +72,8 @@ public final class ReportReligiousPanel extends ReportPanel {
             reportPanel.add(bp);
             production += colony.getNetProductionOf(crosses);
         }
+        Europe europe = player.getEurope();
+        if (europe != null) production += europe.getImmigration(production);
 
         progressBar.update(0, player.getImmigrationRequired(),
                            player.getImmigration(), production);

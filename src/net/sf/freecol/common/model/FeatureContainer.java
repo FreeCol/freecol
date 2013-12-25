@@ -239,8 +239,7 @@ public final class FeatureContainer {
      */
     public float applyModifier(float number, String id,
                                FreeColGameObjectType fcgot, Turn turn) {
-        return applyModifierSet(number, turn,
-                                getModifierSet(id, fcgot, turn));
+        return applyModifierSet(number, turn, getModifierSet(id, fcgot, turn));
     }
 
     /**

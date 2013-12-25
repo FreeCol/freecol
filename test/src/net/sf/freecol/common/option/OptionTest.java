@@ -90,7 +90,7 @@ public class OptionTest extends FreeColTestCase {
             for (String name : names) {
                 OptionGroup subGroup = (OptionGroup) group.getOption("model.difficulty." + name);
                 assertNotNull("Failed to find option group '" + name + "' (" + level + ")", subGroup);
-                assertFalse("Option group '" + name + "' should not be editable", subGroup.isEditable());
+                assertFalse("Option group '" + name + "' in '" + level + "' should not be editable", subGroup.isEditable());
             }
         }
 

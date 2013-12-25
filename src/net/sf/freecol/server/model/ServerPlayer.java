@@ -292,6 +292,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
         if (!isEuropean() || isREF()) return;
         final Specification spec = getGame().getSpecification();
 
+        // Set initial immigration target
+        int i0 = spec.getInteger(GameOptions.INITIAL_IMMIGRATION);
+        immigrationRequired = (int)applyModifier((float)i0,
+            Modifier.RELIGIOUS_UNREST_BONUS);
+
         // Add initial gold
         modifyGold(spec.getInteger(GameOptions.STARTING_MONEY));
 
@@ -1157,11 +1162,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // Settlements
         List<Settlement> settlements
             = new ArrayList<Settlement>(getSettlements());
-        int newSoL = 0;
+        int newSoL = 0, newImmigration = getImmigration();
         for (Settlement settlement : settlements) {
             ((ServerModelObject)settlement).csNewTurn(random, cs);
             newSoL += settlement.getSoL();
         }
+        newImmigration = getImmigration() - newImmigration;
+
         int numberOfColonies = settlements.size();
         if (numberOfColonies > 0) {
             newSoL = newSoL / numberOfColonies;
@@ -1180,6 +1187,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // Europe.
         if (europe != null) {
             ((ServerModelObject) europe).csNewTurn(random, cs);
+            modifyImmigration(europe.getImmigration(newImmigration));
         }
         // Units.
         for (Unit unit : new ArrayList<Unit>(getUnits())) {
