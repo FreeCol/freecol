@@ -20,6 +20,7 @@
 package net.sf.freecol.server.control;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map.Entry;
@@ -91,7 +92,7 @@ public final class PreGameController extends Controller {
         Game game = freeColServer.buildGame();
 
         // Inform the clients.
-        for (Player player : game.getPlayers()) {
+        for (Player player : new ArrayList<Player>(game.getPlayers())) {
             if (!player.isAI()) {
                 player.invalidateCanSeeTiles();//Send clean copy of the game
                 Connection conn = ((ServerPlayer)player).getConnection();
