@@ -840,6 +840,11 @@ public class DebugUtils {
                 gui.setActiveUnit(u);
                 first = false;
             }
+            for (Unit u2 : u.getUnitList()) {
+                Unit su2 = sGame.getFreeColGameObject(u2.getId(), Unit.class);
+                u2.setMovesLeft(u2.getInitialMovesLeft());
+                su2.setMovesLeft(su2.getInitialMovesLeft());
+            }
         }
         gui.refresh();
     }
