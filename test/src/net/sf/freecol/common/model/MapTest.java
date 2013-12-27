@@ -543,7 +543,7 @@ public class MapTest extends FreeColTestCase {
 
         // Check the colonist does not use the carrier if it does not help.
         Tile midTile = map.getTile(9, 4);
-        path = map.findPath(colonist, map.getTile(2, 6), midTile,
+        path = map.findPath(colonist, map.getTile(2, 5), midTile,
                             galleon, null);
         assertNotNull("Middle path should be legal.", path);
         assertFalse("Middle path should not not use carrier.",

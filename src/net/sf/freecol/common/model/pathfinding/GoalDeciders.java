@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.PathNode;
@@ -141,12 +142,16 @@ public final class GoalDeciders {
     public static GoalDecider getLocationGoalDecider(final Location target) {
         return new GoalDecider() {
             private PathNode best = null;
+            private int bestCost = FreeColObject.INFINITY;
 
             public PathNode getGoal() { return best; }
             public boolean hasSubGoals() { return false; }
             public boolean check(Unit u, PathNode path) {
-                if (Map.isSameLocation(path.getLocation(), target)) {
+                int cost;
+                if (Map.isSameLocation(path.getLocation(), target)
+                    && (cost = path.getCost()) < bestCost) {
                     best = path;
+                    bestCost = cost;
                     return true;
                 }
                 return false;
