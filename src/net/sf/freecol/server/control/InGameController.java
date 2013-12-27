@@ -2908,7 +2908,6 @@ public final class InGameController extends Controller {
             }
             serverPlayer.addSettlement(settlement);
             settlement.placeSettlement(false);//-vis(serverPlayer,?),-til
-            serverPlayer.exploreForSettlement(settlement);
             cs.add(See.only(serverPlayer),
                    serverPlayer.exploreForSettlement(settlement));
 
@@ -2923,7 +2922,8 @@ public final class InGameController extends Controller {
             // Coronado
             for (ServerPlayer sp : getOtherPlayers(serverPlayer)) {
                 if (!sp.hasAbility(Ability.SEE_ALL_COLONIES)) continue;
-                sp.exploreForSettlement(settlement);//-vis(sp)
+                cs.add(See.only(serverPlayer),
+                       sp.exploreForSettlement(settlement));//-vis(sp)
                 sp.invalidateCanSeeTiles();//+vis(sp)
                 cs.addMessage(See.only(sp),
                     new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,

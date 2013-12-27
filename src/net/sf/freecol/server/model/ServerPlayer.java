@@ -1902,7 +1902,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 for (Tile t : game.getMap().getAllTiles()) {
                     Colony colony = t.getColony();
                     if (colony != null && !this.owns(colony)) {
-                        exploreForSettlement(colony);
+                        cs.add(See.only(this), exploreForSettlement(colony));
                         cs.add(See.only(this), colony.getOwnedTiles());
                     }
                 }
