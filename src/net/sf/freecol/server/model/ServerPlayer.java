@@ -825,10 +825,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         List<Tile> done = new ArrayList<Tile>();
         for (Tile t : tiles) {
             if (done.contains(t)) continue; // Ignore duplicates
-            if (exploreTile(t)) {
-                System.err.println("  X " + t + " = true");
-                result.add(t);
-            } else System.err.println("  X " + t + " = false");
+            if (exploreTile(t)) result.add(t);
             done.add(t);
         }
         return result;
@@ -846,7 +843,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
         List<Tile> tiles = new ArrayList<Tile>(settlement.getOwnedTiles());
         tiles.addAll(settlement.getTile().getSurroundingTiles(1,
                 settlement.getLineOfSight()));
-System.err.println("EXPLORE FOR " + settlement.getName() + " " + tiles.size());
         return exploreTiles(tiles);
     }
 
