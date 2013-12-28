@@ -261,7 +261,9 @@ public final class Monarch extends FreeColGameObject implements Named {
                 if (enemy.isREF()) continue;
                 switch (player.getStance(enemy)) {
                 case PEACE: case CEASE_FIRE:
-                    enemies.add(enemy);
+                    if (!enemy.hasAbility(Ability.IGNORE_EUROPEAN_WARS)) {
+                        enemies.add(enemy);
+                    }
                     break;
                 }
             }
@@ -282,7 +284,9 @@ public final class Monarch extends FreeColGameObject implements Named {
                 if (enemy.isREF()) continue;
                 switch (player.getStance(enemy)) {
                 case WAR: case CEASE_FIRE:
-                    friends.add(enemy);
+                    if (!enemy.hasAbility(Ability.IGNORE_EUROPEAN_WARS)) {
+                        friends.add(enemy);
+                    }
                     break;
                 }
             }
