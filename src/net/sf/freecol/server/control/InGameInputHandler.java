@@ -66,6 +66,7 @@ import net.sf.freecol.common.networking.LearnSkillMessage;
 import net.sf.freecol.common.networking.LoadCargoMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MissionaryMessage;
+import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.MoveMessage;
 import net.sf.freecol.common.networking.MoveToMessage;
 import net.sf.freecol.common.networking.NetworkConstants;
@@ -416,6 +417,14 @@ public final class InGameInputHandler extends InputHandler
             public Element handle(Player player, Connection connection,
                                   Element element) {
                 return new MissionaryMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(MonarchActionMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new MonarchActionMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
         register(MoveMessage.getXMLElementTagName(),

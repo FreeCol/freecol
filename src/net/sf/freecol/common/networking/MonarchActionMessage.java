@@ -24,6 +24,7 @@ import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -157,7 +158,11 @@ public class MonarchActionMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        return null;
+        ServerPlayer serverPlayer = server.getPlayer(connection);
+
+        // Try to resolve the action.
+        return server.getInGameController()
+            .monarchAction(serverPlayer, action, getResult());
     }
 
     /**

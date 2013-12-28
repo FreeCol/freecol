@@ -121,6 +121,7 @@ import net.sf.freecol.server.control.ChangeSet.See;
 import net.sf.freecol.server.control.InputHandler;
 import net.sf.freecol.server.model.DiplomacySession;
 import net.sf.freecol.server.model.LootSession;
+import net.sf.freecol.server.model.MonarchSession;
 import net.sf.freecol.server.model.ServerColony;
 import net.sf.freecol.server.model.ServerEurope;
 import net.sf.freecol.server.model.ServerGame;
@@ -425,110 +426,6 @@ public final class InGameController extends Controller {
     }
 
     /**
-     * A trivial class to associate a future with a runnable that resolves it.
-     */
-    private static class FutureQuery {
-
-        /** A place to stash queries that need to be resolved at some point. */
-        private static final List<FutureQuery> outstandingQueries
-            = new ArrayList<FutureQuery>();
-
-        /** The future to keep. */
-        private Future<?> future;
-
-        /**
-         * The runnable that resolves the problem if the future is unresolved.
-         */
-        private Runnable runnable;
-
-
-        /**
-         * Create a new future query.
-         *
-         * @param future The <code>Future</code> to save.
-         * @param runnable The <code>Runnable</code> that resolves the future.
-         */
-        public FutureQuery(Future<?> future, Runnable runnable) {
-            this.future = future;
-            this.runnable = runnable;
-            addOutstandingQuery(this);
-        }
-
-        /**
-         * Add an outstanding query.
-         *
-         * @param fq The <code>FutureQuery</code> to add.
-         */
-        public static void addOutstandingQuery(FutureQuery fq) {
-            outstandingQueries.add(fq);
-        }
-
-        /**
-         * Resolves and clears any outstanding queries.
-         */
-        public static void resolveOutstandingQueries() {
-            FutureQuery fq;
-            while (!outstandingQueries.isEmpty()) {
-                fq = outstandingQueries.remove(0);
-                if (fq.future == null || !fq.future.isDone()) {
-                    if (fq.runnable != null) {
-                        fq.runnable.run();
-                    }
-                    if (fq.future != null) fq.future.cancel(true);
-                }
-            }
-        }
-    };
-
-    // A handler interface to pass to handleThisTurn().
-    // This will change from DOMMessage to Message when DOM goes away.
-    private interface CSMessageHandler {
-        public ChangeSet handle(DOMMessage message);
-    };
-
-    /**
-     * Handle a new message type in this turn only for a given player.
-     *
-     * Registers a new message handler which unregisters itself when run,
-     * or by a FutureQuery at the end of turn.
-     *
-     * @param serverPlayer The <code>ServerPlayer</code> to handle for.
-     * @param messageType The <code>DOMMessage</code> question.
-     * @param handler The <code>DOMMessageHandler</code> handler to process
-     *     the reply with.
-     * @param runnable An optional <code>Runnable</code> to run if the
-     *     question was not answered.
-     */
-    private void handleThisTurn(final ServerPlayer serverPlayer,
-                                final String messageType,
-                                final CSMessageHandler handler,
-                                final Runnable runnable) {
-        final InGameInputHandler igih = getFreeColServer()
-            .getInGameInputHandler();
-        final Game game = getGame();
-        final NetworkRequestHandler nwh
-            = new CurrentPlayerNetworkRequestHandler(getFreeColServer()) {
-                protected Element handle(Player player, Connection conn,
-                                         Element element) {
-                    if (!serverPlayer.equals((ServerPlayer)player)) {
-                        return DOMMessage.clientError("Wrong player, expected "
-                            + serverPlayer.getName());
-                    }
-                    igih.unregister(messageType, this);
-                    DOMMessage m = DOMMessage.createMessage(game, element);
-                    ChangeSet cs = handler.handle(m);
-                    return (cs == null) ? null : cs.build(serverPlayer);
-                }
-            };
-        igih.register(messageType, nwh);
-        new FutureQuery(null, new Runnable() {
-                public void run() {
-                    if (igih.unregister(messageType, nwh)) runnable.run();
-                }
-            });
-    }
-
-    /**
      * Asks a question of a player with a timeout.
      *
      * @param serverPlayer The <code>ServerPlayer</code> to ask.
@@ -756,9 +653,6 @@ public final class InGameController extends Controller {
                 sendToOthers(serverPlayer, cs);
                 return cs.build(serverPlayer);
             }
-
-            // Clean up futures from the current player.
-            FutureQuery.resolveOutstandingQueries();
 
             // Check for new turn
             ChangeSet cs = new ChangeSet();
@@ -1054,23 +948,7 @@ public final class InGameController extends Controller {
                 .setTax(taxRaise);
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_EARLY,
                    message);
-            handleThisTurn(serverPlayer, message.getType(),
-                new CSMessageHandler() {
-                    public ChangeSet handle(DOMMessage message) {
-                        boolean result
-                            = (message instanceof MonarchActionMessage)
-                                ? ((MonarchActionMessage)message).getResult()
-                                : false;
-                        ChangeSet cs = new ChangeSet();
-                        serverPlayer.csRaiseTax(taxRaise, goods, result, cs);
-                        return cs;
-                    }
-                },
-                new Runnable() {
-                    public void run() {
-                        raiseTax(serverPlayer, taxRaise, goods, false);
-                    }
-                });
+            new MonarchSession(serverPlayer, action, taxRaise, goods);
             break;
         case LOWER_TAX_WAR: case LOWER_TAX_OTHER:
             int oldTax = serverPlayer.getTax();
@@ -1154,27 +1032,42 @@ public final class InGameController extends Controller {
                         abstractUnitTemplate(", ", mercenaries)));
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_EARLY,
                    message);
-            handleThisTurn(serverPlayer, message.getType(),
-                new CSMessageHandler() {
-                    public ChangeSet handle(DOMMessage message) {
-                        boolean result
-                            = (message instanceof MonarchActionMessage)
-                                ? ((MonarchActionMessage)message).getResult()
-                                : false;
-                        if (result) {
-                            ChangeSet cs = new ChangeSet();
-                            serverPlayer.csAddMercenaries(mercenaries,
-                                                          mercPrice, cs);
-                            return cs;
-                        }
-                        return null;
-                    }
-                }, null);
+            new MonarchSession(serverPlayer, action, mercenaries, mercPrice);
             break;
         case DISPLEASURE: default:
             logger.warning("Bogus action: " + action);
             break;
         }
+    }
+
+    public Element monarchAction(ServerPlayer serverPlayer,
+                                 MonarchAction action, boolean result) {
+        MonarchSession session = TransactionSession.lookup(MonarchSession.class,
+            serverPlayer.getId(), "");
+        if (session == null) {
+            return DOMMessage.clientError("Bogus monarch action: " + action);
+        } else if (action != session.getAction()) {
+            return DOMMessage.clientError("Session action mismatch, "
+                + session.getAction() + " expected: " + action);
+        }
+
+        ChangeSet cs = new ChangeSet();
+        switch (action) {
+        case RAISE_TAX_ACT: case RAISE_TAX_WAR:
+            serverPlayer.csRaiseTax(session.getTax(), session.getGoods(),
+                                    result, cs);
+            break;
+        case OFFER_MERCENARIES:
+            if (result) {
+                serverPlayer.csAddMercenaries(session.getMercenaries(),
+                                              session.getPrice(), cs);
+            }
+            break;
+        default:
+            return DOMMessage.clientError("Invalid monarch action: " + action);
+        }
+
+        return cs.build(serverPlayer);
     }
 
     /**
