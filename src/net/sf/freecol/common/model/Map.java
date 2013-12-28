@@ -1562,10 +1562,17 @@ public class Map extends FreeColGameObject implements Location {
                     continue;
                 }
 
+                // Is this move to the goal?  Use fake high costs so
+                // this does not become cached inside the goal decider
+                // as the preferred path.
+                boolean isGoal = goalDecider.check(unit,
+                    new PathNode(moveTile, 0, INFINITY, false,
+                        currentNode, null));
+
                 // Is this move possible?  Loop on failure.
                 //
-                // Allow some seemingly impossible moves if it is to the
-                // final destination (see the comment to recoverMove).
+                // Allow some seemingly impossible moves if it is to
+                // the goal (see the comment to recoverMove).
                 // 
                 // Check for a carrier change at the new tile,
                 // creating a MoveCandidate for each case.
@@ -1587,10 +1594,6 @@ public class Map extends FreeColGameObject implements Location {
                 // short of a goal settlement, where we should
                 // consider an immediate move into the settlement by
                 // the passenger.
-                //
-                boolean isGoal = goalDecider.check(unit,
-                    new PathNode(moveTile, currentMovesLeft, currentTurns,
-                                 false, currentNode, null));
                 Unit.MoveType umt = unit.getSimpleMoveType(currentTile,
                                                            moveTile);
                 boolean unitMove = (isGoal) ? umt.isLegal() : umt.isProgress();

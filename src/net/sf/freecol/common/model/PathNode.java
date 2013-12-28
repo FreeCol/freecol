@@ -20,9 +20,10 @@
 
 package net.sf.freecol.common.model;
 
-import  net.sf.freecol.common.model.Location;
-import  net.sf.freecol.common.model.Map.Direction;
-import  net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.FreeColObject;
+import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Tile;
 
 
 /**
@@ -33,6 +34,9 @@ import  net.sf.freecol.common.model.Tile;
  * evaluating/following a path.
  */
 public class PathNode {
+
+    /** Weight turns >> moves. */
+    private static final int TURN_FACTOR = 100;
 
     /** The location this node refers to.  Usually a Tile. */
     private Location location;
@@ -264,14 +268,19 @@ public class PathNode {
 
     /**
      * Standard function to get the cost of moving to a <code>PathNode</code>.
-     * Static version provided for path calculation comparisons.
+     *
+     * Static version provided for path calculation comparisons.  Some
+     * care is taken to avoid overflow as test paths with infinite
+     * moves are created in the path planning process.
      *
      * @param turns The number of turns taken.
      * @param movesLeft The number of moves left for the moving unit.
      * @return The cost of moving to a <code>PathNode</code>.
      */
     public static int getCost(int turns, int movesLeft) {
-        return 100 * turns + (100 - movesLeft);
+        return (turns >= FreeColObject.INFINITY / (TURN_FACTOR + 1))
+            ? FreeColObject.INFINITY
+            : TURN_FACTOR * turns + (TURN_FACTOR - movesLeft);
     }
         
     /**
