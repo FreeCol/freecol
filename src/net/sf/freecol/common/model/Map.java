@@ -1065,6 +1065,10 @@ public class Map extends FreeColGameObject implements Location {
         // Validate the arguments, reducing to either Europe or a Tile.
         final Location realStart = findRealStart(unit, start, carrier);
         final Location realEnd = findRealEnd(end);
+        // Do not allow finding a path into unexplored territory, as we
+        // do not have the terrain type and thus can not calculate costs.
+        if (realEnd instanceof Tile
+            && !((Tile)realEnd).isExplored()) return null;
         // Get the unit that will be used for off-map travel.
         final Unit offMapUnit = (carrier != null) ? carrier : unit;
 
