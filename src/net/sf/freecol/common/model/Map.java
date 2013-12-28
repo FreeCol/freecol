@@ -1294,7 +1294,7 @@ public class Map extends FreeColGameObject implements Location {
             if (this.cost != CostDecider.ILLEGAL_MOVE) {
                 this.turns += decider.getNewTurns();
                 this.movesLeft = decider.getMovesLeft();
-                this.cost = PathNode.getCost(turns, movesLeft);
+                this.cost = PathNode.getCost(this.turns, this.movesLeft);
             }
             this.path = null;
         }
@@ -1533,6 +1533,10 @@ public class Map extends FreeColGameObject implements Location {
                 continue;
             }
 
+            // Valid candidate for the closed list.
+            closedList.put(currentLocation.getId(), currentNode);
+            if (sb != null) sb.append("...close");
+
             // Collect the parameters for the current node.
             final int currentMovesLeft = currentNode.getMovesLeft();
             final int currentTurns = currentNode.getTurns();
@@ -1669,12 +1673,13 @@ public class Map extends FreeColGameObject implements Location {
                     if (isGoal) move.recoverGoal();
 
                     // Tighten the bounds on a previously seen case if possible
-                    if (move.canImprove(closed)) {
-                        closedList.put(moveTile.getId(), movePath);
-                    }
-
-                    // Is this an improvement?  If not, ignore.
-                    if (move.canImprove(openList.get(moveTile.getId()))) {
+                    if (closed != null) {
+                        if (move.canImprove(closed)) {
+                            closedList.remove(moveTile.getId());
+                            move.improve(openList, openListQueue, f,
+                                         searchHeuristic);
+                        }
+                    } else if (move.canImprove(openList.get(moveTile.getId()))){
                         move.improve(openList, openListQueue, f,
                                      searchHeuristic);
                     }
@@ -1696,10 +1701,12 @@ public class Map extends FreeColGameObject implements Location {
                     ((costDecider != null) ? costDecider
                         : CostDeciders.defaultCostDeciderFor(currentUnit)));
                 PathNode movePath = move.resetPath();
-                if (move.canImprove(closed)) {
-                    closedList.put(europe.getId(), movePath);
-                }
-                if (move.canImprove(openList.get(europe.getId()))) {
+                if (closed != null) {
+                    if (move.canImprove(closed)) {
+                        closedList.remove(europe.getId());
+                        move.improve(openList, openListQueue, f, null);
+                    }
+                } else if (move.canImprove(openList.get(europe.getId()))) {
                     move.improve(openList, openListQueue, f, null);
                 }
             }
