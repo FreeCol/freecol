@@ -50,8 +50,9 @@ public class FreeColDebugger {
                // tooltip in MarketLabel, the extra modifiers on the
                // BuildingToolTip, the region and Mission
                // displays in MapViewer, and turn skipping.
-        INIT   // An initial colony is made, and goods added to all
+        INIT,  // An initial colony is made, and goods added to all
                // native settlements.
+        PATHS  // Display more information on goto paths
     }
     private static int debugMode = 0;
 

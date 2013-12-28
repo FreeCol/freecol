@@ -1739,6 +1739,8 @@ public final class MapViewer {
      */
     private void displayGotoPath(Graphics2D g, PathNode gotoPath) {
         final Font font = ResourceManager.getFont("NormalFont", 12f);
+        final boolean debug = FreeColDebugger
+            .isInDebugMode(FreeColDebugger.DebugMode.PATHS);
 
         for (PathNode p = gotoPath; p != null; p = p.next) {
             Tile tile = p.getTile();
@@ -1759,6 +1761,12 @@ public final class MapViewer {
                 image = lib.getPathNextTurnImage(show);
                 turns = lib.getStringImage(g, Integer.toString(p.getTurns()), 
                                            Color.WHITE, font);
+            }
+            if (debug) {
+                if (show != null) image = lib.getPathNextTurnImage(show);
+                turns = lib.getStringImage(g, Integer.toString(p.getTurns())
+                    + "/" + Integer.toString(p.getMovesLeft()),
+                    Color.WHITE, font);
             }
             Point point = getTilePosition(tile);
             if (point != null) {
