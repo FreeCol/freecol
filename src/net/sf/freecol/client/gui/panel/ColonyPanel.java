@@ -277,7 +277,10 @@ public final class ColonyPanel extends PortPanel
             = new DefaultTransferHandler(freeColClient, this);
         nameActionListener = new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    initialize((Colony)nameBox.getSelectedItem());
+                    final Colony newColony = (Colony)nameBox.getSelectedItem();
+                    final GUI gui = getGUI();
+                    gui.removeFromCanvas(ColonyPanel.this);
+                    gui.showColonyPanel(newColony);
                 }
             };
         pressListener = new DragListener(freeColClient, this);
