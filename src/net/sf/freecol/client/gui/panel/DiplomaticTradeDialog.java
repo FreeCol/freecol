@@ -638,6 +638,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         boolean negotiate = unit.hasAbility(Ability.NEGOTIATE);
         boolean trade = unit.isCarrier()
             && unitPlayer.hasAbility(Ability.TRADE_WITH_FOREIGN_COLONIES);
+        boolean tribute = unit.isOffensiveUnit();
 
         NationSummary ns = getController().getNationSummary(otherPlayer);
         int gold = (ns == null) ? HUGE_DEMAND : ns.getGold();
@@ -648,17 +649,20 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         }
         this.goldOfferPanel = new GoldTradeItemPanel(player, gold);
 
-        if (negotiate) {
+        if (negotiate || tribute) {
             this.stancePanel = new StanceTradeItemPanel(player, otherPlayer);
             if (player.atWarWith(otherPlayer)
                 && (newOffer || agreement.getStance() == null)) {
                 this.agreement.add(new StanceTradeItem(getGame(), player,
                         otherPlayer, Stance.PEACE));
             }
+        } else {
+            this.stancePanel = null;
+        }
+        if (negotiate) {
             this.colonyDemandPanel = new ColonyTradeItemPanel(otherPlayer);
             this.colonyOfferPanel = new ColonyTradeItemPanel(player);
         } else {
-            this.stancePanel = null;
             this.colonyDemandPanel = this.colonyOfferPanel = null;
         }
         if (trade) {
@@ -672,14 +676,15 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
                 }
             }
             this.goodsOfferPanel = new GoodsTradeItemPanel(player, goods);
+            this.unitDemandPanel = new UnitTradeItemPanel(otherPlayer,
+                                                          getUnitUnitList(null));
+            this.unitOfferPanel = new UnitTradeItemPanel(player,
+                ((unitPlayer == player) ? getUnitUnitList(unit)
+                    : settlement.getUnitList()));
         } else {
             this.goodsDemandPanel = this.goodsOfferPanel = null;
+            this.unitOfferPanel = this.unitDemandPanel = null;
         }
-        this.unitDemandPanel = new UnitTradeItemPanel(otherPlayer,
-                                                      getUnitUnitList(null));
-        this.unitOfferPanel = new UnitTradeItemPanel(player,
-            ((unitPlayer == player) ? getUnitUnitList(unit)
-                : settlement.getUnitList()));
 
         this.summary = new MigPanel();
         this.summary.setLayout(new MigLayout("wrap 2", "[20px][]"));

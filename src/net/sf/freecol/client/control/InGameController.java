@@ -60,6 +60,7 @@ import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
+import net.sf.freecol.common.model.GoldTradeItem;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
@@ -87,7 +88,9 @@ import net.sf.freecol.common.model.ProductionType;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.StanceTradeItem;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TradeRoute;
@@ -287,6 +290,124 @@ public final class InGameController implements NetworkConstants {
             return gui.showPreCombatDialog(attacker, defender, tile);
         }
         return true;
+    }
+
+    /**
+     * Confirm whether the player wants to demand tribute.
+     *
+     * @param attacker The potential attacking <code>Unit</code>.
+     * @param settlement The target <code>Settlement</code>.
+     * @return The amount of tribute to demand, positive if the demand
+     *     should proceed.
+     */
+    private int confirmTribute(Unit attacker, Settlement settlement) {
+        Player player = attacker.getOwner();
+        Player other = settlement.getOwner();
+        int strength = NationSummary.calculateStrength(player, false);
+        StringTemplate t;
+
+        if (other.isIndian()) {
+            IndianSettlement is = (IndianSettlement)settlement;
+            String messageId = (other.getNumberOfSettlements() >= strength)
+                ? "confirmTribute.unwise"
+                : (other.getStance(player) == Stance.CEASE_FIRE)
+                ? "confirmTribute.warLikely"
+                : (is.getAlarm(player).getLevel() == Tension.Level.HAPPY)
+                ? "confirmTribute.happy"
+                : "confirmTribute.normal";
+            return (gui.showConfirmDialog(true, settlement.getTile(),
+                    StringTemplate.template(messageId)
+                        .addName("%settlement%", settlement.getName())
+                        .addStringTemplate("%nation%", other.getNationName()),
+                    attacker, "confirmTribute.yes", "confirmTribute.no"))
+                ? 1 : -1;
+
+        } else {
+            Colony colony = (Colony)settlement;
+            NationSummary ns = getNationSummary(other);
+            int otherStrength = ns.getMilitaryStrength();
+            int mil = (otherStrength <= 1 || otherStrength * 5 < strength) ? 0
+                : (strength == 0 || strength * 5 < otherStrength) ? 2
+                : 1;
+            int gold = ns.getGold();
+            if (gold == 0) {
+                t = StringTemplate.template("confirmTribute.broke")
+                    .addStringTemplate("%nation%", other.getNationName());
+                gui.showInformationMessage(t);
+                return -1;
+            }
+            int fin = (gold <= 100) ? 0 : (gold <= 1000) ? 1 : 2;
+            String val[] = new String[] { "low", "normal", "high" };
+            t = StringTemplate.template("confirmTribute.european")
+                    .addStringTemplate("%nation%", other.getNationName())
+                    .addStringTemplate("%danger%",
+                        StringTemplate.template("danger." + val[mil]))
+                    .addStringTemplate("%finance%",
+                        StringTemplate.template("finance." + val[fin]));
+            return gui.showSelectTributeAmountDialog(t, gold);
+        }
+    }
+
+    /**
+     * Iterate through a diplomatic negotiation.
+     *
+     * @param unit The <code>Unit</code> negotiating.
+     * @param settlement The <code>Settlement</code> that is negotiating.
+     * @param agreement An optional predefined <code>DiplomaticTrade</code>
+     *     to begin negotiating with.
+     * @param t A <code>StringTemplate</code> describing the negotiation.
+     */
+    private void diplomacyLoop(Unit unit, Settlement settlement,
+                               DiplomaticTrade agreement, StringTemplate t) {
+        final Game game = freeColClient.getGame();
+        final Player player = unit.getOwner();
+        final StringTemplate nation = settlement.getOwner().getNationName();
+        ModelMessage m = null;
+        TradeStatus status;
+
+        // If agreement is not predefined, get the user to do it.
+        DiplomaticTrade a = (agreement != null) ? agreement
+            : gui.showDiplomaticTradeDialog(unit, settlement, null, t);
+
+        while (a != null) {
+            // Inform server of current agreement, exit if it did not
+            // require a response (i.e. was not a proposal).
+            status = a.getStatus();
+            a = askServer().diplomacy(game, unit, settlement, agreement);
+            if (status != TradeStatus.PROPOSE_TRADE) break;
+            
+            // Process the result of a proposal.
+            status = (a == null) ? TradeStatus.REJECT_TRADE : a.getStatus();
+            m = null;
+            switch (status) {
+            case PROPOSE_TRADE:
+                a.incrementVersion();
+                break;
+            case ACCEPT_TRADE:
+                m = new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
+                                     "negotiationDialog.offerAccepted",
+                                     settlement)
+                    .addStringTemplate("%nation%", nation);
+                a = null;
+                break;
+            case REJECT_TRADE:
+                m = new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
+                                     "negotiationDialog.offerRejected",
+                                     settlement)
+                    .addStringTemplate("%nation%", nation);
+                a = null;
+                break;
+            default:
+                throw new IllegalStateException("Bogus trade status" + status);
+            }
+            if (m != null) player.addModelMessage(m);
+
+            // If it was a counter proposal, consider it.
+            if (a != null) {
+                a = gui.showDiplomaticTradeDialog(unit, settlement, a, t);
+            }
+        }
+        gui.updateMenuBar();
     }
 
     /**
@@ -2025,7 +2146,7 @@ public final class InGameController implements NetworkConstants {
         final Player player = freeColClient.getMyPlayer();
         final Player other = agreement.getOtherPlayer(player);
         StringTemplate t, nation = other.getNationName();
-        
+
         switch (agreement.getStatus()) {
         case ACCEPT_TRADE:
             boolean visibilityChange = false;
@@ -2048,7 +2169,11 @@ public final class InGameController implements NetworkConstants {
             gui.showInformationMessage(null, t);
             break;
         case PROPOSE_TRADE:
-            t = StringTemplate.template("negotiationDialog.consider")
+            String messageId = (player == settlement.getOwner() 
+                && !unit.hasAbility(Ability.NEGOTIATE)
+                && unit.isOffensiveUnit()) ? "negotiationDialog.tribute"
+                : "negotiationDialog.consider";
+            t = StringTemplate.template(messageId)
                 .addStringTemplate("%nation%", nation);
             DiplomaticTrade ourAgreement
                 = gui.showDiplomaticTradeDialog(unit, settlement,
@@ -2640,8 +2765,11 @@ public final class InGameController implements NetworkConstants {
         case EXPLORE_LOST_CITY_RUMOUR:
             result = moveExplore(unit, direction);
             break;
-        case ATTACK_UNIT: case ATTACK_SETTLEMENT:
+        case ATTACK_UNIT:
             result = moveAttack(unit, direction);
+            break;
+        case ATTACK_SETTLEMENT:
+            result = moveAttackSettlement(unit, direction);
             break;
         case EMBARK:
             result = moveEmbark(unit, direction);
@@ -2788,31 +2916,60 @@ public final class InGameController implements NetworkConstants {
     private boolean moveAttack(Unit unit, Direction direction) {
         clearGotoOrders(unit);
 
-        // Extra option with native settlement
         Tile tile = unit.getTile();
         Tile target = tile.getNeighbourOrNull(direction);
-        IndianSettlement is = target.getIndianSettlement();
-        if (is != null && unit.isArmed()) {
-            GUI.ScoutIndianSettlementAction act
-                = gui.showArmedUnitIndianSettlementDialog(is);
-            if (act == null) return true; // Cancelled
-            switch (act) {
-            case INDIAN_SETTLEMENT_ATTACK:
-                break;
-            case INDIAN_SETTLEMENT_TRIBUTE:
-                moveTribute(unit, direction);
-                return false;
-            default:
-                logger.warning("showArmedUnitIndianSettlementDialog fail: "
-                    + act);
-                return true;
-            }
+        Unit u = target.getFirstUnit();
+        if (u == null) {
+            throw new IllegalStateException("Attacking empty tile!");
+        } else if (unit.getOwner().owns(u)) {
+            throw new IllegalStateException("Attacking own unit!");
         }
         if (confirmHostileAction(unit, target)
             && confirmPreCombat(unit, target)) {
             askServer().attack(unit, direction);
             nextActiveUnit();
             return false;
+        }
+        return true;
+    }
+
+    /**
+     * Confirm attack or demand a tribute from a settlement, following
+     * an attacking move.
+     *
+     * @param unit The <code>Unit</code> to perform the attack.
+     * @param direction The direction in which to attack.
+     * @return True if the unit could move further.
+     */
+    private boolean moveAttackSettlement(Unit unit, Direction direction) {
+        Tile tile = unit.getTile();
+        Tile target = tile.getNeighbourOrNull(direction);
+        Settlement settlement = target.getSettlement();
+        if (settlement == null) {
+            throw new IllegalStateException("Attacking empty tile!");
+        } else if (unit.getOwner().owns(settlement)) {
+            throw new IllegalStateException("Attacking own settlement!");
+        }
+        GUI.ArmedUnitSettlementAction act
+            = gui.showArmedUnitSettlementDialog(settlement);
+        if (act == null) return true; // Cancelled
+        switch (act) {
+        case SETTLEMENT_ATTACK:
+            if (confirmHostileAction(unit, target)
+                && confirmPreCombat(unit, target)) {
+                askServer().attack(unit, direction);
+                nextActiveUnit();
+                return false;
+            }
+            break;
+        case SETTLEMENT_TRIBUTE:
+            int amount = confirmTribute(unit, settlement);
+            if (amount <= 0) return true; // Cancelled
+            return moveTribute(unit, amount, direction);
+
+        default:
+            logger.warning("showArmedUnitSettlementDialog fail: " + act);
+            break;
         }
         return true;
     }
@@ -3209,7 +3366,7 @@ public final class InGameController implements NetworkConstants {
             nextActiveUnit();
             return false;
         case INDIAN_SETTLEMENT_TRIBUTE:
-            return moveTribute(unit, direction);
+            return moveTribute(unit, 1, direction);
         default:
             logger.warning("showScoutIndianSettlementDialog fail: " + act);
             break;
@@ -3275,53 +3432,12 @@ public final class InGameController implements NetworkConstants {
             throw new IllegalStateException("Unit tried to negotiate with REF");
         }
 
-        ModelMessage m = null;
-        StringTemplate t, nation = settlement.getOwner().getNationName();
-        DiplomaticTrade ourAgreement = null;
-        DiplomaticTrade agreement = null;
-        TradeStatus status;
-        for (;;) {
-            t = StringTemplate.template("negotiationDialog.propose")
-                .addStringTemplate("%nation%", nation);
-            ourAgreement = gui.showDiplomaticTradeDialog(unit, settlement,
-                                                         agreement, t);
-            if (agreement == null && (ourAgreement == null
-                    || ourAgreement.getStatus() == TradeStatus.REJECT_TRADE))
-                break;
-            agreement = ourAgreement;
-            if (agreement.getStatus() != TradeStatus.PROPOSE_TRADE) {
-                askServer().diplomacy(freeColClient.getGame(), unit,
-                                      settlement, agreement);
-                gui.updateMenuBar();
-                break;
-            }
-
-            agreement = askServer().diplomacy(freeColClient.getGame(), unit,
-                                              settlement, agreement);
-            status = (agreement == null) ? TradeStatus.REJECT_TRADE
-                : agreement.getStatus();
-            switch (status) {
-            case PROPOSE_TRADE:
-                agreement.incrementVersion();
-                continue; // counter proposal, try again
-            case ACCEPT_TRADE:
-                m = new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
-                                     "negotiationDialog.offerAccepted",
-                                     settlement)
-                    .addStringTemplate("%nation%", nation);
-                break;
-            case REJECT_TRADE:
-                m = new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
-                                     "negotiationDialog.offerRejected",
-                                     settlement)
-                    .addStringTemplate("%nation%", nation);
-                break;
-            default:
-                throw new IllegalStateException("Bogus trade status" + status);
-            }
-            player.addModelMessage(m);
-            break; // only counter proposals should loop
-        }
+        StringTemplate nation = settlement.getOwner().getNationName();
+        StringTemplate t = StringTemplate.template("negotiationDialog.propose")
+            .addStringTemplate("%nation%", nation)
+            .addName("%settlement%", settlement.getLocationNameFor(player));
+        diplomacyLoop(unit, settlement, null, t);
+        gui.updateMenuBar();
         nextActiveUnit();
         return false;
     }
@@ -3588,15 +3704,37 @@ public final class InGameController implements NetworkConstants {
      * Demand a tribute.
      *
      * @param unit The <code>Unit</code> to perform the attack.
+     * @param amount An amount of tribute to demand.
      * @param direction The direction in which to attack.
      * @return True if the unit can move further.
      */
-    private boolean moveTribute(Unit unit, Direction direction) {
-        if (askServer().demandTribute(unit, direction)) {
-            // Assume tribute paid
-            gui.updateMenuBar();
-            nextActiveUnit();
+    private boolean moveTribute(Unit unit, int amount, Direction direction) {
+        final Game game = freeColClient.getGame();
+        Player player = unit.getOwner();
+        Tile tile = unit.getTile();
+        Tile target = tile.getNeighbourOrNull(direction);
+        Settlement settlement = target.getSettlement();
+        Player other = settlement.getOwner();
+
+        // Indians are easy and can use the basic tribute mechanism.
+        if (settlement.getOwner().isIndian()) {
+            if (askServer().demandTribute(unit, direction)) {
+                // Assume tribute paid
+                gui.updateMenuBar();
+                nextActiveUnit();
+            }
+            return false;
         }
+        // Europeans might be human players, so we convert to a diplomacy
+        // dialog.
+        StringTemplate t = StringTemplate.template("negotiationDialog.demand")
+            .addStringTemplate("%nation%", other.getNationName())
+            .addName("%settlement%", settlement.getLocationNameFor(player));
+        DiplomaticTrade agreement = new DiplomaticTrade(game, player, other,
+                                                        null, 0);
+        agreement.add(new StanceTradeItem(game, player, other, Stance.PEACE));
+        agreement.add(new GoldTradeItem(game, other, player, amount));
+        diplomacyLoop(unit, settlement, agreement, t);
         return false;
     }
 

@@ -122,7 +122,7 @@ public final class ReportIndianPanel extends ReportPanel {
         reportPanel.add(label);
         label.setFont(GUI.DEFAULT_BOLD_FONT);
         reportPanel.add(new JLabel(Messages.message(opponent.getTension(player).getKey())
-                + "/" + Messages.message(opponent.getStance(player).getKey())),
+                + "/" + Messages.message(opponent.getStance(player).getLabel())),
             "left, wrap 20");
 
         if (!nativeSettlements.isEmpty()) {

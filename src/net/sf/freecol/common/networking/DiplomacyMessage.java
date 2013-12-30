@@ -47,14 +47,10 @@ public class DiplomacyMessage extends DOMMessage {
      */
     private Unit unit;
 
-    /**
-     * The settlement to negotiate with.
-     */
+    /** The settlement to negotiate with. */
     private Settlement settlement;
 
-    /**
-     * The trade to make.
-     */
+    /** The trade to make. */
     private DiplomaticTrade agreement;
 
 
@@ -162,7 +158,8 @@ public class DiplomacyMessage extends DOMMessage {
                 + unit.getId());
         } else if (unit.hasAbility(Ability.NEGOTIATE)
             || (serverPlayer.hasAbility(Ability.TRADE_WITH_FOREIGN_COLONIES)
-                && unit.isCarrier())) {
+                && unit.isCarrier())
+            || unit.isOffensiveUnit()) {
             ; // OK
         } else {
             return DOMMessage.clientError("Unit lacks ability to trade: "

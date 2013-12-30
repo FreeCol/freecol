@@ -128,6 +128,12 @@ public class GUI {
 
     private static final Logger logger = Logger.getLogger(GUI.class.getName());
 
+    /** Actions when an armed unit contacts a settlement. */
+    public static enum ArmedUnitSettlementAction {
+        SETTLEMENT_ATTACK,
+        SETTLEMENT_TRIBUTE,
+    }
+
     /** Actions when dealing with a boycott. */
     public static enum BoycottAction {
         PAY_ARREARS,
@@ -1201,10 +1207,9 @@ public class GUI {
         canvas.showAboutPanel();
     }
 
-    public ScoutIndianSettlementAction
-        showArmedUnitIndianSettlementDialog(IndianSettlement settlement) {
+    public ArmedUnitSettlementAction showArmedUnitSettlementDialog(Settlement settlement) {
         if (canvas == null) return null;
-        return canvas.showArmedUnitIndianSettlementDialog(settlement);
+        return canvas.showArmedUnitSettlementDialog(settlement);
     }
 
     public BoycottAction showBoycottedGoodsDialog(Goods goods, Europe europe) {
@@ -1675,6 +1680,12 @@ public class GUI {
         if (canvas == null) return -1;
         return canvas.showSelectAmountDialog(goodsType, available,
                                              defaultAmount, needToPay);
+    }
+
+    public int showSelectTributeAmountDialog(StringTemplate question,
+                                             int maximum) {
+        if (canvas == null) return -1;
+        return canvas.showSelectTributeAmountDialog(question, maximum);
     }
 
     public Location showSelectDestinationDialog(Unit unit) {

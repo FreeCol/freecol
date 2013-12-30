@@ -2625,7 +2625,7 @@ public class Colony extends Settlement implements Nameable {
      */
     public StringTemplate getAlarmLevelMessage(Player player) {
         Stance stance = getOwner().getStance(player);
-        return StringTemplate.template("colony.tension." + stance.toString())
+        return StringTemplate.template("colony.tension." + stance.getKey())
             .addStringTemplate("%nation%", getOwner().getNationName());
     }
 

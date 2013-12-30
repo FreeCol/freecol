@@ -67,7 +67,7 @@ public final class ReportForeignAffairPanel extends ReportPanel {
             enemyPanel.add(localizedLabel(enemy.getNationName()), "wrap 12");
 
             enemyPanel.add(new JLabel(Messages.message("report.stance")), "newline");
-            enemyPanel.add(new JLabel(Messages.message(ns.getStance().getKey())));
+            enemyPanel.add(new JLabel(Messages.message(ns.getStance().getLabel())));
 
             n = ns.getNumberOfSettlements();
             enemyPanel.add(new JLabel(Messages.message("report.numberOfColonies")), "newline");

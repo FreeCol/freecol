@@ -2983,7 +2983,7 @@ public final class InGameController extends Controller {
             Stance stance = tradeItem.getStance();
             if (stance != null
                 && !source.csChangeStance(stance, dest, true, cs)) {
-                logger.warning("Stance trade failure");
+                logger.warning("Stance trade failure: " + stance);
             }
             Colony colony = tradeItem.getColony();
             if (colony != null) {
@@ -3060,16 +3060,17 @@ public final class InGameController extends Controller {
         DiplomacySession session
             = TransactionSession.lookup(DiplomacySession.class,
                 unit, settlement);
-        TradeStatus status;
+        TradeStatus status = agreement.getStatus();
         Player.makeContact(serverPlayer, otherPlayer);
 
-        switch (status = agreement.getStatus()) {
+        switch (status) {
         case PROPOSE_TRADE:
             if (session == null) {
                 Unit.MoveType mt = unit.getMoveType(settlement.getTile());
                 switch (mt) {
                 case ENTER_FOREIGN_COLONY_WITH_SCOUT:
                 case ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
+                case ATTACK_SETTLEMENT: // Tribute demand
                     break;
                 default:
                     return DOMMessage.clientError("Unable to enter "

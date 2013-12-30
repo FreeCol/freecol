@@ -420,12 +420,12 @@ public class Player extends FreeColGameObject implements Nameable {
         }
 
         /**
-         * Gets a message key for this stance.
+         * Gets a key for this stance.
          *
-         * @return The stance message key.
+         * @return The stance key.
          */
         public String getKey() {
-            return "model.stance." + toString().toLowerCase(Locale.US);
+            return toString().toLowerCase(Locale.US);
         }
 
         /**
@@ -434,7 +434,7 @@ public class Player extends FreeColGameObject implements Nameable {
          * @return A <code>StringTemplate</code> for this stance.
          */
         public StringTemplate getLabel() {
-            return StringTemplate.template(getKey());
+            return StringTemplate.template("model.stance." + getKey());
         }
     }
 

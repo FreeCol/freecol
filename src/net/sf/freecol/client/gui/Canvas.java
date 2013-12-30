@@ -54,6 +54,7 @@ import javax.swing.plaf.basic.BasicInternalFrameUI;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI.ArmedUnitSettlementAction;
 import net.sf.freecol.client.gui.GUI.BoycottAction;
 import net.sf.freecol.client.gui.GUI.BuyAction;
 import net.sf.freecol.client.gui.GUI.ClaimAction;
@@ -132,6 +133,7 @@ import net.sf.freecol.client.gui.panel.RiverStyleDialog;
 import net.sf.freecol.client.gui.panel.SaveDialog;
 import net.sf.freecol.client.gui.panel.ScaleMapSizeDialog;
 import net.sf.freecol.client.gui.panel.SelectAmountDialog;
+import net.sf.freecol.client.gui.panel.SelectTributeAmountDialog;
 import net.sf.freecol.client.gui.panel.SelectDestinationDialog;
 import net.sf.freecol.client.gui.panel.ServerListPanel;
 import net.sf.freecol.client.gui.panel.StartGamePanel;
@@ -1358,26 +1360,25 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Displays a dialog that asks the user what he wants to do with
-     * his armed unit in a native settlement.
+     * his armed unit at a foreign settlement.
      *
-     * @param settlement The <code>IndianSettlement</code> to consider.
+     * @param settlement The <code>Settlement</code> to consider.
      * @return The chosen action, tribute, attack or cancel.
      */
-    public ScoutIndianSettlementAction
-        showArmedUnitIndianSettlementDialog(IndianSettlement settlement) {
+    public ArmedUnitSettlementAction showArmedUnitSettlementDialog(Settlement settlement) {
         final Player player = freeColClient.getMyPlayer();
 
         StringTemplate t = settlement.getAlarmLevelMessage(player);
         JTextArea text = GUI.getDefaultTextArea(Messages.message(t));
 
-        List<ChoiceItem<ScoutIndianSettlementAction>> choices
-            = new ArrayList<ChoiceItem<ScoutIndianSettlementAction>>();
-        choices.add(new ChoiceItem<ScoutIndianSettlementAction>(
-                Messages.message("scoutSettlement.tribute"),
-                ScoutIndianSettlementAction.INDIAN_SETTLEMENT_TRIBUTE));
-        choices.add(new ChoiceItem<ScoutIndianSettlementAction>(
-                Messages.message("scoutSettlement.attack"),
-                ScoutIndianSettlementAction.INDIAN_SETTLEMENT_ATTACK));
+        List<ChoiceItem<ArmedUnitSettlementAction>> choices
+            = new ArrayList<ChoiceItem<ArmedUnitSettlementAction>>();
+        choices.add(new ChoiceItem<ArmedUnitSettlementAction>(
+                Messages.message("armedUnitSettlement.tribute"),
+                ArmedUnitSettlementAction.SETTLEMENT_TRIBUTE));
+        choices.add(new ChoiceItem<ArmedUnitSettlementAction>(
+                Messages.message("armedUnitSettlement.attack"),
+                ArmedUnitSettlementAction.SETTLEMENT_ATTACK));
 
         return showChoiceDialog(true, settlement.getTile(), text,
                                 gui.getImageIcon(settlement, false),
@@ -2423,8 +2424,8 @@ public final class Canvas extends JDesktopPane {
         final Player owner = settlement.getOwner();
 
         StringBuilder sb = new StringBuilder(400);
-        sb.append(Messages.message(settlement.getAlarmLevelMessage(player)));
-        sb.append("\n\n");
+        sb.append(Messages.message(settlement.getAlarmLevelMessage(player)))
+            .append("\n\n");
         String key = ((IndianNationType)owner.getNationType())
             .getSettlementTypeKey(true);
         sb.append(Messages.message(StringTemplate
@@ -2432,14 +2433,14 @@ public final class Canvas extends JDesktopPane {
                     .addStringTemplate("%nation%", owner.getNationName())
                     .addName("%settlement%", settlement.getName())
                     .add("%number%", number)
-                    .add("%settlementType%", key)));
-        sb.append(" ");
+                    .add("%settlementType%", key)))
+            .append(" ");
         if (settlement.getLearnableSkill() != null) {
             key = settlement.getLearnableSkill().getNameKey();
             sb.append(Messages.message(StringTemplate
                     .template("scoutSettlement.skill")
-                        .add("%skill%", key)));
-            sb.append(" ");
+                        .add("%skill%", key)))
+                .append(" ");
         }
         GoodsType[] wantedGoods = settlement.getWantedGoods();
         int present = 0;
@@ -2488,6 +2489,22 @@ public final class Canvas extends JDesktopPane {
         FreeColDialog<Integer> fcd
             = new SelectAmountDialog(freeColClient, goodsType, available,
                                      defaultAmount, needToPay);
+        Integer result = showFreeColDialog(fcd, null);
+        return (result == null) ? -1 : result.intValue();
+    }
+
+    /**
+     * display the select-tribute-amount dialog.
+     *
+     * @param question a <code>stringtemplate</code> describing the
+     *     amount of tribute to demand.
+     * @param maximum The maximum amount available.
+     * @return The amount selected.
+     */
+    public int showSelectTributeAmountDialog(StringTemplate question,
+                                             int maximum) {
+        FreeColDialog<Integer> fcd
+            = new SelectTributeAmountDialog(freeColClient, question, maximum);
         Integer result = showFreeColDialog(fcd, null);
         return (result == null) ? -1 : result.intValue();
     }

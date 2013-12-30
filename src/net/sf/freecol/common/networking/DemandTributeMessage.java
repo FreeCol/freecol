@@ -38,15 +38,12 @@ import org.w3c.dom.Element;
  */
 public class DemandTributeMessage extends DOMMessage {
 
-    /**
-     * The identifier of the object demanding.
-     */
+    /** The identifier of the object demanding tribute. */
     private String unitId;
 
-    /**
-     * The direction the demand is made.
-     */
+    /** The direction the demand is made. */
     private String directionString;
+
 
     /**
      * Create a new <code>DemandTributeMessage</code> with the
@@ -110,9 +107,9 @@ public class DemandTributeMessage extends DOMMessage {
             return DOMMessage.clientError(e.getMessage());
         }
 
-        IndianSettlement is = tile.getIndianSettlement();
-        if (is == null) {
-            return DOMMessage.clientError("There is no native settlement at: "
+        IndianSettlement settlement = tile.getIndianSettlement();
+        if (settlement == null) {
+            return DOMMessage.clientError("There is native settlement at: "
                 + tile.getId());
         }
 
@@ -120,12 +117,12 @@ public class DemandTributeMessage extends DOMMessage {
         if (type != MoveType.ATTACK_SETTLEMENT
             && type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT) {
             return DOMMessage.clientError("Unable to demand tribute at: "
-                + is.getName() + ": " + type.whyIllegal());
+                + settlement.getName() + ": " + type.whyIllegal());
         }
 
         // Do the demand
         return server.getInGameController()
-            .demandTribute(serverPlayer, unit, is);
+            .demandTribute(serverPlayer, unit, settlement);
     }
 
     /**
