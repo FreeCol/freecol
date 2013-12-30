@@ -55,10 +55,6 @@ public class MapGeneratorOptions {
     public static final String RUMOUR_NUMBER
         = "model.option.rumourNumber";
 
-    /** Option for setting the number of settlements on the map. */
-    public static final String SETTLEMENT_NUMBER
-        = "model.option.settlementNumber";
-
     /** Option for setting the percentage of forests on the map. */
     public static final String FOREST_NUMBER 
         = "model.option.forestNumber";

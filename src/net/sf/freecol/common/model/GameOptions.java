@@ -276,7 +276,10 @@ public class GameOptions {
     public static final String BUILD_ON_NATIVE_LAND_NEVER
         = "model.option.buildOnNativeLand.never";
 
-    /** The minimum distance between settlements. [FIXME: move to map generator options!] */
+    /**
+     * Option for setting the number of settlements on the map.
+     * Note: *not* a MapGeneratorOption because it is difficulty-sensitive.
+     */
     public static final String SETTLEMENT_NUMBER
         = "model.option.settlementNumber";
 
