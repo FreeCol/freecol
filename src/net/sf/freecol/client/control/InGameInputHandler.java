@@ -623,6 +623,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         final DiplomaticTrade agreement = message.getAgreement();
+        agreement.incrementVersion();
 
         invokeAndWait(new Runnable() {
                 public void run() {

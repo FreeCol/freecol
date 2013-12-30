@@ -160,8 +160,13 @@ public class DiplomacyMessage extends DOMMessage {
         } else if (unit.getOwner() != serverPlayer) {
             return DOMMessage.clientError("Player does not own unit: "
                 + unit.getId());
-        } else if (!unit.hasAbility(Ability.NEGOTIATE)) {
-            return DOMMessage.clientError("Unit lacks abiility to negotiate: " + unit.getId());
+        } else if (unit.hasAbility(Ability.NEGOTIATE)
+            || (serverPlayer.hasAbility(Ability.TRADE_WITH_FOREIGN_COLONIES)
+                && unit.isCarrier())) {
+            ; // OK
+        } else {
+            return DOMMessage.clientError("Unit lacks ability to trade: "
+                + unit.getId());
         }
 
         Settlement settlement = getSettlement();

@@ -78,6 +78,7 @@ import net.sf.freecol.client.gui.panel.ConfirmDeclarationDialog;
 import net.sf.freecol.client.gui.panel.DeclarationPanel;
 import net.sf.freecol.client.gui.panel.DialogHandler;
 import net.sf.freecol.client.gui.panel.DifficultyDialog;
+import net.sf.freecol.client.gui.panel.DiplomaticTradeDialog;
 import net.sf.freecol.client.gui.panel.DumpCargoDialog;
 import net.sf.freecol.client.gui.panel.EditOptionDialog;
 import net.sf.freecol.client.gui.panel.EditSettlementDialog;
@@ -103,7 +104,6 @@ import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
 import net.sf.freecol.client.gui.panel.MapSizeDialog;
 import net.sf.freecol.client.gui.panel.MapGeneratorOptionsDialog;
 import net.sf.freecol.client.gui.panel.MonarchDialog;
-import net.sf.freecol.client.gui.panel.NegotiationDialog;
 import net.sf.freecol.client.gui.panel.NewPanel;
 import net.sf.freecol.client.gui.panel.Parameters;
 import net.sf.freecol.client.gui.panel.ParametersDialog;
@@ -2160,19 +2160,23 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Displays the <code>NegotiationDialog</code>.
+     * Displays the <code>DiplomaticTradeDialog</code>.
      *
      * @param unit The <code>Unit</code> that is negotiating.
      * @param settlement A <code>Settlement</code> that is negotiating.
      * @param agreement The current <code>DiplomaticTrade</code> agreement.
+     * @param comment An optional <code>StringTemplate</code> containing a
+     *     commentary message.
      * @return An updated agreement.
-     * @see NegotiationDialog
      */
-    public DiplomaticTrade showNegotiationDialog(Unit unit,
-                                                 Settlement settlement,
-                                                 DiplomaticTrade agreement) {
-        return showFreeColDialog(new NegotiationDialog(freeColClient, unit,
-                settlement, agreement), unit.getTile());
+    public DiplomaticTrade
+        showDiplomaticTradeDialog(Unit unit, Settlement settlement,
+                                  DiplomaticTrade agreement,
+                                  StringTemplate comment) {
+        DiplomaticTradeDialog dtd
+            = new DiplomaticTradeDialog(freeColClient, unit, settlement,
+                                        agreement, comment);
+        return showFreeColDialog(dtd, unit.getTile());
     }
 
     /**

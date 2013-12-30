@@ -62,6 +62,9 @@ public class DiplomaticTrade extends FreeColObject {
     /** The individual items the trade consists of. */
     private final List<TradeItem> items = new ArrayList<TradeItem>();
 
+    /** Counter for the number of iterations on this attempt to agree. */
+    private int version;
+
 
     /**
      * Creates a new <code>DiplomaticTrade</code> instance.
@@ -69,10 +72,10 @@ public class DiplomaticTrade extends FreeColObject {
      * @param game The enclosing <code>Game</code>.
      * @param sender The sending <code>Player</code>.
      * @param recipient The recipient <code>Player</code>.
-     */
     public DiplomaticTrade(Game game, Player sender, Player recipient) {
         this(game, sender, recipient, new ArrayList<TradeItem>());
     }
+     */
 
     /**
      * Creates a new <code>DiplomaticTrade</code> instance.
@@ -83,14 +86,15 @@ public class DiplomaticTrade extends FreeColObject {
      * @param items A list of items to trade.
      */
     public DiplomaticTrade(Game game, Player sender, Player recipient,
-                           List<TradeItem> items) {
+                           List<TradeItem> items, int version) {
         setId("");
         this.game = game;
         this.sender = sender;
         this.recipient = recipient;
         this.status = TradeStatus.PROPOSE_TRADE;
         this.items.clear();
-        this.items.addAll(items);
+        if (items != null) this.items.addAll(items);
+        this.version = version;
     }
 
     /**
@@ -158,6 +162,16 @@ public class DiplomaticTrade extends FreeColObject {
      */
     public final void setRecipient(final Player newRecipient) {
         this.recipient = newRecipient;
+    }
+
+    /**
+     * Get the other player in a trade.
+     *
+     * @param player The known <code>Player</code>.
+     * @return The other player, not the supplied known one.
+     */
+    public Player getOtherPlayer(Player player) {
+        return (sender == player) ? recipient : sender;
     }
 
     /**
@@ -295,12 +309,29 @@ public class DiplomaticTrade extends FreeColObject {
         return unitList;
     }
 
+    /**
+     * Gets the version of this agreement.
+     *
+     * @return The version number.
+     */
+    public int getVersion() {
+        return version;
+    }
+
+    /**
+     * Increment the version of this agreement.
+     */
+    public void incrementVersion() {
+        this.version++;
+    }
+
 
     // Serialization
 
     private static final String RECIPIENT_TAG = "recipient";
     private static final String SENDER_TAG = "sender";
     private static final String STATUS_TAG = "status";
+    private static final String VERSION_TAG = "version";
 
 
     /**
@@ -315,6 +346,8 @@ public class DiplomaticTrade extends FreeColObject {
         xw.writeAttribute(RECIPIENT_TAG, recipient);
 
         xw.writeAttribute(STATUS_TAG, status);
+
+        xw.writeAttribute(VERSION_TAG, version);
     }
 
     /**
@@ -342,6 +375,8 @@ public class DiplomaticTrade extends FreeColObject {
 
         status = xr.getAttribute(STATUS_TAG, TradeStatus.class,
                                  TradeStatus.REJECT_TRADE);
+
+        version = xr.getAttribute(VERSION_TAG, 0);
     }
 
     /**

@@ -119,6 +119,9 @@ public class FreeColComboBoxRenderer implements ListCellRenderer, UIResource {
     public void setLabelValues(JLabel c, Object value) {
         if (value == null) {
             c.setText(null);
+        } else if (value instanceof Integer) {
+            // partial load values from SelectAmountDialog are Integers
+            c.setText(value.toString());
         } else if (value instanceof Language) {
             c.setText(value.toString());
         } else if (value instanceof String) {
@@ -140,18 +143,7 @@ public class FreeColComboBoxRenderer implements ListCellRenderer, UIResource {
             }
             c.setText(nd[0]);
             if (nd[1] != null) c.setToolTipText(nd[1]);
-        } else if (value instanceof Integer) {
-            // partial load values from SelectAmountDialog are Integers
-            c.setText(value.toString());
         } else {
-            try {
-                Method m = value.getClass().getMethod("comboBoxLabel");
-                c.setText((String)m.invoke(value));
-                return;
-            } catch (NoSuchMethodException nsme) {
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "comboBoxLabel fail", e);
-            }
             logger.warning("What is this?: " + value
                 + " (" + value.getClass() + ")");
         }

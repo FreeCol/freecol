@@ -2023,7 +2023,8 @@ public final class InGameController implements NetworkConstants {
     public DiplomaticTrade diplomacy(Unit unit, Settlement settlement,
                                      DiplomaticTrade agreement) {
         final Player player = freeColClient.getMyPlayer();
-        String nation = Messages.message(unit.getOwner().getNationName());
+        final Player other = agreement.getOtherPlayer(player);
+        StringTemplate t, nation = other.getNationName();
         
         switch (agreement.getStatus()) {
         case ACCEPT_TRADE:
@@ -2037,18 +2038,21 @@ public final class InGameController implements NetworkConstants {
                 visibilityChange = true;
             }
             if (visibilityChange) player.invalidateCanSeeTiles();//+vis(player)
-            gui.showInformationMessage(null, StringTemplate
-                .template("negotiationDialog.offerAccepted")
-                .addName("%nation%", nation));
+            t = StringTemplate.template("negotiationDialog.offerAccepted")
+                .addStringTemplate("%nation%", nation);
+            gui.showInformationMessage(null, t);
             break;
         case REJECT_TRADE:
-            gui.showInformationMessage(null, StringTemplate
-                .template("negotiationDialog.offerRejected")
-                .addName("%nation%", nation));
+            t = StringTemplate.template("negotiationDialog.offerRejected")
+                .addStringTemplate("%nation%", nation);
+            gui.showInformationMessage(null, t);
             break;
         case PROPOSE_TRADE:
+            t = StringTemplate.template("negotiationDialog.consider")
+                .addStringTemplate("%nation%", nation);
             DiplomaticTrade ourAgreement
-                = gui.showNegotiationDialog(unit, settlement, agreement);
+                = gui.showDiplomaticTradeDialog(unit, settlement,
+                                                agreement, t);
             if (ourAgreement == null) {
                 agreement.setStatus(TradeStatus.REJECT_TRADE);
             } else {
@@ -3247,7 +3251,7 @@ public final class InGameController implements NetworkConstants {
 
     /**
      * Initiates a negotiation with a foreign power. The player
-     * creates a DiplomaticTrade with the NegotiationDialog. The
+     * creates a DiplomaticTrade with the DiplomaticTradeDialog. The
      * DiplomaticTrade is sent to the other player. If the other
      * player accepts the offer, the trade is concluded.  If not, this
      * method returns, since the next offer must come from the other
@@ -3268,14 +3272,15 @@ public final class InGameController implements NetworkConstants {
         }
 
         ModelMessage m = null;
-        String nation
-            = Messages.message(settlement.getOwner().getNationName());
+        StringTemplate t, nation = settlement.getOwner().getNationName();
         DiplomaticTrade ourAgreement = null;
         DiplomaticTrade agreement = null;
         TradeStatus status;
         for (;;) {
-            ourAgreement = gui.showNegotiationDialog(unit, settlement,
-                                                     agreement);
+            t = StringTemplate.template("negotiationDialog.propose")
+                .addStringTemplate("%nation%", nation);
+            ourAgreement = gui.showDiplomaticTradeDialog(unit, settlement,
+                                                         agreement, t);
             if (agreement == null && (ourAgreement == null
                     || ourAgreement.getStatus() == TradeStatus.REJECT_TRADE))
                 break;
@@ -3293,18 +3298,19 @@ public final class InGameController implements NetworkConstants {
                 : agreement.getStatus();
             switch (status) {
             case PROPOSE_TRADE:
+                agreement.incrementVersion();
                 continue; // counter proposal, try again
             case ACCEPT_TRADE:
                 m = new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
                                      "negotiationDialog.offerAccepted",
                                      settlement)
-                    .addName("%nation%", nation);
+                    .addStringTemplate("%nation%", nation);
                 break;
             case REJECT_TRADE:
                 m = new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
                                      "negotiationDialog.offerRejected",
                                      settlement)
-                    .addName("%nation%", nation);
+                    .addStringTemplate("%nation%", nation);
                 break;
             default:
                 throw new IllegalStateException("Bogus trade status" + status);

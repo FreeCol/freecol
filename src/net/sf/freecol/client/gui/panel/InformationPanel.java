@@ -131,7 +131,9 @@ public class InformationPanel extends FreeColPanel {
      */
     private String displayLabel(FreeColObject fco) {
         return (fco instanceof Colony)
-            ? Messages.message(((Colony)fco).getLocationName())
+            ? ((getMyPlayer().owns((Colony)fco))
+                ? Messages.message(((Colony)fco).getLocationName())
+                : null)
 
             : (fco instanceof Europe)
             ? Messages.message(((Europe)fco).getLocationName())
