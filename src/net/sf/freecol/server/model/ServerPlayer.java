@@ -169,6 +169,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         Socket socket, Connection connection) {
         super(game);
 
+        final Specification spec = getSpecification();
+
         this.name = name;
         this.admin = admin;
         if (nation != null && nation.getType() != null) {
@@ -210,7 +212,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
             this.gold = 0;
         }
         this.market = new Market(getGame(), this);
-        this.immigration = 0;
+        // In BR#2615 misiulo reports that Col1 players start with 2
+        // crosses.  This is surprising, but you could argue that some
+        // level of religious unrest might contribute to the fact
+        // there is an expedition to the new world underway.  Crosses
+        // increment is 2 in Col1 which is sufficiently suggestive to
+        // use it for initialization here.
+        this.immigration = spec.getInteger(GameOptions.CROSSES_INCREMENT);
         this.liberty = 0;
         this.currentFather = null;
 
