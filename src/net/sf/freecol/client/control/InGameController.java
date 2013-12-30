@@ -2459,9 +2459,13 @@ public final class InGameController implements NetworkConstants {
      * @param accept If true, accept the action.
      */
     public void monarchAction(MonarchAction action, boolean accept) {
-        // Strictly only needed for:
-        //    case RAISE_TAX_ACT: case RAISE_TAX_WAR: case OFFER_MERCENARIES:
-        askServer().answerMonarch(action, accept);
+        switch (action) {
+        case RAISE_TAX_ACT: case RAISE_TAX_WAR: case OFFER_MERCENARIES:
+            askServer().answerMonarch(action, accept);
+            break;
+        default:
+            break;
+        }
     }
 
     /**

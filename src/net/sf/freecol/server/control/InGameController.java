@@ -917,6 +917,7 @@ public final class InGameController extends Controller {
     private void csMonarchAction(final ServerPlayer serverPlayer,
                                  MonarchAction action, ChangeSet cs) {
         final Monarch monarch = serverPlayer.getMonarch();
+        final Specification spec = getGame().getSpecification();
         boolean valid = monarch.actionIsValid(action);
         if (!valid) return;
         String messageId = "model.monarch.action." + action.toString();
@@ -977,7 +978,7 @@ public final class InGameController extends Controller {
             monarch.getExpeditionaryForce().add(refAdditions);
             template = StringTemplate.template(messageId)
                 .addAmount("%number%", refAdditions.getNumber())
-                .add("%unit%", getGame().getSpecification().getUnitType(refAdditions.getId())
+                .add("%unit%", spec.getUnitType(refAdditions.getId())
                      .getNameKey());
             cs.add(See.only(serverPlayer), monarch);
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
