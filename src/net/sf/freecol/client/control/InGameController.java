@@ -2798,12 +2798,6 @@ public final class InGameController implements NetworkConstants {
             if (act == null) return true; // Cancelled
             switch (act) {
             case INDIAN_SETTLEMENT_ATTACK:
-                if (confirmHostileAction(unit, target)
-                    && confirmPreCombat(unit, target)) {
-                    askServer().attack(unit, direction);
-                    nextActiveUnit();
-                    return false;
-                }
                 break;
             case INDIAN_SETTLEMENT_TRIBUTE:
                 moveTribute(unit, direction);
@@ -2811,8 +2805,14 @@ public final class InGameController implements NetworkConstants {
             default:
                 logger.warning("showArmedUnitIndianSettlementDialog fail: "
                     + act);
-                break;
+                return true;
             }
+        }
+        if (confirmHostileAction(unit, target)
+            && confirmPreCombat(unit, target)) {
+            askServer().attack(unit, direction);
+            nextActiveUnit();
+            return false;
         }
         return true;
     }
