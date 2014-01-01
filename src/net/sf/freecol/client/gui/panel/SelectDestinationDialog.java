@@ -77,7 +77,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
-import net.sf.freecol.common.model.pathfinding.GoalDeciders.MultipleDecider;
+import net.sf.freecol.common.model.pathfinding.GoalDeciders.MultipleAdjacentDecider;
 import net.sf.freecol.common.util.Utils;
 
 import net.miginfocom.swing.MigLayout;
@@ -468,7 +468,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
             }
         }
 
-        MultipleDecider md = new MultipleDecider(locs);
+        MultipleAdjacentDecider md = new MultipleAdjacentDecider(locs);
         unit.search(unit.getLocation(), md.getGoalDecider(), null,
                     FreeColObject.INFINITY, null);
         PathNode path;
@@ -476,7 +476,8 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
             Settlement s = e.getKey().getTile().getSettlement();
             PathNode p = e.getValue();
             turns = p.getTotalTurns();
-            if (p.getMovesLeft() <= 0) turns++;
+            if (unit.isInEurope()) turns += unit.getSailTurns();
+            if (p.getMovesLeft() < unit.getInitialMovesLeft()) turns++;
             this.destinations.add(new Destination(s, turns, unit, goodsTypes));
         }
 

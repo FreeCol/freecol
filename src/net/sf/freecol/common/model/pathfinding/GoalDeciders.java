@@ -192,7 +192,7 @@ public final class GoalDeciders {
      * A class to wrap a goal decider that searches for paths to an adjacent
      * tile to a set of locations, and the results of such a search.
      */
-    public static class MultipleDecider {
+    public static class MultipleAdjacentDecider {
 
         private final GoalDecider gd;
 
@@ -206,10 +206,8 @@ public final class GoalDeciders {
          * @param locs The list of <code>Location</code>s to search for
          *     paths to an adjacent location for.
          */
-        public MultipleDecider(final List<Location> locs) {
+        public MultipleAdjacentDecider(final List<Location> locs) {
             this.gd = new GoalDecider() {
-
-                    private List<Location> done = new ArrayList<Location>();
 
                     public PathNode getGoal() { return null; }
                     public boolean hasSubGoals() { return true; }
@@ -218,12 +216,12 @@ public final class GoalDeciders {
                         if (tile == null) return false;
                         for (Location loc : locs) {
                             if (tile.isAdjacent(loc.getTile())) {
-                                results.put(loc, path);
-                                done.add(loc);
+                                PathNode p = results.get(loc);
+                                if (p == null
+                                    || p.getCost() > path.getCost()) {
+                                    results.put(loc, path);
+                                }
                             }
-                        }
-                        while (!done.isEmpty()) {
-                            locs.remove(done.remove(0));
                         }
                         return false;
                     }

@@ -179,11 +179,14 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     private int contiguity = -1;
 
-    /** A map of cached tiles for each European player. */
-    private java.util.Map<Player, Tile> cachedTiles = null;
+    /** A map of cached tiles for each European player, null in clients. */
+    private final java.util.Map<Player, Tile> cachedTiles;
 
-    /** A map of native settlement internals for each European player. */
-    private java.util.Map<Player, IndianSettlementInternals> playerIndianSettlements;
+    /**
+     * A map of native settlement internals for each European player,
+     * null in clients.
+     */
+    private final java.util.Map<Player, IndianSettlementInternals> playerIndianSettlements;
 
 
     /**
@@ -203,7 +206,14 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         this.owningSettlement = null;
         this.settlement = null;
 
-        initializePlayerView(game);
+        if (game.isInServer()) {
+            this.cachedTiles = new HashMap<Player, Tile>();
+            this.playerIndianSettlements
+                = new HashMap<Player, IndianSettlementInternals>();
+        } else {
+            this.cachedTiles = null;
+            this.playerIndianSettlements = null;
+        }
     }
 
     /**
@@ -217,14 +227,14 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public Tile(Game game, String id) {
         super(game, id);
 
-        initializePlayerView(game);
-    }
-
-    private void initializePlayerView(Game game) {
-        if (!game.isInServer()) return;
-        this.cachedTiles = new HashMap<Player, Tile>();
-        this.playerIndianSettlements
-            = new HashMap<Player, IndianSettlementInternals>();
+        if (game.isInServer()) {
+            this.cachedTiles = new HashMap<Player, Tile>();
+            this.playerIndianSettlements
+                = new HashMap<Player, IndianSettlementInternals>();
+        } else {
+            this.cachedTiles = null;
+            this.playerIndianSettlements = null;
+        }
     }
 
 
@@ -1482,6 +1492,12 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * Checks if this <code>Tile</code> has been explored by the given
      * <code>Player</code>.
      *
+     * If we are in the server, then the presence of a cached tile
+     * determines whether exploration has happened.  In the client
+     * there are no cached tiles, but if the tile is explored the
+     * server will have updated the client with the tile type (checked
+     * by isExplored()).
+     *
      * @param player The <code>Player</code>.
      * @return True if this <code>Tile</code> has been explored
      *     by the given <code>Player</code>.
@@ -1489,6 +1505,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public boolean isExploredBy(Player player) {
         return (!player.isEuropean()) ? true
             : (!isExplored()) ? false
+            : (cachedTiles == null) ? true
             : getCachedTile(player) != null;
     }
 

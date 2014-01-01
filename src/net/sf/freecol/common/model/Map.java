@@ -1725,7 +1725,8 @@ public class Map extends FreeColGameObject implements Location {
 
         // Output the trace result and return.
         if (sb != null) {
-            if (best != null) sb.append("\n").append(best.fullPathToString());
+            sb.append("\nResult\n");
+            if (best != null) sb.append(best.fullPathToString());
             logger.info(sb.toString());
         }
         return best;
