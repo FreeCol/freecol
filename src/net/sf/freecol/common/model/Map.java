@@ -1136,7 +1136,6 @@ public class Map extends FreeColGameObject implements Location {
                     last.getTurns() + offMapUnit.getSailTurns(),
                     last.isOnCarrier(), last, null);
             }
-System.err.println("SEARCH FOR EUROPE " + unit + " = " + path);
 
         } else if (realStart instanceof Tile && realEnd instanceof Tile) {
             // 3: Tile->Tile
