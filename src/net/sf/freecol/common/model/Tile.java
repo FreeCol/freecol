@@ -1446,6 +1446,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     public void removeIndianSettlementInternals(Player player) {
+        if (playerIndianSettlements == null) return;
         playerIndianSettlements.remove(player);
     }
 
@@ -2133,7 +2134,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                 Player.class, (Player)null, true);
 
             boolean copied = xr.getAttribute(COPIED_TAG, false);
-
             if (copied) {
                 FreeColXMLReader.ReadScope scope = xr.getReadScope();
                 xr.setReadScope(FreeColXMLReader.ReadScope.NOINTERN);

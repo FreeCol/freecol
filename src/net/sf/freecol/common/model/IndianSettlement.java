@@ -1203,55 +1203,28 @@ public class IndianSettlement extends Settlement {
         final Player client = xw.getClientPlayer();
         final Player hated = getMostHated();
 
-        if (xw.validFor(getOwner())) {
-
-            // Delegated from Settlement
+        if (getName() != null) { // Delegated from Settlement
             xw.writeAttribute(NAME_TAG, getName());
+        }
+
+        if (xw.validFor(getOwner())) {
 
             xw.writeAttribute(LAST_TRIBUTE_TAG, lastTribute);
 
             xw.writeAttribute(CONVERT_PROGRESS_TAG, convertProgress);
+        }
 
-            if (learnableSkill != null) {
-                xw.writeAttribute(LEARNABLE_SKILL_TAG, learnableSkill);
-            }
+        if (learnableSkill != null) {
+            xw.writeAttribute(LEARNABLE_SKILL_TAG, learnableSkill);
+        }
 
-            for (int i = 0; i < wantedGoods.length; i++) {
-                if (wantedGoods[i] != null) {
-                    xw.writeAttribute(WANTED_GOODS_TAG + i, wantedGoods[i]);
-                }
-            }
-
-            if (hated != null) xw.writeAttribute(MOST_HATED_TAG, hated);
-
-        } else if (client != null && hasContacted(client)) {
-            // Delegated from Settlement
-            if (getName() != null) {
-                xw.writeAttribute(NAME_TAG, getName());
-            }
-
-            if (hated != null) xw.writeAttribute(MOST_HATED_TAG, hated);
-
-            // Special handling for skill and wanted goods which are
-            // only visible when in close contact with the settlement
-            // and cached (per player) in the tile.
-            UnitType skill = getTile().getLearnableSkill(client);
-            GoodsType[] wanted = getTile().getWantedGoods(client);
-
-            if (skill != null) {
-                xw.writeAttribute(LEARNABLE_SKILL_TAG, skill);
-            }
-
-            if (wanted != null) {
-                int i, j = 0;
-                for (i = 0; i < wanted.length; i++) {
-                    if (wanted[i] != null) {
-                        xw.writeAttribute(WANTED_GOODS_TAG + j, wanted[i]);
-                        j++;
-                    }
-                }
+        for (int i = 0; i < wantedGoods.length; i++) {
+            if (wantedGoods[i] != null) {
+                xw.writeAttribute(WANTED_GOODS_TAG + i, wantedGoods[i]);
             }
         }
+
+        if (hated != null) xw.writeAttribute(MOST_HATED_TAG, hated);
     }
 
     /**
