@@ -3711,8 +3711,13 @@ public final class InGameController implements NetworkConstants {
         // Respond to the server.
         askServer().newLandName(unit, name, welcomer, accept);
 
+        // The name is set, bring up the first landing panel.
+        final Player player = unit.getOwner();
+        player.addModelMessage(new ModelMessage(ModelMessage.MessageType.DEFAULT,
+                "EventPanel.FIRST_LANDING", player)
+            .addName("%name%", name));
+
         // Add tutorial message.
-        Player player = unit.getOwner();
         String key = FreeColActionUI.getHumanKeyStrokeText(freeColClient
             .getActionManager().getFreeColAction("buildColonyAction")
             .getAccelerator());

@@ -941,9 +941,6 @@ public class ServerUnit extends Unit implements ServerModelObject {
             boolean landNamed = serverPlayer.isNewLandNamed();
             if (serverPlayer.isEuropean() && !landNamed) {
                 newLand = Messages.getNewLandName(serverPlayer);
-                cs.addMessage(See.only(serverPlayer),
-                    new ModelMessage(ModelMessage.MessageType.DEFAULT,
-                        "EventPanel.FIRST_LANDING", serverPlayer));
                 // Set the default value now to prevent multiple attempts.
                 // The user setNewLandName can override.
                 serverPlayer.setNewLandName(newLand);
