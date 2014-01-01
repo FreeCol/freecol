@@ -119,6 +119,7 @@ public final class GoalDeciders {
             public boolean check(Unit u, PathNode path) {
                 Tile tile = path.getTile();
                 if (tile != null
+                    && tile.isExploredBy(u.getOwner())
                     && tile.isDirectlyHighSeasConnected()
                     && (tile.getFirstUnit() == null
                         || tile.getFirstUnit().getOwner() == u.getOwner())) {

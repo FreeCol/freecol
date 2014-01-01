@@ -126,7 +126,8 @@ public class TransportMissionTest extends FreeColTestCase {
         assertNotNull(aiMain);
 
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
-
+        dutch.exploreMap(true);
+        
         // create a ship carrying a colonist
         Tile colonyTile = map.getTile(9, 9);
         getStandardColony(1, colonyTile.getX(), colonyTile.getY());
@@ -174,7 +175,8 @@ public class TransportMissionTest extends FreeColTestCase {
         aiUnit.setMission(mission);
         Transportable goods = new AIGoods(aiMain, galleon, horsesType, 50,
                                           europe);
-        mission.queueTransportable(goods, false);
+        assertTrue("Goods should queue",
+                   mission.queueTransportable(goods, false));
         mission.doMission();
 
         // Exercise
@@ -234,6 +236,7 @@ public class TransportMissionTest extends FreeColTestCase {
         assertNotNull(aiMain);
 
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
+        dutch.exploreMap(true);
         Europe europe = dutch.getEurope();
         assertNotNull("Setup error, europe is null", europe);
 
