@@ -1594,6 +1594,7 @@ public class EuropeanAIPlayer extends AIPlayer {
      *     assign more transportables to.
      */
     private void allocateTransportables(List<TransportMission> missions) {
+        if (missions.isEmpty()) return;
         List<Transportable> urgent = getUrgentTransportables();
         String logMe = "allocateTransportables(" + missions.size() + "):";
         for (Transportable t : urgent) logMe += " " + t.toString();

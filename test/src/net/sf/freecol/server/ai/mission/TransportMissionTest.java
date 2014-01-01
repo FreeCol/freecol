@@ -159,6 +159,7 @@ public class TransportMissionTest extends FreeColTestCase {
         assertNotNull(aiMain);
 
         ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        dutch.exploreMap(true);
         Europe europe = dutch.getEurope();
         assertNotNull("Setup error, europe is null", europe);
 

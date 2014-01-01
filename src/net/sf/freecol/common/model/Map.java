@@ -1136,6 +1136,7 @@ public class Map extends FreeColGameObject implements Location {
                     last.getTurns() + offMapUnit.getSailTurns(),
                     last.isOnCarrier(), last, null);
             }
+System.err.println("SEARCH FOR EUROPE " + unit + " = " + path);
 
         } else if (realStart instanceof Tile && realEnd instanceof Tile) {
             // 3: Tile->Tile
@@ -1477,7 +1478,9 @@ public class Map extends FreeColGameObject implements Location {
                 .append(") for ").append(unit.toString())
                 .append("/").append((carrier==null) ? "-" : carrier.toString())
                 .append(" from ").append(start.toString())
-                .append(" with ").append(currentUnit.getId());
+                .append(" with ").append(currentUnit.getId())
+                .append(" costDecider=" + costDecider)
+                .append(" goalDecider=" + goalDecider);
         }
 
         // Create the start node and put it on the open list.

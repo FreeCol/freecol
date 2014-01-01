@@ -692,6 +692,8 @@ public class TransportMission extends Mission {
             : ((path = getTrivialPath()) == null) ? null
             : upLoc(path.getLastNode().getLocation());
         setTarget(loc);
+        logger.finest(tag + " retargeted "
+            + ((loc == null) ? "null" : loc.getId()));
     }
 
     /**
