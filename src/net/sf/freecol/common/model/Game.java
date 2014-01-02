@@ -70,14 +70,14 @@ public class Game extends FreeColGameObject {
     /** Game UUID, persistent in savegame files */
     private UUID uuid = UUID.randomUUID();
 
+    /** The client player name, null in the server. */
+    private String clientUserName;
+
     /** All the players in the game. */
     protected final List<Player> players = new ArrayList<Player>();
 
     /** A virtual player to use for enemy privateers. */
     private Player unknownEnemy;
-
-    /** The player whose turn it is. */
-    protected Player currentPlayer = null;
 
     /** The map of the New World. */
     private Map map = null;
@@ -87,6 +87,9 @@ public class Game extends FreeColGameObject {
      * nation is available.
      */
     private NationOptions nationOptions = null;
+
+    /** The player whose turn it is. */
+    protected Player currentPlayer = null;
 
     /** The current turn. */
     private Turn turn = new Turn(1);
@@ -109,12 +112,6 @@ public class Game extends FreeColGameObject {
      */
     protected HashMap<String, WeakReference<FreeColGameObject>> freeColGameObjects
         = new HashMap<String, WeakReference<FreeColGameObject>>(10000);
-
-    /**
-     * The owner of this view of the game, or <code>null</code> if this game
-     * has all the information.
-     */
-    protected Player clientPlayer = null;
 
     /**
      * The combat model this game uses. At the moment, the only combat
@@ -149,6 +146,7 @@ public class Game extends FreeColGameObject {
         super(null);
 
         this.specification = specification;
+        this.clientUserName = null;
     }
 
     /**
@@ -156,15 +154,14 @@ public class Game extends FreeColGameObject {
      * in a DOM-parsed XML-tree.
      *
      * @param element The <code>Element</code> containing the game.
-     * @param clientUsername The username of the owner of this view of the
-     *     game.
+     * @param clientUserName The name of the owner of this view of the game.
      */
-    public Game(Element element, String clientUsername) {
+    public Game(Element element, String clientUserName) {
         super(null);
      
+        this.clientUserName = clientUserName;
         this.combatModel = new SimpleCombatModel();
         readFromXMLElement(element);
-        this.clientPlayer = getPlayerByName(clientUsername);
         // setId() does not add Games to the freeColGameObjects
         this.setFreeColGameObject(getId(), this);
     }
@@ -597,7 +594,8 @@ public class Game extends FreeColGameObject {
      * @return The client <code>Player</code>.
      */
     public Player getClientPlayer() {
-        return clientPlayer;
+        return (clientUserName == null) ? null
+            : getPlayerByName(clientUserName);
     }
 
     /**
@@ -606,7 +604,7 @@ public class Game extends FreeColGameObject {
      * @return True in a client.
      */
     public boolean isInClient() {
-        return getClientPlayer() != null;
+        return clientUserName != null;
     }
 
     /**
@@ -615,7 +613,7 @@ public class Game extends FreeColGameObject {
      * @return True in the server.
      */
     public boolean isInServer() {
-        return getClientPlayer() == null;
+        return clientUserName == null;
     }
 
     /**

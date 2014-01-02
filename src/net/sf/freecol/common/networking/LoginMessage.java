@@ -115,7 +115,7 @@ public class LoginMessage extends DOMMessage {
         this.activeUnitId = element.getAttribute("activeUnit");
         NodeList children = element.getChildNodes();
         this.game = (children.getLength() != 1) ? null
-            : new Game((Element)children.item(0), userName);
+            : new Game((Element)children.item(0), this.userName);
     }
 
     // Simple public accessors.
