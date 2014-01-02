@@ -1599,7 +1599,7 @@ resources of 400, lost city rumours of 500
     <building-type id="model.building.arsenal" extends="model.building.magazine" upkeep="15"
                    upgradesFrom="model.building.magazine">
       <production>
-        <input goods-type="model.goods.tools" value="6"/>
+        <input goods-type="model.goods.tools" value="9"/>
         <output goods-type="model.goods.muskets" value="9"/>
       </production>
       <required-goods id="model.goods.hammers" value="240"/>
