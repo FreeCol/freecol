@@ -1545,7 +1545,6 @@ public class Unit extends GoodsLocation
     }
 
 
-
     // More complex equipment manipulation.
 
     /**
@@ -2076,7 +2075,7 @@ public class Unit extends GoodsLocation
         // more easily
 
         int cost = target.getType().getBasicMoveCost();
-        if (target.isLand()) {
+        if (target.isLand() && !isNaval()) {
             TileItemContainer container = target.getTileItemContainer();
             if (container != null) {
                 cost = container.getMoveCost(from, target, cost);
