@@ -2666,6 +2666,11 @@ public class Colony extends Settlement implements Nameable {
 
         } else {
 
+            int uc = getUnitCount();
+            if (uc <= 0) {
+                logger.warning("Unit count fail: " + uc + "\n"
+                    + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
+            }
             xw.writeAttribute(UNIT_COUNT_TAG, getUnitCount());
         }
     }
@@ -2752,7 +2757,7 @@ public class Colony extends Settlement implements Nameable {
 
         landLocked = xr.getAttribute(LAND_LOCKED_TAG, true);
 
-        displayUnitCount = xr.getAttribute(UNIT_COUNT_TAG, 0);
+        displayUnitCount = xr.getAttribute(UNIT_COUNT_TAG, -1);
     }
 
     /**
