@@ -674,6 +674,15 @@ public abstract class Settlement extends GoodsLocation
      */
     public abstract int getTotalProductionOf(GoodsType goodsType);
 
+    /**
+     * Gets a message indicating the alarm level at this settlement
+     * with respect to another player.
+     *
+     * @param player The other <code>Player</code>.
+     * @return An alarm message.
+     */
+    public abstract StringTemplate getAlarmLevelMessage(Player player);
+
 
     // Serialization
 

@@ -581,19 +581,6 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-     * Gets a messageId for an alarm message associated with the
-     * alarm level of this player.
-     *
-     * @param player The other <code>Player</code>.
-     * @return The alarm messageId.
-     */
-    public String getAlarmLevelMessageId(Player player) {
-        Tension alarm = (hasContacted(player)) ? getAlarm(player)
-            : new Tension(Tension.TENSION_MIN);
-        return "indianSettlement." + alarm.getKey();
-    }
-
-    /**
      * Is a unit permitted to make contact with this settlement?
      * The unit must be from a nation that has already made contact,
      * or in the first instance, must be arriving by land, with the
@@ -1171,6 +1158,16 @@ public class IndianSettlement extends Settlement {
         potential += getTile().potential(type, null);
 
         return potential;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public StringTemplate getAlarmLevelMessage(Player player) {
+        Tension alarm = (hasContacted(player)) ? getAlarm(player)
+            : new Tension(Tension.TENSION_MIN);
+        return StringTemplate.template("indianSettlement." + alarm.getKey())
+            .addStringTemplate("%nation%", getOwner().getNationName());
     }
 
 

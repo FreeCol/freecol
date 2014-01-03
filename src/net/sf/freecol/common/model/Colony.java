@@ -38,6 +38,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.ProductionInfo;
+import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.util.RandomChoice;
 
 
@@ -2482,7 +2483,7 @@ public class Colony extends Settlement implements Nameable {
     }
 
 
-    // Interface Settlement
+    // Settlement
 
     /**
      * {@inheritDoc}
@@ -2613,6 +2614,15 @@ public class Colony extends Settlement implements Nameable {
             if (available < goods.getAmount()) return false;
         }
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public StringTemplate getAlarmLevelMessage(Player player) {
+        Stance stance = getOwner().getStance(player);
+        return StringTemplate.template("colony.tension." + stance.toString())
+            .addStringTemplate("%nation%", getOwner().getNationName());
     }
 
 

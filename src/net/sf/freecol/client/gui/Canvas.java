@@ -1367,10 +1367,8 @@ public final class Canvas extends JDesktopPane {
         showArmedUnitIndianSettlementDialog(IndianSettlement settlement) {
         final Player player = freeColClient.getMyPlayer();
 
-        StringTemplate nation = settlement.getOwner().getNationName();
-        JTextArea text = GUI.getDefaultTextArea(Messages.message(StringTemplate
-                .template(settlement.getAlarmLevelMessageId(player))
-                    .addStringTemplate("%nation%", nation)));
+        StringTemplate t = settlement.getAlarmLevelMessage(player);
+        JTextArea text = GUI.getDefaultTextArea(Messages.message(t));
 
         List<ChoiceItem<ScoutIndianSettlementAction>> choices
             = new ArrayList<ChoiceItem<ScoutIndianSettlementAction>>();
@@ -2422,9 +2420,7 @@ public final class Canvas extends JDesktopPane {
         final Player owner = settlement.getOwner();
 
         StringBuilder sb = new StringBuilder(400);
-        sb.append(Messages.message(StringTemplate
-                .template(settlement.getAlarmLevelMessageId(player))
-                    .addStringTemplate("%nation%", owner.getNationName())));
+        sb.append(Messages.message(settlement.getAlarmLevelMessage(player)));
         sb.append("\n\n");
         String key = ((IndianNationType)owner.getNationType())
             .getSettlementTypeKey(true);
@@ -2701,15 +2697,12 @@ public final class Canvas extends JDesktopPane {
     public MissionaryAction
         showUseMissionaryDialog(Unit unit, IndianSettlement settlement,
                                 boolean canEstablish, boolean canDenounce) {
-        String messageId = settlement.getAlarmLevelMessageId(unit.getOwner());
         StringBuilder sb = new StringBuilder(256);
-        sb.append(Messages.message(StringTemplate.template(messageId)
-                .addStringTemplate("%nation%",
-                    settlement.getOwner().getNationName())));
-        sb.append("\n\n");
-        sb.append(Messages.message(StringTemplate
-                .template("missionarySettlement.question")
-                    .addName("%settlement%", settlement.getName())));
+        StringTemplate t = settlement.getAlarmLevelMessage(unit.getOwner());
+        sb.append(Messages.message(t)).append("\n\n");
+        t = StringTemplate.template("missionarySettlement.question")
+            .addName("%settlement%", settlement.getName());
+        sb.append(Messages.message(t));
         JTextArea text = GUI.getDefaultTextArea(sb.toString());
 
         List<ChoiceItem<MissionaryAction>> choices
