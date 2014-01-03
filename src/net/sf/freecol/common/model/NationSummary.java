@@ -76,17 +76,9 @@ public class NationSummary extends FreeColObject {
         numberOfSettlements = player.getSettlements().size();
 
         if (player.isEuropean()) {
-            numberOfUnits = militaryStrength = navalStrength = 0;
-            CombatModel cm = player.getGame().getCombatModel();
-            for (Unit unit : player.getUnits()) {
-                numberOfUnits++;
-                if (unit.isNaval()) {
-                    navalStrength += cm.getOffencePower(unit, null);
-                } else {
-                    militaryStrength += cm.getOffencePower(unit, null);
-                }
-            }
-
+            numberOfUnits = player.getUnits().size();
+            militaryStrength = calculateStrength(player, false);
+            navalStrength = calculateStrength(player, true);
             gold = player.getGold();
             if (player == requester || requester
                 .hasAbility(Ability.BETTER_FOREIGN_AFFAIRS_REPORT)) {
@@ -147,6 +139,27 @@ public class NationSummary extends FreeColObject {
 
     public int getTax() {
         return tax;
+    }
+
+    /**
+     * Generic strength calculation.
+     *
+     * @param player The <code>Player</code> to calculate strength for.
+     * @param naval If true consider naval units, otherwise, land units.
+     * @return A measure of naval or land offensive power.
+     */
+    public static int calculateStrength(Player player, boolean naval) {
+        if (player.isEuropean()) {
+            final CombatModel cm = player.getGame().getCombatModel();
+            int s = 0;
+            for (Unit unit : player.getUnits()) {
+                if (unit.isNaval() == naval) {
+                    s += cm.getOffencePower(unit, null);
+                }
+            }
+            return s;
+        }
+        return -1;
     }
 
 
