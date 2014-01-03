@@ -279,7 +279,7 @@ public final class ColonyPanel extends PortPanel
                 public void actionPerformed(ActionEvent event) {
                     final Colony newColony = (Colony)nameBox.getSelectedItem();
                     final GUI gui = getGUI();
-                    gui.removeFromCanvas(ColonyPanel.this);
+                    closeColonyPanel();
                     gui.showColonyPanel(newColony);
                 }
             };
