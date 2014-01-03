@@ -438,7 +438,8 @@ public class Unit extends GoodsLocation
         case FORTIFYING:
             return getMovesLeft() > 0;
         case IMPROVING:
-            return location instanceof Tile
+            return getMovesLeft() > 0
+                && location instanceof Tile
                 && getOwner().canAcquireForImprovement(location.getTile());
         case IN_COLONY:
             return !isNaval();
