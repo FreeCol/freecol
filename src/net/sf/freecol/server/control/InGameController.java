@@ -2117,7 +2117,6 @@ public final class InGameController extends Controller {
                 // Do nothing if already spoken to.
                 result = "nothing";
             } else if (scoutSkill != null
-                && unit.getType().canBeUpgraded(scoutSkill, ChangeType.NATIVES)
                 && ((skill != null && skill.hasAbility(Ability.EXPERT_SCOUT))
                     || rnd == 0)) {
                 // If the scout can be taught to be an expert it will be.
