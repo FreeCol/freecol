@@ -70,11 +70,8 @@ public class ServerBuilding extends Building implements ServerModelObject {
      */
     public void csNewTurn(Random random, ChangeSet cs) {
         BuildingType type = getType();
-        ServerPlayer owner = (ServerPlayer) getColony().getOwner();
 
-        if (canTeach()) {
-            teach(cs, owner);
-        }
+        if (canTeach()) csTeach(cs);
 
         if (type.hasAbility(Ability.REPAIR_UNITS)) {
             repairUnits(cs);
@@ -82,10 +79,15 @@ public class ServerBuilding extends Building implements ServerModelObject {
 
     }
 
-    private void teach(ChangeSet cs, ServerPlayer owner) {
+    /**
+     * Teach all the units in this school.
+     *
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    private void csTeach(ChangeSet cs) {
+        final ServerPlayer owner = (ServerPlayer)getColony().getOwner();
+        
         for (Unit teacher : getUnitList()) {
-            boolean teacherDirty = false;
-            boolean studentDirty = false;
             Unit student = teacher.getStudent();
 
             if (student != null && student.getTeacher() != teacher) {
@@ -94,83 +96,101 @@ public class ServerBuilding extends Building implements ServerModelObject {
                 logger.warning("Bogus teacher/student assignment.");
                 teacher.setStudent(null);
                 student = null;
-                teacherDirty = true;
             }
 
             // Student may have changed
             if (student == null && csAssignStudent(teacher, cs)) {
-                teacherDirty = true;
-                studentDirty = true;
                 student = teacher.getStudent();
             }
 
-            // Ready to train?
-            if (student != null) {
-                final int training = teacher.getTurnsOfTraining() + 1;
-                if (training < teacher.getNeededTurnsOfTraining()) {
-                    teacher.setTurnsOfTraining(training);
-                    if (!teacherDirty) {
-                        cs.addPartial(See.only(owner), teacher,
-                                      "turnsOfTraining");
-                    }
-                } else {
-                    StringTemplate oldName = student.getLabel();
-                    UnitType teach = teacher.getType().getSkillTaught();
-                    UnitType skill = Unit
-                        .getUnitTypeTeaching(teach, student.getType());
-                    if (skill == null) {
-                        logger.warning("Student " + student.getId()
-                                       + " can not learn from "
-                                       + teacher.getId());
-                    } else {
-                        student.setType(skill);//-vis: safe within colony
-                        StringTemplate newName = student.getLabel();
-                        cs.addMessage(See.only(owner),
-                                      new ModelMessage(ModelMessage.MessageType.UNIT_IMPROVED,
-                                                       "model.unit.unitEducated",
-                                                       getColony(), this)
-                                      .addStringTemplate("%oldName%", oldName)
-                                      .addStringTemplate("%unit%", newName)
-                                      .addName("%colony%", getColony().getName()));
-                    }
-                    student.setTurnsOfTraining(0);
-                    student.setMovesLeft(0);
-                    cs.add(See.only(owner), student);
-                    studentDirty = false;
+            // Update teaching amount.
+            teacher.setTurnsOfTraining((student == null) ? 0
+                : teacher.getTurnsOfTraining() + 1);
+            cs.add(See.only(owner), teacher);
 
-                    teacher.setTurnsOfTraining(0);
-                    if (student.canBeStudent(teacher)) { // Keep teaching
-                        cs.addPartial(See.only(owner), teacher,
-                                      "turnsOfTraining");
-                    } else {
-                        student.setTeacher(null);
-                        teacher.setStudent(null);
-                        teacherDirty = true;
-                        if (csAssignStudent(teacher, cs)) {
-                            student = teacher.getStudent();
-                            studentDirty = true;
-                        }
-                    }
-                }
-            }
-
-            if (teacherDirty) cs.add(See.only(owner), teacher);
-            if (studentDirty) cs.add(See.only(owner), student);
+            // Do not check for completed training, see csCheckTeach below.
         }
     }
 
+    /**
+     * Check and complete teaching if possible.
+     *
+     * This needs to be separate and public because of the recheck of
+     * teaching required if the colony production bonus rises at end
+     * of new turn calculations.
+     *
+     * @param teacher The teaching <code>Unit</code>.
+     * @param cs A <code>ChangeSet</code> to update.
+     * @return True if teaching occurred.
+     */
+    public boolean csCheckTeach(Unit teacher, ChangeSet cs) {
+        final ServerPlayer owner = (ServerPlayer)getColony().getOwner();
+
+        Unit student = teacher.getStudent();
+        if (student != null
+            && teacher.getTurnsOfTraining()
+                >= teacher.getNeededTurnsOfTraining()) {
+            csTrainStudent(teacher, student, cs);
+            // Student will have changed, teacher already added in csTeach
+            cs.add(See.only(owner), student);
+            if (teacher.getStudent() == null) csAssignStudent(teacher, cs);
+            return true;
+        }
+        return false;
+    }
+        
+    /**
+     * Train a student.
+     *
+     * @param teacher The teacher <code>Unit</code>.
+     * @param student The student <code>Unit</code> to train.
+     * @param cs A <code>ChangeSet</code> to update.
+     * @return True if teaching occurred.
+     */
+    private boolean csTrainStudent(Unit teacher, Unit student, ChangeSet cs) {
+        final ServerPlayer owner = (ServerPlayer)getColony().getOwner();
+        StringTemplate oldName = student.getLabel();
+        UnitType teach = teacher.getType().getSkillTaught();
+        UnitType skill = Unit.getUnitTypeTeaching(teach, student.getType());
+        boolean ret = skill != null;
+        if (skill == null) {
+            logger.warning("Student " + student.getId()
+                           + " can not learn from " + teacher.getId());
+        } else {
+            student.setType(skill);//-vis: safe within colony
+            StringTemplate newName = student.getLabel();
+            cs.addMessage(See.only(owner),
+                new ModelMessage(ModelMessage.MessageType.UNIT_IMPROVED,
+                                 "model.unit.unitEducated",
+                                 getColony(), this)
+                    .addStringTemplate("%oldName%", oldName)
+                    .addStringTemplate("%unit%", newName)
+                    .addName("%colony%", getColony().getName()));
+        }
+        student.setTurnsOfTraining(0);
+        student.setMovesLeft(0);
+        teacher.setTurnsOfTraining(0);
+        teacher.setMovesLeft(0);
+        if (!student.canBeStudent(teacher)) {
+            student.setTeacher(null);
+            teacher.setStudent(null);
+        }
+        return ret;
+    }
 
     /**
      * Assigns a student to a teacher within a building.
      *
      * @param teacher The <code>Unit</code> that is teaching.
      * @param cs A <code>ChangeSet</code> to update.
+     * @return True if a student was assigned.
      */
     private boolean csAssignStudent(Unit teacher, ChangeSet cs) {
-        Colony colony = getColony();
+        final Colony colony = getColony();
+        final ServerPlayer owner = (ServerPlayer)colony.getOwner();
         final Unit student = colony.findStudent(teacher);
         if (student == null) {
-            cs.addMessage(See.only((ServerPlayer) colony.getOwner()),
+            cs.addMessage(See.only(owner),
                 new ModelMessage(ModelMessage.MessageType.WARNING,
                                  "model.building.noStudent",
                                  colony, teacher)
@@ -181,9 +201,15 @@ public class ServerBuilding extends Building implements ServerModelObject {
         teacher.setStudent(student);
         teacher.changeWorkType(null);
         student.setTeacher(teacher);
+        cs.add(See.only(owner), student);
         return true;
     }
 
+    /**
+     * Repair the units in this building.
+     *
+     * @param cs A <code>ChangeSet</code> to update.
+     */
     private void repairUnits(ChangeSet cs) {
         for (Unit unit : getTile().getUnitList()) {
             if (unit.isDamaged()

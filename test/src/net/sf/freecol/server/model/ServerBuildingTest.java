@@ -232,21 +232,23 @@ public class ServerBuildingTest extends FreeColTestCase {
      * After some turns (2 or 3 I don't know) a new LumberJack is ready.
      * Removing the teacher LumberJack replaced by an Ore Miner.
      *
-     * Next turn, a new BlackSmith is ready. Removing the teacher BlackSmith
-     * replaced by a Veteran Soldier. There is still 2 Free Colonists as Farmers
-     * in the Colony.
+     * Next turn, a new BlackSmith is ready. Removing the teacher
+     * BlackSmith replaced by a Veteran Soldier. There is still 2 Free
+     * Colonists as Farmers in the Colony.
      *
      * Waiting during more than 8 turns. NOTHING happens.
      *
      * Changing the two Free Colonists by two other Free Colonists.
      *
-     * After 2 or 3 turns, a new Ore Miner and a new Veteran Soldier are ready.
+     * After 2 or 3 turns, a new Ore Miner and a new Veteran Soldier
+     * are ready.
      *
      * http://sourceforge.net/tracker/index.php?func=detail&aid=1616384&group_id=43225&atid=435578
      *
-     * CO: I think this is a special case of the testSingleGuyTwoTeachers. But
-     * since already the TwoTeachersSimple case fails, I think that needs to be
-     * sorted out first.
+     * CO: I think this is a special case of the
+     * testSingleGuyTwoTeachers.  But since already the
+     * TwoTeachersSimple case fails, I think that needs to be sorted
+     * out first.
      */
     public void testTrackerBug1616384() {
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
@@ -442,8 +444,8 @@ public class ServerBuildingTest extends FreeColTestCase {
     }
 
     /**
-     * If there are two teachers of the same kind, but just one colonist to be
-     * taught, this should not mean any speed up.
+     * If there are two teachers of the same kind, but just one
+     * colonist to be taught, this should not mean any speed up.
      */
     public void testTwoTeachersOfSameKind() {
         boolean selection = FreeColTestUtils.setStudentSelection(false);
@@ -480,9 +482,8 @@ public class ServerBuildingTest extends FreeColTestCase {
     }
 
     /**
-     * If there are two teachers with the same skill level, the first to be put
-     * in the school should be used for teaching.
-     *
+     * If there are two teachers with the same skill level, the first
+     * to be put in the school should be used for teaching.
      */
     public void testSingleGuyTwoTeachers2() {
         boolean selection = FreeColTestUtils.setStudentSelection(false);
@@ -569,8 +570,8 @@ public class ServerBuildingTest extends FreeColTestCase {
     }
 
     /**
-     * The time to teach somebody does not depend on the one who is being
-     * taught, but on the teacher.
+     * The time to teach somebody does not depend on the one who is
+     * being taught, but on the teacher.
      */
     public void testTeachPettyCriminalsByMaster() {
         boolean selection = FreeColTestUtils.setStudentSelection(false);
@@ -898,20 +899,16 @@ public class ServerBuildingTest extends FreeColTestCase {
         FreeColTestUtils.setStudentSelection(selection);
     }
 
-    /* Actually, now it should.  Disabled. */
     /**
-     * Sons of Liberty should not influence teaching.
-     /
+     * Sons of Liberty influences teaching.
+     */
     public void testSonsOfLiberty() {
-        spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION)
-            .setValue(false);
+        boolean selection = FreeColTestUtils.setStudentSelection(false);
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
         Colony colony = getSchoolColony(4, SchoolLevel.UNIVERSITY);
         Building university = colony.getBuilding(universityType);
-        colony.addGoods(bellsType, 10000);
         Iterator<Unit> units = colony.getUnitIterator();
-
         Unit colonist = units.next();
         colonist.setType(freeColonistType);
         colonist.setLocation(colony.getBuilding(townHallType));
@@ -920,10 +917,17 @@ public class ServerBuildingTest extends FreeColTestCase {
         lumberjack.setType(expertLumberJackType);
         lumberjack.setLocation(university);
 
-        trainForTurns(colony, lumberjack.getNeededTurnsOfTraining());
+        assertEquals(4, lumberjack.getNeededTurnsOfTraining());
+
+        colony.addGoods(bellsType, 100000);
+        assertEquals(2, lumberjack.getNeededTurnsOfTraining());
+
+        trainForTurns(colony, 2);
         assertEquals(0, getUnitList(colony, freeColonistType).size());
         assertEquals(2, getUnitList(colony, expertLumberJackType).size());
-    }*/
+
+        FreeColTestUtils.setStudentSelection(selection);
+    }
 
     /**
      * Trains partly one colonist then put another teacher.

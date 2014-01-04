@@ -1256,8 +1256,10 @@ public class Colony extends Settlement implements Nameable {
 
     /**
      * Update the colony's production bonus.
+     *
+     * @return True if the bonus changed.
      */
-    protected void updateProductionBonus() {
+    protected boolean updateProductionBonus() {
         final Specification spec = getSpecification();
         final int veryBadGovernment
             = spec.getInteger("model.option.veryBadGovernmentLimit");
@@ -1275,7 +1277,9 @@ public class Colony extends Settlement implements Nameable {
         if (productionBonus != newBonus) {
             invalidateCache();
             productionBonus = newBonus;
+            return true;
         }
+        return false;
     }
 
     /**

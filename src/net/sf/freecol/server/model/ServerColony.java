@@ -501,6 +501,18 @@ public class ServerColony extends Colony implements ServerModelObject {
             }
         }
         updateProductionBonus();
+        // We have to wait for the production bonus to stabilize
+        // before checking for completion of training.  This is a rare
+        // case so it is not worth reordering the work location calls
+        // to csNewTurn.
+        for (WorkLocation workLocation : getCurrentWorkLocations()) {
+            if (workLocation.canTeach()) {
+                ServerBuilding building = (ServerBuilding)workLocation;
+                for (Unit teacher : building.getUnitList()) {
+                    building.csCheckTeach(teacher, cs);
+                }
+            }
+        }
 
         // Try to update minimally.
         if (tileDirty) {
