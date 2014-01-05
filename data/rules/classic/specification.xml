@@ -2079,11 +2079,11 @@ resources of 400, lost city rumours of 500
       <skill id="model.unit.expertSilverMiner" probability="20"/>
       <skill id="model.unit.expertFarmer" probability="10"/>
       <skill id="model.unit.expertFisherman" probability="10"/>
+      <skill id="model.unit.masterWeaver" probability="3"/>
     </indian-nation-type>
     <indian-nation-type id="model.nationType.inca" extends="city"
                         aggression="low">
       <skill id="model.unit.expertOreMiner" probability="10"/>
-      <skill id="model.unit.masterWeaver" probability="3"/>
       <region id="model.region.southWest" />
       <region id="model.region.south" />
       <settlement id="model.settlement.inca" capital="false"
