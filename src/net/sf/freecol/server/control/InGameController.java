@@ -1813,26 +1813,7 @@ public final class InGameController extends Controller {
         }
 
         ChangeSet cs = new ChangeSet();
-
-        Location oldLocation = unit.getLocation();
-        if (oldLocation instanceof WorkLocation) {
-            oldLocation.getTile().cacheUnseen();//+til
-        }
-        unit.setLocation(carrier);//-vis: only if on a different tile
-                                  //-til if moving from colony
-        unit.setMovesLeft(0);
-        cs.add(See.only(serverPlayer), (FreeColGameObject)oldLocation);
-        if (carrier.getLocation() != oldLocation) {
-            cs.add(See.only(serverPlayer), carrier);
-        }
-        if (oldLocation instanceof Tile) {
-            if (carrier.getTile() != (Tile)oldLocation) {
-                cs.addMove(See.only(serverPlayer), unit, (Tile)oldLocation,
-                           carrier.getTile());
-                serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
-            }
-            cs.addDisappear(serverPlayer, (Tile)oldLocation, unit);
-        }
+        ((ServerUnit)unit).csEmbark(carrier, cs);
 
         // Others might see the unit disappear, or the carrier capacity.
         sendToOthers(serverPlayer, cs);
@@ -3028,12 +3009,28 @@ public final class InGameController extends Controller {
                 cs.add(See.only(source), unit);
                 cs.add(See.only(dest), settlement.getGoodsContainer());
             }
-            Unit newUnit = tradeItem.getUnit();
+            ServerUnit newUnit = (ServerUnit)tradeItem.getUnit();
             if (newUnit != null) {
-                ServerPlayer former = (ServerPlayer) newUnit.getOwner();
-                unit.changeOwner(dest);//-vis(both)
-                cs.add(See.only(dest), dest.exploreForUnit(unit));
-                cs.add(See.perhaps().always(former), newUnit);
+                ServerPlayer former = (ServerPlayer)newUnit.getOwner();
+                Tile oldTile = newUnit.getTile();
+                newUnit.changeOwner(dest);//-vis(both)
+                if (dest == unit.getOwner()) {
+                    if (unit.isOnCarrier()) {
+                        Unit carrier = unit.getCarrier();
+                        if (!carrier.couldCarry(newUnit)) {
+                            logger.warning("Can not add " + newUnit
+                                           + " to " + carrier);
+                            continue;
+                        }
+                        newUnit.setLocation(carrier);
+                    } else {
+                        newUnit.setLocation(unit.getTile());
+                    }
+                } else {
+                    newUnit.setLocation(settlement.getTile());
+                }
+                cs.add(See.only(dest), dest.exploreForUnit(newUnit));
+                cs.add(See.perhaps().always(former), oldTile);
                 visibilityChange = true;
             }
         }

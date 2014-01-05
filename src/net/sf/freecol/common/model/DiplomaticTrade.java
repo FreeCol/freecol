@@ -72,17 +72,6 @@ public class DiplomaticTrade extends FreeColObject {
      * @param game The enclosing <code>Game</code>.
      * @param sender The sending <code>Player</code>.
      * @param recipient The recipient <code>Player</code>.
-    public DiplomaticTrade(Game game, Player sender, Player recipient) {
-        this(game, sender, recipient, new ArrayList<TradeItem>());
-    }
-     */
-
-    /**
-     * Creates a new <code>DiplomaticTrade</code> instance.
-     *
-     * @param game The enclosing <code>Game</code>.
-     * @param sender The sending <code>Player</code>.
-     * @param recipient The recipient <code>Player</code>.
      * @param items A list of items to trade.
      */
     public DiplomaticTrade(Game game, Player sender, Player recipient,
@@ -265,21 +254,6 @@ public class DiplomaticTrade extends FreeColObject {
     }
 
     /**
-     * Get the goods being offered.
-     *
-     * @return A list of <code>Goods</code> offered in this trade.
-     */
-    public List<Goods> getGoodsGivenBy(Player player) {
-        List<Goods> goodsList = new ArrayList<Goods>();
-        for (TradeItem ti : items) {
-            if (ti instanceof GoodsTradeItem && player == ti.getSource()) {
-                goodsList.add(((GoodsTradeItem)ti).getGoods());
-            }
-        }
-        return goodsList;
-    }
-
-    /**
      * Get a list of colonies offered in this trade.
      *
      * @return A list of <code>Colony</code>s offered in this trade.
@@ -292,6 +266,36 @@ public class DiplomaticTrade extends FreeColObject {
             }
         }
         return colonyList;
+    }
+
+    /**
+     * Get the gold offered in this trade by a given player.
+     *
+     * @param player The <code>Player</code> to check.
+     * @return The gold offered in this trade.
+     */
+    public int getGoldGivenBy(Player player) {
+        for (TradeItem ti : items) {
+            if (ti instanceof GoldTradeItem && player == ti.getSource()) {
+                return ((GoldTradeItem)ti).getGold();
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Get the goods being offered.
+     *
+     * @return A list of <code>Goods</code> offered in this trade.
+     */
+    public List<Goods> getGoodsGivenBy(Player player) {
+        List<Goods> goodsList = new ArrayList<Goods>();
+        for (TradeItem ti : items) {
+            if (ti instanceof GoodsTradeItem && player == ti.getSource()) {
+                goodsList.add(((GoodsTradeItem)ti).getGoods());
+            }
+        }
+        return goodsList;
     }
 
     /**

@@ -427,6 +427,15 @@ public class Player extends FreeColGameObject implements Nameable {
         public String getKey() {
             return "model.stance." + toString().toLowerCase(Locale.US);
         }
+
+        /**
+         * Get a label for this stance.
+         *
+         * @return A <code>StringTemplate</code> for this stance.
+         */
+        public StringTemplate getLabel() {
+            return StringTemplate.template(getKey());
+        }
     }
 
 

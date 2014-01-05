@@ -67,16 +67,6 @@ public class ColonyTradeItem extends TradeItem {
     }
 
 
-    /**
-     * Extract the colony name.  Necessary as the colony may not actually be
-     * known by a recipient of an offer.
-     *
-     * @return The colony name.
-     */
-    public String getColonyName() {
-        return colonyName;
-    }
-
     // Interface TradeItem
 
     /**
@@ -92,6 +82,14 @@ public class ColonyTradeItem extends TradeItem {
      */
     public boolean isUnique() {
         return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public StringTemplate getDescription() {
+        return StringTemplate.template("tradeItem.colony.long")
+            .addName("%colony%", colonyName);
     }
 
     /**

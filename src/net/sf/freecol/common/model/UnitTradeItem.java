@@ -81,6 +81,13 @@ public class UnitTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
+    public StringTemplate getDescription() {
+        return unit.getLabel();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Unit getUnit() {
         return unit;

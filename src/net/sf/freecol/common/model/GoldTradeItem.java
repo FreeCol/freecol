@@ -79,6 +79,14 @@ public class GoldTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
+    public StringTemplate getDescription() {
+        return StringTemplate.template("tradeItem.gold.long")
+            .addAmount("%amount%", gold);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getGold() {
         return gold;

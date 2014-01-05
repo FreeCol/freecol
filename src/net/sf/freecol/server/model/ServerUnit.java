@@ -502,6 +502,36 @@ public class ServerUnit extends Unit implements ServerModelObject {
     }
 
     /**
+     * Embark a unit.
+     *
+     * @param carrier The <code>Unit</code> to embark on.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    public void csEmbark(Unit carrier, ChangeSet cs) {
+        final ServerPlayer owner = (ServerPlayer)getOwner();
+
+        Location oldLocation = getLocation();
+        if (oldLocation instanceof WorkLocation) {
+            oldLocation.getTile().cacheUnseen();//+til
+        }
+        setLocation(carrier);//-vis: only if on a different tile
+                                  //-til if moving from colony
+        setMovesLeft(0);
+        cs.add(See.only(owner), (FreeColGameObject)oldLocation);
+        if (carrier.getLocation() != oldLocation) {
+            cs.add(See.only(owner), carrier);
+        }
+        if (oldLocation instanceof Tile) {
+            if (carrier.getTile() != (Tile)oldLocation) {
+                cs.addMove(See.only(owner), this, (Tile)oldLocation,
+                           carrier.getTile());
+                owner.invalidateCanSeeTiles();//+vis(serverPlayer)
+            }
+            cs.addDisappear(owner, (Tile)oldLocation, this);
+        }
+    }
+
+    /**
      * Repair a unit.
      *
      * @param cs A <code>ChangeSet</code> to update.

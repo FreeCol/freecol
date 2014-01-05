@@ -81,6 +81,13 @@ public class StanceTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
+    public StringTemplate getDescription() {
+        return stance.getLabel();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Stance getStance() {
         return stance;

@@ -392,9 +392,7 @@ public final class InfoPanel extends FreeColPanel {
                     for (Goods goods : unit.getGoodsList()) {
                         icon = lib.getScaledGoodsImageIcon(goods.getType(), 0.66f);
                         label = new JLabel(icon);
-                        text = Messages.message(StringTemplate.template("model.goods.goodsAmount")
-                            .addAmount("%amount%", goods.getAmount())
-                            .add("%goods%", goods.getNameKey()));
+                        text = Messages.message(goods.getLabel(true));
                         label.setToolTipText(text);
                         add(label);
                     }

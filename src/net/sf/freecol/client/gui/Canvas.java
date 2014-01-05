@@ -1452,10 +1452,7 @@ public final class Canvas extends JDesktopPane {
      */
     public BuyAction showBuyDialog(Unit unit, Settlement settlement,
                                    Goods goods, int gold, boolean canBuy) {
-        StringTemplate goodsTemplate
-            = StringTemplate.template("model.goods.goodsAmount")
-            .add("%goods%", goods.getType().getNameKey())
-            .addAmount("%amount%", goods.getAmount());
+        StringTemplate goodsTemplate = goods.getLabel(true);
         StringTemplate nation = settlement.getOwner().getNationName();
         StringTemplate template = StringTemplate.template("buy.text")
             .addStringTemplate("%nation%", nation)
@@ -2512,10 +2509,7 @@ public final class Canvas extends JDesktopPane {
      */
     public SellAction showSellDialog(Unit unit, Settlement settlement,
                                      Goods goods, int gold) {
-        StringTemplate goodsTemplate
-            = StringTemplate.template("model.goods.goodsAmount")
-            .add("%goods%", goods.getType().getNameKey())
-            .addAmount("%amount%", goods.getAmount());
+        StringTemplate goodsTemplate = goods.getLabel(true);
         StringTemplate nation = settlement.getOwner().getNationName();
         StringTemplate template = StringTemplate.template("sell.text")
             .addStringTemplate("%nation%", nation)

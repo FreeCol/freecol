@@ -108,6 +108,13 @@ public class GoodsTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
+    public StringTemplate getDescription() {
+        return goods.getLabel(true);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Goods getGoods() {
         return goods;
