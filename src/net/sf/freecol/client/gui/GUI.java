@@ -1507,10 +1507,10 @@ public class GUI {
             });
     }
 
-    public DiplomaticTrade
-        showDiplomaticTradeDialog(Unit unit, Settlement settlement,
-                                  DiplomaticTrade agreement,
-                                  StringTemplate comment) {
+    public DiplomaticTrade showDiplomaticTradeDialog(Unit unit,
+                                                     Settlement settlement,
+                                                     DiplomaticTrade agreement,
+                                                     StringTemplate comment) {
         if (canvas == null) return null;
         return canvas.showDiplomaticTradeDialog(unit, settlement, agreement,
                                                 comment);

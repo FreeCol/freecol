@@ -2167,10 +2167,10 @@ public final class Canvas extends JDesktopPane {
      *     commentary message.
      * @return An updated agreement.
      */
-    public DiplomaticTrade
-        showDiplomaticTradeDialog(Unit unit, Settlement settlement,
-                                  DiplomaticTrade agreement,
-                                  StringTemplate comment) {
+    public DiplomaticTrade showDiplomaticTradeDialog(Unit unit,
+                                                     Settlement settlement,
+                                                     DiplomaticTrade agreement,
+                                                     StringTemplate comment) {
         DiplomaticTradeDialog dtd
             = new DiplomaticTradeDialog(freeColClient, unit, settlement,
                                         agreement, comment);
