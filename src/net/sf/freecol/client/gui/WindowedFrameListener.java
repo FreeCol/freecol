@@ -63,7 +63,11 @@ public final class WindowedFrameListener implements WindowListener {
      * @param event The event that has information on the action.
      */
     public void windowClosing(WindowEvent event) {
-        freeColClient.askToQuit();
+        if (freeColClient.isInGame()) {
+            freeColClient.askToQuit();
+        } else {
+            freeColClient.quit();
+        }
     }
     
     /**
