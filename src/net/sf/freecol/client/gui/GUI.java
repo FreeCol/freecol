@@ -26,8 +26,11 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
+import java.awt.DisplayMode;
 import java.awt.GraphicsEnvironment;
+import java.awt.GraphicsConfiguration;
 import java.awt.HeadlessException;
+import java.awt.MouseInfo;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Point;
@@ -263,9 +266,6 @@ public class GUI {
     /** The parent frame, either a window or the full screen. */
     private FreeColFrame frame;
 
-    /** The graphics device for the screen. */
-    private GraphicsDevice gd;
-
     /** An image library to use. */
     private ImageLibrary imageLibrary;
 
@@ -400,6 +400,16 @@ public class GUI {
         }
         setWindowed(windowed);
 
+        /* User might have moved window to new screen in a
+         * multi-screen setup, so make this.gd point to the current
+         * screen. */
+        GraphicsDevice gd;
+        if (this.frame != null) {
+            GraphicsConfiguration GraphicsConf = this.frame.getGraphicsConfiguration();
+            gd = GraphicsConf.getDevice();
+        } else {
+            gd = getGoodGraphicsDevice();
+        }
         this.frame = FreeColFrame.createFreeColFrame(freeColClient, canvas, gd,
                                                      windowed);
         frame.setJMenuBar(menuBar);
@@ -471,18 +481,19 @@ public class GUI {
      *
      * @param splashFilename The name of the file to find the image in.
      */
-    public void displaySplashScreen(final String splashFilename) {
+    public void displaySplashScreen(final String splashFilename,
+                                    GraphicsDevice gd) {
         splash = null;
         if (splashFilename == null) return;
         try {
             Image im = Toolkit.getDefaultToolkit().getImage(splashFilename);
-            splash = new JWindow();
+            splash = new JWindow(gd.getDefaultConfiguration());
             splash.getContentPane().add(new JLabel(new ImageIcon(im)));
             splash.pack();
-            Point center = GraphicsEnvironment
-                .getLocalGraphicsEnvironment().getCenterPoint();
-            splash.setLocation(center.x - splash.getWidth() / 2,
-                               center.y - splash.getHeight() / 2);
+            Point start = splash.getLocation();
+            DisplayMode dm = gd.getDisplayMode();
+            splash.setLocation(start.x + dm.getWidth()/2 - splash.getWidth() / 2,
+                start.y + dm.getHeight()/2 - splash.getHeight() / 2);
             splash.setVisible(true);
         } catch (Exception e) {
             logger.log(Level.WARNING, "Splash fail", e);
@@ -535,8 +546,11 @@ public class GUI {
      * Quit the GUI.  All that is required is to exit the full screen.
      */
     public void quit() throws Exception {
-        if (gd == null) return;
-        if (!isWindowed()) gd.setFullScreenWindow(null);
+        if (this.frame != null) {
+            GraphicsConfiguration GraphicsConf = this.frame.getGraphicsConfiguration();
+            GraphicsDevice gd = GraphicsConf.getDevice();
+            if (!isWindowed()) gd.setFullScreenWindow(null);
+        }
     }
 
     /**
@@ -621,7 +635,8 @@ public class GUI {
      * @param innerWindowSize The desired size of the GUI window.
      * @param sound Enable sound if true.
      */
-    public void startGUI(Dimension innerWindowSize, boolean sound) {
+    public void startGUI(GraphicsDevice gd, Dimension innerWindowSize,
+                         boolean sound) {
         final ClientOptions opts = freeColClient.getClientOptions();
 
         // Prepare the sound system.
@@ -643,7 +658,6 @@ public class GUI {
             this.soundPlayer = null;
         }
 
-        gd = getDefaultScreenDevice();
         if (gd == null) {
             logger.info("It seems that the GraphicsEnvironment is headless!");
             return;
@@ -749,8 +763,7 @@ public class GUI {
      *
      * @return True if full screen is available.
      */
-    public static boolean checkFullScreen() {
-        GraphicsDevice gd = getDefaultScreenDevice();
+    public static boolean checkFullScreen(GraphicsDevice gd) {
         return gd != null && gd.isFullScreenSupported();
     }
 
@@ -759,12 +772,11 @@ public class GUI {
      *
      * @return A suitable window size.
      */
-    public static Dimension determineFullScreenSize() {
-        GraphicsDevice gd = getDefaultScreenDevice();
+    public static Dimension determineFullScreenSize(GraphicsDevice gd) {
         if (gd == null) return null;
         Rectangle bounds = gd.getDefaultConfiguration().getBounds();
         return new Dimension(bounds.width - bounds.x,
-                             bounds.height - bounds.y);
+            bounds.height - bounds.y);
     }
 
     /**
@@ -772,36 +784,23 @@ public class GUI {
      *
      * @return A suitable window size.
      */
-    public static Dimension determineWindowSize() {
-        final GraphicsEnvironment lge
-            = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        final GraphicsDevice gd = getDefaultScreenDevice();
+    public static Dimension determineWindowSize(GraphicsDevice gd) {
         if (gd == null) return null;
 
         // Get max size of window including border.
-        Rectangle bounds = lge.getMaximumWindowBounds();
-
-        // Do we trust getMaximumWindowBounds?
-        // Check the insets for evidence the taskbar has been missed.
-        Insets insets = Toolkit.getDefaultToolkit()
-            .getScreenInsets(gd.getDefaultConfiguration());
-        if (insets != null && insets.top <= 0 && insets.bottom <= 0) {
-            bounds.height -= DEFAULT_SCREEN_INSET_HEIGHT;
-        }
-        if (insets != null && insets.left <= 0 && insets.right <= 0) {
-            bounds.width -= DEFAULT_SCREEN_INSET_WIDTH;
-        }
+        DisplayMode dm = gd.getDisplayMode();
+        int width = dm.getWidth();
+        int height = dm.getHeight();
 
         // TODO: find better way to get size of window title and
         // border.  The information is only available from getInsets
         // when a window is already displayable.
         Dimension size
-            = new Dimension(bounds.width - DEFAULT_WINDOW_INSET_WIDTH,
-                            bounds.height - DEFAULT_WINDOW_INSET_HEIGHT);
+            = new Dimension(width - DEFAULT_WINDOW_INSET_WIDTH,
+                height - DEFAULT_WINDOW_INSET_HEIGHT);
         logger.info("Screen = " + Toolkit.getDefaultToolkit().getScreenSize()
-            + "\nBounds = " + gd.getDefaultConfiguration().getBounds()
-            + "\nMaxBounds = " + lge.getMaximumWindowBounds()
-            + "\nInsets = " + insets
+            + "\nwidth = " + width
+            + "\nheight = " + height
             + "\n => " + size);
         return size;
     }
@@ -820,17 +819,22 @@ public class GUI {
     }
 
     /**
-     * Get the default screen device.
+     * Get a good screen device for starting FreeCol.
      *
-     * @return The default screen device, or null if none available
+     * @return A screen device, or null if none available
      *     (as in headless mode).
      */
-    public static GraphicsDevice getDefaultScreenDevice() {
-        final GraphicsEnvironment lge
-            = GraphicsEnvironment.getLocalGraphicsEnvironment();
+    public static GraphicsDevice getGoodGraphicsDevice() {
         try {
+            return MouseInfo.getPointerInfo().getDevice();
+        } catch (HeadlessException he) {}
+
+        try {
+            final GraphicsEnvironment lge
+                = GraphicsEnvironment.getLocalGraphicsEnvironment();
             return lge.getDefaultScreenDevice();
         } catch (HeadlessException he) {}
+
         return null;
     }
 

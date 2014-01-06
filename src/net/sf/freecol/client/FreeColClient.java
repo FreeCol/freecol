@@ -22,6 +22,8 @@ package net.sf.freecol.client;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -189,20 +191,21 @@ public final class FreeColClient {
         ResourceManager.setBaseMapping(baseData.getResourceMapping());
 
         // Once the basic resources are in place the GUI can be started.
+        final GraphicsDevice gd = gui.getGoodGraphicsDevice();
         this.gui = new GUI(this);
         this.serverAPI = new UserServerAPI(gui);
-        if (!headless) gui.displaySplashScreen(splashFilename);
+        if (!headless) gui.displaySplashScreen(splashFilename, gd);
 
         // Determine the window size.
-        if (size == null && !GUI.checkFullScreen()) {
+        if (size == null && !GUI.checkFullScreen(gd)) {
             logger.warning("Full screen not supported.");
             System.err.println(Messages.message("client.fullScreen"));
             size = new Dimension(-1, -1);
         }
         gui.setWindowed(size != null);
         final Dimension windowSize = (headless) ? null
-            : (size == null) ? GUI.determineFullScreenSize()
-            : (size.width <= 0 || size.height <= 0) ? GUI.determineWindowSize()
+            : (size == null) ? GUI.determineFullScreenSize(gd)
+            : (size.width <= 0 || size.height <= 0) ? GUI.determineWindowSize(gd)
             : size;
         logger.info("Window size is " + windowSize);
 
@@ -262,7 +265,7 @@ public final class FreeColClient {
         }
 
         // Start the GUI (headless-safe)
-        gui.startGUI(windowSize, sound);
+        gui.startGUI(gd, windowSize, sound);
 
         // Now the GUI is going, either:
         //   - load the saved game if one was supplied

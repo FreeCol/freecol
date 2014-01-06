@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui;
 
 import java.awt.Rectangle;
+import java.awt.GraphicsDevice;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.logging.Logger;
@@ -44,10 +45,11 @@ public final class WindowedFrame extends FreeColFrame  {
     * The constructor to use.
      * @param canvas 
     */
-    public WindowedFrame(final FreeColClient freeColClient, final Canvas canvas) {
-        super(freeColClient, "FreeCol " + FreeCol.getVersion());
+    public WindowedFrame(final FreeColClient freeColClient, GraphicsDevice gd, final Canvas canvas) {
+        super(freeColClient, "FreeCol " + FreeCol.getVersion(), gd);
         logger.info("WindowedFrame's JFrame created.");
 
+	this.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setResizable(true);
         
