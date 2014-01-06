@@ -4143,9 +4143,14 @@ public final class InGameController implements NetworkConstants {
                 && turnsPlayed > 0) autosave_game();
 
             // Check for emigration.
-            if (player.hasAbility(Ability.SELECT_RECRUIT)
-                && player.getEurope().recruitablesDiffer()) {
-                gui.showEmigrationDialog(player, 1, false);
+            if (player.hasAbility(Ability.SELECT_RECRUIT)) {
+                if (player.checkEmigrate()) {
+                    if (player.getEurope().recruitablesDiffer()) {
+                        gui.showEmigrationDialog(player, 1, false);
+                    } else {
+                        emigrate(player, 1);
+                    }
+                }
             } else {
                 while (player.checkEmigrate()) emigrate(player, 0);
             }

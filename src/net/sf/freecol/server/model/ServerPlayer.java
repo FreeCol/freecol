@@ -1925,7 +1925,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         UnitType newType = RandomChoice
                             .getWeightedRandom(logger,
                                 "Replace recruit", recruits, random);
-                        europe.replaceRecruitable(i, newType);
+                        europe.setRecruitable(i, newType);
                         europeDirty = true;
                     }
                 }
@@ -2034,10 +2034,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // Replace the recruit we used.  Shuffle them down first
         // as AI is always recruiting slot 0.
         for (int i = index; i < Europe.RECRUIT_COUNT-1; i++) {
-            europe.replaceRecruitable(i, europe.getRecruitable(i+1));
+            europe.setRecruitable(i, europe.getRecruitable(i+1));
         }
         List<RandomChoice<UnitType>> recruits = generateRecruitablesList();
-        europe.replaceRecruitable(Europe.RECRUIT_COUNT-1,
+        europe.setRecruitable(Europe.RECRUIT_COUNT-1,
             RandomChoice.getWeightedRandom(logger, "Replace recruit", recruits,
                                            random));
         cs.add(See.only(this), europe);

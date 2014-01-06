@@ -146,14 +146,34 @@ public class Europe extends UnitLocation implements Ownable, Named {
      * @param slot The slot of the recruitable whose type needs to be
      *     returned.
      * @return The type of the recruitable in Europe at the given slot.
-     * @exception IllegalArgumentException if the given <code>slot</code> does
-     *                not exist.
+     * @exception IllegalArgumentException if the given
+     *     <code>slot</code> does not exist.
      */
     public UnitType getRecruitable(int slot) {
         if (slot >= 0 && slot < RECRUIT_COUNT && slot < recruitables.size()) {
             return recruitables.get(slot);
         } else {
-            throw new IllegalArgumentException("Invalid recruitment slot: " + slot);
+            throw new IllegalArgumentException("Invalid recruitment slot: "
+                + slot);
+        }
+    }
+
+    /**
+     * Gets the type of the recruitable in Europe at the given slot.
+     *
+     * @param slot The slot of the recruitable whose type needs to be
+     *     returned.
+     * @param type The <code>UnitType</code> of the recruitable in
+     *     Europe at the given slot.
+     * @exception IllegalArgumentException if the given
+     *     <code>slot</code> does not exist.
+     */
+    public void setRecruitable(int slot, UnitType type) {
+        if (slot >= 0 && slot < RECRUIT_COUNT && slot < recruitables.size()) {
+            recruitables.set(slot, type);
+        } else {
+            throw new IllegalArgumentException("Invalid recruitment slot: "
+                + slot);
         }
     }
 
@@ -162,25 +182,6 @@ public class Europe extends UnitLocation implements Ownable, Named {
      */
     protected void addRecruitable(UnitType unitType) {
         recruitables.add(unitType);
-    }
-
-    /**
-     * Removes the UnitType at the given index from the list of
-     * recruitable unit types and adds another.
-     *
-     * @param slot The index of the recruitable to be replaced
-     * @param type The new type for the unit at the given slot in Europe.
-     */
-    public void replaceRecruitable(int slot, UnitType type) {
-        if (slot >= 0 && slot < RECRUIT_COUNT && slot < recruitables.size()) {
-            recruitables.remove(slot);
-            if (type != null) {
-                recruitables.add(type);
-            }
-        } else {
-            throw new IllegalArgumentException("Invalid recruitment slot: "
-                + slot);
-        }
     }
 
     /**
@@ -520,7 +521,19 @@ public class Europe extends UnitLocation implements Ownable, Named {
         final Specification spec = getSpecification();
         final String tag = xr.getLocalName();
 
-        if (UNIT_PRICE_TAG.equals(tag)) {
+        if (Ability.getXMLElementTagName().equals(tag)) {
+            addAbility(new Ability(xr, spec));
+
+        } else if (Modifier.getXMLElementTagName().equals(tag)) {
+            addModifier(new Modifier(xr, spec));
+
+        } else if (RECRUIT_TAG.equals(tag)) {
+            UnitType unitType = xr.getType(spec, RECRUIT_ID_TAG,
+                                           UnitType.class, (UnitType)null);
+            recruitables.add(unitType);
+            xr.closeTag(RECRUIT_TAG);
+
+        } else if (UNIT_PRICE_TAG.equals(tag)) {
             UnitType unitType = xr.getType(spec, UNIT_TYPE_TAG,
                                            UnitType.class, (UnitType)null);
 
@@ -529,16 +542,6 @@ public class Europe extends UnitLocation implements Ownable, Named {
             unitPrices.put(unitType, new Integer(price));
             xr.closeTag(UNIT_PRICE_TAG);
 
-        } else if (Ability.getXMLElementTagName().equals(tag)) {
-            addAbility(new Ability(xr, spec));
-
-        } else if (Modifier.getXMLElementTagName().equals(tag)) {
-            addModifier(new Modifier(xr, spec));
-
-        } else if (RECRUIT_TAG.equals(tag)) {
-            UnitType unitType = xr.getType(spec, RECRUIT_ID_TAG, UnitType.class, (UnitType)null);
-            recruitables.add(unitType);
-            xr.closeTag(RECRUIT_TAG);
         } else {
             super.readChild(xr);
         }
