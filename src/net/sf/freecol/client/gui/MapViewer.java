@@ -143,12 +143,7 @@ public final class MapViewer {
     private Point gotoDragPoint;
     // Helper variables for displaying the map.
     private int tileHeight, tileWidth, halfHeight, halfWidth,
-    topSpace,
-    topRows,
-    //bottomSpace,
-    bottomRows,
-    leftSpace,
-    rightSpace;
+        topSpace, topRows, /*bottomSpace,*/ bottomRows, leftSpace, rightSpace;
     // The y-coordinate of the Tiles that will be drawn at the bottom
     private int bottomRow = -1;
 
@@ -170,6 +165,10 @@ public final class MapViewer {
     // Tiles that will be drawn at the left (can be less than 0)
     private int leftColumnX;
 
+    // Whether the map is currently aligned with the edge.
+    private boolean alignedTop = false, alignedBottom = false,
+        alignedLeft = false, alignedRight = false;
+
     // The height offset to paint a Unit at (in pixels).
     private static final int UNIT_OFFSET = 20,
         STATE_OFFSET_X = 25,
@@ -178,8 +177,10 @@ public final class MapViewer {
         OTHER_UNITS_OFFSET_Y = 1,
         OTHER_UNITS_WIDTH = 3,
         MAX_OTHER_UNITS = 10,
-        MESSAGE_COUNT = 3,
-        MESSAGE_AGE = 30000; // The amount of time before a message gets deleted (in milliseconds).;
+        MESSAGE_COUNT = 3;
+
+    /** The amount of time before a message gets deleted (in milliseconds). */
+    private static final int MESSAGE_AGE = 30000;
 
     public static final int OVERLAY_INDEX = 100;
     public static final int FOREST_INDEX = 200;
@@ -243,9 +244,11 @@ public final class MapViewer {
     }
 
     /**
-    * Adds a message to the list of messages that need to be displayed on the GUI.
-    * @param message The message to add.
-    */
+     * Adds a message to the list of messages that need to be displayed
+     * on the GUI.
+     *
+     * @param message The message to add.
+     */
     public synchronized void addMessage(GUIMessage message) {
         if (getMessageCount() == MESSAGE_COUNT) {
             messages.remove(0);
@@ -867,7 +870,8 @@ public final class MapViewer {
      * improvements. Doesn't draw settlements, lost city rumours, fog
      * of war, optional values neither units.
      *
-     * <br><br>The same as calling <code>displayTile(g, map, tile, x, y, true);</code>.
+     * The same as calling <code>displayTile(g, map, tile, x, y, true);</code>.
+     *
      * @param g The Graphics2D object on which to draw the Tile.
      * @param tile The Tile to draw.
      */
@@ -938,8 +942,7 @@ public final class MapViewer {
      * Gets the focus of the map. That is the center tile of the displayed
      * map.
      *
-     * @return The center tile of the
-     *         displayed map
+     * @return The center tile of the displayed map
      * @see #setFocus(Tile)
      */
     public Tile getFocus() {
@@ -948,8 +951,9 @@ public final class MapViewer {
 
     /**
      * Gets the path to be drawn on the map.
-     * @return The path that should be drawn on the map
-     *        or <code>null</code> if no path should be drawn.
+     *
+     * @return The path that should be drawn on the map or
+     *     <code>null</code> if no path should be drawn.
      */
     public PathNode getGotoPath() {
         return gotoPath;
@@ -983,10 +987,12 @@ public final class MapViewer {
     }
 
     /**
-     * Calculate the bounds of the rectangle containing a Tile on the screen,
-     * and return it. If the Tile is not on-screen a maximal rectangle is returned.
-     * The bounds includes a one-tile padding area above the Tile, to include the space
-     * needed by any units in the Tile.
+     * Calculate the bounds of the rectangle containing a Tile on the
+     * screen, and return it. If the Tile is not on-screen a maximal
+     * rectangle is returned.  The bounds includes a one-tile padding
+     * area above the Tile, to include the space needed by any units
+     * in the Tile.
+     *
      * @param tile The tile on the screen.
      * @return The bounds rectangle
      */
@@ -1046,16 +1052,19 @@ public final class MapViewer {
 
     /**
      * Gets the position where a unitLabel located at tile should be drawn.
-     * @param unitLabel The unit label with the unit's image and occupation indicator drawn.
+     *
+     * @param unitLabel The unit label with the unit's image and
+     *     occupation indicator drawn.
      * @param tileP The position of the Tile on the screen.
      * @return The position where to put the label, null if tileP is null.
      */
     public Point getUnitLabelPositionInTile(JLabel unitLabel, Point tileP) {
         if (tileP != null) {
-            int labelX = tileP.x + getTileWidth() / 2 - unitLabel.getWidth() / 2;
-            int labelY = tileP.y + getTileHeight() / 2 - unitLabel.getHeight() / 2 -
-                        (int) (UNIT_OFFSET * lib.getScalingFactor());
-
+            int labelX = tileP.x + getTileWidth()
+                / 2 - unitLabel.getWidth() / 2;
+            int labelY = tileP.y + getTileHeight()
+                / 2 - unitLabel.getHeight() / 2
+                - (int) (UNIT_OFFSET * lib.getScalingFactor());
             return new Point(labelX, labelY);
         } else {
             return null;
@@ -1086,17 +1095,16 @@ public final class MapViewer {
      * the next time it'll be redrawn).
      *
      * @param tileToCheck The position of the Tile in question.
-     * @return <i>true</i> if the Tile will be drawn on the screen, <i>false</i>
-     * otherwise.
+     * @return <i>true</i> if the Tile will be drawn on the screen,
+     *     <i>false</i> otherwise.
      */
     public boolean onScreen(Tile tileToCheck) {
-        if (tileToCheck == null)
-            return false;
+        if (tileToCheck == null) return false;
         repositionMapIfNeeded();
-        return tileToCheck.getY() - 2 > topRow
-            && tileToCheck.getY() + 4 < bottomRow
-            && tileToCheck.getX() - 1 > leftColumn
-            && tileToCheck.getX() + 2 < rightColumn;
+        return (tileToCheck.getY() - 2 > topRow || alignedTop)
+            && (tileToCheck.getY() + 4 < bottomRow || alignedBottom)
+            && (tileToCheck.getX() - 1 > leftColumn || alignedLeft)
+            && (tileToCheck.getX() + 2 < rightColumn || alignedRight);
     }
 
 
@@ -2171,6 +2179,7 @@ public final class MapViewer {
      * Displays the given Tile onto the given Graphics2D object at the
      * location specified by the coordinates. Show tile names, coordinates
      * and colony values.
+     *
      * @param g The Graphics2D object on which to draw the Tile.
      * @param tile The Tile to draw.
      */
@@ -2416,6 +2425,7 @@ public final class MapViewer {
     /**
      * Displays the given Unit onto the given Graphics2D object at the
      * location specified by the coordinates.
+     *
      * @param g The Graphics2D object on which to draw the Unit.
      * @param unit The Unit to draw.
      */
@@ -2636,8 +2646,9 @@ public final class MapViewer {
     /**
      * Returns the amount of columns that are to the left of the Tile
      * that is displayed in the center of the Map.
+     *
      * @return The amount of columns that are to the left of the Tile
-     * that is displayed in the center of the Map.
+     *     that is displayed in the center of the Map.
      */
     private int getLeftColumns() {
         return getLeftColumns(focus.getY());
@@ -2646,9 +2657,10 @@ public final class MapViewer {
     /**
      * Returns the amount of columns that are to the left of the Tile
      * with the given y-coordinate.
+     *
      * @param y The y-coordinate of the Tile in question.
      * @return The amount of columns that are to the left of the Tile
-     * with the given y-coordinate.
+     *     with the given y-coordinate.
      */
     private int getLeftColumns(int y) {
         int leftColumns = leftSpace / tileWidth + 1;
@@ -2667,9 +2679,10 @@ public final class MapViewer {
     }
 
     /**
-     * Gets the message at position 'index'. The message at position 0 is the oldest
-     * message and is most likely to be removed during the next call of removeOldMessages().
-     * The higher the index of a message, the more recently it was added.
+     * Gets the message at position 'index'. The message at position 0
+     * is the oldest message and is most likely to be removed during
+     * the next call of removeOldMessages().  The higher the index of
+     * a message, the more recently it was added.
      *
      * @param index The index of the message to return.
      * @return The message at position 'index'.
@@ -2679,8 +2692,11 @@ public final class MapViewer {
     }
 
     /**
-     * Gets the amount of message that are currently being displayed on this GUI.
-     * @return The amount of message that are currently being displayed on this GUI.
+     * Gets the amount of message that are currently being displayed
+     * on this GUI.
+     *
+     * @return The amount of message that are currently being
+     *     displayed on this GUI.
      */
     private int getMessageCount() {
         return messages.size();
@@ -2984,16 +3000,19 @@ public final class MapViewer {
             rightColumns = getRightColumns();
 
         /*
-        PART 1
-        ======
-        Calculate: bottomRow, topRow, bottomRowY, topRowY
-        This will tell us which rows need to be drawn on the screen (from
-        bottomRow until and including topRow).
-        bottomRowY will tell us at which height the bottom row needs to be
-        drawn.
+          PART 1
+          ======
+          Calculate: bottomRow, topRow, bottomRowY, topRowY
+          This will tell us which rows need to be drawn on the screen (from
+          bottomRow until and including topRow).
+          bottomRowY will tell us at which height the bottom row needs to be
+          drawn.
         */
 
+        alignedTop = false;
+        alignedBottom = false;
         if (y < topRows) {
+            alignedTop = true;
             // We are at the top of the map
             bottomRow = (size.height / (halfHeight)) - 1;
             if ((size.height % (halfHeight)) != 0) {
@@ -3003,6 +3022,7 @@ public final class MapViewer {
             bottomRowY = bottomRow * (halfHeight);
             topRowY = 0;
         } else if (y >= (gameData.getMap().getHeight() - bottomRows)) {
+            alignedBottom = true;
             // We are at the bottom of the map
             bottomRow = gameData.getMap().getHeight() - 1;
 
@@ -3016,23 +3036,25 @@ public final class MapViewer {
             topRowY = bottomRowY - (bottomRow - topRow) * (halfHeight);
         } else {
             // We are not at the top of the map and not at the bottom
-            bottomRow = y + bottomRows;
+            bottomRow = y + bottomRows - 1;
             topRow = y - topRows;
             bottomRowY = topSpace + (halfHeight) * bottomRows;
             topRowY = topSpace - topRows * (halfHeight);
         }
 
         /*
-        PART 2
-        ======
-        Calculate: leftColumn, rightColumn, leftColumnX
-        This will tell us which columns need to be drawn on the screen (from
-        leftColumn until and including rightColumn).
-        leftColumnX will tell us at which x-coordinate the left column needs
-        to be drawn (this is for the Tiles where y%2==0; the others should be
-        halfWidth more to the right).
+          PART 2
+          ======
+          Calculate: leftColumn, rightColumn, leftColumnX
+          This will tell us which columns need to be drawn on the screen (from
+          leftColumn until and including rightColumn).
+          leftColumnX will tell us at which x-coordinate the left column needs
+          to be drawn (this is for the Tiles where y%2==0; the others should be
+          halfWidth more to the right).
         */
 
+        alignedLeft = false;
+        alignedRight = false;
         if (x < leftColumns) {
             // We are at the left side of the map
             leftColumn = 0;
@@ -3043,6 +3065,7 @@ public final class MapViewer {
             }
 
             leftColumnX = 0;
+            alignedLeft = true;
         } else if (x >= (gameData.getMap().getWidth() - rightColumns)) {
             // We are at the right side of the map
             rightColumn = gameData.getMap().getWidth() - 1;
@@ -3055,6 +3078,7 @@ public final class MapViewer {
             leftColumnX = size.width - tileWidth - halfWidth -
                 leftColumn * tileWidth;
             leftColumn = rightColumn - leftColumn;
+            alignedRight = true;
         } else {
             // We are not at the left side of the map and not at the right side
             leftColumn = x - leftColumns;
