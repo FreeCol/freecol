@@ -1715,8 +1715,7 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Shows the panel that allows the user to choose which unit will emigrate
-     * from Europe.  This method may only be called if the user has William
-     * Brewster in congress.
+     * from Europe.
      *
      * @param player The <code>Player</code> whose unit is emigrating.
      * @param fountainOfYouth Is this dialog displayed as a result of a
