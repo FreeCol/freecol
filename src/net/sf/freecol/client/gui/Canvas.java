@@ -1880,15 +1880,22 @@ public final class Canvas extends JDesktopPane {
 
         ArrayList<ChoiceItem<TradeAction>> choices
             = new ArrayList<ChoiceItem<TradeAction>>();
-        choices.add(new ChoiceItem<TradeAction>(
-                Messages.message("tradeProposition.toBuy"),
-                TradeAction.BUY, canBuy));
-        choices.add(new ChoiceItem<TradeAction>(
-                Messages.message("tradeProposition.toSell"),
-                TradeAction.SELL, canSell));
-        choices.add(new ChoiceItem<TradeAction>(
-                Messages.message("tradeProposition.toGift"),
-                TradeAction.GIFT, canGift));
+        if (canBuy) {
+            choices.add(new ChoiceItem<TradeAction>(
+                    Messages.message("tradeProposition.toBuy"),
+                    TradeAction.BUY, canBuy));
+        }
+        if (canSell) {
+            choices.add(new ChoiceItem<TradeAction>(
+                    Messages.message("tradeProposition.toSell"),
+                    TradeAction.SELL, canSell));
+        }
+        if (canGift) {
+            choices.add(new ChoiceItem<TradeAction>(
+                    Messages.message("tradeProposition.toGift"),
+                    TradeAction.GIFT, canGift));
+        }
+        if (choices.isEmpty()) return null;
 
         return showChoiceDialog(true, settlement.getTile(), text,
                                 gui.getImageIcon(settlement, false),

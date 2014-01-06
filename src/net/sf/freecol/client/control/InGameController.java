@@ -3344,10 +3344,10 @@ public final class InGameController implements NetworkConstants {
      */
     private boolean moveTradeIndianSettlement(Unit unit, Direction direction) {
         Settlement settlement = getSettlementAt(unit.getTile(), direction);
-        boolean[] results;
 
+        boolean[] results = askServer()
+            .openTransactionSession(unit, settlement);
         for (;;) {
-            results = askServer().openTransactionSession(unit, settlement);
             if (results == null) break;
             // The session tracks buy/sell/gift events and disables
             // them when one happens.  So only offer such options if
@@ -3363,16 +3363,23 @@ public final class InGameController implements NetworkConstants {
             if (act == null) break;
             switch (act) {
             case BUY:
-                attemptBuyFromSettlement(unit, settlement);
+                if (attemptBuyFromSettlement(unit, settlement)) {
+                    results[0] = false;
+                }
                 break;
             case SELL:
-                attemptSellToSettlement(unit, settlement);
+                if (attemptSellToSettlement(unit, settlement)) {
+                    results[1] = false;
+                }
                 break;
             case GIFT:
-                attemptGiftToSettlement(unit, settlement);
+                if (attemptGiftToSettlement(unit, settlement)) {
+                    results[2] = false;
+                }
                 break;
             default:
                 logger.warning("showIndianSettlementTradeDialog fail: " + act);
+                results = null;
                 break;
             }
         }
@@ -3426,14 +3433,17 @@ public final class InGameController implements NetworkConstants {
      *
      * @param unit The <code>Unit</code> that is trading.
      * @param settlement The <code>Settlement</code> that is trading.
+     * @return True if a purchase occurs.
      */
-    private void attemptBuyFromSettlement(Unit unit, final Settlement settlement) {
+    private boolean attemptBuyFromSettlement(Unit unit,
+                                             final Settlement settlement) {
+        final Game game = freeColClient.getGame();
         Player player = freeColClient.getMyPlayer();
         Goods goods = null;
 
         // Get list of goods for sale
-        List<Goods> forSale
-            = askServer().getGoodsForSaleInSettlement(freeColClient.getGame(), unit, settlement);
+        List<Goods> forSale = askServer()
+            .getGoodsForSaleInSettlement(game, unit, settlement);
         for (;;) {
             if (forSale.isEmpty()) {
                 // There is nothing to sell to the player
@@ -3443,7 +3453,7 @@ public final class InGameController implements NetworkConstants {
                                                        "trade.nothingToSell");
                         }
                     });
-                return;
+                break;
             }
 
             // Choose goods to buy
@@ -3464,30 +3474,32 @@ public final class InGameController implements NetworkConstants {
                     goods, gold);
                 if (gold <= 0) {
                     showTradeFail(gold, settlement, goods);
-                    return;
+                    break;
                 }
 
                 // Show dialog for buy proposal
                 boolean canBuy = player.checkGold(gold);
                 GUI.BuyAction act
                     = gui.showBuyDialog(unit, settlement, goods, gold, canBuy);
-                if (act == null) return; // User cancelled
+                if (act == null) break; // User cancelled
                 switch (act) {
                 case BUY: // Accept price, make purchase
                     if (askServer().buyFromSettlement(unit,
                             settlement, goods, gold)) {
                         gui.updateMenuBar(); // Assume success
+                        return true;
                     }
-                    return;
+                    return false;
                 case HAGGLE: // Try to negotiate a lower price
                     gold = gold * 9 / 10;
                     break;
                 default:
                     logger.warning("showBuyDialog fail: " + act);
-                    return;
+                    return false;
                 }
             }
         }
+        return false;
     }
 
     /**
@@ -3495,8 +3507,9 @@ public final class InGameController implements NetworkConstants {
      *
      * @param unit The <code>Unit</code> that is trading.
      * @param settlement The <code>Settlement</code> that is trading.
+     * @return True if a sale occurs.
      */
-    private void attemptSellToSettlement(Unit unit, Settlement settlement) {
+    private boolean attemptSellToSettlement(Unit unit, Settlement settlement) {
         Goods goods = null;
         for (;;) {
             // Choose goods to sell
@@ -3518,33 +3531,35 @@ public final class InGameController implements NetworkConstants {
 
                 if (gold <= 0) {
                     showTradeFail(gold, settlement, goods);
-                    return;
+                    break;
                 }
 
                 // Show dialog for sale proposal
                 GUI.SellAction act
                     = gui.showSellDialog(unit, settlement, goods, gold);
-                if (act == null) return; // Cancelled
+                if (act == null) break; // Cancelled
                 switch (act) {
                 case SELL: // Accepted price, make the sale
                     if (askServer().sellToSettlement(unit,
                             settlement, goods, gold)) {
                         gui.updateMenuBar(); // Assume success
+                        return true;
                     }
-                    return;
+                    return false;
                 case HAGGLE: // Ask for more money
                     gold = (gold * 11) / 10;
                     break;
                 case GIFT: // Decide to make a gift of the goods
                     askServer().deliverGiftToSettlement(unit,
                         settlement, goods);
-                    return;
+                    return false;
                 default:
                     logger.warning("showSellDialog fail: " + act);
-                    return;
+                    return false;
                 }
             }
         }
+        return false;
     }
 
     /**
@@ -3552,8 +3567,9 @@ public final class InGameController implements NetworkConstants {
      *
      * @param unit The <code>Unit</code> that is trading.
      * @param settlement The <code>Settlement</code> that is trading.
+     * @return True if the gift is given.
      */
-    private void attemptGiftToSettlement(Unit unit, Settlement settlement) {
+    private boolean attemptGiftToSettlement(Unit unit, Settlement settlement) {
         List<ChoiceItem<Goods>> choices = new ArrayList<ChoiceItem<Goods>>();
         for (Goods g : unit.getGoodsList()) {
             String label = Messages.message(g.getLabel(true));
@@ -3561,9 +3577,11 @@ public final class InGameController implements NetworkConstants {
         }
         Goods goods = gui.showChoiceDialog(true, unit.getTile(),
             Messages.message("gift.text"), settlement, "cancel", choices);
-        if (goods != null) {
-            askServer().deliverGiftToSettlement(unit, settlement, goods);
+        if (goods != null
+            && askServer().deliverGiftToSettlement(unit, settlement, goods)) {
+            return true;
         }
+        return false;
     }
 
     /**
