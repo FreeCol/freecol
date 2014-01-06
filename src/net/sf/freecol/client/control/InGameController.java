@@ -3749,6 +3749,8 @@ public final class InGameController implements NetworkConstants {
      */
     public void newTurn(String turnString) {
         final Game game = freeColClient.getGame();
+        final Player player = freeColClient.getMyPlayer();
+
         try {
             int turnNumber = Integer.parseInt(turnString);
             game.setTurn(new Turn(turnNumber));
@@ -3762,9 +3764,8 @@ public final class InGameController implements NetworkConstants {
 
         Turn currTurn = game.getTurn();
         if (currTurn.isFirstSeasonTurn()) {
-            gui.showInformationMessage(null,
-                StringTemplate.template("twoTurnsPerYear")
-                              .addName("%year%", turnString));
+            player.addModelMessage(new ModelMessage("twoTurnsPerYear", player)
+                .addName("%year%", turnString));
         }
     }
 
@@ -4110,10 +4111,13 @@ public final class InGameController implements NetworkConstants {
             && freeColClient.currentPlayerIsMyPlayer()) gui.closeMenus();
         FreeColDebugger.finishDebugRun(freeColClient, false);
 
-        Game game = freeColClient.getGame();
+        final Game game = freeColClient.getGame();
         game.setCurrentPlayer(player);
         if (freeColClient.getMyPlayer().equals(player)) {
+            // Get turn report out quickly before more message display occurs.
             player.removeDisplayedModelMessages();
+            displayModelMessages(true, true);
+
             player.invalidateCanSeeTiles();
 
             // auto-save the game (if it isn't newly loaded)
@@ -4147,7 +4151,6 @@ public final class InGameController implements NetworkConstants {
             if (!freeColClient.isSinglePlayer()) {
                 gui.playSound("sound.anthem." + player.getNationId());
             }
-            displayModelMessages(true, true);
         }
         freeColClient.updateActions();
 
