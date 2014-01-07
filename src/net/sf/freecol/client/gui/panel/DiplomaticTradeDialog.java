@@ -53,6 +53,7 @@ import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTradeItem;
 import net.sf.freecol.common.model.DiplomaticTrade;
+import net.sf.freecol.common.model.DiplomaticTrade.TradeContext;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
 import net.sf.freecol.common.model.GoldTradeItem;
 import net.sf.freecol.common.model.Goods;
@@ -615,14 +616,12 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
 
         setFocusCycleRoot(true);
 
-        boolean newOffer = agreement == null;
         this.unit = unit;
         this.settlement = settlement;
         this.otherPlayer = (unitPlayer == player) ? colonyPlayer
             : unitPlayer;
-        this.agreement = (!newOffer) ? agreement
-            : new DiplomaticTrade(unit.getGame(), unitPlayer, colonyPlayer, 
-                                  null, 0);
+        this.agreement = agreement;
+
         t = StringTemplate.template("negotiationDialog.demand")
             .addStringTemplate("%nation%", unitPlayer.getNationName());
         this.demandMessage = Messages.message(t);
@@ -635,37 +634,29 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             .addStringTemplate("%nation%", unitPlayer.getNationName());
         this.exchangeMessage = Messages.message(t);
 
-        boolean negotiate = unit.hasAbility(Ability.NEGOTIATE);
-        boolean trade = unit.isCarrier()
-            && unitPlayer.hasAbility(Ability.TRADE_WITH_FOREIGN_COLONIES);
-        boolean tribute = unit.isOffensiveUnit();
+        TradeContext context = agreement.getContext();
 
         NationSummary ns = getController().getNationSummary(otherPlayer);
-        int gold = (ns == null) ? HUGE_DEMAND : ns.getGold();
+        int gold = (ns == null
+            || ns.getGold() == Player.GOLD_NOT_ACCOUNTED) ? HUGE_DEMAND
+            : ns.getGold();
         this.goldDemandPanel = new GoldTradeItemPanel(otherPlayer, gold);
 
-        if (player.getGold() != Player.GOLD_NOT_ACCOUNTED) {
-            gold = player.getGold();
-        }
+        gold = (player.getGold() == Player.GOLD_NOT_ACCOUNTED) ? HUGE_DEMAND
+            : player.getGold();
         this.goldOfferPanel = new GoldTradeItemPanel(player, gold);
 
-        if (negotiate || tribute) {
+        switch (context) {
+        case DIPLOMATIC:
             this.stancePanel = new StanceTradeItemPanel(player, otherPlayer);
-            if (player.atWarWith(otherPlayer)
-                && (newOffer || agreement.getStance() == null)) {
-                this.agreement.add(new StanceTradeItem(getGame(), player,
-                        otherPlayer, Stance.PEACE));
-            }
-        } else {
-            this.stancePanel = null;
-        }
-        if (negotiate) {
             this.colonyDemandPanel = new ColonyTradeItemPanel(otherPlayer);
             this.colonyOfferPanel = new ColonyTradeItemPanel(player);
-        } else {
+            this.goodsDemandPanel = this.goodsOfferPanel = null;
+            this.unitOfferPanel = this.unitDemandPanel = null;
+            break;
+        case TRADE:
+            this.stancePanel = null;
             this.colonyDemandPanel = this.colonyOfferPanel = null;
-        }
-        if (trade) {
             this.goodsDemandPanel = new GoodsTradeItemPanel(otherPlayer,
                                                             getAnyGoods());
             List<Goods> goods = (unitPlayer == player) ? unit.getGoodsList()
@@ -681,9 +672,15 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             this.unitOfferPanel = new UnitTradeItemPanel(player,
                 ((unitPlayer == player) ? getUnitUnitList(unit)
                     : settlement.getUnitList()));
-        } else {
+            break;
+        case TRIBUTE:
+            this.stancePanel = new StanceTradeItemPanel(player, otherPlayer);
+            this.colonyDemandPanel = this.colonyOfferPanel = null;
             this.goodsDemandPanel = this.goodsOfferPanel = null;
             this.unitOfferPanel = this.unitDemandPanel = null;
+            break;
+        default:
+            throw new IllegalStateException("Bogus trade context: " + context);
         }
 
         this.summary = new MigPanel();
@@ -700,23 +697,27 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         panel.add(this.summary, "spany, top");
         panel.add(this.goldOfferPanel);
 
-        if (negotiate) {
+        if (this.colonyDemandPanel != null) {
             panel.add(this.colonyDemandPanel);
             panel.add(this.colonyOfferPanel);
+        }
+        if (this.stancePanel != null) {
             panel.add(this.stancePanel, "skip");
         }
-        if (trade) {
+        if (this.goodsDemandPanel != null) {
             panel.add(this.goodsDemandPanel);
             panel.add(this.goodsOfferPanel);
         }
-        panel.add(this.unitDemandPanel);
-        panel.add(this.unitOfferPanel);
+        if (this.unitDemandPanel != null) {
+            panel.add(this.unitDemandPanel);
+            panel.add(this.unitOfferPanel);
+        }
         panel.setPreferredSize(panel.getPreferredSize());
 
         DiplomaticTrade bogus = null;
         String str;
         List<ChoiceItem<DiplomaticTrade>> c = choices();
-        if (!newOffer) { // A new offer can not be accepted
+        if (agreement.getVersion() > 0) { // A new offer can not be accepted
             str = Messages.message("negotiationDialog.accept");
             c.add(new ChoiceItem<DiplomaticTrade>(str, bogus));
         }

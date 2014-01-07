@@ -22,13 +22,17 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.StringTemplate;
 
 import org.w3c.dom.Element;
 
@@ -38,6 +42,17 @@ import org.w3c.dom.Element;
  * make another.
  */
 public class DiplomaticTrade extends FreeColObject {
+
+    /** A context for the trade. */
+    public static enum TradeContext {
+        DIPLOMATIC, /** Scout negotiating */
+        TRADE,      /** Carrier trading */
+        TRIBUTE;    /** Offensive unit demanding */
+
+        public String getKey() {
+            return this.toString().toLowerCase(Locale.US);
+        }
+    }
 
     /** A type for the trade status. */
     public static enum TradeStatus {
@@ -56,6 +71,9 @@ public class DiplomaticTrade extends FreeColObject {
     /** The player who is to accept this agreement. */
     private Player recipient;
 
+    /** The context of this agreement. */
+    private TradeContext context;
+
     /** The status of this agreement. */
     private TradeStatus status;
 
@@ -70,14 +88,17 @@ public class DiplomaticTrade extends FreeColObject {
      * Creates a new <code>DiplomaticTrade</code> instance.
      *
      * @param game The enclosing <code>Game</code>.
+     * @param context The <code>TradeContext</code> for this agreement.
      * @param sender The sending <code>Player</code>.
      * @param recipient The recipient <code>Player</code>.
      * @param items A list of items to trade.
      */
-    public DiplomaticTrade(Game game, Player sender, Player recipient,
+    public DiplomaticTrade(Game game, TradeContext context,
+                           Player sender, Player recipient,
                            List<TradeItem> items, int version) {
         setId("");
         this.game = game;
+        this.context = context;
         this.sender = sender;
         this.recipient = recipient;
         this.status = TradeStatus.PROPOSE_TRADE;
@@ -98,6 +119,15 @@ public class DiplomaticTrade extends FreeColObject {
         readFromXMLElement(element);
     }
 
+
+    /**
+     * Get the trade context.
+     *
+     * @return The context of this agreement.
+     */
+    public TradeContext getContext() {
+        return context;
+    }
 
     /**
      * Get the trade status.
@@ -161,6 +191,21 @@ public class DiplomaticTrade extends FreeColObject {
      */
     public Player getOtherPlayer(Player player) {
         return (sender == player) ? recipient : sender;
+    }
+
+    /**
+     * Handy utility to get the message associated with sending this
+     * agreement from a player to a settlement owner.
+     *
+     * @param player The sending <code>Player</code>.
+     * @param settlement The <code>Settlement</code> to send to.
+     * @return A <code>StringTemplate</code> for the message.
+     */
+    public StringTemplate getSendMessage(Player player, Settlement sett) {
+        return StringTemplate.template("negotiationDialog.send."
+            + getContext().getKey())
+            .addStringTemplate("%nation%", sett.getOwner().getNationName())
+            .addStringTemplate("%settlement%", sett.getLocationNameFor(player));
     }
 
     /**
@@ -332,6 +377,7 @@ public class DiplomaticTrade extends FreeColObject {
 
     // Serialization
 
+    private static final String CONTEXT_TAG = "context";
     private static final String RECIPIENT_TAG = "recipient";
     private static final String SENDER_TAG = "sender";
     private static final String STATUS_TAG = "status";
@@ -344,6 +390,8 @@ public class DiplomaticTrade extends FreeColObject {
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
+
+        xw.writeAttribute(CONTEXT_TAG, context);
 
         xw.writeAttribute(SENDER_TAG, sender);
 
@@ -370,6 +418,9 @@ public class DiplomaticTrade extends FreeColObject {
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
+
+        context = xr.getAttribute(CONTEXT_TAG, TradeContext.class,
+                                  (TradeContext)null);
 
         sender = xr.getAttribute(game, SENDER_TAG,
                                  Player.class, (Player)null);
