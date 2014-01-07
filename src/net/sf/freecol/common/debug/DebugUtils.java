@@ -372,7 +372,9 @@ public class DebugUtils {
         sPlayer.invalidateCanSeeTiles();//+vis(sPlayer)
 
         freeColClient.getConnectController().reconnect();
-        Unit unit = game.getFreeColGameObject(sUnit.getId(), Unit.class);
+        // Note "game" is no longer valid after reconnect.
+        Unit unit = freeColClient.getGame()
+            .getFreeColGameObject(sUnit.getId(), Unit.class);
         if (unit != null) gui.setActiveUnit(unit);
     }
 
