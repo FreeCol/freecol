@@ -349,7 +349,7 @@ public final class TradeRoutePanel extends FreeColPanel {
             }
             getController().setTradeRoutes(routes);
             if (unit != null && route != null) {
-                unit.setTradeRoute(route);
+                getController().assignTradeRoute(unit, route);
             }
             super.actionPerformed(event);
 
