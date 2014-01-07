@@ -1770,9 +1770,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     brave.setType(Utils.getRandomMember(logger,//-vis: ditto
                                   "Choose convert type", converts, random));
                     brave.setLocation(colony.getTile());//-vis: safe/colony
-                    cs.add(See.only(this), settlement);
-                    cs.addDispose(See.only(this), settlement.getTile(),
-                                  brave);//-vis: safe/settlement
+                    cs.add(See.only(this), settlement, brave);
                     cs.add(See.only(other), colony.getTile());
                     cs.addMessage(See.only(other),
                         new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,

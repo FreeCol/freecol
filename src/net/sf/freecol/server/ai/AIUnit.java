@@ -595,7 +595,8 @@ public class AIUnit extends AIObject implements Transportable {
         if (aiOwner != null) {
             aiOwner.removeAIUnit(this);
         } else {
-            // This happens with missionaries.
+            // This happens with missionaries, and legitimately when a unit
+            // changes owner.  TODO: cleanup.
             logger.warning("Disposing of " + getId() + " but owner is null!");
         }
         abortMission("AIUnit-disposed");
