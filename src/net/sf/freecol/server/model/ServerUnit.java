@@ -670,20 +670,34 @@ public class ServerUnit extends Unit implements ServerModelObject {
         boolean mounds = rumour == RumourType.MOUNDS;
         if (mounds) {
             boolean done = false;
-            boolean burial = false;
+            boolean nothing = false;
             while (!done) {
                 rumour = lostCity.chooseType(this, random);
                 switch (rumour) {
-                case EXPEDITION_VANISHES: case NOTHING: case TRIBAL_CHIEF:
-                case RUINS:
+                case NOTHING: // Do not accept nothing-result the first time.
+                    if (nothing) {
+                        done = true;
+                    } else {
+                        nothing = true;
+                    }
+                    break;
+                case EXPEDITION_VANISHES: case TRIBAL_CHIEF:
                     done = true;
                     break;
+                case RUINS:
+                    done = true;
+                    // Misiulo confirms that in Col1 deSoto does *not*
+                    // protect against a burial ground at the same
+                    // time as a ruins find!
+                    if (Utils.randomInt(logger, "Ruins+Burial", random, 100)
+                        >= spec.getInteger(GameOptions.BAD_RUMOUR)) break;
+                    // Fall through
                 case BURIAL_GROUND:
-                    if (tile.getOwner() != null && tile.getOwner().isIndian()
-                        && !burial) {
+                    if (tile.getOwner() != null
+                        && tile.getOwner().isIndian()) {
                         csNativeBurialGround(cs);
-                        burial = true;
                     }
+                    done = true;
                     break;
                 default:
                     ; // unacceptable result for mounds
