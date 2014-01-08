@@ -1813,6 +1813,39 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
+     * Display the first contact dialog (which is really just a
+     * non-modal confirm dialog).
+     *
+     * @param player The <code>Player</code> making contact.
+     * @param other The <code>Player</code> to contact.
+     * @param tile An optional <code>Tile</code> on offer.
+     * @param settlementCount The number of settlements the other
+     *     player has (from the server, other.getNumberOfSettlements()
+     *     is wrong here!).
+     * @param handler A <code>DialogHandler</code> for the dialog response.
+     */
+    public void showFirstContactDialog(Player player, Player other,
+                                       Tile tile, int settlementCount,
+                                       DialogHandler<Boolean> handler) {
+        String messageId = (tile != null) ? "welcomeOffer.text"
+            : "welcomeSimple.text";
+        String type = ((IndianNationType)other.getNationType())
+            .getSettlementTypeKey(true);
+        StringTemplate template = StringTemplate.template(messageId)
+            .addStringTemplate("%nation%", other.getNationName())
+            .addName("%camps%", Integer.toString(settlementCount))
+            .add("%settlementType%", type);
+        JTextArea text = GUI.getDefaultTextArea(Messages.message(template));
+
+        SwingUtilities.invokeLater(
+            new DialogCallback<Boolean>(
+                new FreeColConfirmDialog(freeColClient, false, text,
+                    gui.getImageIcon(other, false),
+                    "welcome.yes", "welcome.no"),
+                null, handler));
+    }
+
+    /**
      * Detailed view of a foreign colony when in debug mode.
      *
      * @param settlement The <code>Settlement</code> with the colony

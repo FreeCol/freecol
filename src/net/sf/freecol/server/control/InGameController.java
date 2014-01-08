@@ -1631,32 +1631,16 @@ public final class InGameController extends Controller {
      * @param serverPlayer The <code>ServerPlayer</code> who landed.
      * @param unit The <code>Unit</code> that has come ashore.
      * @param name The new land name.
-     * @param welcomer An optional <code>ServerPlayer</code> that has offered
-     *            a treaty.
-     * @param camps An optional number of camps for the welcome message.
-     * @param accept True if the treaty has been accepted.
      * @return An <code>Element</code> encapsulating this action.
      */
     public Element setNewLandName(ServerPlayer serverPlayer, Unit unit,
-                                  String name, ServerPlayer welcomer, int camps,
-                                  boolean accept) {
+                                  String name) {
         ChangeSet cs = new ChangeSet();
 
         // Special case of a welcome from an adjacent native unit,
         // offering the land the landing unit is on if a peace treaty
         // is accepted.
         serverPlayer.setNewLandName(name);
-        if (welcomer != null) {
-            if (accept) { // Claim land
-                Tile tile = unit.getTile();
-                tile.cacheUnseen();//+til
-                tile.changeOwnership(serverPlayer, null);//-til
-                cs.add(See.perhaps(), tile);
-            } else { // Consider not accepting the treaty to be an insult.
-                welcomer.csModifyTension(serverPlayer,
-                    Tension.TENSION_ADD_MAJOR, cs);//+til
-            }
-        }
 
         // Update the name and note the history.
         cs.addPartial(See.only(serverPlayer), serverPlayer, "newLandName");
@@ -1666,8 +1650,6 @@ public final class InGameController extends Controller {
                 .addName("%name%", name);
         cs.addHistory(serverPlayer, h);
 
-        // Only the tile change is not private.
-        sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
 
@@ -3038,6 +3020,45 @@ public final class InGameController extends Controller {
             srcPlayer.invalidateCanSeeTiles();//+vis(srcPlayer)
             dstPlayer.invalidateCanSeeTiles();//+vis(dstPlayer)
         }
+    }
+
+    /**
+     * Handle first contact between European and native player.
+     *
+     * Note that we check for a diplomacy session, but do only bother
+     * in the case of tile!=null as that is the only possibility for
+     * some benefit.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> making contact.
+     * @param other The native <code>ServerPlayer</code> to contact.
+     * @param tile A <code>Tile</code> on offer at first landing.
+     * @param result Whether the initial peace treaty was accepted.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element firstContact(ServerPlayer serverPlayer, ServerPlayer other,
+                                Tile tile, boolean result) {
+        ChangeSet cs = new ChangeSet();
+        if (result) {
+            if (tile != null) {
+                Unit u = tile.getFirstUnit();
+                Settlement s = tile.getOwningSettlement();
+                DiplomacySession session
+                    = TransactionSession.lookup(DiplomacySession.class, u, s);
+                if (session == null) {
+                    return DOMMessage.clientError("No diplomacy in effect for: "
+                        + tile.getId());
+                }
+                tile.cacheUnseen();//+til
+                tile.changeOwnership(serverPlayer, null);//-til
+                cs.add(See.perhaps(), tile);
+            }
+        } else { // Consider not accepting the treaty to be an insult.
+            other.csModifyTension(serverPlayer,
+                Tension.TENSION_ADD_MAJOR, cs);//+til
+        }
+
+        sendToOthers(serverPlayer, cs);
+        return cs.build(serverPlayer);
     }
 
     /**

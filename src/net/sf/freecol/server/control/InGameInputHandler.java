@@ -56,6 +56,7 @@ import net.sf.freecol.common.networking.EmbarkMessage;
 import net.sf.freecol.common.networking.EmigrateUnitMessage;
 import net.sf.freecol.common.networking.EquipForRoleMessage;
 import net.sf.freecol.common.networking.EquipUnitMessage;
+import net.sf.freecol.common.networking.FirstContactMessage;
 import net.sf.freecol.common.networking.GetNationSummaryMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.GoodsForSaleMessage;
@@ -313,6 +314,14 @@ public final class InGameInputHandler extends InputHandler
             public Element handle(Player player, Connection connection,
                                   Element element) {
                 return new EmigrateUnitMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(FirstContactMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new FirstContactMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
         register("endTurn",

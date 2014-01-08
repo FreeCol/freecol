@@ -66,7 +66,6 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HighScore;
-import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Limit;
 import net.sf.freecol.common.model.Location;
@@ -2243,6 +2242,20 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
+     * A player makes first contact with a native player.
+     *
+     * @param player The <code>Player</code> making contact.
+     * @param other The native <code>Player</code> being contacted.
+     * @param tile An optional <code>Tile</code> to offer the player if
+     *     they have made a first landing.
+     * @param result Whether the initial treaty was accepted.
+     */
+    public void firstContact(Player player, Player other, Tile tile,
+                             boolean result) {
+        askServer().firstContact(player, other, tile, result);
+    }
+
+    /**
      * Retrieves client statistics.
      *
      * @return A <code>Map</code> containing the client statistics.
@@ -3828,30 +3841,10 @@ public final class InGameController implements NetworkConstants {
      *
      * @param unit The <code>Unit</code> that landed.
      * @param name The name to use.
-     * @param welcomer An optional native <code>Player</code> present at the
-     *     landing.
-     * @param camps The number of camps for the welcoming message.
      */
-    public void nameNewLand(Unit unit, String name, Player welcomer,
-                            String camps) {
-        // Check if there is a welcoming native offering land.
-        Tile tile = unit.getTile();
-        boolean accept = false;
-        if (welcomer != null) {
-            String messageId = (welcomer.owns(tile))
-                ? "welcomeOffer.text" : "welcomeSimple.text";
-            String type = ((IndianNationType)welcomer.getNationType())
-                .getSettlementTypeKey(true);
-            accept = gui.showConfirmDialog(true, tile,
-                StringTemplate.template(messageId)
-                    .addStringTemplate("%nation%", welcomer.getNationName())
-                    .addName("%camps%", camps)
-                    .add("%settlementType%", type),
-                welcomer, "welcome.yes", "welcome.no");
-        }
-
+    public void nameNewLand(Unit unit, String name) {
         // Respond to the server.
-        askServer().newLandName(unit, name, welcomer, accept);
+        askServer().newLandName(unit, name);
 
         // The name is set, bring up the first landing panel.
         final Player player = unit.getOwner();

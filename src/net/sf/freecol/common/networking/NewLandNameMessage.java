@@ -34,30 +34,12 @@ import org.w3c.dom.Element;
  */
 public class NewLandNameMessage extends DOMMessage {
 
-    /**
-     * The unit that has come ashore.
-     */
+    /** The unit that has come ashore. */
     private String unitId;
 
-    /**
-     * The name to use.
-     */
+    /** The name to use. */
     private String newLandName;
 
-    /**
-     * An optional welcoming player.
-     */
-    private String welcomerId;
-
-    /**
-     * An optional number of camps for the welcome message.
-     */
-    private String campCount;
-
-    /**
-     * Has a treaty been accepted with the welcomer?
-     */
-    private String acceptString;
 
     /**
      * Create a new <code>NewLandNameMessage</code> with the
@@ -65,24 +47,12 @@ public class NewLandNameMessage extends DOMMessage {
      *
      * @param unit The <code>Unit</code> that has come ashore.
      * @param newLandName The new land name.
-     * @param welcomer The optional <Player>welcomer</code> nation.
-     * @param camps The optional number of camps of the welcomer nation.
-     * @param accept Accept the welcomer offer?
      */
-    public NewLandNameMessage(Unit unit, String newLandName,
-                              Player welcomer, int camps, boolean accept) {
+    public NewLandNameMessage(Unit unit, String newLandName) {
         super(getXMLElementTagName());
 
         this.unitId = unit.getId();
         this.newLandName = newLandName;
-        if (welcomer == null) {
-            this.welcomerId = null;
-            this.campCount = null;
-        } else {
-            this.welcomerId = welcomer.getId();
-            this.campCount = Integer.toString(camps);
-        }
-        this.acceptString = Boolean.toString(accept);
     }
 
     /**
@@ -97,14 +67,6 @@ public class NewLandNameMessage extends DOMMessage {
 
         this.unitId = element.getAttribute("unit");
         this.newLandName = element.getAttribute("newLandName");
-        if (element.hasAttribute("welcomer")) {
-            this.welcomerId = element.getAttribute("welcomer");
-            this.campCount = element.getAttribute("camps");
-        } else {
-            this.welcomerId = null;
-            this.campCount = null;
-        }
-        this.acceptString = element.getAttribute("accept");
     }
 
     /**
@@ -126,33 +88,6 @@ public class NewLandNameMessage extends DOMMessage {
         return newLandName;
     }
 
-    /**
-     * Public accessor for the welcomer.
-     *
-     * @param game The <code>Game</code> to look for a welcomer in.
-     * @return The welcomer of this message.
-     */
-    public Player getWelcomer(Game game) {
-        return game.getFreeColGameObject(welcomerId, Player.class);
-    }
-
-    /**
-     * Sets the accept value of this message.
-     *
-     * @param accept The new accept value.
-     */
-    public void setAccept(boolean accept) {
-        this.acceptString = Boolean.toString(accept);
-    }
-
-    /**
-     * Public accessor for the camp count.
-     *
-     * @return The camp count of this message.
-     */
-    public String getCamps() {
-        return campCount;
-    }
 
     /**
      * Handle a "newLandName"-message.
@@ -187,45 +122,9 @@ public class NewLandNameMessage extends DOMMessage {
             return DOMMessage.clientError("Empty new land name");
         }
 
-        ServerPlayer welcomer = null;
-        int camps = 0;
-        if (welcomerId != null) {
-            welcomer = game.getFreeColGameObject(welcomerId,
-                                                 ServerPlayer.class);
-            if (welcomer == null) {
-                return DOMMessage.clientError("Not a player: " + welcomerId);
-            } else if (!welcomer.isIndian()) {
-                return DOMMessage.clientError("Not a native player: "
-                    + welcomerId);
-            }
-            boolean foundWelcomer = false;
-            for (Tile t : tile.getSurroundingTiles(1)) {
-                if (t.getFirstUnit() != null
-                    && t.getFirstUnit().getOwner() == welcomer) {
-                    foundWelcomer = true;
-                    break;
-                }
-            }
-            if (!foundWelcomer) {
-                return DOMMessage.clientError("Unit is not next to welcomer.");
-            } else if (!welcomer.owns(tile)) {
-                return DOMMessage.clientError("Welcomer offers unowned tile: "
-                    + tile.getId());
-            }
-            try {
-                camps = Integer.parseInt(campCount);
-            } catch (NumberFormatException e) {
-                return DOMMessage.clientError("Invalid camp count: "
-                    + campCount);
-            }
-        }
-
-        boolean accept = Boolean.valueOf(acceptString);
-
         // Set name.
         return server.getInGameController()
-            .setNewLandName(serverPlayer, unit, newLandName, welcomer, camps,
-                accept);
+            .setNewLandName(serverPlayer, unit, newLandName);
     }
 
     /**
@@ -234,13 +133,9 @@ public class NewLandNameMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createMessage(getXMLElementTagName(),
+        return createMessage(getXMLElementTagName(),
             "unit", unitId,
             "newLandName", newLandName);
-        if (welcomerId != null) result.setAttribute("welcomer", welcomerId);
-        if (campCount != null) result.setAttribute("camps", campCount);
-        if (acceptString != null) result.setAttribute("accept", acceptString);
-        return result;
     }
 
     /**

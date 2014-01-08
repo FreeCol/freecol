@@ -1486,14 +1486,13 @@ public class GUI {
     }
 
     public void showNameNewLandDialog(String key, final String defaultName,
-                                      final Unit unit, final Player welcomer,
-                                      final String camps) {
+                                      final Unit unit) {
         if (canvas == null) return;
         canvas.showNameNewLandDialog(key, defaultName, unit,
             new DialogHandler<String>() {
                 public void handle(String name) {
                     if (name == null || name.length() == 0) name = defaultName;
-                    igc().nameNewLand(unit, name, welcomer, camps);
+                    igc().nameNewLand(unit, name);
                 }
             });
     }
@@ -1508,6 +1507,17 @@ public class GUI {
                 public void handle(String name) {
                     if (name == null || name.length() == 0) name = defaultName;
                     igc().nameNewRegion(tile, unit, region, name);
+                }
+            });
+    }
+
+    public void showFirstContactDialog(final Player player, final Player other,
+                                       final Tile tile, int settlementCount) {
+        if (canvas == null) return;
+        canvas.showFirstContactDialog(player, other, tile, settlementCount,
+            new DialogHandler<Boolean>() {
+                public void handle(Boolean b) {
+                    igc().firstContact(player, other, tile, b);
                 }
             });
     }

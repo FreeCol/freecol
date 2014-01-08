@@ -798,6 +798,23 @@ public abstract class ServerAPI {
     }
 
     /**
+     * Server query-response for responding to a first contact message.
+     *
+     * @param player The <code>Player</code> making contact.
+     * @param other The native <code>Player</code> being contacted.
+     * @param tile An optional <code>Tile</code> to offer the player if
+     *     they have made a first landing.
+     * @param result Whether the initial peace treaty was accepted.
+     * @return True if the server interaction succeeded.
+     */
+    public boolean firstContact(Player player, Player other, Tile tile,
+                                boolean result) {
+        return askHandling(new FirstContactMessage(player, other, tile)
+                .setResult(result),
+            null, null);
+    }
+
+    /**
      * Server query-response to get a list of goods for sale from a settlement.
      *
      * @param unit The <code>Unit</code> that is trading.
@@ -1041,10 +1058,8 @@ public abstract class ServerAPI {
      * @param accept True if the treaty was accepted.
      * @return True if the server interaction succeeded.
      */
-    public boolean newLandName(Unit unit, String name, Player welcomer,
-                               boolean accept) {
-        return askHandling(new NewLandNameMessage(unit, name, welcomer, -1,
-                accept),
+    public boolean newLandName(Unit unit, String name) {
+        return askHandling(new NewLandNameMessage(unit, name),
             null, null);
     }
 

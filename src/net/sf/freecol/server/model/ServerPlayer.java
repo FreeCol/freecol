@@ -79,6 +79,7 @@ import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.FirstContactMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.util.RandomChoice;
@@ -3874,32 +3875,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
-     * Check for a special contact panel for a nation.  If not found,
-     * check for a more general one if allowed.
-     * Assumes this player is European.
-     *
-     * @param other The <code>Player</code> nation to being contacted.
-     * @return An <code>EventPanel</code> key, or null if none appropriate.
-     */
-    private String getContactKey(ServerPlayer other) {
-        String key = "EventPanel.MEETING_" + other.getNationNameKey();
-        if (!Messages.containsKey(key)) {
-            if (other.isEuropean()) {
-                key = (hasContactedEuropeans()) ? null
-                    : "EventPanel.MEETING_EUROPEANS";
-            } else {
-                key = (hasContactedIndians()) ? null
-                    : "EventPanel.MEETING_NATIVES";
-            }
-        }
-        return key;
-    }
-
-    /**
      * Make contact between two nations if necessary.
      *
      * @param other The other <code>ServerPlayer</code>.
-     * @param tile The <code>Tile</code> contact is made at.
+     * @param tile The <code>Tile</code> contact is made at if this is
+     *     a first landing in the new world and it is owned by the other
+     *     player, which must be a native.
      * @param cs A <code>ChangeSet</code> to update.
      * @return True if this was a first contact.
      */
@@ -3907,44 +3888,44 @@ public class ServerPlayer extends Player implements ServerModelObject {
         if (hasContacted(other)) return false;
 
         // Must be a first contact!
-        Game game = getGame();
+        final Game game = getGame();
         Turn turn = game.getTurn();
-        ServerPlayer welcomer = null;
         if (isIndian()) {
-            // Ignore native-to-native contacts.
             if (other.isIndian()) {
-                return false;
+                return false; // Ignore native-to-native contacts.
             } else {
-                String key = other.getContactKey(this);
-                if (key != null) {
-                    cs.addMessage(See.only(other),
-                        new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                            key, other, this));
-                }
                 cs.addHistory(other, new HistoryEvent(turn,
                         HistoryEvent.EventType.MEET_NATION, other)
                     .addStringTemplate("%nation%", getNationName()));
+
+                cs.add(See.only(other), ChangePriority.CHANGE_EARLY,
+                    new FirstContactMessage(other, this, null));
             }
         } else { // (serverPlayer.isEuropean)
-            String key = getContactKey(other);
-            if (key != null) {
-                cs.addMessage(See.only(this),
-                    new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                        key, this, other));
-            }
-
-            // History event for European players.
             cs.addHistory(this, new HistoryEvent(turn,
                     HistoryEvent.EventType.MEET_NATION, other)
                 .addStringTemplate("%nation%", other.getNationName()));
-        }
 
-        // Now make the contact properly.
-        csChangeStance(Stance.PEACE, other, true, cs);
+            if (other.isIndian()) {
+                cs.add(See.only(this), ChangePriority.CHANGE_EARLY,
+                    new FirstContactMessage(this, other, tile));
+                if (tile != null) {
+                    // Establish a diplomacy session so that if the player
+                    // accepts the tile offer, we can verify it was made.
+                    new DiplomacySession(tile.getFirstUnit(),
+                                         tile.getOwningSettlement());
+                }
+            } else {
+                ; // TODO: Initiate European/European diplomacy
+            }
+        }
+        setStance(other, Stance.PEACE);
+        other.setStance(this, Stance.PEACE);
         setTension(other, new Tension(Tension.TENSION_MIN));
         other.setTension(this, new Tension(Tension.TENSION_MIN));
         logger.finest("First contact between " + this + " and " + other
-                      + " at " + tile);
+                      + " with tile " + tile);
+
         return true;
     }
 

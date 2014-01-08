@@ -62,6 +62,7 @@ import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
+import net.sf.freecol.common.networking.FirstContactMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
@@ -262,6 +263,8 @@ public final class InGameInputHandler extends InputHandler {
             reply = error(element);
         } else if (type.equals("featureChange")) {
             reply = featureChange(element);
+        } else if (type.equals("firstContact")) {
+            reply = firstContact(element);
         } else if (type.equals("fountainOfYouth")) {
             reply = fountainOfYouth(element);
         } else if (type.equals("gameEnded")) {
@@ -730,6 +733,49 @@ public final class InGameInputHandler extends InputHandler {
     }
 
     /**
+     * Handle a first contact with a native nation.
+     *
+     * @param element The element (root element in a DOM-parsed XML
+     *     tree) that holds all the information.
+     * @return Null.
+     */
+    private Element firstContact(Element element) {
+        final Game game = getGame();
+        final Specification spec = game.getSpecification();
+        final FirstContactMessage message
+            = new FirstContactMessage(game, element);
+
+        final Player player = message.getPlayer(game);
+        if (player == null || player != getFreeColClient().getMyPlayer()) {
+            logger.warning("firstContact with bad player: " + player);
+            return null;
+        }
+        final Player other = message.getOtherPlayer(game);
+        if (other == null || other == player || !other.isIndian()) {
+            logger.warning("firstContact with bad other player: " + other);
+            return null;
+        }
+        final Tile tile = message.getTile(game);
+        if (tile != null && tile.getOwner() != other) {
+            logger.warning("firstContact with bad tile: " + tile);
+            return null;
+        }
+
+        String key = "EventPanel.MEETING_" + other.getNationNameKey();
+        if (!Messages.containsKey(key)) {
+            key = (player.hasContactedIndians()) ? null
+                    : "EventPanel.MEETING_NATIVES";
+        }
+        if (key != null) {
+            player.addModelMessage(new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                    key, other, other));
+        }
+        getGUI().showFirstContactDialog(player, other, tile,
+                                        message.getSettlementCount());
+        return null;
+    }
+
+    /**
      * Ask the player to choose migrants from a fountain of youth event.
      *
      * @param element The element (root element in a DOM-parsed XML tree) that
@@ -884,11 +930,8 @@ public final class InGameInputHandler extends InputHandler {
         final String defaultName = message.getNewLandName();
         if (unit == null || defaultName == null 
             || !unit.hasTile()) return null;
-        final Player welcomer = message.getWelcomer(game);
-        final String camps = message.getCamps();
 
-        getGUI().showNameNewLandDialog("newLand.text", defaultName, unit,
-                                       welcomer, camps);
+        getGUI().showNameNewLandDialog("newLand.text", defaultName, unit);
         return null;
     }
 

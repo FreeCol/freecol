@@ -40,6 +40,7 @@ import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
+import net.sf.freecol.common.networking.FirstContactMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MessageHandler;
@@ -127,6 +128,8 @@ public final class AIInGameInputHandler implements MessageHandler {
                 } else if (type.equals("setDead")) {
                 } else if (type.equals("gameEnded")) {
                 } else if (type.equals("disconnect")) {
+                } else if (type.equals("firstContact")) {
+                    reply = firstContact((DummyConnection)connection, element);
                 } else if (type.equals("logout")) {
                 } else if (type.equals("error")) {
                 } else if (type.equals("setAI")) {
@@ -315,6 +318,21 @@ public final class AIInGameInputHandler implements MessageHandler {
     }
 
     /**
+     * Replies to a first contact offer.
+     *
+     * @param connection The connection the message was received on.
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *            holds all the information.
+     * @return The default offer.
+     */
+    private Element firstContact(DummyConnection connection, Element element) {
+        FirstContactMessage message
+            = new FirstContactMessage(freeColServer.getGame(), element)
+                .setResult(true);
+        return message.toXMLElement();
+    }
+
+    /**
      * Replies to offer to name the new land.
      *
      * @param connection The connection the message was received on.
@@ -325,7 +343,6 @@ public final class AIInGameInputHandler implements MessageHandler {
     private Element newLandName(DummyConnection connection, Element element) {
         NewLandNameMessage message
             = new NewLandNameMessage(freeColServer.getGame(), element);
-        message.setAccept(true); // Always accept new land
         return message.toXMLElement();
     }
 

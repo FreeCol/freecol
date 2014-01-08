@@ -615,6 +615,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         ServerPlayer serverPlayer = (ServerPlayer)getOwner();
         Tile tile = getTile();
         ServerPlayer indianPlayer = (ServerPlayer)tile.getOwner();
+        serverPlayer.csContact(indianPlayer, null, cs);
         indianPlayer.csModifyTension(serverPlayer, 
             Tension.Level.HATEFUL.getLimit(), cs);//+til
         serverPlayer.csChangeStance(Stance.WAR, indianPlayer, true, cs);
@@ -984,18 +985,19 @@ public class ServerUnit extends Unit implements ServerModelObject {
 
             // Check for first landing
             String newLand = null;
-            boolean landNamed = serverPlayer.isNewLandNamed();
-            if (serverPlayer.isEuropean() && !landNamed) {
+            boolean firstLanding = !serverPlayer.isNewLandNamed();
+            if (serverPlayer.isEuropean() && firstLanding) {
                 newLand = Messages.getNewLandName(serverPlayer);
                 // Set the default value now to prevent multiple attempts.
                 // The user setNewLandName can override.
                 serverPlayer.setNewLandName(newLand);
+                cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
+                    new NewLandNameMessage(this, newLand));
                 logger.finest("First landing for " + serverPlayer
                     + " at " + newTile + " with " + this);
             }
 
             // Check for new contacts.
-            ServerPlayer welcomer = null;
             for (Tile t : newTile.getSurroundingTiles(1, 1)) {
                 if (t == null || !t.isLand()) {
                     continue; // Invalid tile for contact
@@ -1009,12 +1011,10 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     : null;
                 if (other == null
                     || other == serverPlayer) continue; // No contact
+                Tile offer = (firstLanding && other.owns(newTile)) ? newTile
+                    : null;
+                serverPlayer.csContact(other, offer, cs);
 
-                if (serverPlayer.csContact(other, newTile, cs)
-                    && !landNamed && other.isIndian()
-                    && newTile.getOwner() == other) {
-                    welcomer = other;
-                }
                 // Initialize alarm for native settlements or units and
                 // notify of contact.
                 ServerPlayer contactPlayer = serverPlayer;
@@ -1046,12 +1046,6 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     }                   
                 }
                 csActivateSentries(t, cs);
-            }
-            if (newLand != null) {
-                cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
-                    new NewLandNameMessage(this, newLand, welcomer,
-                        ((welcomer == null) ? -1
-                            : welcomer.getNumberOfSettlements()), false));
             }
         } else { // water
             for (Tile t : newTile.getSurroundingTiles(1, 1)) {
