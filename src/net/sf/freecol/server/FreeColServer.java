@@ -1176,6 +1176,10 @@ public final class FreeColServer {
             "gameOptions.map", -4, false);
         addIntegerOption(GameOptions.PLAYER_IMMIGRATION_BONUS,
             "gameOptions.map", 2, false);
+        addIntegerOption(GameOptions.BAD_RUMOUR,
+            "model.difficulty.other", 23, true);
+        addIntegerOption(GameOptions.GOOD_RUMOUR,
+            "model.difficulty.other", 48, true);
     }
 
     private void addOptionGroup(String id, boolean difficulty) {

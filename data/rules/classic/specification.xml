@@ -1158,6 +1158,8 @@ resources of 400, lost city rumours of 500
                skill="1" recruitProbability="1" scoreValue="4" >
       <default-role id="model.role.scout"/>
       <ability id="model.ability.expertScout" value="true"/>
+      <modifier id="model.modifier.exploreLostCityRumour"
+                type="percentage" value="10"/>
     </unit-type>
     <unit-type id="model.unit.hardyPioneer" extends="colonist" price="1200"
                skill="1" recruitProbability="1" scoreValue="4" >
@@ -2329,6 +2331,8 @@ resources of 400, lost city rumours of 500
           <integerOption id="model.option.arrearsFactor" value="300"/>
           <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
           <stringOption  id="model.option.tileProduction" value="veryHigh" />
+          <percentageOption id="model.option.badRumour" value="11" />
+          <percentageOption id="model.option.goodRumour" value="75" />
         </optionGroup>
         <optionGroup id="model.difficulty.cheat" editable="false">
           <integerOption id="model.option.liftBoycottCheat" value="1"/>
@@ -2465,6 +2469,8 @@ resources of 400, lost city rumours of 500
           <integerOption id="model.option.arrearsFactor" value="400"/>
           <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
           <stringOption  id="model.option.tileProduction" value="high" />
+          <percentageOption id="model.option.badRumour" value="17" />
+          <percentageOption id="model.option.goodRumour" value="62" />
         </optionGroup>
         <optionGroup id="model.difficulty.cheat" editable="false">
           <integerOption id="model.option.liftBoycottCheat" value="5"/>
@@ -2596,6 +2602,8 @@ resources of 400, lost city rumours of 500
           <integerOption id="model.option.arrearsFactor" value="500"/>
           <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
           <stringOption  id="model.option.tileProduction" value="medium" />
+          <percentageOption id="model.option.badRumour" value="23"/>
+          <percentageOption id="model.option.goodRumour" value="48"/>
         </optionGroup>
         <optionGroup id="model.difficulty.cheat" editable="false">
           <integerOption id="model.option.liftBoycottCheat" value="10"/>
@@ -2720,6 +2728,8 @@ resources of 400, lost city rumours of 500
           <integerOption id="model.option.arrearsFactor" value="600"/>
           <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
           <stringOption  id="model.option.tileProduction" value="low" />
+          <percentageOption id="model.option.badRumour" value="30"/>
+          <percentageOption id="model.option.goodRumour" value="33"/>
         </optionGroup>
         <optionGroup id="model.difficulty.cheat" editable="false">
           <integerOption id="model.option.liftBoycottCheat" value="15"/>
@@ -2844,6 +2854,8 @@ resources of 400, lost city rumours of 500
           <integerOption id="model.option.arrearsFactor" value="700"/>
           <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
           <stringOption  id="model.option.tileProduction" value="veryLow" />
+          <percentageOption id="model.option.badRumour" value="37"/>
+          <percentageOption id="model.option.goodRumour" value="17"/>
         </optionGroup>
         <optionGroup id="model.difficulty.cheat" editable="false">
           <integerOption id="model.option.liftBoycottCheat" value="20"/>
@@ -3010,6 +3022,8 @@ resources of 400, lost city rumours of 500
             <choice value="high" />
             <choice value="veryHigh" />
           </stringOption>
+          <percentageOption id="model.option.badRumour" value="37"/>
+          <percentageOption id="model.option.goodRumour" value="17"/>
         </optionGroup>
         <optionGroup id="model.difficulty.cheat">
           <integerOption id="model.option.liftBoycottCheat" value="20"/>

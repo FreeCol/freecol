@@ -252,7 +252,7 @@ public class GameOptions {
     public static final String NATIVE_DEMANDS
         = "model.option.nativeDemands";
 
-    /** Rumour difficulty factor. [FIXME: move to the map generator options!] */
+    /** Rumour difficulty factor. [FIXME: should go away] */
     public static final String RUMOUR_DIFFICULTY
         = "model.option.rumourDifficulty";
 
@@ -374,6 +374,14 @@ public class GameOptions {
     /** Tile production. */
     public static final String TILE_PRODUCTION
         = "model.option.tileProduction";
+
+    /** Bad rumour chance. */
+    public static final String BAD_RUMOUR
+        = "model.option.badRumour";
+
+    /** Good rumour chance. */
+    public static final String GOOD_RUMOUR
+        = "model.option.goodRumour";
 
 
     // Cheat (difficulty) group

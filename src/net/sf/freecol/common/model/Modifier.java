@@ -63,6 +63,8 @@ public class Modifier extends Feature implements Comparable<Modifier> {
         = "model.modifier.conversionSkill";
     public static final String DEFENCE
         = "model.modifier.defence";
+    public static final String EXPLORE_LOST_CITY_RUMOUR
+        = "model.modifier.exploreLostCityRumour";
     public static final String FORTIFIED
         = "model.modifier.fortified";
     public static final String IMMIGRATION

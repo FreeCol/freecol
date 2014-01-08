@@ -50,6 +50,7 @@ import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Resource;
 import net.sf.freecol.common.model.ResourceType;
@@ -616,6 +617,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         ServerPlayer indianPlayer = (ServerPlayer)tile.getOwner();
         indianPlayer.csModifyTension(serverPlayer, 
             Tension.Level.HATEFUL.getLimit(), cs);//+til
+        serverPlayer.csChangeStance(Stance.WAR, indianPlayer, true, cs);
         cs.addMessage(See.only(serverPlayer),
             new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                 "lostCityRumour.burialGround", serverPlayer, this)
@@ -645,7 +647,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
 
         RumourType rumour = lostCity.getType();
         if (rumour == null) {
-            rumour = lostCity.chooseType(this, difficulty, random);
+            rumour = lostCity.chooseType(this, random);
         }
         // Filter out failing cases that could only occur if the
         // type was explicitly set in debug mode.
@@ -670,7 +672,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             boolean done = false;
             boolean burial = false;
             while (!done) {
-                rumour = lostCity.chooseType(this, difficulty, random);
+                rumour = lostCity.chooseType(this, random);
                 switch (rumour) {
                 case EXPEDITION_VANISHES: case NOTHING: case TRIBAL_CHIEF:
                 case RUINS:

@@ -137,119 +137,93 @@ public class LostCityRumour extends TileItem {
      * Chooses a type of Lost City Rumour.  The type of rumour depends
      * on the exploring unit, as well as player settings.
      *
+     * The scouting outcome is based on three factors: good/bad percent
+     * rumour difficulty option, expert scout or not, DeSoto or not.
+     *
      * @param unit The <code>Unit</code> exploring (optional).
-     * @param difficulty The difficulty level.
      * @param random A random number source.
      * @return The type of rumour.
      *
      * TODO: Make RumourType a FreeColGameObjectType and move all the
      * magic numbers in here to the specification.
      */
-    public RumourType chooseType(Unit unit, int difficulty, Random random) {
-        Tile tile = getTile();
-        boolean allowLearn = unit != null
+    public RumourType chooseType(Unit unit, Random random) {
+        final Specification spec = getSpecification();
+        final Tile tile = getTile();
+        final boolean allowLearn = unit != null
             && !unit.getType().getUnitTypesLearntInLostCity().isEmpty();
-        boolean isExpertScout = unit != null
-            && unit.hasAbility(Ability.EXPERT_SCOUT)
-            && unit.hasAbility(Ability.SCOUT_INDIAN_SETTLEMENT);
-        boolean hasDeSoto = unit != null
-            && unit.getOwner().hasAbility(Ability.RUMOURS_ALWAYS_POSITIVE);
-        // The following arrays contain percentage values for
-        // "good" and "bad" events when scouting with a non-expert
-        // at the various difficulty levels [0..4] exact values
-        // but generally "bad" should increase, "good" decrease
-        final int BAD_EVENT_PERCENTAGE[]  = { 11, 17, 23, 30, 37 };
-        final int GOOD_EVENT_PERCENTAGE[] = { 75, 62, 48, 33, 17 };
-        // remaining to 100, event NOTHING:   14, 21, 29, 37, 46
 
-        // The following arrays contain the modifiers applied when
-        // expert scout is at work exact values; modifiers may
-        // look slightly "better" on harder levels since we're
-        // starting from a "worse" percentage.
-        final int BAD_EVENT_MOD[]  = { -6, -7, -7, -8, -9 };
-        final int GOOD_EVENT_MOD[] = { 14, 15, 16, 18, 20 };
+        // Base bad and good chances are difficulty options.
+        int percentBad = spec.getInteger(GameOptions.BAD_RUMOUR);
+        int percentGood = spec.getInteger(GameOptions.GOOD_RUMOUR);
 
-        // The scouting outcome is based on three factors: level,
-        // expert scout or not, DeSoto or not.  Based on this, we
-        // are going to calculate probabilites for neutral, bad
-        // and good events.
-        int percentNeutral;
-        int percentBad;
-        int percentGood;
-        difficulty = Math.max(0, Math.min(BAD_EVENT_PERCENTAGE.length-1,
-                                          difficulty));
-        if (hasDeSoto) {
-            percentBad  = 0;
+        // Expert scouts have a beneficial modifier that works on both
+        // percentages
+        if (unit != null) {
+            float mod = unit.applyModifier(1.0f,
+                Modifier.EXPLORE_LOST_CITY_RUMOUR);
+            percentBad = (int)Math.round(percentBad * mod);
+            percentGood = (int)Math.round(percentGood * mod);
+        }
+
+        // DeSoto forces all good results.
+        if (unit != null
+            && unit.getOwner().hasAbility(Ability.RUMOURS_ALWAYS_POSITIVE)) {
+            percentBad = 0;
             percentGood = 100;
-            percentNeutral = 0;
-        } else {
-            // First, get "basic" percentages
-            percentBad  = BAD_EVENT_PERCENTAGE[difficulty];
-            percentGood = GOOD_EVENT_PERCENTAGE[difficulty];
-
-            // Second, apply ExpertScout bonus if necessary
-            if (isExpertScout) {
-                percentBad  += BAD_EVENT_MOD[difficulty];
-                percentGood += GOOD_EVENT_MOD[difficulty];
-            }
-
-            // Third, get a value for the "neutral" percentage,
-            // unless the other values exceed 100 already
-            if (percentBad + percentGood < 100) {
-                percentNeutral = 100 - percentBad - percentGood;
-            } else {
-                percentNeutral = 0;
-            }
         }
 
-        Map<RumourType, Integer> events =
-            new EnumMap<RumourType, Integer>(RumourType.class);
-
-        // The NEUTRAL
-        events.put(RumourType.NOTHING, 100 * percentNeutral);
-
-        // The BAD
-        // If the tile is native-owned, allow burial grounds rumour.
-        if (tile.getOwner() != null && tile.getOwner().isIndian()) {
-            events.put(RumourType.EXPEDITION_VANISHES, 75 * percentBad);
-            events.put(RumourType.BURIAL_GROUND, 25 * percentBad);
-        } else {
-            events.put(RumourType.EXPEDITION_VANISHES, 100 * percentBad);
-            events.put(RumourType.BURIAL_GROUND, 0);
-        }
-
-        // The GOOD
-        if (allowLearn) { // if the unit can learn
-            events.put(RumourType.LEARN, 30 * percentGood);
-            events.put(RumourType.TRIBAL_CHIEF, 30 * percentGood);
-            events.put(RumourType.COLONIST, 20 * percentGood);
-        } else {
-            events.put(RumourType.LEARN, 0);
-            events.put(RumourType.TRIBAL_CHIEF, 50 * percentGood);
-            events.put(RumourType.COLONIST, 30 * percentGood);
-        }
-
-        // The SPECIAL
-        // Right now, these are considered "good" events that happen randomly.
-        events.put(RumourType.MOUNDS, 8 * percentGood);
-        events.put(RumourType.RUINS, 6 * percentGood);
-        events.put(RumourType.CIBOLA, 4 * percentGood);
-        if (unit == null
-            || unit.getOwner().getPlayerType() == Player.PlayerType.COLONIAL) {
-            events.put(RumourType.FOUNTAIN_OF_YOUTH, 3 * percentGood);
-        }
+        // Neutral is what is left.
+        int percentNeutral = Math.max(0, 100 - percentBad - percentGood);
 
         // Add all possible events to a RandomChoice List
-        List<RandomChoice<RumourType>> choices
+        List<RandomChoice<RumourType>> c
             = new ArrayList<RandomChoice<RumourType>>();
-        for (Entry<RumourType, Integer> entry : events.entrySet()) {
-            if (entry.getValue() > 0) {
-                choices.add(new RandomChoice<RumourType>(entry.getKey(),
-                                                         entry.getValue()));
-            }
+
+        // The GOOD
+        if (allowLearn) {
+            c.add(new RandomChoice<RumourType>(RumourType.LEARN,
+                    30 * percentGood));
+            c.add(new RandomChoice<RumourType>(RumourType.TRIBAL_CHIEF,
+                    30 * percentGood));
+            c.add(new RandomChoice<RumourType>(RumourType.COLONIST,
+                    20 * percentGood));
+        } else {
+            c.add(new RandomChoice<RumourType>(RumourType.TRIBAL_CHIEF,
+                    50 * percentGood));
+            c.add(new RandomChoice<RumourType>(RumourType.COLONIST,
+                    30 * percentGood));
         }
-        return RandomChoice.getWeightedRandom(logger,
-            "Choose rumour", choices, random);
+        if (unit == null
+            || unit.getOwner().getPlayerType() == Player.PlayerType.COLONIAL) {
+            c.add(new RandomChoice<RumourType>(RumourType.FOUNTAIN_OF_YOUTH,
+                        2 * percentGood));
+        }
+        c.add(new RandomChoice<RumourType>(RumourType.MOUNDS,
+                8 * percentGood));
+        c.add(new RandomChoice<RumourType>(RumourType.RUINS,
+                6 * percentGood));
+        c.add(new RandomChoice<RumourType>(RumourType.CIBOLA, 
+                4 * percentGood));
+
+        // The BAD
+        if (tile.getOwner() != null && tile.getOwner().isIndian()) {
+            // If the tile is native-owned, allow burial grounds rumour.
+            c.add(new RandomChoice<RumourType>(RumourType.BURIAL_GROUND,
+                    25 * percentBad));
+            c.add(new RandomChoice<RumourType>(RumourType.EXPEDITION_VANISHES, 
+                    75 * percentBad));
+        } else {
+            c.add(new RandomChoice<RumourType>(RumourType.EXPEDITION_VANISHES,
+                    100 * percentBad));
+        }
+
+        // The NEUTRAL
+        c.add(new RandomChoice<RumourType>(RumourType.NOTHING,
+                100 * percentNeutral));
+
+        return RandomChoice.getWeightedRandom(logger, "Choose rumour", c,
+                                              random);
     }
 
 

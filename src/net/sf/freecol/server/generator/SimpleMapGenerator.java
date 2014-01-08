@@ -242,8 +242,6 @@ public class SimpleMapGenerator implements MapGenerator {
             }
             // END TODO
 
-            int difficulty = map.getGame().getSpecification()
-                .getInteger(GameOptions.RUMOUR_DIFFICULTY);
             for (int i = 0; i < number; i++) {
                 for (int tries=0; tries<100; tries++) {
                     Tile t = terrainGenerator.getRandomLandTile(map, random);
@@ -251,7 +249,7 @@ public class SimpleMapGenerator implements MapGenerator {
                     if (t.isLand() && !t.hasLostCityRumour()
                         && !t.hasSettlement() && t.getUnitCount() == 0) {
                         LostCityRumour r = new LostCityRumour(t.getGame(), t);
-                        if (r.chooseType(null, difficulty, random)
+                        if (r.chooseType(null, random)
                             == LostCityRumour.RumourType.MOUNDS
                             && t.getOwningSettlement() != null) {
                             r.setType(LostCityRumour.RumourType.MOUNDS);
