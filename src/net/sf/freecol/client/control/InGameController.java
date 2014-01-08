@@ -1063,12 +1063,12 @@ public final class InGameController implements NetworkConstants {
         if (game == null) return;
 
         // unconditional save per round (fix file "last-turn")
-        String prefix = options.getString(ClientOptions.AUTO_SAVE_PREFIX);
+        String prefix = options.getText(ClientOptions.AUTO_SAVE_PREFIX);
         String lastTurnName = prefix + "-"
-            + options.getString(ClientOptions.LAST_TURN_NAME)
+            + options.getText(ClientOptions.LAST_TURN_NAME)
             + ".fsg";
         String beforeLastTurnName = prefix + "-"
-            + options.getString(ClientOptions.BEFORE_LAST_TURN_NAME)
+            + options.getText(ClientOptions.BEFORE_LAST_TURN_NAME)
             + ".fsg";
         File autoSaveDir = FreeColDirectories.getAutosaveDirectory();
         File lastTurnFile = new File(autoSaveDir, lastTurnName);

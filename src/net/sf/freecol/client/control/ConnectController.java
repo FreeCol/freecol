@@ -247,7 +247,7 @@ public final class ConnectController {
 
         final ClientOptions co = freeColClient.getClientOptions();
         if (co.getBoolean(ClientOptions.AUTOSAVE_DELETE)) {
-            FreeColServer.removeAutosaves(co.getString(ClientOptions.AUTO_SAVE_PREFIX));
+            FreeColServer.removeAutosaves(co.getText(ClientOptions.AUTO_SAVE_PREFIX));
         }
         freeColClient.getPreGameController().setReady(true);
         if (skip) {

@@ -241,9 +241,10 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      */
     public OptionGroup getOptionGroup(String id) {
         try {
-            return ((OptionGroup) getOption(id)).getValue();
+            return ((OptionGroup)getOption(id)).getValue();
         } catch (ClassCastException e) {
-            throw new IllegalArgumentException("No option group value associated with the specified option.");
+            throw new IllegalArgumentException("No option group"
+                + " value associated with the specified option: " + id);
         }
     }
 
@@ -259,9 +260,10 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      */
     public int getInteger(String id) {
         try {
-            return ((IntegerOption) getOption(id)).getValue();
+            return ((IntegerOption)getOption(id)).getValue();
         } catch (ClassCastException e) {
-            throw new IllegalArgumentException("No integer value associated with the specified option.");
+            throw new IllegalArgumentException("No integer"
+                + " value associated with the specified option: " + id);
         }
     }
 
@@ -277,9 +279,10 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      */
     public void setInteger(String id, int value) {
         try {
-            ((IntegerOption) getOption(id)).setValue(value);
+            ((IntegerOption)getOption(id)).setValue(value);
         } catch (ClassCastException e) {
-            throw new IllegalArgumentException("No integer value associated with the specified option.");
+            throw new IllegalArgumentException("No integer"
+                + " value associated with the specified option: " + id);
         }
     }
 
@@ -295,9 +298,10 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      */
     public boolean getBoolean(String id) {
         try {
-            return ((BooleanOption) getOption(id)).getValue();
+            return ((BooleanOption)getOption(id)).getValue();
         } catch (ClassCastException e) {
-            throw new IllegalArgumentException("No boolean value associated with the specified option.");
+            throw new IllegalArgumentException("No boolean"
+                + " value associated with the specified option: " + id);
         }
     }
 
@@ -313,9 +317,10 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      */
     public void setBoolean(String id, boolean value) {
         try {
-            ((BooleanOption) getOption(id)).setValue(value);
+            ((BooleanOption)getOption(id)).setValue(value);
         } catch (ClassCastException e) {
-            throw new IllegalArgumentException("No boolean value associated with the specified option.");
+            throw new IllegalArgumentException("No boolean"
+                + " value associated with the specified option: " + id);
         }
     }
 
@@ -331,9 +336,10 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      */
     public String getString(String id) {
         try {
-            return ((StringOption) getOption(id)).getValue();
+            return ((StringOption)getOption(id)).getValue();
         } catch (ClassCastException e) {
-            throw new IllegalArgumentException("No String value associated with the specified option.");
+            throw new IllegalArgumentException("No String"
+                + " value associated with the specified option: " + id);
         }
     }
 
@@ -349,12 +355,12 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      */
     public void setString(String id, String value) {
         try {
-            ((StringOption) getOption(id)).setValue(value);
+            ((StringOption)getOption(id)).setValue(value);
         } catch (ClassCastException e) {
-            throw new IllegalArgumentException("No String value associated with the specified option.");
+            throw new IllegalArgumentException("No String"
+                + " value associated with the specified option: " + id);
         }
     }
-
 
     /**
      * Gets the string value of an option.
@@ -368,9 +374,10 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      */
     public String getText(String id) {
         try {
-            return ((TextOption) getOption(id)).getValue();
+            return ((TextOption)getOption(id)).getValue();
         } catch (ClassCastException e) {
-            throw new IllegalArgumentException("No String value associated with the specified option.");
+            throw new IllegalArgumentException("No String"
+                + " value associated with the specified option: " + id);
         }
     }
 
@@ -386,9 +393,10 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      */
     public void setText(String id, String value) {
         try {
-            ((TextOption) getOption(id)).setValue(value);
+            ((TextOption)getOption(id)).setValue(value);
         } catch (ClassCastException e) {
-            throw new IllegalArgumentException("No String value associated with the specified option.");
+            throw new IllegalArgumentException("No String"
+                + " value associated with the specified option: " + id);
         }
     }
 
