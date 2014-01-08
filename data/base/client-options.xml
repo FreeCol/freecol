@@ -21,6 +21,7 @@
   -->
 <clientOptions>
     <optionGroup id="clientOptions.personal">
+      <!-- Player name customization. -->
       <textOption id="model.option.playerName" defaultValue="" />
     </optionGroup>
     <optionGroup id="clientOptions.gui" >
@@ -78,12 +79,6 @@
       <!-- Remember panel sizes? -->
       <booleanOption id="model.option.rememberPanelSizes"
                      defaultValue="true"/>
-      <!-- Map controls -->
-      <stringOption id="model.option.mapControls"
-                    defaultValue="CornerMapControls">
-        <choice value="CornerMapControls"/>
-        <choice value="ClassicMapControls"/>
-      </stringOption>
       <!-- Enable smooth rendering of the minimap when zoomed out? -->
       <booleanOption id="model.option.smoothRendering"
                      defaultValue="false"/>
@@ -96,6 +91,12 @@
       <!-- Draw the borders on the minimap. -->
       <booleanOption id="model.option.miniMapToggleBorders"
                      defaultValue="true"/>
+      <!-- Map controls -->
+      <stringOption id="model.option.mapControls"
+                    defaultValue="CornerMapControls">
+        <choice value="CornerMapControls"/>
+        <choice value="ClassicMapControls"/>
+      </stringOption>
       <!-- The color to fill in around the actual map on the minimap. -->
       <selectOption id="model.option.color.background"
                     defaultValue="0" localizedLabels="true">
@@ -106,18 +107,6 @@
         <selectValue label="clientOptions.minimap.color.background.gray.light" value="4"/>
         <selectValue label="clientOptions.minimap.color.background.gray.light.very" value="5"/>
         <selectValue label="clientOptions.minimap.color.background.blue.light" value="6"/>
-      </selectOption>
-      <!-- Type of colony report. -->
-      <selectOption id="model.option.colonyReport"
-                    defaultValue="0" localizedLabels="true">
-        <selectValue label="clientOptions.colonyReport.classic" value="0"/>
-        <selectValue label="clientOptions.colonyReport.compact" value="1"/>
-      </selectOption>
-      <!-- Type of labour report. -->
-      <selectOption id="model.option.labourReport"
-                    defaultValue="0" localizedLabels="true">
-        <selectValue label="clientOptions.labourReport.classic" value="0"/>
-        <selectValue label="clientOptions.labourReport.compact" value="1"/>
       </selectOption>
       <!-- Option for in tile text display -->
       <selectOption id="model.option.displayTileText"
@@ -219,6 +208,18 @@
       <!-- Show the warnings about poor choice of tile worker. -->
       <booleanOption id="model.option.guiShowNotBestTile"
                      defaultValue="true"/>
+      <!-- Type of colony report. -->
+      <selectOption id="model.option.colonyReport"
+                    defaultValue="0" localizedLabels="true">
+        <selectValue label="clientOptions.colonyReport.classic" value="0"/>
+        <selectValue label="clientOptions.colonyReport.compact" value="1"/>
+      </selectOption>
+      <!-- Type of labour report. -->
+      <selectOption id="model.option.labourReport"
+                    defaultValue="0" localizedLabels="true">
+        <selectValue label="clientOptions.labourReport.classic" value="0"/>
+        <selectValue label="clientOptions.labourReport.compact" value="1"/>
+      </selectOption>
     </optionGroup>
 
     <optionGroup id="clientOptions.savegames" >

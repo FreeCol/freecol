@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- XSD for specification version 0.79
+<!-- XSD for specification version 0.81
      CHANGELOG:
      0.26: add capture-equipment
      0.27: add limits
@@ -57,6 +57,7 @@
            zero-production-factor to goods-type
      0.79: upgrade role from enum to role
      0.80: replace unit type default equipment with default role
+     0.81: Percentage option values are PercentageType.
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:annotation>
@@ -744,21 +745,29 @@
   <xs:element name="optionGroup">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-        <xs:element ref="integerOption"/>
         <xs:element ref="booleanOption"/>
+        <xs:element ref="integerOption"/>
+        <xs:element ref="percentageOption"/>
         <xs:element ref="stringOption"/>
         <xs:element ref="rangeOption"/>
         <xs:element ref="selectOption"/>
         <xs:element ref="languageOption"/>
         <xs:element ref="fileOption"/>
         <xs:element ref="audioMixerOption"/>
-        <xs:element ref="percentageOption"/>
         <xs:element ref="optionGroup"/>
         <xs:element ref="unitListOption"/>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:string"/>
       <xs:attribute name="recursive" use="optional" type="xs:boolean"/>
       <xs:attribute name="editable" use="optional" type="xs:boolean"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="booleanOption">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="xs:string"/>
+      <xs:attribute name="defaultValue" type="xs:boolean"/>
+      <xs:attribute name="value" type="xs:boolean"/>
     </xs:complexType>
   </xs:element>
 
@@ -772,11 +781,11 @@
     </xs:complexType>
   </xs:element>
 
-  <xs:element name="booleanOption">
+  <xs:element name="percentageOption">
     <xs:complexType>
       <xs:attribute name="id" use="required" type="xs:string"/>
-      <xs:attribute name="defaultValue" type="xs:boolean"/>
-      <xs:attribute name="value" type="xs:boolean"/>
+      <xs:attribute name="defaultValue" type="PercentageType"/>
+      <xs:attribute name="value" type="PercentageType"/>
     </xs:complexType>
   </xs:element>
 
@@ -832,14 +841,6 @@
     <xs:complexType>
       <xs:attribute name="id" use="required" type="xs:string"/>
       <xs:attribute name="defaultValue" type="xs:string"/>
-    </xs:complexType>
-  </xs:element>
-
-  <xs:element name="percentageOption">
-    <xs:complexType>
-      <xs:attribute name="id" use="required" type="xs:string"/>
-      <xs:attribute name="defaultValue" use="required" type="xs:string"/>
-      <xs:attribute name="previewEnabled" type="xs:boolean"/>
     </xs:complexType>
   </xs:element>
 

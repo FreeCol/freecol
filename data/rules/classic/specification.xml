@@ -2191,15 +2191,6 @@ resources of 400, lost city rumours of 500
             nation-type="model.nationType.ref"/>
   </nations>
 
-  <!-- crosses-increment: additional crosses required for each new immigrant
-       land-price-factor: determines the price of land bought from the natives
-       founding-father-factor: determines how many bells are required for founding fathers
-       arrears-factor: determines how much money is required to lift a boycott
-       native-convert-probability: determines the probability of getting native converts
-       burn-probability: determines the probability of missions getting burned
-       recruit-price-increase: determines how fast the price for recruiting colonists increases
-       lower-cap-increase: determines how fast the minimum price for recruiting colonists increases
-  -->
   <options>
     <optionGroup id="difficultyLevels" recursive="false">
       <optionGroup id="model.difficulty.veryEasy" editable="false">
@@ -2347,6 +2338,7 @@ resources of 400, lost city rumours of 500
           <integerOption id="model.option.transportNavalUnitCheat" value="1"/>
         </optionGroup>
       </optionGroup>
+
       <optionGroup id="model.difficulty.easy" editable="false">
         <optionGroup id="model.difficulty.immigration" editable="false">
           <integerOption id="model.option.crossesIncrement" value="2"/>
@@ -2482,6 +2474,7 @@ resources of 400, lost city rumours of 500
           <integerOption id="model.option.transportNavalUnitCheat" value="5"/>
         </optionGroup>
       </optionGroup>
+
       <optionGroup id="model.difficulty.medium" editable="false">
         <optionGroup id="model.difficulty.immigration" editable="false">
           <integerOption id="model.option.crossesIncrement" value="2"/>
@@ -2612,6 +2605,7 @@ resources of 400, lost city rumours of 500
           <integerOption id="model.option.transportNavalUnitCheat" value="10"/>
         </optionGroup>
       </optionGroup>
+
       <optionGroup id="model.difficulty.hard" editable="false">
         <optionGroup id="model.difficulty.immigration" editable="false">
           <integerOption id="model.option.crossesIncrement" value="2"/>
@@ -2735,6 +2729,7 @@ resources of 400, lost city rumours of 500
           <integerOption id="model.option.transportNavalUnitCheat" value="15"/>
         </optionGroup>
       </optionGroup>
+
       <optionGroup id="model.difficulty.veryHard" editable="false">
         <optionGroup id="model.difficulty.immigration" editable="false">
           <integerOption id="model.option.crossesIncrement" value="2"/>
@@ -2858,9 +2853,10 @@ resources of 400, lost city rumours of 500
           <integerOption id="model.option.transportNavalUnitCheat" value="20"/>
         </optionGroup>
       </optionGroup>
+
       <optionGroup id="model.difficulty.custom">
         <optionGroup id="model.difficulty.immigration">
-          <integerOption id="model.option.crossesIncrement" value="2" minimumValue="0" maximumValue="100"/>
+          <percentageOption id="model.option.crossesIncrement" defaultValue="2"/>
           <integerOption id="model.option.recruitPriceIncrease" value="30" minimumValue="0" maximumValue="100"/>
           <integerOption id="model.option.lowerCapIncrease" value="0" minimumValue="0" maximumValue="100"/>
           <integerOption id="model.option.priceIncrease.artillery" value="100" minimumValue="0" maximumValue="1000"/>
@@ -3024,20 +3020,28 @@ resources of 400, lost city rumours of 500
         </optionGroup>
       </optionGroup>
     </optionGroup>
+
     <optionGroup id="gameOptions">
       <optionGroup id="gameOptions.map">
-        <!-- The number of turns it takes to sail between Europe and the New World -->
-        <integerOption id="model.option.turnsToSail" defaultValue="3" minimumValue="1" maximumValue="10"/>
+        <!-- The number of turns it takes to sail between Europe and
+             the New World -->
+        <integerOption id="model.option.turnsToSail"
+                       defaultValue="3" minimumValue="1" maximumValue="10"/>
         <!-- Relax settlement limits -->
-        <integerOption id="model.option.settlementLimitModifier" defaultValue="0"/>
+        <integerOption id="model.option.settlementLimitModifier"
+                       defaultValue="0"/>
         <!-- Enables/disables fog of war -->
-        <booleanOption id="model.option.fogOfWar" defaultValue="true"/>
+        <booleanOption id="model.option.fogOfWar"
+                       defaultValue="true"/>
         <!-- Whether to award exploration points or not -->
-        <booleanOption id="model.option.explorationPoints" defaultValue="false"/>
+        <booleanOption id="model.option.explorationPoints"
+                       defaultValue="false"/>
         <!-- Whether amphibious moves are allowed. -->
-        <booleanOption id="model.option.amphibiousMoves" defaultValue="false"/>
+        <booleanOption id="model.option.amphibiousMoves"
+                       defaultValue="false"/>
         <!-- Allow trading with empty units. -->
-        <booleanOption id="model.option.emptyTraders" defaultValue="false"/>
+        <booleanOption id="model.option.emptyTraders"
+                       defaultValue="false"/>
         <!-- Whether all interactions with a native settlement contact the
              chief and thus consume the scouting bonus -->
         <booleanOption id="model.option.settlementActionsContactChief"
@@ -3047,32 +3051,38 @@ resources of 400, lost city rumours of 500
                        defaultValue="false"/>
         <!-- Per turn probability that a peaceful native settlement
              with a surplus will decide to offer some of it as a gift. -->
-        <integerOption id="model.option.giftProbability" defaultValue="5"
-                       minimumValue="0" maximumValue="100"/>
+        <percentageOption id="model.option.giftProbability"
+                          defaultValue="5"/>
         <!-- Per turn probability that an angry native settlement will
              decide to demand tribute from an annoying European
              settlement. -->
-        <integerOption id="model.option.demandProbability" defaultValue="10"
-                       minimumValue="0" maximumValue="100"/>
+        <percentageOption id="model.option.demandProbability"
+                          defaultValue="10" />
         <!-- Founding father recruitment continues after declaring
              independence -->
         <booleanOption id="model.option.continueFoundingFatherRecruitment"
                        defaultValue="false"/>
-        <!-- Does the REF "teleport" to its first target or does it sail in. -->
-        <booleanOption id="model.option.teleportREF" defaultValue="true"/>
+        <!-- Does the REF "teleport" to its first target or does it
+             sail in? -->
+        <booleanOption id="model.option.teleportREF"
+                       defaultValue="true"/>
         <!-- Types of starting positions -->
-        <selectOption id="model.option.startingPositions" defaultValue="0" localizedLabels="true">
-          <selectValue label="model.option.startingPositions.classic" value="0"/>
-          <selectValue label="model.option.startingPositions.random" value="1"/>
-          <selectValue label="model.option.startingPositions.historical" value="2"/>
+        <selectOption id="model.option.startingPositions"
+                      defaultValue="0" localizedLabels="true">
+          <selectValue label="model.option.startingPositions.classic"
+                       value="0"/>
+          <selectValue label="model.option.startingPositions.random"
+                       value="1"/>
+          <selectValue label="model.option.startingPositions.historical"
+                       value="2"/>
         </selectOption>
         <!-- Initial immigration target. -->
-        <integerOption id="model.option.initialImmigration" defaultValue="15"
-                       minimumValue="0" maximumValue="99"/>
+        <integerOption id="model.option.initialImmigration"
+                       defaultValue="15" minimumValue="0" maximumValue="99"/>
         <!-- Per turn probability that an angry AI will continue to
              honour a recent peace treaty -->
-        <integerOption id="model.option.peaceProbability" defaultValue="90"
-                       minimumValue="0" maximumValue="99"/>
+        <percentageOption id="model.option.peaceProbability"
+                          defaultValue="90"/>
         <!-- Per turn immigration penalty for units in Europe. -->
         <integerOption id="model.option.europeanUnitImmigrationPenalty"
                        defaultValue="-4" minimumValue="-100" maximumValue="0"/>
@@ -3082,41 +3092,61 @@ resources of 400, lost city rumours of 500
       </optionGroup>
       <optionGroup id="gameOptions.colony">
         <!-- Does the Custom House sell boycotted goods -->
-        <booleanOption id="model.option.customIgnoreBoycott" defaultValue="true"/>
-        <!-- Whether experts have connections, producing without raw materials in factories -->
-        <booleanOption id="model.option.expertsHaveConnections" defaultValue="true"/>
-        <booleanOption id="model.option.saveProductionOverflow" defaultValue="true"/>
+        <booleanOption id="model.option.customIgnoreBoycott"
+                       defaultValue="true"/>
+        <!-- Whether experts have connections, producing without raw
+             materials in factories -->
+        <booleanOption id="model.option.expertsHaveConnections"
+                       defaultValue="true"/>
+        <!-- Overflow hammer and cross production is preserved? -->
+        <booleanOption id="model.option.saveProductionOverflow"
+                       defaultValue="true"/>
         <!-- Whether to educate the least skilled unit first -->
-        <booleanOption id="model.option.allowStudentSelection" defaultValue="false"/>
+        <booleanOption id="model.option.allowStudentSelection"
+                       defaultValue="false"/>
         <!-- Enable upkeep requirement on buildings. -->
-        <booleanOption id="model.option.enableUpkeep" defaultValue="false"/>
+        <booleanOption id="model.option.enableUpkeep"
+                       defaultValue="false"/>
         <!-- Toggle special production rules for secondary goods. -->
-        <booleanOption id="model.option.onlyNaturalImprovements" defaultValue="true" />
+        <booleanOption id="model.option.onlyNaturalImprovements"
+                       defaultValue="true" />
         <!-- Enable natural disasters striking colonies. -->
-        <integerOption id="model.option.naturalDisasters" defaultValue="0"
-                       minimumValue="0" maximumValue="100" />
+        <percentageOption id="model.option.naturalDisasters"
+                          defaultValue="0"/>
       </optionGroup>
       <optionGroup id="gameOptions.victoryConditions">
-        <!-- Victory condition: Should the player who first defeats the Royal Expeditionary Force win the game? -->
-        <booleanOption id="model.option.victoryDefeatREF" defaultValue="true"/>
-        <!-- Victory condition: Should a player who first defeats all other european players win the game? -->
-        <booleanOption id="model.option.victoryDefeatEuropeans" defaultValue="true"/>
-        <!-- Victory condition: Should a player who first defeats all other human players win the game? -->
-        <booleanOption id="model.option.victoryDefeatHumans" defaultValue="false"/>
+        <!-- Victory condition: Should the player who first defeats
+             the Royal Expeditionary Force win the game? -->
+        <booleanOption id="model.option.victoryDefeatREF"
+                       defaultValue="true"/>
+        <!-- Victory condition: Should a player who first defeats all
+             other european players win the game? -->
+        <booleanOption id="model.option.victoryDefeatEuropeans"
+                       defaultValue="true"/>
+        <!-- Victory condition: Should a player who first defeats all
+             other human players win the game? -->
+        <booleanOption id="model.option.victoryDefeatHumans"
+                       defaultValue="false"/>
       </optionGroup>
       <optionGroup id="gameOptions.years">
         <!-- The very first year of the game. -->
-        <integerOption id="model.option.startingYear" value="1492" minimumValue="1492" maximumValue="1900" />
+        <integerOption id="model.option.startingYear"
+                       value="1492" minimumValue="1492" maximumValue="1900" />
         <!-- The first year in which there are two turns. -->
-        <integerOption id="model.option.seasonYear" value="1600" minimumValue="1492" maximumValue="1900" />
+        <integerOption id="model.option.seasonYear"
+                       value="1600" minimumValue="1492" maximumValue="1900" />
         <!-- The year in which owning a colony becomes mandatory. -->
-        <integerOption id="model.option.mandatoryColonyYear" value="1600" minimumValue="1492" maximumValue="1900" />
+        <integerOption id="model.option.mandatoryColonyYear"
+                       value="1600" minimumValue="1492" maximumValue="1900" />
         <!-- The very last year of the game. -->
-        <integerOption id="model.option.lastYear" value="1850" minimumValue="1492" maximumValue="1900" />
+        <integerOption id="model.option.lastYear"
+                       value="1850" minimumValue="1492" maximumValue="1900" />
         <!-- The last year of the game for a colonial player. -->
-        <integerOption id="model.option.lastColonialYear" value="1800" minimumValue="1492" maximumValue="1900" />
+        <integerOption id="model.option.lastColonialYear"
+                       value="1800" minimumValue="1492" maximumValue="1900" />
       </optionGroup>
     </optionGroup>
+
     <optionGroup id="mapGeneratorOptions">
       <optionGroup id="mapGeneratorOptions.import" >
         <!-- Option for setting a file to be imported (map etc). -->
@@ -3132,32 +3162,46 @@ resources of 400, lost city rumours of 500
       </optionGroup>
       <optionGroup id="mapGeneratorOptions.landGenerator" >
         <!-- Options for setting the size of the map -->
-        <integerOption id="model.option.mapWidth" value="40" minimumValue="20" maximumValue="200"/>
-        <integerOption id="model.option.mapHeight" value="100" minimumValue="20" maximumValue="200"/>
+        <integerOption id="model.option.mapWidth"
+                       value="40" minimumValue="20" maximumValue="200"/>
+        <integerOption id="model.option.mapHeight"
+                       value="100" minimumValue="20" maximumValue="200"/>
         <!-- Option for setting the land mass of the map -->
-        <integerOption id="model.option.landMass" value="25" minimumValue="15" maximumValue="50"/>
+        <integerOption id="model.option.landMass"
+                       value="25" minimumValue="15" maximumValue="50"/>
         <!-- Option for setting the type of land generator to be used -->
-        <selectOption id="model.option.landGeneratorType" defaultValue="0" localizedLabels="true">
-          <selectValue label="model.option.landGeneratorType.classic" value="0"/>
-          <selectValue label="model.option.landGeneratorType.continent" value="1"/>
-          <selectValue label="model.option.landGeneratorType.archipelago" value="2"/>
-          <selectValue label="model.option.landGeneratorType.islands" value="3"/>
+        <selectOption id="model.option.landGeneratorType"
+                      defaultValue="0" localizedLabels="true">
+          <selectValue label="model.option.landGeneratorType.classic"
+                       value="0"/>
+          <selectValue label="model.option.landGeneratorType.continent"
+                       value="1"/>
+          <selectValue label="model.option.landGeneratorType.archipelago"
+                       value="2"/>
+          <selectValue label="model.option.landGeneratorType.islands"
+                       value="3"/>
         </selectOption>
-        <integerOption id="model.option.preferredDistanceToEdge" defaultValue="5"
-                       minimumValue="1" maximumValue="10"/>
-        <integerOption id="model.option.maximumDistanceToEdge" defaultValue="10"
-                       minimumValue="5" maximumValue="20"/>
-        <integerOption id="model.option.distanceToHighSea" defaultValue="4"
-                       minimumValue="3" maximumValue="10"/>
+        <!-- Preferred distance to the edge of the map -->
+        <integerOption id="model.option.preferredDistanceToEdge"
+                       defaultValue="5" minimumValue="1" maximumValue="10"/>
+        <!-- Maximum distance to the edge of the map -->
+        <integerOption id="model.option.maximumDistanceToEdge"
+                       defaultValue="10" minimumValue="5" maximumValue="20"/>
+        <!-- Preferred distance from land to high seas -->
+        <integerOption id="model.option.distanceToHighSea"
+                       defaultValue="4" minimumValue="3" maximumValue="10"/>
       </optionGroup>
       <optionGroup id="mapGeneratorOptions.terrainGenerator" >
-        <integerOption id="model.option.minimumLatitude" defaultValue="-90"
-                       minimumValue="-90" maximumValue="90" />
-        <integerOption id="model.option.maximumLatitude" defaultValue="90"
-                       minimumValue="-90" maximumValue="90" />
+        <!-- Minimum latitude -->
+        <integerOption id="model.option.minimumLatitude"
+                       defaultValue="-90" minimumValue="-90" maximumValue="90"/>
+        <!-- Maximum latitude -->
+        <integerOption id="model.option.maximumLatitude"
+                       defaultValue="90" minimumValue="-90" maximumValue="90"/>
         <!-- Option for setting the number of rivers on the map
              The value indicates the number of land tile per river tile -->
-        <rangeOption id="model.option.riverNumber" defaultValue="10" localizedLabels="true">
+        <rangeOption id="model.option.riverNumber"
+                     defaultValue="10" localizedLabels="true">
           <rangeValue label="verySmall" value="20"/>
           <rangeValue label="small" value="10"/>
           <rangeValue label="medium" value="9"/>
@@ -3166,16 +3210,18 @@ resources of 400, lost city rumours of 500
         </rangeOption>
         <!-- Option for setting the number of mountains on the map
              The value indicates the number of land tile per mountain tile -->
-        <rangeOption id="model.option.mountainNumber" defaultValue="10" localizedLabels="true">
+        <rangeOption id="model.option.mountainNumber"
+                     defaultValue="10" localizedLabels="true">
           <rangeValue label="verySmall" value="20"/>
           <rangeValue label="small" value="10"/>
           <rangeValue label="medium" value="9"/>
           <rangeValue label="large" value="8"/>
           <rangeValue label="veryLarge" value="7"/>
         </rangeOption>
-        <!-- Option for setting the number of rumours on the map
-             The value indicates the number of land tile per rumour tile -->
-        <rangeOption id="model.option.rumourNumber" defaultValue="35" localizedLabels="true">
+        <!-- Option for setting the number of rumours on the map The
+             value indicates the number of land tile per rumour tile -->
+        <rangeOption id="model.option.rumourNumber"
+                     defaultValue="35" localizedLabels="true">
           <rangeValue label="verySmall" value="50"/>
           <rangeValue label="small" value="35"/>
           <rangeValue label="medium" value="30"/>
@@ -3183,7 +3229,8 @@ resources of 400, lost city rumours of 500
           <rangeValue label="veryLarge" value="20"/>
         </rangeOption>
         <!-- Option for setting the percentage of forests on the map -->
-        <rangeOption id="model.option.forestNumber" defaultValue="50" localizedLabels="true">
+        <rangeOption id="model.option.forestNumber"
+                     defaultValue="50" localizedLabels="true">
           <rangeValue label="verySmall" value="10"/>
           <rangeValue label="small" value="30"/>
           <rangeValue label="medium" value="50"/>
@@ -3191,7 +3238,8 @@ resources of 400, lost city rumours of 500
           <rangeValue label="veryLarge" value="90"/>
         </rangeOption>
         <!-- Option for setting the percentage of bonus tiles on the map -->
-        <rangeOption id="model.option.bonusNumber" defaultValue="10" localizedLabels="true">
+        <rangeOption id="model.option.bonusNumber"
+                     defaultValue="10" localizedLabels="true">
           <rangeValue label="verySmall" value="5"/>
           <rangeValue label="small" value="10"/>
           <rangeValue label="medium" value="13"/>
@@ -3199,7 +3247,8 @@ resources of 400, lost city rumours of 500
           <rangeValue label="veryLarge" value="20"/>
         </rangeOption>
         <!-- Option for setting the humidity of the map -->
-        <rangeOption id="model.option.humidity" defaultValue="40" localizedLabels="true">
+        <rangeOption id="model.option.humidity"
+                     defaultValue="40" localizedLabels="true">
           <rangeValue label="veryDry" value="25"/>
           <rangeValue label="dry" value="35"/>
           <rangeValue label="normal" value="40"/>
@@ -3207,7 +3256,8 @@ resources of 400, lost city rumours of 500
           <rangeValue label="veryWet" value="60"/>
         </rangeOption>
         <!-- Option for setting the temperature of the map -->
-        <rangeOption id="model.option.temperature" defaultValue="2" localizedLabels="true">
+        <rangeOption id="model.option.temperature"
+                     defaultValue="2" localizedLabels="true">
           <rangeValue label="cold" value="0"/>
           <rangeValue label="chilly" value="1"/>
           <rangeValue label="temperate" value="2"/>

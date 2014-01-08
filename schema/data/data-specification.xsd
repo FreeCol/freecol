@@ -661,21 +661,29 @@
   <xs:element name="optionGroup">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-        <xs:element ref="integerOption"/>
         <xs:element ref="booleanOption"/>
+        <xs:element ref="integerOption"/>
+        <xs:element ref="percentageOption"/>
         <xs:element ref="stringOption"/>
         <xs:element ref="rangeOption"/>
         <xs:element ref="selectOption"/>
         <xs:element ref="languageOption"/>
         <xs:element ref="fileOption"/>
         <xs:element ref="audioMixerOption"/>
-        <xs:element ref="percentageOption"/>
         <xs:element ref="optionGroup"/>
         <xs:element ref="unitListOption"/>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:string"/>
       <xs:attribute name="recursive" use="optional" type="xs:boolean"/>
       <xs:attribute name="editable" use="optional" type="xs:boolean"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="percentageOption">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="xs:string"/>
+      <xs:attribute name="defaultValue" type="PercentageType"/>
+      <xs:attribute name="value" type="PercentageType"/>
     </xs:complexType>
   </xs:element>
 
@@ -698,14 +706,6 @@
     </xs:complexType>
   </xs:element>
 
-  <xs:element name="percentageOption">
-    <xs:complexType>
-      <xs:attribute name="id" use="required" type="xs:string"/>
-      <xs:attribute name="defaultValue" use="required" type="xs:string"/>
-      <xs:attribute name="previewEnabled" type="xs:boolean"/>
-    </xs:complexType>
-  </xs:element>
-
   <xs:element name="rangeValue">
     <xs:complexType>
       <xs:attribute name="label" use="required" type="xs:string"/>
@@ -718,7 +718,6 @@
       <xs:attribute name="id" use="required" type="xs:string"/>
     </xs:complexType>
   </xs:element>
-
 
   <xs:element name="unitOption">
     <xs:complexType>
