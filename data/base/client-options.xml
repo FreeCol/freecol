@@ -245,6 +245,15 @@
       <!-- Option to confirm the overwrite of existing save files. -->
       <booleanOption id="model.option.confirmSaveOverwrite"
                      defaultValue="false"/>
+      <!-- Prefix for the auto-save files. -->
+      <textOption id="model.option.autoSavePrefix"
+                  defaultValue="Autosave"/>
+      <!-- Stem for the last-turn save file name. -->
+      <textOption id="model.option.lastTurnName"
+                  defaultValue="last-turn"/>
+      <!-- Stem for the before-last-turn save file name. -->
+      <textOption id="model.option.beforeLastTurnName"
+                  defaultValue="before-last-turn"/>
     </optionGroup>
     <optionGroup id="clientOptions.warehouse" >
       <!-- The Stock the custom house should keep when selling goods. -->

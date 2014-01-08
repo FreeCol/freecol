@@ -141,7 +141,7 @@ public class TextOption extends AbstractOption<String> {
     /**
      * Gets the tag name of the root element representing this object.
      *
-     * @return "stringOption".
+     * @return "textOption".
      */
     public static String getXMLElementTagName() {
         return "textOption";

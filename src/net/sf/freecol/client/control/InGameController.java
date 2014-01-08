@@ -1054,49 +1054,45 @@ public final class InGameController implements NetworkConstants {
 
     /**
      * Creates at least one autosave game file of the currently played
-     * game in the autosave directory. Does nothing if there is no
+     * game in the autosave directory.  Does nothing if there is no
      * game running.
-     *
      */
-    private void autosave_game () {
-        Game game = freeColClient.getGame();
+    private void autoSaveGame () {
+        final Game game = freeColClient.getGame();
+        final ClientOptions options = freeColClient.getClientOptions();
         if (game == null) return;
 
         // unconditional save per round (fix file "last-turn")
-        String autosave_text
-            = Messages.message("clientOptions.savegames.autosave.fileprefix");
-        String filename = autosave_text + "-"
-            + Messages.message("clientOptions.savegames.autosave.lastturn")
+        String prefix = options.getString(ClientOptions.AUTO_SAVE_PREFIX);
+        String lastTurnName = prefix + "-"
+            + options.getString(ClientOptions.LAST_TURN_NAME)
             + ".fsg";
-        String beforeFilename = autosave_text + "-"
-            + Messages.message("clientOptions.savegames.autosave.beforelastturn")
+        String beforeLastTurnName = prefix + "-"
+            + options.getString(ClientOptions.BEFORE_LAST_TURN_NAME)
             + ".fsg";
-        File autosaveDir = FreeColDirectories.getAutosaveDirectory();
-        File saveGameFile = new File(autosaveDir, filename);
-        File beforeSaveFile = new File(autosaveDir, beforeFilename);
+        File autoSaveDir = FreeColDirectories.getAutosaveDirectory();
+        File lastTurnFile = new File(autoSaveDir, lastTurnName);
+        File beforeLastTurnFile = new File(autoSaveDir, beforeLastTurnName);
 
         // if "last-turn" file exists, shift it to "before-last-turn" file
-        if (saveGameFile.exists()) {
-           beforeSaveFile.delete();
-           saveGameFile.renameTo(beforeSaveFile);
+        if (lastTurnFile.exists()) {
+            beforeLastTurnFile.delete();
+            lastTurnFile.renameTo(beforeLastTurnFile);
         }
-        saveGame(saveGameFile);
+        saveGame(lastTurnFile);
 
         // conditional save after user-set period
-        ClientOptions options = freeColClient.getClientOptions();
-        int savegamePeriod = options.getInteger(ClientOptions.AUTOSAVE_PERIOD);
+        int saveGamePeriod = options.getInteger(ClientOptions.AUTOSAVE_PERIOD);
         int turnNumber = game.getTurn().getNumber();
-        if (savegamePeriod <= 1
-            || (savegamePeriod != 0 && turnNumber % savegamePeriod == 0)) {
-            Player player = game.getCurrentPlayer();
-            String playerNation = player == null ? ""
+        if (saveGamePeriod <= 1
+            || (saveGamePeriod != 0 && turnNumber % saveGamePeriod == 0)) {
+            Player player = freeColClient.getMyPlayer();
+            String playerNation = (player == null) ? ""
                 : Messages.message(player.getNation().getNameKey());
             String gid = Integer.toHexString(game.getUUID().hashCode());
-            filename = Messages.message("clientOptions.savegames.autosave.fileprefix")
-                + '-' + gid  + "_" + playerNation
+            String name = prefix + "-" + gid  + "_" + playerNation
                 + "_" + getSaveGameString(game.getTurn()) + ".fsg";
-            saveGameFile = new File(autosaveDir, filename);
-            saveGame(saveGameFile);
+            saveGame(new File(autoSaveDir, name));
         }
     }
 
@@ -4266,9 +4262,9 @@ public final class InGameController implements NetworkConstants {
 
             player.invalidateCanSeeTiles();
 
-            // auto-save the game (if it isn't newly loaded)
+            // Save the game (if it isn't newly loaded)
             if (freeColClient.getFreeColServer() != null
-                && turnsPlayed > 0) autosave_game();
+                && turnsPlayed > 0) autoSaveGame();
 
             // Check for emigration.
             if (player.hasAbility(Ability.SELECT_RECRUIT)) {

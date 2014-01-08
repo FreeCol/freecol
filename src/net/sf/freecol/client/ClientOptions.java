@@ -49,6 +49,7 @@ import net.sf.freecol.common.option.ListOption;
 import net.sf.freecol.common.option.ModListOption;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.SelectOption;
+import net.sf.freecol.common.option.TextOption;
 
 import javax.xml.stream.events.XMLEvent;
 
@@ -211,14 +212,6 @@ public class ClientOptions extends OptionGroup {
         = "model.option.rememberPanelSizes";
 
     /**
-     * Style of map controls.
-     */
-    public static final String MAP_CONTROLS
-        = "model.option.mapControls";
-    public static final String MAP_CONTROLS_CORNERS = "CornerMapControls";
-    public static final String MAP_CONTROLS_CLASSIC = "ClassicMapControls";
-
-    /**
      * If selected: Enables smooth rendering of the minimap when zoomed out.
      */
     public static final String SMOOTH_MINIMAP_RENDERING
@@ -243,6 +236,14 @@ public class ClientOptions extends OptionGroup {
         = "model.option.miniMapToggleBorders";
     
     /**
+     * Style of map controls.
+     */
+    public static final String MAP_CONTROLS
+        = "model.option.mapControls";
+    public static final String MAP_CONTROLS_CORNERS = "CornerMapControls";
+    public static final String MAP_CONTROLS_CLASSIC = "ClassicMapControls";
+
+    /**
      * The color to fill in around the actual map on the
      * minimap.  Typically only visible when the minimap is at full
      * zoom-out, but at the default 'black' you can't differentiate
@@ -251,22 +252,6 @@ public class ClientOptions extends OptionGroup {
      */
     public static final String MINIMAP_BACKGROUND_COLOR
         = "model.option.color.background";
-
-    /**
-     * Option for selecting the compact colony report.
-     */
-    public static final String COLONY_REPORT
-        = "model.option.colonyReport";
-    public static final int COLONY_REPORT_CLASSIC = 0;
-    public static final int COLONY_REPORT_COMPACT = 1;
-
-    /**
-     * The type of labour report to display.
-     */
-    public static final String LABOUR_REPORT
-        = "model.option.labourReport";
-    public static final int LABOUR_REPORT_CLASSIC = 0;
-    public static final int LABOUR_REPORT_COMPACT = 1;
 
     /**
      * What text to display in the tiles.
@@ -356,6 +341,22 @@ public class ClientOptions extends OptionGroup {
     public static final String SHOW_NOT_BEST_TILE
         = "model.option.guiShowNotBestTile";
 
+    /**
+     * Option for selecting the compact colony report.
+     */
+    public static final String COLONY_REPORT
+        = "model.option.colonyReport";
+    public static final int COLONY_REPORT_CLASSIC = 0;
+    public static final int COLONY_REPORT_COMPACT = 1;
+
+    /**
+     * The type of labour report to display.
+     */
+    public static final String LABOUR_REPORT
+        = "model.option.labourReport";
+    public static final int LABOUR_REPORT_CLASSIC = 0;
+    public static final int LABOUR_REPORT_COMPACT = 1;
+
 
     // clientOptions.savegames
 
@@ -403,6 +404,24 @@ public class ClientOptions extends OptionGroup {
     public static final String CONFIRM_SAVE_OVERWRITE
         = "model.option.confirmSaveOverwrite";
 
+    /**
+     * Prefix for the auto-save file.
+     */
+    public static final String AUTO_SAVE_PREFIX
+        = "model.option.autoSavePrefix";
+
+    /**
+     * Stem of the last-turn save file name.
+     */
+    public static final String LAST_TURN_NAME
+        = "model.option.lastTurnName";
+
+    /**
+     * Stem of the before-last-turn save file name.
+     */
+    public static final String BEFORE_LAST_TURN_NAME
+        = "model.option.beforeLastTurnName";
+
 
     // clientOptions.warehouse
 
@@ -430,17 +449,20 @@ public class ClientOptions extends OptionGroup {
     /**
      * Choose the default mixer.
      */
-    public static final String AUDIO_MIXER = "model.option.audioMixer";
+    public static final String AUDIO_MIXER
+        = "model.option.audioMixer";
 
     /**
      * The volume level to set.
      */
-    public static final String AUDIO_VOLUME = "model.option.audioVolume";
+    public static final String AUDIO_VOLUME
+        = "model.option.audioVolume";
 
     /**
      * Play an alert sound on message arrival.
      */
-    public static final String AUDIO_ALERTS = "model.option.audioAlerts";
+    public static final String AUDIO_ALERTS
+        = "model.option.audioAlerts";
 
 
     // clientOptions.other
@@ -845,6 +867,12 @@ public class ClientOptions extends OptionGroup {
             "clientOptions.gui", true);    
         addBooleanOption(MINIMAP_TOGGLE_FOG_OF_WAR,
             "clientOptions.gui", true);
+        addTextOption(AUTO_SAVE_PREFIX,
+            "clientOptions.savegames", "Autosave");
+        addTextOption(LAST_TURN_NAME,
+            "clientOptions.savegames", "last-turn");
+        addTextOption(BEFORE_LAST_TURN_NAME,
+            "clientOptions.savegames", "before-last-turn");
         // end @compact 0.11.0
     }
 
@@ -860,6 +888,15 @@ public class ClientOptions extends OptionGroup {
     private void addIntegerOption(String id, String gr, int val) {
         if (getOption(id) == null) {
             IntegerOption op = new IntegerOption(id, null);
+            op.setGroup(gr);
+            op.setValue(val);
+            add(op);
+        }
+    }
+
+    private void addTextOption(String id, String gr, String val) {
+        if (getOption(id) == null) {
+            TextOption op = new TextOption(id, null);
             op.setGroup(gr);
             op.setValue(val);
             add(op);
