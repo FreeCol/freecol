@@ -578,6 +578,9 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
     /** The agreement under negotiation. */
     private DiplomaticTrade agreement;
 
+    /** A comment message. */
+    private StringTemplate comment;
+
     /** The panels for various negotiable data. */
     private StanceTradeItemPanel stancePanel;
     private GoldTradeItemPanel goldOfferPanel, goldDemandPanel;
@@ -619,18 +622,20 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         this.otherPlayer = (unitPlayer == player) ? colonyPlayer
             : unitPlayer;
         this.agreement = agreement;
+        this.comment = comment;
 
         JLabel header
             = GUI.getDefaultHeader(Messages.message("negotiationDialog.title."
                     + agreement.getContext().getKey()));
-
+        StringTemplate nation = player.getNationName(),
+            otherNation = otherPlayer.getNationName();
         t = StringTemplate.template("negotiationDialog.demand")
-            .addStringTemplate("%nation%", unitPlayer.getNationName());
+            .addStringTemplate("%nation%", nation)
+            .addStringTemplate("%otherNation%", otherNation);
         this.demandMessage = Messages.message(t);
-        JTextArea commentArea = GUI.getDefaultTextArea((comment == null) ? ""
-            : Messages.message(comment));
         t = StringTemplate.template("negotiationDialog.offer")
-            .addStringTemplate("%nation%", unitPlayer.getNationName());
+            .addStringTemplate("%nation%", nation)
+            .addStringTemplate("%otherNation%", otherNation);
         this.offerMessage = Messages.message(t);
         t = StringTemplate.template("negotiationDialog.exchange")
             .addStringTemplate("%nation%", unitPlayer.getNationName());
@@ -685,16 +690,17 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             throw new IllegalStateException("Bogus trade context: " + context);
         }
 
-        this.summary = new MigPanel();
-        this.summary.setLayout(new MigLayout("wrap 2", "[20px][]"));
+        this.summary = new MigPanel(new MigLayout("wrap 2", "[20px][]"));
         this.summary.setOpaque(false);
+        this.summary.add(GUI.getDefaultTextArea(Messages.message(comment)),
+                         "center, span 2");
 
         MigPanel panel = new MigPanel(new MigLayout("wrap 3",
                 "[200, fill][300, fill][200, fill]", ""));
         panel.add(header, "span 3, center");
-        panel.add(new JLabel(this.demandMessage), "center");
-        panel.add(commentArea, "center");
-        panel.add(new JLabel(this.offerMessage), "center");
+        panel.add(GUI.getDefaultTextArea(this.demandMessage), "center");
+        panel.add(new JLabel(), "center");
+        panel.add(GUI.getDefaultTextArea(this.offerMessage), "center");
 
         panel.add(this.goldDemandPanel);
         panel.add(this.summary, "spany, top");
@@ -852,6 +858,9 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         final Player player = getMyPlayer();
 
         summary.removeAll();
+
+        summary.add(GUI.getDefaultTextArea(Messages.message(comment)),
+                    "center, span 2");
 
         List<TradeItem> offers = agreement.getItemsGivenBy(player);
         if (!offers.isEmpty()) {
