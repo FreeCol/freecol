@@ -614,13 +614,15 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         final Player colonyPlayer = settlement.getOwner();
         StringTemplate t;
 
-        setFocusCycleRoot(true);
-
         this.unit = unit;
         this.settlement = settlement;
         this.otherPlayer = (unitPlayer == player) ? colonyPlayer
             : unitPlayer;
         this.agreement = agreement;
+
+        JLabel header
+            = GUI.getDefaultHeader(Messages.message("negotiationDialog.title."
+                    + agreement.getContext().getKey()));
 
         t = StringTemplate.template("negotiationDialog.demand")
             .addStringTemplate("%nation%", unitPlayer.getNationName());
@@ -689,6 +691,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
 
         MigPanel panel = new MigPanel(new MigLayout("wrap 3",
                 "[200, fill][300, fill][200, fill]", ""));
+        panel.add(header, "span 3, center");
         panel.add(new JLabel(this.demandMessage), "center");
         panel.add(commentArea, "center");
         panel.add(new JLabel(this.offerMessage), "center");
@@ -713,6 +716,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             panel.add(this.unitOfferPanel);
         }
         panel.setPreferredSize(panel.getPreferredSize());
+        setFocusCycleRoot(true);
 
         DiplomaticTrade bogus = null;
         String str;
@@ -727,10 +731,8 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         str = Messages.message("negotiationDialog.cancel");
         c.add(new ChoiceItem<DiplomaticTrade>(str, bogus)
             .cancelOption().defaultOption());
-        ImageIcon icon = getImageLibrary()
-            .getImageIcon((otherPlayer == unitPlayer) ? unit : settlement,
-                          false);
-        initialize(DialogType.QUESTION, true, panel, icon, c);
+        initialize(DialogType.QUESTION, true, panel, 
+                   getImageLibrary().getImageIcon(player, false), c);
 
         updateDialog();
     }
