@@ -35,13 +35,14 @@ public class LootSession extends TransactionSession {
     private static final Logger logger = Logger.getLogger(LootSession.class.getName());
 
     /** The goods that are available to be captured. */
-    private List<Goods> capture;
+    private final List<Goods> capture;
 
 
-    public LootSession(Unit winner, Unit loser) {
+    public LootSession(Unit winner, Unit loser, List<Goods> capture) {
         super(makeSessionKey(LootSession.class, winner, loser));
-        capture = null;
+        this.capture = capture;
     }
+
 
     public void complete(ChangeSet cs) {
         super.complete(cs);
@@ -49,9 +50,5 @@ public class LootSession extends TransactionSession {
 
     public List<Goods> getCapture() {
         return capture;
-    }
-
-    public void setCapture(List<Goods> capture) {
-        this.capture = capture;
     }
 }

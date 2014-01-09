@@ -1053,21 +1053,7 @@ public final class InGameController extends Controller {
         }
 
         ChangeSet cs = new ChangeSet();
-        switch (action) {
-        case RAISE_TAX_ACT: case RAISE_TAX_WAR:
-            serverPlayer.csRaiseTax(session.getTax(), session.getGoods(),
-                                    result, cs);
-            break;
-        case OFFER_MERCENARIES:
-            if (result) {
-                serverPlayer.csAddMercenaries(session.getMercenaries(),
-                                              session.getPrice(), cs);
-            }
-            break;
-        default:
-            return DOMMessage.clientError("Invalid monarch action: " + action);
-        }
-
+        session.complete(result, cs);
         return cs.build(serverPlayer);
     }
 

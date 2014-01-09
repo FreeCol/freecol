@@ -81,6 +81,18 @@ public class MonarchSession extends TransactionSession {
         this.price = price;
     }
 
+    public void complete(boolean result, ChangeSet cs) {
+        switch (action) {
+        case RAISE_TAX_ACT: case RAISE_TAX_WAR:
+            serverPlayer.csRaiseTax(tax, goods, result, cs);
+            break;
+        case OFFER_MERCENARIES:
+            if (result) serverPlayer.csAddMercenaries(mercenaries, price, cs);
+            break;
+        }
+        super.complete(cs);
+    }
+
     public void complete(ChangeSet cs) {
         switch (action) {
         case RAISE_TAX_ACT: case RAISE_TAX_WAR:
@@ -89,14 +101,12 @@ public class MonarchSession extends TransactionSession {
                 new ModelMessage("model.monarch.ignoredTax", serverPlayer)
                     .addAmount("%amount%", tax));
             break;
-        case OFFER_MERCENARIES: // Do nothing
+        case OFFER_MERCENARIES:
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage("model.monarch.ignoredMercenaries",
-                                 serverPlayer)
-                    .addAmount("%amount%", tax));
+                                 serverPlayer));
             break;
         }
-
         super.complete(cs);
     }
 

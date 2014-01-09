@@ -3340,8 +3340,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         List<Goods> capture = loser.getGoodsList();
         if (!capture.isEmpty() && winner.hasSpaceLeft()) {
             for (Goods g : capture) g.setLocation(null);
-            LootSession session = new LootSession(winner, loser);
-            session.setCapture(capture);
+            LootSession session = new LootSession(winner, loser, capture);
             cs.add(See.only(winnerPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
                 new LootCargoMessage(winner, loser.getId(), capture));
         }
