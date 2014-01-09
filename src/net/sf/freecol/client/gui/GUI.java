@@ -1672,8 +1672,9 @@ public class GUI {
         return canvas.showScaleMapSizeDialog();
     }
 
-    public ScoutColonyAction
-        showScoutForeignColonyDialog(Colony colony, Unit unit, boolean neg) {
+    public ScoutColonyAction showScoutForeignColonyDialog(Colony colony,
+                                                          Unit unit,
+                                                          boolean neg) {
         if (canvas == null) return null;
         return canvas.showScoutForeignColonyDialog(colony, unit, neg);
     }
