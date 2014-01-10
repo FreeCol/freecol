@@ -43,6 +43,11 @@ public class DiplomacySession extends TransactionSession {
         agreement = null;
     }
 
+    public DiplomacySession(Unit unit, Unit otherUnit) {
+        super(makeSessionKey(DiplomacySession.class, unit, otherUnit));
+        agreement = null;
+    }
+
     public void complete(ChangeSet cs) {
         super.complete(cs);
     }

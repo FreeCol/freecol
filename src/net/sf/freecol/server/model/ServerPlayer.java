@@ -40,6 +40,7 @@ import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
+import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.Disaster;
 import net.sf.freecol.common.model.Disaster.Effects;
 import net.sf.freecol.common.model.Effect;
@@ -65,6 +66,7 @@ import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Nation;
+import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Settlement;
@@ -79,6 +81,7 @@ import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.FirstContactMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
@@ -1083,10 +1086,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 + " " + old.toString() + " -> " + stance.toString()
                 + " wrt " + otherPlayer.getName());
             this.addStanceChange(other);
-            cs.addMessage(See.only(other),
-                new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                    "model.diplomacy." + stance + ".declared", this)
-                .addStringTemplate("%nation%", getNationName()));
+            if (old != Stance.UNCONTACTED) {
+                cs.addMessage(See.only(other),
+                    new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                        "model.diplomacy." + stance + ".declared", this)
+                    .addStringTemplate("%nation%", getNationName()));
+            }
             cs.addStance(See.only(this), this, stance, otherPlayer);
             cs.addStance(See.only(other), this, stance, otherPlayer);
             change = true;
@@ -1104,10 +1109,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 + " " + old.toString() + " -> " + stance.toString()
                 + " wrt " + getName() + " (symmetric)");
             other.addStanceChange(this);
-            cs.addMessage(See.only(this),
-                new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                    "model.diplomacy." + stance + ".declared", otherPlayer)
-                .addStringTemplate("%nation%", otherPlayer.getNationName()));
+            if (old != Stance.UNCONTACTED) {
+                cs.addMessage(See.only(this),
+                    new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                        "model.diplomacy." + stance + ".declared", otherPlayer)
+                    .addStringTemplate("%nation%", otherPlayer.getNationName()));
+            }
             cs.addStance(See.only(this), otherPlayer, stance, this);
             cs.addStance(See.only(other), otherPlayer, stance, this);
             change = true;
@@ -3877,13 +3884,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * Make contact between two nations if necessary.
      *
      * @param other The other <code>ServerPlayer</code>.
-     * @param tile The <code>Tile</code> contact is made at if this is
-     *     a first landing in the new world and it is owned by the other
-     *     player, which must be a native.
      * @param cs A <code>ChangeSet</code> to update.
      * @return True if this was a first contact.
      */
-    public boolean csContact(ServerPlayer other, Tile tile, ChangeSet cs) {
+    public boolean csContact(ServerPlayer other, ChangeSet cs) {
         if (hasContacted(other)) return false;
 
         // Must be a first contact!
@@ -3896,39 +3900,67 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 cs.addHistory(other, new HistoryEvent(turn,
                         HistoryEvent.EventType.MEET_NATION, other)
                     .addStringTemplate("%nation%", getNationName()));
-
-                cs.add(See.only(other), ChangePriority.CHANGE_EARLY,
-                    new FirstContactMessage(other, this, null));
             }
         } else { // (serverPlayer.isEuropean)
             cs.addHistory(this, new HistoryEvent(turn,
                     HistoryEvent.EventType.MEET_NATION, other)
                 .addStringTemplate("%nation%", other.getNationName()));
-
-            if (other.isIndian()) {
-                cs.add(See.only(this), ChangePriority.CHANGE_EARLY,
-                    new FirstContactMessage(this, other, tile));
-                if (tile != null) {
-                    // Establish a diplomacy session so that if the player
-                    // accepts the tile offer, we can verify it was made.
-                    new DiplomacySession(tile.getFirstUnit(),
-                                         tile.getOwningSettlement());
-                }
-            } else {
-                ; // TODO: Initiate European/European diplomacy
-            }
         }
-        setStance(other, Stance.PEACE);
-        other.setStance(this, Stance.PEACE);
-        setTension(other, new Tension(Tension.TENSION_MIN));
-        other.setTension(this, new Tension(Tension.TENSION_MIN));
-        logger.finest("First contact between " + this + " and " + other
-                      + " with tile " + tile);
 
+        csChangeStance(Stance.PEACE, other, true, cs);
+        logger.finest("First contact between " + this + " and " + other);
         return true;
     }
 
+    /**
+     * Initiate first contact between this European and native player.
+     *
+     * @param other The native <code>ServerPlayer</code>.
+     * @param tile The <code>Tile</code> contact is made at if this is
+     *     a first landing in the new world and it is owned by the
+     *     other player.
+     * @param cs A <code>ChangeSet</code> to update.
+     * @return True if this was a first contact.
+     */
+    public void csNativeFirstContact(ServerPlayer other, Tile tile,
+                                     ChangeSet cs) {
+        cs.add(See.only(this), ChangePriority.CHANGE_EARLY,
+            new FirstContactMessage(this, other, tile));
+        if (tile != null) {
+            // Establish a diplomacy session so that if the player
+            // accepts the tile offer, we can verify that the offer
+            // was made.
+            new DiplomacySession(tile.getFirstUnit(),
+                                 tile.getOwningSettlement());
+        }
+    }
 
+    /**
+     * Initiate first contact between this European and another
+     * European player.
+     *
+     * @param unit The <code>Unit</code> making contact.
+     * @param tile The <code>Tile</code> containing the other player unit
+     *     or settlement.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    public void csEuropeanFirstContact(Unit unit, Tile tile, ChangeSet cs) {
+        Unit otherUnit = tile.getFirstUnit();
+        if (otherUnit == null) {
+            Settlement settlement = tile.getSettlement();
+            otherUnit = settlement.getUnitList().get(0);
+        }
+        ServerPlayer other = (ServerPlayer)((Ownable)otherUnit).getOwner();
+        
+        DiplomaticTrade agreement = new DiplomaticTrade(getGame(),
+            DiplomaticTrade.TradeContext.CONTACT, other, this, null, 0);
+        DiplomacySession session = new DiplomacySession(unit, otherUnit);
+        session.setAgreement(agreement);
+        cs.add(See.only(this), ChangePriority.CHANGE_LATE,
+               new DiplomacyMessage(unit, null, otherUnit, agreement));
+    }
+
+        
     /**
      * {@inheritDoc}
      */

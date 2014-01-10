@@ -702,10 +702,11 @@ public abstract class ServerAPI {
      * @param agreement The <code>DiplomaticTrade</code> agreement to propose.
      * @return The resulting agreement or null if none present.
      */
-    public DiplomaticTrade diplomacy(Game game, Unit unit, Settlement settlement,
+    public DiplomaticTrade diplomacy(Game game, Unit unit,
+                                     Settlement settlement, Unit otherUnit,
                                      DiplomaticTrade agreement) {
         Element reply = askExpecting(new DiplomacyMessage(unit, settlement,
-                                                          agreement),
+                                                          otherUnit, agreement),
             null, null);
         if (reply == null) 
             return null;

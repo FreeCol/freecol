@@ -610,6 +610,7 @@ public final class InGameInputHandler extends InputHandler {
      * @return A diplomacy response, or null if none required.
      */
     private Element diplomacy(Element element) {
+        final Game game = getGame();
         final DiplomacyMessage message
             = new DiplomacyMessage(getGame(), element);
 
@@ -619,9 +620,10 @@ public final class InGameInputHandler extends InputHandler {
             return null;
         }
 
-        final Settlement settlement = message.getSettlement();
-        if (settlement == null) {
-            logger.warning("Settlement omitted from diplomacy message.");
+        final Settlement settlement = message.getSettlement(game);
+        final Unit otherUnit = message.getOtherUnit(game);
+        if (settlement == null && otherUnit == null) {
+            logger.warning("Settlement and other unit omitted from diplomacy message.");
             return null;
         }
 
@@ -631,13 +633,13 @@ public final class InGameInputHandler extends InputHandler {
         invokeAndWait(new Runnable() {
                 public void run() {
                     message.setAgreement(igc().diplomacy(unit, settlement,
-                                                         agreement));
+                                                         otherUnit, agreement));
                 }
             });
         SwingUtilities.invokeLater(updateMenuBarRunnable);
         return (message.getAgreement() == null) ? null
-            : new DiplomacyMessage(unit, settlement, message.getAgreement())
-                .toXMLElement();
+            : new DiplomacyMessage(unit, settlement, otherUnit,
+                                   message.getAgreement()).toXMLElement();
     }
 
     /**

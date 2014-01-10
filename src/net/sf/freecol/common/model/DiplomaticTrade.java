@@ -45,6 +45,7 @@ public class DiplomaticTrade extends FreeColObject {
 
     /** A context for the trade. */
     public static enum TradeContext {
+        CONTACT,    /** First contact between Europeans */
         DIPLOMATIC, /** Scout negotiating */
         TRADE,      /** Carrier trading */
         TRIBUTE;    /** Offensive unit demanding */

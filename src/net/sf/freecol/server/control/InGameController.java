@@ -582,7 +582,7 @@ public final class InGameController extends Controller {
      */
     private void csVisit(ServerPlayer serverPlayer, IndianSettlement is,
                          int scout, ChangeSet cs) {
-        serverPlayer.csContact((ServerPlayer) is.getOwner(), null, cs);
+        serverPlayer.csContact((ServerPlayer)is.getOwner(), cs);
         is.setVisited(serverPlayer);
         if (scout > 0 || (scout == 0 && getGame().getSpecification()
                 .getBoolean(GameOptions.SETTLEMENT_ACTIONS_CONTACT_CHIEF))) {
@@ -3046,7 +3046,11 @@ public final class InGameController extends Controller {
     }
 
     /**
-     * Diplomatic trades.
+     * Diplomacy.
+     *
+     * Either settlement is non-null (in most types of diplomacy) or
+     * otherUnit is non-null (first European contact).
+     *
      * Note that when an agreement is accepted we always process the
      * agreement that was sent, not what was returned, cutting off a
      * possibility for cheating.
@@ -3054,51 +3058,61 @@ public final class InGameController extends Controller {
      * @param serverPlayer The <code>ServerPlayer</code> that is trading.
      * @param unit The <code>Unit</code> that is trading.
      * @param settlement The <code>Settlement</code> to trade with.
+     * @param otherUnit The other <code>Unit</code> encountered.
      * @param agreement The <code>DiplomaticTrade</code> to consider.
      * @return An <code>Element</code> encapsulating this action.
      */
     public Element diplomaticTrade(ServerPlayer serverPlayer, Unit unit,
-                                   Settlement settlement,
+                                   Settlement settlement, Unit otherUnit,
                                    DiplomaticTrade agreement) {
         ChangeSet cs = new ChangeSet();
-        ServerPlayer otherPlayer = (ServerPlayer) settlement.getOwner();
-        DiplomacySession session
-            = TransactionSession.lookup(DiplomacySession.class,
-                unit, settlement);
+        ServerPlayer otherPlayer = null;
+        Tile tile = null;
+        DiplomacySession session = null;
         TradeStatus status = agreement.getStatus();
+        if (settlement != null) {
+            otherPlayer = (ServerPlayer)settlement.getOwner();
+            session = TransactionSession.lookup(DiplomacySession.class,
+                                                unit, settlement);
+            if (session == null) {
+                if (status == TradeStatus.PROPOSE_TRADE) {
+                    session = new DiplomacySession(unit, settlement);
+                } else {
+                    return DOMMessage.clientError("Diplomacy session not found: "
+                        + unit.getId() + "/" + settlement.getId());
+                }
+            }
+            tile = settlement.getTile();
+        } else if (otherPlayer != null) {
+            otherPlayer = (ServerPlayer)otherUnit.getOwner();
+            session = TransactionSession.lookup(DiplomacySession.class,
+                                                unit, otherUnit);
+            if (session == null) {
+                if (status == TradeStatus.PROPOSE_TRADE) {
+                    session = new DiplomacySession(unit, otherUnit);
+                } else {
+                    return DOMMessage.clientError("Diplomacy session not found: "
+                        + unit.getId() + "/" + otherUnit.getId());
+                }
+            }
+            tile = otherUnit.getTile();
+        } else {
+            return DOMMessage.clientError("Null other participants for: " + unit.getId());
+        }
         Player.makeContact(serverPlayer, otherPlayer);
 
         switch (status) {
         case PROPOSE_TRADE:
-            if (session == null) {
-                Unit.MoveType mt = unit.getMoveType(settlement.getTile());
-                switch (mt) {
-                case ENTER_FOREIGN_COLONY_WITH_SCOUT:
-                case ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
-                case ATTACK_SETTLEMENT: // Tribute demand
-                    break;
-                default:
-                    return DOMMessage.clientError("Unable to enter "
-                        + settlement.getId() + ": " + mt.whyIllegal());
-                }
-                session = new DiplomacySession(unit, settlement);
-                unit.setMovesLeft(0);
-                cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
-            }
+            unit.setMovesLeft(0);
+            cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
             session.setAgreement(agreement);
             break;
         case ACCEPT_TRADE:
-            if (session == null) {
-                return DOMMessage.clientError("Accept-trade with no session");
-            }
             agreement = session.getAgreement();
             agreement.setStatus(status);
             csAcceptTrade(unit, settlement, agreement, cs);
             break;
         case REJECT_TRADE:
-            if (session == null) {
-                return DOMMessage.clientError("Reject-trade with no session");
-            }
             agreement = session.getAgreement();
             agreement.setStatus(status);
             break;
@@ -3107,7 +3121,7 @@ public final class InGameController extends Controller {
         }
 
         DOMMessage reply = askTimeout(otherPlayer,
-            new DiplomacyMessage(unit, settlement, agreement));
+            new DiplomacyMessage(unit, settlement, null, agreement));
         DiplomaticTrade theirAgreement = (reply instanceof DiplomacyMessage)
             ? ((DiplomacyMessage)reply).getAgreement()
             : null;
@@ -3142,7 +3156,7 @@ public final class InGameController extends Controller {
 
         return new ChangeSet()
             .add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
-                new DiplomacyMessage(unit, settlement, agreement))
+                new DiplomacyMessage(unit, settlement, otherUnit, agreement))
             .build(serverPlayer);
     }
 

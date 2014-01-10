@@ -2155,6 +2155,7 @@ public final class Canvas extends JDesktopPane {
      *
      * @param unit The <code>Unit</code> that is negotiating.
      * @param settlement A <code>Settlement</code> that is negotiating.
+     * @param otherUnit The other <code>Unit</code> at first contact.
      * @param agreement The current <code>DiplomaticTrade</code> agreement.
      * @param comment An optional <code>StringTemplate</code> containing a
      *     commentary message.
@@ -2162,11 +2163,12 @@ public final class Canvas extends JDesktopPane {
      */
     public DiplomaticTrade showDiplomaticTradeDialog(Unit unit,
                                                      Settlement settlement,
+                                                     Unit otherUnit,
                                                      DiplomaticTrade agreement,
                                                      StringTemplate comment) {
         DiplomaticTradeDialog dtd
             = new DiplomaticTradeDialog(freeColClient, unit, settlement,
-                                        agreement, comment);
+                                        otherUnit, agreement, comment);
         return showFreeColDialog(dtd, unit.getTile());
     }
 

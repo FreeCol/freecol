@@ -601,25 +601,28 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param unit The <code>Unit</code> that is trading.
      * @param settlement The <code>Settlement</code> that is trading.
+     * @param otherUnit The other <code>Unit</code> at first contact.
      * @param agreement The <code>DiplomaticTrade</code> agreement that
      *     is being negotiated.
      * @param comment An optional <code>StringTemplate</code>
      *     commentary message.
      */
     public DiplomaticTradeDialog(FreeColClient freeColClient, Unit unit,
-                                 Settlement settlement,
+                                 Settlement settlement, Unit otherUnit,
                                  DiplomaticTrade agreement,
                                  StringTemplate comment) {
         super(freeColClient);
 
         final Player player = getMyPlayer();
         final Player unitPlayer = unit.getOwner();
-        final Player colonyPlayer = settlement.getOwner();
+        final Player nonUnitPlayer = (settlement != null)
+            ? settlement.getOwner()
+            : otherUnit.getOwner();
         StringTemplate t;
 
         this.unit = unit;
         this.settlement = settlement;
-        this.otherPlayer = (unitPlayer == player) ? colonyPlayer
+        this.otherPlayer = (unitPlayer == player) ? nonUnitPlayer
             : unitPlayer;
         this.agreement = agreement;
         this.comment = comment;
@@ -654,6 +657,9 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         this.goldOfferPanel = new GoldTradeItemPanel(player, gold);
 
         switch (context) {
+        case CONTACT:
+            this.stancePanel = new StanceTradeItemPanel(player, otherPlayer);
+            break;
         case DIPLOMATIC:
             this.stancePanel = new StanceTradeItemPanel(player, otherPlayer);
             this.colonyDemandPanel = new ColonyTradeItemPanel(otherPlayer);
@@ -737,8 +743,10 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         str = Messages.message("negotiationDialog.cancel");
         c.add(new ChoiceItem<DiplomaticTrade>(str, bogus)
             .cancelOption().defaultOption());
-        initialize(DialogType.QUESTION, true, panel, 
-                   getImageLibrary().getImageIcon(player, false), c);
+        ImageIcon icon = getImageLibrary()
+            .getImageIcon((settlement != null) ? settlement : otherUnit,
+                          false);
+        initialize(DialogType.QUESTION, true, panel, icon, c);
 
         updateDialog();
     }

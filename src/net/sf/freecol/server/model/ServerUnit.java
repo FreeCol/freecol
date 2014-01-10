@@ -615,7 +615,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         ServerPlayer serverPlayer = (ServerPlayer)getOwner();
         Tile tile = getTile();
         ServerPlayer indianPlayer = (ServerPlayer)tile.getOwner();
-        serverPlayer.csContact(indianPlayer, null, cs);
+        serverPlayer.csContact(indianPlayer, cs);
         indianPlayer.csModifyTension(serverPlayer, 
             Tension.Level.HATEFUL.getLimit(), cs);//+til
         serverPlayer.csChangeStance(Stance.WAR, indianPlayer, true, cs);
@@ -1011,9 +1011,25 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     : null;
                 if (other == null
                     || other == serverPlayer) continue; // No contact
-                Tile offer = (firstLanding && other.owns(newTile)) ? newTile
-                    : null;
-                serverPlayer.csContact(other, offer, cs);
+                if (serverPlayer.csContact(other, cs)) {
+                    // First contact
+                    if (serverPlayer.isEuropean()) {
+                        if (other.isIndian()) {
+                            Tile offer = (firstLanding && other.owns(newTile))
+                                ? newTile
+                                : null;
+                            serverPlayer.csNativeFirstContact(other, offer, cs);
+                        } else {
+                            serverPlayer.csEuropeanFirstContact(this, t, cs);
+                        }
+                    } else {
+                        if (other.isIndian()) {
+                            ; // Do nothing
+                        } else {
+                            other.csNativeFirstContact(serverPlayer, null, cs);
+                        }
+                    }
+                }
 
                 // Initialize alarm for native settlements or units and
                 // notify of contact.
