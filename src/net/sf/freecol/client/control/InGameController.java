@@ -3848,9 +3848,10 @@ public final class InGameController implements NetworkConstants {
 
         // The name is set, bring up the first landing panel.
         final Player player = unit.getOwner();
-        player.addModelMessage(new ModelMessage(ModelMessage.MessageType.DEFAULT,
-                "EventPanel.FIRST_LANDING", player)
-            .addName("%name%", name));
+        StringTemplate t = StringTemplate.template("event.firstLanding")
+            .addName("%name%", name);
+        gui.showEventPanel(Messages.message(t), "EventImage.firstLanding",
+                           null);
 
         // Add tutorial message.
         String key = FreeColActionUI.getHumanKeyStrokeText(freeColClient

@@ -89,6 +89,7 @@ import net.sf.freecol.client.gui.panel.ErrorPanel;
 import net.sf.freecol.client.gui.panel.EuropePanel;
 import net.sf.freecol.client.gui.panel.EventPanel;
 import net.sf.freecol.client.gui.panel.FindSettlementPanel;
+import net.sf.freecol.client.gui.panel.FirstContactDialog;
 import net.sf.freecol.client.gui.panel.FreeColChoiceDialog;
 import net.sf.freecol.client.gui.panel.FreeColConfirmDialog;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
@@ -241,15 +242,6 @@ public final class Canvas extends JDesktopPane {
             }.start();
         }
     };
-
-    public static enum EventType {
-        FIRST_LANDING,
-        MEETING_NATIVES,
-        MEETING_EUROPEANS,
-        MEETING_AZTEC,
-        MEETING_INCA,
-        DISCOVER_PACIFIC
-    }
 
     public static enum PopupPosition {
         ORIGIN,
@@ -531,32 +523,6 @@ public final class Canvas extends JDesktopPane {
             getInputMap().put(action.getAccelerator(), action.getId());
             getActionMap().put(action.getId(), action);
         }
-    }
-
-    /**
-     * Filters out and displays the EventPanel messages.
-     *
-     * @param messages The list of <code>ModelMessage</code> to filter.
-     * @return The list of messages without any EventPanel messages.
-     */
-    private List<ModelMessage> filterEventPanels(ModelMessage[] messages) {
-        final String eventMatch = "EventPanel.";
-        List<ModelMessage> normal = new ArrayList<ModelMessage>();
-        for (int i = 0; i < messages.length; i++) {
-            String id = messages[i].getId();
-            if (id.startsWith(eventMatch)) {
-                id = id.substring(eventMatch.length());
-                final EventType e = EventType.valueOf(id);
-                SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            showEventPanel(e);
-                        }
-                    });
-            } else {
-                normal.add(messages[i]);
-            }
-        }
-        return normal;
     }
 
     /**
@@ -1797,10 +1763,12 @@ public final class Canvas extends JDesktopPane {
     /**
      * Display an event panel.
      *
-     * @param type The <code>EventType</code>.
+     * @param header The title.
+     * @param image A resource key for the image to display.
+     * @param footer Optional footer text.
      */
-    public void showEventPanel(EventType type) {
-        showSubPanel(new EventPanel(freeColClient, type),
+    public void showEventPanel(String header, String image, String footer) {
+        showSubPanel(new EventPanel(freeColClient, header, image, footer),
                      PopupPosition.CENTERED, false);
     }
 
@@ -1827,22 +1795,11 @@ public final class Canvas extends JDesktopPane {
     public void showFirstContactDialog(Player player, Player other,
                                        Tile tile, int settlementCount,
                                        DialogHandler<Boolean> handler) {
-        String messageId = (tile != null) ? "welcomeOffer.text"
-            : "welcomeSimple.text";
-        String type = ((IndianNationType)other.getNationType())
-            .getSettlementTypeKey(true);
-        StringTemplate template = StringTemplate.template(messageId)
-            .addStringTemplate("%nation%", other.getNationName())
-            .addName("%camps%", Integer.toString(settlementCount))
-            .add("%settlementType%", type);
-        JTextArea text = GUI.getDefaultTextArea(Messages.message(template));
-
         SwingUtilities.invokeLater(
             new DialogCallback<Boolean>(
-                new FreeColConfirmDialog(freeColClient, false, text,
-                    gui.getImageIcon(other, false),
-                    "welcome.yes", "welcome.no"),
-                null, handler));
+                new FirstContactDialog(freeColClient, player, other, tile,
+                                       settlementCount),
+                tile, handler));
     }
 
     /**
@@ -2112,11 +2069,10 @@ public final class Canvas extends JDesktopPane {
     /**
      * Displays a number of ModelMessages.
      *
-     * @param modelMessages The <code>ModelMessage</code>s to display.
+     * @param messages The <code>ModelMessage</code>s to display.
      */
-    public void showModelMessages(ModelMessage... modelMessages) {
-        List<ModelMessage> messages = filterEventPanels(modelMessages);
-        final int n = messages.size();
+    public void showModelMessages(ModelMessage... messages) {
+        final int n = messages.length;
         if (n <= 0) return;
         final Game game = freeColClient.getGame();
         String[] texts = new String[n];
@@ -2124,7 +2080,7 @@ public final class Canvas extends JDesktopPane {
         ImageIcon[] icons = new ImageIcon[n];
         Tile tile = null;
         for (int i = 0; i < n; i++) {
-            ModelMessage m = messages.get(i);
+            ModelMessage m = messages[i];
             texts[i] = Messages.message(m);
             fcos[i] = game.getMessageSource(m);
             icons[i] = gui.getImageIcon(game.getMessageDisplay(m), false);

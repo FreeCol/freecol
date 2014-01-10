@@ -325,17 +325,6 @@ public class DebugMenu extends JMenu {
             });
         panelMenu.add(victoryPanel);
 
-        for (final Canvas.EventType eventType : Canvas.EventType.values()) {
-            final JMenuItem mItem = new JMenuItem("Display " + eventType
-                + " panel");
-            mItem.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        gui.showEventPanel(eventType);
-                    }
-                });
-            panelMenu.add(mItem);
-        }
-
         final JMenuItem errorMessage = new JMenuItem(
             Messages.message("menuBar.debug.displayErrorMessage"));
         errorMessage.addActionListener(new ActionListener() {

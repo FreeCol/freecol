@@ -401,19 +401,19 @@ public class Region extends FreeColGameObject implements Nameable {
      * @return A <code>HistoryEvent</code> documenting the discovery.
      */
     public HistoryEvent discover(Player player, Turn turn, String newName) {
-        discoveredBy = player;
-        discoveredIn = turn;
-        name = newName;
+        if (!isPacific()) this.name = newName;
+        this.discoveredBy = player;
+        this.discoveredIn = turn;
+        this.discoverable = false;
+        for (Region r : getChildren()) r.setDiscoverable(false);
         int score = (isDiscoverable()
             && getSpecification().getBoolean(GameOptions.EXPLORATION_POINTS)) 
             ? getScoreValue()
             : 0;
-        discoverable = false;
-        for (Region r : getChildren()) r.setDiscoverable(false);
         HistoryEvent h = new HistoryEvent(turn,
             HistoryEvent.EventType.DISCOVER_REGION, player)
-            .addStringTemplate("%nation%", player.getNationName())
-            .addName("%region%", newName);
+                .addStringTemplate("%nation%", player.getNationName())
+                .addName("%region%", newName);
         h.setScore(getScoreValue());
         return h;
     }

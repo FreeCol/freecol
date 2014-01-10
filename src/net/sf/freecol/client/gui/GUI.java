@@ -68,7 +68,6 @@ import javax.swing.text.StyleContext;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
-import net.sf.freecol.client.gui.Canvas.EventType;
 import net.sf.freecol.client.gui.animation.Animations;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.menu.FreeColMenuBar;
@@ -1370,9 +1369,9 @@ public class GUI {
         canvas.showEuropePanel();
     }
 
-    public void showEventPanel(EventType type) {
+    public void showEventPanel(String header, String image, String footer) {
         if (canvas == null) return;
-        canvas.showEventPanel(type);
+        canvas.showEventPanel(header, image, footer);
     }
 
     public void showFindSettlementPanel() {

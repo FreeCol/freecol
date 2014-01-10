@@ -26,7 +26,6 @@ import javax.swing.JLabel;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas.EventType;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.StringTemplate;
@@ -45,51 +44,25 @@ public final class EventPanel extends FreeColPanel {
      * The constructor that will add the items to this panel.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param type The <code>EventType</code> for this panel.
+     * @param header The title.
+     * @param image A resource key for the image to display.
+     * @param footer Optional footer text.
      */
-    public EventPanel(FreeColClient freeColClient, EventType type) {
+    public EventPanel(FreeColClient freeColClient, String header, String image,
+                      String footer) {
         super(freeColClient, new MigLayout("wrap 1", "[center]", "[]20"));
 
-        // TODO: simplify this -- event should contain the necessary
-        // information; add it to enum or upgrade to class
-        String text = null;
-        String image = null;
-        switch (type) {
-        case FIRST_LANDING:
-            image = "EventImage.firstLanding";
-            text = Messages.message(StringTemplate.template("event.firstLanding")
-                .addName("%name%", Messages.getNewLandName(getMyPlayer())));
-            break;
-        case MEETING_EUROPEANS:
-            image = "EventImage.meetingEuropeans";
-            text = Messages.message("event.meetingEuropeans");
-            break;
-        case MEETING_NATIVES:
-            image = "EventImage.meetingNatives";
-            text = Messages.message("event.meetingNatives");
-            break;
-        case MEETING_AZTEC:
-            image = "EventImage.meetingAztec";
-            text = Messages.message("event.meetingAztec");
-            break;
-        case MEETING_INCA:
-            image = "EventImage.meetingInca";
-            text = Messages.message("event.meetingInca");
-            break;
-        case DISCOVER_PACIFIC:
-            image = "EventImage.discoverPacific";
-            text = Messages.message("model.region.pacific.discover");
-            break;
-        }
-
-        JLabel header = new JLabel(text);
-        header.setFont(GUI.MEDIUM_HEADER_FONT);
+        JLabel headerLabel = new JLabel(header);
+        headerLabel.setFont(GUI.MEDIUM_HEADER_FONT);
 
         JLabel imageLabel
             = new JLabel(new ImageIcon(ResourceManager.getImage(image)));
 
-        add(header);
+        JLabel footerLabel = (footer == null) ? null : new JLabel(footer);
+
+        add(headerLabel);
         add(imageLabel);
+        if (footerLabel != null) add(footerLabel);
         add(okButton, "tag ok");
 
         setSize(getPreferredSize());

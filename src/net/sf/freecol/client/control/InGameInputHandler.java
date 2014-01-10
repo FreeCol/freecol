@@ -761,15 +761,6 @@ public final class InGameInputHandler extends InputHandler {
             return null;
         }
 
-        String key = "EventPanel.MEETING_" + other.getNationNameKey();
-        if (!Messages.containsKey(key)) {
-            key = (player.hasContactedIndians()) ? null
-                    : "EventPanel.MEETING_NATIVES";
-        }
-        if (key != null) {
-            player.addModelMessage(new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                    key, other, other));
-        }
         getGUI().showFirstContactDialog(player, other, tile,
                                         message.getSettlementCount());
         return null;
@@ -951,10 +942,16 @@ public final class InGameInputHandler extends InputHandler {
         final String defaultName = message.getNewRegionName();
         if (defaultName == null || region == null) return null;
 
-        StringTemplate template = StringTemplate.template("nameRegion.text")
-            .addStringTemplate("%type%", region.getLabel());
-        getGUI().showNameNewRegionDialog(template, defaultName, unit,
-                                         tile, region);
+        if (region.isPacific()) {
+            getGUI().showEventPanel(Messages.message("event.discoverPacific"),
+                                    "EventImage.discoverPacific", null);
+            igc().nameNewRegion(tile, unit, region, defaultName);
+        } else {
+            StringTemplate template = StringTemplate.template("nameRegion.text")
+                .addStringTemplate("%type%", region.getLabel());
+            getGUI().showNameNewRegionDialog(template, defaultName, unit,
+                                             tile, region);
+        }
         return null;
     }
 

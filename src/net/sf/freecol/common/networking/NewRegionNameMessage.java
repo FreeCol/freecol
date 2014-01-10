@@ -157,9 +157,6 @@ public class NewRegionNameMessage extends DOMMessage {
             return DOMMessage.clientError("No discoverable region in: "
                 + tileId);
         }
-        if (region.isPacific()) {
-            return DOMMessage.clientError("Can not rename the Pacific!");
-        }
         if (!region.getId().equals(regionId)) {
             return DOMMessage.clientError("Region mismatch, " + region.getId()
                 + " != " + regionId);
