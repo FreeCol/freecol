@@ -38,6 +38,54 @@ import javax.swing.JScrollPane;
 
 public class FlagTest extends JFrame {
 
+    public class ColorScheme {
+        Color backgroundColor = Color.RED;
+        Color unionColor = Color.BLUE;
+        Color stripeColor = Color.WHITE;
+        Color starColor = Color.WHITE;
+
+        public ColorScheme(Color backgroundColor, Color unionColor,
+                           Color stripeColor, Color starColor) {
+            this.backgroundColor = backgroundColor;
+            this.unionColor = unionColor;
+            this.stripeColor = stripeColor;
+            this.starColor = starColor;
+        }
+    }
+
+    // based on the flag of Venezuela (Colombia and Ecuador are
+    // similar)
+    private ColorScheme SPAIN
+        = new ColorScheme(new Color(0xcf, 0x14, 0x2b),
+                          new Color(0, 0x24, 0x7d),
+                          new Color(255, 204, 0),
+                          Color.WHITE);
+
+    // based on the flag of Brazil, particularly the Provisional Flag
+    // of Republic of the United States of Brazil (November 15–19,
+    // 1889)
+    private ColorScheme PORTUGAL
+        = new ColorScheme(new Color(0, 168, 89),
+                          new Color(62, 64, 149),
+                          new Color(255, 204, 41),
+                          Color.WHITE);
+
+    // based on the current flag of the United States and its various
+    // predecessors
+    private ColorScheme ENGLAND
+        = new ColorScheme(new Color(.698f, .132f, .203f),
+                          new Color(.234f, .233f, .430f),
+                          Color.WHITE, Color.WHITE);
+
+
+    public enum FlagType {
+        HORIZONTAL_STRIPES,
+            VERTICAL_STRIPES,
+            HORIZONTAL_TRICOLORE,
+            VERTICAL_TRICOLORE,
+            QUARTERED;
+    }
+
     private static final int[][] layout = new int[51][2];
 
     static {
@@ -62,48 +110,95 @@ public class FlagTest extends JFrame {
 
     public class Flag {
 
-        private static final double width = 100;
-        private static final double length = 1.9 * width;
-        private static final double unionLength = 0.4 * length;
-        private static final double star = 0.0616 * width;
-        private double unionWidth;
+        private static final double height = 100;
+        private double width = 1.9 * height;
+        private double unionWidth = 0.4 * width;
+        private double star = 0.0616 * height;
+        private double unionHeight;
 
-        private final Color red = new Color(.698f, .132f, .203f);
-        private final Color blue = new Color(.234f, .233f, .430f);
 
         private BufferedImage image;
 
-        public Flag(int stars, int stripes) {
+        public Flag(ColorScheme colorScheme, FlagType flagType, int stars, int stripes) {
 
-            image = new BufferedImage((int) length, (int) width,
+            image = new BufferedImage((int) width, (int) height,
                 BufferedImage.TYPE_INT_RGB);
             Graphics2D g = image.createGraphics();
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
 
-            g.setColor(red);
+            g.setColor(colorScheme.backgroundColor);
             Rectangle2D.Double background =
-                new Rectangle2D.Double(0, 0, length, width);
+                new Rectangle2D.Double(0, 0, width, height);
             g.fill(background);
-            g.setColor(Color.WHITE);
-            double stripeWidth = width / stripes;
-            Rectangle2D.Double stripe =
-                new Rectangle2D.Double(0, 0, length, stripeWidth);
+
+            g.setColor(colorScheme.stripeColor);
+            Rectangle2D.Double stripe;
             AffineTransform transform = g.getTransform();
-            for (int i = 0; i < stripes / 2; i++) {
-                g.translate(0, stripeWidth);
+            switch(flagType) {
+            case QUARTERED:
+                double stripeSize = height / 7;
+                stripe = new Rectangle2D.Double(0, 0, width, stripeSize);
+                unionHeight = (height - stripeSize) / 2;
+                g.translate(0, unionHeight);
                 g.fill(stripe);
-                g.translate(0, stripeWidth);
+                stripe = new Rectangle2D.Double(0, 0, stripeSize, height);
+                g.setTransform(transform);
+                unionWidth = (width - stripeSize) / 2;
+                g.translate(unionWidth, 0);
+                g.fill(stripe);
+                g.setTransform(transform);
+                break;
+            case HORIZONTAL_STRIPES:
+                double stripeHeight = height / stripes;
+                stripe = new Rectangle2D.Double(0, 0, width, stripeHeight);
+                for (int i = 0; i < stripes / 2; i++) {
+                    g.translate(0, stripeHeight);
+                    g.fill(stripe);
+                    g.translate(0, stripeHeight);
+                }
+                if (stripes == 1) {
+                    unionHeight = stripeHeight / 2;
+                } else {
+                    unionHeight = stripeHeight * Math.ceil(stripes / 2.0);
+                }
+                g.setTransform(transform);
+                break;
+            case VERTICAL_STRIPES:
+                double stripeWidth = width / stripes;
+                stripe = new Rectangle2D.Double(0, 0, height, stripeWidth);
+                for (int i = 0; i < stripes / 2; i++) {
+                    g.translate(stripeWidth, 0);
+                    g.fill(stripe);
+                    g.translate(stripeWidth, 0);
+                }
+                if (stripes == 1) {
+                    unionWidth = stripeWidth / 2;
+                } else {
+                    unionWidth = stripeWidth * Math.ceil(stripes / 2.0);
+                }
+                g.setTransform(transform);
+                break;
+            case HORIZONTAL_TRICOLORE:
+                unionWidth = width;
+                unionHeight = height / 3;
+                stripe = new Rectangle2D.Double(0, 0, unionWidth, unionHeight);
+                g.fill(stripe);
+                g.translate(0, unionHeight);
+                break;
+            case VERTICAL_TRICOLORE:
+                unionWidth = width / 3;
+                unionHeight = height;
+                stripe = new Rectangle2D.Double(0, 0, unionWidth, unionHeight);
+                g.fill(stripe);
+                g.translate(unionWidth, 0);
+                break;
+            default:
             }
-            g.setTransform(transform);
-            g.setColor(blue);
-            if (stripes == 1) {
-                unionWidth = stripeWidth / 2;
-            } else {
-                unionWidth = stripeWidth * Math.ceil(stripes / 2.0);
-            }
-            Rectangle2D.Double union =
-                new Rectangle2D.Double(0, 0, unionLength, unionWidth);
+
+            Rectangle2D.Double union
+                = new Rectangle2D.Double(0, 0, unionWidth, unionHeight);
+            g.setColor(colorScheme.unionColor);
             g.fill(union);
 
             GeneralPath unionPath;
@@ -113,7 +208,7 @@ public class FlagTest extends JFrame {
                 unionPath = new GeneralPath();
                 unionPath.append(getPentagram(), false);
                 GeneralPath newStar = getPentagram();
-                newStar.transform(AffineTransform.getTranslateInstance(unionLength/3, 0));
+                newStar.transform(AffineTransform.getTranslateInstance(unionWidth/3, 0));
                 unionPath.append(newStar, false);
             } else if (stars < 14) {
                 unionPath = getCircleOfStars(stars);
@@ -123,10 +218,10 @@ public class FlagTest extends JFrame {
             unionPath.transform(AffineTransform
                 .getTranslateInstance(-unionPath.getBounds().getX(),
                     -unionPath.getBounds().getY()));
-            double x = unionLength - unionPath.getBounds().getWidth();
-            double y = unionWidth - unionPath.getBounds().getHeight();
+            double x = unionWidth - unionPath.getBounds().getWidth();
+            double y = unionHeight - unionPath.getBounds().getHeight();
             unionPath.transform(AffineTransform.getTranslateInstance(x/2, y/2));
-            g.setColor(Color.WHITE);
+            g.setColor(colorScheme.starColor);
             g.fill(unionPath);
 
         }
@@ -150,8 +245,8 @@ public class FlagTest extends JFrame {
                 sum += bars[rows%2];
                 rows++;
             }
-            double hSpace = unionLength / (2 * maxCols);
-            double vSpace = unionWidth / (2 * rows);
+            double hSpace = unionWidth / (2 * maxCols);
+            double vSpace = unionHeight / (2 * rows);
             double y = 0;
             GeneralPath star = getPentagram();
             GeneralPath grid = new GeneralPath();
@@ -191,7 +286,7 @@ public class FlagTest extends JFrame {
         }
 
         public GeneralPath getCircleOfStars(int n) {
-            double radius = 0.3 * unionWidth;
+            double radius = 0.3 * unionHeight;
             double phi = Math.PI * 2 / n;
             GeneralPath star = getPentagram();
             GeneralPath circle = new GeneralPath();
@@ -217,7 +312,7 @@ public class FlagTest extends JFrame {
         JScrollPane scrollPane = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
             JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         for (int states = 1; states < 51; states++) {
-            Flag flag = new FlagTest.Flag(states, Math.min(13, states));
+            Flag flag = new FlagTest.Flag(SPAIN, FlagType.QUARTERED, states, Math.min(13, states));
             JLabel label = new JLabel(new ImageIcon(flag.getImage()));
             panel.add(label);
         }
