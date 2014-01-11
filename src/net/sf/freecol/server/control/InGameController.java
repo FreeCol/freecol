@@ -2065,12 +2065,10 @@ public final class InGameController extends Controller {
             if (settlement.hasAnyScouted()) {
                 // Do nothing if already spoken to.
                 result = "nothing";
-            } else if (scoutSkill != null
+            } else if (scoutSkill != null && unit.getType() != scoutSkill
                 && ((skill != null && skill.hasAbility(Ability.EXPERT_SCOUT))
                     || rnd == 0)) {
                 // If the scout can be taught to be an expert it will be.
-                // TODO: in the old code the settlement retains the
-                // teaching ability.  WWC1D?
                 unit.setType(scoutSkill);//-vis(serverPlayer)
                 serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
                 result = "expert";
