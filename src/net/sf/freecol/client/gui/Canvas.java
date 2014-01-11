@@ -2702,9 +2702,9 @@ public final class Canvas extends JDesktopPane {
      * @return The chosen action, establish mission, denounce, incite
      *         or cancel.
      */
-    public MissionaryAction
-        showUseMissionaryDialog(Unit unit, IndianSettlement settlement,
-                                boolean canEstablish, boolean canDenounce) {
+    public MissionaryAction showUseMissionaryDialog(Unit unit,
+        IndianSettlement settlement,
+        boolean canEstablish, boolean canDenounce) {
         StringBuilder sb = new StringBuilder(256);
         StringTemplate t = settlement.getAlarmLevelMessage(unit.getOwner());
         sb.append(Messages.message(t)).append("\n\n");
@@ -2715,12 +2715,16 @@ public final class Canvas extends JDesktopPane {
 
         List<ChoiceItem<MissionaryAction>> choices
             = new ArrayList<ChoiceItem<MissionaryAction>>();
-        choices.add(new ChoiceItem<MissionaryAction>(
-                Messages.message("missionarySettlement.establish"),
-                MissionaryAction.ESTABLISH_MISSION, canEstablish));
-        choices.add(new ChoiceItem<MissionaryAction>(
-                Messages.message("missionarySettlement.heresy"),
-                MissionaryAction.DENOUNCE_HERESY, canDenounce));
+        if (canEstablish) {
+            choices.add(new ChoiceItem<MissionaryAction>(
+                    Messages.message("missionarySettlement.establish"),
+                    MissionaryAction.ESTABLISH_MISSION, canEstablish));
+        }
+        if (canDenounce) {
+            choices.add(new ChoiceItem<MissionaryAction>(
+                    Messages.message("missionarySettlement.heresy"),
+                    MissionaryAction.DENOUNCE_HERESY, canDenounce));
+        }
         choices.add(new ChoiceItem<MissionaryAction>(
                 Messages.message("missionarySettlement.incite"),
                 MissionaryAction.INCITE_INDIANS));
