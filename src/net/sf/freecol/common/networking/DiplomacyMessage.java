@@ -72,9 +72,9 @@ public class DiplomacyMessage extends DOMMessage {
         super(getXMLElementTagName());
 
         this.unit = unit;
-        this.otherUnitId = (otherUnit == null) ? null : otherUnit.getId();
         this.settlementId = (settlement == null) ? null
             : settlement.getId();
+        this.otherUnitId = (otherUnit == null) ? null : otherUnit.getId();
         this.agreement = agreement;
     }
 
@@ -171,8 +171,8 @@ public class DiplomacyMessage extends DOMMessage {
         } else {
             switch (agreement.getContext()) {
             case CONTACT:
-                if (this.otherUnitId == null) {
-                    return DOMMessage.clientError("Unit lacks other unit to contact.");
+                if (this.settlementId == null && this.otherUnitId == null) {
+                    return DOMMessage.clientError("Unit lacks contact.");
                 }
                 break;
             case DIPLOMATIC:

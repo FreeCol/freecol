@@ -103,7 +103,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
 
         private final Player source;
         private JComboBox colonyBox;
-        private JButton addButton;
+        private JButton clearButton, addButton;
         private JLabel label;
         private final List<Colony> allColonies;
 
@@ -116,6 +116,10 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         public ColonyTradeItemPanel(Player source) {
             this.source = source;
             this.colonyBox = new JComboBox();
+            this.clearButton
+                = new JButton(Messages.message("negotiationDialog.clear"));
+            this.clearButton.addActionListener(this);
+            this.clearButton.setActionCommand("clear");
             this.addButton
                 = new JButton(Messages.message("negotiationDialog.add"));
             this.addButton.addActionListener(this);
@@ -130,6 +134,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
 
             add(this.label);
             add(this.colonyBox);
+            add(this.clearButton, "split 2");
             add(this.addButton);
 
             setSize(getPreferredSize());
@@ -162,6 +167,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             for (Colony c : available) this.colonyBox.addItem(c);
 
             boolean enable = !available.isEmpty();
+            this.clearButton.setEnabled(!enable);
             this.addButton.setEnabled(enable);
             this.colonyBox.setEnabled(enable);
             this.label.setEnabled(enable);
@@ -182,6 +188,8 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             if (command.equals("add")) {
                 DiplomaticTradeDialog.this.addColonyTradeItem(source,
                     (Colony)colonyBox.getSelectedItem());
+            } else if (command.equals("clear")) {
+                DiplomaticTradeDialog.this.removeTradeItems(ColonyTradeItem.class);
             } else {
                 logger.warning("Bad command: " + command);
             }
@@ -193,7 +201,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
 
         private final Player source;
         private JSpinner spinner;
-        private JButton addButton;
+        private JButton clearButton, addButton;
 
 
         /**
@@ -205,6 +213,10 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         public GoldTradeItemPanel(Player source, int gold) {
             this.source = source;
             this.spinner = new JSpinner(new SpinnerNumberModel(0, 0, gold, 1));
+            this.clearButton
+                = new JButton(Messages.message("negotiationDialog.clear"));
+            this.clearButton.addActionListener(this);
+            this.clearButton.setActionCommand("clear");
             this.addButton
                 = new JButton(Messages.message("negotiationDialog.add"));
             this.addButton.addActionListener(this);
@@ -220,6 +232,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
 
             add(new JLabel(Messages.message("tradeItem.gold")));
             add(this.spinner);
+            add(this.clearButton, "split 2");
             add(this.addButton);
 
             setSize(getPreferredSize());
@@ -246,6 +259,8 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             if (command.equals("add")) {
                 int amount = ((Integer)spinner.getValue()).intValue();
                 DiplomaticTradeDialog.this.addGoldTradeItem(source, amount);
+            } else if (command.equals("clear")) {
+                DiplomaticTradeDialog.this.removeTradeItems(GoldTradeItem.class);
             } else {
                 logger.warning("Bad command: " + command);
             }
@@ -270,7 +285,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
 
         private final Player source;
         private JComboBox goodsBox;
-        private JButton addButton;
+        private JButton clearButton, addButton;
         private JLabel label;
         private final List<Goods> allGoods;
 
@@ -287,6 +302,10 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             this.source = source;
             this.goodsBox = new JComboBox(new DefaultComboBoxModel());
             this.goodsBox.setRenderer(new GoodsBoxRenderer());
+            this.clearButton
+                = new JButton(Messages.message("negotiationDialog.clear"));
+            this.clearButton.addActionListener(this);
+            this.clearButton.setActionCommand("clear");
             this.addButton
                 = new JButton(Messages.message("negotiationDialog.add"));
             this.addButton.addActionListener(this);
@@ -301,6 +320,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
 
             add(this.label);
             add(this.goodsBox);
+            add(this.clearButton, "split 2");
             add(this.addButton);
 
             setSize(getPreferredSize());
@@ -337,6 +357,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
 
             boolean enable = !available.isEmpty();
             this.label.setEnabled(enable);
+            this.clearButton.setEnabled(!enable);
             this.addButton.setEnabled(enable);
             this.goodsBox.setEnabled(enable);
 
@@ -356,6 +377,8 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             if (command.equals("add")) {
                 DiplomaticTradeDialog.this.addGoodsTradeItem(source,
                     (Goods)goodsBox.getSelectedItem());
+            } else if (command.equals("clear")) {
+                DiplomaticTradeDialog.this.removeTradeItems(GoodsTradeItem.class);
             } else {
                 logger.warning("Bad command: " + command);
             }
@@ -385,7 +408,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         private Player source;
         private Player target;
         private JComboBox stanceBox;
-        private JButton addButton;
+        private JButton clearButton, addButton;
 
 
         /**
@@ -400,6 +423,10 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             this.target = target;
             this.stanceBox = new JComboBox(new DefaultComboBoxModel());
             this.stanceBox.setRenderer(new StanceBoxRenderer());
+            this.clearButton
+                = new JButton(Messages.message("negotiationDialog.clear"));
+            this.clearButton.addActionListener(this);
+            this.clearButton.setActionCommand("clear");
             this.addButton
                 = new JButton(Messages.message("negotiationDialog.add"));
             this.addButton.addActionListener(this);
@@ -412,6 +439,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
 
             add(new JLabel(Messages.message("tradeItem.stance")));
             add(this.stanceBox);
+            add(this.clearButton, "split 2");
             add(this.addButton);
         }
 
@@ -437,7 +465,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             if (stance != Stance.PEACE && stance != Stance.UNCONTACTED) {
                 stanceBox.addItem(Stance.PEACE);
             }
-            if (stance != Stance.WAR && stance != Stance.ALLIANCE) {
+            if (stance == Stance.PEACE) {
                 stanceBox.addItem(Stance.ALLIANCE);
             }
 
@@ -456,6 +484,8 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             if (command.equals("add")) {
                 Stance stance = (Stance)stanceBox.getSelectedItem();
                 DiplomaticTradeDialog.this.addStanceTradeItem(stance);
+            } else if (command.equals("clear")) {
+                DiplomaticTradeDialog.this.removeTradeItems(StanceTradeItem.class);
             } else {
                 logger.warning("Bad command: " + command);
             }
@@ -480,7 +510,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
 
         private final Player source;
         private JComboBox unitBox;
-        private JButton addButton;
+        private JButton clearButton, addButton;
         private JLabel label;
         private final List<Unit> allUnits;
 
@@ -497,6 +527,10 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             this.source = source;
             this.unitBox = new JComboBox(new DefaultComboBoxModel());
             this.unitBox.setRenderer(new UnitBoxRenderer());
+            this.clearButton
+                = new JButton(Messages.message("negotiationDialog.clear"));
+            this.clearButton.addActionListener(this);
+            this.clearButton.setActionCommand("clear");
             this.addButton
                 = new JButton(Messages.message("negotiationDialog.add"));
             this.addButton.addActionListener(this);
@@ -511,6 +545,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
 
             add(this.label);
             add(this.unitBox);
+            add(this.clearButton, "split 2");
             add(this.addButton);
 
             setSize(getPreferredSize());
@@ -541,6 +576,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
 
             boolean enable = !available.isEmpty();
             this.label.setEnabled(enable);
+            clearButton.setEnabled(!enable);
             addButton.setEnabled(enable);
             unitBox.setEnabled(enable);
 
@@ -560,6 +596,8 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             if (command.equals("add")) {
                 DiplomaticTradeDialog.this.addUnitTradeItem(source,
                     (Unit)unitBox.getSelectedItem());
+            } else if (command.equals("clear")) {
+                DiplomaticTradeDialog.this.removeTradeItems(UnitTradeItem.class);
             } else {
                 logger.warning("Bad command: " + command);
             }
@@ -656,8 +694,13 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             : player.getGold();
         this.goldOfferPanel = new GoldTradeItemPanel(player, gold);
 
+        String tutorial = "";
+
         switch (context) {
         case CONTACT:
+            if (freeColClient.tutorialMode()) {
+                tutorial = Messages.message("negotiationDialog.contact.tutorial");
+            }
             this.stancePanel = new StanceTradeItemPanel(player, otherPlayer);
             break;
         case DIPLOMATIC:
@@ -696,6 +739,8 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             throw new IllegalStateException("Bogus trade context: " + context);
         }
 
+        JTextArea tutArea = GUI.getDefaultTextArea(tutorial);
+
         this.summary = new MigPanel(new MigLayout("wrap 2", "[20px][]"));
         this.summary.setOpaque(false);
         this.summary.add(GUI.getDefaultTextArea(Messages.message(comment)),
@@ -705,7 +750,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
                 "[200, fill][300, fill][200, fill]", ""));
         panel.add(header, "span 3, center");
         panel.add(GUI.getDefaultTextArea(this.demandMessage), "center");
-        panel.add(new JLabel(), "center");
+        panel.add(tutArea, "center");
         panel.add(GUI.getDefaultTextArea(this.offerMessage), "center");
 
         panel.add(this.goldDemandPanel);
@@ -891,6 +936,16 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         }
     }
 
+
+    /**
+     * Remove trade items of a given type.
+     *
+     * @param itemClass The class of <code>TradeItem</code> to remove.
+     */
+    public void removeTradeItems(Class<? extends TradeItem> itemClass) {
+        this.agreement.removeType(itemClass);
+        updateDialog();
+    }
 
     /**
      * Adds a <code>ColonyTradeItem</code> to the list of TradeItems.

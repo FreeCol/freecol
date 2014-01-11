@@ -216,7 +216,7 @@ public class DiplomaticTrade extends FreeColObject {
      */
     public void add(TradeItem newItem) {
         if (newItem.isUnique()) {
-            removeType(newItem);
+            removeType(newItem.getClass());
         }
         items.add(newItem);
     }
@@ -244,10 +244,10 @@ public class DiplomaticTrade extends FreeColObject {
      *
      * @param someItem a <code>TradeItem</code> value
      */
-    public void removeType(TradeItem someItem) {
+    public void removeType(Class<? extends TradeItem> itemClass) {
         Iterator<TradeItem> itemIterator = items.iterator();
         while (itemIterator.hasNext()) {
-            if (itemIterator.next().getClass() == someItem.getClass()) {
+            if (itemIterator.next().getClass() == itemClass) {
                 itemIterator.remove();
             }
         }

@@ -78,8 +78,7 @@ public class FirstContactDialog extends FreeColConfirmDialog {
             = new JLabel(new ImageIcon(ResourceManager.getImage(imageKey)));
 
         JTextArea tutorial = null;
-        if (!player.hasContactedIndians() && freeColClient.getClientOptions()
-            .getBoolean("model.option.guiShowTutorial")) {
+        if (!player.hasContactedIndians() && freeColClient.tutorialMode()) {
             tutorial = GUI.getDefaultTextArea(Messages.message(TUTORIAL_KEY));
         }
 

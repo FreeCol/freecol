@@ -1020,7 +1020,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                                 : null;
                             serverPlayer.csNativeFirstContact(other, offer, cs);
                         } else {
-                            serverPlayer.csEuropeanFirstContact(this, t, cs);
+                            serverPlayer.csEuropeanFirstContact(this, settlement, unit, cs);
                         }
                     } else {
                         if (other.isIndian()) {
