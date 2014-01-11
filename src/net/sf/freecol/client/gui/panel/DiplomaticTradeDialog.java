@@ -694,8 +694,13 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             : player.getGold();
         this.goldOfferPanel = new GoldTradeItemPanel(player, gold);
 
+        String tutorial = "";
+
         switch (context) {
         case CONTACT:
+            if (freeColClient.tutorialMode()) {
+                tutorial = Messages.message("negotiationDialog.contact.tutorial");
+            }
             this.stancePanel = new StanceTradeItemPanel(player, otherPlayer);
             break;
         case DIPLOMATIC:
@@ -734,6 +739,8 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             throw new IllegalStateException("Bogus trade context: " + context);
         }
 
+        JTextArea tutArea = GUI.getDefaultTextArea(tutorial);
+
         this.summary = new MigPanel(new MigLayout("wrap 2", "[20px][]"));
         this.summary.setOpaque(false);
         this.summary.add(GUI.getDefaultTextArea(Messages.message(comment)),
@@ -743,7 +750,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
                 "[200, fill][300, fill][200, fill]", ""));
         panel.add(header, "span 3, center");
         panel.add(GUI.getDefaultTextArea(this.demandMessage), "center");
-        panel.add(new JLabel(), "center");
+        panel.add(tutArea, "center");
         panel.add(GUI.getDefaultTextArea(this.offerMessage), "center");
 
         panel.add(this.goldDemandPanel);

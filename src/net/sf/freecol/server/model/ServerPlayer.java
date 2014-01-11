@@ -3940,24 +3940,29 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * European player.
      *
      * @param unit The <code>Unit</code> making contact.
-     * @param tile The <code>Tile</code> containing the other player unit
-     *     or settlement.
+     * @param settlement The <code>Settlement</code> being contacted.
+     * @param otherUnit The <code>Unit</code> being contacted.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    public void csEuropeanFirstContact(Unit unit, Tile tile, ChangeSet cs) {
-        Unit otherUnit = tile.getFirstUnit();
-        if (otherUnit == null) {
-            Settlement settlement = tile.getSettlement();
-            otherUnit = settlement.getUnitList().get(0);
+    public void csEuropeanFirstContact(Unit unit, Settlement settlement,
+                                       Unit otherUnit, ChangeSet cs) {
+        ServerPlayer other;
+        if (settlement != null) {
+            other = (ServerPlayer)settlement.getOwner();
+        } else if (otherUnit != null) {
+            other = (ServerPlayer)otherUnit.getOwner();
+        } else {
+            throw new IllegalArgumentException("Non-null settlement or otherUnit required.");
         }
-        ServerPlayer other = (ServerPlayer)((Ownable)otherUnit).getOwner();
         
         DiplomaticTrade agreement = new DiplomaticTrade(getGame(),
             DiplomaticTrade.TradeContext.CONTACT, other, this, null, 0);
-        DiplomacySession session = new DiplomacySession(unit, otherUnit);
+        DiplomacySession session = (settlement == null) 
+            ? new DiplomacySession(unit, otherUnit)
+            : new DiplomacySession(unit, settlement);
         session.setAgreement(agreement);
         cs.add(See.only(this), ChangePriority.CHANGE_LATE,
-               new DiplomacyMessage(unit, null, otherUnit, agreement));
+               new DiplomacyMessage(unit, settlement, otherUnit, agreement));
     }
 
         

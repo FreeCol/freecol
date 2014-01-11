@@ -531,6 +531,14 @@ public final class FreeColClient {
         return clientOptions;
     }
 
+    /**
+     * Convenience accessor for checking whether to display tutorial messages.
+     *
+     * @return True if tutorial messages should be displayed.
+     */
+    public boolean tutorialMode() {
+        return getClientOptions().getBoolean("model.option.guiShowTutorial");
+    }
 
     /**
      * Has the game started?
