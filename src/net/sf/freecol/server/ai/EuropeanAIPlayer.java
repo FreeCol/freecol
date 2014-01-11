@@ -38,6 +38,7 @@ import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTradeItem;
 import net.sf.freecol.common.model.DiplomaticTrade;
+import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.FoundingFather;
@@ -1940,12 +1941,32 @@ public class EuropeanAIPlayer extends AIPlayer {
                                getAIRandom(), 100) < (int)(100.0f * prob);
     }
 
+    /**
+     * Determines the stances towards each player.
+     */
+    private void determineStances() {
+        final Player player = getPlayer();
+
+        for (Player p : getGame().getPlayers()) {
+            if (p != player && !p.isDead()) {
+                Stance newStance = determineStance(p);
+                if (newStance != player.getStance(p)) {
+                    if (newStance == Stance.WAR && peaceHolds(p)) {
+                        ; // Peace treaty holds for now
+                    } else {
+                        getAIMain().getFreeColServer().getInGameController()
+                            .changeStance(player, newStance, p, true);
+                    }
+                }
+            }
+        }
+    }
+
+
     // AIPlayer interface
 
     /**
-     * Tells this <code>AIPlayer</code> to make decisions.  The
-     * <code>AIPlayer</code> is done doing work this turn when this
-     * method returns.
+     * {@inheritDoc}
      */
     public void startWorking() {
         Turn turn = getGame().getTurn();
@@ -1987,30 +2008,7 @@ public class EuropeanAIPlayer extends AIPlayer {
     }
 
     /**
-     * Determines the stances towards each player.
-     */
-    private void determineStances() {
-        final Player player = getPlayer();
-
-        for (Player p : getGame().getPlayers()) {
-            if (p != player && !p.isDead()) {
-                Stance newStance = determineStance(p);
-                if (newStance != player.getStance(p)) {
-                    if (newStance == Stance.WAR && peaceHolds(p)) {
-                        ; // Peace treaty holds for now
-                    } else {
-                        getAIMain().getFreeColServer().getInGameController()
-                            .changeStance(player, newStance, p, true);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Makes every unit perform their mission.
-     * Does all other missions before the transport missions to try to
-     * give the transports valid targets.
+     * {@inheritDoc}
      */
     @Override
     protected void doMissions() {
@@ -2062,22 +2060,21 @@ public class EuropeanAIPlayer extends AIPlayer {
     }
 
     /**
-     * Decides whether to accept an Indian demand, or not.
-     *
-     * @param unit The <code>Unit</code> making demands.
-     * @param colony The <code>Colony</code> where demands are being made.
-     * @param goods The <code>Goods</code> demanded.
-     * @param gold The amount of gold demanded.
-     * @return True if this player accepts the demand.
+     * {@inheritDoc}
      */
+    @Override
     public boolean indianDemand(Unit unit, Colony colony,
-                                Goods goods, int gold) {
+                                GoodsType goods, int gold) {
         // TODO: make a better choice, check whether the colony is
         // well defended
         return !"conquest".equals(getAIAdvantage());
     }
 
-    public boolean acceptDiplomaticTrade(DiplomaticTrade agreement) {
+    /**
+     * {@inheritDoc}
+     */
+    public TradeStatus acceptDiplomaticTrade(DiplomaticTrade agreement) {
+        final Player player = getPlayer();
         boolean validOffer = true;
         Stance stance = null;
         int value = 0;
@@ -2086,7 +2083,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             TradeItem item = itemIterator.next();
             if (item instanceof GoldTradeItem) {
                 int gold = ((GoldTradeItem) item).getGold();
-                if (item.getSource() == getPlayer()) {
+                if (item.getSource() == player) {
                     value -= gold;
                 } else {
                     value += gold;
@@ -2118,7 +2115,7 @@ public class EuropeanAIPlayer extends AIPlayer {
 
             } else if (item instanceof ColonyTradeItem) {
                 // TODO: evaluate whether we might wish to give up a colony
-                if (item.getSource() == getPlayer()) {
+                if (item.getSource() == player) {
                     validOffer = false;
                     break;
                 } else {
@@ -2126,7 +2123,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 }
             } else if (item instanceof UnitTradeItem) {
                 // TODO: evaluate whether we might wish to give up a unit
-                if (item.getSource() == getPlayer()) {
+                if (item.getSource() == player) {
                     validOffer = false;
                     break;
                 } else {
@@ -2134,10 +2131,10 @@ public class EuropeanAIPlayer extends AIPlayer {
                 }
             } else if (item instanceof GoodsTradeItem) {
                 Goods goods = ((GoodsTradeItem) item).getGoods();
-                if (item.getSource() == getPlayer()) {
-                    value -= getPlayer().getMarket().getBidPrice(goods.getType(), goods.getAmount());
+                if (item.getSource() == player) {
+                    value -= player.getMarket().getBidPrice(goods.getType(), goods.getAmount());
                 } else {
-                    value += getPlayer().getMarket().getSalePrice(goods.getType(), goods.getAmount());
+                    value += player.getMarket().getSalePrice(goods.getType(), goods.getAmount());
                 }
             }
         }
@@ -2146,15 +2143,13 @@ public class EuropeanAIPlayer extends AIPlayer {
         } else {
             logger.info("Trade offer is considered invalid!");
         }
-        return (value>=0)&&validOffer;
+        return (value >= 0 && validOffer) ? TradeStatus.ACCEPT_TRADE
+            : TradeStatus.REJECT_TRADE;
     }
 
 
     /**
-     * Called after another <code>Player</code> sends a
-     * <code>trade</code> message
-     *
-     * @param goods The <code>Goods</code> to offer.
+     * {@inheritDoc}
      */
     public void registerSellGoods(Goods goods) {
         String goldKey = "tradeGold#" + goods.getType().getId()
@@ -2163,20 +2158,10 @@ public class EuropeanAIPlayer extends AIPlayer {
     }
 
     /**
-     * Called when another <code>Player</code> proposes to buy.
-     *
-     * TODO: this obviously applies only to native players. Is there
-     * an European equivalent?
-     *
-     * @param unit The foreign <code>Unit</code> trying to trade.
-     * @param settlement The <code>Settlement</code> this player owns and
-     *            which the given <code>Unit</code> is trading.
-     * @param goods The goods the given <code>Unit</code> is trying to sell.
-     * @param gold The suggested price.
-     * @return The price this <code>AIPlayer</code> suggests or
-     *         {@link NetworkConstants#NO_TRADE}.
+     * {@inheritDoc}
      */
-    public int buyProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
+    public int buyProposition(Unit unit, Settlement settlement, Goods goods,
+                              int gold) {
         logger.finest("Entering method buyProposition");
         final Specification spec = getSpecification();
         Player buyer = unit.getOwner();
@@ -2223,17 +2208,10 @@ public class EuropeanAIPlayer extends AIPlayer {
     }
 
     /**
-     * Called when another <code>Player</code> proposes a sale.
-     *
-     * @param unit The foreign <code>Unit</code> trying to trade.
-     * @param settlement The <code>Settlement</code> this player owns and
-     *            which the given <code>Unit</code> if trying to sell goods.
-     * @param goods The goods the given <code>Unit</code> is trying to sell.
-     * @param gold The suggested price.
-     * @return The price this <code>AIPlayer</code> suggests or
-     *         {@link NetworkConstants#NO_TRADE}.
+     * {@inheritDoc}
      */
-    public int sellProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
+    public int sellProposition(Unit unit, Settlement settlement, Goods goods, 
+                               int gold) {
         logger.finest("Entering method sellProposition");
         Colony colony = (Colony) settlement;
         Player otherPlayer = unit.getOwner();
@@ -2252,11 +2230,9 @@ public class EuropeanAIPlayer extends AIPlayer {
     }
 
     /**
-     * Decides whether to accept the monarch's tax raise or not.
-     *
-     * @param tax The new tax rate to be considered.
-     * @return <code>true</code> if the tax raise should be accepted.
+     * {@inheritDoc}
      */
+    @Override
     public boolean acceptTax(int tax) {
         Goods toBeDestroyed = getPlayer().getMostValuableGoods();
         if (toBeDestroyed == null) {
@@ -2303,27 +2279,22 @@ public class EuropeanAIPlayer extends AIPlayer {
     }
 
     /**
-     * Decides to accept an offer of mercenaries or not.
-     * TODO: make a better choice.
-     *
-     * @return True if the mercenaries are accepted.
+     * {@inheritDoc}
      */
+    @Override
     public boolean acceptMercenaries() {
         return getPlayer().isAtWar() || "conquest".equals(getAIAdvantage());
     }
 
     /**
-     * Selects the most useful founding father offered.
-     * TODO: improve choice
-     *
-     * @param foundingFathers The founding fathers on offer.
-     * @return The founding father selected.
+     * {@inheritDoc}
      */
-    public FoundingFather selectFoundingFather(List<FoundingFather> foundingFathers) {
+    @Override
+    public FoundingFather selectFoundingFather(List<FoundingFather> ffs) {
         int age = getGame().getTurn().getAge();
         FoundingFather bestFather = null;
         int bestWeight = Integer.MIN_VALUE;
-        for (FoundingFather father : foundingFathers) {
+        for (FoundingFather father : ffs) {
             if (father == null) continue;
 
             // For the moment, arbitrarily: always choose the one
@@ -2343,6 +2314,9 @@ public class EuropeanAIPlayer extends AIPlayer {
         }
         return bestFather;
     }
+
+
+    // Serialization
 
     /**
      * {@inheritDoc}

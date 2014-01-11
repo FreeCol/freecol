@@ -32,6 +32,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
+import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
@@ -353,19 +354,6 @@ public abstract class AIPlayer extends AIObject {
     }
 
     /**
-     * Makes every unit perform their mission.
-     */
-    protected void doMissions() {
-        for (AIUnit au : getAIUnits()) {
-            try {
-                au.doMission();
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "doMissions failed for: " + au, e);
-            }
-        }
-    }
-
-    /**
      * Counts the number of defenders allocated to a settlement.
      *
      * @param settlement The <code>Settlement</code> to examine.
@@ -444,7 +432,23 @@ public abstract class AIPlayer extends AIObject {
     }
 
 
-    // Interface to be implemented by subclasses
+    /**
+     * Makes every unit perform their mission.
+     *
+     * Overridden by European AI.
+     */
+    protected void doMissions() {
+        for (AIUnit au : getAIUnits()) {
+            try {
+                au.doMission();
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "doMissions failed for: " + au, e);
+            }
+        }
+    }
+
+
+    // AI behaviour interface to be implemented by subclasses
 
     /**
      * Tells this <code>AIPlayer</code> to make decisions. The
@@ -467,15 +471,13 @@ public abstract class AIPlayer extends AIObject {
                                       int value);
 
     /**
-     * Resolves a native demand.
-     * One of goods/gold is significant.
-     * Overridden by the European player.
+     * Decides whether to accept an Indian demand, or not.
      *
-     * @param unit The native <code>Unit</code> making the demand.
-     * @param colony The <code>Colony</code> being demanded of.
-     * @param type The <code>GoodsType</code> demanded (may be null).
-     * @param amount The amount demanded.
-     * @return The response of the player.
+     * @param unit The <code>Unit</code> making demands.
+     * @param colony The <code>Colony</code> where demands are being made.
+     * @param goods The <code>Goods</code> demanded.
+     * @param gold The amount of gold demanded.
+     * @return True if this player accepts the demand.
      */
     public boolean indianDemand(Unit unit, Colony colony,
                                 GoodsType type, int amount) {
@@ -486,9 +488,12 @@ public abstract class AIPlayer extends AIObject {
      * Resolves a diplomatic trade offer.
      *
      * @param agreement The proposed <code>DiplomaticTrade</code>.
-     * @return True if the agreement is accepted.
+     * @return The <code>TradeStatus</code> to apply to the agreement.
+     *
      */
-    public abstract boolean acceptDiplomaticTrade(DiplomaticTrade agreement);
+    public TradeStatus acceptDiplomaticTrade(DiplomaticTrade agreement) {
+        return TradeStatus.REJECT_TRADE;
+    }
 
     /**
      * Called after another <code>Player</code> sends a

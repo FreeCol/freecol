@@ -311,9 +311,8 @@ public final class AIInGameInputHandler implements MessageHandler {
         DiplomacyMessage message
             = new DiplomacyMessage(freeColServer.getGame(), element);
         DiplomaticTrade agreement = message.getAgreement();
-        boolean accept = getAIPlayer().acceptDiplomaticTrade(agreement);
-        agreement.setStatus((accept) ? TradeStatus.ACCEPT_TRADE
-                            : TradeStatus.REJECT_TRADE);
+        TradeStatus status = getAIPlayer().acceptDiplomaticTrade(agreement);
+        agreement.setStatus(status);
         return message.toXMLElement();
     }
 

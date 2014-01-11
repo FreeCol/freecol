@@ -204,23 +204,6 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         return null;
     }
 
-
-    // AI Player interface
-
-    /**
-     * Tells this <code>REFAIPlayer</code> to make decisions.
-     */
-    public void startWorking() {
-        final Player player = getPlayer();
-        logger.finest("Entering method startWorking: "
-            + player + ", year " + getGame().getTurn());
-        if (!player.isWorkForREF()) {
-            logger.warning("No work for REF: " + player);
-            return;
-        }
-        super.startWorking();
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -231,6 +214,46 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         return (other.getREFPlayer() == player
             && other.getPlayerType() == Player.PlayerType.REBEL) ? Stance.WAR
             : super.determineStance(other);
+    }
+
+
+    /**
+     * Gives a mission to non-naval units.
+     */
+    @Override
+    public void giveNormalMissions() {
+        // Give military missions to all REF units.
+        for (AIUnit aiu : getAIUnits()) {
+            Unit u = aiu.getUnit();
+            if (u.isNaval() || aiu.hasMission()) continue;
+            if (u.isOffensiveUnit()) {
+                Location target = UnitSeekAndDestroyMission.findTarget(aiu, 
+                    seekAndDestroyRange, false);
+                Mission m = (target == null)
+                    ? new UnitWanderHostileMission(getAIMain(), aiu)
+                    : new UnitSeekAndDestroyMission(getAIMain(), aiu, target);
+                aiu.setMission(m);
+            }
+        }
+
+        // Fall back to the normal EuropeanAI behaviour for non-army.
+        super.giveNormalMissions();
+    }
+
+
+    // AI Player interface
+    // Inherit everything from EuropeanAIPlayer except the following overrides.
+
+    /**
+     * {@inheritDoc}
+     */
+    public void startWorking() {
+        final Player player = getPlayer();
+        if (!player.isWorkForREF()) {
+            logger.warning("No work for REF: " + player);
+            return;
+        }
+        super.startWorking();
     }
 
     /**
@@ -279,28 +302,5 @@ public class REFAIPlayer extends EuropeanAIPlayer {
             }
         }
         return value;
-    }
-
-    /**
-     * Gives a mission to non-naval units.
-     */
-    @Override
-    public void giveNormalMissions() {
-        // Give military missions to all REF units.
-        for (AIUnit aiu : getAIUnits()) {
-            Unit u = aiu.getUnit();
-            if (u.isNaval() || aiu.hasMission()) continue;
-            if (u.isOffensiveUnit()) {
-                Location target = UnitSeekAndDestroyMission.findTarget(aiu, 
-                    seekAndDestroyRange, false);
-                Mission m = (target == null)
-                    ? new UnitWanderHostileMission(getAIMain(), aiu)
-                    : new UnitSeekAndDestroyMission(getAIMain(), aiu, target);
-                aiu.setMission(m);
-            }
-        }
-
-        // Fall back to the normal EuropeanAI behaviour for non-army.
-        super.giveNormalMissions();
     }
 }

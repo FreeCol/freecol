@@ -38,6 +38,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTradeItem;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.DiplomaticTrade;
+import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
 import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.GoldTradeItem;
@@ -130,35 +131,6 @@ public class NativeAIPlayer extends AIPlayer {
         uninitialized = getPlayer() == null;
     }
 
-
-    /**
-     * Tells this <code>AIPlayer</code> to make decisions.
-     * The <code>AIPlayer</code> is done doing work this turn when
-     * this method returns.
-     */
-    public void startWorking() {
-        Turn turn = getGame().getTurn();
-        logger.finest(getClass().getName() + " in " + turn
-            + ": " + getPlayer().getNationId());
-        sessionRegister.clear();
-        clearAIUnits();
-        determineStances();
-        if (turn.isFirstTurn()) {
-            initializeMissions();
-        } else {
-            abortInvalidAndOneTimeMissions();
-            secureSettlements();
-            bringGifts();
-            demandTribute();
-            giveNormalMissions();
-            doMissions();
-            abortInvalidMissions();
-            giveNormalMissions();
-        }
-        doMissions();
-        abortInvalidMissions();
-        clearAIUnits();
-    }
 
     /**
      * Determines the stances towards each player.
@@ -727,6 +699,59 @@ public class NativeAIPlayer extends AIPlayer {
         }
     }
 
+    /**
+     * Gets the appropriate ship trade penalties.
+     *
+     * @param sense The sense to apply the modifiers.
+     * @return The ship trade penalties.
+     */
+    private Set<Modifier> getShipTradePenalties(boolean sense) {
+        Specification spec = getSpecification();
+        List<Modifier> shipPenalties = spec.getModifiers(Modifier.SHIP_TRADE_PENALTY);
+        Set<Modifier> result = new HashSet<Modifier>();
+        int penalty = spec.getInteger(GameOptions.SHIP_TRADE_PENALTY);
+        for (Modifier m : shipPenalties) {
+            result.add(new Modifier(m.getId(), m.getSource(),
+                    ((sense) ? penalty : -penalty), m.getType()));
+        }
+        return result;
+    }
+
+
+    // AIPlayer interface
+    // Inherit:
+    //   indianDemand
+    //   acceptDiplomaticTrade
+    //   acceptTax
+    //   acceptMercenaries
+    //   selectFoundingFather
+
+    /**
+     * {@inheritDoc}
+     */
+    public void startWorking() {
+        Turn turn = getGame().getTurn();
+        logger.finest(getClass().getName() + " in " + turn
+            + ": " + getPlayer().getNationId());
+        sessionRegister.clear();
+        clearAIUnits();
+        determineStances();
+        if (turn.isFirstTurn()) {
+            initializeMissions();
+        } else {
+            abortInvalidAndOneTimeMissions();
+            secureSettlements();
+            bringGifts();
+            demandTribute();
+            giveNormalMissions();
+            doMissions();
+            abortInvalidMissions();
+            giveNormalMissions();
+        }
+        doMissions();
+        abortInvalidMissions();
+        clearAIUnits();
+    }
 
     /**
      * {@inheritDoc}
@@ -757,93 +782,8 @@ public class NativeAIPlayer extends AIPlayer {
         return value;
     }
 
-
     /**
-     * Resolves a diplomatic trade offer.
-     *
-     * @param agreement The proposed <code>DiplomaticTrade</code>.
-     * @return True if the agreement is accepted.
-     */
-    public boolean acceptDiplomaticTrade(DiplomaticTrade agreement) {
-        boolean validOffer = true;
-        Stance stance = null;
-        int value = 0;
-        Iterator<TradeItem> itemIterator = agreement.iterator();
-        while (itemIterator.hasNext()) {
-            TradeItem item = itemIterator.next();
-            if (item instanceof GoldTradeItem) {
-                int gold = ((GoldTradeItem) item).getGold();
-                if (item.getSource() == getPlayer()) {
-                    value -= gold;
-                } else {
-                    value += gold;
-                }
-            } else if (item instanceof StanceTradeItem) {
-                // TODO: evaluate whether we want this stance change
-                stance = ((StanceTradeItem) item).getStance();
-                switch (stance) {
-                    case UNCONTACTED:
-                        // Invalid, never accept.
-                        validOffer = false;
-                        break;
-                    case WAR: // Always accept war without cost.
-                        break;
-                    case CEASE_FIRE:
-                        value -= 500;
-                        break;
-                    case PEACE:
-                        if (!agreement.getSender()
-                            .hasAbility(Ability.ALWAYS_OFFERED_PEACE)) {
-                            // TODO: introduce some kind of counter in
-                            // order to avoid Benjamin Franklin exploit.
-                            value -= 1000;
-                        }
-                        break;
-                    case ALLIANCE:
-                        value -= 2000;
-                        break;
-                    }
-
-            } else if (item instanceof ColonyTradeItem) {
-                // TODO: evaluate whether we might wish to give up a colony
-                if (item.getSource() == getPlayer()) {
-                    validOffer = false;
-                    break;
-                } else {
-                    value += 1000;
-                }
-            } else if (item instanceof UnitTradeItem) {
-                // TODO: evaluate whether we might wish to give up a unit
-                if (item.getSource() == getPlayer()) {
-                    validOffer = false;
-                    break;
-                } else {
-                    value += 100;
-                }
-            } else if (item instanceof GoodsTradeItem) {
-                Goods goods = ((GoodsTradeItem) item).getGoods();
-                if (item.getSource() == getPlayer()) {
-                    value -= getPlayer().getMarket()
-                        .getBidPrice(goods.getType(), goods.getAmount());
-                } else {
-                    value += getPlayer().getMarket()
-                        .getSalePrice(goods.getType(), goods.getAmount());
-                }
-            }
-        }
-        if (validOffer) {
-            logger.info("Trade value is " + value + ", accept if >=0");
-        } else {
-            logger.info("Trade offer is considered invalid!");
-        }
-        return (value >= 0) && validOffer;
-    }
-
-    /**
-     * Called after another <code>Player</code> sends a
-     * <code>trade</code> message.
-     *
-     * @param goods The goods which we are going to offer
+     * {@inheritDoc}
      */
     public void registerSellGoods(Goods goods) {
         String goldKey = "tradeGold#" + goods.getType().getId()
@@ -852,33 +792,7 @@ public class NativeAIPlayer extends AIPlayer {
     }
 
     /**
-     * Gets the appropriate ship trade penalties.
-     *
-     * @param sense The sense to apply the modifiers.
-     * @return The ship trade penalties.
-     */
-    private Set<Modifier> getShipTradePenalties(boolean sense) {
-        Specification spec = getSpecification();
-        List<Modifier> shipPenalties = spec.getModifiers(Modifier.SHIP_TRADE_PENALTY);
-        Set<Modifier> result = new HashSet<Modifier>();
-        int penalty = spec.getInteger(GameOptions.SHIP_TRADE_PENALTY);
-        for (Modifier m : shipPenalties) {
-            result.add(new Modifier(m.getId(), m.getSource(),
-                    ((sense) ? penalty : -penalty), m.getType()));
-        }
-        return result;
-    }
-
-    /**
-     * Called when another <code>Player</code> proposes to buy.
-     *
-     * @param unit The foreign <code>Unit</code> trying to trade.
-     * @param settlement The <code>Settlement</code> this player owns and
-     *            which the given <code>Unit</code> is trading.
-     * @param goods The goods the given <code>Unit</code> is trying to sell.
-     * @param gold The suggested price.
-     * @return The price this <code>AIPlayer</code> suggests or
-     *         {@link NetworkConstants#NO_TRADE}.
+     * {@inheritDoc}
      */
     public int buyProposition(Unit unit, Settlement settlement,
                               Goods goods, int gold) {
@@ -939,15 +853,7 @@ public class NativeAIPlayer extends AIPlayer {
     }
 
     /**
-     * Called when another <code>Player</code> proposes a sale.
-     *
-     * @param unit The foreign <code>Unit</code> trying to trade.
-     * @param settlement The <code>Settlement</code> this player owns and
-     *     which the given <code>Unit</code> if trying to sell goods.
-     * @param goods The goods the given <code>Unit</code> is trying to sell.
-     * @param gold The suggested price.
-     * @return The price this <code>AIPlayer</code> suggests or
-     *     {@link NetworkConstants#NO_TRADE}.
+     * {@inheritDoc}
      */
     public int sellProposition(Unit unit, Settlement settlement,
                                Goods goods, int gold) {
@@ -1011,8 +917,8 @@ public class NativeAIPlayer extends AIPlayer {
         return gold;
     }
 
-    // Use default acceptTax, acceptMercenaries, determineStances,
-    // selectFoundingFather.
+
+    // Serialization
 
     /**
      * {@inheritDoc}
