@@ -1145,6 +1145,10 @@ public final class ImageLibrary {
             ? ResourceManager.getGrayscaleImage(key, scale)
             : ResourceManager.getImage(key, scale);
         if (image == null) {
+            logger.warning("No image icon for: unitType=" + unitType.getId()
+                + " role=" + roleId + " native=" + nativeEthnicity
+                + " gray=" + grayscale + " scale=" + scale
+                + " (roleQual=" + roleQual + " key=" + key + ")");
             // FIXME: these require the game specification, which
             // ImageLibrary doesn't yet have access to
 
