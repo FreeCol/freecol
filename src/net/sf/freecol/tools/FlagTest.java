@@ -20,6 +20,8 @@
 package net.sf.freecol.tools;
 
 import java.awt.Color;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -30,13 +32,19 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
 import javax.swing.JScrollPane;
+import javax.swing.SpinnerNumberModel;
+
+import net.miginfocom.swing.MigLayout;
 
 
-public class FlagTest extends JFrame {
+public class FlagTest extends JFrame implements ItemListener {
 
     public class ColorScheme {
         Color backgroundColor = Color.RED;
@@ -77,6 +85,20 @@ public class FlagTest extends JFrame {
                           new Color(.234f, .233f, .430f),
                           Color.WHITE, Color.WHITE);
 
+    // based on the flag of Louisiana in 1861 and other similar French
+    // colonial flags
+    private ColorScheme FRANCE
+        = new ColorScheme(new Color(0xed, 0x29, 0x39),
+                          Color.WHITE,
+                          new Color(0, 0x23, 0x95),
+                          Color.WHITE);
+
+    // Dutch similar to French
+    private ColorScheme DUTCH
+        = new ColorScheme(new Color(0x21, 0x46, 0x6b),
+                          Color.WHITE,
+                          new Color(0xae, 0x1c, 0x28),
+                          Color.WHITE);
 
     public enum FlagType {
         HORIZONTAL_STRIPES,
@@ -166,7 +188,7 @@ public class FlagTest extends JFrame {
                 break;
             case VERTICAL_STRIPES:
                 double stripeWidth = width / stripes;
-                stripe = new Rectangle2D.Double(0, 0, height, stripeWidth);
+                stripe = new Rectangle2D.Double(0, 0, stripeWidth, height);
                 for (int i = 0; i < stripes / 2; i++) {
                     g.translate(stripeWidth, 0);
                     g.fill(stripe);
@@ -177,6 +199,7 @@ public class FlagTest extends JFrame {
                 } else {
                     unionWidth = stripeWidth * Math.ceil(stripes / 2.0);
                 }
+                unionHeight = 0.5 * height;
                 g.setTransform(transform);
                 break;
             case HORIZONTAL_TRICOLORE:
@@ -200,6 +223,15 @@ public class FlagTest extends JFrame {
                 = new Rectangle2D.Double(0, 0, unionWidth, unionHeight);
             g.setColor(colorScheme.unionColor);
             g.fill(union);
+            if (colorScheme.unionColor == colorScheme.starColor) {
+                if (flagType == FlagType.VERTICAL_TRICOLORE
+                    || flagType == FlagType.HORIZONTAL_TRICOLORE) {
+                    // tricolore with union above or on the left
+                    g.setTransform(transform);
+                } else {
+                    colorScheme.starColor = colorScheme.backgroundColor;
+                }
+            }
 
             GeneralPath unionPath;
             if (stars == 1) {
@@ -305,20 +337,56 @@ public class FlagTest extends JFrame {
 
     }
 
+    private JComboBox flagType;
+    private JComboBox colorScheme;
+    private JComboBox states;
+
+    private final FlagType[] flagTypes = new FlagType[] {
+        FlagType.HORIZONTAL_STRIPES,
+        FlagType.VERTICAL_STRIPES,
+        FlagType.HORIZONTAL_TRICOLORE,
+        FlagType.VERTICAL_TRICOLORE,
+        FlagType.QUARTERED
+    };
+    private final ColorScheme[] colorSchemes = new ColorScheme[] {
+        ENGLAND, SPAIN, PORTUGAL, FRANCE, DUTCH
+    };
+    private final String[] colorSchemeNames = new String[] {
+        "ENGLAND", "SPAIN", "PORTUGAL", "FRANCE", "DUTCH"
+    };
+
+    final JLabel label = new JLabel();
+
     public FlagTest() {
 
         super("FlagTest");
-        JPanel panel = new JPanel(new GridLayout(0, 5, 5, 5));
-        JScrollPane scrollPane = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-            JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        for (int states = 1; states < 51; states++) {
-            Flag flag = new FlagTest.Flag(SPAIN, FlagType.QUARTERED, states, Math.min(13, states));
-            JLabel label = new JLabel(new ImageIcon(flag.getImage()));
-            panel.add(label);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new MigLayout("wrap 3"));
+        flagType = new JComboBox(flagTypes);
+        flagType.addItemListener(this);
+        add(flagType);
+        colorScheme = new JComboBox(colorSchemeNames);
+        colorScheme.addItemListener(this);
+        add(colorScheme);
+        String[] allStates = new String[50];
+        for (int index = 0; index < 50; index++) {
+            allStates[index] = Integer.toString(index + 1);
         }
-        add(scrollPane);
+        states = new JComboBox(allStates);
+        states.setSelectedIndex(12);
+        states.addItemListener(this);
+        add(states);
+        add(label, "width 200, height 100");
+        itemStateChanged(null);
     }
 
+    public void itemStateChanged(ItemEvent e) {
+        ColorScheme cs = colorSchemes[colorScheme.getSelectedIndex()];
+        FlagType ft = flagTypes[flagType.getSelectedIndex()];
+        int number = states.getSelectedIndex() + 1;
+        Flag flag = new FlagTest.Flag(cs, ft, number, Math.min(13, number));
+        label.setIcon(new ImageIcon(flag.getImage()));
+    }
 
     public static void main(String[] args) {
 
