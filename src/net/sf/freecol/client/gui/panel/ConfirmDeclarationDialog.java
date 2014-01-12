@@ -45,9 +45,9 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>> {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ConfirmDeclarationDialog.class.getName());
 
-    private JTextField nationField;
+    private final JTextField nationField;
 
-    private JTextField countryField;
+    private final JTextField countryField;
 
 
     /**
@@ -70,13 +70,13 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>> {
         StringTemplate country
             = StringTemplate.template("declareIndependence.defaultCountry")
                 .add("%nation%", player.getNewLandName());
-        JTextField countryField = new JTextField(Messages.message(country), 20);
+        countryField = new JTextField(Messages.message(country), 20);
         String cPrompt = Messages.message("declareIndependence.enterCountry");
 
         StringTemplate nation
             = StringTemplate.template("declareIndependence.defaultNation")
                 .addStringTemplate("%nation%", player.getNationName());
-        JTextField nationField = new JTextField(Messages.message(nation), 20);
+        nationField = new JTextField(Messages.message(nation), 20);
         String nPrompt = Messages.message("declareIndependence.enterNation");
 
         panel.add(GUI.getDefaultTextArea(Messages.message(sure)));
