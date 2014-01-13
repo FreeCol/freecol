@@ -1775,7 +1775,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     } else {
                         brave.clearRoleAndEquipment();
                         brave.changeOwner(other);//-vis: safe/colony
-                        brave.setType(type);//-vis: safe/colony
+                        brave.changeType(type);//-vis: safe/colony
                         brave.setLocation(colony.getTile());//-vis: safe/colony
                         brave.setState(Unit.UnitState.ACTIVE);
                         brave.setMovesLeft(0);
@@ -1857,7 +1857,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             for (Unit u : getUnits()) {
                 UnitType newType = upgrades.get(u.getType());
                 if (newType != null) {
-                    u.setType(newType);//-vis(this)
+                    u.changeType(newType);//-vis(this)
                     visibilityChange = true;
                     cs.add(See.perhaps(), u);
                 }
@@ -2771,7 +2771,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             // The attacker however might have captured a unit with
             // greater line of sight.
             convert.changeOwner(attackerPlayer);//-vis(attackerPlayer)
-            convert.setType(type);//-vis(attackerPlayer)
+            convert.changeType(type);//-vis(attackerPlayer)
             convert.setLocation(attacker.getTile());//-vis(attackerPlayer)
             convert.setState(Unit.UnitState.ACTIVE);
             convert.setMovesLeft(0);
@@ -2874,7 +2874,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                                             ? ChangeType.UNDEAD
                                             : ChangeType.CAPTURE, winnerPlayer);
         loser.changeOwner(winnerPlayer);//-vis(loserPlayer)
-        if (type != null) loser.setType(type);//-vis(winnerPlayer)
+        if (type != null) loser.changeType(type);//-vis(winnerPlayer)
         loser.setLocation(winner.getTile());//-vis(winnerPlayer)
         cs.add(See.only(winnerPlayer), winnerPlayer.exploreForUnit(loser));
         loser.setState(Unit.UnitState.ACTIVE);
@@ -3037,7 +3037,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 + ((type == null) ? "null" : "same type: " + type));
             return;
         }
-        loser.setType(type);//-vis(loserPlayer)
+        loser.changeType(type);//-vis(loserPlayer)
         loserPlayer.invalidateCanSeeTiles();//+vis(loserPlayer)
 
         cs.addMessage(See.only(winnerPlayer),
@@ -3603,7 +3603,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 + ((type == null) ? "null" : "same type: " + type));
             return;
         }
-        winner.setType(type);//-vis(winnerPlayer)
+        winner.changeType(type);//-vis(winnerPlayer)
         winnerPlayer.invalidateCanSeeTiles();//+vis(winnerPlayer)
 
         cs.addMessage(See.only(winnerPlayer),

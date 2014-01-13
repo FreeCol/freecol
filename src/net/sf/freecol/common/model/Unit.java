@@ -301,26 +301,33 @@ public class Unit extends GoodsLocation
      *
      * -vis: Has visibility issues as the line of sight may change.
      *
-     * @param newUnitType The new type of the unit.
+     * @param unitType The new type of the unit.
      */
-    public void setType(UnitType newUnitType) {
-        if (newUnitType.isAvailableTo(owner)) {
-            this.unitType = newUnitType;
-            if (getMovesLeft() > getInitialMovesLeft()) {
-                setMovesLeft(getInitialMovesLeft());
-            }
-            hitPoints = unitType.getHitPoints();
-            if (getTeacher() != null && !canBeStudent(getTeacher())) {
-                getTeacher().setStudent(null);
-                setTeacher(null);
-            }
-        } else {
-            // ColonialRegulars for example are only available after
-            // independence is declared.
-            logger.warning("Units of type: " + newUnitType
-                           + " are not available to " + owner.getPlayerType()
-                           + " player " + owner.getName());
+    public void setType(UnitType unitType) {
+        this.unitType = unitType;
+    }
+
+    /**
+     * Changes the type of the unit.
+     *
+     * -vis: Has visibility issues as the line of sight may change.
+     *
+     * @param unitType The new type of the unit.
+     * @return True if the type change succeeds.
+     */
+    public boolean changeType(UnitType unitType) {
+        if (!unitType.isAvailableTo(owner)) return false;
+
+        setType(unitType);
+        if (getMovesLeft() > getInitialMovesLeft()) {
+            setMovesLeft(getInitialMovesLeft());
         }
+        hitPoints = unitType.getHitPoints();
+        if (getTeacher() != null && !canBeStudent(getTeacher())) {
+            getTeacher().setStudent(null);
+            setTeacher(null);
+        }
+        return true;
     }
 
     /**

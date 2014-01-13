@@ -739,7 +739,7 @@ public class BuildingTest extends FreeColTestCase {
                 for (UnitType type : spec().getUnitTypeList()) {
                     if (!building.getType().canAdd(type)
                         || !type.isAvailableTo(colony.getOwner())) continue;
-                    unit.setType(type);
+                    unit.changeType(type);
                     if (output != null) {
                         int productivity = building.getUnitProduction(unit, outputType);
                         int expected = output.getAmount();

@@ -157,7 +157,7 @@ public class ServerBuilding extends Building implements ServerModelObject {
             logger.warning("Student " + student.getId()
                            + " can not learn from " + teacher.getId());
         } else {
-            student.setType(skill);//-vis: safe within colony
+            student.changeType(skill);//-vis: safe within colony
             StringTemplate newName = student.getLabel();
             cs.addMessage(See.only(owner),
                 new ModelMessage(ModelMessage.MessageType.UNIT_IMPROVED,

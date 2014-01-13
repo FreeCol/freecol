@@ -663,7 +663,8 @@ public class SimpleCombatModel extends CombatModel {
             .getUnitTypeChange(ChangeType.PROMOTION, winnerPlayer);
         if (promotion != null
             && (winner.hasAbility(Ability.AUTOMATIC_PROMOTION)
-                || (great && (100 * (r - Math.floor(r)) <= promotion.getProbability(ChangeType.PROMOTION))))) {
+                || (great
+                    && (100 * (r - Math.floor(r)) <= promotion.getProbability(ChangeType.PROMOTION))))) {
             crs.add(CombatResult.PROMOTE_UNIT);
         }
     }

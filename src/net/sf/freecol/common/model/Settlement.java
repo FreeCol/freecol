@@ -284,7 +284,7 @@ public abstract class Settlement extends GoodsLocation
             units.addAll(u.getUnitList());
             u.setState(Unit.UnitState.ACTIVE);
             UnitType type = u.getTypeChange(change, newOwner);
-            if (type != null) u.setType(type);//-vis(newOwner)
+            if (type != null) u.changeType(type);//-vis(newOwner)
             u.changeOwner(newOwner);//-vis(oldOwner,newOwner)
         }
 

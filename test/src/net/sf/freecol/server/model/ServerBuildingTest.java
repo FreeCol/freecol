@@ -1158,15 +1158,15 @@ public class ServerBuildingTest extends FreeColTestCase {
         assertEquals(student, lumber.getStudent());
 
         // lumber jack can teach indentured servant
-        student.setType(indenturedServantType);
+        student.changeType(indenturedServantType);
         assertEquals(student, lumber.getStudent());
 
         // lumber jack can teach free colonist
-        student.setType(freeColonistType);
+        student.changeType(freeColonistType);
         assertEquals(student, lumber.getStudent());
 
         // lumber jack can not teach expert
-        student.setType(masterCarpenterType);
+        student.changeType(masterCarpenterType);
         assertNull(lumber.getStudent());
         assertNull(student.getTeacher());
 

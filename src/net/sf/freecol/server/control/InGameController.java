@@ -828,7 +828,7 @@ public final class InGameController extends Controller {
             for (Unit u : surrenderUnits) {
                 UnitType downgrade = u.getTypeChange(ChangeType.CAPTURE,
                                                      independent);
-                if (downgrade != null) u.setType(downgrade);//-vis(owner)
+                if (downgrade != null) u.changeType(downgrade);//-vis(owner)
                 u.changeOwner(independent);//-vis(both)
                 cs.add(See.only(independent), independent.exploreForUnit(u));
                 cs.add(See.perhaps().always(serverPlayer), u);
@@ -1223,14 +1223,13 @@ public final class InGameController extends Controller {
         for (UnitType unitType : spec.getUnitTypeList()) {
             UnitType upgrade = unitType.getTargetType(ChangeType.INDEPENDENCE,
                                                       serverPlayer);
-            if (upgrade != null) {
-                upgrades.put(unitType, upgrade);
-            }
+            if (upgrade != null) upgrades.put(unitType, upgrade);
         }
         for (Colony colony : serverPlayer.getColonies()) {
             int sol = colony.getSoL();
             if (sol > 50) {
-                java.util.Map<UnitType, List<Unit>> unitMap = new HashMap<UnitType, List<Unit>>();
+                java.util.Map<UnitType, List<Unit>> unitMap
+                    = new HashMap<UnitType, List<Unit>>();
                 List<Unit> allUnits = colony.getTile().getUnitList();
                 allUnits.addAll(colony.getUnitList());
                 for (Unit unit : allUnits) {
@@ -1249,7 +1248,7 @@ public final class InGameController extends Controller {
                         for (int index = 0; index < limit; index++) {
                             Unit unit = entry.getValue().get(index);
                             if (unit == null) break;
-                            unit.setType(upgrades.get(entry.getKey()));//-vis
+                            unit.changeType(upgrades.get(entry.getKey()));//-vis
                             cs.add(See.only(serverPlayer), unit);
                         }
                         cs.addMessage(See.only(serverPlayer),
@@ -1916,7 +1915,7 @@ public final class InGameController extends Controller {
         default:
             // Teach the unit, and expend the skill if necessary.
             // Do a full information update as the unit is in the settlement.
-            unit.setType(skill);//-vis(serverPlayer)
+            unit.changeType(skill);//-vis(serverPlayer)
             serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
             cs.add(See.perhaps(), unit);
             if (!settlement.isCapital()
@@ -2069,7 +2068,7 @@ public final class InGameController extends Controller {
                 && ((skill != null && skill.hasAbility(Ability.EXPERT_SCOUT))
                     || rnd == 0)) {
                 // If the scout can be taught to be an expert it will be.
-                unit.setType(scoutSkill);//-vis(serverPlayer)
+                unit.changeType(scoutSkill);//-vis(serverPlayer)
                 serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
                 result = "expert";
             } else {
@@ -2687,7 +2686,7 @@ public final class InGameController extends Controller {
         }
 
         // Valid, change type.
-        unit.setType(newType);//-vis: safe in colony
+        unit.changeType(newType);//-vis: safe in colony
 
         // Update just the unit, others can not see it as this only happens
         // in-colony.
@@ -3205,11 +3204,9 @@ public final class InGameController extends Controller {
 
         // Check for upgrade.
         UnitType oldType = unit.getType();
-        UnitTypeChange change = oldType
-            .getUnitTypeChange(ChangeType.ENTER_COLONY, unit.getOwner());
-        if (change != null) {
-            unit.setType(change.getNewUnitType());//-vis: safe in colony
-        }
+        UnitType newType = unit.getTypeChange(ChangeType.ENTER_COLONY,
+                                              unit.getOwner());
+        if (newType != null) unit.changeType(newType);//-vis: safe in colony
 
         // Change the location.
         // We could avoid updating the whole tile if we knew that this

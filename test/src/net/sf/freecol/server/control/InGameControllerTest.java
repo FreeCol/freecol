@@ -618,7 +618,7 @@ public class InGameControllerTest extends FreeColTestCase {
         tile2.setExplored(french, true);
         dutch.addAbility(new Ability(Ability.INDEPENDENCE_DECLARED));
         Unit colonist = colony.getUnitIterator().next();
-        colonist.setType(colonialType);
+        colonist.changeType(colonialType);
         assertEquals("Colonist should be Colonial Regular",
                      colonialType, colonist.getType());
         Unit defender = new ServerUnit(getGame(), colony.getTile(), dutch,
