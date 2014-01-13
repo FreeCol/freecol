@@ -52,6 +52,7 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.ChangePriority;
@@ -316,11 +317,12 @@ public class ServerGame extends Game implements ServerModelObject {
                     is.getTile().cacheUnseen(strongest);//+til
                     tiles.add(is.getTile());
                     is.setContacted(strongest);//-til
-                    is.getMissionary().changeOwner(strongest);//-vis(both),-til
-                    cs.add(See.only(strongest),
-                           strongest.exploreForSettlement(is));
-                    is.getTile().updateIndianSettlement(strongest);
-                    cs.add(See.perhaps().always(strongest), is);
+                    ServerUnit missionary = (ServerUnit)is.getMissionary();
+                    if (missionary.csChangeOwner(strongest,
+                            ChangeType.CAPTURE, null, cs)) {//-vis(both),-til
+                        is.getTile().updateIndianSettlement(strongest);
+                        cs.add(See.perhaps().always(strongest), is);
+                    }
                 }
             }
             for (Colony colony : weakest.getColonies()) {
@@ -328,24 +330,27 @@ public class ServerGame extends Game implements ServerModelObject {
                     t.cacheUnseen();//+til
                     tiles.add(t);
                 }
-                ((ServerColony)colony).changeOwner(strongest);//-vis(both),-til
+                ((ServerColony)colony).csChangeOwner(strongest, cs);//-vis(both),-til
                 cs.add(See.only(strongest),
                        strongest.exploreForSettlement(colony));
                 sb.append(" ").append(colony.getName());
             }
             for (Unit unit : weakest.getUnits()) {
-                unit.changeOwner(strongest); //-vis(both)
-                cs.add(See.only(strongest), strongest.exploreForUnit(unit));
-                sb.append(" ").append(unit.getId());
-                if (unit.getLocation() instanceof Europe) {
-                    unit.setLocation(strongestAIPlayer.getEurope());//-vis
-                    cs.add(See.only(strongest), unit);
-                } else if (unit.getLocation() instanceof HighSeas) {
-                    unit.setLocation(strongestAIPlayer.getHighSeas());//-vis
-                    cs.add(See.only(strongest), unit);
-                } else if (unit.getLocation() instanceof Tile) {
-                    Tile tile = unit.getTile();
-                    if (!tiles.contains(tile)) tiles.add(tile);
+                if (((ServerUnit)unit).csChangeOwner(strongest, 
+                        ChangeType.CAPTURE, null, cs)) { //-vis(both)
+                    unit.setMovesLeft(0);
+                    unit.setState(Unit.UnitState.ACTIVE);
+                    sb.append(" ").append(unit.getId());
+                    if (unit.getLocation() instanceof Europe) {
+                        unit.setLocation(strongestAIPlayer.getEurope());//-vis
+                        cs.add(See.only(strongest), unit);
+                    } else if (unit.getLocation() instanceof HighSeas) {
+                        unit.setLocation(strongestAIPlayer.getHighSeas());//-vis
+                        cs.add(See.only(strongest), unit);
+                    } else if (unit.getLocation() instanceof Tile) {
+                        Tile tile = unit.getTile();
+                        if (!tiles.contains(tile)) tiles.add(tile);
+                    }
                 }
             }
 

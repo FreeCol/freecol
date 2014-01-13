@@ -701,31 +701,6 @@ public class BuildingTest extends FreeColTestCase {
         assertEquals("Wrong final bell production",expectBellProd,bellProduction);
     }
 
-    public void testCarpenterHouseNationalAdvantage() {
-        Game game = getStandardGame("freecol");
-        game.setMap(getTestMap(true));
-
-        Colony colony = getStandardColony(2);
-        colony.addGoods(lumberType, 100);
-        Unit unit = colony.getUnitList().get(0);
-        Building building = colony.getBuilding(carpenterHouseType);
-
-        assertEquals("Production()", 0,
-            building.getTotalProductionOf(hammersType));
-
-        unit.setLocation(building);
-        colony.invalidateCache();
-        assertEquals("Production(unit)", 3,
-            building.getTotalProductionOf(hammersType));
-
-        Player swedish = game.getPlayer("model.nation.swedish");
-        assertNotNull("Swedes exist", swedish);
-        colony.changeOwner(swedish);
-        colony.invalidateCache();
-        assertEquals("Production(unit/building-advantage)", 5,
-            building.getTotalProductionOf(hammersType));
-    }
-
     public void testUnitProduction() {
         Game game = getGame();
         game.setMap(getTestMap(true));

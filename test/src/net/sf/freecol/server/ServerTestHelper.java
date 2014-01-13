@@ -31,6 +31,7 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.Controller;
@@ -72,31 +73,47 @@ public final class ServerTestHelper {
         }
     }
 
-    public static FreeColServer startServer(boolean publicServer, boolean singlePlayer) {
-        return startServer(publicServer, singlePlayer, SERVER_PORT, SERVER_NAME);
+    public static FreeColServer startServer(boolean publicServer,
+                                            boolean singlePlayer) {
+        return startServer(publicServer, singlePlayer, FreeColTestCase.spec());
     }
 
-    public static FreeColServer startServer(boolean publicServer, boolean singlePlayer, int port, String name) {
+    public static FreeColServer startServer(boolean publicServer,
+                                            boolean singlePlayer,
+                                            Specification spec) {
+        return startServer(publicServer, singlePlayer, spec,
+                           SERVER_PORT, SERVER_NAME);
+    }
+
+    public static FreeColServer startServer(boolean publicServer,
+                                            boolean singlePlayer,
+                                            Specification spec,
+                                            int port, String name) {
         stopServer();
         try {
             // TODO: fixme! Pass tc
             server = new FreeColServer(publicServer, singlePlayer,
-                                       FreeColTestCase.spec(),  port, name);
+                                       spec,  port, name);
         } catch (NoRouteToServerException e) {
             fail(e.getMessage());
         } catch (IOException e) {
             fail(e.getMessage());
         }
         assertNotNull(server);
-        assertEquals(FreeColServer.GameState.STARTING_GAME, server.getGameState());
+        assertEquals(FreeColServer.GameState.STARTING_GAME,
+                     server.getGameState());
         return server;
     }
 
-    public static FreeColServer startServer(File file, boolean publicServer, boolean singlePlayer) {
-        return startServer(file, publicServer, singlePlayer, SERVER_PORT, SERVER_NAME);
+    public static FreeColServer startServer(File file, boolean publicServer,
+                                            boolean singlePlayer) {
+        return startServer(file, publicServer, singlePlayer,
+                           SERVER_PORT, SERVER_NAME);
     }
 
-    public static FreeColServer startServer(File file, boolean publicServer, boolean singlePlayer, int port, String name) {
+    public static FreeColServer startServer(File file, boolean publicServer,
+                                            boolean singlePlayer, int port,
+                                            String name) {
         stopServer();
         try {
             server = new FreeColServer(new FreeColSavegameFile(file), 
@@ -111,7 +128,7 @@ public final class ServerTestHelper {
 
     public static File createRandomSaveGame() {
         // start a server
-        FreeColServer serv = startServer(false, true, SERVER_PORT, SERVER_NAME);
+        FreeColServer serv = startServer(false, true);
 
         // generate a random map
         Controller c = serv.getController();
@@ -154,8 +171,19 @@ public final class ServerTestHelper {
      * @return The new running server game.
      */
     public static Game startServerGame(Map map) {
+        return startServerGame(map, FreeColTestCase.spec());
+    }
+
+    /**
+     * Start a new server game, using a *copy* of a supplied map.
+     *
+     * @param map The <code>Map</code> to copy.
+     * @param spec The <code>Specification</code> to use.
+     * @return The new running server game.
+     */
+    public static Game startServerGame(Map map, Specification spec) {
         stopServerGame();
-        FreeColServer serv = startServer(false, true);
+        FreeColServer serv = startServer(false, true, spec);
         serv.setMapGenerator(new MockMapGenerator(map));
         PreGameController pgc = (PreGameController) serv.getController();
         try {

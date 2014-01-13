@@ -1755,37 +1755,31 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     || (colony = settlement.getTile().getNearestSettlement(other, MAX_CONVERT_DISTANCE)) == null) {
                     settlement.setConvertProgress((int)Math.floor(convert));
                 } else {
-                    logger.fine("Convert at " + settlement.getName()
-                        + " for " + colony.getName());
                     settlement.setConvertProgress(0);
                     // TODO: fix native AI to put the units just
                     // hanging around (as distinct to those with
                     // DefendSettlement missions) into the settlement
                     // so we can ignore the tile-residents.
                     Tile tile = settlement.getTile();
-                    Unit brave = Utils.getRandomMember(logger, "Choose convert",
-                        ((!tile.isEmpty()) ? tile.getUnitList()
-                            : settlement.getUnitList()),
-                        random);
-                    UnitType type = brave.getTypeChange(ChangeType.CONVERSION,
-                                                        other);
-                    if (type == null) {
-                        logger.warning("Conversion failure at " + settlement
-                            + " for " + brave + " to " + other);
-                    } else {
+                    List<Unit> ul = tile.getUnitList();
+                    if (ul.isEmpty()) ul.addAll(settlement.getUnitList());
+                    ServerUnit brave = (ServerUnit)Utils.getRandomMember(logger,
+                        "Convert", ul, random);
+                    if (brave.csChangeOwner(other, ChangeType.CONVERSION, 
+                            colony.getTile(), cs)) { //-vis(other)
                         brave.clearRoleAndEquipment();
-                        brave.changeOwner(other);//-vis: safe/colony
-                        brave.changeType(type);//-vis: safe/colony
-                        brave.setLocation(colony.getTile());//-vis: safe/colony
-                        brave.setState(Unit.UnitState.ACTIVE);
                         brave.setMovesLeft(0);
-                        cs.addDisappear(other, colony.getTile(), brave);
+                        brave.setState(Unit.UnitState.ACTIVE);
+                        cs.addDisappear(other, settlement.getTile(), brave);
                         cs.add(See.only(other), colony.getTile());
                         cs.addMessage(See.only(other),
                             new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
                                              "model.colony.newConvert", brave)
                                 .addStringTemplate("%nation%", nation)
                                 .addName("%colony%", colony.getName()));
+                        other.invalidateCanSeeTiles();//+vis(other)
+                        logger.fine("Convert at " + settlement.getName()
+                            + " for " + colony.getName());
                     }
                 }
             }
@@ -2727,7 +2721,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             if (!explored.contains(t)) explored.add(t);
         }
         ((ServerColony)colony)//-til
-            .changeOwner(attackerPlayer);//-vis(attackerPlayer,colonyPlayer)
+            .csChangeOwner(attackerPlayer, cs);//-vis(attackerPlayer,colonyPlayer)
         tiles.remove(tile);
         explored.remove(tile);
         cs.add(See.only(attackerPlayer), explored);
@@ -2759,25 +2753,14 @@ public class ServerPlayer extends Player implements ServerModelObject {
         StringTemplate convertNation = nativePlayer.getNationName();
         List<Unit> units = is.getTile().getUnitList();
         if (units.isEmpty()) units.addAll(is.getUnitList());
-        Unit convert = Utils.getRandomMember(logger, "Choose convert",
-                                             units, random);
-        UnitType type = convert.getTypeChange(ChangeType.CONVERSION,
-                                              attackerPlayer);
-        if (type == null) {
-            logger.warning("Failed to capture convert " + convert
-                + " at " + is + " for " + attackerPlayer);
-        } else {
+        ServerUnit convert = (ServerUnit)Utils.getRandomMember(logger,
+            "Choose convert", units, random);
+        if (convert.csChangeOwner(attackerPlayer, ChangeType.CONVERSION,
+                attacker.getTile(), cs)) { //-vis(attackerPlayer)
             convert.clearRoleAndEquipment();
-            // No visibility issue for the loser as the unit
-            // moves/changes from within a non-collapsing settlement.
-            // The attacker however might have captured a unit with
-            // greater line of sight.
-            convert.changeOwner(attackerPlayer);//-vis(attackerPlayer)
-            convert.changeType(type);//-vis(attackerPlayer)
-            convert.setLocation(attacker.getTile());//-vis(attackerPlayer)
-            convert.setState(Unit.UnitState.ACTIVE);
             convert.setMovesLeft(0);
-            cs.addDisappear(attackerPlayer, attacker.getTile(), convert);
+            convert.setState(Unit.UnitState.ACTIVE);
+            cs.add(See.only(nativePlayer), is.getTile());
             cs.addMessage(See.only(attackerPlayer),
                 new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                  "model.unit.newConvertFromAttack", convert)
@@ -2875,36 +2858,36 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // both players because the captured unit might be the only
         // one on its tile, and the winner might have captured a unit
         // with greater line of sight.
-        UnitType type = loser.getTypeChange((winnerPlayer.isUndead())
-                                            ? ChangeType.UNDEAD
-                                            : ChangeType.CAPTURE, winnerPlayer);
-        loser.changeOwner(winnerPlayer);//-vis(loserPlayer)
-        if (type != null) loser.changeType(type);//-vis(winnerPlayer)
-        loser.setLocation(winner.getTile());//-vis(winnerPlayer)
-        cs.add(See.only(winnerPlayer), winnerPlayer.exploreForUnit(loser));
-        loser.setState(Unit.UnitState.ACTIVE);
+        Tile oldTile = loser.getTile();
+        ChangeType change = (winnerPlayer.isUndead()) ? ChangeType.UNDEAD
+            : ChangeType.CAPTURE;
+        if (loser.csChangeOwner(winnerPlayer, change, winner.getTile(), 
+                                cs)) {//-vis(both)
+            loser.setMovesLeft(0);
+            loser.setState(Unit.UnitState.ACTIVE);
+            cs.add(See.perhaps().always(loserPlayer), oldTile);
+            // Winner message post-capture when it owns the loser
+            cs.addMessage(See.only(winnerPlayer),
+                new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
+                                 messageId, loser)
+                    .setDefaultId("model.unit.unitCaptured")
+                    .addStringTemplate("%nation%", loserNation)
+                    .addStringTemplate("%unit%", oldName)
+                    .addStringTemplate("%enemyNation%", winnerNation)
+                    .addStringTemplate("%enemyUnit%", winner.getLabel())
+                    .addStringTemplate("%location%", winnerLocation));
+        }
+        cs.addMessage(See.only(loserPlayer),
+            new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
+                             messageId, loser.getTile())
+                .setDefaultId("model.unit.unitCaptured")
+                .addStringTemplate("%nation%", loserNation)
+                .addStringTemplate("%unit%", oldName)
+                .addStringTemplate("%enemyNation%", winnerNation)
+                .addStringTemplate("%enemyUnit%", winner.getLabel())
+               .addStringTemplate("%location%", loserLocation));
         winnerPlayer.invalidateCanSeeTiles();//+vis(winnerPlayer)
         loserPlayer.invalidateCanSeeTiles();//+vis(loserPlayer)
-
-        // Winner message post-capture when it owns the loser
-        cs.addMessage(See.only(winnerPlayer),
-                      new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
-                                       messageId, loser)
-                      .setDefaultId("model.unit.unitCaptured")
-                      .addStringTemplate("%nation%", loserNation)
-                      .addStringTemplate("%unit%", oldName)
-                      .addStringTemplate("%enemyNation%", winnerNation)
-                      .addStringTemplate("%enemyUnit%", winner.getLabel())
-                      .addStringTemplate("%location%", winnerLocation));
-        cs.addMessage(See.only(loserPlayer),
-                      new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
-                                       messageId, loser.getTile())
-                      .setDefaultId("model.unit.unitCaptured")
-                      .addStringTemplate("%nation%", loserNation)
-                      .addStringTemplate("%unit%", oldName)
-                      .addStringTemplate("%enemyNation%", winnerNation)
-                      .addStringTemplate("%enemyUnit%", winner.getLabel())
-                      .addStringTemplate("%location%", loserLocation));
     }
 
     /**

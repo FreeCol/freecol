@@ -565,7 +565,7 @@ public class Unit extends GoodsLocation
      * @param owner The new owner <code>Player</code>.
      */
     public void changeOwner(Player owner) {
-        Player oldOwner = this.owner;
+        final Player oldOwner = this.owner;
         if (oldOwner == owner) return;
 
         if (oldOwner == null) {
@@ -574,7 +574,7 @@ public class Unit extends GoodsLocation
         }
 
         // This need to be set right away.
-        this.owner = owner;
+        setOwner(owner);
 
         // Clear trade route and goto orders if changing owner.
         if (getTradeRoute() != null) setTradeRoute(null);

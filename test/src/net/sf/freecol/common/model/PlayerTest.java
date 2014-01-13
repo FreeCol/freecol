@@ -28,11 +28,14 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 
 public class PlayerTest extends FreeColTestCase {
-    UnitType freeColonist = spec().getUnitType("model.unit.freeColonist");
-    UnitType galleonType = spec().getUnitType("model.unit.galleon");
+    
+    private static final UnitType freeColonist
+        = spec().getUnitType("model.unit.freeColonist");
+    private static final UnitType galleonType
+        = spec().getUnitType("model.unit.galleon");
+
 
     public void testUnits() {
-
         Game game = getStandardGame();
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
@@ -74,7 +77,6 @@ public class PlayerTest extends FreeColTestCase {
         unit2.changeOwner(french);
         assertTrue(dutch.getUnitById(unit2.getId()) == null);
         assertTrue(french.getUnitById(unit2.getId()) == unit2);
-
     }
 
     public void testEuropeanPlayer(Player player) {

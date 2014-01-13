@@ -1141,6 +1141,60 @@ public class ServerUnit extends Unit implements ServerModelObject {
         return false;
     }
 
+    /**
+     * Change the owner of this unit or dispose of it if the change is
+     * impossible.  Move the unit to a new location if necessary.
+     * Also handle disappearance of any carried units that will now be
+     * invisible to the new owner.
+     *
+     * -vis(owner,newOwner)
+     *
+     * @param newOwner The new owning <code>ServerPlayer</code>.
+     * @param change An optional accompanying <code>ChangeType</code>.
+     * @param loc A optional new <code>Location</code> for the unit.
+     * @param cs A <code>ChangeSet</code> to update.
+     * @return True if the new owner can have this unit.
+     */
+    public boolean csChangeOwner(ServerPlayer newOwner, ChangeType change,
+                                 Location loc, ChangeSet cs) {
+        final ServerPlayer owner = (ServerPlayer)getOwner();
+        if (newOwner == owner) return true; // No transfer needed
+
+        UnitType mainType = getTypeChange(change, newOwner);
+        if (mainType == null) mainType = getType(); // No change needed.
+        if (!mainType.isAvailableTo(newOwner)) { // Can not have this unit.
+            cs.addDispose(See.perhaps().always(owner), getTile(), this);
+            return false;
+        }
+
+        Tile oldTile = getTile();
+        for (Unit u : getUnitList()) {
+            UnitType type = u.getTypeChange(change, newOwner);
+            if (type == null) type = u.getType();
+            if (!type.isAvailableTo(newOwner)) {
+                cs.addDispose(See.only(owner), this, u);
+            } else {
+                if (!u.changeType(type)) {
+                    throw new IllegalStateException("Type change failure: "
+                        + u + " -> " + type);
+                }
+            }
+        }
+        if (!changeType(mainType)) {
+            throw new IllegalStateException("Type change failure: " + this
+                + " -> " + mainType);
+        }
+        changeOwner(newOwner);
+        if (loc != null) setLocation(loc);
+        if (isCarrier()) {
+            cs.addRemoves(See.only(owner), this, getUnitList());
+        }
+        cs.add(See.only(newOwner), newOwner.exploreForUnit(this));
+        return true;
+    }
+
+
+    // Serialization
 
     /**
      * Returns the tag name of the root element representing this object.

@@ -89,6 +89,7 @@ import net.sf.freecol.server.ai.Wish;
 import net.sf.freecol.server.ai.mission.Mission;
 import net.sf.freecol.server.ai.mission.TransportMission;
 import net.sf.freecol.server.model.ServerBuilding;
+import net.sf.freecol.server.model.ServerColony;
 import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
@@ -430,40 +431,36 @@ public class DebugUtils {
      * Called from tile popup menu.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param settlement The <code>Settlement</code> to take ownership of.
+     * @param colony The <code>Colony</code> to take ownership of.
      */
     public static void changeOwnership(final FreeColClient freeColClient,
-                                       final Settlement settlement) {
+                                       final Colony colony) {
         final FreeColServer server = freeColClient.getFreeColServer();
         final Game sGame = server.getGame();
-        final Settlement sSettlement
-            = sGame.getFreeColGameObject(settlement.getId(), Settlement.class);
+        final ServerColony sColony = sGame.getFreeColGameObject(colony.getId(),
+            ServerColony.class);
         final GUI gui = freeColClient.getGUI();
         final Game game = freeColClient.getGame();
 
         List<ChoiceItem<Player>> pcs = new ArrayList<ChoiceItem<Player>>();
-        for (Player p : game.getPlayers()) {
-            if ((settlement instanceof Colony) == p.isEuropean()) {
-                String msg = Messages.message(p.getNationName());
-                pcs.add(new ChoiceItem<Player>(msg, p));
-            }
+        for (Player p : game.getLiveEuropeanPlayers()) {
+            if (p == colony.getOwner()) continue;
+            String msg = Messages.message(p.getNationName());
+            pcs.add(new ChoiceItem<Player>(msg, p));
         }
         Player player = gui.showChoiceDialog(true, null, "Select owner", null,
                                              "cancel", pcs);
-        if (player == null || player == settlement.getOwner()) return;
+        if (player == null) return;
 
         ServerPlayer sPlayer = sGame.getFreeColGameObject(player.getId(),
                                                           ServerPlayer.class);
-        ServerPlayer sOldPlayer = (ServerPlayer)sSettlement.getOwner();
-        for (Tile t : sSettlement.getOwnedTiles()) {
-            t.cacheUnseen(sPlayer);//+til
-        }
-        sPlayer.exploreForSettlement(sSettlement);
-        sSettlement.changeOwner(sPlayer);//-vis(sPlayer,sOldPlayer),//-til
-        sPlayer.invalidateCanSeeTiles();//+vis(sPlayer)
-        sOldPlayer.invalidateCanSeeTiles();//+vis(sOldPlayer)
+        server.getInGameController().debugChangeOwner(sColony, sPlayer);
 
-        freeColClient.getConnectController().reconnect();
+        Player myPlayer = freeColClient.getMyPlayer();
+        if (gui.getActiveUnit() != null
+            && gui.getActiveUnit().getOwner() != myPlayer) {
+            freeColClient.getInGameController().nextActiveUnit();
+        }
     }
 
     /**
@@ -492,16 +489,18 @@ public class DebugUtils {
         if (player == null || unit.getOwner() == player) return;
 
         final Game sGame = server.getGame();
-        final Unit sUnit = sGame.getFreeColGameObject(unit.getId(), Unit.class);
+        ServerUnit sUnit = sGame.getFreeColGameObject(unit.getId(), 
+                                                      ServerUnit.class);
         ServerPlayer sPlayer = sGame.getFreeColGameObject(player.getId(),
                                                           ServerPlayer.class);
-        ServerPlayer sOldPlayer = (ServerPlayer)sUnit.getOwner();
-        sUnit.changeOwner(sPlayer);//-vis(sPlayer,sOldPlayer)
-        sPlayer.exploreForUnit(sUnit);
-        sPlayer.invalidateCanSeeTiles();//+vis(sPlayer)
-        sOldPlayer.invalidateCanSeeTiles();//+vis(sOldPlayer)
+        server.getInGameController().debugChangeOwner(sUnit, sPlayer);
 
-        freeColClient.getConnectController().reconnect();
+        Player myPlayer = freeColClient.getMyPlayer();
+        if (unit.getOwner() == myPlayer) {
+            gui.setActiveUnit(unit);
+        } else {
+            freeColClient.getInGameController().nextActiveUnit();
+        }
     }
 
     /**

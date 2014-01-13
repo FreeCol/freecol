@@ -42,6 +42,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Modifier;
+import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Player.Stance;
@@ -62,6 +63,7 @@ import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.model.ServerBuilding;
+import net.sf.freecol.server.model.ServerColony;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -69,6 +71,9 @@ import net.sf.freecol.util.test.FreeColTestUtils;
 
 
 public class InGameControllerTest extends FreeColTestCase {
+
+    private static BuildingType carpenterHouse
+        = spec().getBuildingType("model.building.carpenterHouse");
     private static BuildingType press
         = spec().getBuildingType("model.building.printingPress");
     private static final BuildingType schoolHouseType
@@ -97,29 +102,33 @@ public class InGameControllerTest extends FreeColTestCase {
     private static final Role nativeDragoonRole
         = spec().getRole("model.role.nativeDragoon");
 
-    private static final EquipmentType tools
-        = spec().getEquipmentType("model.equipment.tools");
     private static final EquipmentType horses
         = spec().getEquipmentType("model.equipment.horses");
-    private static final EquipmentType muskets
-        = spec().getEquipmentType("model.equipment.muskets");
-    private static final EquipmentType indianMuskets
-        = spec().getEquipmentType("model.equipment.indian.muskets");
     private static final EquipmentType indianHorses
         = spec().getEquipmentType("model.equipment.indian.horses");
+    private static final EquipmentType indianMuskets
+        = spec().getEquipmentType("model.equipment.indian.muskets");
+    private static final EquipmentType muskets
+        = spec().getEquipmentType("model.equipment.muskets");
+    private static final EquipmentType tools
+        = spec().getEquipmentType("model.equipment.tools");
 
     private static final GoodsType bellsType
         = spec().getGoodsType("model.goods.bells");
     private static final GoodsType cottonType
         = spec().getGoodsType("model.goods.cotton");
-    private static final GoodsType grainType
-        = spec().getGoodsType("model.goods.grain");
     private static final GoodsType foodType
         = spec().getPrimaryFoodType();
-    private static final GoodsType musketType
-        = spec().getGoodsType("model.goods.muskets");
+    private static final GoodsType grainType
+        = spec().getGoodsType("model.goods.grain");
+    private static final GoodsType hammersType
+        = spec().getGoodsType("model.goods.hammers");
     private static final GoodsType horsesType
         = spec().getGoodsType("model.goods.horses");
+    private static final GoodsType lumberType
+        = spec().getGoodsType("model.goods.lumber");
+    private static final GoodsType musketType
+        = spec().getGoodsType("model.goods.muskets");
     private static final GoodsType toolsType
         = spec().getGoodsType("model.goods.tools");
 
@@ -482,8 +491,7 @@ public class InGameControllerTest extends FreeColTestCase {
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
 
-        dutch.setStance(french, Stance.WAR);
-        french.setStance(dutch, Stance.WAR);
+        igc.changeStance(french, Stance.WAR, dutch, true);
         assertEquals("Dutch should be at war with french",
                      dutch.getStance(french), Stance.WAR);
         assertEquals("French should be at war with dutch",
@@ -539,6 +547,7 @@ public class InGameControllerTest extends FreeColTestCase {
         List<CombatResult> crs;
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
+        igc.changeStance(french, Stance.WAR, dutch, true);
 
         dutch.addAbility(new Ability(Ability.INDEPENDENCE_DECLARED));
         Tile tile1 = map.getTile(5, 8);
@@ -611,6 +620,7 @@ public class InGameControllerTest extends FreeColTestCase {
         List<CombatResult> crs;
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
+        igc.changeStance(french, Stance.WAR, dutch, true);
         Colony colony = getStandardColony();
 
         Tile tile2 = map.getTile(4, 8);
@@ -731,6 +741,7 @@ public class InGameControllerTest extends FreeColTestCase {
         List<CombatResult> crs;
         Player dutch = game.getPlayer("model.nation.dutch");
         Player inca = game.getPlayer("model.nation.inca");
+        igc.changeStance(dutch, Stance.WAR, inca, true);
         Colony colony = getStandardColony(1, 5, 8);
 
         Tile tile2 = map.getTile(4, 8);
@@ -955,6 +966,7 @@ public class InGameControllerTest extends FreeColTestCase {
         List<CombatResult> crs;
         Player dutch = game.getPlayer("model.nation.dutch");
         Player inca =  game.getPlayer("model.nation.inca");
+        igc.changeStance(dutch, Stance.WAR, inca, true);
         Colony colony = getStandardColony();
 
         dutch.setStance(inca, Stance.WAR);
@@ -962,7 +974,8 @@ public class InGameControllerTest extends FreeColTestCase {
         Tile tile2 = map.getTile(4, 8);
         tile2.setExplored(dutch, true);
         Unit colonist = colony.getUnitIterator().next();
-        Unit attacker = new ServerUnit(getGame(), tile2, inca, braveType, nativeDragoonRole);
+        Unit attacker = new ServerUnit(getGame(), tile2, inca, braveType,
+                                       nativeDragoonRole);
         assertEquals("Colonist should be the colony best defender",
                      colonist, colony.getDefendingUnit(attacker));
         dutch.addFather(spec()
@@ -1032,6 +1045,7 @@ public class InGameControllerTest extends FreeColTestCase {
         List<CombatResult> crs;
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
+        igc.changeStance(dutch, Stance.WAR, french, true);
 
         Tile tile1 = map.getTile(5, 8);
         tile1.setExplored(dutch, true);
@@ -1062,6 +1076,7 @@ public class InGameControllerTest extends FreeColTestCase {
         List<CombatResult> crs;
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
+        igc.changeStance(dutch, Stance.WAR, french, true);
 
         // UnitType promotion
         assertEquals("Criminals should promote to servants",
@@ -1182,6 +1197,7 @@ public class InGameControllerTest extends FreeColTestCase {
         List<CombatResult> crs;
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
+        igc.changeStance(dutch, Stance.WAR, french, true);
 
         Tile tile1 = map.getTile(5, 8);
         tile1.setExplored(dutch, true);
@@ -1189,6 +1205,7 @@ public class InGameControllerTest extends FreeColTestCase {
         Tile tile2 = map.getTile(4, 8);
         tile2.setExplored(dutch, true);
         tile2.setExplored(french, true);
+
         Unit colonist = new ServerUnit(game, tile1, dutch, colonistType);
         assertTrue("Colonists should be capturable",
                    colonist.hasAbility(Ability.CAN_BE_CAPTURED));
@@ -1204,7 +1221,7 @@ public class InGameControllerTest extends FreeColTestCase {
         assertTrue("Colonist v Soldier failed", crs.size() == 2
                    && crs.get(0) == CombatResult.LOSE
                    && crs.get(1) == CombatResult.CAPTURE_UNIT);
-        igc.combat((ServerPlayer) dutch, colonist, soldier, crs);
+        igc.combat((ServerPlayer)dutch, colonist, soldier, crs);
 
         assertEquals("Colonist should still be a colonist",
                      colonistType, colonist.getType());
@@ -1222,6 +1239,7 @@ public class InGameControllerTest extends FreeColTestCase {
         List<CombatResult> crs;
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
+        igc.changeStance(dutch, Stance.WAR, french, true);
 
         Tile tile1 = map.getTile(5, 8);
         tile1.setExplored(dutch, true);
@@ -1271,6 +1289,7 @@ public class InGameControllerTest extends FreeColTestCase {
         List<CombatResult> crs;
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
+        igc.changeStance(dutch, Stance.WAR, french, true);
 
         Tile tile1 = map.getTile(5, 8);
         tile1.setExplored(dutch, true);
@@ -1346,6 +1365,7 @@ public class InGameControllerTest extends FreeColTestCase {
         List<CombatResult> crs;
         Player dutch = game.getPlayer("model.nation.dutch");
         Player inca = game.getPlayer("model.nation.inca");
+        igc.changeStance(dutch, Stance.WAR, inca, true);
 
         Tile tile1 = map.getTile(5, 8);
         tile1.setExplored(dutch, true);
@@ -1435,6 +1455,8 @@ public class InGameControllerTest extends FreeColTestCase {
         List<CombatResult> crs;
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
+        igc.changeStance(dutch, Stance.WAR, french, true);
+
         Tile tile1 = map.getTile(5, 8);
         tile1.setExplored(dutch, true);
         tile1.setExplored(french, true);
@@ -1463,6 +1485,8 @@ public class InGameControllerTest extends FreeColTestCase {
         List<CombatResult> crs;
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
+        igc.changeStance(dutch, Stance.WAR, french, true);
+
         Tile tile1 = map.getTile(5, 8);
         tile1.setExplored(dutch, true);
         tile1.setExplored(french, true);
@@ -1514,6 +1538,8 @@ public class InGameControllerTest extends FreeColTestCase {
         List<CombatResult> crs;
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
+        igc.changeStance(dutch, Stance.WAR, french, true);
+
         Tile tile1 = map.getTile(5, 8);
         tile1.setExplored(dutch, true);
         tile1.setExplored(french, true);
@@ -2135,5 +2161,39 @@ public class InGameControllerTest extends FreeColTestCase {
 
         igc.work(dutch, gardener, loc);
         assertEquals(farmerType, gardener.getType());
+    }
+
+    public void testCarpenterHouseNationalAdvantage() {
+        Game game = ServerTestHelper.startServerGame(getTestMap(true));
+        InGameController igc = ServerTestHelper.getInGameController();
+
+        ServerColony colony = (ServerColony)getStandardColony(2);
+        colony.addGoods(lumberType, 100);
+        Unit unit = colony.getUnitList().get(0);
+        Building building = colony.getBuilding(carpenterHouse);
+
+        assertEquals("Production()", 0,
+            building.getTotalProductionOf(hammersType));
+
+        unit.setLocation(building);
+        colony.invalidateCache();
+        assertEquals("Production(unit)", 3,
+            building.getTotalProductionOf(hammersType));
+
+        ServerPlayer swedish = null;
+        for (Nation n : game.getSpecification().getNations()) {
+            if (n.getId().equals("model.nation.swedish")) {
+                swedish = new ServerPlayer(game, n.getRulerNameKey(), false,
+                                           n, null, null);
+                swedish.setAI(true);
+                game.addPlayer(swedish);
+                break;
+            }
+        }
+        assertNotNull("Swedes exist", swedish);
+        igc.debugChangeOwner(colony, (ServerPlayer)swedish);
+        colony.invalidateCache();
+        assertEquals("Production(unit/building-advantage)", 5,
+            building.getTotalProductionOf(hammersType));
     }
 }

@@ -269,6 +269,40 @@ public final class InGameController extends Controller {
     }
 
     /**
+     * Change colony owner.  Public for DebugUtils.
+     *
+     * @param colony The <code>ServerColony</code> to change.
+     * @param serverPlayer The <code>ServerPlayer</code> to change to.
+     */
+    public void debugChangeOwner(ServerColony colony,
+                                 ServerPlayer serverPlayer) {
+        ChangeSet cs = new ChangeSet();
+        ServerPlayer owner = (ServerPlayer)colony.getOwner();
+        colony.csChangeOwner(serverPlayer, cs);//-vis(serverPlayer,owner)
+        cs.add(See.perhaps().always(owner), colony.getOwnedTiles());
+        serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
+        owner.invalidateCanSeeTiles();//+vis(owner)
+        sendToAll(cs);
+    }
+
+    /**
+     * Change unit owner.  Public for DebugUtils.
+     *
+     * @param unit The <code>ServerUnit</code> to change.
+     * @param serverPlayer The <code>ServerPlayer</code> to change to.
+     */
+    public void debugChangeOwner(ServerUnit unit, ServerPlayer serverPlayer) {
+        ChangeSet cs = new ChangeSet();
+        ServerPlayer owner = (ServerPlayer)unit.getOwner();
+        unit.csChangeOwner(serverPlayer, null, null,
+                           cs);//-vis(serverPlayer,owner)
+        cs.add(See.perhaps().always(owner), unit.getTile());
+        serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
+        owner.invalidateCanSeeTiles();//+vis(owner)
+        sendToAll(cs);
+    }
+
+    /**
      * Gets a nation summary.
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is querying.
@@ -822,16 +856,19 @@ public final class InGameController extends Controller {
         // Who surrenders?
         List<Unit> surrenderUnits = new ArrayList<Unit>();
         for (Unit u : serverPlayer.getUnits()) {
-            if (!u.isNaval()) surrenderUnits.add(u);
+            if (!u.isNaval() && !u.isOnCarrier() && !u.isInEurope()) {
+                surrenderUnits.add(u);
+            }
         }
         if (surrenderUnits.size() > 0) {
             for (Unit u : surrenderUnits) {
-                UnitType downgrade = u.getTypeChange(ChangeType.CAPTURE,
-                                                     independent);
-                if (downgrade != null) u.changeType(downgrade);//-vis(owner)
-                u.changeOwner(independent);//-vis(both)
-                cs.add(See.only(independent), independent.exploreForUnit(u));
-                cs.add(See.perhaps().always(serverPlayer), u);
+                Tile oldTile = u.getTile();
+                if (((ServerUnit)u).csChangeOwner(independent,
+                        ChangeType.CAPTURE, null, cs)) {//-vis(both)
+                    u.setMovesLeft(0);
+                    u.setState(Unit.UnitState.ACTIVE);
+                    cs.add(See.perhaps().always(serverPlayer), oldTile);
+                }
             }
             cs.addMessage(See.only(independent),
                 new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
@@ -1826,7 +1863,7 @@ public final class InGameController extends Controller {
 
 
     /**
-     * Combat.
+     * Combat.  Public for the test suite.
      *
      * @param attackerPlayer The <code>ServerPlayer</code> who is attacking.
      * @param attacker The <code>FreeColGameObject</code> that is attacking.
@@ -1848,7 +1885,6 @@ public final class InGameController extends Controller {
         sendToOthers(attackerPlayer, cs);
         return cs.build(attackerPlayer);
     }
-
 
     /**
      * Ask about learning a skill at an IndianSettlement.
@@ -2956,7 +2992,7 @@ public final class InGameController extends Controller {
                 for (Tile t : colony.getOwnedTiles()) {
                     t.cacheUnseen(dest);//+til
                 }
-                ((ServerColony)colony).changeOwner(dest);//-vis(both),-til
+                ((ServerColony)colony).csChangeOwner(dest, cs);//-vis(both),-til
                 cs.add(See.only(dest), dest.exploreForSettlement(colony));
                 cs.add(See.perhaps().always(former), colony.getOwnedTiles());
                 visibilityChange = true;
@@ -2978,24 +3014,25 @@ public final class InGameController extends Controller {
             if (newUnit != null) {
                 ServerPlayer former = (ServerPlayer)newUnit.getOwner();
                 Tile oldTile = newUnit.getTile();
-                newUnit.changeOwner(dest);//-vis(both)
-                if (dest == unit.getOwner()) {
-                    if (unit.isOnCarrier()) {
-                        Unit carrier = unit.getCarrier();
-                        if (!carrier.couldCarry(newUnit)) {
-                            logger.warning("Can not add " + newUnit
-                                           + " to " + carrier);
-                            continue;
-                        }
-                        newUnit.setLocation(carrier);
-                    } else {
-                        newUnit.setLocation(unit.getTile());
+                Location newLoc;
+                if (unit.isOnCarrier()) {
+                    Unit carrier = unit.getCarrier();
+                    if (!carrier.couldCarry(newUnit)) {
+                        logger.warning("Can not add " + newUnit
+                            + " to " + carrier);
+                        continue;
                     }
+                    newLoc = carrier;
+                } else if (dest == unit.getOwner()) {
+                    newLoc = unit.getTile();
                 } else {
-                    newUnit.setLocation(settlement.getTile());
+                    newLoc = settlement.getTile();
                 }
-                cs.add(See.only(dest), dest.exploreForUnit(newUnit));
-                cs.add(See.perhaps().always(former), oldTile);
+                if (newUnit.csChangeOwner(dest, ChangeType.CAPTURE, newLoc,
+                                          cs)) {//-vis(both)
+                    newUnit.setMovesLeft(0);
+                    cs.add(See.perhaps().always(former), oldTile);
+                }
                 visibilityChange = true;
             }
         }

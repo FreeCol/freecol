@@ -262,6 +262,8 @@ public abstract class Settlement extends GoodsLocation
     /**
      * Change the owner of this <code>Settlement</code>.
      *
+     * Does not fix up the units!  That is handled in the server.
+     *
      * -vis: Changes visibility.
      * -til: Changes tile appearance.
      *
@@ -270,23 +272,13 @@ public abstract class Settlement extends GoodsLocation
      * @see #getOwner
      */
     public void changeOwner(Player newOwner) {
-        Player oldOwner = this.owner;
-        setOwner(newOwner);//-til
+        final Player oldOwner = this.owner;
+        if (newOwner.isIndian() != oldOwner.isIndian()) {
+            throw new IllegalArgumentException("Can not transfer settlements between native and European players.");
+        }
+        setOwner(newOwner);//-til,-vis
 
         getGame().checkOwners(this, oldOwner);
-
-        ChangeType change = (newOwner.isUndead()) ? ChangeType.UNDEAD
-            : ChangeType.CAPTURE;
-        List<Unit> units = getUnitList();
-        units.addAll(getTile().getUnitList());
-        while (!units.isEmpty()) {
-            Unit u = units.remove(0);
-            units.addAll(u.getUnitList());
-            u.setState(Unit.UnitState.ACTIVE);
-            UnitType type = u.getTypeChange(change, newOwner);
-            if (type != null) u.changeType(type);//-vis(newOwner)
-            u.changeOwner(newOwner);//-vis(oldOwner,newOwner)
-        }
 
         for (Tile t : getOwnedTiles()) {
             t.changeOwnership(newOwner, this);//-til

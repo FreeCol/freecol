@@ -124,30 +124,6 @@ public class ServerColony extends Colony implements ServerModelObject {
         }
     }
 
-
-    /**
-     * Sets the owner of this <code>Colony</code>, including all units
-     * within, and change main tile nation ownership.
-     *
-     * -vis: Changes visibility.
-     * -til: Changes tile appearance.
-     *
-     * @param owner The new owner <code>Player</code>.
-     * @see Settlement#changeOwner
-     */
-    @Override
-    public void changeOwner(Player owner) {
-        super.changeOwner(owner);//-vis(owner,previous-owner),-til
-
-        // Disable all exports
-        for (ExportData exportDatum : exportData.values()) {
-            exportDatum.setExported(false);
-        }
-        // Changing the owner might alter bonuses applied by founding fathers:
-        updateSoL();
-        updateProductionBonus();
-    }
-
     /**
      * New turn for this colony.
      * Try to find out if the colony is going to survive (last colonist does
@@ -772,6 +748,43 @@ public class ServerColony extends Colony implements ServerModelObject {
         cs.add(See.perhaps(), getTile()); // Colony size might have changed
     }
 
+    /**
+     * Change the owner of this colony.
+     *
+     * -vis: Owner and new owner
+     *
+     * @param newOwner The new owning <code>ServerPlayer</code>.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    public void csChangeOwner(ServerPlayer newOwner, ChangeSet cs) {
+        final ServerPlayer owner = (ServerPlayer)getOwner();
+
+        for (Tile t : getOwnedTiles()) t.cacheUnseen(newOwner);//+til
+
+        changeOwner(newOwner);//-vis(both),-til
+
+        ChangeType change = (newOwner.isUndead()) ? ChangeType.UNDEAD
+            : ChangeType.CAPTURE;
+        List<Unit> units = getUnitList();
+        units.addAll(getTile().getUnitList());
+        for (Unit u : units) {//-vis(both)
+            ((ServerUnit)u).csChangeOwner(newOwner, change, null, cs);
+        }
+        cs.addRemoves(See.only(owner), this, units);
+
+        // Disable all exports
+        for (ExportData exportDatum : exportData.values()) {
+            exportDatum.setExported(false);
+        }
+
+        // Changing the owner might alter bonuses applied by founding fathers:
+        updateSoL();
+        updateProductionBonus();
+        newOwner.exploreForSettlement(this);
+    }
+
+
+    // Serialization
 
     /**
      * Gets the tag name of the root element representing this object.

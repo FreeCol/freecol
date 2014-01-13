@@ -166,7 +166,13 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
                     .getPlayer(newNation.getId());
                 // TODO: recalculate tile ownership properly, taking
                 // settlement radius into account
-                settlement.changeOwner(newPlayer);
+                settlement.setOwner(newPlayer);
+                List<Unit> ul = settlement.getUnitList();
+                ul.addAll(settlement.getTile().getUnitList());
+                for (Unit u : ul) u.setOwner(newPlayer);
+                for (Tile t : settlement.getOwnedTiles()) {
+                    t.setOwner(newPlayer);//-til
+                }
                 MapEditorTransformPanel.setNativePlayer(newPlayer);
             }
             if (capital.isSelected() && !settlement.isCapital()) {
