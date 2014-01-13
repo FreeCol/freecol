@@ -19,65 +19,71 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.Unit.MoveType;
+import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
+import net.sf.freecol.util.test.MockPseudoRandom;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 
 public class CombatTest extends FreeColTestCase {
 
-    private static final EquipmentType muskets
-        = spec().getEquipmentType("model.equipment.muskets");
     private static final EquipmentType horses
         = spec().getEquipmentType("model.equipment.horses");
-    private static final EquipmentType tools
-        = spec().getEquipmentType("model.equipment.tools");
     private static final EquipmentType indianMuskets
         = spec().getEquipmentType("model.equipment.indian.muskets");
     private static final EquipmentType indianHorses
         = spec().getEquipmentType("model.equipment.indian.horses");
+    private static final EquipmentType muskets
+        = spec().getEquipmentType("model.equipment.muskets");
+    private static final EquipmentType tools
+        = spec().getEquipmentType("model.equipment.tools");
 
-    private static final TileType plains
-        = spec().getTileType("model.tile.plains");
     private static final TileType hills
         = spec().getTileType("model.tile.hills");
     private static final TileType ocean
         = spec().getTileType("model.tile.ocean");
+    private static final TileType plains
+        = spec().getTileType("model.tile.plains");
 
-    private static final UnitType galleonType
-        = spec().getUnitType("model.unit.galleon");
-    private static final UnitType privateerType
-        = spec().getUnitType("model.unit.privateer");
-    private static final UnitType braveType
-        = spec().getUnitType("model.unit.brave");
-    private static final UnitType colonistType
-        = spec().getUnitType("model.unit.freeColonist");
-    private static final UnitType veteranType
-        = spec().getUnitType("model.unit.veteranSoldier");
     private static final UnitType artilleryType
         = spec().getUnitType("model.unit.artillery");
-    private static final UnitType damagedArtilleryType
-        = spec().getUnitType("model.unit.damagedArtillery");
+    private static final UnitType braveType
+        = spec().getUnitType("model.unit.brave");
     private static final UnitType colonialRegularType
         = spec().getUnitType("model.unit.colonialRegular");
-    private static final UnitType kingsRegularType
-        = spec().getUnitType("model.unit.kingsRegular");
-    private static final UnitType indianConvertType
-        = spec().getUnitType("model.unit.indianConvert");
-    private static final UnitType pettyCriminalType
-        = spec().getUnitType("model.unit.pettyCriminal");
+    private static final UnitType colonistType
+        = spec().getUnitType("model.unit.freeColonist");
+    private static final UnitType damagedArtilleryType
+        = spec().getUnitType("model.unit.damagedArtillery");
+    private static final UnitType galleonType
+        = spec().getUnitType("model.unit.galleon");
     private static final UnitType indenturedServantType
         = spec().getUnitType("model.unit.indenturedServant");
+    private static final UnitType indianConvertType
+        = spec().getUnitType("model.unit.indianConvert");
+    private static final UnitType jesuitMissionaryType
+        = spec().getUnitType("model.unit.jesuitMissionary");
+    private static final UnitType kingsRegularType
+        = spec().getUnitType("model.unit.kingsRegular");
+    private static final UnitType pettyCriminalType
+        = spec().getUnitType("model.unit.pettyCriminal");
+    private static final UnitType privateerType
+        = spec().getUnitType("model.unit.privateer");
+    private static final UnitType veteranType
+        = spec().getUnitType("model.unit.veteranSoldier");
 
     EquipmentType[] dragoonEquipment = new EquipmentType[] { horses, muskets };
 
@@ -252,8 +258,6 @@ public class CombatTest extends FreeColTestCase {
                      privateer.getMoveType(tile1));
     }
 
-
-
     public void testDefendColonyWithUnarmedColonist() {
         Game game = getGame();
         Map map = getTestMap(true);
@@ -285,9 +289,9 @@ public class CombatTest extends FreeColTestCase {
     }
 
     public void testDefendColonyWithRevere() {
-    	Game game = getGame();
-    	Map map = getTestMap(true);
-    	game.setMap(map);
+        Game game = getGame();
+        Map map = getTestMap(true);
+        game.setMap(map);
 
         Colony colony = getStandardColony();
 
@@ -321,7 +325,6 @@ public class CombatTest extends FreeColTestCase {
     }
 
     public void testDefendSettlement() {
-
         Game game = getStandardGame();
         Map map = getTestMap();
         game.setMap(map);
@@ -360,7 +363,6 @@ public class CombatTest extends FreeColTestCase {
     }
 
     public void testAttackIgnoresMovementPoints() throws Exception {
-
         Game game = getStandardGame();
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
@@ -390,11 +392,9 @@ public class CombatTest extends FreeColTestCase {
                      soldier.getMoveType(tile2, tile1, 1));
         assertEquals(Unit.MoveType.MOVE_NO_MOVES,
                      soldier.getMoveType(tile2, tile1, 0));
-
     }
 
     public void testSpanishAgainstNatives() throws Exception {
-
         Game game = getStandardGame();
         Player spanish = game.getPlayer("model.nation.spanish");
         Player tupi = game.getPlayer("model.nation.tupi");
@@ -429,11 +429,9 @@ public class CombatTest extends FreeColTestCase {
         }
         assertNotNull(offenceAgainst);
         assertEquals(50, (int) offenceAgainst.getValue());
-
     }
 
     public void testAttackShipWithLandUnit() {
-
         Game game = getStandardGame();
         Player spanish = game.getPlayer("model.nation.spanish");
         Player tupi = game.getPlayer("model.nation.tupi");
@@ -547,5 +545,59 @@ public class CombatTest extends FreeColTestCase {
         assertEquals(CombatResult.WIN, result.get(0));
         assertEquals(CombatResult.CAPTURE_UNIT, result.get(1));
         refPlayer.csCombat(regular, colonial, result, random, new ChangeSet());
+    }
+
+    public void testCaptureConvert() {
+        Map map = getTestMap(plains, true);
+        Game game = ServerTestHelper.startServerGame(map);
+        CombatModel combatModel = game.getCombatModel();
+        InGameController igc = ServerTestHelper.getInGameController();
+
+        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        ServerPlayer inca = (ServerPlayer)game.getPlayer("model.nation.inca");
+
+        Tile tile1 = map.getTile(5, 8);
+        tile1.setExplored(dutch, true);
+        Tile tile2 = map.getTile(4, 8);
+        tile2.setExplored(dutch, true);
+        Unit missionary = new ServerUnit(game, null, dutch,
+            jesuitMissionaryType, spec().getRole("model.role.missionary"));
+        FreeColTestCase.IndianSettlementBuilder builder
+            = new FreeColTestCase.IndianSettlementBuilder(game);
+        IndianSettlement settlement = builder.player(inca)
+            .settlementTile(tile1).skillToTeach(null).capital(true)
+            .initialBravesInCamp(8).missionary(missionary).build();
+
+        IntegerOption io = spec().getIntegerOption("model.option.nativeConvertProbability");
+        assertNotNull(io);
+        io.setValue(100);
+
+        Role soldierRole = spec().getRole("model.role.soldier");
+        Unit soldier = new ServerUnit(game, tile2, dutch, colonistType,
+                                      soldierRole);
+        Unit defender = settlement.getDefendingUnit(soldier);
+        assertNotNull(defender);
+        assertTrue(defender.getOwner().isIndian());
+        
+        MockPseudoRandom random = new MockPseudoRandom();
+        List<Integer> il = new ArrayList<Integer>();
+        il.add(new Integer(0));
+        random.setNextNumbers(il, true);
+
+        List<CombatResult> result = combatModel.generateAttackResult(random,
+            soldier, defender);
+        assertTrue("Capture convert results", result.size() >= 3);
+        assertEquals("Capture convert wins", CombatResult.WIN,
+            result.get(0));
+        assertEquals("Capture convert kills", CombatResult.SLAUGHTER_UNIT,
+            result.get(1));
+        assertEquals("Capture convert converts", CombatResult.CAPTURE_CONVERT,
+            result.get(2));
+        assertEquals("One unit on tile", 1, tile2.getUnitList().size());
+        dutch.csCombat(soldier, defender, result, new Random(),
+                       new ChangeSet());
+        assertEquals("Two units on tile", 2, tile2.getUnitList().size());
+        assertEquals("Convert on tile", tile2.getUnitList().get(1).getType(),
+                     indianConvertType);
     }
 }

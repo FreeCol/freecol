@@ -1733,8 +1733,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
 
             // Check for braves converted by missionaries
-            List<UnitType> converts = game.getSpecification()
-                .getUnitTypesWithAbility(Ability.CONVERT);
             StringTemplate nation = getNationName();
             for (IndianSettlement settlement : allSettlements) {
                 Unit missionary = settlement.getMissionary();
@@ -1754,8 +1752,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 if (convert < (float)settlement.getType().getConvertThreshold()
                     || (settlement.getUnitCount()
                         + settlement.getTile().getUnitCount()) <= 2
-                    || (colony = settlement.getTile().getNearestSettlement(other, MAX_CONVERT_DISTANCE)) == null
-                    || converts.isEmpty()) {
+                    || (colony = settlement.getTile().getNearestSettlement(other, MAX_CONVERT_DISTANCE)) == null) {
                     settlement.setConvertProgress((int)Math.floor(convert));
                 } else {
                     logger.fine("Convert at " + settlement.getName()
@@ -1770,21 +1767,26 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         ((!tile.isEmpty()) ? tile.getUnitList()
                             : settlement.getUnitList()),
                         random);
-                    brave.clearEquipment();
-                    brave.setRole(game.getSpecification().getRole("model.role.default"));
-                    brave.changeOwner(other);//-vis: safe/colony
-                    brave.setHomeIndianSettlement(null);
-                    brave.setNationality(other.getNationId());
-                    brave.setType(Utils.getRandomMember(logger,//-vis: ditto
-                                  "Choose convert type", converts, random));
-                    brave.setLocation(colony.getTile());//-vis: safe/colony
-                    cs.add(See.only(this), settlement, brave);
-                    cs.add(See.only(other), colony.getTile());
-                    cs.addMessage(See.only(other),
-                        new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
-                                         "model.colony.newConvert", brave)
-                            .addStringTemplate("%nation%", nation)
-                            .addName("%colony%", colony.getName()));
+                    UnitType type = brave.getTypeChange(ChangeType.CONVERSION,
+                                                        other);
+                    if (type == null) {
+                        logger.warning("Conversion failure at " + settlement
+                            + " for " + brave + " to " + other);
+                    } else {
+                        brave.clearRoleAndEquipment();
+                        brave.changeOwner(other);//-vis: safe/colony
+                        brave.setType(type);//-vis: safe/colony
+                        brave.setLocation(colony.getTile());//-vis: safe/colony
+                        brave.setState(Unit.UnitState.ACTIVE);
+                        brave.setMovesLeft(0);
+                        cs.addDisappear(other, colony.getTile(), brave);
+                        cs.add(See.only(other), colony.getTile());
+                        cs.addMessage(See.only(other),
+                            new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
+                                             "model.colony.newConvert", brave)
+                                .addStringTemplate("%nation%", nation)
+                                .addName("%colony%", colony.getName()));
+                    }
                 }
             }
         }
@@ -2744,40 +2746,43 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * Extracts a convert from a native settlement.
      *
      * @param attacker The <code>Unit</code> that is attacking.
-     * @param natives The <code>IndianSettlement</code> under attack.
+     * @param is The <code>IndianSettlement</code> under attack.
      * @param random A pseudo-random number source.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    private void csCaptureConvert(Unit attacker, IndianSettlement natives,
+    private void csCaptureConvert(Unit attacker, IndianSettlement is,
                                   Random random, ChangeSet cs) {
         ServerPlayer attackerPlayer = (ServerPlayer)attacker.getOwner();
-        ServerPlayer nativePlayer = (ServerPlayer)natives.getOwner();
+        ServerPlayer nativePlayer = (ServerPlayer)is.getOwner();
         StringTemplate convertNation = nativePlayer.getNationName();
-        List<UnitType> converts = getGame().getSpecification()
-            .getUnitTypesWithAbility(Ability.CONVERT);
-        UnitType type = Utils.getRandomMember(logger, "Choose convert",
-                                              converts, random);
-        Unit convert = natives.getUnitList().get(0);
-        convert.setRole(getGame().getSpecification().getRole("model.role.default"));
-        convert.clearEquipment();
-
-        cs.addMessage(See.only(attackerPlayer),
-                      new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
-                                       "model.unit.newConvertFromAttack",
-                                       convert)
-                      .addStringTemplate("%nation%", convertNation)
-                      .addStringTemplate("%unit%", convert.getLabel()));
-
-        // No visibility issue for the loser as the unit moves/changes
-        // from within a non-collapsing settlement.  The attacker however
-        // might have captured a unit with greater line of sight.
-        convert.changeOwner(attackerPlayer);//-vis(attackerPlayer)
-        convert.setType(type);//-vis(attackerPlayer)
-        convert.setLocation(attacker.getTile());//-vis(attackerPlayer)
-        cs.add(See.only(nativePlayer), natives);
-        cs.addDispose(See.only(nativePlayer), null,
-                      convert);//-vis: safe, within settlement
-        attackerPlayer.invalidateCanSeeTiles();//+vis(attackerPlayer)
+        List<Unit> units = is.getTile().getUnitList();
+        if (units.isEmpty()) units.addAll(is.getUnitList());
+        Unit convert = Utils.getRandomMember(logger, "Choose convert",
+                                             units, random);
+        UnitType type = convert.getTypeChange(ChangeType.CONVERSION,
+                                              attackerPlayer);
+        if (type == null) {
+            logger.warning("Failed to capture convert " + convert
+                + " at " + is + " for " + attackerPlayer);
+        } else {
+            convert.clearRoleAndEquipment();
+            // No visibility issue for the loser as the unit
+            // moves/changes from within a non-collapsing settlement.
+            // The attacker however might have captured a unit with
+            // greater line of sight.
+            convert.changeOwner(attackerPlayer);//-vis(attackerPlayer)
+            convert.setType(type);//-vis(attackerPlayer)
+            convert.setLocation(attacker.getTile());//-vis(attackerPlayer)
+            convert.setState(Unit.UnitState.ACTIVE);
+            convert.setMovesLeft(0);
+            cs.addDisappear(attackerPlayer, attacker.getTile(), convert);
+            cs.addMessage(See.only(attackerPlayer),
+                new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
+                                 "model.unit.newConvertFromAttack", convert)
+                    .addStringTemplate("%nation%", convertNation)
+                    .addStringTemplate("%unit%", convert.getLabel()));
+            attackerPlayer.invalidateCanSeeTiles();//+vis(attackerPlayer)
+        }
     }
 
     /**

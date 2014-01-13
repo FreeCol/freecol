@@ -180,10 +180,6 @@ public final class Ability extends Feature implements Comparable<Ability> {
     public static final String CONSUME_ALL_OR_NOTHING
         = "model.ability.consumeAllOrNothing";
 
-    /** Units with this ability are converts. */
-    public static final String CONVERT
-        = "model.ability.convert";
-
     /** The ability of customs houses to trade with other players. */
     public static final String CUSTOM_HOUSE_TRADES_WITH_FOREIGN_COUNTRIES
         = "model.ability.customHouseTradesWithForeignCountries";

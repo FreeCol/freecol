@@ -867,14 +867,15 @@
       <xs:attribute name="unit" use="optional" type="xs:string"/>
       <xs:attribute name="delete" type="xs:boolean"/>
       <!-- TODO: change these types to percentage -->
-      <xs:attribute name="learnFromNatives" type="xs:string"/>
-      <xs:attribute name="learnFromExperience" type="xs:string"/>
-      <xs:attribute name="learnInLostCity" type="xs:string"/>
-      <xs:attribute name="learnInSchool" type="xs:string"/>
-      <xs:attribute name="promotion" type="xs:string"/>
-      <xs:attribute name="creation" type="xs:string"/>
-      <xs:attribute name="independence" type="xs:string"/>
-      <xs:attribute name="enterColony" type="xs:string"/>
+      <xs:attribute name="learnFromNatives" type="PercentageType"/>
+      <xs:attribute name="learnFromExperience" type="PercentageType"/>
+      <xs:attribute name="learnInLostCity" type="PercentageType"/>
+      <xs:attribute name="learnInSchool" type="PercentageType"/>
+      <xs:attribute name="promotion" type="PercentageType"/>
+      <xs:attribute name="creation" type="PercentageType"/>
+      <xs:attribute name="independence" type="PercentageType"/>
+      <xs:attribute name="enterColony" type="PercentageType"/>
+      <xs:attribute name="conversion" type="PercentageType"/>
       <xs:attribute name="turnsToLearn" type="xs:nonNegativeInteger"/>
       <!-- TODO: these are downgrades, but serialization can not
         handle non-static XML Element tag names! We need to combine

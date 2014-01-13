@@ -20,7 +20,7 @@
     In case of incompatible changes, please update version number and
     XSD schema for validation.
 -->
-<freecol-specification id="classic" version="0.81">
+<freecol-specification id="classic" version="0.82">
 
   <!-- Modifiers that are not attached to other game object
        types. They may be modified, but MUST NOT be removed. -->
@@ -1228,7 +1228,6 @@ resources of 400, lost city rumours of 500
                movement="3" lineOfSight="1" maximumAttrition="10"
                scoreValue="3" skill="0">
       <ability id="model.ability.person" value="true"/>
-      <ability id="model.ability.convert" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
       <modifier id="model.goods.grain" type="additive" value="1"/>
       <modifier id="model.goods.sugar" type="additive" value="1"/>
@@ -1269,6 +1268,9 @@ resources of 400, lost city rumours of 500
       <consumes id="model.goods.cigars" value="1" />
       <consumes id="model.goods.coats" value="1" />
       <consumes id="model.goods.cloth" value="1" />
+      <upgrade unit="model.unit.indianConvert" conversion="100">
+        <scope method-name="isEuropean" method-value="true" />
+      </upgrade>
     </unit-type>
     <unit-type id="model.unit.colonialRegular" extends="colonist"
                skillTaught="model.unit.veteranSoldier" skill="3">

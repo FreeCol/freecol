@@ -20,7 +20,7 @@
     In case of incompatible changes, please update version number and
     XSD schema for validation.
 -->
-<freecol-specification id="freecol" version="0.81" extends="classic">
+<freecol-specification id="freecol" version="0.82" extends="classic">
 
   <building-types>
     <building-type id="model.building.stockade" preserve="true">

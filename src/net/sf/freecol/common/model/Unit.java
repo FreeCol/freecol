@@ -669,6 +669,16 @@ public class Unit extends GoodsLocation
     }
 
     /**
+     * Clear any special role and equipment.
+     *
+     * This is often useful prior to a unit type change or ownership change.
+     */
+    public void clearRoleAndEquipment() {
+        clearEquipment();
+        setRole(getSpecification().getRole("model.role.default"));
+    }
+
+    /**
      * Gets the location of this Unit.
      *
      * @return The location of this Unit.

@@ -425,9 +425,7 @@ public final class UnitType extends BuildableType
         for (UnitTypeChange change : getTypeChanges()) {
             if (change.asResultOf(changeType) && change.appliesTo(player)) {
                 UnitType result = change.getNewUnitType();
-                if (result.isAvailableTo(player)) {
-                    return change;
-                }
+                if (result.isAvailableTo(player)) return change;
             }
         }
         return null;

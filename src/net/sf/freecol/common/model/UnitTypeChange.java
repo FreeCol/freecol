@@ -49,6 +49,7 @@ public class UnitTypeChange extends FreeColObject {
         CLEAR_SKILL,
         DEMOTION,
         CAPTURE,
+        CONVERSION,
         UNDEAD
     }
 
@@ -66,6 +67,7 @@ public class UnitTypeChange extends FreeColObject {
         tags.put(ChangeType.CREATION, "creation");
         tags.put(ChangeType.ENTER_COLONY, "enterColony");
         tags.put(ChangeType.INDEPENDENCE, "independence");
+        tags.put(ChangeType.CONVERSION, "conversion");
         tags.put(ChangeType.UNDEAD, "undead");
     }
 
