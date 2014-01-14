@@ -136,6 +136,16 @@ public class RoleTest extends FreeColTestCase {
         regular = new ServerUnit(game, null, dutchREF, regularType, cavalry);
         assertEquals(cavalry, regular.getRole());
 
+        // Veterans do not become infantry or cavalry even if they are owned
+        // by the REF.
+        UnitType veteranType = spec().getUnitType("model.unit.veteranSoldier");
+        Unit veteran = new ServerUnit(game, null, dutchREF, veteranType, none);
+        assertEquals(none, veteran.getRole());
+        veteran = new ServerUnit(game, null, dutchREF, veteranType, infantry);
+        assertEquals(soldier, veteran.getRole());
+        veteran = new ServerUnit(game, null, dutchREF, veteranType, cavalry);
+        assertEquals(dragoon, veteran.getRole());
+
         UnitType braveType = spec().getUnitType("model.unit.brave");
         Unit brave = new ServerUnit(game, null, sioux, braveType);
         assertEquals(none, brave.getRole());

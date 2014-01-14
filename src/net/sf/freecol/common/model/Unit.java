@@ -639,7 +639,7 @@ public class Unit extends GoodsLocation
         if (horses && muskets) {
             if (owner.isIndian()) {
                 role = getSpecification().getRole("model.role.nativeDragoon");
-            } else if (owner.isREF()) {
+            } else if (owner.isREF() && hasAbility(Ability.REF_UNIT)) {
                 role = getSpecification().getRole("model.role.cavalry");
             } else {
                 role = getSpecification().getRole("model.role.dragoon");
@@ -655,7 +655,7 @@ public class Unit extends GoodsLocation
         } else if (muskets) {
             if (owner.isIndian()) {
                 role = getSpecification().getRole("model.role.armedBrave");
-            } else if (owner.isREF()) {
+            } else if (owner.isREF() && hasAbility(Ability.REF_UNIT)) {
                 role = getSpecification().getRole("model.role.infantry");
             } else {
                 role = getSpecification().getRole("model.role.soldier");
