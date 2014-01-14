@@ -287,6 +287,20 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
+     * Update the current father.
+     *
+     * @param ff The <code>FoundingFather</code> to recruit.
+     */
+    public void updateCurrentFather(FoundingFather ff) {
+        setCurrentFather(ff);
+        clearOfferedFathers();
+        if (ff != null) {
+            logger.finest(getId() + " is recruiting " + ff.getId()
+                + " in " + getGame().getTurn().toString());
+        }
+    }
+
+    /**
      * Accumulate extra trades.
      *
      * @param ag The <code>AbstractGoods</code> describing the sale.
@@ -1838,7 +1852,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         cs.addHistory(this,
             new HistoryEvent(getGame().getTurn(),
                 HistoryEvent.EventType.FOUNDING_FATHER, this)
-                .add("%father%", father.getNameKey()));
+                    .add("%father%", father.getNameKey()));
 
         List<AbstractUnit> units = father.getUnits();
         if (units != null && !units.isEmpty() && europe != null) {

@@ -39,10 +39,10 @@ import org.w3c.dom.Element;
 public class ChooseFoundingFatherMessage extends DOMMessage {
 
     /** The fathers to offer. */
-    private List<FoundingFather> fathers;
+    private final List<FoundingFather> fathers;
 
     /** The selected father. */
-    private FoundingFather foundingFather;
+    private String foundingFatherId;
 
 
     /**
@@ -56,8 +56,9 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
                                        FoundingFather ff) {
         super(getXMLElementTagName());
 
-        this.fathers = fathers;
-        this.foundingFather = ff;
+        this.fathers = new ArrayList<FoundingFather>();
+        this.fathers.addAll(fathers);
+        setFather(ff);
     }
 
     /**
@@ -70,38 +71,24 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
     public ChooseFoundingFatherMessage(Game game, Element element) {
         super(getXMLElementTagName());
 
-        Specification spec = game.getSpecification();
-        String id;
-        FoundingFather f;
-        fathers = new ArrayList<FoundingFather>();
+        final Specification spec = game.getSpecification();
+        this.fathers = new ArrayList<FoundingFather>();
         for (FoundingFatherType type : FoundingFatherType.values()) {
-            id = element.getAttribute(type.toString());
+            String id = element.getAttribute(type.toString());
             if (id == null || "".equals(id)) continue;
-            f = spec.getFoundingFather(id);
-            if (f == null) continue;
-            fathers.add(f);
+            FoundingFather ff = spec.getFoundingFather(id);
+            this.fathers.add(ff);
         }
-        foundingFather = ((id = element.getAttribute("foundingFather")) == null
-            || "".equals(id)
-            || (f = spec.getFoundingFather(id)) == null) ? null : f;
+        foundingFatherId = element.getAttribute("foundingFather");
     }
 
-    /**
-     * Client-side convenience to get the list of fathers on offer.
-     *
-     * @return The list of fathers to choose from.
-     */
+    public FoundingFather getFather(Game game) {
+        return (foundingFatherId == null) ? null
+            : game.getSpecification().getFoundingFather(this.foundingFatherId);
+    }
+
     public List<FoundingFather> getFathers() {
         return fathers;
-    }
-
-    /**
-     * Gets the chosen father.
-     *
-     * @return The chosen father.
-     */
-    public FoundingFather getResult() {
-        return foundingFather;
     }
 
     /**
@@ -109,8 +96,9 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
      *
      * @param foundingFather The <code>FoundingFather</code> to choose.
      */
-    public void setResult(FoundingFather foundingFather) {
-        this.foundingFather = foundingFather;
+    public ChooseFoundingFatherMessage setFather(FoundingFather ff) {
+        this.foundingFatherId = (ff == null) ? null : ff.getId();
+        return this;
     }
 
     /**
@@ -125,20 +113,22 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
+        final Game game = server.getGame();
         final ServerPlayer serverPlayer = server.getPlayer(connection);
-        List<FoundingFather> offered = serverPlayer.getOfferedFathers();
+        final List<FoundingFather> offered = serverPlayer.getOfferedFathers();
+        final FoundingFather ff = getFather(game);
 
         if (!serverPlayer.canRecruitFoundingFather()) {
             return DOMMessage.clientError("Player can not recruit fathers: "
                 + serverPlayer.getId());
-        } else if (foundingFather == null) {
+        } else if (ff == null) {
             return DOMMessage.clientError("No founding father selected");
-        } else if (!offered.contains(foundingFather)) {
+        } else if (!offered.contains(ff)) {
             return DOMMessage.clientError("Founding father not offered: "
-                + foundingFather.getId());
+                + ff.getId());
         }
-        serverPlayer.setCurrentFather(foundingFather);
-        serverPlayer.clearOfferedFathers();
+
+        serverPlayer.updateCurrentFather(ff);
         return null;
     }
 
@@ -149,11 +139,11 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
      */
     public Element toXMLElement() {
         Element result = createMessage(getXMLElementTagName());
-        for (FoundingFather f : fathers) {
+        for (FoundingFather f : getFathers()) {
             result.setAttribute(f.getType().toString(), f.getId());
         }
-        if (foundingFather != null) {
-            result.setAttribute("foundingFather", foundingFather.getId());
+        if (this.foundingFatherId != null) {
+            result.setAttribute("foundingFather", foundingFatherId);
         }
         return result;
     }
