@@ -357,6 +357,7 @@ public class FlagTest extends JFrame implements ItemListener {
 
     final JLabel label = new JLabel();
 
+    @SuppressWarnings("unchecked")
     public FlagTest() {
 
         super("FlagTest");
