@@ -185,6 +185,23 @@ public final class InGameInputHandler extends InputHandler {
     }
 
     /**
+     * Get the integer value of an element attribute.
+     *
+     * @param element The <code>Element</code> to query.
+     * @param attrib The attribute to use.
+     * @return The integer value of the attribute, or MIN_INT on failure.
+     */
+    private static int getIntegerAttribute(Element element, String attrib) {
+        int n;
+        try {
+            n = Integer.parseInt(element.getAttribute(attrib));
+        } catch (NumberFormatException e) {
+            n = Integer.MIN_VALUE;
+        }
+        return n;
+    }
+
+    /**
      * Select a child element with the given object identifier from a
      * parent element.
      *
@@ -776,17 +793,13 @@ public final class InGameInputHandler extends InputHandler {
      * @return Null.
      */
     private Element fountainOfYouth(Element element) {
-        String migrants = element.getAttribute("migrants");
-        int n;
-        try {
-            n = Integer.parseInt(migrants);
-        } catch (NumberFormatException e) {
-            logger.warning("Invalid foY migrant count: " + migrants);
-            n = -1;
-        }
+        int n = getIntegerAttribute(element, "migrants");
         if (n > 0) {
             getGUI().showEmigrationDialog(getFreeColClient().getMyPlayer(),
                                           n, true);
+        } else {
+            logger.warning("Invalid migrants attribute: "
+                + element.getAttribute("migrants"));
         }
         return null;
     }
@@ -965,11 +978,11 @@ public final class InGameInputHandler extends InputHandler {
      * @return Null.
      */
     private Element newTurn(Element element) {
-        final String turnString = element.getAttribute("turn");
+        final int n = getIntegerAttribute(element, "turn");
 
         SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    igc().newTurn(turnString);
+                    igc().newTurn(n);
                 }
             });
 

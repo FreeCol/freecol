@@ -3883,17 +3883,16 @@ public final class InGameController implements NetworkConstants {
     /**
      * Switch to a new turn.
      *
-     * @param turnString The turn.
+     * @param turn The turn number.
      */
-    public void newTurn(String turnString) {
+    public void newTurn(int turn) {
         final Game game = freeColClient.getGame();
         final Player player = freeColClient.getMyPlayer();
 
-        try {
-            int turnNumber = Integer.parseInt(turnString);
-            game.setTurn(new Turn(turnNumber));
-        } catch (NumberFormatException e) {
-            logger.warning("Bad turn in newTurn: " + turnString);
+        if (turn >= 0) {
+            game.setTurn(new Turn(turn));
+        } else {
+            logger.warning("Bad turn in newTurn: " + turn);
         }
 
         final boolean alert = freeColClient.getClientOptions()
@@ -3903,7 +3902,7 @@ public final class InGameController implements NetworkConstants {
         Turn currTurn = game.getTurn();
         if (currTurn.isFirstSeasonTurn()) {
             player.addModelMessage(new ModelMessage("twoTurnsPerYear", player)
-                .addName("%year%", turnString));
+                .addStringTemplate("%year%", currTurn.getLabel()));
         }
     }
 
