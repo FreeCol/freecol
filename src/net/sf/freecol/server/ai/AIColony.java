@@ -327,7 +327,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             was.add(new UnitWas(u));
         }
         for (Unit u : tile.getUnitList()) {
-            if (!u.isPerson() || getAIUnit(u) == null) continue;
+            if (!u.isPerson() || u.hasAbility(Ability.REF_UNIT)
+                || getAIUnit(u) == null) continue;
             Mission mission = getAIUnit(u).getMission();
             if (mission == null
                 || mission instanceof IdleAtSettlementMission
