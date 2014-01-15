@@ -39,6 +39,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -583,19 +584,29 @@ public final class InGameController extends Controller {
      * @param serverPlayer The <code>ServerPlayer</code> to update.
      * @param request An <code>Element</code> containing the update.
      */
-    private Element askElement(ServerPlayer serverPlayer, Element request) {
+    private void askElement(ServerPlayer serverPlayer, Element request) {
         Connection connection = serverPlayer.getConnection();
-        if (request == null || connection == null) return null;
+        if (connection == null) return;
 
-        Element reply;
-        try {
-            reply = connection.askDumping(request);
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Could not send \""
-                + request.getTagName() + "\"-message.", e);
-            reply = null;
+        while (request != null) {
+            Element reply;
+            try {
+                reply = connection.askDumping(request);
+                if (reply == null) break;
+            } catch (IOException e) {
+                logger.log(Level.WARNING, "Could not send \""
+                    + request.getTagName() + "\"-message.", e);
+                break;
+            }
+
+            try {
+                request = connection.handle(reply);
+            } catch (FreeColException fce) {
+                logger.log(Level.WARNING, "Exception processing reply \""
+                    + reply.getTagName() + "\"-message.", fce);
+                break;
+            }
         }
-        return reply;
     }
 
     /**

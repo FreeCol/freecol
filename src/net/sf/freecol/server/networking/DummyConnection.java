@@ -96,7 +96,7 @@ public final class DummyConnection extends Connection {
 
     /**
      * Sends the given message over this <code>Connection</code> and waits for
-     * confirmation of receiveval before returning.
+     * confirmation of receival before returning.
      *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information

@@ -37,6 +37,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.io.FreeColXMLReader;
 
@@ -104,7 +105,7 @@ public class Connection {
      * @param port The port to connect to.
      * @param messageHandler The MessageHandler to call for each message
      *     received.
-     * @throws IOException
+     * @exception IOException
      */
     public Connection(String host, int port, MessageHandler messageHandler,
                       String name) throws IOException {
@@ -118,7 +119,7 @@ public class Connection {
      * @param socket The socket to the client.
      * @param messageHandler The MessageHandler to call for each message
      *     received.
-     * @throws IOException
+     * @exception IOException
      */
     public Connection(Socket socket, MessageHandler messageHandler,
                       String name) throws IOException {
@@ -163,8 +164,8 @@ public class Connection {
     /**
      * Gets the socket.
      *
-     * @return The <code>Socket</code> used while communicating with the other
-     *         peer.
+     * @return The <code>Socket</code> used while communicating with
+     *     the other peer.
      */
     public Socket getSocket() {
         return socket;
@@ -199,8 +200,6 @@ public class Connection {
 
     /**
      * Sends a "disconnect"-message and closes this connection.
-     *
-     * @throws IOException
      */
     public void close() {
         try {
@@ -214,7 +213,7 @@ public class Connection {
     /**
      * Really closes this connection.
      *
-     * @throws IOException
+     * @exception IOException
      */
     public void reallyClose() throws IOException {
         if (thread != null) thread.askToStop();
@@ -242,7 +241,7 @@ public class Connection {
      * @param element The <code>Element</code> (root element in a
      *     DOM-parsed XML tree) that holds all the information
      * @param logOK Log the send if true.
-     * @throws IOException If an error occur while sending the message.
+     * @exception IOException If an error occur while sending the message.
      */
     private void send(Element element, boolean logOK) throws IOException {
         synchronized (out) {
@@ -265,7 +264,7 @@ public class Connection {
      *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information
-     * @throws IOException If an error occur while sending the message.
+     * @exception IOException If an error occur while sending the message.
      * @see #sendAndWait(Element)
      * @see #ask(Element)
      */
@@ -278,7 +277,7 @@ public class Connection {
      *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information
-     * @throws IOException If an error occur while sending the message.
+     * @exception IOException If an error occur while sending the message.
      * @see #sendAndWait(Element)
      * @see #ask(Element)
      */
@@ -287,8 +286,7 @@ public class Connection {
             String x = getName() + "-send";
             try {
                 System.err.println("<" + x + ">"
-                    + DOMMessage.elementToString(element)
-                    + "</" + x + ">\n");
+                    + DOMMessage.elementToString(element) + "</" + x + ">\n");
             } catch (Exception e) {}
         }
         send(element);
@@ -300,7 +298,7 @@ public class Connection {
      *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information
-     * @throws IOException If an error occur while sending the message.
+     * @exception IOException If an error occur while sending the message.
      * @see #send(Element)
      * @see #ask(Element)
      */
@@ -313,7 +311,7 @@ public class Connection {
      *
      * @param element The question for the other peer.
      * @return The reply from the other peer.
-     * @throws IOException If an error occur while sending the message.
+     * @exception IOException if an error occur while sending the message.
      * @see #send(Element)
      * @see #sendAndWait(Element)
      */
@@ -336,12 +334,14 @@ public class Connection {
         DOMMessage response = (DOMMessage)nro.getResponse();
         Element reply = (response == null) ? null
             : response.getDocument().getDocumentElement();
+        Element child = (reply == null) ? null
+            : (Element)reply.getFirstChild();
 
         if (logger.isLoggable(Level.FINE)) {
             logger.fine("Ask(" + networkReplyId + "): " + tag + ", reply: "
-                + ((reply == null) ? "null" : reply.getTagName()));
+                + ((child == null) ? "null" : child.getTagName()));
         }
-        return (reply == null) ? null : (Element)reply.getFirstChild();
+        return child;
     }
 
     /**
@@ -350,47 +350,40 @@ public class Connection {
      * be fed to an XML-pretty printer if required.
      *
      * @param request The <code>Element</code> to send.
-     * @return The reply element.
-     * @exception Throws IOException if ask() fails.
+     * @return The reply <code>Element</code>.
+     * @exception IOException if ask() fails.
      */
     public Element askDumping(Element request) throws IOException {
-        if (dump) {
+        if (!dump) return ask(request);
+
+        try {
             String x = getName() + "-request";
+            System.err.println("<" + x + ">"
+                + DOMMessage.elementToString(request) + "</" + x + ">\n");
+        } catch (Exception e) {}
+        try {
+            Element reply = ask(request);
             try {
+                String x = getName() + "-reply";
                 System.err.println("<" + x + ">"
-                    + DOMMessage.elementToString(request)
-                    + "</" + x + ">\n");
-            } catch (Exception e) {}
-        }
-
-        Element reply;
-        if (dump) {
+                    + DOMMessage.elementToString(reply) + "</" + x + ">\n");
+            } catch (Exception x) {}
+            return reply;
+            
+        } catch (IOException e) {
             try {
-                reply = ask(request);
-                try {
-                    String x = getName() + "-reply";
-                    System.err.println("<" + x + ">"
-                        + DOMMessage.elementToString(reply)
-                        + "</" + x + ">\n");
-                } catch (Exception x) {}
-            } catch (IOException e) {
-                try {
-                    System.err.println("<" + getName() + "-exception e=\""
-                        + e.getMessage() + "\" />\n");
-                } catch (Exception x) {}
-                throw e;
-            }
-        } else {
-            reply = ask(request);
+                System.err.println("<" + getName() + "-exception e=\""
+                    + e.getMessage() + "\" />\n");
+            } catch (Exception x) {}
+            throw e;
         }
-
-        return reply;
     }
 
     /**
      * Handles a message using the registered <code>MessageHandler</code>.
      *
      * @param in The stream containing the message.
+     * @exception IOException if the streaming fails.
      */
     public void handleAndSendReply(final BufferedInputStream in) 
         throws IOException {
@@ -422,7 +415,7 @@ public class Connection {
             logger.log(Level.WARNING, "Unable to read message.", e);
             return;
         } finally {
-            if (xr != null) xr.close(); // Will close in
+            if (xr != null) xr.close();
         }
 
         // Process the message in its own thread.
@@ -430,12 +423,12 @@ public class Connection {
         Thread t = new Thread(msg.getType()) {
                 @Override
                 public void run() {
-                    Element reply, element = msg.getDocument()
-                        .getDocumentElement();
+                    Element element = msg.getDocument().getDocumentElement();
+                    Element reply;
                     try {
                         if (question) {
-                            reply = messageHandler.handle(conn,
-                                (Element)element.getFirstChild());
+                            reply = (Element)element.getFirstChild();
+                            reply = conn.handle(reply);
                             if (reply == null) {
                                 reply = DOMMessage.createMessage(REPLY_TAG,
                                     NETWORK_REPLY_ID_TAG, networkReplyId);
@@ -448,7 +441,7 @@ public class Connection {
                                 reply = header;
                             }
                         } else {
-                            reply = messageHandler.handle(conn, element);
+                            reply = conn.handle(element);
                         }
                         if (reply != null) conn.sendDumping(reply);
                     } catch (Exception e) {
@@ -460,6 +453,18 @@ public class Connection {
         t.setName(name + "-MessageHandler-" + t.getName());
         t.start();
     }
+
+    /**
+     * Handle a request.
+     *
+     * @param request The request <code>Element</code> to handle.
+     * @return The reply from the message handler.
+     * @exception FreeColException if there is trouble with the response.
+     */
+    public Element handle(Element request) throws FreeColException {
+        return messageHandler.handle(this, request);
+    }
+
 
     /**
      * {@inheritDoc}
