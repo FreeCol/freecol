@@ -73,8 +73,8 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
         register("disconnect", new DisconnectHandler());
         register("chat", new NetworkRequestHandler() {
                 public Element handle(Connection connection, Element element) {
-                    return new ChatMessage(freeColServer.getGame(),
-                                           element).handle(freeColServer, connection);
+                    return new ChatMessage(getGame(), element)
+                        .handle(freeColServer, connection);
                 }
             });
     }

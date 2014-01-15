@@ -119,7 +119,7 @@ public final class PreGameInputHandler extends InputHandler {
         logger.info("Logout from: " + connection);
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         player.setConnected(false);
-        getFreeColServer().getGame().removePlayer(player);
+        getGame().removePlayer(player);
         getFreeColServer().getServer()
             .sendToAll(DOMMessage.createMessage("logout",
                     "reason", "User has logged out.",
@@ -178,7 +178,7 @@ public final class PreGameInputHandler extends InputHandler {
 
         // Check that no two players have the same nation
         ArrayList<Nation> nations = new ArrayList<Nation>();
-        for (Player player : freeColServer.getGame().getPlayers()) {
+        for (Player player : getGame().getPlayers()) {
             final Nation nation = getGame().getSpecification()
                 .getNation(player.getNationId());
             if (nations.contains(nation)) {
@@ -189,7 +189,7 @@ public final class PreGameInputHandler extends InputHandler {
         }
 
         // Check if all players are ready.
-        if (!freeColServer.getGame().allPlayersReadyToLaunch()) {
+        if (!getGame().allPlayersReadyToLaunch()) {
             return DOMMessage.createError("server.notAllReady",
                 "Not all players are ready to begin the game!");
         }
@@ -217,8 +217,7 @@ public final class PreGameInputHandler extends InputHandler {
                 .getNation(element.getAttribute("nation"));
             NationState state = Enum.valueOf(NationState.class,
                                              element.getAttribute("state"));
-            getFreeColServer().getGame().getNationOptions()
-                .setNationState(nation, state);
+            getGame().getNationOptions().setNationState(nation, state);
             getFreeColServer().getServer().sendToAll(element, 
                 player.getConnection());
         } else {
@@ -272,8 +271,8 @@ public final class PreGameInputHandler extends InputHandler {
         if (player != null) {
             Nation nation = getGame().getSpecification()
                 .getNation(element.getAttribute("value"));
-            if (getFreeColServer().getGame().getNationOptions().getNations()
-                .get(nation) == NationState.AVAILABLE) {
+            if (getGame().getNationOptions().getNations().get(nation)
+                == NationState.AVAILABLE) {
                 player.setNation(nation);
                 getFreeColServer().getServer()
                     .sendToAll(DOMMessage.createMessage("updateNation",
@@ -304,8 +303,8 @@ public final class PreGameInputHandler extends InputHandler {
                 .getNationType(element.getAttribute("value"));
             NationType fixedNationType = getGame().getSpecification()
                 .getNation(player.getNationId()).getType();
-            Advantages advantages = getFreeColServer().getGame()
-                .getNationOptions().getNationalAdvantages();
+            Advantages advantages = getGame().getNationOptions()
+                .getNationalAdvantages();
             if (advantages == Advantages.SELECTABLE
                 || (advantages == Advantages.FIXED
                     && nationType.equals(fixedNationType))) {
@@ -337,7 +336,7 @@ public final class PreGameInputHandler extends InputHandler {
         if (!player.isAdmin()) {
             throw new IllegalStateException("Not an admin");
         }
-        Specification spec = getFreeColServer().getGame().getSpecification();
+        Specification spec = getGame().getSpecification();
         OptionGroup gameOptions = spec.getGameOptions();
         Element child = (Element)element.getChildNodes().item(0);
         gameOptions.readFromXMLElement(child);

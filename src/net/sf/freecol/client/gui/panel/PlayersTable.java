@@ -592,7 +592,10 @@ public final class PlayersTable extends JTable {
                     if (nationOptions.getNationState(nation)
                         == NationState.AVAILABLE) {
                         preGameController.setNation(nation);
-                        preGameController.setNationType(nation.getType());
+                        if (nationOptions.getNationalAdvantages()
+                            != NationOptions.Advantages.NONE) {
+                            preGameController.setNationType(nation.getType());
+                        }
                         update();
                     }
                     break;
