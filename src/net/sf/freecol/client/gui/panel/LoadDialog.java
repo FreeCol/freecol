@@ -44,6 +44,10 @@ import net.sf.freecol.client.gui.panel.FreeColDialog;
  */
 public final class LoadDialog extends FreeColDialog<File> {
 
+    /** Fake file for the cancel selection. */
+    private static final File cancelFile = new File("");
+
+
     /**
      * Creates a dialog to choose a file to load.
      *
@@ -55,7 +59,7 @@ public final class LoadDialog extends FreeColDialog<File> {
                       FileFilter[] fileFilters) {
         super(freeColClient);
 
-        JFileChooser fileChooser = new JFileChooser(directory);
+        final JFileChooser fileChooser = new JFileChooser(directory);
         if (fileFilters.length > 0) {
             for (FileFilter fileFilter : fileFilters) {
                 fileChooser.addChoosableFileFilter(fileFilter);
@@ -63,16 +67,19 @@ public final class LoadDialog extends FreeColDialog<File> {
             fileChooser.setFileFilter(fileFilters[0]);
             fileChooser.setAcceptAllFileFilterUsed(false);
         }
+        fileChooser.setControlButtonsAreShown(true);
+        fileChooser.setApproveButtonText(Messages.message("ok"));
+        //fileChooser.setCancelButtonText(Messages.message("cancel"));
         fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fileChooser.setFileHidingEnabled(false);
         fileChooser.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
                     final String cmd = event.getActionCommand();
-                    setValue((JFileChooser.APPROVE_SELECTION.equals(cmd))
-                        ? ((JFileChooser)event.getSource())
-                            .getSelectedFile()
-                        : null);
+                    File value = (JFileChooser.APPROVE_SELECTION.equals(cmd))
+                        ? ((JFileChooser)event.getSource()).getSelectedFile()
+                        : cancelFile;
+                    setValue(value);
                 }
             });
 
@@ -85,6 +92,7 @@ public final class LoadDialog extends FreeColDialog<File> {
      * {@inheritDoc}
      */
     public File getResponse() {
-        return (File)getValue();
+        File value = (File)getValue();
+        return (value == cancelFile) ? null : value;
     }
 }
