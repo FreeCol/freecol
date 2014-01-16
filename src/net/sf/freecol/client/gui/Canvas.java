@@ -517,7 +517,8 @@ public final class Canvas extends JDesktopPane {
      *     on failure.
      */
     private Point getClearSpace(Component comp, int x, int y, int tries) {
-        if (!this.getBounds().contains(x, y)) return null;
+        Rectangle bounds = this.getBounds();
+        if (!bounds.contains(x, y)) return null;
 
         tries = 3 * tries + 1; // 3 new candidates per level
         List<Point> todo = new ArrayList<Point>();
@@ -527,6 +528,7 @@ public final class Canvas extends JDesktopPane {
             p = todo.remove(0);
             Rectangle r = new Rectangle(p.x, p.y, 
                                         comp.getWidth(), comp.getHeight());
+            if (!bounds.contains(r)) continue;
             Component c = null;
             for (Component child : this.getComponents()) {
                 if (child.getBounds().intersects(r)) {
