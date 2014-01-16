@@ -256,10 +256,6 @@ public final class Canvas extends JDesktopPane {
     /** Number of tries to find a clear spot on the canvas. */
     private static final int MAXTRY = 3;
 
-    private static final Integer MAIN_LAYER = JLayeredPane.DEFAULT_LAYER;
-
-    private static final Integer STATUS_LAYER = JLayeredPane.POPUP_LAYER;
-
     /** A class for frames being used as tool boxes. */
     class ToolBoxFrame extends JInternalFrame {}
 
@@ -398,7 +394,7 @@ public final class Canvas extends JDesktopPane {
         f.setSize(width, height);
         Point p = chooseLocation(comp, width, height, popupPosition);
         f.setLocation(p);
-        add(f, MODAL_LAYER);
+        this.add(f, MODAL_LAYER);
         f.setName(comp.getClass().getSimpleName());
 
         f.setFrameIcon(null);
@@ -421,7 +417,7 @@ public final class Canvas extends JDesktopPane {
         comp.setLocation((getWidth() - comp.getWidth()) / 2,
                          (getHeight() - comp.getHeight()) / 2);
 
-        add(comp, i);
+        this.add(comp, i);
     }
 
     /**
@@ -438,11 +434,7 @@ public final class Canvas extends JDesktopPane {
         }
 
         try {
-            if (i == null) {
-                super.add(comp);
-            } else {
-                super.add(comp, i);
-            }
+            super.add(comp, (i == null) ? JLayeredPane.DEFAULT_LAYER : i);
         } catch (Exception e) {
             logger.log(Level.WARNING, "addToCanvas(" + comp + ", " + i
                 + ") failed.", e);
@@ -827,13 +819,12 @@ public final class Canvas extends JDesktopPane {
      */
     @Override
     public Component add(Component comp) {
-        add(comp, null);
+        this.add(comp, JLayeredPane.DEFAULT_LAYER);
         return comp;
     }
 
     /**
-     * Adds a component to this Canvas.  Removes the statusPanel if
-     * visible (and <code>comp != statusPanel</code>).
+     * Adds a component to this Canvas.
      *
      * @param comp The <code>Component</code> to add to this canvas.
      * @param i The layer to add the component to (see JLayeredPane).
@@ -2019,7 +2010,7 @@ public final class Canvas extends JDesktopPane {
         closeMenus();
         gui.getFrame().setJMenuBar(null);
         mainPanel = new MainPanel(freeColClient);
-        addCentered(mainPanel, MAIN_LAYER);
+        addCentered(mainPanel, JLayeredPane.DEFAULT_LAYER);
         if (userMsg != null) showInformationMessage(userMsg);
         mainPanel.requestFocus();
     }
@@ -2194,7 +2185,7 @@ public final class Canvas extends JDesktopPane {
         final Video video = ResourceManager.getVideo("Opening.video");
         boolean muteAudio = !gui.canPlaySound();
         final VideoComponent vp = new VideoComponent(video, muteAudio);
-        addCentered(vp, MAIN_LAYER);
+        addCentered(vp, JLayeredPane.PALETTE_LAYER);
         vp.play();
 
         final class AbortListener implements KeyListener, MouseListener, 
@@ -2611,7 +2602,7 @@ public final class Canvas extends JDesktopPane {
      */
     public void showStatusPanel(String message) {
         statusPanel.setStatusMessage(message);
-        addCentered(statusPanel, STATUS_LAYER);
+        addCentered(statusPanel, JLayeredPane.POPUP_LAYER);
     }
 
     /**
