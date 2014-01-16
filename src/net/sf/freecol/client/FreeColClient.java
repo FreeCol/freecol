@@ -32,6 +32,7 @@ import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.control.InGameInputHandler;
@@ -306,6 +307,14 @@ public final class FreeColClient {
                     }
                 });
         }
+
+        String quit = FreeCol.CLIENT_THREAD + "Quit Game";
+        Runtime.getRuntime().addShutdownHook(new Thread(quit) {
+                @Override
+                public void run() {
+                    getConnectController().quitGame(true);
+                }
+            });
     }
 
     /**

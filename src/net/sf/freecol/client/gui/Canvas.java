@@ -330,18 +330,8 @@ public final class Canvas extends JDesktopPane {
 
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
-        // takeFocus();
+
         createKeyBindings();
-
-        // TODO: move shutdown hook from GUI to (say) client!
-        Runtime runtime = Runtime.getRuntime();
-        runtime.addShutdownHook(new Thread(FreeCol.CLIENT_THREAD+"Quit Game") {
-                @Override
-                public void run() {
-                    freeColClient.getConnectController().quitGame(true);
-                }
-            });
-
         logger.info("Canvas created.");
     }
 
@@ -349,8 +339,7 @@ public final class Canvas extends JDesktopPane {
     // Internals
 
     /**
-     * Adds a component on this Canvas inside a frame.  Removes the
-     * StatusPanel if visible (and <code>comp != statusPanel</code>).
+     * Adds a component on this Canvas inside a frame.
      *
      * @param comp The component to add to the canvas.
      * @param toolBox Should be set to true if the resulting frame is
