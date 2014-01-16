@@ -2652,7 +2652,6 @@ public class Colony extends Settlement implements Nameable {
      */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
-
         super.writeAttributes(xw);
 
         // Delegated from Settlement

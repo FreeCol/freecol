@@ -404,11 +404,17 @@ public class ChangeSet {
                 }
             }
             if (!canSeeUnit(serverPlayer, defender)) {
-                // Disclose fully.  If scoped to serverPlayer
-                // insufficient information is serialized when inside
-                // a settlement, but combat animation is an exception
-                // to the normal visibility rules.
-                element.appendChild(defender.toXMLElement(doc));
+                // If scoped to serverPlayer insufficient information
+                // is serialized when inside a settlement, but if
+                // unscoped too much is disclosed.  So we make a copy
+                // and neuter it.
+                //
+                // We just have to accept that combat animation is an
+                // exception to the normal visibility rules.
+                Unit copy = defender.copy(serverPlayer.getGame(), Unit.class);
+                copy.setLocation(copy.getTile());
+                copy.setWorkType(null);
+                element.appendChild(copy.toXMLElement(doc));
             }
             return element;
         }
