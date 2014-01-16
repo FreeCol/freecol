@@ -2123,8 +2123,7 @@ public final class MapViewer {
 
             if (greyLayer == null) greyLayer = new GrayLayer(lib, freeColClient);
             if (greyLayer.getParent() == null) { // Not added to the canvas yet.
-                canvas.add(greyLayer, JLayeredPane.DEFAULT_LAYER);
-                canvas.moveToFront(greyLayer);
+                canvas.add(greyLayer, JLayeredPane.DRAG_LAYER);
             }
 
             greyLayer.setBounds(0, 0, canvas.getSize().width, 
