@@ -2679,12 +2679,15 @@ public class Colony extends Settlement implements Nameable {
 
         } else {
 
-            int uc = getUnitCount();
+            int uc = getDisplayUnitCount();
             if (uc <= 0) {
-                logger.warning("Unit count fail: " + uc + "\n"
+                logger.warning("Unit count fail: " + uc + " id=" + getId()
+                    + " unitCount=" + getUnitCount()
+                    + " scope=" + xw.getWriteScope()
+                    + " player=" + xw.getWriteScope().getClient() + "\n"
                     + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
             }
-            xw.writeAttribute(UNIT_COUNT_TAG, getUnitCount());
+            xw.writeAttribute(UNIT_COUNT_TAG, uc);
         }
     }
 

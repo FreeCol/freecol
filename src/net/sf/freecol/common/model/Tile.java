@@ -2164,9 +2164,23 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                 if (is == null) {
                     removeIndianSettlementInternals(player);
                 } else {
-                    setIndianSettlementInternals(player, is.getLearnableSkill(),
-                                                 is.getWantedGoods());
+                    setIndianSettlementInternals(player,
+                        is.getLearnableSkill(), is.getWantedGoods());
                 }
+
+                // Temporary workaround for BR#2618 on input
+                Colony colony = tile.getColony();
+                if (colony != null && this.getColony() != null) {
+                    if (colony.getDisplayUnitCount() <= 0) {
+                        logger.warning("Copied colony " + colony.getId()
+                            + " display unit count corrupt: "
+                            + colony.getDisplayUnitCount());
+                        colony.setDisplayUnitCount(this.getColony()
+                            .getUnitCount());
+                    }
+                }
+                // end workaround
+
             } else {
                 setCachedTile(player, this);
             }

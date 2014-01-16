@@ -98,6 +98,10 @@ public class FreeColXMLWriter implements XMLStreamWriter {
         public boolean validFor(Player player) {
             return this != WriteScope.CLIENT || this.player == player;
         }
+
+        public Player getClient() {
+            return this.player;
+        }
     }
 
 
