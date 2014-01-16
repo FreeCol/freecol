@@ -70,7 +70,6 @@ public final class ChooseFoundingFatherDialog
 
         this.possibleFathers = possibleFoundingFathers;
         this.tb = new JTabbedPane(JTabbedPane.TOP);
-        setFocusCycleRoot(false);
 
         String nominate = Messages.message("foundingFatherDialog.nominate");
         JLabel header = GUI.getDefaultHeader(nominate);

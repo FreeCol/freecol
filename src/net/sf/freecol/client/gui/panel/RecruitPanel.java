@@ -64,8 +64,6 @@ public final class RecruitPanel extends FreeColPanel {
     public RecruitPanel(FreeColClient freeColClient) {
         super(freeColClient, new MigLayout("wrap 1", "", ""));
 
-        setFocusCycleRoot(true);
-
         question = GUI.getDefaultTextArea("");
         for (int i = 0; i < Europe.RECRUIT_COUNT; i++) {
             person[i] = new JButton();

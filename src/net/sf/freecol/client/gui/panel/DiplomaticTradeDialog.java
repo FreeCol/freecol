@@ -778,7 +778,6 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             panel.add(new JLabel("Version = " + agreement.getVersion()));
         }
         panel.setPreferredSize(panel.getPreferredSize());
-        setFocusCycleRoot(true);
 
         DiplomaticTrade bogus = null;
         String str;

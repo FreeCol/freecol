@@ -201,8 +201,6 @@ public final class ColonyPanel extends PortPanel
                           "[][]0[]0[][growprio 200,shrinkprio 10]"
                           + "[growprio 150,shrinkprio 50]"));
 
-        setFocusCycleRoot(true);
-
         // Do not just use colony.getOwner() == getMyPlayer() because
         // in debug mode we are in the *server* colony, and the equality
         // will fail.

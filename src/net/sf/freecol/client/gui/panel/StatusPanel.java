@@ -47,7 +47,6 @@ public final class StatusPanel extends FreeColPanel {
     public StatusPanel(FreeColClient freeColClient) {
         super(freeColClient, new FlowLayout());
 
-        setFocusCycleRoot(false);
         setFocusable(false);
         
         statusLabel = new JLabel();

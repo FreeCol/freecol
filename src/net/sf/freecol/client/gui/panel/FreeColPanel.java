@@ -136,7 +136,6 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
         super(layout);
 
         this.freeColClient = freeColClient;
-        setFocusCycleRoot(true);
 
         setBorder(FreeColImageBorder.imageBorder);
 

@@ -112,8 +112,6 @@ public final class EuropePanel extends PortPanel {
         super(freeColClient, new MigLayout("wrap 3, insets 20, fill",
                                            "[380:][380:][150:200:]"));
 
-        setFocusCycleRoot(true);
-
         exitButton = new EuropeButton(Messages.message("close"),
             KeyEvent.VK_ESCAPE, EuropeAction.EXIT.toString(), this);
         trainButton = new EuropeButton(Messages.message("train"),

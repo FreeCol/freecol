@@ -199,7 +199,6 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
         contentPane.add((this.scrollPane != null) ? this.scrollPane
             : this.pane, BorderLayout.CENTER);
 
-        setFocusCycleRoot(true);
         setComponentOrientation(this.pane.getComponentOrientation());
         setResizable(false);
         setUndecorated(true);
