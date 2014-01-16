@@ -226,14 +226,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
         this.liberty = 0;
         this.currentFather = null;
 
-        //call of super() will lead to this object being registered with AIMain
-        //before playerType has been set. AIMain will fall back to use of
-        //standard AIPlayer in this case. Set object again to fix this.
-        //Possible TODO: Is there a better way to do this?
-        final String curId = getId();
-        game.removeFreeColGameObject(curId);
-        game.setFreeColGameObject(curId, this);
-
         this.socket = socket;
         this.connection = connection;
         connected = connection != null;

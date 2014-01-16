@@ -1353,6 +1353,9 @@ public final class FreeColServer {
         getServer().addDummyConnection(theConnection);
 
         getGame().addPlayer(aiPlayer);
+        // Add to the AI, which was previously deferred because the
+        // player type was unknown.
+        getAIMain().setFreeColGameObject(aiPlayer.getId(), aiPlayer);
 
         // Send message to all players except to the new player:
         // TODO: null-destination-player is unnecessarily generous visibility

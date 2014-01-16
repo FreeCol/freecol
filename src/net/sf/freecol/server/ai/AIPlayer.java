@@ -133,10 +133,10 @@ public abstract class AIPlayer extends AIObject {
      * Used by implementing subclasses.
      *
      * @param p The new <code>Player</code>.
-     */
     protected void setPlayer(ServerPlayer p) {
         player = p;
     }
+     */
 
     /**
      * Gets the PRNG to use for this player.

@@ -363,13 +363,21 @@ public class AIMain extends FreeColObject
         if (fcgo instanceof Colony) {
             new AIColony(this, (Colony)fcgo);
         } else if (fcgo instanceof ServerPlayer) {
-            ServerPlayer p = (ServerPlayer)fcgo;
-            if (p.isIndian()) {
-                new NativeAIPlayer(this, p);
-            } else if (p.isREF()) {
-                new REFAIPlayer(this, p);
-            } else if (p.isEuropean()) {
-                new EuropeanAIPlayer(this, p);
+            ServerPlayer player = (ServerPlayer)fcgo;
+            if (player.getPlayerType() == null) {
+                // No point doing anything with the object yet, as we
+                // need the player type before we can create the
+                // right class of AI player.
+                logger.info("Temporarily ignoring incomplete AI player: "
+                    + fcgo.getId());
+            } else if (player.isIndian()) {
+                new NativeAIPlayer(this, player);
+            } else if (player.isREF()) {
+                new REFAIPlayer(this, player);
+            } else if (player.isEuropean()) {
+                new EuropeanAIPlayer(this, player);
+            } else {
+                throw new IllegalArgumentException("Bogus player: " + player);
             }
         } else if (fcgo instanceof Unit) {
             new AIUnit(this, (Unit)fcgo);
