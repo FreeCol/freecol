@@ -89,4 +89,15 @@ public final class SelectTributeAmountDialog extends FreeColInputDialog<Integer>
         }
         return (result <= 0 || result > maximum) ? null : result;
     }
+
+
+    // Override Component
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void requestFocus() {
+        this.input.requestFocus();
+    }
 }

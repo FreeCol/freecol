@@ -107,7 +107,4 @@ public final class SaveDialog extends FreeColDialog<File> {
         }
         return null;
     }
-
-
-    // TODO: add a requestFocus override that focuses on the cancel button
 }

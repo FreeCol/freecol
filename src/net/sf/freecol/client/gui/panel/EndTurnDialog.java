@@ -212,16 +212,5 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
             }
         }
     }
-
-
-    // Override Component
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void requestFocus() {
-        this.unitList.requestFocus();
-    }
 }
 

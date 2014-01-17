@@ -63,6 +63,7 @@ import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.FreeColImageBorder;
+import net.sf.freecol.client.gui.plaf.FreeColOptionPaneUI;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
@@ -447,6 +448,18 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
 
         for (MouseListener listener : getMouseListeners()) {
             removeMouseListener(listener);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void requestFocus() {
+        if (this.pane.getUI() instanceof FreeColOptionPaneUI) {
+            Component c = ((FreeColOptionPaneUI)this.pane.getUI())
+                .getInitialFocusComponent();
+            if (c != null) c.requestFocus();
         }
     }
 }

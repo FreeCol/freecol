@@ -1316,6 +1316,7 @@ public final class Canvas extends JDesktopPane {
                 getPopupPosition(tile)));
         dialogAdd(freeColDialog);
         if (freeColDialog.isModal()) setBlinking(false);
+        freeColDialog.requestFocus();
         freeColDialog.setVisible(true);
     }
 

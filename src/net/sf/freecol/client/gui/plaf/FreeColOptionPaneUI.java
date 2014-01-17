@@ -60,6 +60,9 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
         return new FreeColOptionPaneUI();
     }
 
+    public Component getInitialFocusComponent() {
+        return initialFocusComponent;
+    }
 
     /**
      * Choose the number of columns for the OptionPane buttons.

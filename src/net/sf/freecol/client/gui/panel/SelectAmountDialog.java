@@ -122,4 +122,15 @@ public final class SelectAmountDialog extends FreeColInputDialog<Integer> {
         }
         return -1;
     }
+
+
+    // Override Component
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void requestFocus() {
+        this.comboBox.requestFocus();
+    }
 }

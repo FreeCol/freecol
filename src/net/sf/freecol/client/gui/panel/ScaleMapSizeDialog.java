@@ -150,6 +150,6 @@ public class ScaleMapSizeDialog extends FreeColDialog<Dimension> {
 
     @Override
     public void requestFocus() {
-        inputWidth.requestFocus();
+        this.inputWidth.requestFocus();
     }
 }

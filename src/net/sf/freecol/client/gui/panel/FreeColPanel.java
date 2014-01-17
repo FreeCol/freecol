@@ -252,14 +252,6 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
     }
 
     /**
-     * The OK button requests focus.
-     */
-    @Override
-    public void requestFocus() {
-        if (okButton != null) okButton.requestFocus();
-    }
-
-    /**
      * Create a button for a colony.
      *
      * @param colony The <code>Colony</code> to create a button for.
@@ -346,5 +338,14 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
         for (MouseListener listener : getMouseListeners()) {
             removeMouseListener(listener);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void requestFocus() {
+        // The OK button requests focus if it exists.
+        if (okButton != null) okButton.requestFocus();
     }
 }

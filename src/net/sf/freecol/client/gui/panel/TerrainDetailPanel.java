@@ -42,14 +42,14 @@ import net.sf.freecol.common.model.TileType;
 /**
  * This panel displays details of terrain types in the Colopedia.
  */
-public class TerrainDetailPanel extends ColopediaGameObjectTypePanel<TileType> {
-
+public class TerrainDetailPanel
+    extends ColopediaGameObjectTypePanel<TileType> {
 
     /**
-     * Creates a new instance of this ColopediaDetailPanel.
+     * Creates a new instance of this TerrainDetailPanel.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param colopediaPanel The parent ColopediaPanel.
+     * @param colopediaPanel The parent <code>ColopediaPanel</code>.
      */
     public TerrainDetailPanel(FreeColClient freeColClient,
                               ColopediaPanel colopediaPanel) {
@@ -148,5 +148,4 @@ public class TerrainDetailPanel extends ColopediaGameObjectTypePanel<TileType> {
         panel.add(GUI.getDefaultTextArea(Messages.message(tileType.getDescriptionKey()), 20),
                   "span, growx");
     }
-
 }

@@ -113,15 +113,4 @@ public final class ChooseFoundingFatherDialog
         }
         return null;
     }
-
-
-    // Override Component
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void requestFocus() {
-        tb.requestFocus();
-    }
 }
