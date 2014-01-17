@@ -35,10 +35,9 @@ import org.w3c.dom.Element;
  */
 public class UnloadCargoMessage extends DOMMessage {
 
-    /**
-     * The goods to be unloaded.
-     */
+    /** The goods to be unloaded. */
     private Goods goods;
+
 
     /**
      * Create a new <code>UnloadCargoMessage</code> with the
@@ -65,6 +64,7 @@ public class UnloadCargoMessage extends DOMMessage {
         this.goods = new Goods(game, (Element) element.getChildNodes().item(0));
     }
 
+
     /**
      * Handle a "unloadCargo"-message.
      *
@@ -77,7 +77,7 @@ public class UnloadCargoMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Location loc = goods.getLocation();
         if (loc == null) {

@@ -107,6 +107,9 @@ public class DiplomacyMessage extends DOMMessage {
         }
     }
 
+
+    // Public interface
+
     /**
      * Get the <code>Unit</code> which began this diplomatic exchange.
      *
@@ -142,6 +145,7 @@ public class DiplomacyMessage extends DOMMessage {
         this.agreement = agreement;
     }
 
+
     /**
      * Handle a "diplomacy"-message.
      *
@@ -152,8 +156,8 @@ public class DiplomacyMessage extends DOMMessage {
      *         or an error <code>Element</code> on outright error.
      */
     public Element handle(FreeColServer server, Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
-        Game game = serverPlayer.getGame();
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final Game game = serverPlayer.getGame();
 
         if (agreement == null) {
             return DOMMessage.clientError("Null diplomatic agreement.");
@@ -177,14 +181,17 @@ public class DiplomacyMessage extends DOMMessage {
                 break;
             case DIPLOMATIC:
                 if (!unit.hasAbility(Ability.NEGOTIATE)) {
-                    return DOMMessage.clientError("Unit lacks ability to negotiate: " + unit);
+                    return DOMMessage.clientError("Unit lacks ability"
+                        + " to negotiate: " + unit);
                 }
                 break;
             case TRADE:
                 if (!unit.isCarrier()) {
-                    return DOMMessage.clientError("Unit is not a carrier: " + unit);
+                    return DOMMessage.clientError("Unit is not a carrier: "
+                        + unit);
                 } else if (!serverPlayer.hasAbility(Ability.TRADE_WITH_FOREIGN_COLONIES)) {
-                    return DOMMessage.clientError("Unit owner lacks ability to trade with other Europeans: " + unit);
+                    return DOMMessage.clientError("Unit owner lacks ability"
+                        + " to trade with other Europeans: " + unit);
                 }
                 break;
             case TRIBUTE:
@@ -206,7 +213,8 @@ public class DiplomacyMessage extends DOMMessage {
                 return DOMMessage.clientError("Missing other player entity in diplomacy.");
             } else {
                 if (serverPlayer.owns(otherUnit)) {
-                    return DOMMessage.clientError("Contacting own unit!?: " + otherUnitId);
+                    return DOMMessage.clientError("Contacting own unit!?: "
+                        + otherUnitId);
                 } else if (!unit.getTile().isAdjacent(otherUnit.getTile())) {
                     return DOMMessage.clientError("Unit " + unit.getId()
                         + " is not adjacent to other unit " + otherUnitId);

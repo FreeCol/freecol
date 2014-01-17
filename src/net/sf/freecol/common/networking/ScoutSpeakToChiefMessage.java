@@ -73,6 +73,7 @@ public class ScoutSpeakToChiefMessage extends DOMMessage {
         this.directionString = element.getAttribute("direction");
     }
 
+
     /**
      * Handle a "scoutSpeakToChief"-message.
      *
@@ -84,7 +85,7 @@ public class ScoutSpeakToChiefMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Unit unit;
         try {

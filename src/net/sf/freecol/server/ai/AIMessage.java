@@ -393,7 +393,7 @@ public class AIMessage {
      */
     public static boolean askEmigrate(AIPlayer aiPlayer, int slot) {
         return sendMessage(aiPlayer.getConnection(),
-            new EmigrateUnitMessage(slot));
+                           new EmigrateUnitMessage(slot));
     }
 
 
@@ -516,7 +516,8 @@ public class AIMessage {
     public static boolean askLoot(AIUnit aiUnit, String defenderId,
                                   List<Goods> goods) {
         return sendMessage(aiUnit.getAIOwner().getConnection(),
-            new LootCargoMessage(aiUnit.getUnit(), defenderId, goods));
+                           new LootCargoMessage(aiUnit.getUnit(), defenderId,
+                                                goods));
     }
 
 

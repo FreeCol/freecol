@@ -32,19 +32,13 @@ import org.w3c.dom.Element;
  */
 public class ChatMessage extends DOMMessage {
 
-    /**
-     * The object identifier of the sender player.
-     */
+    /** The object identifier of the sender player. */
     private String sender;
 
-    /**
-     * The text of the message.
-     */
+    /** The text of the message. */
     private String message;
 
-    /**
-     * Whether this is a private message or not.
-     */
+    /** Whether this is a private message or not. */
     private boolean privateChat;
 
 
@@ -81,6 +75,9 @@ public class ChatMessage extends DOMMessage {
             .booleanValue();
     }
 
+
+    // Public interface
+
     /**
      * Who sent this ChatMessage?
      *
@@ -109,6 +106,7 @@ public class ChatMessage extends DOMMessage {
         return privateChat;
     }
 
+
     /**
      * Handle a "chat"-message.
      *
@@ -118,7 +116,7 @@ public class ChatMessage extends DOMMessage {
      * @return Null.
      */
     public Element handle(FreeColServer server, Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         /* Do not trust the client-supplied sender name */
         sender = serverPlayer.getId();

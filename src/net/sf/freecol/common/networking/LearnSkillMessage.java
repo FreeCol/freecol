@@ -37,15 +37,12 @@ import org.w3c.dom.Element;
  */
 public class LearnSkillMessage extends DOMMessage {
 
-    /**
-     * The identifier of the unit that is learning.
-     */
+    /** The identifier of the unit that is learning. */
     private String unitId;
 
-    /**
-     * The direction the unit is learning in.
-     */
+    /** The direction the unit is learning in. */
     private String directionString;
+
 
     /**
      * Create a new <code>LearnSkillMessage</code> with the
@@ -75,6 +72,7 @@ public class LearnSkillMessage extends DOMMessage {
         this.directionString = element.getAttribute("direction");
     }
 
+
     /**
      * Handle a "learnSkill"-message.
      *
@@ -86,7 +84,7 @@ public class LearnSkillMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Unit unit;
         try {

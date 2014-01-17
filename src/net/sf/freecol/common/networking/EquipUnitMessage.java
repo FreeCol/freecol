@@ -33,19 +33,13 @@ import org.w3c.dom.Element;
  */
 public class EquipUnitMessage extends DOMMessage {
 
-    /**
-     * The identifier of the unit.
-     */
+    /** The identifier of the unit. */
     private String unitId;
 
-    /**
-     * The identifier of the equipment type.
-     */
+    /** The identifier of the equipment type. */
     private String typeId;
 
-    /**
-     * The amount of equipment.
-     */
+    /** The amount of equipment. */
     private String amountString;
 
 
@@ -79,6 +73,7 @@ public class EquipUnitMessage extends DOMMessage {
         this.amountString = element.getAttribute("amount");
     }
 
+
     /**
      * Handle a "equipUnit"-message.
      *
@@ -90,8 +85,8 @@ public class EquipUnitMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
-        Game game = server.getGame();
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final Game game = server.getGame();
 
         Unit unit;
         try {

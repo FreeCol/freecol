@@ -35,14 +35,10 @@ import org.w3c.dom.Element;
  */
 public class WorkMessage extends DOMMessage {
 
-    /**
-     * The identifier of the unit.
-     */
+    /** The identifier of the unit. */
     private String unitId;
 
-    /**
-     * The identifier of the work location.
-     */
+    /** The identifier of the work location.  */
     private String workLocationId;
 
 
@@ -73,6 +69,7 @@ public class WorkMessage extends DOMMessage {
         this.workLocationId = element.getAttribute("workLocation");
     }
 
+
     /**
      * Handle a "work"-message.
      *
@@ -84,8 +81,8 @@ public class WorkMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
-        Game game = server.getGame();
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final Game game = server.getGame();
 
         Unit unit;
         try {

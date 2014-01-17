@@ -36,15 +36,12 @@ import org.w3c.dom.Element;
  */
 public class MoveMessage extends DOMMessage {
 
-    /**
-     * The identifier of the object to be moved.
-     */
+    /** The identifier of the object to be moved. */
     private String unitId;
 
-    /**
-     * The direction to move.
-     */
+    /** The direction to move. */
     private String directionString;
+
 
     /**
      * Create a new <code>MoveMessage</code> for the supplied unit and
@@ -74,6 +71,7 @@ public class MoveMessage extends DOMMessage {
         this.directionString = element.getAttribute("direction");
     }
 
+
     /**
      * Handle a "move"-message.
      *
@@ -85,7 +83,7 @@ public class MoveMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Unit unit;
         try {

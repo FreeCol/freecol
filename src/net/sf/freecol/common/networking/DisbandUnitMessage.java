@@ -33,10 +33,9 @@ import org.w3c.dom.Element;
  */
 public class DisbandUnitMessage extends DOMMessage {
 
-    /**
-     * The identifier of the unit to be disbanded.
-     */
+    /** The identifier of the unit to be disbanded. */
     private String unitId;
+
 
     /**
      * Create a new <code>DisbandUnitMessage</code> with the
@@ -63,6 +62,7 @@ public class DisbandUnitMessage extends DOMMessage {
         this.unitId = element.getAttribute("unit");
     }
 
+
     /**
      * Handle a "disbandUnit"-message.
      *
@@ -74,7 +74,7 @@ public class DisbandUnitMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Unit unit;
         try {

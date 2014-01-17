@@ -36,25 +36,18 @@ import org.w3c.dom.Element;
  */
 public class BuyPropositionMessage extends DOMMessage {
 
-    /**
-     * The object identifier of the unit that is buying.
-     */
+    /** The object identifier of the unit that is buying. */
     private String unitId;
 
-    /**
-     * The object identifier of the settlement that is selling.
-     */
+    /** The object identifier of the settlement that is selling. */
     private String settlementId;
 
-    /**
-     * The goods to be bought.
-     */
+    /** The goods to be bought. */
     private Goods goods;
 
-    /**
-     * The price being negotiated.
-     */
+    /** The price being negotiated. */
     private String goldString;
+
 
     /**
      * Create a new <code>BuyPropositionMessage</code>.
@@ -91,6 +84,9 @@ public class BuyPropositionMessage extends DOMMessage {
         this.goldString = element.getAttribute("gold");
     }
 
+
+    // Public interface
+
     /**
      * What is the price currently negotiated for this transaction?
      *
@@ -104,6 +100,7 @@ public class BuyPropositionMessage extends DOMMessage {
         }
     }
 
+
     /**
      * Handle a "buyProposition"-message.
      *
@@ -116,7 +113,7 @@ public class BuyPropositionMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Unit unit;
         try {
@@ -141,12 +138,8 @@ public class BuyPropositionMessage extends DOMMessage {
                 + goods.getId() + " are not in settlement " + settlementId);
         }
  
-        int gold;
-        try {
-            gold = Integer.parseInt(goldString);
-        } catch (NumberFormatException e) {
-            return DOMMessage.clientError("Bad gold: " + goldString);
-        }
+        int gold = getGold();
+        if (gold < 0) return DOMMessage.clientError("Bad gold: " + goldString);
 
         // Proceed to price.
         return server.getInGameController()

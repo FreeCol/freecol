@@ -77,6 +77,7 @@ public class ClaimLandMessage extends DOMMessage {
         this.priceString = element.getAttribute("price");
     }
 
+
     /**
      * Handle a "claimLand"-message.
      *
@@ -88,8 +89,8 @@ public class ClaimLandMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
-        Game game = server.getGame();
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final Game game = server.getGame();
 
         Tile tile = game.getFreeColGameObject(tileId, Tile.class);
         if (tile == null) {
@@ -102,7 +103,8 @@ public class ClaimLandMessage extends DOMMessage {
         } catch (IllegalStateException e) {} // Expected to fail sometimes...
         Settlement settlement = null;
         try {
-            settlement = player.getOurFreeColGameObject(claimantId, Settlement.class);
+            settlement = player.getOurFreeColGameObject(claimantId,
+                                                        Settlement.class);
         } catch (IllegalStateException e) {} // ...as is this one...
         if (unit != null) {
             if (unit.getTile() != tile) {

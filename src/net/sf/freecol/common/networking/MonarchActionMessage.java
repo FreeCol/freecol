@@ -35,16 +35,16 @@ import org.w3c.dom.NodeList;
  */
 public class MonarchActionMessage extends DOMMessage {
 
-    // The monarch action.
+    /** The monarch action. */
     private MonarchAction action;
 
-    // A template describing the action.
+    /** A template describing the action. */
     private StringTemplate template;
 
-    // The tax rate, if appropriate.
+    /** The tax rate, if appropriate. */
     private String tax;
 
-    // Is the offer accepted?  Valid in replies from client.
+    /** Is the offer accepted?  Valid in replies from client. */
     private String resultString;
 
 
@@ -52,8 +52,10 @@ public class MonarchActionMessage extends DOMMessage {
      * Create a new <code>MonarchActionMessage</code> with the given action.
      *
      * @param action The <code>MonarchAction</code> to do.
+     * @param template A <code>StringTemplate</code> describing the action.
      */
-    public MonarchActionMessage(MonarchAction action, StringTemplate template) {
+    public MonarchActionMessage(MonarchAction action,
+                                StringTemplate template) {
         super(getXMLElementTagName());
 
         this.action = action;
@@ -84,6 +86,9 @@ public class MonarchActionMessage extends DOMMessage {
             this.template = null;
         }
     }
+
+
+    // Public interface
 
     /**
      * Gets the monarch action type of this message.
@@ -147,6 +152,7 @@ public class MonarchActionMessage extends DOMMessage {
         return this;
     }
 
+
     /**
      * Handles a "monarchAction"-message.
      *
@@ -158,7 +164,7 @@ public class MonarchActionMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         // Try to resolve the action.
         return server.getInGameController()

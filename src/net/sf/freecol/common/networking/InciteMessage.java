@@ -37,25 +37,18 @@ import org.w3c.dom.Element;
  */
 public class InciteMessage extends DOMMessage {
 
-    /**
-     * The identifier of the unit inciting.
-     */
+    /** The identifier of the unit inciting. */
     private String unitId;
 
-    /**
-     * The direction to the settlement.
-     */
+    /** The direction to the settlement. */
     private String directionString;
 
-    /**
-     * The identifier of the enemy to incite against.
-     */
+    /** The identifier of the enemy to incite against. */
     private String enemyId;
 
-    /**
-     * The amount of gold in the bribe.
-     */
+    /** The amount of gold in the bribe. */
     private String goldString;
+
 
     /**
      * Create a new <code>InciteMessage</code> with the
@@ -67,7 +60,8 @@ public class InciteMessage extends DOMMessage {
      * @param gold The amount of gold in the bribe (negative for the
      *             initial inquiry).
      */
-    public InciteMessage(Unit unit, Direction direction, Player enemy, int gold) {
+    public InciteMessage(Unit unit, Direction direction, Player enemy,
+                         int gold) {
         super(getXMLElementTagName());
 
         this.unitId = unit.getId();
@@ -92,6 +86,7 @@ public class InciteMessage extends DOMMessage {
         this.goldString = element.getAttribute("gold");
     }
 
+
     /**
      * Handle a "incite"-message.
      *
@@ -103,8 +98,8 @@ public class InciteMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
-        Game game = server.getGame();
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final Game game = server.getGame();
 
         Unit unit;
         try {

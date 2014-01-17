@@ -33,15 +33,16 @@ import org.w3c.dom.Element;
  * The message sent to initiate a transaction.
  */
 public class CloseTransactionMessage extends DOMMessage {
-    /**
-     * The object identifier of the unit performing the transaction.
-     */
+
+    /** The object identifier of the unit performing the transaction. */
     private String unitId;
 
     /**
-     * The object identifier of the settlement at which the transaction occurs.
+     * The object identifier of the settlement at which the
+     * transaction occurs.
      */
     private String settlementId;
+
 
     /**
      * Create a new <code>CloseTransactionMessage</code> with the
@@ -72,6 +73,7 @@ public class CloseTransactionMessage extends DOMMessage {
         this.settlementId = element.getAttribute("settlement");
     }
 
+
     /**
      * Handle a "closeTransaction"-message.
      *
@@ -82,7 +84,7 @@ public class CloseTransactionMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Unit unit;
         try {

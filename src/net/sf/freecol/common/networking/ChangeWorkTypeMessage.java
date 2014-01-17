@@ -34,15 +34,12 @@ import org.w3c.dom.Element;
  */
 public class ChangeWorkTypeMessage extends DOMMessage {
 
-    /**
-     * The identifier of the unit that is working.
-     */
+    /** The identifier of the unit that is working. */
     private String unitId;
 
-    /**
-     * The goods type to produce.
-     */
+    /** The goods type to produce. */
     private String workTypeId;
+
 
     /**
      * Create a new <code>ChangeWorkTypeMessage</code> with the
@@ -72,6 +69,7 @@ public class ChangeWorkTypeMessage extends DOMMessage {
         this.workTypeId = element.getAttribute("workType");
     }
 
+
     /**
      * Handle a "changeWorkType"-message.
      *
@@ -83,7 +81,7 @@ public class ChangeWorkTypeMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Unit unit;
         try {

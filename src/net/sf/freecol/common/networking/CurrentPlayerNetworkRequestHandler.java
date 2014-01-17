@@ -32,9 +32,10 @@ import org.w3c.dom.Element;
 
 /**
  * A network request handler for the current player will automatically
- * return an error (&quot;not your turn&quot;) if called by a connection
- * other than that of the currently active player. If no game is active or
- * if the player is unknown the same error is returned.
+ * return an error (&quot;not your turn&quot;) if called by a
+ * connection other than that of the currently active player. If no
+ * game is active or if the player is unknown the same error is
+ * returned.
  */
 public abstract class CurrentPlayerNetworkRequestHandler
     extends FreeColServerHolder implements NetworkRequestHandler {
@@ -53,7 +54,7 @@ public abstract class CurrentPlayerNetworkRequestHandler
     /**
      * Check if a player is the current player.
      * 
-     * @param player The player.
+     * @param player The <code>Player</code> to check.
      * @return true if a game is active and the player is the current one.
      */
     private boolean isCurrentPlayer(Player player) {
@@ -78,10 +79,10 @@ public abstract class CurrentPlayerNetworkRequestHandler
     /**
      * Handle a request for the current player.
      * 
-     * @param player The player.
-     * @param conn The connection.
-     * @param element The element with the request.
-     * @return answer element, may be null.
+     * @param player The requesting <code>Player</code>.
+     * @param conn The <code>Connection</code> the request originates from.
+     * @param element The <code>Element</code> with the request.
+     * @return An answerering <code>Element</code>, which may be null.
      */
     protected abstract Element handle(Player player, Connection conn,
                                       Element element);

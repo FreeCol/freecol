@@ -36,15 +36,12 @@ import org.w3c.dom.Element;
  */
 public class DeclineMoundsMessage extends DOMMessage {
 
-    /**
-     * The identifier of the unit that is exploring.
-     */
+    /** The identifier of the unit that is exploring. */
     private String unitId;
 
-    /**
-     * The direction of exploration.
-     */
+    /** The direction of exploration. */
     private String directionString;
+
 
     /**
      * Create a new <code>DeclineMoundsMessage</code> with the
@@ -74,6 +71,7 @@ public class DeclineMoundsMessage extends DOMMessage {
         this.directionString = element.getAttribute("direction");
     }
 
+
     /**
      * Handle a "declineMounds"-message.
      *
@@ -85,7 +83,7 @@ public class DeclineMoundsMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Unit unit;
         try {

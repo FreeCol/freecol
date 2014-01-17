@@ -82,6 +82,9 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
         foundingFatherId = element.getAttribute("foundingFather");
     }
 
+
+    // Public interface
+
     public FoundingFather getFather(Game game) {
         return (foundingFatherId == null) ? null
             : game.getSpecification().getFoundingFather(this.foundingFatherId);
@@ -100,6 +103,7 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
         this.foundingFatherId = (ff == null) ? null : ff.getId();
         return this;
     }
+
 
     /**
      * Handle a "chooseFoundingFather"-message.

@@ -34,15 +34,12 @@ import org.w3c.dom.Element;
  */
 public class AssignTeacherMessage extends DOMMessage {
 
-    /**
-     * The identifier of the student.
-     */
+    /** The identifier of the student. */
     private String studentId;
 
-    /**
-     * The identifier of the teacher.
-     */
+    /** The identifier of the teacher. */
     private String teacherId;
+
 
     /**
      * Create a new <code>AssignTeacherMessage</code> with the
@@ -72,6 +69,7 @@ public class AssignTeacherMessage extends DOMMessage {
         this.teacherId = element.getAttribute("teacher");
     }
 
+
     /**
      * Handle a "assignTeacher"-message.
      *
@@ -83,7 +81,7 @@ public class AssignTeacherMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Unit student;
         try {

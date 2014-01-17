@@ -34,20 +34,15 @@ import org.w3c.dom.Element;
  */
 public class BuyGoodsMessage extends DOMMessage {
 
-    /**
-     * The identifier of the carrier to load to goods onto.
-     */
+    /** The identifier of the carrier to load to goods onto. */
     private String carrierId;
 
-    /**
-     * The identifier of the type of goods to buy.
-     */
+    /** The identifier of the type of goods to buy. */
     private String goodsTypeId;
 
-    /**
-     * The amount of goods to buy.
-     */
+    /** The amount of goods to buy. */
     private String amountString;
+
 
     /**
      * Create a new <code>BuyGoodsMessage</code>.
@@ -79,6 +74,7 @@ public class BuyGoodsMessage extends DOMMessage {
         this.amountString = element.getAttribute("amount");
     }
 
+
     /**
      * Handle a "buyGoods"-message.
      *
@@ -90,7 +86,7 @@ public class BuyGoodsMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Unit carrier;
         try {

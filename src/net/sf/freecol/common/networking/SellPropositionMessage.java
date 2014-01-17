@@ -36,25 +36,18 @@ import org.w3c.dom.Element;
  */
 public class SellPropositionMessage extends DOMMessage {
 
-    /**
-     * The object identifier of the unit that is selling.
-     */
+    /** The object identifier of the unit that is selling. */
     private String unitId;
 
-    /**
-     * The object identifier of the settlement that is buying.
-     */
+    /** The object identifier of the settlement that is buying. */
     private String settlementId;
 
-    /**
-     * The goods to be sold.
-     */
+    /** The goods to be sold. */
     private Goods goods;
 
-    /**
-     * The price being negotiated.
-     */
+    /** The price being negotiated. */
     private String goldString;
+
 
     /**
      * Create a new <code>SellPropositionMessage</code>.
@@ -90,6 +83,9 @@ public class SellPropositionMessage extends DOMMessage {
             DOMMessage.getChildElement(element, Goods.getXMLElementTagName()));
     }
 
+
+    // Public interface
+
     /**
      * What is the price currently negotiated for this transaction?
      *
@@ -103,6 +99,7 @@ public class SellPropositionMessage extends DOMMessage {
         }
     }
 
+
     /**
      * Handle a "sellProposition"-message.
      *
@@ -114,7 +111,7 @@ public class SellPropositionMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Unit unit;
         try {
@@ -136,12 +133,8 @@ public class SellPropositionMessage extends DOMMessage {
                 + goods.getId() + " are not with unit " + unitId);
         }
 
-        int gold;
-        try {
-            gold = Integer.parseInt(goldString);
-        } catch (NumberFormatException e) {
-            return DOMMessage.clientError("Bad gold: " + goldString);
-        }
+        int gold = getGold();
+        if (gold < 0) return DOMMessage.clientError("Bad gold: " + goldString);
 
         // Proceed to price.
         return server.getInGameController()

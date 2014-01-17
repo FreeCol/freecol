@@ -69,14 +69,17 @@ public class NewLandNameMessage extends DOMMessage {
         this.newLandName = element.getAttribute("newLandName");
     }
 
+
+    // Public interface
+
     /**
      * Public accessor for the unit.
      *
-     * @param game The <code>Game</code> to look for a unit in.
-     * @return The unit of this message.
+     * @param player The <code>Player</code> who owns the unit.
+     * @return The <code>Unit</code> of this message.
      */
-    public Unit getUnit(Game game) {
-        return game.getFreeColGameObject(unitId, Unit.class);
+    public Unit getUnit(Player player) {
+        return player.getOurFreeColGameObject(unitId, Unit.class);
     }
 
     /**
@@ -100,12 +103,12 @@ public class NewLandNameMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        Game game = server.getGame();
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final Game game = server.getGame();
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(unitId, Unit.class);
+            unit = getUnit(player);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }

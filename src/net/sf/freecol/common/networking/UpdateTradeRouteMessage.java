@@ -32,10 +32,9 @@ import org.w3c.dom.Element;
  */
 public class UpdateTradeRouteMessage extends DOMMessage {
 
-    /**
-     * The trade route to update.
-     */
+    /** The trade route to update. */
     private TradeRoute tradeRoute;
+
 
     /**
      * Create a new <code>UpdateTradeRouteMessage</code> with the
@@ -64,6 +63,7 @@ public class UpdateTradeRouteMessage extends DOMMessage {
                   (Element) element.getChildNodes().item(0));
     }
 
+
     /**
      * Handle a "updateTradeRoute"-message.
      *
@@ -74,7 +74,7 @@ public class UpdateTradeRouteMessage extends DOMMessage {
      *         or an error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         if (tradeRoute == null || tradeRoute.getId() == null
             || !SetTradeRoutesMessage.hasPrefix(tradeRoute)) {
@@ -84,7 +84,8 @@ public class UpdateTradeRouteMessage extends DOMMessage {
         String id = SetTradeRoutesMessage.removePrefix(tradeRoute);
         TradeRoute realRoute;
         try {
-            realRoute = serverPlayer.getOurFreeColGameObject(id, TradeRoute.class);
+            realRoute = serverPlayer.getOurFreeColGameObject(id, 
+                TradeRoute.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }

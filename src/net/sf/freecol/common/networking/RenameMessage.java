@@ -34,15 +34,12 @@ import org.w3c.dom.Element;
  */
 public class RenameMessage extends DOMMessage {
 
-    /**
-     * The identifier of the object to be renamed.
-     */
+    /** The identifier of the object to be renamed. */
     private String id;
 
-    /**
-     * The new name.
-     */
+    /** The new name. */
     private String newName;
+
 
     /**
      * Create a new <code>RenameMessage</code> with the
@@ -72,6 +69,7 @@ public class RenameMessage extends DOMMessage {
         this.newName = element.getAttribute("name");
     }
 
+
     /**
      * Handle a "rename"-message.
      *
@@ -84,7 +82,7 @@ public class RenameMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         FreeColGameObject fcgo;
         try {

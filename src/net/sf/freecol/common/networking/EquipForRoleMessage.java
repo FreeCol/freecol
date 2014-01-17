@@ -67,6 +67,7 @@ public class EquipForRoleMessage extends DOMMessage {
         this.roleId = element.getAttribute("role");
     }
 
+
     /**
      * Handle a "equipForRole"-message.
      *
@@ -78,8 +79,8 @@ public class EquipForRoleMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
-        Game game = server.getGame();
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final Game game = server.getGame();
 
         Unit unit;
         try {

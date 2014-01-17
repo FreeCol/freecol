@@ -33,10 +33,9 @@ import org.w3c.dom.Element;
  */
 public class PayArrearsMessage extends DOMMessage {
 
-    /**
-     * The identifier of the GoodsType to pay arrears for.
-     */
+    /** The identifier of the GoodsType to pay arrears for. */
     private String goodsTypeId;
+
 
     /**
      * Create a new <code>PayArrearsMessage</code> with the
@@ -63,6 +62,7 @@ public class PayArrearsMessage extends DOMMessage {
         this.goodsTypeId = element.getAttribute("goodsType");
     }
 
+
     /**
      * Handle a "payArrears"-message.
      *
@@ -75,7 +75,7 @@ public class PayArrearsMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
         GoodsType goodsType = server.getSpecification()
             .getGoodsType(goodsTypeId);
 

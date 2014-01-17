@@ -83,6 +83,9 @@ public class NewRegionNameMessage extends DOMMessage {
         this.newRegionName = element.getAttribute("newRegionName");
     }
 
+
+    // Public interface
+
     /**
      * Public accessor for the region.
      *
@@ -106,11 +109,11 @@ public class NewRegionNameMessage extends DOMMessage {
     /**
      * Public accessor for the unit.
      *
-     * @param game The <code>Game</code> to look for a tile in.
-     * @return The unit of this message.
+     * @param player The <code>Player</code> who owns the unit.
+     * @return The <code>Unit</code> of this message.
      */
-    public Unit getUnit(Game game) {
-        return game.getFreeColGameObject(unitId, Unit.class);
+    public Unit getUnit(Player player) {
+        return player.getOurFreeColGameObject(unitId, Unit.class);
     }
 
     /**
@@ -133,21 +136,21 @@ public class NewRegionNameMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        Game game = server.getGame();
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final Game game = server.getGame();
 
         Tile tile = getTile(game);
         if (!serverPlayer.hasExplored(tile)) {
             return DOMMessage.clientError("Can not claim discovery in unexplored tile: " + tileId);
         }
 
-        Unit unit = getUnit(game);
-        if (unit == null) {
-            return DOMMessage.clientError("Null discovering unit: " + unitId);
-        } else if (!player.owns(unit)) {
-            return DOMMessage.clientError("Player " + player.getId()
-                + " does not own discovering unit: " + unitId);
-        } else if (unit.getTile() != tile) {
+        Unit unit;
+        try {
+            unit = getUnit(player);
+        } catch (Exception e) {
+            return DOMMessage.clientError(e.getMessage());
+        }
+        if (unit.getTile() != tile) {
             return DOMMessage.clientError("Discovering unit " + unitId
                 + " is not at tile: " + tileId);
         }

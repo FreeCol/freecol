@@ -41,19 +41,13 @@ import org.w3c.dom.NodeList;
  */
 public class GoodsForSaleMessage extends DOMMessage {
 
-    /**
-     * The identifier of the unit that is trading.
-     */
+    /** The identifier of the unit that is trading. */
     private String unitId;
 
-    /**
-     * The identifier of the settlement that is trading.
-     */
+    /** The identifier of the settlement that is trading. */
     private String settlementId;
 
-    /**
-     * The list of goods for sale.
-     */
+    /** The list of goods for sale. */
     private List<Goods> sellGoods;
 
 
@@ -93,6 +87,14 @@ public class GoodsForSaleMessage extends DOMMessage {
         }
     }
 
+
+    // Public interface
+
+    public List<Goods> getGoods() {
+        return this.sellGoods;
+    }
+
+
     /**
      * Handle a "goodsForSale"-message.
      *
@@ -105,7 +107,7 @@ public class GoodsForSaleMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Unit unit;
         try {

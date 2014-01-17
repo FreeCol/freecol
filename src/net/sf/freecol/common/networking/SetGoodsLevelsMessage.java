@@ -34,15 +34,12 @@ import org.w3c.dom.Element;
  */
 public class SetGoodsLevelsMessage extends DOMMessage {
 
-    /**
-     * The identifier of the colony where the goods levels are set.
-     */
+    /** The identifier of the colony where the goods levels are set. */
     private String colonyId;
 
-    /**
-     * The new ExportData.
-     */
+    /** The new ExportData. */
     private ExportData data;
+
 
     /**
      * Create a new <code>SetGoodsLevelsMessage</code> with the
@@ -72,6 +69,7 @@ public class SetGoodsLevelsMessage extends DOMMessage {
         data = new ExportData((Element)element.getChildNodes().item(0));
     }
 
+
     /**
      * Handle a "setGoodsLevels"-message.
      *
@@ -83,7 +81,7 @@ public class SetGoodsLevelsMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-       ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Colony colony;
         try {

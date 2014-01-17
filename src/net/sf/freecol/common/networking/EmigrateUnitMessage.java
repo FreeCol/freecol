@@ -35,10 +35,9 @@ import org.w3c.dom.Element;
  */
 public class EmigrateUnitMessage extends DOMMessage {
 
-    /**
-     * The slot from which to select the unit.
-     */
+    /** The slot from which to select the unit. */
     private String slotString;
+
 
     /**
      * Create a new <code>EmigrateUnitMessage</code> with the supplied slot.
@@ -63,6 +62,7 @@ public class EmigrateUnitMessage extends DOMMessage {
         this.slotString = element.getAttribute("slot");
     }
 
+
     /**
      * Handle a "emigrateUnit"-message.
      *
@@ -74,7 +74,7 @@ public class EmigrateUnitMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Europe europe = player.getEurope();
         if (europe == null) {

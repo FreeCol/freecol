@@ -37,19 +37,13 @@ import org.w3c.dom.Element;
  */
 public class EmbarkMessage extends DOMMessage {
 
-    /**
-     * The identifier of the unit embarking.
-     */
+    /** The identifier of the unit embarking. */
     private String unitId;
 
-    /**
-     * The identifier of the carrier to embark onto.
-     */
+    /** The identifier of the carrier to embark onto. */
     private String carrierId;
 
-    /**
-     * An optional direction for the unit to move to find the carrier.
-     */
+    /** An optional direction for the unit to move to find the carrier. */
     private String directionString;
 
 
@@ -86,6 +80,7 @@ public class EmbarkMessage extends DOMMessage {
             : element.getAttribute("direction");
     }
 
+
     /**
      * Handle a "embark"-message.
      *
@@ -97,7 +92,7 @@ public class EmbarkMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Unit unit;
         try {

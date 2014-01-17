@@ -33,10 +33,9 @@ import org.w3c.dom.Element;
  */
 public class DisembarkMessage extends DOMMessage {
 
-    /**
-     * The identifier of the object disembarking.
-     */
+    /** The identifier of the object disembarking. */
     private String unitId;
+
 
     /**
      * Create a new <code>DisembarkMessage</code> with the
@@ -63,6 +62,7 @@ public class DisembarkMessage extends DOMMessage {
         this.unitId = element.getAttribute("unit");
     }
 
+
     /**
      * Handle a "disembark"-message.
      *
@@ -74,7 +74,7 @@ public class DisembarkMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Unit unit;
         try {

@@ -34,15 +34,12 @@ import org.w3c.dom.Element;
  */
 public class MoveToMessage extends DOMMessage {
 
-    /**
-     * The identifier of the object to be moved.
-     */
+    /** The identifier of the object to be moved. */
     private String unitId;
 
-    /**
-     * The identifier of the destination to be moved to.
-     */
+    /** The identifier of the destination to be moved to. */
     private String destinationId;
+
 
     /**
      * Create a new <code>MoveToMessage</code> for the supplied unit
@@ -72,6 +69,7 @@ public class MoveToMessage extends DOMMessage {
         this.destinationId = element.getAttribute("destination");
     }
 
+
     /**
      * Handle a "moveTo"-message.
      *
@@ -83,8 +81,8 @@ public class MoveToMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
-        Game game = player.getGame();
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final Game game = player.getGame();
 
         Unit unit;
         try {

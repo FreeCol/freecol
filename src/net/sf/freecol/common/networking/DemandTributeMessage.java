@@ -73,6 +73,7 @@ public class DemandTributeMessage extends DOMMessage {
         this.directionString = element.getAttribute("direction");
     }
 
+
     /**
      * Handle a "demandTribute"-message.
      *
@@ -84,7 +85,7 @@ public class DemandTributeMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Unit unit;
         try {
@@ -96,8 +97,8 @@ public class DemandTributeMessage extends DOMMessage {
             || unit.hasAbility(Ability.DEMAND_TRIBUTE)) {
             ; // ok
         } else {
-            return DOMMessage.clientError("Unit is neither armed nor able to demand tribute: "
-                + unitId);
+            return DOMMessage.clientError("Unit is neither armed"
+                + " nor able to demand tribute: " + unitId);
         }
 
         Tile tile;

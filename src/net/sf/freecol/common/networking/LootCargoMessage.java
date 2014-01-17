@@ -39,20 +39,15 @@ import org.w3c.dom.NodeList;
  */
 public class LootCargoMessage extends DOMMessage {
 
-    /**
-     * The object identifier of the unit that is looting.
-     */
+    /** The object identifier of the unit that is looting. */
     private String winnerId;
 
-    /**
-     * The object identifier of the unit that is looted.
-     */
+    /** The object identifier of the unit that is looted. */
     private String loserId;
 
-    /**
-     * The goods to be looted.
-     */
+    /** The goods to be looted. */
     private List<Goods> goods;
+
 
     /**
      * Create a new <code>LootCargoMessage</code>.
@@ -92,12 +87,15 @@ public class LootCargoMessage extends DOMMessage {
         }
     }
 
+
+    // Public interface
+
     /**
      * Public accessor to help the client igc.
      *
      * @return The winner unit.
      */
-    public Unit getUnit(Game game) {
+    public Unit getUnit(Game game) throws ClassCastException {
         return game.getFreeColGameObject(winnerId, Unit.class);
     }
 
@@ -119,6 +117,7 @@ public class LootCargoMessage extends DOMMessage {
         return goods;
     }
 
+
     /**
      * Handle a "lootCargo"-message.
      *
@@ -129,11 +128,12 @@ public class LootCargoMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final Game game = server.getGame();
 
         Unit winner;
         try {
-            winner = player.getOurFreeColGameObject(winnerId, Unit.class);
+            winner = getUnit(game);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }

@@ -34,15 +34,15 @@ import org.w3c.dom.Element;
  */
 public class GetTransactionMessage extends DOMMessage {
 
-    /**
-     * The object identifier of the unit performing the transaction.
-     */
+    /** The object identifier of the unit performing the transaction. */
     private String unitId;
 
     /**
-     * The object identifier of the settlement at which the transaction occurs.
+     * The object identifier of the settlement at which the
+     * transaction occurs.
      */
     private String settlementId;
+
 
     /**
      * Create a new <code>GetTransactionMessage</code> with the
@@ -73,6 +73,7 @@ public class GetTransactionMessage extends DOMMessage {
         this.settlementId = element.getAttribute("settlement");
     }
 
+
     /**
      * Handle a "getTransaction"-message.
      *
@@ -84,7 +85,7 @@ public class GetTransactionMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Unit unit;
         try {

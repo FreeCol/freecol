@@ -73,6 +73,7 @@ public class ScoutIndianSettlementMessage extends DOMMessage {
         this.directionString = element.getAttribute("direction");
     }
 
+
     /**
      * Handle a "scoutIndianSettlement"-message.
      *
@@ -84,7 +85,7 @@ public class ScoutIndianSettlementMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Unit unit;
         try {
@@ -93,7 +94,8 @@ public class ScoutIndianSettlementMessage extends DOMMessage {
             return DOMMessage.clientError(e.getMessage());
         }
         if (!unit.hasAbility(Ability.SCOUT_INDIAN_SETTLEMENT)) {
-            return DOMMessage.clientError("Unit lacks ability to scout native settlement: " + unitId);
+            return DOMMessage.clientError("Unit lacks ability"
+                + " to scout native settlement: " + unitId);
         }
 
         Tile tile;

@@ -37,15 +37,12 @@ import org.w3c.dom.Element;
  */
 public class ChangeWorkImprovementTypeMessage extends DOMMessage {
 
-    /**
-     * The identifier of the unit that is working.
-     */
+    /** The identifier of the unit that is working. */
     private String unitId;
 
-    /**
-     * The identifier of the improvement type.
-     */
+    /** The identifier of the improvement type. */
     private String improvementId;
+
 
     /**
      * Create a new <code>ChangeWorkImprovementTypeMessage</code> with the
@@ -76,6 +73,7 @@ public class ChangeWorkImprovementTypeMessage extends DOMMessage {
         this.improvementId = element.getAttribute("improvementType");
     }
 
+
     /**
      * Handle a "changeWorkImprovementType"-message.
      *
@@ -87,7 +85,7 @@ public class ChangeWorkImprovementTypeMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Unit unit;
         try {

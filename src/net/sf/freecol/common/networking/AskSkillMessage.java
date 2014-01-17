@@ -37,15 +37,12 @@ import org.w3c.dom.Element;
  */
 public class AskSkillMessage extends DOMMessage {
 
-    /**
-     * The identifier of the unit that is asking.
-     */
+    /** The identifier of the unit that is asking. */
     private String unitId;
 
-    /**
-     * The direction the unit is asking in.
-     */
+    /** The direction the unit is asking in. */
     private String directionString;
+
 
     /**
      * Create a new <code>AskSkillMessage</code> with the
@@ -75,6 +72,7 @@ public class AskSkillMessage extends DOMMessage {
         this.directionString = element.getAttribute("direction");
     }
 
+
     /**
      * Handle a "askSkill"-message.
      *
@@ -87,7 +85,8 @@ public class AskSkillMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
+
         Unit unit;
         try {
             unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);

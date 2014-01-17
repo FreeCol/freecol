@@ -41,9 +41,7 @@ public class SetTradeRoutesMessage extends DOMMessage {
 
     private static final String idPrefix = "shadow-";
 
-    /**
-     * The trade routes to set.
-     */
+    /** The trade routes to set. */
     private List<TradeRoute> tradeRoutes;
 
 
@@ -78,6 +76,9 @@ public class SetTradeRoutesMessage extends DOMMessage {
         }
         this.tradeRoutes = newRoutes;
     }
+
+
+    // Public interface
 
     /**
      * Creates a trade route from an element.  Be careful not to allow
@@ -114,6 +115,7 @@ public class SetTradeRoutesMessage extends DOMMessage {
         return idPrefix.equals(getPrefix(route));
     }
 
+
     /**
      * Handle a "setTradeRoutes"-message.
      *
@@ -122,8 +124,8 @@ public class SetTradeRoutesMessage extends DOMMessage {
      * @return Null, or an error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
-        Game game = server.getGame();
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final Game game = server.getGame();
 
         String errors = "";
         for (TradeRoute tradeRoute : tradeRoutes) {
@@ -134,7 +136,8 @@ public class SetTradeRoutesMessage extends DOMMessage {
             String id = removePrefix(tradeRoute);
             TradeRoute realRoute;
             try {
-                realRoute = serverPlayer.getOurFreeColGameObject(id, TradeRoute.class);
+                realRoute = serverPlayer.getOurFreeColGameObject(id,
+                    TradeRoute.class);
             } catch (Exception e) {
                 errors += e.getMessage() + ". ";
                 continue;

@@ -90,6 +90,9 @@ public class IndianDemandMessage extends DOMMessage {
         this.result = element.getAttribute("result");
     }
 
+
+    // Public interface
+
     /**
      * Client-side convenience function to get the unit in this message.
      *
@@ -144,6 +147,7 @@ public class IndianDemandMessage extends DOMMessage {
         this.result = Boolean.toString(result);
     }
 
+
     /**
      * Handle a "indianDemand"-message.
      *
@@ -155,8 +159,8 @@ public class IndianDemandMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
-        Game game = player.getGame();
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final Game game = player.getGame();
 
         Unit unit;
         try {

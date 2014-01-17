@@ -33,15 +33,12 @@ import org.w3c.dom.Element;
  */
 public class AssignTradeRouteMessage extends DOMMessage {
 
-    /**
-     * The identifier of the unit.
-     */
+    /** The identifier of the unit. */
     private String unitId;
 
-    /**
-     * The identifier of the trade route.
-     */
+    /** The identifier of the trade route. */
     private String tradeRouteId;
+
 
     /**
      * Create a new <code>AssignTradeRouteMessage</code> with the
@@ -73,6 +70,7 @@ public class AssignTradeRouteMessage extends DOMMessage {
             : null;
     }
 
+
     /**
      * Handle a "assignTradeRoute"-message.
      *
@@ -82,7 +80,7 @@ public class AssignTradeRouteMessage extends DOMMessage {
      *     error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Unit unit;
         try {

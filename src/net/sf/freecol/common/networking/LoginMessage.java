@@ -118,7 +118,8 @@ public class LoginMessage extends DOMMessage {
             : new Game((Element)children.item(0), this.userName);
     }
 
-    // Simple public accessors.
+
+    // Public interface
 
     public String getUserName() {
         return userName;
@@ -153,6 +154,7 @@ public class LoginMessage extends DOMMessage {
         return game;
     }
 
+
     /**
      * Handle a "login"-message.
      * This is actually done in PreGameController.
@@ -182,7 +184,8 @@ public class LoginMessage extends DOMMessage {
             "singlePlayer", Boolean.toString(singlePlayer),
             "currentPlayer", Boolean.toString(currentPlayer),
             "activeUnit", activeUnitId);
-        result.appendChild(game.toXMLElement(result.getOwnerDocument(), player));
+        result.appendChild(game.toXMLElement(result.getOwnerDocument(), 
+                                             player));
         return result;
     }
 

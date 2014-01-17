@@ -34,15 +34,12 @@ import org.w3c.dom.Element;
  */
 public class LoadCargoMessage extends DOMMessage {
 
-    /**
-     * The goods to be loaded.
-     */
+    /** The goods to be loaded. */
     private Goods goods;
 
-    /**
-     * The identifier of the carrier.
-     */
+    /** The identifier of the carrier. */
     private String carrierId;
+
 
     /**
      * Create a new <code>LoadCargoMessage</code> with the
@@ -69,8 +66,9 @@ public class LoadCargoMessage extends DOMMessage {
         super(getXMLElementTagName());
 
         this.carrierId = element.getAttribute("carrier");
-        this.goods = new Goods(game, (Element) element.getChildNodes().item(0));
+        this.goods = new Goods(game, (Element)element.getChildNodes().item(0));
     }
+
 
     /**
      * Handle a "loadCargo"-message.
@@ -83,7 +81,7 @@ public class LoadCargoMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Unit unit;
         try {

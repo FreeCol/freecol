@@ -34,15 +34,12 @@ import org.w3c.dom.Element;
  */
 public class ChangeStateMessage extends DOMMessage {
 
-    /**
-     * The identifier of the unit to change.
-     */
+    /** The identifier of the unit to change. */
     private String unitId;
 
-    /**
-     * The state as a string.
-     */
+    /** The state as a string. */
     private String stateString;
+
 
     /**
      * Create a new <code>ChangeStateMessage</code> with the
@@ -72,6 +69,7 @@ public class ChangeStateMessage extends DOMMessage {
         this.stateString = element.getAttribute("state");
     }
 
+
     /**
      * Handle a "changeState"-message.
      *
@@ -83,7 +81,7 @@ public class ChangeStateMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Unit unit;
         try {

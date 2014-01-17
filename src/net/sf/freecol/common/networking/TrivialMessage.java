@@ -25,10 +25,16 @@ import java.io.IOException;
 import org.w3c.dom.Element;
 
 
-/** A trivial message.  That is, it contains only simple string attributes. */
+/**
+ * A trivial message.  That is, it contains only simple string
+ * attributes.
+ */
 class TrivialMessage extends DOMMessage {
 
+    /** The tag for the trivial message. */
     private String tag;
+
+    /** An array of (attribute,value) pairs. */
     private String[] attributes;
 
 

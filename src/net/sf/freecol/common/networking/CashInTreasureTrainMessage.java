@@ -33,10 +33,9 @@ import org.w3c.dom.Element;
  */
 public class CashInTreasureTrainMessage extends DOMMessage {
 
-    /**
-     * The identifier of the object to be cashed in.
-     */
+    /** The identifier of the treasure train unit. */
     private String unitId;
+
 
     /**
      * Create a new <code>CashInTreasureTrainMessage</code> with the
@@ -63,6 +62,7 @@ public class CashInTreasureTrainMessage extends DOMMessage {
         this.unitId = element.getAttribute("unit");
     }
 
+
     /**
      * Handle a "cashInTreasureTrain"-message.
      *
@@ -74,7 +74,7 @@ public class CashInTreasureTrainMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Unit unit;
         try {

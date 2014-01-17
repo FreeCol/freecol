@@ -32,10 +32,9 @@ import org.w3c.dom.Element;
  */
 public class UpdateCurrentStopMessage extends DOMMessage {
 
-    /**
-     * The identifier of the unit whose stop is to be updated.
-     */
+    /** The identifier of the unit whose stop is to be updated. */
     private String unitId;
+
 
     /**
      * Create a new <code>UpdateCurrentStopMessage</code> for the
@@ -62,6 +61,7 @@ public class UpdateCurrentStopMessage extends DOMMessage {
         this.unitId = element.getAttribute("unit");
     }
 
+
     /**
      * Handle a "updateCurrentStop"-message.
      *
@@ -71,7 +71,7 @@ public class UpdateCurrentStopMessage extends DOMMessage {
      *     current stop, or an error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Unit unit;
         try {

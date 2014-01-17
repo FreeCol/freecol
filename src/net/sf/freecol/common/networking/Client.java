@@ -42,7 +42,10 @@ public final class Client {
      */
     private final Connection c;
 
+    /** The host to connect to. */
     private String host;
+
+    /** The port to connect to. */
     private int port;
 
 
@@ -51,10 +54,10 @@ public final class Client {
      *
      * @param host The host to connect to.
      * @param port The port to connect to.
-     * @param handler The MessageHandler to use.
+     * @param handler The <code>MessageHandler<code> to use.
      * @param name The name for the connection.
-     * @throws IOException If an exception is thrown while creating
-     *         a new {@link Connection}.
+     * @exception IOException If an exception is thrown while creating
+     *     a new {@link Connection}.
      */
     public Client(String host, int port, MessageHandler handler, String name)
         throws IOException {
@@ -63,8 +66,10 @@ public final class Client {
         c = new Connection(host, port, handler, name);
     }
 
+
     /**
      * Gets the host used by the connection.
+     *
      * Used in reconnect.
      *
      * @return The host.
@@ -75,6 +80,7 @@ public final class Client {
     
     /**
      * Gets the port used by the connection.
+     *
      * Used in reconnect.
      *
      * @return The port.
@@ -84,10 +90,10 @@ public final class Client {
     }
     
     /**
-     * Gets the <code>Connection</code> this <code>Client</code> uses when
-     * communicating with the server.
+     * Gets the <code>Connection</code> this <code>Client</code> uses
+     * when communicating with the server.
      *
-     * @return The {@link Connection}.
+     * @return The <code>Connection</code>.
      */
     public Connection getConnection() {
         return c;
@@ -203,7 +209,8 @@ public final class Client {
             try {
                 c.getMessageHandler().handle(c, reply);
             } catch (FreeColException e) {
-                logger.log(Level.WARNING, "Could not handle reply: " + reply, e);
+                logger.log(Level.WARNING, "Could not handle reply: " + reply,
+                           e);
             }
         }
     }

@@ -35,25 +35,19 @@ import org.w3c.dom.Element;
  * The message sent when purchasing at an IndianSettlement.
  */
 public class BuyMessage extends DOMMessage {
-    /**
-     * The object identifier of the unit that is buying.
-     */
+
+    /** The object identifier of the unit that is buying. */
     private String unitId;
 
-    /**
-     * The object identifier of the settlement that is selling.
-     */
+    /** The object identifier of the settlement that is selling. */
     private String settlementId;
 
-    /**
-     * The goods to be bought.
-     */
+    /** The goods to be bought. */
     private Goods goods;
 
-    /**
-     * The price to pay.
-     */
+    /** The price to pay. */
     private String goldString;
+
 
     /**
      * Create a new <code>BuyMessage</code>.
@@ -63,7 +57,8 @@ public class BuyMessage extends DOMMessage {
      * @param goods The <code>Goods</code> to buy.
      * @param gold The price of the goods.
      */
-    public BuyMessage(Unit unit, Settlement settlement, Goods goods, int gold) {
+    public BuyMessage(Unit unit, Settlement settlement, Goods goods,
+                      int gold) {
         super(getXMLElementTagName());
 
         this.unitId = unit.getId();
@@ -89,6 +84,23 @@ public class BuyMessage extends DOMMessage {
         this.goldString = element.getAttribute("gold");
     }
 
+
+    // Public interface
+
+    /**
+     * What is the price currently negotiated for this transaction?
+     *
+     * @return The current price.
+     */
+    public int getGold() {
+        try {
+            return Integer.parseInt(goldString);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+
+
     /**
      * Handle a "buy"-message.
      *
@@ -100,7 +112,7 @@ public class BuyMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Unit unit;
         try {
@@ -115,18 +127,15 @@ public class BuyMessage extends DOMMessage {
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
+
         // Make sure we are trying to buy something that is there
         if (goods.getLocation() != settlement) {
             return DOMMessage.createError("server.trade.noGoods", "Goods "
                 + goods.getId() + " is not at settlement " + settlementId);
         }
 
-        int gold;
-        try {
-            gold = Integer.parseInt(goldString);
-        } catch (NumberFormatException e) {
-            return DOMMessage.clientError("Bad gold: " + goldString);
-        }
+        int gold = getGold();
+        if (gold < 0) return DOMMessage.clientError("Bad gold: " + goldString);
 
         // Try to buy.
         return server.getInGameController()

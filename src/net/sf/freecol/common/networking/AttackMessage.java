@@ -36,15 +36,12 @@ import org.w3c.dom.Element;
  */
 public class AttackMessage extends DOMMessage {
 
-    /**
-     * The identifier of the attacker.
-     */
+    /** The identifier of the attacker. */
     private String unitId;
 
-    /**
-     * The direction to attack.
-     */
+    /** The direction to attack. */
     private String directionString;
+
 
     /**
      * Create a new <code>AttackMessage</code> for the supplied unit and
@@ -74,6 +71,7 @@ public class AttackMessage extends DOMMessage {
         this.directionString = element.getAttribute("direction");
     }
 
+
     /**
      * Handle a "attack"-message.
      *
@@ -85,7 +83,7 @@ public class AttackMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
         
         Unit unit;
         try {

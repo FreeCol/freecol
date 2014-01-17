@@ -36,25 +36,18 @@ import org.w3c.dom.Element;
  */
 public class SellMessage extends DOMMessage {
 
-    /**
-     * The object identifier of the unit that is selling.
-     */
+    /** The object identifier of the unit that is selling. */
     private String unitId;
 
-    /**
-     * The object identifier of the settlement that is buying.
-     */
+    /** The object identifier of the settlement that is buying. */
     private String settlementId;
 
-    /**
-     * The goods to be sold.
-     */
+    /** The goods to be sold. */
     private Goods goods;
 
-    /**
-     * The sale price.
-     */
+    /** The sale price. */
     private String goldString;
+
 
     /**
      * Create a new <code>SellMessage</code>.
@@ -91,6 +84,23 @@ public class SellMessage extends DOMMessage {
         this.goldString = element.getAttribute("gold");
     }
 
+
+    // Public interface
+
+    /**
+     * What is the price currently negotiated for this transaction?
+     *
+     * @return The current price.
+     */
+    public int getGold() {
+        try {
+            return Integer.parseInt(goldString);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+
+
     /**
      * Handle a "sell"-message.
      *
@@ -102,7 +112,7 @@ public class SellMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Unit unit;
         try {
@@ -124,12 +134,8 @@ public class SellMessage extends DOMMessage {
                 + goods.getId() + " is not with unit " + unitId);
         }
 
-        int gold;
-        try {
-            gold = Integer.parseInt(goldString);
-        } catch (NumberFormatException e) {
-            return DOMMessage.clientError("Bad gold: " + goldString);
-        }
+        int gold = getGold();
+        if (gold < 0) return DOMMessage.clientError("Bad gold: " + goldString);
 
         // Proceed to sell
         return server.getInGameController()

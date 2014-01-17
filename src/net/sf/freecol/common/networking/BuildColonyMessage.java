@@ -34,15 +34,11 @@ import org.w3c.dom.Element;
  */
 public class BuildColonyMessage extends DOMMessage {
 
-    /**
-     * The name of the new colony.
-     **/
-    String colonyName;
+    /** The name of the new colony. */
+    private String colonyName;
 
-    /**
-     * The unit that is building the colony.
-     */
-    String builderId;
+    /** The unit that is building the colony. */
+    private String builderId;
 
 
     /**
@@ -72,6 +68,7 @@ public class BuildColonyMessage extends DOMMessage {
         this.builderId = element.getAttribute("unit");
     }
 
+
     /**
      * Handle a "buildColony"-message.
      *
@@ -84,8 +81,8 @@ public class BuildColonyMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        Game game = server.getGame();
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final Game game = server.getGame();
 
         Unit unit;
         try {

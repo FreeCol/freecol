@@ -36,15 +36,13 @@ import org.w3c.dom.Element;
  * The message sent when spying on a settlement.
  */
 public class SpySettlementMessage extends DOMMessage {
-    /**
-     * The identifier of the object doing the spying.
-     */
+
+    /** The identifier of the object doing the spying. */
     private String unitId;
 
-    /**
-     * The direction the spy is looking.
-     */
+    /** The direction the spy is looking. */
     private String directionString;
+
 
     /**
      * Create a new <code>SpySettlementMessage</code> with the
@@ -87,7 +85,7 @@ public class SpySettlementMessage extends DOMMessage {
      *     position, or an error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Unit unit;
         try {
@@ -96,7 +94,8 @@ public class SpySettlementMessage extends DOMMessage {
             return DOMMessage.clientError(e.getMessage());
         }
         if (!unit.hasAbility(Ability.SPY_ON_COLONY)) {
-            return DOMMessage.clientError("Unit lacks ability to spy on colony: " + unitId);
+            return DOMMessage.clientError("Unit lacks ability"
+                + " to spy on colony: " + unitId);
         }
 
         Tile tile;

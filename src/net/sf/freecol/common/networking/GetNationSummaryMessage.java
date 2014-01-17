@@ -34,14 +34,10 @@ import org.w3c.dom.NodeList;
  */
 public class GetNationSummaryMessage extends DOMMessage {
 
-    /**
-     * The identifier of the player to summarize.
-     */
+    /** The identifier of the player to summarize. */
     private String playerId;
 
-    /**
-     * The summary.
-     */
+    /** The summary. */
     private NationSummary summary;
 
 
@@ -73,6 +69,9 @@ public class GetNationSummaryMessage extends DOMMessage {
             : new NationSummary((Element) nodes.item(0));
     }
 
+
+    // Public interface
+
     /**
      * Client side helper to get the summary.
      *
@@ -82,18 +81,19 @@ public class GetNationSummaryMessage extends DOMMessage {
         return summary;
     }
 
+
     /**
      * Handle a "getNationSummary"-message.
      *
      * @param server The <code>FreeColServer</code> handling the message.
      * @param connection The <code>Connection</code> message was received on.
      *
-     * @return An update containing the nation summaries,
-     *         or an error <code>Element</code> on failure.
+     * @return An update containing the nation summaries, or an error
+     *     <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
-        Game game = serverPlayer.getGame();
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final Game game = serverPlayer.getGame();
 
         Player player = game.getFreeColGameObject(playerId, Player.class);
         if (player == null) {

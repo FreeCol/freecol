@@ -152,13 +152,20 @@ public class RearrangeColonyMessage extends DOMMessage {
         super(getXMLElementTagName());
 
         this.colonyId = element.getAttribute("colony");
-        int n = Integer.parseInt(element.getAttribute(FreeColObject.ARRAY_SIZE_TAG));
+        int n;
+        try {
+            n = Integer.parseInt(element.getAttribute(FreeColObject.ARRAY_SIZE_TAG));
+        } catch (NumberFormatException nfe) {
+            n = 0;
+        }
         this.unitChanges = new ArrayList<UnitChange>();
         for (int i = 0; i < n; i++) {
             unitChanges.add(new UnitChange().readFromElement(game, element, i));
         }
     }
 
+
+    // Public interface
 
     /**
      * Are there no changes present?
@@ -181,6 +188,7 @@ public class RearrangeColonyMessage extends DOMMessage {
         unitChanges.add(new UnitChange(unit, loc, work, role));
     }
 
+
     /**
      * Handle a "rearrangeColony"-message.
      *
@@ -192,8 +200,8 @@ public class RearrangeColonyMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        Game game = server.getGame();
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final Game game = server.getGame();
 
         Colony colony;
         try {

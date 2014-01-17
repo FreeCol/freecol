@@ -34,20 +34,16 @@ import org.w3c.dom.Element;
  * The message sent when delivering a gift to a Settlement.
  */
 public class DeliverGiftMessage extends DOMMessage {
-    /**
-     * The object identifier of the unit that is delivering the gift.
-     */
+
+    /** The object identifier of the unit that is delivering the gift. */
     private String unitId;
 
-    /**
-     * The object identifier of the settlement the gift is going to.
-     */
+    /** The object identifier of the settlement the gift is going to. */
     private String settlementId;
 
-    /**
-     * The goods to be delivered.
-     */
+    /** The goods to be delivered. */
     private Goods goods;
+
 
     /**
      * Create a new <code>DeliverGiftMessage</code>.
@@ -80,12 +76,15 @@ public class DeliverGiftMessage extends DOMMessage {
             DOMMessage.getChildElement(element, Goods.getXMLElementTagName()));
     }
 
+
+    // Public interface
+
     /**
-     * Get the <code>Unit</code> which is delivering the gift.
-     * This is a helper routine to be called in-client as it blindly trusts
+     * Get the <code>Unit</code> which is delivering the gift.  This
+     * is a helper routine to be called in-client as it blindly trusts
      * its field.
      *
-     * @return The unit, or null if none.
+     * @return The <code>Unit</code>, or null if none.
      */
     public Unit getUnit() {
         return goods.getGame().getFreeColGameObject(unitId, Unit.class);
@@ -96,7 +95,7 @@ public class DeliverGiftMessage extends DOMMessage {
      * This is a helper routine to be called in-client as it blindly trusts
      * its field.
      *
-     * @return The settlement, or null if none.
+     * @return The <code>Settlement</code>, or null if none.
      */
     public Settlement getSettlement() {
         return goods.getGame().getFreeColGameObject(settlementId,
@@ -104,15 +103,16 @@ public class DeliverGiftMessage extends DOMMessage {
     }
 
     /**
-     * Get the <code>Goods</code> delivered as a gift.
-     * This is a helper routine to be called in-client as it blindly trusts
-     * its field.
+     * Get the <code>Goods</code> delivered as a gift.  This is a
+     * helper routine to be called in-client as it blindly trusts its
+     * field.
      *
-     * @return The goods, or null if none.
+     * @return The <code>Goods</code>, or null if none.
      */
     public Goods getGoods() {
         return goods;
     }
+
 
     /**
      * Handle a "deliverGift"-message.
@@ -125,7 +125,7 @@ public class DeliverGiftMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Unit unit;
         try {

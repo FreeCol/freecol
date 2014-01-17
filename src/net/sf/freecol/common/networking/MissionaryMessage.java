@@ -38,20 +38,15 @@ import org.w3c.dom.Element;
  */
 public class MissionaryMessage extends DOMMessage {
 
-    /**
-     * The identifier of the missionary.
-     */
+    /** The identifier of the missionary. */
     private String unitId;
 
-    /**
-     * The direction to the settlement.
-     */
+    /** The direction to the settlement. */
     private String directionString;
 
-    /**
-     * Is this a denunciation?
-     */
+    /** Is this a denunciation? */
     private boolean denounce;
+
 
     /**
      * Create a new <code>MissionaryMessage</code> with the
@@ -61,7 +56,8 @@ public class MissionaryMessage extends DOMMessage {
      * @param direction The <code>Direction</code> to the settlement.
      * @param denounce True if this is a denunciation.
      */
-    public MissionaryMessage(Unit unit, Direction direction, boolean denounce) {
+    public MissionaryMessage(Unit unit, Direction direction,
+                             boolean denounce) {
         super(getXMLElementTagName());
 
         this.unitId = unit.getId();
@@ -81,8 +77,10 @@ public class MissionaryMessage extends DOMMessage {
 
         this.unitId = element.getAttribute("unitId");
         this.directionString = element.getAttribute("direction");
-        this.denounce = Boolean.valueOf(element.getAttribute("denounce")).booleanValue();
+        this.denounce = Boolean.valueOf(element.getAttribute("denounce"))
+            .booleanValue();
     }
+
 
     /**
      * Handle a "missionary"-message.
@@ -95,7 +93,7 @@ public class MissionaryMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Unit unit;
         try {
@@ -126,14 +124,16 @@ public class MissionaryMessage extends DOMMessage {
                 return DOMMessage.clientError("Denouncing our own missionary at: "
                     + is.getId());
             } else if (!unit.hasAbility(Ability.DENOUNCE_HERESY)) {
-                return DOMMessage.clientError("Unit lacks denouncement ability: " + unitId);
+                return DOMMessage.clientError("Unit lacks denouncement ability: "
+                    + unitId);
             }
         } else {
             if (missionary != null) {
                 return DOMMessage.clientError("Establishing extra mission at: "
                     + is.getId());
             } else if (!unit.hasAbility(Ability.ESTABLISH_MISSION)) {
-                return DOMMessage.clientError("Unit lacks establish mission ability: " + unitId);
+                return DOMMessage.clientError("Unit lacks establish mission ability: "
+                    + unitId);
             }
         }
 

@@ -92,7 +92,7 @@ public class FirstContactMessage extends DOMMessage {
     }
 
 
-    // Public accessors
+    // Public interface
 
     public Player getPlayer(Game game) {
         return game.getFreeColGameObject(playerId, Player.class);

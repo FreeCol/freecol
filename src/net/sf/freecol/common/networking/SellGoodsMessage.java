@@ -35,20 +35,15 @@ import org.w3c.dom.Element;
  */
 public class SellGoodsMessage extends DOMMessage {
 
-    /**
-     * The identifier of the carrier to unload to goods from.
-     */
+    /** The identifier of the carrier to unload to goods from. */
     private String carrierId;
 
-    /**
-     * The identifier of the type of goods to sell.
-     */
+    /** The identifier of the type of goods to sell.  */
     private String goodsTypeId;
 
-    /**
-     * The amount of goods to sell.
-     */
+    /** The amount of goods to sell. */
     private String amountString;
+
 
     /**
      * Create a new <code>SellGoodsMessage</code>.
@@ -79,6 +74,7 @@ public class SellGoodsMessage extends DOMMessage {
         this.amountString = element.getAttribute("amount");
     }
 
+
     /**
      * Handle a "sellGoods"-message.
      *
@@ -90,7 +86,7 @@ public class SellGoodsMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Unit carrier;
         try {

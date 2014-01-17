@@ -33,10 +33,9 @@ import org.w3c.dom.Element;
  */
 public class PayForBuildingMessage extends DOMMessage {
 
-    /**
-     * The identifier of the colony that is building.
-     */
+    /** The identifier of the colony that is building. */
     private String colonyId;
+
 
     /**
      * Create a new <code>PayForBuildingMessage</code> with the
@@ -63,6 +62,7 @@ public class PayForBuildingMessage extends DOMMessage {
         this.colonyId = element.getAttribute("colony");
     }
 
+
     /**
      * Handle a "payForBuilding"-message.
      *
@@ -75,7 +75,7 @@ public class PayForBuildingMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Colony colony;
         try {

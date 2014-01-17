@@ -33,10 +33,8 @@ import org.w3c.dom.Element;
  */
 public class AbandonColonyMessage extends DOMMessage {
 
-    /**
-     * The colony to abandon.
-     */
-    String colonyId;
+    /** The identifier of the colony to abandon. */
+    private String colonyId;
 
 
     /**
@@ -63,6 +61,7 @@ public class AbandonColonyMessage extends DOMMessage {
         this.colonyId = element.getAttribute("colony");
     }
 
+
     /**
      * Handle a "abandonColony"-message.
      *
@@ -75,7 +74,7 @@ public class AbandonColonyMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Colony colony;
         try {

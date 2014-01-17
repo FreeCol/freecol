@@ -932,7 +932,7 @@ public final class InGameInputHandler extends InputHandler {
     private Element newLandName(Element element) {
         final Game game = getGame();
         NewLandNameMessage message = new NewLandNameMessage(game, element);
-        final Unit unit = message.getUnit(game);
+        final Unit unit = message.getUnit(getFreeColClient().getMyPlayer());
         final String defaultName = message.getNewLandName();
         if (unit == null || defaultName == null 
             || !unit.hasTile()) return null;
@@ -952,7 +952,7 @@ public final class InGameInputHandler extends InputHandler {
         final Game game = getGame();
         NewRegionNameMessage message = new NewRegionNameMessage(game, element);
         final Tile tile = message.getTile(game);
-        final Unit unit = message.getUnit(game);
+        final Unit unit = message.getUnit(getFreeColClient().getMyPlayer());
         final Region region = message.getRegion(game);
         final String defaultName = message.getNewRegionName();
         if (defaultName == null || region == null) return null;

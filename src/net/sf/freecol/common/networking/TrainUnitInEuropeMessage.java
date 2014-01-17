@@ -33,10 +33,9 @@ import org.w3c.dom.Element;
  */
 public class TrainUnitInEuropeMessage extends DOMMessage {
 
-    /**
-     * The identifier of the unit type.
-     */
+    /** The identifier of the unit type. */
     private String typeId;
+
 
     /**
      * Create a new <code>TrainUnitInEuropeMessage</code> with the
@@ -63,6 +62,7 @@ public class TrainUnitInEuropeMessage extends DOMMessage {
         this.typeId = element.getAttribute("unitType");
     }
 
+
     /**
      * Handle a "trainUnitInEurope"-message.
      *
@@ -75,7 +75,7 @@ public class TrainUnitInEuropeMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         UnitType type = server.getSpecification().getUnitType(typeId);
         if (type == null) {

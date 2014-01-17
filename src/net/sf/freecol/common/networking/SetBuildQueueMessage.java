@@ -39,15 +39,12 @@ import org.w3c.dom.Element;
  */
 public class SetBuildQueueMessage extends DOMMessage {
 
-    /**
-     * The identifier of the colony containing the queue.
-     */
+    /** The identifier of the colony containing the queue. */
     private String colonyId;
 
-    /**
-     * The items in the build queue.
-     */
+    /** The items in the build queue. */
     private String[] queue;
+
 
     /**
      * Create a new <code>SetBuildQueueMessage</code> for the
@@ -93,6 +90,7 @@ public class SetBuildQueueMessage extends DOMMessage {
         }
     }
 
+
     /**
      * Handle a "setBuildQueue"-message.
      *
@@ -105,9 +103,9 @@ public class SetBuildQueueMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
-        Game game = server.getGame();
-        Specification spec = game.getSpecification();
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final Game game = server.getGame();
+        final Specification spec = game.getSpecification();
 
         Colony colony;
         try {

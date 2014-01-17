@@ -708,13 +708,14 @@ public abstract class ServerAPI {
         Element reply = askExpecting(new DiplomacyMessage(unit, settlement,
                                                           otherUnit, agreement),
             null, null);
-        if (reply == null) 
+        if (reply == null) {
             return null;
-        if (DiplomacyMessage.getXMLElementTagName().equals(reply.getTagName())) {
+        } else if (DiplomacyMessage.getXMLElementTagName().equals(reply.getTagName())) {
             return new DiplomacyMessage(game, reply).getAgreement();
+        } else {
+            client.handleReply(reply);
+            return null;
         }
-        client.handleReply(reply);
-        return null;
     }
 
     /**
@@ -829,14 +830,9 @@ public abstract class ServerAPI {
             = new GoodsForSaleMessage(unit, settlement, null);
         Element reply = askExpecting(message,
             GoodsForSaleMessage.getXMLElementTagName(), null);
-        if (reply == null) return null;
+        if (reply == null) return Collections.emptyList();
 
-        List<Goods> goodsOffered = new ArrayList<Goods>();
-        NodeList childNodes = reply.getChildNodes();
-        for (int i = 0; i < childNodes.getLength(); i++) {
-            goodsOffered.add(new Goods(game, (Element) childNodes.item(i)));
-        }
-        return goodsOffered;
+        return new GoodsForSaleMessage(game, reply).getGoods();
     }
 
     /**

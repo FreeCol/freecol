@@ -33,15 +33,11 @@ import org.w3c.dom.Element;
  */
 public class SetDestinationMessage extends DOMMessage {
 
-    /**
-     * The object identifier of the unit whose destination is to be set.
-     **/
-    String unitId;
+    /** The object identifier of the unit whose destination is to be set. */
+    private String unitId;
 
-    /**
-     * The object identifier of the unit destination or null.
-     */
-    String destinationId;
+    /** The object identifier of the unit destination or null. */
+    private String destinationId;
 
 
     /**
@@ -74,6 +70,7 @@ public class SetDestinationMessage extends DOMMessage {
             : null;
     }
 
+
     /**
      * Handle a "setDestination"-message.
      *
@@ -83,8 +80,8 @@ public class SetDestinationMessage extends DOMMessage {
      *     or an error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
-        Game game = serverPlayer.getGame();
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final Game game = serverPlayer.getGame();
 
         Unit unit;
         try {

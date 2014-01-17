@@ -24,6 +24,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Limit;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -35,15 +36,12 @@ import org.w3c.dom.Element;
  */
 public class DeclareIndependenceMessage extends DOMMessage {
 
-    /**
-     * The new name for the rebelling nation
-     */
+    /** The new name for the rebelling nation. */
     private String nationName;
 
-    /**
-     * The new name for the rebelling country
-     */
+    /** The new name for the rebelling country */
     private String countryName;
+
 
     /**
      * Create a new <code>DeclareIndependenceMessage</code> with the
@@ -73,6 +71,7 @@ public class DeclareIndependenceMessage extends DOMMessage {
         this.countryName = element.getAttribute("countryName");
     }
 
+
     /**
      * Handle a "declareIndependence"-message.
      *
@@ -83,22 +82,25 @@ public class DeclareIndependenceMessage extends DOMMessage {
      * @return An update <code>Element</code> describing the REF and the
      *         rebel player, or an error <code>Element</code> on failure.
      */
-    public Element handle(FreeColServer server, Player player, Connection connection) {
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+    public Element handle(FreeColServer server, Player player,
+                          Connection connection) {
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final Specification spec = serverPlayer.getSpecification();
 
         if (nationName == null || nationName.length() == 0
             || countryName == null || countryName.length() == 0) {
             return DOMMessage.clientError("Empty nation or country name.");
         }
-        Event event = player.getSpecification().getEvent("model.event.declareIndependence");
+        Event event = spec.getEvent("model.event.declareIndependence");
         for (Limit limit : event.getLimits()) {
             if (!limit.evaluate(player)) {
                 return DOMMessage.clientError(limit.getDescriptionKey() + " "
-                                           + Integer.toString(limit.getRightHandSide().getValue()));
+                    + Integer.toString(limit.getRightHandSide().getValue()));
             }
         }
         if (player.getPlayerType() != PlayerType.COLONIAL) {
-            return DOMMessage.clientError("Only colonial players can declare independence.");
+            return DOMMessage.clientError("Only colonial players"
+                + " can declare independence.");
         }
 
         // Declare.
