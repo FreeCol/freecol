@@ -25,6 +25,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -227,7 +228,8 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
      */
     protected boolean save(File file) {
         try {
-            group.save(file);
+            group.save(new FileOutputStream(file),
+                       FreeColXMLWriter.WriteScope.toSave(), false);
             return true;
         } catch (FileNotFoundException e) {
             logger.log(Level.WARNING, "Save failed", e);

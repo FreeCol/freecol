@@ -788,7 +788,7 @@ public final class FreeColServer {
 
             if (options != null) {
                 fos.putNextEntry(new JarEntry(FreeColSavegameFile.CLIENT_OPTIONS));
-                options.save(fos, FreeColXMLWriter.WriteScope.toSave());
+                options.save(fos, FreeColXMLWriter.WriteScope.toSave(), false);
                 fos.closeEntry();
             }
 

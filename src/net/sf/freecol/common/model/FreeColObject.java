@@ -840,7 +840,7 @@ public abstract class FreeColObject implements ObjectWithId {
      * Debugging tool, dump object XML to System.err.
      */
     public void dumpObject() {
-        save(System.err, WriteScope.toSave());
+        save(System.err, WriteScope.toSave(), false);
     }
 
     /**
@@ -859,7 +859,7 @@ public abstract class FreeColObject implements ObjectWithId {
      * @exception FileNotFoundException
      */
     public void save(File file) throws FileNotFoundException {
-        save(new FileOutputStream(file), WriteScope.toSave());
+        save(new FileOutputStream(file), WriteScope.toSave(), false);
     }
 
     /**
@@ -870,7 +870,7 @@ public abstract class FreeColObject implements ObjectWithId {
      * @exception FileNotFoundException
      */
     public void save(File file, WriteScope scope) throws FileNotFoundException {
-        save(new FileOutputStream(file), scope);
+        save(new FileOutputStream(file), scope, false);
     }
 
     /**
@@ -878,11 +878,12 @@ public abstract class FreeColObject implements ObjectWithId {
      *
      * @param out The <code>OutputStream</code> to write to.
      * @param scope The <code>WriteScope</code> to use.
+     * @param pretty Attempt to indent the output nicely.
      */
-    public void save(OutputStream out, WriteScope scope) {
+    public void save(OutputStream out, WriteScope scope, boolean pretty) {
         FreeColXMLWriter xw = null;
         try {
-            xw = new FreeColXMLWriter(out, scope, true);
+            xw = new FreeColXMLWriter(out, scope, pretty);
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Error creating FreeColXMLWriter.", ioe);
             return;

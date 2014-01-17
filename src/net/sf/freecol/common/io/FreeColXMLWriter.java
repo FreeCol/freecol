@@ -21,7 +21,11 @@ package net.sf.freecol.common.io;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.io.Writer;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Locale;
@@ -33,6 +37,11 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -56,6 +65,12 @@ import net.sf.freecol.common.model.Tile;
 public class FreeColXMLWriter implements XMLStreamWriter {
 
     private static final Logger logger = Logger.getLogger(FreeColXMLWriter.class.getName());
+
+    /** Magic properties to indent files if supported. */
+    private static final String[] indentProps = new String[] {
+        OutputKeys.INDENT, "yes",
+        "{http://xml.apache.org/xslt}indent-amount", "2"
+    };
 
     /** The scope of a FreeCol object write. */
     public static enum WriteScope {
@@ -108,6 +123,11 @@ public class FreeColXMLWriter implements XMLStreamWriter {
     /** The stream to write to. */
     private XMLStreamWriter xmlStreamWriter;
 
+    /** Internal writer to accumulate into when pretty printing. */
+    private StringWriter stringWriter = null;
+    /** The final output writer to use when pretty printing. */
+    private Writer outputWriter = null;
+
     /** A write scope to use for FreeCol object writes. */
     private WriteScope writeScope;
 
@@ -126,13 +146,7 @@ public class FreeColXMLWriter implements XMLStreamWriter {
     public FreeColXMLWriter(OutputStream outputStream,
                             WriteScope writeScope,
                             boolean indent) throws IOException {
-        try {
-            this.xmlStreamWriter = getFactory(indent)
-                .createXMLStreamWriter(outputStream, "UTF-8");
-        } catch (XMLStreamException e) {
-            throw new IOException(e);
-        }
-        this.writeScope = writeScope;
+        this(new OutputStreamWriter(outputStream), writeScope, indent);
     }
 
     /**
@@ -149,8 +163,15 @@ public class FreeColXMLWriter implements XMLStreamWriter {
     public FreeColXMLWriter(Writer writer, WriteScope writeScope,
                             boolean indent) throws IOException {
         try {
-            this.xmlStreamWriter = getFactory(indent)
-                .createXMLStreamWriter(writer);
+            if (indent) {
+                this.outputWriter = writer;
+                this.stringWriter = new StringWriter(1024);
+                this.xmlStreamWriter = getFactory()
+                    .createXMLStreamWriter(this.stringWriter);
+            } else {
+                this.xmlStreamWriter = getFactory()
+                    .createXMLStreamWriter(writer);
+            }
         } catch (XMLStreamException e) {
             throw new IOException(e);
         }
@@ -161,15 +182,10 @@ public class FreeColXMLWriter implements XMLStreamWriter {
     /**
      * Get the <code>XMLOutputFactory</code> to create the output stream with.
      *
-     * @param indent If true, produce indented output if supported.
      * @return An <code>XMLOutputFactory</code>.
      */
-    private XMLOutputFactory getFactory(boolean indent) {
-        XMLOutputFactory xof = XMLOutputFactory.newInstance();
-        if (indent && xof.isPropertySupported(OutputKeys.INDENT)) {
-            xof.setProperty(OutputKeys.INDENT, "yes");
-        }
-        return xof;
+    private XMLOutputFactory getFactory() {
+        return XMLOutputFactory.newInstance();
     }
 
     /**
@@ -200,6 +216,30 @@ public class FreeColXMLWriter implements XMLStreamWriter {
                 xmlStreamWriter.close();
             } catch (XMLStreamException xse) {
                 logger.log(Level.WARNING, "Error closing stream.", xse);
+            }
+        }
+
+        if (this.outputWriter != null) {
+            TransformerFactory factory;
+            Transformer transformer;
+            StreamSource source;
+            StreamResult result;
+            try {
+                source = new StreamSource(new StringReader(this.stringWriter
+                                                               .toString()));
+                result = new StreamResult(this.outputWriter);
+                factory = TransformerFactory.newInstance();
+                transformer = factory.newTransformer();
+                for (int i = 0; i < indentProps.length; i += 2) {
+                    transformer.setOutputProperty(indentProps[i],
+                                                  indentProps[i+1]);
+                }
+                transformer.transform(source, result);
+                this.outputWriter.flush();
+            } catch (IOException ioe) {
+                logger.log(Level.WARNING, "IO fail", ioe);
+            } catch (TransformerException te) {
+                logger.log(Level.WARNING, "Transformer fail", te);
             }
         }
     }
