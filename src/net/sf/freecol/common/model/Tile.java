@@ -2239,6 +2239,17 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                 xr.nextTag();
                 xr.expectTag(Tile.getXMLElementTagName());
                 Tile tile = xr.readFreeColGameObject(game, Tile.class);
+
+                // Temporary workaround for BR#2618 on input
+                Colony colony = tile.getColony();
+                if (colony != null && colony.getDisplayUnitCount() <= 0) {
+                    logger.warning("Copied colony " + colony.getId()
+                        + " display unit count set to 1 from corrupt: "
+                        + colony.getDisplayUnitCount());
+                    colony.setDisplayUnitCount(1);
+                }
+                // end workaround
+
                 setCachedTile(player, tile);
                 xr.setReadScope(scope);
 
@@ -2249,19 +2260,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                     setIndianSettlementInternals(player,
                         is.getLearnableSkill(), is.getWantedGoods());
                 }
-
-                // Temporary workaround for BR#2618 on input
-                Colony colony = tile.getColony();
-                if (colony != null && this.getColony() != null) {
-                    if (colony.getDisplayUnitCount() <= 0) {
-                        logger.warning("Copied colony " + colony.getId()
-                            + " display unit count corrupt: "
-                            + colony.getDisplayUnitCount());
-                        colony.setDisplayUnitCount(this.getColony()
-                            .getUnitCount());
-                    }
-                }
-                // end workaround
 
             } else {
                 setCachedTile(player, this);
