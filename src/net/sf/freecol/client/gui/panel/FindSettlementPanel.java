@@ -163,7 +163,7 @@ public final class FindSettlementPanel extends FreeColPanel
         if (settlement instanceof Colony
             && settlement.getOwner() == getMyPlayer()) {
             getGUI().removeFromCanvas(FindSettlementPanel.this);
-            getGUI().showColonyPanel((Colony) settlement);
+            getGUI().showColonyPanel((Colony)settlement);
         } else if (settlement instanceof IndianSettlement) {
             getGUI().removeFromCanvas(FindSettlementPanel.this);
             getGUI().showIndianSettlementPanel((IndianSettlement) settlement);

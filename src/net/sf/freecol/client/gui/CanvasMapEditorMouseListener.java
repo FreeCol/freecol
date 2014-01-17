@@ -35,6 +35,7 @@ import net.sf.freecol.client.control.MapEditorController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.panel.RiverStyleDialog;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.TileTypeTransform;
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
@@ -100,7 +101,8 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
         try {
             if (e.getClickCount() > 1) {
                 Tile tile = mapViewer.convertToMapTile(e.getX(), e.getY());
-                canvas.showColonyPanel(tile);
+                Colony colony = tile.getColony();
+                if (colony != null) canvas.showColonyPanel(colony);
             } else {
                 canvas.requestFocus();
             }

@@ -1525,6 +1525,8 @@ public final class Canvas extends JDesktopPane {
      * @see ColonyPanel
      */
     public ColonyPanel showColonyPanel(Colony colony) {
+        if (!freeColClient.getMyPlayer().owns(colony)) return null;
+
         ColonyPanel panel = getColonyPanel(colony);
         if (panel == null) {
             panel = new ColonyPanel(freeColClient, colony);
@@ -1533,23 +1535,6 @@ public final class Canvas extends JDesktopPane {
             panel.requestFocus();
         }
         return panel;
-    }
-
-    /**
-     * Show the colony panel for a colony on a given tile.
-     *
-     * @param t The <code>Tile</code> to look for a colony on.
-     * @return The colony panel, or null on failure.
-     */
-    public ColonyPanel showColonyPanel(Tile t) {
-        if (gui.getCurrentViewMode() == GUI.MOVE_UNITS_MODE
-            && t != null && t.getColony() != null
-            && freeColClient.getMyPlayer().owns(t.getColony())) {
-            mapViewer.setFocus(t);
-            mapViewer.stopBlinking();
-            return showColonyPanel(t.getColony());
-        }
-        return null;
     }
 
     /**
