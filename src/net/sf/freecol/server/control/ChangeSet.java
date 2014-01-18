@@ -412,7 +412,7 @@ public class ChangeSet {
                 // We just have to accept that combat animation is an
                 // exception to the normal visibility rules.
                 Unit copy = defender.copy(serverPlayer.getGame(), Unit.class);
-                copy.setLocation(copy.getTile());
+                copy.setLocationNoUpdate(copy.getTile());
                 copy.setWorkType(null);
                 element.appendChild(copy.toXMLElement(doc));
             }
