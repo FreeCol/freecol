@@ -500,7 +500,6 @@ public class ColonyTest extends FreeColTestCase {
                 assertEquals(u.getRole(), ou.getRole());
                 assertEquals(game.getFreeColGameObject(u.getId()), u);
                 assertEquals(u.getOwner(), ou.getOwner());
-                assertEquals(u.getOwner().getUnitById(u.getId()), u);
             }
         }
     }

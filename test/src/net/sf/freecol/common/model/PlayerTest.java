@@ -65,18 +65,12 @@ public class PlayerTest extends FreeColTestCase {
         }
         assertTrue(count == 4);
 
-        assertTrue(dutch.getUnitById(unit1.getId()) == unit1);
-        assertTrue(dutch.getUnitById(unit2.getId()) == unit2);
-        assertTrue(dutch.getUnitById(unit3.getId()) == unit3);
-        assertTrue(dutch.getUnitById(unit4.getId()) == unit4);
-
-        String id = unit1.getId();
         unit1.dispose();
-        assertTrue(dutch.getUnitById(id) == null);
+        assertFalse(dutch.hasUnit(unit1));
 
         unit2.changeOwner(french);
-        assertTrue(dutch.getUnitById(unit2.getId()) == null);
-        assertTrue(french.getUnitById(unit2.getId()) == unit2);
+        assertFalse(dutch.hasUnit(unit2));
+        assertTrue(french.hasUnit(unit2));
     }
 
     public void testEuropeanPlayer(Player player) {

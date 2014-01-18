@@ -2059,6 +2059,16 @@ public class Player extends FreeColGameObject implements Nameable {
     //
 
     /**
+     * Does this player's units list contain the given unit?
+     *
+     * @param unit The <code>Unit</code> to test.
+     * @return True if the player has the unit.
+     */
+    public boolean hasUnit(Unit unit) {
+        return units.get(unit.getId()) != null;
+    }
+
+    /**
      * Get a copy of the players units.
      *
      * @return A list of the player <code>Unit</code>s.
@@ -2075,17 +2085,6 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public Iterator<Unit> getUnitIterator() {
         return units.values().iterator();
-    }
-
-    /**
-     * Get a unit by its identifier.
-     *
-     * @param id The identifier to check.
-     * @return The player <code>Unit</code> or null if the player does not
-     *     have the unit with the supplied identifier.
-     */
-    public final Unit getUnitById(String id) {
-        return units.get(id);
     }
 
     /**
@@ -2137,11 +2136,11 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A list of suitable carriers.
      */
     public List<Unit> getCarriersForUnit(Unit unit) {
-        List<Unit> units = new ArrayList<Unit>();
+        List<Unit> ul = new ArrayList<Unit>();
         for (Unit u : getUnits()) {
-            if (u.couldCarry(unit)) units.add(u);
+            if (u.couldCarry(unit)) ul.add(u);
         }
-        return units;
+        return ul;
     }
 
     /**
