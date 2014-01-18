@@ -1771,7 +1771,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     if (ul.isEmpty()) ul.addAll(settlement.getUnitList());
                     ServerUnit brave = (ServerUnit)Utils.getRandomMember(logger,
                         "Convert", ul, random);
-                    if (brave.csChangeOwner(other, ChangeType.CONVERSION, 
+                    if (csChangeOwner(brave, other, ChangeType.CONVERSION, 
                             colony.getTile(), cs)) { //-vis(other)
                         brave.clearRoleAndEquipment();
                         brave.setMovesLeft(0);
@@ -2759,8 +2759,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
         if (units.isEmpty()) units.addAll(is.getUnitList());
         ServerUnit convert = (ServerUnit)Utils.getRandomMember(logger,
             "Choose convert", units, random);
-        if (convert.csChangeOwner(attackerPlayer, ChangeType.CONVERSION,
-                attacker.getTile(), cs)) { //-vis(attackerPlayer)
+        if (nativePlayer.csChangeOwner(convert, attackerPlayer,
+                                       ChangeType.CONVERSION,
+                                       attacker.getTile(),
+                                       cs)) { //-vis(attackerPlayer)
             convert.clearRoleAndEquipment();
             convert.setMovesLeft(0);
             convert.setState(Unit.UnitState.ACTIVE);
@@ -2862,7 +2864,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         Tile oldTile = loser.getTile();
         ChangeType change = (winnerPlayer.isUndead()) ? ChangeType.UNDEAD
             : ChangeType.CAPTURE;
-        if (((ServerUnit)loser).csChangeOwner(winnerPlayer, change,
+        if (loserPlayer.csChangeOwner(loser, winnerPlayer, change,
                 winner.getTile(), cs)) {//-vis(both)
             loser.setMovesLeft(0);
             loser.setState(Unit.UnitState.ACTIVE);
@@ -3959,7 +3961,62 @@ public class ServerPlayer extends Player implements ServerModelObject {
                new DiplomacyMessage(unit, settlement, otherUnit, agreement));
     }
 
-        
+    /**
+     * Change the owner of a unit or dispose of it if the change is
+     * impossible.  Move the unit to a new location if necessary.
+     * Also handle disappearance of any carried units that will now be
+     * invisible to the new owner.
+     *
+     * -vis(owner,newOwner)
+     *
+     * @param unit The <code>Unit</code> to change ownership of.
+     * @param newOwner The new owning <code>ServerPlayer</code>.
+     * @param change An optional accompanying <code>ChangeType</code>.
+     * @param loc A optional new <code>Location</code> for the unit.
+     * @param cs A <code>ChangeSet</code> to update.
+     * @return True if the new owner can have this unit.
+     */
+    public boolean csChangeOwner(Unit unit, ServerPlayer newOwner,
+                                 ChangeType change, Location loc,
+                                 ChangeSet cs) {
+        if (newOwner == this) return true; // No transfer needed
+
+        final Tile oldTile = unit.getTile();
+        UnitType mainType = unit.getTypeChange(change, newOwner);
+        if (mainType == null) mainType = unit.getType(); // No change needed.
+        if (!mainType.isAvailableTo(newOwner)) { // Can not have this unit.
+            cs.addDispose(See.perhaps().always(this), oldTile, unit);
+            return false;
+        }
+
+        for (Unit u : unit.getUnitList()) {
+            UnitType type = u.getTypeChange(change, newOwner);
+            if (type == null) type = u.getType();
+            if (!type.isAvailableTo(newOwner)) {
+                cs.addDispose(See.only(this), unit, u);
+            } else {
+                if (!u.changeType(type)) {
+                    throw new IllegalStateException("Type change failure: "
+                        + u + " -> " + type);
+                }
+            }
+        }
+        if (!unit.changeType(mainType)) {
+            throw new IllegalStateException("Type change failure: " + unit
+                + " -> " + mainType);
+        }
+        unit.changeOwner(newOwner);
+        if (loc != null) unit.setLocation(loc);
+        if (unit.isCarrier()) {
+            cs.addRemoves(See.only(this), unit, unit.getUnitList());
+        }
+        cs.add(See.only(newOwner), newOwner.exploreForUnit(unit));
+        return true;
+    }
+
+
+    // Serialization
+
     /**
      * {@inheritDoc}
      */

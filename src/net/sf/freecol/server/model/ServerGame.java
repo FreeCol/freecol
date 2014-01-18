@@ -318,7 +318,7 @@ public class ServerGame extends Game implements ServerModelObject {
                     tiles.add(is.getTile());
                     is.setContacted(strongest);//-til
                     ServerUnit missionary = (ServerUnit)is.getMissionary();
-                    if (missionary.csChangeOwner(strongest,
+                    if (weakest.csChangeOwner(missionary, strongest,
                             ChangeType.CAPTURE, null, cs)) {//-vis(both),-til
                         is.getTile().updateIndianSettlement(strongest);
                         cs.add(See.perhaps().always(strongest), is);
@@ -336,7 +336,7 @@ public class ServerGame extends Game implements ServerModelObject {
                 sb.append(" ").append(colony.getName());
             }
             for (Unit unit : weakest.getUnits()) {
-                if (((ServerUnit)unit).csChangeOwner(strongest, 
+                if (weakest.csChangeOwner(unit, strongest, 
                         ChangeType.CAPTURE, null, cs)) { //-vis(both)
                     unit.setMovesLeft(0);
                     unit.setState(Unit.UnitState.ACTIVE);

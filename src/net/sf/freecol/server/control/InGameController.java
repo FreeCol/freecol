@@ -295,8 +295,8 @@ public final class InGameController extends Controller {
     public void debugChangeOwner(ServerUnit unit, ServerPlayer serverPlayer) {
         ChangeSet cs = new ChangeSet();
         ServerPlayer owner = (ServerPlayer)unit.getOwner();
-        unit.csChangeOwner(serverPlayer, null, null,
-                           cs);//-vis(serverPlayer,owner)
+        owner.csChangeOwner(unit, serverPlayer, null, null,
+                            cs);//-vis(serverPlayer,owner)
         cs.add(See.perhaps().always(owner), unit.getTile());
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
         owner.invalidateCanSeeTiles();//+vis(owner)
@@ -874,7 +874,7 @@ public final class InGameController extends Controller {
         if (surrenderUnits.size() > 0) {
             for (Unit u : surrenderUnits) {
                 Tile oldTile = u.getTile();
-                if (((ServerUnit)u).csChangeOwner(independent,
+                if (serverPlayer.csChangeOwner(u, independent,
                         ChangeType.CAPTURE, null, cs)) {//-vis(both)
                     u.setMovesLeft(0);
                     u.setState(Unit.UnitState.ACTIVE);
@@ -3039,8 +3039,8 @@ public final class InGameController extends Controller {
                 } else {
                     newLoc = settlement.getTile();
                 }
-                if (newUnit.csChangeOwner(dest, ChangeType.CAPTURE, newLoc,
-                                          cs)) {//-vis(both)
+                if (source.csChangeOwner(newUnit, dest, ChangeType.CAPTURE,
+                                         newLoc, cs)) {//-vis(both)
                     newUnit.setMovesLeft(0);
                     cs.add(See.perhaps().always(former), oldTile);
                 }

@@ -768,7 +768,7 @@ public class ServerColony extends Colony implements ServerModelObject {
         List<Unit> units = getUnitList();
         units.addAll(getTile().getUnitList());
         for (Unit u : units) {//-vis(both)
-            ((ServerUnit)u).csChangeOwner(newOwner, change, null, cs);
+            owner.csChangeOwner(u, newOwner, change, null, cs);
         }
         cs.addRemoves(See.only(owner), this, units);
 
