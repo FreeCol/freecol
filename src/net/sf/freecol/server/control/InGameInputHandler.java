@@ -316,14 +316,6 @@ public final class InGameInputHandler extends InputHandler
                 return new EmigrateUnitMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(FirstContactMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
-                return new FirstContactMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
-            }});
         register("endTurn",
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
@@ -645,6 +637,13 @@ public final class InGameInputHandler extends InputHandler
             public Element handle(Connection connection, Element element) {
                 return freeColServer.getInGameController()
                     .enterRevengeMode(freeColServer.getPlayer(connection));
+            }});
+        register(FirstContactMessage.getXMLElementTagName(),
+                 new NetworkRequestHandler() {
+            @Override
+            public Element handle(Connection connection, Element element) {
+                return new FirstContactMessage(getGame(), element)
+                    .handle(freeColServer, connection);
             }});
         register("getHighScores",
                  new NetworkRequestHandler() {

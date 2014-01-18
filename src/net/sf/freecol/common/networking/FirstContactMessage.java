@@ -127,20 +127,18 @@ public class FirstContactMessage extends DOMMessage {
      * Handle a "firstContact"-message.
      *
      * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message was received on.
      * @return An update containing the firstContactd unit, or an error
      *     <code>Element</code> on failure.
      */
-    public Element handle(FreeColServer server, Player player,
-                          Connection connection) {
+    public Element handle(FreeColServer server, Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
         final Game game = serverPlayer.getGame();
 
         Player first = getPlayer(game);
         if (first == null) {
             return DOMMessage.clientError("Invalid player: " + playerId);
-        } else if (player.getId().equals(playerId)) {
+        } else if (serverPlayer.getId().equals(playerId)) {
             ; // OK
         } else {
             return DOMMessage.clientError("Not our player: " + playerId);
@@ -149,7 +147,7 @@ public class FirstContactMessage extends DOMMessage {
         ServerPlayer other = (ServerPlayer)getOtherPlayer(game);
         if (other == null) {
             return DOMMessage.clientError("Invalid other player: " + otherId);
-        } else if (other == player) {
+        } else if (other == serverPlayer) {
             return DOMMessage.clientError("First contact with self!?!");
         }
 
