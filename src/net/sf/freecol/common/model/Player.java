@@ -2065,7 +2065,9 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if the player has the unit.
      */
     public boolean hasUnit(Unit unit) {
-        return units.get(unit.getId()) != null;
+        synchronized (units) {
+            return units.get(unit.getId()) != null;
+        }
     }
 
     /**
@@ -2074,7 +2076,9 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A list of the player <code>Unit</code>s.
      */
     public List<Unit> getUnits() {
-        return new ArrayList<Unit>(units.values());
+        synchronized (units) {
+            return new ArrayList<Unit>(units.values());
+        }
     }
 
     /**
@@ -2084,7 +2088,9 @@ public class Player extends FreeColGameObject implements Nameable {
      * @see Unit
      */
     public Iterator<Unit> getUnitIterator() {
-        return units.values().iterator();
+        synchronized (units) {
+            return units.values().iterator();
+        }
     }
 
     /**
@@ -2102,19 +2108,23 @@ public class Player extends FreeColGameObject implements Nameable {
             throw new IllegalStateException(this + " adding another players unit=" + newUnit.getId());
         }
 
-        Unit old = units.get(newUnit.getId());
-        if (old == null
-            || old.isDisposed() // Normal, clients see units come and go
-            ) {
-            units.put(newUnit.getId(), newUnit);
-            return true;
-        } else if (old == newUnit) {
-            return false;
-        } else {
-            throw new IllegalStateException(this + " duplicate add for "
-                + newUnit.getId() + "/" + newUnit.hashCode()
-                + " existing " + old.getId() + "/" + old.hashCode()
-                + ": " + old);
+        synchronized (units) {
+            Unit old = units.get(newUnit.getId());
+            if (old == null) {
+                units.put(newUnit.getId(), newUnit);
+                return true;
+            } else if (old.isDisposed()) {
+                logger.warning("Old unit on units list?!?: " + old);
+                units.put(newUnit.getId(), newUnit);
+                return true;
+            } else if (old == newUnit) {
+                return false;
+            } else {
+                throw new IllegalStateException(this + " duplicate add for "
+                    + newUnit.getId() + "/" + newUnit.hashCode()
+                    + " existing " + old.getId() + "/" + old.hashCode()
+                    + ": " + old);
+            }
         }
     }
 
@@ -2125,8 +2135,10 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if the units container changed.
      */
     public boolean removeUnit(final Unit oldUnit) {
-        return (oldUnit == null) ? false
-            : units.remove(oldUnit.getId()) != null;
+        if (oldUnit == null) return false;
+        synchronized (units) {
+            return units.remove(oldUnit.getId()) != null;
+        }
     }
 
     /**
