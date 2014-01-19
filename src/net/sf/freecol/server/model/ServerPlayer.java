@@ -603,7 +603,30 @@ public class ServerPlayer extends Player implements ServerModelObject {
             cs.addDispose(See.perhaps().always(this),
                           u.getLocation(), u);//-vis(this)
         }
-       
+
+        // Remove European stuff
+        if (market != null) {
+            market.dispose();
+            market = null;
+        }
+        if (monarch != null) {
+            monarch.dispose();
+            monarch = null;
+        }
+        if (europe != null) {
+            europe.dispose();
+            europe = null;
+        }
+        currentFather = null;
+        if (foundingFathers != null) foundingFathers.clear();
+        if (offeredFathers != null) offeredFathers.clear();
+        // TODO: stance and tension?
+        if (tradeRoutes != null) tradeRoutes.clear();
+        // Retaining model messages for now
+        // Retaining history for now
+        if (lastSales != null) lastSales = null;
+        featureContainer.clear();
+
         invalidateCanSeeTiles();//+vis(this)
     }
 

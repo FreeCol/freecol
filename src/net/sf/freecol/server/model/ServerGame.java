@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -47,6 +48,7 @@ import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Limit;
 import net.sf.freecol.common.model.ModelMessage;
+import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.SimpleCombatModel;
 import net.sf.freecol.common.model.Specification;
@@ -313,11 +315,11 @@ public class ServerGame extends Game implements ServerModelObject {
             || strongestAIPlayer == null
             || weakestAIPlayer == strongestAIPlayer) return;
 
-        lb.add("Spanish succession in ", getTurn(), " scores[");
+        lb.add("Spanish succession scores[");
         for (Player player : scores.keySet()) {
             lb.add(" ", player.getName(), "=", scores.get(player));
         }
-        lb.add(" ]\n=> ", weakestAIPlayer.getName(),
+        lb.add(" ]=> ", weakestAIPlayer.getName(),
                " cedes to ", strongestAIPlayer.getName(), ":");
         List<Tile> tiles = new ArrayList<Tile>();
         ServerPlayer strongest = (ServerPlayer)strongestAIPlayer;
@@ -386,6 +388,17 @@ public class ServerGame extends Game implements ServerModelObject {
         
         weakest.csKill(cs);//+vis(weakest)
         strongest.invalidateCanSeeTiles();//+vis(strongest)
+
+        // Trace fail where not all units are transferred
+        Iterator<FreeColGameObject> it = getFreeColGameObjectIterator();
+        while (it.hasNext()) {
+            FreeColGameObject fcgo = it.next();
+            if (fcgo instanceof Ownable
+                && ((Ownable)fcgo).getOwner() == weakest) {
+                throw new RuntimeException("Lurking " + weakest.getId()
+                    + " fcgo: " + fcgo);
+            }
+        }
     }
 
     /**

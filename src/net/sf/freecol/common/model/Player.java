@@ -576,12 +576,12 @@ public class Player extends FreeColGameObject implements Nameable {
     protected Monarch monarch;
 
     /** The founding fathers in this Player's congress. */
-    final protected Set<FoundingFather> foundingFathers
+    protected final Set<FoundingFather> foundingFathers
         = new HashSet<FoundingFather>();
     /** Current founding father being recruited. */
     protected FoundingFather currentFather;
     /** The offered founding fathers. */
-    final protected List<FoundingFather> offeredFathers
+    protected final List<FoundingFather> offeredFathers
         = new ArrayList<FoundingFather>();
 
     /**
