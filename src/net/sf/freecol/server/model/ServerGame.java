@@ -260,11 +260,13 @@ public class ServerGame extends Game implements ServerModelObject {
      * Visibility changes for the winner, loser is killed/irrelevant.
      *
      * @param cs A <code>ChangeSet</code> to update.
-     * @param spanishSuccession A Spanish Succession <code>Event</code>.
+     * @param event The Spanish Succession <code>Event</code>.
      */
-    private void csSpanishSuccession(ChangeSet cs, Event spanishSuccession) {
-        Limit weakLimit = spanishSuccession.getLimit("model.limit.spanishSuccession.weakestPlayer");
-        Limit strongLimit = spanishSuccession.getLimit("model.limit.spanishSuccession.strongestPlayer");
+    private void csSpanishSuccession(ChangeSet cs, Event event) {
+        Limit weakLimit
+            = event.getLimit("model.limit.spanishSuccession.weakestPlayer");
+        Limit strongLimit
+            = event.getLimit("model.limit.spanishSuccession.strongestPlayer");
         Map<Player, Integer> scores = new HashMap<Player, Integer>();
         boolean ready = false;
         for (Player player : getLiveEuropeanPlayers()) {
@@ -292,89 +294,89 @@ public class ServerGame extends Game implements ServerModelObject {
                 strongestAIPlayer = player;
             }
         }
+        if (weakestAIPlayer == null
+            || strongestAIPlayer == null
+            || weakestAIPlayer == strongestAIPlayer) return;
 
-        if (weakestAIPlayer != null
-            && strongestAIPlayer != null
-            && weakestAIPlayer != strongestAIPlayer) {
-            StringBuffer sb = new StringBuffer(512);
-            sb.append("Spanish succession in ").append(getTurn())
-                .append(" scores[");
-            for (Player player : scores.keySet()) {
-                sb.append(" ").append(player.getName())
-                    .append("=").append(scores.get(player));
-            }
-            sb.append(" ]\n=> ").append(weakestAIPlayer.getName())
-                .append(" cedes to ").append(strongestAIPlayer.getName())
-                .append(":");
-            List<Tile> tiles = new ArrayList<Tile>();
-            ServerPlayer strongest = (ServerPlayer)strongestAIPlayer;
-            ServerPlayer weakest = (ServerPlayer)weakestAIPlayer;
-            for (Player player : getPlayers()) {
-                if (!player.isIndian()) continue;
-                for (IndianSettlement is : player.getIndianSettlements()) {
-                    if (!is.hasMissionary(weakest)) continue;
-                    sb.append(" ").append(is.getName()).append("(mission)");
-                    is.getTile().cacheUnseen(strongest);//+til
-                    tiles.add(is.getTile());
-                    is.setContacted(strongest);//-til
-                    ServerUnit missionary = (ServerUnit)is.getMissionary();
-                    if (weakest.csChangeOwner(missionary, strongest,
-                            ChangeType.CAPTURE, null, cs)) {//-vis(both),-til
-                        is.getTile().updateIndianSettlement(strongest);
-                        cs.add(See.perhaps().always(strongest), is);
-                    }
-                }
-            }
-            for (Colony colony : weakest.getColonies()) {
-                for (Tile t : colony.getOwnedTiles()) {
-                    t.cacheUnseen();//+til
-                    tiles.add(t);
-                }
-                ((ServerColony)colony).csChangeOwner(strongest, cs);//-vis(both),-til
-                cs.add(See.only(strongest),
-                       strongest.exploreForSettlement(colony));
-                sb.append(" ").append(colony.getName());
-            }
-            for (Unit unit : weakest.getUnits()) {
-                if (weakest.csChangeOwner(unit, strongest, 
-                        ChangeType.CAPTURE, null, cs)) { //-vis(both)
-                    unit.setMovesLeft(0);
-                    unit.setState(Unit.UnitState.ACTIVE);
-                    sb.append(" ").append(unit.getId());
-                    if (unit.getLocation() instanceof Europe) {
-                        unit.setLocation(strongestAIPlayer.getEurope());//-vis
-                        cs.add(See.only(strongest), unit);
-                    } else if (unit.getLocation() instanceof HighSeas) {
-                        unit.setLocation(strongestAIPlayer.getHighSeas());//-vis
-                        cs.add(See.only(strongest), unit);
-                    } else if (unit.getLocation() instanceof Tile) {
-                        Tile tile = unit.getTile();
-                        if (!tiles.contains(tile)) tiles.add(tile);
-                    }
-                }
-            }
-
-            StringTemplate loser = weakestAIPlayer.getNationName();
-            StringTemplate winner = strongestAIPlayer.getNationName();
-            cs.addMessage(See.all(),
-                new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                 "model.diplomacy.spanishSuccession",
-                                 strongestAIPlayer)
-                                 .addStringTemplate("%loserNation%", loser)
-                                 .addStringTemplate("%nation%", winner));
-            cs.addGlobalHistory(this,
-                new HistoryEvent(getTurn(),
-                    HistoryEvent.EventType.SPANISH_SUCCESSION, null)
-                                 .addStringTemplate("%loserNation%", loser)
-                                 .addStringTemplate("%nation%", winner));
-            setSpanishSuccession(true);
-            cs.addPartial(See.all(), this, "spanishSuccession");
-            cs.add(See.perhaps(), tiles);
-
-            weakest.csKill(cs);//+vis(weakest)
-            strongest.invalidateCanSeeTiles();//+vis(strongest)
-            logger.info(sb.toString());
+        StringBuffer sb = new StringBuffer(512);
+        sb.append("Spanish succession in ").append(getTurn())
+            .append(" scores[");
+        for (Player player : scores.keySet()) {
+            sb.append(" ").append(player.getName())
+                .append("=").append(scores.get(player));
         }
+        sb.append(" ]\n=> ").append(weakestAIPlayer.getName())
+            .append(" cedes to ").append(strongestAIPlayer.getName())
+            .append(":");
+        List<Tile> tiles = new ArrayList<Tile>();
+        ServerPlayer strongest = (ServerPlayer)strongestAIPlayer;
+        ServerPlayer weakest = (ServerPlayer)weakestAIPlayer;
+        for (Player player : getPlayers()) {
+            if (!player.isIndian()) continue;
+            for (IndianSettlement is : player.getIndianSettlements()) {
+                if (!is.hasMissionary(weakest)) continue;
+                sb.append(" ").append(is.getName()).append("(mission)");
+                is.getTile().cacheUnseen(strongest);//+til
+                tiles.add(is.getTile());
+                is.setContacted(strongest);//-til
+                ServerUnit missionary = (ServerUnit)is.getMissionary();
+                if (weakest.csChangeOwner(missionary, strongest,
+                        ChangeType.CAPTURE, null, cs)) {//-vis(both),-til
+                    is.getTile().updateIndianSettlement(strongest);
+                    cs.add(See.perhaps().always(strongest), is);
+                }
+            }
+        }
+        for (Colony colony : weakest.getColonies()) {
+            for (Tile t : colony.getOwnedTiles()) {
+                t.cacheUnseen();//+til
+                tiles.add(t);
+            }
+            ((ServerColony)colony).csChangeOwner(strongest,
+                                                 cs);//-vis(both),-til
+            cs.add(See.only(strongest),
+                strongest.exploreForSettlement(colony));
+            sb.append(" ").append(colony.getName());
+        }
+        for (Unit unit : weakest.getUnits()) {
+            if (weakest.csChangeOwner(unit, strongest, 
+                    ChangeType.CAPTURE, null, cs)) { //-vis(both)
+                unit.setMovesLeft(0);
+                unit.setState(Unit.UnitState.ACTIVE);
+                sb.append(" ").append(unit.getId());
+                if (unit.getLocation() instanceof Europe) {
+                    unit.setLocation(strongestAIPlayer.getEurope());//-vis
+                    cs.add(See.only(strongest), unit);
+                } else if (unit.getLocation() instanceof HighSeas) {
+                    unit.setLocation(strongestAIPlayer.getHighSeas());//-vis
+                    cs.add(See.only(strongest), unit);
+                } else if (unit.getLocation() instanceof Tile) {
+                    Tile tile = unit.getTile();
+                    if (!tiles.contains(tile)) tiles.add(tile);
+                }
+            }
+        }
+
+        StringTemplate loser = weakestAIPlayer.getNationName();
+        StringTemplate winner = strongestAIPlayer.getNationName();
+        cs.addMessage(See.all(),
+            new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                "model.diplomacy.spanishSuccession",
+                strongestAIPlayer)
+                .addStringTemplate("%loserNation%", loser)
+                .addStringTemplate("%nation%", winner));
+        cs.addGlobalHistory(this,
+            new HistoryEvent(getTurn(),
+                HistoryEvent.EventType.SPANISH_SUCCESSION, null)
+                .addStringTemplate("%loserNation%", loser)
+                .addStringTemplate("%nation%", winner));
+        setSpanishSuccession(true);
+        cs.addPartial(See.all(), this, "spanishSuccession");
+        cs.add(See.perhaps(), tiles);
+        
+        weakest.csKill(cs);//+vis(weakest)
+        strongest.invalidateCanSeeTiles();//+vis(strongest)
+        logger.info(sb.toString());
     }
 
     /**
