@@ -614,9 +614,8 @@ public class Player extends FreeColGameObject implements Nameable {
 
     // Temporary/transient variables, do not serialize.
 
-    /** A map of the units this player owns indexed by object identifier. */
-    protected final java.util.Map<String, Unit> units
-        = new HashMap<String, Unit>();
+    /** The units this player owns. */
+    private final List<Unit> units = new ArrayList<Unit>();
 
     /** The settlements this player owns. */
     protected final List<Settlement> settlements
@@ -2066,7 +2065,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public boolean hasUnit(Unit unit) {
         synchronized (units) {
-            return units.get(unit.getId()) != null;
+            return units.contains(unit);
         }
     }
 
@@ -2077,7 +2076,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public List<Unit> getUnits() {
         synchronized (units) {
-            return new ArrayList<Unit>(units.values());
+            return new ArrayList<Unit>(units);
         }
     }
 
@@ -2089,7 +2088,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public Iterator<Unit> getUnitIterator() {
         synchronized (units) {
-            return units.values().iterator();
+            return units.iterator();
         }
     }
 
@@ -2105,26 +2104,13 @@ public class Player extends FreeColGameObject implements Nameable {
         // Make sure the owner of the unit is set first, before adding
         // it to the list
         if (!this.owns(newUnit)) {
-            throw new IllegalStateException(this + " adding another players unit=" + newUnit.getId());
+            throw new IllegalStateException("Adding another players unit:"
+                + newUnit.getId() + " to " + this);
         }
+        if (hasUnit(newUnit)) return false;
 
         synchronized (units) {
-            Unit old = units.get(newUnit.getId());
-            if (old == null) {
-                units.put(newUnit.getId(), newUnit);
-                return true;
-            } else if (old.isDisposed()) {
-                logger.warning("Old unit on units list?!?: " + old);
-                units.put(newUnit.getId(), newUnit);
-                return true;
-            } else if (old == newUnit) {
-                return false;
-            } else {
-                throw new IllegalStateException(this + " duplicate add for "
-                    + newUnit.getId() + "/" + newUnit.hashCode()
-                    + " existing " + old.getId() + "/" + old.hashCode()
-                    + ": " + old);
-            }
+            return units.add(newUnit);
         }
     }
 
@@ -2136,8 +2122,9 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public boolean removeUnit(final Unit oldUnit) {
         if (oldUnit == null) return false;
+
         synchronized (units) {
-            return units.remove(oldUnit.getId()) != null;
+            return units.remove(oldUnit);
         }
     }
 
