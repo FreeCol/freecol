@@ -37,7 +37,7 @@ import net.miginfocom.swing.MigLayout;
  */
 public class EditOptionDialog extends FreeColConfirmDialog {
 
-    private OptionUI ui;
+    private final OptionUI ui;
 
 
     /**
@@ -56,5 +56,18 @@ public class EditOptionDialog extends FreeColConfirmDialog {
         panel.add(ui.getComponent());
 
         initialize(true, panel, null, "ok", "cancel");
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Boolean getResponse() {
+        Boolean result = super.getResponse();
+        if (result && ui != null) {
+            ui.updateOption();
+        }
+        return result;
     }
 }
