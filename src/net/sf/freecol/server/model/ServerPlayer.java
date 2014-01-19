@@ -1640,14 +1640,14 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
                 // Look at the uses of tiles surrounding the settlement.
                 int alarmRadius = settlement.getRadius() + ALARM_RADIUS;
-                int alarm = 0;
                 for (Tile tile: settlement.getTile()
                          .getSurroundingTiles(alarmRadius)) {
                     Colony colony = tile.getColony();
                     if (tile.getFirstUnit() != null) { // Military units
                         Player enemy =  tile.getFirstUnit().getOwner();
                         if (enemy.isEuropean()) {
-                            alarm = extra.get(enemy);
+                            Integer alarm = extra.get(enemy);
+                            if (alarm == null) continue;
                             for (Unit unit : tile.getUnitList()) {
                                 if (unit.isOffensiveUnit() && !unit.isNaval()) {
                                     alarm += unit.getType().getOffence();
