@@ -24,6 +24,7 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -43,12 +44,12 @@ import javax.swing.JTextArea;
 import javax.swing.ListCellRenderer;
 import javax.swing.SpinnerNumberModel;
 
-import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.ObjectWithId;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTradeItem;
@@ -69,6 +70,8 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TradeItem;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitTradeItem;
+
+import net.miginfocom.swing.MigLayout;
 
 
 /**
@@ -682,8 +685,6 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             .addStringTemplate("%nation%", unitPlayer.getNationName());
         this.exchangeMessage = Messages.message(t);
 
-        TradeContext context = agreement.getContext();
-
         NationSummary ns = getController().getNationSummary(otherPlayer);
         int gold = (ns == null
             || ns.getGold() == Player.GOLD_NOT_ACCOUNTED) ? HUGE_DEMAND
@@ -696,6 +697,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
 
         String tutorial = "";
 
+        TradeContext context = agreement.getContext();
         switch (context) {
         case CONTACT:
             if (freeColClient.tutorialMode()) {
@@ -772,6 +774,9 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             panel.add(this.unitDemandPanel);
             panel.add(this.unitOfferPanel);
         }
+        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
+            panel.add(new JLabel("Version = " + agreement.getVersion()));
+        }
         panel.setPreferredSize(panel.getPreferredSize());
         setFocusCycleRoot(true);
 
@@ -785,9 +790,11 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         str = Messages.message("negotiationDialog.send");
         c.add(new ChoiceItem<DiplomaticTrade>(str, bogus)
             .okOption());
-        str = Messages.message("negotiationDialog.cancel");
-        c.add(new ChoiceItem<DiplomaticTrade>(str, bogus)
-            .cancelOption().defaultOption());
+        if (agreement.getVersion() > 0 || context != TradeContext.CONTACT) {
+            str = Messages.message("negotiationDialog.cancel");
+            c.add(new ChoiceItem<DiplomaticTrade>(str, bogus)
+                .cancelOption().defaultOption());
+        }
         ImageIcon icon = getImageLibrary()
             .getImageIcon((settlement != null) ? settlement : otherUnit,
                           false);

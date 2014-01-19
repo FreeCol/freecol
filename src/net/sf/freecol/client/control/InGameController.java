@@ -2117,6 +2117,7 @@ public final class InGameController implements NetworkConstants {
             } else {
                 agreement = ourAgreement;
             }
+            agreement.incrementVersion();
             return agreement;
         default:
             logger.warning("Bogus trade status: " + agreement.getStatus());
