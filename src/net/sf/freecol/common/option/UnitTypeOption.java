@@ -54,7 +54,7 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
     private boolean addNone;
 
     /** Which choices to generate. */
-    private TypeSelector generateChoices = TypeSelector.UNITS;
+    private TypeSelector selector = TypeSelector.UNITS;
 
     /** A list of choices to provide to the UI. */
     private final List<UnitType> choices = new ArrayList<UnitType>();
@@ -104,7 +104,7 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
      * @return The type of choices to generate.
      */
     public final TypeSelector getGenerateChoices() {
-        return generateChoices;
+        return selector;
     }
 
 
@@ -117,7 +117,7 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
         UnitTypeOption result = new UnitTypeOption(getId(), getSpecification());
         result.value = value;
         result.addNone = addNone;
-        result.generateChoices = generateChoices;
+        result.selector = selector;
         result.generateChoices();
         result.isDefined = true;
         return result;
@@ -174,12 +174,12 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
      * {@inheritDoc}
      */
     public void generateChoices() {
-        if (generateChoices == null) {
+        if (selector == null) {
             choices.add(getValue());
         } else {
             List<UnitType> unitTypeList = getSpecification().getUnitTypeList();
             choices.clear();
-            switch (generateChoices) {
+            switch (selector) {
             case UNITS:
                 choices.addAll(unitTypeList);
                 break;
@@ -230,8 +230,8 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
             xw.writeAttribute(VALUE_TAG, value);
         }
 
-        if (generateChoices != null) {
-            xw.writeAttribute(GENERATE_TAG, generateChoices);
+        if (selector != null) {
+            xw.writeAttribute(GENERATE_TAG, selector);
         }
 
         if (addNone) {
@@ -263,8 +263,8 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr); // value is read here
 
-        generateChoices = xr.getAttribute(GENERATE_TAG,
-            TypeSelector.class, (TypeSelector)null);
+        selector = xr.getAttribute(GENERATE_TAG,
+                                   TypeSelector.class, (TypeSelector)null);
 
         addNone = xr.getAttribute(ADD_NONE_TAG, false);
     }
@@ -307,7 +307,7 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
         sb.append("[").append(getId())
             .append(" value=").append(value)
             .append(" addNone=").append(addNone)
-            .append(" generateChoices=").append(generateChoices)
+            .append(" selector=").append(selector)
             .append("]");
         return sb.toString();
     }
