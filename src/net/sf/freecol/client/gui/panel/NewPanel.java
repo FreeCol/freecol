@@ -126,14 +126,12 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
     private final ButtonGroup group = new ButtonGroup();
 
     /**
-     * The specification to use for the new game.
+     * A particular specification to use for the new game.  If null, the user
+     * chooses using the specificationBox.
      */
-    private Specification specification;
+    private final Specification fixedSpecification;
 
-    /**
-     * The difficulty level to use for the new game.
-     *
-     */
+    /** The difficulty level to use for the new game. */
     private OptionGroup difficulty;
 
 
@@ -157,16 +155,26 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
     public NewPanel(FreeColClient freeColClient, Specification specification) {
         super(freeColClient, new MigLayout("wrap 6", "[15]", ""));
 
-        this.specification = specification;
+        this.fixedSpecification = specification;
 
-        String selectTC = (specification != null) ? specification.getId()
-            : FreeCol.getTC();
-        for (FreeColTcFile tc : Mods.getRuleSets()) {
-            specificationBox.addItem(tc);
-            if (selectTC.equals(tc.getId())) {
-                specificationBox.setSelectedItem(tc);
+        if (fixedSpecification == null) { // Allow TC selection
+            String selectTC = FreeCol.getTC();
+            for (FreeColTcFile tc : Mods.getRuleSets()) {
+                specificationBox.addItem(tc);
+                if (selectTC.equals(tc.getId())) {
+                    specificationBox.setSelectedItem(tc);
+                }
+            }
+        } else { // Force the use of the TC that contains the given spec
+            String selectTC = fixedSpecification.getId();
+            for (FreeColTcFile tc : Mods.getRuleSets()) {
+                if (selectTC.equals(tc.getId())) {
+                    specificationBox.addItem(tc);
+                    specificationBox.setSelectedItem(tc);
+                }
             }
         }
+
         setRenderers();
 
         JButton cancel = new JButton(Messages.message("cancel"));
@@ -247,18 +255,19 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
     /**
      * Update the contents of the difficulty level box depending on
      * the specification currently selected.
-     *
      */
     @SuppressWarnings("unchecked") // FIXME in Java7
     private void updateDifficulty() {
         difficultyBox.removeAllItems();
+
         Specification spec = getSpecification();
         OptionGroup selected = null;
         for (OptionGroup group : spec.getDifficultyLevels()) {
             difficultyBox.addItem(group);
-            // check the equality of the group ids rather than the
+            // Check the equality of the group ids rather than the
             // option groups themselves
-            if (difficulty != null && group.getId().equals(difficulty.getId())) {
+            if (difficulty != null
+                && group.getId().equals(difficulty.getId())) {
                 selected = group;
             }
         }
@@ -274,21 +283,16 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
         updateShowButton();
     }
 
-
     private void updateShowButton() {
         OptionGroup selected = (OptionGroup)difficultyBox.getSelectedItem();
         if (selected == null) {
             showDifficulty.setEnabled(false);
         } else {
             showDifficulty.setEnabled(true);
-            if (selected.isEditable()) {
-                showDifficulty.setText(Messages.message("editDifficulty"));
-            } else {
-                showDifficulty.setText(Messages.message("showDifficulty"));
-            }
+            showDifficulty.setText(Messages.message((selected.isEditable())
+                    ? "editDifficulty" : "showDifficulty"));
         }
     }
-
 
     /**
      * Gets the currently selected TC from the specificationBox.
@@ -311,12 +315,12 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
     }
 
     /**
-     * Return the preferred player name. This is either the value of
+     * Return the preferred player name.  This is either the value of
      * the client option "model.option.playerName", or the value of
      * the system property "user.name", or the localized value of
      * "defaultPlayerName".
      *
-     * @return a <code>String</code> value
+     * @return A name for the player.
      */
     private String getPlayerName() {
         String name = getClientOptions().getText(ClientOptions.NAME);
@@ -327,33 +331,24 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
     }
 
     /**
-     * Get the <code>Specification</code> value.
+     * Get the specification.  Either the one set for this panel, or the
+     * one implied by the currently selected TC.
      *
-     * @return a <code>Specification</code> value
+     * @return The current <code>Specification</code>.
      */
     @Override
     public Specification getSpecification() {
-        if (specification == null) {
-            FreeColTcFile tcFile = getTC();
-            if (tcFile != null) {
-                try {
-                    specification = tcFile.getSpecification();
-                } catch (Exception e) {
-                    logger.log(Level.WARNING, "Spec read failed in "
-                        + tcFile.getId(), e);
-                }
+        if (fixedSpecification != null) return fixedSpecification;
+        FreeColTcFile tcFile = getTC();
+        if (tcFile != null) {
+            try {
+                return tcFile.getSpecification();
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Spec read failed in "
+                    + tcFile.getId(), e);
             }
         }
-        return specification;
-    }
-
-    /**
-     * Set the <code>Specification</code> value.
-     *
-     * @param newSpecification The new Specification value.
-     */
-    public void setSpecification(final Specification newSpecification) {
-        this.specification = newSpecification;
+        return null;
     }
 
     private void enableComponents(Component[] components, boolean enable) {
