@@ -87,6 +87,38 @@
   </nations>
 
   <options>
+    <optionGroup id="difficultyLevels" recursive="false">
+      <optionGroup id="model.difficulty.veryEasy" editable="false">
+        <optionGroup id="model.difficulty.immigration" editable="false">
+          <integerOption id="model.option.crossesIncrement" value="2"/>
+        </optionGroup>
+      </optionGroup>
+      <optionGroup id="model.difficulty.easy" editable="false">
+        <optionGroup id="model.difficulty.immigration" editable="false">
+          <integerOption id="model.option.crossesIncrement" value="3"/>
+        </optionGroup>
+      </optionGroup>
+      <optionGroup id="model.difficulty.medium" editable="false"> 
+        <optionGroup id="model.difficulty.immigration" editable="false">
+          <integerOption id="model.option.crossesIncrement" value="4"/>
+        </optionGroup>
+      </optionGroup>
+      <optionGroup id="model.difficulty.hard" editable="false">
+        <optionGroup id="model.difficulty.immigration" editable="false">
+          <integerOption id="model.option.crossesIncrement" value="6"/>
+        </optionGroup>
+      </optionGroup>
+      <optionGroup id="model.difficulty.veryHard" editable="false">
+        <optionGroup id="model.difficulty.immigration" editable="false">
+          <integerOption id="model.option.crossesIncrement" value="10"/>
+        </optionGroup>
+      </optionGroup>
+      <optionGroup id="model.difficulty.custom" editable="true">
+        <optionGroup id="model.difficulty.immigration" editable="true">
+          <integerOption id="model.option.crossesIncrement" value="10"/>
+        </optionGroup>
+      </optionGroup>
+    </optionGroup>
     <optionGroup id="gameOptions">
       <optionGroup id="gameOptions.map">
         <!-- Enables/disables fog of war -->

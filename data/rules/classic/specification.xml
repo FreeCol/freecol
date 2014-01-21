@@ -2870,7 +2870,7 @@ resources of 400, lost city rumours of 500
 
       <optionGroup id="model.difficulty.custom">
         <optionGroup id="model.difficulty.immigration">
-          <percentageOption id="model.option.crossesIncrement" defaultValue="2"/>
+          <integerOption id="model.option.crossesIncrement" defaultValue="2"/>
           <integerOption id="model.option.recruitPriceIncrease" value="30" minimumValue="0" maximumValue="100"/>
           <integerOption id="model.option.lowerCapIncrease" value="0" minimumValue="0" maximumValue="100"/>
           <integerOption id="model.option.priceIncrease.artillery" value="100" minimumValue="0" maximumValue="1000"/>

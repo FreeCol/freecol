@@ -219,10 +219,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // In BR#2615 misiulo reports that Col1 players start with 2
         // crosses.  This is surprising, but you could argue that some
         // level of religious unrest might contribute to the fact
-        // there is an expedition to the new world underway.  Crosses
-        // increment is 2 in Col1 which is sufficiently suggestive to
-        // use it for initialization here.
-        this.immigration = spec.getInteger(GameOptions.CROSSES_INCREMENT);
+        // there is an expedition to the new world underway.
+        this.immigration = spec.getInteger(GameOptions.PLAYER_IMMIGRATION_BONUS);
         this.liberty = 0;
         this.currentFather = null;
 
