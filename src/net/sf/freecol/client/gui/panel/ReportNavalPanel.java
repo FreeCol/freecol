@@ -31,9 +31,10 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Role;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.UnitType;
 
 
@@ -55,6 +56,7 @@ public final class ReportNavalPanel extends ReportUnitPanel {
 
     protected void addREFUnits() {
         final Player player = getMyPlayer();
+        final Specification spec = getSpecification();
         reportPanel.add(new JLabel(Messages.message(player.getNation().getREFNation().getId() + ".name")),
                         "span, split 2");
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
@@ -62,7 +64,7 @@ public final class ReportNavalPanel extends ReportUnitPanel {
         List<AbstractUnit> refUnits = getController().getREFUnits();
         if (refUnits != null) {
             for (AbstractUnit unit : refUnits) {
-                if (getSpecification().getUnitType(unit.getId()).hasAbility(Ability.NAVAL_UNIT)) {
+                if (unit.getType(spec).hasAbility(Ability.NAVAL_UNIT)) {
                     reportPanel.add(createUnitTypeLabel(unit), "sg");
                 }
             }

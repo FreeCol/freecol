@@ -182,8 +182,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
     }
 
     protected JButton getUnitButton(AbstractUnit au) {
-        return getUnitButton(getSpecification().getUnitType(au.getId()),
-                             au.getRoleId());
+        return getUnitButton(au.getType(getSpecification()), au.getRoleId());
     }
 
     protected JButton getUnitButton(final UnitType unitType, String roleId) {

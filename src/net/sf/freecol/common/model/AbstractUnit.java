@@ -140,12 +140,26 @@ public class AbstractUnit extends FreeColObject {
     }
 
     /**
-     * Gets the equipment necessary to create a Unit with the same
-     * type and role as this AbstractUnit.
+     * Convenience accessor for the role.
      *
-     * @param spec A <code>Specification<code> to query.
-     * @return An array of equipment types.
+     * @param spec A <code>Specification</code> to look up the role in.
+     * @return The <code>Role</code> of this abstract unit.
      */
+    public Role getRole(Specification spec) {
+        return spec.getRole(getRoleId());
+    }
+
+    /**
+     * Convenience accessor for the unit type.
+     *
+     * @param spec A <code>Specification</code> to look up the type in.
+     * @return The <code>UnitType</code> of this abstract unit.
+     */
+    public UnitType getType(Specification spec) {
+        return spec.getUnitType(getId());
+    }
+
+
     // Serialization
 
     private static final String ROLE_TAG = "role";

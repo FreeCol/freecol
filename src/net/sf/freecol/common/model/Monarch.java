@@ -473,8 +473,8 @@ public final class Monarch extends FreeColGameObject implements Named {
                 boolean progress = false;
                 for (AbstractUnit ship : interventionForce.getNavalUnits()) {
                     // add ships until all units can be transported at once
-                    if (spec.getUnitType(ship.getId()).canCarryUnits()
-                        && spec.getUnitType(ship.getId()).getSpace() > 0) {
+                    if (ship.getType(spec).canCarryUnits()
+                        && ship.getType(spec).getSpace() > 0) {
                         int value = ship.getNumber() + 1;
                         ship.setNumber(value);
                         progress = true;
@@ -662,9 +662,10 @@ public final class Monarch extends FreeColGameObject implements Named {
          *     in the force.
          */
         public Force(UnitListOption option, String ability) {
+            final Specification spec = getSpecification();
             List<AbstractUnit> units = option.getOptionValues();
             for (AbstractUnit unit : units) {
-                UnitType unitType = getSpecification().getUnitType(unit.getId());
+                UnitType unitType = unit.getType(spec);
                 if (ability == null || unitType.hasAbility(ability)) {
                     if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
                         navalUnits.add(unit);
@@ -691,16 +692,16 @@ public final class Monarch extends FreeColGameObject implements Named {
          * Update the space and capacity variables.
          */
         public void updateSpaceAndCapacity() {
-            Specification spec = getSpecification();
+            final Specification spec = getSpecification();
             capacity = 0;
             for (AbstractUnit nu : navalUnits) {
-                if (spec.getUnitType(nu.getId()).canCarryUnits()) {
-                    capacity += spec.getUnitType(nu.getId()).getSpace() * nu.getNumber();
+                if (nu.getType(spec).canCarryUnits()) {
+                    capacity += nu.getType(spec).getSpace() * nu.getNumber();
                 }
             }
             spaceRequired = 0;
             for (AbstractUnit lu : landUnits) {
-                spaceRequired += spec.getUnitType(lu.getId()).getSpaceTaken() * lu.getNumber();
+                spaceRequired += lu.getType(spec).getSpaceTaken() * lu.getNumber();
             }
         }
 
@@ -745,12 +746,12 @@ public final class Monarch extends FreeColGameObject implements Named {
         /**
          * Adds units to this Force.
          *
-         * @param units The addition to this Force.
+         * @param au The addition to this Force.
          */
-        public void add(AbstractUnit units) {
+        public void add(AbstractUnit au) {
             Specification spec = getSpecification();
-            UnitType unitType = spec.getUnitType(units.getId());
-            int n = units.getNumber();
+            UnitType unitType = au.getType(spec);
+            int n = au.getNumber();
             boolean added = false;
             if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
                 for (AbstractUnit refUnit : navalUnits) {
@@ -763,18 +764,18 @@ public final class Monarch extends FreeColGameObject implements Named {
                         break;
                     }
                 }
-                if (!added) navalUnits.add(units);
+                if (!added) navalUnits.add(au);
             } else {
                 for (AbstractUnit refUnit : landUnits) {
                     if (spec.getUnitType(refUnit.getId()) == unitType
-                        && refUnit.getRoleId().equals(units.getRoleId())) {
+                        && refUnit.getRoleId().equals(au.getRoleId())) {
                         refUnit.setNumber(refUnit.getNumber() + n);
                         spaceRequired += unitType.getSpaceTaken() * n;
                         added = true;
                         break;
                     }
                 }
-                if (!added) landUnits.add(units);
+                if (!added) landUnits.add(au);
             }
             updateSpaceAndCapacity();
         }
