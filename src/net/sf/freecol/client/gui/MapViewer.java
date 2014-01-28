@@ -1276,7 +1276,6 @@ public final class MapViewer {
             where = 1;
         }
         if (moveX >= 0) positionMap(map.getTile(moveX, ty));
-        if (gui.getCurrentViewMode() == GUI.MOVE_UNITS_MODE) stopBlinking();
         return where;
     }
 
@@ -1373,8 +1372,7 @@ public final class MapViewer {
     public void startCursorBlinking() {
         ActionListener taskPerformer = new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                if (!blinkingMarqueeEnabled)
-                    return;
+                if (!blinkingMarqueeEnabled) return;
                 Unit unit = getActiveUnit();
                 if (unit != null) {
                     Tile tile = unit.getTile();
@@ -1394,13 +1392,12 @@ public final class MapViewer {
      */
     public void startGoto() {
         gotoStarted = true;
-        gui.getCanvas().setCursor((java.awt.Cursor) UIManager.get("cursor.go"));
+        gui.getCanvas().setCursor((java.awt.Cursor)UIManager.get("cursor.go"));
         setGotoPath(null);
     }
 
     /**
      * Describe <code>stopBlinking</code> method here.
-     *
      */
     public void stopBlinking() {
         blinkingMarqueeEnabled = false;

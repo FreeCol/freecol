@@ -756,6 +756,24 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
+     * Set the blinking state.  Switching it on again needs to check
+     * for the presence of other dialogs.
+     *
+     * @param on The new desired blinking state.
+     */
+    private void setBlinking(boolean on) {
+        if (on) {
+            for (FreeColDialog<?> f : dialogs) {
+                if (f.isModal()) return;
+            }
+            mapViewer.restartBlinking();
+        } else {
+            if (gui.getCurrentViewMode() != GUI.MOVE_UNITS_MODE) return;
+            mapViewer.stopBlinking();
+        }
+    }
+
+    /**
      * Displays the given dialog, optionally making sure a tile is visible.
      *
      * @param freeColDialog The dialog to be displayed
@@ -770,6 +788,7 @@ public final class Canvas extends JDesktopPane {
         T response = freeColDialog.getResponse();
         remove(freeColDialog);
         dialogRemove(freeColDialog);
+        if (freeColDialog.isModal()) setBlinking(true);
         return response;
     }
 
@@ -1293,6 +1312,7 @@ public final class Canvas extends JDesktopPane {
                 freeColDialog.getWidth(), freeColDialog.getHeight(),
                 getPopupPosition(tile)));
         dialogAdd(freeColDialog);
+        if (freeColDialog.isModal()) setBlinking(false);
         freeColDialog.setVisible(true);
     }
 
