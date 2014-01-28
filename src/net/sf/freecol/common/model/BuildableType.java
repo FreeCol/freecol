@@ -131,6 +131,7 @@ public abstract class BuildableType extends FreeColGameObjectType {
      */
     public boolean isAvailableTo(Player player) {
         if (requiredAbilities != null) {
+
             for (Entry<String, Boolean> entry : requiredAbilities.entrySet()) {
                 if (player.hasAbility(entry.getKey()) != entry.getValue()) {
                     return false;

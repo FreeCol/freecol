@@ -30,10 +30,12 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
+import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Role;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.UnitType;
 
 
@@ -52,33 +54,76 @@ public final class ReportMilitaryPanel extends ReportUnitPanel {
     }
 
 
+    @Override
+    public Dimension getMinimumSize() {
+        return new Dimension(750, 600);
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+        return getMinimumSize();
+    }
+
+
+    // Implement ReportUnitPanel
+
+    /**
+     * {@inheritDoc}
+     */
+    protected void gatherData() {
+        for (Unit unit : getMyPlayer().getUnits()) {
+            if (unit.isOffensiveUnit() && !unit.isNaval()) {
+                String key = "model.role.dragoon".equals(unit.getRole().getId())
+                    ? "dragoons"
+                    : "model.role.soldier".equals(unit.getRole().getId())
+                    ? "soldiers"
+                    : "others";
+                addUnit(unit, key);
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     protected void addREFUnits() {
-        reportPanel.add(new JLabel(Messages.message(getMyPlayer().getNation().getREFNation().getId() + ".name")),
+        final Specification spec = getSpecification();
+        final Nation refNation = getMyPlayer().getNation().getREFNation();
+
+        reportPanel.add(localizedLabel(refNation.getNameKey()),
                         "span, split 2");
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
 
         List<AbstractUnit> refUnits = getController().getREFUnits();
         if (refUnits != null) {
-            for (AbstractUnit unit : refUnits) {
-                if (!getSpecification().getUnitType(unit.getId()).hasAbility(Ability.NAVAL_UNIT)) {
-                    reportPanel.add(createUnitTypeLabel(unit), "sg");
+            for (AbstractUnit au : refUnits) {
+                if (!au.getType(spec).isNaval()) {
+                    reportPanel.add(createUnitTypeLabel(au), "sg");
                 }
             }
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected void addOwnUnits() {
+        final Specification spec = getSpecification();
         final Player player = getMyPlayer();
-        reportPanel.add(localizedLabel(StringTemplate.template("report.military.forces")
-                                       .addStringTemplate("%nation%", player.getNationName())),
-                        "newline, span, split 2");
+        final Role defaultRole = spec.getRole("model.role.default");
+        final UnitType defaultType = spec.getDefaultUnitType();
+        
+        StringTemplate t;
+        t = StringTemplate.template("report.military.forces")
+            .addStringTemplate("%nation%", player.getNationName());
+        reportPanel.add(localizedLabel(t), "newline, span, split 2");
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
 
         List<AbstractUnit> units = new ArrayList<AbstractUnit>();
         List<AbstractUnit> scoutUnits = new ArrayList<AbstractUnit>();
         List<AbstractUnit> dragoonUnits = new ArrayList<AbstractUnit>();
         List<AbstractUnit> soldierUnits = new ArrayList<AbstractUnit>();
-        for (UnitType unitType : getSpecification().getUnitTypeList()) {
+        for (UnitType unitType : spec.getUnitTypeList()) {
             if (unitType.isAvailableTo(player) &&
                 !unitType.hasAbility(Ability.NAVAL_UNIT) &&
                 (unitType.hasAbility(Ability.EXPERT_SOLDIER) ||
@@ -96,7 +141,6 @@ public final class ReportMilitaryPanel extends ReportUnitPanel {
                 }
             }
         }
-        UnitType defaultType = getSpecification().getDefaultUnitType();
         dragoonUnits.add(new AbstractUnit(defaultType,
                 "model.role.dragoon", getCount("dragoons", defaultType)));
         soldierUnits.add(new AbstractUnit(defaultType,
@@ -109,35 +153,6 @@ public final class ReportMilitaryPanel extends ReportUnitPanel {
 
         for (AbstractUnit unit : units) {
             reportPanel.add(createUnitTypeLabel(unit), "sg");
-        }
-    }
-
-    @Override
-    public Dimension getMinimumSize() {
-        return new Dimension(750, 600);
-    }
-
-    @Override
-    public Dimension getPreferredSize() {
-        return getMinimumSize();
-    }
-
-    protected void gatherData() {
-        UnitType defaultType = getSpecification().getDefaultUnitType();
-        for (Unit unit : getMyPlayer().getUnits()) {
-            if (unit.isOffensiveUnit() && !unit.isNaval()) {
-                UnitType unitType = defaultType;
-                if (unit.getType().getOffence() > 0 ||
-                    unit.hasAbility(Ability.EXPERT_SOLDIER)) {
-                    unitType = unit.getType();
-                }
-                String key = "model.role.dragoon".equals(unit.getRole().getId())
-                    ? "dragoons"
-                    : "model.role.soldier".equals(unit.getRole().getId())
-                    ? "soldiers"
-                    : "others";
-                addUnit(unit, key);
-            }
         }
     }
 }

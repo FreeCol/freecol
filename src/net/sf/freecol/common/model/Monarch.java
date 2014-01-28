@@ -627,6 +627,39 @@ public final class Monarch extends FreeColGameObject implements Named {
         return mercs;
     }
 
+    // @compat 0.10.x
+    /**
+     * Checks the integrity of this Monarch.
+     * 
+     * - Detects/fixes bogus expeditionary force roles
+     *
+     * @param fix Fix problems if possible.
+     * @return Negative if there are problems remaining, zero if
+     *     problems were fixed, positive if no problems found at all.
+     */
+    public int checkIntegrity(boolean fix) {
+        int result = 1;
+        for (AbstractUnit au : expeditionaryForce.getLandUnits()) {
+            if ("model.role.soldier".equals(au.getRoleId())) {
+                if (fix) {
+                    au.setRoleId("model.role.infantry");
+                    result = 0;
+                } else {
+                    return -1;
+                }
+            }
+            if ("model.role.dragoon".equals(au.getRoleId())) {
+                if (fix) {
+                    au.setRoleId("model.role.cavalry");
+                    result = 0;
+                } else {
+                    return -1;
+                }
+            }
+        }
+        return result;
+    }
+    // end @compat 0.10.x
 
     /**
      * A group of units with a common origin and purpose.

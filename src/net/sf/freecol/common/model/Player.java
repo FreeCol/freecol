@@ -3788,6 +3788,9 @@ public class Player extends FreeColGameObject implements Nameable {
                 }
             }
         }
+        if (monarch != null) {
+            result = Math.min(result, monarch.checkIntegrity(fix));
+        }
         return result;
     }
 
