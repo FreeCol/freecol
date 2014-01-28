@@ -441,8 +441,8 @@ public final class Monarch extends FreeColGameObject implements Named {
             || !unitType.hasAbility(Ability.CAN_BE_EQUIPPED))
             ? "model.role.default"
             : (Utils.randomInt(logger, "Choose land role", random, 2) == 0)
-            ? "model.role.soldier"
-            : "model.role.dragoon";
+            ? "model.role.infantry"
+            : "model.role.cavalry";
         int number = (needNaval) ? 1
             : Utils.randomInt(logger, "Choose land#", random, 3) + 1;
         AbstractUnit result = new AbstractUnit(unitType, roleId, number);
