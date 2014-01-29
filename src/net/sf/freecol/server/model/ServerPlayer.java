@@ -419,13 +419,15 @@ public class ServerPlayer extends Player implements ServerModelObject {
             Unit carrier;
             if ((carrier = unit.getCarrier()) != null) {
                 if (carrier.hasTile()) {
-                    logger.info(getName() + " alive, unit (embarked) on map.");
+                    logger.info(getName() + " alive, unit " + unit.getId()
+                        + " (embarked) on map.");
                     return IS_ALIVE;
                 }
                 hasEmbarked = true;
             }
-            if (unit.hasTile()) {
-                logger.info(getName() + " alive, unit on map.");
+            if (unit.hasTile() && !unit.isInMission()) {
+                logger.info(getName() + " alive, unit " + unit.getId()
+                    + " on map.");
                 return IS_ALIVE;
             }
         }
