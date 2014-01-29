@@ -1473,9 +1473,9 @@ public class GUI {
     }
 
     public void showMonarchDialog(final MonarchAction action,
-                                  StringTemplate template) {
+                                  StringTemplate template, String monarchKey) {
         if (canvas == null) return;
-        canvas.showMonarchDialog(action, template,
+        canvas.showMonarchDialog(action, template, monarchKey,
             new DialogHandler<Boolean>() {
                 public void handle(Boolean b) {
                     igc().monarchAction(action, b.booleanValue());

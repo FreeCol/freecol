@@ -893,7 +893,8 @@ public final class InGameInputHandler extends InputHandler {
         final MonarchActionMessage message
             = new MonarchActionMessage(game, element);
 
-        getGUI().showMonarchDialog(message.getAction(), message.getTemplate());
+        getGUI().showMonarchDialog(message.getAction(), message.getTemplate(),
+                                   message.getMonarchKey());
         return null;
     }
 

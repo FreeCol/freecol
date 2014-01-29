@@ -3805,6 +3805,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         GoodsType goodsType = goods.getType();
         Colony colony = (Colony) goods.getLocation();
         int amount = Math.min(goods.getAmount(), GoodsContainer.CARGO_SIZE);
+        String monarchKey = getMonarchKey();
 
         if (accepted) {
             csSetTax(tax, cs);
@@ -3817,7 +3818,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
             cs.add(See.only(this), ChangePriority.CHANGE_NORMAL,
                 new MonarchActionMessage(Monarch.MonarchAction.FORCE_TAX,
                     StringTemplate.template("model.monarch.action.FORCE_TAX")
-                        .addAmount("%amount%", tax + extraTax)));
+                        .addAmount("%amount%", tax + extraTax),
+                    monarchKey));
             logger.info("Forced tax raise to: " + (tax + extraTax));
         } else { // Tea party
             Specification spec = getGame().getSpecification();
@@ -3893,7 +3895,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
             getMonarch().setDispleasure(true);
             cs.add(See.only(this), ChangePriority.CHANGE_NORMAL,
                 new MonarchActionMessage(Monarch.MonarchAction.DISPLEASURE,
-                    StringTemplate.template("model.monarch.action.DISPLEASURE")));
+                    StringTemplate.template("model.monarch.action.DISPLEASURE"),
+                    getMonarchKey()));
         }
     }
 

@@ -39,6 +39,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.Ability;
@@ -971,6 +972,7 @@ public final class InGameController extends Controller {
         String messageId = "model.monarch.action." + action.toString();
         StringTemplate template;
         MonarchActionMessage message;
+        String monarchKey = serverPlayer.getMonarchKey();
 
         switch (action) {
         case NO_ACTION:
@@ -993,7 +995,7 @@ public final class InGameController extends Controller {
                     Utils.randomInt(logger, "Tax act goods", random, 6))
                     .addName("%newWorld%", serverPlayer.getNewLandName());
             }
-            message = new MonarchActionMessage(action, template)
+            message = new MonarchActionMessage(action, template, monarchKey)
                 .setTax(taxRaise);
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_EARLY,
                    message);
@@ -1013,12 +1015,12 @@ public final class InGameController extends Controller {
                     Utils.randomInt(logger, "Lower tax reason", random, 5));
             }
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
-                new MonarchActionMessage(action, template));
+                new MonarchActionMessage(action, template, monarchKey));
             break;
         case WAIVE_TAX:
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL,
                 new MonarchActionMessage(action,
-                    StringTemplate.template(messageId)));
+                    StringTemplate.template(messageId), monarchKey));
             break;
         case ADD_TO_REF:
             AbstractUnit refAdditions = monarch.chooseForREF(random);
@@ -1029,7 +1031,7 @@ public final class InGameController extends Controller {
                 .add("%unit%", refAdditions.getType(spec).getNameKey());
             cs.add(See.only(serverPlayer), monarch);
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
-                   new MonarchActionMessage(action, template));
+                new MonarchActionMessage(action, template, monarchKey));
             break;
         case DECLARE_PEACE:
             List<Player> friends = monarch.collectPotentialFriends();
@@ -1041,7 +1043,8 @@ public final class InGameController extends Controller {
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
                 new MonarchActionMessage(action,
                     StringTemplate.template(messageId)
-                        .addStringTemplate("%nation%", friend.getNationName())));
+                        .addStringTemplate("%nation%", friend.getNationName()),
+                    monarchKey));
             break;
         case DECLARE_WAR:
             List<Player> enemies = monarch.collectPotentialEnemies();
@@ -1053,7 +1056,8 @@ public final class InGameController extends Controller {
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
                 new MonarchActionMessage(action,
                     StringTemplate.template(messageId)
-                        .addStringTemplate("%nation%", enemy.getNationName())));
+                        .addStringTemplate("%nation%", enemy.getNationName()),
+                    monarchKey));
             break;
         case SUPPORT_LAND: case SUPPORT_SEA:
             boolean sea = action == MonarchAction.SUPPORT_SEA;
@@ -1065,22 +1069,42 @@ public final class InGameController extends Controller {
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
                 new MonarchActionMessage(action,
                     StringTemplate.template(messageId)
-                    .addStringTemplate("%addition%",
-                        abstractUnitTemplate(", ", support))));
+                        .addStringTemplate("%addition%",
+                            abstractUnitTemplate(", ", support)),
+                    monarchKey));
             break;
-        case OFFER_MERCENARIES:
+        case MONARCH_MERCENARIES:
             final List<AbstractUnit> mercenaries
                 = monarch.getMercenaries(random);
             if (mercenaries.isEmpty()) break;
             final int mercPrice = serverPlayer.priceMercenaries(mercenaries);
-            message = new MonarchActionMessage(MonarchAction.OFFER_MERCENARIES,
-                StringTemplate.template("model.monarch.action.OFFER_MERCENARIES")
+            message = new MonarchActionMessage(action,
+                StringTemplate.template("model.monarch.action.MONARCH_MERCENARIES")
                     .addAmount("%gold%", mercPrice)
                     .addStringTemplate("%mercenaries%",
-                        abstractUnitTemplate(", ", mercenaries)));
+                        abstractUnitTemplate(", ", mercenaries)),
+                monarchKey);
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_EARLY,
                    message);
             new MonarchSession(serverPlayer, action, mercenaries, mercPrice);
+            break;
+        case HESSIAN_MERCENARIES:
+            final List<AbstractUnit> hessians
+                = monarch.getMercenaries(random);
+            if (hessians.isEmpty()) break;
+            int n = Messages.getMercenaryLeaderCount();
+            n = Utils.randomInt(logger, "Mercenary leader", random, n);
+            final int hessPrice = serverPlayer.priceMercenaries(hessians);
+            message = new MonarchActionMessage(action,
+                StringTemplate.template("model.monarch.action.HESSIAN_MERCENARIES")
+                    .addName("%leader%", Messages.getMercenaryLeaderName(n))
+                    .addAmount("%gold%", hessPrice)
+                    .addStringTemplate("%mercenaries%",
+                        abstractUnitTemplate(", ", hessians)),
+                "model.mercenaries." + n + ".image");
+            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_EARLY,
+                   message);
+            new MonarchSession(serverPlayer, action, hessians, hessPrice);
             break;
         case DISPLEASURE: default:
             logger.warning("Bogus action: " + action);

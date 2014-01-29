@@ -41,6 +41,9 @@ public class MonarchActionMessage extends DOMMessage {
     /** A template describing the action. */
     private StringTemplate template;
 
+    /** The monarch image key. */
+    private String monarchKey;
+
     /** The tax rate, if appropriate. */
     private String tax;
 
@@ -53,13 +56,15 @@ public class MonarchActionMessage extends DOMMessage {
      *
      * @param action The <code>MonarchAction</code> to do.
      * @param template A <code>StringTemplate</code> describing the action.
+     * @param monarchKey The resource key for the monarch image.
      */
     public MonarchActionMessage(MonarchAction action,
-                                StringTemplate template) {
+                                StringTemplate template, String monarchKey) {
         super(getXMLElementTagName());
 
         this.action = action;
         this.template = template;
+        this.monarchKey = monarchKey;
         this.tax = null;
         this.resultString = null;
     }
@@ -76,6 +81,7 @@ public class MonarchActionMessage extends DOMMessage {
 
         this.action = Enum.valueOf(MonarchAction.class,
                                    element.getAttribute("action"));
+        this.monarchKey = element.getAttribute("monarch");
         this.tax = element.getAttribute("tax");
         this.resultString = element.getAttribute("result");
         NodeList children = element.getChildNodes();
@@ -106,6 +112,15 @@ public class MonarchActionMessage extends DOMMessage {
      */
     public StringTemplate getTemplate() {
         return template;
+    }
+
+    /**
+     * Gets the monarch key.
+     *
+     * @return The monarch key.
+     */
+    public String getMonarchKey() {
+        return this.monarchKey;
     }
 
     /**
@@ -178,7 +193,8 @@ public class MonarchActionMessage extends DOMMessage {
      */
     public Element toXMLElement() {
         Element result = createMessage(getXMLElementTagName(),
-            "action", action.toString());
+            "action", action.toString(),
+            "monarch", monarchKey);
         if (tax != null) result.setAttribute("tax", tax);
         if (resultString != null) result.setAttribute("result", resultString);
         if (template != null) {

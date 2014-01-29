@@ -131,6 +131,9 @@ public class Messages {
     /** Extra river names. */
     private static List<String> otherRivers = null;
 
+    /** Mercenary leaders. */
+    private static List<String> mercenaryLeaders = null;
+
 
     /**
      * Gets the Selector with the given tag.
@@ -850,6 +853,29 @@ public class Messages {
             } while (map.getRegionByName(name) != null);
         }
         return name;
+    }
+
+    /**
+     * Get the number of mercenary leaders.
+     *
+     * @return The number of mercenary leaders.
+     */
+    public static int getMercenaryLeaderCount() {
+        if (mercenaryLeaders == null) {
+            mercenaryLeaders = new ArrayList<String>();
+            collectNames("model.mercenaries.", mercenaryLeaders);
+        }
+        return mercenaryLeaders.size();
+    }
+
+    /**
+     * Get the name of the nth mercenary leader.
+     *
+     * @param n The index of the leader required.
+     * @return The mercenary leader name.
+     */
+    public static String getMercenaryLeaderName(int n) {
+        return mercenaryLeaders.get(n);
     }
 
     /**

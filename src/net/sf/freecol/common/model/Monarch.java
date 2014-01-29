@@ -44,8 +44,11 @@ public final class Monarch extends FreeColGameObject implements Named {
 
     private static final Logger logger = Logger.getLogger(Monarch.class.getName());
 
-    /** The minimum price for mercenaries. */
-    public static final int MINIMUM_PRICE = 300;
+    /** The minimum price for a monarch offer of mercenaries. */
+    public static final int MONARCH_MINIMUM_PRICE = 200;
+
+    /** The minimum price for a Hessian offer of mercenaries. */
+    public static final int HESSIAN_MINIMUM_PRICE = 5000;
 
     /**
      * The minimum tax rate (given in percentage) from where it
@@ -79,7 +82,9 @@ public final class Monarch extends FreeColGameObject implements Named {
         DECLARE_WAR,
         SUPPORT_LAND,
         SUPPORT_SEA,
-        OFFER_MERCENARIES, DISPLEASURE,
+        MONARCH_MERCENARIES, 
+        HESSIAN_MERCENARIES,
+        DISPLEASURE,
     }
 
     /**
@@ -322,8 +327,10 @@ public final class Monarch extends FreeColGameObject implements Named {
         case SUPPORT_SEA:
             return player.getAttackedByPrivateers() && !getSupportSea()
                 && !getDispleasure();
-        case SUPPORT_LAND: case OFFER_MERCENARIES:
+        case SUPPORT_LAND: case MONARCH_MERCENARIES:
             return player.isAtWar() && !getDispleasure();
+        case HESSIAN_MERCENARIES:
+            return player.checkGold(HESSIAN_MINIMUM_PRICE);
         case DISPLEASURE:
             return false;
         default:
@@ -363,12 +370,13 @@ public final class Monarch extends FreeColGameObject implements Named {
         addIfValid(choices, MonarchAction.ADD_TO_REF, 10 + dx);
         addIfValid(choices, MonarchAction.DECLARE_PEACE, 6 - dx);
         addIfValid(choices, MonarchAction.DECLARE_WAR, 5 + dx);
-        if (player.checkGold(MINIMUM_PRICE)) {
-            addIfValid(choices, MonarchAction.OFFER_MERCENARIES, 6 - dx);
+        if (player.checkGold(MONARCH_MINIMUM_PRICE)) {
+            addIfValid(choices, MonarchAction.MONARCH_MERCENARIES, 6-dx);
         } else if (dx < 3) {
             addIfValid(choices, MonarchAction.SUPPORT_LAND, 3 - dx);
         }
         addIfValid(choices, MonarchAction.SUPPORT_SEA, 6 - dx);
+        addIfValid(choices, MonarchAction.HESSIAN_MERCENARIES, 6-dx);
 
         return choices;
     }

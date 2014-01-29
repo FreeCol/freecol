@@ -265,7 +265,7 @@ public final class AIInGameInputHandler implements MessageHandler {
                           + " = " + accept);
             break;
 
-        case OFFER_MERCENARIES:
+        case MONARCH_MERCENARIES: case HESSIAN_MERCENARIES:
             accept = getAIPlayer().acceptMercenaries();
             message.setResult(accept);
             logger.finest("AI player monarch action " + action

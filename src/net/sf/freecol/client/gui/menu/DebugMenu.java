@@ -310,8 +310,8 @@ public class DebugMenu extends JMenu {
             Messages.message("menuBar.debug.displayMonarchPanel"));
         monarchDialog.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    gui.showMonarchDialog(
-                        Monarch.MonarchAction.RAISE_TAX_WAR, null);
+                    gui.showMonarchDialog(Monarch.MonarchAction.RAISE_TAX_WAR,
+                        null, player.getMonarchKey());
                 }
             });
         panelMenu.add(monarchDialog);
