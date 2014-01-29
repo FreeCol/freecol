@@ -32,7 +32,7 @@ import net.sf.freecol.util.test.FreeColTestCase;
 public class RoleTest extends FreeColTestCase {
 
     private static final Role none
-        = spec().getRole("model.role.default");
+        = spec().getDefaultRole();
     private static final Role scout
         = spec().getRole("model.role.scout");
     private static final Role soldier

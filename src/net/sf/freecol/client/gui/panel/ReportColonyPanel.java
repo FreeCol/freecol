@@ -672,14 +672,14 @@ public final class ReportColonyPanel extends ReportPanel
                 - u.getTurnsOfTraining();
             if (left <= 0) {
                 b = colourButton(cac, Integer.toString(0),
-                    lib.getUnitImageIcon(u.getType(), "model.role.default",
+                    lib.getUnitImageIcon(u.getType(), Role.DEFAULT_ID,
                         true, 0.333), cAlarm,
                     stpl("report.colony.making.noteach.description")
                         .addName("%colony%", colony.getName())
                         .addStringTemplate("%teacher%", Messages.getLabelTemplate(u)));
             } else {
                 b = colourButton(cac, Integer.toString(left),
-                    lib.getUnitImageIcon(u.getType(), "model.role.default",
+                    lib.getUnitImageIcon(u.getType(), Role.DEFAULT_ID,
                         true, 0.333), Color.BLACK,
                     stpl("report.colony.making.educating.description")
                         .addName("%colony%", colony.getName())
@@ -740,7 +740,7 @@ public final class ReportColonyPanel extends ReportPanel
         final UnitType colonistType = getSpecification().getDefaultUnitType();
         ImageIcon colonistIcon
             = getGUI().getImageLibrary().getUnitImageIcon(colonistType,
-                "model.role.default", true, 0.333);
+                Role.DEFAULT_ID, true, 0.333);
         reportPanel.add(newLabel(null, colonistIcon, null,
                                  stpl("report.colony.birth.description")));
         reportPanel.add(newLabel("report.colony.making.header", null, null,
@@ -854,8 +854,8 @@ public final class ReportColonyPanel extends ReportPanel
             }
             Suggestion suggestion = suggestions.get(type);
             String label = Integer.toString(suggestion.amount);
-            ImageIcon ii = lib.getUnitImageIcon(type, "model.role.default",
-                true, 0.333);
+            ImageIcon ii = lib.getUnitImageIcon(type, Role.DEFAULT_ID,
+                                                true, 0.333);
             StringTemplate tip = (suggestion.oldType == null)
                 ? stpl("report.colony.wanting.description")
                     .addName("%colony%", colony.getName())

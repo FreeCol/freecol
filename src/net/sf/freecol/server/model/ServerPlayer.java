@@ -419,13 +419,15 @@ public class ServerPlayer extends Player implements ServerModelObject {
             Unit carrier;
             if ((carrier = unit.getCarrier()) != null) {
                 if (carrier.hasTile()) {
-                    logger.info(getName() + " alive, unit (embarked) on map.");
+                    logger.info(getName() + " alive, unit " + unit.getId()
+                        + " (embarked) on map.");
                     return IS_ALIVE;
                 }
                 hasEmbarked = true;
             }
-            if (unit.hasTile()) {
-                logger.info(getName() + " alive, unit on map.");
+            if (unit.hasTile() && !unit.isInMission()) {
+                logger.info(getName() + " alive, unit " + unit.getId()
+                    + " on map.");
                 return IS_ALIVE;
             }
         }
@@ -910,16 +912,37 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     public List<Unit> createUnits(List<AbstractUnit> abstractUnits,
                                   Location location) {
-        Game game = getGame();
         List<Unit> units = new ArrayList<Unit>();
         if (location == null) return units;
 
-        Specification spec = game.getSpecification();
+        final Game game = getGame();
+        final Specification spec = game.getSpecification();
         for (AbstractUnit au : abstractUnits) {
+            UnitType type = au.getType(spec);
+            Role role = au.getRole(spec);
+            if (!type.isAvailableTo(this)) {
+                logger.warning("Ignoring abstract unit with broken type: "
+                    + type);
+                continue;
+            }
+            // @compat 0.10.x
+            if (isREF() && !role.isAvailableTo(this, type)) {
+                if ("model.role.soldier".equals(role.getId())) {
+                    role = spec.getRole("model.role.infantry");
+                } else if ("model.role.dragoon".equals(role.getId())) {
+                    role = spec.getRole("model.role.cavalry");
+                }
+            }
+            // end @compat 0.10.x
+            if (!role.isAvailableTo(this, type)) {
+                logger.warning("Ignoring abstract unit with broken role: "
+                    + role);
+                continue;
+            }
             for (int i = 0; i < au.getNumber(); i++) {
-                units.add(new ServerUnit(game, location, this,
-                                         spec.getUnitType(au.getId()),
-                                         spec.getRole(au.getRoleId())));//-vis(this)
+                ServerUnit su = new ServerUnit(game, location, this, type,
+                                               role);//-vis(this)
+                units.add(su);
             }
         }
         return units;
@@ -3782,6 +3805,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         GoodsType goodsType = goods.getType();
         Colony colony = (Colony) goods.getLocation();
         int amount = Math.min(goods.getAmount(), GoodsContainer.CARGO_SIZE);
+        String monarchKey = getMonarchKey();
 
         if (accepted) {
             csSetTax(tax, cs);
@@ -3794,7 +3818,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
             cs.add(See.only(this), ChangePriority.CHANGE_NORMAL,
                 new MonarchActionMessage(Monarch.MonarchAction.FORCE_TAX,
                     StringTemplate.template("model.monarch.action.FORCE_TAX")
-                        .addAmount("%amount%", tax + extraTax)));
+                        .addAmount("%amount%", tax + extraTax),
+                    monarchKey));
             logger.info("Forced tax raise to: " + (tax + extraTax));
         } else { // Tea party
             Specification spec = getGame().getSpecification();
@@ -3870,7 +3895,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
             getMonarch().setDispleasure(true);
             cs.add(See.only(this), ChangePriority.CHANGE_NORMAL,
                 new MonarchActionMessage(Monarch.MonarchAction.DISPLEASURE,
-                    StringTemplate.template("model.monarch.action.DISPLEASURE")));
+                    StringTemplate.template("model.monarch.action.DISPLEASURE"),
+                    getMonarchKey()));
         }
     }
 

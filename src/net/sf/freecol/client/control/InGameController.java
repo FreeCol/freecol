@@ -2534,7 +2534,8 @@ public final class InGameController implements NetworkConstants {
      */
     public void monarchAction(MonarchAction action, boolean accept) {
         switch (action) {
-        case RAISE_TAX_ACT: case RAISE_TAX_WAR: case OFFER_MERCENARIES:
+        case RAISE_TAX_ACT: case RAISE_TAX_WAR:
+        case MONARCH_MERCENARIES: case HESSIAN_MERCENARIES:
             askServer().answerMonarch(action, accept);
             break;
         default:

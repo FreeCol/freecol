@@ -77,6 +77,7 @@
                        type="model.option.lastColonialYear"/>
       </limit>
       <ability id="model.ability.independenceDeclared" />
+      <ability id="model.ability.independentNation" />
     </event>
     <event id="model.event.spanishSuccession">
       <limit id="model.limit.spanishSuccession.year" operator="GE">
@@ -797,7 +798,8 @@
     </role>
     <role id="model.role.infantry">
       <required-ability id="model.ability.canBeEquipped" />
-      <required-ability id="model.ability.refUnit" />
+      <required-ability id="model.ability.royalExpeditionaryForce" value="true"/>
+      <required-ability id="model.ability.refUnit" value="true"/>
       <required-goods id="model.goods.muskets" value="50" />
       <ability id="model.ability.captureUnits"/>
       <ability id="model.ability.disposeOnCombatLoss"/>
@@ -806,7 +808,8 @@
     </role>
     <role id="model.role.cavalry" downgrade="model.role.infantry">
       <required-ability id="model.ability.canBeEquipped" />
-      <required-ability id="model.ability.refUnit" />
+      <required-ability id="model.ability.royalExpeditionaryForce" value="true"/>
+      <required-ability id="model.ability.refUnit" value="true"/>
       <required-goods id="model.goods.muskets" value="50" />
       <required-goods id="model.goods.horses" value="50" />
       <ability id="model.ability.captureUnits" value="true"/>
@@ -1320,7 +1323,7 @@ resources of 400, lost city rumours of 500
                lineOfSight="2" space="6" spaceTaken="64" hitPoints="6" scoreValue="8">
       <required-goods id="model.goods.hammers" value="1024"/>
       <required-goods id="model.goods.tools" value="300"/>
-      <required-ability id="model.ability.independenceDeclared"/>
+      <required-ability id="model.ability.independentNation"/>
       <ability id="model.ability.refUnit" value="true"/>
       <ability id="model.ability.captureGoods" value="true"/>
     </unit-type>
@@ -1927,6 +1930,7 @@ resources of 400, lost city rumours of 500
       <modifier id="model.modifier.bombardBonus" type="percentage" value="50"/>
       <ability id="model.ability.ambushPenalty" value="true"/>
       <ability id="model.ability.royalExpeditionaryForce" value="true"/>
+      <ability id="model.ability.independentNation" value="true"/>
       <settlement id="model.settlement.colony" capital="false" claimableRadius="1"
                   visibleRadius="2">
         <modifier id="model.modifier.defence" type="percentage" value="50" />

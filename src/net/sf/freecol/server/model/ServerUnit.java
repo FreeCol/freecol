@@ -1043,7 +1043,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     || (unit != null
                         && (contactPlayer = (ServerPlayer)unit.getOwner())
                             .isEuropean()
-                        && (is = getHomeIndianSettlement()) != null)) {
+                        && (is = getHomeIndianSettlement()) != null
+                        && is.getTile() != null)) {
                     Tile copied = is.getTile().getTileToCache();
                     if (contactPlayer.hasExplored(is.getTile())
                         && is.setContacted(contactPlayer)) {//-til

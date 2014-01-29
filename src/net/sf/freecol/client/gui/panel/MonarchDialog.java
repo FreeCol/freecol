@@ -57,9 +57,11 @@ public final class MonarchDialog extends FreeColDialog<Boolean> {
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param action The <code>MonarchAction</code> the monarch is performing.
      * @param template The <code>StringTemplate</code> describing the action.
+     * @param monarchKey The resource key for the monarch image.
      */
     public MonarchDialog(FreeColClient freeColClient,
-                         MonarchAction action, StringTemplate template) {
+                         MonarchAction action, StringTemplate template,
+                         String monarchKey) {
         super(freeColClient);
 
         final ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
@@ -74,7 +76,10 @@ public final class MonarchDialog extends FreeColDialog<Boolean> {
         String noId = messageId + ".no";
         if (!Messages.containsKey(noId)) noId = "close";
 
-        String hdr = Messages.message("aMessageFromTheCrown");
+        String hdrKey = (action == MonarchAction.HESSIAN_MERCENARIES)
+            ? "monarchDialog.header.fromHessians"
+            : "monarchDialog.header.fromCrown";
+        String hdr = Messages.message(hdrKey);
         JTextArea header = GUI.getDefaultTextArea(hdr);
         header.setFont(GUI.MEDIUM_HEADER_FONT);
 
@@ -91,9 +96,11 @@ public final class MonarchDialog extends FreeColDialog<Boolean> {
                 });
             panel.add(helpButton, "tag help");
         }
-        panel.add(GUI.getDefaultTextArea((template == null)
-                ? Messages.message(messageId)
-                : Messages.message(new StringTemplate(messageId, template))));
+        JTextArea text = GUI.getDefaultTextArea((template == null)
+            ? Messages.message(messageId)
+            : Messages.message(new StringTemplate(messageId, template)),
+            30);
+        panel.add(text);
         panel.setSize(panel.getPreferredSize());
 
         List<ChoiceItem<Boolean>> c = choices();
@@ -103,7 +110,8 @@ public final class MonarchDialog extends FreeColDialog<Boolean> {
         }
         c.add(new ChoiceItem<Boolean>(Messages.message(noId), Boolean.FALSE)
             .cancelOption().defaultOption());
+
         initialize(DialogType.QUESTION, false, panel,
-                   lib.getMonarchImageIcon(nation), c);
+                   lib.getMiscImageIcon(monarchKey), c);
     }
 }

@@ -73,13 +73,11 @@ public class TerrainCursor implements ActionListener  {
     }
     
     public void startBlinking() {
-        if(!blinkTimer.isRunning())
-            blinkTimer.start();
+        if (!blinkTimer.isRunning()) blinkTimer.start();
     }
     
     public void stopBlinking() {
-        if(blinkTimer.isRunning())
-            blinkTimer.stop();
+        if (blinkTimer.isRunning()) blinkTimer.stop();
     }
 
     public void setCanvasPos(int x,int y) {

@@ -836,6 +836,15 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Get a resource key for the player monarch image.
+     *
+     * @return The monarch image key.
+     */
+    public String getMonarchKey() {
+        return nationId + ".monarch.image";
+    }
+
+    /**
      * Gets the name index for a given key.
      *
      * @param key The key to use.
@@ -2018,9 +2027,9 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The price for the unit.
      */
     public int getPrice(AbstractUnit au) {
-        Specification spec = getSpecification();
-        UnitType unitType = spec.getUnitType(au.getId());
-        Role role = spec.getRole(au.getRoleId());
+        final Specification spec = getSpecification();
+        UnitType unitType = au.getType(spec);
+        Role role = au.getRole(spec);
         if (unitType.hasPrice()) {
             int price = getEurope().getUnitPrice(unitType);
             for (AbstractGoods goods : role.getRequiredGoods()) {
@@ -3787,6 +3796,9 @@ public class Player extends FreeColGameObject implements Nameable {
                     result = -1;
                 }
             }
+        }
+        if (monarch != null) {
+            result = Math.min(result, monarch.checkIntegrity(fix));
         }
         return result;
     }

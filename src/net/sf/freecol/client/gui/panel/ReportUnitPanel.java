@@ -124,6 +124,16 @@ public abstract class ReportUnitPanel extends ReportPanel {
         repaint();
     }
 
+    @Override
+    public Dimension getMinimumSize() {
+        return new Dimension(750, 600);
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+        return getMinimumSize();
+    }
+
     protected int getCount(String key, UnitType type) {
         TypeCountMap<UnitType> map = units.get(key);
         if (map == null) {
@@ -236,16 +246,6 @@ public abstract class ReportUnitPanel extends ReportPanel {
         }
         button.setToolTipText(toolTip);
         return button;
-    }
-
-    @Override
-    public Dimension getMinimumSize() {
-        return new Dimension(750, 600);
-    }
-
-    @Override
-    public Dimension getPreferredSize() {
-        return getMinimumSize();
     }
 
 }

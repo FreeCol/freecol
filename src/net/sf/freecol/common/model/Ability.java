@@ -287,6 +287,14 @@ public final class Ability extends Feature implements Comparable<Ability> {
     public static final String INDEPENDENCE_DECLARED
         = "model.ability.independenceDeclared";
 
+    /**
+     * The ability denoting that this is an independent nation.
+     * Note: this differs from INDEPENDENCE_DECLARED in that
+     * the REF is also (representing) an independent nation.
+     */
+    public static final String INDEPENDENT_NATION
+        = "model.ability.independentNation";
+
     /** Units with this ability can be chosen as mercenaries support units. */
     public static final String MERCENARY_UNIT
         = "model.ability.mercenaryUnit";

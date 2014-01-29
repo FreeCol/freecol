@@ -475,7 +475,7 @@ public class ScoutingMission extends Mission {
         setTarget(findTarget(aiUnit, 20, false));
         if (completed instanceof Colony) {
             if (getTarget() == null || getTarget() == completed) {
-                aiUnit.equipForRole("model.role.default", false);
+                aiUnit.equipForRole(Role.DEFAULT_ID, false);
                 setTarget(null);
             }
             logger.finest(tag + " arrived at " + ((Colony)completed).getName()

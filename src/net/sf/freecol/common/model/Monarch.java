@@ -44,8 +44,11 @@ public final class Monarch extends FreeColGameObject implements Named {
 
     private static final Logger logger = Logger.getLogger(Monarch.class.getName());
 
-    /** The minimum price for mercenaries. */
-    public static final int MINIMUM_PRICE = 300;
+    /** The minimum price for a monarch offer of mercenaries. */
+    public static final int MONARCH_MINIMUM_PRICE = 200;
+
+    /** The minimum price for a Hessian offer of mercenaries. */
+    public static final int HESSIAN_MINIMUM_PRICE = 5000;
 
     /**
      * The minimum tax rate (given in percentage) from where it
@@ -79,7 +82,9 @@ public final class Monarch extends FreeColGameObject implements Named {
         DECLARE_WAR,
         SUPPORT_LAND,
         SUPPORT_SEA,
-        OFFER_MERCENARIES, DISPLEASURE,
+        MONARCH_MERCENARIES, 
+        HESSIAN_MERCENARIES,
+        DISPLEASURE,
     }
 
     /**
@@ -322,8 +327,10 @@ public final class Monarch extends FreeColGameObject implements Named {
         case SUPPORT_SEA:
             return player.getAttackedByPrivateers() && !getSupportSea()
                 && !getDispleasure();
-        case SUPPORT_LAND: case OFFER_MERCENARIES:
+        case SUPPORT_LAND: case MONARCH_MERCENARIES:
             return player.isAtWar() && !getDispleasure();
+        case HESSIAN_MERCENARIES:
+            return player.checkGold(HESSIAN_MINIMUM_PRICE);
         case DISPLEASURE:
             return false;
         default:
@@ -363,12 +370,13 @@ public final class Monarch extends FreeColGameObject implements Named {
         addIfValid(choices, MonarchAction.ADD_TO_REF, 10 + dx);
         addIfValid(choices, MonarchAction.DECLARE_PEACE, 6 - dx);
         addIfValid(choices, MonarchAction.DECLARE_WAR, 5 + dx);
-        if (player.checkGold(MINIMUM_PRICE)) {
-            addIfValid(choices, MonarchAction.OFFER_MERCENARIES, 6 - dx);
+        if (player.checkGold(MONARCH_MINIMUM_PRICE)) {
+            addIfValid(choices, MonarchAction.MONARCH_MERCENARIES, 6-dx);
         } else if (dx < 3) {
             addIfValid(choices, MonarchAction.SUPPORT_LAND, 3 - dx);
         }
         addIfValid(choices, MonarchAction.SUPPORT_SEA, 6 - dx);
+        addIfValid(choices, MonarchAction.HESSIAN_MERCENARIES, 6-dx);
 
         return choices;
     }
@@ -439,10 +447,10 @@ public final class Monarch extends FreeColGameObject implements Named {
                                                   types, random);
         String roleId = (needNaval
             || !unitType.hasAbility(Ability.CAN_BE_EQUIPPED))
-            ? "model.role.default"
+            ? Role.DEFAULT_ID
             : (Utils.randomInt(logger, "Choose land role", random, 2) == 0)
-            ? "model.role.soldier"
-            : "model.role.dragoon";
+            ? "model.role.infantry"
+            : "model.role.cavalry";
         int number = (needNaval) ? 1
             : Utils.randomInt(logger, "Choose land#", random, 3) + 1;
         AbstractUnit result = new AbstractUnit(unitType, roleId, number);
@@ -473,8 +481,8 @@ public final class Monarch extends FreeColGameObject implements Named {
                 boolean progress = false;
                 for (AbstractUnit ship : interventionForce.getNavalUnits()) {
                     // add ships until all units can be transported at once
-                    if (spec.getUnitType(ship.getId()).canCarryUnits()
-                        && spec.getUnitType(ship.getId()).getSpace() > 0) {
+                    if (ship.getType(spec).canCarryUnits()
+                        && ship.getType(spec).getSpace() > 0) {
                         int value = ship.getNumber() + 1;
                         ship.setNumber(value);
                         progress = true;
@@ -513,7 +521,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         if (naval) {
             support.add(new AbstractUnit(Utils.getRandomMember(logger,
                         "Choose naval support", navalTypes, random),
-                        "model.role.default", 1));
+                        Role.DEFAULT_ID, 1));
             setSupportSea(true);
             return support;
         }
@@ -530,7 +538,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         case 4:
             support.add(new AbstractUnit(Utils.getRandomMember(logger,
                         "Choose bombard", bombardTypes, random),
-                        "model.role.default", 1));
+                        Role.DEFAULT_ID, 1));
             support.add(new AbstractUnit(Utils.getRandomMember(logger,
                         "Choose mounted", mountedTypes, random),
                         "model.role.dragoon", 2));
@@ -597,7 +605,7 @@ public final class Monarch extends FreeColGameObject implements Named {
                 ? ((Utils.randomInt(logger, "Swap role", random, 2) == 0)
                     ? new String[] { "model.role.dragoon", "model.role.soldier" }
                     : new String[] { "model.role.soldier", "model.role.dragoon" })
-                : new String[] { "model.role.default" };
+                : new String[] { Role.DEFAULT_ID };
             for (int r = 0; r < roleIds.length; r++) {
                 int n = Utils.randomInt(logger, "Choose number " + unitType,
                                         random, Math.min(count, 2)) + 1;
@@ -621,12 +629,45 @@ public final class Monarch extends FreeColGameObject implements Named {
         if (mercs.isEmpty() && unitType != null) {
             String roleId = (unitType.hasAbility(Ability.CAN_BE_EQUIPPED))
                 ? "model.role.soldier"
-                : "model.role.default";
+                : Role.DEFAULT_ID;
             mercs.add(new AbstractUnit(unitType, roleId, 1));
         }
         return mercs;
     }
 
+    // @compat 0.10.x
+    /**
+     * Checks the integrity of this Monarch.
+     * 
+     * - Detects/fixes bogus expeditionary force roles
+     *
+     * @param fix Fix problems if possible.
+     * @return Negative if there are problems remaining, zero if
+     *     problems were fixed, positive if no problems found at all.
+     */
+    public int checkIntegrity(boolean fix) {
+        int result = 1;
+        for (AbstractUnit au : expeditionaryForce.getLandUnits()) {
+            if ("model.role.soldier".equals(au.getRoleId())) {
+                if (fix) {
+                    au.setRoleId("model.role.infantry");
+                    result = 0;
+                } else {
+                    return -1;
+                }
+            }
+            if ("model.role.dragoon".equals(au.getRoleId())) {
+                if (fix) {
+                    au.setRoleId("model.role.cavalry");
+                    result = 0;
+                } else {
+                    return -1;
+                }
+            }
+        }
+        return result;
+    }
+    // end @compat 0.10.x
 
     /**
      * A group of units with a common origin and purpose.
@@ -662,9 +703,10 @@ public final class Monarch extends FreeColGameObject implements Named {
          *     in the force.
          */
         public Force(UnitListOption option, String ability) {
+            final Specification spec = getSpecification();
             List<AbstractUnit> units = option.getOptionValues();
             for (AbstractUnit unit : units) {
-                UnitType unitType = getSpecification().getUnitType(unit.getId());
+                UnitType unitType = unit.getType(spec);
                 if (ability == null || unitType.hasAbility(ability)) {
                     if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
                         navalUnits.add(unit);
@@ -691,16 +733,16 @@ public final class Monarch extends FreeColGameObject implements Named {
          * Update the space and capacity variables.
          */
         public void updateSpaceAndCapacity() {
-            Specification spec = getSpecification();
+            final Specification spec = getSpecification();
             capacity = 0;
             for (AbstractUnit nu : navalUnits) {
-                if (spec.getUnitType(nu.getId()).canCarryUnits()) {
-                    capacity += spec.getUnitType(nu.getId()).getSpace() * nu.getNumber();
+                if (nu.getType(spec).canCarryUnits()) {
+                    capacity += nu.getType(spec).getSpace() * nu.getNumber();
                 }
             }
             spaceRequired = 0;
             for (AbstractUnit lu : landUnits) {
-                spaceRequired += spec.getUnitType(lu.getId()).getSpaceTaken() * lu.getNumber();
+                spaceRequired += lu.getType(spec).getSpaceTaken() * lu.getNumber();
             }
         }
 
@@ -745,12 +787,12 @@ public final class Monarch extends FreeColGameObject implements Named {
         /**
          * Adds units to this Force.
          *
-         * @param units The addition to this Force.
+         * @param au The addition to this Force.
          */
-        public void add(AbstractUnit units) {
+        public void add(AbstractUnit au) {
             Specification spec = getSpecification();
-            UnitType unitType = spec.getUnitType(units.getId());
-            int n = units.getNumber();
+            UnitType unitType = au.getType(spec);
+            int n = au.getNumber();
             boolean added = false;
             if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
                 for (AbstractUnit refUnit : navalUnits) {
@@ -763,18 +805,18 @@ public final class Monarch extends FreeColGameObject implements Named {
                         break;
                     }
                 }
-                if (!added) navalUnits.add(units);
+                if (!added) navalUnits.add(au);
             } else {
                 for (AbstractUnit refUnit : landUnits) {
                     if (spec.getUnitType(refUnit.getId()) == unitType
-                        && refUnit.getRoleId().equals(units.getRoleId())) {
+                        && refUnit.getRoleId().equals(au.getRoleId())) {
                         refUnit.setNumber(refUnit.getNumber() + n);
                         spaceRequired += unitType.getSpaceTaken() * n;
                         added = true;
                         break;
                     }
                 }
-                if (!added) landUnits.add(units);
+                if (!added) landUnits.add(au);
             }
             updateSpaceAndCapacity();
         }
@@ -936,8 +978,8 @@ public final class Monarch extends FreeColGameObject implements Named {
         // end @compat
 
         } else if (MERCENARY_FORCE_TAG.equals(tag)) {
-            interventionForce.readFromXML(xr);
-
+            mercenaryForce.readFromXML(xr);
+            
         // @compat 0.10.5
         } else if (Force.NAVAL_UNITS_TAG.equals(tag)) {
             expeditionaryForce.getNavalUnits().clear();

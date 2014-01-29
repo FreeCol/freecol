@@ -125,7 +125,7 @@ public class ReportPanel extends FreeColPanel {
     }
 
     protected JLabel createUnitTypeLabel(AbstractUnit au) {
-        UnitType unitType = getSpecification().getUnitType(au.getId());
+        UnitType unitType = au.getType(getSpecification());
         String roleId = au.getRoleId();
         int count = au.getNumber();
         ImageIcon unitIcon = getLibrary().getUnitImageIcon(unitType, roleId,

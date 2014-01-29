@@ -86,7 +86,7 @@ public class MonarchSession extends TransactionSession {
         case RAISE_TAX_ACT: case RAISE_TAX_WAR:
             serverPlayer.csRaiseTax(tax, goods, result, cs);
             break;
-        case OFFER_MERCENARIES:
+        case MONARCH_MERCENARIES: case HESSIAN_MERCENARIES:
             if (result) serverPlayer.csAddMercenaries(mercenaries, price, cs);
             break;
         }
@@ -101,7 +101,7 @@ public class MonarchSession extends TransactionSession {
                 new ModelMessage("model.monarch.ignoredTax", serverPlayer)
                     .addAmount("%amount%", tax));
             break;
-        case OFFER_MERCENARIES:
+        case MONARCH_MERCENARIES: case HESSIAN_MERCENARIES:
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage("model.monarch.ignoredMercenaries",
                                  serverPlayer));

@@ -21,7 +21,11 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -36,10 +40,8 @@ import net.sf.freecol.common.util.Utils;
  */
 public class Role extends BuildableType implements Comparable<Role> {
 
-    /**
-     * The ID of the default role.
-     */
-    public static final String DEFAULT = "model.role.default";
+    /** The ID of the default role. */
+    public static final String DEFAULT_ID = "model.role.default";
 
     /**
      * The Role to downgrade to after losing a battle. Defaults to
@@ -131,7 +133,7 @@ public class Role extends BuildableType implements Comparable<Role> {
      * @return A message key, which is null for the default role.
      */
     public static String getRoleKey(String roleId) {
-        return ("model.role.default".equals(roleId)) ? null
+        return (Role.DEFAULT_ID.equals(roleId)) ? null
             : getRoleSuffix(roleId);
     }
 
@@ -306,6 +308,46 @@ public class Role extends BuildableType implements Comparable<Role> {
         } else {
             return 0;
         }
+    }
+
+    /**
+     * Is this role available to a proposed unit?
+     *
+     * @param player The <code>Player</code> to own the unit.
+     * @param type The <code>UnitType</code> to check.
+     * @return True if the role is available.
+     */
+    public boolean isAvailableTo(Player player, UnitType type) {
+        Map<String, Boolean> required = getRequiredAbilities();
+        if (required != null) {
+            Set<Ability> abilities = new HashSet<Ability>();
+            abilities.addAll(player.getAbilitySet());
+            abilities.addAll(type.getAbilitySet());
+            for (Entry<String, Boolean> entry : required.entrySet()) {
+                Ability found = null;
+                for (Ability a : abilities) {
+                    if (a.getId().equals(entry.getKey())) {
+                        found = a;
+                        break;
+                    }
+                }
+                boolean value = (found == null) ? false : found.getValue();
+                if (value != entry.getValue()) return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isAvailableTo(Player player) {
+        // Do *not* use BuildableType.isAvailableTo for roles, the
+        // unit context must be considered as there are unit specific
+        // abilities required.
+        throw new RuntimeException("isAvailableTo inappropriate for Role: "
+            + this);
     }
 
 

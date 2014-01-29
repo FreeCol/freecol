@@ -447,8 +447,7 @@ public class UnitTest extends FreeColTestCase {
         Unit colonist = new ServerUnit(game, map.getTile(6, 8), dutch,
                                        colonistType);
         colonist.modifyExperience(10);
-        assertEquals(spec().getRole("model.role.default"),
-                     colonist.getRole());
+        assertEquals(spec().getDefaultRole(), colonist.getRole());
         assertTrue("Colonist should some initial experience",
                    colonist.getExperience() > 0);
 

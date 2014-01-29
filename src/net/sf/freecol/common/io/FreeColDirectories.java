@@ -232,8 +232,7 @@ public class FreeColDirectories {
         File[] todo = new File[xdg.length];
         for (int i = 0; i < xdg.length; i++) {
             String env = System.getenv(xdg[i][0]);
-            File d = (env != null) ? new File(home, env)
-                : new File(home, xdg[i][1]);
+            File d = (env != null) ? new File(env) : new File(home, xdg[i][1]);
             if (d.exists()) {
                 if (!d.isDirectory() || !d.canWrite()) {
                     return -1; // Fail hard if something is broken

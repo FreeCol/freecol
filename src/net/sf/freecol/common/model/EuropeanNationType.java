@@ -252,7 +252,7 @@ public class EuropeanNationType extends NationType {
 
             String type = xr.getAttribute(TYPE_TAG, (String)null);
 
-            String roleId = xr.getAttribute(ROLE_TAG, "model.role.default");
+            String roleId = xr.getAttribute(ROLE_TAG, Role.DEFAULT_ID);
             // @compat 0.10.7
             if (roleId.indexOf('.') < 0) {
                 roleId = "model.role." + roleId;

@@ -267,13 +267,14 @@ public class SimpleMapGenerator implements MapGenerator {
     }
 
     private void importIndianSettlements(Map map, Game importGame) {
-        Game game = map.getGame();
+        final Game game = map.getGame();
+        final Specification spec = game.getSpecification();
         boolean hasSettlements = false;
         for (Player player : importGame.getPlayers()) {
             if (player.isIndian()) {
                 Player indian = game.getPlayer(player.getNationId());
                 if (indian == null) {
-                    Nation nation = game.getSpecification().getNation(player.getNationId());
+                    Nation nation = spec.getNation(player.getNationId());
                     indian = new ServerPlayer(game, null, false, nation, null, null);
                     game.addPlayer(indian);
                 }
@@ -291,14 +292,15 @@ public class SimpleMapGenerator implements MapGenerator {
                         indian.addSettlement(settlement);
                         // TODO: the template settlement might have additional owned
                         // units elsewhere on the map
+                        
                         for (Unit unit: template.getUnitList()) {
-                            UnitType type = game.getSpecification().getUnitType(unit.getType().getId());
+                            UnitType type = spec.getUnitType(unit.getType().getId());
                             Unit newUnit = new ServerUnit(game, settlement, indian, type);
                             settlement.add(newUnit);
                             settlement.addOwnedUnit(newUnit);
                         }
                         for (Goods goods : template.getCompactGoods()) {
-                            GoodsType type = game.getSpecification().getGoodsType(goods.getType().getId());
+                            GoodsType type = spec.getGoodsType(goods.getType().getId());
                             settlement.addGoods(type, goods.getAmount());
                         }
                         settlement.setWantedGoods(template.getWantedGoods());
@@ -819,8 +821,8 @@ public class SimpleMapGenerator implements MapGenerator {
             List<AbstractUnit> unitList = ((EuropeanNationType) player.getNationType())
                 .getStartingUnits();
             for (AbstractUnit startingUnit : unitList) {
-                UnitType type = spec.getUnitType(startingUnit.getId());
-                Role role = spec.getRole(startingUnit.getRoleId());
+                UnitType type = startingUnit.getType(spec);
+                Role role = startingUnit.getRole(spec);
                 Unit newUnit = new ServerUnit(game, null, player, type, role);
                 newUnit.setName(player.getNameForUnit(type, random));
                 if (newUnit.isNaval()) {
