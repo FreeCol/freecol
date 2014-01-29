@@ -937,8 +937,8 @@ public final class Monarch extends FreeColGameObject implements Named {
         // end @compat
 
         } else if (MERCENARY_FORCE_TAG.equals(tag)) {
-            interventionForce.readFromXML(xr);
-
+            mercenaryForce.readFromXML(xr);
+            
         // @compat 0.10.5
         } else if (Force.NAVAL_UNITS_TAG.equals(tag)) {
             expeditionaryForce.getNavalUnits().clear();
