@@ -134,12 +134,10 @@ public class BuyMessage extends DOMMessage {
                 + goods.getId() + " is not at settlement " + settlementId);
         }
 
-        int gold = getGold();
-        if (gold < 0) return DOMMessage.clientError("Bad gold: " + goldString);
-
         // Try to buy.
         return server.getInGameController()
-            .buyFromSettlement(serverPlayer, unit, settlement, goods, gold);
+            .buyFromSettlement(serverPlayer, unit, settlement, goods,
+                getGold());
     }
 
     /**
