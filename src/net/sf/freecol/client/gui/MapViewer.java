@@ -1275,7 +1275,11 @@ public final class MapViewer {
             moveX = tx - width / 4;
             where = 1;
         }
-        if (moveX >= 0) positionMap(map.getTile(moveX, ty));
+        if (moveX >= 0) {
+            Tile other = map.getTile(moveX, ty);
+            positionMap(other);
+            setFocus(other);
+        }
         return where;
     }
 
