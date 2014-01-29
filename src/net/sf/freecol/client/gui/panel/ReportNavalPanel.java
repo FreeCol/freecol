@@ -81,7 +81,7 @@ public final class ReportNavalPanel extends ReportUnitPanel {
         for (UnitType unitType : getSpecification().getUnitTypeList()) {
             if (unitType.isAvailableTo(player)
                 && unitType.hasAbility(Ability.NAVAL_UNIT)) {
-                AbstractUnit unit = new AbstractUnit(unitType, "model.role.default",
+                AbstractUnit unit = new AbstractUnit(unitType, Role.DEFAULT_ID,
                     getCount("naval", unitType));
                 reportPanel.add(createUnitTypeLabel(unit), "sg");
             }

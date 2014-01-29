@@ -304,7 +304,7 @@ public class EquipmentType extends BuildableType {
         combatLossPriority = xr.getAttribute(COMBAT_LOSS_PRIORITY_TAG, -1);
 
         role = xr.getRole(getSpecification(), ROLE_TAG, Role.class,
-                          getSpecification().getRole("model.role.default"));
+                          getSpecification().getDefaultRole());
     }
 
     /**

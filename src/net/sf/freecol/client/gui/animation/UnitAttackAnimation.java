@@ -72,8 +72,7 @@ final class UnitAttackAnimation {
     private SimpleZippedAnimation getAnimation(Unit unit,
                                                Direction direction) {
         float scale = gui.getMapScale();
-        String roleStr = ("model.role.default".equals(unit.getRole().getId()))
-            ? ""
+        String roleStr = (unit.hasDefaultRole()) ? ""
             : "." + unit.getRoleSuffix();
         String startStr = unit.getType().getId() + roleStr + ".attack.";
         String specialId = startStr + direction.toString().toLowerCase()

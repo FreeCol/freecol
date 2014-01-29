@@ -439,7 +439,7 @@ public final class Monarch extends FreeColGameObject implements Named {
                                                   types, random);
         String roleId = (needNaval
             || !unitType.hasAbility(Ability.CAN_BE_EQUIPPED))
-            ? "model.role.default"
+            ? Role.DEFAULT_ID
             : (Utils.randomInt(logger, "Choose land role", random, 2) == 0)
             ? "model.role.infantry"
             : "model.role.cavalry";
@@ -513,7 +513,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         if (naval) {
             support.add(new AbstractUnit(Utils.getRandomMember(logger,
                         "Choose naval support", navalTypes, random),
-                        "model.role.default", 1));
+                        Role.DEFAULT_ID, 1));
             setSupportSea(true);
             return support;
         }
@@ -530,7 +530,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         case 4:
             support.add(new AbstractUnit(Utils.getRandomMember(logger,
                         "Choose bombard", bombardTypes, random),
-                        "model.role.default", 1));
+                        Role.DEFAULT_ID, 1));
             support.add(new AbstractUnit(Utils.getRandomMember(logger,
                         "Choose mounted", mountedTypes, random),
                         "model.role.dragoon", 2));
@@ -597,7 +597,7 @@ public final class Monarch extends FreeColGameObject implements Named {
                 ? ((Utils.randomInt(logger, "Swap role", random, 2) == 0)
                     ? new String[] { "model.role.dragoon", "model.role.soldier" }
                     : new String[] { "model.role.soldier", "model.role.dragoon" })
-                : new String[] { "model.role.default" };
+                : new String[] { Role.DEFAULT_ID };
             for (int r = 0; r < roleIds.length; r++) {
                 int n = Utils.randomInt(logger, "Choose number " + unitType,
                                         random, Math.min(count, 2)) + 1;
@@ -621,7 +621,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         if (mercs.isEmpty() && unitType != null) {
             String roleId = (unitType.hasAbility(Ability.CAN_BE_EQUIPPED))
                 ? "model.role.soldier"
-                : "model.role.default";
+                : Role.DEFAULT_ID;
             mercs.add(new AbstractUnit(unitType, roleId, 1));
         }
         return mercs;

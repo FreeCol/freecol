@@ -368,7 +368,8 @@ public class MessagesTest extends FreeColTestCase {
 
 
     public void testAbstractUnitLabels() {
-        AbstractUnit unit = new AbstractUnit("model.unit.merchantman", "model.role.default", 1);
+        AbstractUnit unit = new AbstractUnit("model.unit.merchantman",
+                                             Role.DEFAULT_ID, 1);
         assertEquals("one Merchantman", Messages.message(unit.getLabel()));
 
     }

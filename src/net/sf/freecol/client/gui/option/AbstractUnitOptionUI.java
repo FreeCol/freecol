@@ -146,7 +146,8 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
             box.setModel(new DefaultComboBoxModel(roleUI.getOption().getChoices().toArray(new String[0])));
             box.setEnabled(roleEditable);
         } else {
-            box.setModel(new DefaultComboBoxModel(new String[] { "model.role.default" }));
+            box.setModel(new DefaultComboBoxModel(new String[] {
+                        Role.DEFAULT_ID }));
             box.setEnabled(false);
         }
     }
@@ -173,7 +174,7 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
                 .getValue();
             String key = au.getId();
             if (au.getType(spec).hasAbility(Ability.CAN_BE_EQUIPPED)
-                && !"model.role.default".equals(au.getRoleId())) {
+                && !Role.DEFAULT_ID.equals(au.getRoleId())) {
                 key = au.getRoleId();
             }
             StringTemplate template = StringTemplate.template(key + ".name")

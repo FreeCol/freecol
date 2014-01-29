@@ -120,7 +120,7 @@ public final class ReportLabourPanel extends ReportPanel {
 
         for (UnitType unitType : getSpecification().getUnitTypeList()) {
             if (unitType.isPerson() && unitType.isAvailableTo(getMyPlayer())) {
-                String roleId = "model.role.default";
+                String roleId = Role.DEFAULT_ID;
                 if (unitType.hasAbility(Ability.EXPERT_PIONEER)) {
                     roleId = "model.role.pioneer";
                 } else if (unitType.hasAbility(Ability.EXPERT_MISSIONARY)) {

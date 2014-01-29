@@ -80,7 +80,7 @@ public final class ReportLabourDetailPanel extends ReportPanel implements Action
                                             ""));
         detailPanel.setOpaque(false);
 
-        String roleId = "model.role.default";
+        String roleId = Role.DEFAULT_ID;
         if (unitType.hasAbility(Ability.EXPERT_PIONEER)) {
             roleId = "model.role.pioneer";
         } else if (unitType.hasAbility(Ability.EXPERT_MISSIONARY)) {

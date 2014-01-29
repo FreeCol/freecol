@@ -345,7 +345,7 @@ public final class UnitType extends BuildableType
 
     /**
      * Gets the default role of this unit type, mostly
-     * "model.role.default".
+     * Role.DEFAULT_ID.
      *
      * @return The default <code>Role</code>.
      */
@@ -875,7 +875,7 @@ public final class UnitType extends BuildableType
         // @compat 0.10.7
         } else if (DEFAULT_EQUIPMENT_TAG.equals(tag)) {
             String id = xr.getAttribute(ID_ATTRIBUTE_TAG, null);
-            String roleId = Role.DEFAULT;
+            String roleId = Role.DEFAULT_ID;
             if ("model.equipment.horses".equals(id)) {
                 roleId = "model.role.scout";
             } else if ("model.equipment.muskets".equals(id)) {
@@ -891,7 +891,7 @@ public final class UnitType extends BuildableType
 
         } else if (DEFAULT_ROLE_TAG.equals(tag)) {
             defaultRole = xr.getType(spec, ID_ATTRIBUTE_TAG,
-                                     Role.class, spec.getRole(Role.DEFAULT));
+                                     Role.class, spec.getDefaultRole());
             xr.closeTag(DEFAULT_ROLE_TAG);
 
         } else if (DOWNGRADE_TAG.equals(tag) || UPGRADE_TAG.equals(tag)) {

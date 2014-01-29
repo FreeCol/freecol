@@ -609,6 +609,15 @@ public class Unit extends GoodsLocation
     }
 
     /**
+     * Does this unit have the default role?
+     *
+     * @return True if the unit has the default <code>Role</code>.
+     */
+    public boolean hasDefaultRole() {
+        return Role.DEFAULT_ID.equals(role.getId());
+    }
+
+    /**
      * Get the last part of the role identifier, which is often used as
      * part of a message key.
      *
@@ -623,7 +632,7 @@ public class Unit extends GoodsLocation
      */
     public void setRole() {
         Role oldRole = role;
-        role = getSpecification().getRole(Role.DEFAULT);
+        role = getSpecification().getDefaultRole();
         boolean horses = false, muskets = false;
         for (EquipmentType type : equipment.keySet()) {
             if ("model.equipment.horses".equals(type.getId())
@@ -682,7 +691,7 @@ public class Unit extends GoodsLocation
      */
     public void clearRoleAndEquipment() {
         clearEquipment();
-        setRole(getSpecification().getRole("model.role.default"));
+        setRole(getSpecification().getDefaultRole());
     }
 
     /**
@@ -1812,7 +1821,7 @@ public class Unit extends GoodsLocation
             addOrRemoveEquipment(entry.getKey(), entry.getValue(), settlement);
         }
         clearEquipment();
-        setRole(getSpecification().getRole(Role.DEFAULT));
+        setRole(getSpecification().getDefaultRole());
     }
 
     private void addOrRemoveEquipment(EquipmentType et, int count, Settlement settlement) {
@@ -3966,7 +3975,7 @@ public class Unit extends GoodsLocation
         state = xr.getAttribute(STATE_TAG, UnitState.class, UnitState.ACTIVE);
 
         role = xr.getRole(spec, ROLE_TAG, Role.class,
-                          spec.getRole("model.role.default"));
+                          spec.getDefaultRole());
 
         location = xr.getLocationAttribute(game, LOCATION_TAG, true);
 
@@ -4098,9 +4107,7 @@ public class Unit extends GoodsLocation
         } else {
             sb.append(" ").append(Utils.lastPart(owner.getNationId(), "."))
                 .append(" ").append(getType().getSuffix());
-            if (!"model.role.default".equals(getRole().getId())) {
-                sb.append("-").append(getRoleSuffix());
-            }
+            if (!hasDefaultRole()) sb.append("-").append(getRoleSuffix());
             sb.append(" ").append(getMovesAsString());
         }
         sb.append("]");

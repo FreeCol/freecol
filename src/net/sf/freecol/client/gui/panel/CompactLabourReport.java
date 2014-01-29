@@ -612,7 +612,7 @@ public final class CompactLabourReport extends ReportPanel {
     }
 
     private ImageIcon getUnitIcon(UnitType unit) {
-        String roleId = "model.role.default";
+        String roleId = Role.DEFAULT_ID;
         if (unit.hasAbility(Ability.EXPERT_PIONEER)) {
             roleId = "model.role.pioneer";
         } else if (unit.hasAbility(Ability.EXPERT_MISSIONARY)) {

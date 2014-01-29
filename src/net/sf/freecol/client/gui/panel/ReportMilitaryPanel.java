@@ -110,7 +110,7 @@ public final class ReportMilitaryPanel extends ReportUnitPanel {
     protected void addOwnUnits() {
         final Specification spec = getSpecification();
         final Player player = getMyPlayer();
-        final Role defaultRole = spec.getRole("model.role.default");
+        final Role defaultRole = spec.getDefaultRole();
         final UnitType defaultType = spec.getDefaultUnitType();
         
         StringTemplate t;
@@ -136,8 +136,8 @@ public final class ReportMilitaryPanel extends ReportUnitPanel {
                     soldierUnits.add(new AbstractUnit(unitType,
                             "model.role.soldier", getCount("soldiers", unitType)));
                 } else {
-                    units.add(new AbstractUnit(unitType,
-                            "model.role.default", getCount("others", unitType)));
+                    units.add(new AbstractUnit(unitType, Role.DEFAULT_ID,
+                                               getCount("others", unitType)));
                 }
             }
         }

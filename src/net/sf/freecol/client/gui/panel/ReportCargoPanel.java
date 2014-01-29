@@ -60,7 +60,7 @@ public final class ReportCargoPanel extends ReportUnitPanel {
         for (UnitType unitType : getSpecification().getUnitTypeList()) {
             if (unitType.isAvailableTo(player)
                 && (unitType.canCarryUnits() || unitType.canCarryGoods())) {
-                AbstractUnit unit = new AbstractUnit(unitType, "model.role.default",
+                AbstractUnit unit = new AbstractUnit(unitType, Role.DEFAULT_ID,
                     getCount("carriers", unitType));
                 reportPanel.add(createUnitTypeLabel(unit), "sg");
             }

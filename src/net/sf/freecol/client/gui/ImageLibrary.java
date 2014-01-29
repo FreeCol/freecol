@@ -1064,23 +1064,23 @@ public final class ImageLibrary {
      * @return an <code>ImageIcon</code> value
      */
     public ImageIcon getUnitImageIcon(UnitType unitType) {
-        return getUnitImageIcon(unitType, "model.role.default", false,
+        return getUnitImageIcon(unitType, Role.DEFAULT_ID, false,
                                 false, scalingFactor);
     }
 
     public ImageIcon getUnitImageIcon(UnitType unitType, boolean grayscale) {
-        return getUnitImageIcon(unitType, "model.role.default", false,
+        return getUnitImageIcon(unitType, Role.DEFAULT_ID, false,
                                 grayscale, scalingFactor);
     }
 
     public ImageIcon getUnitImageIcon(UnitType unitType, boolean grayscale,
                                       double scale) {
-        return getUnitImageIcon(unitType, "model.role.default", false,
+        return getUnitImageIcon(unitType, Role.DEFAULT_ID, false,
                                 grayscale, scale);
     }
 
     public ImageIcon getUnitImageIcon(UnitType unitType, double scale) {
-        return getUnitImageIcon(unitType, "model.role.default", false,
+        return getUnitImageIcon(unitType, Role.DEFAULT_ID, false,
                                 false, scale);
     }
 
@@ -1133,7 +1133,7 @@ public final class ImageLibrary {
         }
 
         // try to get an image matching the key
-        String roleQual = ("model.role.default".equals(roleId)) ? ""
+        String roleQual = (Role.DEFAULT_ID.equals(roleId)) ? ""
             : "." + Utils.lastPart(roleId, ".");
         String key = unitType.getId() + roleQual
             + ((nativeEthnicity) ? ".native" : "")

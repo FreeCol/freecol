@@ -1355,6 +1355,14 @@ public final class Specification {
         return result;
     }
 
+    /**
+     * Get the default role.
+     *
+     * @return The default <code>Role</code>.
+     */
+    public Role getDefaultRole() {
+        return getRole(Role.DEFAULT_ID);
+    }
 
 
     // -- EquipmentTypes --
@@ -1740,9 +1748,8 @@ public final class Specification {
                 logger.log(Level.WARNING, "Failed to load remedial roles.", e);
             }
         } else { // @compat 0.10.6-7
-            String id = "model.role.default";
-            if (findType(id) == null) {
-                Role role = new Role(id, this);
+            if (findType(Role.DEFAULT_ID) == null) {
+                Role role = getDefaultRole();
                 roles.add(role);
                 allTypes.put(role.getId(), role);
             }
@@ -1799,12 +1806,12 @@ public final class Specification {
             AbstractUnitOption artillery
                 = new AbstractUnitOption(id + ".artillery", this);
             artillery.setValue(new AbstractUnit("model.unit.artillery",
-                                                "model.role.default", 2));
+                                                Role.DEFAULT_ID, 2));
             interventionForce.getValue().add(artillery);
             AbstractUnitOption menOfWar
                 = new AbstractUnitOption(id + ".menOfWar", this);
             menOfWar.setValue(new AbstractUnit("model.unit.manOWar",
-                                               "model.role.default", 2));
+                                               Role.DEFAULT_ID, 2));
             interventionForce.getValue().add(menOfWar);
             allOptions.put(id, interventionForce);
         }
@@ -1824,12 +1831,12 @@ public final class Specification {
             AbstractUnitOption artillery
                 = new AbstractUnitOption(id + ".artillery", this);
             artillery.setValue(new AbstractUnit("model.unit.artillery",
-                                                "model.role.default", 2));
+                                                Role.DEFAULT_ID, 2));
             mercenaryForce.getValue().add(artillery);
             AbstractUnitOption menOfWar
                 = new AbstractUnitOption(id + ".menOfWar", this);
             menOfWar.setValue(new AbstractUnit("model.unit.manOWar",
-                                               "model.role.default", 2));
+                                               Role.DEFAULT_ID, 2));
             mercenaryForce.getValue().add(menOfWar);
             allOptions.put(id, mercenaryForce);
         }
@@ -1892,7 +1899,7 @@ public final class Specification {
             for (AbstractUnit au
                      : ((UnitListOption)refSize).getOptionValues()) {
                 if ("DEFAULT".equals(au.getRoleId())) {
-                    au.setRoleId("model.role.default");
+                    au.setRoleId(Role.DEFAULT_ID);
                 } else if ("model.role.soldier".equals(au.getRoleId())
                     || "SOLDIER".equals(au.getRoleId())) {
                     au.setRoleId("model.role.infantry");
@@ -1915,11 +1922,11 @@ public final class Specification {
                 for (AbstractUnit au : ((UnitListOption)o).getOptionValues()) {
                     String roleId = au.getRoleId();
                     if (roleId == null) {
-                        au.setRoleId("model.role.default");
+                        au.setRoleId(Role.DEFAULT_ID);
                     } else if (au.getRoleId().startsWith("model.role.")) {
                         ; // OK
                     } else if ("DEFAULT".equals(au.getRoleId())) {
-                        au.setRoleId("model.role.default");
+                        au.setRoleId(Role.DEFAULT_ID);
                     } else if ("DRAGOON".equals(au.getRoleId())) {
                         au.setRoleId("model.role.dragoon");
                     } else if ("MISSIONARY".equals(au.getRoleId())) {
@@ -1933,7 +1940,7 @@ public final class Specification {
                     } else if ("SOLDIER".equals(au.getRoleId())) {
                         au.setRoleId("model.role.soldier");
                     } else {
-                        au.setRoleId("model.role.default");
+                        au.setRoleId(Role.DEFAULT_ID);
                     }
                 }
             }

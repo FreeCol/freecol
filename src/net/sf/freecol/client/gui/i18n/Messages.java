@@ -691,7 +691,7 @@ public class Messages {
     public static StringTemplate getLabelTemplate(Unit unit) {
         UnitType type = unit.getType();
         Role role = unit.getRole();
-        Role defaultRole = unit.getSpecification().getRole("model.role.default");
+        Role defaultRole = unit.getSpecification().getDefaultRole();
 
         String nationName = getName(unit.getOwner().getNation());
         String unitName = getName(type);

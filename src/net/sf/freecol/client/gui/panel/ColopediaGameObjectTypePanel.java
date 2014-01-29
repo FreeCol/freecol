@@ -193,7 +193,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
     }
 
     protected JButton getUnitButton(final UnitType unitType) {
-        return getUnitButton(unitType, "model.role.default");
+        return getUnitButton(unitType, Role.DEFAULT_ID);
     }
 
     public JComponent getModifierComponent(Modifier modifier) {

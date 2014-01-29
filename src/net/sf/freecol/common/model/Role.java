@@ -40,10 +40,8 @@ import net.sf.freecol.common.util.Utils;
  */
 public class Role extends BuildableType implements Comparable<Role> {
 
-    /**
-     * The ID of the default role.
-     */
-    public static final String DEFAULT = "model.role.default";
+    /** The ID of the default role. */
+    public static final String DEFAULT_ID = "model.role.default";
 
     /**
      * The Role to downgrade to after losing a battle. Defaults to
@@ -135,7 +133,7 @@ public class Role extends BuildableType implements Comparable<Role> {
      * @return A message key, which is null for the default role.
      */
     public static String getRoleKey(String roleId) {
-        return ("model.role.default".equals(roleId)) ? null
+        return (Role.DEFAULT_ID.equals(roleId)) ? null
             : getRoleSuffix(roleId);
     }
 

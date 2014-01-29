@@ -1113,7 +1113,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             && Utils.randomInt(logger, "Equip Scout?", air, 100)
             < equipScoutCheatPercent) {
             for (Unit u : europe.getUnitList()) {
-                if ("model.role.default".equals(u.getRole().getId())
+                if (u.hasDefaultRole()
                     && u.isPerson()
                     && getAIUnit(u).equipForRole("model.role.scout", true)) {
                     player.logCheat("equipped scout " + u);

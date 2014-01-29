@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.Role;
 
 
 /**
@@ -35,7 +36,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 public class AbstractUnit extends FreeColObject {
 
     /** The role identifier of this AbstractUnit. */
-    private String roleId = "model.role.default";
+    private String roleId = Role.DEFAULT_ID;
 
     /** The number of units. */
     private int number = 1;
@@ -185,7 +186,7 @@ public class AbstractUnit extends FreeColObject {
     protected final void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        roleId = xr.getAttribute(ROLE_TAG, "model.role.default");
+        roleId = xr.getAttribute(ROLE_TAG, Role.DEFAULT_ID);
         // @compat 0.10.7
         if (roleId.indexOf('.') < 0) {
             roleId = "model.role." + roleId.toLowerCase();
