@@ -133,12 +133,9 @@ public class SellPropositionMessage extends DOMMessage {
                 + goods.getId() + " are not with unit " + unitId);
         }
 
-        int gold = getGold();
-        if (gold < 0) return DOMMessage.clientError("Bad gold: " + goldString);
-
         // Proceed to price.
         return server.getInGameController()
-            .sellProposition(serverPlayer, unit, settlement, goods, gold);
+            .sellProposition(serverPlayer, unit, settlement, goods, getGold());
     }
 
     /**
