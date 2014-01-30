@@ -255,7 +255,7 @@ public class PioneeringMission extends Mission {
         final Player owner = aiUnit.getUnit().getOwner();
         final GoalDecider gd = new GoalDecider() {
                 private PathNode bestPath = null;
-                private int bestValue = 0;
+                private int bestValue = Integer.MIN_VALUE;
 
                 public PathNode getGoal() { return bestPath; }
                 public boolean hasSubGoals() { return true; }

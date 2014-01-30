@@ -1572,7 +1572,7 @@ public class Map extends FreeColGameObject implements Location {
                 // this does not become cached inside the goal decider
                 // as the preferred path.
                 boolean isGoal = goalDecider.check(unit,
-                    new PathNode(moveTile, 0, INFINITY, false,
+                    new PathNode(moveTile, 0, INFINITY-1, false,
                         currentNode, null));
 
                 // Is this move possible?  Loop on failure.

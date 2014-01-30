@@ -139,10 +139,10 @@ public class DefendSettlementMission extends Mission {
      * @return A suitable <code>GoalDecider</code>.
      */
     private static GoalDecider getGoalDecider(final AIUnit aiUnit) {
-        return new GoalDecider() {
+        GoalDecider gd = new GoalDecider() {
                 private PathNode bestPath = null;
-                private int bestValue = 0;
-
+                private int bestValue = Integer.MIN_VALUE;
+                
                 public PathNode getGoal() { return bestPath; }
                 public boolean hasSubGoals() { return true; }
                 public boolean check(Unit u, PathNode path) {
@@ -155,6 +155,7 @@ public class DefendSettlementMission extends Mission {
                     return false;
                 }
             };
+        return gd;
     }
 
     /**

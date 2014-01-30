@@ -170,7 +170,7 @@ public class ScoutingMission extends Mission {
                                               boolean deferOK) {
         GoalDecider gd = new GoalDecider() {
                 private PathNode bestPath = null;
-                private int bestValue = 0;
+                private int bestValue = Integer.MIN_VALUE;
 
                 public PathNode getGoal() { return bestPath; }
                 public boolean hasSubGoals() { return true; }
@@ -332,7 +332,7 @@ public class ScoutingMission extends Mission {
         String reason = invalidTargetReason(is);
         return (reason != null) ? reason
             : (is.hasScouted(owner))
-            ? "settlement-contacted"
+            ? "settlement-scouted"
             : ((tension = is.getAlarm(owner)) != null
                 && tension.getValue() >= Tension.Level.HATEFUL.getLimit())
             ? "settlement-hateful"

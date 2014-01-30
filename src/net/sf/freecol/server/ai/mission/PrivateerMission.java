@@ -178,22 +178,23 @@ public class PrivateerMission extends Mission {
      */
     private static GoalDecider getGoalDecider(final AIUnit aiUnit,
                                               boolean deferOK) {
-        return new GoalDecider() {
-            private PathNode bestPath = null;
-            private int bestValue = 0;
+        GoalDecider gd = new GoalDecider() {
+                private PathNode bestPath = null;
+                private int bestValue = Integer.MIN_VALUE;
 
-            public PathNode getGoal() { return bestPath; }
-            public boolean hasSubGoals() { return true; }
-            public boolean check(Unit u, PathNode path) {
-                int value = scorePath(aiUnit, path);
-                if (bestValue < value) {
-                    bestValue = value;
-                    bestPath = path;
-                    return true;
+                public PathNode getGoal() { return bestPath; }
+                public boolean hasSubGoals() { return true; }
+                public boolean check(Unit u, PathNode path) {
+                    int value = scorePath(aiUnit, path);
+                    if (bestValue < value) {
+                        bestValue = value;
+                        bestPath = path;
+                        return true;
+                    }
+                    return false;
                 }
-                return false;
-            }
-        };
+            };
+        return gd;
     }
 
     /**

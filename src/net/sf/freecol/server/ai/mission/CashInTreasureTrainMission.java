@@ -144,27 +144,27 @@ public class CashInTreasureTrainMission extends Mission {
     private static GoalDecider getGoalDecider(final AIUnit aiUnit,
                                               final boolean deferOK) {
         GoalDecider gd = new GoalDecider() {
-            private PathNode bestPath = null;
-            private int bestValue = 0;
-
-            public PathNode getGoal() { return bestPath; }
-            public boolean hasSubGoals() { return true; }
-            public boolean check(Unit u, PathNode path) {
-                Location loc = extractTarget(aiUnit, path);
-                if ((loc instanceof Colony
-                        && invalidFullColonyReason(aiUnit, (Colony)loc)
-                        == null)
-                    || loc instanceof Europe) {
-                    int value = scorePath(aiUnit, path);
-                    if (bestValue < value) {
-                        bestValue = value;
-                        bestPath = path;
-                        return true;
+                private PathNode bestPath = null;
+                private int bestValue = Integer.MIN_VALUE;
+                
+                public PathNode getGoal() { return bestPath; }
+                public boolean hasSubGoals() { return true; }
+                public boolean check(Unit u, PathNode path) {
+                    Location loc = extractTarget(aiUnit, path);
+                    if ((loc instanceof Colony
+                            && invalidFullColonyReason(aiUnit, (Colony)loc)
+                            == null)
+                        || loc instanceof Europe) {
+                        int value = scorePath(aiUnit, path);
+                        if (bestValue < value) {
+                            bestValue = value;
+                            bestPath = path;
+                            return true;
+                        }
                     }
+                    return false;
                 }
-                return false;
-            }
-        };
+            };
         return (deferOK) ? GoalDeciders.getComposedGoalDecider(gd,
             GoalDeciders.getOurClosestSettlementGoalDecider())
             : gd;
