@@ -1228,9 +1228,12 @@ public class Map extends FreeColGameObject implements Location {
      * Sets the search tracing status.
      *
      * @param trace The new search tracing status.
+     * @return The original search tracing status.
      */
-    public void setSearchTrace(boolean trace) {
+    public boolean setSearchTrace(boolean trace) {
+        boolean ret = traceSearch;
         traceSearch = trace;
+        return ret;
     }
 
     /**
@@ -1507,16 +1510,17 @@ public class Map extends FreeColGameObject implements Location {
             // Check for success.
             if (goalDecider.check(currentUnit, currentNode)) {
                 if (sb != null) {
-                    sb.append(" ***at goal(")
+                    sb.append(" ***goal(")
                         .append(Integer.toString(currentNode.getCost()))
                         .append(")***");
                 }
+                best = goalDecider.getGoal();
+                bestScore = best.getCost();
+                if (!goalDecider.hasSubGoals()) break;
                 continue;
             }
 
             // Skip nodes that can not beat the current best path.
-            bestScore = ((best = goalDecider.getGoal()) == null) ? INFINITY
-                : best.getCost();
             if (bestScore < currentNode.getCost()) {
                 closedList.put(currentLocation.getId(), currentNode);
                 if (sb != null) {
@@ -1557,14 +1561,17 @@ public class Map extends FreeColGameObject implements Location {
             PathNode closed;
             for (Tile moveTile : currentTile.getSurroundingTiles(1)) {
                 // If the new tile is the tile we just visited, skip it.
+                if (sb != null) sb.append("\n    " + moveTile);
                 if (currentNode.previous != null
                     && currentNode.previous.getTile() == moveTile) {
+                    if (sb != null) sb.append(" previous");
                     continue;
                 }
 
                 // Skip neighbouring tiles already too expensive.
                 if ((closed = closedList.get(moveTile.getId())) != null
                     && closed.getCost() <= currentNode.getCost()) {
+                    if (sb != null) sb.append(" closed-won");
                     continue;
                 }
 
@@ -1574,6 +1581,7 @@ public class Map extends FreeColGameObject implements Location {
                 boolean isGoal = goalDecider.check(unit,
                     new PathNode(moveTile, 0, INFINITY-1, false,
                         currentNode, null));
+                if (isGoal && sb != null) sb.append(" *goal*");
 
                 // Is this move possible?  Loop on failure.
                 //
@@ -1667,6 +1675,7 @@ public class Map extends FreeColGameObject implements Location {
                     move = null;
                     break;
                 }
+                if (sb != null) sb.append(" ").append(step.toString());
 
                 if (move != null) {
                     PathNode movePath = move.resetPath();
@@ -1680,11 +1689,19 @@ public class Map extends FreeColGameObject implements Location {
                             closedList.remove(moveTile.getId());
                             move.improve(openList, openListQueue, f,
                                          searchHeuristic);
+                            if (sb != null) sb.append(" closed-added");
+                        } else {
+                            if (sb != null) sb.append(" closed-won");
                         }
                     } else if (move.canImprove(openList.get(moveTile.getId()))){
                         move.improve(openList, openListQueue, f,
                                      searchHeuristic);
+                        if (sb != null) sb.append(" added");
+                    } else {
+                        if (sb != null) sb.append(" loses");
                     }
+                } else {
+                    if (sb != null) sb.append(" invalid");
                 }
             }
 
