@@ -434,6 +434,14 @@ public class BuildColonyMission extends Mission {
                     + ": " + this);
                 return;
             }
+
+            // Log the colony values so we can improve things
+            StringBuffer sb = new StringBuffer();
+            sb.append(tag).append(" score-at-foundation:");
+            for (Double d : player.getAllColonyValues(tile)) {
+                sb.append(" ").append(d);
+            }
+            logger.finest(sb.toString());
             
             // Clear to build the colony.
             if (AIMessage.askBuildColony(aiUnit, Player.ASSIGN_SETTLEMENT_NAME)
