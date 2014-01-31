@@ -162,6 +162,25 @@ public abstract class CombatModel {
             && ((Locatable)defender).getTile().isLand();
     }
 
+    /**
+     * Is this a combat between a rebel player and the REF at a colony?
+     *
+     * @return True if the attack is a war of independence battle for a colony.
+     */
+    public boolean combatIsWarOfIndependence(FreeColGameObject attacker,
+                                             FreeColGameObject defender) {
+        if (attacker instanceof Unit
+            && defender instanceof Colony) {
+            Player aPlayer = ((Unit)attacker).getOwner();
+            Player dPlayer = ((Colony)defender).getOwner();
+            return (aPlayer.getPlayerType() == Player.PlayerType.REBEL
+                    && aPlayer.getREFPlayer() == dPlayer)
+                || (dPlayer.getPlayerType() == Player.PlayerType.REBEL
+                    && dPlayer.getREFPlayer() == aPlayer);
+        }
+        return false;
+    }
+
 
     /**
      * Calculates the chance of the outcomes of a combat.
@@ -234,5 +253,4 @@ public abstract class CombatModel {
     public abstract List<CombatResult> generateAttackResult(Random random,
                                                             FreeColGameObject attacker,
                                                             FreeColGameObject defender);
-
 }

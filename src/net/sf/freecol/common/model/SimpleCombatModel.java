@@ -243,6 +243,13 @@ public class SimpleCombatModel extends CombatModel {
             // Settlement present, REF bombardment bonus
             result.addAll(attackerUnit
                           .getModifierSet(Modifier.BOMBARD_BONUS));
+            if (combatIsWarOfIndependence(attacker, defender)) {
+                Colony colony = (Colony)defender;
+                int bonus = colony.getSoL();
+                if (attackerUnit.getOwner().isREF()) bonus = 100 - bonus;
+                result.add(new Modifier(Modifier.POPULAR_SUPPORT, colony,
+                                        bonus, Modifier.Type.PERCENTAGE));
+            }
         } else if (combatIsAttack(attacker, defender)) {
             Unit defenderUnit = (Unit) defender;
             Tile tile = defenderUnit.getTile();
