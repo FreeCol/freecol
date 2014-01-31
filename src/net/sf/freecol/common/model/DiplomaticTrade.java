@@ -254,6 +254,13 @@ public class DiplomaticTrade extends FreeColObject {
     }
 
     /**
+     * Remove all trade items from this agreement.
+     */
+    public void clear() {
+        items.clear();
+    }
+
+    /**
      * Get a list of all items to trade.
      *
      * @return A list of all the TradeItems.
@@ -471,6 +478,27 @@ public class DiplomaticTrade extends FreeColObject {
         } else {
             super.readChild(xr);
         }
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(128);
+        sb.append("[").append(getId())
+            .append(" ").append(context)
+            .append(" ").append(status)
+            .append(" from=").append(sender.getId())
+            .append(" to=").append(recipient.getId())
+            .append(" version=").append(getVersion())
+            .append(" [");
+        for (TradeItem item : getTradeItems()) {
+            sb.append(" ").append(item.toString());
+        }
+        sb.append(" ]]");
+        return sb.toString();
     }
 
     /**

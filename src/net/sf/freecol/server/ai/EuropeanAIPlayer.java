@@ -25,6 +25,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,7 +36,9 @@ import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
+import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.ColonyTradeItem;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
@@ -1963,6 +1966,68 @@ public class EuropeanAIPlayer extends AIPlayer {
     }
 
 
+    // Diplomacy support
+
+    private int evaluateColony(Colony colony) {
+        if (getPlayer().getEurope() == null) return Integer.MIN_VALUE;
+
+        int result = 0, v;
+        for (WorkLocation wl : colony.getAvailableWorkLocations()) {
+            for (Unit u : wl.getUnitList()) {
+                result += evaluateUnit(u);
+            }
+            if (wl instanceof Building) {
+                for (AbstractGoods ag : ((Building)wl).getType()
+                         .getRequiredGoods()) {
+                    result += evaluateGoods(ag);
+                }
+            } else if (wl instanceof ColonyTile) {
+                for (AbstractGoods ag : ((ColonyTile)wl).getProductionInfo().getProduction()) {
+                    result += evaluateGoods(ag);
+                }
+            }
+        }
+        for (Unit u : colony.getTile().getUnitList()) {
+            result += evaluateUnit(u);
+        }
+        for (Goods g : colony.getCompactGoods()) {
+            result += evaluateGoods(g);
+        }
+        return result;
+    }
+
+    private int evaluateUnit(Unit unit) {
+        final Europe europe = getPlayer().getEurope();
+
+        return (europe == null) ? Integer.MIN_VALUE
+            : europe.getUnitPrice(unit.getType());
+    }
+
+    private int evaluateGoods(AbstractGoods ag) {
+        final Market market = getPlayer().getMarket();
+
+        return (market == null) ? Integer.MIN_VALUE
+            : market.getSalePrice(ag.getType(), ag.getAmount());
+    }
+
+    /**
+     * Reject a trade agreement, except if a Franklin-derived stance
+     * is supplied.
+     *
+     * @param stance An optional stance <code>TradeItem</code>.
+     * @param agreement The <code>DiplomaticTrade</code> to reset.
+     * @return The <code>TradeStatus</code> for the agreement.
+     */
+    private TradeStatus rejectAgreement(TradeItem stance,
+                                        DiplomaticTrade agreement) {
+        if (stance == null) return TradeStatus.REJECT_TRADE;
+        
+        agreement.clear();
+        agreement.add(stance);
+        return TradeStatus.PROPOSE_TRADE;
+    }
+
+
     // AIPlayer interface
 
     /**
@@ -2075,76 +2140,157 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     public TradeStatus acceptDiplomaticTrade(DiplomaticTrade agreement) {
         final Player player = getPlayer();
-        boolean validOffer = true;
-        Stance stance = null;
-        int value = 0;
-        Iterator<TradeItem> itemIterator = agreement.iterator();
-        while (itemIterator.hasNext()) {
-            TradeItem item = itemIterator.next();
+        final Player other = agreement.getOtherPlayer(player);
+        final Market market = player.getMarket();
+        final boolean franklin
+            = other.hasAbility(Ability.ALWAYS_OFFERED_PEACE);
+        final java.util.Map<TradeItem, Integer> scores
+            = new HashMap<TradeItem, Integer>();
+        TradeItem peace = null;
+        TradeItem cash = null;
+
+        int unacceptable = 0;
+        for (TradeItem item : agreement.getTradeItems()) {
+            int value;
             if (item instanceof GoldTradeItem) {
-                int gold = ((GoldTradeItem) item).getGold();
+                cash = item;
+                int gold = ((GoldTradeItem)item).getGold();
                 if (item.getSource() == player) {
-                    value -= gold;
+                    value = -gold;
                 } else {
-                    value += gold;
+                    value = gold;
                 }
+
             } else if (item instanceof StanceTradeItem) {
+                NationSummary ns = AIMessage.askGetNationSummary(this, other);
+                int strength = NationSummary.calculateStrength(player, false);
+                double ratio = (double)strength
+                    / (strength + ns.getMilitaryStrength());
                 // TODO: evaluate whether we want this stance change
-                stance = ((StanceTradeItem) item).getStance();
+                Stance stance = ((StanceTradeItem)item).getStance();
                 switch (stance) {
-                    case UNCONTACTED:
-                        validOffer = false; //never accept invalid stance change
-                        break;
-                    case WAR: // always accept war without cost
-                        break;
-                    case CEASE_FIRE:
-                        value -= 500;
-                        break;
-                    case PEACE:
-                        if (!agreement.getSender()
-                            .hasAbility(Ability.ALWAYS_OFFERED_PEACE)) {
-                            // TODO: introduce some kind of counter in
-                            // order to avoid Benjamin Franklin exploit
-                            value -= 1000;
-                        }
-                        break;
-                    case ALLIANCE:
-                        value -= 2000;
+                case WAR:
+                    if (ratio < 0.33) {
+                        value = Integer.MIN_VALUE;
+                    } else if (ratio < 0.5) {
+                        value = -(int)Math.round(100 * ratio);
+                    } else {
+                        value = (int)Math.round(100 * ratio);
+                    }
+                    break;
+                case PEACE:
+                    if (agreement.getContext() == DiplomaticTrade.TradeContext.CONTACT) {
+                        peace = item;
+                        value = 0;
                         break;
                     }
+                    // Fall through
+                case CEASE_FIRE: case ALLIANCE:
+                    if (franklin) {
+                        peace = item;
+                        value = 0;
+                    } else if (ratio > 0.66) {
+                        value = Integer.MIN_VALUE;
+                    } else if (ratio > 0.5) {
+                        value = -(int)Math.round(100 * ratio);
+                    } else if (ratio > 0.33) {
+                        value = (int)Math.round(100 * ratio);
+                    } else {
+                        value = 1000;
+                    }                       
+                    break;
+                case UNCONTACTED:
+                default:
+                    value = Integer.MIN_VALUE;
+                    break;
+                }
 
             } else if (item instanceof ColonyTradeItem) {
-                // TODO: evaluate whether we might wish to give up a colony
                 if (item.getSource() == player) {
-                    validOffer = false;
-                    break;
+                    if (player.getNumberOfSettlements() < 5) {
+                        value = Integer.MIN_VALUE;
+                    } else {
+                        value = -evaluateColony(item.getColony());
+                    }
                 } else {
-                    value += 1000;
+                    value = evaluateColony(item.getColony());
                 }
+
             } else if (item instanceof UnitTradeItem) {
-                // TODO: evaluate whether we might wish to give up a unit
                 if (item.getSource() == player) {
-                    validOffer = false;
-                    break;
+                    if (player.getUnits().size() < 10) {
+                        value = Integer.MIN_VALUE;
+                    } else {
+                        value = -evaluateUnit(item.getUnit());
+                    }
                 } else {
-                    value += 100;
+                    value = evaluateUnit(item.getUnit());
                 }
+
             } else if (item instanceof GoodsTradeItem) {
-                Goods goods = ((GoodsTradeItem) item).getGoods();
+                Goods goods = ((GoodsTradeItem)item).getGoods();
                 if (item.getSource() == player) {
-                    value -= player.getMarket().getBidPrice(goods.getType(), goods.getAmount());
+                    value = -market.getBidPrice(goods.getType(),
+                                                goods.getAmount());
                 } else {
-                    value += player.getMarket().getSalePrice(goods.getType(), goods.getAmount());
+                    value = market.getSalePrice(goods.getType(),
+                                                goods.getAmount());
                 }
+            } else {
+                throw new RuntimeException("Bogus item: " + item);
+            }
+
+            if (value == Integer.MIN_VALUE) unacceptable++;
+            scores.put(item, new Integer(value));
+        }
+
+        // If too many items are unacceptable, reject
+        double ratio = (double)unacceptable
+            / (unacceptable + agreement.getTradeItems().size());
+        if (ratio > 0.5 - 0.5 * agreement.getVersion()) {
+            return rejectAgreement(peace, agreement);
+        }
+
+        // Dump the unacceptable offers, sum the rest
+        int value = 0;
+        for (Entry<TradeItem, Integer> entry : scores.entrySet()) {
+            if (entry.getValue() == Integer.MIN_VALUE) {
+                agreement.remove(entry.getKey());
+            } else {
+                value += entry.getValue();
             }
         }
-        if (validOffer) {
-            logger.info("Trade value is " + value + ", accept if >=0");
-        } else {
-            logger.info("Trade offer is considered invalid!");
+        // If the result is positive, accept/propose-without-unacceptable
+        if (value > 0) {
+            return (unacceptable == 0) ? TradeStatus.ACCEPT_TRADE
+                : TradeStatus.PROPOSE_TRADE;
         }
-        return (value >= 0 && validOffer) ? TradeStatus.ACCEPT_TRADE
-            : TradeStatus.REJECT_TRADE;
+
+        // Give up?
+        if (Utils.randomInt(logger, "Enough diplomacy?", getAIRandom(),
+                            1 + agreement.getVersion()) > 5) {
+            return rejectAgreement(peace, agreement);
+        }
+
+        // Dump the negative offers until the sum is positive.
+        // Return a proposal with items we like/can accept, or reject
+        // if none are left.
+        List<TradeItem> items
+            = new ArrayList<TradeItem>(agreement.getTradeItems());
+        Collections.sort(items, new Comparator<TradeItem>() {
+                public int compare(TradeItem t1, TradeItem t2) {
+                    return scores.get(t1) - scores.get(t2);
+                }
+            });
+        while (!items.isEmpty()) {
+            TradeItem item = items.remove(0);
+System.err.println("TRADEITEM: " + item + " score=" + scores.get(item));
+            value += scores.get(item);
+            agreement.remove(item);
+            if (value > 0) break;
+        }
+        return (value > 0 && !items.isEmpty()) ? TradeStatus.PROPOSE_TRADE
+            : rejectAgreement(peace, agreement);
     }
 
 

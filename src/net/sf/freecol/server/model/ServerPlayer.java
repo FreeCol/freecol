@@ -71,6 +71,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.StanceTradeItem;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
@@ -3966,6 +3967,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     public void csEuropeanFirstContact(Unit unit, Settlement settlement,
                                        Unit otherUnit, ChangeSet cs) {
+        final Game game = getGame();
+
         ServerPlayer other;
         if (settlement != null) {
             other = (ServerPlayer)settlement.getOwner();
@@ -3975,8 +3978,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
             throw new IllegalArgumentException("Non-null settlement or otherUnit required.");
         }
         
-        DiplomaticTrade agreement = new DiplomaticTrade(getGame(),
+        DiplomaticTrade agreement = new DiplomaticTrade(game,
             DiplomaticTrade.TradeContext.CONTACT, other, this, null, 0);
+        agreement.add(new StanceTradeItem(game, this, other, Stance.PEACE));
         DiplomacySession session = (settlement == null) 
             ? new DiplomacySession(unit, otherUnit)
             : new DiplomacySession(unit, settlement);
