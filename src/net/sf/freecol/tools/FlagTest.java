@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2013   The FreeCol Team
+ *  Copyright (C) 2002-2014   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -21,6 +21,8 @@ package net.sf.freecol.tools;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.Graphics2D;
@@ -31,21 +33,26 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JScrollPane;
+import javax.swing.plaf.ColorUIResource;
 import javax.swing.SpinnerNumberModel;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.gui.panel.Flag;
 
-public class FlagTest extends JFrame implements ItemListener {
+public class FlagTest extends JFrame implements ActionListener, ItemListener {
 
 
     private static Flag SPANISH_FLAG, ENGLISH_FLAG, FRENCH_FLAG,
@@ -132,8 +139,16 @@ public class FlagTest extends JFrame implements ItemListener {
     @SuppressWarnings("unchecked") // FIXME in Java7
     private JComboBox stripes = new JComboBox(getNumbers(13));
 
-    private JComboBox[] customBoxes = new JComboBox[] {
-        background, alignment, union, stripes
+    private JButton unionColor = new JButton(" ");
+    private JButton starColor = new JButton(" ");
+    private JButton[] stripeColors = new JButton[] {
+        new JButton(" "), new JButton(" "), new JButton(" ")
+    };
+
+    private Component[] customComponents = new Component[] {
+        background, alignment, union, stripes,
+        unionColor, starColor, stripeColors[0],
+        stripeColors[1], stripeColors[2]
     };
 
     private JComboBox[] typeBoxes = new JComboBox[] {
@@ -147,7 +162,7 @@ public class FlagTest extends JFrame implements ItemListener {
 
         super("FlagTest");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new MigLayout("wrap 2"));
+        setLayout(new MigLayout("wrap 2", "[][fill]"));
         flags.addItemListener(this);
         add(new JLabel("predefined flags"));
         add(flags);
@@ -166,13 +181,27 @@ public class FlagTest extends JFrame implements ItemListener {
 
         stars.setSelectedIndex(12);
         stars.addItemListener(this);
-        add(new JLabel("Number of stars"));
+        add(new JLabel("number of stars"));
         add(stars);
 
         stripes.setSelectedIndex(12);
         stripes.addItemListener(this);
-        add(new JLabel("Number of stripes"));
+        add(new JLabel("number of stripes"));
         add(stripes);
+
+        unionColor.addActionListener(this);
+        add(new JLabel("union color"));
+        add(unionColor);
+
+        starColor.addActionListener(this);
+        add(new JLabel("star color"));
+        add(starColor);
+
+        for (JButton button : stripeColors) {
+            button.addActionListener(this);
+            add(new JLabel("stripe color"));
+            add(button);
+        }
 
         add(label, "width 200, height 100");
 
@@ -187,10 +216,18 @@ public class FlagTest extends JFrame implements ItemListener {
         if (e == null || e.getSource() == flags) {
             if (newFlag == null) {
                 // custom
-                enable(customBoxes, true);
+                enable(customComponents, true);
             } else {
-                enable(customBoxes, false);
+                enable(customComponents, false);
                 flag = newFlag;
+                unionColor.setBackground(flag.getUnionColor());
+                starColor.setBackground(flag.getStarColor());
+                List<Color> colors = flag.getBackgroundColors();
+                for (int index = 0; index < stripeColors.length; index++) {
+                    Color color = (index < colors.size())
+                        ? colors.get(index) : null;
+                    stripeColors[index].setBackground(color);
+                }
             }
         } else {
             if (newFlag == null) {
@@ -204,13 +241,37 @@ public class FlagTest extends JFrame implements ItemListener {
                     }
                 }
                 flag = new Flag(newAlignment, newType, newPosition);
-                flag.setBackgroundColors(new Color[] { Color.RED, Color.WHITE, Color.BLUE });
                 flag.setStripes(stripes.getSelectedIndex() + 1);
+                setColors();
             }
             flag.setStars(stars.getSelectedIndex() + 1);
         }
 
         label.setIcon(new ImageIcon(flag.getImage()));
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        JButton button = (JButton) e.getSource();
+        Color color = JColorChooser
+            .showDialog(FlagTest.this,
+                        label.getText(),
+                        button.getBackground());
+        button.setBackground(color);
+        setColors();
+        label.setIcon(new ImageIcon(flag.getImage()));
+    }
+
+    private void setColors() {
+        flag.setUnionColor(unionColor.getBackground());
+        flag.setStarColor(starColor.getBackground());
+        List<Color> colors = new ArrayList<Color>();
+        for (JButton button : stripeColors) {
+            Color color = button.getBackground();
+            if (!(color == null || color instanceof ColorUIResource)) {
+                colors.add(color);
+            }
+            flag.setBackgroundColors(colors);
+        }
     }
 
     public String[] getNumbers(int count) {
@@ -238,4 +299,5 @@ public class FlagTest extends JFrame implements ItemListener {
 
 
     }
+
 }

@@ -24,7 +24,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
 import java.awt.Graphics2D;
-//import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.RenderingHints;
 import java.util.ArrayList;
@@ -152,7 +151,9 @@ public class Flag {
     public void setBackgroundColors(Color[] colors) {
         backgroundColors.clear();
         for (Color color : colors) {
-            backgroundColors.add(color);
+            if (color != null) {
+                backgroundColors.add(color);
+            }
         }
     }
 
@@ -230,9 +231,13 @@ public class Flag {
                 x = stripeWidth;
             }
             for (int index = 0; index < stripes; index++) {
-                g.setColor(backgroundColors.get(index % colors));
-                rectangle.setRect(index * x, index * y, stripeWidth, stripeHeight);
-                g.fill(rectangle);
+                try {
+                    g.setColor(backgroundColors.get(index % colors));
+                    rectangle.setRect(index * x, index * y, stripeWidth, stripeHeight);
+                    g.fill(rectangle);
+                } catch(Exception e) {
+                    // ignore for now : no background colors defined
+                }
             }
             break;
         case CROSS:
