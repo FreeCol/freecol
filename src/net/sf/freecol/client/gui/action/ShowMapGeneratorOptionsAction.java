@@ -50,6 +50,6 @@ public class ShowMapGeneratorOptionsAction extends FreeColAction {
      */
     public void actionPerformed(ActionEvent e) {
         OptionGroup mgo = getGame().getMapGeneratorOptions();
-        getGUI().showMapGeneratorOptionsDialog(mgo, false, false);
+        getGUI().showMapGeneratorOptionsDialog(mgo, false);
     }
 }

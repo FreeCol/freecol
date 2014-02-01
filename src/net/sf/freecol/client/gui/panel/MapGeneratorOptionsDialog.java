@@ -64,27 +64,22 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
             }
         };
 
-    private static final String OPTION_GROUP_ID
-        = MapGeneratorOptions.getXMLElementTagName();
-
 
     /**
      * Creates a dialog to set the map generator options.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param mgo the map generator options
-     * @param editable whether the options may be edited
-     * @param loadCustomOptions whether to load custom options
+     * @param mgo The map generator option group.
+     * @param editable Whether the options may be edited.
      */
     public MapGeneratorOptionsDialog(FreeColClient freeColClient,
-                                     OptionGroup mgo, boolean editable,
-                                     boolean loadCustomOptions) {
+                                     OptionGroup mgo, boolean editable) {
         super(freeColClient, editable, mgo, mgo.getName(),
-            "map_generator_options.xml", OPTION_GROUP_ID);
+              FreeColDirectories.MAP_GENERATOR_OPTIONS_FILE_NAME,
+              MapGeneratorOptions.getXMLElementTagName());
         
-        if (isEditable() && loadCustomOptions) loadCustomOptions();
-
         if (isEditable()) {
+            loadDefaultOptions();
             // TODO: The update should be solved by PropertyEvent.
             File mapDirectory = FreeColDirectories.getMapsDirectory();
             if (mapDirectory.isDirectory()) {
@@ -169,6 +164,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
                 value = null;
             } else {
                 freeColClient.getPreGameController().sendMapGeneratorOptions();
+                if (isEditable()) saveDefaultOptions();
             }
         }
         return value;

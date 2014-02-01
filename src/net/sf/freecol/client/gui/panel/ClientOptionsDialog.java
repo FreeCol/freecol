@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.io.File;
 
+import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.io.FreeColDirectories;
@@ -39,8 +40,11 @@ public final class ClientOptionsDialog extends OptionsDialog  {
      */
     public ClientOptionsDialog(FreeColClient freeColClient) {
         super(freeColClient, true, freeColClient.getClientOptions(),
-            freeColClient.getClientOptions().getName(),
-            "options.xml", "clientOptions");
+              freeColClient.getClientOptions().getName(),
+              FreeColDirectories.CLIENT_OPTIONS_FILE_NAME,
+              ClientOptions.getXMLElementTagName());
+
+        // Client options are loaded early
 
         initialize();
     }
@@ -55,8 +59,7 @@ public final class ClientOptionsDialog extends OptionsDialog  {
     public OptionGroup getResponse() {
         OptionGroup value = super.getResponse();
         if (value != null) {
-            File file = FreeColDirectories.getClientOptionsFile();
-            if (!save(file)) value = null;
+            saveDefaultOptions();
         }
         return value;
     }

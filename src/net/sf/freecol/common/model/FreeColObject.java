@@ -856,10 +856,11 @@ public abstract class FreeColObject implements ObjectWithId {
      * Writes the object to the given file.
      *
      * @param file The <code>File</code> to write to.
+     * @return True if the save proceeded without error.
      * @exception FileNotFoundException
      */
-    public void save(File file) throws FileNotFoundException {
-        save(new FileOutputStream(file), WriteScope.toSave(), false);
+    public boolean save(File file) throws FileNotFoundException {
+        return save(new FileOutputStream(file), WriteScope.toSave(), false);
     }
 
     /**
@@ -867,10 +868,11 @@ public abstract class FreeColObject implements ObjectWithId {
      *
      * @param file The <code>File</code> to write to.
      * @param scope The <code>WriteScope</code> to use.
+     * @return True if the save proceeded without error.
      * @exception FileNotFoundException
      */
-    public void save(File file, WriteScope scope) throws FileNotFoundException {
-        save(new FileOutputStream(file), scope, false);
+    public boolean save(File file, WriteScope scope) throws FileNotFoundException {
+        return save(new FileOutputStream(file), scope, false);
     }
 
     /**
@@ -879,16 +881,18 @@ public abstract class FreeColObject implements ObjectWithId {
      * @param out The <code>OutputStream</code> to write to.
      * @param scope The <code>WriteScope</code> to use.
      * @param pretty Attempt to indent the output nicely.
+     * @return True if the save proceeded without error.
      */
-    public void save(OutputStream out, WriteScope scope, boolean pretty) {
+    public boolean save(OutputStream out, WriteScope scope, boolean pretty) {
         FreeColXMLWriter xw = null;
         try {
             xw = new FreeColXMLWriter(out, scope, pretty);
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Error creating FreeColXMLWriter.", ioe);
-            return;
+            return false;
         }
 
+        boolean ret = false;
         try {
             xw.writeStartDocument("UTF-8", "1.0");
 
@@ -898,11 +902,13 @@ public abstract class FreeColObject implements ObjectWithId {
 
             xw.flush();
 
+            ret = true;
         } catch (XMLStreamException xse) {
             logger.log(Level.WARNING, "Exception writing object.", xse);
         } finally {
             if (xw != null) xw.close();
         }
+        return ret;
     }
 
     /**

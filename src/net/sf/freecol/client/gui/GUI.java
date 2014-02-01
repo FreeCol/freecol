@@ -1379,10 +1379,9 @@ public class GUI {
         canvas.showFindSettlementPanel();
     }
 
-    public void showGameOptionsDialog(boolean editable,
-                                      boolean loadCustomOptions) {
+    public void showGameOptionsDialog(boolean editable, boolean custom) {
         if (canvas == null) return;
-        canvas.showGameOptionsDialog(editable, loadCustomOptions);
+        canvas.showGameOptionsDialog(editable, custom);
     }
 
     public void showHighScoresPanel(String messageId) {
@@ -1456,10 +1455,9 @@ public class GUI {
     }
 
     public OptionGroup showMapGeneratorOptionsDialog(OptionGroup mgo,
-                                                     boolean editable,
-                                                     boolean loadCustom) {
+                                                     boolean editable) {
         if (canvas == null) return null;
-        return canvas.showMapGeneratorOptionsDialog(mgo, editable, loadCustom);
+        return canvas.showMapGeneratorOptionsDialog(mgo, editable);
     }
 
     public Dimension showMapSizeDialog() {

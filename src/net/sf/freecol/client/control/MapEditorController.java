@@ -169,7 +169,7 @@ public final class MapEditorController {
             .getMapGenerator();
 
         OptionGroup group = spec.getMapGeneratorOptions();
-        group = gui.showMapGeneratorOptionsDialog(group, true, true);
+        group = gui.showMapGeneratorOptionsDialog(group, true);
         if (group == null) return;
 
         try {

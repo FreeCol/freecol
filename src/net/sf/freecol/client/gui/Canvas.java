@@ -1806,12 +1806,12 @@ public final class Canvas extends JDesktopPane {
      * Display the GameOptionsDialog.
      *
      * @param editable Should the game options be editable?
-     * @param loadCustomOptions
+     * @param custom Whether to load custom options.
      */
     public void showGameOptionsDialog(boolean editable,
-                                      boolean loadCustomOptions) {
+                                      boolean custom) {
         showFreeColDialog(new GameOptionsDialog(freeColClient, editable,
-                                                loadCustomOptions),
+                                                custom),
                           null);
     }
 
@@ -2038,12 +2038,11 @@ public final class Canvas extends JDesktopPane {
      * @param mgo The <code>OptionGroup</code> containing the map
      *     generator options.
      * @param editable Should these options be editable.
-     * @param loadCustomOptions Whether to load custom options.
      */
     public OptionGroup showMapGeneratorOptionsDialog(OptionGroup mgo,
-        boolean editable, boolean loadCustomOptions) {
+                                                     boolean editable) {
         return showFreeColDialog(new MapGeneratorOptionsDialog(freeColClient,
-                mgo, editable, loadCustomOptions), null);
+                mgo, editable), null);
     }
 
     /**

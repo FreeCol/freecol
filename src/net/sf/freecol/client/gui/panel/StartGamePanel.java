@@ -306,10 +306,7 @@ public final class StartGamePanel extends FreeColPanel {
                 break;
             case MAP_GENERATOR_OPTIONS:
                 OptionGroup mgo = fcc.getGame().getMapGeneratorOptions();
-                FileOption importFile = (FileOption)mgo.getOption(MapGeneratorOptions.IMPORT_FILE);
-                boolean loadCustomOptions = importFile.getValue() == null;
-                getGUI().showMapGeneratorOptionsDialog(mgo, fcc.isAdmin(),
-                                                       loadCustomOptions);
+                getGUI().showMapGeneratorOptionsDialog(mgo, fcc.isAdmin());
                 break;
             default:
                 super.actionPerformed(event);
