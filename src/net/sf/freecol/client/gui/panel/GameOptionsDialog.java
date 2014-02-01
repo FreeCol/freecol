@@ -25,6 +25,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.BooleanOptionUI;
+import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.option.OptionGroup;
 
@@ -42,16 +43,17 @@ public final class GameOptionsDialog extends OptionsDialog {
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param editable Whether the game options can be modified.
-     * @param loadCustomOptions Whether to load custom options.
+     * @param custom Whether to load custom options.
      */
     public GameOptionsDialog(FreeColClient freeColClient,
-                             boolean editable, boolean loadCustomOptions) {
+                             boolean editable, boolean custom) {
         super(freeColClient, editable,
             freeColClient.getGame().getSpecification().getGameOptions(),
             Messages.message(OPTION_GROUP_ID),
-            "game_options.xml", OPTION_GROUP_ID);
+            FreeColDirectories.GAME_OPTIONS_FILE_NAME, OPTION_GROUP_ID);
 
-        if (isEditable() && loadCustomOptions) loadCustomOptions();
+        if (isEditable()) loadDefaultOptions();
+
         // Set special cases
         // Disable victory option "All humans defeated"
         // when playing single player
@@ -81,6 +83,7 @@ public final class GameOptionsDialog extends OptionsDialog {
                 value = null;
             } else {
                 freeColClient.getPreGameController().sendGameOptions();
+                if (isEditable()) saveDefaultOptions();
             }
         }
         return value;

@@ -167,6 +167,21 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
     }
 
     /**
+     * Reset the group for this panel.
+     *
+     * @param group The new <code>OptionGroup</code>.
+     */
+    private void reset(OptionGroup group) {
+        this.group = group;
+        this.optionPanel.removeAll();
+        this.ui = new OptionGroupUI(getGUI(), this.group, this.editable);
+        this.optionPanel.add(this.ui);
+        invalidate();
+        validate();
+        repaint();
+    }
+
+    /**
      * Load an option group from given File.
      *
      * @param file A <code>File</code> to load from.
@@ -206,21 +221,6 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
     }
 
     /**
-     * Reset the group for this panel.
-     *
-     * @param group The new <code>OptionGroup</code>.
-     */
-    private void reset(OptionGroup group) {
-        this.group = group;
-        this.optionPanel.removeAll();
-        this.ui = new OptionGroupUI(getGUI(), this.group, this.editable);
-        this.optionPanel.add(this.ui);
-        invalidate();
-        validate();
-        repaint();
-    }
-
-    /**
      * Save an option group to a given File.
      *
      * @param file The <code>File</code> to save to.
@@ -228,27 +228,37 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
      */
     protected boolean save(File file) {
         try {
-            group.save(new FileOutputStream(file),
-                       FreeColXMLWriter.WriteScope.toSave(), false);
-            return true;
+            return group.save(new FileOutputStream(file),
+                              FreeColXMLWriter.WriteScope.toSave(), false);
         } catch (FileNotFoundException e) {
             logger.log(Level.WARNING, "Save failed", e);
             StringTemplate t = StringTemplate.template("failedToSave")
                 .addName("%name%", file.getPath());
             getGUI().showInformationMessage(t);
-            return false;
         }
+        return false;
     }
 
     /**
-     * Load a custom option group from the default file.
+     * Load the option group from the default file.
      *
      * @return True if the options were loaded.
      */
-    protected boolean loadCustomOptions() {
-        File customFile = new File(FreeColDirectories.getOptionsDirectory(),
-                                   getDefaultFileName());
-        return (customFile.exists()) ? load(customFile) : false;
+    protected boolean loadDefaultOptions() {
+        File f = new File(FreeColDirectories.getOptionsDirectory(),
+                          getDefaultFileName());
+        return (f.exists()) ? load(f) : false;
+    }
+
+    /**
+     * Save the option group to the default file.
+     *
+     * @return True if the options were saved.
+     */
+    protected boolean saveDefaultOptions() {
+        File f = new File(FreeColDirectories.getOptionsDirectory(),
+                          getDefaultFileName());
+        return save(f);
     }
 
 

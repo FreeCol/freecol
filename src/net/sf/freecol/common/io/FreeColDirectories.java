@@ -42,8 +42,6 @@ public class FreeColDirectories {
 
     private static final String CLASSIC_DIRECTORY = "classic";
 
-    private static final String CLIENT_OPTIONS_FILE = "options.xml";
-
     private static final String[] CONFIG_DIRS
         = new String[] { "classic", "freecol" };
 
@@ -73,6 +71,16 @@ public class FreeColDirectories {
     private static final String XDG_DATA_HOME_DEFAULT = ".local/share";
     private static final String XDG_CACHE_HOME_ENV = "XDG_CACHE_HOME";
     private static final String XDG_CACHE_HOME_DEFAULT = ".cache";
+
+    // Public names, used by the respective dialogs
+
+    public static final String CLIENT_OPTIONS_FILE_NAME = "options.xml";
+
+    public static final String GAME_OPTIONS_FILE_NAME = "game_options.xml";
+
+    public static final String MAP_GENERATOR_OPTIONS_FILE_NAME
+        = "map_generator_options.xml";
+
 
     /**
      * The directory containing automatically created save games.  At
@@ -614,7 +622,7 @@ public class FreeColDirectories {
      */
     public static File getClientOptionsFile() {
         return (clientOptionsFile != null) ? clientOptionsFile
-            : new File(getOptionsDirectory(), CLIENT_OPTIONS_FILE);
+            : new File(getOptionsDirectory(), CLIENT_OPTIONS_FILE_NAME);
     }
 
     /**
