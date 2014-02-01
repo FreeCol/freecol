@@ -35,7 +35,8 @@ public class Flag {
 
     public enum Alignment {
         HORIZONTAL,
-        VERTICAL
+        VERTICAL,
+        NONE
     };
 
     public enum Background {
@@ -133,12 +134,26 @@ public class Flag {
     private int stripes = 13;
 
 
+    public Flag(Alignment alignment, Background background,
+                UnionPosition unionPosition) {
+        this.alignment = alignment;
+        this.background = background;
+        this.unionPosition = unionPosition;
+    }
+
     public List<Color> getBackgroundColors() {
         return backgroundColors;
     }
 
     public void setBackgroundColors(List<Color> backgroundColors) {
         this.backgroundColors = backgroundColors;
+    }
+
+    public void setBackgroundColors(Color[] colors) {
+        backgroundColors.clear();
+        for (Color color : colors) {
+            backgroundColors.add(color);
+        }
     }
 
     public Color getUnionColor() {
@@ -178,11 +193,12 @@ public class Flag {
         this.stripes = stripes;
     }
 
-    public void setType(Alignment alignment, Background background,
-                        UnionPosition unionPosition) {
-        this.alignment = alignment;
-        this.background = background;
-        this.unionPosition = unionPosition;
+    public UnionPosition getUnionPosition() {
+        return unionPosition;
+    }
+
+    public void setUnionPosition(UnionPosition position) {
+        this.unionPosition = position;
     }
 
     public BufferedImage getImage() {
@@ -197,6 +213,8 @@ public class Flag {
         int colors = backgroundColors.size();
         double stripeWidth = WIDTH;
         double stripeHeight = HEIGHT;
+        double quarterWidth = 0;
+        double quarterHeight = 0;
         switch(background) {
         case STRIPES:
             if (stripes < 1) {
@@ -205,10 +223,10 @@ public class Flag {
             }
             double x = 0, y = 0;
             if (alignment == Alignment.HORIZONTAL) {
-                stripeHeight = HEIGHT / stripes;
+                stripeHeight = (double) HEIGHT / stripes;
                 y = stripeHeight;
             } else {
-                stripeWidth = WIDTH / stripes;
+                stripeWidth = (double) WIDTH / stripes;
                 x = stripeWidth;
             }
             for (int index = 0; index < stripes; index++) {
@@ -218,14 +236,14 @@ public class Flag {
             }
             break;
         case CROSS:
-            // for the moment
-            unionPosition = UnionPosition.INSET;
+            unionPosition = UnionPosition.INSET; // for the moment
+            alignment = null; // probably always
             g.setColor(backgroundColors.get(0));
             rectangle.setRect(0, 0, WIDTH, HEIGHT);
             g.fill(rectangle);
             double stripeSize = HEIGHT / 7;
-            double quarterWidth = (WIDTH - stripeSize) / 2;
-            double quarterHeight = (HEIGHT - stripeSize) / 2;
+            quarterWidth = (WIDTH - stripeSize) / 2;
+            quarterHeight = (HEIGHT - stripeSize) / 2;
             g.setColor(backgroundColors.get(1));
             rectangle.setRect(0, 0, quarterWidth, quarterHeight);
             g.fill(rectangle);
@@ -260,7 +278,7 @@ public class Flag {
                 && stripes < 3) {
                 union.height = stripeHeight;
                 if (stripes == 2 && unionPosition == UnionPosition.BOTTOM) {
-                    union.y = HEIGHT /2;
+                    union.y = HEIGHT / 2;
                 }
             } else {
                 union.height = HEIGHT / 3;
@@ -276,13 +294,16 @@ public class Flag {
                 } else {
                     union.height = stripeHeight * (stripes / 2);
                 }
-            } else {
+            } else if (alignment == Alignment.VERTICAL) {
                 if (stripes == 1) {
                     union.width = WIDTH / 2;
                 } else {
                     union.width = stripeWidth * (stripes / 2);
                 }
                 union.height = HEIGHT / 2;
+            } else {
+                union.width = quarterWidth;
+                union.height = quarterHeight;
             }
         }
 
@@ -307,6 +328,7 @@ public class Flag {
             g.setColor(unionColor);
             g.fill(union);
         }
+        g.translate(union.x, union.y);
         unionPath.transform(AffineTransform
                             .getTranslateInstance(-unionPath.getBounds().getX(),
                                                   -unionPath.getBounds().getY()));
@@ -325,7 +347,7 @@ public class Flag {
     }
 
     private GeneralPath getCircleOfStars() {
-        double radius = 0.3 * union.getHeight();
+        double radius = 0.3 * Math.min(union.height, union.width);
         double phi = Math.PI * 2 / stars;
         GeneralPath circle = new GeneralPath();
         for (int i = 0; i < stars; i++) {
@@ -380,5 +402,29 @@ public class Flag {
         return grid;
     }
 
+
+    public static Flag tricolore(Alignment alignment, Color... colors) {
+        UnionPosition position = (alignment == Alignment.HORIZONTAL)
+            ? UnionPosition.MIDDLE : UnionPosition.CENTER;
+        Flag result = new Flag(alignment, Background.STRIPES, position);
+        result.stripes = 3;
+        result.unionColor = null; // use background
+        result.setBackgroundColors(colors);
+        return result;
+    }
+
+    public static Flag starsAndStripes(Alignment alignment, Color unionColor, Color... colors) {
+        Flag result = new Flag(alignment, Background.STRIPES, UnionPosition.INSET);
+        result.unionColor = unionColor;
+        result.setBackgroundColors(colors);
+        return result;
+    }
+
+    public static Flag quartered(Color... colors) {
+        Flag result = new Flag(null, Background.CROSS, UnionPosition.INSET);
+        result.setUnionColor(null); // use background
+        result.setBackgroundColors(colors);
+        return result;
+    }
 
 }
