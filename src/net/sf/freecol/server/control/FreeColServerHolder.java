@@ -29,6 +29,7 @@ import net.sf.freecol.server.model.ServerGame;
  */
 public class FreeColServerHolder {
 
+    /** The main server object. */
     private final FreeColServer freeColServer;
 
 

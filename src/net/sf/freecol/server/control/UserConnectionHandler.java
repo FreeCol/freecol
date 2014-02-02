@@ -20,10 +20,13 @@
 package net.sf.freecol.server.control;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
@@ -33,6 +36,7 @@ import net.sf.freecol.common.networking.LoginMessage;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.FreeColServerHolder;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.networking.Server;
 
@@ -41,16 +45,14 @@ import org.w3c.dom.Element;
 
 
 /**
- * Handles a new client connection. {@link PreGameInputHandler} is set
- * as the message handler when the client has successfully logged on.
+ * Handles a new client connection.  {@link PreGameInputHandler} is
+ * set as the message handler when the client has successfully logged
+ * on.
  */
-public final class UserConnectionHandler implements MessageHandler {
+public final class UserConnectionHandler extends FreeColServerHolder
+    implements MessageHandler {
 
     private static Logger logger = Logger.getLogger(UserConnectionHandler.class.getName());
-
-
-    /** The main server object. */
-    private final FreeColServer freeColServer;
 
 
     /**
@@ -59,9 +61,11 @@ public final class UserConnectionHandler implements MessageHandler {
      * @param freeColServer The main control object.
      */
     public UserConnectionHandler(FreeColServer freeColServer) {
-        this.freeColServer = freeColServer;
+        super(freeColServer);
     }
 
+
+    // Implement MessageHandler
 
     /**
      * Handles a network message.
@@ -71,20 +75,19 @@ public final class UserConnectionHandler implements MessageHandler {
      * @return The reply.
      */
     public synchronized Element handle(Connection conn, Element element) {
-        String type = (element == null) ? "(null)" : element.getTagName();
-        return ("disconnect".equals(type)) 
+        final String tag = element.getTagName();
+        return ("disconnect".equals(tag)) 
             ? disconnect(conn, element)
-            : ("getVacantPlayers".equals(type))
+            : ("gameState".equals(tag))
+            ? gameState(conn, element)
+            : ("getVacantPlayers".equals(tag))
             ? getVacantPlayers(conn, element)
-            : ("login".equals(type))
+            : ("login".equals(tag))
             ? login(conn, element)
-            : unknown(type);
+            : unknown(tag);
     }
 
-    private Element unknown(String type) {
-        logger.warning("Unknown user connection request: " + type);
-        return null;
-    }
+    // Individual message handlers
 
     /**
      * Handles a "disconnect"-message.
@@ -102,6 +105,49 @@ public final class UserConnectionHandler implements MessageHandler {
             logger.log(Level.WARNING, "Could not close the connection.", e);
         }
         return null;
+    }
+
+    /**
+     * Handles a "gameState"-request.
+     *
+     * @param connection The connection the message came from.
+     * @param element The element containing the request.
+     * @return An element with a "gameState" attribute set.
+     */
+    private Element gameState(Connection connection, Element element) {
+        final FreeColServer freeColServer = getFreeColServer();
+        final Game game = getGame();
+
+        Element reply = DOMMessage.createMessage("gameState");
+        reply.setAttribute("state",
+                           freeColServer.getGameState().toString());
+        return reply;
+    }
+
+    /**
+     * Handles a "getVacantPlayers"-request.
+     *
+     * @param connection The connection the message came from.
+     * @param element The element containing the request.
+     * @return Null on error (such as requesting during end game), an empty
+     *     list if the game is starting, or a list of all the inactive
+     *     European players.
+     */
+    private Element getVacantPlayers(Connection connection, Element element) {
+        final FreeColServer freeColServer = getFreeColServer();
+        final Game game = getGame();
+
+        Element reply = DOMMessage.createMessage("vacantPlayers");
+        Document doc = reply.getOwnerDocument();
+        for (Player p : game.getLiveEuropeanPlayers()) {
+            if (!p.isREF()
+                && (p.isAI() || !((ServerPlayer)p).isConnected())) {
+                Element playerElement = doc.createElement("player");
+                playerElement.setAttribute("username", p.getNationId());
+                reply.appendChild(playerElement);
+            }
+        }
+        return reply;
     }
 
     /**
@@ -130,9 +176,10 @@ public final class UserConnectionHandler implements MessageHandler {
                 version + " != " + FreeCol.getVersion());
         }
 
+        final FreeColServer freeColServer = getFreeColServer();
+        final Server server = freeColServer.getServer();
         Game game;
         ServerPlayer player;
-        Server server = freeColServer.getServer();
         Unit active = null;
         boolean isCurrentPlayer = false;
         MessageHandler mh;
@@ -182,7 +229,7 @@ public final class UserConnectionHandler implements MessageHandler {
                 StringBuilder sb = new StringBuilder("Player \"");
                 sb.append(userName).append("\" is not present in the game.")
                     .append("\n  Known players = ( ");
-                for (Player p : game.getPlayers()) {
+                for (Player p : game.getLiveEuropeanPlayers()) {
                     sb.append(p.getName()).append(" ");
                 }
                 sb.append(")");
@@ -228,32 +275,13 @@ public final class UserConnectionHandler implements MessageHandler {
     }
 
     /**
-     * Handles a "getVacantPlayers"-request.
+     * Gripe about an unknown tag.
      *
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
-     * @return The reply: An XML element containing a list of the
-     *       vacant players.
+     * @param tag The unknown tag.
+     * @return Null.
      */
-    private Element getVacantPlayers(Connection connection, Element element) {
-        Game game = freeColServer.getGame();
-        if (freeColServer.getGameState()
-            == FreeColServer.GameState.STARTING_GAME) {
-            return null;
-        }
-
-        Element reply = DOMMessage.createMessage("vacantPlayers");
-        Document doc = reply.getOwnerDocument();
-        for (Player player : game.getPlayers()) {
-            if (!player.isDead()
-                && player.isEuropean()
-                && !player.isREF()
-                && (!((ServerPlayer)player).isConnected() || player.isAI())) {
-                Element playerElement = doc.createElement("player");
-                playerElement.setAttribute("username", player.getName());
-                reply.appendChild(playerElement);
-            }
-        }
-        return reply;
+    private Element unknown(String tag) {
+        logger.warning("Unknown user connection request: " + tag);
+        return null;
     }
 }

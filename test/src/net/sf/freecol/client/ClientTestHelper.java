@@ -38,8 +38,9 @@ public class ClientTestHelper {
         ConnectController connectController = client.getConnectController();
         client.setFreeColServer(freeColServer);
         client.setSinglePlayer(true);
-        boolean connected = connectController.login("127.0.0.1",
-                                                    freeColServer.getPort());
+        boolean connected
+            = connectController.login("test", ConnectController.LOCALHOST,
+                                      freeColServer.getPort());
         assertTrue(connected);
         client.getPreGameController().setReady(true);
         return client;

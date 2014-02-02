@@ -58,6 +58,7 @@ import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.FreeColServer.GameState;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -71,6 +72,8 @@ import org.w3c.dom.NodeList;
 public final class ConnectController {
 
     private static final Logger logger = Logger.getLogger(ConnectController.class.getName());
+
+    public static final String LOCALHOST = "localhost";
 
     private final FreeColClient freeColClient;
 
@@ -105,6 +108,201 @@ public final class ConnectController {
                 return false;
             }
         }
+        return true;
+    }
+
+    /**
+     * Start a server.
+     *
+     * @param publicServer If true, add to the meta-server.
+     * @param singlePlayer True if this is a single player game.
+     * @param specification The <code>Specification</code> to use in this game.
+     * @param port The TCP port to use for the public socket.
+     * @return A new <code>FreeColServer</code> or null on error.
+     */
+    private FreeColServer startServer(boolean publicServer,
+        boolean singlePlayer, Specification spec, int port) {
+        try {
+            return new FreeColServer(publicServer, singlePlayer, spec, port,
+                                     null);
+        } catch (NoRouteToServerException e) {
+            gui.showErrorMessage("server.noRouteToServer");
+            logger.log(Level.WARNING, "No route to server.", e);
+        } catch (IOException e) {
+            gui.showErrorMessage("server.couldNotStart");
+            logger.log(Level.WARNING, "Could not start server.", e);
+        }
+        return null;
+    }
+
+    /**
+     * Get a connection to a server.
+     *
+     * @param host The name of the machine running the
+     *     <code>FreeColServer</code>.
+     * @param port The port to use when connecting to the host.
+     * @return A <code>Connection</code> to the server.
+     */
+    private Connection getConnection(String host, int port) {
+        try {
+            return new Connection(host, port, null, FreeCol.CLIENT_THREAD);
+        } catch (IOException e) {
+            gui.showErrorMessage("server.couldNotConnect", e.getMessage());
+            logger.log(Level.WARNING, "Could not connect to " + host
+                + ":" + port, e);
+        }
+        return null;
+    }
+
+    /**
+     * Gets a the game state on the remote server.
+     *
+     * @param host The name of the machine running the
+     *     <code>FreeColServer</code>.
+     * @param port The port to use when connecting to the host.
+     * @return The <code>GameState</code>.
+     */
+    private GameState getGameState(String host, int port) {
+        Connection mc = getConnection(host, port);
+        if (mc == null) return null;
+        
+        String state = null;
+        Element element = DOMMessage.createMessage("gameState");
+        try {
+            Element reply = mc.askDumping(element);
+            if (reply == null) {
+                return null;
+            } else if (!reply.getTagName().equals("gameState")) {
+                logger.warning("The reply has an unknown type: "
+                    + reply.getTagName());
+                return null;
+            }
+            state = reply.getAttribute("state");
+
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Could not send message to server.", e);
+            return null;
+        } finally {
+            mc.close();
+        }
+
+        try {
+            return Enum.valueOf(GameState.class, state);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Bad state: " + state, e);
+        }
+        return null;
+    }
+
+    /**
+     * Gets a list of available players on a given server.
+     *
+     * @param host The name of the machine running the
+     *     <code>FreeColServer</code>.
+     * @param port The port to use when connecting to the host.
+     * @return A list of available {@link Player#getName() user names}.
+     */
+    private List<String> getVacantPlayers(String host, int port) {
+        Connection mc = getConnection(host, port);
+        if (mc == null) return null;
+
+        List<String> items = new ArrayList<String>();
+        Element element = DOMMessage.createMessage("getVacantPlayers");
+        try {
+            Element reply = mc.askDumping(element);
+            if (reply == null) {
+                logger.warning("The server did not return a list.");
+                return null;
+            } else if (!reply.getTagName().equals("vacantPlayers")) {
+                logger.warning("The reply has an unknown type: "
+                    + reply.getTagName());
+                return null;
+            }
+
+            NodeList nl = reply.getChildNodes();
+            for (int i = 0; i < nl.getLength(); i++) {
+                items.add(((Element)nl.item(i)).getAttribute("username"));
+            }
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Could not send message to server.", e);
+        } finally {
+            mc.close();
+        }
+
+        return items;
+    }
+
+    /**
+     * Starts the client and connects to <i>host:port</i>.
+     *
+     * Public for the test suite.
+     *
+     * @param user The name of the player to use.
+     * @param host The name of the machine running the
+     *            <code>FreeColServer</code>.
+     * @param port The port to use when connecting to the host.
+     * @return True if the login succeeds.
+     */
+    public boolean login(String user, String host, int port) {
+        freeColClient.setMapEditor(false);
+ 
+        freeColClient.askServer().disconnect();
+
+        try {
+            freeColClient.askServer().connect(FreeCol.CLIENT_THREAD + user,
+                host, port, freeColClient.getPreGameInputHandler());
+        } catch (Exception e) {
+            gui.showErrorMessage("server.couldNotConnect", e.getMessage());
+            return false;
+        }
+
+        LoginMessage msg = freeColClient.askServer().login(user,
+            FreeCol.getVersion());
+        Game game;
+        if (msg == null || (game = msg.getGame()) == null) return false;
+
+        // This completes the client's view of the spec with options
+        // obtained from the server difficulty.  It should not be
+        // required in the client, to be removed later, when newTurn()
+        // only runs in the server
+        freeColClient.setGame(game);
+        Player player = game.getPlayerByName(user);
+        if (player == null) {
+            logger.warning("New game does not contain player: " + user);
+            return false;
+        }
+        freeColClient.setMyPlayer(player);
+        freeColClient.addSpecificationActions(game.getSpecification());
+        freeColClient.updateActions();
+        logger.info("FreeColClient logged in as " + user
+            + "/" + player.getId());
+
+        // Reconnect
+        if (msg.getStartGame()) {
+            Tile entryTile = (player.getEntryLocation() == null) ? null
+                : player.getEntryLocation().getTile();
+            freeColClient.setSinglePlayer(msg.isSinglePlayer());
+            freeColClient.getPreGameController().startGame();
+            gui.setActiveUnit(null);
+
+            if (msg.isCurrentPlayer()) {
+                freeColClient.getInGameController()
+                    .setCurrentPlayer(player);
+                Unit activeUnit = msg.getActiveUnit();
+                if (activeUnit != null) {
+                    activeUnit.getOwner().resetIterators();
+                    activeUnit.getOwner().setNextActiveUnit(activeUnit);
+                    gui.setActiveUnit(activeUnit);
+                } else {
+                    gui.setSelectedTile(entryTile, false);
+                }
+            } else {
+                gui.setSelectedTile(entryTile, false);
+            }
+        }
+
+        // All done.
+        freeColClient.setLoggedIn(true);
         return true;
     }
 
@@ -150,26 +348,16 @@ public final class ConnectController {
 
         if (!unblockServer(port)) return false;
 
-        FreeColServer freeColServer;
-        try {
-            freeColServer = new FreeColServer(publicServer, false,
-                                              specification, port, null);
-        } catch (NoRouteToServerException e) {
-            gui.showErrorMessage("server.noRouteToServer");
-            logger.log(Level.WARNING, "No route to server.", e);
-            return false;
-        } catch (IOException e) {
-            gui.showErrorMessage("server.couldNotStart");
-            logger.log(Level.WARNING, "Could not start server.", e);
-            return false;
-        }
+        FreeColServer freeColServer = startServer(publicServer, false,
+                                                  specification, port);
+        if (freeColServer == null) return false;
 
         freeColClient.setFreeColServer(freeColServer);
-        return joinMultiplayerGame("localhost", port);
+        return joinMultiplayerGame(LOCALHOST, port);
     }
 
     /**
-     * Starts a new multiplayer game by connecting to the server.
+     * Join an existing multiplayer game.
      *
      * @param host The name of the machine running the server.
      * @param port The port to use when connecting to the host.
@@ -180,24 +368,38 @@ public final class ConnectController {
 
         if (freeColClient.isLoggedIn()) logout(true);
 
-        List<ChoiceItem<String>> vacantPlayers
-            = new ArrayList<ChoiceItem<String>>();
-        for (String player : getVacantPlayers(host, port)) {
-            vacantPlayers.add(new ChoiceItem<String>(Messages.message(player),
-                                                     player));
-        }
-        if (vacantPlayers.isEmpty()) return false;
-        String choice = gui.showChoiceDialog(true, null,
-            Messages.message("connectController.choicePlayer"), null,
-            "cancel", vacantPlayers);
-        if (choice == null) return false;
-        FreeCol.setName(choice);
-
-        freeColClient.setSinglePlayer(false);
-        if (!login(host, port)) return false;
-        if (!freeColClient.isInGame()) {
+        GameState state = getGameState(host, port);
+        if (state == null) return false;
+        switch (state) {
+        case STARTING_GAME:
+            if (!login(FreeCol.getName(), host, port)) return false;
             gui.showStartGamePanel(freeColClient.getGame(),
                                    freeColClient.getMyPlayer(), false);
+            freeColClient.setSinglePlayer(false);
+            break;
+
+        case IN_GAME:
+            if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS))
+                return false;
+            List<String> names = getVacantPlayers(host, port);
+            if (names == null || names.isEmpty()) return false;
+
+            List<ChoiceItem<String>> choices
+                = new ArrayList<ChoiceItem<String>>();
+            for (String n : names) {
+                choices.add(new ChoiceItem<String>(Messages.getName(n), n));
+            }
+            String id = gui.showChoiceDialog(true, null,
+                Messages.message("connectController.choicePlayer"), null,
+                "cancel", choices);
+            if (id == null) return false;
+
+            if (!login(id + ".ruler", host, port)) return false;
+            freeColClient.setSinglePlayer(false);
+            break;
+
+        case ENDING_GAME: default:
+            return false;
         }
         return true;
     }
@@ -206,12 +408,11 @@ public final class ConnectController {
      * Starts a new single player game by connecting to the server.
      * TODO: connect client/server directly (not using network-classes)
      *
-     * @param specification The <code>Specification</code> for the game.
+     * @param spec The <code>Specification</code> for the game.
      * @param skip Skip the start game panel.
      * @return True if the game starts successfully.
      */
-    public boolean startSinglePlayerGame(Specification specification,
-                                         boolean skip) {
+    public boolean startSinglePlayerGame(Specification spec, boolean skip) {
         freeColClient.setMapEditor(false);
 
         if (freeColClient.isLoggedIn()) logout(true);
@@ -223,27 +424,16 @@ public final class ConnectController {
         //
         // ATM we only allow mods in single player games.
         // TODO: allow in stand alone server starts?
-        specification.loadMods(freeColClient.getClientOptions()
-                                            .getActiveMods());
+        spec.loadMods(freeColClient.getClientOptions().getActiveMods());
 
-        FreeColServer freeColServer;
-        try {
-            freeColServer = new FreeColServer(false, true, specification,
-                                              -1, null);
-        } catch (NoRouteToServerException e) {
-            gui.showErrorMessage("server.noRouteToServer");
-            logger.log(Level.WARNING, "No route to server (single player!).",
-                e);
-            return false;
-        } catch (IOException e) {
-            gui.showErrorMessage("server.couldNotStart");
-            logger.log(Level.WARNING, "Could not start server.", e);
-            return false;
-        }
+        FreeColServer freeColServer = startServer(false, true, spec, -1);
+        if (freeColServer == null) return false;
 
         freeColClient.setFreeColServer(freeColServer);
         freeColClient.setSinglePlayer(true);
-        if (!login("127.0.0.1", freeColServer.getPort())) return false;
+        if (!login(FreeCol.getName(), LOCALHOST, freeColServer.getPort())) {
+            return false;
+        }
 
         final ClientOptions co = freeColClient.getClientOptions();
         if (co.getBoolean(ClientOptions.AUTOSAVE_DELETE)) {
@@ -373,7 +563,7 @@ public final class ConnectController {
                     final int serverPort = freeColServer.getPort();
                     freeColClient.setSinglePlayer(singlePlayer);
                     freeColClient.getInGameController().setGameConnected();
-                    if (login("127.0.0.1", serverPort)) {
+                    if (login(FreeCol.getName(), LOCALHOST, serverPort)) {
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 ResourceManager.setScenarioMapping(saveGame.getResourceMapping());
@@ -422,78 +612,6 @@ public final class ConnectController {
     }
 
     /**
-     * Starts the client and connects to <i>host:port</i>.
-     *
-     * @param host The name of the machine running the
-     *            <code>FreeColServer</code>.
-     * @param port The port to use when connecting to the host.
-     * @return True if the login succeeds.
-     */
-    public boolean login(String host, int port) {
-        String userName = FreeCol.getName();
-        freeColClient.setMapEditor(false);
- 
-        freeColClient.askServer().disconnect();
-
-        try {
-            freeColClient.askServer().connect(FreeCol.CLIENT_THREAD + userName,
-                    host, port, freeColClient.getPreGameInputHandler());
-        } catch (Exception e) {
-            gui.showErrorMessage("server.couldNotConnect", e.getMessage());
-            return false;
-        }
-
-        LoginMessage msg = freeColClient.askServer()
-                                        .login(userName, FreeCol.getVersion());
-        Game game;
-        if (msg == null || (game = msg.getGame()) == null) return false;
-
-        // This completes the client's view of the spec with options
-        // obtained from the server difficulty.  It should not be
-        // required in the client, to be removed later, when newTurn()
-        // only runs in the server
-        freeColClient.setGame(game);
-        Player player = game.getPlayerByName(userName);
-        if (player == null) {
-            logger.warning("New game does not contain player: " + userName);
-            return false;
-        }
-        freeColClient.setMyPlayer(player);
-        freeColClient.addSpecificationActions(game.getSpecification());
-        freeColClient.updateActions();
-        logger.info("FreeColClient logged in as " + userName
-                    + "/" + player.getId());
-
-        // Reconnect
-        if (msg.getStartGame()) {
-            Tile entryTile = (player.getEntryLocation() == null) ? null
-                : player.getEntryLocation().getTile();
-            freeColClient.setSinglePlayer(msg.isSinglePlayer());
-            freeColClient.getPreGameController().startGame();
-            gui.setActiveUnit(null);
-
-            if (msg.isCurrentPlayer()) {
-                freeColClient.getInGameController()
-                    .setCurrentPlayer(player);
-                Unit activeUnit = msg.getActiveUnit();
-                if (activeUnit != null) {
-                    activeUnit.getOwner().resetIterators();
-                    activeUnit.getOwner().setNextActiveUnit(activeUnit);
-                    gui.setActiveUnit(activeUnit);
-                } else {
-                    gui.setSelectedTile(entryTile, false);
-                }
-            } else {
-                gui.setSelectedTile(entryTile, false);
-            }
-        }
-
-        // All done.
-        freeColClient.setLoggedIn(true);
-        return true;
-    }
-
-    /**
      * Reconnects to the server.
      *
      * @return True if the reconnection succeeds.
@@ -504,7 +622,7 @@ public final class ConnectController {
 
         gui.removeInGameComponents();
         logout(true);
-        if (!login(host, port)) return false;
+        if (!login(FreeCol.getName(), host, port)) return false;
         freeColClient.getInGameController().nextModelMessage();
         return true;
     }
@@ -563,50 +681,6 @@ public final class ConnectController {
      */
     public void quitGame(boolean stopServer) {
         quitGame(stopServer, true);
-    }
-
-
-    /**
-     * Returns a list of vacant players on a given server.
-     *
-     * @param host The name of the machine running the
-     *     <code>FreeColServer</code>.
-     * @param port The port to use when connecting to the host.
-     * @return A list of available {@link Player#getName() user names}.
-     */
-    private List<String> getVacantPlayers(String host, int port) {
-        Connection mc;
-        try {
-            mc = new Connection(host, port, null, FreeCol.CLIENT_THREAD);
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Could not connect to server.", e);
-            return null;
-        }
-
-        List<String> items = new ArrayList<String>();
-        Element element = DOMMessage.createMessage("getVacantPlayers");
-        try {
-            Element reply = mc.askDumping(element);
-            if (reply == null) {
-                logger.warning("The server did not return a list.");
-                return null;
-            } else if (!reply.getTagName().equals("vacantPlayers")) {
-                logger.warning("The reply has an unknown type: "
-                    + reply.getTagName());
-                return null;
-            }
-
-            NodeList nl = reply.getChildNodes();
-            for (int i = 0; i < nl.getLength(); i++) {
-                items.add(((Element)nl.item(i)).getAttribute("username"));
-            }
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Could not send message to server.", e);
-        } finally {
-            mc.close();
-        }
-
-        return items;
     }
 
     /**
