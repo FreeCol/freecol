@@ -20,6 +20,8 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -29,7 +31,6 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 
-import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.ActionManager;
@@ -40,6 +41,8 @@ import net.sf.freecol.client.gui.action.OpenAction;
 import net.sf.freecol.client.gui.action.PreferencesAction;
 import net.sf.freecol.client.gui.action.QuitAction;
 import net.sf.freecol.common.resources.ResourceManager;
+
+import net.miginfocom.swing.MigLayout;
 
 
 /**
@@ -91,5 +94,16 @@ public final class MainPanel extends FreeColPanel {
         add(quitButton, "width 70%");
 
         setSize(getPreferredSize());
+    }
+
+
+    // Interface ActionListener
+
+    /**
+     * {@inheritDoc}
+     */
+    public void actionPerformed(ActionEvent event) {
+        // The actions are handled implicitly by the JButton/FreeColActions
+        getGUI().removeFromCanvas(this);
     }
 }
