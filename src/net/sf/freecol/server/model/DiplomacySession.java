@@ -21,6 +21,7 @@ package net.sf.freecol.server.model;
 
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
@@ -37,15 +38,30 @@ public class DiplomacySession extends TransactionSession {
     /** The agreement under consideration. */
     private DiplomaticTrade agreement;
 
+    /** The initiating unit. */
+    private Unit unit;
+
+    /** The other player's settlement. */
+    private Settlement settlement;
+
+    /** The other player's unit (only non-null in first contact cases). */
+    private Unit otherUnit;
+
 
     public DiplomacySession(Unit unit, Settlement settlement) {
         super(makeSessionKey(DiplomacySession.class, unit, settlement));
-        agreement = null;
+        this.agreement = null;
+        this.unit = unit;
+        this.settlement = settlement;
+        this.otherUnit = null;
     }
 
     public DiplomacySession(Unit unit, Unit otherUnit) {
         super(makeSessionKey(DiplomacySession.class, unit, otherUnit));
-        agreement = null;
+        this.agreement = null;
+        this.unit = unit;
+        this.settlement = null;
+        this.otherUnit = otherUnit;
     }
 
     public void complete(ChangeSet cs) {
@@ -58,5 +74,17 @@ public class DiplomacySession extends TransactionSession {
 
     public void setAgreement(DiplomaticTrade agreement) {
         this.agreement = agreement;
+    }
+    
+    public Unit getUnit() {
+        return unit;
+    }
+
+    public Settlement getSettlement() {
+        return settlement;
+    }
+
+    public Unit getOtherUnit() {
+        return otherUnit;
     }
 }

@@ -57,6 +57,8 @@ public class ContactTest extends FreeColTestCase {
     }
 
 
+    /* Disabled.  European contact now required diplomatic negotiation.
+
     public void testEuropeanMeetsEuropean() throws Exception {
         Game game = ServerTestHelper.startServerGame(getTestMap(plains));
         Map map = game.getMap();
@@ -83,11 +85,10 @@ public class ContactTest extends FreeColTestCase {
         Unit soldier = new ServerUnit(game, tile3, french, colonistType);
         igc.move(french, soldier, tile2);
 
-        assertTrue(french.hasContacted(dutch));
-        assertTrue(dutch.hasContacted(french));
         assertEquals(Stance.PEACE, french.getStance(dutch));
         assertEquals(Stance.PEACE, dutch.getStance(french));
     }
+    */
 
     public void testEuropeanMeetsNative() throws Exception {
         Game game = ServerTestHelper.startServerGame(getTestMap(plains));
@@ -122,6 +123,8 @@ public class ContactTest extends FreeColTestCase {
         assertNotNull(iroquois.getTension(dutch));
     }
 
+    /* Disabled.  European contact now required diplomatic negotiation.
+
     public void testEuropeanMeetsColony() throws Exception {
         Game game = ServerTestHelper.startServerGame(getTestMap(plains));
         Map map = game.getMap();
@@ -147,11 +150,10 @@ public class ContactTest extends FreeColTestCase {
         Unit soldier = new ServerUnit(game, tile3, french, colonistType);
         igc.move(french, soldier, tile2);
 
-        assertTrue(french.hasContacted(dutch));
-        assertTrue(dutch.hasContacted(french));
         assertEquals(Stance.PEACE, french.getStance(dutch));
         assertEquals(Stance.PEACE, dutch.getStance(french));
     }
+    */
 
     public void testEuropeanMeetsIndianSettlement() throws Exception {
         Game game = ServerTestHelper.startServerGame(getTestMap(plains));

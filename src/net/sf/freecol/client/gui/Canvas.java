@@ -2140,23 +2140,29 @@ public final class Canvas extends JDesktopPane {
     /**
      * Displays the <code>DiplomaticTradeDialog</code>.
      *
-     * @param unit The <code>Unit</code> that is negotiating.
-     * @param settlement A <code>Settlement</code> that is negotiating.
-     * @param otherUnit The other <code>Unit</code> at first contact.
+     * @param our Our <code>FreeColGameObject</code> that is negotiating.
+     * @param other The other <code>FreeColGameObject</code>.
      * @param agreement The current <code>DiplomaticTrade</code> agreement.
      * @param comment An optional <code>StringTemplate</code> containing a
      *     commentary message.
      * @return An updated agreement.
      */
-    public DiplomaticTrade showDiplomaticTradeDialog(Unit unit,
-                                                     Settlement settlement,
-                                                     Unit otherUnit,
+    public DiplomaticTrade showDiplomaticTradeDialog(FreeColGameObject our,
+                                                     FreeColGameObject other,
                                                      DiplomaticTrade agreement,
                                                      StringTemplate comment) {
-        DiplomaticTradeDialog dtd
-            = new DiplomaticTradeDialog(freeColClient, unit, settlement,
-                                        otherUnit, agreement, comment);
-        return showFreeColDialog(dtd, unit.getTile());
+        if ((our instanceof Unit || our instanceof Colony)
+            && (other instanceof Unit || other instanceof Colony)
+            && !(our instanceof Colony && other instanceof Colony)) {
+            ; // ok
+        } else {
+            throw new RuntimeException("Bad DTD args: " + our + ", " + other);
+        }
+        DiplomaticTradeDialog dtd = new DiplomaticTradeDialog(freeColClient,
+            our, other, agreement, comment);
+        Tile tile = (our instanceof Location) ? ((Location)our).getTile()
+            : null;
+        return showFreeColDialog(dtd, tile);
     }
 
     /**

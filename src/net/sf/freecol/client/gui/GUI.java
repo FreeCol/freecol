@@ -1519,14 +1519,12 @@ public class GUI {
             });
     }
 
-    public DiplomaticTrade showDiplomaticTradeDialog(Unit unit,
-                                                     Settlement settlement,
-                                                     Unit otherUnit,
+    public DiplomaticTrade showDiplomaticTradeDialog(FreeColGameObject our,
+                                                     FreeColGameObject other,
                                                      DiplomaticTrade agreement,
                                                      StringTemplate comment) {
         if (canvas == null) return null;
-        return canvas.showDiplomaticTradeDialog(unit, settlement, otherUnit,
-                                                agreement, comment);
+        return canvas.showDiplomaticTradeDialog(our, other, agreement, comment);
     }
 
     public void showNewPanel() {

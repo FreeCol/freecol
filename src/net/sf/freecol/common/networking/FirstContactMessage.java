@@ -144,16 +144,17 @@ public class FirstContactMessage extends DOMMessage {
             return DOMMessage.clientError("Not our player: " + playerId);
         }
 
-        ServerPlayer other = (ServerPlayer)getOtherPlayer(game);
-        if (other == null) {
+        ServerPlayer otherPlayer = (ServerPlayer)getOtherPlayer(game);
+        if (otherPlayer == null) {
             return DOMMessage.clientError("Invalid other player: " + otherId);
-        } else if (other == serverPlayer) {
+        } else if (otherPlayer == serverPlayer) {
             return DOMMessage.clientError("First contact with self!?!");
         }
 
         // Proceed to contact.
         return server.getInGameController()
-            .firstContact(serverPlayer, other, getTile(game), getResult());
+            .nativeFirstContact(serverPlayer, otherPlayer,
+                                getTile(game), getResult());
     }
 
     /**

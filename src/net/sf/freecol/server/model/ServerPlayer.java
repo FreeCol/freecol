@@ -3966,7 +3966,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 .addStringTemplate("%nation%", other.getNationName()));
         }
 
-        csChangeStance(Stance.PEACE, other, true, cs);
         logger.finest("First contact between " + this + " and " + other);
         return true;
     }
@@ -3985,6 +3984,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                                      ChangeSet cs) {
         cs.add(See.only(this), ChangePriority.CHANGE_EARLY,
             new FirstContactMessage(this, other, tile));
+        csChangeStance(Stance.PEACE, other, true, cs);
         if (tile != null) {
             // Establish a diplomacy session so that if the player
             // accepts the tile offer, we can verify that the offer
@@ -4017,14 +4017,15 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
         
         DiplomaticTrade agreement = new DiplomaticTrade(game,
-            DiplomaticTrade.TradeContext.CONTACT, other, this, null, 0);
+            DiplomaticTrade.TradeContext.CONTACT, this, other, null, 0);
         agreement.add(new StanceTradeItem(game, this, other, Stance.PEACE));
-        DiplomacySession session = (settlement == null) 
+        DiplomacySession session = (settlement == null)
             ? new DiplomacySession(unit, otherUnit)
             : new DiplomacySession(unit, settlement);
         session.setAgreement(agreement);
-        cs.add(See.only(this), ChangePriority.CHANGE_LATE,
-               new DiplomacyMessage(unit, settlement, otherUnit, agreement));
+        cs.add(See.only(this), ChangePriority.CHANGE_LATE, (settlement == null)
+            ? new DiplomacyMessage(unit, otherUnit, agreement)
+            : new DiplomacyMessage(unit, settlement, agreement));
     }
 
     /**

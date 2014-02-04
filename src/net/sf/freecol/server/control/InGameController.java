@@ -3007,15 +3007,20 @@ public final class InGameController extends Controller {
     /**
      * Accept a diplomatic trade.  Handles the transfers of TradeItems.
      *
-     * @param unit The <code>Unit</code> that is trading.
-     * @param settlement The <code>Settlement</code> to trade with.
+     * Note that first contact contexts may not necessarily have a settlement,
+     * but this is ok because first contact trade can only include stance
+     * and gold trade items.
+     *
      * @param agreement The <code>DiplomacyTrade</code> agreement.
+     * @param session The <code>DiplomacySession</code> in scope.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    private void csAcceptTrade(Unit unit, Settlement settlement,
-                               DiplomaticTrade agreement, ChangeSet cs) {
-        ServerPlayer srcPlayer = (ServerPlayer)agreement.getSender();
-        ServerPlayer dstPlayer = (ServerPlayer)agreement.getRecipient();
+    private void csAcceptTrade(DiplomaticTrade agreement,
+                               DiplomacySession session, ChangeSet cs) {
+        final ServerPlayer srcPlayer = (ServerPlayer)agreement.getSender();
+        final ServerPlayer dstPlayer = (ServerPlayer)agreement.getRecipient();
+        final Unit unit = session.getUnit();
+        final Settlement settlement = session.getSettlement();
         boolean visibilityChange = false;
 
         for (TradeItem tradeItem : agreement.getTradeItems()) {
@@ -3025,13 +3030,13 @@ public final class InGameController extends Controller {
                                + tradeItem.toString());
                 continue;
             }
-            ServerPlayer source = (ServerPlayer) tradeItem.getSource();
+            ServerPlayer source = (ServerPlayer)tradeItem.getSource();
             if (source != srcPlayer && source != dstPlayer) {
                 logger.warning("Trade with invalid source: "
                                + ((source == null) ? "null" : source.getId()));
                 continue;
             }
-            ServerPlayer dest = (ServerPlayer) tradeItem.getDestination();
+            ServerPlayer dest = (ServerPlayer)tradeItem.getDestination();
             if (dest != srcPlayer && dest != dstPlayer) {
                 logger.warning("Trade with invalid destination: "
                                + ((dest == null) ? "null" : dest.getId()));
@@ -3066,13 +3071,19 @@ public final class InGameController extends Controller {
                 cs.addPartial(See.only(dest), dest, "gold", "score");
             }
             Goods goods = tradeItem.getGoods();
-            if (goods != null) {
-                moveGoods(goods, settlement);
-                cs.add(See.only(source), unit);
-                cs.add(See.only(dest), settlement.getGoodsContainer());
+            if (goods != null && settlement != null) {
+                if (settlement.getOwner() == dest) {
+                    moveGoods(goods, settlement);
+                    cs.add(See.only(source), unit);
+                    cs.add(See.only(dest), settlement.getGoodsContainer());
+                } else {
+                    moveGoods(goods, unit);
+                    cs.add(See.only(dest), unit);
+                    cs.add(See.only(source), settlement.getGoodsContainer());
+                }
             }
             ServerUnit newUnit = (ServerUnit)tradeItem.getUnit();
-            if (newUnit != null) {
+            if (newUnit != null && settlement != null) {
                 ServerPlayer former = (ServerPlayer)newUnit.getOwner();
                 Tile oldTile = newUnit.getTile();
                 Location newLoc;
@@ -3116,8 +3127,9 @@ public final class InGameController extends Controller {
      * @param result Whether the initial peace treaty was accepted.
      * @return An <code>Element</code> encapsulating this action.
      */
-    public Element firstContact(ServerPlayer serverPlayer, ServerPlayer other,
-                                Tile tile, boolean result) {
+    public Element nativeFirstContact(ServerPlayer serverPlayer,
+                                      ServerPlayer other, Tile tile,
+                                      boolean result) {
         ChangeSet cs = new ChangeSet();
         if (result) {
             if (tile != null) {
@@ -3142,119 +3154,249 @@ public final class InGameController extends Controller {
         return cs.build(serverPlayer);
     }
 
-    /**
-     * Diplomacy.
-     *
-     * Either settlement is non-null (in most types of diplomacy) or
-     * otherUnit is non-null (first European contact).
-     *
-     * Note that when an agreement is accepted we always process the
-     * agreement that was sent, not what was returned, cutting off a
-     * possibility for cheating.
-     *
-     * @param serverPlayer The <code>ServerPlayer</code> that is trading.
-     * @param unit The <code>Unit</code> that is trading.
-     * @param settlement The <code>Settlement</code> to trade with.
-     * @param otherUnit The other <code>Unit</code> encountered.
-     * @param agreement The <code>DiplomaticTrade</code> to consider.
-     * @return An <code>Element</code> encapsulating this action.
-     */
-    public Element diplomaticTrade(ServerPlayer serverPlayer, Unit unit,
-                                   Settlement settlement, Unit otherUnit,
-                                   DiplomaticTrade agreement) {
-        ChangeSet cs = new ChangeSet();
-        ServerPlayer otherPlayer = null;
-        Tile tile = null;
-        DiplomacySession session = null;
-        TradeStatus status = agreement.getStatus();
-        if (settlement != null) {
-            otherPlayer = (ServerPlayer)settlement.getOwner();
-            session = TransactionSession.lookup(DiplomacySession.class,
-                                                unit, settlement);
-            if (session == null) {
-                if (status == TradeStatus.PROPOSE_TRADE) {
-                    session = new DiplomacySession(unit, settlement);
-                } else {
-                    return DOMMessage.clientError("Diplomacy session not found: "
-                        + unit.getId() + "/" + settlement.getId());
-                }
-            }
-            tile = settlement.getTile();
-        } else if (otherPlayer != null) {
-            otherPlayer = (ServerPlayer)otherUnit.getOwner();
-            session = TransactionSession.lookup(DiplomacySession.class,
-                                                unit, otherUnit);
-            if (session == null) {
-                if (status == TradeStatus.PROPOSE_TRADE) {
-                    session = new DiplomacySession(unit, otherUnit);
-                } else {
-                    return DOMMessage.clientError("Diplomacy session not found: "
-                        + unit.getId() + "/" + otherUnit.getId());
-                }
-            }
-            tile = otherUnit.getTile();
-        } else {
-            return DOMMessage.clientError("Null other participants for: " + unit.getId());
-        }
-        Player.makeContact(serverPlayer, otherPlayer);
 
+    /**
+     * Process a European diplomacy session according to an agreement.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> in the session.
+     * @param otherPlayer The other <code>ServerPlayer</code> in the session.
+     * @param agreement The <code>DiplomaticTrade</code> to consider.
+     * @param session The <code>DiplomacySession</code> underway.
+     * @param message A <code>DiplomacyMessage</code> to send.
+     * @param A <code>ChangeSet</code> to contain the trade changes
+     *     if accepted.
+     * @return True if a new DiplomacyMessage reply needs to be sent.
+     */
+    private boolean csDiplomacySession(ServerPlayer serverPlayer,
+                                       ServerPlayer otherPlayer,
+                                       DiplomaticTrade agreement, 
+                                       DiplomacySession session,
+                                       DiplomacyMessage message,
+                                       ChangeSet cs) {
+        // Consider the status, process acceptance and rejection,
+        // which need no further action.
+        TradeStatus status = agreement.getStatus();
         switch (status) {
         case PROPOSE_TRADE:
-            unit.setMovesLeft(0);
-            cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
             session.setAgreement(agreement);
             break;
         case ACCEPT_TRADE:
+            // Process the agreement that was sent!
             agreement = session.getAgreement();
             agreement.setStatus(status);
-            csAcceptTrade(unit, settlement, agreement, cs);
-            break;
-        case REJECT_TRADE:
-            agreement = session.getAgreement();
-            agreement.setStatus(status);
-            break;
-        default:
-            return DOMMessage.clientError("Bogus trade status: " + status);
-        }
-
-        DOMMessage reply = askTimeout(otherPlayer,
-            new DiplomacyMessage(unit, settlement, null, agreement));
-        DiplomaticTrade theirAgreement = (reply instanceof DiplomacyMessage)
-            ? ((DiplomacyMessage)reply).getAgreement()
-            : null;
-        if (status != TradeStatus.PROPOSE_TRADE) {
+            csAcceptTrade(agreement, session, cs);
             session.complete(cs);
             sendToOthers(serverPlayer, cs);
-            return cs.build(serverPlayer);
+            return false;
+        case REJECT_TRADE: default:
+            agreement = session.getAgreement();
+            agreement.setStatus(status);
+            session.complete(cs);
+            sendToOthers(serverPlayer, cs);
+            return false;
         }
-        status = (theirAgreement == null) ? TradeStatus.REJECT_TRADE
-            : theirAgreement.getStatus();
+
+        // Ask the other player to consider the agreement.
+        // Treat a missing reply as a rejection.
+        DOMMessage reply = askTimeout(otherPlayer, message);
+        if (reply instanceof DiplomacyMessage) {
+            agreement = ((DiplomacyMessage)reply).getAgreement();
+            status = agreement.getStatus();
+        } else {
+            status = TradeStatus.REJECT_TRADE;
+            agreement.setStatus(status);
+        }
+
+        // Process the result.  Always return true here as the serverPlayer
+        // needs to be informed of the other player's response.
         switch (status) {
         case PROPOSE_TRADE:
-            session.setAgreement(agreement = theirAgreement);
+            session.setAgreement(agreement);
             break;
         case ACCEPT_TRADE:
+            agreement = session.getAgreement(); // Accept offered agreement
             agreement.setStatus(status);
-            csAcceptTrade(unit, settlement, agreement, cs);
+            csAcceptTrade(agreement, session, cs);
             session.complete(cs);
+            sendToOthers(serverPlayer, cs);
             break;
-        case REJECT_TRADE:
-            agreement.setStatus(status);
+        case REJECT_TRADE: default:
+            session.setAgreement(agreement);
             session.complete(cs);
-            break;
-        default:
-            logger.warning("Bogus trade status: " + status);
+            sendToOthers(serverPlayer, cs);
             break;
         }
-        // Update *everyone* with the result, *and* return a
-        // DiplomacyMessage to the originating player because that is
-        // what ServerAPI.askDiplomacy is expecting.
-        sendToAll(cs);
+        return true;
+    }
 
-        return new ChangeSet()
-            .add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
-                new DiplomacyMessage(unit, settlement, otherUnit, agreement))
-            .build(serverPlayer);
+    /**
+     * Handle first contact between European players.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> making contact.
+     * @param ourUnit Our <code>Unit</code>.
+     * @param otherUnit The other <code>unit</code>.
+     * @param agreement The <code>DiplomaticTrade</code> to consider.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element europeanFirstContact(ServerPlayer serverPlayer,
+                                        Unit ourUnit, Unit otherUnit,
+                                        DiplomaticTrade agreement) {
+        ChangeSet cs = new ChangeSet();
+        DiplomacySession session
+            = TransactionSession.lookup(DiplomacySession.class, 
+                                        ourUnit, otherUnit);
+        if (session == null) {
+            session = TransactionSession.lookup(DiplomacySession.class,
+                                                otherUnit, ourUnit);
+        }
+        if (session == null) {
+            if (agreement.getStatus() != TradeStatus.PROPOSE_TRADE) {
+                return DOMMessage.clientError("Missing session for "
+                    + ourUnit.getId() + "," + otherUnit.getId());
+            }
+            session = new DiplomacySession(ourUnit, otherUnit);
+            ourUnit.setMovesLeft(0);
+            cs.addPartial(See.only(serverPlayer), ourUnit, "movesLeft");
+        }
+        ServerPlayer otherPlayer = (ServerPlayer)otherUnit.getOwner();
+        if (csDiplomacySession(serverPlayer, otherPlayer,
+                agreement, session,
+                new DiplomacyMessage(otherUnit, ourUnit, agreement), cs)) {
+            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
+                new DiplomacyMessage(ourUnit, otherUnit, 
+                                     session.getAgreement()));
+        }
+        return cs.build(serverPlayer);
+    }
+
+    /**
+     * Handle first contact between European players.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> making contact.
+     * @param ourUnit Our <code>Unit</code>.
+     * @param otherColony The other <code>Colony</code>.
+     * @param agreement The <code>DiplomaticTrade</code> to consider.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element europeanFirstContact(ServerPlayer serverPlayer,
+                                        Unit ourUnit, Colony otherColony,
+                                        DiplomaticTrade agreement) {
+        ChangeSet cs = new ChangeSet();
+        DiplomacySession session
+            = TransactionSession.lookup(DiplomacySession.class,
+                                        ourUnit, otherColony);
+        if (session == null) {
+            if (agreement.getStatus() != TradeStatus.PROPOSE_TRADE) {
+                return DOMMessage.clientError("Missing diplomacy session for "
+                    + ourUnit.getId() + "," + otherColony.getId());
+            }
+            session = new DiplomacySession(ourUnit, otherColony);
+            ourUnit.setMovesLeft(0);
+            cs.addPartial(See.only(serverPlayer), ourUnit, "movesLeft");
+        }
+        ServerPlayer otherPlayer = (ServerPlayer)otherColony.getOwner();
+        if (csDiplomacySession(serverPlayer, otherPlayer,
+                agreement, session,
+                new DiplomacyMessage(otherColony, ourUnit, agreement), cs)) {
+            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
+                new DiplomacyMessage(ourUnit, otherColony, 
+                                     session.getAgreement()));
+        }
+        return cs.build(serverPlayer);
+    }
+
+    /**
+     * Handle first contact between European players.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> making contact.
+     * @param ourColony Our <code>Colony</code>.
+     * @param otherUnit The other <code>Unit</code>.
+     * @param agreement The <code>DiplomaticTrade</code> to consider.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element europeanFirstContact(ServerPlayer serverPlayer,
+                                        Colony ourColony, Unit otherUnit,
+                                        DiplomaticTrade agreement) {
+        ChangeSet cs = new ChangeSet();
+        DiplomacySession session
+            = TransactionSession.lookup(DiplomacySession.class,
+                                        otherUnit, ourColony);
+        if (session == null) {
+            return DOMMessage.clientError("Missing diplomacy session for "
+                + ourColony.getId() + "," + otherUnit.getId());
+        }
+        ServerPlayer otherPlayer = (ServerPlayer)otherUnit.getOwner();
+        if (csDiplomacySession(serverPlayer, otherPlayer,
+                agreement, session,
+                new DiplomacyMessage(otherUnit, ourColony, agreement), cs)) {
+            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
+                new DiplomacyMessage(ourColony, otherUnit,
+                                     session.getAgreement()));
+        }
+        return cs.build(serverPlayer);
+    }
+
+    /**
+     * Diplomacy.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is trading.
+     * @param ourUnit The <code>Unit</code> that is trading.
+     * @param otherColony The <code>Colony</code> to trade with.
+     * @param agreement The <code>DiplomaticTrade</code> to consider.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element diplomacy(ServerPlayer serverPlayer, Unit ourUnit,
+                             Colony otherColony, DiplomaticTrade agreement) {
+        ChangeSet cs = new ChangeSet();
+        TradeStatus status = agreement.getStatus();
+        DiplomacySession session
+            = TransactionSession.lookup(DiplomacySession.class,
+                                        ourUnit, otherColony);
+        if (session == null) {
+            if (status != TradeStatus.PROPOSE_TRADE) {
+                return DOMMessage.clientError("Mission session for "
+                    + ourUnit.getId() + "/" + otherColony.getId());
+            }
+            session = new DiplomacySession(ourUnit, otherColony);
+        }
+        ServerPlayer otherPlayer = (ServerPlayer)otherColony.getOwner();
+        if (csDiplomacySession(serverPlayer, otherPlayer, agreement, session,
+                new DiplomacyMessage(otherColony, ourUnit, agreement), cs)) {
+            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
+                new DiplomacyMessage(ourUnit, otherColony, 
+                                     session.getAgreement()));
+        }
+        return cs.build(serverPlayer);
+    }
+
+    /**
+     * Diplomacy.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is trading.
+     * @param ourColony Our <code>Colony</code>.
+     * @param otherUnit The other <code>Unit</code> that is trading.
+     * @param agreement The <code>DiplomaticTrade</code> to consider.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element diplomacy(ServerPlayer serverPlayer, Colony ourColony,
+                             Unit otherUnit, DiplomaticTrade agreement) {
+        ChangeSet cs = new ChangeSet();
+        TradeStatus status = agreement.getStatus();
+        DiplomacySession session
+            = TransactionSession.lookup(DiplomacySession.class,
+                                        otherUnit, ourColony);
+        if (session == null) {
+            return DOMMessage.clientError("Mission session for "
+                + otherUnit.getId() + "/" + ourColony.getId());
+        }
+        ServerPlayer otherPlayer = (ServerPlayer)otherUnit.getOwner();
+        if (csDiplomacySession(serverPlayer, otherPlayer, agreement, session,
+                new DiplomacyMessage(otherUnit, ourColony, agreement), cs)) {
+            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
+                new DiplomacyMessage(ourColony, otherUnit,
+                                     session.getAgreement()));
+        }
+        return cs.build(serverPlayer);
     }
 
     /**

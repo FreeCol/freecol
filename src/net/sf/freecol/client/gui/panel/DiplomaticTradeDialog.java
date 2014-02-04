@@ -56,12 +56,14 @@ import net.sf.freecol.common.model.ColonyTradeItem;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeContext;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.GoldTradeItem;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsTradeItem;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.NationSummary;
+import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Settlement;
@@ -565,12 +567,12 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             }
 
             List<Unit> available = new ArrayList<Unit>(allUnits);
-            for (Unit unit : dt.getUnitsGivenBy(source)) {
+            for (Unit u : dt.getUnitsGivenBy(source)) {
                 // Remove the ones already on the table
-                if (available.contains(unit)) {
-                    available.remove(unit);
+                if (available.contains(u)) {
+                    available.remove(u);
                 } else {
-                    allUnits.add(unit); // Did not know about this!
+                    allUnits.add(u); // Did not know about this!
                 }
             }
 
@@ -607,11 +609,6 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         }
     }
 
-    /** The unit negotiating the agreement. */
-    private final Unit unit;
-
-    /** The settlement to negotiate with. */
-    private final Settlement settlement;
 
     /** The other player in the negotiation (!= getMyPlayer()). */
     private Player otherPlayer;
@@ -635,36 +632,38 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
     /** Useful internal messages. */
     private String demandMessage, offerMessage, exchangeMessage;
 
+    /** Responses. */
+    private ChoiceItem<DiplomaticTrade> send = null, accept = null;
+
 
     /**
      * Creates a new <code>DiplomaticTradeDialog</code> instance.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param unit The <code>Unit</code> that is trading.
-     * @param settlement The <code>Settlement</code> that is trading.
-     * @param otherUnit The other <code>Unit</code> at first contact.
+     * @param our Our <code>FreeColGameObject</code> that is negotiating.
+     * @param other The other <code>FreeColGameObject</code>.
      * @param agreement The <code>DiplomaticTrade</code> agreement that
      *     is being negotiated.
      * @param comment An optional <code>StringTemplate</code>
      *     commentary message.
      */
-    public DiplomaticTradeDialog(FreeColClient freeColClient, Unit unit,
-                                 Settlement settlement, Unit otherUnit,
+    public DiplomaticTradeDialog(FreeColClient freeColClient,
+                                 FreeColGameObject our,
+                                 FreeColGameObject other,
                                  DiplomaticTrade agreement,
                                  StringTemplate comment) {
         super(freeColClient);
 
         final Player player = getMyPlayer();
-        final Player unitPlayer = unit.getOwner();
-        final Player nonUnitPlayer = (settlement != null)
-            ? settlement.getOwner()
-            : otherUnit.getOwner();
+        final Unit ourUnit = (our instanceof Unit) ? (Unit)our : null;
+        final Colony ourColony = (our instanceof Colony) ? (Colony)our : null;
+        final Unit otherUnit = (other instanceof Unit) ? (Unit)other : null;
+        final Colony otherColony = (other instanceof Colony) ? (Colony)other
+            : null;
+
         StringTemplate t;
 
-        this.unit = unit;
-        this.settlement = settlement;
-        this.otherPlayer = (unitPlayer == player) ? nonUnitPlayer
-            : unitPlayer;
+        this.otherPlayer = ((Ownable)other).getOwner();
         this.agreement = agreement;
         this.comment = comment;
 
@@ -681,9 +680,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             .addStringTemplate("%nation%", nation)
             .addStringTemplate("%otherNation%", otherNation);
         this.offerMessage = Messages.message(t);
-        t = StringTemplate.template("negotiationDialog.exchange")
-            .addStringTemplate("%nation%", unitPlayer.getNationName());
-        this.exchangeMessage = Messages.message(t);
+        this.exchangeMessage = Messages.message("negotiationDialog.exchange");
 
         NationSummary ns = getController().getNationSummary(otherPlayer);
         int gold = (ns == null
@@ -717,8 +714,8 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             this.colonyDemandPanel = this.colonyOfferPanel = null;
             this.goodsDemandPanel = new GoodsTradeItemPanel(otherPlayer,
                                                             getAnyGoods());
-            List<Goods> goods = (unitPlayer == player) ? unit.getGoodsList()
-                : settlement.getCompactGoods();
+            List<Goods> goods = (ourUnit != null) ? ourUnit.getGoodsList()
+                : ourColony.getCompactGoods();
             for (Goods g : goods) {
                 if (g.getAmount() > GoodsContainer.CARGO_SIZE) {
                     g.setAmount(GoodsContainer.CARGO_SIZE);
@@ -728,8 +725,8 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             this.unitDemandPanel = new UnitTradeItemPanel(otherPlayer,
                                                           getUnitUnitList(null));
             this.unitOfferPanel = new UnitTradeItemPanel(player,
-                ((unitPlayer == player) ? getUnitUnitList(unit)
-                    : settlement.getUnitList()));
+                ((ourUnit != null) ? getUnitUnitList(ourUnit)
+                    : ourColony.getUnitList()));
             break;
         case TRIBUTE:
             this.stancePanel = new StanceTradeItemPanel(player, otherPlayer);
@@ -784,10 +781,10 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         List<ChoiceItem<DiplomaticTrade>> c = choices();
         if (agreement.getVersion() > 0) { // A new offer can not be accepted
             str = Messages.message("negotiationDialog.accept");
-            c.add(new ChoiceItem<DiplomaticTrade>(str, bogus));
+            c.add(this.accept = new ChoiceItem<DiplomaticTrade>(str, bogus));
         }
         str = Messages.message("negotiationDialog.send");
-        c.add(new ChoiceItem<DiplomaticTrade>(str, bogus)
+        c.add(this.send = new ChoiceItem<DiplomaticTrade>(str, bogus)
             .okOption());
         if (agreement.getVersion() > 0 || context != TradeContext.CONTACT) {
             str = Messages.message("negotiationDialog.cancel");
@@ -795,7 +792,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
                 .cancelOption().defaultOption());
         }
         ImageIcon icon = getImageLibrary()
-            .getImageIcon((settlement != null) ? settlement : otherUnit,
+            .getImageIcon((otherColony != null) ? otherColony : otherUnit,
                           false);
         initialize(DialogType.QUESTION, true, panel, icon, c);
 
@@ -809,13 +806,11 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
     @Override
     public DiplomaticTrade getResponse() {
         Object value = getValue();
-        agreement.setStatus((options.size()==3 && options.get(0).equals(value))
-            ? TradeStatus.ACCEPT_TRADE
-            : (options.size() == 3 && options.get(1).equals(value))
-            ? TradeStatus.PROPOSE_TRADE
-            : (options.size() == 2 && options.get(0).equals(value))
-            ? TradeStatus.PROPOSE_TRADE
-            : TradeStatus.REJECT_TRADE);
+        TradeStatus s = (value == null) ? TradeStatus.REJECT_TRADE
+            : (value == this.accept) ? TradeStatus.ACCEPT_TRADE
+            : (value == this.send) ? TradeStatus.PROPOSE_TRADE
+            : TradeStatus.REJECT_TRADE;
+        agreement.setStatus(s);
         return agreement;
     }
 
@@ -931,7 +926,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
 
         List<TradeItem> demands = agreement.getItemsGivenBy(otherPlayer);
         if (!demands.isEmpty()) {
-            if (demands.isEmpty()) {
+            if (offers.isEmpty()) {
                 summary.add(new JLabel(demandMessage), "span");
             } else {
                 summary.add(new JLabel(exchangeMessage), "newline 20, span");
@@ -994,7 +989,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
 
         Player destination = (source == otherPlayer) ? player : otherPlayer;
         agreement.add(new GoodsTradeItem(getGame(), source, destination,
-                                         goods, settlement));
+                                         goods));
         updateDialog();
     }
 

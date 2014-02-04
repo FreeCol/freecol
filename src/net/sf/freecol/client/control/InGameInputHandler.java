@@ -630,31 +630,32 @@ public final class InGameInputHandler extends InputHandler {
         final Game game = getGame();
         final DiplomacyMessage message
             = new DiplomacyMessage(getGame(), element);
-
-        final Unit unit = message.getUnit();
-        if (unit == null) {
-            logger.warning("Unit omitted from diplomacy message.");
-            return null;
-        }
-
-        final Settlement settlement = message.getSettlement(game);
-        final Unit otherUnit = message.getOtherUnit(game);
-        if (settlement == null && otherUnit == null) {
-            logger.warning("Settlement and other unit omitted from diplomacy message.");
-            return null;
-        }
-
         final DiplomaticTrade agreement = message.getAgreement();
+        final Unit extraUnit = message.getExtraUnit();
+
+        final FreeColGameObject our = message.getOurFCGO(game);
+        if (our == null) {
+            logger.warning("Our FCGO omitted from diplomacy message.");
+            return null;
+        }
+
+        final FreeColGameObject other = message.getOtherFCGO(game);
+        if (other == null) {
+            logger.warning("Other FCGO omitted from diplomacy message.");
+            return null;
+        }
+
         invokeAndWait(new Runnable() {
                 public void run() {
-                    message.setAgreement(igc().diplomacy(unit, settlement,
-                                                         otherUnit, agreement));
+                    message.setAgreement(igc().diplomacy(our, other,
+                                                         agreement));
                 }
             });
         SwingUtilities.invokeLater(updateMenuBarRunnable);
-        return (message.getAgreement() == null) ? null
-            : new DiplomacyMessage(unit, settlement, otherUnit,
-                                   message.getAgreement()).toXMLElement();
+        DiplomaticTrade dt = message.getAgreement();
+        if (dt == null) return null;
+        dt.incrementVersion();
+        return message.toXMLElement();
     }
 
     /**

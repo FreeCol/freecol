@@ -728,17 +728,65 @@ public abstract class ServerAPI {
     /**
      * Handler server query-response for diplomatic messages.
      *
-     * @param unit The <code>Unit</code> conducting the diplomacy.
-     * @param settlement The <code>Settlement</code> to negotiate with.
+     * @param ourUnit Our <code>Unit</code> conducting the diplomacy.
+     * @param otherColony The other <code>Colony</code> to negotiate with.
      * @param agreement The <code>DiplomaticTrade</code> agreement to propose.
      * @return The resulting agreement or null if none present.
      */
-    public DiplomaticTrade diplomacy(Game game, Unit unit,
-                                     Settlement settlement, Unit otherUnit,
+    public DiplomaticTrade diplomacy(Game game, Unit ourUnit,
+                                     Colony otherColony, 
                                      DiplomaticTrade agreement) {
-        Element reply = askExpecting(new DiplomacyMessage(unit, settlement,
-                                                          otherUnit, agreement),
-            null, null);
+        Element reply = askExpecting(new DiplomacyMessage(ourUnit, otherColony,
+                                                          agreement),
+            DiplomacyMessage.getXMLElementTagName(), null);
+        if (reply == null) {
+            return null;
+        } else if (DiplomacyMessage.getXMLElementTagName().equals(reply.getTagName())) {
+            return new DiplomacyMessage(game, reply).getAgreement();
+        } else {
+            client.handleReply(reply);
+            return null;
+        }
+    }
+
+    /**
+     * Handler server query-response for diplomatic messages.
+     *
+     * @param ourUnit Out <code>Unit</code> conducting the diplomacy.
+     * @param otherUnit The other <code>Unit</code> to negotiate with.
+     * @param agreement The <code>DiplomaticTrade</code> agreement to propose.
+     * @return The resulting agreement or null if none present.
+     */
+    public DiplomaticTrade diplomacy(Game game, Unit ourUnit,
+                                     Unit otherUnit, 
+                                     DiplomaticTrade agreement) {
+        Element reply = askExpecting(new DiplomacyMessage(ourUnit, otherUnit,
+                                                          agreement),
+            DiplomacyMessage.getXMLElementTagName(), null);
+        if (reply == null) {
+            return null;
+        } else if (DiplomacyMessage.getXMLElementTagName().equals(reply.getTagName())) {
+            return new DiplomacyMessage(game, reply).getAgreement();
+        } else {
+            client.handleReply(reply);
+            return null;
+        }
+    }
+
+    /**
+     * Handler server query-response for diplomatic messages.
+     *
+     * @param ourColony Out <code>Colony</code> conducting the diplomacy.
+     * @param otherUnit The other <code>Unit</code> to negotiate with.
+     * @param agreement The <code>DiplomaticTrade</code> agreement to propose.
+     * @return The resulting agreement or null if none present.
+     */
+    public DiplomaticTrade diplomacy(Game game, Colony ourColony,
+                                     Unit otherUnit, 
+                                     DiplomaticTrade agreement) {
+        Element reply = askExpecting(new DiplomacyMessage(ourColony, otherUnit,
+                                                          agreement),
+            DiplomacyMessage.getXMLElementTagName(), null);
         if (reply == null) {
             return null;
         } else if (DiplomacyMessage.getXMLElementTagName().equals(reply.getTagName())) {

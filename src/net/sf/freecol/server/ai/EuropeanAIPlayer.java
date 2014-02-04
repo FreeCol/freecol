@@ -2260,9 +2260,11 @@ public class EuropeanAIPlayer extends AIPlayer {
                 value += entry.getValue();
             }
         }
-        // If the result is positive, accept/propose-without-unacceptable
-        if (value > 0) {
-            return (unacceptable == 0) ? TradeStatus.ACCEPT_TRADE
+        // If the result is non-negative, accept/propose-without-unacceptable
+        if (value >= 0) {
+            return (agreement.getContext() == DiplomaticTrade.TradeContext.CONTACT
+                && agreement.getVersion() == 0) ? TradeStatus.PROPOSE_TRADE
+                : (unacceptable == 0) ? TradeStatus.ACCEPT_TRADE
                 : TradeStatus.PROPOSE_TRADE;
         }
 
@@ -2284,7 +2286,6 @@ public class EuropeanAIPlayer extends AIPlayer {
             });
         while (!items.isEmpty()) {
             TradeItem item = items.remove(0);
-System.err.println("TRADEITEM: " + item + " score=" + scores.get(item));
             value += scores.get(item);
             agreement.remove(item);
             if (value > 0) break;

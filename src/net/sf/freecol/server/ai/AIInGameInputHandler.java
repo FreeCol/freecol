@@ -231,8 +231,6 @@ public final class AIInGameInputHandler implements MessageHandler {
         final Game game = freeColServer.getGame();
         final DiplomacyMessage message = new DiplomacyMessage(game, element);
         final DiplomaticTrade agreement = message.getAgreement();
-        final Unit unit = message.getUnit();
-        final Unit other = message.getOtherUnit(game);
 
         StringBuffer sb = new StringBuffer(256);
         sb.append("Diplomacy: ").append(agreement.toString());
@@ -244,7 +242,8 @@ public final class AIInGameInputHandler implements MessageHandler {
         sb.append(" -> ").append(agreement.toString());
         logger.fine(sb.toString());
 
-        return new DiplomacyMessage(other, null, unit, agreement)
+        return new DiplomacyMessage(message.getOurFCGO(game),
+                                    message.getOtherFCGO(game), agreement)
             .toXMLElement();
     }
 

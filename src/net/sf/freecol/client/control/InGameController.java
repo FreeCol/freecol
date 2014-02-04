@@ -2069,19 +2069,18 @@ public final class InGameController implements NetworkConstants {
     /**
      * Handle a diplomatic offer.
      *
-     * @param unit The offering <code>Unit</code>.
-     * @param settlement The <code>Settlement</code> that is negotiating.
-     * @param otherUnit The other <code>Unit</code> at first contact.
+     * @param our Our <code>FreeColGameObject</code> that is negotiating.
+     * @param other The other <code>FreeColGameObject</code>.
      * @param agreement The <code>DiplomaticTrade</code> agreement.
      * @return A counter agreement, a rejected agreement, or null if
      *     the original agreement was already decided.
      */
-    public DiplomaticTrade diplomacy(Unit unit, Settlement settlement,
-                                     Unit otherUnit,
+    public DiplomaticTrade diplomacy(FreeColGameObject our,
+                                     FreeColGameObject other,
                                      DiplomaticTrade agreement) {
         final Player player = freeColClient.getMyPlayer();
-        final Player other = agreement.getOtherPlayer(player);
-        StringTemplate t, nation = other.getNationName();
+        final Player otherPlayer = agreement.getOtherPlayer(player);
+        StringTemplate t, nation = otherPlayer.getNationName();
 
         switch (agreement.getStatus()) {
         case ACCEPT_TRADE:
@@ -2110,14 +2109,12 @@ public final class InGameController implements NetworkConstants {
             t = StringTemplate.template(messageId)
                 .addStringTemplate("%nation%", nation);
             DiplomaticTrade ourAgreement
-                = gui.showDiplomaticTradeDialog(unit, settlement, otherUnit,
-                                                agreement, t);
+                = gui.showDiplomaticTradeDialog(our, other, agreement, t);
             if (ourAgreement == null) {
                 agreement.setStatus(TradeStatus.REJECT_TRADE);
             } else {
                 agreement = ourAgreement;
             }
-            agreement.incrementVersion();
             return agreement;
         default:
             logger.warning("Bogus trade status: " + agreement.getStatus());
@@ -2937,11 +2934,13 @@ public final class InGameController implements NetworkConstants {
                                   DiplomaticTrade dt) {
         Settlement settlement = getSettlementAt(unit.getTile(), direction);
         if (settlement == null) return false;
+        if (!(settlement instanceof Colony)) return false;
+        Colony colony = (Colony)settlement;
 
         // Can not negotiate with the REF.
         final Game game = freeColClient.getGame();
         final Player player = unit.getOwner();
-        final Player other = settlement.getOwner();
+        final Player other = colony.getOwner();
         if (other == player.getREFPlayer()) {
             throw new IllegalStateException("Unit tried to negotiate with REF");
         }
@@ -2953,7 +2952,7 @@ public final class InGameController implements NetworkConstants {
             // Inform server of current agreement, exit if it did not
             // require a response (i.e. was not a proposal).
             status = dt.getStatus();
-            dt = askServer().diplomacy(game, unit, settlement, null, dt);
+            dt = askServer().diplomacy(game, unit, colony, dt);
             if (status != TradeStatus.PROPOSE_TRADE) break;
             
             // Process the result of a proposal.
@@ -2966,14 +2965,14 @@ public final class InGameController implements NetworkConstants {
             case ACCEPT_TRADE:
                 m = new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
                                      "negotiationDialog.offerAccepted",
-                                     settlement)
+                                     colony)
                     .addStringTemplate("%nation%", nation);
                 dt = null;
                 break;
             case REJECT_TRADE:
                 m = new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
                                      "negotiationDialog.offerRejected",
-                                     settlement)
+                                     colony)
                     .addStringTemplate("%nation%", nation);
                 dt = null;
                 break;
@@ -2984,8 +2983,8 @@ public final class InGameController implements NetworkConstants {
 
             // If it was a counter proposal, consider it.
             if (dt != null) {
-                dt = gui.showDiplomaticTradeDialog(unit, settlement, null, dt,
-                    dt.getSendMessage(player, settlement));
+                dt = gui.showDiplomaticTradeDialog(unit, colony, dt,
+                    dt.getSendMessage(player, colony));
             }
         }
         gui.updateMenuBar();
@@ -3319,7 +3318,7 @@ public final class InGameController implements NetworkConstants {
             DiplomaticTrade agreement
                 = new DiplomaticTrade(game, TradeContext.DIPLOMATIC,
                                       player, colony.getOwner(), null, 0);
-            agreement = gui.showDiplomaticTradeDialog(unit, colony, null,
+            agreement = gui.showDiplomaticTradeDialog(unit, colony,
                 agreement, agreement.getSendMessage(player, colony));
             return (agreement == null
                 || agreement.getStatus() == TradeStatus.REJECT_TRADE) ? true
@@ -3434,7 +3433,7 @@ public final class InGameController implements NetworkConstants {
             DiplomaticTrade agreement
                 = new DiplomaticTrade(game, TradeContext.TRADE,
                     player, settlement.getOwner(), null, 0);
-            agreement = gui.showDiplomaticTradeDialog(unit, settlement, null,
+            agreement = gui.showDiplomaticTradeDialog(unit, settlement,
                 agreement, agreement.getSendMessage(player, settlement));
             return (agreement == null
                 || agreement.getStatus() == TradeStatus.REJECT_TRADE) ? true

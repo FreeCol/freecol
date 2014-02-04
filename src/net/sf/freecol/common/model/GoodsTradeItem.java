@@ -33,9 +33,6 @@ public class GoodsTradeItem extends TradeItem {
     
     /** The goods to change hands. */
     private Goods goods;
-
-    /** The settlement where the trade is to take place. */
-    private Settlement settlement;
         
 
     /**
@@ -45,14 +42,12 @@ public class GoodsTradeItem extends TradeItem {
      * @param source The source <code>Player</code>.
      * @param destination The destination <code>Player</code>.
      * @param goods The <code>Goods</code> to trade.
-     * @param settlement The <code>Settlement</code> to trade at.
      */
     public GoodsTradeItem(Game game, Player source, Player destination,
-                          Goods goods, Settlement settlement) {
+                          Goods goods) {
         super(game, "tradeItem.goods", source, destination);
 
         this.goods = goods;
-        this.settlement = settlement;
     }
 
     /**
@@ -66,36 +61,15 @@ public class GoodsTradeItem extends TradeItem {
     }
 
 
-    /**
-     * Get the <code>Settlement</code> value.
-     *
-     * @return The <code>Settlement</code>.
-     */
-    public final Settlement getSettlement() {
-        return settlement;
-    }
-
-    /**
-     * Set the <code>Settlement</code> value.
-     *
-     * @param newSettlement The new <code>Settlement</code> value.
-     */
-    public final void setSettlement(final Settlement newSettlement) {
-        this.settlement = newSettlement;
-    }
-
     // Interface TradeItem
 
     /**
      * {@inheritDoc}
      */
     public boolean isValid() {
-        if (!(goods.getLocation() instanceof Unit)) return false;
-
-        Unit unit = (Unit) goods.getLocation();
-        if (unit.getOwner() != getSource()) return false;
-
-        return settlement != null && settlement.getOwner() == getDestination();
+        Location loc = goods.getLocation();
+        return (loc instanceof Ownable)
+            && ((Ownable)loc).getOwner() == getSource();
     }
     
     /**
@@ -131,19 +105,6 @@ public class GoodsTradeItem extends TradeItem {
 
     // Serialization
 
-    private static final String SETTLEMENT_TAG = "settlement";
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
-        super.writeAttributes(xw);
-
-        xw.writeAttribute(SETTLEMENT_TAG, settlement);
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -152,17 +113,6 @@ public class GoodsTradeItem extends TradeItem {
         super.writeChildren(xw);
 
         goods.toXML(xw);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
-        super.readAttributes(xr);
-
-        settlement = xr.getAttribute(getGame(), SETTLEMENT_TAG,
-                                     Settlement.class, (Settlement)null);
     }
 
     /**
@@ -181,7 +131,7 @@ public class GoodsTradeItem extends TradeItem {
      */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
-        final Game game = settlement.getGame();
+        final Game game = getGame();
         final String tag = xr.getLocalName();
 
         if (Goods.getXMLElementTagName().equals(tag)) {
