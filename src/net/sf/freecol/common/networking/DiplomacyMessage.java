@@ -273,7 +273,7 @@ public class DiplomacyMessage extends DOMMessage {
         }
         Document doc = result.getOwnerDocument();
         result.appendChild(agreement.toXMLElement(doc));
-        result.appendChild(unit.toXMLElement(doc));
+        if (unit != null) result.appendChild(unit.toXMLElement(doc));
         return result;
     }
 
