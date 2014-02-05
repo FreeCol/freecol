@@ -471,7 +471,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
 
             xw.writeAttribute(TYPE_TAG, goodsType);
 
-            xw.writeAttribute(AMOUNT_TAG, storage.get(goodsType).intValue());
+            xw.writeAttribute(AMOUNT_TAG, getGoodsCount(goodsType));
 
             xw.writeEndElement();
         }
