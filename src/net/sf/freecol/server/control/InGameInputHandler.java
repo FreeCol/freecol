@@ -586,17 +586,18 @@ public final class InGameInputHandler extends InputHandler
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
-                NodeList nodes = element.getChildNodes();
+                final NodeList nodes = element.getChildNodes();
                 List<Element> results = new ArrayList<Element>();
 
                 for (int i = 0; i < nodes.getLength(); i++) {
+                    final Element node = (Element)nodes.item(i);
+                    final String tag = node.getTagName();
                     try {
-                        Element reply = super.handle(connection,
-                            (Element) nodes.item(i));
+                        Element reply = super.handle(connection, node);
                         if (reply != null) results.add(reply);
                     } catch (Exception e) {
                         logger.log(Level.WARNING, "Crash in multiple, item " + i
-                            + ", continuing.", e);
+                            + ", tag " + tag + ", continuing.", e);
                     }
                 }
                 return DOMMessage.collapseElements(results);

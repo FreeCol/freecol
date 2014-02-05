@@ -68,106 +68,35 @@ public final class AIInGameInputHandler implements MessageHandler {
     /** The server. */
     private final FreeColServer freeColServer;
 
+    /** The main AI object. */
     private final AIMain aiMain;
 
 
     /**
-     *
      * The constructor to use.
      *
      * @param freeColServer The main server.
-     *
-     * @param me The AI player that is being managed by this
-     *            AIInGameInputHandler.
-     *
+     * @param me The AI <code>ServerPlayer</code> that is being
+     *     managed by this AIInGameInputHandler.
      * @param aiMain The main AI-object.
-     *
      */
-    public AIInGameInputHandler(FreeColServer freeColServer, ServerPlayer me, AIMain aiMain) {
-        this.freeColServer = freeColServer;
-        this.serverPlayer = me;
-        this.aiMain = aiMain;
+    public AIInGameInputHandler(FreeColServer freeColServer, ServerPlayer me,
+                                AIMain aiMain) {
         if (freeColServer == null) {
             throw new NullPointerException("freeColServer == null");
         } else if (me == null) {
             throw new NullPointerException("me == null");
+        } else if (!me.isAI()) {
+            throw new RuntimeException("Applying AIInGameInputHandler to a non-AI player!");
         } else if (aiMain == null) {
             throw new NullPointerException("aiMain == null");
         }
-        if (!me.isAI()) {
-            logger.severe("VERY BAD: Applying AIInGameInputHandler to a non-AI player!!!");
-        }
+
+        this.freeColServer = freeColServer;
+        this.serverPlayer = me;
+        this.aiMain = aiMain;
     }
 
-    /**
-     * Deals with incoming messages that have just been received.
-     *
-     * @param connection The <code>Connection</code> the message was received
-     *            on.
-     * @param element The root element of the message.
-     * @return The reply.
-     */
-    public synchronized Element handle(Connection connection, Element element) {
-        Element reply = null;
-        try {
-            if (element != null) {
-                String type = element.getTagName();
-
-                // Since we're the server, we can see everything.
-                // Therefore most of these messages are useless.
-                if (type.equals("update")) {
-                } else if (type.equals("remove")) {
-                } else if (type.equals("startGame")) {
-                } else if (type.equals("updateGame")) {
-                } else if (type.equals("addPlayer")) {
-                } else if (type.equals("animateMove")) {
-                } else if (type.equals("animateAttack")) {
-                } else if (type.equals("setCurrentPlayer")) {
-                    reply = setCurrentPlayer((DummyConnection) connection, element);
-                } else if (type.equals("newTurn")) {
-                } else if (type.equals("setDead")) {
-                } else if (type.equals("gameEnded")) {
-                } else if (type.equals("disconnect")) {
-                } else if (type.equals("firstContact")) {
-                    reply = firstContact((DummyConnection)connection, element);
-                } else if (type.equals("logout")) {
-                } else if (type.equals("error")) {
-                } else if (type.equals("setAI")) {
-                } else if (type.equals("chat")) {
-                } else if (type.equals("chooseFoundingFather")) {
-                    reply = chooseFoundingFather((DummyConnection) connection, element);
-                } else if (type.equals("reconnect")) {
-                    logger.warning("The server requests a reconnect. This means an illegal operation has been performed. Please refer to any previous error message.");
-                } else if (type.equals("setStance")) {
-                } else if (type.equals("monarchAction")) {
-                    reply = monarchAction((DummyConnection) connection, element);
-                } else if (type.equals("removeGoods")) {
-                } else if (type.equals("indianDemand")) {
-                    reply = indianDemand((DummyConnection) connection, element);
-                } else if (type.equals("diplomacy")) {
-                    reply = diplomaticTrade((DummyConnection) connection, element);
-                } else if (type.equals("addObject")) {
-                } else if (type.equals("featureChange")) {
-                } else if (type.equals("newLandName")) {
-                    reply = newLandName((DummyConnection) connection, element);
-                } else if (type.equals("newRegionName")) {
-                    reply = newRegionName((DummyConnection) connection, element);
-                } else if (type.equals("fountainOfYouth")) {
-                    reply = fountainOfYouth((DummyConnection) connection, element);
-                } else if (type.equals("lootCargo")) {
-                    reply = lootCargo(connection, element);
-                } else if (type.equals("multiple")) {
-                    reply = multiple((DummyConnection) connection, element);
-                } else {
-                    logger.warning("Message is of unsupported type \"" + type + "\".");
-                }
-            }
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "AI input handler for " + serverPlayer
-                + " caught error handling " + element.getTagName(), e);
-        }
-        return reply;
-    }
 
     /**
      * Gets the <code>AIPlayer</code> using this
@@ -189,37 +118,84 @@ public final class AIInGameInputHandler implements MessageHandler {
         return aiMain.getAIUnit(unit);
     }
 
+
+    // Implement MessageHandler
+
     /**
-     * Handles a "setCurrentPlayer"-message.
+     * Deals with incoming messages that have just been received.
      *
-     * @param connection The connection the message was received on.
-     * @param setCurrentPlayerElement The element (root element in a DOM-parsed
-     *            XML tree) that holds all the information.
+     * @param connection The <code>Connection</code> the message was received
+     *            on.
+     * @param element The root element of the message.
+     * @return The reply.
      */
-    private Element setCurrentPlayer(final DummyConnection connection,
-                                     final Element setCurrentPlayerElement) {
-        final Game game = freeColServer.getGame();
+    public synchronized Element handle(Connection connection, Element element) {
+        Element reply = null;
+        DummyConnection dummy = (DummyConnection)connection;
+        try {
+            if (element != null) {
+                String type = element.getTagName();
 
-        String str = setCurrentPlayerElement.getAttribute("player");
-        final Player currentPlayer = game.getFreeColGameObject(str, Player.class);
+                if (type.equals("reconnect")) {
+                    logger.warning("The server requests a reconnect. This means an illegal operation has been performed. Please refer to any previous error message.");
 
-        if (currentPlayer != null
-            && serverPlayer.getId() == currentPlayer.getId()) {
-            logger.finest("Starting new Thread for " + serverPlayer.getName());
-            Thread t = new Thread(FreeCol.SERVER_THREAD+"AIPlayer (" + serverPlayer.getName() + ")") {
-                public void run() {
-                    try {
-                        getAIPlayer().startWorking();
-                    } catch (Exception e) {
-                        logger.log(Level.SEVERE, "AI player failed while working!", e);
-                    }
-                    AIMessage.askEndTurn(getAIPlayer());
+                } else if (type.equals("chooseFoundingFather")) {
+                    reply = chooseFoundingFather(dummy, element);
+                } else if (type.equals("diplomacy")) {
+                    reply = diplomacy(dummy, element);
+                } else if (type.equals("firstContact")) {
+                    reply = firstContact(dummy, element);
+                } else if (type.equals("fountainOfYouth")) {
+                    reply = fountainOfYouth(dummy, element);
+                } else if (type.equals("indianDemand")) {
+                    reply = indianDemand(dummy, element);
+                } else if (type.equals("lootCargo")) {
+                    reply = lootCargo(dummy, element);
+                } else if (type.equals("monarchAction")) {
+                    reply = monarchAction(dummy, element);
+                } else if (type.equals("multiple")) {
+                    reply = multiple(dummy, element);
+                } else if (type.equals("newLandName")) {
+                    reply = newLandName(dummy, element);
+                } else if (type.equals("newRegionName")) {
+                    reply = newRegionName(dummy, element);
+                } else if (type.equals("setCurrentPlayer")) {
+                    reply = setCurrentPlayer(dummy, element);
+
+                // Since we're the server, we can see everything.
+                // Therefore most of these messages are useless.  This
+                // may change one day.
+                } else if (type.equals("addObject")) {
+                } else if (type.equals("addPlayer")) {
+                } else if (type.equals("animateMove")) {
+                } else if (type.equals("animateAttack")) {
+                } else if (type.equals("chat")) {
+                } else if (type.equals("disconnect")) {
+                } else if (type.equals("error")) {
+                } else if (type.equals("featureChange")) {
+                } else if (type.equals("gameEnded")) {
+                } else if (type.equals("logout")) {
+                } else if (type.equals("newTurn")) {
+                } else if (type.equals("remove")) {
+                } else if (type.equals("removeGoods")) {
+                } else if (type.equals("setAI")) {
+                } else if (type.equals("setDead")) {
+                } else if (type.equals("setStance")) {
+                } else if (type.equals("startGame")) {
+                } else if (type.equals("update")) {
+                } else if (type.equals("updateGame")) {
+                } else {
+                    logger.warning("Unknown message type: " + type);
                 }
-            };
-            t.start();
+            }
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "AI input handler for " + serverPlayer
+                + " caught error handling " + element.getTagName(), e);
         }
-        return null;
+        return reply;
     }
+
+    // Individual message handlers
 
     /**
      * Handles a "chooseFoundingFather"-message.
@@ -241,6 +217,130 @@ public final class AIInGameInputHandler implements MessageHandler {
         if (ff != null) message.setFather(ff);
         logger.finest(aiPlayer.getId() + " chose founding father: " + ff);
         return message.toXMLElement();
+    }
+
+    /**
+     * Handles an "diplomacy"-message.
+     *
+     * @param connection The connection the message was received on.
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *            holds all the information.
+     * @return The original message with the acceptance state set.
+     */
+    private Element diplomacy(DummyConnection connection, Element element) {
+        final Game game = freeColServer.getGame();
+        final DiplomacyMessage message = new DiplomacyMessage(game, element);
+        final DiplomaticTrade agreement = message.getAgreement();
+        final Unit unit = message.getUnit();
+        final Unit other = message.getOtherUnit(game);
+
+        StringBuffer sb = new StringBuffer(256);
+        sb.append("Diplomacy: ").append(agreement.toString());
+
+        TradeStatus status = getAIPlayer().acceptDiplomaticTrade(agreement);
+        agreement.setStatus(status);
+        agreement.incrementVersion();
+
+        sb.append(" -> ").append(agreement.toString());
+        logger.fine(sb.toString());
+
+        return new DiplomacyMessage(other, null, unit, agreement)
+            .toXMLElement();
+    }
+
+    /**
+     * Replies to a first contact offer.
+     *
+     * @param connection The connection the message was received on.
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *            holds all the information.
+     * @return The default offer.
+     */
+    private Element firstContact(DummyConnection connection, Element element) {
+        FirstContactMessage message
+            = new FirstContactMessage(freeColServer.getGame(), element)
+                .setResult(true);
+        return message.toXMLElement();
+    }
+
+    /**
+     * Replies to fountain of youth offer.
+     *
+     * @param connection The connection the message was received on.
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *            holds all the information.
+     * @return Null.
+     */
+    private Element fountainOfYouth(DummyConnection connection, Element element) {
+        String migrants = element.getAttribute("migrants");
+        int n;
+        try {
+            n = Integer.parseInt(migrants);
+        } catch (NumberFormatException e) {
+            n = -1;
+        }
+        for (int i = 0; i < n; i++) {
+            AIMessage.askEmigrate(getAIPlayer(), 0);
+        }
+        return null;
+    }
+
+    /**
+     * Handles an "indianDemand"-message.
+     *
+     * @param connection The connection the message was received on.
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *            holds all the information.
+     * @return The original message with the acceptance state set if querying
+     *     the colony player (result == null), or null if reporting the final
+     *     result to the native player (result != null).
+     */
+    private Element indianDemand(DummyConnection connection, Element element) {
+        Game game = aiMain.getGame();
+        IndianDemandMessage message = new IndianDemandMessage(game, element);
+        boolean accept = getAIPlayer()
+            .indianDemand(message.getUnit(game), message.getColony(game),
+                message.getType(game), message.getAmount());
+        message.setResult(accept);
+        logger.finest("AI handling native demand by " + message.getUnit(game)
+            + " at " + message.getColony(game).getName()
+            + " result: " + accept);
+        return message.toXMLElement();
+    }
+
+    /**
+     * Replies to loot cargo offer.
+     *
+     * @param connection The connection the message was received on.
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *            holds all the information.
+     * @return Null.
+     */
+    private Element lootCargo(DummyConnection connection, Element element) {
+        Game game = freeColServer.getGame();
+        LootCargoMessage message = new LootCargoMessage(game, element);
+        Unit unit = message.getUnit(game);
+        List<Goods> goods = message.getGoods();
+        final Market market = serverPlayer.getMarket();
+        Collections.sort(goods, new Comparator<Goods>() {
+                public int compare(Goods g1, Goods g2) {
+                    int p1 = market.getPaidForSale(g1.getType())
+                        * g1.getAmount();
+                    int p2 = market.getPaidForSale(g2.getType())
+                        * g2.getAmount();
+                    return p2 - p1;
+                }
+            });
+        List<Goods> loot = new ArrayList<Goods>();
+        int space = unit.getSpaceLeft();
+        while (!goods.isEmpty()) {
+            Goods g = goods.remove(0);
+            if (g.getSpaceTaken() > space) continue; // Approximate
+            loot.add(g);
+            space -= g.getSpaceTaken();
+        }
+        AIMessage.askLoot(getAIUnit(unit), message.getDefenderId(), loot);
+        return null;
     }
 
     /**
@@ -281,64 +381,26 @@ public final class AIInGameInputHandler implements MessageHandler {
     }
 
     /**
-     * Handles an "indianDemand"-message.
+     * Handle all the children of this element.
      *
-     * @param connection The connection the message was received on.
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *            holds all the information.
-     * @return The original message with the acceptance state set if querying
-     *     the colony player (result == null), or null if reporting the final
-     *     result to the native player (result != null).
+     * @param connection The <code>Connection</code> the element arrived on.
+     * @param element The <code>Element</code> to process.
+     * @return An <code>Element</code> containing the response/s.
      */
-    private Element indianDemand(DummyConnection connection, Element element) {
-        Game game = aiMain.getGame();
-        IndianDemandMessage message = new IndianDemandMessage(game, element);
-        boolean accept = getAIPlayer()
-            .indianDemand(message.getUnit(game), message.getColony(game),
-                message.getType(game), message.getAmount());
-        message.setResult(accept);
-        logger.finest("AI handling native demand by " + message.getUnit(game)
-            + " at " + message.getColony(game).getName()
-            + " result: " + accept);
-        return message.toXMLElement();
-    }
+    public Element multiple(DummyConnection connection, Element element) {
+        NodeList nodes = element.getChildNodes();
+        List<Element> results = new ArrayList<Element>();
 
-    /**
-     * Handles an "diplomaticTrade"-message.
-     *
-     * @param connection The connection the message was received on.
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *            holds all the information.
-     * @return The original message with the acceptance state set.
-     */
-    private Element diplomaticTrade(DummyConnection connection, Element element) {
-        DiplomacyMessage message
-            = new DiplomacyMessage(freeColServer.getGame(), element);
-        DiplomaticTrade agreement = message.getAgreement();
-        StringBuffer sb = new StringBuffer(256);
-        sb.append("Diplomatic trade: ").append(agreement.toString());
-
-        TradeStatus status = getAIPlayer().acceptDiplomaticTrade(agreement);
-        agreement.setStatus(status);
-        sb.append(" -> ").append(agreement.toString());
-        logger.fine(sb.toString());
-
-        return message.toXMLElement();
-    }
-
-    /**
-     * Replies to a first contact offer.
-     *
-     * @param connection The connection the message was received on.
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *            holds all the information.
-     * @return The default offer.
-     */
-    private Element firstContact(DummyConnection connection, Element element) {
-        FirstContactMessage message
-            = new FirstContactMessage(freeColServer.getGame(), element)
-                .setResult(true);
-        return message.toXMLElement();
+        for (int i = 0; i < nodes.getLength(); i++) {
+            try {
+                Element reply = handle(connection, (Element) nodes.item(i));
+                if (reply != null) results.add(reply);
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Caught crash in multiple item " + i
+                    + ", continuing.", e);
+            }
+        }
+        return DOMMessage.collapseElements(results);
     }
 
     /**
@@ -369,83 +431,34 @@ public final class AIInGameInputHandler implements MessageHandler {
     }
 
     /**
-     * Replies to fountain of youth offer.
+     * Handles a "setCurrentPlayer"-message.
      *
      * @param connection The connection the message was received on.
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *            holds all the information.
-     * @return Null.
+     * @param setCurrentPlayerElement The element (root element in a DOM-parsed
+     *            XML tree) that holds all the information.
      */
-    private Element fountainOfYouth(DummyConnection connection, Element element) {
-        String migrants = element.getAttribute("migrants");
-        int n;
-        try {
-            n = Integer.parseInt(migrants);
-        } catch (NumberFormatException e) {
-            n = -1;
-        }
-        for (int i = 0; i < n; i++) {
-            AIMessage.askEmigrate(getAIPlayer(), 0);
-        }
-        return null;
-    }
+    private Element setCurrentPlayer(final DummyConnection connection,
+                                     final Element setCurrentPlayerElement) {
+        final Game game = freeColServer.getGame();
 
-    /**
-     * Replies to loot cargo offer.
-     *
-     * @param connection The connection the message was received on.
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *            holds all the information.
-     * @return Null.
-     */
-    private Element lootCargo(Connection connection, Element element) {
-        Game game = freeColServer.getGame();
-        LootCargoMessage message = new LootCargoMessage(game, element);
-        Unit unit = message.getUnit(game);
-        List<Goods> goods = message.getGoods();
-        final Market market = serverPlayer.getMarket();
-        Collections.sort(goods, new Comparator<Goods>() {
-                public int compare(Goods g1, Goods g2) {
-                    int p1 = market.getPaidForSale(g1.getType())
-                        * g1.getAmount();
-                    int p2 = market.getPaidForSale(g2.getType())
-                        * g2.getAmount();
-                    return p2 - p1;
+        String str = setCurrentPlayerElement.getAttribute("player");
+        final Player currentPlayer = game.getFreeColGameObject(str, Player.class);
+
+        if (currentPlayer != null
+            && serverPlayer.getId() == currentPlayer.getId()) {
+            logger.finest("Starting new Thread for " + serverPlayer.getName());
+            Thread t = new Thread(FreeCol.SERVER_THREAD+"AIPlayer (" + serverPlayer.getName() + ")") {
+                public void run() {
+                    try {
+                        getAIPlayer().startWorking();
+                    } catch (Exception e) {
+                        logger.log(Level.SEVERE, "AI player failed while working!", e);
+                    }
+                    AIMessage.askEndTurn(getAIPlayer());
                 }
-            });
-        List<Goods> loot = new ArrayList<Goods>();
-        int space = unit.getSpaceLeft();
-        while (!goods.isEmpty()) {
-            Goods g = goods.remove(0);
-            if (g.getSpaceTaken() > space) continue; // Approximate
-            loot.add(g);
-            space -= g.getSpaceTaken();
+            };
+            t.start();
         }
-        AIMessage.askLoot(getAIUnit(unit), message.getDefenderId(), loot);
         return null;
-    }
-
-
-    /**
-     * Handle all the children of this element.
-     *
-     * @param connection The <code>Connection</code> the element arrived on.
-     * @param element The <code>Element</code> to process.
-     * @return An <code>Element</code> containing the response/s.
-     */
-    public Element multiple(Connection connection, Element element) {
-        NodeList nodes = element.getChildNodes();
-        List<Element> results = new ArrayList<Element>();
-
-        for (int i = 0; i < nodes.getLength(); i++) {
-            try {
-                Element reply = handle(connection, (Element) nodes.item(i));
-                if (reply != null) results.add(reply);
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Caught crash in multiple item " + i
-                    + ", continuing.", e);
-            }
-        }
-        return DOMMessage.collapseElements(results);
     }
 }

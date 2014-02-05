@@ -110,6 +110,7 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
      * @return The reply.
      */
     public final Element handle(Connection connection, Element element) {
+        if (element == null) return null;
         String tagName = element.getTagName();
         NetworkRequestHandler handler = _handlerMap.get(tagName);
         if (handler != null) {

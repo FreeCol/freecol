@@ -207,15 +207,10 @@ public abstract class ServerAPI {
                 // non-i18n text.
                 reply.removeAttribute("messageID");
             }
-            if (messageId == null && messageText == null) {
-                logger.warning("Received null error response");
-            } else {
-                logger.warning("Received error response: "
-                               + ((messageId != null) ? messageId : "")
-                               + "/" + ((messageText != null)
-                                   ? messageText : ""));
-                client.handleReply(reply);
-            }
+            logger.warning("ServerAPI. " + message.getType() + " error,"
+                + " messageId: " + messageId
+                + " message: " + messageText);
+            client.handleReply(reply);
             return null;
         }
 

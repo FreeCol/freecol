@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -89,36 +90,82 @@ public class AIMessage {
 
     private static final Logger logger = Logger.getLogger(AIMessage.class.getName());
 
+
     /**
      * Ask the server a question.
      *
-     * @param connection The <code>Connection</code> to use
-     *     when communicating with the server.
+     * @param conn The <code>Connection</code> to use when
+     *     communicating with the server.
      * @param request The <code>Element</code> to send.
-     * @return The reply element.
+     * @return The reply <code>Element</code>.
      */
-    private static Element askMessage(Connection connection,
-                                      Element request) {
+    private static Element ask(Connection conn, Element request) {
         Element reply;
         try {
-            reply = connection.askDumping(request);
+            reply = conn.askDumping(request);
         } catch (IOException e) {
             logger.log(Level.WARNING, "Could not send \""
                 + request.getTagName() + "\"-message.", e);
-            return null;
-        }
-        
-        if (reply != null && "error".equals(reply.getTagName())) {
-            String msgID = reply.getAttribute("messageID");
-            String msg = reply.getAttribute("message");
-            String logMessage = "AIMessage." + request.getTagName()
-                + " error,"
-                + " messageID: " + ((msgID == null) ? "(null)" : msgID)
-                + " message: " + ((msg == null) ? "(null)" : msg);
-            logger.warning(logMessage);
-            return null;
+            reply = null;
         }
         return reply;
+    }
+
+    /**
+     * Handle error elements.
+     *
+     * @param element The <code>Element</code> to check.
+     * @param tag The tag that was originally sent.
+     * @return True if there was an error.
+     */
+    private static boolean checkError(Element element, String tag) {
+        if (element != null && "error".equals(element.getTagName())) {
+            String messageId = element.getAttribute("messageID");
+            String messageText = element.getAttribute("message");
+            logger.warning("AIMessage." + tag + " error,"
+                + " messageId: " + messageId
+                + " message: " + messageText);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Ask the server a question, returning non-error replies.
+     *
+     * @param conn The <code>Connection</code> to use when
+     *     communicating with the server.
+     * @param request The <code>Element</code> to send.
+     * @return The reply <code>Element</code> if not an error, otherwise null.
+     */
+    private static Element askMessage(Connection conn, Element request) {
+        Element reply = ask(conn, request);
+        return (checkError(reply, request.getTagName())) ? null : reply;
+    }
+        
+    /**
+     * Ask the server a question, handling the reply.
+     *
+     * @param conn The <code>Connection</code> to use when
+     *     communicating with the server.
+     * @param request The <code>Element</code> to send.
+     * @return True if the message was sent, handled, and no error returned.
+     */
+    private static boolean askHandling(Connection conn, Element request) {
+        for (;;) {
+            Element reply = ask(conn, request);
+            if (reply == null) break;
+
+            if (checkError(reply, request.getTagName())) return false;
+            try {
+                request = conn.handle(reply);
+            } catch (FreeColException fce) {
+                logger.log(Level.WARNING, "AI handler failed: "
+                    + reply.toString(), fce);
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -127,12 +174,11 @@ public class AIMessage {
      * @param connection The <code>Connection</code> to use
      *     when communicating with the server.
      * @param request The <code>Element</code> to send.
-     * @return True if the message was sent, and a non-null, non-error
-     *     reply returned.
+     * @return True if the message was sent and a non-error reply returned.
      */
     private static boolean sendMessage(Connection connection,
                                        Element request) {
-        return askMessage(connection, request) != null;
+        return askHandling(connection, request);
     }
 
     /**
@@ -569,7 +615,8 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askRearrangeColony(AIColony aiColony,
-        List<Unit> workers, Colony scratch) {
+                                             List<Unit> workers,
+                                             Colony scratch) {
         Colony colony = aiColony.getColony();
         RearrangeColonyMessage message = new RearrangeColonyMessage(colony);
         for (Unit u : workers) {
