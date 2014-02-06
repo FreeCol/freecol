@@ -426,6 +426,9 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
             FreeCol.setName(name.getText());
             FreeCol.setTC(getTC().getId());
             FreeCol.setAdvantages(getAdvantages());
+            if (getAdvantages() == Advantages.NONE) {
+                spec.clearNationalAdvantages();
+            }
             NewPanelAction action = Enum.valueOf(NewPanelAction.class,
                 group.getSelection().getActionCommand());
             switch (action) {
@@ -454,9 +457,6 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
                     break;
                 }
                 spec.applyDifficultyLevel(level);
-                if (getAdvantages() == Advantages.NONE) {
-                    spec.clearNationalAdvantages();
-                }
                 // Launch!
                 if (connectController.startMultiplayerGame(spec,
                         publicServer.isSelected(), port)) return;
