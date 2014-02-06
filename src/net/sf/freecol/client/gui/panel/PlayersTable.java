@@ -157,10 +157,18 @@ public final class PlayersTable extends JTable {
 
         TableColumn advantagesColumn
             = getColumnModel().getColumn(ADVANTAGE_COLUMN);
-        if (nationOptions.getNationalAdvantages()
-            == NationOptions.Advantages.SELECTABLE) {
+        switch (nationOptions.getNationalAdvantages()) {
+        case SELECTABLE:
             advantagesColumn.setCellEditor(new AdvantageCellEditor(spec
                     .getEuropeanNationTypes()));
+            break;
+        case FIXED:
+            break; // Do nothing
+        case NONE:
+            nationOptions.clearAdvantages();
+            break;
+        default:
+            break;
         }
         advantagesColumn.setCellRenderer(new AdvantageCellRenderer(nationOptions.getNationalAdvantages()));
         advantagesColumn.setHeaderRenderer(renderer);
@@ -593,10 +601,7 @@ public final class PlayersTable extends JTable {
                     if (nationOptions.getNationState(nation)
                         == NationState.AVAILABLE) {
                         preGameController.setNation(nation);
-                        if (nationOptions.getNationalAdvantages()
-                            != NationOptions.Advantages.NONE) {
-                            preGameController.setNationType(nation.getType());
-                        }
+                        preGameController.setNationType(nation.getType());
                         update();
                     }
                     break;

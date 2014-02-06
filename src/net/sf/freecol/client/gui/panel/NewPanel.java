@@ -454,6 +454,9 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
                     break;
                 }
                 spec.applyDifficultyLevel(level);
+                if (getAdvantages() == Advantages.NONE) {
+                    spec.clearNationalAdvantages();
+                }
                 // Launch!
                 if (connectController.startMultiplayerGame(spec,
                         publicServer.isSelected(), port)) return;

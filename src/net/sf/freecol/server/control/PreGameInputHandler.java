@@ -299,15 +299,28 @@ public final class PreGameInputHandler extends InputHandler {
     private Element setNationType(Connection connection, Element element) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         if (player != null) {
-            NationType nationType = getGame().getSpecification()
-                .getNationType(element.getAttribute("value"));
-            NationType fixedNationType = getGame().getSpecification()
-                .getNation(player.getNationId()).getType();
+            final Specification spec = getGame().getSpecification();
+            NationType nationType = spec.getNationType(element.getAttribute("value"));
+            NationType fixedNationType = spec.getNation(player.getNationId())
+                .getType();
             Advantages advantages = getGame().getNationOptions()
                 .getNationalAdvantages();
-            if (advantages == Advantages.SELECTABLE
-                || (advantages == Advantages.FIXED
-                    && nationType.equals(fixedNationType))) {
+            boolean ok;
+            switch (advantages) {
+            case SELECTABLE:
+                ok = true;
+                break;
+            case FIXED:
+                ok = nationType.equals(fixedNationType);
+                break;
+            case NONE:
+                ok = nationType == spec.getDefaultNationType();
+                break;
+            default:
+                ok = false;
+                break;
+            }
+            if (ok) {
                 player.changeNationType(nationType);
                 getFreeColServer().getServer()
                     .sendToAll(DOMMessage.createMessage("updateNationType",

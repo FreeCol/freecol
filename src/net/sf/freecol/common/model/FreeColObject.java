@@ -844,12 +844,12 @@ public abstract class FreeColObject implements ObjectWithId {
     }
 
     /**
-     * Debugging tool, dump set XML to System.err.
+     * Debugging tool, dump collection XML to System.err.
      */
-    public static <T extends FreeColObject> void dumpSet(Set<T> set) {
-        System.err.println("[Set begin");
-        for (T t : set) t.dumpObject();
-        System.err.println("Set end]");
+    public static <T extends FreeColObject> void dumpCollection(Collection<T> items) {
+        System.err.println("[Collection begin ");
+        for (T t : items) t.dumpObject();
+        System.err.println(" collection end]");
     }
 
     /**

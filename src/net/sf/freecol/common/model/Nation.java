@@ -123,6 +123,15 @@ public class Nation extends FreeColGameObjectType {
     }
 
     /**
+     * Set the nation type.  Needed to when "no advantages" is selected.
+     *
+     * @param type The new <code>NationType</code>.
+     */
+    public final void setType(NationType type) {
+        this.type = type;
+    }
+
+    /**
      * Is this nation selectable?
      *
      * @return True if the nation is selectable.

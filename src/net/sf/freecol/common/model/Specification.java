@@ -1271,6 +1271,11 @@ public final class Specification {
         return getType(id, NationType.class);
     }
 
+    public NationType getDefaultNationType() {
+        return getNationType("model.nationType.default");
+    }
+
+
     // -- Nations --
 
     public List<Nation> getNations() {
@@ -1297,6 +1302,12 @@ public final class Specification {
      */
     public Nation getNation(String id) {
         return getType(id, Nation.class);
+    }
+
+    public void clearNationalAdvantages() {
+        for (Nation n : getNations()) {
+            n.setType(getDefaultNationType());
+        }
     }
 
     // -- Roles --
