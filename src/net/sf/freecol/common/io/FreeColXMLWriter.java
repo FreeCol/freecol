@@ -137,31 +137,42 @@ public class FreeColXMLWriter implements XMLStreamWriter {
      *
      * @param outputStream The <code>OutputStream</code> to create
      *     an <code>FreeColXMLWriter</code> for.
-     * @param writeScope The <code>WriteScope</code> to use for
-     *     FreeCol object writes.
+     * @param scope The <code>WriteScope</code> to use for FreeCol
+     *     object writes.
      * @param indent If true, produce indented output if supported.
      * @exception IOException if thrown while creating the
      *     <code>XMLStreamWriter</code>.
      */
-    public FreeColXMLWriter(OutputStream outputStream,
-                            WriteScope writeScope,
+    public FreeColXMLWriter(OutputStream outputStream, WriteScope scope,
                             boolean indent) throws IOException {
-        this(new OutputStreamWriter(outputStream), writeScope, indent);
+        this(new OutputStreamWriter(outputStream, "UTF-8"), scope, indent);
     }
 
     /**
      * Creates a new <code>FreeColXMLWriter</code>.
      *
-     * @param writer A <code>Writer</code> to create
-     *     an <code>FreeColXMLWriter</code> for.
-     * @param writeScope The <code>WriteScope</code> to use for
-     *     FreeCol object writes.
+     * @param writer A <code>Writer</code> to create an
+     *     <code>FreeColXMLWriter</code> for.
+     * @param scope The <code>WriteScope</code> to use for FreeCol
+     *     object writes.
+     * @exception IOException if thrown while creating the
+     *     <code>XMLStreamWriter</code>.
+     */
+    public FreeColXMLWriter(Writer writer, WriteScope scope) throws IOException {
+        this(writer, scope, false);
+    }
+
+    /**
+     * Creates a new <code>FreeColXMLWriter</code>.
+     *
+     * @param scope The <code>WriteScope</code> to use for FreeCol
+     *     object writes.
      * @param indent If true, produce indented output if supported.
      * @exception IOException if thrown while creating the
      *     <code>FreeColXMLWriter</code>.
      */
-    public FreeColXMLWriter(Writer writer, WriteScope writeScope,
-                            boolean indent) throws IOException {
+    private FreeColXMLWriter(Writer writer, WriteScope scope,
+                             boolean indent) throws IOException {
         try {
             if (indent) {
                 this.outputWriter = writer;
@@ -175,7 +186,7 @@ public class FreeColXMLWriter implements XMLStreamWriter {
         } catch (XMLStreamException e) {
             throw new IOException(e);
         }
-        this.writeScope = writeScope;
+        this.writeScope = scope;
     }
 
 

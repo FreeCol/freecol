@@ -720,7 +720,7 @@ public abstract class FreeColObject implements ObjectWithId {
         StringWriter sw = new StringWriter();
         FreeColXMLWriter xw = null;
         try {
-            xw = new FreeColXMLWriter(sw, writeScope, false);
+            xw = new FreeColXMLWriter(sw, writeScope);
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Error creating FreeColXMLWriter,", ioe);
             return null;
@@ -914,17 +914,17 @@ public abstract class FreeColObject implements ObjectWithId {
     /**
      * Serialize this FreeColObject to a string.
      *
+     * @param scope The write scope to use.
      * @return The serialized object, or null if the stream could not be
      *     created.
      * @exception XMLStreamException if there are any problems writing
      *     to the stream.
      */
-    public String serialize() throws XMLStreamException {
+    public String serialize(WriteScope scope) throws XMLStreamException {
         StringWriter sw = new StringWriter();
         FreeColXMLWriter xw = null;
         try {
-            xw = new FreeColXMLWriter(sw, 
-                FreeColXMLWriter.WriteScope.toServer(), false);
+            xw = new FreeColXMLWriter(sw, scope);
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Error creating FreeColXMLWriter,", ioe);
             return null;
@@ -937,6 +937,18 @@ public abstract class FreeColObject implements ObjectWithId {
         }
 
         return sw.toString();
+    }
+
+    /**
+     * Serialize this FreeColObject to a string.
+     *
+     * @return The serialized object, or null if the stream could not be
+     *     created.
+     * @exception XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    public String serialize() throws XMLStreamException {
+        return serialize(WriteScope.toServer());
     }
 
     /**

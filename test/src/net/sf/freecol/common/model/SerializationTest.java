@@ -22,7 +22,7 @@ package net.sf.freecol.common.model;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.List;
@@ -156,8 +156,8 @@ public class SerializationTest extends FreeColTestCase {
         try {
             String filename = "test/data/specification.xml";
             Validator validator = buildValidator("schema/specification-schema.xsd");
-            FileWriter sw = new FileWriter(filename);
-            FreeColXMLWriter xw = new FreeColXMLWriter(sw,
+            FileOutputStream fos = new FileOutputStream(filename);
+            FreeColXMLWriter xw = new FreeColXMLWriter(fos,
                 FreeColXMLWriter.WriteScope.toSave(), false);
 
             spec().toXML(xw);
@@ -175,7 +175,6 @@ public class SerializationTest extends FreeColTestCase {
     }
 
     public void testDifficulty() throws Exception {
-System.err.println("TESTDIFF");
         Specification spec1 = null;
         Specification spec2 = null;
         try {
@@ -183,7 +182,7 @@ System.err.println("TESTDIFF");
             spec1.applyDifficultyLevel("model.difficulty.veryEasy");
             StringWriter sw = new StringWriter();
             FreeColXMLWriter xw = new FreeColXMLWriter(sw,
-                FreeColXMLWriter.WriteScope.toSave(), false);
+                FreeColXMLWriter.WriteScope.toSave());
 
             spec1.toXML(xw);
 
@@ -220,7 +219,7 @@ System.err.println("TESTDIFF");
             spec1.applyDifficultyLevel("model.difficulty.veryEasy");
             StringWriter sw = new StringWriter();
             FreeColXMLWriter xw = new FreeColXMLWriter(sw,
-                FreeColXMLWriter.WriteScope.toSave(), false);
+                FreeColXMLWriter.WriteScope.toSave());
 
             spec1.toXML(xw);
 
