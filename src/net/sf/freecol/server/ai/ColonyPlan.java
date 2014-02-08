@@ -701,6 +701,9 @@ public class ColonyPlan {
     private void updateBuildableTypes() {
         final EuropeanAIPlayer euaip = (EuropeanAIPlayer)getAIMain()
             .getAIPlayer(colony.getOwner());
+        if (euaip == null) {
+            throw new RuntimeException("Null EuropeanAIPlayer for " + colony.getOwner() + " in ColonyPlan for: " + colony);
+        }
         String advantage = euaip.getAIAdvantage();
         buildPlans.clear();
 
