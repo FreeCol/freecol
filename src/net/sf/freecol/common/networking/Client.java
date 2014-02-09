@@ -203,15 +203,17 @@ public final class Client {
      * Handle a reply element using the client input handler.
      *
      * @param reply The reply <code>Element</code> to handle.
+     * @return The reply <code>Element</code>.
      */
-    public void handleReply(Element reply) {
+    public Element handleReply(Element reply) {
         if (reply != null) {
             try {
-                c.getMessageHandler().handle(c, reply);
+                return c.getMessageHandler().handle(c, reply);
             } catch (FreeColException e) {
                 logger.log(Level.WARNING, "Could not handle reply: " + reply,
                            e);
             }
         }
+        return null;
     }
 }

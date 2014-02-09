@@ -173,6 +173,23 @@ public abstract class ServerAPI {
     }
 
     /**
+     * Loop sending requests and handling replies from the server until
+     * they reduce to null.
+     *
+     * @param request The initial request <code>Element</code>.
+     */
+    private void resolve(Element request) {
+        while (request != null) {
+            try {
+                request = client.handleReply(client.ask(request));
+            } catch (IOException ioe) {
+                logger.warning("Could not resolve: " + request.getTagName());
+                break;
+            }
+        }
+    }
+
+    /**
      * Sends the specified message to the server and returns the reply,
      * if it has the specified tag.
      * Handle "error" replies if they have a messageID or when in debug mode.
@@ -238,6 +255,25 @@ public abstract class ServerAPI {
             return reply;
         }
 
+        // Process multiple returns, pick out expected element
+        if ("multiple".equals(reply.getTagName())) {
+            List<Element> replies = new ArrayList<Element>();
+            NodeList nodes = reply.getChildNodes();
+            Element result = null;
+
+            for (int i = 0; i < nodes.getLength(); i++) {
+                if (nodes.item(i) instanceof Element
+                    && ((Element)nodes.item(i)).getTagName().equals(tag)) {
+                    result = (Element)nodes.item(i);
+                    continue;
+                }
+                Element e = client.handleReply((Element)nodes.item(i));
+                if (e != null) replies.add(e);
+            }
+            resolve(DOMMessage.collapseElements(replies));
+            return result;
+        }
+
         // Unexpected reply.  Whine and fail.
         String complaint = "Received reply with tag " + reply.getTagName()
             + " which should have been " + tag
@@ -253,14 +289,14 @@ public abstract class ServerAPI {
      * @param message A <code>DOMMessage</code> to send.
      * @param tag The expected tag
      * @param results A <code>Map</code> to store special attribute results in.
-     * @return True if the server interaction succeeded, else false.
+     * @return True if the server interaction succeeded and an element
+     *     with the expected tag was found in the reply, else false.
      */
     private boolean askHandling(DOMMessage message, String tag,
                                 HashMap<String, String> results) {
         Element reply = askExpecting(message, tag, results);
         if (reply == null) return false;
-
-        client.handleReply(reply);
+        resolve(client.handleReply(reply));
         return true;
     }
 
