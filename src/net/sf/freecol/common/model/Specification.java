@@ -1304,8 +1304,8 @@ public final class Specification {
         return getType(id, Nation.class);
     }
 
-    public void clearNationalAdvantages() {
-        for (Nation n : getNations()) {
+    public void clearEuropeanNationalAdvantages() {
+        for (Nation n : getEuropeanNations()) {
             n.setType(getDefaultNationType());
         }
     }

@@ -427,7 +427,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
             FreeCol.setTC(getTC().getId());
             FreeCol.setAdvantages(getAdvantages());
             if (getAdvantages() == Advantages.NONE) {
-                spec.clearNationalAdvantages();
+                spec.clearEuropeanNationalAdvantages();
             }
             NewPanelAction action = Enum.valueOf(NewPanelAction.class,
                 group.getSelection().getActionCommand());

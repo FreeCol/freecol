@@ -165,7 +165,7 @@ public final class PlayersTable extends JTable {
         case FIXED:
             break; // Do nothing
         case NONE:
-            nationOptions.clearAdvantages();
+            spec.clearEuropeanNationalAdvantages();
             break;
         default:
             break;

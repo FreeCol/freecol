@@ -150,16 +150,6 @@ public class NationOptions extends FreeColObject {
         this.nations.put(nation, state);
     }
 
-    /**
-     * Clear all national advantages.  Used when "no advantages" is selected.
-     */
-    public void clearAdvantages() {
-        final NationType defType = specification.getDefaultNationType();
-        for (Nation n : nations.keySet()) {
-            n.setType(defType);
-        }
-    }
-
 
     // Serialization
     // Note: NATION/S_TAG is capitalized to avoid collision with Nation.java.
