@@ -192,12 +192,24 @@ public class TransportMission extends Mission {
             this.spaceLeft = spaceLeft;
         }
 
+        public void clear() {
+            this.transportable = null;
+            this.carrier = null;
+            this.mode = null;
+            this.target = null;
+        }
+
+        public boolean isValid() {
+            return this.mode != null;
+        }
+
         /**
          * How much space would be needed to add this transportable?
          *
          * @return The extra space required.
          */
         public int getNewSpace() {
+            if (!isValid()) return 0;
             int ret = 0;
             ret += (mode.isCollection()) ? getTransportable().getSpaceTaken()
                 : -getTransportable().getSpaceTaken();
@@ -283,6 +295,7 @@ public class TransportMission extends Mission {
          * @return A reason the targeting failed, null if it succeeded.
          */
         public String setTarget() {
+            if (!isValid()) return "invalid";
             Location dst = transportable.getTransportDestination();
             if (dst == null) return "no-destination";
             dst = upLoc(dst);
@@ -575,12 +588,17 @@ public class TransportMission extends Mission {
     /**
      * Sets the cargoes to a new list.
      *
+     * @param nxt The new cargoes list.
+     * @param setSpace If true, call tSpace to reset the space left values.
      * @return The old cargoes list.
      */
-    private List<Cargo> tSet(List<Cargo> nxt) {
+    private List<Cargo> tSet(List<Cargo> nxt, boolean setSpace) {
         List<Cargo> old = tClear();
         synchronized (cargoes) {
-            cargoes.addAll(nxt);
+            for (Cargo c : nxt) {
+                if (c.isValid()) cargoes.add(c);
+            }
+            if (setSpace) tSpace();
         }
         return old;
     }
@@ -623,9 +641,14 @@ public class TransportMission extends Mission {
      * @return The first cargo, or null if none found.
      */
     private Cargo tFirst() {
-        Cargo cargo;
+        Cargo cargo = null;
         synchronized (cargoes) {
-            cargo = (cargoes.isEmpty()) ? null : cargoes.get(0);
+            for (int i = 0; i < cargoes.size(); i++) {
+                if (cargoes.get(i).isValid()) {
+                    cargo = cargoes.get(i);
+                    break;
+                }
+            }
         }
         return cargo;
     }
@@ -638,7 +661,8 @@ public class TransportMission extends Mission {
      * @return True if the addition succeeded.
      */
     private boolean tAdd(Cargo cargo, int index) {
-        if (tFind(cargo.getTransportable()) != null) return false;
+        if (!cargo.isValid()
+            || tFind(cargo.getTransportable()) != null) return false;
         synchronized (cargoes) {
             if (index >= 0) {
                 cargoes.add(index, cargo); 
@@ -673,9 +697,16 @@ public class TransportMission extends Mission {
         final Unit carrier = getUnit();
         final int maxHolds = carrier.getCargoCapacity();
         int holds = carrier.getCargoSpaceTaken();
-        for (Cargo cargo : cargoes) {
-            holds += cargo.getNewSpace();
-            cargo.setSpaceLeft(maxHolds - holds);
+        int i = 0;
+        while (i < cargoes.size()) {
+            Cargo cargo = cargoes.get(i);
+            if (cargo.isValid()) {
+                holds += cargo.getNewSpace();
+                cargo.setSpaceLeft(maxHolds - holds);
+                i++;
+            } else {
+                cargoes.remove(i);
+            }
         }
     }
 
@@ -1288,10 +1319,9 @@ public class TransportMission extends Mission {
             }
         }
         if (best != null) {
-            tSet(unwrapCargoes(best));
-            tSpace();
+            tSet(unwrapCargoes(best), true);
         } else {
-            tSet(unwrapCargoes(ts));
+            tSet(unwrapCargoes(ts), false);
         }
         retarget();
         if (best != null) {
@@ -1649,7 +1679,8 @@ public class TransportMission extends Mission {
                     // fail to deliver something.
                     String logMe = tag + " delivery-pass:";
                     List<Cargo> cont = new ArrayList<Cargo>();
-                    for (Cargo cargo : tCopy()) {
+                    List<Cargo> curr = tClear();
+                    for (Cargo cargo : curr) {
                         CargoResult result = (cargo.getMode().isCollection())
                             ? CargoResult.TCONTINUE
                             : tryCargo(cargo);
@@ -1660,6 +1691,8 @@ public class TransportMission extends Mission {
                             cont.add(cargo);
                             break;
                         case TDONE:
+                            cargo.clear();
+                            break;
                         case TFAIL: // failures will be retargeted below
                             break;
                         case TNEXT:
@@ -1667,10 +1700,10 @@ public class TransportMission extends Mission {
                         }
                     }
                     logger.finest(logMe);
+                    curr.clear();
                     // Rebuild the cargo list with the original members,
                     // less the transportables that were dropped.
-                    tSet(cont);
-                    tSpace();
+                    tSet(cont, true);
                     optimizeCargoes(); // This will retarget failures
 
                     // Now try again, this time collecting as well as
@@ -1678,7 +1711,8 @@ public class TransportMission extends Mission {
                     logMe = tag + " collection-pass:";
                     cont.clear();
                     List<Cargo> next = new ArrayList<Cargo>();
-                    for (Cargo cargo : tCopy()) {
+                    curr = tClear();
+                    for (Cargo cargo : curr) {
                         CargoResult result = (cargo.getMode().isCollection())
                             ? tryCargo(cargo)
                             : CargoResult.TCONTINUE;
@@ -1688,6 +1722,7 @@ public class TransportMission extends Mission {
                             cont.add(cargo);
                             break;
                         case TDONE:
+                            cargo.clear();
                             break;
                         case TNEXT:
                             next.add(cargo);
@@ -1703,11 +1738,11 @@ public class TransportMission extends Mission {
                         }
                     }
                     logger.finest(logMe);
+                    curr.clear();
 
                     // Rebuild the cargo list with the original members,
                     // less the transportables that were dropped.
-                    tSet(cont);
-                    tSpace();
+                    tSet(cont, true);
 
                     // Add the new and blocked cargoes incrementally with
                     // the current arrangement, which is likely to put them
