@@ -641,6 +641,7 @@ public class TileItemContainer extends FreeColGameObject {
         for (TileItem item : tileItems) {
             sb.append(" ").append(item.toString());
         }
+        sb.append("]");
         return sb.toString();
     }
 

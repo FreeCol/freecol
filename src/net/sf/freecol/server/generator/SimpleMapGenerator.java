@@ -57,6 +57,7 @@ import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Role;
+import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
@@ -90,15 +91,45 @@ public class SimpleMapGenerator implements MapGenerator {
 
     private static final Logger logger = Logger.getLogger(SimpleMapGenerator.class.getName());
 
-    private final Random random;
-    private final OptionGroup mapGeneratorOptions;
-
-    private final LandGenerator landGenerator;
-    private final TerrainGenerator terrainGenerator;
-
     // To avoid starting positions to be too close to the poles
     // percentage indicating how much of the half map close to the pole cannot be spawned on
     private static final float MIN_DISTANCE_FROM_POLE = 0.30f;
+
+    private class Territory {
+        public ServerRegion region;
+        public Tile tile;
+        public Player player;
+        public int numberOfSettlements;
+
+        public Territory(Player player, Tile tile) {
+            this.player = player;
+            this.tile = tile;
+        }
+
+        public Territory(Player player, ServerRegion region) {
+            this.player = player;
+            this.region = region;
+        }
+
+        public Tile getCenterTile(Map map) {
+            if (tile != null) return tile;
+            int[] xy = region.getCenter();
+            return map.getTile(xy[0], xy[1]);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            return player + " territory at " + region.toString();
+        }
+    }
+
+    private final Random random;
+    private final OptionGroup mapGeneratorOptions;
+    private final LandGenerator landGenerator;
+    private final TerrainGenerator terrainGenerator;
 
 
     /**
@@ -111,8 +142,17 @@ public class SimpleMapGenerator implements MapGenerator {
     public SimpleMapGenerator(Random random, Specification specification) {
         this.random = random;
         this.mapGeneratorOptions = specification.getMapGeneratorOptions();
-        landGenerator = new LandGenerator(mapGeneratorOptions, random);
-        terrainGenerator = new TerrainGenerator(mapGeneratorOptions, random);
+        this.landGenerator = new LandGenerator(mapGeneratorOptions, random);
+        this.terrainGenerator = new TerrainGenerator(mapGeneratorOptions, random);
+    }
+
+
+    public LandGenerator getLandGenerator() {
+        return landGenerator;
+    }
+
+    public TerrainGenerator getTerrainGenerator() {
+        return terrainGenerator;
     }
 
     /**
@@ -128,218 +168,155 @@ public class SimpleMapGenerator implements MapGenerator {
     }
 
     /**
-     * Creates a map given for a game.
+     * Make lost city rumours on the given map.
      *
-     * @param game The <code>Game</code> to use.
-     * @see net.sf.freecol.server.generator.MapGenerator#createMap(net.sf.freecol.common.model.Game)
-     */
-    public void createMap(Game game) throws FreeColException {
-        // Prepare imports:
-        final File importFile = ((FileOption) getMapGeneratorOptions()
-            .getOption(MapGeneratorOptions.IMPORT_FILE)).getValue();
-        final Game importGame;
-        if (importFile != null) {
-            Game g = null;
-            try {
-                logger.info("Importing file " + importFile.getPath());
-                g = FreeColServer.readGame(new FreeColSavegameFile(importFile),
-                    game.getSpecification(), null);
-            } catch (IOException ioe) {
-                g = null;
-            } catch (XMLStreamException xse) {
-                g = null;
-            }
-            importGame = g;
-        } else {
-            importGame = null;
-        }
-
-        // Create land map.
-        boolean[][] landMap;
-        if (importGame != null) {
-            landMap = LandGenerator.importLandMap(importGame);
-        } else {
-            landMap = landGenerator.createLandMap();
-        }
-
-        // Create terrain:
-        terrainGenerator.createMap(game, importGame, landMap);
-
-        Map map = game.getMap();
-        if (game.getSpecification().getBoolean(MapGeneratorOptions.IMPORT_SETTLEMENTS)) {
-            importIndianSettlements(map, importGame);
-        } else {
-            createIndianSettlements(map, game.getPlayers());
-        }
-        createLostCityRumours(map, importGame);
-        createEuropeanUnits(map, game.getPlayers());
-    }
-
-    /**
-     * Creates a <code>Map</code> for the given <code>Game</code>.
-     *
-     * The <code>Map</code> is added to the <code>Game</code> after
-     * it is created.
-     *
-     * @param game The game.
-     * @param landMap Determines whether there should be land
-     *                or ocean on a given tile. This array also
-     *                specifies the size of the map that is going
-     *                to be created.
-     * @see Map
-     * @see TerrainGenerator#createMap
-     */
-    public void createEmptyMap(Game game, boolean[][] landMap) {
-        terrainGenerator.createMap(game, null, landMap);
-    }
-
-    public LandGenerator getLandGenerator() {
-        return landGenerator;
-    }
-
-    public TerrainGenerator getTerrainGenerator() {
-        return terrainGenerator;
-    }
-
-    /* (non-Javadoc)
-     * @see net.sf.freecol.server.generator.IMapGenerator#getMapGeneratorOptions()
-     */
-    public OptionGroup getMapGeneratorOptions() {
-        return mapGeneratorOptions;
-    }
-
-    /**
-     * Creates lost city rumours on the given map.
      * The number of rumours depends on the map size.
      *
-     * @param map The map to use.
-     * @param importGame The game to lost city rumours from.
+     * @param map The <code>Map</code> to use.
+     * @param importGame An optional <code>Game</code> to load lost city
+     *     rumours from.
      */
-    private void createLostCityRumours(Map map, Game importGame) {
-        final boolean importRumours = getMapGeneratorOptions()
+    private void makeLostCityRumours(Map map, Game importGame) {
+        final boolean importRumours = mapGeneratorOptions
             .getBoolean(MapGeneratorOptions.IMPORT_RUMOURS);
-
         if (importGame != null && importRumours) {
+            int nLCRs = 0;
             for (Tile importTile : importGame.getMap().getAllTiles()) {
-                LostCityRumour rumor = importTile.getLostCityRumour();
+                LostCityRumour rumour = importTile.getLostCityRumour();
                 // no rumor
-                if (rumor == null) continue;
+                if (rumour == null) continue;
                 int x = importTile.getX();
                 int y = importTile.getY();
                 if (map.isValid(x, y)) {
                     final Tile t = map.getTile(x, y);
-                    t.add(rumor);
+                    rumour.setLocation(t);
+                    t.addLostCityRumour(rumour);
+                    nLCRs++;
                 }
             }
-        } else {
-            int number = getApproximateLandCount() / getMapGeneratorOptions()
-                .getInteger(MapGeneratorOptions.RUMOUR_NUMBER);
-            int counter = 0;
-
-            // TODO: Remove temporary fix:
-            if (importGame != null) {
-                number = map.getWidth() * map.getHeight() * 25 / (100 * 35);
+            if (nLCRs > 0) {
+                logger.info("Imported " + nLCRs + " lost city rumours.");
+                return;
             }
-            // END TODO
-
-            for (int i = 0; i < number; i++) {
-                for (int tries=0; tries<100; tries++) {
-                    Tile t = terrainGenerator.getRandomLandTile(map, random);
-                    if (t.isPolar()) continue; // No polar lost cities
-                    if (t.isLand() && !t.hasLostCityRumour()
-                        && !t.hasSettlement() && t.getUnitCount() == 0) {
-                        LostCityRumour r = new LostCityRumour(t.getGame(), t);
-                        if (r.chooseType(null, random)
-                            == LostCityRumour.RumourType.MOUNDS
-                            && t.getOwningSettlement() != null) {
-                            r.setType(LostCityRumour.RumourType.MOUNDS);
-                        }
-                        t.addLostCityRumour(r);
-                        counter++;
-                        break;
-                    }
-                }
-            }
-
-            logger.info("Created " + counter
-                        + " lost city rumours of maximum " + number + ".");
+            // Otherwise fall through and create them
         }
+
+        final int rumourNumber = mapGeneratorOptions
+            .getInteger(MapGeneratorOptions.RUMOUR_NUMBER);
+        int number = getApproximateLandCount() / rumourNumber;
+        int counter = 0;
+
+        // TODO: Remove temporary fix:
+        if (importGame != null) {
+            number = map.getWidth() * map.getHeight() * 25 / (100 * 35);
+        }
+        // END TODO
+
+        for (int i = 0; i < number; i++) {
+            for (int tries=0; tries<100; tries++) {
+                Tile t = terrainGenerator.getRandomLandTile(map, random);
+                if (t.isPolar()) continue; // No polar lost cities
+                if (t.isLand() && !t.hasLostCityRumour()
+                    && !t.hasSettlement() && t.getUnitCount() == 0) {
+                    LostCityRumour r = new LostCityRumour(t.getGame(), t);
+                    if (r.chooseType(null, random)
+                        == LostCityRumour.RumourType.MOUNDS
+                        && t.getOwningSettlement() != null) {
+                        r.setType(LostCityRumour.RumourType.MOUNDS);
+                    }
+                    t.addLostCityRumour(r);
+                    counter++;
+                    break;
+                }
+            }
+        }
+        logger.info("Created " + counter
+            + " lost city rumours of maximum " + number + ".");
     }
 
-    private void importIndianSettlements(Map map, Game importGame) {
+    private boolean importIndianSettlements(Map map, Game importGame) {
         final Game game = map.getGame();
         final Specification spec = game.getSpecification();
-        boolean hasSettlements = false;
+        int nSettlements = 0;
+
         for (Player player : importGame.getPlayers()) {
-            if (player.isIndian()) {
-                Player indian = game.getPlayer(player.getNationId());
-                if (indian == null) {
-                    Nation nation = spec.getNation(player.getNationId());
-                    indian = new ServerPlayer(game, null, false, nation, null, null);
-                    game.addPlayer(indian);
+            if (!player.isIndian()) continue;
+            Player indian = game.getPlayer(player.getNationId());
+            if (indian == null) {
+                Nation nation = spec.getNation(player.getNationId());
+                indian = new ServerPlayer(game, null, false, nation, 
+                                          null, null);
+                game.addPlayer(indian);
+            }
+            for (IndianSettlement template : player.getIndianSettlements()) {
+                int x = template.getTile().getX();
+                int y = template.getTile().getY();
+                Tile tile = map.getTile(x, y);
+                if (tile == null) continue;
+                UnitType skill = template.getLearnableSkill();
+                IndianSettlement settlement
+                    = new ServerIndianSettlement(game, indian,
+                        template.getName(), tile, template.isCapital(),
+                        skill, null);
+                tile.setSettlement(settlement);
+                indian.addSettlement(settlement);
+                // TODO: the template settlement might have
+                // additional owned units elsewhere on the map
+                for (Unit unit: template.getUnitList()) {
+                    UnitType t = spec.getUnitType(unit.getType().getId());
+                    Unit newUnit = new ServerUnit(game, settlement, indian, t);
+                    settlement.add(newUnit);
+                    settlement.addOwnedUnit(newUnit);
                 }
-                for (IndianSettlement template : player.getIndianSettlements()) {
-                    int x = template.getTile().getX();
-                    int y = template.getTile().getY();
-                    Tile tile = map.getTile(x, y);
-                    if (tile != null) {
-                        UnitType skill = template.getLearnableSkill();
-                        IndianSettlement settlement =
-                            new ServerIndianSettlement(game, indian, template.getName(), tile,
-                                                       template.isCapital(), skill, null);
-                        tile.setSettlement(settlement);
-                        tile.changeOwnership(player, settlement);
-                        indian.addSettlement(settlement);
-                        // TODO: the template settlement might have additional owned
-                        // units elsewhere on the map
-                        
-                        for (Unit unit: template.getUnitList()) {
-                            UnitType type = spec.getUnitType(unit.getType().getId());
-                            Unit newUnit = new ServerUnit(game, settlement, indian, type);
-                            settlement.add(newUnit);
-                            settlement.addOwnedUnit(newUnit);
-                        }
-                        for (Goods goods : template.getCompactGoods()) {
-                            GoodsType type = spec.getGoodsType(goods.getType().getId());
-                            settlement.addGoods(type, goods.getAmount());
-                        }
-                        settlement.setWantedGoods(template.getWantedGoods());
-                        hasSettlements = true;
-                    }
+                for (Goods goods : template.getCompactGoods()) {
+                    GoodsType type = spec.getGoodsType(goods.getType().getId());
+                    settlement.addGoods(type, goods.getAmount());
                 }
+                settlement.setWantedGoods(template.getWantedGoods());
+                nSettlements++;
             }
         }
 
-        if (hasSettlements) {
+        if (nSettlements > 0) {
             for (Tile template : importGame.getMap().getAllTiles()) {
-                if (template.getOwner() != null) {
-                    String nationId = template.getOwner().getNationId();
-                    Player owner = game.getPlayer(nationId);
-                    Tile tile = map.getTile(template.getX(), template.getY());
-                    if (owner != null && tile != null) {
-                        tile.setOwner(owner);
-                        if (template.getOwningSettlement() != null) {
-                            tile.setOwningSettlement(game.getSettlement(template.getOwningSettlement().getName()));
-                        }
+                if (template.getOwner() == null) continue;
+                String nationId = template.getOwner().getNationId();
+                Player owner = game.getPlayer(nationId);
+                Tile tile = map.getTile(template.getX(), template.getY());
+                if (owner != null && tile != null) {
+                    tile.setOwner(owner);
+                    if (template.getOwningSettlement() != null) {
+                        String name = template.getOwningSettlement().getName();
+                        Settlement is = game.getSettlement(name);
+                        tile.setOwningSettlement(is);
                     }
                 }
             }
         }
+        logger.info("Imported " + nSettlements + " native settlements.");
+        return nSettlements > 0;
     }
 
 
     /**
-     * Create the Indian settlements, at least a capital for every nation and
-     * random numbers of other settlements.
+     * Make the native settlements, at least a capital for every
+     * nation and random numbers of other settlements.
      *
      * @param map The <code>Map</code> to place the indian settlements on.
-     * @param players The players to create <code>Settlement</code>s
-     *       and starting locations for. That is; both indian and
-     *       european players. If players does not contain any indian players,
-     *       no settlements are added.
+     * @param importGame An optional <code>Game</code> to import
+     *     settlements from.
      */
-    private void createIndianSettlements(final Map map, List<Player> players) {
-        Specification spec = map.getGame().getSpecification();
+    private void makeNativeSettlements(final Map map, Game importGame) {
+        final boolean importSettlements = mapGeneratorOptions
+            .getBoolean(MapGeneratorOptions.IMPORT_SETTLEMENTS);
+        if (importSettlements && importGame != null) {
+            if (importIndianSettlements(map, importGame)) return;
+            // Fall through and create them
+        }
+        
+        final Game game = map.getGame();
+        final List<Player> players = game.getPlayers();
+        final Specification spec = game.getSpecification();
         float shares = 0f;
         List<IndianSettlement> settlements = new ArrayList<IndianSettlement>();
         List<Player> indians = new ArrayList<Player>();
@@ -1108,34 +1085,75 @@ public class SimpleMapGenerator implements MapGenerator {
     }
 
 
-    private class Territory {
-        public ServerRegion region;
-        public Tile tile;
-        public Player player;
-        public int numberOfSettlements;
+    // Implement MapGenerator
 
-        public Territory(Player player, Tile tile) {
-            this.player = player;
-            this.tile = tile;
+    /**
+     * {@inheritDoc}
+     */
+    public OptionGroup getMapGeneratorOptions() {
+        return mapGeneratorOptions;
+    }
+
+    /**
+     * Creates a <code>Map</code> for the given <code>Game</code>.
+     *
+     * The <code>Map</code> is added to the <code>Game</code> after
+     * it is created.
+     *
+     * @param game The game.
+     * @param landMap Determines whether there should be land
+     *                or ocean on a given tile. This array also
+     *                specifies the size of the map that is going
+     *                to be created.
+     * @see Map
+     * @see TerrainGenerator#createMap
+     */
+    public void createEmptyMap(Game game, boolean[][] landMap) {
+        terrainGenerator.createMap(game, null, landMap);
+    }
+
+    /**
+     * Creates a map given for a game.
+     *
+     * @param game The <code>Game</code> to use.
+     * @see net.sf.freecol.server.generator.MapGenerator#createMap(net.sf.freecol.common.model.Game)
+     */
+    public void createMap(Game game) throws FreeColException {
+        // Prepare imports:
+        final File importFile = ((FileOption)mapGeneratorOptions
+            .getOption(MapGeneratorOptions.IMPORT_FILE)).getValue();
+        final Game importGame;
+        if (importFile != null) {
+            Game g = null;
+            try {
+                logger.info("Importing file " + importFile.getPath());
+                g = FreeColServer.readGame(new FreeColSavegameFile(importFile),
+                    game.getSpecification(), null);
+            } catch (IOException ioe) {
+                g = null;
+            } catch (XMLStreamException xse) {
+                g = null;
+            }
+            importGame = g;
+        } else {
+            importGame = null;
         }
 
-        public Territory(Player player, ServerRegion region) {
-            this.player = player;
-            this.region = region;
+        // Create land map.
+        boolean[][] landMap;
+        if (importGame != null) {
+            landMap = LandGenerator.importLandMap(importGame);
+        } else {
+            landMap = landGenerator.createLandMap();
         }
 
-        public Tile getCenterTile(Map map) {
-            if (tile != null) return tile;
-            int[] xy = region.getCenter();
-            return map.getTile(xy[0], xy[1]);
-        }
+        // Create terrain.
+        terrainGenerator.createMap(game, importGame, landMap);
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String toString() {
-            return player + " territory at " + region.toString();
-        }
+        // Decorate the map.
+        Map map = game.getMap();
+        makeNativeSettlements(map, importGame);
+        makeLostCityRumours(map, importGame);
+        createEuropeanUnits(map, game.getPlayers());
     }
 }

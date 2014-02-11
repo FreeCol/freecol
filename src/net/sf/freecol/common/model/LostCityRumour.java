@@ -90,6 +90,7 @@ public class LostCityRumour extends TileItem {
      */
     public LostCityRumour(Game game, Tile tile, RumourType type, String name) {
         super(game, tile);
+
         this.type = type;
         this.name = name;
     }
