@@ -471,7 +471,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
 
             xw.writeAttribute(TYPE_TAG, goodsType);
 
-            xw.writeAttribute(AMOUNT_TAG, getGoodsCount(goodsType));
+            xw.writeAttribute(AMOUNT_TAG, storage.get(goodsType));
 
             xw.writeEndElement();
         }
@@ -545,13 +545,19 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      */
     public String toString() {
         StringBuilder sb = new StringBuilder(128);
-        sb.append("[").append(getId()).append(" ");
+        sb.append("[").append(getId()).append(" [");
         for (Map.Entry<GoodsType, Integer> entry : storedGoods.entrySet()) {
             sb.append(entry.getKey()).append("=").append(entry.getValue())
                 .append(", ");
         }
         sb.setLength(sb.length() - 2);
-        sb.append("]");
+        sb.append("][");
+        for (Map.Entry<GoodsType, Integer> entry : oldStoredGoods.entrySet()) {
+            sb.append(entry.getKey()).append("=").append(entry.getValue())
+                .append(", ");
+        }
+        sb.setLength(sb.length() - 2);
+        sb.append("]]");
         return sb.toString();
     }
 
