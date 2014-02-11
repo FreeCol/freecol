@@ -178,6 +178,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         this.name = name;
         this.admin = admin;
+        this.immigration = 0;
         if (nation != null && nation.getType() != null) {
             this.nationType = nation.getType();
             this.nationId = nation.getId();
@@ -200,6 +201,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 initializeHighSeas();
                 if (this.playerType == PlayerType.COLONIAL) {
                     this.monarch = new Monarch(game, this, nation.getRulerNameKey());
+                    // In BR#2615 misiulo reports that Col1 players start
+                    // with 2 crosses.  This is surprising, but you could
+                    // argue that some level of religious unrest might
+                    // contribute to the fact there is an expedition to
+                    // the new world underway.
+                    this.immigration = spec.getInteger(GameOptions.PLAYER_IMMIGRATION_BONUS);
                 }
                 this.gold = 0;
             } else { // indians
@@ -217,11 +224,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
             this.gold = 0;
         }
         this.market = new Market(getGame(), this);
-        // In BR#2615 misiulo reports that Col1 players start with 2
-        // crosses.  This is surprising, but you could argue that some
-        // level of religious unrest might contribute to the fact
-        // there is an expedition to the new world underway.
-        this.immigration = spec.getInteger(GameOptions.PLAYER_IMMIGRATION_BONUS);
         this.liberty = 0;
         this.currentFather = null;
 
