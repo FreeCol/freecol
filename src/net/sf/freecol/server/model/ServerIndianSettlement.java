@@ -173,22 +173,25 @@ public class ServerIndianSettlement extends IndianSettlement
             = spec.getUnitTypesWithAbility(Ability.BORN_IN_INDIAN_SETTLEMENT);
         if (!unitTypes.isEmpty()
             && (getGoodsCount(foodType) + 4 * getGoodsCount(rumType)
-                > FOOD_PER_COLONIST + KEEP_RAW_MATERIAL)
-            && ownedUnits.size() <= getType().getMaximumSize()) {
-            // Allow one more brave than the initially generated number.
-            // This is more than sufficient. Do not increase the amount
-            // without discussing it on the developer's mailing list first.
-            UnitType type = Utils.getRandomMember(logger, "Choose birth",
-                                                  unitTypes, random);
-            Unit unit = new ServerUnit(getGame(), getTile(), owner,
-                                       type);//-vis: safe within settlement
+                > FOOD_PER_COLONIST + KEEP_RAW_MATERIAL)) {
+            if (ownedUnits.size() <= getType().getMaximumSize()) {
+                // Allow one more brave than the initially generated
+                // number.  This is more than sufficient. Do not
+                // increase the amount without discussing it on the
+                // developer's mailing list first.
+                UnitType type = Utils.getRandomMember(logger, "Choose birth",
+                                                      unitTypes, random);
+                Unit unit = new ServerUnit(getGame(), getTile(), owner,
+                                           type);//-vis: safe within settlement
+                consumeGoods(rumType, FOOD_PER_COLONIST/4);
+                // New units quickly go out of their city and start annoying.
+                addOwnedUnit(unit);
+                unit.setHomeIndianSettlement(this);
+                logger.info("New native created in " + getName()
+                    + ": " + unit.getId());
+            }
+            // Consume the food anyway
             consumeGoods(foodType, FOOD_PER_COLONIST);
-            consumeGoods(rumType, FOOD_PER_COLONIST/4);
-            // New units quickly go out of their city and start annoying.
-            addOwnedUnit(unit);
-            unit.setHomeIndianSettlement(this);
-            logger.info("New native created in " + getName()
-                        + ": " + unit.getId());
         }
 
         // Try to breed horses

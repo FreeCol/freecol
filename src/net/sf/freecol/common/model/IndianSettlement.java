@@ -96,6 +96,9 @@ public class IndianSettlement extends Settlement {
             }
         };
 
+    /** The production fudge factor. */
+    public static final double NATIVE_PRODUCTION_EFFICIENCY = 0.67;
+
     /** The maximum number of wanted goods. */
     public static final int WANTED_GOODS_COUNT = 3;
 
@@ -1152,6 +1155,13 @@ public class IndianSettlement extends Settlement {
         // efficiency.
         if (tiles > getUnitCount()) {
             potential *= (float) getUnitCount() / tiles;
+        }
+
+        // Raw production is too generous, apply a fudge factor to reduce it
+        // a bit for the non-food cases.
+        if (!type.isFoodType()) {
+            potential = (int)Math.round(potential
+                * NATIVE_PRODUCTION_EFFICIENCY);
         }
 
         // But always add full potential of the center tile.
