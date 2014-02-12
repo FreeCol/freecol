@@ -62,6 +62,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsTradeItem;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.InciteTradeItem;
 import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
@@ -390,6 +391,119 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         }
     }
 
+    private class InciteTradeItemPanel extends JPanel
+        implements ActionListener {
+
+        private class InciteBoxRenderer extends JLabel
+            implements ListCellRenderer {
+
+            public Component getListCellRendererComponent(JList list,
+                Object value, int index, boolean isSelected,
+                boolean cellHasFocus) {
+                Player victim = (Player)value;
+                setText((victim == null) ? ""
+                    : Messages.message(victim.getNationName()));
+                return this;
+            }
+        }
+
+        private final Player source;
+        private final Player other;
+        private JComboBox victimBox;
+        private JLabel label;
+        private JButton clearButton, addButton;
+        private final List<Player> available = new ArrayList<Player>();
+
+
+        /**
+         * Creates a new <code>InciteTradeItemPanel</code> instance.
+         *
+         * @param source The <code>Player</code> that is trading.
+         * @param other The <code>Player</code> negotiated with.
+         */
+        @SuppressWarnings("unchecked") // FIXME in Java7
+        public InciteTradeItemPanel(Player source, Player other) {
+            this.source = source;
+            this.other = other;
+            this.victimBox = new JComboBox(new DefaultComboBoxModel());
+            this.victimBox.setRenderer(new InciteBoxRenderer());
+            this.clearButton
+                = new JButton(Messages.message("negotiationDialog.clear"));
+            this.clearButton.addActionListener(this);
+            this.clearButton.setActionCommand("clear");
+            this.addButton
+                = new JButton(Messages.message("negotiationDialog.add"));
+            this.addButton.addActionListener(this);
+            this.addButton.setActionCommand("add");
+            this.label = new JLabel(Messages.message("tradeItem.incite"));
+
+            setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(Color.BLACK),
+                    BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+            setLayout(new MigLayout("wrap 1", "", ""));
+
+            available.clear();
+            for (Player p : getGame().getPlayers()) {
+                if (p == this.source || p == this.other || p.isDead()
+                    || this.source.getStance(p) == Stance.ALLIANCE
+                    || this.source.getStance(p) == Stance.WAR) continue;
+                available.add(p);
+            }
+
+            add(this.label);
+            add(this.victimBox);
+            add(this.clearButton, "split 2");
+            add(this.addButton);
+
+            setSize(getPreferredSize());
+        }
+
+
+        @SuppressWarnings("unchecked") // FIXME in Java7
+        public void update(DiplomaticTrade dt) {
+            // Remove all action listeners, so the update has no
+            // effect (except updating the list).
+            ActionListener[] listeners = this.victimBox.getActionListeners();
+            for (ActionListener al : listeners) {
+                this.victimBox.removeActionListener(al);
+            }
+
+            this.victimBox.removeAllItems();
+            for (Player p : available) victimBox.addItem(p);
+
+            boolean enable = !available.isEmpty();
+            this.label.setEnabled(enable);
+            this.clearButton.setEnabled(!enable);
+            this.addButton.setEnabled(enable);
+            this.victimBox.setEnabled(enable);
+
+            for (ActionListener al : listeners) {
+                this.victimBox.addActionListener(al);
+            }
+        }
+
+
+        // Implement ActionListener
+
+        /**
+         * {@inheritDoc}
+         */
+        public void actionPerformed(ActionEvent event) {
+            final String command = event.getActionCommand();
+            if (command.equals("add")) {
+                Player victim = (Player)victimBox.getSelectedItem();
+                if (victim != null) {
+                    DiplomaticTradeDialog.this.addInciteTradeItem(source, victim);
+                }
+            } else if (command.equals("clear")) {
+                DiplomaticTradeDialog.this
+                    .removeTradeItems(InciteTradeItem.class);
+            } else {
+                logger.warning("Bad command: " + command);
+            }
+        }
+    }
+
     /**
      * Class for the stance trade panel.  Access needs to be public so
      * that comboBoxLabel() is externally visible.
@@ -624,6 +738,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
     private GoldTradeItemPanel goldOfferPanel, goldDemandPanel;
     private ColonyTradeItemPanel colonyOfferPanel, colonyDemandPanel;
     private GoodsTradeItemPanel goodsOfferPanel, goodsDemandPanel;
+    private InciteTradeItemPanel inciteOfferPanel, inciteDemandPanel;
     private UnitTradeItemPanel unitOfferPanel, unitDemandPanel;
 
     /** A panel showing a summary of the current agreement. */
@@ -701,12 +816,16 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
                 tutorial = Messages.message("negotiationDialog.contact.tutorial");
             }
             this.stancePanel = new StanceTradeItemPanel(player, otherPlayer);
+            this.inciteOfferPanel = new InciteTradeItemPanel(player, otherPlayer);
+            this.inciteDemandPanel = new InciteTradeItemPanel(otherPlayer, player);
             break;
         case DIPLOMATIC:
             this.stancePanel = new StanceTradeItemPanel(player, otherPlayer);
             this.colonyDemandPanel = new ColonyTradeItemPanel(otherPlayer);
             this.colonyOfferPanel = new ColonyTradeItemPanel(player);
             this.goodsDemandPanel = this.goodsOfferPanel = null;
+            this.inciteOfferPanel = new InciteTradeItemPanel(player, otherPlayer);
+            this.inciteDemandPanel = new InciteTradeItemPanel(otherPlayer, player);
             this.unitOfferPanel = this.unitDemandPanel = null;
             break;
         case TRADE:
@@ -722,6 +841,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
                 }
             }
             this.goodsOfferPanel = new GoodsTradeItemPanel(player, goods);
+            this.inciteOfferPanel = this.inciteDemandPanel = null;
             this.unitDemandPanel = new UnitTradeItemPanel(otherPlayer,
                                                           getUnitUnitList(null));
             this.unitOfferPanel = new UnitTradeItemPanel(player,
@@ -732,6 +852,8 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             this.stancePanel = new StanceTradeItemPanel(player, otherPlayer);
             this.colonyDemandPanel = this.colonyOfferPanel = null;
             this.goodsDemandPanel = this.goodsOfferPanel = null;
+            this.inciteOfferPanel = new InciteTradeItemPanel(player, otherPlayer);
+            this.inciteDemandPanel = new InciteTradeItemPanel(otherPlayer, player);
             this.unitOfferPanel = this.unitDemandPanel = null;
             break;
         default:
@@ -766,6 +888,10 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         if (this.goodsDemandPanel != null) {
             panel.add(this.goodsDemandPanel);
             panel.add(this.goodsOfferPanel);
+        }
+        if (this.inciteDemandPanel != null) {
+            panel.add(this.inciteDemandPanel);
+            panel.add(this.inciteOfferPanel);
         }
         if (this.unitDemandPanel != null) {
             panel.add(this.unitDemandPanel);
@@ -876,6 +1002,12 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         }
         if (this.goodsDemandPanel != null) {
             this.goodsDemandPanel.update(agreement);
+        }
+        if (this.inciteOfferPanel != null) {
+            this.inciteOfferPanel.update(agreement);
+        }
+        if (this.inciteDemandPanel != null) {
+            this.inciteDemandPanel.update(agreement);
         }
         if (this.unitOfferPanel != null) {
             this.unitOfferPanel.update(agreement);
@@ -994,6 +1126,21 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
     }
 
     /**
+     * Add an <code>InciteTradeItem</code> to the list of trade items.
+     *
+     * @param source The source <code>Player</code>.
+     * @param victim The <code>Player</code> to be attacked.
+     */
+    public void addInciteTradeItem(Player source, Player victim) {
+        final Player player = getMyPlayer();
+
+        Player destination = (source == otherPlayer) ? player : otherPlayer;
+        agreement.add(new InciteTradeItem(getGame(), source, destination,
+                                          victim));
+        updateDialog();
+    }
+
+    /**
      * Trade a stance change between the players.
      *
      * @param stance The <code>Stance</code> to trade.
@@ -1037,6 +1184,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         this.goldOfferPanel = this.goldDemandPanel = null;
         this.colonyOfferPanel = this.colonyDemandPanel = null;
         this.goodsOfferPanel = this.goodsDemandPanel = null;
+        this.inciteOfferPanel = this.inciteDemandPanel = null;
         this.unitOfferPanel = this.unitDemandPanel = null;
         this.summary = null;
         this.demandMessage = this.offerMessage = this.exchangeMessage = null;

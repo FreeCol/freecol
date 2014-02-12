@@ -183,6 +183,13 @@ public abstract class TradeItem extends FreeColObject {
     public void setGold(int gold) {}
 
     /**
+     * Get the victim player to incite war against.
+     *
+     * @return The <code>Player</code> to trade.
+     */
+    public Player getVictim() { return null; }
+
+    /**
      * Get the stance to trade.
      *
      * @return The <code>Stance</code> to trade.

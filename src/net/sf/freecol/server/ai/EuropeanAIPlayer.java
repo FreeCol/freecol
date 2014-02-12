@@ -53,6 +53,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsTradeItem;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HistoryEvent;
+import net.sf.freecol.common.model.InciteTradeItem;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
@@ -1968,6 +1969,12 @@ public class EuropeanAIPlayer extends AIPlayer {
 
     // Diplomacy support
 
+    private double getStrengthRatio(Player other) {
+        NationSummary ns = AIMessage.askGetNationSummary(this, other);
+        int strength = NationSummary.calculateStrength(getPlayer(), false);
+        return (double)strength / (strength + ns.getMilitaryStrength());
+    }
+
     private int evaluateColony(Colony colony) {
         if (getPlayer().getEurope() == null) return Integer.MIN_VALUE;
 
@@ -2161,11 +2168,49 @@ public class EuropeanAIPlayer extends AIPlayer {
                     value = gold;
                 }
 
+            } else if (item instanceof ColonyTradeItem) {
+                if (item.getSource() == player) {
+                    if (player.getNumberOfSettlements() < 5) {
+                        value = Integer.MIN_VALUE;
+                    } else {
+                        value = -evaluateColony(item.getColony());
+                    }
+                } else {
+                    value = evaluateColony(item.getColony());
+                }
+
+            } else if (item instanceof GoodsTradeItem) {
+                Goods goods = ((GoodsTradeItem)item).getGoods();
+                if (item.getSource() == player) {
+                    value = -market.getBidPrice(goods.getType(),
+                                                goods.getAmount());
+                } else {
+                    value = market.getSalePrice(goods.getType(),
+                                                goods.getAmount());
+                }
+
+            } else if (item instanceof InciteTradeItem) {
+                // TODO, rebalance this
+                Player victim = item.getVictim();
+                switch (player.getStance(victim)) {
+                case ALLIANCE:
+                    value = -1;
+                    break;
+                case WAR: // Not invalid, other player may not know our stance
+                    value = 0;
+                    break;
+                default:
+                    double ratio = getStrengthRatio(victim);
+                    if (item.getSource() == player) {
+                        value = -(int)Math.round(30 * ratio);
+                    } else {
+                        value = (int)Math.round(30 * ratio);
+                    }
+                    break;
+                }
+
             } else if (item instanceof StanceTradeItem) {
-                NationSummary ns = AIMessage.askGetNationSummary(this, other);
-                int strength = NationSummary.calculateStrength(player, false);
-                double ratio = (double)strength
-                    / (strength + ns.getMilitaryStrength());
+                double ratio = getStrengthRatio(other);
                 // TODO: evaluate whether we want this stance change
                 Stance stance = ((StanceTradeItem)item).getStance();
                 switch (stance) {
@@ -2205,17 +2250,6 @@ public class EuropeanAIPlayer extends AIPlayer {
                     break;
                 }
 
-            } else if (item instanceof ColonyTradeItem) {
-                if (item.getSource() == player) {
-                    if (player.getNumberOfSettlements() < 5) {
-                        value = Integer.MIN_VALUE;
-                    } else {
-                        value = -evaluateColony(item.getColony());
-                    }
-                } else {
-                    value = evaluateColony(item.getColony());
-                }
-
             } else if (item instanceof UnitTradeItem) {
                 if (item.getSource() == player) {
                     if (player.getUnits().size() < 10) {
@@ -2227,15 +2261,6 @@ public class EuropeanAIPlayer extends AIPlayer {
                     value = evaluateUnit(item.getUnit());
                 }
 
-            } else if (item instanceof GoodsTradeItem) {
-                Goods goods = ((GoodsTradeItem)item).getGoods();
-                if (item.getSource() == player) {
-                    value = -market.getBidPrice(goods.getType(),
-                                                goods.getAmount());
-                } else {
-                    value = market.getSalePrice(goods.getType(),
-                                                goods.getAmount());
-                }
             } else {
                 throw new RuntimeException("Bogus item: " + item);
             }

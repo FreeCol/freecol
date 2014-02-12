@@ -3082,6 +3082,11 @@ public final class InGameController extends Controller {
                     cs.add(See.only(source), settlement.getGoodsContainer());
                 }
             }
+            ServerPlayer victim = (ServerPlayer)tradeItem.getVictim();
+            if (victim != null
+                && !source.csChangeStance(Stance.WAR, victim, true, cs)) {
+                logger.warning("Incite trade failure: " + victim);
+            }                
             ServerUnit newUnit = (ServerUnit)tradeItem.getUnit();
             if (newUnit != null && settlement != null) {
                 ServerPlayer former = (ServerPlayer)newUnit.getOwner();

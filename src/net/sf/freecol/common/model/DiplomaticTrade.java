@@ -352,6 +352,20 @@ public class DiplomaticTrade extends FreeColObject {
     }
 
     /**
+     * Get the player being incited against.
+     *
+     * @return The <code>Player</code> to be incited against.
+     */
+    public Player getVictim() {
+        for (TradeItem ti : items) {
+            if (ti instanceof InciteTradeItem) {
+                return ((InciteTradeItem)ti).getVictim();
+            }
+        }
+        return null;
+    }
+
+    /**
      * Get a list of units offered in this trade.
      *
      * @return A list of <code>Unit</code>s offered in this trade.
@@ -468,6 +482,9 @@ public class DiplomaticTrade extends FreeColObject {
 
         } else if (GoodsTradeItem.getXMLElementTagName().equals(tag)) {
             add(new GoodsTradeItem(game, xr));
+
+        } else if (InciteTradeItem.getXMLElementTagName().equals(tag)) {
+            add(new InciteTradeItem(game, xr));
 
         } else if (StanceTradeItem.getXMLElementTagName().equals(tag)) {
             add(new StanceTradeItem(game, xr));
