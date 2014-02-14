@@ -1398,11 +1398,13 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Is this player bankrupt?
+     * Get the bankruptcy state.
+     *
+     * isBankrupt would be nicer, but the introspector expects getBankrupt.
      *
      * @return True if this player is bankrupt.
      */
-    public final boolean isBankrupt() {
+    public final boolean getBankrupt() {
         return bankrupt;
     }
 

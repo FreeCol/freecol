@@ -1324,7 +1324,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
         if (getGold() >= upkeep) {
             modifyGold(-upkeep);
-            if (isBankrupt()) {
+            if (getBankrupt()) {
                 setBankrupt(false);
                 // the only effects of a disaster that can be reversed
                 // are the modifiers
@@ -1339,7 +1339,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
         } else {
             modifyGold(-getGold());
-            if (!isBankrupt()) {
+            if (!getBankrupt()) {
                 setBankrupt(true);
                 csApplyDisaster(random, cs, null, bankruptcy);
                 cs.addMessage(See.only(this),
