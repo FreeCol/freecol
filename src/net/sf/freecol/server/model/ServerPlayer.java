@@ -1341,7 +1341,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             modifyGold(-getGold());
             if (!getBankrupt()) {
                 setBankrupt(true);
-                csApplyDisaster(random, cs, null, bankruptcy);
+                csApplyDisaster(random, null, bankruptcy, cs);
                 cs.addMessage(See.only(this),
                               new ModelMessage(ModelMessage.MessageType.GOVERNMENT_EFFICIENCY,
                                                "model.disaster.bankruptcy.start", this));
@@ -1366,11 +1366,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     Disaster disaster = RandomChoice
                         .getWeightedRandom(logger, "select disaster", disasters,
                                            random);
-                    List<ModelMessage> messages = csApplyDisaster(random, cs, colony, disaster);
+                    List<ModelMessage> messages = csApplyDisaster(random,
+                        colony, disaster, cs);
                     if (!messages.isEmpty()) {
                         cs.addMessage(See.only(this),
                                       new ModelMessage(ModelMessage.MessageType.DEFAULT,
-                                                       "model.disaster.strikes", this)
+                                                       "model.disaster.strikes", colony)
                                       .addName("%colony%", colony.getName())
                                       .addName("%disaster%", disaster));
                         for (ModelMessage message : messages) {
@@ -1392,34 +1393,45 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * returned list is empty.
      *
      * @param random A <code>Random</code> number source.
-     * @param cs A <code>ChangeSet</code> to update.
      * @param colony A <code>Colony</code>, or <code>null</code>.
      * @param disaster A <code>Disaster</code> value.
+     * @param cs A <code>ChangeSet</code> to update.
      * @return A list of <code>ModelMessage</code>s, possibly empty.
      */
-    public List<ModelMessage> csApplyDisaster(Random random, ChangeSet cs, Colony colony, Disaster disaster) {
-        logger.finest("Applying effects of disaster " + disaster.getId());
+    public List<ModelMessage> csApplyDisaster(Random random, Colony colony,
+                                              Disaster disaster, ChangeSet cs) {
+        StringBuffer sb = new StringBuffer(64);
+        sb.append("Applying ").append(disaster.getNumberOfEffects())
+            .append(" effect/s of disaster ")
+            .append(Messages.getName(disaster))
+            .append(" to ").append(colony.getName())
+            .append(":");
         List<Effect> effects = new ArrayList<Effect>();
-        switch(disaster.getNumberOfEffects()) {
+        switch (disaster.getNumberOfEffects()) {
         case ONE:
-            effects.add(RandomChoice.getWeightedRandom(logger, "Get effects of disaster",
-                                                       disaster.getEffects(),
-                                                       random));
+            effects.add(RandomChoice.getWeightedRandom(logger,
+                    "Get effect of disaster", disaster.getEffects(), random));
+            sb.append(" ").append(Messages.getName(effects.get(0)));
             break;
         case SEVERAL:
             for (RandomChoice<Effect> effect : disaster.getEffects()) {
                 if (Utils.randomInt(logger, "Get effects of disaster", random, 100)
                     < effect.getProbability()) {
                     effects.add(effect.getObject());
+                    sb.append(" ").append(Messages.getName(effect.getObject()));
                 }
             }
             break;
         case ALL:
             for (RandomChoice<Effect> effect : disaster.getEffects()) {
                 effects.add(effect.getObject());
+                sb.append(" ").append(Messages.getName(effect.getObject()));
             }
         }
+        if (effects.isEmpty()) sb.append(" All avoided");
+        logger.fine(sb.toString());
 
+        boolean colonyDirty = false;
         List<ModelMessage> messages = new ArrayList<ModelMessage>();
         for (Effect effect : effects) {
             if (colony == null) {
@@ -1440,8 +1452,18 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     modifyGold(-plunder);
                     cs.addPartial(See.only(this), this, "gold");
                     messages.add(new ModelMessage(ModelMessage.MessageType.DEFAULT,
-                                                  effect.getId(), this)
-                                 .addAmount("%amount%", plunder));
+                            effect.getId(), this)
+                        .addAmount("%amount%", plunder));
+                } else if (Effect.LOSS_OF_BUILDING.equals(effect.getId())) {
+                    Building building = getBuildingForEffect(colony, effect, random);
+                    if (building != null) {
+                        // Add message before damaging building
+                        messages.add(new ModelMessage(ModelMessage.MessageType.DEFAULT,
+                                effect.getId(), colony)
+                            .add("%building%", building.getType().getNameKey()));
+                        csDamageBuilding(building, cs);
+                        colonyDirty = true;
+                    }
                 } else if (Effect.LOSS_OF_GOODS.equals(effect.getId())) {
                     Goods goods = Utils.getRandomMember(logger, "select goods",
                                                         colony.getLootableGoodsList(), random);
@@ -1449,26 +1471,27 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         goods.setAmount(Math.min(goods.getAmount() / 2, 50));
                         colony.removeGoods(goods);
                         messages.add(new ModelMessage(ModelMessage.MessageType.DEFAULT,
-                                                      effect.getId(), this)
-                                     .addAmount("%amount%", goods.getAmount())
-                                     .add("%goods%", goods.getType().getNameKey()));
-                        
+                                effect.getId(), colony)
+                            .addStringTemplate("%goods%", goods.getLabel(true)));
+                        colonyDirty = true;
                     }
                 } else if (Effect.LOSS_OF_UNIT.equals(effect.getId())) {
                     Unit unit = getUnitForEffect(colony, effect, random);
                     if (unit != null) {
                         if (colony.getUnitCount() == 1) {
+                            messages.clear();
                             messages.add(new ModelMessage(ModelMessage.MessageType.DEFAULT,
-                                                          "model.disaster.effect.colonyDestroyed", this)
-                                         .addName("%colony%", colony));
+                                    "model.disaster.effect.colonyDestroyed", this)
+                                .addName("%colony%", colony.getName()));
                             csDisposeSettlement(colony, cs);
-                        } else {
-                            messages.add(new ModelMessage(ModelMessage.MessageType.DEFAULT,
-                                                          effect.getId(), this)
-                                         .add("%unit%", unit.getType().getNameKey()));
-                            cs.addDispose(See.only(this), null,
-                                unit);//-vis: Safe, entirely within colony
+                            colonyDirty = false;
+                            break; // No point proceeding
                         }
+                        messages.add(new ModelMessage(ModelMessage.MessageType.DEFAULT,
+                                effect.getId(), colony)
+                            .addStringTemplate("%unit%", unit.getLabel()));
+                        cs.addDispose(See.only(this), null, unit);//-vis: Safe, entirely within colony
+                        colonyDirty = true;
                     }
                 } else if (Effect.DAMAGED_UNIT.equals(effect.getId())) {
                     Unit unit = getUnitForEffect(colony, effect, random);
@@ -1476,19 +1499,20 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         Location repairLocation = unit.getRepairLocation();
                         if (repairLocation == null) {
                             messages.add(new ModelMessage(ModelMessage.MessageType.DEFAULT,
-                                                          "model.disaster.effect.lossOfUnit", this)
-                                         .add("%unit%", unit.getType().getNameKey()));
+                                    "model.disaster.effect.lossOfUnit", colony)
+                                .addStringTemplate("%unit%", unit.getLabel()));
                             csSinkShip(unit, null, cs);
                         } else {
                             messages.add(new ModelMessage(ModelMessage.MessageType.DEFAULT,
-                                                          effect.getId(), this)
-                                         .addName("%unit%", unit));
+                                    effect.getId(), colony)
+                                .addStringTemplate("%unit%", unit.getLabel()));
                             csDamageShip(unit, repairLocation, cs);
                         }
+                        colonyDirty = true;
                     }
                 } else {
                     messages.add(new ModelMessage(ModelMessage.MessageType.DEFAULT,
-                                                  effect.getId(), this));
+                                                  effect.getId(), colony));
                     for (Modifier modifier : effect.getModifierSet()) {
                         if (modifier.getDuration() > 0) {
                             Modifier timedModifier = Modifier
@@ -1497,11 +1521,20 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         } else {
                             cs.addFeatureChange(this, colony, modifier, true);
                         }
+                        colonyDirty = true;
                     }
                 }
             }
         }
+        if (colonyDirty) cs.add(See.perhaps(), colony);
         return messages;
+    }
+
+    public Building getBuildingForEffect(Colony colony, Effect effect, Random random) {
+        List<Building> buildings = colony.getBurnableBuildings();
+        if (buildings.isEmpty()) return null;
+        return Utils.getRandomMember(logger, "Select building for effect",
+                                     buildings, random);
     }
 
     public Unit getUnitForEffect(Colony colony, Effect effect, Random random) {
@@ -1511,11 +1544,14 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 units.add(unit);
             }
         }
-        if (units.isEmpty()) {
-            return null;
-        } else {
-            return Utils.getRandomMember(logger, "select unit", units, random);
+        for (Unit unit : colony.getTile().getUnitList()) {
+            if (effect.appliesTo(unit.getType())) {
+                units.add(unit);
+            }
         }
+        if (units.isEmpty()) return null;
+        return Utils.getRandomMember(logger, "Select unit for effect",
+                                     units, random);
     }
 
     /**

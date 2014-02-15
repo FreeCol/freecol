@@ -470,8 +470,12 @@ public final class FeatureContainer {
             synchronized (abilities) {
                 for (Entry<String, Set<Ability>> entry : ca) {
                     Set<Ability> abilitySet = abilities.get(entry.getKey());
-                    if (abilitySet != null) {
-                        abilitySet.removeAll(entry.getValue());
+                    if (abilitySet == null) continue;
+                    for (Ability a : new HashSet<Ability>(abilitySet)) {
+                        if (a.getSource() == fco) {
+                            abilitySet.remove(a);
+System.err.println("REMOVED ABILITY " +a + " of " + fco + " from " + this);
+                        }
                     }
                 }
             }
@@ -482,8 +486,12 @@ public final class FeatureContainer {
             synchronized (modifiers) {
                 for (Entry<String, Set<Modifier>> entry : cm) {
                     Set<Modifier> modifierSet = modifiers.get(entry.getKey());
-                    if (modifierSet != null) {
-                        modifierSet.removeAll(entry.getValue());
+                    if (modifierSet == null) continue;
+                    for (Modifier m : new HashSet<Modifier>(modifierSet)) {
+                        if (m.getSource() == fco) {
+                            modifierSet.remove(m);
+System.err.println("REMOVED MODIFIER " + m + " of " + fco + " from " + this);
+                        }
                     }
                 }
             }

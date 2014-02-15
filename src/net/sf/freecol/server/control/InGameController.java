@@ -51,6 +51,7 @@ import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
+import net.sf.freecol.common.model.Disaster;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Europe.MigrationType;
@@ -302,6 +303,32 @@ public final class InGameController extends Controller {
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
         owner.invalidateCanSeeTiles();//+vis(owner)
         sendToAll(cs);
+    }
+
+    /**
+     * Apply a disaster to a colony.  Public for DebugUtils.
+     *
+     * @param colony The <code>Colony</code> to apply the disaster to.
+     * @param disaster The <code>Disaster</code> to apply.
+     * @return The number of messages generated.
+     */
+    public int debugApplyDisaster(ServerColony colony, Disaster disaster) {
+        ChangeSet cs = new ChangeSet();
+        ServerPlayer owner = (ServerPlayer)colony.getOwner();
+        List<ModelMessage> messages
+            = owner.csApplyDisaster(random, colony, disaster, cs);
+        if (!messages.isEmpty()) {
+            cs.addMessage(See.all(),
+                new ModelMessage(ModelMessage.MessageType.DEFAULT,
+                    "model.disaster.strikes", owner)
+                .addName("%colony%", colony.getName())
+                .addName("%disaster%", disaster));
+            for (ModelMessage message : messages) {
+                cs.addMessage(See.all(), message);
+            }
+            sendToAll(cs);
+        }
+        return messages.size();
     }
 
     /**

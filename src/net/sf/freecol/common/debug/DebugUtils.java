@@ -51,6 +51,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter.WriteScope;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Disaster;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -77,6 +78,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.BooleanOption;
+import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIColony;
@@ -426,7 +428,52 @@ public class DebugUtils {
     }
 
     /**
-     * Debug action to change ownership of a settlement.
+     * Debug action to apply a disaster to a colony.
+     *
+     * Called from tile popup menu.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param colony The <code>Colony</code> to apply a disaster to.
+     */
+    public static void applyDisaster(final FreeColClient freeColClient,
+                                     final Colony colony) {
+        final GUI gui = freeColClient.getGUI();
+        List<RandomChoice<Disaster>> disasters = colony.getDisasters();
+        if (disasters.isEmpty()) {
+            gui.showErrorMessage(null, "No disasters available for "
+                + colony.getName());
+            return;
+        }
+        List<ChoiceItem<Disaster>> choices
+            = new ArrayList<ChoiceItem<Disaster>>();
+        for (RandomChoice<Disaster> rc : disasters) {
+            String label = Messages.getName(rc.getObject())
+                + " " + Integer.toString(rc.getProbability());
+            choices.add(new ChoiceItem<Disaster>(label, rc.getObject()));
+        }
+        Disaster disaster = gui.showChoiceDialog(true, null, "Select disaster",
+                                                 null, "cancel", choices);
+        if (disaster == null) return;
+
+        final Player player = colony.getOwner();
+        final FreeColServer server = freeColClient.getFreeColServer();
+        final Game sGame = server.getGame();
+        final ServerColony sColony = sGame.getFreeColGameObject(colony.getId(),
+            ServerColony.class);
+        final ServerPlayer sPlayer = sGame.getFreeColGameObject(player.getId(),
+            ServerPlayer.class);
+        final Disaster sDisaster = sGame.getSpecification()
+            .getDisaster(disaster.getId());
+        if (server.getInGameController().debugApplyDisaster(sColony, sDisaster)
+            <= 0) {
+            gui.showErrorMessage(null, "Disaster " + Messages.getName(disaster)
+                + " avoided.");
+        }
+        freeColClient.getInGameController().nextModelMessage();
+    }
+
+    /**
+     * Debug action to change ownership of a colony.
      *
      * Called from tile popup menu.
      *

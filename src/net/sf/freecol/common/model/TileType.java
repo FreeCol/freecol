@@ -581,9 +581,11 @@ public final class TileType extends FreeColGameObjectType {
         final String tag = xr.getLocalName();
 
         if (DISASTER_TAG.equals(tag)) {
-            addDisaster(xr.getType(spec, ID_ATTRIBUTE_TAG,
-                                   Disaster.class, (Disaster)null),
-                        xr.getAttribute(PROBABILITY_TAG, 100));
+            Disaster d = xr.getType(spec, ID_ATTRIBUTE_TAG,
+                                    Disaster.class, (Disaster)null);
+            if (d != null) {
+                addDisaster(d, xr.getAttribute(PROBABILITY_TAG, 100));
+            }
             xr.closeTag(DISASTER_TAG);
 
         } else if (GEN_TAG.equals(tag)) {

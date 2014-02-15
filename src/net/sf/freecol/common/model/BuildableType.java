@@ -192,7 +192,7 @@ public abstract class BuildableType extends FreeColGameObjectType {
      * @return True if goods are required to build this buildable.
      */
     public boolean needsGoodsToBuild() {
-        return requiredGoods != null && !requiredGoods.isEmpty();
+        return !getRequiredGoods().isEmpty();
     }
 
     /**

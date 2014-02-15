@@ -43,7 +43,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 public class Effect extends FreeColGameObjectType {
 
     public static final String DAMAGED_UNIT
-        = "model.disaster.effect.damageUnit";
+        = "model.disaster.effect.damagedUnit";
     public static final String LOSS_OF_UNIT
         = "model.disaster.effect.lossOfUnit";
     public static final String LOSS_OF_MONEY
@@ -52,6 +52,8 @@ public class Effect extends FreeColGameObjectType {
         = "model.disaster.effect.lossOfGoods";
     public static final String LOSS_OF_TILE_PRODUCTION
         = "model.disaster.effect.lossOfTileProduction";
+    public static final String LOSS_OF_BUILDING
+        = "model.disaster.effect.lossOfBuilding";
     public static final String LOSS_OF_BUILDING_PRODUCTION
         = "model.disaster.effect.lossOfBuildingProduction";
 

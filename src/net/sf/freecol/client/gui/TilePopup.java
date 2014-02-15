@@ -285,6 +285,14 @@ public final class TilePopup extends JPopupMenu {
                     }
                 });
             add(displayColonyPlan);
+
+            JMenuItem applyDisaster = new JMenuItem("Apply Disaster");
+            applyDisaster.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent event) {
+                        DebugUtils.applyDisaster(freeColClient, colony);
+                    }
+                });
+            add(applyDisaster);
         }
         if (tile.getIndianSettlement() != null) {
             JMenuItem displayGoods = new JMenuItem("Examine Settlement");
