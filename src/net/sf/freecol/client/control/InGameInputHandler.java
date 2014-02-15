@@ -652,10 +652,8 @@ public final class InGameInputHandler extends InputHandler {
                 }
             });
         SwingUtilities.invokeLater(updateMenuBarRunnable);
-        DiplomaticTrade dt = message.getAgreement();
-        if (dt == null) return null;
-        dt.incrementVersion();
-        return message.toXMLElement();
+        return (message.getAgreement() == null) ? null
+            : message.toXMLElement();
     }
 
     /**

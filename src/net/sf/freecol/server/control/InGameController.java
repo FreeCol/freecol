@@ -3206,6 +3206,7 @@ public final class InGameController extends Controller {
             status = TradeStatus.REJECT_TRADE;
             agreement.setStatus(status);
         }
+        agreement.incrementVersion();
 
         // Process the result.  Always return true here as the serverPlayer
         // needs to be informed of the other player's response.
@@ -3217,12 +3218,10 @@ public final class InGameController extends Controller {
             agreement = session.getAgreement(); // Accept offered agreement
             agreement.setStatus(status);
             csAcceptTrade(agreement, session, cs);
-            session.complete(cs);
             sendToOthers(serverPlayer, cs);
             break;
         case REJECT_TRADE: default:
             session.setAgreement(agreement);
-            session.complete(cs);
             sendToOthers(serverPlayer, cs);
             break;
         }

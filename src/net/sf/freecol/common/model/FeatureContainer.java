@@ -474,7 +474,8 @@ public final class FeatureContainer {
                     for (Ability a : new HashSet<Ability>(abilitySet)) {
                         if (a.getSource() == fco) {
                             abilitySet.remove(a);
-System.err.println("REMOVED ABILITY " +a + " of " + fco + " from " + this);
+                            logger.fine("Removed Ability " + a.getId()
+                                + " of " + fco + " from " + this);
                         }
                     }
                 }
@@ -490,7 +491,8 @@ System.err.println("REMOVED ABILITY " +a + " of " + fco + " from " + this);
                     for (Modifier m : new HashSet<Modifier>(modifierSet)) {
                         if (m.getSource() == fco) {
                             modifierSet.remove(m);
-System.err.println("REMOVED MODIFIER " + m + " of " + fco + " from " + this);
+                            logger.fine("Removed Modifier " + m.getId()
+                                + " of " + fco + " from " + this);
                         }
                     }
                 }

@@ -2960,7 +2960,6 @@ public final class InGameController implements NetworkConstants {
             m = null;
             switch (status) {
             case PROPOSE_TRADE:
-                dt.incrementVersion();
                 break;
             case ACCEPT_TRADE:
                 m = new ModelMessage(MessageType.FOREIGN_DIPLOMACY,

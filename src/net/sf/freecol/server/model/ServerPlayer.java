@@ -3966,7 +3966,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 .addStringTemplate("%nation%", other.getNationName()));
         }
 
-        logger.finest("First contact between " + this + " and " + other);
+        logger.finest("First contact between " + this.getId()
+            + " and " + other.getId());
         return true;
     }
 

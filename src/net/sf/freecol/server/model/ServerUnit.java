@@ -1059,7 +1059,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
                                              this, is)
                                 .addStringTemplate("%nation%", nation)
                                 .addName("%settlement%", is.getName()));
-                        logger.finest("First contact between " + contactPlayer
+                        logger.finest("First contact between "
+                            + contactPlayer.getId()
                             + " and " + is + " at " + newTile);
                     }                   
                 }

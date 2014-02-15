@@ -56,6 +56,7 @@ public abstract class TransactionSession {
         }
         completed = false;
         allSessions.put(key, this);
+        logger.finest("Created session: " + key);
     }
 
     /**
