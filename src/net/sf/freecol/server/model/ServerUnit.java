@@ -998,6 +998,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             }
 
             // Check for new contacts.
+            List<ServerPlayer> pending = new ArrayList<ServerPlayer>();
             for (Tile t : newTile.getSurroundingTiles(1, 1)) {
                 if (t == null || !t.isLand()) {
                     continue; // Invalid tile for contact
@@ -1010,9 +1011,14 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     ? (ServerPlayer)unit.getOwner()
                     : null;
                 if (other == null
-                    || other == serverPlayer) continue; // No contact
+                    || other == serverPlayer
+                    || pending.contains(other)) continue; // No contact
                 if (serverPlayer.csContact(other, cs)) {
-                    // First contact
+                    // First contact.  Note contact pending because
+                    // European first contact now requires a diplomacy
+                    // interaction to complete before leaving UNCONTACTED
+                    // state.
+                    pending.add(other);
                     if (serverPlayer.isEuropean()) {
                         if (other.isIndian()) {
                             Tile offer = (firstLanding && other.owns(newTile))
