@@ -593,10 +593,14 @@ public final class InGameInputHandler extends InputHandler
                     final Element node = (Element)nodes.item(i);
                     final String tag = node.getTagName();
                     try {
-                        Element reply = super.handle(connection, node);
+                        Element reply = InGameInputHandler.this
+                            .handle(connection, node);
                         if (reply != null) results.add(reply);
+                        logger.log(Level.FINEST, "multiple(" + i + "): " + tag
+                                + " -> " + ((reply == null) ? "null"
+                                    : reply.getTagName()));
                     } catch (Exception e) {
-                        logger.log(Level.WARNING, "Crash in multiple, item " + i
+                        logger.log(Level.WARNING, "Crash in multiple " + i
                             + ", tag " + tag + ", continuing.", e);
                     }
                 }
