@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -119,6 +120,46 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     }
 
     /**
+     * Checks if the specified <code>Goods</code> is in this container.
+     *
+     * @param g The <code>Goods</code> to test the presence of.
+     * @return True if there is enough of the specified goods present that it
+     *     can be removed without error.
+     */
+    public boolean contains(Goods g) {
+        return getGoodsCount(g.getType()) >= g.getAmount();
+    }
+
+    /**
+     * Gets the amount of one type of goods in this container.
+     *
+     * @param type The <code>GoodsType</code> being looked for.
+     * @return The amount of this type of goods in this container.
+     */
+    public int getGoodsCount(GoodsType type) {
+        synchronized (storedGoods) {
+            return (storedGoods.containsKey(type)) 
+                ? storedGoods.get(type).intValue()
+                : 0;
+        }
+    }
+
+    /**
+     * Gets the amount of one type of goods at the beginning of the turn.
+     *
+     * @param type The <code>GoodsType</code> being looked for.
+     * @return The amount of this type of goods in this container at
+     *     the beginning of the turn
+     */
+    public int getOldGoodsCount(GoodsType type) {
+        synchronized (oldStoredGoods) {
+            return (oldStoredGoods.containsKey(type))
+                ? oldStoredGoods.get(type).intValue()
+                : 0;
+        }
+    }
+
+    /**
      * Adds goods to this goods container.
      *
      * @param goods The <code>Goods</code> to add.
@@ -146,9 +187,13 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
                 + newAmount + " goods of type "
                 + type.getNameKey() + " in Location " + parent);
         } else if (newAmount == 0) {
-            storedGoods.remove(type);
+            synchronized (storedGoods) {
+                storedGoods.remove(type);
+            }
         } else {
-            storedGoods.put(type, newAmount);
+            synchronized (storedGoods) {
+                storedGoods.put(type, newAmount);
+            }
         }
         return true;
     }
@@ -189,10 +234,14 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
         Goods removedGoods;
         if (newAmount > 0) {
             removedGoods = new Goods(getGame(), null, type, amount);
-            storedGoods.put(type, newAmount);
+            synchronized (storedGoods) {
+                storedGoods.put(type, newAmount);
+            }
         } else {
             removedGoods = new Goods(getGame(), null, type, oldAmount);
-            storedGoods.remove(type);
+            synchronized (storedGoods) {
+                storedGoods.remove(type);
+            }
         }
         return removedGoods;
     }
@@ -205,9 +254,13 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      */
     public void setAmount(GoodsType goodsType, int newAmount) {
         if (newAmount == 0) {
-            storedGoods.remove(goodsType);
+            synchronized (storedGoods) {
+                storedGoods.remove(goodsType);
+            }
         } else {
-            storedGoods.put(goodsType, newAmount);
+            synchronized (storedGoods) {
+                storedGoods.put(goodsType, newAmount);
+            }
         }
     }
 
@@ -215,7 +268,9 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * Remove all goods.
      */
     public void removeAll() {
-        storedGoods.clear();
+        synchronized (storedGoods) {
+            storedGoods.clear();
+        }
     }
 
     /**
@@ -225,10 +280,16 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * @param newAmount The threshold.
      */
     public void removeAbove(int newAmount) {
-        for (GoodsType goodsType : storedGoods.keySet()) {
-            if (goodsType.isStorable() && !goodsType.limitIgnored()
-                && storedGoods.get(goodsType) > newAmount) {
-                setAmount(goodsType, newAmount);
+        synchronized (storedGoods) {
+            if (newAmount <= 0) {
+                storedGoods.clear();
+                return;
+            }
+            for (GoodsType goodsType : storedGoods.keySet()) {
+                if (goodsType.isStorable() && !goodsType.limitIgnored()
+                    && storedGoods.get(goodsType) > newAmount) {
+                    setAmount(goodsType, newAmount);
+                }
             }
         }
     }
@@ -241,48 +302,15 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      *     given amount.
      */
     public boolean hasReachedCapacity(int amount) {
-        for (GoodsType goodsType : storedGoods.keySet()) {
-            if (goodsType.isStorable() && !goodsType.limitIgnored()
-                && storedGoods.get(goodsType) > amount) {
-                return true;
+        synchronized (storedGoods) {
+            for (GoodsType goodsType : storedGoods.keySet()) {
+                if (goodsType.isStorable() && !goodsType.limitIgnored()
+                    && storedGoods.get(goodsType) > amount) {
+                    return true;
+                }
             }
         }
         return false;
-    }
-
-    /**
-     * Checks if the specified <code>Goods</code> is in this container.
-     *
-     * @param g The <code>Goods</code> to test the presence of.
-     * @return The result.
-     */
-    public boolean contains(Goods g) {
-        throw new UnsupportedOperationException("GoodsContainer.contains NYI");
-    }
-
-    /**
-     * Gets the amount of one type of goods in this container.
-     *
-     * @param type The <code>GoodsType</code> being looked for.
-     * @return The amount of this type of goods in this container.
-     */
-    public int getGoodsCount(GoodsType type) {
-        return (storedGoods.containsKey(type)) 
-            ? storedGoods.get(type).intValue()
-            : 0;
-    }
-
-    /**
-     * Gets the amount of one type of goods at the beginning of the turn.
-     *
-     * @param type The <code>GoodsType</code> being looked for.
-     * @return The amount of this type of goods in this container at
-     *     the beginning of the turn
-     */
-    public int getOldGoodsCount(GoodsType type) {
-        return (oldStoredGoods.containsKey(type))
-            ? oldStoredGoods.get(type).intValue()
-            : 0;
     }
 
     /**
@@ -293,11 +321,13 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      */
     public int getSpaceTaken() {
         int count = 0;
-        for (Integer amount : storedGoods.values()) {
-            if (amount % CARGO_SIZE == 0) {
-                count += amount/CARGO_SIZE;
-            } else {
-                count += amount/CARGO_SIZE + 1;
+        synchronized (storedGoods) {
+            for (Integer amount : storedGoods.values()) {
+                if (amount % CARGO_SIZE == 0) {
+                    count += amount/CARGO_SIZE;
+                } else {
+                    count += amount/CARGO_SIZE + 1;
+                }
             }
         }
         return count;
@@ -323,12 +353,14 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      */
     public List<Goods> getGoods() {
         List<Goods> totalGoods = new ArrayList<Goods>();
-        for (GoodsType goodsType : storedGoods.keySet()) {
-            int amount = storedGoods.get(goodsType).intValue();
-            while (amount > 0) {
-                totalGoods.add(new Goods(getGame(), parent, goodsType,
-                        ((amount >= CARGO_SIZE) ? CARGO_SIZE : amount)));
-                amount -= CARGO_SIZE;
+        synchronized (storedGoods) {
+            for (GoodsType goodsType : storedGoods.keySet()) {
+                int amount = storedGoods.get(goodsType);
+                while (amount > 0) {
+                    totalGoods.add(new Goods(getGame(), parent, goodsType,
+                            ((amount >= CARGO_SIZE) ? CARGO_SIZE : amount)));
+                    amount -= CARGO_SIZE;
+                }
             }
         }
         return totalGoods;
@@ -343,10 +375,12 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      */
     public List<Goods> getCompactGoods() {
         List<Goods> totalGoods = new ArrayList<Goods>();
-        for (Entry<GoodsType, Integer> entry : storedGoods.entrySet()) {
-            if (entry.getValue() > 0) {
-                totalGoods.add(new Goods(getGame(), parent, entry.getKey(),
-                                         entry.getValue()));
+        synchronized (storedGoods) {
+            for (Entry<GoodsType, Integer> entry : storedGoods.entrySet()) {
+                if (entry.getValue() > 0) {
+                    totalGoods.add(new Goods(getGame(), parent, entry.getKey(),
+                                             entry.getValue()));
+                }
             }
         }
         return totalGoods;
@@ -357,10 +391,12 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * stored goods.
      */
     public void saveState() {
-        oldStoredGoods.clear();
-        for (Map.Entry<GoodsType, Integer> entry : storedGoods.entrySet()) {
-            oldStoredGoods.put(entry.getKey(), 
-                               new Integer(entry.getValue().intValue()));
+        List<Goods> current = getCompactGoods();
+        synchronized (oldStoredGoods) {
+            oldStoredGoods.clear();
+            for (Goods g : current) {
+                oldStoredGoods.put(g.getType(), g.getAmount());
+            }
         }
     }
 
@@ -391,7 +427,6 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
                 firePropertyChange(type.getId(), oldCount, newCount);
             }
         }
-        oldStoredGoods.clear();
     }
 
     // Interface Ownable
@@ -418,8 +453,12 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      */
     @Override
     public List<FreeColGameObject> disposeList() {
-        oldStoredGoods.clear();
-        storedGoods.clear();
+        synchronized (storedGoods) {
+            storedGoods.clear();
+        }
+        synchronized (oldStoredGoods) {
+            oldStoredGoods.clear();
+        }
 
         List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
         objects.addAll(super.disposeList());
@@ -485,8 +524,12 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
-        storedGoods.clear();
-        oldStoredGoods.clear();
+        synchronized (storedGoods) {
+            storedGoods.clear();
+        }
+        synchronized (oldStoredGoods) {
+            oldStoredGoods.clear();
+        }
 
         super.readChildren(xr);
     }
@@ -546,15 +589,19 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     public String toString() {
         StringBuilder sb = new StringBuilder(128);
         sb.append("[").append(getId()).append(" [");
-        for (Map.Entry<GoodsType, Integer> entry : storedGoods.entrySet()) {
-            sb.append(entry.getKey()).append("=").append(entry.getValue())
-                .append(", ");
+        synchronized (storedGoods) {
+            for (Map.Entry<GoodsType, Integer> entry : storedGoods.entrySet()) {
+                sb.append(entry.getKey()).append("=").append(entry.getValue())
+                    .append(", ");
+            }
         }
         sb.setLength(sb.length() - 2);
         sb.append("][");
-        for (Map.Entry<GoodsType, Integer> entry : oldStoredGoods.entrySet()) {
-            sb.append(entry.getKey()).append("=").append(entry.getValue())
-                .append(", ");
+        synchronized (oldStoredGoods) {
+            for (Map.Entry<GoodsType, Integer> entry : oldStoredGoods.entrySet()) {
+                sb.append(entry.getKey()).append("=").append(entry.getValue())
+                    .append(", ");
+            }
         }
         sb.setLength(sb.length() - 2);
         sb.append("]]");
