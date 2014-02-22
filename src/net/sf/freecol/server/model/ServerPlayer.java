@@ -1926,6 +1926,24 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         if (!father.getModifierSet().isEmpty()) {
             cs.add(See.only(this), this);
+            // deSoto is special
+            if (!father.getModifierSet(Modifier.LINE_OF_SIGHT_BONUS).isEmpty()) {
+                List<Tile> tiles = new ArrayList<Tile>();
+                for (Colony c : getColonies()) {
+                    tiles.addAll(exploreForSettlement(c));
+                }
+                for (Unit u : getUnits()) tiles.addAll(exploreForUnit(u));
+                if (hasAbility(Ability.SEE_ALL_COLONIES)) {
+                    for (Player other : getGame().getLiveEuropeanPlayers()) {
+                        if (this.equals(other)) continue;
+                        for (Colony c : other.getColonies()) {
+                            tiles.addAll(exploreForSettlement(c));
+                        }
+                    }
+                }
+                cs.add(See.only(this), tiles);
+                visibilityChange = true;
+            }
         }
 
         for (Event event : father.getEvents()) {

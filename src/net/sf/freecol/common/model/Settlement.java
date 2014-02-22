@@ -740,8 +740,9 @@ public abstract class Settlement extends GoodsLocation
         tile = xr.findFreeColGameObject(game, TILE_TAG,
                                         Tile.class, (Tile)null, true);
 
-        String type = xr.getAttribute(SETTLEMENT_TYPE_TAG, (String)null);
-        changeType(owner.getNationType().getSettlementType(type));
+        this.type = null;
+        String newType = xr.getAttribute(SETTLEMENT_TYPE_TAG, (String)null);
+        changeType(owner.getNationType().getSettlementType(newType));
     }
 
     /**
