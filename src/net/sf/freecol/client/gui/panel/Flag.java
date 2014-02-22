@@ -73,8 +73,8 @@ public class Flag {
         SCANDINAVIAN_CROSS(UnionPosition.CANTON),
         CHEVRON(UnionShape.CHEVRON, UnionPosition.LEFT),
         PALL(UnionShape.CHEVRON, UnionPosition.LEFT),
-        BEND(UnionShape.CHEVRON, UnionPosition.TOP, UnionPosition.BOTTOM),
-        BEND_SINISTER(UnionShape.CHEVRON, UnionPosition.TOP, UnionPosition.BOTTOM),
+        BEND(UnionShape.BEND, UnionPosition.TOP, UnionPosition.BOTTOM),
+        BEND_SINISTER(UnionShape.BEND, UnionPosition.TOP, UnionPosition.BOTTOM),
         SALTIRE(UnionShape.CHEVRON, UnionPosition.TOP, UnionPosition.BOTTOM,
                 UnionPosition.LEFT, UnionPosition.RIGHT),
         SALTIRE_AND_CROSS(UnionPosition.CANTON);
@@ -98,7 +98,9 @@ public class Flag {
 
     public enum UnionShape {
         RECTANGLE,
+        TRIANGLE,
         CHEVRON,
+        BEND,
         RHOMBUS
     };
 
@@ -190,7 +192,7 @@ public class Flag {
 
     private Background background = Background.FESSES;
     private Decoration decoration = Decoration.NONE;
-    private UnionShape unionShape = UnionShape.RECTANGLE;
+    private UnionShape unionShape; // = UnionShape.RECTANGLE;
     private UnionPosition unionPosition = UnionPosition.CANTON;
 
     /**
@@ -305,10 +307,10 @@ public class Flag {
         case FESSES:
         case PALES:
             if (stripes < 1) {
-                // we always need background color
-                stripes = 1;
+                drawBackground(g);
+            } else {
+                drawStripes(g, background.alignment, stripes);
             }
-            drawStripes(g, background.alignment, stripes);
             break;
         case PLAIN:
             drawBackground(g);
@@ -324,70 +326,94 @@ public class Flag {
             break;
         case PER_SALTIRE:
             drawPerSaltire(g);
-            unionShape = UnionShape.CHEVRON;
             break;
         }
 
         // draw decoration
+        GeneralPath decorationShape = null;
         switch(decoration) {
         case GREEK_CROSS:
         case SYMMETRIC_CROSS:
         case SCANDINAVIAN_CROSS:
-            drawCross(g, decoration);
+            decorationShape = getCross(decoration);
             break;
         case CHEVRON:
-            drawChevron(g);
-            unionShape = UnionShape.CHEVRON;
+            decorationShape = getChevron(false);
             break;
         case PALL:
-            drawPall(g);
-            unionShape = UnionShape.CHEVRON;
+            decorationShape = getPall();
             break;
         case BEND:
-            drawBend(g, false);
+            decorationShape = getBend(false);
             break;
         case BEND_SINISTER:
-            drawBend(g, true);
+            decorationShape = getBend(true);
             break;
         case SALTIRE:
-            drawSaltire(g);
-            unionShape = UnionShape.CHEVRON;
+            decorationShape = getBend(true);
+            decorationShape.append(getBend(false), false);
             break;
         case SALTIRE_AND_CROSS:
-            drawCross(g, Decoration.SYMMETRIC_CROSS);
-            drawSaltire(g);
+            decorationShape = getBend(true);
+            decorationShape.append(getBend(false), false);
+            decorationShape.append(getCross(Decoration.SYMMETRIC_CROSS), false);
             break;
         }
+        if (decorationShape != null) {
+            g.setColor(decorationColor);
+            g.fill(decorationShape);
+        }
 
-        // draw union
         Shape union = null;
-        double radius = 0;
+        Shape starShape = null;
+        // draw union
+        if (unionShape == null && decoration != null) {
+            unionShape = decoration.unionShape;
+        }
         switch(unionShape) {
         case RECTANGLE:
-            Rectangle2D.Double rectangle = getUnionRectangle();
+            Rectangle2D.Double rectangle = getRectangle();
             union = rectangle;
-            radius = 0.3 * Math.min(rectangle.height, rectangle.width);
+            starShape = getUnionRectangle(rectangle);
             break;
         case CHEVRON:
             union = getChevron(decoration == Decoration.PALL);
-            radius = 0.6 * SQRT_3 * HEIGHT / 6;
+            starShape = getUnionTriangle(true);
+            break;
+        case BEND:
+            boolean small = (decoration == Decoration.BEND)
+                || (decoration == Decoration.BEND_SINISTER);
+            boolean sinister = (decoration == Decoration.BEND_SINISTER)
+                || (background == Background.PER_BEND_SINISTER);
+            union = getTriangle(small, sinister);
+            starShape = getUnionTriangle(false);
             break;
         case RHOMBUS:
             break;
+        default:
+            break;
         }
-        if (union == null) {
-            return image;
-        }
-        if (unionColor != null) {
+        if (!(union == null || unionColor == null)) {
             g.setColor(unionColor);
             g.fill(union);
         }
+        if (starShape != null) {
+            g.setColor(starColor);
+            g.fill(starShape);
+        }
+        return image;
+    }
 
+    private Shape getUnionRectangle(Rectangle2D.Double union) {
+
+        if (union == null) return null;
+
+        double radius = 0.3 * Math.min(union.height, union.width);
 
         GeneralPath unionPath;
         if (stars == 0) {
             // nothing to do
-            return image;
+            return null;
         } else if (stars == 1) {
             unionPath = getStar();
             unionPath.transform(AffineTransform.getScaleInstance(2, 2));
@@ -403,28 +429,85 @@ public class Flag {
         } else if (stars < 14) {
             unionPath = getCircleOfStars(radius);
         } else {
-            unionPath = getGridOfStars((Rectangle2D.Double)union);
+            unionPath = getGridOfStars(union);
         }
-        g.translate(union.getBounds().getX(), union.getBounds().getY());
-        unionPath.transform(AffineTransform
-                            .getTranslateInstance(-unionPath.getBounds().getX(),
-                                                  -unionPath.getBounds().getY()));
-        switch(unionShape) {
-        case RECTANGLE:
-            double x = union.getBounds().getWidth() - unionPath.getBounds().getWidth();
-            double y = union.getBounds().getHeight() - unionPath.getBounds().getHeight();
-            unionPath.transform(AffineTransform.getTranslateInstance(x/2, y/2));
-            break;
-        case CHEVRON:
-            unionPath.transform(AffineTransform.getTranslateInstance(SQRT_3 * HEIGHT / 6
-                                                                     - unionPath.getBounds().getWidth() /2,
-                                                                     SQRT_3 * HEIGHT / 6));
-            break;
-        }
-        g.setColor(starColor);
-        g.fill(unionPath);
+        Rectangle2D bounds = unionPath.getBounds2D();
+        double x = (union.x - bounds.getX()) + (union.width - bounds.getWidth()) / 2;
+        double y = (union.y - bounds.getY()) + (union.height - bounds.getHeight()) / 2;
+        unionPath.transform(AffineTransform.getTranslateInstance(x, y));
+        return unionPath;
+    }
 
-        return image;
+    private Shape getUnionTriangle(boolean isosceles) {
+        boolean small = (decoration == Decoration.PALL);
+        Shape union = getChevron(small);
+
+        double x = 0;
+        double y = 0;
+        double radius = 0;
+        if (isosceles) {
+            radius = SQRT_3 * HEIGHT / 6;
+            x = CHEVRON_X;
+            y = HEIGHT;
+            if (small) {
+                x -= BEND_X;
+                y -= 2 * BEND_Y;
+            }
+        } else {
+            // pythagorean
+            double c = Math.sqrt(WIDTH * WIDTH + HEIGHT * HEIGHT);
+            double A = HEIGHT * WIDTH / 2;
+            radius = 2 * A / (WIDTH + HEIGHT + c);
+            if (unionPosition == UnionPosition.TOP
+                || unionPosition == UnionPosition.BOTTOM) {
+                x = HEIGHT;
+                y = WIDTH;
+            } else {
+                x = WIDTH;
+                y = HEIGHT;
+            }
+        }
+        // leave a margin
+        radius = radius * 0.6;
+
+        int sum = 0;
+        int rows = 1;
+        while (sum < stars) {
+            sum += rows;
+            rows++;
+        }
+        int missing = sum - stars;
+        double slope = y / x;
+        double dx = x / rows;
+        double xx = dx / 2;
+        rows--;
+        GeneralPath unionPath = new GeneralPath();
+        for (int index = rows; index > 0; index--) {
+            double height = y - xx * slope;
+            double dy = height / index;
+            double yy = dy / 2;
+            double offset = isosceles
+                ? (HEIGHT - height) / 2 : 0;
+            int count = index;
+            if (missing > 0) {
+                count = index - missing;
+                yy += missing / 2 * dy;
+                missing = 0;
+            }
+            for (int star = 0; star < count; star++) {
+                GeneralPath newStar = getStar();
+                newStar.transform(AffineTransform.getTranslateInstance(xx, yy + offset));
+                unionPath.append(newStar, false);
+                yy += dy;
+            }
+            xx += dx;
+        }
+        /*
+        unionPath.transform(AffineTransform.getTranslateInstance(SQRT_3 * HEIGHT / 6
+                                                                 - unionPath.getBounds().getWidth() /2,
+                                                               SQRT_3 * HEIGHT / 6));
+        */
+        return unionPath;
     }
 
     private double getStripeWidth(Alignment alignment) {
@@ -440,11 +523,6 @@ public class Flag {
     private void drawBackground(Graphics2D g) {
         g.setColor(backgroundColors.get(0));
         g.fillRect(0, 0, WIDTH, HEIGHT);
-    }
-
-    private void decorate(Graphics2D g, Shape shape) {
-        g.setColor(decorationColor);
-        g.fill(shape);
     }
 
     private void drawStripes(Graphics2D g, Alignment alignment, int stripes) {
@@ -509,7 +587,7 @@ public class Flag {
         }
     }
 
-    private void drawCross(Graphics2D g, Decoration decoration) {
+    private GeneralPath getCross(Decoration decoration) {
         double quarterWidth = (WIDTH - DECORATION_SIZE) / 2;
         double quarterHeight = (HEIGHT - DECORATION_SIZE) / 2;
         double offset = 0;
@@ -523,15 +601,15 @@ public class Flag {
             width = height = Math.min(WIDTH, HEIGHT) - 2 * DECORATION_SIZE;
             break;
         }
-        g.setColor(decorationColor);
-        Rectangle2D.Double rectangle = new Rectangle2D.Double();
-        rectangle.setRect((WIDTH - width) / 2, quarterHeight, width, DECORATION_SIZE);
-        g.fill(rectangle);
-        rectangle.setRect(quarterWidth - offset, (HEIGHT - height) / 2, DECORATION_SIZE, height);
-        g.fill(rectangle);
+        GeneralPath cross = new GeneralPath();
+        cross.append(new Rectangle2D.Double((WIDTH - width) / 2, quarterHeight,
+                                            width, DECORATION_SIZE), false);
+        cross.append(new Rectangle2D.Double(quarterWidth - offset, (HEIGHT - height) / 2,
+                                            DECORATION_SIZE, height), false);
+        return cross;
     }
 
-    private void drawBend(Graphics2D g, boolean sinister) {
+    private GeneralPath getBend(boolean sinister) {
         GeneralPath path = new GeneralPath();
         if (sinister) {
             path.moveTo(0, HEIGHT);
@@ -548,53 +626,61 @@ public class Flag {
             path.lineTo(WIDTH - BEND_X, HEIGHT);
             path.lineTo(0, BEND_Y);
         }
-        decorate(g, path);
+        return path;
     }
 
-    private void drawSaltire(Graphics2D g) {
-        drawBend(g, true);
-        drawBend(g, false);
-    }
-
-    private void drawPall(Graphics2D g) {
-        GeneralPath path = new GeneralPath();
-        path.moveTo(0, 0);
-        path.lineTo(BEND_X, 0);
-        path.lineTo(CHEVRON_X + BEND_X, HEIGHT / 2);
-        path.lineTo(BEND_X, HEIGHT);
+    private GeneralPath getPall() {
+        double y1 = (HEIGHT - DECORATION_SIZE) / 2;
+        double y2 = (HEIGHT + DECORATION_SIZE) / 2;
+        double x = BEND_X + y1 * SQRT_3;
+        GeneralPath path = new GeneralPath(getChevron(true));
         path.lineTo(0, HEIGHT);
-        /*
-        path.lineTo(0, HEIGHT - BEND_Y);
-        path.lineTo(CHEVRON_X - BEND_X, HEIGHT / 2);
-        path.lineTo(0, BEND_Y);
-        */
-        path.append(getChevron(true), true);
-        path.append(new Rectangle2D.Double(CHEVRON_X, (HEIGHT - DECORATION_SIZE) / 2,
-                                           WIDTH - CHEVRON_X, DECORATION_SIZE),
-                    false);
-        decorate(g, path);
+        path.lineTo(BEND_X, HEIGHT);
+        path.lineTo(x, y2);
+        path.lineTo(WIDTH, y2);
+        path.lineTo(WIDTH, y1);
+        path.lineTo(x, y1);
+        path.lineTo(BEND_X, 0);
+        path.lineTo(0, 0);
+        return path;
     }
 
-    private void drawChevron(Graphics2D g) {
-        decorate(g, getChevron(false));
-    }
-
-    private Shape getChevron(boolean small) {
+    private GeneralPath getChevron(boolean small) {
         GeneralPath path = new GeneralPath();
+        double x = 0;
+        double y = 0;
         if (small) {
-            path.moveTo(0, HEIGHT - BEND_Y);
-            path.lineTo(CHEVRON_X - BEND_X, HEIGHT / 2);
-            path.lineTo(0, BEND_Y);
+            x = BEND_X;
+            y = BEND_Y;
+        }
+        path.moveTo(0, y);
+        path.lineTo(CHEVRON_X - x, HEIGHT / 2);
+        path.lineTo(0, HEIGHT - y);
+        return path;
+    }
+
+    private GeneralPath getTriangle(boolean small, boolean sinister) {
+        GeneralPath path = new GeneralPath();
+        double x = 0;
+        double y = 0;
+        if (small) {
+            x = BEND_X;
+            y = BEND_Y;
+        }
+        if (sinister) {
+            path.moveTo(x, HEIGHT);
+            path.lineTo(WIDTH, y);
+            path.lineTo(WIDTH, HEIGHT);
         } else {
-            path.moveTo(0, 0);
-            path.lineTo(CHEVRON_X, HEIGHT / 2);
-            path.lineTo(0, HEIGHT);
+            path.moveTo(0, HEIGHT - y);
+            path.lineTo(0, 0);
+            path.lineTo(WIDTH - x, 0);
         }
         return path;
     }
 
 
-    private Rectangle2D.Double getUnionRectangle() {
+    private Rectangle2D.Double getRectangle() {
         if (unionPosition == null || unionPosition == UnionPosition.NONE) {
             return null;
         }
