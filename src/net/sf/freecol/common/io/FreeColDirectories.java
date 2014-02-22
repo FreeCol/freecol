@@ -356,7 +356,7 @@ public class FreeColDirectories {
      * @return The migration state.
      */
     private static int getWindowsDirs(File[] dirs) {
-        if (onMacOSX() || onWindows() || !onUnix()) return -1;
+        if (onMacOSX() || !onWindows() || onUnix()) return -1;
         File home = getUserDefaultDirectory();
         if (home == null) return -1; // Fail badly
         File d = new File(home, FREECOL_DIRECTORY);
