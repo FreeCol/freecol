@@ -231,6 +231,7 @@ public class FreeColDirectories {
      */
     private static int getXDGDirs(File[] dirs) {
         if (onMacOSX() || onWindows() || !onUnix()) return -1;
+
         int ret = -1;
         File home = getUserDefaultDirectory();
         if (home == null) return -1; // Fail badly
@@ -281,6 +282,32 @@ public class FreeColDirectories {
     }
 
     /**
+     * Is the specified file a writable directory?
+     *
+     * @param f The <code>File</code> to check.
+     * @return True if the file is a writable directory.
+     */
+    private static boolean isGoodDirectory(File f) {
+        return f.exists() && f.isDirectory() && f.canWrite();
+    }
+
+    /**
+     * Create the given directory if it does not exist, otherwise expect
+     * it to be writable.
+     *
+     * @param dir The <code>File</code> specifying the required directory.
+     * @return The required directory, or null on failure.
+     */
+    private static File requireDir(File dir) {
+        if (dir.exists()) {
+            if (dir.isDirectory() && dir.canWrite()) return dir;
+        } else {
+            if (dir.mkdir()) return dir;
+        }
+        return null;
+    }
+
+    /**
      * Get FreeCol directories for MacOSX.
      *
      * No separate cache directory here.
@@ -300,46 +327,53 @@ public class FreeColDirectories {
         File homeDir = getUserDefaultDirectory();
         if (homeDir == null) return -1;
         File libDir = new File(homeDir, "Library");
-        if (!libDir.exists() || !libDir.isDirectory()
-            || !libDir.canWrite()) return -1;
-        File prefsDir = new File(libDir, "Preferences");
-        if (prefsDir.exists() && prefsDir.isDirectory()
-            && prefsDir.canWrite()) {
-            dirs[0] = prefsDir;
-            File d = new File(prefsDir, FREECOL_DIRECTORY);
-            if (d.exists()) {
-                if (d.isDirectory() && d.canWrite()) {
-                    dirs[0] = d;
-                    ret++;
-                } else return -1;
-            }
-        } else return -1;
-        File appsDir = new File(libDir, "Application Support");
-        if (appsDir.exists() && appsDir.isDirectory() && appsDir.canWrite()) {
-            dirs[1] = appsDir;
-            File d = new File(appsDir, FREECOL_DIRECTORY);
-            if (d.exists()) {
-                if (d.isDirectory() && d.canWrite()) {
-                    dirs[1] = d;
-                    ret++;
-                } else return -1;
-            }
-        } else return -1;
+        if (!isGoodDirectory(libDir)) return -1;
 
-        if (ret == 2) {
-            dirs[2] = dirs[1];
-            return 1;
+        if (dirs[0] == null) {
+            File prefsDir = new File(libDir, "Preferences");
+            if (isGoodDirectory(prefsDir)) {
+                dirs[0] = prefsDir;
+                File d = new File(prefsDir, FREECOL_DIRECTORY);
+                if (d.exists()) {
+                    if (d.isDirectory() && d.canWrite()) {
+                        dirs[0] = d;
+                        ret++;
+                    } else return -1;
+                }
+            } else return -1;
         }
 
-        File d = new File(dirs[0], FREECOL_DIRECTORY);
-        if (!d.mkdir()) return -1;
+        if (dirs[1] == null) {
+            File appsDir = new File(libDir, "Application Support");
+            if (isGoodDirectory(appsDir)) {
+                dirs[1] = appsDir;
+                File d = new File(appsDir, FREECOL_DIRECTORY);
+                if (d.exists()) {
+                    if (d.isDirectory() && d.canWrite()) {
+                        dirs[1] = d;
+                        ret++;
+                    } else return -1;
+                }
+            } else return -1;
+        }
+
+        if (dirs[2] == null) {
+            dirs[2] = dirs[1];
+        }
+
+        if (ret == 2) return 1;
+        
+        File d = requireDir(new File(dirs[0], FREECOL_DIRECTORY));
+        if (d == null) return -1;
         dirs[0] = d;
-        d = new File(dirs[1], FREECOL_DIRECTORY);
-        if (!d.mkdir()) return -1;
+
+        d = requireDir(new File(dirs[1], FREECOL_DIRECTORY));
+        if (d == null) return -1;
         dirs[1] = d;
-        dirs[2] = d;
+
         return 0;
     }
+
 
     /**
      * Get FreeCol directories for Windows.
@@ -357,18 +391,11 @@ public class FreeColDirectories {
      */
     private static int getWindowsDirs(File[] dirs) {
         if (onMacOSX() || !onWindows() || onUnix()) return -1;
+
         File home = getUserDefaultDirectory();
         if (home == null) return -1; // Fail badly
-        File d = new File(home, FREECOL_DIRECTORY);
-        if (d.exists()) {
-            if (d.isDirectory() && d.canWrite()) {
-                dirs[0] = dirs[1] = dirs[2] = d;
-                return 1;
-            } else return -1;
-        }
-        if (!d.mkdir()) return -1;
-        dirs[0] = dirs[1] = dirs[2] = d;
-        return 0;
+        File d = requireDir(new File(home, FREECOL_DIRECTORY));
+        return (d == null) ? -1 : 1; // Do not migrate windows
     }
 
     /**
@@ -545,15 +572,28 @@ public class FreeColDirectories {
      *     nothing to say.
      */
     public static String setUserDirectories() {
-        File homeDir = getUserDefaultDirectory();
-        File oldDir = getOldUserDirectory();
-        File dirs[] = { null, null, null };
+        if (userConfigDirectory != null
+            && !isGoodDirectory(userConfigDirectory))
+            userConfigDirectory = null;
+        if (userDataDirectory != null
+            && !isGoodDirectory(userDataDirectory))
+            userDataDirectory = null;
+        if (userCacheDirectory != null
+            && !isGoodDirectory(userCacheDirectory))
+            userCacheDirectory = null;
+        File dirs[] = { userConfigDirectory, userDataDirectory,
+                        userCacheDirectory };
 
-        // Check for OSX first because it is a Unix.
-        int migrate = (onMacOSX()) ? getMacOSXDirs(dirs)
+        // If the CL-specified directories are valid, all is well.
+        // Check for OSX next because it is a Unix.
+        int migrate = (dirs[0] != null && isGoodDirectory(dirs[0])
+            && dirs[1] != null && isGoodDirectory(dirs[1])
+            && dirs[2] != null && isGoodDirectory(dirs[2])) ? 1
+            : (onMacOSX()) ? getMacOSXDirs(dirs)
             : (onUnix()) ? getXDGDirs(dirs)
             : (onWindows()) ? getWindowsDirs(dirs)
             : -1;
+        File oldDir = getOldUserDirectory();
         if (migrate < 0) {
             if (oldDir == null) return "main.userDir.fail";
             dirs[0] = dirs[1] = dirs[2] = oldDir; // Do not migrate.
