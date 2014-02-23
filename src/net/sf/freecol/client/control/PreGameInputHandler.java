@@ -30,6 +30,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.NationType;
@@ -356,7 +357,7 @@ public final class PreGameInputHandler extends InputHandler {
         Game game = getFreeColClient().getGame();
 
         Element mgoElement = (Element)element
-            .getElementsByTagName("gameOptions").item(0);
+            .getElementsByTagName(GameOptions.getXMLElementTagName()).item(0);
         Specification spec = game.getSpecification();
         OptionGroup gameOptions = spec.getGameOptions();
         gameOptions.readFromXMLElement(mgoElement);

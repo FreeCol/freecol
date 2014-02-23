@@ -396,4 +396,14 @@ public class GameOptions {
         = "model.option.offensiveNavalUnitCheat";
     public static final String TRANSPORT_NAVAL_UNIT_CHEAT
         = "model.option.transportNavalUnitCheat";
+
+
+    /**
+     * Gets the tag name of the root element representing this object.
+     *
+     * @return "gameOptions".
+     */
+    public static String getXMLElementTagName() {
+        return "gameOptions";
+    }
 }

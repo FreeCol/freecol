@@ -35,8 +35,6 @@ import net.sf.freecol.common.option.OptionGroup;
  */
 public final class GameOptionsDialog extends OptionsDialog {
 
-    public static final String OPTION_GROUP_ID = "gameOptions";
-
 
     /**
      * Creates a game options dialog.
@@ -49,8 +47,9 @@ public final class GameOptionsDialog extends OptionsDialog {
                              boolean editable, boolean custom) {
         super(freeColClient, editable,
             freeColClient.getGame().getSpecification().getGameOptions(),
-            Messages.message(OPTION_GROUP_ID),
-            FreeColDirectories.GAME_OPTIONS_FILE_NAME, OPTION_GROUP_ID);
+            Messages.message(GameOptions.getXMLElementTagName()),
+            FreeColDirectories.GAME_OPTIONS_FILE_NAME,
+            GameOptions.getXMLElementTagName());
 
         if (isEditable()) loadDefaultOptions();
 

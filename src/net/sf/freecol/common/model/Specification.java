@@ -1452,7 +1452,7 @@ public final class Specification {
     }
 
     public OptionGroup getGameOptions() {
-        return getOptionGroup("gameOptions");
+        return getOptionGroup(GameOptions.getXMLElementTagName());
     }
 
     public OptionGroup getMapGeneratorOptions() {

@@ -96,7 +96,7 @@ public final class StartGamePanel extends FreeColPanel {
                                  getMyPlayer());
 
         start = new JButton(Messages.message("startGame"));
-        gameOptions = new JButton(Messages.message("gameOptions"));
+        gameOptions = new JButton(Messages.message(GameOptions.getXMLElementTagName()));
         mapGeneratorOptions = new JButton(Messages.message(MapGeneratorOptions.getXMLElementTagName()));
         readyBox = new JCheckBox(Messages.message("iAmReady"));
 
