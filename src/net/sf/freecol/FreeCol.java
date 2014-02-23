@@ -506,6 +506,12 @@ public final class FreeCol {
                           .withArgName(Messages.message("cli.arg.timeout"))
                           .hasArg()
                           .create());
+        options.addOption(OptionBuilder.withLongOpt("user-cache-directory")
+                          .withDescription(Messages.message("cli.user-cache-directory"))
+                          .withArgName(Messages.message("cli.arg.directory"))
+                          .withType(new File("dummy"))
+                          .hasArg()
+                          .create());
         options.addOption(OptionBuilder.withLongOpt("user-config-directory")
                           .withDescription(Messages.message("cli.user-config-directory"))
                           .withArgName(Messages.message("cli.arg.directory"))
