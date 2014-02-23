@@ -1454,10 +1454,9 @@ public class GUI {
         canvas.showMainPanel(userMsg);
     }
 
-    public OptionGroup showMapGeneratorOptionsDialog(OptionGroup mgo,
-                                                     boolean editable) {
-        if (canvas == null) return null;
-        return canvas.showMapGeneratorOptionsDialog(mgo, editable);
+    public boolean showMapGeneratorOptionsDialog(boolean editable) {
+        if (canvas == null) return false;
+        return canvas.showMapGeneratorOptionsDialog(editable);
     }
 
     public Dimension showMapSizeDialog() {

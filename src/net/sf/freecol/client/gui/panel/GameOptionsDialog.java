@@ -46,7 +46,7 @@ public final class GameOptionsDialog extends OptionsDialog {
     public GameOptionsDialog(FreeColClient freeColClient,
                              boolean editable, boolean custom) {
         super(freeColClient, editable,
-            freeColClient.getGame().getSpecification().getGameOptions(),
+            freeColClient.getGame().getGameOptions(),
             Messages.message(GameOptions.getXMLElementTagName()),
             FreeColDirectories.GAME_OPTIONS_FILE_NAME,
             GameOptions.getXMLElementTagName());
@@ -78,11 +78,9 @@ public final class GameOptionsDialog extends OptionsDialog {
     public OptionGroup getResponse() {
         OptionGroup value = super.getResponse();
         if (value != null) {
-            if (freeColClient.isMapEditor()) {
-                value = null;
-            } else {
-                freeColClient.getPreGameController().sendGameOptions();
-                if (isEditable()) saveDefaultOptions();
+            freeColClient.getPreGameController().updateGameOptions();
+            if (isEditable() && !freeColClient.isMapEditor()) {
+                saveDefaultOptions();
             }
         }
         return value;

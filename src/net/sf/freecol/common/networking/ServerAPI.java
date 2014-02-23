@@ -1512,7 +1512,7 @@ public abstract class ServerAPI {
      *     map generator options.
      * @return True if the server interaction succeeded.
      */
-    public boolean updateMapGeneratorOption(OptionGroup mapOptions) {
+    public boolean updateMapGeneratorOptions(OptionGroup mapOptions) {
         Element up = DOMMessage.createMessage("updateMapGeneratorOptions");
         up.appendChild(mapOptions.toXMLElement(up.getOwnerDocument()));
         return send(up);    

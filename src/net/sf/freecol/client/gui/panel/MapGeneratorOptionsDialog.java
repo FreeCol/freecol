@@ -25,6 +25,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileFilter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,6 +47,7 @@ import net.sf.freecol.client.gui.option.FileOptionUI;
 import net.sf.freecol.client.gui.option.OptionGroupUI;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColSavegameFile;
+import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
@@ -73,22 +78,49 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
      * @param editable Whether the options may be edited.
      */
     public MapGeneratorOptionsDialog(FreeColClient freeColClient,
-                                     OptionGroup mgo, boolean editable) {
-        super(freeColClient, editable, mgo, mgo.getName(),
-              FreeColDirectories.MAP_GENERATOR_OPTIONS_FILE_NAME,
-              MapGeneratorOptions.getXMLElementTagName());
-        
+                                     boolean editable) {
+        super(freeColClient, editable,
+            freeColClient.getGame().getMapGeneratorOptions(),
+            Messages.message(MapGeneratorOptions.getXMLElementTagName()),
+            FreeColDirectories.MAP_GENERATOR_OPTIONS_FILE_NAME,
+            MapGeneratorOptions.getXMLElementTagName());
+
         if (isEditable()) {
             loadDefaultOptions();
             // TODO: The update should be solved by PropertyEvent.
             File mapDirectory = FreeColDirectories.getMapsDirectory();
             if (mapDirectory.isDirectory()) {
+                final OptionGroup mgo = freeColClient.getGame()
+                    .getMapGeneratorOptions();
+                final OptionGroupUI mgoUI = getOptionUI();
+                final FileOption fileOption = (FileOption)mgo
+                    .getOption(MapGeneratorOptions.IMPORT_FILE);
+                final BooleanOption iTerrain = (BooleanOption)mgo
+                    .getOption(MapGeneratorOptions.IMPORT_TERRAIN);
+                final BooleanOption iBonuses = (BooleanOption)mgo
+                    .getOption(MapGeneratorOptions.IMPORT_BONUSES);
+                final BooleanOption iRumour = (BooleanOption)mgo
+                    .getOption(MapGeneratorOptions.IMPORT_RUMOURS);
+                final BooleanOption iSettlement = (BooleanOption)mgo
+                    .getOption(MapGeneratorOptions.IMPORT_SETTLEMENTS);
+
+                File[] files = mapDirectory.listFiles(fsgFilter);
+                Arrays.sort(files, new Comparator<File>() {
+                        public int compare(File f1, File f2) {
+                            return f1.getName().compareTo(f2.getName());
+                        }
+                    });
                 JPanel mapPanel = new JPanel();
-                for (final File file : mapDirectory.listFiles(fsgFilter)) {
+                for (final File file : files) {
                     JButton mapButton = makeMapButton(file);
                     mapButton.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent e) {
-                                setFile(file);
+                                fileOption.setValue(file);
+                                iTerrain.setValue(true);
+                                iBonuses.setValue(false);
+                                iRumour.setValue(false);
+                                iSettlement.setValue(false);
+                                mgoUI.reset();
                             }
                         });
                     mapPanel.add(mapButton);
@@ -108,8 +140,6 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
         initialize();
     }
 
-
-    // Internals
 
     private JButton makeMapButton(File file) {
         String mapName = file.getName().substring(0, file.getName()
@@ -139,18 +169,6 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
         return mapButton;
     }
 
-    private void setFile(File file) {
-        OptionGroup group = getGroup();
-        ((FileOption)group.getOption(MapGeneratorOptions.IMPORT_FILE))
-            .setValue(file);
-
-        group.setBoolean(MapGeneratorOptions.IMPORT_TERRAIN, true);
-        group.setBoolean(MapGeneratorOptions.IMPORT_BONUSES, false);
-        group.setBoolean(MapGeneratorOptions.IMPORT_RUMOURS, false);
-        group.setBoolean(MapGeneratorOptions.IMPORT_SETTLEMENTS, false);
-        getOptionUI().reset();
-    }
-
 
     // Override OptionsDialog
 
@@ -161,6 +179,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
     public OptionGroup getResponse() {
         OptionGroup value = super.getResponse();
         if (value != null) {
+            freeColClient.getPreGameController().updateMapGeneratorOptions();
             if (isEditable() && !freeColClient.isMapEditor()) {
                 saveDefaultOptions();
             }

@@ -87,17 +87,19 @@ public final class StartGamePanel extends FreeColPanel {
         NationOptions nationOptions = getGame().getNationOptions();
 
         cancel = new JButton(Messages.message("cancel"));
+        setCancelComponent(cancel);
 
         JScrollPane chatScroll = null, tableScroll;
-
-        setCancelComponent(cancel);
 
         table = new PlayersTable(getFreeColClient(), nationOptions,
                                  getMyPlayer());
 
         start = new JButton(Messages.message("startGame"));
+
         gameOptions = new JButton(Messages.message(GameOptions.getXMLElementTagName()));
+
         mapGeneratorOptions = new JButton(Messages.message(MapGeneratorOptions.getXMLElementTagName()));
+
         readyBox = new JCheckBox(Messages.message("iAmReady"));
 
         if (singlePlayerGame) {
@@ -306,13 +308,7 @@ public final class StartGamePanel extends FreeColPanel {
                 gui.showGameOptionsDialog(fcc.isAdmin(), true);
                 break;
             case MAP_GENERATOR_OPTIONS:
-                OptionGroup mgo = fcc.getGame().getMapGeneratorOptions();
-                if (gui.showMapGeneratorOptionsDialog(mgo,
-                        fcc.isAdmin()) != null) {
-                    if (!fcc.isMapEditor()) {
-                        fcc.getPreGameController().sendMapGeneratorOptions();
-                    }
-                }
+                gui.showMapGeneratorOptionsDialog(fcc.isAdmin());
                 break;
             default:
                 super.actionPerformed(event);

@@ -2035,14 +2035,13 @@ public final class Canvas extends JDesktopPane {
     /**
      * Display the map generator options dialog.
      *
-     * @param mgo The <code>OptionGroup</code> containing the map
-     *     generator options.
      * @param editable Should these options be editable.
+     * @return True if the dialog was not cancelled.
      */
-    public OptionGroup showMapGeneratorOptionsDialog(OptionGroup mgo,
-                                                     boolean editable) {
-        return showFreeColDialog(new MapGeneratorOptionsDialog(freeColClient,
-                mgo, editable), null);
+    public boolean showMapGeneratorOptionsDialog(boolean editable) {
+        MapGeneratorOptionsDialog mgod
+            = new MapGeneratorOptionsDialog(freeColClient, editable);
+        return showFreeColDialog(mgod, null) != null;
     }
 
     /**

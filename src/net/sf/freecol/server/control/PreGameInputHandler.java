@@ -349,7 +349,7 @@ public final class PreGameInputHandler extends InputHandler {
         if (!player.isAdmin()) {
             throw new IllegalStateException("Not an admin");
         }
-        Specification spec = getGame().getSpecification();
+        final Specification spec = getGame().getSpecification();
         OptionGroup gameOptions = spec.getGameOptions();
         Element child = (Element)element.getChildNodes().item(0);
         gameOptions.readFromXMLElement(child);
@@ -374,9 +374,9 @@ public final class PreGameInputHandler extends InputHandler {
         if (!player.isAdmin()) {
             throw new IllegalStateException("Not an admin");
         }
+        final Specification spec = getGame().getSpecification();
+        OptionGroup mgo = spec.getMapGeneratorOptions();
         Element child = (Element)element.getChildNodes().item(0);
-        OptionGroup mgo = getFreeColServer().getMapGenerator()
-            .getMapGeneratorOptions();
         mgo.readFromXMLElement(child);
         Element umge = DOMMessage.createMessage("updateMapGeneratorOptions");
         umge.appendChild(mgo.toXMLElement(umge.getOwnerDocument()));

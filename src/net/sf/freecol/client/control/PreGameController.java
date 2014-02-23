@@ -147,29 +147,6 @@ public final class PreGameController {
     }
 
     /**
-     * Sends the {@link GameOptions} to the server.
-     * This method should be called after updating that object.
-     */
-    public void sendGameOptions() {
-        Specification spec = freeColClient.getGame().getSpecification();
-        OptionGroup gameOptions = spec.getGameOptions();
-        spec.clean("update game options (client initiated)");
-
-        freeColClient.askServer().updateGameOptions(gameOptions);
-    }
-
-    /**
-     * Sends the {@link MapGeneratorOptions} to the server.
-     * This method should be called after updating that object.
-     */
-    public void sendMapGeneratorOptions() {
-        Specification spec = freeColClient.getGame().getSpecification();
-        OptionGroup mapOptions = spec.getMapGeneratorOptions();
-
-        freeColClient.askServer().updateMapGeneratorOption(mapOptions);
-    }
-
-    /**
      * Starts the game.
      */
     public void startGame() {
@@ -211,5 +188,27 @@ public final class PreGameController {
             // force view of tutorial message
             igc.nextModelMessage();
         }
+    }
+
+    /**
+     * Update the {@link GameOptions} at the server.
+     * This method should be called after updating that object.
+     */
+    public void updateGameOptions() {
+        OptionGroup gameOptions = freeColClient.getGame().getGameOptions();
+        freeColClient.getGame().getSpecification()
+            .clean("update game options (client initiated)");
+
+        freeColClient.askServer().updateGameOptions(gameOptions);
+    }
+
+    /**
+     * Update the {@link MapGeneratorOptions} at the server.
+     * This method should be called after updating that object.
+     */
+    public void updateMapGeneratorOptions() {
+        OptionGroup mgo = freeColClient.getGame().getMapGeneratorOptions();
+
+        freeColClient.askServer().updateMapGeneratorOptions(mgo);
     }
 }

@@ -128,9 +128,10 @@ public class SimpleMapGenerator implements MapGenerator {
     }
 
     private final Random random;
-    private final OptionGroup mapGeneratorOptions;
-    private final LandGenerator landGenerator;
-    private final TerrainGenerator terrainGenerator;
+    private final Specification specification;
+
+    private LandGenerator landGenerator = null;
+    private TerrainGenerator terrainGenerator = null;
 
 
     /**
@@ -142,12 +143,22 @@ public class SimpleMapGenerator implements MapGenerator {
      */
     public SimpleMapGenerator(Random random, Specification specification) {
         this.random = random;
-        this.mapGeneratorOptions = specification.getMapGeneratorOptions();
-        this.landGenerator = new LandGenerator(mapGeneratorOptions, random);
-        this.terrainGenerator = new TerrainGenerator(mapGeneratorOptions, random);
+        this.specification = specification;
+        initialize();
     }
 
 
+    /**
+     * Initialize from the specification.
+     *
+     * May be called multiple times, as map generator options change.
+     */
+    private void initialize() {
+        final OptionGroup mgo = getMapGeneratorOptions();
+        this.landGenerator = new LandGenerator(mgo, random);
+        this.terrainGenerator = new TerrainGenerator(mgo, random);
+    }
+        
     public LandGenerator getLandGenerator() {
         return landGenerator;
     }
@@ -162,10 +173,10 @@ public class SimpleMapGenerator implements MapGenerator {
      * @return The approximate number of land tiles
      */
     private int getApproximateLandCount() {
-        return mapGeneratorOptions.getInteger(MapGeneratorOptions.MAP_WIDTH)
-            * mapGeneratorOptions.getInteger(MapGeneratorOptions.MAP_HEIGHT)
-            * mapGeneratorOptions.getInteger(MapGeneratorOptions.LAND_MASS)
-            / 100;
+        final OptionGroup mgo = getMapGeneratorOptions();
+        return mgo.getInteger(MapGeneratorOptions.MAP_WIDTH)
+            * mgo.getInteger(MapGeneratorOptions.MAP_HEIGHT)
+            * mgo.getInteger(MapGeneratorOptions.LAND_MASS) / 100;
     }
 
     /**
@@ -178,8 +189,8 @@ public class SimpleMapGenerator implements MapGenerator {
      *     rumours from.
      */
     private void makeLostCityRumours(Map map, Game importGame) {
-        final boolean importRumours = mapGeneratorOptions
-            .getBoolean(MapGeneratorOptions.IMPORT_RUMOURS);
+        final OptionGroup mgo = getMapGeneratorOptions();
+        final boolean importRumours = mgo.getBoolean(MapGeneratorOptions.IMPORT_RUMOURS);
         if (importGame != null && importRumours) {
             int nLCRs = 0;
             for (Tile importTile : importGame.getMap().getAllTiles()) {
@@ -202,8 +213,7 @@ public class SimpleMapGenerator implements MapGenerator {
             // Otherwise fall through and create them
         }
 
-        final int rumourNumber = mapGeneratorOptions
-            .getInteger(MapGeneratorOptions.RUMOUR_NUMBER);
+        final int rumourNumber = mgo.getInteger(MapGeneratorOptions.RUMOUR_NUMBER);
         int number = getApproximateLandCount() / rumourNumber;
         int counter = 0;
 
@@ -308,8 +318,8 @@ public class SimpleMapGenerator implements MapGenerator {
      *     settlements from.
      */
     private void makeNativeSettlements(final Map map, Game importGame) {
-        final boolean importSettlements = mapGeneratorOptions
-            .getBoolean(MapGeneratorOptions.IMPORT_SETTLEMENTS);
+        final OptionGroup mgo = getMapGeneratorOptions();
+        final boolean importSettlements = mgo.getBoolean(MapGeneratorOptions.IMPORT_SETTLEMENTS);
         if (importSettlements && importGame != null) {
             if (importIndianSettlements(map, importGame)) return;
             // Fall through and create them
@@ -1092,7 +1102,7 @@ public class SimpleMapGenerator implements MapGenerator {
      * {@inheritDoc}
      */
     public OptionGroup getMapGeneratorOptions() {
-        return mapGeneratorOptions;
+        return specification.getMapGeneratorOptions();
     }
 
     /**
@@ -1121,9 +1131,12 @@ public class SimpleMapGenerator implements MapGenerator {
      * @see net.sf.freecol.server.generator.MapGenerator#createMap(net.sf.freecol.common.model.Game)
      */
     public void createMap(Game game) throws FreeColException {
+        // Reinitialize.
+        initialize();
+
         // Prepare imports:
-        final File importFile = ((FileOption)mapGeneratorOptions
-            .getOption(MapGeneratorOptions.IMPORT_FILE)).getValue();
+        final OptionGroup mgo = getMapGeneratorOptions();
+        final File importFile = ((FileOption)mgo.getOption(MapGeneratorOptions.IMPORT_FILE)).getValue();
         final Game importGame;
         if (importFile != null) {
             Game g = null;
