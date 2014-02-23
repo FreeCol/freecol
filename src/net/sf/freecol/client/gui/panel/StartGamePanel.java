@@ -265,6 +265,7 @@ public final class StartGamePanel extends FreeColPanel {
     public void actionPerformed(ActionEvent event) {
         final String command = event.getActionCommand();
         final FreeColClient fcc = getFreeColClient();
+        final GUI gui = getGUI();
         try {
             switch (Integer.valueOf(command).intValue()) {
             case START:
@@ -286,8 +287,8 @@ public final class StartGamePanel extends FreeColPanel {
                 break;
             case CANCEL:
                 fcc.getConnectController().quitGame(true);
-                getGUI().removeFromCanvas(this);
-                getGUI().showNewPanel();
+                gui.removeFromCanvas(this);
+                gui.showNewPanel();
                 break;
             case READY:
                 fcc.getPreGameController().setReady(readyBox.isSelected());
@@ -302,11 +303,16 @@ public final class StartGamePanel extends FreeColPanel {
                 }
                 break;
             case GAME_OPTIONS:
-                getGUI().showGameOptionsDialog(fcc.isAdmin(), true);
+                gui.showGameOptionsDialog(fcc.isAdmin(), true);
                 break;
             case MAP_GENERATOR_OPTIONS:
                 OptionGroup mgo = fcc.getGame().getMapGeneratorOptions();
-                getGUI().showMapGeneratorOptionsDialog(mgo, fcc.isAdmin());
+                if (gui.showMapGeneratorOptionsDialog(mgo,
+                        fcc.isAdmin()) != null) {
+                    if (!fcc.isMapEditor()) {
+                        fcc.getPreGameController().sendMapGeneratorOptions();
+                    }
+                }
                 break;
             default:
                 super.actionPerformed(event);

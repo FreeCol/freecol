@@ -144,9 +144,10 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
         ((FileOption)group.getOption(MapGeneratorOptions.IMPORT_FILE))
             .setValue(file);
 
-        group.setBoolean(MapGeneratorOptions.IMPORT_RUMOURS, false);
         group.setBoolean(MapGeneratorOptions.IMPORT_TERRAIN, true);
         group.setBoolean(MapGeneratorOptions.IMPORT_BONUSES, false);
+        group.setBoolean(MapGeneratorOptions.IMPORT_RUMOURS, false);
+        group.setBoolean(MapGeneratorOptions.IMPORT_SETTLEMENTS, false);
         getOptionUI().reset();
     }
 
@@ -160,11 +161,8 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
     public OptionGroup getResponse() {
         OptionGroup value = super.getResponse();
         if (value != null) {
-            if (freeColClient.isMapEditor()) {
-                value = null;
-            } else {
-                freeColClient.getPreGameController().sendMapGeneratorOptions();
-                if (isEditable()) saveDefaultOptions();
+            if (isEditable() && !freeColClient.isMapEditor()) {
+                saveDefaultOptions();
             }
         }
         return value;

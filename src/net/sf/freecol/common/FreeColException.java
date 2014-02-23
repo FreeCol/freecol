@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common;
 
+import java.lang.Throwable;
+
 
 /**
  * The Exception thrown by the FreeCol application.
@@ -26,11 +28,16 @@ package net.sf.freecol.common;
 public final class FreeColException extends Exception {
     
     /**
-     * The constructor to use.
-     *
-     * @param message The message that this FreeColException should hold.
+     * {@inheritDoc}
      */
     public FreeColException(String message) {
         super(message);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public FreeColException(String message, Throwable throwable) {
+        super(message, throwable);
     }
 }

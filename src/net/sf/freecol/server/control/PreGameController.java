@@ -86,6 +86,8 @@ public final class PreGameController extends Controller {
      *   <li>Changes the game state to {@link net.sf.freecol.server.FreeColServer.GameState#IN_GAME}.
      *   <li>Sends the "startGame"-message to the clients.
      * </ol>
+     *
+     * @exception FreeColException if there is an error building the game.
      */
     public void startGame() throws FreeColException {
         final FreeColServer freeColServer = getFreeColServer();

@@ -375,11 +375,11 @@ public final class PreGameInputHandler extends InputHandler {
             throw new IllegalStateException("Not an admin");
         }
         Element child = (Element)element.getChildNodes().item(0);
-        getFreeColServer().getMapGenerator().getMapGeneratorOptions()
-            .readFromXMLElement(child);
+        OptionGroup mgo = getFreeColServer().getMapGenerator()
+            .getMapGeneratorOptions();
+        mgo.readFromXMLElement(child);
         Element umge = DOMMessage.createMessage("updateMapGeneratorOptions");
-        umge.appendChild(getFreeColServer().getMapGenerator()
-            .getMapGeneratorOptions().toXMLElement(umge.getOwnerDocument()));
+        umge.appendChild(mgo.toXMLElement(umge.getOwnerDocument()));
         getFreeColServer().getServer().sendToAll(umge, connection);
         return null;
     }

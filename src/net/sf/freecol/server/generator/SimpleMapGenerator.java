@@ -27,6 +27,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -1116,6 +1117,7 @@ public class SimpleMapGenerator implements MapGenerator {
      * Creates a map given for a game.
      *
      * @param game The <code>Game</code> to use.
+     * @exception FreeColException on map import or generation failure.
      * @see net.sf.freecol.server.generator.MapGenerator#createMap(net.sf.freecol.common.model.Game)
      */
     public void createMap(Game game) throws FreeColException {
@@ -1126,13 +1128,12 @@ public class SimpleMapGenerator implements MapGenerator {
         if (importFile != null) {
             Game g = null;
             try {
-                logger.info("Importing file " + importFile.getPath());
                 g = FreeColServer.readGame(new FreeColSavegameFile(importFile),
-                    game.getSpecification(), null);
-            } catch (IOException ioe) {
-                g = null;
-            } catch (XMLStreamException xse) {
-                g = null;
+                                           game.getSpecification(), null);
+                logger.info("Imported file " + importFile.getPath());
+            } catch (Exception e) {
+                throw new FreeColException("Import failed for "
+                    + importFile.getPath(), e);
             }
             importGame = g;
         } else {
