@@ -54,6 +54,7 @@ import net.sf.freecol.client.gui.panel.Flag;
 import net.sf.freecol.client.gui.panel.Flag.Background;
 import net.sf.freecol.client.gui.panel.Flag.Decoration;
 import net.sf.freecol.client.gui.panel.Flag.UnionPosition;
+import net.sf.freecol.client.gui.panel.Flag.UnionShape;
 
 
 public class FlagTest extends JFrame implements ActionListener, ItemListener {
@@ -170,6 +171,8 @@ public class FlagTest extends JFrame implements ActionListener, ItemListener {
     @SuppressWarnings("unchecked") // FIXME in Java7
     private JComboBox union = new JComboBox(Flag.UnionPosition.values());
     @SuppressWarnings("unchecked") // FIXME in Java7
+    private JComboBox unionShape = new JComboBox(Flag.UnionShape.values());
+    @SuppressWarnings("unchecked") // FIXME in Java7
     private JComboBox stars = new JComboBox(getNumbers(50));
     @SuppressWarnings("unchecked") // FIXME in Java7
     private JComboBox stripes = new JComboBox(getNumbers(13));
@@ -183,8 +186,8 @@ public class FlagTest extends JFrame implements ActionListener, ItemListener {
     };
 
     private Component[] customComponents = new Component[] {
-        background, decoration, union, stripes,
-        unionColor, starColor, decorationColor,
+        background, decoration, union, unionShape,
+        stripes, unionColor, starColor, decorationColor,
         backgroundColors[0], backgroundColors[1],
         backgroundColors[2], backgroundColors[3],
         backgroundColors[4], backgroundColors[5]
@@ -215,8 +218,12 @@ public class FlagTest extends JFrame implements ActionListener, ItemListener {
         add(decoration);
 
         union.addItemListener(this);
-        add(new JLabel("union"));
+        add(new JLabel("union position"));
         add(union);
+
+        unionShape.addItemListener(this);
+        add(new JLabel("union shape"));
+        add(unionShape);
 
         stars.setSelectedIndex(12);
         stars.addItemListener(this);
@@ -263,6 +270,7 @@ public class FlagTest extends JFrame implements ActionListener, ItemListener {
         Flag.Background newBackground = (Flag.Background) background.getSelectedItem();
         Flag.Decoration newDecoration = (Flag.Decoration) decoration.getSelectedItem();
         Flag.UnionPosition newPosition = (Flag.UnionPosition) union.getSelectedItem();
+        Flag.UnionShape newShape = (Flag.UnionShape) unionShape.getSelectedItem();
         Flag newFlag = FLAGS[flags.getSelectedIndex()];
         if (e == null || e.getSource() == flags) {
             if (newFlag == null) {
@@ -292,11 +300,14 @@ public class FlagTest extends JFrame implements ActionListener, ItemListener {
                     union.setSelectedItem(oldPosition);
                 }
                 flag = new Flag(newBackground, newDecoration, newPosition);
+                flag.setUnionShape(newShape);
                 flag.setStripes(stripes.getSelectedIndex() + 1);
                 setColors();
             }
             flag.setStars(stars.getSelectedIndex() + 1);
         }
+        stripes.setEnabled(newBackground == Background.PALES
+                           || newBackground == Background.FESSES);
 
         label.setIcon(new ImageIcon(flag.getImage()));
     }

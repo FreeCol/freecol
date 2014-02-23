@@ -292,6 +292,15 @@ public class Flag {
         return this;
     }
 
+    public UnionShape getUnionShape() {
+        return unionShape;
+    }
+
+    public Flag setUnionShape(UnionShape shape) {
+        this.unionShape = shape;
+        return this;
+    }
+
     public BufferedImage getImage() {
         BufferedImage image = new BufferedImage((int) WIDTH, (int) HEIGHT,
                                                 BufferedImage.TYPE_INT_RGB);
@@ -393,6 +402,7 @@ public class Flag {
             transformTriangle(starShape);
             break;
         case RHOMBUS:
+            union = getRhombus();
             break;
         default:
             break;
@@ -450,9 +460,9 @@ public class Flag {
 
         double x = 0;
         double y = 0;
-        double radius = 0;
+        double r = 0;
         if (isosceles) {
-            radius = SQRT_3 * HEIGHT / 6;
+            r = SQRT_3 * HEIGHT / 6;
             x = CHEVRON_X;
             y = HEIGHT;
             if (small) {
@@ -463,7 +473,7 @@ public class Flag {
             // pythagorean
             double c = Math.sqrt(WIDTH * WIDTH + HEIGHT * HEIGHT);
             double A = HEIGHT * WIDTH / 2;
-            radius = 2 * A / (WIDTH + HEIGHT + c);
+            r = 2 * A / (WIDTH + HEIGHT + c);
             x = WIDTH;
             y = HEIGHT;
             if (small) {
@@ -472,49 +482,71 @@ public class Flag {
             }
         }
         // leave a margin
-        radius = radius * 0.6;
+        double radius = r * 0.6;
 
-        int sum = 0;
-        int rows = 1;
-        while (sum < stars) {
-            sum += rows;
-            rows++;
-        }
-        int missing = sum - stars;
-        double slope = y / x;
-        double dx = x / rows;
-        double xx = dx / 2;
-        double height = y - xx * slope;
-        double offset = 0;
-        rows--;
-        double dy = height / rows;
         GeneralPath unionPath = new GeneralPath();
-        for (int index = rows; index > 0; index--) {
+        if (stars == 0) {
+            // nothing to do
+            return null;
+        } else if (stars == 1) {
+            unionPath = getStar();
+            unionPath.transform(AffineTransform.getScaleInstance(2, 2));
+            unionPath.transform(AffineTransform.getTranslateInstance(r, HEIGHT / 2));
+        } else if (stars == 2) {
+            unionPath = new GeneralPath();
+            GeneralPath newStar = getStar();
+            newStar.transform(AffineTransform.getScaleInstance(1.5, 1.5));
+            unionPath.append(newStar, false);
+            newStar = getStar();
+            newStar.transform(AffineTransform.getScaleInstance(1.5, 1.5));
+            newStar.transform(AffineTransform.getTranslateInstance(radius, 0));
+            unionPath.append(newStar, false);
+            unionPath.transform(AffineTransform.getTranslateInstance(r, HEIGHT / 2));
+        } else if (stars < 14) {
+            unionPath = getCircleOfStars(radius);
             if (isosceles) {
-                height = y - xx * slope;
-                dy = height / index;
-                offset = (HEIGHT - height) / 2;
+                double dx = r - unionPath.getBounds().getWidth() / 2;
+                double dy = (HEIGHT - unionPath.getBounds().getHeight()) / 2;
+                unionPath.transform(AffineTransform.getTranslateInstance(dx, dy));
             }
-            double yy = dy / 2;
-            int count = index;
-            if (missing > 0) {
-                count = index - missing;
-                yy += missing / 2 * dy;
-                missing = 0;
+        } else {
+
+            int sum = 0;
+            int rows = 1;
+            while (sum < stars) {
+                sum += rows;
+                rows++;
             }
-            for (int star = 0; star < count; star++) {
-                GeneralPath newStar = getStar();
-                newStar.transform(AffineTransform.getTranslateInstance(xx, yy + offset));
-                unionPath.append(newStar, false);
-                yy += dy;
+            int missing = sum - stars;
+            double slope = y / x;
+            double dx = x / rows;
+            double xx = dx / 2;
+            double height = y - xx * slope;
+            double offset = 0;
+            rows--;
+            double dy = height / rows;
+            for (int index = rows; index > 0; index--) {
+                if (isosceles) {
+                    height = y - xx * slope;
+                    dy = height / index;
+                    offset = (HEIGHT - height) / 2;
+                }
+                double yy = dy / 2;
+                int count = index;
+                if (missing > 0) {
+                    count = index - missing;
+                    yy += missing / 2 * dy;
+                    missing = 0;
+                }
+                for (int star = 0; star < count; star++) {
+                    GeneralPath newStar = getStar();
+                    newStar.transform(AffineTransform.getTranslateInstance(xx, yy + offset));
+                    unionPath.append(newStar, false);
+                    yy += dy;
+                }
+                xx += dx;
             }
-            xx += dx;
         }
-        /*
-        unionPath.transform(AffineTransform.getTranslateInstance(SQRT_3 * HEIGHT / 6
-                                                                 - unionPath.getBounds().getWidth() /2,
-                                                               SQRT_3 * HEIGHT / 6));
-        */
         return unionPath;
     }
 
@@ -705,6 +737,14 @@ public class Flag {
         return path;
     }
 
+    private GeneralPath getRhombus() {
+        GeneralPath rhombus = new GeneralPath();
+        rhombus.moveTo(WIDTH / 2, BEND_Y);
+        rhombus.lineTo(WIDTH - BEND_X, HEIGHT / 2);
+        rhombus.lineTo(WIDTH / 2, HEIGHT - BEND_Y);
+        rhombus.lineTo(BEND_X, HEIGHT / 2);
+        return rhombus;
+    }
 
     private Rectangle2D.Double getRectangle() {
         if (unionPosition == null || unionPosition == UnionPosition.NONE) {
