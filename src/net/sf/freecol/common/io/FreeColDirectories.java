@@ -560,9 +560,17 @@ public class FreeColDirectories {
             migrate = 1;
         }
 
-        userConfigDirectory = dirs[0];
-        userDataDirectory = dirs[1];
-        userCacheDirectory = dirs[2];
+        // Only set user directories if not already overridden at the
+        // command line, and do not migrate in such cases.
+        if (userConfigDirectory == null) {
+            userConfigDirectory = dirs[0];
+        } else migrate = 1;
+        if (userDataDirectory == null) {
+            userDataDirectory = dirs[1];
+        } else migrate = 1;
+        if (userCacheDirectory == null) {
+            userCacheDirectory = dirs[2];
+        } else migrate = 1;
         if (migrate == 0 && oldDir != null) {
             copyIfFound(oldDir, "classic", userConfigDirectory);
             copyIfFound(oldDir, "freecol", userConfigDirectory);
@@ -792,6 +800,20 @@ public class FreeColDirectories {
      */
     public static File getUserCacheDirectory() {
         return userCacheDirectory;
+    }
+
+    /**
+     * Sets the user cache directory, that is the directory under which
+     * the user-specific cache files live.
+     *
+     * @param path The path to the new user cache directory.
+     * @return Null on success, an error message key on failure.
+     */
+    public static String setUserCacheDirectory(String path) {
+        File dir = new File(path);
+        String ret = checkDir(dir);
+        if (ret == null) userCacheDirectory = dir;
+        return ret;
     }
 
     /**
