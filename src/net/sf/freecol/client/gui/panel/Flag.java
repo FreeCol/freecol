@@ -364,8 +364,13 @@ public class Flag {
             g.fill(decorationShape);
         }
 
-        Shape union = null;
-        Shape starShape = null;
+        if (unionPosition == null
+            || unionPosition == UnionPosition.NONE) {
+            return image;
+        }
+
+        GeneralPath union = null;
+        GeneralPath starShape = null;
         // draw union
         if (unionShape == null && decoration != null) {
             unionShape = decoration.unionShape;
@@ -373,7 +378,7 @@ public class Flag {
         switch(unionShape) {
         case RECTANGLE:
             Rectangle2D.Double rectangle = getRectangle();
-            union = rectangle;
+            union = new GeneralPath(rectangle);
             starShape = getUnionRectangle(rectangle);
             break;
         case CHEVRON:
@@ -381,12 +386,11 @@ public class Flag {
             starShape = getUnionTriangle(true);
             break;
         case BEND:
-            boolean small = (decoration == Decoration.BEND)
-                || (decoration == Decoration.BEND_SINISTER);
-            boolean sinister = (decoration == Decoration.BEND_SINISTER)
-                || (background == Background.PER_BEND_SINISTER);
-            union = getTriangle(small, sinister);
+            union = getTriangle((decoration == Decoration.BEND)
+                                || (decoration == Decoration.BEND_SINISTER));
             starShape = getUnionTriangle(false);
+            transformTriangle(union);
+            transformTriangle(starShape);
             break;
         case RHOMBUS:
             break;
@@ -404,7 +408,7 @@ public class Flag {
         return image;
     }
 
-    private Shape getUnionRectangle(Rectangle2D.Double union) {
+    private GeneralPath getUnionRectangle(Rectangle2D.Double union) {
 
         if (union == null) return null;
 
@@ -438,8 +442,10 @@ public class Flag {
         return unionPath;
     }
 
-    private Shape getUnionTriangle(boolean isosceles) {
-        boolean small = (decoration == Decoration.PALL);
+    private GeneralPath getUnionTriangle(boolean isosceles) {
+        boolean small = (decoration == Decoration.PALL
+                         || decoration == Decoration.BEND
+                         || decoration == Decoration.BEND_SINISTER);
         Shape union = getChevron(small);
 
         double x = 0;
@@ -458,13 +464,11 @@ public class Flag {
             double c = Math.sqrt(WIDTH * WIDTH + HEIGHT * HEIGHT);
             double A = HEIGHT * WIDTH / 2;
             radius = 2 * A / (WIDTH + HEIGHT + c);
-            if (unionPosition == UnionPosition.TOP
-                || unionPosition == UnionPosition.BOTTOM) {
-                x = HEIGHT;
-                y = WIDTH;
-            } else {
-                x = WIDTH;
-                y = HEIGHT;
+            x = WIDTH;
+            y = HEIGHT;
+            if (small) {
+                x -= BEND_X;
+                y -= BEND_Y;
             }
         }
         // leave a margin
@@ -480,14 +484,18 @@ public class Flag {
         double slope = y / x;
         double dx = x / rows;
         double xx = dx / 2;
+        double height = y - xx * slope;
+        double offset = 0;
         rows--;
+        double dy = height / rows;
         GeneralPath unionPath = new GeneralPath();
         for (int index = rows; index > 0; index--) {
-            double height = y - xx * slope;
-            double dy = height / index;
+            if (isosceles) {
+                height = y - xx * slope;
+                dy = height / index;
+                offset = (HEIGHT - height) / 2;
+            }
             double yy = dy / 2;
-            double offset = isosceles
-                ? (HEIGHT - height) / 2 : 0;
             int count = index;
             if (missing > 0) {
                 count = index - missing;
@@ -509,6 +517,27 @@ public class Flag {
         */
         return unionPath;
     }
+
+    private GeneralPath transformTriangle(GeneralPath triangle) {
+        if (unionPosition == UnionPosition.TOP) {
+            if (decoration == Decoration.BEND) {
+                triangle.transform(AffineTransform.getScaleInstance(-1, 1));
+                triangle.transform(AffineTransform.getTranslateInstance(WIDTH, 0));
+            } else if (decoration == Decoration.BEND_SINISTER) {
+                // nothing to do: default is top left
+            }
+        } else if (unionPosition == UnionPosition.BOTTOM) {
+            if (decoration == Decoration.BEND) {
+                triangle.transform(AffineTransform.getScaleInstance(1, -1));
+                triangle.transform(AffineTransform.getTranslateInstance(0, HEIGHT));
+            } else if (decoration == Decoration.BEND_SINISTER) {
+                triangle.transform(AffineTransform.getQuadrantRotateInstance(2));
+                triangle.transform(AffineTransform.getTranslateInstance(WIDTH, HEIGHT));
+            }
+        }
+        return triangle;
+    }
+
 
     private double getStripeWidth(Alignment alignment) {
         return (alignment == Alignment.HORIZONTAL)
@@ -659,7 +688,10 @@ public class Flag {
         return path;
     }
 
-    private GeneralPath getTriangle(boolean small, boolean sinister) {
+    /**
+     * Returns the top left triangle.
+     */
+    private GeneralPath getTriangle(boolean small) {
         GeneralPath path = new GeneralPath();
         double x = 0;
         double y = 0;
@@ -667,15 +699,9 @@ public class Flag {
             x = BEND_X;
             y = BEND_Y;
         }
-        if (sinister) {
-            path.moveTo(x, HEIGHT);
-            path.lineTo(WIDTH, y);
-            path.lineTo(WIDTH, HEIGHT);
-        } else {
-            path.moveTo(0, HEIGHT - y);
-            path.lineTo(0, 0);
-            path.lineTo(WIDTH - x, 0);
-        }
+        path.moveTo(0, HEIGHT - y);
+        path.lineTo(0, 0);
+        path.lineTo(WIDTH - x, 0);
         return path;
     }
 
