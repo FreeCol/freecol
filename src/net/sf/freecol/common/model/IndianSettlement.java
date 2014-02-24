@@ -1140,7 +1140,7 @@ public class IndianSettlement extends Settlement {
         }
 
         int potential = 0;
-        int tiles = 1; // Always include center tile
+        int tiles = 0;
 
         for (Tile workTile : getOwnedTiles()) {
             if (workTile != getTile() && !workTile.isOccupied()) {
@@ -1166,7 +1166,6 @@ public class IndianSettlement extends Settlement {
 
         // But always add full potential of the center tile.
         potential += getTile().potential(type, null);
-
         return potential;
     }
 
