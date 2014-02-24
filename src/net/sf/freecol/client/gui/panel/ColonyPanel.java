@@ -760,6 +760,7 @@ public final class ColonyPanel extends PortPanel
      */
     public void setSelectedUnitLabel(UnitLabel unitLabel) {
         if (selectedUnitLabel != unitLabel) {
+            inPortPanel.removePropertyChangeListeners();
             if (selectedUnitLabel != null) {
                 selectedUnitLabel.setSelected(false);
                 selectedUnitLabel.getUnit().removePropertyChangeListener(this);
@@ -772,6 +773,7 @@ public final class ColonyPanel extends PortPanel
                 unitLabel.setSelected(true);
                 unitLabel.getUnit().addPropertyChangeListener(this);
             }
+            inPortPanel.addPropertyChangeListeners();
         }
         updateCarrierButtons();
         inPortPanel.revalidate();
@@ -1017,9 +1019,10 @@ public final class ColonyPanel extends PortPanel
      */
     @Override
     public void removeNotify() {
-        super.removeNotify();
-
         if (colony == null) return; // Been here already
+        colony = null; // Now Canvas.getColonyPanel will no longer find this
+
+        super.removeNotify();
 
         // Alas, ColonyPanel is often leaky.
         nameBox = null;
@@ -1054,8 +1057,6 @@ public final class ColonyPanel extends PortPanel
         //defaultTransferHandler = null;
         //pressListener = null;
         //selectedUnitLabel = null;
-
-        colony = null; // Now Canvas.getColonyPanel will no longer find this
     }
 
 
@@ -1349,7 +1350,7 @@ public final class ColonyPanel extends PortPanel
     }
 
     /**
-     * A panel that holds UnitsLabels that represent naval Units that are
+     * A panel that holds UnitLabels that represent naval Units that are
      * waiting in the port of the colony.
      */
     public final class ColonyInPortPanel extends InPortPanel {

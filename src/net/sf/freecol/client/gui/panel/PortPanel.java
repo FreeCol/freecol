@@ -134,7 +134,6 @@ public abstract class PortPanel extends FreeColPanel {
 
         removeAll();
         cargoPanel = null;
-        cargoPanel = null;
         inPortPanel = null;
         defaultTransferHandler = null;
         pressListener = null;

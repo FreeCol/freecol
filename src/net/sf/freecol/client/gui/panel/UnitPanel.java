@@ -55,6 +55,7 @@ public abstract class UnitPanel extends MigPanel
      * @param editable True if the panel can be edited.
      */
     public UnitPanel(PortPanel portPanel, String name, boolean editable) {
+        if (portPanel == null) throw new RuntimeException("Null port panel.");
         this.portPanel = portPanel;
         this.editable = editable;
         setName(name);
@@ -177,6 +178,7 @@ public abstract class UnitPanel extends MigPanel
     public void removeNotify() {
         super.removeNotify();
 
+        removePropertyChangeListeners();
         portPanel = null;
     }
 }
