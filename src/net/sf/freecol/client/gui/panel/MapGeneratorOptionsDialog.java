@@ -90,20 +90,6 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
             // TODO: The update should be solved by PropertyEvent.
             File mapDirectory = FreeColDirectories.getMapsDirectory();
             if (mapDirectory.isDirectory()) {
-                final OptionGroup mgo = freeColClient.getGame()
-                    .getMapGeneratorOptions();
-                final OptionGroupUI mgoUI = getOptionUI();
-                final FileOption fileOption = (FileOption)mgo
-                    .getOption(MapGeneratorOptions.IMPORT_FILE);
-                final BooleanOption iTerrain = (BooleanOption)mgo
-                    .getOption(MapGeneratorOptions.IMPORT_TERRAIN);
-                final BooleanOption iBonuses = (BooleanOption)mgo
-                    .getOption(MapGeneratorOptions.IMPORT_BONUSES);
-                final BooleanOption iRumour = (BooleanOption)mgo
-                    .getOption(MapGeneratorOptions.IMPORT_RUMOURS);
-                final BooleanOption iSettlement = (BooleanOption)mgo
-                    .getOption(MapGeneratorOptions.IMPORT_SETTLEMENTS);
-
                 File[] files = mapDirectory.listFiles(fsgFilter);
                 Arrays.sort(files, new Comparator<File>() {
                         public int compare(File f1, File f2) {
@@ -113,14 +99,10 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
                 JPanel mapPanel = new JPanel();
                 for (final File file : files) {
                     JButton mapButton = makeMapButton(file);
+                    if (mapButton == null) continue;
                     mapButton.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent e) {
-                                fileOption.setValue(file);
-                                iTerrain.setValue(true);
-                                iBonuses.setValue(false);
-                                iRumour.setValue(false);
-                                iSettlement.setValue(false);
-                                mgoUI.reset();
+                                updateFile(file);
                             }
                         });
                     mapPanel.add(mapButton);
@@ -141,6 +123,63 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
     }
 
 
+    /**
+     * Update the selected map file.
+     *
+     * The option UI may not have been created if we just click on the
+     * map, because the text field is under mapGeneratorOptions.import.
+     * Once the import submenu is opened, it is better to use the
+     * option UIs under it.
+     *
+     * @param file The new map <code>File</code>.
+     */
+    private void updateFile(File file) {
+        final OptionGroup mgo = freeColClient.getGame()
+            .getMapGeneratorOptions();
+        OptionGroupUI mgoUI = getOptionUI();
+        FileOptionUI foui = (FileOptionUI)mgoUI
+            .getOptionUI(MapGeneratorOptions.IMPORT_FILE);
+        if (foui == null) {
+            FileOption fileOption = (FileOption)mgo
+                .getOption(MapGeneratorOptions.IMPORT_FILE);
+            BooleanOption iTerrain = (BooleanOption)mgo
+                .getOption(MapGeneratorOptions.IMPORT_TERRAIN);
+            BooleanOption iBonuses = (BooleanOption)mgo
+                .getOption(MapGeneratorOptions.IMPORT_BONUSES);
+            BooleanOption iRumour = (BooleanOption)mgo
+                .getOption(MapGeneratorOptions.IMPORT_RUMOURS);
+            BooleanOption iSettlement = (BooleanOption)mgo
+                .getOption(MapGeneratorOptions.IMPORT_SETTLEMENTS);
+            fileOption.setValue(file);
+            iTerrain.setValue(true);
+            iBonuses.setValue(false);
+            iRumour.setValue(false);
+            iSettlement.setValue(false);
+            mgoUI.reset();
+        } else {
+            foui.setValue(file);
+            BooleanOptionUI terrainUI = (BooleanOptionUI)mgoUI
+                .getOptionUI(MapGeneratorOptions.IMPORT_TERRAIN);
+            BooleanOptionUI bonusesUI = (BooleanOptionUI)mgoUI
+                .getOptionUI(MapGeneratorOptions.IMPORT_BONUSES);
+            BooleanOptionUI rumourUI = (BooleanOptionUI)mgoUI
+                .getOptionUI(MapGeneratorOptions.IMPORT_RUMOURS);
+            BooleanOptionUI settlementsUI = (BooleanOptionUI)mgoUI
+                .getOptionUI(MapGeneratorOptions.IMPORT_SETTLEMENTS);
+            terrainUI.setValue(true);
+            bonusesUI.setValue(false);
+            rumourUI.setValue(false);
+            settlementsUI.setValue(false);
+        }
+    }
+
+    /**
+     * Make a map button for a given map file.
+     *
+     * @param file The map <code>File</code>.
+     * @return A <code>JButton</code> if the map is readable, or null
+     *     on failure.
+     */
     private JButton makeMapButton(File file) {
         String mapName = file.getName().substring(0, file.getName()
                                                          .lastIndexOf('.'));
@@ -160,6 +199,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
                     + properties.getProperty("map.height"));
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Unable to load savegame.", e);
+                return null;
             }
             mapButton.setHorizontalTextPosition(JButton.CENTER);
             mapButton.setVerticalTextPosition(JButton.BOTTOM);

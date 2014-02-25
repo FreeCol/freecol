@@ -83,7 +83,8 @@ public final class OptionGroupUI extends MigPanel
         this.group = group;
         this.editable = editable;
 
-        setLayout(new MigLayout("fill", "[200:]unrelated[550:, grow, fill]", "[top]"));
+        setLayout(new MigLayout("fill", "[200:]unrelated[550:, grow, fill]",
+                                "[top]"));
 
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(group);
         buildTree(group, root);
@@ -95,25 +96,27 @@ public final class OptionGroupUI extends MigPanel
                     return new Dimension(200, super.getPreferredSize().height);
                 }
                 @Override
-                public String convertValueToText(Object value, boolean selected, boolean expanded,
-                                                 boolean leaf, int row, boolean hasFocus) {
-                    DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-                    Option option = (Option) node.getUserObject();
-                    return Messages.message(option.getId() + ".name");
+                public String convertValueToText(Object value,
+                    boolean selected, boolean expanded,
+                    boolean leaf, int row, boolean hasFocus) {
+                    DefaultMutableTreeNode node
+                        = (DefaultMutableTreeNode)value;
+                    Option option = (Option)node.getUserObject();
+                    return Messages.getName(option.getId());
                 }
             };
 
         tree.setOpaque(false);
         tree.addTreeSelectionListener(this);
-        DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) tree.getCellRenderer();
-        renderer.setBackgroundNonSelectionColor(new Color(0,0,0,1));
+        DefaultTreeCellRenderer renderer
+            = (DefaultTreeCellRenderer)tree.getCellRenderer();
+        renderer.setBackgroundNonSelectionColor(new Color(0, 0, 0, 1));
 
         add(tree);
         detailPanel = new MigPanel();
         detailPanel.setLayout(new MigLayout("wrap 2", "[fill]related[fill]"));
         detailPanel.setOpaque(false);
         add(detailPanel, "grow");
-
     }
 
     public JTree getTree() {
@@ -125,10 +128,10 @@ public final class OptionGroupUI extends MigPanel
      * returns it
      */
     private void buildTree(OptionGroup group, DefaultMutableTreeNode parent) {
-
         for (Option option : group.getOptions()) {
             if (option instanceof OptionGroup) {
-                DefaultMutableTreeNode branch = new DefaultMutableTreeNode(option);
+                DefaultMutableTreeNode branch
+                    = new DefaultMutableTreeNode(option);
                 parent.add(branch);
                 buildTree((OptionGroup) option, branch);
             }
@@ -144,7 +147,8 @@ public final class OptionGroupUI extends MigPanel
      */
     public void valueChanged(TreeSelectionEvent event) {
         detailPanel.removeAll();
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+        DefaultMutableTreeNode node
+            = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
         if (node != null) {
             if (node.isLeaf()) {
                 OptionGroup group = (OptionGroup) node.getUserObject();
@@ -180,7 +184,7 @@ public final class OptionGroupUI extends MigPanel
             if (ui == null) {
                 logger.warning("Unknown option type: " + option.toString());
             } else if (ui instanceof FreeColActionUI) {
-                ((FreeColActionUI) ui).setOptionGroupUI(this);
+                ((FreeColActionUI)ui).setOptionGroupUI(this);
             }
             if (option.getId() != null) {
                 optionUIs.put(option.getId(), ui);
@@ -194,10 +198,9 @@ public final class OptionGroupUI extends MigPanel
             detailPanel.add(ui.getComponent());
         }
         if (group.isEditable()) {
-            optionUpdaters.add((OptionUpdater) ui);
+            optionUpdaters.add((OptionUpdater)ui);
         }
     }
-
 
     /**
      * Removes the given <code>KeyStroke</code> from all of this

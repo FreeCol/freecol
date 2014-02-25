@@ -118,13 +118,7 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
      */
     public void setValue(File f) {
         getOption().setValue(f);
-        if (f == null) {
-            fileField.setText("");
-            fileField.setToolTipText("");
-        } else {
-            fileField.setText(f.getAbsolutePath());
-            fileField.setToolTipText(f.getAbsolutePath());
-        }
+        reset();
     }
 
     /**
@@ -138,11 +132,9 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
      * {@inheritDoc}
      */
     public void updateOption() {
-        if (fileField.getText().equals("")) {
-            getOption().setValue(null);
-        } else {
-            getOption().setValue(new File(fileField.getText()));
-        }
+        File f = (fileField.getText().equals("")) ? null
+            : new File(fileField.getText());
+        getOption().setValue(f);
     }
 
     /**
@@ -150,8 +142,8 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
      */
     public void reset() {
         File file = getOption().getValue();
-        fileField.setText((file == null) ? null : file.getAbsolutePath());
-        fileField.setToolTipText((file == null) ? null : file.getAbsolutePath());
+        String text = (file == null) ? "" : file.getAbsolutePath();
+        fileField.setText(text);
+        fileField.setToolTipText(text);
     }
-
 }
