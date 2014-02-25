@@ -383,7 +383,7 @@ public class Europe extends UnitLocation implements Ownable, Named {
                                       Turn turn) {
         Set<Ability> result = super.getAbilitySet(id, fcgot, turn);
         // Always able to dress a missionary.
-        if (id == null || id == Ability.DRESS_MISSIONARY) {
+        if (id == null || Ability.DRESS_MISSIONARY.equals(id)) {
             result.add(ABILITY_DRESS_MISSIONARY);
         }
         return result;
