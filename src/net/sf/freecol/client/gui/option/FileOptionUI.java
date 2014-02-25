@@ -57,7 +57,7 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
         panel.add(getLabel());
 
         File file = option.getValue();
-        fileField = new JTextField((file == null) ? null : file.getAbsolutePath(), 10);
+        fileField = new JTextField((file == null) ? null : file.getAbsolutePath(), 20);
         fileField.setToolTipText((file == null) ? null : file.getAbsolutePath());
         fileField.setDisabledTextColor(Color.BLACK);
         panel.add(fileField);
@@ -65,29 +65,27 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
         JButton browse = new JButton(Messages.message("file.browse"));
         if (editable) {
             browse.addActionListener(new ActionListener() {
-               public void actionPerformed(ActionEvent e) {
-                   File file = gui.showLoadDialog(FreeColDirectories.getSaveDirectory());
-                   if (file == null) {
-                       return;
-                   } else if (!file.isFile()) {
-                       gui.showErrorMessage("fileNotFound");
-                       return;
-                   }
-
-                   fileField.setText(file.getAbsolutePath());
-                   fileField.setToolTipText(file.getAbsolutePath());
-               }
-            });
+                    public void actionPerformed(ActionEvent e) {
+                        File file = gui.showLoadDialog(FreeColDirectories.getSaveDirectory());
+                        if (file == null) {
+                            return;
+                        } else if (!file.isFile()) {
+                            gui.showErrorMessage("fileNotFound");
+                            return;
+                        }
+                        setValue(file);
+                    }
+                });
         }
         panel.add(browse);
 
         JButton remove = new JButton(Messages.message("option.remove"));
         if (editable) {
             remove.addActionListener(new ActionListener() {
-               public void actionPerformed(ActionEvent e) {
-                   fileField.setText("");
-               }
-            });
+                    public void actionPerformed(ActionEvent e) {
+                        setValue(null);
+                    }
+                });
         }
         panel.add(remove);
 
@@ -132,7 +130,7 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
      * {@inheritDoc}
      */
     public void updateOption() {
-        File f = (fileField.getText().equals("")) ? null
+        File f = ("".equals(fileField.getText())) ? null
             : new File(fileField.getText());
         getOption().setValue(f);
     }

@@ -168,7 +168,9 @@ public final class MapEditorController {
         final MapGenerator mapGenerator = freeColClient.getFreeColServer()
             .getMapGenerator();
 
-        if (!gui.showMapGeneratorOptionsDialog(true)) return;
+        OptionGroup mgo = gui.showMapGeneratorOptionsDialog(true);
+        if (mgo == null) return;
+        game.setMapGeneratorOptions(mgo);
 
         try {
             if (spec.getDifficultyLevel() == null) {

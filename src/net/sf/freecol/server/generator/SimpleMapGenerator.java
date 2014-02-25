@@ -255,9 +255,19 @@ public class SimpleMapGenerator implements MapGenerator {
             Player indian = game.getPlayer(player.getNationId());
             if (indian == null) {
                 Nation nation = spec.getNation(player.getNationId());
+                if (nation == null) {
+                    logger.warning("Native nation "
+                        + player.getNationId() + " not found in spec.");
+                    continue;
+                }
                 indian = new ServerPlayer(game, null, false, nation, 
                                           null, null);
+                logger.info("Imported new native nation "
+                    + player.getNationId() + ": " + indian.getId());
                 game.addPlayer(indian);
+            } else {
+                logger.info("Found native nation " + player.getNationId()
+                    + " for import: " + indian.getId());
             }
             for (IndianSettlement template : player.getIndianSettlements()) {
                 int x = template.getTile().getX();

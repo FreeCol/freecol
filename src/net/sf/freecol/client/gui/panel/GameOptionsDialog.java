@@ -78,10 +78,7 @@ public final class GameOptionsDialog extends OptionsDialog {
     public OptionGroup getResponse() {
         OptionGroup value = super.getResponse();
         if (value != null) {
-            freeColClient.getPreGameController().updateGameOptions();
-            if (isEditable() && !freeColClient.isMapEditor()) {
-                saveDefaultOptions();
-            }
+            if (isEditable()) saveDefaultOptions();
         }
         return value;
     }

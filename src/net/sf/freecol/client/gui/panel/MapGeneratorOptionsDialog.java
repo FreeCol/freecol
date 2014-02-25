@@ -45,6 +45,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.BooleanOptionUI;
 import net.sf.freecol.client.gui.option.FileOptionUI;
 import net.sf.freecol.client.gui.option.OptionGroupUI;
+import net.sf.freecol.client.gui.option.OptionUI;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.option.BooleanOption;
@@ -128,49 +129,49 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
      *
      * The option UI may not have been created if we just click on the
      * map, because the text field is under mapGeneratorOptions.import.
-     * Once the import submenu is opened, it is better to use the
-     * option UIs under it.
+     * Hence the null tests against the OptionUIs.
      *
      * @param file The new map <code>File</code>.
      */
     private void updateFile(File file) {
-        final OptionGroup mgo = freeColClient.getGame()
-            .getMapGeneratorOptions();
-        OptionGroupUI mgoUI = getOptionUI();
+        final OptionGroup mgo = getGroup();
+        final OptionGroupUI mgoUI = getOptionUI();
+        final GUI gui = freeColClient.getGUI();
+
         FileOptionUI foui = (FileOptionUI)mgoUI
             .getOptionUI(MapGeneratorOptions.IMPORT_FILE);
-        if (foui == null) {
-            FileOption fileOption = (FileOption)mgo
-                .getOption(MapGeneratorOptions.IMPORT_FILE);
-            BooleanOption iTerrain = (BooleanOption)mgo
-                .getOption(MapGeneratorOptions.IMPORT_TERRAIN);
-            BooleanOption iBonuses = (BooleanOption)mgo
-                .getOption(MapGeneratorOptions.IMPORT_BONUSES);
-            BooleanOption iRumour = (BooleanOption)mgo
-                .getOption(MapGeneratorOptions.IMPORT_RUMOURS);
-            BooleanOption iSettlement = (BooleanOption)mgo
-                .getOption(MapGeneratorOptions.IMPORT_SETTLEMENTS);
-            fileOption.setValue(file);
-            iTerrain.setValue(true);
-            iBonuses.setValue(false);
-            iRumour.setValue(false);
-            iSettlement.setValue(false);
-            mgoUI.reset();
-        } else {
-            foui.setValue(file);
-            BooleanOptionUI terrainUI = (BooleanOptionUI)mgoUI
-                .getOptionUI(MapGeneratorOptions.IMPORT_TERRAIN);
-            BooleanOptionUI bonusesUI = (BooleanOptionUI)mgoUI
-                .getOptionUI(MapGeneratorOptions.IMPORT_BONUSES);
-            BooleanOptionUI rumourUI = (BooleanOptionUI)mgoUI
-                .getOptionUI(MapGeneratorOptions.IMPORT_RUMOURS);
-            BooleanOptionUI settlementsUI = (BooleanOptionUI)mgoUI
-                .getOptionUI(MapGeneratorOptions.IMPORT_SETTLEMENTS);
-            terrainUI.setValue(true);
-            bonusesUI.setValue(false);
-            rumourUI.setValue(false);
-            settlementsUI.setValue(false);
-        }
+        if (foui == null)
+            foui = (FileOptionUI)OptionUI.getOptionUI(gui,
+                mgo.getOption(MapGeneratorOptions.IMPORT_FILE), true);
+        foui.setValue(file);
+        
+        BooleanOptionUI terrainUI = (BooleanOptionUI)mgoUI
+            .getOptionUI(MapGeneratorOptions.IMPORT_TERRAIN);
+        if (terrainUI == null)
+            terrainUI = (BooleanOptionUI)OptionUI.getOptionUI(gui,
+                mgo.getOption(MapGeneratorOptions.IMPORT_TERRAIN), true);
+        terrainUI.setValue(true);
+
+        BooleanOptionUI bonusesUI = (BooleanOptionUI)mgoUI
+            .getOptionUI(MapGeneratorOptions.IMPORT_BONUSES);
+        if (bonusesUI == null)
+            bonusesUI = (BooleanOptionUI)OptionUI.getOptionUI(gui,
+                mgo.getOption(MapGeneratorOptions.IMPORT_BONUSES), true);
+        bonusesUI.setValue(false);
+
+        BooleanOptionUI rumourUI = (BooleanOptionUI)mgoUI
+            .getOptionUI(MapGeneratorOptions.IMPORT_RUMOURS);
+        if (rumourUI == null)
+            rumourUI = (BooleanOptionUI)OptionUI.getOptionUI(gui,
+                mgo.getOption(MapGeneratorOptions.IMPORT_RUMOURS), true);
+        rumourUI.setValue(false);
+
+        BooleanOptionUI settlementsUI = (BooleanOptionUI)mgoUI
+            .getOptionUI(MapGeneratorOptions.IMPORT_SETTLEMENTS);
+        if (settlementsUI == null)
+            settlementsUI = (BooleanOptionUI)OptionUI.getOptionUI(gui,
+                mgo.getOption(MapGeneratorOptions.IMPORT_SETTLEMENTS), true);
+        settlementsUI.setValue(false);
     }
 
     /**
@@ -219,10 +220,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
     public OptionGroup getResponse() {
         OptionGroup value = super.getResponse();
         if (value != null) {
-            freeColClient.getPreGameController().updateMapGeneratorOptions();
-            if (isEditable() && !freeColClient.isMapEditor()) {
-                saveDefaultOptions();
-            }
+            if (isEditable()) saveDefaultOptions();
         }
         return value;
     }

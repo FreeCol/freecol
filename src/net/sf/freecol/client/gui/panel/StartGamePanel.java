@@ -305,10 +305,18 @@ public final class StartGamePanel extends FreeColPanel {
                 }
                 break;
             case GAME_OPTIONS:
-                gui.showGameOptionsDialog(fcc.isAdmin(), true);
+                OptionGroup go = gui.showGameOptionsDialog(fcc.isAdmin(), true);
+                if (go != null) {
+                    fcc.getGame().setGameOptions(go);
+                    fcc.getPreGameController().updateGameOptions();
+                }
                 break;
             case MAP_GENERATOR_OPTIONS:
-                gui.showMapGeneratorOptionsDialog(fcc.isAdmin());
+                OptionGroup mgo = gui.showMapGeneratorOptionsDialog(fcc.isAdmin());
+                if (mgo != null) {
+                    fcc.getGame().setMapGeneratorOptions(mgo);
+                    fcc.getPreGameController().updateMapGeneratorOptions();
+                }
                 break;
             default:
                 super.actionPerformed(event);

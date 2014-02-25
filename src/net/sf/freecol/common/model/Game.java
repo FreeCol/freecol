@@ -196,6 +196,15 @@ public class Game extends FreeColGameObject {
     }
 
     /**
+     * Sets the game options associated with this game.
+     *
+     * @param go An <code>OptionGroup</code> containing the game options.
+     */
+    public void setGameOptions(OptionGroup go) {
+        specification.setGameOptions(go);
+    }
+
+    /**
      * Gets the map generator options associated with this game.
      *
      * @return An <code>OptionGroup</code> containing the map
@@ -212,7 +221,7 @@ public class Game extends FreeColGameObject {
      *     generator options.
      */
     public void setMapGeneratorOptions(OptionGroup mgo) {
-        specification.addOptionGroup(mgo, true);
+        specification.setMapGeneratorOptions(mgo);
     }
 
     /**

@@ -1455,8 +1455,18 @@ public final class Specification {
         return getOptionGroup(GameOptions.getXMLElementTagName());
     }
 
+    public void setGameOptions(OptionGroup go) {
+        allOptionGroups.put(GameOptions.getXMLElementTagName(), go);
+        addOptionGroup(go, true);
+    }
+
     public OptionGroup getMapGeneratorOptions() {
         return getOptionGroup(MapGeneratorOptions.getXMLElementTagName());
+    }
+
+    public void setMapGeneratorOptions(OptionGroup mgo) {
+        allOptionGroups.put(MapGeneratorOptions.getXMLElementTagName(), mgo);
+        addOptionGroup(mgo, true);
     }
 
 
