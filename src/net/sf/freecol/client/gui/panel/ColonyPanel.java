@@ -1002,6 +1002,7 @@ public final class ColonyPanel extends PortPanel
         } else if (Tile.UNIT_CHANGE.equals(property)) {
             updateOutsideColonyPanel();
             updateInPortPanel();
+            updatePopulationPanel();
         } else {
             // ColonyTiles and Buildings now have their own
             // propertyChangeListeners so {ColonyTile,Building}.UNIT_CHANGE
