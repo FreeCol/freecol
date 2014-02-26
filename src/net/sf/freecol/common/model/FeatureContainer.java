@@ -550,15 +550,24 @@ public final class FeatureContainer {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(256);
-        sb.append("[FeatureContainer [abilities");
-        for (Ability ability : getAbilitySet(null, null, null)) {
-            sb.append(" ").append(ability.toString());
+        sb.append("[FeatureContainer");
+        Set<Ability> abilities = getAbilitySet(null, null, null);
+        if (!abilities.isEmpty()) {
+            sb.append(" [abilities");
+            for (Ability ability : getAbilitySet(null, null, null)) {
+                sb.append(" ").append(ability.toString());
+            }
+            sb.append("]");
         }
-        sb.append("] [modifiers");
-        for (Modifier modifier : getModifierSet(null, null, null)) {
-            sb.append(" ").append(modifier.toString());
+        Set<Modifier> modifiers = getModifierSet(null, null, null);
+        if (!modifiers.isEmpty()) {
+            sb.append(" [modifiers");
+            for (Modifier modifier : getModifierSet(null, null, null)) {
+                sb.append(" ").append(modifier.toString());
+            }
+            sb.append("]");
         }
-        sb.append("]]");
+        sb.append("]");
         return sb.toString();
     }
 }
