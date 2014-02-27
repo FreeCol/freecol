@@ -408,9 +408,6 @@ public final class MiniMap extends JPanel implements MouseInputListener {
             }
         }
         g.setTransform(originTransform);
-
-
-
     }
 
 
