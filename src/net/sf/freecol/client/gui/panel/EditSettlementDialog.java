@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -157,6 +158,9 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
      */
     public IndianSettlement getResponse() {
         final Specification spec = freeColClient.getGame().getSpecification();
+        final GUI gui = freeColClient.getGUI();
+        IndianSettlement ret = null;
+        List<Tile> tiles = settlement.getOwnedTiles();
         Object value = getValue();
         if (options.get(0).equals(value)) { // OK
             settlement.setName(name.getText());
@@ -201,7 +205,13 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
                     unit.dispose();
                 }
             }
-            return settlement;
+            settlement.setType(newNation.getType()
+                .getSettlementType(settlement.isCapital()));
+            for (Unit u : settlement.getUnitList()) {
+                u.setEthnicity(newNation.getId());
+                u.setNationality(newNation.getId());
+            }
+            ret = settlement;
 
         } else if (options.get(1).equals(value)) {
             if (!getGUI().showSimpleConfirmDialog("editor.removeSettlement.text",
@@ -217,6 +227,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
             ((ServerPlayer)settlement.getOwner())
                 .csDisposeSettlement(settlement, new ChangeSet());
         }
-        return null;
+        for (Tile t : tiles) gui.refreshTile(t);
+        return ret;
     }
 }

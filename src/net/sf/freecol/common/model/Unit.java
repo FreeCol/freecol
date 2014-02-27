@@ -1294,13 +1294,10 @@ public class Unit extends GoodsLocation
     /**
      * Sets the ethnicity of this Unit.
      *
-     * Ethnicity is something units are born with.  It cannot be
-     * subsequently changed.
-     *
      * @param newEthnicity The new ethnicity of this Unit.
      */
     public void setEthnicity(String newEthnicity) {
-        throw new UnsupportedOperationException("Can not change a Unit's ethnicity!");
+        this.ethnicity = newEthnicity;
     }
 
     /**

@@ -107,7 +107,7 @@ public abstract class Settlement extends GoodsLocation
      *
      * @param newType The new <code>SettlementType</code>.
      */
-    private final void setType(final SettlementType newType) {
+    public void setType(final SettlementType newType) {
         this.type = newType;
     }
 
