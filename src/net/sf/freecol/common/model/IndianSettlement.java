@@ -419,11 +419,15 @@ public class IndianSettlement extends Settlement {
     /**
      * Has a player contacted this settlement?
      *
+     * Allow player == null as this is true in the map editor where
+     * the user player is moot.
+     *
      * @param player The <code>Player</code> to check.
      * @return True if the player has contacted this settlement.
      */
     public boolean hasContacted(Player player) {
-        return getContactLevel(player) != ContactLevel.UNCONTACTED;
+        return player == null
+            || getContactLevel(player) != ContactLevel.UNCONTACTED;
     }
 
     /**
