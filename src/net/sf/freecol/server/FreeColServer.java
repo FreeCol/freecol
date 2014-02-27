@@ -758,11 +758,26 @@ public final class FreeColServer {
      * Saves a game.
      *
      * @param file The file where the data will be written.
-     * @throws IOException If a problem was encountered while trying to open,
-     *             write or close the file.
+     * @exception IOException If a problem was encountered while trying
+     *     to open, write or close the file.
      */
     public void saveGame(File file, OptionGroup options) throws IOException {
         saveGame(file, options, null);
+    }
+
+    /**
+     * Save a game from the map editor.
+     *
+     * @param file The file where the data will be written.
+     * @param image A thumbnail image for the map.
+     * @exception IOException If a problem was encountered while trying
+     *     to open, write or close the file.
+     */
+    public void saveMapEditorGame(File file, BufferedImage image) 
+        throws IOException {
+        this.setAIMain(null);
+        // TODO: nullify the spec?
+        saveGame(file, null, image);
     }
 
     /**
@@ -770,7 +785,7 @@ public final class FreeColServer {
      *
      * @param file The file where the data will be written.
      * @param image an <code>Image</code> value
-     * @throws IOException If a problem was encountered while trying
+     * @exception IOException If a problem was encountered while trying
      *     to open, write or close the file.
      */
     public void saveGame(File file, OptionGroup options, BufferedImage image)

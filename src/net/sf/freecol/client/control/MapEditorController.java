@@ -213,7 +213,8 @@ public final class MapEditorController {
             public void run() {
                 try {
                     BufferedImage scaledImage = gui.createMiniMapThumbNail();
-                    freeColClient.getFreeColServer().saveGame(file, null, scaledImage);
+                    freeColClient.getFreeColServer()
+                        .saveMapEditorGame(file, scaledImage);
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             gui.closeStatusPanel();
