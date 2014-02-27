@@ -38,7 +38,6 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.Ability;
-import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
@@ -706,50 +705,15 @@ public class SimpleMapGenerator implements MapGenerator {
             : player.getSettlementName(random);
         UnitType skill
             = generateSkillForLocation(map, tile, player.getNationType());
-        IndianSettlement settlement
+        ServerIndianSettlement settlement
             = new ServerIndianSettlement(map.getGame(), player, name, tile,
                                          capital, skill, null);
         player.addSettlement(settlement);
         logger.fine("Generated skill: " + settlement.getLearnableSkill());
 
-        int low = settlement.getType().getMinimumSize();
-        int high = settlement.getType().getMaximumSize();
-        int unitCount = low + Utils.randomInt(logger, "S-units", random,
-                                              high - low);
-        for (int i = 0; i < unitCount; i++) {
-            UnitType unitType = map.getSpecification().getUnitType("model.unit.brave");
-            Unit unit = new ServerUnit(map.getGame(), settlement, player,
-                unitType, unitType.getDefaultRole());
-            unit.setHomeIndianSettlement(settlement);
-
-            if (i == 0) {
-                unit.setLocation(tile);
-            } else {
-                unit.setLocation(settlement);
-            }
-        }
         settlement.placeSettlement(true);
-
-        // Add some initial goods.  After all, they have been here for
-        // some time.
-        HashMap<GoodsType, Integer> goodsMap
-            = new HashMap<GoodsType, Integer>();
-        for (Tile t : settlement.getOwnedTiles()) {
-            for (AbstractGoods ag : t.getSortedPotential()) {
-                GoodsType type = ag.getType().getStoredAs();
-                Integer i = goodsMap.get(type);
-                int value = (i == null) ? 0 : i.intValue();
-                goodsMap.put(type, value + ag.getAmount());
-            }
-        }
-        double d = Utils.randomInt(logger, "Goods at " + settlement.getName(),
-            random, 10) * 0.1 + 1.0;
-        for (Entry<GoodsType, Integer> e : goodsMap.entrySet()) {
-            int i = e.getValue();
-            if (!e.getKey().isFoodType()) i = (int)Math.round(d * e.getValue());
-            i = Math.min(i, GoodsContainer.CARGO_SIZE);
-            if (i > 0) settlement.addGoods(e.getKey(), i);
-        }
+        settlement.addRandomGoods(random);
+        settlement.addRandomUnits(random);
 
         return settlement;
     }

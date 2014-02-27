@@ -127,6 +127,31 @@ public class ServerIndianSettlement extends IndianSettlement
 
 
     /**
+     * Add the standard number of units to this settlement and tile.
+     *
+     * @param random A pseudo-random number source.
+     */
+    public void addRandomUnits(Random random) {
+        final Game game = getGame();
+        final Specification spec = getSpecification();
+        final UnitType brave = spec.getUnitType("model.unit.brave");
+        int low = getType().getMinimumSize();
+        int high = getType().getMaximumSize();
+        int count = Utils.randomInt(logger, "Units at " + getName(), random,
+                                    high - low) + low;
+        for (int i = 0; i < count; i++) {
+            Unit unit = new ServerUnit(game, this, getOwner(), brave,
+                                       brave.getDefaultRole());
+            unit.setHomeIndianSettlement(this);
+            if (i == 0) {
+                unit.setLocation(tile);
+            } else {
+                unit.setLocation(this);
+            }
+        }
+    }
+
+    /**
      * New turn for this native settlement.
      *
      * @param random A <code>Random</code> number source.

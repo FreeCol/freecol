@@ -27,6 +27,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Logger;
 
 import javax.swing.ButtonGroup;
@@ -346,25 +347,23 @@ public final class MapEditorTransformPanel extends FreeColPanel {
 
     private class SettlementTransform extends MapTransform {
         public void transform(Tile t) {
-            if (t.isLand()) {
-                Settlement settlement = t.getSettlement();
-                if (settlement == null && nativePlayer != null) {
-                    logger.info("Adding settlement to tile " + t);
-                    UnitType skill = ((IndianNationType) nativePlayer.getNationType()).getSkills().get(0)
-                        .getObject();
-                    String name = nativePlayer.getSettlementName(null);
-                    settlement = new ServerIndianSettlement(t.getGame(),
-                        nativePlayer, name, t, false, skill, null);
-                    nativePlayer.addSettlement(settlement);
-                    settlement.placeSettlement(true);
-                    UnitType brave = getSpecification().getUnitType("model.unit.brave");
-                    for (int index = 0; index < 5; index++) {
-                        logger.info("Adding unit " + brave + " to settlement.");
-                        settlement.add(new ServerUnit(settlement.getGame(),
-                                settlement, settlement.getOwner(), brave));
-                    }
-                }
-            }
+            if (!t.isLand()
+                || t.hasSettlement()
+                || nativePlayer == null) return;
+            UnitType skill = ((IndianNationType)nativePlayer
+                .getNationType()).getSkills().get(0).getObject();
+            String name = nativePlayer.getSettlementName(null);
+            ServerIndianSettlement settlement
+                = new ServerIndianSettlement(t.getGame(),
+                    nativePlayer, name, t, false, skill, null);
+            nativePlayer.addSettlement(settlement);
+            settlement.placeSettlement(true);
+            Random random = getFreeColClient().getFreeColServer()
+                .getServerRandom();
+            settlement.addRandomGoods(random);
+            settlement.addRandomUnits(random);
+            logger.info("Add settlement " + settlement.getName()
+                + " to tile " + t);
         }
     }
 }

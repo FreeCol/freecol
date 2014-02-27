@@ -996,6 +996,34 @@ public class IndianSettlement extends Settlement {
     }
 
 
+    /**
+     * Add some initial goods to a newly generated settlement.
+     * After all, they have been here for some time.
+     *
+     * @param random A pseudo-random number source.
+     */
+    public void addRandomGoods(Random random) {
+        HashMap<GoodsType, Integer> goodsMap
+            = new HashMap<GoodsType, Integer>();
+        for (Tile t : getOwnedTiles()) {
+            for (AbstractGoods ag : t.getSortedPotential()) {
+                GoodsType type = ag.getType().getStoredAs();
+                Integer i = goodsMap.get(type);
+                int value = (i == null) ? 0 : i.intValue();
+                goodsMap.put(type, value + ag.getAmount());
+            }
+        }
+        double d = Utils.randomInt(logger, "Goods at " + getName(), random,
+                                   10) * 0.1 + 1.0;
+        for (Entry<GoodsType, Integer> e : goodsMap.entrySet()) {
+            int i = e.getValue();
+            if (!e.getKey().isFoodType()) i = (int)Math.round(d * e.getValue());
+            i = Math.min(i, GoodsContainer.CARGO_SIZE);
+            if (i > 0) addGoods(e.getKey(), i);
+        }
+    }
+
+
     // Override FreeColGameObject
 
     /**
