@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,6 +38,7 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.Ability;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
@@ -47,6 +49,7 @@ import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -471,8 +474,10 @@ public class SimpleMapGenerator implements MapGenerator {
                     logger.fine("Placing the " + territory.player
                                 + " capital in region: " + name
                                 + " at tile: " + tile);
-                    settlements.add(placeIndianSettlement(territory.player,
-                                                          true, tile, map));
+                    IndianSettlement is
+                        = placeIndianSettlement(territory.player, true,
+                                                tile, map);
+                    settlements.add(is);
                     territory.numberOfSettlements--;
                     territory.tile = tile;
                     settlementTiles.remove(tile);
@@ -725,10 +730,25 @@ public class SimpleMapGenerator implements MapGenerator {
         }
         settlement.placeSettlement(true);
 
-        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.INIT)) {
-            for (GoodsType type : map.getSpecification().getGoodsTypeList()) {
-                if (type.isNewWorldGoodsType()) settlement.addGoods(type, 150);
+        // Add some initial goods.  After all, they have been here for
+        // some time.
+        HashMap<GoodsType, Integer> goodsMap
+            = new HashMap<GoodsType, Integer>();
+        for (Tile t : settlement.getOwnedTiles()) {
+            for (AbstractGoods ag : t.getSortedPotential()) {
+                GoodsType type = ag.getType().getStoredAs();
+                Integer i = goodsMap.get(type);
+                int value = (i == null) ? 0 : i.intValue();
+                goodsMap.put(type, value + ag.getAmount());
             }
+        }
+        double d = Utils.randomInt(logger, "Goods at " + settlement.getName(),
+            random, 10) * 0.1 + 1.0;
+        for (Entry<GoodsType, Integer> e : goodsMap.entrySet()) {
+            int i = e.getValue();
+            if (!e.getKey().isFoodType()) i = (int)Math.round(d * e.getValue());
+            i = Math.min(i, GoodsContainer.CARGO_SIZE);
+            if (i > 0) settlement.addGoods(e.getKey(), i);
         }
 
         return settlement;
