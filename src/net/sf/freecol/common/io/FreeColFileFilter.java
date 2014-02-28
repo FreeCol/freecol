@@ -23,6 +23,7 @@ import java.io.File;
 
 import javax.swing.filechooser.FileFilter;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 
 
@@ -31,60 +32,53 @@ import net.sf.freecol.client.gui.i18n.Messages;
  */
 public class FreeColFileFilter extends FileFilter {
 
-    private final String extension1;
-    private final String extension2;
+    private final String[] extensions;
+    private final boolean allowSubdirs;
     private final String description;
 
-    
-    public FreeColFileFilter(String extension, String descriptionMessage) {
-        this.extension1 = extension;
-        this.extension2 = "....";
-        description = Messages.message(descriptionMessage);
+    /**
+     * Visible predefined constant filter for selected saved games or
+     * subdirectories.
+     */
+    public static final FileFilter freeColSaveDirectoryFilter
+        = new FreeColFileFilter(FreeCol.FREECOL_SAVE_EXTENSION, true,
+                                "filter.savedGames");
+
+
+    /**
+     * Create a new FreeColFileFilter.
+     *
+     * @param extension An acceptable extension.
+     * @param allowSubdirs If true accept subdirectories.
+     * @param description A description for the filter.
+     */
+    public FreeColFileFilter(String extension, boolean allowSubdirs,
+                             String description) {
+        this.extensions = new String[] { extension };
+        this.allowSubdirs = allowSubdirs;
+        this.description = Messages.message(description);
     }
 
-    public FreeColFileFilter(String extension1, String extension2,
-                             String descriptionMessage) {
-        this.extension1 = extension1;
-        this.extension2 = extension2;
-        description = Messages.message(descriptionMessage);
-    }
-    
+
+    // Implement FileFilter
+
+    /**
+     * {@inheritDoc}
+     */
     public boolean accept(File f) {
-        return f.isDirectory() || f.getName().endsWith(extension1)
-            || f.getName().endsWith(extension2);
+        if (allowSubdirs && f.isDirectory()) return true;
+        if (!f.isFile()) return false;
+        for (String x : extensions) {
+            if (f.getName().endsWith(x) && f.getName().length() > x.length())
+                return true;
+        }
+        return false;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     public String getDescription() {
         return description;
-    }
-
-    /**
-     * Get a filter accepting "*.fgo".
-     *
-     * @return The filter.
-     */
-    public static FileFilter getFGOFileFilter() {
-        return new FreeColFileFilter(".fgo", "filter.gameOptions");
-    }
-
-    /**
-     * Get a filter accepting "*.fsg".
-     *
-     * @return The filter.
-     */
-    public static FileFilter getFSGFileFilter() {
-        return new FreeColFileFilter(".fsg", "filter.savedGames");
-    }
-
-    /**
-     * Get a filter accepting all files containing a
-     * {@link net.sf.freecol.common.model.GameOptions}.
-     * That is; both "*.fgo" and "*.fsg".
-     *
-     * @return The filter.
-     */
-    public static FileFilter getGameOptionsFileFilter() {
-        return new FreeColFileFilter(".fgo", ".fsg",
-                                     "filter.gameOptionsAndSavedGames");
     }
 }

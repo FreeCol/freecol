@@ -39,6 +39,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -64,12 +65,6 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
 
     private static final Logger logger = Logger.getLogger(MapGeneratorOptionsDialog.class.getName());
 
-    private static final FileFilter fsgFilter = new FileFilter() {
-            public boolean accept(File file) {
-                return file.isFile() && file.getName().endsWith(".fsg");
-            }
-        };
-
 
     /**
      * Creates a dialog to set the map generator options.
@@ -91,7 +86,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
             // TODO: The update should be solved by PropertyEvent.
             File mapDirectory = FreeColDirectories.getMapsDirectory();
             if (mapDirectory.isDirectory()) {
-                File[] files = mapDirectory.listFiles(fsgFilter);
+                File[] files = mapDirectory.listFiles(FreeCol.freeColSaveFileFilter);
                 Arrays.sort(files, new Comparator<File>() {
                         public int compare(File f1, File f2) {
                             return f1.getName().compareTo(f2.getName());

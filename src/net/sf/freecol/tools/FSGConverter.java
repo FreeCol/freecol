@@ -30,6 +30,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.zip.GZIPInputStream;
 
+import net.sf.freecol.FreeCol;
+
 
 /**
  * Class for converting FreeCol Savegames (fsg-files).
@@ -190,7 +192,8 @@ public class FSGConverter {
             if (args.length >= 3) {
                 out = new File(args[2]);
             } else {
-                String filename = in.getName().replaceAll(".fsg", ".xml");
+                String filename = in.getName()
+                    .replaceAll(FreeCol.FREECOL_SAVE_EXTENSION, ".xml");
                 if (filename.equals(in.getName())) {
                     filename += ".xml";
                 }

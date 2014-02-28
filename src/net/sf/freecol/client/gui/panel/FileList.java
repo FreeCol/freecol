@@ -24,6 +24,8 @@ import java.io.FileFilter;
 
 import javax.swing.JList;
 
+import net.sf.freecol.FreeCol;
+
 
 /**
  * A list for displaying files.
@@ -39,7 +41,7 @@ public class FileList extends JList {
     @SuppressWarnings("unchecked") // FIXME in Java7
     public FileList(File directory) {        
         super();       
-        setListData(getEntries(directory, getDefaultFileFilter()));        
+        setListData(getEntries(directory, FreeCol.freeColSaveFileFilter));
     }
 
     /**
@@ -81,22 +83,6 @@ public class FileList extends JList {
     }
 
     
-    /**
-     * Gets the default file filter.
-     * @return A filter that accepts any file ending with ".fsg".
-     */
-    public FileFilter getDefaultFileFilter() {
-        FileFilter ff = new FileFilter() {
-            public boolean accept(File file) {
-                String name = file.getName();
-                return (name.length() >= 4 && name.substring(name.length()-4).equals(".fsg"));
-            }
-        };
-        
-        return ff;
-    }
-
-        
     /**
      * A single entry in the <code>FileList</code>.
      */

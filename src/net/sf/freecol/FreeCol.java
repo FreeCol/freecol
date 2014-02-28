@@ -21,6 +21,7 @@ package net.sf.freecol;
 
 import java.awt.Dimension;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.Thread.UncaughtExceptionHandler;
@@ -75,6 +76,19 @@ import org.apache.commons.cli.PosixParser;
 public final class FreeCol {
 
     private static final Logger logger = Logger.getLogger(FreeCol.class.getName());
+
+    /** The extension for FreeCol saved games. */
+    public static final String  FREECOL_SAVE_EXTENSION = ".fsg";
+
+    /** A file filter to select the saved game files. */
+    public static final FileFilter freeColSaveFileFilter
+        = new FileFilter() {
+                public boolean accept(File f) {
+                    return f.isFile()
+                        && f.getName().endsWith(FREECOL_SAVE_EXTENSION)
+                        && f.getName().length() > FREECOL_SAVE_EXTENSION.length();
+                }
+            };
 
     public static final String  CLIENT_THREAD = "FreeColClient:";
     public static final String  SERVER_THREAD = "FreeColServer:";

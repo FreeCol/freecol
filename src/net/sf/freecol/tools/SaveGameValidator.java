@@ -29,8 +29,8 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.io.FreeColSavegameFile;
-
 import org.xml.sax.SAXParseException;
 
 
@@ -39,12 +39,6 @@ import org.xml.sax.SAXParseException;
  */
 public class SaveGameValidator {
 
-    private static FileFilter fsgFilter = new FileFilter() {
-            public boolean accept(File pathname) {
-                return pathname.getName().endsWith(".fsg");
-            }
-        };
-    
     public static void main(String[] args) throws Exception {
 
         SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
@@ -53,14 +47,15 @@ public class SaveGameValidator {
         Validator saveGameValidator = schema.newValidator();
 
         List<File> allFiles = new ArrayList<File>();
+        FileFilter ff = FreeCol.freeColSaveFileFilter;
         for (String name : args) {
             File file = new File(name);
             if (file.exists()) {
                 if (file.isDirectory()) {
-                    for (File fsg : file.listFiles(fsgFilter)) {
+                    for (File fsg : file.listFiles(ff)) {
                         allFiles.add(fsg);
                     }
-                } else if (fsgFilter.accept(file)) {
+                } else if (ff.accept(file)) {
                     allFiles.add(file);
                 }
             }

@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.BufferedInputStream;
 import java.util.logging.Logger;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.io.FreeColXMLReader;
 
 
@@ -99,6 +100,6 @@ public class FreeColSavegameFile extends FreeColDataFile {
      */
     @Override
     protected String[] getFileEndings() {
-        return new String[] {".fsg", ".zip"};
+        return new String[] { FreeCol.FREECOL_SAVE_EXTENSION, ".zip"};
     }
 }

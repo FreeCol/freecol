@@ -250,9 +250,6 @@ public final class Canvas extends JDesktopPane {
         CENTERED_RIGHT,
     }
 
-    /** The extension for FreeCol save files. */
-    private static final String FSG_EXTENSION = ".fsg";
-
     /** Number of tries to find a clear spot on the canvas. */
     private static final int MAXTRY = 3;
 
@@ -1956,7 +1953,7 @@ public final class Canvas extends JDesktopPane {
     public File showLoadDialog(File directory) {
         if (fileFilters == null) {
             fileFilters = new FileFilter[] {
-                FreeColFileFilter.getFSGFileFilter()
+                FreeColFileFilter.freeColSaveDirectoryFilter,
             };
         }
         return showFreeColDialog(new LoadDialog(freeColClient, directory,
@@ -2325,11 +2322,11 @@ public final class Canvas extends JDesktopPane {
     public File showSaveDialog(File directory, String defaultName) {
         if (fileFilters == null) {
             fileFilters = new FileFilter[] {
-                FreeColFileFilter.getFSGFileFilter()
+                FreeColFileFilter.freeColSaveDirectoryFilter,
             };
         }
         return showSaveDialog(directory, fileFilters, defaultName,
-                              FSG_EXTENSION);
+                              FreeCol.FREECOL_SAVE_EXTENSION);
     }
 
     /**

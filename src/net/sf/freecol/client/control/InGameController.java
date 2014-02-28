@@ -34,6 +34,7 @@ import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
@@ -129,12 +130,6 @@ public final class InGameController implements NetworkConstants {
     private int moveMode = MODE_NEXT_ACTIVE_UNIT;
 
     private int turnsPlayed = 0;
-
-    private static FileFilter FSG_FILTER = new FileFilter() {
-            public boolean accept(File file) {
-                return file.isFile() && file.getName().endsWith(".fsg");
-            }
-        };
 
     /** A map of messages to be ignored. */
     private HashMap<String, Integer> messagesToIgnore
@@ -1066,10 +1061,10 @@ public final class InGameController implements NetworkConstants {
         String prefix = options.getText(ClientOptions.AUTO_SAVE_PREFIX);
         String lastTurnName = prefix + "-"
             + options.getText(ClientOptions.LAST_TURN_NAME)
-            + ".fsg";
+            + FreeCol.FREECOL_SAVE_EXTENSION;
         String beforeLastTurnName = prefix + "-"
             + options.getText(ClientOptions.BEFORE_LAST_TURN_NAME)
-            + ".fsg";
+            + FreeCol.FREECOL_SAVE_EXTENSION;
         File autoSaveDir = FreeColDirectories.getAutosaveDirectory();
         File lastTurnFile = new File(autoSaveDir, lastTurnName);
         File beforeLastTurnFile = new File(autoSaveDir, beforeLastTurnName);
@@ -1091,7 +1086,8 @@ public final class InGameController implements NetworkConstants {
                 : Messages.message(player.getNation().getNameKey());
             String gid = Integer.toHexString(game.getUUID().hashCode());
             String name = prefix + "-" + gid  + "_" + playerNation
-                + "_" + getSaveGameString(game.getTurn()) + ".fsg";
+                + "_" + getSaveGameString(game.getTurn())
+                + FreeCol.FREECOL_SAVE_EXTENSION;
             saveGame(new File(autoSaveDir, name));
         }
     }
@@ -1127,8 +1123,9 @@ public final class InGameController implements NetworkConstants {
     public File getLastSaveGameFile() {
         File lastSave = null;
         for (File directory : new File[] {
-                FreeColDirectories.getSaveDirectory(), FreeColDirectories.getAutosaveDirectory() }) {
-            for (File savegame : directory.listFiles(FSG_FILTER)) {
+                FreeColDirectories.getSaveDirectory(),
+                FreeColDirectories.getAutosaveDirectory() }) {
+            for (File savegame : directory.listFiles(FreeCol.freeColSaveFileFilter)) {
                 if (lastSave == null
                     || savegame.lastModified() > lastSave.lastModified()) {
                     lastSave = savegame;
@@ -1171,7 +1168,8 @@ public final class InGameController implements NetworkConstants {
         Game game = freeColClient.getGame();
         if (game != null) {
             String gid = Integer.toHexString(game.getUUID().hashCode());
-            String filename = "quicksave-" + gid + ".fsg";
+            String filename = "quicksave-" + gid
+                + FreeCol.FREECOL_SAVE_EXTENSION;
             File file = new File(FreeColDirectories.getAutosaveDirectory(), filename);
             if (file.isFile()) {
                 // ask user to confirm reload action
@@ -1255,7 +1253,8 @@ public final class InGameController implements NetworkConstants {
         Game game = freeColClient.getGame();
         if (game != null) {
             String gid = Integer.toHexString(game.getUUID().hashCode());
-            String filename = "quicksave-" + gid + ".fsg";
+            String filename = "quicksave-" + gid
+                + FreeCol.FREECOL_SAVE_EXTENSION;
             File file = new File(FreeColDirectories.getAutosaveDirectory(), filename);
             return saveGame(file);
         }
