@@ -483,7 +483,8 @@ public final class Canvas extends JDesktopPane {
                 break;
             }
         }
-        if ((p = getClearSpace((Component)comp, x, y, MAXTRY)) != null
+        if ((p = getClearSpace((Component)comp, x, y, width, height,
+                               MAXTRY)) != null
             && p.x >= 0 && p.x < getWidth()
             && p.y >= 0 && p.y < getHeight()) {
             x = p.x;
@@ -510,22 +511,25 @@ public final class Canvas extends JDesktopPane {
      * @param comp The <code>Component</code> to place.
      * @param x A starting x coordinate.
      * @param y A starting y coordinate.
+     * @param w The component width to use.
+     * @param h The component height to use.
      * @return A <code>Point</code> to place the component at or null
      *     on failure.
      */
-    private Point getClearSpace(Component comp, int x, int y, int tries) {
+    private Point getClearSpace(Component comp, int x, int y, int w, int h,
+                                int tries) {
         Rectangle bounds = this.getBounds();
         if (!bounds.contains(x, y)) return null;
-
         tries = 3 * tries + 1; // 3 new candidates per level
         List<Point> todo = new ArrayList<Point>();
         Point p = new Point(x, y);
         todo.add(p);
         while (!todo.isEmpty()) {
             p = todo.remove(0);
-            Rectangle r = new Rectangle(p.x, p.y, 
-                                        comp.getWidth(), comp.getHeight());
-            if (!bounds.contains(r)) continue;
+            Rectangle r = new Rectangle(p.x, p.y, w, h);
+            if (!bounds.contains(r)) {
+                continue;
+            }
             Component c = null;
             for (Component child : this.getComponents()) {
                 if (child.getBounds().intersects(r)) {
@@ -541,7 +545,9 @@ public final class Canvas extends JDesktopPane {
                     }
                 }
             }
-            if (c == null) return p;
+            if (c == null) {
+                return p;
+            }
             if (--tries <= 0) break;
 
             int n = todo.size();
