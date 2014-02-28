@@ -98,9 +98,8 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     private List<Unit> setType(final BuildingType newBuildingType) {
         // remove features from current type
         Colony colony = getColony();
-        logger.fine("Building upgrade " + buildingType
+        colony.removeFeatures(buildingType, "Building change " + buildingType
             + " -> " + newBuildingType + " at " + colony.getName());
-        colony.removeFeatures(buildingType);
         List<Unit> eject = new ArrayList<Unit>();
 
         if (newBuildingType != null) {

@@ -630,10 +630,11 @@ public abstract class FreeColObject implements ObjectWithId {
      * Removes all the features in an object from this object.
      *
      * @param fco The <code>FreeColObject</code> to find features to remove in.
+     * @param logMe An explanatory string for the log message.
      */
-    public void removeFeatures(FreeColObject fco) {
+    public void removeFeatures(FreeColObject fco, String logMe) {
         FeatureContainer fc = getFeatureContainer();
-        if (fc != null) fc.removeFeatures(fco);
+        if (fc != null) fc.removeFeatures(fco, logMe);
     }
 
 

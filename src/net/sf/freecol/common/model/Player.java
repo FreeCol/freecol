@@ -1102,7 +1102,10 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param newNationType The new <code>NationType</code>.
      */
     public void changeNationType(NationType newNationType) {
-        if (nationType != null) removeFeatures(nationType);
+        if (nationType != null) {
+            removeFeatures(nationType, "Changing type from " + nationType
+                + " to " + newNationType + " for " + this);
+        }
         setNationType(newNationType);
         if (newNationType != null) addFeatures(newNationType);
     }

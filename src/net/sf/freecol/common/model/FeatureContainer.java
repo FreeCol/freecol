@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -460,10 +461,13 @@ public final class FeatureContainer {
      *
      * @param fco The <code>FreeColObject</code> to find features to remove
      *     in.
+     * @param logMe An explanatory string for the log message.
      */
-    public void removeFeatures(FreeColObject fco) {
+    public void removeFeatures(FreeColObject fco, String logMe) {
         FeatureContainer c = fco.getFeatureContainer();
         if (c == null) return;
+        StringBuilder sb = (!logger.isLoggable(Level.FINE)) ? null
+            : new StringBuilder(64);
 
         Set<Entry<String, Set<Ability>>> ca = c.getAbilityEntries();
         if (ca != null && abilitiesPresent()) {
@@ -474,8 +478,7 @@ public final class FeatureContainer {
                     for (Ability a : new HashSet<Ability>(abilitySet)) {
                         if (a.getSource() == fco) {
                             abilitySet.remove(a);
-                            logger.fine("Removed Ability " + a.getId()
-                                + " of " + fco + " from " + this);
+                            if (sb != null) sb.append(" ").append(a.getId());
                         }
                     }
                 }
@@ -491,12 +494,14 @@ public final class FeatureContainer {
                     for (Modifier m : new HashSet<Modifier>(modifierSet)) {
                         if (m.getSource() == fco) {
                             modifierSet.remove(m);
-                            logger.fine("Removed Modifier " + m.getId()
-                                + " of " + fco + " from " + this);
+                            if (sb != null) sb.append(" ").append(m.getId());
                         }
                     }
                 }
             }
+        }
+        if (sb != null && sb.length() > 0) {
+            logger.fine(logMe + ", removed features:" + sb.toString());
         }
     }
 

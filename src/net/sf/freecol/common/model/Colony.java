@@ -371,9 +371,8 @@ public class Colony extends Settlement implements Nameable {
         BuildingType buildingType = building.getType().getFirstLevel();
         boolean result = buildingMap.remove(buildingType.getId()) != null;
         if (result) {
-            logger.fine("Removing building " + building.getType()
-                + " from " + getName());
-            removeFeatures(building.getType());
+            removeFeatures(building.getType(), "Removing building "
+                + building.getType() + " from " + getName());
             invalidateCache();
         }
         return result;
