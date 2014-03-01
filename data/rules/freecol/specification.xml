@@ -32,33 +32,57 @@
     <building-type id="model.building.fortress" preserve="true">
       <modifier id="model.modifier.minimumColonySize" delete="true" />
     </building-type>
+    <building-type id="model.building.country" preserve="true">
+      <production delete="true"/>
+      <production>
+        <input goods-type="model.goods.grain" value="1"/>
+        <output goods-type="model.goods.horses" value="1"/>
+      </production>
+    </building-type>
+    <building-type id="model.building.stables" extends="model.building.country"
+                   preserve="true">
+      <production delete="true"/>
+      <production>
+        <input goods-type="model.goods.grain" value="1"/>
+        <output goods-type="model.goods.horses" value="1"/>
+      </production>
+    </building-type>
   </building-types>
   <european-nation-types>
-    <european-nation-type id="model.nationType.naval" extends="model.nationType.default">
+    <european-nation-type id="model.nationType.naval"
+                          extends="model.nationType.default">
       <modifier id="model.modifier.movementBonus" type="additive" value="3">
         <scope ability-id="model.ability.navalUnit"/>
       </modifier>
       <unit id="ship" type="model.unit.merchantman"/>
     </european-nation-type>
-    <european-nation-type id="model.nationType.building" extends="model.nationType.default">
+    <european-nation-type id="model.nationType.building"
+                          extends="model.nationType.default">
       <modifier id="model.goods.lumber" type="additive" value="2"/>
       <modifier id="model.goods.hammers" type="additive" value="2">
         <scope ability-id="model.ability.person" />
       </modifier>
-      <unit id="pioneer" type="model.unit.masterCarpenter" role="model.role.pioneer"/>
-      <unit id="soldier" type="model.unit.expertLumberJack" role="model.role.soldier"/>
+      <unit id="pioneer" type="model.unit.masterCarpenter"
+            role="model.role.pioneer"/>
+      <unit id="soldier" type="model.unit.expertLumberJack"
+            role="model.role.soldier"/>
     </european-nation-type>
-    <european-nation-type id="model.nationType.agriculture" extends="model.nationType.default">
+    <european-nation-type id="model.nationType.agriculture"
+                          extends="model.nationType.default">
       <modifier id="model.goods.grain" type="additive" value="2"/>
-      <unit id="pioneer" type="model.unit.expertFarmer" role="model.role.pioneer"/>
+      <unit id="pioneer" type="model.unit.expertFarmer"
+            role="model.role.pioneer"/>
     </european-nation-type>
-    <european-nation-type id="model.nationType.furTrapping" extends="model.nationType.default">
+    <european-nation-type id="model.nationType.furTrapping"
+                          extends="model.nationType.default">
       <modifier id="model.goods.furs" type="additive" value="2"/>
       <modifier id="model.goods.coats" type="additive" value="2">
         <scope ability-id="model.ability.person" />
       </modifier>
-      <unit id="pioneer" type="model.unit.expertFurTrapper" role="model.role.pioneer"/>
-      <unit id="soldier" type="model.unit.masterFurTrader" role="model.role.soldier"/>
+      <unit id="pioneer" type="model.unit.expertFurTrapper"
+            role="model.role.pioneer"/>
+      <unit id="soldier" type="model.unit.masterFurTrader"
+            role="model.role.soldier"/>
     </european-nation-type>
   </european-nation-types>
 
@@ -122,29 +146,40 @@
     <optionGroup id="gameOptions">
       <optionGroup id="gameOptions.map">
         <!-- Enables/disables fog of war -->
-        <booleanOption id="model.option.fogOfWar" defaultValue="true"/>
+        <booleanOption id="model.option.fogOfWar"
+                       defaultValue="true"/>
         <!-- Whether to award exploration points or not -->
-        <booleanOption id="model.option.explorationPoints" defaultValue="true"/>
-        <!-- The number of turns it takes to sail between Europe and the New World -->
-        <integerOption id="model.option.turnsToSail" defaultValue="3" minimumValue="1" maximumValue="10"/>
+        <booleanOption id="model.option.explorationPoints"
+                       defaultValue="true"/>
+        <!-- The number of turns it takes to sail between Europe and
+             the New World. -->
+        <integerOption id="model.option.turnsToSail"
+                       defaultValue="3" minimumValue="1" maximumValue="10"/>
         <!-- Whether amphibious moves are allowed. -->
-        <booleanOption id="model.option.amphibiousMoves" defaultValue="true"/>
+        <booleanOption id="model.option.amphibiousMoves"
+                       defaultValue="true"/>
         <!-- Allow trading with empty units. -->
-        <booleanOption id="model.option.emptyTraders" defaultValue="true"/>
+        <booleanOption id="model.option.emptyTraders"
+                       defaultValue="true"/>
         <!-- Missionaries grant visibility and enhance trade and training -->
         <booleanOption id="model.option.enhancedMissionaries"
                        defaultValue="true"/>
-        <!-- Does the REF "teleport" to its first target or does it sail in. -->
+        <!-- Does the REF "teleport" to its first target or sail in. -->
         <booleanOption id="model.option.teleportREF" defaultValue="false"/>
       </optionGroup>
       <optionGroup id="gameOptions.colony">
         <!-- Does the Custom House sell boycotted goods -->
-        <booleanOption id="model.option.customIgnoreBoycott" defaultValue="false"/>
-        <!-- Whether experts have connections, producing without raw materials in factories -->
-        <booleanOption id="model.option.expertsHaveConnections" defaultValue="false"/>
-        <booleanOption id="model.option.saveProductionOverflow" defaultValue="false"/>
+        <booleanOption id="model.option.customIgnoreBoycott"
+                       defaultValue="false"/>
+        <!-- Whether experts have connections, producing without raw
+             materials in factories. -->
+        <booleanOption id="model.option.expertsHaveConnections"
+                       defaultValue="false"/>
+        <booleanOption id="model.option.saveProductionOverflow"
+                       defaultValue="false"/>
         <!-- Whether to educate the least skilled unit first -->
-        <booleanOption id="model.option.allowStudentSelection" defaultValue="true"/>
+        <booleanOption id="model.option.allowStudentSelection"
+                       defaultValue="true"/>
       </optionGroup>
     </optionGroup>
   </options>
