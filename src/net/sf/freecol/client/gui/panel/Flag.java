@@ -455,6 +455,7 @@ public class Flag {
             break;
         case RHOMBUS:
             union = getRhombus();
+            starShape = getUnionRhombus();
             break;
         default:
             break;
@@ -635,6 +636,73 @@ public class Flag {
             }
         }
         return triangle;
+    }
+
+    private GeneralPath getUnionRhombus() {
+        GeneralPath unionPath = new GeneralPath();
+
+        int count = 1;
+        int square = 1;
+        while (square < stars) {
+            count++;
+            square = count * count;
+        }
+        int rows = stars / count;
+        if (rows * count < stars) rows++;
+        int starCount = 0;
+        double a = WIDTH / 2 - BEND_X;
+        double b = HEIGHT / 2 - BEND_Y;
+        double c = Math.sqrt(a * a + b * b);
+        double r = (a * b) / c;
+        double radius = 0.6 * r;
+        double dx = a / count;
+        double dy = b / count;
+        double dx1 = a / rows;
+        double dy1 = b / rows;
+
+        GeneralPath newStar;
+        if (stars == 0) {
+            // nothing to do
+            return null;
+        } else if (stars == 1) {
+            unionPath = getStar();
+            unionPath.transform(AffineTransform.getScaleInstance(2, 2));
+            unionPath.transform(AffineTransform.getTranslateInstance(WIDTH / 2, HEIGHT / 2));
+        } else if (stars == 2) {
+            unionPath = new GeneralPath();
+            newStar = getStar();
+            newStar.transform(AffineTransform.getScaleInstance(1.5, 1.5));
+            unionPath.append(newStar, false);
+            newStar = getStar();
+            newStar.transform(AffineTransform.getScaleInstance(1.5, 1.5));
+            newStar.transform(AffineTransform.getTranslateInstance(WIDTH / 4, 0));
+            unionPath.append(newStar, false);
+            unionPath.transform(AffineTransform.getTranslateInstance(3 * WIDTH / 8, HEIGHT / 2));
+        } else if (stars < 14) {
+            unionPath = getCircleOfStars(radius);
+            double x = (WIDTH - unionPath.getBounds().getWidth()) / 2;
+            double y = (HEIGHT - unionPath.getBounds().getHeight()) / 2;
+            unionPath.transform(AffineTransform.getTranslateInstance(x, y));
+        } else {
+            outer: for (int index = 0; index < rows; index++) {
+                double x = BEND_X + dx + index * dx1;
+                double y = HEIGHT / 2 - index * dy1;
+                for (int star = 0; star < count; star++) {
+                    newStar = getStar();
+                    newStar.transform(AffineTransform.getTranslateInstance(x, y));
+                    unionPath.append(newStar, false);
+                    starCount++;
+                    if (starCount == stars) {
+                        break outer;
+                    } else {
+                        x += dx;
+                        y += dy;
+                    }
+                }
+            }
+        }
+
+        return unionPath;
     }
 
 
