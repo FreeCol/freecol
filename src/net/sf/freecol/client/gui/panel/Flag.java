@@ -33,16 +33,34 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * This class generates the most common types of flags from a small
+ * number of parameters, biased towards flags similar to that of the
+ * United States, i.e. flags with a "union", an area filled with stars
+ * representing the colonies of the player. Obvious improvements
+ * include adding shapes other than stars (e.g. the fleur-de-lys for
+ * Quebec) and larger design elements, such as the Southern Cross, or
+ * coats of arms.
+ *
  * Please feel free to correct any vexillological errors.
  */
 public class Flag {
 
+    /**
+     * The alignment of stripes or other design elements on the
+     * flag. Might be extended to handle diagonal alignment
+     * (Friesland, for example).
+     */
     public enum Alignment {
         NONE,
         HORIZONTAL,
         VERTICAL
     };
 
+    /**
+     * The "background layer" of the flag, generally one or several
+     * squares or triangles of different color. The alignment of the
+     * background influences the size of the canton, if there is one.
+     */
     public enum Background {
             /** A plain background. */
         PLAIN(Alignment.NONE),
@@ -66,6 +84,11 @@ public class Flag {
         }
     };
 
+    /**
+     * The "middle layer" of the flag, generally a number of vertical,
+     * horizontal or diagonal bars. The decoration limits the shape
+     * and possible positions of the "union".
+     */
     public enum Decoration {
         NONE(),
         GREEK_CROSS(UnionPosition.CANTON),
@@ -96,6 +119,10 @@ public class Flag {
 
     };
 
+    /**
+     * The shape of the "union", which generally depends on the
+     * decoration or background of the flag.
+     */
     public enum UnionShape {
         RECTANGLE,
         TRIANGLE,
@@ -104,6 +131,11 @@ public class Flag {
         RHOMBUS
     };
 
+    /**
+     * The position of the "union", which depends on the alignment of
+     * the background. The "canton" is the top left quarter of the
+     * flag. Other quarters might be added.
+     */
     public enum UnionPosition {
         LEFT(Alignment.VERTICAL, 0),
         CENTER(Alignment.VERTICAL, 1),
@@ -131,9 +163,19 @@ public class Flag {
     public static final int WIDTH = 150;
     public static final int HEIGHT = 100;
     public static final double SQRT_3 = Math.sqrt(3);
+    /**
+     * MAGIC NUMBER: the width of decoration elements.
+     */
     public static final double DECORATION_SIZE = (double) HEIGHT / 7;
     public static final double CHEVRON_X = SQRT_3 * HEIGHT / 2;
+    /**
+     * MAGIC NUMBER: the size of the stars in the union.
+     */
     public static final double STAR_SIZE = 0.07 * HEIGHT;
+    /**
+     * MAGIC NUMBER: the horizontal offset of the vertical bar of the
+     * Scandinavian cross.
+     */
     public static final double CROSS_OFFSET = 2 * DECORATION_SIZE;
     public static final double BEND_X = DECORATION_SIZE;
     public static final double BEND_Y = DECORATION_SIZE / SQRT_3;
@@ -155,6 +197,11 @@ public class Flag {
         star.closePath();
     }
 
+    /**
+     * The distribution of stars in the "union", based on historical
+     * flags of the United States. This really should be extended to
+     * handle rectangles of different shapes.
+     */
     private static final int[][] layout = new int[51][2];
 
     static {
@@ -301,6 +348,11 @@ public class Flag {
         return this;
     }
 
+    /**
+     * Generate the flag.
+     *
+     * @returns an image of the flag
+     */
     public BufferedImage getImage() {
         BufferedImage image = new BufferedImage((int) WIDTH, (int) HEIGHT,
                                                 BufferedImage.TYPE_INT_RGB);
@@ -418,6 +470,14 @@ public class Flag {
         return image;
     }
 
+    /**
+     * Return the stars in a rectangular "union", distributed
+     * according to rules derived from historical flags of the United
+     * States.
+     *
+     * @param union The rectangular area to fill.
+     * @returns The union path
+     */
     private GeneralPath getUnionRectangle(Rectangle2D.Double union) {
 
         if (union == null) return null;
@@ -550,6 +610,13 @@ public class Flag {
         return unionPath;
     }
 
+    /**
+     * Flip or rotate a top left triangle so that it fits another
+     * corner.
+     *
+     * @param triangle The top left triangle.
+     * @returns The transformed triangle.
+     */
     private GeneralPath transformTriangle(GeneralPath triangle) {
         if (unionPosition == UnionPosition.TOP) {
             if (decoration == Decoration.BEND) {
@@ -571,11 +638,25 @@ public class Flag {
     }
 
 
+    /**
+     * Calculate the width of stripes on the basis of the given
+     * alignment.
+     *
+     * @param alignment The alignment of the stripes.
+     * @returns The width of the stripes.
+     */
     private double getStripeWidth(Alignment alignment) {
         return (alignment == Alignment.HORIZONTAL)
             ? WIDTH : (double) WIDTH / stripes;
     }
 
+    /**
+     * Calculate the height of stripes on the basis of the given
+     * alignment.
+     *
+     * @param alignment The alignment of the stripes.
+     * @returns The height of the stripes.
+     */
     private double getStripeHeight(Alignment alignment) {
         return (alignment == Alignment.VERTICAL)
             ? HEIGHT : (double) HEIGHT / stripes;
