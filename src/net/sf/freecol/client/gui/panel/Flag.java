@@ -384,7 +384,7 @@ public class Flag {
             decorationShape = getCross(decoration);
             break;
         case CHEVRON:
-            decorationShape = getChevron(false);
+            decorationShape = getTriangle(UnionShape.CHEVRON, false);
             break;
         case PALL:
             decorationShape = getPall();
@@ -428,19 +428,25 @@ public class Flag {
             starShape = getUnionRectangle(rectangle);
             break;
         case CHEVRON:
-            union = getChevron(decoration == Decoration.PALL);
+            union = getTriangle(unionShape, decoration == Decoration.PALL);
             starShape = getUnionTriangle(true);
             break;
         case BEND:
-            union = getTriangle((decoration == Decoration.BEND)
+            union = getTriangle(unionShape, (decoration == Decoration.BEND)
                                 || (decoration == Decoration.BEND_SINISTER));
             starShape = getUnionTriangle(false);
-            transformTriangle(union);
-            transformTriangle(starShape);
+            transformBend(union);
+            transformBend(starShape);
             break;
         case RHOMBUS:
             union = getRhombus();
             starShape = getUnionRhombus();
+            break;
+        case TRIANGLE:
+            union = getTriangle(unionShape, decoration == Decoration.SALTIRE);
+            starShape = getUnionTriangle(true);
+            transformTriangle(union);
+            transformTriangle(starShape);
             break;
         default:
             break;
@@ -485,12 +491,11 @@ public class Flag {
         boolean small = (decoration == Decoration.PALL
                          || decoration == Decoration.BEND
                          || decoration == Decoration.BEND_SINISTER);
-        Shape union = getChevron(small);
 
         double x = 0;
         double y = 0;
         double r = 0;
-        if (isosceles) {
+        if (unionShape == UnionShape.CHEVRON) {
             x = CHEVRON_X;
             y = HEIGHT;
             if (small) {
@@ -498,8 +503,29 @@ public class Flag {
                 y -= 2 * BEND_Y;
             }
             r = SQRT_3 * y / 6;
+        } else if (unionShape == UnionShape.TRIANGLE) {
+            if (unionPosition == UnionPosition.LEFT
+                || unionPosition == UnionPosition.RIGHT) {
+                x = WIDTH / 2;
+                y = HEIGHT;
+                if (small) {
+                    x -= BEND_X;
+                    y -= 2 * BEND_Y;
+                }
+                r = SQRT_3 * y / 6;
+            } else {
+                x = HEIGHT / 2;
+                y = WIDTH;
+                if (small) {
+                    x -= BEND_Y;
+                    y -= 2 * BEND_X;
+                }
+                double h = y / 2;
+                double c = Math.sqrt(h * h + x * x);
+                r = x * y / (y + 2 * c);
+            }
         } else {
-            // pythagorean
+            // union shape is bend
             x = WIDTH;
             y = HEIGHT;
             if (small) {
@@ -517,7 +543,12 @@ public class Flag {
         if (stars < 14) {
             unionPath = getCircleOfStars(radius);
             if (isosceles) {
-                center(unionPath, r, HEIGHT / 2);
+                if (unionPosition == UnionPosition.LEFT
+                    || unionPosition == UnionPosition.RIGHT) {
+                    center(unionPath, r, HEIGHT / 2);
+                } else {
+                    center(unionPath, r, WIDTH / 2);
+                }
             } else {
                 center(unionPath, r, r);
             }
@@ -567,7 +598,7 @@ public class Flag {
      * @param triangle The top left triangle.
      * @returns The transformed triangle.
      */
-    private GeneralPath transformTriangle(GeneralPath triangle) {
+    private GeneralPath transformBend(GeneralPath triangle) {
         if (unionPosition == UnionPosition.TOP) {
             if (decoration == Decoration.BEND) {
                 triangle.transform(AffineTransform.getScaleInstance(-1, 1));
@@ -583,6 +614,32 @@ public class Flag {
                 triangle.transform(AffineTransform.getQuadrantRotateInstance(2));
                 triangle.transform(AffineTransform.getTranslateInstance(WIDTH, HEIGHT));
             }
+        }
+        return triangle;
+    }
+
+    /**
+     * Flip or rotate a left triangle so that it fits another side.
+     *
+     * @param triangle The left triangle.
+     * @returns The transformed triangle.
+     */
+    private GeneralPath transformTriangle(GeneralPath triangle) {
+        switch(unionPosition) {
+        case TOP:
+            triangle.transform(AffineTransform.getQuadrantRotateInstance(1));
+            triangle.transform(AffineTransform.getTranslateInstance(WIDTH, 0));
+            break;
+        case BOTTOM:
+            triangle.transform(AffineTransform.getQuadrantRotateInstance(3));
+            triangle.transform(AffineTransform.getTranslateInstance(0, HEIGHT));
+            break;
+        case RIGHT:
+            triangle.transform(AffineTransform.getScaleInstance(-1, 1));
+            triangle.transform(AffineTransform.getTranslateInstance(WIDTH, 0));
+            break;
+        case LEFT:
+        default:
         }
         return triangle;
     }
@@ -770,7 +827,7 @@ public class Flag {
         double y1 = (HEIGHT - DECORATION_SIZE) / 2;
         double y2 = (HEIGHT + DECORATION_SIZE) / 2;
         double x = BEND_X + y1 * SQRT_3;
-        GeneralPath path = new GeneralPath(getChevron(true));
+        GeneralPath path = new GeneralPath(getTriangle(UnionShape.CHEVRON, true));
         path.lineTo(0, HEIGHT);
         path.lineTo(BEND_X, HEIGHT);
         path.lineTo(x, y2);
@@ -782,24 +839,15 @@ public class Flag {
         return path;
     }
 
-    private GeneralPath getChevron(boolean small) {
-        GeneralPath path = new GeneralPath();
-        double x = 0;
-        double y = 0;
-        if (small) {
-            x = BEND_X;
-            y = BEND_Y;
-        }
-        path.moveTo(0, y);
-        path.lineTo(CHEVRON_X - x, HEIGHT / 2);
-        path.lineTo(0, HEIGHT - y);
-        return path;
-    }
-
     /**
-     * Returns the top left triangle.
+     * Returns a triangle of the given shape and size. This is a large
+     * top left triangle if the given shape is BEND, and a small left
+     * triangle if the given shape is CHEVRON or TRIANGLE.
+     *
+     * @param unionShape The shape of the union.
+     * @param small Whether the shape is limited by decorations.
      */
-    private GeneralPath getTriangle(boolean small) {
+    private GeneralPath getTriangle(UnionShape unionShape, boolean small) {
         GeneralPath path = new GeneralPath();
         double x = 0;
         double y = 0;
@@ -807,9 +855,30 @@ public class Flag {
             x = BEND_X;
             y = BEND_Y;
         }
-        path.moveTo(0, HEIGHT - y);
-        path.lineTo(0, 0);
-        path.lineTo(WIDTH - x, 0);
+        switch(unionShape) {
+        case BEND:
+            path.moveTo(0, HEIGHT - y);
+            path.lineTo(0, 0);
+            path.lineTo(WIDTH - x, 0);
+            break;
+        case CHEVRON:
+            path.moveTo(0, y);
+            path.lineTo(CHEVRON_X - x, HEIGHT / 2);
+            path.lineTo(0, HEIGHT - y);
+            break;
+        case TRIANGLE:
+            if (unionPosition == UnionPosition.LEFT
+                || unionPosition == UnionPosition.RIGHT) {
+                path.moveTo(0, y);
+                path.lineTo(WIDTH / 2 - x, HEIGHT / 2);
+                path.lineTo(0, HEIGHT - y);
+            } else {
+                path.moveTo(0, x);
+                path.lineTo(HEIGHT / 2 - y, WIDTH / 2);
+                path.lineTo(0, WIDTH - x);
+            }
+            break;
+        }
         return path;
     }
 
@@ -878,6 +947,11 @@ public class Flag {
         return union;
     }
 
+    /**
+     * Return the basic five-point star.
+     *
+     * @returns the basic star shape
+     */
     private static GeneralPath getStar() {
         GeneralPath star = new GeneralPath(GeneralPath.WIND_NON_ZERO);
         double angle = 2 * Math.PI / 5;
@@ -896,10 +970,23 @@ public class Flag {
         return star;
     }
 
+    /**
+     * Returns a star at the given coordinates (x, y).
+     *
+     * @param x The x coordinate of the star.
+     * @param y The y coordinate of the star.
+     */
     public GeneralPath getStar(double x, double y) {
         return getStar(-1, x, y);
     }
 
+    /**
+     * Returns a star of the given scale at the given coordinates (x, y).
+     *
+     * @param scale The scale of the star.
+     * @param x The x coordinate of the star.
+     * @param y The y coordinate of the star.
+     */
     public GeneralPath getStar(double scale, double x, double y) {
         GeneralPath newStar = new GeneralPath(star);
         if (scale > 0) {
