@@ -180,22 +180,7 @@ public class Flag {
     public static final double BEND_X = DECORATION_SIZE;
     public static final double BEND_Y = DECORATION_SIZE / SQRT_3;
 
-    private static final GeneralPath star
-        = new GeneralPath(GeneralPath.WIND_NON_ZERO);
-
-    static {
-        double angle = 2 * Math.PI / 5;
-        double y = -STAR_SIZE / 2;
-        star.moveTo(0, y);
-        int[] vertex = new int[] { 2, 4, 1, 3 };
-        for (int i : vertex) {
-            double phi = i * angle;
-            double xx = -y * Math.sin(phi);
-            double yy = y * Math.cos(phi);
-            star.lineTo(xx, yy);
-        }
-        star.closePath();
-    }
+    private static final GeneralPath star = getStar();
 
     /**
      * The distribution of stars in the "union", based on historical
@@ -483,33 +468,16 @@ public class Flag {
 
         if (union == null) return null;
 
-        double radius = 0.3 * Math.min(union.height, union.width);
-
         GeneralPath unionPath;
-        if (stars == 0) {
-            // nothing to do
-            return null;
-        } else if (stars == 1) {
-            unionPath = getStar();
-            unionPath.transform(AffineTransform.getScaleInstance(2, 2));
-        } else if (stars == 2) {
-            unionPath = new GeneralPath();
-            GeneralPath newStar = getStar();
-            newStar.transform(AffineTransform.getScaleInstance(1.5, 1.5));
-            unionPath.append(newStar, false);
-            newStar = getStar();
-            newStar.transform(AffineTransform.getScaleInstance(1.5, 1.5));
-            newStar.transform(AffineTransform.getTranslateInstance(radius, 0));
-            unionPath.append(newStar, false);
-        } else if (stars < 14) {
+        if (stars < 14) {
+            double radius = 0.3 * Math.min(union.height, union.width);
             unionPath = getCircleOfStars(radius);
         } else {
             unionPath = getGridOfStars(union);
         }
-        Rectangle2D bounds = unionPath.getBounds2D();
-        double x = (union.x - bounds.getX()) + (union.width - bounds.getWidth()) / 2;
-        double y = (union.y - bounds.getY()) + (union.height - bounds.getHeight()) / 2;
-        unionPath.transform(AffineTransform.getTranslateInstance(x, y));
+        double x = union.x + union.width / 2;
+        double y = union.y + union.height / 2;
+        center(unionPath, x, y);
         return unionPath;
     }
 
@@ -523,52 +491,35 @@ public class Flag {
         double y = 0;
         double r = 0;
         if (isosceles) {
-            r = SQRT_3 * HEIGHT / 6;
             x = CHEVRON_X;
             y = HEIGHT;
             if (small) {
                 x -= BEND_X;
                 y -= 2 * BEND_Y;
             }
+            r = SQRT_3 * y / 6;
         } else {
             // pythagorean
-            double c = Math.sqrt(WIDTH * WIDTH + HEIGHT * HEIGHT);
-            double A = HEIGHT * WIDTH / 2;
-            r = 2 * A / (WIDTH + HEIGHT + c);
             x = WIDTH;
             y = HEIGHT;
             if (small) {
                 x -= BEND_X;
                 y -= BEND_Y;
             }
+            double c = Math.sqrt(x * x + y * y);
+            double A = x * y / 2;
+            r = 2 * A / (x + y + c);
         }
         // leave a margin
         double radius = r * 0.6;
 
         GeneralPath unionPath = new GeneralPath();
-        if (stars == 0) {
-            // nothing to do
-            return null;
-        } else if (stars == 1) {
-            unionPath = getStar();
-            unionPath.transform(AffineTransform.getScaleInstance(2, 2));
-            unionPath.transform(AffineTransform.getTranslateInstance(r, HEIGHT / 2));
-        } else if (stars == 2) {
-            unionPath = new GeneralPath();
-            GeneralPath newStar = getStar();
-            newStar.transform(AffineTransform.getScaleInstance(1.5, 1.5));
-            unionPath.append(newStar, false);
-            newStar = getStar();
-            newStar.transform(AffineTransform.getScaleInstance(1.5, 1.5));
-            newStar.transform(AffineTransform.getTranslateInstance(radius, 0));
-            unionPath.append(newStar, false);
-            unionPath.transform(AffineTransform.getTranslateInstance(r, HEIGHT / 2));
-        } else if (stars < 14) {
+        if (stars < 14) {
             unionPath = getCircleOfStars(radius);
             if (isosceles) {
-                double dx = r - unionPath.getBounds().getWidth() / 2;
-                double dy = (HEIGHT - unionPath.getBounds().getHeight()) / 2;
-                unionPath.transform(AffineTransform.getTranslateInstance(dx, dy));
+                center(unionPath, r, HEIGHT / 2);
+            } else {
+                center(unionPath, r, r);
             }
         } else {
 
@@ -600,9 +551,7 @@ public class Flag {
                     missing = 0;
                 }
                 for (int star = 0; star < count; star++) {
-                    GeneralPath newStar = getStar();
-                    newStar.transform(AffineTransform.getTranslateInstance(xx, yy + offset));
-                    unionPath.append(newStar, false);
+                    unionPath.append(getStar(xx, yy + offset), false);
                     yy += dy;
                 }
                 xx += dx;
@@ -652,45 +601,23 @@ public class Flag {
         int starCount = 0;
         double a = WIDTH / 2 - BEND_X;
         double b = HEIGHT / 2 - BEND_Y;
-        double c = Math.sqrt(a * a + b * b);
-        double r = (a * b) / c;
-        double radius = 0.6 * r;
-        double dx = a / count;
-        double dy = b / count;
-        double dx1 = a / rows;
-        double dy1 = b / rows;
 
-        GeneralPath newStar;
-        if (stars == 0) {
-            // nothing to do
-            return null;
-        } else if (stars == 1) {
-            unionPath = getStar();
-            unionPath.transform(AffineTransform.getScaleInstance(2, 2));
-            unionPath.transform(AffineTransform.getTranslateInstance(WIDTH / 2, HEIGHT / 2));
-        } else if (stars == 2) {
-            unionPath = new GeneralPath();
-            newStar = getStar();
-            newStar.transform(AffineTransform.getScaleInstance(1.5, 1.5));
-            unionPath.append(newStar, false);
-            newStar = getStar();
-            newStar.transform(AffineTransform.getScaleInstance(1.5, 1.5));
-            newStar.transform(AffineTransform.getTranslateInstance(WIDTH / 4, 0));
-            unionPath.append(newStar, false);
-            unionPath.transform(AffineTransform.getTranslateInstance(3 * WIDTH / 8, HEIGHT / 2));
-        } else if (stars < 14) {
+        if (stars < 14) {
+            double c = Math.sqrt(a * a + b * b);
+            double r = (a * b) / c;
+            double radius = 0.6 * r;
             unionPath = getCircleOfStars(radius);
-            double x = (WIDTH - unionPath.getBounds().getWidth()) / 2;
-            double y = (HEIGHT - unionPath.getBounds().getHeight()) / 2;
-            unionPath.transform(AffineTransform.getTranslateInstance(x, y));
+            center(unionPath, WIDTH / 2, HEIGHT / 2);
         } else {
+            double dx = a / count;
+            double dy = b / count;
+            double dx1 = a / rows;
+            double dy1 = b / rows;
             outer: for (int index = 0; index < rows; index++) {
                 double x = BEND_X + dx + index * dx1;
                 double y = HEIGHT / 2 - index * dy1;
                 for (int star = 0; star < count; star++) {
-                    newStar = getStar();
-                    newStar.transform(AffineTransform.getTranslateInstance(x, y));
-                    unionPath.append(newStar, false);
+                    unionPath.append(getStar(x, y), false);
                     starCount++;
                     if (starCount == stars) {
                         break outer;
@@ -951,24 +878,78 @@ public class Flag {
         return union;
     }
 
-    public GeneralPath getStar() {
-        return (GeneralPath) star.clone();
+    private static GeneralPath getStar() {
+        GeneralPath star = new GeneralPath(GeneralPath.WIND_NON_ZERO);
+        double angle = 2 * Math.PI / 5;
+        double radius = STAR_SIZE / 2;
+        double x = 0;
+        double y = -radius;
+        star.moveTo(x, y);
+        int[] vertex = new int[] { 2, 4, 1, 3 };
+        for (int i : vertex) {
+            double phi = i * angle;
+            x = radius * Math.sin(phi);
+            y = -radius * Math.cos(phi);
+            star.lineTo(x, y);
+        }
+        star.closePath();
+        return star;
     }
 
+    public GeneralPath getStar(double x, double y) {
+        return getStar(-1, x, y);
+    }
+
+    public GeneralPath getStar(double scale, double x, double y) {
+        GeneralPath newStar = new GeneralPath(star);
+        if (scale > 0) {
+            newStar.transform(AffineTransform.getScaleInstance(scale, scale));
+        }
+        newStar.transform(AffineTransform.getTranslateInstance(x, y));
+        return newStar;
+    }
+
+    /**
+     * Centers the given path on the given point (x,y).
+     *
+     * @param path The path to center.
+     * @param x The x coordinate of the center.
+     * @param y The y coordinate of the center.
+     */
+    private void center(GeneralPath path, double x, double y) {
+        double dx = x - path.getBounds().getX() - path.getBounds().getWidth() / 2;
+        double dy = y - path.getBounds().getY() - path.getBounds().getHeight() / 2;
+        path.transform(AffineTransform.getTranslateInstance(dx, dy));
+    }
+
+    /**
+     * Returns either a single star, or a circle of stars with the
+     * given radius, centered at the origin.
+     *
+     * @param radius The radius of the circle.
+     * @returns The circle of stars.
+     */
     private GeneralPath getCircleOfStars(double radius) {
         double phi = Math.PI * 2 / stars;
-        GeneralPath circle = new GeneralPath();
-        for (int i = 0; i < stars; i++) {
-            GeneralPath newStar = (GeneralPath) star.clone();
-            double xx = -radius - radius * Math.sin(i * phi);
-            double yy = -radius * Math.cos(i * phi);
-            newStar.transform(AffineTransform.getTranslateInstance(xx, yy));
-            circle.append(newStar, false);
+        GeneralPath unionPath = new GeneralPath();
+        if (stars == 0) {
+            // nothing to do
+        } else if (stars == 1) {
+            // one double sized star
+            unionPath = getStar(2, 0, 0);
+        } else if (stars == 2) {
+            // two larger stars, on the x axis
+            unionPath.append(getStar(1.5, -radius, 0), false);
+            unionPath.append(getStar(1.5, radius, 0), false);
+        } else {
+            // a general circle of stars
+            for (int i = 0; i < stars; i++) {
+                double x = -radius - radius * Math.sin(i * phi);
+                double y = -radius * Math.cos(i * phi);
+                unionPath.append(getStar(x, y), false);
+            }
         }
-        double x = circle.getBounds().getX();
-        double y = circle.getBounds().getY();
-        circle.transform(AffineTransform.getTranslateInstance(-x, -y));
-        return circle;
+        return unionPath;
     }
 
 
@@ -999,9 +980,7 @@ public class Flag {
                 if (count > stars) {
                     break;
                 }
-                GeneralPath newStar = getStar();
-                newStar.transform(AffineTransform.getTranslateInstance(x, y));
-                grid.append(newStar, false);
+                grid.append(getStar(x, y), false);
                 x += 2 * hSpace;
                 count++;
             }
