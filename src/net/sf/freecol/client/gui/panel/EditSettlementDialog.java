@@ -41,6 +41,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
@@ -192,7 +193,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         Object value = getValue();
         if (options.get(0).equals(value)) { // OK
             settlement.setName(name.getText());
-            Nation newNation = (Nation) owner.getSelectedItem();
+            Nation newNation = (Nation)owner.getSelectedItem();
             if (newNation != settlement.getOwner().getNation()) {
                 Player newPlayer = settlement.getGame()
                     .getPlayer(newNation.getId());
@@ -233,9 +234,17 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
                     unit.dispose();
                 }
             }
-            settlement.setType(newNation.getType()
-                .getSettlementType(settlement.isCapital()));
+            SettlementType type = newNation.getType()
+                .getSettlementType(settlement.isCapital());
+            settlement.setType(type);
+            for (Modifier m : settlement.getModifierSet(Modifier.DEFENCE)) {
+                m.setSource(type);
+            }
             for (Unit u : settlement.getUnitList()) {
+                u.setEthnicity(newNation.getId());
+                u.setNationality(newNation.getId());
+            }
+            for (Unit u : settlement.getTile().getUnitList()) {
                 u.setEthnicity(newNation.getId());
                 u.setNationality(newNation.getId());
             }

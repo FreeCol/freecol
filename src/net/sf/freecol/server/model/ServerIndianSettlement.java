@@ -138,7 +138,7 @@ public class ServerIndianSettlement extends IndianSettlement
         int low = getType().getMinimumSize();
         int high = getType().getMaximumSize();
         int count = Utils.randomInt(logger, "Units at " + getName(), random,
-                                    high - low) + low;
+                                    high - low + 1) + low;
         for (int i = 0; i < count; i++) {
             Unit unit = new ServerUnit(game, this, getOwner(), brave,
                                        brave.getDefaultRole());
