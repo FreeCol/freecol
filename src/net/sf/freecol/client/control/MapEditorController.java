@@ -200,6 +200,7 @@ public final class MapEditorController {
 
     /**
      * Saves the game to the given file.
+     *
      * @param file The <code>File</code>.
      */
     public void saveGame(final File file) {
