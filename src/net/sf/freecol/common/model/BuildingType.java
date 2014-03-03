@@ -451,7 +451,13 @@ public final class BuildingType extends BuildableType
         final String tag = xr.getLocalName();
 
         if (PRODUCTION_TAG.equals(tag)) {
-            productionTypes.add(new ProductionType(xr, spec));
+            if (xr.getAttribute(DELETE_TAG, false)) {
+                productionTypes.clear();
+                xr.closeTag(PRODUCTION_TAG);
+
+            } else {
+                productionTypes.add(new ProductionType(xr, spec));
+            }
 
         } else {
             super.readChild(xr);

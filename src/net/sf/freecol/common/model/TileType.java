@@ -598,6 +598,11 @@ public final class TileType extends FreeColGameObjectType {
             xr.closeTag(GEN_TAG);
 
         } else if (PRODUCTION_TAG.equals(tag)
+            && xr.getAttribute(DELETE_TAG, false)) {
+            productionTypes.clear();
+            xr.closeTag(PRODUCTION_TAG);
+
+        } else if (PRODUCTION_TAG.equals(tag)
             && xr.getAttribute(GOODS_TYPE_TAG, (String)null) == null) {
             // new production style
             addProductionType(new ProductionType(xr, spec));
