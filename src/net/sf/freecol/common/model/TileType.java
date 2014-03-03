@@ -452,15 +452,17 @@ public final class TileType extends FreeColGameObjectType {
     private static final String IS_ELEVATION_TAG = "is-elevation";
     private static final String IS_FOREST_TAG = "is-forest";
     private static final String IS_WATER_TAG = "is-water";
-    private static final String PRIMARY_PRODUCTION_TAG = "primary-production";
     private static final String PROBABILITY_TAG = "probability";
     private static final String PRODUCTION_TAG = "production";
     private static final String RESOURCE_TAG = "resource";
-    private static final String SECONDARY_PRODUCTION_TAG = "secondary-production";
     private static final String TEMPERATURE_MIN_TAG = "temperatureMin";
     private static final String TEMPERATURE_MAX_TAG = "temperatureMax";
     private static final String TILE_PRODUCTION_TAG = "tile-production";
     private static final String TYPE_TAG = "type";
+    // @compat 0.10.x
+    private static final String PRIMARY_PRODUCTION_TAG = "primary-production";
+    private static final String SECONDARY_PRODUCTION_TAG = "secondary-production";
+    // end @compat 0.10.x
 
 
     /**
@@ -608,9 +610,9 @@ public final class TileType extends FreeColGameObjectType {
             addProductionType(new ProductionType(xr, spec));
 
         } else if (PRODUCTION_TAG.equals(tag)
+            // @compat 0.10.6
             || PRIMARY_PRODUCTION_TAG.equals(tag)
             || SECONDARY_PRODUCTION_TAG.equals(tag)) {
-            // @compat 0.10.6
             GoodsType type = xr.getType(spec, GOODS_TYPE_TAG,
                                         GoodsType.class, (GoodsType)null);
             int amount = xr.getAttribute(VALUE_TAG, 0);
@@ -630,12 +632,12 @@ public final class TileType extends FreeColGameObjectType {
                         productionType.getOutputs().add(goods);
                     }
                 }
+            // end @compat
             } else {
                 addProductionType(new ProductionType(goods, false,
                                                      tileProduction));
             }
             xr.closeTag(tag);
-            // end @compat
 
         } else if (RESOURCE_TAG.equals(tag)) {
             addResourceType(xr.getType(spec, TYPE_TAG, ResourceType.class,
