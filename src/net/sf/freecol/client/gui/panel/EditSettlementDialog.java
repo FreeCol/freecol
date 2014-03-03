@@ -44,6 +44,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.SettlementType;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -84,7 +85,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         super(freeColClient);
 
         this.settlement = settlement;
-
+        
         MigPanel panel = new MigPanel(new MigLayout("wrap 2, gapx 20"));
 
         name = new JTextField(settlement.getName(), 30);
@@ -111,6 +112,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         SpinnerNumberModel spinnerModel
             = new SpinnerNumberModel(unitCount, 1, 20, 1);
         units = new JSpinner(spinnerModel);
+        spinnerModel.setValue(getAverageSize());
 
         panel.add(new JLabel(Messages.message("name")));
         panel.add(name);
@@ -135,10 +137,30 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
             getGUI().getImageLibrary().getImageIcon(settlement, true), c);
     }
 
+    private Player getOwnerPlayer() {
+        String id = ((Nation)owner.getSelectedItem()).getId();
+        for (Player player : settlement.getGame().getPlayers()) {
+            if (player.getNationId().equals(id)) return player;
+        }
+        return null;
+    }
+
+    private IndianNationType getNationType() {
+        return (IndianNationType)((Nation)owner.getSelectedItem()).getType();
+    }
+
+    private SettlementType getSettlementType() {
+        return getNationType().getSettlementType(capital.isSelected());
+    }
+        
+    private int getAverageSize() {
+        SettlementType t = getSettlementType();
+        return (t.getMinimumSize() + t.getMaximumSize()) / 2;
+    }
+
     @SuppressWarnings("unchecked") // FIXME in Java7
     private DefaultComboBoxModel getSkillModel() {
-        IndianNationType ownerType = (IndianNationType)
-            ((Nation) owner.getSelectedItem()).getType();
+        IndianNationType ownerType = getNationType();
         DefaultComboBoxModel skillModel = new DefaultComboBoxModel();
         for (RandomChoice<UnitType> skill : ownerType.getSkills()) {
             skillModel.addElement(skill.getObject());
@@ -148,8 +170,14 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
 
     @SuppressWarnings("unchecked") // FIXME in Java7
     public void itemStateChanged(ItemEvent e) {
+        Player player = getOwnerPlayer();
+        if (player != null) {
+            name.setText((capital.isSelected()) ? player.getCapitalName(null)
+                : player.getSettlementName(null));
+        }
         skill.setModel(getSkillModel());
         skill.setSelectedItem(settlement.getLearnableSkill());
+        units.getModel().setValue(getAverageSize());
     }
 
 
