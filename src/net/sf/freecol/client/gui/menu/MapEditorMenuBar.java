@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.logging.Logger;
 
 import javax.swing.ButtonGroup;
@@ -115,11 +116,22 @@ public class MapEditorMenuBar extends FreeColMenuBar {
         JMenuItem playItem = new JMenuItem(Messages.message("startGame"));
         playItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    File saveGameFile = new File(FreeColDirectories.getAutosaveDirectory(), "tempMap.fsg");
-                    OptionGroup options = freeColClient.getGame().getMapGeneratorOptions();
-                    FileOption fileOption = (FileOption) options.getOption(MapGeneratorOptions.IMPORT_FILE);
+                    File saveGameFile
+                        = new File(FreeColDirectories.getAutosaveDirectory(),
+                                   "tempMap.fsg");
+                    freeColClient.getMapEditorController()
+                        .saveGame(saveGameFile);
+                    OptionGroup options = freeColClient.getGame()
+                        .getMapGeneratorOptions();
+                    FileOption fileOption = (FileOption)options
+                        .getOption(MapGeneratorOptions.IMPORT_FILE);
                     fileOption.setValue(saveGameFile);
-                    freeColClient.getMapEditorController().saveGame(saveGameFile);
+                    File mapOptionsFile
+                        = new File(FreeColDirectories.getOptionsDirectory(),
+                            FreeColDirectories.MAP_GENERATOR_OPTIONS_FILE_NAME);
+                    try {
+                        options.save(mapOptionsFile);
+                    } catch (FileNotFoundException fnfe) {}
                     freeColClient.newGame();
                 }
             });
