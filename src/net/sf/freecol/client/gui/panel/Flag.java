@@ -245,6 +245,15 @@ public class Flag {
         this.unionPosition = unionPosition;
     }
 
+    public Background getBackground() {
+        return background;
+    }
+
+    public Flag setBackground(Background background) {
+        this.background = background;
+        return this;
+    }
+
     public List<Color> getBackgroundColors() {
         return backgroundColors;
     }
