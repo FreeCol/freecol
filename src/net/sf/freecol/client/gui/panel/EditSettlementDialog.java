@@ -257,12 +257,8 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
             }
             // Dispose of units and settlement on tile
             Tile tile = settlement.getTile();
-            for (Unit unit : tile.getUnitList()) {
-                unit.dispose();
-            }
-            // TODO: improve recalculation of tile ownership
-            ((ServerPlayer)settlement.getOwner())
-                .csDisposeSettlement(settlement, new ChangeSet());
+            for (Unit unit : tile.getUnitList()) unit.dispose();
+            settlement.exciseSettlement();
         }
         for (Tile t : tiles) gui.refreshTile(t);
         return ret;

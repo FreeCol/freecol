@@ -358,10 +358,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                     nativePlayer, name, t, false, skill, null);
             nativePlayer.addSettlement(settlement);
             settlement.placeSettlement(true);
-            Random random = getFreeColClient().getFreeColServer()
-                .getServerRandom();
-            settlement.addRandomGoods(random);
-            settlement.addRandomUnits(random);
+            settlement.addUnits(null);
             logger.info("Add settlement " + settlement.getName()
                 + " to tile " + t);
         }

@@ -271,48 +271,61 @@ public class SimpleMapGenerator implements MapGenerator {
                 logger.info("Found native nation " + player.getNationId()
                     + " for import: " + indian.getId());
             }
-            for (IndianSettlement template : player.getIndianSettlements()) {
-                int x = template.getTile().getX();
-                int y = template.getTile().getY();
+            for (IndianSettlement is : player.getIndianSettlements()) {
+                int x = is.getTile().getX();
+                int y = is.getTile().getY();
                 Tile tile = map.getTile(x, y);
                 if (tile == null) continue;
-                UnitType skill = template.getLearnableSkill();
-                IndianSettlement settlement
+                UnitType skill = is.getLearnableSkill();
+                ServerIndianSettlement settlement
                     = new ServerIndianSettlement(game, indian,
-                        template.getName(), tile, template.isCapital(),
-                        skill, null);
-                tile.setSettlement(settlement);
-                indian.addSettlement(settlement);
-                // TODO: the template settlement might have
-                // additional owned units elsewhere on the map
-                for (Unit unit: template.getUnitList()) {
-                    UnitType t = spec.getUnitType(unit.getType().getId());
-                    Unit newUnit = new ServerUnit(game, settlement, indian, t);
-                    settlement.add(newUnit);
-                    settlement.addOwnedUnit(newUnit);
+                        is.getName(), tile, is.isCapital(), skill, null);
+                settlement.placeSettlement(false);
+
+                List<Unit> units = is.getUnitList();
+                if (units.isEmpty()) {
+                    settlement.addUnits(random);
+                } else {
+                    for (Unit u : units) {
+                        UnitType t = spec.getUnitType(u.getType().getId());
+                        if (t != null) {
+                            Unit unit = new ServerUnit(game, settlement,
+                                                       indian, t);
+                            settlement.add(unit);
+                            settlement.addOwnedUnit(unit);
+                        }
+                    }
                 }
-                for (Goods goods : template.getCompactGoods()) {
-                    GoodsType type = spec.getGoodsType(goods.getType().getId());
-                    settlement.addGoods(type, goods.getAmount());
+
+                List<Goods> goods = is.getCompactGoods();
+                if (goods.isEmpty()) {
+                    settlement.addRandomGoods(random);
+                } else {
+                    for (Goods g : goods) {
+                        GoodsType t = spec.getGoodsType(g.getType().getId());
+                        if (t != null) {
+                            settlement.addGoods(t, g.getAmount());
+                        }
+                    }
                 }
-                settlement.setWantedGoods(template.getWantedGoods());
+                settlement.setWantedGoods(is.getWantedGoods());
                 nSettlements++;
             }
         }
 
         if (nSettlements > 0) {
-            for (Tile template : importGame.getMap().getAllTiles()) {
-                if (template.getOwner() == null) continue;
-                String nationId = template.getOwner().getNationId();
+            for (Tile t : importGame.getMap().getAllTiles()) {
+                if (t.getOwner() == null) continue;
+                String nationId = t.getOwner().getNationId();
                 Player owner = game.getPlayer(nationId);
-                Tile tile = map.getTile(template.getX(), template.getY());
-                if (owner != null && tile != null) {
-                    tile.setOwner(owner);
-                    if (template.getOwningSettlement() != null) {
-                        String name = template.getOwningSettlement().getName();
-                        Settlement is = game.getSettlement(name);
-                        tile.setOwningSettlement(is);
-                    }
+                if (owner == null) continue;
+                Tile tile = map.getTile(t.getX(), t.getY());
+                if (tile == null) continue;
+                tile.setOwner(owner);
+                if (tile.getOwningSettlement() != null) {
+                    String name = tile.getOwningSettlement().getName();
+                    Settlement is = game.getSettlement(name);
+                    tile.setOwningSettlement(is);
                 }
             }
         }
@@ -713,7 +726,7 @@ public class SimpleMapGenerator implements MapGenerator {
 
         settlement.placeSettlement(true);
         settlement.addRandomGoods(random);
-        settlement.addRandomUnits(random);
+        settlement.addUnits(random);
 
         return settlement;
     }

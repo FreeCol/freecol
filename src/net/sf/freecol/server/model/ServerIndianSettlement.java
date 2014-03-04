@@ -127,18 +127,32 @@ public class ServerIndianSettlement extends IndianSettlement
 
 
     /**
-     * Add the standard number of units to this settlement and tile.
+     * Add a standard number of units to this settlement and tile.  If
+     * a pseudo-random number source is provided use it to pick a
+     * random number of units within the ranges provided by the
+     * settlement type, otherwise use the average.
      *
-     * @param random A pseudo-random number source.
+     * @param random An optional pseudo-random number source.
      */
-    public void addRandomUnits(Random random) {
-        final Game game = getGame();
-        final Specification spec = getSpecification();
-        final UnitType brave = spec.getUnitType("model.unit.brave");
+    public void addUnits(Random random) {
         int low = getType().getMinimumSize();
         int high = getType().getMaximumSize();
-        int count = Utils.randomInt(logger, "Units at " + getName(), random,
-                                    high - low + 1) + low;
+        int count = (random == null) ? (high + low) / 2
+            : Utils.randomInt(logger, "Units at " + getName(), random,
+                              high - low + 1) + low;
+        addUnits(count);
+    }
+
+    /**
+     * Add a given number of units to the settlement.
+     *
+     * @param count The number of units to add.
+     */
+    public void addUnits(int count) {
+        final Specification spec = getSpecification();
+        final Game game = getGame();
+        final UnitType brave = spec.getUnitType("model.unit.brave");
+
         for (int i = 0; i < count; i++) {
             Unit unit = new ServerUnit(game, this, getOwner(), brave,
                                        brave.getDefaultRole());
