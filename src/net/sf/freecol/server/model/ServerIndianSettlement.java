@@ -143,11 +143,7 @@ public class ServerIndianSettlement extends IndianSettlement
             Unit unit = new ServerUnit(game, this, getOwner(), brave,
                                        brave.getDefaultRole());
             unit.setHomeIndianSettlement(this);
-            if (i == 0) {
-                unit.setLocation(tile);
-            } else {
-                unit.setLocation(this);
-            }
+            unit.setLocation(this);
         }
     }
 
