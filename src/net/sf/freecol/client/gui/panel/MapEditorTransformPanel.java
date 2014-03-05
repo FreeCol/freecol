@@ -42,6 +42,7 @@ import net.sf.freecol.client.control.MapEditorController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map.Direction;
@@ -51,6 +52,7 @@ import net.sf.freecol.common.model.Resource;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.SettlementType;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementStyle;
@@ -61,6 +63,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.generator.RiverSection;
 import net.sf.freecol.server.model.ServerIndianSettlement;
+import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
 
 
@@ -85,9 +88,9 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     private ButtonGroup group;
 
     /**
-     * A native player to use for native settlement type and skill.
+     * A native nation to use for native settlement type and skill.
      */
-    private static Player nativePlayer = null;
+    private static Nation nativeNation = null;
 
 
     /**
@@ -98,16 +101,8 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     public MapEditorTransformPanel(FreeColClient freeColClient) {
         super(freeColClient, new BorderLayout());
 
-        // Make sure the native players are present.
-        if (getGame().getPlayers().isEmpty()) {
-            getFreeColClient().getFreeColServer().initializeAI(false);
-        }
-        for (Player p : getGame().getPlayers()) {
-            if (p.isIndian()) {
-                nativePlayer = p;
-                break;
-            }
-        }
+        this.nativeNation = getSpecification().getIndianNations().get(0);
+
         listPanel = new JPanel(new GridLayout(2, 0));
 
         group = new ButtonGroup();
@@ -127,7 +122,8 @@ public final class MapEditorTransformPanel extends FreeColPanel {
      * Builds the buttons for all the terrains.
      */
     private void buildList() {
-        List<TileType> tileList = getSpecification().getTileTypeList();
+        final Specification spec = getSpecification();
+        List<TileType> tileList = spec.getTileTypeList();
         for (TileType type : tileList) {
             listPanel.add(buildButton(getLibrary().getCompoundTerrainImage(type, 0.5),
                                       Messages.message(type.getNameKey()),
@@ -145,12 +141,11 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         listPanel.add(buildButton(getLibrary().getMiscImage(ImageLibrary.LOST_CITY_RUMOUR, 0.66),
                                   Messages.message("model.message.LOST_CITY_RUMOUR"),
                                   new LostCityRumourTransform()));
-        if (nativePlayer != null) {
-            SettlementType settlementType = nativePlayer.getNationType().getCapitalType();
-            settlementButton = buildButton(getLibrary().getSettlementImage(settlementType, 0.5),
-                                           Messages.message("Settlement"), new SettlementTransform());
-            listPanel.add(settlementButton);
-        }
+        SettlementType settlementType = nativeNation.getType().getCapitalType();
+        settlementButton = buildButton(getLibrary().getSettlementImage(settlementType, 0.5),
+                                       Messages.message("Settlement"),
+                                       new SettlementTransform());
+        listPanel.add(settlementButton);
     }
 
     /**
@@ -174,30 +169,30 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         button.setOpaque(false);
         group.add(button);
         button.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-            	MapEditorController ctlr = getFreeColClient().getMapEditorController();
-            	MapTransform newMapTransform = null;
-            	if(ctlr.getMapTransform() != mt){
-            		newMapTransform = mt;
-            	}
-            	ctlr.setMapTransform(newMapTransform);
-            	if(newMapTransform == null && mt != null){
-            		//select the invisible button, de-selecting all others
-            		group.setSelected(group.getElements().nextElement().getModel(),true);
-            	}
-            }
-        });
+                public void actionPerformed(ActionEvent e) {
+                    MapEditorController ctlr = getFreeColClient().getMapEditorController();
+                    MapTransform newMapTransform = null;
+                    if(ctlr.getMapTransform() != mt){
+                        newMapTransform = mt;
+                    }
+                    ctlr.setMapTransform(newMapTransform);
+                    if(newMapTransform == null && mt != null){
+                        //select the invisible button, de-selecting all others
+                        group.setSelected(group.getElements().nextElement().getModel(),true);
+                    }
+                }
+            });
         button.setBorder(null);
         return button;
     }
 
     /**
-     * Set the <code>NativePlayer</code> value.
+     * Set the native nation.
      *
-     * @param newNativePlayer The new NativePlayer value.
+     * @param newNativeNation The new native <code>Nation</code>.
      */
-    public static void setNativePlayer(final Player newNativePlayer) {
-        nativePlayer = newNativePlayer;
+    public static void setNativeNation(Nation newNativeNation) {
+        nativeNation = newNativeNation;
     }
 
     /**
@@ -349,9 +344,10 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         public void transform(Tile t) {
             if (!t.isLand()
                 || t.hasSettlement()
-                || nativePlayer == null) return;
-            UnitType skill = ((IndianNationType)nativePlayer
-                .getNationType()).getSkills().get(0).getObject();
+                || nativeNation == null) return;
+            UnitType skill = ((IndianNationType)nativeNation.getType())
+                .getSkills().get(0).getObject();
+            Player nativePlayer = getGame().getPlayer(nativeNation.getId());
             String name = nativePlayer.getSettlementName(null);
             ServerIndianSettlement settlement
                 = new ServerIndianSettlement(t.getGame(),

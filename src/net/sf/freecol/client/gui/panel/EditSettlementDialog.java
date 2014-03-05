@@ -206,7 +206,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
                 for (Tile t : settlement.getOwnedTiles()) {
                     t.setOwner(newPlayer);//-til
                 }
-                MapEditorTransformPanel.setNativePlayer(newPlayer);
+                MapEditorTransformPanel.setNativeNation(newNation);
             }
             if (capital.isSelected() && !settlement.isCapital()) {
                 // make sure we downgrade the old capital

@@ -45,6 +45,7 @@ import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.generator.MapGenerator;
 
 
@@ -254,6 +255,7 @@ public final class MapEditorController {
 
     /**
      * Loads a game from the given file.
+     *
      * @param file The <code>File</code>.
      */
     public void loadGame(File file) {
@@ -264,7 +266,7 @@ public final class MapEditorController {
         class ErrorJob implements Runnable {
             private final String message;
 
-            ErrorJob( String message ) {
+            ErrorJob(String message) {
                 this.message = message;
             }
 
@@ -277,51 +279,49 @@ public final class MapEditorController {
         gui.showStatusPanel(Messages.message("status.loadingGame"));
 
         Runnable loadGameJob = new Runnable() {
-            public void run() {
-                FreeColServer freeColServer = null;
-                try {
-                    Specification spec = getDefaultSpecification();
-                    freeColServer = new FreeColServer(new FreeColSavegameFile(theFile),
-                        spec, 0, "MapEditor");
-                    freeColClient.setFreeColServer(freeColServer);
-                    freeColClient.setGame(freeColServer.getGame());
-                    SwingUtilities.invokeLater( new Runnable() {
-                        public void run() {
-                            gui.closeStatusPanel();
-                            gui.setFocus(freeColClient.getGame().getMap().getTile(1,1));
-                            freeColClient.updateActions();
-                            gui.refresh();
-                        }
-                    } );
-                } catch (FreeColException e) {
-                    reloadMainPanel();
-                    SwingUtilities.invokeLater(new ErrorJob(e.getMessage()));
-                } catch (FileNotFoundException e) {
-                    reloadMainPanel();
-                    SwingUtilities.invokeLater(new ErrorJob("fileNotFound"));
-                } catch (IOException e) {
-                    reloadMainPanel();
-                    SwingUtilities.invokeLater(new ErrorJob("server.couldNotStart"));
-                } catch (NoRouteToServerException e) {
-                    reloadMainPanel();
-                    SwingUtilities.invokeLater(new ErrorJob("server.noRouteToServer"));
-                } catch (XMLStreamException e) {
-                    reloadMainPanel();
-                    SwingUtilities.invokeLater(new ErrorJob("server.streamError"));
+                public void run() {
+                    FreeColServer freeColServer = null;
+                    try {
+                        Specification spec = getDefaultSpecification();
+                        ServerGame game = FreeColServer.readGame(new FreeColSavegameFile(theFile),
+                            spec, null);
+                        
+                        freeColClient.setGame(game);
+                        freeColClient.getFreeColServer().setGame(game);
+                        SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    gui.closeStatusPanel();
+                                    gui.setFocus(freeColClient.getGame()
+                                        .getMap().getTile(1,1));
+                                    freeColClient.updateActions();
+                                    gui.refresh();
+                                }
+                            });
+                    } catch (FreeColException e) {
+                        reloadMainPanel();
+                        SwingUtilities.invokeLater(new ErrorJob(e.getMessage()));
+                    } catch (FileNotFoundException e) {
+                        reloadMainPanel();
+                        SwingUtilities.invokeLater(new ErrorJob("fileNotFound"));
+                    } catch (IOException e) {
+                        reloadMainPanel();
+                        SwingUtilities.invokeLater(new ErrorJob("server.couldNotStart"));
+                    } catch (XMLStreamException e) {
+                        reloadMainPanel();
+                        SwingUtilities.invokeLater(new ErrorJob("server.streamError"));
+                    }
                 }
-            }
-        };
-        freeColClient.worker.schedule( loadGameJob );
+            };
+        freeColClient.worker.schedule(loadGameJob);
     }
 
-    private void reloadMainPanel ()
-    {
+    private void reloadMainPanel () {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                gui.closeMainPanel();
-                gui.showMainPanel(null);
-                gui.playSound("sound.intro.general");
-            }
-        });
+                public void run() {
+                    gui.closeMainPanel();
+                    gui.showMainPanel(null);
+                    gui.playSound("sound.intro.general");
+                }
+            });
     }
 }
