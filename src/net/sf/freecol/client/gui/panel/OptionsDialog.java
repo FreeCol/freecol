@@ -245,8 +245,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
      * @return True if the options were loaded.
      */
     protected boolean loadDefaultOptions() {
-        File f = new File(FreeColDirectories.getOptionsDirectory(),
-                          getDefaultFileName());
+        File f = FreeColDirectories.getOptionsFile(getDefaultFileName());
         return (f.exists()) ? load(f) : false;
     }
 
@@ -256,8 +255,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
      * @return True if the options were saved.
      */
     protected boolean saveDefaultOptions() {
-        File f = new File(FreeColDirectories.getOptionsDirectory(),
-                          getDefaultFileName());
+        File f = FreeColDirectories.getOptionsFile(getDefaultFileName());
         return save(f);
     }
 

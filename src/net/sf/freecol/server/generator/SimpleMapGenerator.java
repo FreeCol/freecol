@@ -36,6 +36,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
+import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
@@ -1176,5 +1177,15 @@ public class SimpleMapGenerator implements MapGenerator {
         makeNativeSettlements(map, importGame);
         makeLostCityRumours(map, importGame);
         createEuropeanUnits(map, game.getPlayers());
+
+        // If importing as a result of "Start Game" in the map editor,
+        // consume the file.
+        if (importFile != null) {
+            File startGame = FreeColDirectories.getStartMapFile();
+            if (startGame != null
+                && startGame.getPath().equals(importFile.getPath())) {
+                importFile.delete();
+            }
+        }
     }
 }

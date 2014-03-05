@@ -116,19 +116,16 @@ public class MapEditorMenuBar extends FreeColMenuBar {
         JMenuItem playItem = new JMenuItem(Messages.message("startGame"));
         playItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    File saveGameFile
-                        = new File(FreeColDirectories.getAutosaveDirectory(),
-                                   "tempMap.fsg");
+                    File startFile = FreeColDirectories.getStartMapFile();
                     freeColClient.getMapEditorController()
-                        .saveGame(saveGameFile);
+                        .saveGame(startFile);
                     OptionGroup options = freeColClient.getGame()
                         .getMapGeneratorOptions();
                     FileOption fileOption = (FileOption)options
                         .getOption(MapGeneratorOptions.IMPORT_FILE);
-                    fileOption.setValue(saveGameFile);
-                    File mapOptionsFile
-                        = new File(FreeColDirectories.getOptionsDirectory(),
-                            FreeColDirectories.MAP_GENERATOR_OPTIONS_FILE_NAME);
+                    fileOption.setValue(startFile);
+                    File mapOptionsFile = FreeColDirectories
+                        .getOptionsFile(FreeColDirectories.MAP_GENERATOR_OPTIONS_FILE_NAME);
                     try {
                         options.save(mapOptionsFile);
                     } catch (FileNotFoundException fnfe) {}
