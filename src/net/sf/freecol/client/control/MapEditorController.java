@@ -66,11 +66,10 @@ public final class MapEditorController {
     private final GUI gui;
 
     /**
-     * The transform that should be applied to a
-     * <code>Tile</code> that is clicked on the map.
+     * The transform that should be applied to a <code>Tile</code>
+     * that is clicked on the map.
      */
     private MapTransform currentMapTransform = null;
-
 
 
     /**
@@ -97,7 +96,9 @@ public final class MapEditorController {
             final FreeColServer freeColServer
                 = new FreeColServer(false, false, specification, 0, null);
             freeColClient.setFreeColServer(freeColServer);
-            freeColClient.setGame(freeColServer.getGame());
+            Game game = freeColServer.getGame();
+            requireNativeNations(game);
+            freeColClient.setGame(game);
             freeColClient.setMyPlayer(null);
             gui.playSound(null);
 
@@ -182,6 +183,7 @@ public final class MapEditorController {
                 spec.applyDifficultyLevel(FreeCol.getDifficulty());
             }
             mapGenerator.createMap(game);
+            requireNativeNations(game);
             gui.setFocus(game.getMap().getTile(1,1));
             freeColClient.updateActions();
             gui.refresh();
@@ -257,6 +259,23 @@ public final class MapEditorController {
     }
 
     /**
+     * Require all native nation players to be present in a game.
+     *
+     * @param game The <code>Game</code> to add native nations to.
+     */
+    public void requireNativeNations(Game game) {
+        final Specification spec = game.getSpecification();
+        for (Nation n : spec.getIndianNations()) {
+            Player p = game.getPlayer(n.getId());
+            if (p == null) {
+                p = new ServerPlayer(game,Messages.getName(n.getRulerNameKey()),
+                                     false, n, null, null);
+                game.addPlayer(p);
+            }
+        }
+    }
+
+    /**
      * Loads a game from the given file.
      *
      * @param file The <code>File</code>.
@@ -290,15 +309,7 @@ public final class MapEditorController {
                         Game game = FreeColServer.readGame(new FreeColSavegameFile(theFile),
                             spec, freeColServer);
                         freeColClient.setGame(game);
-                        for (Nation n : spec.getIndianNations()) {
-                            Player p = game.getPlayer(n.getId());
-                            if (p == null) {
-                                p = new ServerPlayer(game,
-                                    Messages.getName(n.getRulerNameKey()),
-                                    false, n, null, null);
-                                game.addPlayer(p);
-                            }
-                        }
+                        requireNativeNations(game);
                         SwingUtilities.invokeLater(new Runnable() {
                                 public void run() {
                                     gui.closeStatusPanel();
