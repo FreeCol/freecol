@@ -38,6 +38,7 @@ import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.networking.NoRouteToServerException;
@@ -205,32 +206,34 @@ public final class MapEditorController {
      */
     public void saveGame(final File file) {
         final Game game = freeColClient.getGame();
-        game.getMap().resetContiguity();
-        game.getMap().resetHighSeasCount();
+        Map map = game.getMap();
+        map.resetContiguity();
+        map.resetHighSeasCount();
+        map.resetLayers();
 
         gui.showStatusPanel(Messages.message("status.savingGame"));
         Thread t = new Thread(FreeCol.CLIENT_THREAD+"Saving Map") {
-            @Override
-            public void run() {
-                try {
-                    BufferedImage scaledImage = gui.createMiniMapThumbNail();
-                    freeColClient.getFreeColServer()
-                        .saveMapEditorGame(file, scaledImage);
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            gui.closeStatusPanel();
-                            gui.requestFocusInWindow();
-                        }
-                    });
-                } catch (IOException e) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            gui.showErrorMessage("couldNotSaveGame");
-                        }
-                    });
+                @Override
+                public void run() {
+                    try {
+                        BufferedImage thumb = gui.createMiniMapThumbNail();
+                        freeColClient.getFreeColServer()
+                            .saveMapEditorGame(file, thumb);
+                        SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    gui.closeStatusPanel();
+                                    gui.requestFocusInWindow();
+                                }
+                            });
+                    } catch (IOException e) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    gui.showErrorMessage("couldNotSaveGame");
+                                }
+                            });
+                    }
                 }
-            }
-        };
+            };
         t.start();
     }
 
