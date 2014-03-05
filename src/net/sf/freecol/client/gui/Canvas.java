@@ -771,7 +771,7 @@ public final class Canvas extends JDesktopPane {
             }
             mapViewer.restartBlinking();
         } else {
-            if (gui.getCurrentViewMode() != GUI.MOVE_UNITS_MODE) return;
+            if (gui.getViewMode() != GUI.MOVE_UNITS_MODE) return;
             mapViewer.stopBlinking();
         }
     }

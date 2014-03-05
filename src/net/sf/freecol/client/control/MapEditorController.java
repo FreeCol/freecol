@@ -105,7 +105,7 @@ public final class MapEditorController {
             gui.closeMainPanel();
             gui.closeMenus();
             freeColClient.setInGame(true);
-
+            gui.changeViewMode(GUI.VIEW_TERRAIN_MODE);
             gui.startMapEditorGUI();
         } catch (NoRouteToServerException e) {
             gui.showErrorMessage("server.noRouteToServer");

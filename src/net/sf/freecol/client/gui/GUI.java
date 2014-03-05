@@ -1799,6 +1799,11 @@ public class GUI {
         mapViewer.centerActiveUnit();
     }
 
+    public void changeViewMode(int newViewMode) {
+        if (mapViewer == null) return;
+        mapViewer.changeViewMode(newViewMode);
+    }
+
     public void executeWithUnitOutForAnimation(final Unit unit,
                                                final Tile sourceTile,
                                                final OutForAnimationCallback r) {
@@ -1809,11 +1814,6 @@ public class GUI {
     public Unit getActiveUnit() {
         if (mapViewer == null) return null;
         return mapViewer.getActiveUnit();
-    }
-
-    public int getCurrentViewMode() {
-        if (mapViewer == null) return -1;
-        return mapViewer.getView();
     }
 
     public Tile getFocus() {
@@ -1839,6 +1839,11 @@ public class GUI {
     public Point getTilePosition(Tile tile) {
         if (mapViewer == null) return null;
         return mapViewer.getTilePosition(tile);
+    }
+
+    public int getViewMode() {
+        if (mapViewer == null) return -1;
+        return mapViewer.getViewMode();
     }
 
     public boolean onScreen(Tile tileToCheck) {

@@ -225,14 +225,14 @@ public final class InfoPanel extends FreeColPanel {
      */
     @Override
     public void paintComponent(Graphics graphics) {
-        int viewMode = getGUI().getCurrentViewMode();
         mapEditorPanel.setVisible(false);
         unitInfoPanel.setVisible(false);
         endTurnPanel.setVisible(false);
         tileInfoPanel.setVisible(false);
+
         if (getFreeColClient().isMapEditor()) {
             mapEditorPanel.setVisible(true);
-        } else if (viewMode == GUI.VIEW_TERRAIN_MODE) {
+        } else if (getGUI().getViewMode() == GUI.VIEW_TERRAIN_MODE) {
             tileInfoPanel.setVisible(true);
         } else if (unitInfoPanel.getUnit() != null) {
             unitInfoPanel.setVisible(true);

@@ -159,9 +159,9 @@ public abstract class MapControls {
      * Updates this <code>MapControls</code>.
      */
     public void update() {
-        GUI gui = freeColClient.getGUI();
-        int viewMode = gui.getCurrentViewMode();
-        switch (viewMode) {
+        final GUI gui = freeColClient.getGUI();
+
+        switch (gui.getViewMode()) {
         case GUI.MOVE_UNITS_MODE:
             infoPanel.update(gui.getActiveUnit());
             break;

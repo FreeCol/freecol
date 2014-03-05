@@ -69,7 +69,7 @@ public class MoveAction extends MapboardAction {
      * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) { 
-        switch (getGUI().getCurrentViewMode()) {
+        switch (getGUI().getViewMode()) {
         case GUI.MOVE_UNITS_MODE:
             getInGameController().moveActiveUnit(direction);
             break;
