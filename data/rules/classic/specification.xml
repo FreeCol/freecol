@@ -3118,6 +3118,9 @@ resources of 400, lost city rumours of 500
              materials in factories -->
         <booleanOption id="model.option.expertsHaveConnections"
                        defaultValue="true"/>
+        <!-- Can colonies be founded during the war of independence? -->
+        <booleanOption id="model.option.foundColonyDuringRebellion"
+                       defaultValue="false"/>
         <!-- Overflow hammer and cross production is preserved? -->
         <booleanOption id="model.option.saveProductionOverflow"
                        defaultValue="true"/>

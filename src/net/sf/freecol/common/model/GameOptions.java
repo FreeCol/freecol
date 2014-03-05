@@ -113,6 +113,10 @@ public class GameOptions {
     public static final String EXPERTS_HAVE_CONNECTIONS
         = "model.option.expertsHaveConnections";
 
+    /** Can colonies be founded during the war of independence? */
+    public static final String FOUND_COLONY_DURING_REBELLION
+        = "model.option.foundColonyDuringRebellion";
+
     /**
      * Does a hammer surplus after a build completes accumulate to
      * the next build?

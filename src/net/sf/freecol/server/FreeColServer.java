@@ -1196,6 +1196,8 @@ public final class FreeColServer {
             "model.difficulty.other", 23, true);
         addIntegerOption(GameOptions.GOOD_RUMOUR,
             "model.difficulty.other", 48, true);
+        addBooleanOption(GameOptions.FOUND_COLONY_DURING_REBELLION,
+            "gameOptions.colony", true, false);
     }
 
     private void addOptionGroup(String id, boolean difficulty) {

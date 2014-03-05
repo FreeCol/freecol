@@ -175,6 +175,10 @@
              materials in factories. -->
         <booleanOption id="model.option.expertsHaveConnections"
                        defaultValue="false"/>
+        <!-- Can colonies be founded during the war of independence? -->
+        <booleanOption id="model.option.foundColonyDuringRebellion"
+                       defaultValue="true"/>
+        <!-- Overflow hammer and cross production is preserved? -->
         <booleanOption id="model.option.saveProductionOverflow"
                        defaultValue="false"/>
         <!-- Whether to educate the least skilled unit first -->

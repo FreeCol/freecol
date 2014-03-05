@@ -2548,7 +2548,10 @@ public class Unit extends GoodsLocation
      * @return <code>true</code> if this unit can build a colony.
      */
     public boolean canBuildColony() {
-        return hasTile() && unitType.canBuildColony() && getMovesLeft() > 0;
+        final Specification spec = getSpecification();
+        return hasTile() && unitType.canBuildColony() && getMovesLeft() > 0
+            && (getOwner().getPlayerType() != Player.PlayerType.REBEL
+                || spec.getBoolean(GameOptions.FOUND_COLONY_DURING_REBELLION));
     }
 
     /**

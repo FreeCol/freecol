@@ -759,8 +759,9 @@ public class Colony extends Settlement implements Nameable {
         Building building = getBuildingFor(unit);
         if (building != null) {
             // TODO: improve this, possible extend Occupation
-            GoodsType output = building.getOutputs().get(0).getType();
-            return new Occupation(building, output);
+            List<AbstractGoods> outputs = building.getOutputs();
+            if (outputs.isEmpty()) return null;
+            return new Occupation(building, outputs.get(0).getType());
         }
         return null;
     }
