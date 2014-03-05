@@ -39,6 +39,8 @@ import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Nation;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.networking.NoRouteToServerException;
@@ -46,6 +48,7 @@ import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerGame;
+import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.generator.MapGenerator;
 
 
@@ -280,14 +283,22 @@ public final class MapEditorController {
 
         Runnable loadGameJob = new Runnable() {
                 public void run() {
-                    FreeColServer freeColServer = null;
+                    FreeColServer freeColServer
+                        = freeColClient.getFreeColServer();
                     try {
                         Specification spec = getDefaultSpecification();
-                        ServerGame game = FreeColServer.readGame(new FreeColSavegameFile(theFile),
-                            spec, null);
-                        
+                        Game game = FreeColServer.readGame(new FreeColSavegameFile(theFile),
+                            spec, freeColServer);
                         freeColClient.setGame(game);
-                        freeColClient.getFreeColServer().setGame(game);
+                        for (Nation n : spec.getIndianNations()) {
+                            Player p = game.getPlayer(n.getId());
+                            if (p == null) {
+                                p = new ServerPlayer(game,
+                                    Messages.getName(n.getRulerNameKey()),
+                                    false, n, null, null);
+                                game.addPlayer(p);
+                            }
+                        }
                         SwingUtilities.invokeLater(new Runnable() {
                                 public void run() {
                                     gui.closeStatusPanel();
