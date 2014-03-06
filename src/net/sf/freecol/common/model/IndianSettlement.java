@@ -961,6 +961,7 @@ public class IndianSettlement extends Settlement {
             GoodsType produced;
             if (g.isRawMaterial()
                 && (produced = g.getOutputType()) != null
+                && !produced.isBreedable()
                 && produced.isStorable()
                 && getGoodsCount(g) > getWantedGoodsAmount(g)
                 && (diff = getWantedGoodsAmount(produced)
