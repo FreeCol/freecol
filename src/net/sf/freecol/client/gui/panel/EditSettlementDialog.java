@@ -188,7 +188,6 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
     @SuppressWarnings("unchecked") // FIXME in Java7
     public void itemStateChanged(ItemEvent e) {
         Player player = getOwnerPlayer();
-System.err.println("P = " + player);
         if (player != null) {
             name.setText((capital.isSelected()) ? player.getCapitalName(null)
                 : player.getSettlementName(null));
