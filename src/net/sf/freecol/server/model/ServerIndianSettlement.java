@@ -31,12 +31,16 @@ import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.ModelMessage;
+import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.See;
@@ -49,6 +53,9 @@ public class ServerIndianSettlement extends IndianSettlement
     implements ServerModelObject {
 
     private static final Logger logger = Logger.getLogger(ServerIndianSettlement.class.getName());
+
+    // How far to search for a colony to add an Indian convert to.
+    public static final int MAX_CONVERT_DISTANCE = 10;
 
     public static final int MAX_HORSES_PER_TURN = 2;
 
@@ -125,6 +132,60 @@ public class ServerIndianSettlement extends IndianSettlement
         wantedGoods = template.getWantedGoods();
     }
 
+
+    /**
+     * Starts a new turn for a player.
+     *
+     * @param random A pseudo-random number source.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    public void csStartTurn(Random random, ChangeSet cs) {
+        // Check for braves converted by missionaries
+        final Unit missionary = getMissionary();
+        if (missionary == null) return;
+
+        ServerPlayer other = (ServerPlayer)missionary.getOwner();
+        float convert = missionary.applyModifier(0f,Modifier.CONVERSION_SKILL);
+        // The convert rate increases by a percentage of the current alarm.
+        int alarm = Math.min(getAlarm(other).getValue(), Tension.TENSION_MAX);
+        convert += getConvertProgress() - alarm
+            + missionary.applyModifier(alarm, Modifier.CONVERSION_ALARM_RATE);
+        final Tile tile = getTile();
+        Settlement colony = null;
+        if (convert < (float)getType().getConvertThreshold()
+            || (getUnitCount() + tile.getUnitCount()) <= 2
+            || (colony = tile.getNearestSettlement(other, MAX_CONVERT_DISTANCE)) == null) {
+            setConvertProgress((int)Math.floor(convert));
+        } else {
+            setConvertProgress(0);
+            // TODO: fix native AI to put the units just hanging
+            // around (as distinct to those with DefendSettlement
+            // missions) into the settlement so we can ignore the
+            // tile-residents.
+            List<Unit> ul = tile.getUnitList();
+            if (ul.isEmpty()) ul.addAll(getUnitList());
+            ServerUnit brave = (ServerUnit)Utils.getRandomMember(logger,
+                "Convert", ul, random);
+            ServerPlayer owner = (ServerPlayer)getOwner();
+            if (owner.csChangeOwner(brave, other, ChangeType.CONVERSION, 
+                                    colony.getTile(), cs)) { //-vis(other)
+                brave.clearRoleAndEquipment();
+                brave.setMovesLeft(0);
+                brave.setState(Unit.UnitState.ACTIVE);
+                cs.addDisappear(other, tile, brave);
+                cs.add(See.only(other), colony.getTile());
+                StringTemplate nation = owner.getNationName();
+                cs.addMessage(See.only(other),
+                    new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
+                                     "model.colony.newConvert", brave)
+                        .addStringTemplate("%nation%", nation)
+                        .addName("%colony%", colony.getName()));
+                other.invalidateCanSeeTiles();//+vis(other)
+                logger.fine("Convert at " + getName()
+                    + " for " + colony.getName());
+            }
+        }
+    }
 
     /**
      * Add a standard number of units to this settlement and tile.  If
