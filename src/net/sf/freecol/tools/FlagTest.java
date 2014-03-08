@@ -44,6 +44,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
+import net.sf.freecol.client.gui.panel.ConfirmDeclarationDialog;
+import net.sf.freecol.client.gui.panel.ConfirmDeclarationDialog.ColorButton;
 import net.sf.freecol.client.gui.panel.Flag;
 import net.sf.freecol.client.gui.panel.Flag.Background;
 import net.sf.freecol.client.gui.panel.Flag.Decoration;
@@ -54,99 +56,13 @@ import net.sf.freecol.client.gui.panel.Flag.UnionShape;
 public class FlagTest extends JFrame implements ActionListener, ItemListener {
 
 
-    public class ColorButton extends JButton {
-        private Color color = null;
-
-        public ColorButton(Color color) {
-            setColor(color);
-        }
-
-        public Color getColor() {
-            return color;
-        }
-
-        public void setColor(Color color) {
-            this.color = color;
-            setBackground(color);
-            setText(color == null ? "X" : " ");
-        }
-
-    }
-
-    // based on the flag of Venezuela (Colombia and Ecuador are
-    // similar)
-    public static final Flag SPANISH_FLAG =
-        new Flag(Background.FESSES, Decoration.NONE, UnionPosition.MIDDLE)
-        .setStripes(3)
-        .setUnionColor(null)
-        .setBackgroundColors(new Color(0xcf, 0x14, 0x2b),
-                             new Color(0, 0x24, 0x7d),
-                             new Color(255, 204, 0));
-
-    // based on the flag of Brazil, particularly the Provisional
-    // Flag of Republic of the United States of Brazil (November
-    // 15–19, 1889)
-    public static final Flag PORTUGUESE_FLAG =
-        new Flag(Background.FESSES, Decoration.NONE, UnionPosition.CANTON)
-        .setUnionColor(new Color(62, 64, 149))
-        .setBackgroundColors(new Color(0, 168, 89),
-                             new Color(255, 204, 41));
-
-    // based on the current flag of the United States and its
-    // various predecessors
-    public static final Flag ENGLISH_FLAG =
-        new Flag(Background.FESSES, Decoration.NONE, UnionPosition.CANTON)
-        .setUnionColor(new Color(.234f, .233f, .430f))
-        .setBackgroundColors(new Color(.698f, .132f, .203f),
-                             Color.WHITE);
-
-    // based on the flag of Louisiana in 1861 and other similar
-    // French colonial flags
-    public static final Flag FRENCH_FLAG =
-        new Flag(Background.PALES, Decoration.NONE, UnionPosition.LEFT)
-        .setStripes(3)
-        .setUnionColor(null)
-        .setBackgroundColors(new Color(0, 0x23, 0x95),
-                             Color.WHITE,
-                             new Color(0xed, 0x29, 0x39));
-
-    // Dutch flag
-    public static final Flag DUTCH_FLAG =
-        new Flag(Background.FESSES, Decoration.NONE, UnionPosition.TOP)
-        .setStripes(3)
-        .setUnionColor(null)
-        .setBackgroundColors(new Color(0xae, 0x1c, 0x28),
-                             Color.WHITE,
-                             new Color(0x21, 0x46, 0x6b));
-
-    // Swedish flag
-    public static final Flag SWEDISH_FLAG =
-        new Flag(Background.QUARTERLY, Decoration.SCANDINAVIAN_CROSS, UnionPosition.CANTON)
-        .setUnionColor(null)
-        .setDecorationColor(new Color(0xFE, 0xCB, 0))
-        .setBackgroundColors(new Color(0, 0x52, 0x93));
-
-    // Danish flag
-    public static final Flag DANISH_FLAG =
-        new Flag(Background.QUARTERLY, Decoration.SCANDINAVIAN_CROSS, UnionPosition.CANTON)
-        .setUnionColor(null)
-        .setDecorationColor(Color.WHITE)
-        .setBackgroundColors(new Color(0xC6, 0x0C, 0x30));
-
-    // Russian flag
-    public static final Flag RUSSIAN_FLAG =
-        new Flag(Background.FESSES, Decoration.NONE, UnionPosition.MIDDLE)
-        .setStripes(3)
-        .setUnionColor(null)
-        .setBackgroundColors(Color.WHITE,
-                             new Color(0, 0x39, 0xa6),
-                             new Color(0xd5, 0x2b, 0x1e));
-
-
 
     private final Flag[] FLAGS = new Flag[] {
-        ENGLISH_FLAG, SPANISH_FLAG, FRENCH_FLAG, DUTCH_FLAG,
-        PORTUGUESE_FLAG, SWEDISH_FLAG, DANISH_FLAG, RUSSIAN_FLAG, null
+        ConfirmDeclarationDialog.ENGLISH_FLAG, ConfirmDeclarationDialog.SPANISH_FLAG,
+        ConfirmDeclarationDialog.FRENCH_FLAG, ConfirmDeclarationDialog.DUTCH_FLAG,
+        ConfirmDeclarationDialog.PORTUGUESE_FLAG, ConfirmDeclarationDialog.SWEDISH_FLAG,
+        ConfirmDeclarationDialog.DANISH_FLAG, ConfirmDeclarationDialog.RUSSIAN_FLAG,
+        null // custom
     };
 
     private final String[] FLAG_NAMES = new String[] {
@@ -293,8 +209,7 @@ public class FlagTest extends JFrame implements ActionListener, ItemListener {
                     }
                     union.setSelectedItem(oldPosition);
                 }
-                flag = new Flag(newBackground, newDecoration, newPosition);
-                flag.setUnionShape(newShape);
+                flag = new Flag(newBackground, newDecoration, newPosition, newShape);
                 flag.setStripes(stripes.getSelectedIndex() + 1);
                 setColors();
             }

@@ -91,8 +91,8 @@ public class Flag {
      */
     public enum Decoration {
         NONE(),
+        CROSS(UnionPosition.CANTON),
         GREEK_CROSS(UnionPosition.CANTON),
-        SYMMETRIC_CROSS(UnionPosition.CANTON),
         SCANDINAVIAN_CROSS(UnionPosition.CANTON),
         CHEVRON(UnionShape.CHEVRON, UnionPosition.LEFT),
         PALL(UnionShape.CHEVRON, UnionPosition.LEFT),
@@ -224,45 +224,145 @@ public class Flag {
 
     private Background background = Background.FESSES;
     private Decoration decoration = Decoration.NONE;
-    private UnionShape unionShape; // = UnionShape.RECTANGLE;
+    private UnionShape unionShape = UnionShape.RECTANGLE;
     private UnionPosition unionPosition = UnionPosition.CANTON;
 
     /**
-     * The number of stars in the union.
+     * The number of stars in the union. This value is only relevant
+     * if the flag contains a union.
      */
     private int stars = 13;
 
     /**
-     * The number of background stripes.
+     * The number of background stripes. This value is only relevant
+     * if the background contains stripes (currently FESSES or
+     * PALES).
      */
     private int stripes = 13;
 
 
     public Flag(Background background, Decoration decoration,
                 UnionPosition unionPosition) {
+        this(background, decoration, unionPosition, UnionShape.RECTANGLE);
+    }
+
+    public Flag(Background background, Decoration decoration,
+                UnionPosition unionPosition, UnionShape unionShape) {
         this.background = background;
         this.decoration = decoration;
         this.unionPosition = unionPosition;
+        this.unionShape = unionShape;
     }
 
+    /**
+     * Returns the background of the flag.
+     *
+     * @return A <code>Background</code> value.
+     */
     public Background getBackground() {
         return background;
     }
 
+    /**
+     * Sets the background of the flag and returns the flag itself.
+     *
+     * @param background The new <code>Background</code> value.
+     * @return The modified flag.
+     */
     public Flag setBackground(Background background) {
         this.background = background;
         return this;
     }
 
+    /**
+     * Returns the decoration of the flag.
+     *
+     * @return A <code>Decoration</code> value.
+     */
+    public Decoration getDecoration() {
+        return decoration;
+    }
+
+    /**
+     * Sets the decoration of the flag and returns the flag itself.
+     *
+     * @param decoration The new <code>Decoration</code> value.
+     * @return The modified flag.
+     */
+    public Flag setDecoration(Decoration decoration) {
+        this.decoration = decoration;
+        return this;
+    }
+
+    /**
+     * Returns the union position of the flag.
+     *
+     * @return A <code>UnionPosition</code> value.
+     */
+    public UnionPosition getUnionPosition() {
+        return unionPosition;
+    }
+
+    /**
+     * Sets the union position of the flag and returns the flag
+     * itself.
+     *
+     * @param position The new <code>UnionPosition</code> value.
+     * @return The modified flag.
+     */
+    public Flag setUnionPosition(UnionPosition position) {
+        this.unionPosition = position;
+        return this;
+    }
+
+    /**
+     * Returns the union shape of the flag.
+     *
+     * @return A <code>UnionShape</code> value.
+     */
+    public UnionShape getUnionShape() {
+        return unionShape;
+    }
+
+    /**
+     * Sets the union shape of the flag and returns the flag itself.
+     *
+     * @param shape The new <code>UnionShape</code> value.
+     * @return The modified flag.
+     */
+    public Flag setUnionShape(UnionShape shape) {
+        this.unionShape = shape;
+        return this;
+    }
+
+    /**
+     * Returns a <code>List</code> of background colors.
+     *
+     * @return A <code>List</code> of background colors.
+     */
     public List<Color> getBackgroundColors() {
         return backgroundColors;
     }
 
+    /**
+     * Sets the background colors of the flag and returns the flag
+     * itself.
+     *
+     * @param backgroundColors A <code>List</code> of background colors.
+     * @return The modified flag.
+     */
     public Flag setBackgroundColors(List<Color> backgroundColors) {
         this.backgroundColors = backgroundColors;
         return this;
     }
 
+    /**
+     * Sets the background colors of the flag and returns the flag
+     * itself.
+     *
+     * @param colors A variable number of background colors.
+     * @return The modified flag.
+     */
     public Flag setBackgroundColors(Color... colors) {
         backgroundColors.clear();
         for (Color color : colors) {
@@ -273,77 +373,111 @@ public class Flag {
         return this;
     }
 
+    /**
+     * Returns the union color of the flag.
+     *
+     * @return A <code>Color</code> value.
+     */
     public Color getUnionColor() {
         return unionColor;
     }
 
+    /**
+     * Sets the union color of the flag and returns the flag itself.
+     *
+     * @param unionColor The new <code>Color</code> value.
+     * @return The modified flag.
+     */
     public Flag setUnionColor(Color unionColor) {
         this.unionColor = unionColor;
         return this;
     }
 
+    /**
+     * Returns the decoration color of the flag.
+     *
+     * @return A <code>Color</code> value.
+     */
     public Color getDecorationColor() {
         return decorationColor;
     }
 
+    /**
+     * Sets the decoration color of the flag and returns the flag
+     * itself.
+     *
+     * @param decorationColor The new <code>Color</code> value.
+     * @return The modified flag.
+     */
     public Flag setDecorationColor(Color decorationColor) {
         this.decorationColor = decorationColor;
         return this;
     }
 
+    /**
+     * Returns the star color of the flag.
+     *
+     * @return A <code>Color</code> value.
+     */
     public Color getStarColor() {
         return starColor;
     }
 
+    /**
+     * Sets the star color of the flag and returns the flag itself.
+     *
+     * @param starColor The new <code>Color</code> value.
+     * @return The modified flag.
+     */
     public Flag setStarColor(Color starColor) {
         this.starColor = starColor;
         return this;
     }
 
+    /**
+     * Returns the number of stars in the union.
+     *
+     * @return The number of stars.
+     */
     public int getStars() {
         return stars;
     }
 
+    /**
+     * Sets the number of stars in the union and returns the flag
+     * itself.
+     *
+     * @param stars The new number of stars.
+     * @return The modified flag.
+     */
     public Flag setStars(int stars) {
         this.stars = stars;
         return this;
     }
 
+    /**
+     * Returns the number of background stripes.
+     *
+     * @return The number of stars.
+     */
     public int getStripes() {
         return stripes;
     }
 
+    /**
+     * Sets the number of background stripes and returns the flag
+     * itself.
+     *
+     * @param stripes The new number of background stripes.
+     * @return The modified flag.
+     */
     public Flag setStripes(int stripes) {
         this.stripes = stripes;
         return this;
     }
 
-    public Flag setStarsAndStripes(int stars, int stripes) {
-        this.stars = stars;
-        this.stripes = stripes;
-        return this;
-    }
-
-    public UnionPosition getUnionPosition() {
-        return unionPosition;
-    }
-
-    public Flag setUnionPosition(UnionPosition position) {
-        this.unionPosition = position;
-        return this;
-    }
-
-    public UnionShape getUnionShape() {
-        return unionShape;
-    }
-
-    public Flag setUnionShape(UnionShape shape) {
-        this.unionShape = shape;
-        return this;
-    }
-
     /**
-     * Generate the flag.
+     * Generates an image of the flag.
      *
      * @returns an image of the flag
      */
@@ -388,7 +522,7 @@ public class Flag {
         GeneralPath decorationShape = null;
         switch(decoration) {
         case GREEK_CROSS:
-        case SYMMETRIC_CROSS:
+        case CROSS:
         case SCANDINAVIAN_CROSS:
             decorationShape = getCross(decoration);
             break;
@@ -411,7 +545,7 @@ public class Flag {
         case SALTIRE_AND_CROSS:
             decorationShape = getBend(true);
             decorationShape.append(getBend(false), false);
-            decorationShape.append(getCross(Decoration.SYMMETRIC_CROSS), false);
+            decorationShape.append(getCross(Decoration.CROSS), false);
             break;
         }
         if (decorationShape != null) {
@@ -943,7 +1077,7 @@ public class Flag {
                     : (stripes / 2) * getStripeWidth(background.alignment);
             }
             if (decoration == Decoration.GREEK_CROSS
-                || decoration == Decoration.SYMMETRIC_CROSS) {
+                || decoration == Decoration.CROSS) {
                 union.width = (WIDTH - DECORATION_SIZE) / 2;
                 union.height = (HEIGHT - DECORATION_SIZE) / 2;
             } else if (decoration == Decoration.SCANDINAVIAN_CROSS) {

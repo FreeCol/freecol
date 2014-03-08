@@ -153,6 +153,10 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
             u.put("EuropeInPortPanelUI", transparentPanelUI);
             u.put("DocksPanelUI", transparentPanelUI);
 
+            // ColorButton
+            u.put("javax.swing.plaf.metal.MetalButtonUI", javax.swing.plaf.metal.MetalButtonUI.class);
+            u.put("ColorButtonUI", "javax.swing.plaf.metal.MetalButtonUI");
+
             // Add cursors:
             Image im = ResourceManager.getImage("cursor.go.image");
             if (im != null) {
