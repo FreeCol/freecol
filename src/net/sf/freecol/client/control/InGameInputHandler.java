@@ -1168,7 +1168,7 @@ public final class InGameInputHandler extends InputHandler {
 
         SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    getGUI().showColonyPanel(colony);
+                    getGUI().showColonyPanel(colony, null);
                 }
             });
         return null;

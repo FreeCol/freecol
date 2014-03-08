@@ -95,7 +95,7 @@ public class ChangeAction extends UnitAction {
         Tile tile = unit.getTile();
 
         if (tile.getColony() != null) {
-            getGUI().showColonyPanel(tile.getColony());
+            getGUI().showColonyPanel(tile.getColony(), unit);
         } else if (unit.isOnCarrier()) {
             getGUI().setActiveUnit(unit.getCarrier());
         } else {

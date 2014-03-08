@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
@@ -155,6 +156,25 @@ public abstract class UnitPanel extends MigPanel
         // Default to doing nothing
     }
 
+    /**
+     * Select a given unit.
+     *
+     * @param unit The <code>Unit</code> to select.
+     * @return True if the selection succeeds.
+     */
+    public boolean setSelectedUnit(Unit unit) {
+        for (Component component : getComponents()) {
+            if (component instanceof UnitLabel) {
+                UnitLabel label = (UnitLabel)component;
+                if (label.getUnit() == unit) {
+                    getPortPanel().setSelectedUnitLabel(label);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+        
 
     // Interface PropertyChangeListener
 

@@ -130,7 +130,7 @@ public final class CompactLabourReport extends ReportPanel {
 
         return createButton(text, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                getGUI().showColonyPanel(colony);
+                getGUI().showColonyPanel(colony, null);
             }
         });
     }

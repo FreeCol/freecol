@@ -459,7 +459,7 @@ public final class TilePopup extends JPopupMenu {
         JMenuItem menuItem = new JMenuItem(Messages.message(name));
         menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    gui.showColonyPanel(colony);
+                    gui.showColonyPanel(colony, null);
                 }
             });
 

@@ -82,7 +82,7 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
                     if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
                         canvas.showForeignColony(colony);
                     } else {
-                        canvas.showColonyPanel(colony);
+                        canvas.showColonyPanel(colony, null);
                     }
                 }
             } else {

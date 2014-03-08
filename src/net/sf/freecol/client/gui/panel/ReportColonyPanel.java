@@ -917,7 +917,7 @@ public final class ReportColonyPanel extends ReportPanel
             } else {
                 Colony colony = getGame().getFreeColGameObject(command, Colony.class);
                 if (colony != null) {
-                    getGUI().showColonyPanel(colony)
+                    getGUI().showColonyPanel(colony, null)
                         .addClosingCallback(new Runnable() {
                                 public void run() {
                                     updateCompactColonyPanel();

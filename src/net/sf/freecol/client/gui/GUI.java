@@ -1269,9 +1269,9 @@ public class GUI {
         return canvas.showClientOptionsDialog();
     }
 
-    public ColonyPanel showColonyPanel(Colony colony) {
+    public ColonyPanel showColonyPanel(Colony colony, Unit unit) {
         if (canvas == null) return null;
-        return canvas.showColonyPanel(colony);
+        return canvas.showColonyPanel(colony, unit);
     }
 
     public void showColopediaPanel(String nodeId) {

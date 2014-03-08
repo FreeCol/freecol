@@ -278,7 +278,7 @@ public final class ColonyPanel extends PortPanel
                     final Colony newColony = (Colony)nameBox.getSelectedItem();
                     final GUI gui = getGUI();
                     closeColonyPanel();
-                    gui.showColonyPanel(newColony);
+                    gui.showColonyPanel(newColony, null);
                 }
             };
         pressListener = new DragListener(freeColClient, this);
@@ -742,22 +742,13 @@ public final class ColonyPanel extends PortPanel
         return warehousePanel;
     }
 
-    /**
-     * Gets the currently select unit.
-     *
-     * @return The currently select <code>Unit</code>.
-     */
-    public Unit getSelectedUnit() {
-        return (selectedUnitLabel == null) ? null
-            : selectedUnitLabel.getUnit();
-    }
+
+    // Override PortPanel
 
     /**
-     * Selects a unit that is located somewhere on this panel.
-     *
-     * @param unitLabel The <code>UnitLabel</code> for the unit that
-     *     is being selected.
+     * {@inheritDoc}
      */
+    @Override
     public void setSelectedUnitLabel(UnitLabel unitLabel) {
         if (selectedUnitLabel != unitLabel) {
             inPortPanel.removePropertyChangeListeners();
@@ -765,7 +756,7 @@ public final class ColonyPanel extends PortPanel
                 selectedUnitLabel.setSelected(false);
                 selectedUnitLabel.getUnit().removePropertyChangeListener(this);
             }
-            selectedUnitLabel = unitLabel;
+            super.setSelectedUnitLabel(unitLabel);
             if (unitLabel == null) {
                 cargoPanel.setCarrier(null);
             } else {
@@ -778,6 +769,15 @@ public final class ColonyPanel extends PortPanel
         updateCarrierButtons();
         inPortPanel.revalidate();
         inPortPanel.repaint();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean setSelectedUnit(Unit unit) {
+        return ((unit.isCarrier()) ? inPortPanel.setSelectedUnit(unit)
+            : super.setSelectedUnit(unit));
     }
 
 
