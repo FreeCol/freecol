@@ -98,9 +98,14 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
      */
     private class Destination {
 
+        public Unit unit;
         public Location location;
         public int turns;
         public String extras;
+        public String text;
+        public int score;
+        public ImageIcon icon;
+
 
         /**
          * Create a destination.
@@ -112,9 +117,37 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
          */
         public Destination(Location location, int turns, Unit unit,
                            List<GoodsType> goodsTypes) {
+            this.unit = unit;
             this.location = location;
             this.turns = turns;
             this.extras = getExtras(location, unit, goodsTypes);
+            this.score = calculateScore();
+            this.icon = null;
+
+            final Player player = getMyPlayer();
+            final ImageLibrary lib = getImageLibrary();
+            String name = "";
+            if (location instanceof Europe) {
+                Europe europe = (Europe)location;
+                Nation nation = europe.getOwner().getNation();
+                name = Messages.message(europe.getNameKey());
+                this.icon = new ImageIcon(lib.getCoatOfArmsImage(nation)
+                    .getScaledInstance(-1, CELL_HEIGHT, Image.SCALE_SMOOTH));
+            } else if (location instanceof Map) {
+                name = Messages.message(location.getLocationNameFor(player));
+                this.icon = lib.getMiscImageIcon(ImageLibrary.LOST_CITY_RUMOUR);
+            } else if (location instanceof Settlement) {
+                Settlement settlement = (Settlement) location;
+                name = Messages.message(settlement.getLocationNameFor(player));
+                this.icon = new ImageIcon(lib.getSettlementImage(settlement)
+                    .getScaledInstance(64, -1, Image.SCALE_SMOOTH));
+            }
+            StringTemplate template
+                = StringTemplate.template("selectDestination.destinationTurns")
+                    .addName("%location%", name)
+                    .addAmount("%turns%", this.turns)
+                    .addName("%extras%", this.extras);
+            this.text = Messages.message(template);
         }
 
         /**
@@ -129,14 +162,16 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
          */
         private String getExtras(Location loc, Unit unit,
                                  List<GoodsType> goodsTypes) {
+            final String sep = ", ";
             final Player owner = unit.getOwner();
-            List<String> sales = new ArrayList<String>();
+            StringBuffer sb = new StringBuffer(32);
 
             if (loc instanceof Europe && !goodsTypes.isEmpty()) {
                 Market market = owner.getMarket();
                 for (GoodsType goodsType : goodsTypes) {
-                    sales.add(Messages.message(goodsType.getNameKey()) + " "
-                        + Integer.toString(market.getSalePrice(goodsType, 1)));
+                    sb.append(Messages.getName(goodsType)).append(" ")
+                        .append(market.getSalePrice(goodsType, 1))
+                        .append(sep);
                 }
 
             } else if (loc instanceof Settlement
@@ -145,27 +180,28 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
 
             } else if (loc instanceof Settlement
                 && ((Settlement)loc).getOwner().atWarWith(owner)) {
-                return "[" + Messages.message("model.stance.war") + "]";
+                sb.append("[").append(Messages.message("model.stance.war"))
+                    .append("]");
+                return sb.toString();
 
             } else if (loc instanceof Settlement && !goodsTypes.isEmpty()) {
                 for (GoodsType g : goodsTypes) {
                     String sale = owner.getLastSaleString((Settlement)loc, g);
                     if (sale != null) {
-                        sales.add(Messages.message(g.getNameKey())
-                            + " " + sale);
-                        continue;
-                    }
-                    if (loc instanceof IndianSettlement) {
+                        sb.append(Messages.getName(g)).append(" ")
+                            .append(sale);
+                    } else if (loc instanceof IndianSettlement) {
                         GoodsType[] wanted
                             = ((IndianSettlement)loc).getWantedGoods();
                         if (wanted.length > 0 && g == wanted[0]) {
-                            sales.add(Messages.message(g.getNameKey()) + "***");
+                            sb.append(Messages.getName(g)).append("***");
                         } else if (wanted.length > 1 && g == wanted[1]) {
-                            sales.add(Messages.message(g.getNameKey()) + "**");
+                            sb.append(Messages.getName(g)).append("**");
                         } else if (wanted.length > 2 && g == wanted[2]) {
-                            sales.add(Messages.message(g.getNameKey()) + "*");
+                            sb.append(Messages.getName(g)).append("*");
                         }
-                    }
+                    } else continue;
+                    sb.append(sep);                             
                 }
 
             } else if (loc instanceof IndianSettlement) {
@@ -173,12 +209,25 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
                 UnitType sk = indianSettlement.getLearnableSkill();
                 if (sk != null
                     && unit.getType().canBeUpgraded(sk, ChangeType.NATIVES)) {
-                    return "[" + Messages.message(sk.getNameKey()) + "]";
+                    sb.append("[").append(Messages.getName(sk)).append("]");
+                    return sb.toString();
                 }
             }
 
-            return (sales.isEmpty()) ? ""
-                : "[" + Utils.join(", ", sales) + "]";
+            if (sb.length() > sep.length()) {
+                sb.setLength(sb.length() - sep.length());
+            }
+            return sb.toString();
+        }
+
+        private int calculateScore() {
+            return (location instanceof Europe || location instanceof Map)
+                ? 10
+                : (location instanceof Colony)
+                ? ((unit.getOwner().owns((Colony)location)) ? 20 : 30)
+                : (location instanceof IndianSettlement)
+                ? 40
+                : 100;
         }
     }
 
@@ -191,24 +240,10 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
         }
 
         public int compare(Destination choice1, Destination choice2) {
-            Location loc1 = choice1.location;
-            Location loc2 = choice2.location;
-
-            int score1 = (loc1 instanceof Europe || loc1 instanceof Map)
-                ? 10
-                : (loc1 instanceof Colony)
-                ? ((owner.owns((Colony)loc1)) ? 20 : 30)
-                : (loc1 instanceof IndianSettlement)
-                ? 40
-                : 100;
-            int score2 = (loc2 instanceof Europe || loc2 instanceof Map) ? 10
-                : (loc2 instanceof Colony)
-                ? ((owner.owns((Colony)loc2)) ? 20 : 30)
-                : (loc2 instanceof IndianSettlement)
-                ? 40
-                : 100;
+            int score1 = choice1.score;
+            int score2 = choice2.score;
             return (score1 != score2) ? score1 - score2
-                : compareNames(loc1, loc2);
+                : compareNames(choice1.location, choice2.location);
         }
 
         /**
@@ -264,35 +299,9 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
 
         @Override
         public void setLabelValues(JLabel label, Object value) {
-            final Player player = getMyPlayer();
-            final ImageLibrary lib = getImageLibrary();
-
             Destination d = (Destination)value;
-            Location location = d.location;
-            String name = "";
-            ImageIcon icon = null;
-            if (location instanceof Europe) {
-                Europe europe = (Europe)location;
-                Nation nation = europe.getOwner().getNation();
-                name = Messages.message(europe.getNameKey());
-                icon = new ImageIcon(lib.getCoatOfArmsImage(nation)
-                    .getScaledInstance(-1, CELL_HEIGHT, Image.SCALE_SMOOTH));
-            } else if (location instanceof Map) {
-                name = Messages.message(location.getLocationNameFor(player));
-                icon = lib.getMiscImageIcon(ImageLibrary.LOST_CITY_RUMOUR);
-            } else if (location instanceof Settlement) {
-                Settlement settlement = (Settlement) location;
-                name = Messages.message(settlement.getLocationNameFor(player));
-                icon = new ImageIcon(lib.getSettlementImage(settlement)
-                    .getScaledInstance(64, -1, Image.SCALE_SMOOTH));
-            }
-            if (icon != null) label.setIcon(icon);
-            StringTemplate template
-                = StringTemplate.template("selectDestination.destinationTurns")
-                    .addName("%location%", name)
-                    .addAmount("%turns%", d.turns)
-                    .addName("%extras%", d.extras);
-            label.setText(Messages.message(template));
+            if (d.icon != null) label.setIcon(d.icon);
+            label.setText(d.text);
         }
     }
 
@@ -449,7 +458,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
                                                       unit, goodsTypes));
             }
         }
-
+        
         List<Location> locs = new ArrayList<Location>();
         for (Player p : game.getPlayers()) {
             if (p == player || !p.hasContacted(player)
@@ -467,7 +476,6 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
                 locs.add(s.getTile());
             }
         }
-
         MultipleAdjacentDecider md = new MultipleAdjacentDecider(locs);
         unit.search(unit.getLocation(), md.getGoalDecider(), null,
                     FreeColObject.INFINITY, null);
