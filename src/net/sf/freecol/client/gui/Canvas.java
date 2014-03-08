@@ -771,7 +771,7 @@ public final class Canvas extends JDesktopPane {
             }
             mapViewer.restartBlinking();
         } else {
-            if (gui.getCurrentViewMode() != GUI.MOVE_UNITS_MODE) return;
+            if (gui.getViewMode() != GUI.MOVE_UNITS_MODE) return;
             mapViewer.stopBlinking();
         }
     }
@@ -1316,6 +1316,7 @@ public final class Canvas extends JDesktopPane {
                 getPopupPosition(tile)));
         dialogAdd(freeColDialog);
         if (freeColDialog.isModal()) setBlinking(false);
+        freeColDialog.requestFocus();
         freeColDialog.setVisible(true);
     }
 
@@ -1544,10 +1545,11 @@ public final class Canvas extends JDesktopPane {
      * against the same colony.
      *
      * @param colony The colony whose panel needs to be displayed.
+     * @param unit An optional <code>Unit</code> to select within the panel.
      * @return The colony panel.
      * @see ColonyPanel
      */
-    public ColonyPanel showColonyPanel(Colony colony) {
+    public ColonyPanel showColonyPanel(Colony colony, Unit unit) {
         if (!freeColClient.getMyPlayer().owns(colony)) return null;
 
         ColonyPanel panel = getColonyPanel(colony);
@@ -1557,6 +1559,7 @@ public final class Canvas extends JDesktopPane {
         } else {
             panel.requestFocus();
         }
+        if (panel != null && unit != null) panel.setSelectedUnit(unit);
         return panel;
     }
 
@@ -1801,7 +1804,7 @@ public final class Canvas extends JDesktopPane {
         if (settlement instanceof Colony) {
             Colony colony = freeColClient.getFreeColServer().getGame()
                 .getFreeColGameObject(settlement.getId(), Colony.class);
-            showColonyPanel(colony);
+            showColonyPanel(colony, null);
         }
     }
 
@@ -2567,7 +2570,7 @@ public final class Canvas extends JDesktopPane {
     public void showSettlement(Settlement settlement) {
         if (settlement instanceof Colony) {
             if (settlement.getOwner().equals(freeColClient.getMyPlayer())) {
-                showColonyPanel((Colony)settlement);
+                showColonyPanel((Colony)settlement, null);
             } else if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
                 showForeignColony(settlement);
             }

@@ -63,6 +63,8 @@ public class FreeColDirectories {
 
     private static final String SAVE_DIRECTORY = "save";
 
+    private static final String START_MAP_NAME = "startMap.fsg";
+
     private static final String SEPARATOR = System.getProperty("file.separator");
 
     private static final String XDG_CONFIG_HOME_ENV = "XDG_CONFIG_HOME";
@@ -670,7 +672,7 @@ public class FreeColDirectories {
      */
     public static File getClientOptionsFile() {
         return (clientOptionsFile != null) ? clientOptionsFile
-            : new File(getOptionsDirectory(), CLIENT_OPTIONS_FILE_NAME);
+            : getOptionsFile(CLIENT_OPTIONS_FILE_NAME);
     }
 
     /**
@@ -743,15 +745,6 @@ public class FreeColDirectories {
     }
 
     /**
-     * Gets the standard mods directory.
-     *
-     * @return The directory where the standard mods are located.
-     */
-    public static File getStandardModsDirectory() {
-        return new File(getDataDirectory(), MODS_DIRECTORY);
-    }
-
-    /**
      * Gets the directory where the user options are saved.
      *
      * @return The directory to save user options in.
@@ -759,6 +752,17 @@ public class FreeColDirectories {
     public static File getOptionsDirectory() {
         File dir = new File(getUserConfigDirectory(), FreeCol.getTC());
         return (insistDirectory(dir)) ? dir : null;
+    }
+
+    /**
+     * Get an options file from the options directory.
+     *
+     * @param name The name of the file within the options directory.
+     * @return The options file.
+     */
+    public static File getOptionsFile(String name) {
+        File dir = getOptionsDirectory();
+        return (dir == null) ? null : new File(dir, name);
     }
 
     /**
@@ -830,6 +834,24 @@ public class FreeColDirectories {
         setSavegameFile(file);
         setSaveDirectory(file.getParentFile());
         return true;
+    }
+
+    /**
+     * Gets the standard mods directory.
+     *
+     * @return The directory where the standard mods are located.
+     */
+    public static File getStandardModsDirectory() {
+        return new File(getDataDirectory(), MODS_DIRECTORY);
+    }
+
+    /**
+     * Get the map file to start from, if any.
+     *
+     * @return The start map file if any.
+     */
+    public static File getStartMapFile() {
+        return new File(getAutosaveDirectory(), START_MAP_NAME);
     }
 
     /**

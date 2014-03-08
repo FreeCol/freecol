@@ -21,6 +21,7 @@ package net.sf.freecol.common.option;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -277,12 +278,14 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
             xr.closeTag(TEMPLATE_TAG);
 
         } else {
+            AbstractOption<T> op = null;
             try {
-                AbstractOption<T> op = (AbstractOption<T>)readOption(xr);
-                if (op != null) addMember(op);
-            } catch (XMLStreamException x) {
-                logger.warning("Invalid option at: " + tag);
+                op = (AbstractOption<T>)readOption(xr);
+            } catch (XMLStreamException xse) {
+                logger.log(Level.WARNING, "Invalid option at: " + tag, xse);
+                xr.closeTag(tag);
             }
+            if (op != null) addMember(op);
         }
     }
 

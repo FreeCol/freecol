@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Component;
 import java.awt.LayoutManager;
 import java.awt.event.MouseListener;
 
@@ -76,6 +77,25 @@ public abstract class PortPanel extends FreeColPanel {
     public Unit getSelectedUnit() {
         return (selectedUnitLabel == null) ? null
             : selectedUnitLabel.getUnit();
+    }
+
+    /**
+     * Select a given unit.
+     *
+     * @param unit The <code>Unit</code> to select.
+     * @return True if the selection succeeds.
+     */
+    public boolean setSelectedUnit(Unit unit) {
+        for (Component component : getComponents()) {
+            if (component instanceof UnitLabel) {
+                UnitLabel label = (UnitLabel)component;
+                if (label.getUnit() == unit) {
+                    setSelectedUnitLabel(label);
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**

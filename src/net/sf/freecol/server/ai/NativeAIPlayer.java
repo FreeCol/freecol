@@ -165,7 +165,11 @@ public class NativeAIPlayer extends AIPlayer {
             units.clear();
             units.addAll(is.getTile().getUnitList());
             units.addAll(is.getUnitList());
-            while (units.size() > defence) units.remove(0);
+            while (units.size() > defence) {
+                Unit u = units.remove(0);
+                AIUnit aiu = getAIUnit(u);
+                aiu.setMission(new UnitWanderHostileMission(aiMain, aiu));
+            }
             for (Unit u : units) {
                 AIUnit aiu = getAIUnit(u);
                 aiu.setMission(new DefendSettlementMission(aiMain, aiu, is));

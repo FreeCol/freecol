@@ -1536,7 +1536,8 @@ public final class InGameController implements NetworkConstants {
      */
     public void buildColony() {
         if (!requireOurTurn()) return;
-        Player player = freeColClient.getMyPlayer();
+        final Specification spec = getSpecification();
+        final Player player = freeColClient.getMyPlayer();
 
         // Check unit can build, and is on the map.
         // Show the colony warnings if required.
@@ -1546,7 +1547,7 @@ public final class InGameController implements NetworkConstants {
         } else if (!unit.canBuildColony()) {
             gui.showInformationMessage(unit,
                 StringTemplate.template("buildColony.badUnit")
-                .addName("%unit%", unit.getName()));
+                    .addName("%unit%", unit.getName()));
             return;
         }
         Tile tile = unit.getTile();
@@ -3282,7 +3283,7 @@ public final class InGameController implements NetworkConstants {
             && unit.getTradeRoute() == null
             && (unit.getDestination() == null
                 || unit.getDestination().getTile() == tile.getTile())) {
-            gui.showColonyPanel(tile.getColony());
+            gui.showColonyPanel(tile.getColony(), unit);
         }
         if (unit.getMovesLeft() <= 0) return false;
         displayModelMessages(false);

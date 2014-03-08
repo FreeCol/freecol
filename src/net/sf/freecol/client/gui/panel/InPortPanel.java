@@ -54,11 +54,12 @@ public abstract class InPortPanel extends UnitPanel {
         UnitLabel lastCarrier = null;
         for (Component component : getComponents()) {
             if (component instanceof UnitLabel) {
-                UnitLabel label = (UnitLabel) component;
-                if (label.getUnit() == selectedUnit) {
+                UnitLabel label = (UnitLabel)component;
+                Unit unit = label.getUnit();
+                if (unit == selectedUnit) {
                     getPortPanel().setSelectedUnitLabel(label);
                     return;
-                } else if (label.getUnit().isCarrier()) {
+                } else if (unit.isCarrier() && unit.getTradeRoute() == null) {
                     lastCarrier = label;
                 }
             }

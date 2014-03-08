@@ -50,6 +50,49 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
 
     private static final Logger logger = Logger.getLogger(CaptureGoodsDialog.class.getName());
 
+    private class CheckBoxRenderer extends JCheckBox
+        implements ListCellRenderer {
+
+        public CheckBoxRenderer() {
+            //setBackground(UIManager.getColor("List.textBackground"));
+            //setForeground(UIManager.getColor("List.textForeground"));
+        }
+
+        public Component getListCellRendererComponent(JList listBox,
+            Object obj, int currentindex, boolean isChecked,
+            boolean hasFocus) {
+            GoodsItem item = (GoodsItem) obj;
+            setSelected(item.isSelected());
+            setText(item.toString());
+            setEnabled(item.isEnabled());
+            return this;
+        }
+    }
+
+    private class GoodsItem extends JCheckBox {
+        private Goods good;
+
+        public GoodsItem(Goods good) {
+            this.good = good;
+        }
+
+        public Goods getGoods() {
+            return good;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            StringTemplate template
+                = StringTemplate.template("model.goods.goodsAmount")
+                    .add("%goods%", good.getNameKey())
+                    .addAmount("%amount%", good.getAmount());
+            return Messages.message(template);
+        }
+    }
+
     /** The maximum number of items to loot. */
     private final int maxCargo;
 
@@ -188,48 +231,4 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
         }
         return gl;
     }            
-
-
-    private class CheckBoxRenderer extends JCheckBox
-        implements ListCellRenderer {
-
-        public CheckBoxRenderer() {
-            //setBackground(UIManager.getColor("List.textBackground"));
-            //setForeground(UIManager.getColor("List.textForeground"));
-        }
-
-        public Component getListCellRendererComponent(JList listBox,
-            Object obj, int currentindex, boolean isChecked,
-            boolean hasFocus) {
-            GoodsItem item = (GoodsItem) obj;
-            setSelected(item.isSelected());
-            setText(item.toString());
-            setEnabled(item.isEnabled());
-            return this;
-        }
-    }
-
-    private class GoodsItem extends JCheckBox {
-        private Goods good;
-
-        public GoodsItem(Goods good) {
-            this.good = good;
-        }
-
-        public Goods getGoods() {
-            return good;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String toString() {
-            StringTemplate template
-                = StringTemplate.template("model.goods.goodsAmount")
-                    .add("%goods%", good.getNameKey())
-                    .addAmount("%amount%", good.getAmount());
-            return Messages.message(template);
-        }
-    }
 }

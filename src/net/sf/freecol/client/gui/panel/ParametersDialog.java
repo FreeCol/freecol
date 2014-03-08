@@ -153,6 +153,6 @@ public class ParametersDialog extends FreeColDialog<Parameters> {
      */
     @Override
     public void requestFocus() {
-        inputD.requestFocus();
+        this.inputD.requestFocus();
     }
 }

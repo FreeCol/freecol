@@ -1048,6 +1048,56 @@ The player pays a smaller fee for transporting treasures to Europe.
 
 The building increases the capacity of the warehouse.
 
+\hypertarget{Mods}{\chapter{Mods}}
+
+FreeCol packages a number of simple modifications to the FreeCol rules
+and resources, generally known as \emph{mods}.  The standard mods live
+in \texttt{.../data/mods}.  Users can add their own mods to a
+\texttt{mods} directory under their main data directory.
+
+A mod consists of a directory that includes at minimum a file
+\texttt{mod.xml}, a file \texttt{FreeColMessages.properties}, and
+other files that implement the required changes.  \texttt{mod.xml}
+simply contains: \texttt{<mod id="}\emph{identifier}\texttt{" />}
+where the identifier is some unique name (distinct from other existing
+mods).  The \texttt{FreeColMessages.properties} file should contain at
+minimum entries for \texttt{mod.}\emph{identifier}\texttt{.name} 
+and \texttt{mod.}\emph{identifier}\texttt{.shortDescription}, so that
+the mod selection dialog can display the mod correctly.  The messages
+file should also contain other messages needed by the mod.
+
+Many mods define extra resources.  If so, a
+\texttt{resources.properties} file will be needed, and similarly files
+for the resources involved.  For example, the ``example'' mod defines
+a ``milkmaid'' unit, which needs an image, so the example mod
+directory contains an image file for the milkmaid, and a reference to
+this file in \texttt{resources.properties}.
+
+Most mods change the specification.  This is done in a
+\texttt{specification.xml} file.  This file is in the same general
+format as the existing freecol rule sets, but does not attempt to
+provide a comprehensive set.  The first non-comment line should be:
+\texttt{<freecol-specification id="}\emph{identifier}\texttt{">}.
+Note that mods typically do not specify which ruleset they extend.
+
+When modifying a specification, expect additional elements you provide
+to be applied additively, but attributes of an existing element are
+cleared unless a special \texttt{preserve="true"} attribute is
+present.  If you need to delete or redefine an element, respecify it
+in context with just its \texttt{id} and \texttt{delete="true"}
+attributes.  So for example, in the freecol ruleset we need to remove
+the \texttt{model.modifier.minimumColonySize} modifier from the
+stockade building, which is done as follows:
+
+\begin{verbatim}
+    <building-type id="model.building.stockade" preserve="true">
+      <modifier id="model.modifier.minimumColonySize" delete="true" />
+    </building-type>
+\end{verbatim}
+
+Note that not all elements take a \texttt{delete} tag yet.  You may
+need to read or modify the source to be certain a mod will work.
+
 
 \hypertarget{Resources}{\chapter{Resources}}
 

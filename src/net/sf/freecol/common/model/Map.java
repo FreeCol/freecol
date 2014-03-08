@@ -2219,8 +2219,33 @@ public class Map extends FreeColGameObject implements Location {
         }
     }
 
+    /**
+     * Reset layer to reflect what is actually there.
+     */
+    public void resetLayers() {
+        boolean regions = false,
+            rivers = false,
+            lostCityRumours = false,
+            resources = false,
+            nativeSettlements = false;
+        for (Tile t : getAllTiles()) {
+            regions |= t.getRegion() != null;
+            rivers |= t.hasRiver();
+            lostCityRumours |= t.hasLostCityRumour();
+            resources |= t.hasResource();
+            nativeSettlements |= t.getSettlement() instanceof IndianSettlement;
+        }
+        setLayer((rivers && lostCityRumours && resources && nativeSettlements)
+            ? Layer.ALL
+            : (nativeSettlements || lostCityRumours) ? Layer.NATIVES
+            : (resources) ? Layer.RESOURCES
+            : (rivers) ? Layer.RIVERS
+            : (regions) ? Layer.REGIONS
+            : Layer.TERRAIN);
+    }
 
-    // Location interface.
+
+    // Interface Location
     // getId() inherited.
 
     /**

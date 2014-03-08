@@ -54,7 +54,7 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
 
     private final Canvas canvas;
 
-    private Point oldPoint;
+    private Point endPoint;
     private Point startPoint;
 
 
@@ -90,19 +90,41 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
     }
 
     /**
-     * Invoked when a mouse button was clicked.
+     * Draw a box on screen.
      *
-     * @param e The MouseEvent that holds all the information.
+     * @param component The <code>JComponent</code> to draw on.
+     * @param startPoint The starting <code>Point</code>.
+     * @param endPoint The end <code>Point</code>.
+     */
+    private void drawBox(JComponent component,
+                         Point startPoint, Point endPoint) {
+        final MapEditorController controller;
+        if (startPoint == null || endPoint == null
+            || startPoint.distance(endPoint) == 0
+            || (controller = freeColClient.getMapEditorController()) == null)
+            return;
+
+        Graphics2D graphics = (Graphics2D)component.getGraphics();
+        graphics.setColor(Color.WHITE);
+        int x = Math.min(startPoint.x, endPoint.x);
+        int y = Math.min(startPoint.y, endPoint.y);
+        int width = Math.abs(startPoint.x - endPoint.x);
+        int height = Math.abs(startPoint.y - endPoint.y);
+        graphics.drawRect(x, y, width, height);
+    }
+
+
+    // Implement MouseListener
+
+    /**
+     * {@inheritDoc}
      */
     public void mouseClicked(MouseEvent e) {
-        if (getMap() == null) {
-            return;
-        }
+        if (getMap() == null) return;
+
         try {
             if (e.getClickCount() > 1) {
-                Tile tile = mapViewer.convertToMapTile(e.getX(), e.getY());
-                Colony colony = tile.getColony();
-                if (colony != null) canvas.showColonyPanel(colony);
+                mapViewer.convertToMapTile(e.getX(), e.getY());
             } else {
                 canvas.requestFocus();
             }
@@ -112,49 +134,25 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
     }
 
     /**
-     * Invoked when the mouse enters the component.
-     *
-     * @param e The MouseEvent that holds all the information.
-     */
-    public void mouseEntered(MouseEvent e) {
-        // Ignore for now.
-    }
-
-    /**
-     * Invoked when the mouse exits the component.
-     *
-     * @param e The MouseEvent that holds all the information.
-     */
-    public void mouseExited(MouseEvent e) {
-        // Ignore for now.
-    }
-
-
-    /**
-     * Invoked when a mouse button was pressed.
-     *
-     * @param e The MouseEvent that holds all the information.
+     * {@inheritDoc}
      */
     public void mousePressed(MouseEvent e) {
-        if (!e.getComponent().isEnabled()) {
-            return;
-        }
-        if (getMap() == null) {
-            return;
-        }
+        if (getMap() == null || !e.getComponent().isEnabled()) return;
+
         try {
             if (e.getButton() == MouseEvent.BUTTON1) {
-                startPoint = e.getPoint();
-                oldPoint = e.getPoint();
-                JComponent component = (JComponent)e.getSource();
-                drawBox(component, startPoint, oldPoint);
-
-            } else if (e.getButton() == MouseEvent.BUTTON2) {
                 Tile tile = mapViewer.convertToMapTile(e.getX(), e.getY());
                 if (tile != null) getGUI().setSelectedTile(tile, false);
+                startPoint = endPoint = null;
+
+            } else if (e.getButton() == MouseEvent.BUTTON2) {
+                startPoint = e.getPoint();
+                JComponent component = (JComponent)e.getSource();
+                drawBox(component, startPoint, endPoint);
 
             } else if (e.getButton() == MouseEvent.BUTTON3
                 || e.isPopupTrigger()) {
+                startPoint = e.getPoint();
                 Tile tile = mapViewer.convertToMapTile(e.getX(), e.getY());
                 if (tile != null) {
                     if (tile.hasRiver()) {
@@ -172,8 +170,7 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
                         canvas.showEditSettlementDialog(tile.getIndianSettlement());
                     }
                 } else {
-                    getGUI().setSelectedTile(null,
-                        tile.getX() >= 0 && tile.getY() >= 0);
+                    getGUI().setSelectedTile(null, false);
                 }
             }
         } catch (Exception ex) {
@@ -182,126 +179,109 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
     }
 
     /**
-     * Invoked when a mouse button was released.
-     *
-     * @param e The MouseEvent that holds all the information.
+     * {@inheritDoc}
      */
     public void mouseReleased(MouseEvent e) {
-        if (getMap() == null) return;
-        JComponent component = (JComponent)e.getSource();
+        if (getMap() == null
+            || e.getButton() == MouseEvent.BUTTON1
+            || getGUI().getFocus() == null) return;
+        final JComponent component = (JComponent)e.getSource();
+        final MapEditorController controller
+            = freeColClient.getMapEditorController();
+        final boolean isTransformActive = controller.getMapTransform() != null;
 
-        MapEditorController controller = freeColClient.getMapEditorController();
-        boolean isTransformActive = controller.getMapTransform() != null;
+        if ((endPoint = e.getPoint()) == null) return;
+        if (startPoint == null) startPoint = endPoint;
+        drawBox(component, startPoint, endPoint);
+        Tile start = mapViewer.convertToMapTile(startPoint.x, startPoint.y);
+        Tile end = (startPoint == endPoint) ? start
+            : mapViewer.convertToMapTile(endPoint.x, endPoint.y);
 
-        if (startPoint == null) startPoint = e.getPoint();
-        if (oldPoint == null)	oldPoint = e.getPoint();
-        drawBox(component, startPoint, oldPoint);
-        if (getGUI().getFocus() != null) {
-            Tile start = mapViewer.convertToMapTile(startPoint.x, startPoint.y);
-            Tile end = start;
-            // Optimization, only check if the points are different
-            if (startPoint.x != oldPoint.x || startPoint.y != oldPoint.y) {
-                end = mapViewer.convertToMapTile(oldPoint.x, oldPoint.y);
-            }
-
-            // edit 2 more conditions in if statement.  we need to
-            // check for coordinator of X and Y if (x,y) outside of
-            // map then dont focus to that else setfocus to that
-            // position no option selected, just center map
-            if (!isTransformActive && end.getX() >= 0 && end.getY() >= 0) {
-                getGUI().setFocus(end);
-                return;
-            }
-
-            // find the area to transform
-            int min_x, max_x, min_y, max_y;
-            if (start.getX() < end.getX()) {
-                min_x = start.getX();
-                max_x = end.getX();
-            } else {
-                min_x = end.getX();
-                max_x = start.getX();
-            }
-            if (start.getY() < end.getY()) {
-                min_y = start.getY();
-                max_y = end.getY();
-            } else {
-                min_y = end.getY();
-                max_y = start.getY();
-            }
-
-            // apply transformation to all tiles in the area
-            Tile t = null;
-            for (int x = min_x; x <= max_x; x++) {
-                for (int y = min_y; y <= max_y; y++) {
-                    t = getMap().getTile(x, y);
-                    if (t != null) {
-                        controller.transform(t);
-                    }
-                }
-            }
-            if (controller.getMapTransform() instanceof TileTypeTransform) {
-                for (int x = min_x - 2; x <= max_x + 2; x++) {
-                    for (int y = min_y - 2; y <= max_y + 2; y++) {
-                        t = getMap().getTile(x, y);
-                        if (t != null && t.getType().isWater()) {
-                            TerrainGenerator.encodeStyle(t);
-                        }
-                    }
-                }
-            }
-            getGUI().refresh();
-            canvas.requestFocus();
-        }
-    }
-
-    /**
-     * Invoked when the mouse has been moved.
-     *
-     * @param e The MouseEvent that holds all the information.
-     */
-    public void mouseMoved(MouseEvent e) {
-        if (getMap() == null) return;
-        if (e.getY() < AUTO_SCROLLSPACE) return; // handle this in the menu bar
-
-        performAutoScrollIfActive(e);
-    }
-
-    /**
-     * Invoked when the mouse has been dragged.
-     *
-     * @param e The MouseEvent that holds all the information.
-     */
-    public void mouseDragged(MouseEvent e) {
-        if (getMap() == null) {
+        // edit 2 more conditions in if statement.  we need to
+        // check for coordinator of X and Y if (x,y) outside of
+        // map then dont focus to that else setfocus to that
+        // position no option selected, just center map
+        if (!isTransformActive && end.getX() >= 0 && end.getY() >= 0) {
+            getGUI().setFocus(end);
             return;
         }
 
-        JComponent component = (JComponent)e.getSource();
-        drawBox(component, startPoint, oldPoint);
-        oldPoint = e.getPoint();
-        drawBox(component, startPoint, oldPoint);
+        // find the area to transform
+        int min_x, max_x, min_y, max_y;
+        if (start.getX() < end.getX()) {
+            min_x = start.getX();
+            max_x = end.getX();
+        } else {
+            min_x = end.getX();
+            max_x = start.getX();
+        }
+        if (start.getY() < end.getY()) {
+            min_y = start.getY();
+            max_y = end.getY();
+        } else {
+            min_y = end.getY();
+            max_y = start.getY();
+        }
+
+        // apply transformation to all tiles in the area
+        Tile t = null;
+        for (int x = min_x; x <= max_x; x++) {
+            for (int y = min_y; y <= max_y; y++) {
+                t = getMap().getTile(x, y);
+                if (t != null) {
+                    controller.transform(t);
+                }
+            }
+        }
+        if (controller.getMapTransform() instanceof TileTypeTransform) {
+            for (int x = min_x - 2; x <= max_x + 2; x++) {
+                for (int y = min_y - 2; y <= max_y + 2; y++) {
+                    t = getMap().getTile(x, y);
+                    if (t != null && t.getType().isWater()) {
+                        TerrainGenerator.encodeStyle(t);
+                    }
+                }
+            }
+        }
+        getGUI().refresh();
+        canvas.requestFocus();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void mouseEntered(MouseEvent e) {} // Ignore for now.
+
+    /**
+     * {@inheritDoc}
+     */
+    public void mouseExited(MouseEvent e) {} // Ignore for now.
+
+
+    // Implement MouseMotionListener
+
+    /**
+     * {@inheritDoc}
+     */
+    public void mouseDragged(MouseEvent e) {
+        if (getMap() == null) return;
+        final JComponent component = (JComponent)e.getSource();
+
+        drawBox(component, startPoint, endPoint);
+        endPoint = e.getPoint();
+        drawBox(component, startPoint, endPoint);
 
         performDragScrollIfActive(e);
 
         getGUI().refresh();
     }
 
-    private void drawBox(JComponent component, Point startPoint, Point endPoint) {
-        if (startPoint == null || endPoint == null
-            || startPoint.distance(endPoint) == 0) return;
+    /**
+     * {@inheritDoc}
+     */
+    public void mouseMoved(MouseEvent e) {
+        if (getMap() == null || e.getY() < AUTO_SCROLLSPACE) return;
 
-        // only bother to draw if a transformation is active
-        MapEditorController controller = freeColClient.getMapEditorController();
-        if (controller.getMapTransform() == null) return;
-
-        Graphics2D graphics = (Graphics2D) component.getGraphics ();
-        graphics.setColor(Color.WHITE);
-        int x = Math.min(startPoint.x, endPoint.x);
-        int y = Math.min(startPoint.y, endPoint.y);
-        int width = Math.abs(startPoint.x - endPoint.x);
-        int height = Math.abs(startPoint.y - endPoint.y);
-        graphics.drawRect(x, y, width, height);
+        performAutoScrollIfActive(e);
     }
-
 }

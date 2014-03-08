@@ -297,7 +297,7 @@ public abstract class FreeColGameObjectType extends FreeColObject
         if (Ability.getXMLElementTagName().equals(tag)) {
             if (xr.getAttribute(DELETE_TAG, false)) {
                 removeAbilities(xr.readId());
-                xr.closeTag(DELETE_TAG);
+                xr.closeTag(Ability.getXMLElementTagName());
 
             } else {
                 Ability ability = new Ability(xr, spec); // Closes the element

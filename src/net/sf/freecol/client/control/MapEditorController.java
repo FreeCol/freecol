@@ -38,12 +38,17 @@ import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Nation;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.model.ServerGame;
+import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.generator.MapGenerator;
 
 
@@ -61,11 +66,10 @@ public final class MapEditorController {
     private final GUI gui;
 
     /**
-     * The transform that should be applied to a
-     * <code>Tile</code> that is clicked on the map.
+     * The transform that should be applied to a <code>Tile</code>
+     * that is clicked on the map.
      */
     private MapTransform currentMapTransform = null;
-
 
 
     /**
@@ -92,14 +96,16 @@ public final class MapEditorController {
             final FreeColServer freeColServer
                 = new FreeColServer(false, false, specification, 0, null);
             freeColClient.setFreeColServer(freeColServer);
-            freeColClient.setGame(freeColServer.getGame());
+            Game game = freeColServer.getGame();
+            requireNativeNations(game);
+            freeColClient.setGame(game);
             freeColClient.setMyPlayer(null);
             gui.playSound(null);
 
             gui.closeMainPanel();
             gui.closeMenus();
             freeColClient.setInGame(true);
-
+            gui.changeViewMode(GUI.VIEW_TERRAIN_MODE);
             gui.startMapEditorGUI();
         } catch (NoRouteToServerException e) {
             gui.showErrorMessage("server.noRouteToServer");
@@ -177,6 +183,7 @@ public final class MapEditorController {
                 spec.applyDifficultyLevel(FreeCol.getDifficulty());
             }
             mapGenerator.createMap(game);
+            requireNativeNations(game);
             gui.setFocus(game.getMap().getTile(1,1));
             freeColClient.updateActions();
             gui.refresh();
@@ -205,32 +212,34 @@ public final class MapEditorController {
      */
     public void saveGame(final File file) {
         final Game game = freeColClient.getGame();
-        game.getMap().resetContiguity();
-        game.getMap().resetHighSeasCount();
+        Map map = game.getMap();
+        map.resetContiguity();
+        map.resetHighSeasCount();
+        map.resetLayers();
 
         gui.showStatusPanel(Messages.message("status.savingGame"));
         Thread t = new Thread(FreeCol.CLIENT_THREAD+"Saving Map") {
-            @Override
-            public void run() {
-                try {
-                    BufferedImage scaledImage = gui.createMiniMapThumbNail();
-                    freeColClient.getFreeColServer()
-                        .saveMapEditorGame(file, scaledImage);
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            gui.closeStatusPanel();
-                            gui.requestFocusInWindow();
-                        }
-                    });
-                } catch (IOException e) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            gui.showErrorMessage("couldNotSaveGame");
-                        }
-                    });
+                @Override
+                public void run() {
+                    try {
+                        BufferedImage thumb = gui.createMiniMapThumbNail();
+                        freeColClient.getFreeColServer()
+                            .saveMapEditorGame(file, thumb);
+                        SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    gui.closeStatusPanel();
+                                    gui.requestFocusInWindow();
+                                }
+                            });
+                    } catch (IOException e) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    gui.showErrorMessage("couldNotSaveGame");
+                                }
+                            });
+                    }
                 }
-            }
-        };
+            };
         t.start();
     }
 
@@ -250,7 +259,25 @@ public final class MapEditorController {
     }
 
     /**
+     * Require all native nation players to be present in a game.
+     *
+     * @param game The <code>Game</code> to add native nations to.
+     */
+    public void requireNativeNations(Game game) {
+        final Specification spec = game.getSpecification();
+        for (Nation n : spec.getIndianNations()) {
+            Player p = game.getPlayer(n.getId());
+            if (p == null) {
+                p = new ServerPlayer(game,Messages.getName(n.getRulerNameKey()),
+                                     false, n, null, null);
+                game.addPlayer(p);
+            }
+        }
+    }
+
+    /**
      * Loads a game from the given file.
+     *
      * @param file The <code>File</code>.
      */
     public void loadGame(File file) {
@@ -261,7 +288,7 @@ public final class MapEditorController {
         class ErrorJob implements Runnable {
             private final String message;
 
-            ErrorJob( String message ) {
+            ErrorJob(String message) {
                 this.message = message;
             }
 
@@ -274,51 +301,49 @@ public final class MapEditorController {
         gui.showStatusPanel(Messages.message("status.loadingGame"));
 
         Runnable loadGameJob = new Runnable() {
-            public void run() {
-                FreeColServer freeColServer = null;
-                try {
-                    Specification spec = getDefaultSpecification();
-                    freeColServer = new FreeColServer(new FreeColSavegameFile(theFile),
-                        spec, 0, "MapEditor");
-                    freeColClient.setFreeColServer(freeColServer);
-                    freeColClient.setGame(freeColServer.getGame());
-                    SwingUtilities.invokeLater( new Runnable() {
-                        public void run() {
-                            gui.closeStatusPanel();
-                            gui.setFocus(freeColClient.getGame().getMap().getTile(1,1));
-                            freeColClient.updateActions();
-                            gui.refresh();
-                        }
-                    } );
-                } catch (FreeColException e) {
-                    reloadMainPanel();
-                    SwingUtilities.invokeLater(new ErrorJob(e.getMessage()));
-                } catch (FileNotFoundException e) {
-                    reloadMainPanel();
-                    SwingUtilities.invokeLater(new ErrorJob("fileNotFound"));
-                } catch (IOException e) {
-                    reloadMainPanel();
-                    SwingUtilities.invokeLater(new ErrorJob("server.couldNotStart"));
-                } catch (NoRouteToServerException e) {
-                    reloadMainPanel();
-                    SwingUtilities.invokeLater(new ErrorJob("server.noRouteToServer"));
-                } catch (XMLStreamException e) {
-                    reloadMainPanel();
-                    SwingUtilities.invokeLater(new ErrorJob("server.streamError"));
+                public void run() {
+                    FreeColServer freeColServer
+                        = freeColClient.getFreeColServer();
+                    try {
+                        Specification spec = getDefaultSpecification();
+                        Game game = FreeColServer.readGame(new FreeColSavegameFile(theFile),
+                            spec, freeColServer);
+                        freeColClient.setGame(game);
+                        requireNativeNations(game);
+                        SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    gui.closeStatusPanel();
+                                    gui.setFocus(freeColClient.getGame()
+                                        .getMap().getTile(1,1));
+                                    freeColClient.updateActions();
+                                    gui.refresh();
+                                }
+                            });
+                    } catch (FreeColException e) {
+                        reloadMainPanel();
+                        SwingUtilities.invokeLater(new ErrorJob(e.getMessage()));
+                    } catch (FileNotFoundException e) {
+                        reloadMainPanel();
+                        SwingUtilities.invokeLater(new ErrorJob("fileNotFound"));
+                    } catch (IOException e) {
+                        reloadMainPanel();
+                        SwingUtilities.invokeLater(new ErrorJob("server.couldNotStart"));
+                    } catch (XMLStreamException e) {
+                        reloadMainPanel();
+                        SwingUtilities.invokeLater(new ErrorJob("server.streamError"));
+                    }
                 }
-            }
-        };
-        freeColClient.worker.schedule( loadGameJob );
+            };
+        freeColClient.worker.schedule(loadGameJob);
     }
 
-    private void reloadMainPanel ()
-    {
+    private void reloadMainPanel () {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                gui.closeMainPanel();
-                gui.showMainPanel(null);
-                gui.playSound("sound.intro.general");
-            }
-        });
+                public void run() {
+                    gui.closeMainPanel();
+                    gui.showMainPanel(null);
+                    gui.playSound("sound.intro.general");
+                }
+            });
     }
 }

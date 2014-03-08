@@ -205,23 +205,12 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
             } else {
                 getGUI().setActiveUnit(unit);
                 if (unit.getColony() != null) {
-                    getGUI().showColonyPanel(unit.getColony());
+                    getGUI().showColonyPanel(unit.getColony(), unit);
                 } else if (unit.hasTile()) {
                     getGUI().setFocus(unit.getTile());
                 }
             }
         }
-    }
-
-
-    // Override Component
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void requestFocus() {
-        this.unitList.requestFocus();
     }
 }
 

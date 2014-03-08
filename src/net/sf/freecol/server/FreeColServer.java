@@ -776,7 +776,6 @@ public final class FreeColServer {
     public void saveMapEditorGame(File file, BufferedImage image) 
         throws IOException {
         this.setAIMain(null);
-        // TODO: nullify the spec?
         saveGame(file, null, image);
     }
 
@@ -784,7 +783,8 @@ public final class FreeColServer {
      * Saves a game.
      *
      * @param file The file where the data will be written.
-     * @param image an <code>Image</code> value
+     * @param options Optional client options to save in the game.
+     * @param image A thumbnail <code>Image</code> value to save in the game.
      * @exception IOException If a problem was encountered while trying
      *     to open, write or close the file.
      */
@@ -1196,6 +1196,8 @@ public final class FreeColServer {
             "model.difficulty.other", 23, true);
         addIntegerOption(GameOptions.GOOD_RUMOUR,
             "model.difficulty.other", 48, true);
+        addBooleanOption(GameOptions.FOUND_COLONY_DURING_REBELLION,
+            "gameOptions.colony", true, false);
     }
 
     private void addOptionGroup(String id, boolean difficulty) {

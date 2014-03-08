@@ -131,7 +131,8 @@ public final class MapViewer {
 
     private Unit savedActiveUnit;
 
-    private int currentMode;
+    /** The view mode in use. */
+    private int viewMode = 0;
 
     /** A path to be displayed on the map. */
     private PathNode currentPath;
@@ -243,7 +244,47 @@ public final class MapViewer {
         blinkingMarqueeEnabled = true;
 
         cursor = new net.sf.freecol.client.gui.TerrainCursor();
+    }
 
+
+    /**
+     * Get the view mode.
+     *
+     * @return The view mode.
+     */
+    public int getViewMode() {
+        return viewMode;
+    }
+
+    /**
+     * Toggle the current view mode.
+     */
+    public void toggleViewMode() {
+        changeViewMode(1 - viewMode);
+    }
+
+    /**
+     * Change the view mode to a new one.
+     *
+     * @param newViewMode The new view mode.
+     */
+    public void changeViewMode(int newViewMode) {
+        if (newViewMode != viewMode) {
+            logger.fine("Changed to " + ((newViewMode == GUI.MOVE_UNITS_MODE)
+                    ? "Move Units" : "View Terrain") + " mode");
+            viewMode = newViewMode;
+        }
+
+        switch (viewMode) {
+        case GUI.MOVE_UNITS_MODE:
+            if (getActiveUnit() == null) setActiveUnit(savedActiveUnit);
+            savedActiveUnit = null;
+            break;
+        case GUI.VIEW_TERRAIN_MODE:
+            savedActiveUnit = activeUnit;
+            setActiveUnit(null);
+            break;
+        }
     }
 
 
@@ -1166,7 +1207,7 @@ public final class MapViewer {
         this.activeUnit = activeUnit;
 
         // The user activated a unit
-        if (getView() == GUI.VIEW_TERRAIN_MODE && activeUnit != null) {
+        if (getViewMode() == GUI.VIEW_TERRAIN_MODE && activeUnit != null) {
             changeViewMode(GUI.MOVE_UNITS_MODE);
         }
 
@@ -1313,7 +1354,7 @@ public final class MapViewer {
         boolean ret = false;
         selectedTile = newTile;
 
-        if (getView() == GUI.MOVE_UNITS_MODE) {
+        if (getViewMode() == GUI.MOVE_UNITS_MODE) {
             if (noActiveUnitIsAt(newTile)) {
                 if (newTile != null && newTile.hasSettlement()) {
                     gui.getCanvas().showSettlement(newTile.getSettlement());
@@ -3222,43 +3263,14 @@ public final class MapViewer {
         rightSpace = leftSpace;
     }
 
-    public void toggleViewMode() {
-        logger.warning("Toggling view");
-        changeViewMode(1 - currentMode);
-    }
-
-    public void changeViewMode(int newViewMode) {
-        if (newViewMode != currentMode) {
-            logger.fine("Changed to " + ((newViewMode == GUI.MOVE_UNITS_MODE)
-                    ? "Move Units" : "View Terrain") + " mode");
-            currentMode = newViewMode;
-        }
-
-        switch (currentMode) {
-        case GUI.MOVE_UNITS_MODE:
-            if (getActiveUnit() == null) setActiveUnit(savedActiveUnit);
-            savedActiveUnit = null;
-            break;
-        case GUI.VIEW_TERRAIN_MODE:
-            savedActiveUnit = activeUnit;
-            setActiveUnit(null);
-            break;
-        }
-    }
-
-    public int getView() {
-        return currentMode;
-    }
-
     public boolean displayTileCursor(Tile tile) {
-        return (currentMode == GUI.VIEW_TERRAIN_MODE) && 
-            tile != null &&
-            tile.equals(selectedTile);
+        return viewMode == GUI.VIEW_TERRAIN_MODE
+            && tile != null && tile.equals(selectedTile);
     }
 
     public boolean displayUnitCursor(Unit unit) {
-        return (currentMode == GUI.MOVE_UNITS_MODE) &&
-            (unit == activeUnit) && 
-            (cursor.isActive() || (unit.getMovesLeft() == 0)) ;
+        return viewMode == GUI.MOVE_UNITS_MODE
+            && unit == activeUnit
+            && (cursor.isActive() || unit.getMovesLeft() <= 0);
     }
 }

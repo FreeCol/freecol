@@ -163,7 +163,7 @@ public class InformationPanel extends FreeColPanel {
      */
     private void displayFCO(GUI gui, FreeColObject fco) {
         if (fco instanceof Colony) {
-            gui.showColonyPanel((Colony)fco);
+            gui.showColonyPanel((Colony)fco, null);
         } else if (fco instanceof Europe) {
             gui.showEuropePanel();
         } else if (fco instanceof IndianSettlement) {
@@ -173,7 +173,7 @@ public class InformationPanel extends FreeColPanel {
         } else if (fco instanceof Unit) {
             displayFCO(gui, (FreeColObject)(((Unit)fco).getLocation()));
         } else if (fco instanceof WorkLocation) {
-            gui.showColonyPanel(((WorkLocation)fco).getColony());
+            gui.showColonyPanel(((WorkLocation)fco).getColony(), null);
         }
     }
 
