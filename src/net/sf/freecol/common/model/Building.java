@@ -319,6 +319,8 @@ public class Building extends WorkLocation implements Named, Comparable<Building
         for (AbstractGoods input : getInputs()) {
             int required = (int) (input.getAmount() * minimumRatio);
             int available = getAvailable(input.getType(), inputs);
+            // Do not allow auto-production to go negative.
+            if (canAutoProduce()) available = Math.max(0, available);
             // experts in factory level buildings may produce a
             // certain amount of goods even when no input is available
             if (available < required
