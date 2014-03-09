@@ -253,11 +253,10 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
                     unit.dispose();
                 }
             }
+            SettlementType oldType = settlement.getType();
             SettlementType type = getSettlementType();
             settlement.setType(type);
-            for (Modifier m : settlement.getModifierSet(Modifier.DEFENCE)) {
-                m.setSource(type);
-            }
+            settlement.getFeatureContainer().replaceSource(oldType, type);
             ret = settlement;
 
         } else if (options.get(1).equals(value)) {
