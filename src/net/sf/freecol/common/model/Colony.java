@@ -374,6 +374,7 @@ public class Colony extends Settlement implements Nameable {
             removeFeatures(building.getType(), "Removing building "
                 + building.getType() + " from " + getName());
             invalidateCache();
+            validateBuildQueues();
         }
         return result;
     }
@@ -1051,6 +1052,33 @@ public class Colony extends Settlement implements Nameable {
             }
         }
         return NoBuildReason.NONE;
+    }
+
+    /**
+     * Validate the build queues.  Catches build fails due to broken
+     * requirements.
+     */
+    private void validateBuildQueues() {
+        List<BuildableType> buildables = buildQueue.getValues();
+        for (int i = 0; i < buildables.size(); i++) {
+            BuildableType bt = buildables.get(i);
+            NoBuildReason reason = getNoBuildReason(bt);
+            if (reason != NoBuildReason.NONE) {
+                buildQueue.remove(i);
+                logger.warning("Removed bogus buildable " + bt
+                    + ": " + reason);
+            }
+        }
+        List<UnitType> unitTypes = populationQueue.getValues();
+        for (int i = 0; i < unitTypes.size(); i++) {
+            UnitType ut = unitTypes.get(i);
+            NoBuildReason reason = getNoBuildReason(ut);
+            if (reason != NoBuildReason.NONE) {
+                populationQueue.remove(i);
+                logger.warning("Removed bogus unit type " + ut
+                    + ": " + reason);
+            }
+        }
     }
 
     /**
@@ -2794,6 +2822,13 @@ public class Colony extends Settlement implements Nameable {
 
         super.readChildren(xr);
 
+        // @compat 0.10.x
+        if (!landLocked && !hasAbility(Ability.HAS_PORT)) {
+            addAbility(new Ability(Ability.HAS_PORT));
+        }
+        // end @compat 0.10.x
+
+        validateBuildQueues();
         invalidateCache();
     }
 
@@ -2807,14 +2842,16 @@ public class Colony extends Settlement implements Nameable {
         final String tag = xr.getLocalName();
 
         if (BUILD_QUEUE_TAG.equals(tag)) {
-            buildQueue.add(xr.getType(spec, ID_ATTRIBUTE_TAG,
-                    BuildableType.class, (BuildableType)null));
+            BuildableType bt = xr.getType(spec, ID_ATTRIBUTE_TAG,
+                BuildableType.class, (BuildableType)null);
+            if (bt != null) buildQueue.add(bt);
             xr.closeTag(BUILD_QUEUE_TAG);
 
 
         } else if (POPULATION_QUEUE_TAG.equals(xr.getLocalName())) {
-            populationQueue.add(xr.getType(spec, ID_ATTRIBUTE_TAG,
-                                           UnitType.class, (UnitType)null));;
+            UnitType ut = xr.getType(spec, ID_ATTRIBUTE_TAG,
+                                     UnitType.class, (UnitType)null);
+            if (ut != null) populationQueue.add(ut);
             xr.closeTag(POPULATION_QUEUE_TAG);
 
         } else if (Building.getXMLElementTagName().equals(tag)) {
