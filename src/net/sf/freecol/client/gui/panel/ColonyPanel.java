@@ -975,6 +975,7 @@ public final class ColonyPanel extends PortPanel
         if (property == null) {
             logger.warning("Null property change");
         } else if (Unit.CARGO_CHANGE.equals(property)) {
+            cargoPanel.update();
             updateInPortPanel();
         } else if (ColonyChangeEvent.POPULATION_CHANGE.toString().equals(property)) {
             updatePopulationPanel();
