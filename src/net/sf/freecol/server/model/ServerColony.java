@@ -677,7 +677,7 @@ public class ServerColony extends Colony implements ServerModelObject {
         boolean invalidate = false;
 
         while ((buildable = queue.getCurrentlyBuilding()) != null) {
-            switch (getNoBuildReason(buildable)) {
+            switch (getNoBuildReason(buildable, null)) {
             case NONE:
                 return buildable;
             case NOT_BUILDING:
@@ -706,7 +706,7 @@ public class ServerColony extends Colony implements ServerModelObject {
             default: // Are there other warnings to send?
                 logger.warning("Unexpected build failure at " + getName()
                     + " for " + buildable
-                    + ": " + getNoBuildReason(buildable));
+                    + ": " + getNoBuildReason(buildable, null));
                 cs.addMessage(See.only(owner),
                     new ModelMessage(ModelMessage.MessageType.WARNING,
                                      "colonyPanel.unbuildable",

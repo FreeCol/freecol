@@ -147,25 +147,29 @@ public class BuildingTest extends FreeColTestCase {
         Game game = getGame();
         game.setMap(getTestMap(true));
         Colony colony = getStandardColony(2);
-        assertEquals(Colony.NoBuildReason.POPULATION_TOO_SMALL, colony.getNoBuildReason(stockadeType));
+        assertEquals(Colony.NoBuildReason.POPULATION_TOO_SMALL,
+                     colony.getNoBuildReason(stockadeType, null));
 
         Unit colonist = new ServerUnit(game, colony.getTile(), colony.getOwner(), freeColonistType);
         colonist.setLocation(colony);
 
-        assertEquals(Colony.NoBuildReason.NONE, colony.getNoBuildReason(stockadeType));
+        assertEquals(Colony.NoBuildReason.NONE,
+                     colony.getNoBuildReason(stockadeType, null));
     }
 
     public void testFortRequiresMinimumPopulation() {
         Game game = getGame();
         game.setMap(getTestMap(true));
         Colony colony = getStandardColony(2);
-        assertEquals(Colony.NoBuildReason.POPULATION_TOO_SMALL, colony.getNoBuildReason(fortType));
+        assertEquals(Colony.NoBuildReason.POPULATION_TOO_SMALL,
+                     colony.getNoBuildReason(fortType, null));
 
         Unit colonist = new ServerUnit(game, colony.getTile(), colony.getOwner(), freeColonistType);
         colonist.setLocation(colony);
 
         colony.addBuilding(new ServerBuilding(game, colony, stockadeType));
-        assertEquals(Colony.NoBuildReason.NONE, colony.getNoBuildReason(fortType));
+        assertEquals(Colony.NoBuildReason.NONE,
+                     colony.getNoBuildReason(fortType, null));
     }
 
     public void testFortressRequiresMinimumPopulation() {
@@ -175,13 +179,15 @@ public class BuildingTest extends FreeColTestCase {
         Colony colony = getStandardColony(7);
         colony.addBuilding(new ServerBuilding(game, colony, stockadeType));
         colony.addBuilding(new ServerBuilding(game, colony, fortType));
-        assertEquals(Colony.NoBuildReason.POPULATION_TOO_SMALL, colony.getNoBuildReason(fortressType));
+        assertEquals(Colony.NoBuildReason.POPULATION_TOO_SMALL,
+                     colony.getNoBuildReason(fortressType, null));
 
         Unit colonist = new ServerUnit(game, colony.getTile(), colony.getOwner(), freeColonistType);
         colonist.setLocation(colony);
 
         assertEquals(8, colony.getUnitCount());
-        assertEquals(Colony.NoBuildReason.NONE, colony.getNoBuildReason(fortressType));
+        assertEquals(Colony.NoBuildReason.NONE,
+                     colony.getNoBuildReason(fortressType, null));
     }
 
     public void testInitialColony() {

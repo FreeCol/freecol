@@ -152,7 +152,8 @@ public class DebugUtils {
         List<String> results = new ArrayList<String>();
         int fails = 0;
         for (Colony sColony : sPlayer.getColonies()) {
-            Colony.NoBuildReason reason = sColony.getNoBuildReason(sBuildingType);
+            Colony.NoBuildReason reason
+                = sColony.getNoBuildReason(sBuildingType, null);
             results.add(sColony.getName() + ": " + reason.toString());
             if (reason == Colony.NoBuildReason.NONE) {
                 if (sBuildingType.isDefenceType()) {

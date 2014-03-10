@@ -1873,8 +1873,15 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *     problems were fixed, positive if no problems found at all.
      */
     public int checkIntegrity(boolean fix) {
-        return (tileItemContainer == null) ? 1
-            : tileItemContainer.checkIntegrity(fix);
+        int result = 1;
+        Colony colony = getColony();
+        if (colony != null) {
+            result = Math.min(result, colony.checkIntegrity(fix));
+        }
+        if (tileItemContainer != null) {
+            result = Math.min(result, tileItemContainer.checkIntegrity(fix));
+        }
+        return result;
     }
 
 

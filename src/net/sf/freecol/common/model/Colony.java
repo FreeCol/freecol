@@ -374,7 +374,7 @@ public class Colony extends Settlement implements Nameable {
             removeFeatures(building.getType(), "Removing building "
                 + building.getType() + " from " + getName());
             invalidateCache();
-            validateBuildQueues();
+            checkBuildQueueIntegrity(true);
         }
         return result;
     }
@@ -994,17 +994,22 @@ public class Colony extends Settlement implements Nameable {
      * @return a <code>boolean</code> value
      */
     public boolean canBuild(BuildableType buildableType) {
-        return (getNoBuildReason(buildableType) == NoBuildReason.NONE);
+        return getNoBuildReason(buildableType, null) == NoBuildReason.NONE;
     }
 
     /**
      * Return the reason why the give <code>BuildableType</code> can
      * not be built.
      *
-     * @param buildableType a <code>BuildableType</code> value
-     * @return a <code>NoBuildReason</code> value
+     * @param buildableType A <code>BuildableType</code> to build.
+     * @param assumeBuilt An optional list of other buildable types
+     *     which can be assumed to be built, for the benefit of build
+     *     queue checks.
+     * @return A <code>NoBuildReason</code> value decribing the failure,
+     *     including <code>NoBuildReason.NONE</code> on success.
      */
-    public NoBuildReason getNoBuildReason(BuildableType buildableType) {
+    public NoBuildReason getNoBuildReason(BuildableType buildableType,
+                                          List<BuildableType> assumeBuilt) {
         if (buildableType == null) {
             return NoBuildReason.NOT_BUILDING;
         } else if (!buildableType.needsGoodsToBuild()) {
@@ -1026,20 +1031,22 @@ public class Colony extends Settlement implements Nameable {
                 }
             }
         }
+        if (assumeBuilt == null) assumeBuilt = Collections.emptyList();
         if (buildableType instanceof BuildingType) {
             BuildingType newBuildingType = (BuildingType) buildableType;
             Building colonyBuilding = this.getBuilding(newBuildingType);
             if (colonyBuilding == null) {
                 // the colony has no similar building yet
-                if (newBuildingType.getUpgradesFrom() != null) {
+                BuildingType from = newBuildingType.getUpgradesFrom();
+                if (from != null && !assumeBuilt.contains(from)) {
                     // we are trying to build an advanced factory, we
                     // should build lower level shop first
                     return NoBuildReason.WRONG_UPGRADE;
                 }
             } else {
                 // a building of the same family already exists
-                if (colonyBuilding.getType().getUpgradesTo()
-                    != newBuildingType) {
+                BuildingType from = colonyBuilding.getType().getUpgradesTo();
+                if (from != newBuildingType && !assumeBuilt.contains(from)) {
                     // the existing building's next upgrade is not the
                     // new one we want to build
                     return NoBuildReason.WRONG_UPGRADE;
@@ -1052,33 +1059,6 @@ public class Colony extends Settlement implements Nameable {
             }
         }
         return NoBuildReason.NONE;
-    }
-
-    /**
-     * Validate the build queues.  Catches build fails due to broken
-     * requirements.
-     */
-    private void validateBuildQueues() {
-        List<BuildableType> buildables = buildQueue.getValues();
-        for (int i = 0; i < buildables.size(); i++) {
-            BuildableType bt = buildables.get(i);
-            NoBuildReason reason = getNoBuildReason(bt);
-            if (reason != NoBuildReason.NONE) {
-                buildQueue.remove(i);
-                logger.warning("Removed bogus buildable " + bt
-                    + ": " + reason);
-            }
-        }
-        List<UnitType> unitTypes = populationQueue.getValues();
-        for (int i = 0; i < unitTypes.size(); i++) {
-            UnitType ut = unitTypes.get(i);
-            NoBuildReason reason = getNoBuildReason(ut);
-            if (reason != NoBuildReason.NONE) {
-                populationQueue.remove(i);
-                logger.warning("Removed bogus unit type " + ut
-                    + ": " + reason);
-            }
-        }
     }
 
     /**
@@ -2661,6 +2641,80 @@ public class Colony extends Settlement implements Nameable {
             .addStringTemplate("%nation%", getOwner().getNationName());
     }
 
+    //
+    // Miscellaneous low level
+    //
+
+    /**
+     * Check the integrity of the build queues.  Catches build fails
+     * due to broken requirements.
+     *
+     * @param fix Fix problems if possible.
+     * @return Negative if there are problems remaining, zero if
+     *     problems were fixed, positive if no problems found at all.
+     */
+    private int checkBuildQueueIntegrity(boolean fix) {
+        int result = 1;
+        List<BuildableType> buildables = buildQueue.getValues();
+        List<BuildableType> assumeBuilt = new ArrayList<BuildableType>();
+        for (int i = 0; i < buildables.size(); i++) {
+            BuildableType bt = buildables.get(i);
+            NoBuildReason reason = getNoBuildReason(bt, assumeBuilt);
+            if (reason == NoBuildReason.NONE) {
+                assumeBuilt.add(bt);
+            } else if (fix) {
+                buildQueue.remove(i);
+                logger.warning("Removed bogus buildable " + bt
+                    + ": " + reason);
+                result = Math.min(result, 0);
+            } else {
+                result = -1;
+            }
+        }
+        List<UnitType> unitTypes = populationQueue.getValues();
+        assumeBuilt.clear();
+        for (int i = 0; i < unitTypes.size(); i++) {
+            UnitType ut = unitTypes.get(i);
+            NoBuildReason reason = getNoBuildReason(ut, assumeBuilt);
+            if (reason == NoBuildReason.NONE) {
+                assumeBuilt.add(ut);
+            } else if (fix) {                
+                populationQueue.remove(i);
+                logger.warning("Removed bogus unit type " + ut
+                    + ": " + reason);
+                result = Math.min(result, 0);
+            } else {
+                result = -1;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Check for any integrity problems.
+     *
+     * @param fix Fix problems if possible.
+     * @return Negative if there are problems remaining, zero if
+     *     problems were fixed, positive if no problems found at all.
+     */
+    public int checkIntegrity(boolean fix) {
+        int result = 1;
+
+        // @compat 0.10.x
+        if (!landLocked && !hasAbility(Ability.HAS_PORT)) {
+            if (fix) {
+                addAbility(new Ability(Ability.HAS_PORT));
+                result = Math.min(result, 0);
+            } else {
+                result = -1;
+            }
+        }
+        // end @compat 0.10.x
+
+        result = Math.min(result, checkBuildQueueIntegrity(fix));
+        return result;
+    }
+
 
     // Serialization
 
@@ -2822,13 +2876,6 @@ public class Colony extends Settlement implements Nameable {
 
         super.readChildren(xr);
 
-        // @compat 0.10.x
-        if (!landLocked && !hasAbility(Ability.HAS_PORT)) {
-            addAbility(new Ability(Ability.HAS_PORT));
-        }
-        // end @compat 0.10.x
-
-        validateBuildQueues();
         invalidateCache();
     }
 
@@ -2846,7 +2893,6 @@ public class Colony extends Settlement implements Nameable {
                 BuildableType.class, (BuildableType)null);
             if (bt != null) buildQueue.add(bt);
             xr.closeTag(BUILD_QUEUE_TAG);
-
 
         } else if (POPULATION_QUEUE_TAG.equals(xr.getLocalName())) {
             UnitType ut = xr.getType(spec, ID_ATTRIBUTE_TAG,
