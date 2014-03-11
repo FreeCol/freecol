@@ -397,7 +397,9 @@ public class FreeColDirectories {
         File home = getUserDefaultDirectory();
         if (home == null) return -1; // Fail badly
         File d = requireDir(new File(home, FREECOL_DIRECTORY));
-        return (d == null) ? -1 : 1; // Do not migrate windows
+        if (d == null) return -1;
+        dirs[0] = dirs[1] = dirs[2] = d;
+        return 1; // Do not migrate windows
     }
 
     /**
