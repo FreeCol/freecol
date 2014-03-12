@@ -406,13 +406,31 @@ public final class InGameController implements NetworkConstants {
      *     reached their destination and are free to move again.
      */
     private boolean doExecuteGotoOrders() {
-        Player player = freeColClient.getMyPlayer();
-        Unit active = gui.getActiveUnit();
+        if (gui.isShowingSubPanel()) return false; // Clear the panel first
+
+        final Player player = freeColClient.getMyPlayer();
+        final Unit active = gui.getActiveUnit();
+        Unit stillActive = null;
 
         // Ensure the goto mode sticks.
         if (moveMode < MODE_EXECUTE_GOTO_ORDERS) {
             moveMode = MODE_EXECUTE_GOTO_ORDERS;
         }
+
+        // Deal with the trade route units first.
+        List<ModelMessage> messages = new ArrayList<ModelMessage>();
+        while (player.hasNextTradeRouteUnit()) {
+            Unit unit = player.getNextTradeRouteUnit();
+            gui.setActiveUnit(unit);
+            if (moveToDestination(unit, messages)) stillActive = unit;
+        }
+        if (!messages.isEmpty()) {
+            for (ModelMessage m : messages) player.addModelMessage(m);
+            nextModelMessage();
+            gui.setActiveUnit((stillActive != null) ? stillActive : active);
+            return false;
+        }
+        stillActive = null;
 
         // The active unit might also be a going-to unit.  Make sure it
         // gets processed first.  setNextGoingToUnit will fail harmlessly
@@ -420,26 +438,20 @@ public final class InGameController implements NetworkConstants {
         if (active != null) player.setNextGoingToUnit(active);
 
         // Process all units.
-        Unit stillActive = null;
-        List<ModelMessage> messages = new ArrayList<ModelMessage>();
         while (player.hasNextGoingToUnit()) {
             Unit unit = player.getNextGoingToUnit();
             gui.setActiveUnit(unit);
 
             // Move the unit as much as possible
-            if (moveToDestination(unit, messages)) stillActive = unit;
-            nextModelMessage();
+            if (moveToDestination(unit, null)) stillActive = unit;
 
             // Give the player a chance to deal with any problems
             // shown in a popup before pressing on with more moves.
             if (gui.isShowingSubPanel()) {
                 gui.requestFocusForSubPanel();
+                stillActive = unit;
                 break;
             }
-        }
-        if (!messages.isEmpty()) {
-            for (ModelMessage m : messages) player.addModelMessage(m);
-            nextModelMessage();
         }
         gui.setActiveUnit((stillActive != null) ? stillActive : active);
         return stillActive == null;
@@ -3943,10 +3955,6 @@ public final class InGameController implements NetworkConstants {
 
         // Always flush outstanding messages first.
         nextModelMessage();
-        //if (canvas.isShowingSubPanel()) {
-        //    canvas.getShowingSubPanel().requestFocus();
-        //    return;
-        //}
 
         // Flush any outstanding orders once the mode is raised.
         if (moveMode >= MODE_EXECUTE_GOTO_ORDERS

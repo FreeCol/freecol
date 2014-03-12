@@ -137,7 +137,8 @@ public class Player extends FreeColGameObject implements Nameable {
          * @return True if the unit can be moved.
          */
         public boolean obtains(Unit unit) {
-            return unit.couldMove();
+            return unit.couldMove()
+                && unit.getState() != Unit.UnitState.SKIPPED;
         }
     }
 
@@ -147,14 +148,19 @@ public class Player extends FreeColGameObject implements Nameable {
     public class GoingToPredicate extends UnitPredicate {
 
         private final Player player;
+        private final boolean tradeRoute;
+
 
         /**
          * Creates a new going-to predicate.
          *
          * @param player The owning <code>Player</code>.
+         * @param tradeRoute Whether this should be a unit following a
+         *     trade route.
          */
-        public GoingToPredicate(Player player) {
+        public GoingToPredicate(Player player, boolean tradeRoute) {
             this.player = player;
+            this.tradeRoute = tradeRoute;
         }
 
         /**
@@ -168,12 +174,12 @@ public class Player extends FreeColGameObject implements Nameable {
                 && unit.getState() != Unit.UnitState.FORTIFYING
                 && unit.getState() != Unit.UnitState.SKIPPED
                 && unit.getMovesLeft() > 0
-                && (unit.getDestination() != null
-                    || unit.getTradeRoute() != null)
                 && !unit.isDamaged()
                 && !unit.isAtSea()
                 && !unit.isOnCarrier()
-                && !unit.isInColony();
+                && !unit.isInColony()
+                && ((!tradeRoute && unit.getDestination() != null)
+                    || (tradeRoute && unit.getTradeRoute() != null));
         }
     }
 
@@ -640,7 +646,11 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /** An iterator for the player units that have a destination to go to. */
     private final UnitIterator nextGoingToUnitIterator
-        = new UnitIterator(this, new GoingToPredicate(this));
+        = new UnitIterator(this, new GoingToPredicate(this, false));
+
+    /** An iterator for the player units that have a trade route to follow. */
+    private final UnitIterator nextTradeRouteUnitIterator
+        = new UnitIterator(this, new GoingToPredicate(this, true));
 
     /**
      * The HighSeas is a Location that enables Units to travel between
@@ -2244,11 +2254,30 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Gets the next trade route unit.
+     *
+     * @return A <code>Unit</code> that has a trade route to follow.
+     */
+    public Unit getNextTradeRouteUnit() {
+        return nextTradeRouteUnitIterator.next();
+    }
+
+    /**
+     * Checks if there is a unit that has a trade route.
+     *
+     * @return True if there is a unit with a trade route.
+     */
+    public boolean hasNextTradeRouteUnit() {
+        return nextTradeRouteUnitIterator.hasNext();
+    }
+
+    /**
      * Reset the player iterators ready for a new turn.
      */
     public void resetIterators() {
         nextActiveUnitIterator.reset();
         nextGoingToUnitIterator.reset();
+        nextTradeRouteUnitIterator.reset();
     }
 
     /**
