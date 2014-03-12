@@ -78,11 +78,11 @@ public final class QuickActionMenu extends JPopupMenu {
 
     private static final Logger logger = Logger.getLogger(QuickActionMenu.class.getName());
 
-    private final FreeColPanel parentPanel;
-
     private FreeColClient freeColClient;
 
     private final GUI gui;
+
+    private final FreeColPanel parentPanel;
 
 
     /**
@@ -99,7 +99,7 @@ public final class QuickActionMenu extends JPopupMenu {
      * Creates a popup menu for a Unit.
      */
     public void createUnitMenu(final UnitLabel unitLabel) {
-        final ImageLibrary imageLibrary = parentPanel.getLibrary();
+        final ImageLibrary imageLibrary = gui.getImageLibrary();
         final Unit unit = unitLabel.getUnit();
 
         this.setLabel("Unit");
@@ -269,6 +269,8 @@ public final class QuickActionMenu extends JPopupMenu {
     private JMenuItem makeProductionItem(GoodsType type, WorkLocation wl,
                                          int amount, UnitLabel unitLabel,
                                          boolean claim) {
+        final ImageLibrary imageLibrary = gui.getImageLibrary();
+
         StringTemplate t = StringTemplate.template(type.getId() + ".workAs")
             .addAmount("%amount%", amount);
         if (claim) {
@@ -277,7 +279,7 @@ public final class QuickActionMenu extends JPopupMenu {
             t.addName("%claim%", "");
         }
         JMenuItem menuItem = new JMenuItem(Messages.message(t),
-            parentPanel.getLibrary().getScaledGoodsImageIcon(type, 0.66f));
+            imageLibrary.getScaledGoodsImageIcon(type, 0.66f));
         menuItem.setActionCommand(UnitLabel.getWorkLabel(wl)
             + "/" + wl.getId() + "/" + type.getId()
             + "/" + ((claim) ? "!" : ""));
@@ -380,9 +382,9 @@ public final class QuickActionMenu extends JPopupMenu {
     }
 
     private boolean addEducationItems(final UnitLabel unitLabel) {
+        final ImageLibrary imageLibrary = gui.getImageLibrary();
         boolean separatorNeeded = false;
         Unit unit = unitLabel.getUnit();
-        ImageLibrary imageLibrary = parentPanel.getLibrary();
 
         if (unit.getSpecification().getBoolean(GameOptions.ALLOW_STUDENT_SELECTION)) {
             for (Unit teacher : unit.getColony().getTeachers()) {
@@ -542,7 +544,7 @@ public final class QuickActionMenu extends JPopupMenu {
     private boolean addEquipmentItems(final UnitLabel unitLabel) {
         final Unit tempUnit = unitLabel.getUnit();
         final InGameController igc = freeColClient.getInGameController();
-        ImageLibrary imageLibrary = parentPanel.getLibrary();
+        final ImageLibrary imageLibrary = gui.getImageLibrary();
         boolean separatorNeeded = false;
         if (tempUnit.getEquipment().size() > 1) {
             JMenuItem newItem = new JMenuItem(Messages.message("model.equipment.removeAll"));
@@ -576,6 +578,9 @@ public final class QuickActionMenu extends JPopupMenu {
                         public void actionPerformed(ActionEvent e) {
                             igc.equipUnit(tempUnit, type, -items);
                             unitLabel.updateIcon();
+                            if (parentPanel instanceof ColonyPanel) {
+                                ((ColonyPanel)parentPanel).update();
+                            }
                         }
                     });
                 this.add(newItem);
@@ -629,6 +634,9 @@ public final class QuickActionMenu extends JPopupMenu {
                             public void actionPerformed(ActionEvent e) {
                                 igc.equipUnit(tempUnit, type, items);
                                 unitLabel.updateIcon();
+                                if (parentPanel instanceof ColonyPanel) {
+                                    ((ColonyPanel)parentPanel).update();
+                                }
                             }
                         });
                     this.add(newItem);
@@ -648,6 +656,9 @@ public final class QuickActionMenu extends JPopupMenu {
                         igc.equipUnit(tempUnit, horseType, 1);
                         igc.equipUnit(tempUnit, musketType, 1);
                         unitLabel.updateIcon();
+                        if (parentPanel instanceof ColonyPanel) {
+                            ((ColonyPanel)parentPanel).update();
+                        }
                     }
                 });
             this.add(newItem);
@@ -690,7 +701,7 @@ public final class QuickActionMenu extends JPopupMenu {
         if (unit.getWorkTile() != null) {
             final Tile tile = unit.getWorkTile().getWorkTile();
             addTileItem(tile);
-           return true;
+            return true;
         }
         return false;
     }
@@ -732,7 +743,7 @@ public final class QuickActionMenu extends JPopupMenu {
         final InGameController igc = freeColClient.getInGameController();
         final Player player = freeColClient.getMyPlayer();
         final Goods goods = goodsLabel.getGoods();
-        ImageLibrary imageLibrary = parentPanel.getLibrary();
+        final ImageLibrary imageLibrary = gui.getImageLibrary();
 
         this.setLabel(Messages.message("cargo"));
         JMenuItem name = new JMenuItem(Messages.message(goods.getNameKey())
@@ -808,7 +819,7 @@ public final class QuickActionMenu extends JPopupMenu {
         final InGameController igc = freeColClient.getInGameController();
         final Player player = freeColClient.getMyPlayer();
         final AbstractGoods ag = marketLabel.getGoods();
-        ImageLibrary imageLibrary = parentPanel.getLibrary();
+        final ImageLibrary imageLibrary = gui.getImageLibrary();
 
         this.setLabel(Messages.message("cargo"));
         JMenuItem name = new JMenuItem(Messages.message(ag.getNameKey())

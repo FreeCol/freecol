@@ -88,8 +88,6 @@ public final class UnitLabel extends JLabel
 
     private final Unit unit;
 
-    private final InGameController inGameController;
-
     private boolean selected;
 
     private boolean isSmall = false;
@@ -107,7 +105,6 @@ public final class UnitLabel extends JLabel
         this.freeColClient = freeColClient;
         this.gui = freeColClient.getGUI();
         this.unit = unit;
-        this.inGameController = freeColClient.getInGameController();
 
         selected = false;
         setSmall(false);
@@ -319,25 +316,6 @@ public final class UnitLabel extends JLabel
                                 + Messages.message(label) + ")");
         }
         setSmall(isSmall);
-
-        Component uc = getParent();
-        while (uc != null) {
-            if (uc instanceof ColonyPanel) {
-                if (unit.getColony() == null) {
-                    gui.removeFromCanvas(uc);
-                    freeColClient.updateActions();
-                } else {
-                    // ((ColonyPanel) uc).reinitialize();
-                }
-
-                break;
-            } else if (uc instanceof EuropePanel) {
-                break;
-            }
-
-            uc = uc.getParent();
-        }
-
         // repaint(0, 0, getWidth(), getHeight());
         // uc.refresh();
     }
@@ -383,22 +361,13 @@ public final class UnitLabel extends JLabel
     public void actionPerformed(ActionEvent event) {
         final Game game = freeColClient.getGame();
         final Specification spec = game.getSpecification();
+        final InGameController igc = freeColClient.getInGameController();
         String[] args = event.getActionCommand().split("/");
         switch (Enum.valueOf(UnitAction.class,
                              args[0].toUpperCase(Locale.US))) {
         case ASSIGN:
-            inGameController.assignTeacher(unit,
-                game.getFreeColGameObject(args[1], Unit.class));
-            /*
-            Component uc = getParent();
-            while (uc != null) {
-                if (uc instanceof ColonyPanel) {
-                    ((ColonyPanel) uc).reinitialize();
-                    break;
-                }
-                uc = uc.getParent();
-            }
-            */
+            igc.assignTeacher(unit,
+                              game.getFreeColGameObject(args[1], Unit.class));
             break;
         case WORK_COLONYTILE:
             if (args.length < 3) break;
@@ -406,52 +375,50 @@ public final class UnitLabel extends JLabel
                 = game.getFreeColGameObject(args[1], ColonyTile.class);
             if (args.length >= 4 && "!".equals(args[3])) {
                 // Claim tile if needed
-                if (!inGameController.claimLand(colonyTile.getWorkTile(), 
-                                                unit.getColony(), 0)) break;
+                if (!igc.claimLand(colonyTile.getWorkTile(), unit.getColony(),
+                                   0)) break;
             }
-            if (colonyTile != unit.getLocation()) {
-                inGameController.work(unit, colonyTile);
-            }
-            inGameController.changeWorkType(unit, spec.getGoodsType(args[2]));
+            if (colonyTile != unit.getLocation()) igc.work(unit, colonyTile);
+            igc.changeWorkType(unit, spec.getGoodsType(args[2]));
             break;
         case WORK_BUILDING:
             if (args.length < 3) break;
             Building building
                 = game.getFreeColGameObject(args[1], Building.class);
             if (building == unit.getLocation()) break;
-            inGameController.changeWorkType(unit, spec.getGoodsType(args[2]));
-            inGameController.work(unit, building);
+            igc.changeWorkType(unit, spec.getGoodsType(args[2]));
+            igc.work(unit, building);
             break;
         case ACTIVATE_UNIT:
-            inGameController.changeState(unit, Unit.UnitState.ACTIVE);
+            igc.changeState(unit, Unit.UnitState.ACTIVE);
             gui.setActiveUnit(unit);
             break;
         case FORTIFY:
-            inGameController.changeState(unit, Unit.UnitState.FORTIFYING);
+            igc.changeState(unit, Unit.UnitState.FORTIFYING);
             break;
         case SENTRY:
-            inGameController.changeState(unit, Unit.UnitState.SENTRY);
+            igc.changeState(unit, Unit.UnitState.SENTRY);
             break;
         case COLOPEDIA:
             gui.showColopediaPanel(unit.getType().getId());
             break;
         case LEAVE_TOWN:
-            inGameController.putOutsideColony(unit);
+            igc.putOutsideColony(unit);
             break;
         case CLEAR_SPECIALITY:
-            inGameController.clearSpeciality(unit);
+            igc.clearSpeciality(unit);
             break;
         case CLEAR_ORDERS:
-            inGameController.clearOrders(unit);
+            igc.clearOrders(unit);
             break;
         case ASSIGN_TRADE_ROUTE:
             gui.showTradeRoutePanel(unit);
             break;
         case LEAVE_SHIP:
-            inGameController.leaveShip(unit);
+            igc.leaveShip(unit);
             break;
         case UNLOAD:
-            inGameController.unload(unit);
+            igc.unload(unit);
             break;
         }
         updateIcon();

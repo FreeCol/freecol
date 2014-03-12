@@ -107,7 +107,7 @@ public abstract class UnitPanel extends MigPanel
                 TradeRoute tradeRoute = unit.getTradeRoute();
                 if (tradeRoute != null) {
                     unitLabel.setDescriptionLabel(Messages.getLabel(unit)
-                                                  + " (" + tradeRoute.getName() + ")");
+                        + " (" + tradeRoute.getName() + ")");
                 }
                 if (editable) {
                     unitLabel.setTransferHandler(portPanel.getTransferHandler());

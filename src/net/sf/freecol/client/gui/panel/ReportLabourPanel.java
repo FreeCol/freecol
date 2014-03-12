@@ -127,7 +127,7 @@ public final class ReportLabourPanel extends ReportPanel {
                     roleId = "model.role.missionary";
                 }
                 int count = unitCount.getCount(unitType);
-                model.addElement(new UnitPanel(unitType, roleId, count));
+                model.addElement(new LabourUnitPanel(unitType, roleId, count));
             }
         }
         list = new JList(model);
@@ -166,7 +166,7 @@ public final class ReportLabourPanel extends ReportPanel {
     }
 
     public void showDetails() {
-        UnitType unitType = ((UnitPanel) list.getSelectedValue()).unitType;
+        UnitType unitType = ((LabourUnitPanel) list.getSelectedValue()).unitType;
         getGUI().showReportLabourDetailPanel(unitType, data, unitCount, colonies);
     }
 
@@ -174,7 +174,7 @@ public final class ReportLabourPanel extends ReportPanel {
 
         public Component getListCellRendererComponent(JList list, Object value, int index,
                                                       boolean isSelected, boolean cellHasFocus) {
-            UnitPanel panel = (UnitPanel) value;
+            LabourUnitPanel panel = (LabourUnitPanel) value;
             panel.selected = isSelected;
             return panel;
         }
@@ -182,12 +182,12 @@ public final class ReportLabourPanel extends ReportPanel {
     }
 
 
-    private class UnitPanel extends JPanel {
+    private class LabourUnitPanel extends JPanel {
 
         boolean selected;
         UnitType unitType;
 
-        public UnitPanel(UnitType unitType, String roleId, int count) {
+        public LabourUnitPanel(UnitType unitType, String roleId, int count) {
             this.unitType = unitType;
             setOpaque(false);
             setLayout(new MigLayout("wrap 2", "[60, right][left]"));

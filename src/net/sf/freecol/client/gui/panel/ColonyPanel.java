@@ -553,7 +553,7 @@ public final class ColonyPanel extends PortPanel
     /**
      * Update the entire colony panel.
      */
-    private void update() {
+    public void update() {
         buildingsPanel.update();
         constructionPanel.update();
         inPortPanel.update();
