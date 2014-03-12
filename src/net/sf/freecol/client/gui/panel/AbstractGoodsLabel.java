@@ -36,8 +36,6 @@ public class AbstractGoodsLabel extends JLabel {
 
     private boolean partialChosen = false;
 
-    private boolean toEquip = false;
-
     private GUI gui;
 
 
@@ -81,24 +79,6 @@ public class AbstractGoodsLabel extends JLabel {
      */
     public void setPartialChosen(boolean partialChosen) {
         this.partialChosen = partialChosen;
-    }
-
-    /**
-     * Has unit equipping been selected?
-     *
-     * @return True if a unit equipping operation has been selected.
-     */
-    public boolean isToEquip() {
-        return toEquip;
-    }
-
-    /**
-     * Set the unit equipping state.
-     *
-     * @param toEquip The new unit equipping state.
-     */
-    public void toEquip(boolean toEquip) {
-        this.toEquip = toEquip;
     }
 
     /**

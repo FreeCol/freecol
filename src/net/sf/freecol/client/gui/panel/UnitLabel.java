@@ -320,20 +320,15 @@ public final class UnitLabel extends JLabel
         // uc.refresh();
     }
 
-    public boolean canUnitBeEquipedWith(JLabel data){
-        if(!getUnit().hasAbility(Ability.CAN_BE_EQUIPPED)){
-            return false;
-        }
-
-        if(data instanceof GoodsLabel && ((GoodsLabel)data).isToEquip()){
-            return true;
-        }
-
-        if(data instanceof MarketLabel && ((MarketLabel)data).isToEquip()){
-            return true;
-        }
-
-        return false;
+    /**
+     * Can a unit be equipped with a particular label.
+     *
+     * @param data The label to add.
+     * @return True if the label refers to suitable equipment.
+     */
+    public boolean canUnitBeEquippedWith(JLabel data) {
+        return getUnit().hasAbility(Ability.CAN_BE_EQUIPPED)
+            && (data instanceof GoodsLabel || data instanceof MarketLabel);
     }
 
     public boolean isOnCarrier() {

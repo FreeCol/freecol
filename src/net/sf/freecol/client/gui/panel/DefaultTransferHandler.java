@@ -138,9 +138,10 @@ public final class DefaultTransferHandler extends TransferHandler {
     /**
      * Imports the data represented by the given Transferable into
      * the given component. Returns 'true' on success, 'false' otherwise.
+     *
      * @param comp The component to import the data to.
      * @param t The Transferable that holds the data.
-     * @return 'true' on success, 'false' otherwise.
+     * @return True if the import succeeded.
      */
     public boolean importData(JComponent comp, Transferable t) {
         try {
@@ -161,9 +162,7 @@ public final class DefaultTransferHandler extends TransferHandler {
             }
 
             // Do not allow a transferable to be dropped upon itself:
-            if (comp == data) {
-                return false;
-            }
+            if (comp == data) return false;
 
             // Make sure we don't drop onto other Labels.
             if (comp instanceof UnitLabel) {
@@ -182,12 +181,13 @@ public final class DefaultTransferHandler extends TransferHandler {
                     && unitLabel.getParent() instanceof InPortPanel
                     && parentPanel instanceof PortPanel) {
                     PortPanel portPanel = (PortPanel) parentPanel;
-                    if (data instanceof Draggable && ((Draggable) data).isOnCarrier()) {
+                    if (data instanceof Draggable
+                        && ((Draggable) data).isOnCarrier()) {
                         oldSelectedUnit = portPanel.getSelectedUnitLabel();
                     }
                     portPanel.setSelectedUnitLabel(unitLabel);
                     comp = portPanel.getCargoPanel();
-                } else if (unitLabel.canUnitBeEquipedWith(data)) {
+                } else if (unitLabel.canUnitBeEquippedWith(data)) {
                     // don't do anything before partial amount has been checked
                 } else {
                     comp = getDropTarget(comp);

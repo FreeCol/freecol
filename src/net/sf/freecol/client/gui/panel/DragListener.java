@@ -140,18 +140,17 @@ public final class DragListener extends MouseAdapter {
                 AbstractGoodsLabel label = (AbstractGoodsLabel)comp;
                 if (e.isShiftDown()) {
                     label.setPartialChosen(true);
-                } else if (e.isAltDown()) {
-                    label.toEquip(true);
                 } else {
                     label.setPartialChosen(false);
                     label.setDefaultAmount();
                 }
             } else if (comp instanceof UnitLabel) {
-                Unit u = ((UnitLabel)comp).getUnit();
+                UnitLabel label = (UnitLabel)comp;
+                Unit u = label.getUnit();
                 if (u.isCarrier()
                     && !u.isAtSea()
                     && parentPanel instanceof PortPanel) {
-                    ((PortPanel) parentPanel).setSelectedUnitLabel((UnitLabel) comp);
+                    ((PortPanel)parentPanel).setSelectedUnitLabel(label);
                 }
             }
 
