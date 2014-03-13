@@ -95,6 +95,46 @@ public final class QuickActionMenu extends JPopupMenu {
         this.parentPanel = freeColPanel;
     }
 
+
+    /**
+     * Prompt for an amount of goods to use.
+     *
+     * The amount is returned through the parameter amount.
+     *
+     * @param ag The <code>AbstractGoods</code> to query.
+     */
+    private void promptForGoods(AbstractGoods ag) {
+        int ret = gui.showSelectAmountDialog(ag.getType(),
+                                             GoodsContainer.CARGO_SIZE,
+                                             ag.getAmount(), true);
+        if (ret > 0) ag.setAmount(ret);
+    }
+
+    /**
+     * Prompt for the amount of goods to use in making equipment for a unit.
+     *
+     * @param unit The <code>Unit</code> to equip.
+     * @param et The <code>EquipmentType</code> to equip with.
+     * @param n The maximum amount of the equipment.
+     * @return A number of equipment items to use.
+     */
+    private int promptForEquipment(final Unit unit, final EquipmentType et,
+                                   int n) {
+        AbstractGoods least = null;
+        int divisor = 1;
+        for (AbstractGoods ag : et.getRequiredGoods()) {
+            int present = (unit.isInEurope()) ? GoodsContainer.CARGO_SIZE
+                : unit.getColony().getGoodsCount(ag.getType());
+            if (least == null || least.getAmount() > present) {
+                least = new AbstractGoods(ag.getType(), present);
+                divisor = ag.getAmount();
+            }
+        }
+        if (least == null) return n;
+        promptForGoods(least);
+        return least.getAmount() / divisor;
+    }
+
     /**
      * Creates a popup menu for a Unit.
      */
@@ -185,7 +225,7 @@ public final class QuickActionMenu extends JPopupMenu {
                 menuItem.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
                             if ((e.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
-                                promptForAmount(goods);
+                                promptForGoods(goods);
                             }
                             igc.loadCargo(goods, unit);
                         }
@@ -195,13 +235,6 @@ public final class QuickActionMenu extends JPopupMenu {
             }
         }
         return added;
-    }
-
-    private void promptForAmount(AbstractGoods ag) {
-        int ret = gui.showSelectAmountDialog(ag.getType(),
-                                             GoodsContainer.CARGO_SIZE,
-                                             ag.getAmount(), true);
-        if (ret > 0) ag.setAmount(ret);
     }
 
     private boolean addMarketItems(final AbstractGoods ag, Europe europe) {
@@ -218,7 +251,7 @@ public final class QuickActionMenu extends JPopupMenu {
                 menuItem.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
                             if ((e.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
-                                promptForAmount(ag);
+                                promptForGoods(ag);
                             }
                             igc.buyGoods(ag.getType(), ag.getAmount(), unit);
                         }
@@ -541,42 +574,57 @@ public final class QuickActionMenu extends JPopupMenu {
         return true;
     }
 
+    /**
+     * Add menu items for equipment manipulation for a unit.
+     *
+     * Note "clear speciality" is here too to keep it well separated from
+     * other items.
+     *
+     * TODO: fix the PCL handling so the hacks with parentPanel can go away
+     *
+     * @param unitLabel The <code>UnitLabel</code> specifying the unit.
+     * @return True if menu items were added and a separator is now needed.
+     */
     private boolean addEquipmentItems(final UnitLabel unitLabel) {
-        final Unit tempUnit = unitLabel.getUnit();
+        final Unit unit = unitLabel.getUnit();
         final InGameController igc = freeColClient.getInGameController();
         final ImageLibrary imageLibrary = gui.getImageLibrary();
+        final Specification spec = freeColClient.getGame().getSpecification();
         boolean separatorNeeded = false;
-        if (tempUnit.getEquipment().size() > 1) {
-            JMenuItem newItem = new JMenuItem(Messages.message("model.equipment.removeAll"));
+
+        if (unit.getEquipment().size() > 1) {
+            JMenuItem newItem
+                = new JMenuItem(Messages.message("model.equipment.removeAll"));
             newItem.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        Map<EquipmentType, Integer> equipment =
-                            new HashMap<EquipmentType, Integer>(tempUnit.getEquipment().getValues());
-                        for (Map.Entry<EquipmentType, Integer> entry: equipment.entrySet()) {
-                            igc.equipUnit(tempUnit, entry.getKey(), -entry.getValue());
+                    public void actionPerformed(ActionEvent ae) {
+                        Map<EquipmentType, Integer> equipment
+                            = new HashMap<EquipmentType, Integer>(unit.getEquipment().getValues());
+                        for (Map.Entry<EquipmentType, Integer> e
+                                 : equipment.entrySet()) {
+                            igc.equipUnit(unit, e.getKey(), -e.getValue());
                         }
                         unitLabel.updateIcon();
                     }
                 });
             this.add(newItem);
+            separatorNeeded = true;
         }
 
         EquipmentType horses = null;
         EquipmentType muskets = null;
-        for (EquipmentType equipmentType : freeColClient.getGame().getSpecification().getEquipmentTypeList()) {
-            int count = tempUnit.getEquipment().getCount(equipmentType);
-            if (count > 0) {
-                // "remove current equipment" action
-                JMenuItem newItem = new JMenuItem(Messages.message(equipmentType.getId() + ".remove"));
-                if (equipmentType.needsGoodsToBuild()) {
-                    GoodsType goodsType = equipmentType.getRequiredGoods().get(0).getType();
+        for (final EquipmentType et : spec.getEquipmentTypeList()) {
+            int count = unit.getEquipment().getCount(et);
+            if (count > 0) { // "remove current equipment" action
+                JMenuItem newItem
+                    = new JMenuItem(Messages.message(et.getId() + ".remove"));
+                if (et.needsGoodsToBuild()) {
+                    GoodsType goodsType = et.getRequiredGoods().get(0).getType();
                     newItem.setIcon(imageLibrary.getScaledGoodsImageIcon(goodsType, 0.66f));
                 }
                 final int items = count;
-                final EquipmentType type = equipmentType;
                 newItem.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
-                            igc.equipUnit(tempUnit, type, -items);
+                            igc.equipUnit(unit, et, -items);
                             unitLabel.updateIcon();
                             if (parentPanel instanceof ColonyPanel) {
                                 ((ColonyPanel)parentPanel).update();
@@ -584,55 +632,55 @@ public final class QuickActionMenu extends JPopupMenu {
                         }
                     });
                 this.add(newItem);
+                separatorNeeded = true;
             }
-            if (tempUnit.canBeEquippedWith(equipmentType) && count == 0) {
+            if (unit.canBeEquippedWith(et) && count < et.getMaximumCount()) {
                 // "add new equipment" action
                 JMenuItem newItem = null;
-                count = equipmentType.getMaximumCount() - count;
-                if (!equipmentType.needsGoodsToBuild()) {
+                count = et.getMaximumCount() - count;
+                if (!et.needsGoodsToBuild()) {
                     newItem = new JMenuItem();
-                    newItem.setText(Messages.message(equipmentType.getId() + ".add"));
-                } else if (tempUnit.isInEurope() &&
-                           tempUnit.getOwner().getEurope().canBuildEquipment(equipmentType)) {
+                    newItem.setText(Messages.message(et.getId() + ".add"));
+                } else if (unit.isInEurope() && unit.getOwner().getEurope()
+                    .canBuildEquipment(et)) {
                     int price = 0;
                     newItem = new JMenuItem();
-                    for (AbstractGoods ag : equipmentType.getRequiredGoods()) {
-                        price += tempUnit.getOwner().getMarket().getBidPrice(ag.getType(),
-                                                                             ag.getAmount());
+                    for (AbstractGoods ag : et.getRequiredGoods()) {
+                        price += unit.getOwner().getMarket()
+                            .getBidPrice(ag.getType(), ag.getAmount());
                         newItem.setIcon(imageLibrary.getScaledGoodsImageIcon(ag.getType(), 0.66f));
                     }
-                    while (!tempUnit.getOwner().checkGold(count * price)) {
+                    while (!unit.getOwner().checkGold(count * price)) {
                         count--;
                     }
-                    newItem.setText(Messages.message(equipmentType.getId() + ".add") + " (" +
-                                    Messages.message(StringTemplate.template("goldAmount")
-                                                     .addAmount("%amount%", count * price)) +
-                                    ")");
-                } else if (tempUnit.getColony() != null &&
-                           tempUnit.getColony().canBuildEquipment(equipmentType)) {
-                    newItem = new JMenuItem();
-                    for (AbstractGoods ag : equipmentType.getRequiredGoods()) {
-                        int present = tempUnit.getColony()
+                    newItem.setText(Messages.message(et.getId() + ".add")
+                        + " (" + Messages.message(StringTemplate.template("goldAmount")
+                            .addAmount("%amount%", count * price)) + ")");
+                } else if (unit.getColony() != null
+                    && unit.getColony().canBuildEquipment(et)) {
+                    newItem = new JMenuItem(Messages.message(et.getId() + ".add"));
+                    for (AbstractGoods ag : et.getRequiredGoods()) {
+                        int present = unit.getColony()
                             .getGoodsCount(ag.getType()) / ag.getAmount();
-                        if (present < count) {
-                            count = present;
-                        }
+                        if (present < count) count = present;
                         newItem.setIcon(imageLibrary.getScaledGoodsImageIcon(ag.getType(), 0.66f));
                     }
-                    newItem.setText(Messages.message(equipmentType.getId() + ".add"));
                 }
-                if (newItem != null) {
+                if (newItem != null && count > 0) {
                     // for convenience menu only
-                    if ("model.equipment.horses".equals(equipmentType.getId())) {
-                        horses = equipmentType;
-                    } else if ("model.equipment.muskets".equals(equipmentType.getId())) {
-                        muskets = equipmentType;
+                    if ("model.equipment.horses".equals(et.getId())) {
+                        horses = et;
+                    } else if ("model.equipment.muskets".equals(et.getId())) {
+                        muskets = et;
                     }
                     final int items = count;
-                    final EquipmentType type = equipmentType;
                     newItem.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent e) {
-                                igc.equipUnit(tempUnit, type, items);
+                                int n = ((e.getModifiers() & ActionEvent.SHIFT_MASK) != 0
+                                    && items > 1) ? promptForEquipment(unit, et, items)
+                                    : items;
+                                if (n <= 0) return;
+                                igc.equipUnit(unit, et, n);
                                 unitLabel.updateIcon();
                                 if (parentPanel instanceof ColonyPanel) {
                                     ((ColonyPanel)parentPanel).update();
@@ -640,21 +688,24 @@ public final class QuickActionMenu extends JPopupMenu {
                             }
                         });
                     this.add(newItem);
+                    separatorNeeded = true;
                 }
             }
         }
 
         // convenience menu for equipping dragoons
-        if (horses != null && muskets != null && horses.isCompatibleWith(muskets)) {
+        if (horses != null && muskets != null
+            && horses.isCompatibleWith(muskets)) {
             final EquipmentType horseType = horses;
             final EquipmentType musketType = muskets;
-            JMenuItem newItem = new JMenuItem(Messages.message("model.equipment.dragoon"),
-                imageLibrary.getUnitImageIcon(tempUnit.getType(),
-                    "model.role.dragoon", 1.0/3));
+            JMenuItem newItem
+                = new JMenuItem(Messages.message("model.equipment.dragoon"),
+                    imageLibrary.getUnitImageIcon(unit.getType(),
+                        "model.role.dragoon", 1.0/3));
             newItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        igc.equipUnit(tempUnit, horseType, 1);
-                        igc.equipUnit(tempUnit, musketType, 1);
+                        igc.equipUnit(unit, horseType, 1);
+                        igc.equipUnit(unit, musketType, 1);
                         unitLabel.updateIcon();
                         if (parentPanel instanceof ColonyPanel) {
                             ((ColonyPanel)parentPanel).update();
@@ -662,25 +713,26 @@ public final class QuickActionMenu extends JPopupMenu {
                     }
                 });
             this.add(newItem);
+            separatorNeeded = true;
         }
-
-        separatorNeeded = true;
 
         if (separatorNeeded) {
             this.addSeparator();
             separatorNeeded = false;
         }
 
-        UnitType newUnitType = tempUnit.getType().getTargetType(ChangeType.CLEAR_SKILL, tempUnit.getOwner());
+        UnitType newUnitType = unit.getType()
+            .getTargetType(ChangeType.CLEAR_SKILL, unit.getOwner());
         if (newUnitType != null) {
-            JMenuItem menuItem = new JMenuItem(Messages.message("clearSpeciality"),
-                imageLibrary.getUnitImageIcon(newUnitType, 1.0/3));
+            JMenuItem menuItem
+                = new JMenuItem(Messages.message("clearSpeciality"),
+                    imageLibrary.getUnitImageIcon(newUnitType, 1.0/3));
             menuItem.setActionCommand(UnitAction.CLEAR_SPECIALITY.toString());
             menuItem.addActionListener(unitLabel);
             this.add(menuItem);
-            if(tempUnit.getLocation() instanceof Building &&
-               !((Building)tempUnit.getLocation()).canAddType(newUnitType)){
-                    menuItem.setEnabled(false);
+            if (unit.getLocation() instanceof Building
+                && !((Building)unit.getLocation()).canAddType(newUnitType)) {
+                menuItem.setEnabled(false);
             }
             separatorNeeded = true;
         }
@@ -691,11 +743,18 @@ public final class QuickActionMenu extends JPopupMenu {
      * Creates a menu for a tile.
      */
     public void createTileMenu(final ASingleTilePanel singleTilePanel) {
-        if (singleTilePanel.getColonyTile() != null && singleTilePanel.getColonyTile().getColony() != null) {
+        if (singleTilePanel.getColonyTile() != null
+            && singleTilePanel.getColonyTile().getColony() != null) {
             addTileItem(singleTilePanel.getColonyTile().getWorkTile());
         }
     }
 
+    /**
+     * Add a menu item for the tile a unit is working.
+     *
+     * @param unitLabel The <code>UnitLabel</code> specifying the unit.
+     * @return True if an item was added.
+     */
     private boolean addTileItem(final UnitLabel unitLabel) {
         final Unit unit = unitLabel.getUnit();
         if (unit.getWorkTile() != null) {
@@ -706,23 +765,35 @@ public final class QuickActionMenu extends JPopupMenu {
         return false;
     }
 
+    /**
+     * Add a menu item to show the tile panel for a tile.
+     *
+     * @param tile The <code>Tile</code> to use.
+     */
     private void addTileItem(final Tile tile) {
         if (tile != null) {
-            JMenuItem menuItem = new JMenuItem(Messages.message(tile.getNameKey()));
+            JMenuItem menuItem
+                = new JMenuItem(Messages.message(tile.getNameKey()));
             menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
                     gui.showTilePanel(tile);
                 }
             });
-            add(menuItem);
+            this.add(menuItem);
         }
     }
 
+    /**
+     * Add an item to pay arrears on the given goods type.
+     *
+     * @param goodsType The <code>GoodsType</code> to pay arrears on.
+     */
     private void addPayArrears(final GoodsType goodsType) {
         final InGameController igc = freeColClient.getInGameController();
 
-        JMenuItem pay = new JMenuItem(Messages.message("boycottedGoods.payArrears"));
-        pay.addActionListener(new ActionListener() {
+        JMenuItem menuItem
+            = new JMenuItem(Messages.message("boycottedGoods.payArrears"));
+        menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     igc.payArrears(goodsType);
                     // TODO fix pcls so this hackery can go away
@@ -733,7 +804,7 @@ public final class QuickActionMenu extends JPopupMenu {
                     parentPanel.revalidate();
                 }
             });
-        this.add(pay);
+        this.add(menuItem);
     }
 
     /**
@@ -777,7 +848,7 @@ public final class QuickActionMenu extends JPopupMenu {
                 unload.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
                             if ((e.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
-                                promptForAmount(goods);
+                                promptForGoods(goods);
                             }
                             igc.unloadCargo(goods, false);
                         }
@@ -793,7 +864,7 @@ public final class QuickActionMenu extends JPopupMenu {
                 dump.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
                             if ((e.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
-                                promptForAmount(goods);
+                                promptForGoods(goods);
                             }
                             igc.unloadCargo(goods, true);
                             // TODO fix pcls so this hackery can go away
