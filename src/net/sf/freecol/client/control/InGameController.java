@@ -1526,14 +1526,15 @@ public final class InGameController implements NetworkConstants {
 
         // Proceed to board
         UnitWas unitWas = new UnitWas(unit);
-        if (askServer().embark(unit, carrier, null)
-            && unit.getLocation() == carrier) {
-            gui.playSound("sound.event.loadCargo");
-            unitWas.fireChanges();
-            nextActiveUnit();
-            return true;
+        if (!askServer().embark(unit, carrier, null)
+            || unit.getLocation() != carrier) {
+            unit.setState(UnitState.SKIPPED);
+            return false;
         }
-        return false;
+        gui.playSound("sound.event.loadCargo");
+        unitWas.fireChanges();
+        nextActiveUnit();
+        return true;
     }
 
     /**
@@ -2464,7 +2465,7 @@ public final class InGameController implements NetworkConstants {
      * Leave a ship.  The ship must be in harbour.
      *
      * @param unit The <code>Unit</code> which is to leave the ship.
-     * @return boolean
+     * @return True if the unit left the ship.
      */
     public boolean leaveShip(Unit unit) {
         if (!requireOurTurn()) return false;
@@ -2478,14 +2479,15 @@ public final class InGameController implements NetworkConstants {
 
         // Proceed to disembark
         UnitWas unitWas = new UnitWas(unit);
-        if (askServer().disembark(unit)
-            && unit.getLocation() != carrier) {
-            checkCashInTreasureTrain(unit);
-            unitWas.fireChanges();
-            nextActiveUnit();
-            return true;
+        if (!askServer().disembark(unit)
+            || unit.getLocation() == carrier) { // Probably desynch.
+            unit.setState(UnitState.SKIPPED);
+            return false;
         }
-        return false;
+        checkCashInTreasureTrain(unit);
+        unitWas.fireChanges();
+        nextActiveUnit();
+        return true;
     }
 
     /**
@@ -2591,10 +2593,11 @@ public final class InGameController implements NetworkConstants {
             }
         }
 
-        if (askServer().moveTo(unit, destination)) {
-            nextActiveUnit();
+        if (!askServer().moveTo(unit, destination)) {
+            unit.setState(UnitState.SKIPPED);
+            return false;
         }
-        return false;
+        return unit.getMovesLeft() > 0;
     }
 
     /**
@@ -2657,16 +2660,16 @@ public final class InGameController implements NetworkConstants {
             StringTemplate dst = destination.getLocationNameFor(player);
             gui.showInformationMessage(unit,
                 StringTemplate.template("selectDestination.failed")
-                .addStringTemplate("%unit%", unit.getFullLabel())
-                .addStringTemplate("%location%", src)
-                .addStringTemplate("%destination%", dst));
+                    .addStringTemplate("%unit%", unit.getFullLabel())
+                    .addStringTemplate("%location%", src)
+                    .addStringTemplate("%destination%", dst));
             return false;
         }
         gui.setActiveUnit(unit);
-        followPath(unit, path);
 
         // Clear ordinary destinations if arrived.
-        if (destination != null && unit.isAtLocation(destination)) {
+        if (followPath(unit, path) && destination != null
+            && unit.isAtLocation(destination)) {
             clearGotoOrders(unit);
             // Check cash-in, and if the unit has moves left and was
             // not set to SKIPPED by moveDirection, then return true
@@ -3108,14 +3111,16 @@ public final class InGameController implements NetworkConstants {
 
         // Proceed to embark
         clearGotoOrders(unit);
-        if (askServer().embark(unit, carrier, direction)
-            && unit.getLocation() == carrier) {
-            unit.getOwner().invalidateCanSeeTiles();
-            if (carrier.getMovesLeft() > 0) {
-                gui.setActiveUnit(carrier);
-            } else {
-                nextActiveUnit();
-            }
+        if (!askServer().embark(unit, carrier, direction)
+            || unit.getLocation() != carrier) {
+            unit.setState(UnitState.SKIPPED);
+            return false;
+        }
+        unit.getOwner().invalidateCanSeeTiles();
+        if (carrier.getMovesLeft() > 0) {
+            gui.setActiveUnit(carrier);
+        } else {
+            nextActiveUnit();
         }
         return false;
     }
@@ -3263,7 +3268,12 @@ public final class InGameController implements NetworkConstants {
 
         // Ask the server
         UnitWas unitWas = new UnitWas(unit);
-        if (!askServer().move(unit, direction)) return false;
+        if (!askServer().move(unit, direction)) {
+            // Can fail due to desynchronization.  Skip this unit so
+            // we do not end up retrying indefinitely.
+            unit.setState(UnitState.SKIPPED);
+            return false;
+        }
 
         unit.getOwner().invalidateCanSeeTiles();
         unitWas.fireChanges();
