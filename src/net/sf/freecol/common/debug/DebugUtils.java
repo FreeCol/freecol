@@ -586,11 +586,12 @@ public class DebugUtils {
     /**
      * Debug action to check for client-server desynchronization.
      *
-     * Called from the debug menu.
+     * Called from the debug menu and client controller.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @return True if desynchronization found.
      */
-    public static void checkDesyncAction(final FreeColClient freeColClient) {
+    public static boolean checkDesyncAction(final FreeColClient freeColClient) {
         final FreeColServer server = freeColClient.getFreeColServer();
         final Game game = freeColClient.getGame();
         final Map map = game.getMap();
@@ -654,9 +655,12 @@ public class DebugUtils {
         }
 
         if (problemDetected) {
-            freeColClient.getGUI().showInformationMessage(sb.toString());
-            System.err.println(sb.toString());
+            String err = sb.toString();
+            freeColClient.getGUI().showInformationMessage(err);
+            logger.severe(err);
         }
+System.err.println("PROB = " + problemDetected);
+        return problemDetected;
     }
 
     /**

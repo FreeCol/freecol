@@ -45,6 +45,7 @@ public class FreeColDebugger {
     public static enum DebugMode {
         COMMS, // Trace print full c-s communications, and verbose
                // (non-i18n) server errors.
+        DESYNC,// Check frequently for desynchronization
         MENUS, // Enable the Debug menu, the extra commands in
                // ColonyPanel and TilePopup, the goods-in-market
                // tooltip in MarketLabel, the extra modifiers on the

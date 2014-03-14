@@ -41,6 +41,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.FreeColActionUI;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
+import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.model.Ability;
@@ -448,6 +449,10 @@ public final class InGameController implements NetworkConstants {
      * Really end the turn.
      */
     private void doEndTurn() {
+        // Check for desync as last thing!
+        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.DESYNC)
+            && DebugUtils.checkDesyncAction(freeColClient)) return;
+
         // Clean up lingering menus.
         gui.closeMenus();
 
@@ -4246,12 +4251,18 @@ public final class InGameController implements NetworkConstants {
         logger.finest("Entering client setCurrentPlayer: " + player.getName());
 
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
-            && freeColClient.currentPlayerIsMyPlayer()) gui.closeMenus();
+            && freeColClient.currentPlayerIsMyPlayer()) {
+            gui.closeMenus();
+        }
         FreeColDebugger.finishDebugRun(freeColClient, false);
 
         final Game game = freeColClient.getGame();
         game.setCurrentPlayer(player);
         if (freeColClient.getMyPlayer().equals(player)) {
+            if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.DESYNC)) {
+                DebugUtils.checkDesyncAction(freeColClient);
+            }
+
             // Get turn report out quickly before more message display occurs.
             player.removeDisplayedModelMessages();
             displayModelMessages(true, true);
