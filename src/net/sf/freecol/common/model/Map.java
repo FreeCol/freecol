@@ -1610,7 +1610,22 @@ public class Map extends FreeColGameObject implements Location {
                 // the passenger.
                 Unit.MoveType umt = unit.getSimpleMoveType(currentTile,
                                                            moveTile);
-                boolean unitMove = (isGoal) ? umt.isLegal() : umt.isProgress();
+                boolean unitMove = umt.isProgress();
+                if (isGoal && !unitMove) {
+                    // Relax requirements at goal.  If there is just a
+                    // unit in the way, assume this condition is transient
+                    // unless the unit is in a constrained position such as
+                    // a small island or river.  Consider beached units
+                    // as permanent blockages.
+                    switch (umt) {
+                    case MOVE_NO_ATTACK_CIVILIAN:
+                    case MOVE_NO_ATTACK_MARINE:
+                        unitMove = moveTile.getAvailableAdjacentCount() >= 3;
+                        break;
+                    default:
+                        break;
+                    }
+                }
                 boolean carrierMove = carrier != null
                     && carrier.isTileAccessible(moveTile);
                 boolean embarked = embarkedThisTurn(currentNode, currentTurns);

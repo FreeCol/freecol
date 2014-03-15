@@ -1027,6 +1027,19 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
+     * Get the number of tiles adjacent to this one that are of the same
+     * land/water type such as to be nominally accessible to a unit.
+     *
+     * @return The number of adjacent available tiles.
+     */
+    public int getAvailableAdjacentCount() {
+        int n = 0;
+        for (Tile t : getSurroundingTiles(1)) if (t.isLand() == isLand()) n++;
+        return n;
+    }
+
+
+    /**
      * Finds the nearest settlement to this tile.
      *
      * @param owner If non-null, the settlement should be owned by this player.
