@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2013   The FreeCol Team
+ *  Copyright (C) 2002-2014   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -62,12 +62,17 @@ public class ForestMaker {
         -0.5, 0.5, -0.5, 0.5
     };
 
+    private static final Point TOP = new Point(HALF_WIDTH, -HALF_HEIGHT);
+    private static final Point BOTTOM = new Point(HALF_WIDTH, HALF_HEIGHT);
+    private static final Point LEFT = new Point(0, 0);
+    private static final Point RIGHT = new Point(BASE_WIDTH, 0);
+
     private static final int[] POWERS_OF_TWO
         = new int[] { 1, 2, 4, 8 };
 
 
-    private static boolean drawBorders = false;
-    private static boolean drawRivers = false;
+    private static boolean drawBorders = true;
+    private static boolean drawRivers = true;
     private static boolean drawTrees = true;
 
 
@@ -112,7 +117,20 @@ public class ForestMaker {
         river = river.getSubimage(44, 22, 40, 20);
         Rectangle2D rectangle = new Rectangle(0, 0, river.getWidth(), river.getHeight());
         TexturePaint texture = new TexturePaint(river, rectangle);
-
+        // set up river points
+        Point[] p = new Point[] {
+            new Point(RIGHT), new Point(RIGHT),
+            new Point(BOTTOM), new Point(TOP),
+            null, null
+        };
+        p[0].translate(-8, 4);
+        p[1].translate(-8, -4);
+        p[2].translate(-8, 4);
+        p[3].translate(-8, -4);
+        p[4] = new Point((p[0].x + p[2].x) / 2,
+                         (p[0].y + p[2].y) / 2);
+        p[5] = new Point((p[1].x + p[3].x) / 2,
+                         (p[1].y + p[3].y) / 2);
 
         for (String arg : args) {
             File sourceDirectory = new File(arg);
@@ -136,14 +154,14 @@ public class ForestMaker {
                                    + arg + ".");
             }
             List<BufferedImage> images = new ArrayList<BufferedImage>(imageFiles.length);
-            int minimumHeight = Integer.MAX_VALUE;
+            int maximumHeight = 0;
             for (File imageFile : imageFiles) {
                 if (imageFile.isFile() && imageFile.canRead()) {
                     try {
                         BufferedImage image = ImageIO.read(imageFile);
                         images.add(image);
-                        if (image.getHeight() < minimumHeight) {
-                            minimumHeight = image.getHeight();
+                        if (image.getHeight() > maximumHeight) {
+                            maximumHeight = image.getHeight();
                         }
                     } catch(Exception e) {
                         System.out.println("Unable to load image " + imageFile.getName() + ":\n");
@@ -154,35 +172,29 @@ public class ForestMaker {
             int numberOfImages = images.size();
             Random random = new Random(1492);
 
-            // the tile itself
-            int[] x_coords = new int[] {
-                0, HALF_WIDTH, 0, -HALF_WIDTH
-            };
-            int[] y_coords = new int[] {
-                -HALF_HEIGHT, 0, HALF_HEIGHT, 0
-            };
-
-            Polygon diamond = new Polygon(x_coords, y_coords, 4);
-            Polygon[] polygons = getBranches(RIVER_MARGIN);
-
+            /**
+             * If we translate the diamond so that it is bisected by
+             * the x-axis, we can describe any point within the
+             * diamond as the addition of the two vectors that make up
+             * the diamond's left sides, namely:
+             *
+             * { HALF_WIDTH,  HALF_HEIGHT }    and
+             * { HALF_WIDTH, -HALF_HEIGHT }
+             *
+             * Thus, a random point can be found by scaling these two
+             * vectors by the random numbers a and b, and adding the
+             * result:
+             *
+             * x = (a + b) * HALF_WIDTH;
+             * y = (a - b) * HALF_HEIGHT;
+             */
             for (int index = 0; index < 16; index++) {
                 BufferedImage base = new BufferedImage(BASE_WIDTH, BASE_HEIGHT + MARGIN,
                                                        BufferedImage.TYPE_INT_ARGB);
                 Graphics2D g = base.createGraphics();
-                // for the sake of convenience: translate graphics in
-                // order to use the centre of the tile as origin
-                g.translate(HALF_WIDTH, HALF_HEIGHT + MARGIN);
-
-                if (drawBorders) {
-                    g.setColor(Color.RED);
-                    g.draw(diamond);
-                    for (Polygon p : polygons) {
-                        g.draw(p);
-                    }
-                }
+                g.translate(0, HALF_HEIGHT + MARGIN);
 
                 g.setPaint(texture);
-                g.setStroke(new BasicStroke(6));
                 String counter = "";
                 boolean[] branches = new boolean[4];
                 if (index > 0) {
@@ -190,55 +202,108 @@ public class ForestMaker {
                         if ((index & POWERS_OF_TWO[i]) == POWERS_OF_TWO[i]) {
                             branches[i] = true;
                             counter += "1";
-                            if (drawRivers) {
-                                g.drawLine(0, 0, LIMIT[i], getY(0, 0, SLOPE[i], LIMIT[i]));
-                            }
                         } else {
                             counter += "0";
                         }
                     }
                 }
 
+                // the two vectors that describe the diamond
+                Point v1 = new Point(HALF_WIDTH, HALF_HEIGHT);
+                Point v2 = new Point(HALF_WIDTH, -HALF_HEIGHT);
+                // make space for rivers
+                if (branches[0] || branches[2]) {
+                    v1.translate(-16, -8);
+                }
+                if (branches[1] || branches[3]) {
+                    v2.translate(-16, 8);
+                }
+
+                if (drawBorders) {
+                    int dx = v1.x + v2.x;
+                    int dy = v1.y + v2.y;
+                    g.setColor(Color.RED);
+                    g.drawLine(0, 0, v1.x, v1.y);
+                    g.drawLine(v1.x, v1.y, dx, dy);
+                    g.drawLine(dx, dy, v2.x, v2.y);
+                    g.drawLine(v2.x, v2.y, 0, 0);
+                }
+
+                if (drawRivers) {
+                    g.setPaint(texture);
+                    g.setStroke(new BasicStroke(6));
+                    for (int r = 0; r < 2; r++) {
+                        int i = r;
+                        int j = r + 2;
+                        if (branches[i] && branches[j]) {
+                            // do nothing
+                        } else if (branches[i]) {
+                            j = r + 4;
+                        } else if (branches[j]) {
+                            i = r + 4;
+                        } else {
+                            continue;
+                        }
+                        g.drawLine(p[i].x, p[i].y, p[j].x, p[j].y);
+                    }
+                }
+
                 if (drawTrees) {
                     List<ImageLocation> trees = new ArrayList<ImageLocation>(TREES);
-                    int count = 0;
                     // reduce number of trees if river branches are present
                     int numberOfTrees = (8 - Integer.bitCount(index)) * TREES / 8;
 
-                    int x, y;
-                    trees: while (count < numberOfTrees) {
-                        images: for (int im = 0; im < numberOfImages; im++) {
-                            BufferedImage image = images.get((count + im) % numberOfImages);
-                            int width = image.getWidth();
-                            int height = image.getHeight();
-                            x = random.nextInt(BASE_WIDTH) - HALF_WIDTH;
-                            if (count < 10) {
-                                // choose a particularly favourable
-                                // point near the southern edge of the
-                                // diamond
-                                y = HALF_HEIGHT - Math.abs(x)/2;
-                                if (x > 0) {
-                                    x -= width;
-                                }
-                            } else {
-                                y = getRandomY(random, x);
-                            }
-                            // crown of the tree
-                            int crown = y - height;
-                            // assume trees are more or less symmetrical
-                            if (diamond.contains(x + width/2, y)
-                                && x + width < HALF_WIDTH
-                                && y - height > -(HALF_HEIGHT + MARGIN)) {
-                                for (int i = 0; i < branches.length; i++) {
-                                    if (branches[i]
-                                        && polygons[i].intersects(x, crown, width, height)) {
-                                        // would obscure river image
-                                        continue images;
-                                    }
-                                }
-                                trees.add(new ImageLocation(image, x, y - height));
-                                count++;
-                            }
+                    int count = 0;
+                    while (count < numberOfTrees) {
+                        BufferedImage image = images.get(random.nextInt(numberOfImages));
+                        int width = image.getWidth();
+                        int height = image.getHeight();
+                        int halfWidth = width / 2;
+                        /**
+                         * Find a point for the root of the tree, that
+                         * is the center of the lower edge of the tree
+                         * image.
+                         */
+                        float a = random.nextFloat();
+                        float b = random.nextFloat();
+                        int x = (int) (a * v1.x + b * v2.x);
+                        int y = (int) (a * v1.y + b * v2.y);
+                        /**
+                         * Additional constraint: the left and right
+                         * edges of the tree image must be within the
+                         * tile bounds (this will fail if the tree
+                         * image is too large).
+                         */
+                        int dx = x - halfWidth;
+                        if (dx < 0) {
+                            x += -dx;
+                        }
+                        dx = x + halfWidth - BASE_WIDTH;
+                        if (dx > 0) {
+                            x += -dx;
+                        }
+                        /**
+                         * Additional constraint: the top edge of the
+                         * tree image must be within the tile bounds.
+                         */
+                        int crown = y - height;
+                        int dy = (HALF_HEIGHT + MARGIN) - crown;
+                        if (dy < 0) {
+                            y += -dy;
+                        }
+                        /**
+                         * Additional constraint: if there is a river
+                         * in the Northwest or Southeast, then the
+                         * crown of the tree, i.e. the center of the
+                         * top edge of the tree image, must not be
+                         * within the top right triangle of the tile
+                         * image.
+                         */
+                        if (!((branches[1] || branches[3])
+                              && crown < -BASE_HEIGHT + 8 + (x + halfWidth) / 2)) {
+                            //System.out.println("x=" + x + ", y=" + (y - height));
+                            trees.add(new ImageLocation(image, x - halfWidth, crown));
+                            count++;
                         }
                     }
 
@@ -266,32 +331,6 @@ public class ForestMaker {
         return (height == 0) ? 0 : random.nextInt(2 * height) - height;
     }
 
-    /**
-     * Returns an array of polygons describing the river branches of
-     * the tile.
-     *
-     * @param height an <code>int</code> value
-     * @return a <code>Polygon[]</code> value
-     */
-    private static Polygon[] getBranches(int height) {
-        int width = 2 * height;
-        Polygon[] result = new Polygon[4];
-        int[] xx = new int[] { 0, -width, 0, width };
-        int[] yy = new int[] { height, 0, -height, 0 };
-        for (int i = 0; i < 4; i++) {
-            int[] x = new int[4];
-            int[] y = new int[4];
-            x[0] = xx[i];
-            y[0] = yy[i];
-            x[1] = xx[(i + 1) % 4];
-            y[1] = yy[(i + 1) % 4];
-            x[2] = LIMIT[i];
-            y[2] = getY(x[1], y[1], SLOPE[i], LIMIT[i]);
-            x[3] = LIMIT[i];
-            y[3] = getY(x[0], y[0], SLOPE[i], LIMIT[i]);
-            result[i] = new Polygon(x, y, 4);
-        }
-        return result;
-    }
+
 }
 
