@@ -2222,7 +2222,7 @@ public final class InGameController implements NetworkConstants {
             if (!colony.canBuildEquipment(type, amount)) {
                 gui.showInformationMessage(unit,
                     StringTemplate.template("equipUnit.impossible")
-                        .addName("%colony", colony.getName())
+                        .addName("%colony%", colony.getName())
                         .add("%equipment%", type.getNameKey())
                         .addStringTemplate("%unit%", unit.getFullLabel()));
                 return;
