@@ -207,13 +207,6 @@ public final class DefaultTransferHandler extends TransferHandler {
 
                 DropTarget target = (DropTarget)comp;
                 if (!target.accepts(unit)) return false;
-
-                if (unit.isInColony()
-                    && (comp instanceof ColonyPanel.OutsideColonyPanel
-                        || comp instanceof ColonyPanel.ColonyCargoPanel)
-                    && freeColClient.getInGameController()
-                                    .tryLeaveColony(unit)) return false;
-                
                 target.add(data, true);
 
                 // Update unit selection.

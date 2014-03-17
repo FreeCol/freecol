@@ -1311,7 +1311,7 @@ public final class ColonyPanel extends PortPanel
             Container oldParent = comp.getParent();
             if (editState) {
                 if (comp instanceof UnitLabel) {
-                    UnitLabel unitLabel = ((UnitLabel) comp);
+                    UnitLabel unitLabel = (UnitLabel)comp;
                     Unit unit = unitLabel.getUnit();
 
                     if (!unit.isOnCarrier()) {
