@@ -565,16 +565,26 @@ public final class EuropePanel extends PortPanel {
             super(EuropePanel.this, "Europe - port", true);
         }
 
+
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected void addPropertyChangeListeners() {
             europe.addPropertyChangeListener(this);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected void removePropertyChangeListeners() {
             europe.removePropertyChangeListener(this);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public boolean accepts(Unit unit) {
             if (!unit.isNaval()) return false;
             switch (unit.getState()) {

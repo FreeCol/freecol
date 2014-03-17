@@ -1469,7 +1469,7 @@ public final class InGameController implements NetworkConstants {
             || student == null
             || !player.owns(student)
             || student.getColony() == null
-            || !(student.getLocation() instanceof WorkLocation)
+            || !student.isInColony()
             || teacher == null
             || !player.owns(teacher)
             || !student.canBeStudent(teacher)

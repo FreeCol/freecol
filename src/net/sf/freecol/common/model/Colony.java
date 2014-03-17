@@ -1515,9 +1515,7 @@ public class Colony extends Settlement implements Nameable {
      *     clear existing ones.
      */
     public void updateEducation(Unit unit, boolean enable) {
-        Location loc = unit.getLocation();
-        WorkLocation wl = (loc instanceof WorkLocation) ? (WorkLocation)loc
-            : null;
+        WorkLocation wl = unit.getWorkLocation();
         if (wl == null) {
             throw new RuntimeException("updateEducation(" + unit
                 + ") unit not at work location.");

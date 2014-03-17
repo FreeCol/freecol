@@ -518,17 +518,15 @@ public class LabourData {
     }
 
     private void incrementColonyCount(final Colony colony, Unit unit, UnitData unitData) {
-
-        Location location = unit.getLocation();
-        if (!(location instanceof WorkLocation)) {
+        if (!unit.isInColony()) {
             incrementOutsideWorker(unitData, unit, new LocationData.Getter() {
-                public LocationData getLocationData(UnitData data) {
-                    return data.getLocationData(colony);
-                }
-            });
+                    public LocationData getLocationData(UnitData data) {
+                        return data.getLocationData(colony);
+                    }
+                });
             return;
         }
-        WorkLocation wl = (WorkLocation)location;
+        WorkLocation wl = unit.getWorkLocation();
         LocationData colonyData = unitData.getLocationData(colony);
         Unit teacher = unit.getTeacher();
         if (teacher != null) {

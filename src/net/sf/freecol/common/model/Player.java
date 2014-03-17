@@ -173,7 +173,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 && !unit.isDamaged()
                 && !unit.isAtSea()
                 && !unit.isOnCarrier()
-                && !(unit.getLocation() instanceof WorkLocation);
+                && !unit.isInColony();
         }
     }
 

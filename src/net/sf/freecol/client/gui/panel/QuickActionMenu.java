@@ -173,8 +173,7 @@ public final class QuickActionMenu extends JPopupMenu {
                 if (addTileItem(unitLabel)) this.addSeparator();
                 if (addWorkItems(unitLabel)) this.addSeparator();
                 if (addEducationItems(unitLabel)) this.addSeparator();
-                if (unit.getLocation() instanceof WorkLocation
-                    && colony.canReducePopulation()) {
+                if (unit.isInColony() && colony.canReducePopulation()) {
                     JMenuItem menuItem = new JMenuItem(Messages.message("leaveTown"));
                     menuItem.setActionCommand(UnitAction.LEAVE_TOWN.toString());
                     menuItem.addActionListener(unitLabel);
@@ -338,8 +337,7 @@ public final class QuickActionMenu extends JPopupMenu {
         final GoodsType expertGoods = unitType.getExpertProduction();
         final Colony colony = unit.getLocation().getColony();
         final Specification spec = freeColClient.getGame().getSpecification();
-        WorkLocation current = (unit.getLocation() instanceof WorkLocation)
-            ? (WorkLocation)unit.getLocation() : null;
+        WorkLocation current = unit.getWorkLocation();
         final int bonusChange = (current != null) ? 0
             : colony.governmentChange(colony.getUnitCount() + 1);
 
@@ -431,7 +429,7 @@ public final class QuickActionMenu extends JPopupMenu {
 
         if (unit.getSpecification().getBoolean(GameOptions.ALLOW_STUDENT_SELECTION)) {
             for (Unit teacher : unit.getColony().getTeachers()) {
-                if (unit.canBeStudent(teacher) && (unit.getLocation() instanceof WorkLocation)) {
+                if (unit.canBeStudent(teacher) && unit.isInColony()) {
                     JMenuItem menuItem = null;
                     ImageIcon teacherIcon = imageLibrary.getUnitImageIcon(teacher, 0.5);
                     if (teacher.getStudent() != unit) {

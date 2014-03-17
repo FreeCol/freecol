@@ -334,7 +334,7 @@ public class DefendSettlementMission extends Mission {
         Mission m = null;
         if (getTarget() instanceof Colony) {
             Colony colony = (Colony)getTarget();
-            if (unit.getLocation() instanceof WorkLocation
+            if (unit.isInColony()
                 || (unit.isPerson() && colony.getUnitCount() <= 1)) {
                 m = new WorkInsideColonyMission(aiMain, aiUnit,
                     aiMain.getAIColony(colony));

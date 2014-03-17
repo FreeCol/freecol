@@ -1195,8 +1195,8 @@ public class Game extends FreeColGameObject {
         // @compat 0.10.7
         for (Player player : getLiveEuropeanPlayers()) {
             for (Unit unit : player.getUnits()) {
-                if (unit.getLocation() instanceof WorkLocation) {
-                    ((WorkLocation) unit.getLocation()).updateProductionType();
+                if (unit.isInColony()) {
+                    unit.getWorkLocation().updateProductionType();
                 }
             }
         }

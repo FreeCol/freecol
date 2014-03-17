@@ -159,18 +159,18 @@ public class CargoPanel extends FreeColPanel
     }
 
     /**
-     * Get the <code>Carrier</code> value.
+     * Get the carrier unit.
      *
-     * @return an <code>Unit</code> value
+     * @return The carrier <code>Unit</code>.
      */
     public Unit getCarrier() {
         return carrier;
     }
 
     /**
-     * Set the <code>Carrier</code> value.
+     * Set the carrier unit.
      *
-     * @param newCarrier The new Carrier value.
+     * @param newCarrier The new carrier <code>Unit</code>.
      */
     public void setCarrier(final Unit newCarrier) {
         if (newCarrier != carrier) {
@@ -231,6 +231,7 @@ public class CargoPanel extends FreeColPanel
                         return comp;
                     }
                 }
+
             } else if (comp instanceof GoodsLabel) {
                 Goods goods = ((GoodsLabel) comp).getGoods();
                 int loadableAmount = carrier.getLoadableAmount(goods.getType());
@@ -245,6 +246,7 @@ public class CargoPanel extends FreeColPanel
                 getController().loadCargo(goodsToAdd, carrier);
                 update();
                 return comp;
+
             } else if (comp instanceof MarketLabel) {
                 MarketLabel label = (MarketLabel) comp;
                 Player player = carrier.getOwner();

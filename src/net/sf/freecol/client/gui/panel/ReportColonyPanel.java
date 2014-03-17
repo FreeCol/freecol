@@ -588,9 +588,7 @@ public final class ReportColonyPanel extends ReportPanel
         List<UnitType> couldWork = new ArrayList<UnitType>();
         for (Unit u : notWorking) {
             GoodsType t = u.getWorkType();
-            WorkLocation wl = (u.getLocation() instanceof WorkLocation)
-                ? (WorkLocation) u.getLocation()
-                : null;
+            WorkLocation wl = u.getWorkLocation();
             GoodsType w = bestProduction(wl, colonistType);
             if (w == null || w != t) couldWork.add(u.getType());
         }

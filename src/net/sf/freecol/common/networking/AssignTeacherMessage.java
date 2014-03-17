@@ -100,7 +100,7 @@ public class AssignTeacherMessage extends DOMMessage {
         if (student.getColony() == null) {
             return DOMMessage.clientError("Student not in colony: "
                 + studentId);
-        } else if (!(student.getLocation() instanceof WorkLocation)) {
+        } else if (!student.isInColony()) {
             return DOMMessage.clientError("Student not working colony: "
                 + studentId);
         } else if (teacher.getColony() == null) {

@@ -331,9 +331,6 @@ public final class UnitLabel extends JLabel
             && (data instanceof GoodsLabel || data instanceof MarketLabel);
     }
 
-    public boolean isOnCarrier() {
-        return unit != null && unit.isOnCarrier();
-    }
 
     /**
      * Gets a string corresponding to the UnitAction to work at a work
@@ -345,6 +342,16 @@ public final class UnitLabel extends JLabel
     public static String getWorkLabel(WorkLocation wl) {
         return "WORK_" + Utils.lastPart(wl.getClass().toString(), ".")
             .toUpperCase(Locale.US);
+    }
+
+
+    // Interface Draggable
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isOnCarrier() {
+        return unit != null && unit.isOnCarrier();
     }
 
 

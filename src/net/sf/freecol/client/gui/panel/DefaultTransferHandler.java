@@ -169,10 +169,10 @@ public final class DefaultTransferHandler extends TransferHandler {
                 UnitLabel unitLabel = (UnitLabel) comp;
                 /**
                  * If the unit/cargo is dropped on a carrier in port
-                 * (EuropePanel.InPortPanel), then the ship is
-                 * selected and the unit is added to its cargo. If the
-                 * unit is not a carrier, but can be equipped, and the
-                 * goods can be converted to equipment, equip the unit.
+                 * then the ship is selected and the unit is added to
+                 * its cargo.  If the unit is not a carrier, but can
+                 * be equipped, and the goods can be converted to
+                 * equipment, equip the unit.
                  *
                  * If not, assume that the user wished to drop the
                  * unit/cargo on the panel below.
@@ -182,7 +182,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                     && parentPanel instanceof PortPanel) {
                     PortPanel portPanel = (PortPanel) parentPanel;
                     if (data instanceof Draggable
-                        && ((Draggable) data).isOnCarrier()) {
+                        && ((Draggable)data).isOnCarrier()) {
                         oldSelectedUnit = portPanel.getSelectedUnitLabel();
                     }
                     portPanel.setSelectedUnitLabel(unitLabel);
@@ -196,40 +196,32 @@ public final class DefaultTransferHandler extends TransferHandler {
                 comp = getDropTarget(comp);
             }
 
-            // t is already in comp:
-            if (data.getParent() == comp) {
-                return false;
-            }
+            // Ignore if data is already in comp.
+            if (data.getParent() == comp) return false;
 
             if (data instanceof UnitLabel) {
                 // Check if the unit can be dragged to comp.
-
                 Unit unit = ((UnitLabel)data).getUnit();
-                if (comp instanceof DropTarget) {
-                    DropTarget target = (DropTarget) comp;
-                    if (!target.accepts(unit)) {
-                        return false;
-                    }
+                if (!(comp instanceof DropTarget)) return false;
 
-                    if ((comp instanceof ColonyPanel.OutsideColonyPanel
-                         || comp instanceof ColonyPanel.ColonyCargoPanel)
-                        && !freeColClient.getInGameController()
-                            .tryLeaveColony(unit)) {
-                        return false;
-                    }
-                    target.add(data, true);
+                DropTarget target = (DropTarget)comp;
+                if (!target.accepts(unit)) return false;
 
-                    // Update unit selection
+                if (unit.isInColony()
+                    && (comp instanceof ColonyPanel.OutsideColonyPanel
+                        || comp instanceof ColonyPanel.ColonyCargoPanel)
+                    && freeColClient.getInGameController()
+                                    .tryLeaveColony(unit)) return false;
+                
+                target.add(data, true);
 
-                    // new unit selection has already been taken care
-                    // of if this unit was moved to ToAmericaPanel
-                    restoreSelection(oldSelectedUnit);
-                    comp.revalidate();
+                // Update unit selection.
+                // New unit selection has already been taken care of
+                // if this unit was moved to ToAmericaPanel
+                restoreSelection(oldSelectedUnit);
+                comp.revalidate();
+                return true;
 
-                    return true;
-                } else {
-                    return false;
-                }
             } else if (data instanceof GoodsLabel) {
                 // Check if the goods can be dragged to comp.
                 GoodsLabel label = (GoodsLabel)data;
@@ -275,36 +267,29 @@ public final class DefaultTransferHandler extends TransferHandler {
                     return true;
                 }
             } else if (data instanceof MarketLabel) {
-
-                // Check if the unit can be dragged to comp.
-
-                MarketLabel label = ((MarketLabel)data);
+                MarketLabel label = (MarketLabel)data;
 
                 // Import the data.
-
                 if (label.isPartialChosen()) {
-                    int amount = getAmount(label.getType(), label.getAmount(), -1, true);
-                    if (amount <= 0) {
-                        return false;
-                    }
+                    int amount = getAmount(label.getType(), label.getAmount(),
+                                           -1, true);
+                    if (amount <= 0) return false;
                     label.setAmount(amount);
                 }
 
                 if (comp instanceof UnitLabel) {
-                    return equipUnitIfPossible((UnitLabel) comp, label.getGoods());
+                    return equipUnitIfPossible((UnitLabel)comp,
+                                               label.getGoods());
+                } else if (comp instanceof CargoPanel) {
+                    ((CargoPanel)comp).add(data, true);
+                    comp.revalidate();
+                    return true;
                 } else if (comp instanceof JLabel) {
                     logger.warning("Oops, I thought we didn't have to write this part.");
                     return true;
-                } else if (comp instanceof JPanel) {
-                    if (comp instanceof CargoPanel) {
-                        ((CargoPanel)comp).add(data, true);
-                    } else {
-                        logger.warning("The receiving component is of an invalid type.");
-                        return false;
-                    }
-
-                    comp.revalidate();
-                    return true;
+                } else {
+                    logger.warning("The receiving component is of an invalid type.");
+                    return false;
                 }
             }
 

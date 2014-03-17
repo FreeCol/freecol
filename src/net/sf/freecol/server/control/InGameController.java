@@ -3456,10 +3456,7 @@ public final class InGameController extends Controller {
         // We could avoid updating the whole tile if we knew that this
         // was definitely a move between locations and no student/teacher
         // interaction occurred.
-        Location oldLoc = unit.getLocation();
-        if (!(oldLoc instanceof WorkLocation)) {
-            colony.getTile().cacheUnseen();//+til
-        }
+        if (!unit.isInColony()) unit.getColony().getTile().cacheUnseen();//+til
         unit.setLocation(workLocation);//-vis: safe/colony,-til if not in colony
         cs.add(See.perhaps(), colony.getTile());
         // Others can see colony change size
@@ -3633,7 +3630,7 @@ public final class InGameController extends Controller {
             // Equipping a unit at work in a colony should remove the unit
             // from the work location which might cause a visible change
             // in population.
-            if (unit.getLocation() instanceof WorkLocation) {
+            if (unit.isInColony()) {
                 settlement.getTile().cacheUnseen();//+til
                 unit.setLocation(settlement.getTile());//-vis: safe/colony,-til
             }
@@ -3936,10 +3933,7 @@ public final class InGameController extends Controller {
     public Element putOutsideColony(ServerPlayer serverPlayer, Unit unit) {
         Tile tile = unit.getTile();
         Colony colony = unit.getColony();
-        Location oldLoc = unit.getLocation();
-        if (oldLoc instanceof WorkLocation) {
-            tile.cacheUnseen();//+til
-        }
+        if (unit.isInColony()) tile.cacheUnseen();//+til
         unit.setLocation(tile);//-vis: safe/colony,-til if in colony
 
         // Full tile update for the player, the rest get their limited

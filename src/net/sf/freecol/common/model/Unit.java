@@ -746,8 +746,7 @@ public class Unit extends GoodsLocation
         // We have to handle this issue here in setLocation as this is
         // the only place that contains information about both
         // locations.
-        Colony oldColony = (location instanceof WorkLocation)
-            ? location.getColony() : null;
+        Colony oldColony = (isInColony()) ? location.getColony() : null;
         Colony newColony = (newLocation instanceof WorkLocation)
             ? newLocation.getColony() : null;
         boolean withinColony = newColony != null && newColony == oldColony;
@@ -830,6 +829,15 @@ public class Unit extends GoodsLocation
     }
 
     /**
+     * Checks whether this unit is working inside a colony.
+     *
+     * @return True if in colony.
+     */
+    public boolean isInColony() {
+        return getLocation() instanceof WorkLocation;
+    }
+
+    /**
      * Is this unit on a tile?
      *
      * @return True if this unit is on a tile.
@@ -845,10 +853,7 @@ public class Unit extends GoodsLocation
      * @return The current <code>WorkLocation</code>, or null if none.
      */
     public WorkLocation getWorkLocation() {
-        if (getLocation() instanceof WorkLocation) {
-            return (WorkLocation) getLocation();
-        }
-        return null;
+        return (isInColony()) ? (WorkLocation)getLocation() : null;
     }
 
     /**
@@ -1654,13 +1659,9 @@ public class Unit extends GoodsLocation
             return null;
         }
 
-        Settlement settlement = null;
-        if (getLocation() instanceof WorkLocation) {
-            settlement = getColony();
-        }
-        if (getLocation() instanceof IndianSettlement) {
-            settlement = (Settlement) getLocation();
-        }
+        Settlement settlement = (isInColony()) ? getColony()
+            : (getLocation() instanceof IndianSettlement) ? (Settlement)getLocation()
+            : null;
         if (settlement == null) return null;
 
         TypeCountMap<EquipmentType> equipmentList = null;
@@ -2629,7 +2630,7 @@ public class Unit extends GoodsLocation
             && !isOnCarrier()
             // this should never happen anyway, since these units
             // should have state IN_COLONY, but better safe than sorry
-            && !(location instanceof WorkLocation);
+            && !isInColony();
     }
 
 
@@ -3207,7 +3208,7 @@ public class Unit extends GoodsLocation
      * @return A message to display, or null if education is not an issue.
      */
     public StringTemplate getAbandonEducationMessage(boolean leavingColony) {
-        if (!(getLocation() instanceof WorkLocation)) return null;
+        if (!isInColony()) return null;
         boolean teacher = getStudent() != null;
         // if leaving the colony, the student loses learning spot, so
         // check with player
@@ -3872,7 +3873,7 @@ public class Unit extends GoodsLocation
         }
 
         if (location != null) {
-            if (!full && location instanceof WorkLocation) {
+            if (!full && isInColony()) {
                 // Really special case.  This happens in attack
                 // animations when a defender unit is invisible
                 // working inside a colony and has to be specially

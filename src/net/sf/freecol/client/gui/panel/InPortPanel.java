@@ -73,6 +73,9 @@ public abstract class InPortPanel extends UnitPanel {
 
     // Override JLabel
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getUIClassID() {
         return "InPortPanelUI";

@@ -244,7 +244,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         // Check for experience-promotion.
         GoodsType produce;
         UnitType learn;
-        if (loc instanceof WorkLocation
+        if (isInColony()
             && (produce = getWorkType()) != null
             && (learn = spec.getExpertForProducing(produce)) != null
             && learn != getType()
