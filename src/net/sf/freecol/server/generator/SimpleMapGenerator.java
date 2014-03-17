@@ -919,17 +919,16 @@ public class SimpleMapGenerator implements MapGenerator {
     }
 
     private void createDebugUnits(Map map, Player player, Tile startTile) {
-
-        Game game = map.getGame();
-        Specification spec = game.getSpecification();
+        final Game game = map.getGame();
+        final Specification spec = game.getSpecification();
 
         // In debug mode give each player a few more units and a colony.
         UnitType unitType = spec.getUnitType("model.unit.galleon");
         Unit unit4 = new ServerUnit(game, startTile, player, unitType);
 
         unitType = spec.getUnitType("model.unit.privateer");
-        @SuppressWarnings("unused")
         Unit privateer = new ServerUnit(game, startTile, player, unitType);
+        ((ServerPlayer)player).exploreForUnit(privateer);
 
         unitType = spec.getUnitType("model.unit.freeColonist");
         @SuppressWarnings("unused")
@@ -1020,8 +1019,8 @@ public class SimpleMapGenerator implements MapGenerator {
         }
 
         unitType = spec.getUnitType("model.unit.seasonedScout");
-        @SuppressWarnings("unused")
         Unit scout = new ServerUnit(game, colonyTile, player, unitType);
+        ((ServerPlayer)player).exploreForUnit(scout);
 
         unitType = spec.getUnitType("model.unit.veteranSoldier");
         @SuppressWarnings("unused")
