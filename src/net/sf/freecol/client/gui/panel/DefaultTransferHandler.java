@@ -57,6 +57,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsLocation;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 
 
@@ -248,10 +249,8 @@ public final class DefaultTransferHandler extends TransferHandler {
                 }
 
                 if (comp instanceof UnitLabel) {
-                    return equipUnitIfPossible((UnitLabel) comp, goods);
-                } else if (comp instanceof JLabel) {
-                    logger.warning("Oops, I thought we didn't have to write this part.");
-                    return true;
+                    return equipUnitIfPossible((UnitLabel)comp, goods);
+
                 } else if (comp instanceof DropTarget) {
                     DropTarget target = (DropTarget) comp;
                     if (target.accepts(goods)) {
@@ -265,6 +264,11 @@ public final class DefaultTransferHandler extends TransferHandler {
                     comp.revalidate();
 
                     return true;
+
+                } else if (comp instanceof JLabel) {
+                    logger.warning("Oops, I thought we didn't have to write this part.");
+                    return true;
+
                 }
             } else if (data instanceof MarketLabel) {
                 MarketLabel label = (MarketLabel)data;
@@ -318,24 +322,24 @@ public final class DefaultTransferHandler extends TransferHandler {
         }
     }
 
-
-    private boolean equipUnitIfPossible(UnitLabel unitLabel, AbstractGoods goods) {
-        Unit unit = unitLabel.getUnit();
-        if (unit.hasAbility(Ability.CAN_BE_EQUIPPED)) {
-            for (EquipmentType equipment : freeColClient.getGame().getSpecification()
-                     .getEquipmentTypeList()) {
-                if (unit.canBeEquippedWith(equipment)
-                    && equipment.getRequiredGoods().size() == 1) {
-                    AbstractGoods requiredGoods = equipment.getRequiredGoods().get(0);
-                    if (requiredGoods.getType().equals(goods.getType())
-                        && requiredGoods.getAmount() <= goods.getAmount()) {
-                        int amount = Math.min(goods.getAmount() / requiredGoods.getAmount(),
-                                              equipment.getMaximumCount());
-                        freeColClient.getInGameController()
-                            .equipUnit(unit, equipment, amount);
-                        unitLabel.updateIcon();
-                        return true;
-                    }
+    private boolean equipUnitIfPossible(UnitLabel unitLabel,
+                                        AbstractGoods goods) {
+        final Unit unit = unitLabel.getUnit();
+        if (!unit.hasAbility(Ability.CAN_BE_EQUIPPED)) return false;
+        
+        final Specification spec = freeColClient.getGame().getSpecification();
+        for (EquipmentType et : spec.getEquipmentTypeList()) {
+            if (unit.canBeEquippedWith(et)
+                && et.getRequiredGoods().size() == 1) {
+                AbstractGoods requiredGoods = et.getRequiredGoods().get(0);
+                if (requiredGoods.getType().equals(goods.getType())
+                    && requiredGoods.getAmount() <= goods.getAmount()) {
+                    int amount = Math.min(goods.getAmount() / requiredGoods.getAmount(),
+                        et.getMaximumCount());
+                    freeColClient.getInGameController()
+                        .equipUnit(unit, et, amount);
+                    unitLabel.updateIcon();
+                    return true;
                 }
             }
         }
