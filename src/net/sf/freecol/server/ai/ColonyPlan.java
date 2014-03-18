@@ -680,6 +680,7 @@ public class ColonyPlan {
             ret = prioritize(type, BUILDING_WEIGHT * factor,
                 1.0/*FIXME: need for this type*/);
         } else if (goodsType.isLibertyType()) {
+            if (player.isREF()) return false; // no bells for REF colonies
             ret = prioritize(type, LIBERTY_WEIGHT,
                 (colony.getSoL() >= 100) ? 0.01 : 1.0);
         } else if (goodsType.isImmigrationType()) {
