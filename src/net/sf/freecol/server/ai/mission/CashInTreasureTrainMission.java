@@ -19,6 +19,7 @@
 
 package net.sf.freecol.server.ai.mission;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -397,10 +398,11 @@ public class CashInTreasureTrainMission extends Mission {
         final Player player = unit.getOwner();
         final Europe europe = player.getEurope();
         if (unit.canCashInTreasureTrain()) {
+            List<Unit> carriers = player.getCarriersForUnit(unit);
             if (unit.isInEurope()
                 || europe == null
                 || unit.getTransportFee() == 0
-                || player.getCarriersForUnit(unit).isEmpty()) {
+                || carriers.isEmpty()) {
                 if (AIMessage.askCashInTreasureTrain(aiUnit)) {
                     logger.finest(tag + " completed cash in at "
                         + upLoc(unit.getLocation()) + ": " + this);
@@ -410,8 +412,28 @@ public class CashInTreasureTrainMission extends Mission {
                 }
             } else {
                 setTarget(europe);
+                // Pick the closest carrier and forcibly add this unit.
+                int turns = INFINITY;
+                Unit closest = null;
+                for (Unit c : carriers) {
+                    int t = c.getTurnsToReach(unit.getLocation());
+                    if (turns > t) {
+                        turns = t;
+                        closest = c;
+                    }
+                }
+                final AIMain aiMain = getAIMain();
+                AIUnit aiCarrier = aiMain.getAIUnit(closest);
+                Mission m = aiCarrier.getMission();
+                if (!(m instanceof TransportMission)) {
+                    m = new TransportMission(aiMain, aiCarrier);
+                    aiCarrier.setMission(m);
+                }
+                if (!((TransportMission)m).queueTransportable(aiUnit, false)) {
+                    throw new RuntimeException("NO QUEUE for " + aiUnit + " on " + aiCarrier);
+                }                    
                 logger.finest(tag + " at " + upLoc(unit.getLocation())
-                    + " retargeting Europe: " + this);
+                    + " retargeting Europe with " + aiCarrier + ": " + this);
             }
         } else {
             retargetMission(tag, "arrived at "

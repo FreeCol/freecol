@@ -970,11 +970,7 @@ public class TransportMission extends Mission {
         }
         if (candidate < 0) {
             if (requireMatch) return false;
-            if (!ts.isEmpty() && !isCarrying(t)) {
-                int holds = maxHolds - ts.get(ts.size()-1).getSpaceLeft()
-                    + newSpace;
-                if (holds < 0 || holds > maxHolds) return false;
-            }
+            candidate = ts.size();
         }
         return addCargo(cargo, candidate);
     }
@@ -1379,7 +1375,8 @@ public class TransportMission extends Mission {
 
     /**
      * Wrapper for queueCargo.
-     * Public for the benefit of EuropeanAIPlayer.allocateTransportables.
+     * Public for the benefit of EuropeanAIPlayer.allocateTransportables
+     * and CashInTreasureTrain.doMission.
      *
      * @param t The <code>Transportable</code> to add.
      * @param requireMatch Fail if an existing destination is not matched.
@@ -1448,7 +1445,7 @@ public class TransportMission extends Mission {
                 return AIMessage.askUnloadCargo(aiCarrier, aig.getGoods());
             }
 
-        } else throw new IllegalStateException("Bogus transportable: " + t);
+        } else throw new RuntimeException("Bogus transportable: " + t);
 
         return true;
     }
