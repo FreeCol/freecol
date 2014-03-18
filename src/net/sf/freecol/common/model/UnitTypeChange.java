@@ -260,6 +260,16 @@ public class UnitTypeChange extends FreeColObject {
     /**
      * {@inheritDoc}
      */
+    @Override
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
+
+        for (Scope scope : getScopes()) scope.toXML(xw);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         // UnitTypeChange do not have ids, no super.readAttributes().
         // However, they might in future.
