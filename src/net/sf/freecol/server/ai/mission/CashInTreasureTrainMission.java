@@ -398,11 +398,12 @@ public class CashInTreasureTrainMission extends Mission {
         final Player player = unit.getOwner();
         final Europe europe = player.getEurope();
         if (unit.canCashInTreasureTrain()) {
+            AIUnit aiCarrier = aiUnit.getTransport();
             List<Unit> carriers = player.getCarriersForUnit(unit);
             if (unit.isInEurope()
                 || europe == null
                 || unit.getTransportFee() == 0
-                || carriers.isEmpty()) {
+                || (aiCarrier == null && carriers.isEmpty())) {
                 if (AIMessage.askCashInTreasureTrain(aiUnit)) {
                     logger.finest(tag + " completed cash in at "
                         + upLoc(unit.getLocation()) + ": " + this);
@@ -410,6 +411,9 @@ public class CashInTreasureTrainMission extends Mission {
                     logger.warning(tag + " failed to cash in at "
                         + upLoc(unit.getLocation()) + ": " + this);
                 }
+            } else if (aiCarrier != null) {
+                logger.finest(tag + " queued for Europe with carrier: "
+                    + aiCarrier); // Let the carrier do its job
             } else {
                 setTarget(europe);
                 // Pick the closest carrier and forcibly add this unit.
@@ -423,15 +427,13 @@ public class CashInTreasureTrainMission extends Mission {
                     }
                 }
                 final AIMain aiMain = getAIMain();
-                AIUnit aiCarrier = aiMain.getAIUnit(closest);
+                aiCarrier = aiMain.getAIUnit(closest);
                 Mission m = aiCarrier.getMission();
                 if (!(m instanceof TransportMission)) {
                     m = new TransportMission(aiMain, aiCarrier);
                     aiCarrier.setMission(m);
                 }
-                if (!((TransportMission)m).queueTransportable(aiUnit, false)) {
-                    throw new RuntimeException("NO QUEUE for " + aiUnit + " on " + aiCarrier);
-                }                    
+                ((TransportMission)m).queueTransportable(aiUnit, false);
                 logger.finest(tag + " at " + upLoc(unit.getLocation())
                     + " retargeting Europe with " + aiCarrier + ": " + this);
             }
