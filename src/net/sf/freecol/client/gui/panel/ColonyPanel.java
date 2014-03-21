@@ -1748,10 +1748,7 @@ public final class ColonyPanel extends PortPanel
                 // check to see if the unit actually starts working at
                 // the building some units like a teacher may not have
                 // actually started working there
-                if (unit.getWorkBuilding() == building) {
-                    return true;
-                }
-                return false;
+                return unit.getWorkBuilding() == building;
             }
 
 
@@ -1778,11 +1775,7 @@ public final class ColonyPanel extends PortPanel
                 Container oldParent = comp.getParent();
                 if (editState) {
                     if (comp instanceof UnitLabel) {
-                        if (tryWork(((UnitLabel) comp).getUnit())) {
-                            oldParent.remove(comp);
-                        } else {
-                            return null;
-                        }
+                        if (!tryWork(((UnitLabel)comp).getUnit())) return null;
                     } else {
                         logger.warning("An invalid component was dropped"
                             + " on this ASingleBuildingPanel.");
@@ -2131,6 +2124,7 @@ public final class ColonyPanel extends PortPanel
                 // unit, and possibly even change its work type as the
                 // server has the right to maintain consistency.
                 getController().work(unit, colonyTile);
+                if (unit.getLocation() != colonyTile) return false;
                 // Now recheck, and see if we want to change to the
                 // expected work type.
                 if (workType != null
@@ -2180,12 +2174,9 @@ public final class ColonyPanel extends PortPanel
                 Container oldParent = comp.getParent();
                 if (editState) {
                     if (comp instanceof UnitLabel) {
-                        if (tryWork(((UnitLabel) comp).getUnit())) {
-                            oldParent.remove(comp);
-                            ((UnitLabel) comp).setSmall(false);
-                        } else {
-                            return null;
-                        }
+                        UnitLabel label = (UnitLabel)comp;
+                        if (!tryWork(label.getUnit())) return null;
+                        label.setSmall(false);
                     } else {
                         logger.warning("An invalid component was dropped"
                                        + " on this ASingleTilePanel.");
