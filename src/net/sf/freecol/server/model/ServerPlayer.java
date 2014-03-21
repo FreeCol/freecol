@@ -1314,15 +1314,19 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     public void csPayUpkeep(Random random, ChangeSet cs) {
-        Disaster bankruptcy = getSpecification().getDisaster(Disaster.BANKRUPTCY);
+        final Specification spec = getSpecification();
+        final Disaster bankruptcy = spec.getDisaster(Disaster.BANKRUPTCY);
+
+        boolean changed = false;
         int upkeep = 0;
         for (Settlement settlement : getSettlements()) {
             upkeep += settlement.getUpkeep();
         }
-        if (getGold() >= upkeep) {
+        if (checkGold(upkeep)) {
             modifyGold(-upkeep);
             if (getBankrupt()) {
                 setBankrupt(false);
+                changed = true;
                 // the only effects of a disaster that can be reversed
                 // are the modifiers
                 for (RandomChoice<Effect> effect: bankruptcy.getEffects()) {
@@ -1331,21 +1335,22 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     }
                 }
                 cs.addMessage(See.only(this),
-                              new ModelMessage(ModelMessage.MessageType.GOVERNMENT_EFFICIENCY,
-                                               "model.disaster.bankruptcy.stop", this));
+                    new ModelMessage(ModelMessage.MessageType.GOVERNMENT_EFFICIENCY,
+                                     "model.disaster.bankruptcy.stop", this));
             }
         } else {
             modifyGold(-getGold());
             if (!getBankrupt()) {
                 setBankrupt(true);
+                changed = true;
                 csApplyDisaster(random, null, bankruptcy, cs);
                 cs.addMessage(See.only(this),
-                              new ModelMessage(ModelMessage.MessageType.GOVERNMENT_EFFICIENCY,
-                                               "model.disaster.bankruptcy.start", this));
+                    new ModelMessage(ModelMessage.MessageType.GOVERNMENT_EFFICIENCY,
+                                     "model.disaster.bankruptcy.start", this));
             }
         }
-        cs.addPartial(See.only(this), this, "bankrupt");
-        cs.addPartial(See.only(this), this, "gold");
+        if (upkeep > 0) cs.addPartial(See.only(this), this, "gold");
+        if (changed) cs.addPartial(See.only(this), this, "bankrupt");
     }
 
     public void csNaturalDisasters(Random random, ChangeSet cs, int probability) {
@@ -1400,9 +1405,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
         StringBuffer sb = new StringBuffer(64);
         sb.append("Applying ").append(disaster.getNumberOfEffects())
             .append(" effect/s of disaster ")
-            .append(Messages.getName(disaster))
-            .append(" to ").append(colony.getName())
-            .append(":");
+            .append(Messages.getName(disaster));
+        if (colony != null) sb.append(" to ").append(colony.getName());
+        sb.append(":");
         List<Effect> effects = new ArrayList<Effect>();
         switch (disaster.getNumberOfEffects()) {
         case ONE:
