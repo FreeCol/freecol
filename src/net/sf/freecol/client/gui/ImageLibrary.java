@@ -77,6 +77,8 @@ public final class ImageLibrary {
 
     private static final Logger logger = Logger.getLogger(ImageLibrary.class.getName());
 
+    public static final String CROSS = "\u271D";
+
     public static final String UNIT_SELECT = "unitSelect.image",
                                DELETE = "delete.image",
                                PLOWED = "model.improvement.plow.image",
@@ -719,7 +721,7 @@ public final class ImageLibrary {
             if (foreground == null) {
                 foreground = (expert) ? Color.BLACK : Color.GRAY;
             }
-            img = createChip("\u271D", Color.BLACK, background, foreground);
+            img = createChip(CROSS, Color.BLACK, background, foreground);
             ResourceManager.addGameMapping(key, new ImageResource(img));
         }
         return img;

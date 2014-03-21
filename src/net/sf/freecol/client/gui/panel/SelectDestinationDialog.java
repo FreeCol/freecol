@@ -165,6 +165,14 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
             final String sep = ", ";
             final Player owner = unit.getOwner();
             StringBuffer sb = new StringBuffer(32);
+            boolean dropSep = false;
+
+            // Always show our missions, it may influence our choice of
+            // units to bring, and/or goods.
+            if (loc instanceof IndianSettlement
+                && ((IndianSettlement)loc).hasMissionary(owner)) {
+                sb.append(ImageLibrary.CROSS);
+            }
 
             if (loc instanceof Europe && !goodsTypes.isEmpty()) {
                 Market market = owner.getMarket();
@@ -172,6 +180,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
                     sb.append(Messages.getName(goodsType)).append(" ")
                         .append(market.getSalePrice(goodsType, 1))
                         .append(sep);
+                    dropSep = true;
                 }
 
             } else if (loc instanceof Settlement
@@ -182,41 +191,58 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
                 && ((Settlement)loc).getOwner().atWarWith(owner)) {
                 sb.append("[").append(Messages.message("model.stance.war"))
                     .append("]");
-                return sb.toString();
 
-            } else if (loc instanceof Settlement && !goodsTypes.isEmpty()) {
-                for (GoodsType g : goodsTypes) {
-                    String sale = owner.getLastSaleString((Settlement)loc, g);
-                    if (sale != null) {
-                        sb.append(Messages.getName(g)).append(" ")
-                            .append(sale);
-                    } else if (loc instanceof IndianSettlement) {
-                        GoodsType[] wanted
-                            = ((IndianSettlement)loc).getWantedGoods();
-                        if (wanted.length > 0 && g == wanted[0]) {
-                            sb.append(Messages.getName(g)).append("***");
-                        } else if (wanted.length > 1 && g == wanted[1]) {
-                            sb.append(Messages.getName(g)).append("**");
-                        } else if (wanted.length > 2 && g == wanted[2]) {
-                            sb.append(Messages.getName(g)).append("*");
+            } else if (loc instanceof Settlement) {
+                if (loc instanceof IndianSettlement) {
+                    // Show skill if relevant
+                    IndianSettlement is = (IndianSettlement)loc;
+                    UnitType sk = is.getLearnableSkill();
+                    if (sk != null) {
+                        Unit up = (unit.getType().canBeUpgraded(sk,
+                                ChangeType.NATIVES)) ? unit : null;
+                        if (unit.isCarrier()) {
+                            for (Unit u : unit.getUnitList()) {
+                                if (u.getType().canBeUpgraded(sk,
+                                        ChangeType.NATIVES)) {
+                                    up = u;
+                                    break;
+                                }
+                            }
                         }
-                    } else continue;
-                    sb.append(sep);                             
+                        if (up != null) {
+                            sb.append("[").append(Messages.getName(sk))
+                                .append("]");
+                        }
+                    }
                 }
-
-            } else if (loc instanceof IndianSettlement) {
-                IndianSettlement indianSettlement = (IndianSettlement) loc;
-                UnitType sk = indianSettlement.getLearnableSkill();
-                if (sk != null
-                    && unit.getType().canBeUpgraded(sk, ChangeType.NATIVES)) {
-                    sb.append("[").append(Messages.getName(sk)).append("]");
-                    return sb.toString();
+                if (!goodsTypes.isEmpty()) {
+                    // Show goods prices if relevant
+                    for (GoodsType g : goodsTypes) {
+                        String sale = owner.getLastSaleString((Settlement)loc, g);
+                        String more = null;
+                        if (loc instanceof IndianSettlement) {
+                            GoodsType[] wanted
+                                = ((IndianSettlement)loc).getWantedGoods();
+                            if (wanted.length > 0 && g == wanted[0]) {
+                                more = "***";
+                            } else if (wanted.length > 1 && g == wanted[1]) {
+                                more = "**";
+                            } else if (wanted.length > 2 && g == wanted[2]) {
+                                more = "*";
+                            }
+                        }
+                        if (sale != null && more != null) {
+                            sb.append(Messages.getName(g));
+                            if (sale != null) sb.append(" ").append(sale);
+                            if (more != null) sb.append(more);
+                            sb.append(sep);
+                            dropSep = true;
+                        }
+                    }
                 }
-            }
+            } // else do nothing
 
-            if (sb.length() > sep.length()) {
-                sb.setLength(sb.length() - sep.length());
-            }
+            if (dropSep) sb.setLength(sb.length() - sep.length());
             return sb.toString();
         }
 
