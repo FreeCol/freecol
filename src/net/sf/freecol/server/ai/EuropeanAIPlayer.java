@@ -2086,6 +2086,7 @@ public class EuropeanAIPlayer extends AIPlayer {
     protected void doMissions() {
         List<AIUnit> aiUnits = getAIUnits();
         for (AIUnit aiu : aiUnits) {
+            logger.log(Level.FINEST, "doMissions(normal): " + aiu);
             if (aiu.getMission() instanceof TransportMission) continue;
             try {
                 aiu.doMission();
@@ -2094,6 +2095,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
         }
         for (AIUnit aiu : aiUnits) {
+            logger.log(Level.FINEST, "doMissions(transport): " + aiu);
             if (!(aiu.getMission() instanceof TransportMission)) continue;
             try {
                 aiu.doMission();

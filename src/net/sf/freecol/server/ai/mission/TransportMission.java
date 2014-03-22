@@ -1517,22 +1517,22 @@ public class TransportMission extends Mission {
     }
 
     /**
-     * Why would this mission be invalid with a given transportable?
-     * Checks the transportable locations.
+     * Why would this mission be invalid with a given cargo?
+     * Checks the cargo locations.
      * A location becomes invalid if:
      *   - step is a null location
      *   - step is disposed
      *   - step is a captured settlement
      *
      * @param aiUnit The <code>AIUnit</code> to test.
-     * @param t The <code>Transportable</code> to test.
+     * @param cargo The <code>Cargo</code> to test.
      * @return A reason why the mission would be invalid,
      *     or null if none found.
      */
-    private static String invalidTransportableReason(AIUnit aiUnit, 
-                                                     Transportable t) {
+    private static String invalidCargoReason(AIUnit aiUnit, Cargo cargo) {
         final Unit carrier = aiUnit.getUnit();
         final Player owner = carrier.getOwner();
+        final Transportable t = cargo.getTransportable();
         final Locatable l = t.getTransportLocatable();
         if (l == null) {
             return "null-transportable";
@@ -1554,7 +1554,12 @@ public class TransportMission extends Mission {
         }
         Location dst = t.getTransportDestination();
         if (dst == null) {
-            return "transportable-destination-missing";
+            // Destination is null if we have arrived, but that should not
+            // invalidate a transport mission as we still have to unload!
+            if (!Map.isSameLocation(cargo.getTarget(),
+                                    carrier.getLocation())) {
+                return "transportable-destination-missing";
+            }
         } else if (((FreeColGameObject)dst).isDisposed()) {
             return "transportable-destination-disposed";
         } else if (((dst instanceof Settlement)
@@ -1603,7 +1608,7 @@ public class TransportMission extends Mission {
         Cargo cargo;
         return (reason != null) ? reason
             : ((cargo = tFirst()) == null) ? null
-            : invalidTransportableReason(aiUnit, cargo.getTransportable());
+            : invalidCargoReason(aiUnit, cargo);
     }
 
     // Not a one-time mission, omit isOneTime().

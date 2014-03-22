@@ -530,7 +530,7 @@ public class AIUnit extends AIObject implements Transportable {
         final Unit carrier = unit.getCarrier();
         boolean result = (direction != null) ? move(direction)
             : AIMessage.askDisembark(this)
-            && unit.getLocation() == carrier.getTile();
+            && unit.getLocation() == carrier.getLocation();
 
         if (result) {
             Colony colony = unit.getColony();
@@ -564,14 +564,6 @@ public class AIUnit extends AIObject implements Transportable {
                                           true, false);
             }
             retargetTransport();
-
-            AIPlayer owner = getAIOwner();
-            if (owner instanceof EuropeanAIPlayer) {
-                if (!((EuropeanAIPlayer)owner).claimTransportable(this, old)) {
-                    logger.warning("Could not claim transportable from " + old
-                        + ": " + this);
-                }
-            }
         }
         return result;
     }

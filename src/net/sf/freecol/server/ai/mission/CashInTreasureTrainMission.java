@@ -186,22 +186,20 @@ public class CashInTreasureTrainMission extends Mission {
         if (invalidAIUnitReason(aiUnit) != null) return null;
         final Unit unit = aiUnit.getUnit();
         final Tile startTile = unit.getPathStartTile();
-        if (startTile == null) return null;
-        
-        // Not on the map?  Europe *must* be viable, so go there
-        // (return null for now, path still impossible).
-        PathNode path;
         final Player player = unit.getOwner();
         final Europe europe = player.getEurope();
         final Unit carrier = unit.getCarrier();
         final CostDecider standardCd
             = CostDeciders.avoidSettlementsAndBlockingUnits();
+        PathNode path;
 
-        if (player.getNumberOfSettlements() <= 0) {
-            // No settlements, so go straight to Europe.  If Europe does
-            // not exist then this mission is doomed.
+        if (player.getNumberOfSettlements() <= 0 || startTile == null) {
+            // No settlements or not on the map, so go straight to
+            // Europe.  If Europe does not exist then this mission is
+            // doomed.
             return (europe == null) ? null
-                : unit.findPath(startTile, europe, carrier, standardCd);
+                : unit.findPath(unit.getLocation(), europe, carrier,
+                                standardCd);
         }
 
         // Can the unit get to a cash in site?
@@ -384,9 +382,10 @@ public class CashInTreasureTrainMission extends Mission {
         }
 
         // Go to the target.
-        if (travelToTarget(tag, getTarget(),
-                CostDeciders.avoidSettlementsAndBlockingUnits())
-            != Unit.MoveType.MOVE) return;
+        Unit.MoveType mt = travelToTarget(tag, getTarget(),
+            CostDeciders.avoidSettlementsAndBlockingUnits());
+logger.finest(tag + " travel=" + mt + ": " + this);
+        if (mt != Unit.MoveType.MOVE) return;
 
         // Cash in now if:
         // - already in Europe
@@ -399,43 +398,52 @@ public class CashInTreasureTrainMission extends Mission {
         final Europe europe = player.getEurope();
         if (unit.canCashInTreasureTrain()) {
             AIUnit aiCarrier = aiUnit.getTransport();
-            List<Unit> carriers = player.getCarriersForUnit(unit);
-            if (unit.isInEurope()
-                || europe == null
-                || unit.getTransportFee() == 0
-                || (aiCarrier == null && carriers.isEmpty())) {
-                if (AIMessage.askCashInTreasureTrain(aiUnit)) {
-                    logger.finest(tag + " completed cash in at "
-                        + upLoc(unit.getLocation()) + ": " + this);
-                } else {
-                    logger.warning(tag + " failed to cash in at "
-                        + upLoc(unit.getLocation()) + ": " + this);
-                }
-            } else if (aiCarrier != null) {
+            if (aiCarrier != null) {
                 logger.finest(tag + " queued for Europe with carrier: "
                     + aiCarrier); // Let the carrier do its job
             } else {
-                setTarget(europe);
-                // Pick the closest carrier and forcibly add this unit.
-                int turns = INFINITY;
-                Unit closest = null;
-                for (Unit c : carriers) {
-                    int t = c.getTurnsToReach(unit.getLocation());
-                    if (turns > t) {
-                        turns = t;
-                        closest = c;
+                List<Unit> carriers = player.getCarriersForUnit(unit);
+                boolean cashin = unit.isInEurope()
+                    || europe == null
+                    || unit.getTransportFee() == 0
+                    || (aiCarrier == null && carriers.isEmpty());
+                if (!cashin) {
+                    setTarget(europe);
+                    // Pick the closest carrier and forcibly add this unit.
+                    int turns = INFINITY;
+                    Unit closest = null;
+                    for (Unit c : carriers) {
+                        int t = c.getTurnsToReach(unit.getLocation());
+                        if (turns > t) {
+                            turns = t;
+                            closest = c;
+                        }
+                    }
+                    final AIMain aiMain = getAIMain();
+                    if (closest == null // No suitable carrier
+                        || (aiCarrier = aiMain.getAIUnit(closest)) == null) {
+                        cashin = true;
+                    } else {
+                        Mission m = aiCarrier.getMission();
+                        if (!(m instanceof TransportMission)) {
+                            m = new TransportMission(aiMain, aiCarrier);
+                            aiCarrier.setMission(m);
+                        }
+                        ((TransportMission)m).queueTransportable(aiUnit, false);
+                        logger.finest(tag + " at " + upLoc(unit.getLocation())
+                            + " retargeting Europe with " + aiCarrier
+                            + ": " + this);
                     }
                 }
-                final AIMain aiMain = getAIMain();
-                aiCarrier = aiMain.getAIUnit(closest);
-                Mission m = aiCarrier.getMission();
-                if (!(m instanceof TransportMission)) {
-                    m = new TransportMission(aiMain, aiCarrier);
-                    aiCarrier.setMission(m);
+                if (cashin) {
+                    if (AIMessage.askCashInTreasureTrain(aiUnit)) {
+                        logger.finest(tag + " completed cash in at "
+                            + upLoc(unit.getLocation()) + ": " + this);
+                    } else {
+                        logger.warning(tag + " failed to cash in at "
+                            + upLoc(unit.getLocation()) + ": " + this);
+                    }
                 }
-                ((TransportMission)m).queueTransportable(aiUnit, false);
-                logger.finest(tag + " at " + upLoc(unit.getLocation())
-                    + " retargeting Europe with " + aiCarrier + ": " + this);
             }
         } else {
             retargetMission(tag, "arrived at "
