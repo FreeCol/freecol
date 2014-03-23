@@ -694,9 +694,13 @@ public class Messages {
     public static StringTemplate getLabelTemplate(Unit unit) {
         UnitType type = unit.getType();
         Role role = unit.getRole();
-        Role defaultRole = unit.getSpecification().getDefaultRole();
+        Player owner = unit.getOwner();
+        if (type == null || role == null || owner == null) {
+            return null; // Probably disposed
+        }
 
-        String nationName = getName(unit.getOwner().getNation());
+        Role defaultRole = unit.getSpecification().getDefaultRole();
+        String nationName = getName(owner.getNation());
         String unitName = getName(type);
         String roleName = getName(role);
         String extra = unitName;
