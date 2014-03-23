@@ -2083,7 +2083,7 @@ public class EuropeanAIPlayer extends AIPlayer {
 
     // Diplomacy support
 
-    private double getStrengthRatio(Player other) {
+    protected double getStrengthRatio(Player other) {
         NationSummary ns = AIMessage.askGetNationSummary(this, other);
         int strength = getPlayer().calculateStrength(false);
         return (double)strength / (strength + ns.getMilitaryStrength());

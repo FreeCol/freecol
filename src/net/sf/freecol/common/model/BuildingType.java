@@ -119,6 +119,13 @@ public final class BuildingType extends BuildableType
         return priority;
     }
 
+    /**
+     * Gets the reason why a given unit type can not be added to a
+     * building of this type.
+     *
+     * @param unitType The <code>UnitType</code> to test.
+     * @return The reason why adding would fail.
+     */
     public NoAddReason getNoAddReason(UnitType unitType) {
         if (workPlaces == 0) {
             return NoAddReason.CAPACITY_EXCEEDED;
@@ -132,7 +139,6 @@ public final class BuildingType extends BuildableType
             return NoAddReason.NONE;
         }
     }
-
 
     /**
      * Can a unit of a given type be added to a Building of this type?
