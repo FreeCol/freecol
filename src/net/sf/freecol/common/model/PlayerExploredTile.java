@@ -122,6 +122,11 @@ public class PlayerExploredTile extends FreeColGameObject {
      * something credible.
      */
     public void fixCache() {
+        if (!getSpecification().getBoolean(GameOptions.FOG_OF_WAR)) {
+            tile.setCachedTile(player, tile);
+            return;
+        }
+
         Tile copied = tile.getTileToCache();
         boolean ok = true;
         if (tile.getOwner() != owner) {

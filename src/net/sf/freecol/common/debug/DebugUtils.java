@@ -603,40 +603,39 @@ public class DebugUtils {
         final GUI gui = freeColClient.getGUI();
 
         boolean problemDetected = false;
-        StringBuilder sb = new StringBuilder("Desynchronization detected\n\n");
+        StringBuilder sb = new StringBuilder("Desynchronization detected\n");
         for (Tile t : sMap.getAllTiles()) {
-            if (sPlayer.canSee(t)) {
-                for (Unit u : t.getUnitList()) {
-                    if (!sPlayer.owns(u)
-                        && (t.hasSettlement() || u.isOnCarrier())) continue;
-                    if (game.getFreeColGameObject(u.getId(), Unit.class) == null) {
-                        sb.append("Unit missing on client-side.\n");
-                        sb.append("  Server: ");
-                        sb.append(Messages.message(u.getFullLabel())
+            if (!sPlayer.canSee(t)) continue;
+            for (Unit u : t.getUnitList()) {
+                if (!sPlayer.owns(u)
+                    && (t.hasSettlement() || u.isOnCarrier())) continue;
+                if (game.getFreeColGameObject(u.getId(), Unit.class) == null) {
+                    sb.append("Unit missing on client-side.\n");
+                    sb.append("  Server: ");
+                    sb.append(Messages.message(u.getFullLabel())
+                        + "(" + u.getId() + ") from: "
+                        + u.getLocation().getId() + ".\n");
+                    try {
+                        sb.append("  Client: "
+                            + map.getTile(u.getTile().getX(),
+                                u.getTile().getY())
+                            .getFirstUnit().getId() + "\n");
+                    } catch (NullPointerException npe) {}
+                    problemDetected = true;
+                } else {
+                    Unit cUnit = game.getFreeColGameObject(u.getId(),
+                                                           Unit.class);
+                    if (cUnit.hasTile()
+                        && !cUnit.getTile().getId().equals(u.getTile().getId())) {
+                        sb.append("Unit located on different tiles.\n");
+                        sb.append("  Server: " + Messages.message(u.getFullLabel())
                             + "(" + u.getId() + ") from: "
-                            + u.getLocation().getId() + ".\n");
-                        try {
-                            sb.append("  Client: "
-                                + map.getTile(u.getTile().getX(),
-                                              u.getTile().getY())
-                                .getFirstUnit().getId() + "\n");
-                        } catch (NullPointerException npe) {}
+                            + u.getLocation().getId() + "\n");
+                        sb.append("  Client: "
+                            + Messages.message(cUnit.getFullLabel())
+                            + "(" + cUnit.getId() + ") at: "
+                            + cUnit.getLocation().getId() + "\n");
                         problemDetected = true;
-                    } else {
-                        Unit cUnit = game.getFreeColGameObject(u.getId(),
-                                                               Unit.class);
-                        if (cUnit.hasTile()
-                            && !cUnit.getTile().getId().equals(u.getTile().getId())) {
-                            sb.append("Unit located on different tiles.\n");
-                            sb.append("  Server: " + Messages.message(u.getFullLabel())
-                                + "(" + u.getId() + ") from: "
-                                + u.getLocation().getId() + "\n");
-                            sb.append("  Client: "
-                                + Messages.message(cUnit.getFullLabel())
-                                + "(" + cUnit.getId() + ") at: "
-                                + cUnit.getLocation().getId() + "\n");
-                            problemDetected = true;
-                        }
                     }
                 }
             }
@@ -659,7 +658,6 @@ public class DebugUtils {
             freeColClient.getGUI().showInformationMessage(err);
             logger.severe(err);
         }
-System.err.println("PROB = " + problemDetected);
         return problemDetected;
     }
 

@@ -911,7 +911,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
      * @param cs A <code>ChangeSet</code> to update.
      */
     public void csMove(Tile newTile, Random random, ChangeSet cs) {
-        ServerPlayer serverPlayer = (ServerPlayer) getOwner();
+        final ServerPlayer serverPlayer = (ServerPlayer)getOwner();
 
         // Plan to update tiles that could not be seen before but will
         // now be within the line-of-sight.
