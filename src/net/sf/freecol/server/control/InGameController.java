@@ -4005,8 +4005,8 @@ public final class InGameController extends Controller {
                                UnitState state) {
         ChangeSet cs = new ChangeSet();
 
-        Tile tile;
-        if (state == UnitState.FORTIFYING && (tile = unit.getTile()) != null) {
+        Tile tile = unit.getTile();
+        if (state == UnitState.FORTIFYING && tile != null) {
             ServerColony colony = (tile.getOwningSettlement() instanceof Colony)
                 ? (ServerColony) tile.getOwningSettlement()
                 : null;
@@ -4022,7 +4022,12 @@ public final class InGameController extends Controller {
         }
 
         unit.setState(state);
-        cs.add(See.perhaps(), (FreeColGameObject)unit.getLocation());
+        Location loc = unit.getLocation();
+        if (tile != null && tile.getIndianSettlement() != null) {
+            cs.add(See.only((ServerPlayer)unit.getOwner()), tile);
+        } else {
+            cs.add(See.perhaps(), (FreeColGameObject)loc);
+        }
 
         // Others might be able to see the unit.
         sendToOthers(serverPlayer, cs);
