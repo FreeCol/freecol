@@ -52,27 +52,36 @@ public class GrayLayer extends Component {
     /** Font size decrement for message text to reduce length */
     private static final int FONT_SIZE_DECREMENT = 2;
     /**
-     * Maximum text width to show. This is additional constraint to the
-     * component's bounds
+     * Maximum text width to show.  This is additional constraint to
+     * the component's bounds
      */
     private static final int MAX_TEXT_WIDTH = 640;
 
+    /** The client for this FreeCol game */
+    private FreeColClient freeColClient;
     /** Image library for icon lookup */
     private ImageLibrary imageLibrary;
     /** Player object or <code>null</code> */
     private Player player;
-    /** The client for this FreeCol game */
-    private FreeColClient freeColClient;
 
-    public GrayLayer(ImageLibrary imageLibrary, FreeColClient freeColClient) {
-        this.imageLibrary = imageLibrary;
-        this.freeColClient = freeColClient;
-    }
 
     /**
-     * Executes painting. The method shadows the background image, and
+     * Create a gray layer.
+     *
+     * @param imageLibrary The <code>ImageLibrary</code> to use.
+     * @param freeColClient The client for the game.
+     */
+    public GrayLayer(FreeColClient freeColClient, ImageLibrary imageLibrary) {
+        this.freeColClient = freeColClient;
+        this.imageLibrary = imageLibrary;
+    }
+
+
+    /**
+     * Executes painting.  The method shadows the background image, and
      * paints the message with icon (if available) and text.
-     * @param g a <code>Graphics</code> value
+     *
+     * @param g The <code>Graphics</code> to paint on.
      */
     @Override
     public void paint(Graphics g) {
@@ -91,26 +100,26 @@ public class GrayLayer extends Component {
             g.fillRect(clipArea.x, clipArea.y, clipArea.width, clipArea.height);
         }
 
+        ImageIcon coatOfArmsIcon = null;
+        String message = null;
+        Color colour = null;
+
         if (player == null) {
-            // we are done, no player information
-            return;
-        }
+            message = Messages.message(freeColClient.getGame().getTurn()
+                .getLabel());
+            colour = Color.WHITE;
 
-        ImageIcon coatOfArmsIcon = imageLibrary
+        } else {
+            coatOfArmsIcon = imageLibrary
                 .getCoatOfArmsImageIcon(player.getNation());
-
-        Rectangle iconBounds = new Rectangle();
-        if (coatOfArmsIcon != null) {
-            iconBounds.width = coatOfArmsIcon.getIconWidth();
-            iconBounds.height = coatOfArmsIcon.getIconHeight();
+            StringTemplate t = StringTemplate.template("waitingFor")
+                .addStringTemplate("%nation%", player.getNationName());
+            message = Messages.message(t);
+            colour = player.getNationColor();
         }
 
         Font nameFont = getFont();
         FontMetrics nameFontMetrics = getFontMetrics(nameFont);
-        StringTemplate t = StringTemplate.template("waitingFor")
-            .addStringTemplate("%nation%", player.getNationName());
-        String message = Messages.message(t);
-
         Rectangle textBounds;
         int fontSize = DEFAULT_FONT_SIZE;
         int maxWidth = Math.min(MAX_TEXT_WIDTH, getSize().width);
@@ -124,37 +133,37 @@ public class GrayLayer extends Component {
 
         Dimension size = getSize();
         textBounds.x = (size.width - textBounds.width) / 2;
-        textBounds.y = size.height - InfoPanel.PANEL_HEIGHT - 2 * textBounds.height;
-
-        iconBounds.x = (size.width - iconBounds.width) / 2;
-        iconBounds.y = textBounds.y + 3 * textBounds.height / 2;
+        textBounds.y = size.height - InfoPanel.PANEL_HEIGHT
+            - 2 * textBounds.height;
 
         if (textBounds.intersects(clipArea)) {
             // show message
             g.setFont(nameFont);
-            g.setColor(player.getNationColor());
+            g.setColor(colour);
             g.drawString(message, textBounds.x, textBounds.y
                     + textBounds.height);
         }
-        if (coatOfArmsIcon != null && iconBounds.intersects(clipArea)) {
-            // show icon
-            coatOfArmsIcon.paintIcon(this, g, iconBounds.x, iconBounds.y);
+        if (coatOfArmsIcon != null) {
+            Rectangle iconBounds = new Rectangle();
+            iconBounds.width = coatOfArmsIcon.getIconWidth();
+            iconBounds.height = coatOfArmsIcon.getIconHeight();
+            iconBounds.x = (size.width - iconBounds.width) / 2;
+            iconBounds.y = textBounds.y + 3 * textBounds.height / 2;
+            if (iconBounds.intersects(clipArea)) {
+                // show icon
+                coatOfArmsIcon.paintIcon(this, g, iconBounds.x, iconBounds.y);
+            }
         }
     }
 
     /**
-     * Set the player for which we paint. If the player is already set, then
-     * nothing happens, otherwise a repaint event is sent.
+     * Set the player for which we paint.  If the player is already
+     * set, then nothing happens, otherwise a repaint event is sent.
      *
-     * @param player
-     *            Player for status information
-     *
-     * @see #paint(Graphics)
+     * @param player The <code>Player</code> for status information.
      */
     public void setPlayer(Player player) {
-        if (this.player == player) {
-            return;
-        }
+        if (this.player == player) return;
         this.player = player;
         repaint();
     }

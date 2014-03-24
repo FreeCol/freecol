@@ -218,12 +218,11 @@ public class ServerGame extends Game implements ServerModelObject {
 
 
     /**
-     * New turn for this game.
+     * Change to the next turn for this game.
      *
-     * @param random A <code>Random</code> number source.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    public void csNewTurn(Random random, ChangeSet cs) {
+    public void csNextTurn(ChangeSet cs) {
         String duration = null;
         long now = new Date().getTime();
         if (lastTime >= 0) {
@@ -233,23 +232,29 @@ public class ServerGame extends Game implements ServerModelObject {
 
         TransactionSession.completeAll(cs);
         setTurn(getTurn().next());
-        logger.finest("ServerGame.csNewTurn, turn is "
-            + getTurn().toString() + duration);
+        logger.finest("Turn is now " + getTurn().toString() + duration);
         cs.addTrivial(See.all(), "newTurn", ChangePriority.CHANGE_NORMAL,
                       "turn", Integer.toString(getTurn().getNumber()));
+    }
 
+    /**
+     * Build the updates for a new turn for all the players in this game.
+     *
+     * @param random A <code>Random</code> number source.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    public void csNewTurn(Random random, ChangeSet cs) {
         for (Player player : getPlayers()) {
             if (!player.isUnknownEnemy() && !player.isDead()) {
-                ((ServerPlayer) player).csNewTurn(random, cs);
+                ((ServerPlayer)player).csNewTurn(random, cs);
             }
         }
 
-        Event spanishSuccession = getSpecification().getEvent("model.event.spanishSuccession");
-        if (spanishSuccession != null && !getSpanishSuccession()) {
-            Limit yearLimit = spanishSuccession.getLimit("model.limit.spanishSuccession.year");
-            if (yearLimit.evaluate(this)) {
-                csSpanishSuccession(cs, spanishSuccession);
-            }
+        final Specification spec = getSpecification();
+        Event succession = spec.getEvent("model.event.spanishSuccession");
+        if (succession != null && !getSpanishSuccession()) {
+            Limit yearLimit = succession.getLimit("model.limit.spanishSuccession.year");
+            if (yearLimit.evaluate(this)) csSpanishSuccession(cs, succession);
         }
     }
 

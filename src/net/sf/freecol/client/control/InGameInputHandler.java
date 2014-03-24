@@ -984,6 +984,9 @@ public final class InGameInputHandler extends InputHandler {
                 }
             });
 
+        igc().setCurrentPlayer(null);
+        refreshCanvas(false);
+
         SwingUtilities.invokeLater(updateMenuBarRunnable);
         return null;
     }

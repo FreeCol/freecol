@@ -2188,7 +2188,9 @@ public final class MapViewer {
             && freeColClient.getGame() != null
             && !freeColClient.currentPlayerIsMyPlayer()) {
 
-            if (greyLayer == null) greyLayer = new GrayLayer(lib, freeColClient);
+            if (greyLayer == null) {
+                greyLayer = new GrayLayer(freeColClient, lib);
+            }
             if (greyLayer.getParent() == null) { // Not added to the canvas yet.
                 canvas.add(greyLayer, JLayeredPane.DRAG_LAYER);
             }

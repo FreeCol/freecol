@@ -694,8 +694,7 @@ public final class FreeColClient {
         return inGame
             && game != null
             && player != null
-            && game.getCurrentPlayer() != null
-            && game.getCurrentPlayer().equals(player);
+            && player.equals(game.getCurrentPlayer());
     }
 
     /**

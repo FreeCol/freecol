@@ -726,6 +726,10 @@ public final class InGameController extends Controller {
             // Check for new turn
             ChangeSet cs = new ChangeSet();
             if (game.isNextPlayerInNewTurn()) {
+                ChangeSet next = new ChangeSet();
+                game.csNextTurn(next);
+                sendToAll(next);
+
                 game.csNewTurn(random, cs);
                 if (debugOnlyAITurns > 0) {
                     if (--debugOnlyAITurns <= 0) {

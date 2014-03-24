@@ -4256,7 +4256,7 @@ public final class InGameController implements NetworkConstants {
      * @param player The <code>Player</code> to be the new current player.
      */
     public void setCurrentPlayer(Player player) {
-        logger.finest("Entering client setCurrentPlayer: " + player.getName());
+        logger.finest("Entering client setCurrentPlayer: " + player);
 
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
             && freeColClient.currentPlayerIsMyPlayer()) {
@@ -4316,7 +4316,7 @@ public final class InGameController implements NetworkConstants {
         }
         freeColClient.updateActions();
 
-        logger.finest("Exiting client setCurrentPlayer: " + player.getName());
+        logger.finest("Exiting client setCurrentPlayer: " + player);
     }
 
     /**
