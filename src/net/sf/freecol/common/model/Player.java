@@ -2565,8 +2565,10 @@ public class Player extends FreeColGameObject implements Nameable {
      *     <code>Player</code>.
      */
     public List<ModelMessage> getNewModelMessages() {
+        Iterator<ModelMessage> messageIterator = modelMessages.iterator();
         List<ModelMessage> out = new ArrayList<ModelMessage>();
-        for (ModelMessage message : modelMessages) {
+        while (messageIterator.hasNext()) {
+            ModelMessage message = messageIterator.next();
             if (message.hasBeenDisplayed()) continue;
             out.add(message); // preserve message order
         }
