@@ -610,16 +610,16 @@ public class DebugUtils {
                 if (!sPlayer.owns(u)
                     && (t.hasSettlement() || u.isOnCarrier())) continue;
                 if (game.getFreeColGameObject(u.getId(), Unit.class) == null) {
-                    sb.append("Unit missing on client-side.\n");
-                    sb.append("  Server: ");
-                    sb.append(Messages.message(u.getFullLabel())
-                        + "(" + u.getId() + ") from: "
-                        + u.getLocation().getId() + ".\n");
+                    sb.append("Unit missing on client-side.\n")
+                        .append("  Server: ")
+                        .append(Messages.message(u.getFullLabel()))
+                        .append("(").append(u.getId()).append(") from: ")
+                        .append(u.getLocation().getId()).append(".\n");
                     try {
-                        sb.append("  Client: "
-                            + map.getTile(u.getTile().getX(),
-                                u.getTile().getY())
-                            .getFirstUnit().getId() + "\n");
+                        sb.append("  Client: ")
+                            .append(map.getTile(u.getTile().getX(),
+                                    u.getTile().getY()).getFirstUnit().getId())
+                            .append("\n");
                     } catch (NullPointerException npe) {}
                     problemDetected = true;
                 } else {
@@ -627,17 +627,40 @@ public class DebugUtils {
                                                            Unit.class);
                     if (cUnit.hasTile()
                         && !cUnit.getTile().getId().equals(u.getTile().getId())) {
-                        sb.append("Unit located on different tiles.\n");
-                        sb.append("  Server: " + Messages.message(u.getFullLabel())
-                            + "(" + u.getId() + ") from: "
-                            + u.getLocation().getId() + "\n");
-                        sb.append("  Client: "
-                            + Messages.message(cUnit.getFullLabel())
-                            + "(" + cUnit.getId() + ") at: "
-                            + cUnit.getLocation().getId() + "\n");
+                        sb.append("Unit located on different tiles.\n")
+                            .append("  Server: ")
+                            .append(Messages.message(u.getFullLabel()))
+                            .append("(").append(u.getId()).append(") from: ")
+                            .append(u.getLocation().getId()).append("\n")
+                            .append("  Client: ")
+                            .append(Messages.message(cUnit.getFullLabel()))
+                            .append("(").append(cUnit.getId()).append(") at: ")
+                            .append(cUnit.getLocation().getId()).append("\n");
                         problemDetected = true;
                     }
                 }
+            }
+            Tile ct = game.getFreeColGameObject(t.getId(), Tile.class);
+            Settlement sSettlement = t.getSettlement();
+            Settlement cSettlement = ct.getSettlement();
+            if (sSettlement == null && cSettlement == null) {
+                ;// OK
+            } else if (sSettlement != null && cSettlement == null) {
+                sb.append("Settlement not present in client: ")
+                    .append(sSettlement.toString());
+                problemDetected = true;
+            } else if (sSettlement == null && cSettlement != null) { 
+                sb.append("Settlement still present in client: ")
+                    .append(cSettlement.toString());
+                problemDetected = true;
+            } else if (sSettlement.getId().equals(cSettlement.getId())) {
+                ;// OK
+            } else {
+                sb.append("Settlements differ.\n")
+                    .append("  Server: ")
+                    .append(sSettlement.toString()).append("\n")
+                    .append("  Client: ")
+                    .append(cSettlement.toString()).append("\n");
             }
         }
 
@@ -646,9 +669,10 @@ public class DebugUtils {
             GoodsType cg = game.getSpecification().getGoodsType(sg.getId());
             int cPrice = player.getMarket().getBidPrice(cg, 1);
             if (sPrice != cPrice) {
-                sb.append("Goods prices for " + sg + " differ.\n");
-                sb.append("  Server: " + sPrice + "\n");
-                sb.append("  Client: " + cPrice + "\n");
+                sb.append("Goods prices for ").append(sg.toString())
+                    .append(" differ.\n")
+                    .append("  Server: ").append(sPrice).append("\n")
+                    .append("  Client: ").append(cPrice).append("\n");
                 problemDetected = true;
             }
         }

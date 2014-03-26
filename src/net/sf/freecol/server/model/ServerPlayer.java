@@ -3307,6 +3307,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
         owner.invalidateCanSeeTiles();//+vis(owner)
         // Recache, should only show now cleared tiles to former owner.
         for (Tile t : owned) t.cacheUnseen();
+        // Center tile is special for native settlements.  Because
+        // native settlement tiles are *always* cached, the cache
+        // needs to be completely cleared for players that can see the
+        // settlement is gone.
+        if (settlement instanceof IndianSettlement) centerTile.seeTile();
     }
 
     /**

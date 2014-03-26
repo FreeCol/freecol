@@ -1378,6 +1378,17 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
+     * Set the players view of this tile to the tile itself if
+     * the player can see it.  Useful when the cache needs to be cleared
+     * forcibly such as when a native settlement is removed.
+     */
+    public void seeTile() {
+        for (Player p : getGame().getLiveEuropeanPlayers()) {
+            if (p.canSee(this)) seeTile(p);
+        }
+    }
+
+    /**
      * Set a players view of this tile to the tile itself.
      *
      * @param player The <code>Player</code> who owns the view.
@@ -1403,6 +1414,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         tile.clearUnitList();
         return tile;
     }
+
 
     /**
      * A change is about to occur on this tile.  Cache it if unseen.
