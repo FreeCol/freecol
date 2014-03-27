@@ -664,20 +664,27 @@ public class DebugUtils {
             }
         }
 
+        boolean goodsProblemDetected = false;
         for (GoodsType sg : sGame.getSpecification().getGoodsTypeList()) {
             int sPrice = sPlayer.getMarket().getBidPrice(sg, 1);
             GoodsType cg = game.getSpecification().getGoodsType(sg.getId());
             int cPrice = player.getMarket().getBidPrice(cg, 1);
             if (sPrice != cPrice) {
                 sb.append("Goods prices for ").append(sg.toString())
-                    .append(" differ.\n")
-                    .append("  Server: ").append(sPrice).append("\n")
-                    .append("  Client: ").append(cPrice).append("\n");
-                problemDetected = true;
+                    .append(" differ.\n");
+                goodsProblemDetected = true;
             }
+        }
+        if (goodsProblemDetected) {
+            sb.append("  Server:\n").append(sPlayer.getMarket().toString())
+                .append("\n")
+                .append("  Client:\n").append(player.getMarket().toString())
+                .append("\n");
+            problemDetected = true;
         }
 
         if (problemDetected) {
+            sb.setLength(sb.length()-1);
             String err = sb.toString();
             freeColClient.getGUI().showInformationMessage(err);
             logger.severe(err);
