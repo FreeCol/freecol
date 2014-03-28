@@ -252,8 +252,10 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     @Override
     public List<FreeColGameObject> disposeList() {
         List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
-        while (!units.isEmpty()) {
-            objects.addAll(units.remove(0).disposeList());
+        synchronized (units) {
+            while (!units.isEmpty()) {
+                objects.addAll(units.remove(0).disposeList());
+            }
         }
         objects.addAll(super.disposeList());
         return objects;
@@ -294,7 +296,9 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
             if (contains(unit)) {
                 return true;
             } else if (canAdd(unit)) {
-                return units.add(unit);
+                synchronized (units) {
+                    return units.add(unit);
+                }
             }
         } else if (locatable instanceof Goods) {
             // dumping goods is a valid action
@@ -314,7 +318,9 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      */
     public boolean remove(Locatable locatable) {
         if (locatable instanceof Unit) {
-            return units.remove((Unit)locatable);
+            synchronized (units) {
+                return units.remove((Unit)locatable);
+            }
         } else {
             logger.warning("Tried to remove non-Unit " + locatable
                            + " from UnitLocation: " + getId());
@@ -326,8 +332,10 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * {@inheritDoc}
      */
     public boolean contains(Locatable locatable) {
-        return (locatable instanceof Unit) ? units.contains((Unit)locatable)
-            : false;
+        if (!(locatable instanceof Unit)) return false;
+        synchronized (units) {
+            return units.contains((Unit)locatable);
+        }
     }
 
     /**
@@ -341,14 +349,18 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * {@inheritDoc}
      */
     public int getUnitCount() {
-        return units.size();
+        synchronized (units) {
+            return units.size();
+        }
     }
 
     /**
      * {@inheritDoc}
      */
     public List<Unit> getUnitList() {
-        return new ArrayList<Unit>(units);
+        synchronized (units) {
+            return new ArrayList<Unit>(units);
+        }
     }
 
     /**
@@ -415,14 +427,18 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * @param u The <code>Unit</code> to move to the front.
      */
     public void moveToFront(Unit u) {
-        if (units.remove(u)) units.add(0, u);
+        synchronized (units) {
+            if (units.remove(u)) units.add(0, u);
+        }
     }
 
     /**
      * Clear the units from this container.
      */
     protected void clearUnitList() {
-        units.clear();
+        synchronized (units) {
+            units.clear();
+        }
     }
 
     /**
@@ -444,9 +460,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         Unit unit = (locatable instanceof Unit) ? (Unit)locatable : null;
         return (unit == null)
             ? NoAddReason.WRONG_TYPE
-            : (units == null)
-            ? NoAddReason.CAPACITY_EXCEEDED
-            : (!isEmpty() && units.get(0).getOwner() != unit.getOwner())
+            : (!isEmpty() && getFirstUnit().getOwner() != unit.getOwner())
             ? NoAddReason.OCCUPIED_BY_ENEMY
             : (contains(unit))
             ? NoAddReason.ALREADY_PRESENT
@@ -509,8 +523,10 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        for (Unit unit : units) {
-            unit.toXML(xw);
+        synchronized (units) {
+            for (Unit unit : units) {
+                unit.toXML(xw);
+            }
         }
     }
 
@@ -520,7 +536,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
-        units.clear();
+        clearUnitList();
 
         super.readChildren(xr);
     }
@@ -533,7 +549,9 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         final String tag = xr.getLocalName();
 
         if (Unit.getXMLElementTagName().equals(tag)) {
-            units.add(xr.readFreeColGameObject(getGame(), Unit.class));
+            synchronized (units) {
+                units.add(xr.readFreeColGameObject(getGame(), Unit.class));
+            }
 
         } else {
             super.readChild(xr);
