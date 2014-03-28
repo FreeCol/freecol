@@ -312,9 +312,11 @@ public class MarketData extends FreeColGameObject {
      * the market, initial price and goods-type specific information.
      * Ensures that prices change incrementally with a clamping
      * mechanism.
+     *
+     * @return True if the price changes.
      */
-    public void price() {
-        if (!goodsType.isStorable()) return;
+    public boolean price() {
+        if (!goodsType.isStorable()) return false;
         int diff = goodsType.getPriceDifference();
         float amountPrice = initialPrice * (goodsType.getInitialAmount()
             / (float) amountInMarket);
@@ -368,8 +370,10 @@ public class MarketData extends FreeColGameObject {
             newPrice = newSalePrice + diff;
         }
 
+        int oldCostToBuy = costToBuy, oldPaidForSale = paidForSale;
         costToBuy = newPrice;
         paidForSale = newSalePrice;
+        return costToBuy != oldCostToBuy || paidForSale != oldPaidForSale;
     }
 
     /**

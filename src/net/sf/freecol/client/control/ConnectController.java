@@ -282,22 +282,23 @@ public final class ConnectController {
             Tile entryTile = (player.getEntryLocation() == null) ? null
                 : player.getEntryLocation().getTile();
             freeColClient.setSinglePlayer(msg.isSinglePlayer());
-            freeColClient.getPreGameController().startGame();
-            gui.setActiveUnit(null);
-
-            if (msg.isCurrentPlayer()) {
-                freeColClient.getInGameController()
-                    .setCurrentPlayer(player);
-                Unit activeUnit = msg.getActiveUnit();
-                if (activeUnit != null) {
-                    activeUnit.getOwner().resetIterators();
-                    activeUnit.getOwner().setNextActiveUnit(activeUnit);
-                    gui.setActiveUnit(activeUnit);
+            boolean play = freeColClient.getPreGameController().startGame();
+            if (play) {
+                gui.setActiveUnit(null);
+                if (msg.isCurrentPlayer()) {
+                    freeColClient.getInGameController()
+                        .setCurrentPlayer(player);
+                    Unit activeUnit = msg.getActiveUnit();
+                    if (activeUnit != null) {
+                        activeUnit.getOwner().resetIterators();
+                        activeUnit.getOwner().setNextActiveUnit(activeUnit);
+                        gui.setActiveUnit(activeUnit);
+                    } else {
+                    gui.setSelectedTile(entryTile, false);
+                    }
                 } else {
                     gui.setSelectedTile(entryTile, false);
                 }
-            } else {
-                gui.setSelectedTile(entryTile, false);
             }
         }
 

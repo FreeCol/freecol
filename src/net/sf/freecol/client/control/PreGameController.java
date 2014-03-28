@@ -148,8 +148,11 @@ public final class PreGameController {
 
     /**
      * Starts the game.
+     *
+     * @return True if the player should continue, false if we are in
+     *     a debug run and should be skipping turns.
      */
-    public void startGame() {
+    public boolean startGame() {
         Player myPlayer = freeColClient.getMyPlayer();
         if (!freeColClient.isHeadless()) {
             gui.closeMainPanel();
@@ -161,10 +164,8 @@ public final class PreGameController {
         freeColClient.askServer()
             .registerMessageHandler(freeColClient.getInGameInputHandler());
 
-        if (!freeColClient.isHeadless()) {
-            freeColClient.setInGame(true);
-            gui.setupInGameMenuBar();
-        }
+        freeColClient.setInGame(true);
+        gui.setupInGameMenuBar();
 
         InGameController igc = freeColClient.getInGameController();
         gui.setSelectedTile((Tile) myPlayer.getEntryLocation(), false);
@@ -177,7 +178,10 @@ public final class PreGameController {
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
             && FreeColDebugger.getDebugRunTurns() > 0) {
             freeColClient.skipTurns(FreeColDebugger.getDebugRunTurns());
-        } else if (freeColClient.getGame().getTurn().getNumber() == 1) {
+            return false;
+        }
+
+        if (freeColClient.getGame().getTurn().getNumber() == 1) {
             ModelMessage message
                 = new ModelMessage(ModelMessage.MessageType.TUTORIAL,
                                    "tutorial.startGame", myPlayer);
@@ -188,6 +192,7 @@ public final class PreGameController {
             // force view of tutorial message
             igc.nextModelMessage();
         }
+        return true;
     }
 
     /**

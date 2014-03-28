@@ -1001,14 +1001,38 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
+     * Flush any market price changes.
+     *
+     * @param cs A <code>ChangeSet</code> to update.
+     * @return True if the market has changed.
+     */
+    public boolean csFlushMarket(ChangeSet cs) {
+        Market market = getMarket();
+        if (market == null) return false;
+        boolean ret = false;
+        StringBuffer sb = new StringBuffer(32);
+        sb.append("Flush market for ").append(getId()).append(":");
+        for (GoodsType type : getSpecification().getGoodsTypeList()) {
+            if (csFlushMarket(type, cs)) {
+                sb.append(" ").append(type.getId());
+                ret = true;
+            }
+        }
+        if (ret) logger.finest(sb.toString());
+        return ret;
+    }
+
+    /**
      * Flush any market price changes for a specified goods type.
      *
      * @param type The <code>GoodsType</code> to check.
      * @param cs A <code>ChangeSet</code> to update.
+     * @return True if the market price had changed.
      */
-    public void csFlushMarket(GoodsType type, ChangeSet cs) {
+    public boolean csFlushMarket(GoodsType type, ChangeSet cs) {
         Market market = getMarket();
-        if (market.hasPriceChanged(type)) {
+        boolean ret = market.hasPriceChanged(type);
+        if (ret) {
             // This type of goods has changed price, so we will update
             // the market and send a message as well.
             cs.addMessage(See.only(this),
@@ -1016,6 +1040,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             market.flushPriceChange(type);
             cs.add(See.only(this), market.getMarketData(type));
         }
+        return ret;
     }
 
     /**
@@ -1593,9 +1618,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param cs A <code>ChangeSet</code> to update.
      */
     public void csYearlyGoodsAdjust(Random random, ChangeSet cs) {
-        List<GoodsType> goodsTypes = getGame().getSpecification()
+        final Game game = getGame();
+        final List<GoodsType> goodsTypes = game.getSpecification()
             .getGoodsTypeList();
-        Market market = getMarket();
+        final Market market = getMarket();
 
         // Pick a random type of storable goods to add/remove an extra
         // amount of.
@@ -1609,7 +1635,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             if (type.isStorable() && market.hasBeenTraded(type)) {
                 boolean add = market.getAmountInMarket(type)
                     < type.getInitialAmount();
-                int amount = getGame().getTurn().getNumber() / 10;
+                int amount = game.getTurn().getNumber() / 10;
                 if (type == extraType) amount = 2 * amount + 1;
                 if (amount <= 0) continue;
                 amount = Utils.randomInt(logger, "Market adjust " + type,
@@ -1628,8 +1654,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
             AbstractGoods ag = extraTrades.remove(0);
             propagateToEuropeanMarkets(ag.getType(), ag.getAmount(), random);
         }
-        for (GoodsType type : goodsTypes) {
-            csFlushMarket(type, cs);
+        for (Player p : game.getLiveEuropeanPlayers()) {
+            ((ServerPlayer)p).csFlushMarket(cs);
         }
     }
 
@@ -1665,7 +1691,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             if (updateScore()) {
                 cs.addPartial(See.only(this), this, "score");
             }
-            
+
         } else if (isIndian()) {
             // We do not have to worry about Player level stance
             // changes driving Stance, as that is delegated to the AI.

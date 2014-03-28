@@ -673,7 +673,7 @@ public final class InGameController extends Controller {
     public Element endTurn(ServerPlayer serverPlayer) {
         FreeColServer freeColServer = getFreeColServer();
         ServerGame game = getGame();
-        ServerPlayer player = (ServerPlayer) game.getCurrentPlayer();
+        ServerPlayer player = (ServerPlayer)game.getCurrentPlayer();
 
         if (serverPlayer != player) {
             throw new IllegalArgumentException("It is not "
@@ -737,10 +737,12 @@ public final class InGameController extends Controller {
                 }
             }
 
-            if ((player = (ServerPlayer) game.getNextPlayer()) == null) {
+            if ((player = (ServerPlayer)game.getNextPlayer()) == null) {
                 // "can not happen"
                 return DOMMessage.clientError("Can not get next player");
             }
+            player.csFlushMarket(cs);
+
             // Remove dead players and retry
             switch (player.checkForDeath()) {
             case ServerPlayer.IS_DEAD:

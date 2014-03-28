@@ -187,15 +187,16 @@ public final class Market extends FreeColGameObject implements Ownable {
      *
      * @param goodsType The <code>GoodsType</code> to add.
      * @param amount The amount of goods.
+     * @return True if the price changes as a result of this addition.
      */
-    public void addGoodsToMarket(GoodsType goodsType, int amount) {
+    public boolean addGoodsToMarket(GoodsType goodsType, int amount) {
         MarketData data = requireMarketData(goodsType);
 
         // Markets are bottomless, amount can not go below the threshold
         data.setAmountInMarket(Math.max(MINIMUM_AMOUNT,
                                         data.getAmountInMarket() + amount));
         data.setTraded(true);
-        data.price();
+        return data.price();
     }
 
     /**
@@ -397,10 +398,10 @@ public final class Market extends FreeColGameObject implements Ownable {
                                 ? "model.market.priceIncrease"
                                 : "model.market.priceDecrease"),
                                this, goodsType)
-            .addStringTemplate("%market%", owner.getMarketName())
-            .add("%goods%", goodsType.getNameKey())
-            .addAmount("%buy%", newPrice)
-            .addAmount("%sell%", data.getPaidForSale());
+                .addStringTemplate("%market%", owner.getMarketName())
+                .add("%goods%", goodsType.getNameKey())
+                .addAmount("%buy%", newPrice)
+                .addAmount("%sell%", data.getPaidForSale());
     }
 
     /**
@@ -544,7 +545,7 @@ public final class Market extends FreeColGameObject implements Ownable {
         StringBuilder sb = new StringBuilder(64);
         sb.append("[").append(getId())
             .append(" owner=").append(owner.getId());
-        for (MarketData md : marketData.values()) {
+        for (MarketData md : getSortedCopy(marketData.values())) {
             sb.append(" ").append(md.toString());
         }
         sb.append("]");
