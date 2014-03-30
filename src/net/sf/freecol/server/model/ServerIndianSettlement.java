@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
@@ -54,7 +55,10 @@ public class ServerIndianSettlement extends IndianSettlement
 
     private static final Logger logger = Logger.getLogger(ServerIndianSettlement.class.getName());
 
-    // How far to search for a colony to add an Indian convert to.
+    /** Alarm added when a new missionary is added. */
+    public static final int ALARM_NEW_MISSIONARY = -100;
+
+    /** How far to search for a colony to add an Indian convert to. */
     public static final int MAX_CONVERT_DISTANCE = 10;
 
     public static final int MAX_HORSES_PER_TURN = 2;
@@ -405,23 +409,18 @@ public class ServerIndianSettlement extends IndianSettlement
      * at this settlement, and propagate the alarm upwards through the
      * tribe.
      *
-     * +til: Handles tile visibility changes.
+     * -til: Might change tile appearance through most hated state
      *
      * @param serverPlayer The <code>ServerPlayer</code> to modify alarm for.
      * @param add The amount to add to the current alarm level.
      * @param propagate If true, propagate the alarm change upward to the
      *     owning player.
      * @param cs A <code>ChangeSet</code> to update.
+     * @return True if the alarm changed.
      */
-    public void csModifyAlarm(Player player, int add, boolean propagate,
-                              ChangeSet cs) {
-        Tile copied = getTile().getTileToCache();
-        boolean change = changeAlarm(player, add);//-til
-        if (change) {
-            getTile().cacheUnseen(copied);//+til
-            cs.add(See.perhaps(), this);
-        }
-
+    private boolean csChangeAlarm(Player player, int add, boolean propagate,
+                                  ChangeSet cs) {
+        boolean change = changeAlarm(player, add);
         if (propagate) {
             // Propagate alarm upwards.  Capital has a greater impact.
             ((ServerPlayer)getOwner()).csModifyTension(player,
@@ -431,6 +430,32 @@ public class ServerIndianSettlement extends IndianSettlement
             + " toward " + player.getName()
             + " modified by " + add
             + " now = " + getAlarm(player).getValue());
+        return change;
+    }
+
+    /**
+     * Modifies the alarm level towards the given player due to an event
+     * at this settlement, and propagate the alarm upwards through the
+     * tribe.
+     *
+     * +til: Handles tile visibility changes.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> to modify alarm for.
+     * @param add The amount to add to the current alarm level.
+     * @param propagate If true, propagate the alarm change upward to the
+     *     owning player.
+     * @param cs A <code>ChangeSet</code> to update.
+     * @return True if the alarm changed and the tile added.
+     */
+    public boolean csModifyAlarm(Player player, int add, boolean propagate,
+                                 ChangeSet cs) {
+        Tile copied = getTile().getTileToCache();
+        boolean change = csChangeAlarm(player, add, propagate, cs);//-til
+        if (change) {
+            getTile().cacheUnseen(copied);//+til
+            cs.add(See.perhaps(), this);
+        }
+        return change;
     }
 
     /**
@@ -443,19 +468,21 @@ public class ServerIndianSettlement extends IndianSettlement
      * @param cs A <code>ChangeSet</code> to update.
      */
     public void csChangeMissionary(Unit missionary, ChangeSet cs) {
-        Unit old = getMissionary();
+        final Unit old = getMissionary();
         if (missionary == old) return;
-        Tile tile = getTile();
-        ServerPlayer oldOwner = null, newOwner = (missionary == null) ? null
-            : (ServerPlayer)missionary.getOwner();
 
+        final Tile tile = getTile();
+        final ServerPlayer newOwner = (missionary == null) ? null
+            : (ServerPlayer)missionary.getOwner();
         tile.cacheUnseen(newOwner);//+til
+
         if (old != null) {
-            oldOwner = (ServerPlayer)old.getOwner(); 
+            final ServerPlayer oldOwner = (ServerPlayer)old.getOwner(); 
             setMissionary(null);//-vis(oldOwner),-til
             tile.updateIndianSettlement(oldOwner);
             cs.addDispose(See.only(oldOwner), null, old);//-vis(oldOwner)
-            cs.add(See.perhaps().always(oldOwner), tile);
+            cs.add(See.only(oldOwner), tile);
+            oldOwner.invalidateCanSeeTiles();//+vis(oldOwner)
         }
 
         if (missionary != null) {
@@ -465,12 +492,22 @@ public class ServerIndianSettlement extends IndianSettlement
             // validity checks.
             missionary.setLocation(null);//-vis(newOwner)
             missionary.setLocationNoUpdate(this);//-vis(newOwner),-til
-            cs.add(See.only(newOwner), newOwner.exploreForSettlement(this));
+            missionary.setMovesLeft(0);
+            setConvertProgress(0);
+            csChangeAlarm(newOwner, ALARM_NEW_MISSIONARY, true, cs);//-til
             tile.updateIndianSettlement(newOwner);
+            
+            final boolean enhanced = getSpecification() 
+                .getBoolean(GameOptions.ENHANCED_MISSIONARIES);
+            int radius = (enhanced) ? getLineOfSight() : 1;
+            for (Tile t : tile.getSurroundingTiles(1, radius)) {
+                if (newOwner.exploreTile(t) || !newOwner.canSee(t)) {
+                    cs.add(See.only(newOwner), t);
+                }
+            }
+            cs.add(See.perhaps(), tile);
+            newOwner.invalidateCanSeeTiles();//+vis(newOwner)
         }
-
-        if (oldOwner != null) oldOwner.invalidateCanSeeTiles();//+vis(oldOwner)
-        if (newOwner != null) newOwner.invalidateCanSeeTiles();//+vis(newOwner)
     }
 
     /**

@@ -3795,6 +3795,7 @@ public final class InGameController implements NetworkConstants {
                 if (settlement.hasMissionary(player)) {
                     gui.playSound("sound.event.missionEstablished");
                 }
+                player.invalidateCanSeeTiles();
                 nextActiveUnit();
             }
             break;

@@ -144,10 +144,6 @@ public final class InGameController extends Controller {
 
     private static Logger logger = Logger.getLogger(InGameController.class.getName());
 
-    // TODO: options, spec?
-    // Alarm adjustments.
-    public static final int ALARM_NEW_MISSIONARY = -100;
-
     /**
      * Score bonus on declaring independence = (1780, Spring) - turn
      * 1780 is documented in the Col1 manual:
@@ -2297,17 +2293,14 @@ public final class InGameController extends Controller {
      */
     public Element establishMission(ServerPlayer serverPlayer, Unit unit,
                                     IndianSettlement settlement) {
+        final ServerIndianSettlement sis = (ServerIndianSettlement)settlement;
         ChangeSet cs = new ChangeSet();
         csVisit(serverPlayer, settlement, 0, cs);
 
-        if (settlement.hasMissionary()) {
-            ((ServerIndianSettlement)settlement)
-                .csKillMissionary("indianSettlement.mission.denounced", cs);
-        }
-
         // Result depends on tension wrt this settlement.
         // Establish if at least not angry.
-        switch (settlement.getAlarm(serverPlayer).getLevel()) {
+        final Tension tension = settlement.getAlarm(serverPlayer);
+        switch (tension.getLevel()) {
         case HATEFUL: case ANGRY:
             cs.add(See.perhaps().always(serverPlayer),
                    (FreeColGameObject)unit.getLocation());
@@ -2315,32 +2308,25 @@ public final class InGameController extends Controller {
                           unit.getLocation(), unit);//-vis(serverPlayer)
             serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
             break;
+
         case HAPPY: case CONTENT: case DISPLEASED:
-            ((ServerIndianSettlement)settlement)
-                .csChangeMissionary(unit, cs);//+vis(serverPlayer)
-            unit.setMovesLeft(0);
-            settlement.setConvertProgress(0);
-            cs.add(See.perhaps().always(serverPlayer), unit.getTile());
-            ((ServerIndianSettlement)settlement).csModifyAlarm(serverPlayer,
-                ALARM_NEW_MISSIONARY, true, cs);//+til
-            int radius = (serverPlayer.getSpecification()
-                .getBoolean(GameOptions.ENHANCED_MISSIONARIES))
-                ? settlement.getLineOfSight()
-                : 1;
-            for (Tile t : settlement.getTile().getSurroundingTiles(radius)) {
-                cs.add(See.only(serverPlayer), t);
+            if (settlement.hasMissionary()) {
+                sis.csKillMissionary("indianSettlement.mission.denounced", cs);
             }
+            // Always show the tile the unit was on
+            cs.add(See.perhaps().always(serverPlayer), unit.getTile());
+
+            sis.csChangeMissionary(unit, cs);//+vis(serverPlayer)
             break;
         }
-        Tile tile = settlement.getTile();
-        tile.updateIndianSettlement(serverPlayer);
-        cs.add(See.perhaps().always(serverPlayer), tile);
-        String messageId = "indianSettlement.mission."
-            + settlement.getAlarm(serverPlayer).getKey();
+
+        // Add the descriptive message.
+        final StringTemplate nation = settlement.getOwner().getNationName();
+        final String messageId = "indianSettlement.mission." + tension.getKey();
         cs.addMessage(See.only(serverPlayer),
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                              messageId, serverPlayer, unit)
-                .addStringTemplate("%nation%", settlement.getOwner().getNationName()));
+                .addStringTemplate("%nation%", nation));
 
         // Others can see missionary disappear and settlement acquire
         // mission.
