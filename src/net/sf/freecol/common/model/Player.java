@@ -2551,11 +2551,13 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Gets all the model messages for this player.
      *
-     * @return all The <code>ModelMessage</code>s for this
+     * @return A copy of the <code>ModelMessage</code>s for this
      *     <code>Player</code>.
      */
     public List<ModelMessage> getModelMessages() {
-        return modelMessages;
+        synchronized (modelMessages) {
+            return new ArrayList<ModelMessage>(modelMessages);
+        }
     }
 
     /**
@@ -2565,12 +2567,9 @@ public class Player extends FreeColGameObject implements Nameable {
      *     <code>Player</code>.
      */
     public List<ModelMessage> getNewModelMessages() {
-        Iterator<ModelMessage> messageIterator = modelMessages.iterator();
         List<ModelMessage> out = new ArrayList<ModelMessage>();
-        while (messageIterator.hasNext()) {
-            ModelMessage message = messageIterator.next();
-            if (message.hasBeenDisplayed()) continue;
-            out.add(message); // preserve message order
+        for (ModelMessage m : getModelMessages()) {
+            if (!m.hasBeenDisplayed()) out.add(m); // preserve message order
         }
         return out;
     }
@@ -2581,7 +2580,9 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param modelMessage The <code>ModelMessage</code> to add.
      */
     public void addModelMessage(ModelMessage modelMessage) {
-        modelMessages.add(modelMessage);
+        synchronized (modelMessages) {
+            modelMessages.add(modelMessage);
+        }
     }
 
     /**
@@ -2592,11 +2593,13 @@ public class Player extends FreeColGameObject implements Nameable {
      *     to enforce.
      */
     public void refilterModelMessages(OptionGroup options) {
-        Iterator<ModelMessage> messageIterator = modelMessages.iterator();
-        while (messageIterator.hasNext()) {
-            ModelMessage message = messageIterator.next();
-            String id = message.getMessageType().getOptionName();
-            if (!options.getBoolean(id)) messageIterator.remove();
+        synchronized (modelMessages) {
+            Iterator<ModelMessage> messageIterator = modelMessages.iterator();
+            while (messageIterator.hasNext()) {
+                ModelMessage message = messageIterator.next();
+                String id = message.getMessageType().getOptionName();
+                if (!options.getBoolean(id)) messageIterator.remove();
+            }
         }
     }
 
@@ -2604,10 +2607,12 @@ public class Player extends FreeColGameObject implements Nameable {
      * Removes all undisplayed model messages for this player.
      */
     public void removeDisplayedModelMessages() {
-        Iterator<ModelMessage> messageIterator = modelMessages.iterator();
-        while (messageIterator.hasNext()) {
-            ModelMessage message = messageIterator.next();
-            if (message.hasBeenDisplayed()) messageIterator.remove();
+        synchronized (modelMessages) {
+            Iterator<ModelMessage> messageIterator = modelMessages.iterator();
+            while (messageIterator.hasNext()) {
+                ModelMessage message = messageIterator.next();
+                if (message.hasBeenDisplayed()) messageIterator.remove();
+            }
         }
     }
 
@@ -2615,7 +2620,9 @@ public class Player extends FreeColGameObject implements Nameable {
      * Removes all the model messages for this player.
      */
     public void clearModelMessages() {
-        modelMessages.clear();
+        synchronized (modelMessages) {
+            modelMessages.clear();
+        }
     }
 
     /**
@@ -2629,14 +2636,16 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public void divertModelMessages(FreeColGameObject source,
                                     FreeColGameObject newSource) {
-        Iterator<ModelMessage> messageIterator = modelMessages.iterator();
-        while (messageIterator.hasNext()) {
-            ModelMessage message = messageIterator.next();
-            if (message.getSourceId() == source.getId()) {
-                if (newSource == null) {
-                    messageIterator.remove();
-                } else {
-                    message.divert(newSource);
+        synchronized (modelMessages) {
+            Iterator<ModelMessage> messageIterator = modelMessages.iterator();
+            while (messageIterator.hasNext()) {
+                ModelMessage message = messageIterator.next();
+                if (message.getSourceId() == source.getId()) {
+                    if (newSource == null) {
+                        messageIterator.remove();
+                    } else {
+                        message.divert(newSource);
+                    }
                 }
             }
         }
@@ -4040,7 +4049,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
             if (monarch != null) monarch.toXML(xw);
 
-            for (ModelMessage m : getSortedCopy(modelMessages)) m.toXML(xw);
+            for (ModelMessage m : getModelMessages()) m.toXML(xw);
 
             if (lastSales != null) {
                 for (LastSale sale : getSortedCopy(lastSales.values())) {
@@ -4170,7 +4179,7 @@ public class Player extends FreeColGameObject implements Nameable {
         monarch = null;
         history.clear();
         tradeRoutes.clear();
-        modelMessages.clear();
+        clearModelMessages();
         lastSales = null;
         highSeas = null;
         featureContainer.clear();
