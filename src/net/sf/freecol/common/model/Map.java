@@ -1102,9 +1102,13 @@ public class Map extends FreeColGameObject implements Location {
                 path = findMapPath(unit, tile, (Tile)realEnd,
                                    carrier, costDecider);
                 setSearchTrace(old);
-                throw new IllegalStateException("FINDPATH-FAIL: " + unit
-                    + "/" + carrier + " from " + tile + " to " + end
-                    + "\n" + p.fullPathToString());
+                logger.warning("Fail in findPath(" + unit + ", " + tile
+                    + ", " + ((Tile)realEnd) + ", " + carrier + ")\n"
+                    + p.fullPathToString());
+                //throw new IllegalStateException("FINDPATH-FAIL: " + unit
+                //    + "/" + carrier + " from " + tile + " to " + end
+                //    + "\n" + p.fullPathToString());
+                return null;
             }
 
             // At the front of the path insert a node for the starting
@@ -1583,11 +1587,59 @@ public class Map extends FreeColGameObject implements Location {
                         currentNode, null));
                 if (isGoal && sb != null) sb.append(" *goal*");
 
-                // Is this move possible?  Loop on failure.
-                //
+                // Is this move possible for the base unit?
                 // Allow some seemingly impossible moves if it is to
                 // the goal (see the comment to recoverMove).
-                // 
+                Unit.MoveType umt = unit.getSimpleMoveType(currentTile,
+                                                           moveTile);
+                boolean unitMove = umt.isProgress();
+                if (isGoal && !unitMove) {
+                    switch (umt) {
+                    case ATTACK_UNIT:
+                    case ATTACK_SETTLEMENT:
+                    case ENTER_FOREIGN_COLONY_WITH_SCOUT:
+                    case ENTER_INDIAN_SETTLEMENT_WITH_SCOUT:
+                    case ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST:
+                    case ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY:
+                    case ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
+                        // Can not move to the tile, but there is a
+                        // valid interaction with the unit or
+                        // settlement that is there.
+                        unitMove = true;
+                        break;
+                    case MOVE_NO_ATTACK_CIVILIAN:
+                    case MOVE_NO_ATTACK_MARINE:
+                        // There is a unit in the way.  Assume this
+                        // condition is transient unless the unit is
+                        // in a constrained position such as a small
+                        // island or river.  Exception: beached units
+                        // are considered to be a permanent blockage.
+                        unitMove = moveTile.getAvailableAdjacentCount() >= 3;
+                        break;
+                    default:
+                        break;
+                    }
+                    if (!unitMove && unit == currentUnit) {
+                        // This search can never succeed if the unit
+                        // can not reach the goal, except if there is
+                        // a carrier involved that might still succeed.
+                        if (sb != null) {
+                            sb.append(" utter-fail(").append(umt).append(")");
+                            logger.info(sb.toString());
+                        }
+System.err.println("BAH! Search for " + unit
+    + " from " + currentTile
+    + " to goal at " + moveTile
+    + " fails with: " + umt
+    + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
+                        return null;
+                    }
+                }
+                if (sb != null) {
+                    sb.append(" unitMove=").append(umt)
+                        .append("/").append(unitMove);
+                }
+
                 // Check for a carrier change at the new tile,
                 // creating a MoveCandidate for each case.
                 //
@@ -1608,28 +1660,9 @@ public class Map extends FreeColGameObject implements Location {
                 // short of a goal settlement, where we should
                 // consider an immediate move into the settlement by
                 // the passenger.
-                Unit.MoveType umt = unit.getSimpleMoveType(currentTile,
-                                                           moveTile);
-                boolean unitMove = umt.isProgress();
-                if (isGoal && !unitMove) {
-                    // Relax requirements at goal.  If there is just a
-                    // unit in the way, assume this condition is transient
-                    // unless the unit is in a constrained position such as
-                    // a small island or river.  Consider beached units
-                    // as permanent blockages.
-                    switch (umt) {
-                    case MOVE_NO_ATTACK_CIVILIAN:
-                    case MOVE_NO_ATTACK_MARINE:
-                        unitMove = moveTile.getAvailableAdjacentCount() >= 3;
-                        break;
-                    default:
-                        break;
-                    }
-                }
                 boolean carrierMove = carrier != null
                     && carrier.isTileAccessible(moveTile);
                 boolean embarked = embarkedThisTurn(currentNode, currentTurns);
-
                 boolean disembarkToGoal = false;
                 if (unitMove && carrierMove && currentOnCarrier
                     && !embarked && isGoal) {
