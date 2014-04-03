@@ -1558,7 +1558,7 @@ public class TransportMission extends Mission {
             // invalidate a transport mission as we still have to unload!
             if (!Map.isSameLocation(cargo.getTarget(),
                                     carrier.getLocation())) {
-                return "transportable-destination-missing";
+                return "transportable-destination-failure";
             }
         } else if (((FreeColGameObject)dst).isDisposed()) {
             return "transportable-destination-disposed";

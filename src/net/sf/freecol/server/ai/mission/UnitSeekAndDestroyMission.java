@@ -309,10 +309,9 @@ public class UnitSeekAndDestroyMission extends Mission {
      */
     @Override
     public Location getTransportDestination() {
-        Location loc = getTarget();
-        return (loc == null) ? null
-            : (getUnit().shouldTakeTransportTo(loc.getTile())) ? loc.getTile()
-            : null;
+        final Location loc = getTarget();
+        return (!isValid() || !getUnit().shouldTakeTransportTo(loc)) ? null
+            : loc.getTile();
     }
 
 

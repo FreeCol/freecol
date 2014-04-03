@@ -83,10 +83,10 @@ public class IdleAtSettlementMission extends Mission {
      * {@inheritDoc}
      */
     public Location getTransportDestination() {
+        if (!isValid()) return null;
         final Unit unit = getUnit();
         if (!unit.hasTile() || unit.getTile().hasSettlement()) return null;
-        PathNode path = unit.findOurNearestOtherSettlement();
-        Tile target = (path == null) ? null : path.getLastNode().getTile();
+        Location target = findTarget();
         return (unit.shouldTakeTransportTo(target)) ? target : null;
     }
 

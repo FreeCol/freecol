@@ -251,8 +251,9 @@ public class MissionaryMission extends Mission {
      */
     @Override
     public Location getTransportDestination() {
-        return (getUnit().shouldTakeTransportTo(getTarget())) ? getTarget()
-            : null;
+        final Location loc = getTarget();
+        return (!isValid() || !getUnit().shouldTakeTransportTo(loc)) ? null
+            : loc;
     }
 
 
