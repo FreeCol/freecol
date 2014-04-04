@@ -221,6 +221,23 @@ public class IndianDemandMission extends Mission {
                         GoodsContainer.CARGO_SIZE); // One load of goods max
     }
 
+    // Fake Transportable interface, noop as natives do not use carriers.
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Location getTransportDestination() {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getTransportPriority() {
+        return 0;
+    }
 
     // Mission interface
 

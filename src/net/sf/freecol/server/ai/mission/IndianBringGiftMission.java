@@ -114,6 +114,23 @@ public class IndianBringGiftMission extends Mission {
         return getUnit().hasGoodsCargo();
     }
 
+    // Fake Transportable interface, noop as natives do not use carriers.
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Location getTransportDestination() {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getTransportPriority() {
+        return 0;
+    }
 
     // Mission interface
 

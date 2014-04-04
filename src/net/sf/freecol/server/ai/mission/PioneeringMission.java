@@ -362,18 +362,7 @@ public class PioneeringMission extends Mission {
     }
 
 
-    // Fake Transportable interface.
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Location getTransportDestination() {
-        final Location loc = getTarget();
-        return (!isValid() || !getUnit().shouldTakeTransportTo(loc)) ? null
-            : loc;
-    }
-
+    // Fake Transportable interface wholly inherited from Mission.
 
     // Mission interface
 

@@ -1453,26 +1453,22 @@ public class TransportMission extends Mission {
     // End of public Transportable manipulations
 
 
-    // Fake Transportable interface
+    // Fake Transportable interface, noop as carriers are not transported.
 
     /**
-     * Returns the destination of a required transport.
-     *
-     * @return Always null, we never transport carrier units.
+     * {@inheritDoc}
      */
     @Override
     public Tile getTransportDestination() {
-        return null;
+        return null; // The carrier unit is never transported!
     }
 
     /**
-     * Returns the priority of getting the unit to the transport destination.
-     *
-     * @return 0, the carrier is never transported.
+     * {@inheritDoc}
      */
     @Override
     public int getTransportPriority() {
-        return 0;
+        return 0; // Override with no priority.
     }
 
 

@@ -102,17 +102,7 @@ public class WishRealizationMission extends Mission {
     }
 
 
-    // Fake Transportable interface
-
-    /**
-     * {@inheritDoc}
-     */
-    public Location getTransportDestination() {
-        Tile tile = (wish == null || wish.getDestination() == null) ? null
-            : wish.getDestination().getTile();
-        return (getUnit().shouldTakeTransportTo(tile)) ? tile : null;
-    }
-
+    // Fake Transportable interface wholly inherited from Mission.
 
     // Mission interface
 

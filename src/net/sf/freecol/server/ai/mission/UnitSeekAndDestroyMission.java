@@ -302,18 +302,7 @@ public class UnitSeekAndDestroyMission extends Mission {
     }
 
 
-    // Fake Transportable interface
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Location getTransportDestination() {
-        final Location loc = getTarget();
-        return (!isValid() || !getUnit().shouldTakeTransportTo(loc)) ? null
-            : loc.getTile();
-    }
-
+    // Fake Transportable interface wholly inherited from Mission
 
     // Mission interface
 

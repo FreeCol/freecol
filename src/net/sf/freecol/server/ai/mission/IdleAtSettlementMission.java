@@ -77,19 +77,7 @@ public class IdleAtSettlementMission extends Mission {
     }
 
 
-    // Fake Transportable interface
-
-    /**
-     * {@inheritDoc}
-     */
-    public Location getTransportDestination() {
-        if (!isValid()) return null;
-        final Unit unit = getUnit();
-        if (!unit.hasTile() || unit.getTile().hasSettlement()) return null;
-        Location target = findTarget();
-        return (unit.shouldTakeTransportTo(target)) ? target : null;
-    }
-
+    // Fake Transportable interface wholly inherited from Mission.
 
     // Mission interface
 

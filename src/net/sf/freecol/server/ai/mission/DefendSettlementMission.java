@@ -195,20 +195,12 @@ public class DefendSettlementMission extends Mission {
 
 
     // Fake Transportable interface
+    // Inherit: Mission.getTransportDestination
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Location getTransportDestination() {
-        final Location loc = getTarget();
-        return (!isValid() || !getUnit().shouldTakeTransportTo(loc)) ? null
-            : loc;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public int getTransportPriority() {
         return (getTransportDestination() == null) ? 0
             : NORMAL_TRANSPORT_PRIORITY + 5;

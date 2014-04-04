@@ -51,6 +51,7 @@ import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.ai.EuropeanAIPlayer;
+import net.sf.freecol.server.ai.Transportable;
 
 
 /**
@@ -753,29 +754,24 @@ public abstract class Mission extends AIObject {
         return newTarget != null;
     }
 
-    // Fake implementation of Transportable interface.
+    // Fake partial implementation of Transportable interface.
     // Missions are not actually Transportables but the units that are
-    // performing a mission delegate to these routines.
+    // performing a mission often determine their destination and priority
+    // from the mission undertaken.
 
     /**
-     * Gets the transport destination of the unit associated with this
-     * mission.
-     * TODO: is this still needed?
+     * Gets the destination of a required transport.
      *
-     * @return The destination of a required transport or
-     *         <code>null</code> if no transport is needed.
+     * @return The mission target, or null if the mission is invalid,
+     *     otherwise lacks a target (e.g. UnitWanderHostile), or the
+     *     unit does not need transport.
      */
     public Location getTransportDestination() {
-        final Unit unit = getUnit();
-        final Unit carrier = unit.getCarrier();
-        PathNode path;
-
-        return (!unit.hasTile())
-            ? ((unit.isOnCarrier()) ? carrier : unit).getFullEntryLocation()
-            : (!unit.isOnCarrier()) ? null
-            : (carrier.getSettlement() != null) ? carrier.getTile()
-            : ((path = unit.findOurNearestSettlement()) == null) ? null
-            : path.getLastNode().getTile();
+        Location loc;
+        return (!isValid()) ? null
+            : ((loc = getTarget()) == null) ? null
+            : (!getUnit().shouldTakeTransportTo(loc)) ? null
+            : loc;
     }
 
     /**
