@@ -67,6 +67,9 @@ public final class Specification {
 
     private static final Logger logger = Logger.getLogger(Specification.class.getName());
 
+    /** Roles backward compatibility fragment. */
+    public static final String ROLES_COMPAT_FILE_NAME = "roles-compat.xml";
+
     public static class Source extends FreeColGameObjectType {
 
         /**
@@ -1762,9 +1765,10 @@ public final class Specification {
     private void fixupRoles() {
         if (roles.isEmpty()) { // @compat 0.10.0-5 (no <role> definitions)
             try {
-                logger.warning("Loading role backward compatibility fragment.");
+                logger.info("Loading role backward compatibility fragment: "
+                            + ROLES_COMPAT_FILE_NAME);
                 File base = FreeColDirectories.getBaseDirectory();
-                load(new FileInputStream(new File(base, "roles-compat.xml")));
+                load(new FileInputStream(new File(base, ROLES_COMPAT_FILE_NAME)));
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Failed to load remedial roles.", e);
             }
