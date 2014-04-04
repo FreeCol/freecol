@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.logging.Logger;
 
@@ -578,23 +579,42 @@ public abstract class Settlement extends GoodsLocation
         if (!getGame().isInServer()) {
             throw new RuntimeException("Must be in server");
         }
+        if (!unit.isPerson()) return false;
         int price = canBuildRoleEquipment(role);
         if (price < 0 || !owner.checkGold(price)) return false;
-        // Process adding equipment first, so as to settle what has to
-        // be removed.
-        List<EquipmentType> remove = null;
-        for (EquipmentType et : getSpecification().getRoleEquipment(role.getId())) {
-            for (AbstractGoods ag : et.getRequiredGoods()) {
-                removeGoods(ag);
-            }
-            for (EquipmentType rt : unit.changeEquipment(et, 1)) {
-                int a = unit.getEquipmentCount(rt);
-                for (AbstractGoods ag : rt.getRequiredGoods()) {
-                    addGoods(ag.getType(), ag.getAmount() * a);
+
+        // Get the equipment changes.
+        TypeCountMap<EquipmentType> change
+            = unit.getEquipmentChangeForRole(role);
+
+        // First drop all non-required equipment, this should succeed.
+        for (Entry<EquipmentType, Integer> entry
+                 : change.getValues().entrySet()) {
+            EquipmentType et = entry.getKey();
+            int count = entry.getValue().intValue();
+            if (count < 0) {
+                unit.changeEquipment(et, count);
+                if (!addEquipment(et, -count)) {
+                    throw new RuntimeException("equipForRole drop failure"
+                        + " for " + unit + " / " + role + " at " + this);
                 }
-                unit.changeEquipment(rt, -a);
             }
         }
+        // Then collect all required equipment.  The canBuildRoleEquipment
+        // test above should guarantee this will succeed.
+        for (Entry<EquipmentType, Integer> entry
+                 : change.getValues().entrySet()) {
+            EquipmentType et = entry.getKey();
+            int count = entry.getValue().intValue();
+            if (count > 0) {
+                unit.changeEquipment(et, count);
+                if (!addEquipment(et, -count)) {
+                    throw new RuntimeException("equipForRole take failure"
+                        + " for " + unit + " / " + role + " at " + this);
+                }
+            }
+        }
+
         unit.setRole();
         return unit.getRole() == role;
     }

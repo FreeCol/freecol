@@ -4316,14 +4316,18 @@ public final class InGameController extends Controller {
      */
     public Element rearrangeColony(ServerPlayer serverPlayer, Colony colony,
                                    List<UnitChange> unitChanges) {
+        final Role defaultRole = getGame().getSpecification().getDefaultRole();
         ChangeSet cs = new ChangeSet();
         Tile tile = colony.getTile();
         tile.cacheUnseen();//+til
         final int oldUnitCount = colony.getUnitCount();
 
-        // Move everyone out of the way.
+        // Move everyone out of the way and stockpile their equipment.
         for (UnitChange uc : unitChanges) {
             uc.unit.setLocation(tile);//-til
+            if (!uc.unit.hasDefaultRole()) {
+                colony.equipForRole(uc.unit, defaultRole);
+            }
         }
 
         List<UnitChange> todo = new ArrayList<UnitChange>(unitChanges);
@@ -4331,10 +4335,9 @@ public final class InGameController extends Controller {
             UnitChange uc = todo.remove(0);
             if (uc.loc == tile) continue;
             WorkLocation wl = (WorkLocation)uc.loc;
-            // Adding to wl can fail, and in the worse case there
+            // Adding to wl can fail, and in the worst case there
             // might be a circular dependency.  If the move can
-            // succeed, do it, but if not move the unit to the tile
-            // and retry.
+            // succeed, do it, but if not, retry.
             switch (wl.getNoAddReason(uc.unit)) {
             case NONE:
                 uc.unit.setLocation(wl);
@@ -4363,10 +4366,12 @@ public final class InGameController extends Controller {
                              RearrangeColonyMessage.roleComparator);
             Collections.reverse(unitChanges);
             for (UnitChange uc : unitChanges) {
-                if (!uc.unit.equipForRole(uc.role, colony)) {
-                    // Should not happen if we equip simplest first
-                    return DOMMessage.clientError("Failed to equip "
-                        + uc.unit.getId() + " for role " + uc.role);
+                if (uc.role != defaultRole) {
+                    if (!colony.equipForRole(uc.unit, uc.role)) {
+                        // Should not happen if we equip simplest first
+                        return DOMMessage.clientError("Failed to equip "
+                            + uc.unit.getId() + " for role " + uc.role);
+                    }
                 }
             }
         }

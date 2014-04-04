@@ -167,6 +167,29 @@ public abstract class GoodsLocation extends UnitLocation {
         return goodsContainer.getCompactGoods();
     }
 
+    /**
+     * Adds equipment (or removes if amount is negative) to this goods location.
+     *
+     * @param et The <code>EquipmentType</code> to add.
+     * @param amount The amount of equipment.
+     * @return True if the underlying goods is successfully transferred.
+     */
+    public final boolean addEquipment(EquipmentType et, int amount) {
+        List<AbstractGoods> added = new ArrayList<AbstractGoods>();
+        for (AbstractGoods ag : et.getRequiredGoods()) {
+            int c = ag.getAmount() * amount;
+            if (c == 0) continue;
+            if (c < 0 && c + getGoodsCount(ag.getType()) < 0) {
+                for (AbstractGoods revert : added) removeGoods(revert);
+                return false;
+            }
+            AbstractGoods nag = new AbstractGoods(ag.getType(), c);
+            addGoods(nag);
+            added.add(nag);
+        }
+        return true;
+    }
+
     // Interface Location (from UnitLocation)
     // Inheriting
     //    FreeColObject.getId()

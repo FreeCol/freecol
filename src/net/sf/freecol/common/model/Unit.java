@@ -1774,7 +1774,8 @@ public class Unit extends GoodsLocation
      * @return A list of <code>EquipmentType</code>s.
      */
     public List<EquipmentType> getRoleEquipment(Role role) {
-        List<EquipmentType> equipment = getSpecification().getRoleEquipment(role.getId());
+        List<EquipmentType> equipment
+            = getSpecification().getRoleEquipment(role.getId());
         Iterator<EquipmentType> i = equipment.iterator();
         while (i.hasNext()) {
             EquipmentType et = i.next();
@@ -1808,6 +1809,27 @@ public class Unit extends GoodsLocation
     }
 
     /**
+     * Get a map of equipment type changes needed by this unit to assume
+     * a new role.
+     *
+     * @param role The <code>Role</code> to assume.
+     * @return A map of equipment type changes.
+     */
+    public TypeCountMap<EquipmentType> getEquipmentChangeForRole(Role role) {
+        final Specification spec = getSpecification();
+        final List<EquipmentType> roleEq = getRoleEquipment(role);
+        TypeCountMap<EquipmentType> change = new TypeCountMap<EquipmentType>();
+        for (EquipmentType et : spec.getEquipmentTypeList()) {
+            int oldCount = getEquipmentCount(et);
+            int newCount = (roleEq.contains(et)) ? 1 : 0;
+            if (newCount != oldCount) {
+                change.incrementCount(et, newCount - oldCount);
+            }
+        }
+        return change;
+    }
+
+    /**
      * Convenience function to remove all equipment this unit has and
      * drop it in a settlement.
      *
@@ -1815,65 +1837,12 @@ public class Unit extends GoodsLocation
      *     goods.
      */
     public void clearEquipment(Settlement settlement) {
-        for (Entry<EquipmentType, Integer> entry : getEquipment().getValues().entrySet()) {
-            addOrRemoveEquipment(entry.getKey(), entry.getValue(), settlement);
-        }
-        clearEquipment();
-        setRole(getSpecification().getDefaultRole());
-    }
+        Role defaultRole = getSpecification().getDefaultRole();
+        settlement.equipForRole(this, defaultRole);
 
-    private void addOrRemoveEquipment(EquipmentType et, int count, Settlement settlement) {
-        for (AbstractGoods goods : et.getRequiredGoods()) {
-            AbstractGoods ag = new AbstractGoods(goods.getType(), goods.getAmount() * count);
-            settlement.addGoods(ag);
-        }
+        assert getRole() == defaultRole;
     }
-
-    /**
-     * Equip and set a unit to a particular role.  Take or drop equipment
-     * at the given settlement.
-     *
-     * @param role The <code>Role</code> to perform.
-     * @param settlement The <code>Settlement</code> that holds the equipment.
-     * @return True if the role was set.
-     */
-    public boolean equipForRole(Role role, Settlement settlement) {
-        if (!isPerson()) return false;
-        final Specification spec = getSpecification();
-        final List<EquipmentType> roleEq = getRoleEquipment(role);
-
-        TypeCountMap<EquipmentType> change = new TypeCountMap<EquipmentType>();
-        for (EquipmentType et : spec.getEquipmentTypeList()) {
-            int oldCount = getEquipmentCount(et);
-            int newCount = (roleEq.contains(et)) ? 1 : 0;
-            if (newCount > oldCount && !settlement.canBuildEquipment(et)) {
-                return false;
-            }
-            if (newCount != oldCount) {
-                change.incrementCount(et, newCount - oldCount);
-            }
-        }
-        for (Entry<EquipmentType, Integer> entry
-                 : change.getValues().entrySet()) {
-            EquipmentType et = entry.getKey();
-            int count = entry.getValue().intValue();
-            if (count < 0) {
-                changeEquipment(et, count); // can not fail
-                addOrRemoveEquipment(et, -count, settlement);
-            }
-        }
-        for (Entry<EquipmentType, Integer> entry
-                 : change.getValues().entrySet()) {
-            EquipmentType et = entry.getKey();
-            int count = entry.getValue().intValue();
-            if (count > 0) {
-                changeEquipment(et, count); // should not fail!
-                addOrRemoveEquipment(et, -count, settlement);
-            }
-        }
-        setRole(role);
-        return getRole() == role;
-    }
+    
 
 
     // Combat routines

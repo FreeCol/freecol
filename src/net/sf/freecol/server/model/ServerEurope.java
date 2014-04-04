@@ -20,6 +20,7 @@
 package net.sf.freecol.server.model;
 
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.logging.Logger;
 
@@ -33,6 +34,7 @@ import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.UnitListOption;
@@ -72,36 +74,54 @@ public class ServerEurope extends Europe implements ServerModelObject {
      */
     @Override
     public boolean equipForRole(Unit unit, Role role) {
-        ServerPlayer owner = (ServerPlayer)getOwner();
+        if (!unit.isPerson()) return false;
         int price = canBuildRoleEquipment(role);
-        if (price < 0 || !owner.checkGold(price)) return false;
+        if (price < 0 || !unit.getOwner().checkGold(price)) return false;
 
-        // Process adding equipment first, so as to settle what has to
-        // be removed.
-        List<EquipmentType> remove = null;
-        for (EquipmentType et : getSpecification().getRoleEquipment(role.getId())) {
-            for (AbstractGoods ag : et.getRequiredGoods()) {
-                int m = owner.buy(null, ag.getType(), ag.getAmount());
-                if (m > 0) {
-                    owner.addExtraTrade(new AbstractGoods(ag.getType(), -m));
-                }
-            }
-            for (EquipmentType rt : unit.changeEquipment(et, 1)) {
-                int a = unit.getEquipmentCount(rt);
-                for (AbstractGoods rg : rt.getRequiredGoods()) {
-                    if (owner.canTrade(rg.getType(),
-                            Market.Access.EUROPE)) {
-                        int rm = owner.sell(null, rg.getType(),
-                                            a * rg.getAmount());
+        // Get the equipment changes.
+        final ServerPlayer owner = (ServerPlayer)getOwner();
+        TypeCountMap<EquipmentType> change
+            = unit.getEquipmentChangeForRole(role);
+
+        // Sell what is no longer needed.
+        for (Entry<EquipmentType, Integer> entry
+                 : change.getValues().entrySet()) {
+            EquipmentType et = entry.getKey();
+            int count = entry.getValue().intValue();
+            if (count < 0) {
+                unit.changeEquipment(et, count);
+                for (AbstractGoods ag : et.getRequiredGoods()) {
+                    if (owner.canTrade(ag.getType(), Market.Access.EUROPE)) {
+                        int rm = owner.sell(null, ag.getType(),
+                                            ag.getAmount() * count);
                         if (rm > 0) {
-                            owner.addExtraTrade(new AbstractGoods(rg.getType(), rm));
+                            owner.addExtraTrade(new AbstractGoods(ag.getType(), rm));
                         }
                     }
                 }
-                // Removals can not cause incompatible-equipment trouble
-                unit.changeEquipment(rt, -a);
             }
         }
+
+        // Buy what is needed.  The canBuildRoleEquipment
+        // test above should guarantee this will succeed.
+        for (Entry<EquipmentType, Integer> entry
+                 : change.getValues().entrySet()) {
+            EquipmentType et = entry.getKey();
+            int count = entry.getValue().intValue();
+            if (count > 0) {
+                unit.changeEquipment(et, count);
+                for (AbstractGoods ag : et.getRequiredGoods()) {
+                    if (owner.canTrade(ag.getType(), Market.Access.EUROPE)) {
+                        int m = owner.buy(null, ag.getType(),
+                                          ag.getAmount() * count);
+                        if (m > 0) {
+                            owner.addExtraTrade(new AbstractGoods(ag.getType(), -m));
+                        }
+                    }
+                }
+            }
+        }
+
         unit.setRole();
         return unit.getRole() == role;
     }
