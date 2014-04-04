@@ -42,6 +42,7 @@ import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
+import net.sf.freecol.common.model.UnitLocation;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.util.Utils;
@@ -644,10 +645,17 @@ public abstract class Mission extends AIObject {
                         + ": " + this);
                     return MoveType.MOVE_ILLEGAL;
                 }
-                if (!newCarrier.canAdd(unit)) {
-                    logger.warning(logMe + " at " + unit.getLocation()
-                        + " can not join assigned carrier " + newCarrier
+                UnitLocation.NoAddReason reason
+                    = newCarrier.getNoAddReason(unit);
+                switch (reason) {
+                case NONE:
+                    break;
+                case CAPACITY_EXCEEDED:
+                    logger.finest(logMe + " at " + unit.getLocation()
+                        + " waiting for space to be cleared on " + newCarrier
                         + ": " + this);
+                    return MoveType.MOVE_NO_MOVES;
+                default:
                     return MoveType.MOVE_ILLEGAL;
                 }
                 Direction d;
