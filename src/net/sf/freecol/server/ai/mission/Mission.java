@@ -514,7 +514,8 @@ public abstract class Mission extends AIObject {
 
         path = unit.findPath(unit.getLocation(), target, carrier, costDecider);
         if (path == null) {
-            if (unit.getType().canMoveToHighSeas() || unit.isOnCarrier()) {
+            if (unit.getType().canMoveToHighSeas() || unit.isOnCarrier()
+                || unit.getOwner().isIndian()) {
                 logger.fine(logMe + " no path from " + unit.getLocation()
                     + " to " + target + ": " + this);
                 return MoveType.MOVE_NO_TILE;
