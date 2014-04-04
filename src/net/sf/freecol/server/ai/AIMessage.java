@@ -81,6 +81,7 @@ import net.sf.freecol.common.networking.UnloadCargoMessage;
 import net.sf.freecol.common.networking.WorkMessage;
 
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 
 /**
@@ -131,19 +132,6 @@ public class AIMessage {
     }
 
     /**
-     * Ask the server a question, returning non-error replies.
-     *
-     * @param conn The <code>Connection</code> to use when
-     *     communicating with the server.
-     * @param request The <code>Element</code> to send.
-     * @return The reply <code>Element</code> if not an error, otherwise null.
-     */
-    private static Element askMessage(Connection conn, Element request) {
-        Element reply = ask(conn, request);
-        return (checkError(reply, request.getTagName())) ? null : reply;
-    }
-        
-    /**
      * Ask the server a question, handling the reply.
      *
      * @param conn The <code>Connection</code> to use when
@@ -152,10 +140,9 @@ public class AIMessage {
      * @return True if the message was sent, handled, and no error returned.
      */
     private static boolean askHandling(Connection conn, Element request) {
-        for (;;) {
+        while (request != null) {
             Element reply = ask(conn, request);
             if (reply == null) break;
-
             if (checkError(reply, request.getTagName())) return false;
             try {
                 request = conn.handle(reply);
@@ -168,6 +155,51 @@ public class AIMessage {
         return true;
     }
 
+    /**
+     * Ask the server a question, returning non-error replies.
+     *
+     * @param conn The <code>Connection</code> to use when
+     *     communicating with the server.
+     * @param request The <code>Element</code> to send.
+     * @return The reply <code>Element</code> if not an error, otherwise null.
+     */
+    private static Element askExpecting(Connection conn, Element request,
+                                        String expect) {
+        Element reply = ask(conn, request);
+        if (checkError(reply, request.getTagName())
+            || reply == null) return null;
+       
+        final String tag = reply.getTagName();
+        if ("multiple".equals(tag)) {
+            List<Element> replies = new ArrayList<Element>();
+            NodeList nodes = reply.getChildNodes();
+            Element result = null;
+
+            for (int i = 0; i < nodes.getLength(); i++) {
+                if (nodes.item(i) instanceof Element
+                    && ((Element)nodes.item(i)).getTagName().equals(expect)) {
+                    result = (Element)nodes.item(i);
+                    continue;
+                }
+                try {
+                    Element e = conn.handle((Element)nodes.item(i));
+                    if (e != null) replies.add(e);
+                } catch (FreeColException fce) {
+                    logger.log(Level.WARNING, "AI handler failed: "
+                        + reply.toString(), fce);
+                }
+            }
+            if (!askHandling(conn, DOMMessage.collapseElements(replies))
+                || result == null) return null;
+            reply = result;
+        }
+
+        if (expect.equals(reply.getTagName())) return reply;
+        logger.log(Level.WARNING, "AI handler expected " + expect
+            + ", recieved " + tag);
+        return null;
+    }
+        
     /**
      * Sends a DOMMessage to the server.
      *
@@ -494,8 +526,9 @@ public class AIMessage {
      */
     public static NationSummary askGetNationSummary(AIPlayer owner,
                                                     Player player) {
-        Element reply = askMessage(owner.getConnection(),
-            new GetNationSummaryMessage(player).toXMLElement());
+        Element reply = askExpecting(owner.getConnection(),
+            new GetNationSummaryMessage(player).toXMLElement(),
+            GetNationSummaryMessage.getXMLElementTagName());
         GetNationSummaryMessage message
             = new GetNationSummaryMessage(reply);
         return (message == null) ? null : message.getNationSummary();
@@ -529,9 +562,10 @@ public class AIMessage {
      */
     public static boolean askIndianDemand(AIUnit aiUnit, Colony colony,
                                           GoodsType type, int amount) {
-        Element reply = askMessage(aiUnit.getAIOwner().getConnection(),
+        Element reply = askExpecting(aiUnit.getAIOwner().getConnection(),
             new IndianDemandMessage(aiUnit.getUnit(), colony,
-                                    type, amount).toXMLElement());
+                                    type, amount).toXMLElement(),
+            IndianDemandMessage.getXMLElementTagName());
         IndianDemandMessage message
             = new IndianDemandMessage(colony.getGame(), reply);
         return (message == null) ? false : message.getResult();
