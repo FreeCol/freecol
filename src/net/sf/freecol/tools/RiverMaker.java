@@ -96,17 +96,35 @@ public class RiverMaker {
                                                      BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = result.createGraphics();
             g.setPaint(texture);
-            String name = "";
+            String name = getName(branches);
+            int count = branchCount(branches);
             for (int branch = 0; branch < branches.length; branch++) {
                 int size = branches[branch];
-                name += Integer.toString(size);
-                if (size == 0) {
-                    // nothing to do
-                } else {
+                if (size > 0) {
                     g.setStroke(size == 1 ? minor : major);
+                    int next = (branch + 1) % 4;
+                    int other = (branch + 2) % 4;
                     Path2D.Float bend = new Path2D.Float();
-                    bend.moveTo(CENTER.x, CENTER.y);
-                    bend.lineTo(POINTS[branch].x, POINTS[branch].y);
+                    float px = (POINTS[branch].x + POINTS[other].x) / 2;
+                    float py = (POINTS[branch].y + POINTS[other].y) / 2;
+                    bend.moveTo(POINTS[branch].x, POINTS[branch].y);
+                    if (count == 1) {
+                        // single
+                        bend.lineTo(px, py);
+                        g.draw(bend);
+                        break;
+                    } else if (branches[other] > 0) {
+                        // or straight line
+                        bend.lineTo(px, py);
+                        bend.moveTo(POINTS[branch].x, POINTS[branch].y);
+                    }
+                    if (branches[next] > 0) {
+                        // bend, possibly around start
+                        bend.quadTo(CENTER.x, CENTER.y,
+                                    (POINTS[next].x + CENTER.x) / 2,
+                                    (POINTS[next].y + CENTER.y) / 2);
+                        bend.lineTo(POINTS[next].x, POINTS[next].y);
+                    }
                     g.draw(bend);
                 }
             }
@@ -146,4 +164,21 @@ public class RiverMaker {
         return branches;
     }
 
+    private static int branchCount(int[] branches) {
+        int result = 0;
+        for (int index = 0; index < branches.length; index++) {
+            if (branches[index] > 0) {
+                result++;
+            }
+        }
+        return result;
+    }
+
+    private static String getName(int[] branches) {
+        String name = "";
+        for (int index = 0; index < branches.length; index++) {
+            name += Integer.toString(branches[index]);
+        }
+        return name;
+    }
 }
