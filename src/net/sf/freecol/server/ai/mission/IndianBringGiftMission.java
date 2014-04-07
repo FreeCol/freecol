@@ -252,10 +252,10 @@ public class IndianBringGiftMission extends Mission {
         if (!hasGift()) {
             Unit.MoveType mt = travelToTarget(tag, is, null);
             switch (mt) {
-            case MOVE_NO_MOVES: case MOVE_NO_REPAIR:
-                return;
             case MOVE: // Arrived!
                 break;
+            case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
+                return;
             case ATTACK_SETTLEMENT: case ATTACK_UNIT: // A blockage!
                 Location blocker = resolveBlockage(aiUnit, is);
                 if (blocker == null) {
@@ -297,7 +297,9 @@ public class IndianBringGiftMission extends Mission {
             Unit.MoveType mt = travelToTarget(tag, getTarget(),
                 CostDeciders.avoidSettlementsAndBlockingUnits());
             switch (mt) {
-            case MOVE_NO_MOVES: case MOVE_NO_REPAIR:
+            case MOVE: // Arrived!
+                break;
+            case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
                 return;
             case ATTACK_SETTLEMENT: // Arrived (do not really attack)
                 break;

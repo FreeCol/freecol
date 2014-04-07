@@ -363,10 +363,10 @@ public class IndianDemandMission extends Mission {
                 Unit.MoveType mt = travelToTarget(tag, is,
                     CostDeciders.avoidSettlementsAndBlockingUnits());
                 switch (mt) {
-                case MOVE_NO_MOVES:
-                    return;
                 case MOVE: // Arrived!
                     break;
+                case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
+                    return;                
                 default:
                     logger.warning(tag + " unexpected delivery move type: " + mt
                         + ": " + this);
@@ -389,8 +389,10 @@ public class IndianDemandMission extends Mission {
             Unit.MoveType mt = travelToTarget(tag, target, null);
             Direction d;
             switch (mt) {
-            case MOVE_NO_MOVES: case MOVE_NO_REPAIR:
-                return;
+            case MOVE: // Arrived!
+                break;
+            case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
+                return;                
             case ATTACK_SETTLEMENT:
                 d = unit.getTile().getDirection(target.getTile());
                 if (d != null) break; // Arrived at target, handled below.
