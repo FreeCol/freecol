@@ -692,7 +692,14 @@ public class NativeAIPlayer extends AIPlayer {
             Colony target = RandomChoice.getWeightedRandom(logger,
                 "Choose demand colony", nearbyColonies, getAIRandom());
             if (target == null) {
-                throw new IllegalStateException("No demand target!?!");
+                StringBuffer sb = new StringBuffer(64);
+                sb.append("No demand target for ").append(is.getName());
+                for (RandomChoice<Colony> rc : nearbyColonies) {
+                    sb.append("\n  ").append(rc.getObject().getName())
+                        .append(" p=").append(rc.getProbability());
+                }
+                logger.warning(sb.toString());
+                continue;
             }
 
             // Send the unit.
