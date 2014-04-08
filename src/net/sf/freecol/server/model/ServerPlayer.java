@@ -3898,6 +3898,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
             cs.addAttribute(See.only(this), "flush", Boolean.TRUE.toString());
             logger.info("Goods party at " + colony.getName()
                 + " with: " + goods + " arrears: " + arrears);
+            if (isAI()) { // Reset the goods wishes
+                colony.firePropertyChange(REARRANGE_WORKERS, true, false);
+            }
         }
     }
 
