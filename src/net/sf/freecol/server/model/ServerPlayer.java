@@ -3899,7 +3899,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             logger.info("Goods party at " + colony.getName()
                 + " with: " + goods + " arrears: " + arrears);
             if (isAI()) { // Reset the goods wishes
-                colony.firePropertyChange(REARRANGE_WORKERS, true, false);
+                colony.firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
             }
         }
     }
