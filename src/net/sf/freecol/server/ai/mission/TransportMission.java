@@ -331,18 +331,19 @@ public class TransportMission extends Mission {
                     // does the unit need the carrier at all?
                     if ((path = unit.findPath(unit.getLocation(), dst,
                                               carrier, null)) == null) {
-                        return "no-collect " + unit + "/" + carrier
+                        return "no-collect+deliver " + unit + "/" + carrier
                             + " -> " + dst;
                     }
                     if ((drop = path.getCarrierMove()) == null) {
-                        return "carrier not needed for " + unit.toString();
+                        return "no-carrier-move for " + carrier
+                            + " to collect " + unit;
                     }
                     // TODO: proper rendezvous paths, unit needs
                     // to modify its target too!
                     if ((path = carrier.findPath(drop.getLocation())) == null) {
-                        return "carrier can not reach collection point "
-                            + carrier + " -> "
-                            + ((FreeColGameObject)drop.getLocation());
+                        return "no-collect of " + unit
+                            + " with " + carrier
+                            + " -> " + ((FreeColGameObject)drop.getLocation());
                     }
                     if (upLoc(drop.getLocation()) instanceof Tile) {
                         this.mode = CargoMode.PICKUP;
@@ -885,7 +886,7 @@ public class TransportMission extends Mission {
                 + " (at " + ((index < 0) ? "end" : Integer.toString(index))
                 + "): " + toFullString());
         } else {
-            logger.finest(tag + " add " + cargo.toString()
+            logger.warning(tag + " add " + cargo.toString()
                 + " (at " + ((index < 0) ? "end" : Integer.toString(index))
                 + ") failed: " + toFullString());
         }
@@ -1096,10 +1097,8 @@ public class TransportMission extends Mission {
             if (euaip.retargetCargo(aiu, aiCarrier, tCopy())) {
                 Cargo cargo = makeCargo(aiu);
                 if (cargo == null) {
-                    logger.warning("COULD NOT REMAKE CARGO: " + aiu);
                     drop.add(aiu);
                 } else if (!queueCargo(cargo, false)) {
-                    logger.warning("COULD NOT QUEUE CARGO: " + cargo);
                     drop.add(aiu);
                 }
             }
