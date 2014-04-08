@@ -367,18 +367,20 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         // Argh.  We may have chosen to build something we can no
         // longer build due to some limitation.  Try to find a
-        // replacement, but do not re-refine/assign as that process is
+        // replacement, but do not re-refine as that process is
         // sufficiently complex that we can not be confident that this
         // will not loop indefinitely.  The compromise is to just
         // rearrange next turn until we get out of this state.
         if (build != null && !colony.canBuild(build)) {
-            logger.warning(colony.getName()
+            BuildableType newBuild = colonyPlan.getBestBuildableType();
+            logger.finest(colony.getName()
                 + " reneged building " + build.getSuffix()
-                + ": " + colony.getNoBuildReason(build, null));
+                + " (" + colony.getNoBuildReason(build, null)
+                + ") reassigned to " + newBuild.getSuffix());
             List<BuildableType> queue = new ArrayList<BuildableType>();
-            build = colonyPlan.getBestBuildableType();
             if (build != null) queue.add(build);
             AIMessage.askSetBuildQueue(this, queue);
+            build = colony.getCurrentlyBuilding();
             nextRearrange = 1;
         }
 
