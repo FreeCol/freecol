@@ -3622,7 +3622,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 if (!wl.isEmpty() && !wl.canBeWorked()) {
                     changed |= colony.ejectUnits(wl, wl.getUnitList());//-til
                     logger.info("Units ejected from workLocation "
-                        + wl.getId() + " on loss of " + building.getId());
+                        + wl.getId() + " on loss of "
+                        + building.getType().getSuffix());
                 }
             }
         } else if (building.canBeDamaged()) {
