@@ -1611,8 +1611,9 @@ public class EuropeanAIPlayer extends AIPlayer {
             float bestValue = 0.0f;
             boolean present = false;
             for (TransportMission tm : missions) {
+                if (!tm.spaceAvailable(t)) continue;
                 Cargo cargo = tm.makeCargo(t);
-                if (cargo == null || !tm.spaceAvailable(cargo)) continue;
+                if (cargo == null) continue;
                 int turns = cargo.getTurns();
                 float value;
                 if (turns == 0) {

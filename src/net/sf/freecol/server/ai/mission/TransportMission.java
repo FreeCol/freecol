@@ -863,7 +863,7 @@ public class TransportMission extends Mission {
             reason = cargo.setTarget();
         }
         if (reason == null) return cargo;
-        logger.finest("Failed to remake cargo (" + reason + "): " + t);
+        logger.finest("Failed to make cargo (" + reason + "): " + t);
         return null;
     }
 
@@ -925,8 +925,18 @@ public class TransportMission extends Mission {
      * @return True if there is space available for this cargo.
      */
     public boolean spaceAvailable(Cargo cargo) {
+        return spaceAvailable(cargo.getTransportable());
+    }
+
+    /**
+     * Is there space available for a new cargo?
+     *
+     * @param t The <code>Transportable</code> to check.
+     * @return True if there is space available for this transportable.
+     */
+    public boolean spaceAvailable(Transportable t) {
         final List<Cargo> ts = tCopy();
-        final int newSpace = cargo.getTransportable().getSpaceTaken();
+        final int newSpace = t.getSpaceTaken();
 
         for (int i = ts.size()-1; i >= 0; i--) {
             if (ts.get(i).getSpaceLeft() < newSpace) return false;
