@@ -376,9 +376,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             logger.finest(colony.getName()
                 + " reneged building " + build.getSuffix()
                 + " (" + colony.getNoBuildReason(build, null)
-                + ") reassigned to " + newBuild.getSuffix());
+                + ") reassigned to "
+                + ((newBuild == null) ? "nothing" : newBuild.getSuffix()));
             List<BuildableType> queue = new ArrayList<BuildableType>();
-            if (build != null) queue.add(build);
+            if (newBuild != null) queue.add(newBuild);
             AIMessage.askSetBuildQueue(this, queue);
             build = colony.getCurrentlyBuilding();
             nextRearrange = 1;
