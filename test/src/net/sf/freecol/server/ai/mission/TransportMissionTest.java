@@ -25,6 +25,7 @@ import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
@@ -281,7 +282,9 @@ public class TransportMissionTest extends FreeColTestCase {
     public void testWagonTrain() {
         Game game = ServerTestHelper.startServerGame(getTestMap());
         Colony one = getStandardColony(3, 3, 3);
+        one.setName("one");
         Colony two = getStandardColony(3, 8, 8);
+        two.setName("two");
         assertEquals(one.getOwner(), two.getOwner());
 
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
@@ -293,7 +296,7 @@ public class TransportMissionTest extends FreeColTestCase {
         assertNotNull(wagon);
 
         wagon.abortMission("test");
-        assertNull("Transport mission should be valid",
+        assertNull("Transport mission should be valid.",
                    TransportMission.invalidReason(wagon));
         TransportMission mission = new TransportMission(aiMain, wagon);
 
@@ -304,11 +307,15 @@ public class TransportMissionTest extends FreeColTestCase {
         dest = mission.getTarget();
         assertEquals("Destination should still be colony one.", one, dest);
 
-        AIGoods goods = new AIGoods(aiMain, two, horsesType, 20, one);
-        mission.queueTransportable(goods, false);
+        Goods goods = new Goods(game, two, horsesType, 20);
+        two.addGoods(goods);
+        AIGoods aiGoods = new AIGoods(aiMain, two, 
+                                      goods.getType(), goods.getAmount(), one);
+        mission.queueTransportable(aiGoods, false);
         mission.doMission();
 
         dest = mission.getTarget();
+        assertEquals("Destination should now be colony two", two.getId(), dest.getId());
         assertEquals("Destination should now be colony two.", two, dest);
     }
 }

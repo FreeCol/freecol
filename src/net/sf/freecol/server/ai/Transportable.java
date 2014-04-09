@@ -30,9 +30,9 @@ import net.sf.freecol.common.model.Unit;
 
 /**
  * A single item in a carrier's transport list.  Any {@link Locatable}
- * which should be able to be transported by a carrier using the {@link
- * net.sf.freecol.server.ai.mission.TransportMission}, needs an AI
- * object implementing this interface.
+ * which should be able to be transported by a carrier using the
+ * {@link net.sf.freecol.server.ai.mission.TransportMission}, 
+ * needs an {@link AIObject} implementing this interface.
  *
  * @see net.sf.freecol.server.ai.mission.TransportMission
  */
@@ -211,4 +211,11 @@ public interface Transportable {
      * @return True if the transportable could be carried.
      */
     public boolean carriableBy(Unit carrier);
+
+    /**
+     * Is the underlying object disposed?
+     *
+     * @return True if this transportable is disposed.
+     */
+    public boolean isDisposed();
 }

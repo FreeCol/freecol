@@ -1389,6 +1389,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     public void dispose() {
         List<AIObject> disposeList = new ArrayList<AIObject>();
         for (AIGoods ag : aiGoods) {
+            if (ag.isDisposed() || ag.getGoods() == null) continue;
             if (ag.getGoods().getLocation() == colony) disposeList.add(ag);
         }
         for (Wish w : wishes) {

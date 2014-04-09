@@ -1561,6 +1561,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             if (tl.isEmpty()) continue;
             Collections.sort(tl, Transportable.transportableComparator);
             for (Transportable t : tl) {
+                if (t.isDisposed()) continue;
                 if (upLoc(t.getTransportSource()) != loc) {
                     logger.warning("Transportable " + t
                         + " should have been claimed from " + loc
@@ -1600,20 +1601,28 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     private void allocateTransportables(List<TransportMission> missions) {
         if (missions.isEmpty()) return;
-        List<Transportable> urgent = getUrgentTransportables();
-        String logMe = "allocateTransportables(" + missions.size() + "):";
-        for (Transportable t : urgent) logMe += " " + t.toString();
-        logger.info(logMe);
 
-        for (Transportable t : urgent) {
+        StringBuffer sb = new StringBuffer(64);
+        sb.append("allocateTransportables(").append(missions.size())
+            .append("):");
+        List<Transportable> urgent = getUrgentTransportables();
+        for (Transportable t : urgent) sb.append(" ").append(t.toString());
+        logger.info(sb.toString());
+
+        int i = 0;
+        outer: while (i < urgent.size()) {
             if (missions.isEmpty()) break;
+            Transportable t = urgent.get(i);
             TransportMission best = null;
             float bestValue = 0.0f;
             boolean present = false;
             for (TransportMission tm : missions) {
                 if (!tm.spaceAvailable(t)) continue;
                 Cargo cargo = tm.makeCargo(t);
-                if (cargo == null) continue;
+                if (cargo == null) { // Serious problem with this cargo
+                    urgent.remove(i);
+                    continue outer;
+                }
                 int turns = cargo.getTurns();
                 float value;
                 if (turns == 0) {
@@ -1644,6 +1653,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                     missions.remove(best);
                 }
             }
+            i++;
         }
     }
 

@@ -33,6 +33,8 @@ import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsContainer;
+import net.sf.freecol.common.model.GoodsLocation;
 import net.sf.freecol.common.model.Locatable;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
@@ -296,8 +298,9 @@ public class TransportMission extends Mission {
          */
         public String setTarget() {
             if (!isValid()) return "invalid";
+            if (transportable.isDisposed()) return "invalid-disposed";
             Location dst = transportable.getTransportDestination();
-            if (dst == null) return "no-destination";
+            if (dst == null) return "invalid-null-destination";
             dst = upLoc(dst);
             PathNode path, drop;
 
@@ -390,6 +393,19 @@ public class TransportMission extends Mission {
                 } else if (goods.getLocation() instanceof Unit) {
                     return "goods-already-collected";
                 } else {
+                    if (goods.getLocation() instanceof GoodsLocation) {
+                        GoodsLocation gl = (GoodsLocation)goods.getLocation();
+                        int present = gl.getGoodsCount(goods.getType());
+                        if (present <= 0) { // Goods party can do this
+                            ((AIGoods)transportable).dispose();
+                            return "invalid-goods-gone-away";
+                        }
+                        if (goods.getAmount() != present) {
+                            // Tolerate incorrect amount
+                            goods.setAmount(Math.min(GoodsContainer.CARGO_SIZE,
+                                                     present));
+                        }
+                    }
                     path = carrier.findPath(goods.getLocation());
                     if (path == null) {
                         return "no-collect for " + carrier + " -> " + dst;
@@ -415,10 +431,16 @@ public class TransportMission extends Mission {
             String reason = invalidReason(aiCarrier, target);
             if (reason != null) return reason;
 
+            if (transportable == null) {
+                return "null transportable";
+            } else if (transportable.isDisposed()) {
+                return "disposed transportable";
+            }
+            
             Locatable l = transportable.getTransportLocatable();
-            if (l == null) return "null locatable: " + transportable.toString();
-
-            if (l instanceof FreeColGameObject
+            if (l == null) {
+                return "null locatable: " + transportable.toString();
+            } else if (l instanceof FreeColGameObject
                 && ((FreeColGameObject)l).isDisposed()) {
                 return "locatable disposed";
             }
@@ -1067,7 +1089,9 @@ public class TransportMission extends Mission {
             // map situation.
             Transportable t = cargo.getTransportable();
             if (carrier.hasTile()) {
-                if ((reason = cargo.setTarget()) != null && !cargo.retry()) {
+                reason = cargo.setTarget();
+                if (reason != null
+                    && (reason.startsWith("invalid") || !cargo.retry())) {
                     removeCargo(cargo, "can not progress (" + reason
                         + ") to " + t.getTransportDestination());
                     continue;
