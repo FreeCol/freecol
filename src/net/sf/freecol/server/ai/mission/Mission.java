@@ -30,6 +30,7 @@ import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
@@ -934,6 +935,8 @@ public abstract class Mission extends AIObject {
         sb.append(Utils.lastPart(getClass().getName(), "."))
             .append("@").append(hashCode())
             .append("-").append(aiUnit);
+        Location target = getTarget();
+        if (target != null) sb.append("->").append(target);
         return sb.toString();
     }
 }

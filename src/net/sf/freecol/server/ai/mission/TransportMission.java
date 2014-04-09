@@ -1934,16 +1934,6 @@ public class TransportMission extends Mission {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder(super.toString());
-        sb.append(" -> ").append(target);
-        return sb.toString();
-    }
-
-    /**
      * More verbose version of toString().
      *
      * @return A summary of this mission including its transportables.
