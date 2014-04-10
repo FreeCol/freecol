@@ -383,7 +383,8 @@ public class MissionaryMission extends Mission {
         Unit.MoveType mt = travelToTarget(tag, getTarget(),
             CostDeciders.avoidSettlementsAndBlockingUnits());
         switch (mt) {
-        case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_ILLEGAL:
+        case MOVE_ILLEGAL:
+        case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
             break;
         case MOVE:
             // Reached an intermediate colony.  Retarget, but do not
