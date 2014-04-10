@@ -2408,27 +2408,46 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     @Override
     public boolean acceptTax(int tax) {
+        boolean ret = true;
+        StringBuilder sb = new StringBuilder(32);
+        sb.append("Tax demand to ").append(getPlayer().getId())
+            .append(" of ").append(tax).append("%: ");
         Goods toBeDestroyed = getPlayer().getMostValuableGoods();
-        if (toBeDestroyed == null) {
-            return false;
-        }
+        GoodsType goodsType = (toBeDestroyed == null) ? null
+            : toBeDestroyed.getType();
 
-        GoodsType goodsType = toBeDestroyed.getType();
-        if (goodsType.isFoodType() || goodsType.isBreedable()) {
-            // we should be able to produce food and horses ourselves
-            // TODO: check whether we already have horses!
-            return false;
-        } else if (goodsType.isMilitaryGoods() ||
-                   goodsType.isTradeGoods() ||
-                   goodsType.isBuildingMaterial()) {
-            if (getGame().getTurn().getAge() == 3) {
-                // by this time, we should be able to produce
-                // enough ourselves
-                // TODO: check whether we have an armory, at least
-                return false;
-            } else {
-                return true;
+        // Is this cheat to look at what the crown will destroy?
+        if (toBeDestroyed == null) {
+            ret = false;
+            sb.append("refused: no-goods-under-threat");
+        } else if (goodsType.isFoodType()) {
+            ret = false;
+            sb.append("refused: food-type");
+        } else if (goodsType.isBreedable()) {
+            // Refuse if we already have this type under production in
+            // multiple places.
+            int n = 0;
+            for (Settlement s : getPlayer().getSettlements()) {
+                if (s.getGoodsCount(goodsType) > 0) n++;
             }
+            ret = n < 2;
+            if (ret) {
+                sb.append("accepted: breedable-type-")
+                    .append(goodsType.getSuffix()).append("-missing");
+            } else {
+                sb.append("refused: breedable-type-")
+                    .append(goodsType.getSuffix())
+                    .append("-present-in-").append(n).append("-settlements");
+            }
+        } else if (goodsType.isMilitaryGoods()
+            || goodsType.isTradeGoods()
+            || goodsType.isBuildingMaterial()) {
+            // By age 3 we should be able to produce enough ourselves.
+            // TODO: check whether we have an armory, at least
+            int age = getGame().getTurn().getAge();
+            ret = age < 3;
+            sb.append((ret) ? "accepted" : "rejected")
+                .append(": special-goods-in-age-").append(age);
         } else {
             int averageIncome = 0;
             int numberOfGoods = 0;
@@ -2442,14 +2461,16 @@ public class EuropeanAIPlayer extends AIPlayer {
                     numberOfGoods++;
                 }
             }
-            averageIncome = averageIncome / numberOfGoods;
-            if (getPlayer().getIncomeAfterTaxes(toBeDestroyed.getType()) > averageIncome) {
-                // this is a more valuable type of goods
-                return false;
-            } else {
-                return true;
-            }
+            averageIncome /= numberOfGoods;
+            int income = getPlayer().getIncomeAfterTaxes(toBeDestroyed.getType());
+            ret = income < averageIncome;
+            sb.append((ret) ? "accepted" : "rejected")
+                .append(": standard-goods-with-income-").append(income)
+                .append((ret) ? "-less-than-" : "-greater-than-")
+                .append(averageIncome);
         }
+        logger.finest(sb.toString());
+        return ret;
     }
 
     /**
