@@ -28,16 +28,19 @@ import net.sf.freecol.common.model.Unit;
 
 
 /**
- * An action for using the active unit to plow/clear a forest.
+ * An action for using the active unit to add a tile improvement to
+ * the unit's tile, possibly changing the tile type in the process. In
+ * the original game, artificial tile improvements were clearing,
+ * plowing and building a road.
  */
 public class ImprovementAction extends UnitAction {
 
     private TileImprovementType improvement;
-    
+
 
     /**
      * Creates this action.
-     * 
+     *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param improvement The <code>TileImprovementType</code> to make.
      */
@@ -52,7 +55,7 @@ public class ImprovementAction extends UnitAction {
 
     /**
      * Checks if this action should be enabled.
-     * 
+     *
      * @return <code>false</code> if there is no active unit or if the unit
      *         cannot plow/clear forest.
      */
