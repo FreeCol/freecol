@@ -1131,28 +1131,6 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Gets the most recently saved game file, or <b>null</b>.  (This
-     * may be either from a recent arbitrary user operation or an
-     * autosave function.)
-     *
-     *  @return The recent save game file
-     */
-    public File getLastSaveGameFile() {
-        File lastSave = null;
-        for (File directory : new File[] {
-                FreeColDirectories.getSaveDirectory(),
-                FreeColDirectories.getAutosaveDirectory() }) {
-            for (File savegame : directory.listFiles(FreeCol.freeColSaveFileFilter)) {
-                if (lastSave == null
-                    || savegame.lastModified() > lastSave.lastModified()) {
-                    lastSave = savegame;
-                }
-            }
-        }
-        return lastSave;
-    }
-
-    /**
      * Opens a dialog where the user should specify the filename and
      * loads the game.
      */

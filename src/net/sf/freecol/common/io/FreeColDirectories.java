@@ -161,7 +161,7 @@ public class FreeColDirectories {
 
     /**
      * Does the OS look like Mac OS X?
-     * 
+     *
      * @return True if Mac OS X appears to be present.
      */
     public static boolean onMacOSX() {
@@ -179,7 +179,7 @@ public class FreeColDirectories {
 
     /**
      * Does the OS look like some sort of Windows?
-     * 
+     *
      * @return True if Windows appears to be present.
      */
     public static boolean onWindows() {
@@ -218,7 +218,7 @@ public class FreeColDirectories {
      *   broken in some way.
      * - Zero if there is at least one relevant XDG environment
      *   variable in use and it points to a valid writable directory,
-     *   or the default exists and is writable.  
+     *   or the default exists and is writable.
      * - Positive if there are a full set of suitable XDG directories and
      *   there are freecol directories therein.
      * - Otherwise negative, including non-directories in the wrong place
@@ -364,7 +364,7 @@ public class FreeColDirectories {
         }
 
         if (ret == 2) return 1;
-        
+
         File d = requireDir(new File(dirs[0], FREECOL_DIRECTORY));
         if (d == null) return -1;
         dirs[0] = d;
@@ -464,7 +464,7 @@ public class FreeColDirectories {
         FileOutputStream out = null;
     		try {
             in = new FileInputStream(src);
-            out = new FileOutputStream(dst); 
+            out = new FileOutputStream(dst);
             while ((len = in.read(buf)) > 0) out.write(buf, 0, len);
         } catch (IOException ioe) {
             return false;
@@ -492,7 +492,7 @@ public class FreeColDirectories {
             copyDir(src, dst);
         }
     }
-            
+
     /**
      * Insist that a directory either already exists, or is created.
      *
@@ -630,10 +630,10 @@ public class FreeColDirectories {
             saveDirectory = new File(getUserDataDirectory(), SAVE_DIRECTORY);
             if (!insistDirectory(saveDirectory)) return "main.userDir.fail";
         }
-    
+
         autosaveDirectory = new File(getSaveDirectory(), AUTOSAVE_DIRECTORY);
         if (!insistDirectory(autosaveDirectory)) autosaveDirectory = null;
-    
+
         userModsDirectory = new File(getUserDataDirectory(), MODS_DIRECTORY);
         if (!insistDirectory(userModsDirectory)) userModsDirectory = null;
 
@@ -793,7 +793,7 @@ public class FreeColDirectories {
     public static File getSaveDirectory() {
         return saveDirectory;
     }
-    
+
     /**
      * Set the directory where the saved games should be put.
      *
@@ -836,6 +836,28 @@ public class FreeColDirectories {
         setSavegameFile(file);
         setSaveDirectory(file.getParentFile());
         return true;
+    }
+
+    /**
+     * Gets the most recently saved game file, or <b>null</b>.  (This
+     * may be either from a recent arbitrary user operation or an
+     * autosave function.)
+     *
+     *  @return The recent save game file
+     */
+    public static File getLastSaveGameFile() {
+        File lastSave = null;
+        for (File directory : new File[] {
+                FreeColDirectories.getSaveDirectory(),
+                FreeColDirectories.getAutosaveDirectory() }) {
+            for (File savegame : directory.listFiles(FreeCol.freeColSaveFileFilter)) {
+                if (lastSave == null
+                    || savegame.lastModified() > lastSave.lastModified()) {
+                    lastSave = savegame;
+                }
+            }
+        }
+        return lastSave;
     }
 
     /**

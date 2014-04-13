@@ -1089,20 +1089,37 @@ public final class FreeCol {
      */
     private static void startClient(String userMsg) {
         Specification spec = null;
-        if (debugStart || fastStart) {
-            try {
-                FreeColTcFile tcf = getTCFile();
-                if (tcf == null) {
-                    fatal(StringTemplate.template("cli.error.badTC")
-                        .addName("%tc%", getTC()));
+        File savegame = FreeColDirectories.getSavegameFile();
+        if (debugStart) {
+            spec = getSpecification();
+        } else if (fastStart) {
+            if (savegame == null) {
+                // continue last saved game if possible,
+                // otherwise start a new one
+                savegame = FreeColDirectories.getLastSaveGameFile();
+                if (savegame == null) {
+                    spec = getSpecification();
                 }
-                spec = tcf.getSpecification();
-                spec.applyDifficultyLevel(FreeCol.getDifficulty());
-            } catch (IOException ioe) {}
+            }
+            // savegame was specified on command line
         }
-        new FreeColClient(FreeColDirectories.getSavegameFile(), windowSize,
+        new FreeColClient(savegame, windowSize,
                           sound, splashFilename, introVideo, fontName,
                           userMsg, spec);
+    }
+
+    private static Specification getSpecification() {
+        Specification spec = null;
+        try {
+            FreeColTcFile tcf = getTCFile();
+            if (tcf == null) {
+                fatal(StringTemplate.template("cli.error.badTC")
+                      .addName("%tc%", getTC()));
+            }
+            spec = tcf.getSpecification();
+            spec.applyDifficultyLevel(FreeCol.getDifficulty());
+        } catch (IOException ioe) {}
+        return spec;
     }
 
     /**

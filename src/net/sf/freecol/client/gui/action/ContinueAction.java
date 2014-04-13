@@ -24,7 +24,7 @@ import java.io.File;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.i18n.Messages;
-
+import net.sf.freecol.common.io.FreeColDirectories;
 
 /**
  * Action to load and start the most recent save game of the client.
@@ -41,7 +41,7 @@ public class ContinueAction extends FreeColAction {
      */
     public ContinueAction(FreeColClient freeColClient) {
         super(freeColClient, id);
-        
+
         // interim solution to be replaced! redirect to identical NAME text
         putValue(NAME, Messages.message("victory.continue"));
         putValue(SHORT_DESCRIPTION, null);
@@ -54,7 +54,7 @@ public class ContinueAction extends FreeColAction {
      * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) {
-        File lastSave = getInGameController().getLastSaveGameFile();
+        File lastSave = FreeColDirectories.getLastSaveGameFile();
         if (lastSave != null) {
             getGUI().removeInGameComponents();
             getConnectController().startSavedGame(lastSave, null);

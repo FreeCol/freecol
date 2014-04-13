@@ -40,6 +40,7 @@ import net.sf.freecol.client.gui.action.NewAction;
 import net.sf.freecol.client.gui.action.OpenAction;
 import net.sf.freecol.client.gui.action.PreferencesAction;
 import net.sf.freecol.client.gui.action.QuitAction;
+import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.resources.ResourceManager;
 
 import net.miginfocom.swing.MigLayout;
@@ -62,7 +63,7 @@ public final class MainPanel extends FreeColPanel {
         super(freeColClient, new MigLayout("wrap 1, insets n n 20 n",
                                            "[center]"));
 
-        boolean canContinue = getFreeColClient().getInGameController()
+        boolean canContinue = FreeColDirectories
             .getLastSaveGameFile() != null;
 
         ActionManager am = getFreeColClient().getActionManager();
