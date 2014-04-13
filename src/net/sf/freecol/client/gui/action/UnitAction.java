@@ -44,10 +44,14 @@ public abstract class UnitAction extends MapboardAction {
     /**
      * Checks if this action should be enabled.
      *
-     * @return <code>false</code> if there is no active unit.
+     * @return <code>true</code> if the active unit belongs to the
+     * player.
      */
     @Override
     protected boolean shouldBeEnabled() {
-        return super.shouldBeEnabled() && getGUI().getActiveUnit() != null;
+        return super.shouldBeEnabled()
+            && getGUI().getActiveUnit() != null
+            && getGUI().getActiveUnit().getOwner()
+            == getFreeColClient().getMyPlayer();
     }
 }
