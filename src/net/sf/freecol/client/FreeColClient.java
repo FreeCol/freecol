@@ -166,12 +166,12 @@ public final class FreeColClient {
             if (!FreeColDebugger.isInDebugMode()
                 || FreeColDebugger.getDebugRunTurns() <= 0) {
                 fatal(Messages.message("client.headlessDebug"));
-            }                
+            }
             if (savedGame == null && spec == null) {
                 fatal(Messages.message("client.headlessRequires"));
             }
         }
- 
+
         // Look for base data directory.  Failure is fatal.
         File baseDirectory = FreeColDirectories.getBaseDirectory();
         FreeColDataFile baseData = null;
@@ -291,11 +291,11 @@ public final class FreeColClient {
                         }
                     }
                 });
-        } else if (spec != null) { // Debug start
+        } else if (spec != null) { // Debug or fast start
             gui.playSound("sound.intro.general");
             SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        if (!connectController.startSinglePlayerGame(spec, 
+                        if (!connectController.startSinglePlayerGame(spec,
                                                                      true)) {
                             gui.showMainPanel(userMsg);
                         }
@@ -717,7 +717,7 @@ public final class FreeColClient {
     public void setWork(Runnable runnable) {
         worker.schedule(runnable);
     }
-    
+
     // Fundamental game start/stop/continue actions
 
     /**

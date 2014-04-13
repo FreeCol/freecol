@@ -122,6 +122,7 @@ public final class FreeCol {
     private static boolean checkIntegrity = false,
                            consoleLogging = false,
                            debugStart = false,
+                           fastStart = false,
                            introVideo = true,
                            javaCheck = true,
                            memoryCheck = true,
@@ -447,6 +448,9 @@ public final class FreeCol {
                           .withArgName(Messages.message("cli.arg.europeans"))
                           .hasArg()
                           .create());
+        options.addOption(OptionBuilder.withLongOpt("fast")
+                          .withDescription(Messages.message("cli.fast"))
+                          .create());
         options.addOption(OptionBuilder.withLongOpt("font")
                           .withDescription(Messages.message("cli.font"))
                           .withArgName(Messages.message("cli.arg.font"))
@@ -589,7 +593,7 @@ public final class FreeCol {
                     gripe(StringTemplate.template("cli.error.clientOptions")
                         .addName("%string%", fileName));
                 }
-            }                    
+            }
 
             if (line.hasOption("debug")) {
                 // If the optional argument is supplied use limited mode.
@@ -630,6 +634,11 @@ public final class FreeCol {
                     gripe(StringTemplate.template("cli.error.europeans")
                         .addAmount("%min%", EUROPEANS_MIN));
                 }
+            }
+
+            if (line.hasOption("fast")) {
+                fastStart = true;
+                introVideo = false;
             }
 
             if (line.hasOption("font")) {
@@ -1080,7 +1089,7 @@ public final class FreeCol {
      */
     private static void startClient(String userMsg) {
         Specification spec = null;
-        if (debugStart) {
+        if (debugStart || fastStart) {
             try {
                 FreeColTcFile tcf = getTCFile();
                 if (tcf == null) {
@@ -1092,7 +1101,7 @@ public final class FreeCol {
             } catch (IOException ioe) {}
         }
         new FreeColClient(FreeColDirectories.getSavegameFile(), windowSize,
-                          sound, splashFilename, introVideo, fontName, 
+                          sound, splashFilename, introVideo, fontName,
                           userMsg, spec);
     }
 
