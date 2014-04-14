@@ -320,7 +320,6 @@ public abstract class BuildableType extends FreeColGameObjectType {
         } else if (REQUIRED_GOODS_TAG.equals(tag)) {
             GoodsType type = xr.getType(spec, ID_ATTRIBUTE_TAG,
                                         GoodsType.class, (GoodsType)null);
-            type.setBuildingMaterial(true);
             int amount = xr.getAttribute(VALUE_TAG, 0);
             addRequiredGoods(new AbstractGoods(type, amount));
             xr.closeTag(REQUIRED_GOODS_TAG);

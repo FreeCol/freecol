@@ -24,6 +24,11 @@ import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.common.model.BuildableType;
+import net.sf.freecol.common.model.BuildingType;
+import net.sf.freecol.common.model.EquipmentType;
+import net.sf.freecol.common.model.UnitType;
+
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 
@@ -49,14 +54,17 @@ public final class GoodsType extends FreeColGameObjectType {
     /** Is this goods type native to the New World. */
     private boolean newWorldGoods;
 
-    /** Whether this type of goods is required for building. */
-    private boolean buildingMaterial;
+    /**
+     * Whether this type of goods is required for building. (Derived
+     * attribute)
+     */
+    private boolean buildingMaterial = false;
 
     /**
      * Whether this type of goods is required for building equipment
-     * that grants an offence bonus or defence bonus.
+     * that grants an offence bonus or defence bonus. (Derived attribute)
      */
-    private boolean militaryGoods;
+    private boolean militaryGoods = false;
 
     /** Whether these are trade goods that can only be obtained in Europe. */
     private boolean tradeGoods;
@@ -70,8 +78,8 @@ public final class GoodsType extends FreeColGameObjectType {
     /** What this goods type is made from. */
     private GoodsType madeFrom;
 
-    /** What this goods type can make. */
-    private GoodsType makes;
+    /** What this goods type can make.  (Derived attribute) */
+    private GoodsType makes = null;
 
     /** The initial amount of this goods type in a market. */
     private int initialAmount;
@@ -181,30 +189,12 @@ public final class GoodsType extends FreeColGameObjectType {
     }
 
     /**
-     * Set the building material state.
-     *
-     * @param newBuildingMaterial The new building material state.
-     */
-    public void setBuildingMaterial(final boolean newBuildingMaterial) {
-        this.buildingMaterial = newBuildingMaterial;
-    }
-
-    /**
      * Is this goods type a military goods type?
      *
      * @return True if this is a military goods type.
      */
     public boolean isMilitaryGoods() {
         return militaryGoods;
-    }
-
-    /**
-     * Set the military goods state.
-     *
-     * @param newMilitaryGoods The new military goods state.
-     */
-    public void setMilitaryGoods(final boolean newMilitaryGoods) {
-        this.militaryGoods = newMilitaryGoods;
     }
 
     /**
@@ -348,15 +338,6 @@ public final class GoodsType extends FreeColGameObjectType {
     }
 
     /**
-     * Set the breeding number.
-     *
-     * @param newBreedingNumber The new breeding number.
-     */
-    public void setBreedingNumber(final int newBreedingNumber) {
-        this.breedingNumber = newBreedingNumber;
-    }
-
-    /**
      * Is this type of goods breedable?
      *
      * @return True if this <code>GoodsType</code> is breedable.
@@ -462,6 +443,60 @@ public final class GoodsType extends FreeColGameObjectType {
             refinedType = refinedType.makes;
         }
         return false;
+    }
+
+    /**
+     * Set the derived fields for the goods types in a specification.
+     *
+     * The "derived" fields are: buildingMaterial, makes, militaryGoods
+     * - buildingMaterial depends on whether a GoodsType is present on
+     *   a BuildableType requiredGoods list
+     * - makes depends on whether a GoodsType madeFrom field refers
+     *   to another
+     * - militaryGoods depends on whether a GoodsType is present on a
+     *   military EquipmentType requiredGoods list
+     *   
+     * This is called from Specification.clean() when the
+     * specification is fully read.  We must wait until then as the
+     * made-from field can change in extended specifications and mods.
+     * The current example of which is horses, which is made-from food
+     * in the classic ruleset and made-from grain in the freecol
+     * ruleset.
+     *
+     * @param spec The <code>Specification<code> to operate on.
+     */
+    public static void setDerivedAttributes(Specification spec) {
+        // Reset to default state
+        for (GoodsType g : spec.getGoodsTypeList()) {
+            g.buildingMaterial = false;
+            g.makes = null;
+            g.militaryGoods = false;
+        }
+
+        // Set buildingMaterial attribute
+        List<BuildableType> buildableTypes = new ArrayList<BuildableType>();
+        buildableTypes.addAll(spec.getBuildingTypeList());
+        buildableTypes.addAll(spec.getUnitTypeList());
+        buildableTypes.addAll(spec.getEquipmentTypeList());
+        for (BuildableType b : buildableTypes) {
+            for (AbstractGoods ag : b.getRequiredGoods()) {
+                ag.getType().buildingMaterial = true;
+            }
+        }
+
+        // Set makes attribute
+        for (GoodsType g : spec.getGoodsTypeList()) {
+            if (g.madeFrom != null) g.madeFrom.makes = g;
+        }
+
+        // Set militaryGoods attribute
+        for (EquipmentType e : spec.getEquipmentTypeList()) {
+            if (e.isMilitaryEquipment()) {
+                for (AbstractGoods ag : e.getRequiredGoods()) {
+                    ag.getType().militaryGoods = true;
+                }
+            }
+        }
     }
 
 
@@ -579,7 +614,6 @@ public final class GoodsType extends FreeColGameObjectType {
 
         madeFrom = xr.getType(spec, MADE_FROM_TAG, GoodsType.class,
                               (GoodsType)null);
-        if (madeFrom != null) madeFrom.makes = this;
 
         storable = xr.getAttribute(STORABLE_TAG, true);
 

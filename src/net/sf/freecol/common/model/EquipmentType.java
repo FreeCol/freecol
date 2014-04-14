@@ -325,9 +325,6 @@ public class EquipmentType extends BuildableType {
             if (modifier.getId().equals(Modifier.OFFENCE)
                 || modifier.getId().equals(Modifier.DEFENCE)) {
                 militaryEquipment = true;
-                for (AbstractGoods goods : getRequiredGoods()) {
-                    goods.getType().setMilitaryGoods(true);
-                }
                 break;
             }
         }

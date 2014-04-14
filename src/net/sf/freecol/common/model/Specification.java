@@ -424,6 +424,10 @@ public final class Specification {
             }
         }
 
+        // Fix up the GoodsType derived attributes.  Several GoodsType
+        // predicates are likely to fail until this is done.
+        GoodsType.setDerivedAttributes(this);
+
         farmedGoodsTypeList.clear();
         foodGoodsTypeList.clear();
         newWorldGoodsTypeList.clear();
