@@ -238,7 +238,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     public static boolean isBadlyDefended(Colony colony) {
         return colony.getTotalDefencePower()
-            < 1.25f * colony.getUnitCount() - 2.5f;
+            < 0.95f * colony.getUnitCount() - 2.5f;
     }
 
     /**

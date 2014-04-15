@@ -2066,10 +2066,19 @@ public class EuropeanAIPlayer extends AIPlayer {
         if (turn.isFirstTurn()) initializeMissions();
         buildTipMap();
 
+        StringBuffer sb = new StringBuffer(64);
         for (AIColony aic : getAIColonies()) {
             aic.rearrangeWorkers();
             aic.updateAIGoods();
+            if (aic.isBadlyDefended()) {
+                sb.append(" ").append(aic.getColony().getName());
+            }
         }
+        if (logger.isLoggable(Level.FINEST) && sb.length() > 0) {
+            sb.insert(0, "Badly defended colonies:");
+            logger.finest(sb.toString());
+        }
+        
         buildTransportMaps();
         buildWishMaps();
         cheat();
