@@ -22,6 +22,14 @@
 -->
 <freecol-specification id="freecol" version="0.83" extends="classic">
 
+  <goods-types>
+    <goods-type id="model.goods.horses" is-farmed="false"
+                breeding-number="2"
+                made-from="model.goods.grain"> <!-- changed from food --> 
+      <market initial-amount="1000"  initial-price="1"  price-difference="2" />
+    </goods-type>
+  </goods-types>
+
   <building-types>
     <building-type id="model.building.stockade" preserve="true">
       <modifier id="model.modifier.minimumColonySize" delete="true" />

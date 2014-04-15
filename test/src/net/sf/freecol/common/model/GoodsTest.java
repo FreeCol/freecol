@@ -46,6 +46,8 @@ public class GoodsTest extends FreeColTestCase {
         = spec().getGoodsType("model.goods.fish");
     private static final GoodsType foodType
         = spec().getPrimaryFoodType();
+    private static final GoodsType grainType
+        = spec().getGoodsType("model.goods.grain");
     private static final GoodsType hammersType
         = spec().getGoodsType("model.goods.hammers");
     private static final GoodsType horsesType
@@ -181,7 +183,8 @@ public class GoodsTest extends FreeColTestCase {
         assertTrue(oreType.isRawBuildingMaterial());
         assertTrue(lumberType.isRawBuildingMaterial());
         assertFalse(toolsType.isRawBuildingMaterial());
-        assertTrue(foodType.isRawBuildingMaterial());
+        assertFalse(foodType.isRawBuildingMaterial());// freecol-ruleset!
+        assertTrue(grainType.isRawBuildingMaterial());// freecol-ruleset!
         assertFalse(fishType.isRawBuildingMaterial());
         assertFalse(horsesType.isRawBuildingMaterial());
         assertFalse(musketsType.isRawBuildingMaterial());
