@@ -1326,17 +1326,21 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
             aiUnits.remove(i);
         }
-        String report = Utils.lastPart(getPlayer().getNationId(), ".")
-            + ".giveNormalMissions(turn=" + turnNumber
-            + " colonies=" + getPlayer().getNumberOfSettlements()
-            + " all-units=" + allUnits
-            + " free-land-units=" + aiUnits.size()
-            + " free-naval-units=" + navalUnits.size()
-            + " builders=" + nBuilders
-            + " pioneers=" + nPioneers
-            + " scouts=" + nScouts
-            + " naval-carriers=" + nNavalCarrier
-            + ")";
+        StringBuffer sb = null;
+        if (logger.isLoggable(Level.FINE)) {
+            sb = new StringBuffer(256);
+            sb.append(Utils.lastPart(getPlayer().getNationId(), "."))
+                .append(".giveNormalMissions(turn=").append(turnNumber)
+                .append(" colonies=").append(getPlayer().getNumberOfSettlements())
+                .append(" all-units=").append(allUnits)
+                .append(" free-land-units=").append(aiUnits.size())
+                .append(" free-naval-units=").append(navalUnits.size())
+                .append(" builders=").append(nBuilders)
+                .append(" pioneers=").append(nPioneers)
+                .append(" scouts=").append(nScouts)
+                .append(" naval-carriers=").append(nNavalCarrier)
+                .append(")");
+        }
 
         // First try to satisfy the demand for missions with a defined quota.
         if (nBuilders > 0) {
@@ -1469,14 +1473,15 @@ public class EuropeanAIPlayer extends AIPlayer {
                 String reason = reasons.get(u);
                 if (reason == null) reason = "OMITTED";
                 Mission m = aiu.getMission();
-                report += "\n  " + u.getLocation() + " " + reason + "-"
-                    + ((m == null)
+                sb.append("\n  ").append(u.getLocation())
+                    .append(" ").append(reason)
+                    .append("-").append((m == null)
                         ? "NoMission"
                         : (m instanceof TransportMission)
                         ? ((TransportMission)m).toFullString()
                         : m.toString());
             }
-            logger.fine(report);
+            logger.fine(sb.toString());
         }
     }
 
@@ -2095,9 +2100,11 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     @Override
     protected void doMissions() {
+        StringBuffer sb = new StringBuffer(64);
+        sb.append("doMissions, normal: ");
         List<AIUnit> aiUnits = getAIUnits();
         for (AIUnit aiu : aiUnits) {
-            logger.log(Level.FINEST, "doMissions(normal): " + aiu);
+            sb.append(aiu);
             if (aiu.getMission() instanceof TransportMission) continue;
             try {
                 aiu.doMission();
@@ -2105,8 +2112,9 @@ public class EuropeanAIPlayer extends AIPlayer {
                 logger.log(Level.WARNING, "doMissions failed for: " + aiu, e);
             }
         }
+        sb.append(", transport: ");
         for (AIUnit aiu : aiUnits) {
-            logger.log(Level.FINEST, "doMissions(transport): " + aiu);
+            sb.append(aiu);
             if (!(aiu.getMission() instanceof TransportMission)) continue;
             try {
                 aiu.doMission();
@@ -2114,6 +2122,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 logger.log(Level.WARNING, "doMissions failed for: " + aiu, e);
             }
         }
+        if (logger.isLoggable(Level.FINEST)) logger.finest(sb.toString());
     }
 
     /**
