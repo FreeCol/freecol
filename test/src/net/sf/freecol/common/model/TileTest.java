@@ -645,4 +645,34 @@ public class TileTest extends FreeColTestCase {
         // recognized as belonging to the colony which stops those
         // work locations from contributing their units.
     }
+
+    public void testGetBestLandingTile() {
+        Game game = getStandardGame();
+        Map map = getCoastTestMap(plains, true);
+        game.setMap(map);
+
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Tile settlementTile = map.getTile(9, 2);
+        FreeColTestUtils.getColonyBuilder().player(dutch)
+            .colonyTile(settlementTile).build();
+        Tile tileN = map.getTile(9, 1);
+        assertTrue(tileN.isLand());
+        Tile tileS = map.getTile(9, 3);
+        assertTrue(tileS.isLand());
+        Tile tileE = map.getTile(8, 2);
+        assertTrue(tileE.isLand());
+        tileS.setType(tundraForest);
+        tileE.setType(mountains);
+        
+        List<Tile> tiles = settlementTile.getSafestSurroundingLandTiles(dutch);
+        assertFalse("Surrounding tiles should be found", tiles.isEmpty());
+        assertEquals("Best tile is mountainous", tileE, tiles.get(0));
+
+        assertEquals("Best landing tile is forest", tileS, 
+            settlementTile.getBestLandingTile(dutch));
+        
+        tileN.setType(hills);
+        assertEquals("Best landing tile is now hills", tileN,
+            settlementTile.getBestLandingTile(dutch));
+    }
 }

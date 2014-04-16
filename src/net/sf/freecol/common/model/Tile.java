@@ -1090,6 +1090,56 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         }
     }
 
+    /**
+     * Get the defence value for this tile type.
+     *
+     * @return The defence value.
+     */
+    public float getDefenceValue() {
+        return FeatureContainer.applyModifierSet(1.0f, null,
+            getType().getDefenceBonus());
+    }
+
+    /**
+     * Get a list of surrounding land tiles, sorted with the most
+     * defensible first.  Useful when planning an attack.
+     *
+     * @param player A <code>Player</code> to use to check for
+     *     tile access.
+     * @return A list of land <code>Tile</code>s.
+     */
+    public List<Tile> getSafestSurroundingLandTiles(Player player) {
+        List<Tile> tiles = new ArrayList<Tile>();
+        for (Tile t : getSurroundingTiles(1)) {
+            if (t.isLand()
+                && (!t.hasSettlement() || player.owns(t.getSettlement()))) {
+                tiles.add(t);
+            }
+        }
+        Collections.sort(tiles, new Comparator<Tile>() {
+                public int compare(Tile t1, Tile t2) {
+                    float f = t2.getDefenceValue() - t1.getDefenceValue();
+                    return (f < 0.0f) ? -1 : (f > 0.0f) ? 1 : 0;
+                }
+            });
+        return tiles;
+    }
+                    
+    /**
+     * Get the adjacent land tile with the best defence bonus.
+     * Useful for incoming attackers as a landing site.
+     *
+     * @param player A <code>Player</code> to use to check for
+     *     tile access.
+     * @return The most defensible adjacent land <code>Tile</code>.
+     */
+    public Tile getBestLandingTile(Player player) {
+        for (Tile t : getSafestSurroundingLandTiles(player)) {
+            if (t.isHighSeasConnected()) return t;
+        }
+        return null;
+    }
+
 
     //
     // Type and Ownership
