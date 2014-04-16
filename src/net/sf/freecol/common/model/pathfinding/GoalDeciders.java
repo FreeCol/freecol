@@ -165,8 +165,8 @@ public final class GoalDeciders {
      * Builds a goal decider to find an adjacent tile to a target location.
      *
      * @param target The target <code>Location</code>.
-     * @return A <code>GoalDecider</code> that only succeeds for tiles adjacent
-     *     to the target location.
+     * @return A <code>GoalDecider</code> that only succeeds for tiles
+     *     adjacent to the target location.
      */
     public static GoalDecider getAdjacentLocationGoalDecider(Location target) {
         final Tile tile = target.getTile();
@@ -189,8 +189,36 @@ public final class GoalDeciders {
     }
 
     /**
-     * A class to wrap a goal decider that searches for paths to an adjacent
-     * tile to a set of locations, and the results of such a search.
+     * Get a goal decider that succeeds for settlements owned by one
+     * of a given list of enemies.
+     *
+     * @param enemies The list of enemy <code>Player</code>s.
+     * @return A suitable <code>GoalDecider</code>.
+     **/
+    public static GoalDecider getEnemySettlementGoalDecider(final List<Player> enemies) {
+        return new GoalDecider() {
+            private PathNode best = null;
+                        
+            public PathNode getGoal() { return best; }
+            public boolean hasSubGoals() { return false; }
+            public boolean check(Unit u, PathNode path) {
+                Tile t = path.getTile();
+                if (t == null || !t.isLand()) return false;
+                Settlement s = t.getSettlement();
+                if (s == null) return false;
+                if (enemies.contains(s.getOwner())) {
+                    best = path;
+                    return true;
+                }
+                return false;
+            }
+        };
+    }
+
+    /**
+     * A class to wrap a goal decider that searches for paths to an
+     * adjacent tile to a set of locations, and the results of such a
+     * search.
      */
     public static class MultipleAdjacentDecider {
 

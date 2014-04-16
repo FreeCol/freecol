@@ -1198,6 +1198,8 @@ public final class FreeColServer {
             "model.difficulty.other", 48, true);
         addBooleanOption(GameOptions.FOUND_COLONY_DURING_REBELLION,
             "gameOptions.colony", true, false);
+        addIntegerOption(GameOptions.OFFENSIVE_LAND_UNIT_CHEAT,
+            "model.difficulty.cheat", 4, true);
     }
 
     private void addOptionGroup(String id, boolean difficulty) {

@@ -396,6 +396,8 @@ public class GameOptions {
         = "model.option.equipScoutCheat";
     public static final String LAND_UNIT_CHEAT
         = "model.option.landUnitCheat";
+    public static final String OFFENSIVE_LAND_UNIT_CHEAT
+        = "model.option.offensiveLandUnitCheat";
     public static final String OFFENSIVE_NAVAL_UNIT_CHEAT
         = "model.option.offensiveNavalUnitCheat";
     public static final String TRANSPORT_NAVAL_UNIT_CHEAT

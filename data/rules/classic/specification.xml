@@ -2344,6 +2344,7 @@ resources of 400, lost city rumours of 500
           <integerOption id="model.option.liftBoycottCheat" value="1"/>
           <integerOption id="model.option.equipScoutCheat" value="1"/>
           <integerOption id="model.option.landUnitCheat" value="1"/>
+          <integerOption id="model.option.offensiveLandUnitCheat" value="0"/>
           <integerOption id="model.option.offensiveNavalUnitCheat" value="1"/>
           <integerOption id="model.option.transportNavalUnitCheat" value="1"/>
         </optionGroup>
@@ -2482,6 +2483,7 @@ resources of 400, lost city rumours of 500
           <integerOption id="model.option.liftBoycottCheat" value="5"/>
           <integerOption id="model.option.equipScoutCheat" value="5"/>
           <integerOption id="model.option.landUnitCheat" value="5"/>
+          <integerOption id="model.option.offensiveLandUnitCheat" value="2"/>
           <integerOption id="model.option.offensiveNavalUnitCheat" value="5"/>
           <integerOption id="model.option.transportNavalUnitCheat" value="5"/>
         </optionGroup>
@@ -2615,6 +2617,7 @@ resources of 400, lost city rumours of 500
           <integerOption id="model.option.liftBoycottCheat" value="10"/>
           <integerOption id="model.option.equipScoutCheat" value="10"/>
           <integerOption id="model.option.landUnitCheat" value="10"/>
+          <integerOption id="model.option.offensiveLandUnitCheat" value="4"/>
           <integerOption id="model.option.offensiveNavalUnitCheat" value="10"/>
           <integerOption id="model.option.transportNavalUnitCheat" value="10"/>
         </optionGroup>
@@ -2741,6 +2744,7 @@ resources of 400, lost city rumours of 500
           <integerOption id="model.option.liftBoycottCheat" value="15"/>
           <integerOption id="model.option.equipScoutCheat" value="15"/>
           <integerOption id="model.option.landUnitCheat" value="15"/>
+          <integerOption id="model.option.offensiveLandUnitCheat" value="7"/>
           <integerOption id="model.option.offensiveNavalUnitCheat" value="15"/>
           <integerOption id="model.option.transportNavalUnitCheat" value="15"/>
         </optionGroup>
@@ -2867,6 +2871,7 @@ resources of 400, lost city rumours of 500
           <integerOption id="model.option.liftBoycottCheat" value="20"/>
           <integerOption id="model.option.equipScoutCheat" value="20"/>
           <integerOption id="model.option.landUnitCheat" value="20"/>
+          <integerOption id="model.option.offensiveLandUnitCheat" value="10"/>
           <integerOption id="model.option.offensiveNavalUnitCheat" value="20"/>
           <integerOption id="model.option.transportNavalUnitCheat" value="20"/>
         </optionGroup>
@@ -3035,6 +3040,7 @@ resources of 400, lost city rumours of 500
           <integerOption id="model.option.liftBoycottCheat" value="20"/>
           <integerOption id="model.option.equipScoutCheat" value="20"/>
           <integerOption id="model.option.landUnitCheat" value="20"/>
+          <integerOption id="model.option.offensiveLandUnitCheat" value="10"/>
           <integerOption id="model.option.offensiveNavalUnitCheat" value="20"/>
           <integerOption id="model.option.transportNavalUnitCheat" value="20"/>
         </optionGroup>

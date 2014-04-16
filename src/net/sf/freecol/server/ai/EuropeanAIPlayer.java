@@ -78,6 +78,7 @@ import net.sf.freecol.common.model.UnitTradeItem;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
+import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.util.RandomChoice;
@@ -1071,6 +1072,8 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     private void cheat() {
         final Specification spec = getSpecification();
+        final Game game = getGame();
+        final AIMain aiMain = getAIMain();
         final Player player = getPlayer();
         final Market market = player.getMarket();
         final Europe europe = player.getEurope();
@@ -1081,6 +1084,8 @@ public class EuropeanAIPlayer extends AIPlayer {
             = spec.getInteger(GameOptions.EQUIP_SCOUT_CHEAT);
         final int landUnitCheatPercent
             = spec.getInteger(GameOptions.LAND_UNIT_CHEAT);
+        final int offensiveLandUnitCheatPercent
+            = spec.getInteger(GameOptions.OFFENSIVE_LAND_UNIT_CHEAT);
         final int offensiveNavalUnitCheatPercent
             = spec.getInteger(GameOptions.OFFENSIVE_NAVAL_UNIT_CHEAT);
         final int transportNavalUnitCheatPercent
@@ -1182,6 +1187,85 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
         }
 
+        if (game.getTurn().getAge() >= 2
+            && player.isAtWar()
+            && Utils.randomInt(logger, "Recruit Offensive Land Unit?", air, 100)
+            < offensiveLandUnitCheatPercent) {
+            // Find a target to attack.
+            Location target = null;
+            // - collect enemies, prefer not to antagonize the strong or
+            //   crush the weak
+            List<Player> enemies = new ArrayList<Player>();
+            List<Player> preferred = new ArrayList<Player>();
+            for (Player p : game.getPlayers()) {
+                if (player.atWarWith(p)) {
+                    enemies.add(p);
+                    double strength = getStrengthRatio(p);
+                    if (strength < 3.0/2.0 && strength > 2.0/3.0) {
+                        preferred.add(p);
+                    }
+                }
+            }
+            if (!preferred.isEmpty()) {
+                enemies.clear();
+                enemies.addAll(preferred);
+            }
+            List<Colony> colonies = player.getColonies();
+            // Few colonies?  Attack the weakest European port
+            if (colonies.size() < 3) {
+                List<Colony> targets = new ArrayList<Colony>();
+                for (Player p : enemies) {
+                    if (p.isEuropean()) targets.addAll(p.getColonies());
+                }
+                double targetScore = -1;
+                for (Colony c : targets) {
+                    if (c.isConnectedPort()) {
+                        double score = 100000.0 / c.getUnitCount();
+                        Building stockade = c.getStockade();
+                        score /= (stockade == null) ? 1.0
+                            : (stockade.getLevel() + 1.5);
+                        if (targetScore < score) {
+                            targetScore = score;
+                            target = c;
+                        }
+                    }
+                }
+            }
+            // Otherwise attack something near a weak colony
+            if (target == null) {
+                List<AIColony> bad = new ArrayList<AIColony>();
+                for (AIColony aic : getAIColonies()) {
+                    if (aic.isBadlyDefended()) bad.add(aic);
+                }
+                if (bad.isEmpty()) bad.addAll(getAIColonies());
+                AIColony defend = Utils.getRandomMember(logger,
+                    "AIColony to defend", bad, air);
+                Tile center = defend.getColony().getTile();
+                Tile t = game.getMap().searchCircle(center,
+                    GoalDeciders.getEnemySettlementGoalDecider(enemies),
+                    30);
+                if (t != null) target = t.getSettlement();
+            }
+            if (target == null) {
+                logger.warning("Failed to find offensive land unit cheat target");
+            } else {
+                List<Unit> mercs = ((ServerPlayer)player)
+                    .createUnits(player.getMonarch().getMercenaries(air),
+                                 europe);
+                for (Unit u : mercs) {
+                    AIUnit aiu = getAIUnit(u);
+                    if (aiu == null) {
+                        logger.warning("AIUNIT FAIL " + u);
+                        aiu = new AIUnit(aiMain, u);
+                    }
+                    aiu.setMission(new UnitSeekAndDestroyMission(aiMain,
+                            aiu, target));
+                }
+                logger.info("AI offensive land unit cheat ("
+                    + mercs.size() + ") targeted: " + target);
+            }
+        }
+            
         // Always cheat a new armed ship if the navy is destroyed,
         // otherwise if the navy is below average the chance to cheat
         // is proportional to how badly below average.
@@ -1235,19 +1319,30 @@ public class EuropeanAIPlayer extends AIPlayer {
      * Cheat-build a unit in Europe.
      *
      * @param rc A list of random choices to choose from.
+     * @return The <code>AIUnit</code> built.
      */
-    private void cheatUnit(List<RandomChoice<UnitType>> rc) {
-        final Player player = getPlayer();
-        final Europe europe = player.getEurope();
+    private AIUnit cheatUnit(List<RandomChoice<UnitType>> rc) {
         final Random random = getAIRandom();
-
         UnitType unitToPurchase
             = RandomChoice.getWeightedRandom(logger, "Cheat which unit",
                                              rc, random);
-        int cost = europe.getUnitPrice(unitToPurchase);
+        return cheatUnit(unitToPurchase);
+    }
+
+    /**
+     * Cheat-build a unit in Europe.
+     *
+     * @param unitType The <code>UnitType</code> to build.
+     * @return The <code>AIUnit</code> built.
+     */
+    private AIUnit cheatUnit(UnitType unitType) {
+        final Player player = getPlayer();
+        final Europe europe = player.getEurope();
+        int cost = europe.getUnitPrice(unitType);
         if (cost > 0 && !player.checkGold(cost)) player.modifyGold(cost);
-        AIUnit aiUnit = trainAIUnitInEurope(unitToPurchase);
-        if (aiUnit != null) player.logCheat("build " + unitToPurchase);
+        AIUnit aiUnit = trainAIUnitInEurope(unitType);
+        if (aiUnit != null) player.logCheat("build " + unitType);
+        return aiUnit;
     }
 
     /**
