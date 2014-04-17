@@ -33,6 +33,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
@@ -58,7 +59,7 @@ public class UnitSeekAndDestroyMission extends Mission {
      * The object we are trying to destroy. This can be a
      * either <code>Settlement</code> or a <code>Unit</code>.
      */
-    private Location target;
+    private Location target, transportTarget;
 
 
     /**
@@ -302,8 +303,17 @@ public class UnitSeekAndDestroyMission extends Mission {
     }
 
 
-    // Fake Transportable interface wholly inherited from Mission
+    // Fake Transportable interface
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Location getTransportDestination() {
+        return (transportTarget != null) ? transportTarget : target;
+    }
+
+    
     // Mission interface
 
     /**
@@ -321,6 +331,17 @@ public class UnitSeekAndDestroyMission extends Mission {
             || target instanceof Unit || target instanceof Settlement) {
             boolean retarget = this.target != null && this.target != target;
             this.target = target;
+            Unit unit = getUnit();
+            transportTarget = null;
+            if (unit.shouldTakeTransportTo(target)) {
+                Tile t = target.getTile();
+                Player player = getPlayer();
+                if (target instanceof Settlement) {
+                    transportTarget = ((Settlement)target).isConnectedPort()
+                        ? t.getBestLandingTile(player)
+                        : t.getSafestSurroundingLandTiles(player).get(0);
+                }
+            }
             if (retarget) retargetTransportable();
         }
     }
@@ -448,7 +469,8 @@ public class UnitSeekAndDestroyMission extends Mission {
         // Is there a target-of-opportunity?
         final AIUnit aiUnit = getAIUnit();
         final Unit unit = getUnit();
-        Location nearbyTarget = findTarget(aiUnit, 1, false);
+        Location nearbyTarget = (unit.isOnCarrier()) ? null
+            : findTarget(aiUnit, 1, false);
         if (nearbyTarget != null) {
             if (getTarget() == null) {
                 logger.finest(tag + " retargeted " + nearbyTarget
