@@ -33,23 +33,27 @@ import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
- * The frame that contains everything. If full screen mode is
- * supported and choosen, then the {@link FullScreenFrame} will be used
- * instead.
+ * The frame that contains everything.  If full screen mode is
+ * supported and chosen, then {@link FullScreenFrame} is used instead.
  */
 public final class WindowedFrame extends FreeColFrame  {
 
     private static final Logger logger = Logger.getLogger(WindowedFrame.class.getName());
 
     /**
-    * The constructor to use.
-     * @param canvas 
-    */
-    public WindowedFrame(final FreeColClient freeColClient, GraphicsDevice gd, final Canvas canvas) {
+     * Create a windowed frame.
+     *
+     * @param freeColClient The enclosing <code>FreeColClient</code>.
+     * @param gd The <code>GraphicsDevice</code> to display on.
+     * @param canvas The <code>Canvas</code> to extract the size from.
+     */
+    public WindowedFrame(final FreeColClient freeColClient,
+                         GraphicsDevice gd, final Canvas canvas) {
         super(freeColClient, "FreeCol " + FreeCol.getVersion(), gd);
-        logger.info("WindowedFrame's JFrame created.");
 
-	this.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+        // Disabled as this prevents the --windowed WIDTHxHEIGHT
+        // command line parameter from working.
+        //this.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setResizable(true);
         
@@ -60,11 +64,14 @@ public final class WindowedFrame extends FreeColFrame  {
             }
         });
 
-        logger.info("WindowedFrame created.");
+        logger.info("WindowedFrame created with size: "
+            + canvas.getSize());
     }
 
 
-    @Override
+    /**
+     * {@inheritDoc}
+     */
     public void updateBounds(Rectangle rectangle) {
         if (rectangle != null) {
             setBounds(rectangle);
