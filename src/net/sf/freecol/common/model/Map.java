@@ -1607,8 +1607,9 @@ public class Map extends FreeColGameObject implements Location {
                         // settlement that is there.
                         unitMove = true;
                         break;
-                    case MOVE_NO_ATTACK_CIVILIAN:
                     case MOVE_NO_ATTACK_MARINE:
+                    case MOVE_NO_ATTACK_CIVILIAN:
+                        if (moveTile.hasSettlement()) break;
                         // There is a unit in the way.  Assume this
                         // condition is transient unless the unit is
                         // in a constrained position such as a small
