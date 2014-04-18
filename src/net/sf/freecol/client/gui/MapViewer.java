@@ -2421,7 +2421,7 @@ public final class MapViewer {
                 }
             }
             // Tile Overlays (eg. hills and mountains)
-            Image overlayImage = lib.getOverlayImage(tile.getType(), tile.getX(), tile.getY());
+            Image overlayImage = lib.getOverlayImage(tile);
             if (overlayImage != null) {
                 g.drawImage(overlayImage, 0, (tileHeight - overlayImage.getHeight(null)), null);
             }

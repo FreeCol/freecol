@@ -32,6 +32,8 @@ import java.awt.Transparency;
 import java.awt.font.TextLayout;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -93,6 +95,8 @@ public final class ImageLibrary {
      * this object is not a result of a scaling operation.
      */
     private final float scalingFactor;
+
+    private Map<String, Integer> imageCounts = new HashMap<String, Integer>();
 
 
     /**
@@ -454,7 +458,7 @@ public final class ImageLibrary {
     public Image getCompoundTerrainImage(TileType type, double scale) {
         // Currently used for hills and mountains
         Image terrainImage = getTerrainImage(type, 0, 0, scale);
-        Image overlayImage = getOverlayImage(type, 0, 0, scale);
+        Image overlayImage = getOverlayImage(type, type.getId(), scale);
         Image forestImage = type.isForested() ? getForestImage(type, scale)
             : null;
         if (overlayImage == null && forestImage == null) {
@@ -501,7 +505,7 @@ public final class ImageLibrary {
         Image terrain = getTerrainImage(type, 0, 0);
         int height = terrain.getHeight(null);
         if (type != null) {
-            Image overlayImage = getOverlayImage(type, 0, 0);
+            Image overlayImage = getOverlayImage(type, type.getId(), scalingFactor);
             if (overlayImage != null) {
                 height = Math.max(height, overlayImage.getHeight(null));
             }
@@ -771,26 +775,43 @@ public final class ImageLibrary {
     }
 
     /**
-     * Returns the overlay-image for the given type.
+     * Returns the overlay image for the given tile.
      *
-     * @param type The type of the terrain-image to return.
-     * @param x The x-coordinate of the location of the tile that is being
-     *            drawn.
-     * @param y The x-coordinate of the location of the tile that is being
-     *            drawn.
-     * @return The terrain-image at the given index.
+     * @param tile The tile for which to return an image.
+     * @return A pseudo-random terrain image.
      */
-    public Image getOverlayImage(TileType type, int x, int y) {
-        return getOverlayImage(type, x, y, scalingFactor);
+    public Image getOverlayImage(Tile tile) {
+        return getOverlayImage(tile.getType(), tile.getId(), scalingFactor);
     }
 
-    public Image getOverlayImage(TileType type, int x, int y, double scale) {
-        String key = type.getId() + ".overlay" + ((x + y) % 2) + ".image";
-        if (ResourceManager.hasResource(key)) {
-            return ResourceManager.getImage(key, scale);
-        } else {
-            return null;
+    /**
+     * Returns the overlay-image for the given type and scale.
+     *
+     * @param type The type of the terrain-image to return.
+     * @param id A string used to get a random image.
+     * @param scale The scale of the image to return.
+     * @return The terrain-image at the given index.
+     */
+    public Image getOverlayImage(TileType type, String id, double scale) {
+        return getRandomizedImage(type.getId() + ".overlay", id, scale);
+    }
+
+    private Image getRandomizedImage(String prefix, String id, double scale) {
+        int count = getImageCount(prefix);
+        if (count > 0) {
+            String key = prefix + Math.abs(id.hashCode() % count) + ".image";
+            if (ResourceManager.hasResource(key)) {
+                return ResourceManager.getImage(key, scale);
+            }
         }
+        return null;
+    }
+
+    private int getImageCount(String prefix) {
+        if (!imageCounts.containsKey(prefix)) {
+            imageCounts.put(prefix, ResourceManager.getKeys(prefix).size());
+        }
+        return imageCounts.get(prefix);
     }
 
     private String getPathType(Unit unit) {
