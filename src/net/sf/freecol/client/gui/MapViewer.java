@@ -44,6 +44,7 @@ import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -103,13 +104,26 @@ public final class MapViewer {
 
     public static enum BorderType { COUNTRY, REGION }
 
- 
+
     class TextSpecification {
         public String text;
         public Font font;
         public TextSpecification(String newText, Font newFont) {
             text = newText;
             font = newFont;
+        }
+    }
+
+    class SortableImage implements Comparable<SortableImage> {
+        public Image image;
+        public int index;
+        public SortableImage(Image image, int index) {
+            this.image = image;
+            this.index = index;
+        }
+
+        public int compareTo(SortableImage other) {
+            return other.index - this.index;
         }
     }
 
@@ -1191,7 +1205,7 @@ public final class MapViewer {
     }
 
     /**
-     * Sets the active unit.  
+     * Sets the active unit.
      *
      * Invokes {@link #setSelectedTile(Tile, boolean)} if the selected
      * tile is another tile than where the <code>activeUnit</code> is located.
@@ -1689,7 +1703,7 @@ public final class MapViewer {
      * location specified by the coordinates. Only base terrain will be drawn.
      *
      * @param g The Graphics2D object on which to draw the Tile.
-     * @param library The <code>ImageLibrary</code> to use. 
+     * @param library The <code>ImageLibrary</code> to use.
      * @param tile The Tile to draw.
      * @param drawUnexploredBorders If true; draws border between explored and
      *        unexplored terrain.
@@ -1716,6 +1730,8 @@ public final class MapViewer {
                     }
                 }
 
+                List<SortableImage> imageBorders = new ArrayList<SortableImage>(8);
+                SortableImage si;
                 for (Direction direction : Direction.values()) {
                     Tile borderingTile = tile.getNeighbourOrNull(direction);
                     if (borderingTile != null) {
@@ -1735,12 +1751,15 @@ public final class MapViewer {
                         } else if (!tile.isLand() && borderingTile.isLand() && borderingTile.isExplored()) {
                             // If there is a Coast image (eg. beach) defined, use it, otherwise skip
                             // Draw the grass from the neighboring tile, spilling over on the side of this tile
-                            g.drawImage(library.getBorderImage(borderingTile.getType(), direction, x, y),
-                                        0, 0, null);
+                            si = new SortableImage(library.getBorderImage(borderingTile.getType(), direction, x, y),
+                                                   borderingTile.getType().getIndex());
+                            imageBorders.add(si);
                             TileImprovement river = borderingTile.getRiver();
                             if (river != null && river.isConnectedTo(direction.getReverseDirection())) {
-                                g.drawImage(library.getRiverMouthImage(direction, borderingTile.getRiver().getMagnitude(), x, y),
-                                            0, 0, null);
+                                si = new SortableImage(library.getRiverMouthImage(direction, borderingTile
+                                                                                  .getRiver().getMagnitude(), x, y),
+                                                       -1);
+                                imageBorders.add(si);
                             }
                         } else if (borderingTile.isExplored()) {
                             if (library.getTerrainImage(tile.getType(), 0, 0)
@@ -1749,11 +1768,16 @@ public final class MapViewer {
                                 continue;
                             } else if (borderingTile.getType().getIndex() < tile.getType().getIndex()) {
                                 // Draw land terrain with bordering land type, or ocean/high seas limit
-                                g.drawImage(library.getBorderImage(borderingTile.getType(), direction,
-                                                               x, y), 0, 0, null);
+                                si = new SortableImage(library.getBorderImage(borderingTile.getType(), direction,
+                                                                              x, y), borderingTile.getType().getIndex());
+                                imageBorders.add(si);
                             }
                         }
                     }
+                }
+                Collections.sort(imageBorders);
+                for (SortableImage sorted : imageBorders) {
+                    g.drawImage(sorted.image, 0, 0, null);
                 }
             }
         }
@@ -1811,7 +1835,7 @@ public final class MapViewer {
             } else {
                 g.setColor(Color.RED);
                 image = lib.getPathNextTurnImage(show);
-                turns = lib.getStringImage(g, Integer.toString(p.getTurns()), 
+                turns = lib.getStringImage(g, Integer.toString(p.getTurns()),
                                            Color.WHITE, font);
             }
             if (debug) {
@@ -2074,7 +2098,7 @@ public final class MapViewer {
                         }
                     }
                     specs[0] = new TextSpecification(name, font);
-                    
+
                     Image nameImage = createLabel(g, specs, backgroundColor);
                     if (nameImage != null) {
                         int spacing = 3;
@@ -2083,7 +2107,7 @@ public final class MapViewer {
                         if (settlement instanceof Colony) {
                             Colony colony = (Colony)settlement;
                             String size = Integer.toString(colony.getDisplayUnitCount());
-                            
+
                             leftImage = createLabel(g, size,
                                 ((colony.getPreferredSizeChange() > 0) ? italicFont : font),
                                 backgroundColor);
@@ -2102,7 +2126,7 @@ public final class MapViewer {
                             if (is.getType().isCapital()) {
                                 leftImage = createCapitalLabel(nameImage.getHeight(null), 5, backgroundColor);
                             }
-                            
+
                             Unit missionary = is.getMissionary();
                             if (missionary != null) {
                                 boolean expert = missionary.hasAbility(Ability.EXPERT_MISSIONARY);
@@ -2111,7 +2135,7 @@ public final class MapViewer {
                                 rightImage = createReligiousMissionLabel(nameImage.getHeight(null), 5, backgroundColor, expert);
                             }
                         }
-                        
+
                         int width = (int)((nameImage.getWidth(null)
                                 * lib.getScalingFactor())
                             + ((leftImage != null)
@@ -2169,7 +2193,7 @@ public final class MapViewer {
                 canvas.add(greyLayer, JLayeredPane.DRAG_LAYER);
             }
 
-            greyLayer.setBounds(0, 0, canvas.getSize().width, 
+            greyLayer.setBounds(0, 0, canvas.getSize().width,
                                 canvas.getSize().height);
             greyLayer.setPlayer(freeColClient.getGame().getCurrentPlayer());
         } else {
@@ -2177,7 +2201,7 @@ public final class MapViewer {
                 canvas.removeFromCanvas(greyLayer);
             }
         }
-        
+
         /*
         PART 6
         ======
@@ -2473,7 +2497,7 @@ public final class MapViewer {
      */
     private void displayUnit(Graphics2D g, Unit unit) {
         final Player player = freeColClient.getMyPlayer();
- 
+
         try {
             // Draw the 'selected unit' image if needed.
             //if ((unit == getActiveUnit()) && cursor) {
