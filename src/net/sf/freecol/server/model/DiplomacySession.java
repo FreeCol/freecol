@@ -26,6 +26,7 @@ import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.control.ChangeSet;
+import net.sf.freecol.server.control.ChangeSet.See;
 
 
 /**
@@ -65,6 +66,8 @@ public class DiplomacySession extends TransactionSession {
     }
 
     public void complete(ChangeSet cs) {
+        unit.setMovesLeft(0);
+        cs.add(See.only((ServerPlayer)unit.getOwner()), unit);
         super.complete(cs);
     }
 

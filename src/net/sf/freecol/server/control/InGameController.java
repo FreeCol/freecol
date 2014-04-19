@@ -3211,10 +3211,12 @@ public final class InGameController extends Controller {
             agreement = session.getAgreement(); // Accept offered agreement
             agreement.setStatus(status);
             csAcceptTrade(agreement, session, cs);
+            session.complete(cs);
             sendToOthers(serverPlayer, cs);
             break;
         case REJECT_TRADE: default:
             session.setAgreement(agreement);
+            session.complete(cs);
             sendToOthers(serverPlayer, cs);
             break;
         }
