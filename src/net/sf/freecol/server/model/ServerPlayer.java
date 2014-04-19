@@ -1668,9 +1668,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             AbstractGoods ag = extraTrades.remove(0);
             propagateToEuropeanMarkets(ag.getType(), ag.getAmount(), random);
         }
-        for (Player p : game.getLiveEuropeanPlayers()) {
-            ((ServerPlayer)p).csFlushMarket(cs);
-        }
+        csFlushMarket(cs);
     }
 
     /**

@@ -3762,7 +3762,8 @@ public final class InGameController extends Controller {
     /**
      * Pay for a building.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that owns the colony.
+     * @param serverPlayer The <code>ServerPlayer</code> that owns the
+     *     colony.
      * @param colony The <code>Colony</code> that is building.
      * @return An <code>Element</code> encapsulating this action.
      */
