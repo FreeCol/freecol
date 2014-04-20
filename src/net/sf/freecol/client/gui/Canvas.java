@@ -1844,23 +1844,22 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Displays the panel for trading with an <code>IndianSettlement</code>.
+     * Displays the panel for trading with an
+     * <code>IndianSettlement</code>.
      *
      * @param settlement The native settlement to trade with.
+     * @param template A <code>StringTemplate</code> containing the message
+     *     to display.
      * @param canBuy Show a "buy" option.
      * @param canSell Show a "sell" option.
      * @param canGift Show a "gift" option.
      * @return The chosen action, buy, sell, gift or cancel.
      */
     public TradeAction showIndianSettlementTradeDialog(Settlement settlement,
+                                                       StringTemplate template,
                                                        boolean canBuy,
                                                        boolean canSell,
                                                        boolean canGift) {
-        StringTemplate template
-            = StringTemplate.template("tradeProposition.welcome")
-                .addStringTemplate("%nation%",
-                    settlement.getOwner().getNationName())
-                .addName("%settlement%", settlement.getName());
         JTextArea text = GUI.getDefaultTextArea(Messages.message(template));
 
         ArrayList<ChoiceItem<TradeAction>> choices

@@ -1399,9 +1399,10 @@ public class GUI {
     }
 
     public TradeAction showIndianSettlementTradeDialog(Settlement settlement,
+        StringTemplate template,
         boolean canBuy, boolean canSell, boolean canGift) {
         if (canvas == null) return null;
-        return canvas.showIndianSettlementTradeDialog(settlement,
+        return canvas.showIndianSettlementTradeDialog(settlement, template,
                                                       canBuy, canSell, canGift);
     }
 

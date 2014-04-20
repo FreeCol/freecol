@@ -119,6 +119,10 @@ public final class InGameController implements NetworkConstants {
 
     private static final Logger logger = Logger.getLogger(InGameController.class.getName());
 
+    /** A template to use as a magic cookie for aborted trades. */
+    private static final StringTemplate abortTrade
+        = StringTemplate.template("");
+
     private final FreeColClient freeColClient;
 
     private final short UNIT_LAST_MOVE_DELAY = 300;
@@ -3470,10 +3474,15 @@ public final class InGameController implements NetworkConstants {
     private boolean moveTradeIndianSettlement(Unit unit, Direction direction) {
         Settlement settlement = getSettlementAt(unit.getTile(), direction);
 
+        StringTemplate baseTemplate
+            = StringTemplate.template("tradeProposition.welcome")
+                .addStringTemplate("%nation%",
+                    settlement.getOwner().getNationName())
+                .addName("%settlement%", settlement.getName());
+        StringTemplate template = baseTemplate;
         boolean[] results = askServer()
             .openTransactionSession(unit, settlement);
-        for (;;) {
-            if (results == null) break;
+        while (results != null) {
             // The session tracks buy/sell/gift events and disables
             // them when one happens.  So only offer such options if
             // the session allows it and the carrier is in good shape.
@@ -3483,30 +3492,45 @@ public final class InGameController implements NetworkConstants {
             if (!buy && !sel && !gif) break;
 
             GUI.TradeAction act
-                = gui.showIndianSettlementTradeDialog(settlement, 
+                = gui.showIndianSettlementTradeDialog(settlement, template,
                                                       buy, sel, gif);
             if (act == null) break;
+            StringTemplate t = null;
             switch (act) {
             case BUY:
-                if (attemptBuyFromSettlement(unit, settlement)) {
+                t = attemptBuyFromSettlement(unit, settlement);
+                if (t == null) {
                     results[0] = false;
+                    template = baseTemplate;
+                } else {
+                    template = t;
                 }
                 break;
             case SELL:
-                if (attemptSellToSettlement(unit, settlement)) {
+                t = attemptSellToSettlement(unit, settlement);
+                if (t == null) {
                     results[1] = false;
+                    template = baseTemplate;
+                } else {
+                    template = t;
                 }
                 break;
             case GIFT:
-                if (attemptGiftToSettlement(unit, settlement)) {
+                t = attemptGiftToSettlement(unit, settlement);
+                if (t == null) {
                     results[2] = false;
+                    template = baseTemplate;
+                } else {
+                    template = t;
                 }
                 break;
             default:
-                logger.warning("showIndianSettlementTradeDialog fail: " + act);
+                logger.warning("showIndianSettlementTradeDialog fail: "
+                    + act);
                 results = null;
                 break;
             }
+            if (template == abortTrade) template = baseTemplate;
         }
 
         askServer().closeTransactionSession(unit, settlement);
@@ -3524,33 +3548,23 @@ public final class InGameController implements NetworkConstants {
      * @param fail The failure state.
      * @param settlement The <code>Settlement</code> that failed to trade.
      * @param goods The <code>Goods</code> that failed to trade.
+     * @return A <code>StringTemplate</code> describing the failure.
      */
-    private void showTradeFail(final int fail, final Settlement settlement,
-                               final Goods goods) {
-        SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    switch (fail) {
-                    case NO_TRADE_GOODS:
-                        gui.showInformationMessage(settlement,
-                            StringTemplate.template("trade.noTradeGoods")
-                            .add("%goods%", goods.getNameKey()));
-                        return;
-                    case NO_TRADE_HAGGLE:
-                        gui.showInformationMessage(settlement,
-                                                   "trade.noTradeHaggle");
-                        break;
-                    case NO_TRADE_HOSTILE:
-                        gui.showInformationMessage(settlement,
-                                                   "trade.noTradeHostile");
-                        break;
-                    case NO_TRADE: // Proposal was refused
-                    default:
-                        gui.showInformationMessage(settlement,
-                                                   "trade.noTrade");
-                        break;
-                    }
-                }
-            });
+    private StringTemplate tradeFailMessage(int fail,
+        Settlement settlement, Goods goods) {
+        switch (fail) {
+        case NO_TRADE_GOODS:
+            return StringTemplate.template("trade.noTradeGoods")
+                .add("%goods%", goods.getNameKey());
+        case NO_TRADE_HAGGLE:
+            return StringTemplate.template("trade.noTradeHaggle");
+        case NO_TRADE_HOSTILE:
+            return StringTemplate.template("trade.noTradeHostile");
+        case NO_TRADE: // Proposal was refused
+        default:
+            break;
+        }
+        return StringTemplate.template("trade.noTrade");
     }
 
     /**
@@ -3558,10 +3572,11 @@ public final class InGameController implements NetworkConstants {
      *
      * @param unit The <code>Unit</code> that is trading.
      * @param settlement The <code>Settlement</code> that is trading.
-     * @return True if a purchase occurs.
+     * @return A <code>StringTemplate</code> containing a message if
+     *     there is problem, or null on success.
      */
-    private boolean attemptBuyFromSettlement(Unit unit,
-                                             final Settlement settlement) {
+    private StringTemplate attemptBuyFromSettlement(Unit unit,
+                                                    Settlement settlement) {
         final Game game = freeColClient.getGame();
         Player player = freeColClient.getMyPlayer();
         Goods goods = null;
@@ -3570,15 +3585,8 @@ public final class InGameController implements NetworkConstants {
         List<Goods> forSale = askServer()
             .getGoodsForSaleInSettlement(game, unit, settlement);
         for (;;) {
-            if (forSale.isEmpty()) {
-                // There is nothing to sell to the player
-                SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            gui.showInformationMessage(settlement,
-                                                       "trade.nothingToSell");
-                        }
-                    });
-                break;
+            if (forSale.isEmpty()) { // Nothing to sell to the player
+                return StringTemplate.template("trade.nothingToSell");
             }
 
             // Choose goods to buy
@@ -3598,8 +3606,7 @@ public final class InGameController implements NetworkConstants {
                 gold = askServer().buyProposition(unit, settlement,
                     goods, gold);
                 if (gold <= 0) {
-                    showTradeFail(gold, settlement, goods);
-                    break;
+                    return tradeFailMessage(gold, settlement, goods);
                 }
 
                 // Show dialog for buy proposal
@@ -3612,19 +3619,19 @@ public final class InGameController implements NetworkConstants {
                     if (askServer().buyFromSettlement(unit,
                             settlement, goods, gold)) {
                         gui.updateMenuBar(); // Assume success
-                        return true;
+                        return null;
                     }
-                    return false;
+                    return abortTrade;
                 case HAGGLE: // Try to negotiate a lower price
                     gold = gold * 9 / 10;
                     break;
                 default:
                     logger.warning("showBuyDialog fail: " + act);
-                    return false;
+                    return null;
                 }
             }
         }
-        return false;
+        return abortTrade;
     }
 
     /**
@@ -3632,9 +3639,11 @@ public final class InGameController implements NetworkConstants {
      *
      * @param unit The <code>Unit</code> that is trading.
      * @param settlement The <code>Settlement</code> that is trading.
-     * @return True if a sale occurs.
+     * @return A <code>StringTemplate</code> containing a message if
+     *     there is problem, or null on success.
      */
-    private boolean attemptSellToSettlement(Unit unit, Settlement settlement) {
+    private StringTemplate attemptSellToSettlement(Unit unit,
+                                                   Settlement settlement) {
         Goods goods = null;
         for (;;) {
             // Choose goods to sell
@@ -3653,10 +3662,8 @@ public final class InGameController implements NetworkConstants {
             for (;;) {
                 gold = askServer().sellProposition(unit, settlement,
                     goods, gold);
-
                 if (gold <= 0) {
-                    showTradeFail(gold, settlement, goods);
-                    break;
+                    return tradeFailMessage(gold, settlement, goods);
                 }
 
                 // Show dialog for sale proposal
@@ -3668,23 +3675,23 @@ public final class InGameController implements NetworkConstants {
                     if (askServer().sellToSettlement(unit,
                             settlement, goods, gold)) {
                         gui.updateMenuBar(); // Assume success
-                        return true;
+                        return null;
                     }
-                    return false;
+                    return abortTrade;
                 case HAGGLE: // Ask for more money
                     gold = (gold * 11) / 10;
                     break;
                 case GIFT: // Decide to make a gift of the goods
                     askServer().deliverGiftToSettlement(unit,
                         settlement, goods);
-                    return false;
+                    return abortTrade;
                 default:
                     logger.warning("showSellDialog fail: " + act);
-                    return false;
+                    return null;
                 }
             }
         }
-        return false;
+        return abortTrade;
     }
 
     /**
@@ -3692,10 +3699,13 @@ public final class InGameController implements NetworkConstants {
      *
      * @param unit The <code>Unit</code> that is trading.
      * @param settlement The <code>Settlement</code> that is trading.
-     * @return True if the gift is given.
+     * @return A <code>StringTemplate</code> containing a message if
+     *     there is problem, or null on success.
      */
-    private boolean attemptGiftToSettlement(Unit unit, Settlement settlement) {
-        List<ChoiceItem<Goods>> choices = new ArrayList<ChoiceItem<Goods>>();
+    private StringTemplate attemptGiftToSettlement(Unit unit,
+                                                   Settlement settlement) {
+        List<ChoiceItem<Goods>> choices
+            = new ArrayList<ChoiceItem<Goods>>();
         for (Goods g : unit.getGoodsList()) {
             String label = Messages.message(g.getLabel(true));
             choices.add(new ChoiceItem<Goods>(label, g));
@@ -3704,9 +3714,9 @@ public final class InGameController implements NetworkConstants {
             Messages.message("gift.text"), settlement, "cancel", choices);
         if (goods != null
             && askServer().deliverGiftToSettlement(unit, settlement, goods)) {
-            return true;
+            return null;
         }
-        return false;
+        return abortTrade;
     }
 
     /**
