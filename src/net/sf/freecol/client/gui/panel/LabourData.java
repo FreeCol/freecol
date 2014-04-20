@@ -542,8 +542,9 @@ public class LabourData {
             : wl.getProductionOf(unit, currentlyWorking);
 
         UnitData workingAs = experts.get(currentlyWorking);
-
-        if (workingAs.getUnitType() == unit.getType()) {
+        if (workingAs == null) {
+            ; // pass
+        } else if (workingAs.getUnitType() == unit.getType()) {
             colonyData.getWorkingProfessionals().addProduction(production);
         } else {
             colonyData.workingAmateurs++;
