@@ -50,22 +50,25 @@ public abstract class InPortPanel extends UnitPanel {
     public void selectLabel() {
         // Keep the previous selected unit if possible, otherwise default
         // on the last carrier.
-        Unit selectedUnit = getPortPanel().getSelectedUnit();
+        PortPanel portPanel = getPortPanel();
+        if (portPanel == null) return;
+        Unit selectedUnit = portPanel.getSelectedUnit();
         UnitLabel lastCarrier = null;
         for (Component component : getComponents()) {
             if (component instanceof UnitLabel) {
                 UnitLabel label = (UnitLabel)component;
                 Unit unit = label.getUnit();
                 if (unit == selectedUnit) {
-                    getPortPanel().setSelectedUnitLabel(label);
+                    portPanel.setSelectedUnitLabel(label);
                     return;
-                } else if (unit.isCarrier() && unit.getTradeRoute() == null) {
+                }
+                if (unit.isCarrier() && unit.getTradeRoute() == null) {
                     lastCarrier = label;
                 }
             }
         }
         if (lastCarrier != null) {
-            getPortPanel().setSelectedUnitLabel(lastCarrier);
+            portPanel.setSelectedUnitLabel(lastCarrier);
         }
         // No revalidate+repaint as this is done in setSelectedUnitLabel
     }
