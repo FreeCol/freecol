@@ -75,7 +75,7 @@ public final class TradeRoutePanel extends FreeColPanel {
     private final Unit unit;
 
     /** The list model describing the players trade routes. */
-    private DefaultListModel listModel;
+    private final DefaultListModel listModel = new DefaultListModel();
 
     /** The list of trade routes to display. */
     private JList tradeRoutes;
@@ -107,7 +107,6 @@ public final class TradeRoutePanel extends FreeColPanel {
         final Player player = getMyPlayer();
 
         this.unit = unit;
-        this.listModel = new DefaultListModel();
         this.tradeRoutes = new JList(listModel);
         this.tradeRoutes.addListSelectionListener(new ListSelectionListener() {
                 public void valueChanged(ListSelectionEvent e) {
@@ -370,7 +369,6 @@ public final class TradeRoutePanel extends FreeColPanel {
     @Override
     public void removeNotify() {
         this.listModel.clear();
-        this.listModel = null;
         this.tradeRoutes = null;
         this.counts.clear();
         this.newRouteButton = null;
