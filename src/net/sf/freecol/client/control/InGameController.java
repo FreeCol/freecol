@@ -598,6 +598,7 @@ public final class InGameController implements NetworkConstants {
                             .append(Messages.message("tradeRoute.wait"));
                     }
                     unit.setState(UnitState.SKIPPED);
+                    unit.setMovesLeft(0); // Prevent reselection
                     break;
                 }
                 for (;;) {
