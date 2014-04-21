@@ -574,12 +574,14 @@ public final class ReportColonyPanel extends ReportPanel
 
             // Add a suggestion for an extra worker if there is
             // space, valid work to do, an expert type to do it,
-            // and the goods are wanted.
+            // the goods are wanted, and there is sufficient input.
             if (needsWorker
                 && (work = bestProduction(wl, colonistType)) != null
                 && (expert = spec.getExpertForProducing(work)) != null
                 && (delta = wl.getPotentialProduction(work, expert)) > 0
-                && wantGoods(wl, work, null, expert)) {
+                && wantGoods(wl, work, null, expert)
+                && (work.getInputType() == null
+                    || colony.getAdjustedNetProductionOf(work.getInputType()) >= delta)) {
                 addSuggestion(want, null, expert, work, delta);
             }
         }
