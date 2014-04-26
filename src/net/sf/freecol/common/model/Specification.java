@@ -1974,6 +1974,17 @@ public final class Specification {
                 }
             }
         }
+
+        // The REF is also an independent nation, which is a required
+        // ability to have man-o-war.  Older specs used
+        // INDEPENDENCE_DECLARED but we can not directly use that or
+        // the REF gets access to colonialRegulars.
+        for (NationType nt : europeanNationTypes) {
+            if (!nt.isREF()) continue;
+            if (!nt.hasAbility(Ability.INDEPENDENT_NATION)) {
+                nt.addAbility(new Ability(Ability.INDEPENDENT_NATION));
+            }
+        }
         // end @compat 0.10.7
     }
     // end @compat 0.10.x

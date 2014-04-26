@@ -905,7 +905,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * -vis: Visibility issues depending on location.
      * -til: Tile appearance issue if created in a colony (not ATM)
      *
-     * @param abstractUnits The list of <code>AbstractUnit</code>s to create.
+     * @param abstractUnits The list of <code>AbstractUnit</code>s to
+     *     create.
      * @param location The <code>Location</code> where the units will
      *     be created.
      * @return A list of units created.
@@ -920,25 +921,37 @@ public class ServerPlayer extends Player implements ServerModelObject {
         for (AbstractUnit au : abstractUnits) {
             UnitType type = au.getType(spec);
             Role role = au.getRole(spec);
-            if (!type.isAvailableTo(this)) {
-                logger.warning("Ignoring abstract unit with broken type: "
-                    + type);
-                continue;
-            }
             // @compat 0.10.x
-            if (isREF() && !role.isAvailableTo(this, type)) {
-                if ("model.role.soldier".equals(role.getId())) {
-                    role = spec.getRole("model.role.infantry");
-                } else if ("model.role.dragoon".equals(role.getId())) {
-                    role = spec.getRole("model.role.cavalry");
+            // The REF always had an exemption from the availability
+            // rules.  We are transitioning to it being subject to the
+            // normal rules, which requires REF nations to have the
+            // INDEPENDENT_NATION ability (or they do not get
+            // man-o-war).  We are also handling the role transition.
+            //
+            // Drop the isREF() branch when the compatibility code
+            // goes away.
+            if (isREF()) {
+                if (!role.isAvailableTo(this, type)) {
+                    if ("model.role.soldier".equals(role.getId())) {
+                        role = spec.getRole("model.role.infantry");
+                    } else if ("model.role.dragoon".equals(role.getId())) {
+                        role = spec.getRole("model.role.cavalry");
+                    }
+                }
+            } else {
+                if (!type.isAvailableTo(this)) {
+                    logger.warning("Ignoring abstract unit " + au
+                        + " unavailable to: " + getId());
+                    continue;
+                }
+                if (!role.isAvailableTo(this, type)) {
+                    logger.warning("Ignoring abstract unit " + au
+                        + " with role " + role
+                        + " unavailable to: " + getId());
+                    continue;
                 }
             }
             // end @compat 0.10.x
-            if (!role.isAvailableTo(this, type)) {
-                logger.warning("Ignoring abstract unit with broken role: "
-                    + role);
-                continue;
-            }
             for (int i = 0; i < au.getNumber(); i++) {
                 ServerUnit su = new ServerUnit(game, location, this, type,
                                                role);//-vis(this)
@@ -966,7 +979,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param random A pseudo-random number source.
      * @return a list of units left over
      */
-    public List<Unit> loadShips(List<Unit> landUnits, List<Unit> navalUnits,
+    public List<Unit> loadShips(List<Unit> landUnits,
+                                List<Unit> navalUnits,
                                 Random random) {
         List<Unit> leftOver = new ArrayList<Unit>();
         Utils.randomShuffle(logger, "Naval load", navalUnits, random);
