@@ -120,6 +120,11 @@ public class REFAIPlayer extends EuropeanAIPlayer {
             return false;
         }
         final Unit unit = aiUnit.getUnit();
+        final Unit carrier = unit.getCarrier();
+        if (carrier == null) {
+            logger.warning("REF land unit not on a carrier?!?");
+            return false;
+        }
 
         // Find the best coastal colony.
         Location target = UnitSeekAndDestroyMission.findTarget(aiUnit,
@@ -175,7 +180,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                     return false;
                 }
             };
-        PathNode path = unit.search(tile, gd, null, 10, unit.getCarrier());
+        PathNode path = unit.search(tile, gd, null, 10, carrier);
         if (path == null) {
             logger.warning("Can not find suitable REF landing site for: "
                 + colony);
@@ -194,14 +199,12 @@ public class REFAIPlayer extends EuropeanAIPlayer {
 
         // Unit should be aboard a man-o-war which we can use to find a
         // path to Europe.  Use the end of that path.
-        if (unit.isOnCarrier()) {
-            Tile entry = unit.getCarrier().getBestEntryTile(tile);
-            if (entry != null) return true;
+        Tile entry = carrier.getBestEntryTile(tile);
+        if (entry == null) {
             logger.warning("Can not find path to Europe from: " + tile);
             return false;
         }
-        logger.warning("REF land unit not aboard a ship: " + unit);
-        return false;
+        return true;
     }
 
     /**
