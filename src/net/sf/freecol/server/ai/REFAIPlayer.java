@@ -103,9 +103,9 @@ public class REFAIPlayer extends EuropeanAIPlayer {
      * assignment works and drop it from here.
      *
      * @param teleport "Teleporting" in is allowed.
-     * @return The preferred entry location, or null if no useful preference.
+     * @return True if the initialization succeeds.
      */
-    public Tile initialize(boolean teleport) {
+    public boolean initialize(boolean teleport) {
         // Find a representative offensive land unit to use to search
         // for the initial target.
         AIUnit aiUnit = null;
@@ -117,7 +117,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         }
         if (aiUnit == null) {
             logger.warning("REF has no army?!?");
-            return null;
+            return false;
         }
         final Unit unit = aiUnit.getUnit();
 
@@ -126,7 +126,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
             INFINITY, false);
         if (!(target instanceof Colony)) {
             logger.warning("Rebels have no connected colonies?!?");
-            return null;
+            return false;
         }
         Colony colony = (Colony)target;
         Tile tile = colony.getTile();
@@ -179,7 +179,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         if (path == null) {
             logger.warning("Can not find suitable REF landing site for: "
                 + colony);
-            return null;
+            return false;
         }
         tile = path.getTile();
 
@@ -190,18 +190,18 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                 break;
             }
         }
-        if (teleport) return tile;
+        if (teleport) return true;
 
         // Unit should be aboard a man-o-war which we can use to find a
         // path to Europe.  Use the end of that path.
         if (unit.isOnCarrier()) {
             Tile entry = unit.getCarrier().getBestEntryTile(tile);
-            if (entry != null) return entry;
+            if (entry != null) return true;
             logger.warning("Can not find path to Europe from: " + tile);
-            return null;
+            return false;
         }
         logger.warning("REF land unit not aboard a ship: " + unit);
-        return null;
+        return false;
     }
 
     /**

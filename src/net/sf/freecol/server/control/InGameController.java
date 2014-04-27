@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -396,6 +397,8 @@ public final class InGameController extends Controller {
      * a given player that is about to rebel.
      * Public for the test suite.
      *
+     * TODO: this should eventually generate changes for the REF player.
+     *
      * @param serverPlayer The <code>ServerPlayer</code> about to rebel.
      * @return The REF player.
      */
@@ -404,23 +407,32 @@ public final class InGameController extends Controller {
         Monarch monarch = serverPlayer.getMonarch();
         ServerPlayer refPlayer = getFreeColServer().addAIPlayer(refNation);
         Europe europe = refPlayer.getEurope();
-        refPlayer.setEntryLocation(null); // Trigger initial placement routine
-        Player.makeContact(serverPlayer, refPlayer); // Will change, setup only
+
+        // Inherit rebel player knowledge of the seas, coasts, claimed
+        // land but not full detailed scouting knowledge.
+        List<Tile> explore = new ArrayList<Tile>();
+        for (Tile t : getGame().getMap().getAllTiles()) {
+            if (!t.isExploredBy(serverPlayer)) continue;
+            if (!t.isLand()
+                || t.isCoastland()
+                || t.getOwner() == serverPlayer) {
+                explore.add(t);
+            }
+        }
+        refPlayer.exploreTiles(explore);
+
+        // Trigger initial placement routine
+        refPlayer.setEntryLocation(null);
+        // Will change, setup only
+        Player.makeContact(serverPlayer, refPlayer);
 
         // Instantiate the REF in Europe
         Monarch.Force exf = monarch.getExpeditionaryForce();
         List<Unit> landUnits = refPlayer.createUnits(exf.getLandUnits(),
                                                      europe);//-vis: safe!map
         List<Unit> navalUnits = refPlayer.createUnits(exf.getNavalUnits(),
-                                                     europe);//-vis: safe!map
+                                                      europe);//-vis: safe!map
         refPlayer.loadShips(landUnits, navalUnits, random);//-vis: safe!map
-        // Send the navy on its way
-        for (Unit u : navalUnits) {
-            u.setWorkLeft(1);
-            u.setDestination(getGame().getMap());
-            u.setLocation(u.getOwner().getHighSeas());//-vis: safe!map
-        }
-
         return refPlayer;
     }
 
@@ -775,36 +787,50 @@ public final class InGameController extends Controller {
             // before the player is about to move.
             game.setCurrentPlayer(player);
             if (player.isREF() && player.getEntryLocation() == null) {
-                // Initialize this newly created REF, determining its
-                // entry location.
+                // Initialize this newly created REF
                 // If the teleportREF option is enabled, teleport it in.
-                REFAIPlayer refAIPlayer = (REFAIPlayer) freeColServer
+                REFAIPlayer refAIPlayer = (REFAIPlayer)freeColServer
                     .getAIPlayer(player);
                 boolean teleport = getGame().getSpecification()
                     .getBoolean(GameOptions.TELEPORT_REF);
-                Tile entry = refAIPlayer.initialize(teleport);
-                if (entry == null) {
+                if (!refAIPlayer.initialize(teleport)) {
+                    logger.severe("REF failed to initialize.");
+                } else {
+                    // Set the REF player entry location from the
+                    // rebels.  Note that the REF units will have
+                    // their own unit-specific entry locations set by
+                    // their missions.  This just flags that the REF
+                    // is initialized.
                     for (Player p : player.getRebels()) {
-                        entry = p.getEntryLocation().getTile();
+                        player.setEntryLocation(p.getEntryLocation().getTile());
                         break;
                     }
-                }
-                player.setEntryLocation(entry);
-                logger.fine(player.getName() + " will appear at " + entry);
-                if (teleport) {
-                    Unit explorer = null;
-                    for (Unit u : player.getUnits()) {
-                        if (u.isNaval()) {
-                            explorer = u;
+
+                    if (teleport) { // Teleport in the units.
+                        Set<Tile> seen = new HashSet<Tile>();
+                        for (Unit u : player.getUnits()) {
+                            if (!u.isNaval()) continue;
+                            Tile entry = u.getEntryLocation().getTile();
                             u.setLocation(entry);//-vis(player)
                             u.setWorkLeft(-1);
                             u.setState(Unit.UnitState.ACTIVE);
+                            if (!seen.contains(entry)) {
+                                seen.add(entry);
+                                cs.add(See.only(player),
+                                    player.exploreForUnit(u));
+                                cs.add(See.perhaps().except(player), entry);
+                            }
+                        }
+                        player.invalidateCanSeeTiles();//+vis(player)
+                    } else {
+                        // Put navy on the high seas, with 1-turn sail time
+                        for (Unit u : player.getUnits()) {
+                            if (!u.isNaval()) continue;
+                            u.setWorkLeft(1);
+                            u.setDestination(u.getEntryLocation());
+                            u.setLocation(u.getOwner().getHighSeas());//-vis: safe!map
                         }
                     }
-                    if (explorer != null) cs.add(See.only(player),
-                        ((ServerPlayer)player).exploreForUnit(explorer));
-                    player.invalidateCanSeeTiles();//+vis(player)
-                    cs.add(See.perhaps(), entry);
                 }
             }
             player.csStartTurn(random, cs);

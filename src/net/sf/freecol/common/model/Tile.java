@@ -448,6 +448,15 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
+     * Is this a land tile on the sea coast (lakes do not count).
+     *
+     * @return True if this is a coastland tile.
+     */
+    public boolean isCoastland() {
+        return isLand() && getHighSeasCount() > 0;
+    }
+
+    /**
      * Get the move-to-Europe state of the tile.
      *
      * @return The move-to-Europe state of the <code>Tile</code>.
