@@ -23,7 +23,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
@@ -122,11 +124,11 @@ public final class GoalDeciders {
                     && tile.isExploredBy(u.getOwner())
                     && tile.isDirectlyHighSeasConnected()
                     && (tile.getFirstUnit() == null
-                        || tile.getFirstUnit().getOwner() == u.getOwner())) {
+                        || u.getOwner().owns(tile.getFirstUnit()))) {
                     if (best == null || path.getCost() < best.getCost()) {
                         best = path;
+                        return true;
                     }
-                    return true;
                 }
                 return false;
             }
@@ -214,6 +216,75 @@ public final class GoalDeciders {
             }
         };
     }
+
+    /**
+     * Goal decider to find the best land tile to disembark a unit that
+     * is planning to attack a given target.
+     *
+     * The result must be:
+     * - Unoccupied
+     * - Have at least one unoccupied high-seas-connected neighbour
+     * - Favour the best natural defence of the alternatives
+     * - Favour a short journey to the target
+     * - Prioritize not landing next to a hostile fort/fortress.
+     *
+     * @param target The target <code>Tile</code>.
+     * @return A suitable <code>GoalDecider</code>.
+     */
+    public static GoalDecider getDisembarkGoalDecider(final Tile target) {
+        return new GoalDecider() {
+            private float bestScore = -1.0f;
+            private boolean goalDangerous = true;
+            private PathNode goal = null;
+
+            public PathNode getGoal() { return goal; }
+            public boolean hasSubGoals() { return true; }
+            public boolean check(Unit u, PathNode pathNode) {
+                Tile tile = pathNode.getTile();
+                if (tile == null || !tile.isLand() || !tile.isEmpty()
+                    || tile.hasSettlement()) return false;
+                final Player owner = u.getOwner();
+                boolean found = false, danger = false;
+                for (Tile t : pathNode.getTile().getSurroundingTiles(1)) {
+                    if (!t.isHighSeasConnected() || t.isLand()) continue;
+                    for (Tile t2 : t.getSurroundingTiles(1)) {
+                        Settlement settlement = t2.getSettlement();
+                        if (settlement != null
+                            && !owner.owns(settlement)
+                            && settlement.hasAbility(Ability.BOMBARD_SHIPS)
+                            && (owner.atWarWith(settlement.getOwner())
+                                || u.hasAbility(Ability.PIRACY))) {
+                            danger = true;
+                            break;
+                        }
+                    }
+                    if (goalDangerous) {
+                        found = true;
+                        if (!danger) {
+                            // Found first non-dangerous tile, reset scores
+                            goalDangerous = false;
+                            bestScore = -1.0f;
+                        }
+                    } else {
+                        found = !danger; // Only accept non-dangerous tiles
+                    }
+                }
+                if (found) {
+                    float distance = 1.0f + u.getGame().getMap()
+                        .getDistance(target, tile);
+                    float score = FeatureContainer.applyModifierSet(0f,
+                        null, tile.getType().getDefenceBonus()) / distance;
+                    if (bestScore < score) {
+                        bestScore = score;
+                        goal = pathNode;
+                        return true;
+                    }
+                }
+                return false;
+            }
+        };
+    }
+        
 
     /**
      * A class to wrap a goal decider that searches for paths to an
