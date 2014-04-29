@@ -35,14 +35,10 @@ import net.sf.freecol.common.model.Unit;
  */
 class BaseCostDecider implements CostDecider {
 
-    /**
-     * The number of moves left following a proposed move.
-     */
+    /** The number of moves left following a proposed move. */
     private int movesLeft;
 
-    /**
-     * The number of turns consumed by the proposed move.
-     */
+    /** The number of turns consumed by the proposed move. */
     private int newTurns;
 
 

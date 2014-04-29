@@ -164,7 +164,81 @@ public final class CostDeciders {
         = new AvoidSettlementsAndBlockingUnitsCostDecider();
 
 
+    /**
+     * A <code>CostDecider</code> to avoid naval danger.
+     */
+    private static class AvoidNavalDangerCostDecider
+        extends AvoidSettlementsAndBlockingUnitsCostDecider {
+        @Override
+        public int getCost(Unit unit, Location oldLocation,
+                           Location newLocation, int movesLeft) {
+            int cost = super.getCost(unit, oldLocation, newLocation, movesLeft);
+            Tile tile = newLocation.getTile();
+            if (cost != ILLEGAL_MOVE && cost != Map.INFINITY
+                && tile != null) {
+                if (tile.isDangerousToShip(unit)) cost = ILLEGAL_MOVE;
+            }
+            return cost;
+        }
+    };
+
+    /**
+     * An instance of the naval-danger-avoidance cost decider.
+     */
+    private static final AvoidNavalDangerCostDecider
+        avoidNavalDangerCostDecider = new AvoidNavalDangerCostDecider();
+
+
     // Public interface
+
+    /**
+     * Gets a composite cost decider composed of two or more
+     * individual cost deciders.  The result/s are determined by the
+     * cost decider which returns the highest cost, with an
+     * ILLEGAL_MOVE result dominating.
+     *
+     * @param cds A series (two minimum) of <code>CostDecider</code>s
+     *     to compose.
+     * @return A new <code>CostDecider</code> composed of the argument
+     *     cost deciders.
+     */
+    public static CostDecider getComposedCostDecider(final CostDecider... cds) {
+        if (cds.length < 2) {
+            throw new IllegalArgumentException("Short CostDecider list");
+        }
+
+        return new CostDecider() {
+
+            private CostDecider[] costDeciders = cds;
+            private int ret = -1;
+            private int index = -1;
+
+            public int getCost(Unit unit, Location oldLocation,
+                               Location newLocation, int movesLeft) {
+                for (int i = 0; i < costDeciders.length; i++) {
+                    int cost = costDeciders[i].getCost(unit, oldLocation,
+                                                       newLocation, movesLeft);
+                    if (cost == ILLEGAL_MOVE || cost == Map.INFINITY) {
+                        index = i;
+                        return ILLEGAL_MOVE;
+                    }
+                    if (cost > ret) {
+                        index = i;
+                        ret = cost;
+                    }
+                }
+                return ret;
+            }
+
+            public int getMovesLeft() {
+                return (index < 0) ? 0 : costDeciders[index].getMovesLeft();
+            }
+
+            public int getNewTurns() {
+                return (index < 0) ? 0 : costDeciders[index].getNewTurns();
+            }
+        };
+    }
 
     /**
      * Selects a default <code>CostDecider</code> for the given unit
@@ -175,8 +249,11 @@ public final class CostDeciders {
      * @return A suitable <code>CostDecider</code>.
      */
     public static CostDecider defaultCostDeciderFor(final Unit unit) {
-        return (unit != null && unit.isOffensiveUnit()
-                && unit.getRole().isOffensive())
+        return (unit == null)
+            ? avoidIllegal()
+            : (unit.isNaval())
+            ? avoidNavalDanger()
+            : (unit.isOffensiveUnit() && unit.getRole().isOffensive())
             ? avoidSettlements()
             : avoidSettlementsAndBlockingUnits();
     }
@@ -243,5 +320,15 @@ public final class CostDeciders {
      */
     public static CostDecider avoidSettlementsAndBlockingUnits() {
         return avoidSettlementsAndBlockingUnitsCostDecider;
+    }
+
+    /**
+     * A <code>CostDecider</code> for avoiding using locations which have
+     * blocking enemy units or expose naval units to bombardment.
+     *
+     * @return The <code>CostDecider</code>.
+     */
+    public static CostDecider avoidNavalDanger() {
+        return avoidNavalDangerCostDecider;
     }
 }

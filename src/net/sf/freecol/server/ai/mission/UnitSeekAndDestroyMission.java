@@ -310,7 +310,8 @@ public class UnitSeekAndDestroyMission extends Mission {
      */
     @Override
     public Location getTransportDestination() {
-        return (transportTarget != null) ? transportTarget : target;
+        Location loc = (transportTarget != null) ? transportTarget : target;
+        return (getUnit().shouldTakeTransportTo(loc)) ? loc : null;
     }
 
     
@@ -333,13 +334,18 @@ public class UnitSeekAndDestroyMission extends Mission {
             this.target = target;
             Unit unit = getUnit();
             transportTarget = null;
-            if (unit.shouldTakeTransportTo(target)) {
-                Tile t = target.getTile();
-                Player player = getPlayer();
-                if (target instanceof Settlement) {
-                    transportTarget = ((Settlement)target).isConnectedPort()
-                        ? t.getBestLandingTile(player)
-                        : t.getSafestSurroundingLandTiles(player).get(0);
+            if (unit.shouldTakeTransportTo(target)
+                && (target instanceof Settlement)) {
+                Settlement settlement = (Settlement)target;
+                if (settlement.isConnectedPort()) {
+                    transportTarget = settlement.getTile()
+                        .getBestDisembarkTile(unit.getOwner());
+                    logger.finest(tag + " chose dropoff " + transportTarget
+                        + " for attack on "
+                        + ((settlement.canBombardEnemyShip()) ? "hazardous"
+                            : "normal")
+                        + " settlement " + settlement.getName()
+                        + ": " + this);
                 }
             }
             if (retarget) retargetTransportable();
@@ -465,6 +471,13 @@ public class UnitSeekAndDestroyMission extends Mission {
             logger.finest(tag + " broken(" + reason + "): " + this);
             return;
         }
+
+        int disembark = checkDisembark(tag);
+        if (disembark > 0) { // Arrived
+            logger.finest(tag + " arrived at transport target "
+                + transportTarget + ": " + this);
+            return;
+        } else if (disembark < 0) return; // Failed!?!
 
         // Is there a target-of-opportunity?
         final AIUnit aiUnit = getAIUnit();

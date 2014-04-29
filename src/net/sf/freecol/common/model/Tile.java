@@ -1149,19 +1149,56 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                     
     /**
      * Get the adjacent land tile with the best defence bonus.
-     * Useful for incoming attackers as a landing site.
+     * Useful for incoming attackers as a disembark site.
      *
      * @param player A <code>Player</code> to use to check for
      *     tile access.
      * @return The most defensible adjacent land <code>Tile</code>.
      */
-    public Tile getBestLandingTile(Player player) {
+    public Tile getBestDisembarkTile(Player player) {
         for (Tile t : getSafestSurroundingLandTiles(player)) {
             if (t.isHighSeasConnected()) return t;
         }
         return null;
     }
 
+    /**
+     * Is this tile dangerous for a naval unit to enter?
+     * That is, is there an adjacent settlement that is likely to bombard it.
+     *
+     * @param ship The naval <code>Unit</code> to check.
+     * @return True if moving the ship to this tile exposes it to attack.
+     */
+    public boolean isDangerousToShip(Unit ship) {
+        final Player player = ship.getOwner();
+        for (Tile t : getSurroundingTiles(1)) {
+            if (!t.hasSettlement()) continue;
+            Settlement settlement = t.getSettlement();
+            if (!player.owns(settlement)
+                && settlement.canBombardEnemyShip()
+                && (player.atWarWith(settlement.getOwner())
+                    || ship.hasAbility(Ability.PIRACY))) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Get any safe sites for a naval transport unit to stop at to disembark
+     * a unit to this tile.  To be safe, the tile must be adjacent to this
+     * one but not adjacent to a dangerous settlement.
+     *
+     * @param unit The transport <code>Unit</code> that needs a anchoring site.
+     * @return A list of suitable <code>Tile</code>s.
+     */
+    public List<Tile> getSafeAnchoringTiles(Unit unit) {
+        List<Tile> result = new ArrayList<Tile>();
+        for (Tile t : getSurroundingTiles(1)) {
+            if (!t.isLand() && t.isHighSeasConnected()
+                && !t.isDangerousToShip(unit)) result.add(t);
+        }
+        return result;
+    }
+                
 
     //
     // Type and Ownership

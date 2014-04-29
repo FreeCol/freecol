@@ -646,7 +646,7 @@ public class TileTest extends FreeColTestCase {
         // work locations from contributing their units.
     }
 
-    public void testGetBestLandingTile() {
+    public void testGetBestDisembarkTile() {
         Game game = getStandardGame();
         Map map = getCoastTestMap(plains, true);
         game.setMap(map);
@@ -669,10 +669,10 @@ public class TileTest extends FreeColTestCase {
         assertEquals("Best tile is mountainous", tileE, tiles.get(0));
 
         assertEquals("Best landing tile is forest", tileS, 
-            settlementTile.getBestLandingTile(dutch));
+            settlementTile.getBestDisembarkTile(dutch));
         
         tileN.setType(hills);
         assertEquals("Best landing tile is now hills", tileN,
-            settlementTile.getBestLandingTile(dutch));
+            settlementTile.getBestDisembarkTile(dutch));
     }
 }

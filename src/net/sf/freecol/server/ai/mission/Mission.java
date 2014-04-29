@@ -412,6 +412,36 @@ public abstract class Mission extends AIObject {
     }
 
     /**
+     * Check if a unit can disembark to its transport destination.
+     * This is useful because the normal path finding does not always
+     * chose to use the transport destination tile, but it may have been
+     * chosen carefully.
+     *
+     * @param tag A logging tag.
+     * @return Positive if the unit disembarked, zero if no change occurs,
+     *     negative if the disembark failed.
+     */
+    protected int checkDisembark(String tag) {
+        final AIUnit aiUnit = getAIUnit();
+        final Unit unit = getUnit();
+        final Location transportTarget = getTransportDestination();
+        if (unit.isOnCarrier()
+            && transportTarget instanceof Tile
+            && unit.hasTile()
+            && unit.getTile().isAdjacent((Tile)transportTarget)) {
+            Direction d = unit.getTile().getDirection((Tile)transportTarget);
+            if (!aiUnit.leaveTransport(d)) {
+                logger.warning(tag + " at " + unit.getLocation()
+                    + " failed to disembark to " + transportTarget
+                    + ": " + this);
+                return -1;
+            }
+            return 1;
+        }
+        return 0;
+    }
+
+    /**
      * Tries to move this mission's unit to a target location.
      *
      * First check for units in transit, that is units on a carrier that
@@ -770,6 +800,10 @@ public abstract class Mission extends AIObject {
 
     /**
      * Gets the destination of a required transport.
+     *
+     * Override this in the child mission classes if there is a useful
+     * intermediate point to deliver the unit distinct from the
+     * target.
      *
      * @return The mission target, or null if the mission is invalid,
      *     otherwise lacks a target (e.g. UnitWanderHostile), or the
