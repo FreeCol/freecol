@@ -961,6 +961,19 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
+     * Is this tile land locked?
+     *
+     * @return True if land locked.
+     */
+    public boolean isLandLocked() {
+        if (!isLand()) return false;
+        for (Tile t : getSurroundingTiles(1)) {
+            if (t.getType().isWater()) return false;
+        }
+        return true;
+    }
+
+    /**
      * Is this a shoreline tile?
      *
      * The tile can be water or land, and the water can be ocean,
@@ -1958,9 +1971,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public int checkIntegrity(boolean fix) {
         int result = 1;
-        Colony colony = getColony();
-        if (colony != null) {
-            result = Math.min(result, colony.checkIntegrity(fix));
+        Settlement settlement = getSettlement();
+        if (settlement != null) {
+            result = Math.min(result, settlement.checkIntegrity(fix));
         }
         if (tileItemContainer != null) {
             result = Math.min(result, tileItemContainer.checkIntegrity(fix));

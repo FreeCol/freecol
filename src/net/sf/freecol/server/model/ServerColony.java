@@ -96,12 +96,10 @@ public class ServerColony extends Colony implements ServerModelObject {
         colonyTiles.add(colonyTile);
         for (Tile t : tile.getSurroundingTiles(getRadius())) {
             colonyTiles.add(new ServerColonyTile(game, this, t));
-            if (t.getType().isWater()) {
-                landLocked = false;
-            }
         }
-        // set up default production queues
-        if (landLocked) {
+        // Set up default production queues.
+        // TODO: express this in the spec somehow.
+        if (isLandLocked()) {
             buildQueue.add(spec.getBuildingType("model.building.warehouse"));
         } else {
             buildQueue.add(spec.getBuildingType("model.building.docks"));

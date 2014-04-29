@@ -1212,6 +1212,13 @@ public class IndianSettlement extends Settlement {
             .addStringTemplate("%nation%", getOwner().getNationName());
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public int checkIntegrity(boolean fix) {
+        return 1;
+    }
+
 
     // Serialization
 

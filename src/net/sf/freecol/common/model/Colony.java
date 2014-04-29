@@ -126,9 +126,6 @@ public class Colony extends Settlement implements Nameable {
      */
     protected int immigration;
 
-    /** Is this colony landlocked? */
-    protected boolean landLocked = true;
-
     /** The turn in which this colony was established. */
     protected Turn established = new Turn(0);
 
@@ -295,15 +292,6 @@ public class Colony extends Settlement implements Nameable {
      */
     public void modifyImmigration(int amount) {
         immigration += amount;
-    }
-
-    /**
-     * Is this colony landlocked?
-     *
-     * @return True if no adjacent tiles are water.
-     */
-    public boolean isLandLocked() {
-        return landLocked;
     }
 
     /**
@@ -2689,17 +2677,13 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
-     * Check for any integrity problems.
-     *
-     * @param fix Fix problems if possible.
-     * @return Negative if there are problems remaining, zero if
-     *     problems were fixed, positive if no problems found at all.
+     * {@inheritDoc}
      */
     public int checkIntegrity(boolean fix) {
         int result = 1;
 
         // @compat 0.10.x
-        if (!landLocked && !hasAbility(Ability.HAS_PORT)) {
+        if (!isLandLocked() && !hasAbility(Ability.HAS_PORT)) {
             if (fix) {
                 addAbility(new Ability(Ability.HAS_PORT));
                 result = Math.min(result, 0);
@@ -2719,7 +2703,6 @@ public class Colony extends Settlement implements Nameable {
     private static final String BUILD_QUEUE_TAG = "buildQueueItem";
     private static final String ESTABLISHED_TAG = "established";
     private static final String IMMIGRATION_TAG = "immigration";
-    private static final String LAND_LOCKED_TAG = "landLocked";
     private static final String LIBERTY_TAG = "liberty";
     private static final String PRODUCTION_BONUS_TAG = "productionBonus";
     private static final String NAME_TAG = "name";
@@ -2758,8 +2741,6 @@ public class Colony extends Settlement implements Nameable {
             xw.writeAttribute(IMMIGRATION_TAG, immigration);
 
             xw.writeAttribute(PRODUCTION_BONUS_TAG, productionBonus);
-
-            xw.writeAttribute(LAND_LOCKED_TAG, landLocked);
 
         } else {
 
@@ -2854,8 +2835,6 @@ public class Colony extends Settlement implements Nameable {
         immigration = xr.getAttribute(IMMIGRATION_TAG, 0);
 
         productionBonus = xr.getAttribute(PRODUCTION_BONUS_TAG, 0);
-
-        landLocked = xr.getAttribute(LAND_LOCKED_TAG, true);
 
         displayUnitCount = xr.getAttribute(UNIT_COUNT_TAG, -1);
     }

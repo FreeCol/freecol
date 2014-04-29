@@ -113,6 +113,15 @@ public abstract class Settlement extends GoodsLocation
     }
 
     /**
+     * Is this settlement landlocked?
+     *
+     * @return True if no adjacent tiles are water.
+     */
+    public boolean isLandLocked() {
+        return tile.isLandLocked();
+    }
+
+    /**
      * Change the settlement type, setting the consequent features.
      *
      * @param newType The new <code>SettlementType</code>.
@@ -697,6 +706,15 @@ public abstract class Settlement extends GoodsLocation
      */
     public abstract StringTemplate getAlarmLevelMessage(Player player);
 
+    /**
+     * Check for any settlement integrity problems.
+     *
+     * @param fix Fix problems if possible.
+     * @return Negative if there are problems remaining, zero if
+     *     problems were fixed, positive if no problems found at all.
+     */
+    public abstract int checkIntegrity(boolean fix);
+        
 
     // Serialization
 
