@@ -420,6 +420,18 @@ public abstract class Settlement extends GoodsLocation
         return getGoodsCapacity();
     }
 
+    /**
+     * Check if colony has the ability to bombard an enemy ship
+     * adjacent to it.  Only sea-side colonies can bombard.  Does it
+     * have the buildings that give such abilities?
+     *
+     * @return True if bombarding is allowed.
+     */
+    public boolean canBombardEnemyShip() {
+        return (isLandLocked()) ? false
+            : hasAbility(Ability.BOMBARD_SHIPS);
+    }
+
 
     // Override FreeColObject
 
