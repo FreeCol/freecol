@@ -1628,11 +1628,6 @@ public class Map extends FreeColGameObject implements Location {
                             sb.append(" utter-fail(").append(umt).append(")");
                             logger.info(sb.toString());
                         }
-System.err.println("BAH! Search for " + unit
-    + " from " + currentTile
-    + " to goal at " + moveTile
-    + " fails with: " + umt
-    + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
                         return null;
                     }
                 }
