@@ -26,6 +26,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
@@ -531,10 +532,8 @@ public final class InGameController implements NetworkConstants {
         TradeRouteStop stop;
         boolean result = false, more = true;
 
-        // Accumulate a summary of all the activity of this unit on
-        // its trade route into this string buffer.  Always allocate
-        // so we can use sb for error messages even when detailed
-        // goods movement is disabled.
+        // If required accumulate a summary of all the activity of
+        // this unit on its trade route into this string buffer.
         StringBuffer sb = (tr.isSilent()) ? null : new StringBuffer(128);
 
         for (;;) {
@@ -597,8 +596,8 @@ public final class InGameController implements NetworkConstants {
                         sb.append(" ")
                             .append(Messages.message("tradeRoute.wait"));
                     }
-                    unit.setState(UnitState.SKIPPED);
-                    unit.setMovesLeft(0); // Prevent reselection
+                    // Prevent reselection
+                    askServer().changeState(unit, UnitState.SKIPPED);
                     break;
                 }
                 for (;;) {
@@ -671,85 +670,69 @@ public final class InGameController implements NetworkConstants {
      * @return True if goods were loaded.
      */
     private boolean loadUnitAtStop(Unit unit, StringBuffer sb) {
-        // Copy the list of goods types to load at this stop.
-        TradeRouteStop stop = unit.getStop();
-        List<GoodsType> goodsTypesToLoad
-            = new ArrayList<GoodsType>(stop.getCargo());
+        final Game game = freeColClient.getGame();
+        final Colony colony = unit.getColony();
+        final Location loc = (unit.isInEurope())
+            ? unit.getOwner().getEurope()
+            : colony;
+        final TradeRouteStop stop = unit.getStop();
         boolean ret = false;
 
-        // First handle partial loads.
-        // For each cargo the unit is already carrying, and which is
-        // not to be unloaded at this stop, check if the cargo is
-        // completely full and if not, try to fill to capacity.
-        Colony colony = unit.getColony();
-        Location loc = (unit.isInEurope()) ? unit.getOwner().getEurope()
-            : colony;
-        Game game = freeColClient.getGame();
-        for (Goods goods : unit.getGoodsList()) {
-            GoodsType type = goods.getType();
-            int index, toLoad;
-            if ((toLoad = GoodsContainer.CARGO_SIZE - goods.getAmount()) > 0
-                && (index = goodsTypesToLoad.indexOf(type)) >= 0) {
-                int present, atStop;
-                if (unit.isInEurope()) {
-                    present = atStop = Integer.MAX_VALUE;
+        // Make a list of goods to load at this stop.  Collapse multiple
+        // loads of the same goods type.
+        List<AbstractGoods> toLoad = new ArrayList<AbstractGoods>();
+        outer: for (GoodsType type : stop.getCargo()) {
+            for (AbstractGoods g : toLoad) {
+                if (g.getType() == type) {
+                    g.setAmount(g.getAmount() + GoodsContainer.CARGO_SIZE);
+                    continue outer;
+                }
+            }
+            toLoad.add(new AbstractGoods(type, GoodsContainer.CARGO_SIZE));
+        }
+
+        // Adjust for what is already being carried.
+        Iterator<AbstractGoods> ig = toLoad.iterator();
+        while (ig.hasNext()) {
+            AbstractGoods ag = ig.next();
+            int amount = unit.getGoodsCount(ag.getType());
+            if (amount > 0) {
+                amount = ag.getAmount() - amount;
+                if (amount <= 0) {
+                    // Already at capacity for this goods type.  Ignore it.
+                    ig.remove();
                 } else {
-                    present = colony.getGoodsCount(type);
-                    atStop = colony.getExportAmount(type);
+                    ag.setAmount(amount);
                 }
-                if (atStop > 0) {
-                    Goods cargo = new Goods(game, loc, type,
-                        Math.min(toLoad, atStop));
-                    if (loadGoods(cargo, unit)) {
-                        if (sb != null) {
-                            sb.append(" ")
-                                .append(getLoadGoodsMessage(unit, type,
-                                        cargo.getAmount(), present,
-                                        atStop, toLoad));
-                        }
-                        ret = true;
-                    }
-                } else if (present > 0) {
-                    if (sb != null) {
-                        sb.append(" ")
-                            .append(getLoadGoodsMessage(unit, type,
-                                    0, present, 0, toLoad));
-                    }
-                }
-                // Do not try to load this goods type again.  Either
-                // it has already succeeded, or it can not ever
-                // succeed because there is nothing available.
-                goodsTypesToLoad.remove(index);
             }
         }
 
-        // Then fill any remaining empty cargo slots.
-        for (GoodsType type : goodsTypesToLoad) {
-            if (!unit.hasSpaceLeft()) break; // Full
-            int toLoad = GoodsContainer.CARGO_SIZE;
-            int present, atStop;
+        // Load as much as possible
+        for (AbstractGoods ag : toLoad) {
+            GoodsType type = ag.getType();
+            int present, export, demand = ag.getAmount();
             if (unit.isInEurope()) {
-                present = atStop = Integer.MAX_VALUE;
+                present = export = Integer.MAX_VALUE;
             } else {
-                present = colony.getGoodsCount(type);
-                atStop = colony.getExportAmount(type);
+                present = colony.getGoodsCount(ag.getType());
+                export = colony.getExportAmount(ag.getType());
             }
-            if (atStop > 0) {
-                Goods cargo = new Goods(game, loc, type,
-                    Math.min(toLoad, atStop));
+            if (export > 0) {
+                int amount = Math.min(demand, export);
+                Goods cargo = new Goods(game, loc, type, amount);
                 if (loadGoods(cargo, unit)) {
                     if (sb != null) {
                         sb.append(" ")
-                            .append(getLoadGoodsMessage(unit, type,
-                                    cargo.getAmount(), present, 
-                                    atStop, toLoad));
+                            .append(getLoadGoodsMessage(unit, type, amount,
+                                    present, export, demand));
                     }
                     ret = true;
                 }
             } else if (present > 0) {
                 if (sb != null) {
-                    sb.append(getLoadGoodsMessage(unit, type,
-                            0, present, 0, toLoad));
+                    sb.append(" ")
+                        .append(getLoadGoodsMessage(unit, type, 0,
+                                present, 0, demand));
                 }
             }
         }
@@ -763,27 +746,27 @@ public final class InGameController implements NetworkConstants {
      * @param type The <code>GoodsType</code> the type of goods being loaded.
      * @param amount The amount of goods loaded.
      * @param present The amount of goods already at the location.
-     * @param atStop The amount of goods available to load.
-     * @param toLoad The amount of goods the unit should load according to
+     * @param export The amount of goods available to export.
+     * @param demand The amount of goods the unit should load according to
      *     the trade route orders.
      * @return A summary of the load.
      */
     private String getLoadGoodsMessage(Unit unit, GoodsType type,
                                        int amount, int present,
-                                       int atStop, int toLoad) {
+                                       int export, int demand) {
         Player player = unit.getOwner();
         Location loc = unit.getLocation();
         String route = unit.getTradeRoute().getName();
         String key = null;
         int more = 0;
 
-        if (toLoad < atStop) {
+        if (demand < export) {
             key = "tradeRoute.loadStopImport";
-            more = atStop - toLoad;
-        } else if (present > atStop && toLoad > atStop) {
+            more = export - demand;
+        } else if (present > export && demand > export) {
             key = (amount == 0) ? "tradeRoute.loadStopNoExport"
                 : "tradeRoute.loadStopExport";
-            more = present - atStop;
+            more = present - export;
         } else {
             key = "tradeRoute.loadStop";
         }
