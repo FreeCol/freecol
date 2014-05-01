@@ -1768,6 +1768,58 @@ public class Player extends FreeColGameObject implements Nameable {
         return result;
     }
 
+    /**
+     * Check whether this player can declare independence.
+     *
+     * @return Null if there is no barrier to declaration, otherwise
+     *     a <code>StringTemplate</code> explaining the problem.
+     */
+    public StringTemplate checkDeclareIndependence() {
+        if (getPlayerType() != PlayerType.COLONIAL)
+            return StringTemplate.template("model.independence.colonial");
+        Event event = getSpecification()
+            .getEvent("model.event.declareIndependence");
+        for (Limit limit : event.getLimits()) {
+            if (!limit.evaluate(this)) {
+                return StringTemplate.template(limit.getDescriptionKey())
+                    .addAmount("%limit%",
+                        limit.getRightHandSide().getValue(getGame()));
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Generic strength calculation.
+     *
+     * @param naval If true consider naval units, otherwise, land units.
+     * @return A measure of naval or land offensive power.
+     */
+    public int calculateStrength(boolean naval) {
+        final CombatModel cm = getGame().getCombatModel();
+        int s = 0;
+        for (Unit unit : getUnits()) {
+            if (unit.isNaval() == naval) {
+                s += cm.getOffencePower(unit, null);
+            }
+        }
+        return s;
+    }
+
+    /**
+     * Get the strength ratio of this player with respect to its REF.
+     *
+     * @return A measure of the military viability of this player.
+     */
+    public float getRebelStrengthRatio() {
+        if (getPlayerType() != PlayerType.COLONIAL) return 0f;
+        float ref = getMonarch().getExpeditionaryForce()
+            .calculateStrength(false);
+        float pla = calculateStrength(false);
+        return ref / (ref + pla);
+    }
+
+
     //
     // Taxation and trade
     //

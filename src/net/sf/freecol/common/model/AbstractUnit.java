@@ -160,6 +160,20 @@ public class AbstractUnit extends FreeColObject {
         return spec.getUnitType(getId());
     }
 
+    /**
+     * Get the approximate offence power that an instantiated unit
+     * corresponding to this abstract form would have.
+     *
+     * @param spec A <code>Specification</code> to look up.
+     * @return The approximate offence power.
+     */
+    public float getOffence(Specification spec) {
+        int n = getNumber();
+        Role role = spec.getRole(getRoleId());
+        UnitType type = spec.getUnitType(getId());
+        return n * type.getOffence() * role.getOffence();
+    }
+
 
     // Serialization
 

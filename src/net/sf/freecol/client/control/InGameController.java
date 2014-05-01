@@ -305,7 +305,7 @@ public final class InGameController implements NetworkConstants {
     private int confirmTribute(Unit attacker, Settlement settlement) {
         Player player = attacker.getOwner();
         Player other = settlement.getOwner();
-        int strength = NationSummary.calculateStrength(player, false);
+        int strength = player.calculateStrength(false);
         StringTemplate t;
 
         if (other.isIndian()) {
@@ -2015,16 +2015,10 @@ public final class InGameController implements NetworkConstants {
         Player player = freeColClient.getMyPlayer();
 
         // Check for adequate support.
-        Event event = getSpecification()
-            .getEvent("model.event.declareIndependence");
-        for (Limit limit : event.getLimits()) {
-            if (!limit.evaluate(player)) {
-                gui.showInformationMessage(StringTemplate
-                    .template(limit.getDescriptionKey())
-                    .addAmount("%limit%",
-                        limit.getRightHandSide().getValue(game)));
-                return;
-            }
+        StringTemplate declare = player.checkDeclareIndependence();
+        if (declare != null) {
+            gui.showInformationMessage(declare);
+            return;
         }
         if (player.getNewLandName() == null) {
             // Can only happen in debug mode.

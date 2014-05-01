@@ -196,7 +196,7 @@ public class Role extends BuildableType implements Comparable<Role> {
      *
      * @return The offense value.
      */
-    private float getOffence() {
+    public float getOffence() {
         return getFeatureContainer()
             .applyModifier(1, Modifier.OFFENCE, null, null);
     }

@@ -377,7 +377,7 @@ public class CashInTreasureTrainMission extends Mission {
         // Go to the target.
         Unit.MoveType mt = travelToTarget(tag, getTarget(),
             CostDeciders.avoidSettlementsAndBlockingUnits());
-logger.finest(tag + " travel=" + mt + ": " + this);
+        logger.finest(tag + " travel=" + mt + ": " + this);
         if (mt != Unit.MoveType.MOVE) return;
 
         // Cash in now if:
@@ -391,7 +391,7 @@ logger.finest(tag + " travel=" + mt + ": " + this);
         final Europe europe = player.getEurope();
         if (unit.canCashInTreasureTrain()) {
             AIUnit aiCarrier = aiUnit.getTransport();
-            if (aiCarrier != null) {
+            if (europe != null && aiCarrier != null) {
                 logger.finest(tag + " queued for Europe with carrier: "
                     + aiCarrier); // Let the carrier do its job
             } else {

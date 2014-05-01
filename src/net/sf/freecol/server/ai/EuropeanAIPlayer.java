@@ -984,6 +984,7 @@ public class EuropeanAIPlayer extends AIPlayer {
     public AIUnit recruitAIUnitInEurope(int index) {
         AIUnit aiUnit = null;
         Europe europe = getPlayer().getEurope();
+        if (europe == null) return null;
         int n = europe.getUnitCount();
         final String selectAbility = Ability.SELECT_RECRUIT;
         int slot = (index >= 0 && index < Europe.RECRUIT_COUNT
@@ -1011,6 +1012,7 @@ public class EuropeanAIPlayer extends AIPlayer {
 
         AIUnit aiUnit = null;
         Europe europe = getPlayer().getEurope();
+        if (europe == null) return null;
         int n = europe.getUnitCount();
 
         if (AIMessage.askTrainUnitInEurope(this, unitType)
@@ -1071,10 +1073,14 @@ public class EuropeanAIPlayer extends AIPlayer {
      * TODO: Remove when the AI is good enough.
      */
     private void cheat() {
+        final AIMain aiMain = getAIMain();
+        if (!aiMain.getFreeColServer().isSinglePlayer()) return;
+
+        final Player player = getPlayer();
+        if (player.getPlayerType() != PlayerType.COLONIAL) return;
+
         final Specification spec = getSpecification();
         final Game game = getGame();
-        final AIMain aiMain = getAIMain();
-        final Player player = getPlayer();
         final Market market = player.getMarket();
         final Europe europe = player.getEurope();
         final Random air = getAIRandom();
@@ -1113,9 +1119,6 @@ public class EuropeanAIPlayer extends AIPlayer {
                 }
             }
         }
-
-        if (!getAIMain().getFreeColServer().isSinglePlayer()
-            || player.getPlayerType() != PlayerType.COLONIAL) return;
 
         if (!europe.isEmpty()
             && scoutsNeeded() > 0
@@ -2082,7 +2085,7 @@ public class EuropeanAIPlayer extends AIPlayer {
 
     private double getStrengthRatio(Player other) {
         NationSummary ns = AIMessage.askGetNationSummary(this, other);
-        int strength = NationSummary.calculateStrength(getPlayer(), false);
+        int strength = getPlayer().calculateStrength(false);
         return (double)strength / (strength + ns.getMilitaryStrength());
     }
 
@@ -2152,9 +2155,12 @@ public class EuropeanAIPlayer extends AIPlayer {
      * {@inheritDoc}
      */
     public void startWorking() {
+        Player player = getPlayer();
         Turn turn = getGame().getTurn();
         logger.finest(getClass().getName() + " in " + turn
-            + ": " + Utils.lastPart(getPlayer().getNationId(), "."));
+            + " declare=" + (player.checkDeclareIndependence() == null)
+            + " strength=" + player.getRebelStrengthRatio()
+            + ": " + Utils.lastPart(player.getNationId(), "."));
         sessionRegister.clear();
         clearAIUnits();
         determineStances();

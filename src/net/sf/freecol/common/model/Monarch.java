@@ -821,6 +821,22 @@ public final class Monarch extends FreeColGameObject implements Named {
             updateSpaceAndCapacity();
         }
 
+        /**
+         * Calculate the approximate offence power of this force.
+         *
+         * @param naval If true, consider only naval units, otherwise
+         *     consider the land units.
+         * @return The approximate offence power.
+         */
+        public float calculateStrength(boolean naval) {
+            final Specification spec = getSpecification();
+            float result = 0;
+            for (AbstractUnit au : (naval) ? navalUnits : landUnits) {
+                result += au.getOffence(spec);
+            }
+            return result;
+        }
+
 
         // Serialization
 

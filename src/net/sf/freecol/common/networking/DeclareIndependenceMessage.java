@@ -25,8 +25,10 @@ import net.sf.freecol.common.model.Limit;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
+import net.sf.freecol.client.gui.i18n.Messages;
 
 import org.w3c.dom.Element;
 
@@ -91,21 +93,14 @@ public class DeclareIndependenceMessage extends DOMMessage {
             || countryName == null || countryName.length() == 0) {
             return DOMMessage.clientError("Empty nation or country name.");
         }
-        Event event = spec.getEvent("model.event.declareIndependence");
-        for (Limit limit : event.getLimits()) {
-            if (!limit.evaluate(player)) {
-                return DOMMessage.clientError(limit.getDescriptionKey() + " "
-                    + Integer.toString(limit.getRightHandSide().getValue()));
-            }
-        }
-        if (player.getPlayerType() != PlayerType.COLONIAL) {
-            return DOMMessage.clientError("Only colonial players"
-                + " can declare independence.");
+        StringTemplate problem = player.checkDeclareIndependence();
+        if (problem != null) {
+            return DOMMessage.clientError(Messages.message(problem));
         }
 
         // Declare.
-        return server.getInGameController().
-            declareIndependence(serverPlayer, nationName, countryName);
+        return server.getInGameController()
+            .declareIndependence(serverPlayer, nationName, countryName);
     }
 
     /**
