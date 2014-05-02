@@ -467,16 +467,13 @@ public class Building extends WorkLocation implements Named, Comparable<Building
         final Turn turn = getGame().getTurn();
 
         List<Modifier> mods = new ArrayList<Modifier>();
-        if (unitType == null) {
-            // If a unit is not present add only the bonuses
-            // specific to the building (such as the Paine bells
-            // bonus).
+        if (unitType == null) { // Add only the building-specific bonuses
             mods.addAll(colony.getModifierSet(id, type, turn));
             if (owner != null) {
                 mods.addAll(owner.getModifierSet(id, type, turn));
             }
-        } else {
-            // If a unit is present add unit specific bonuses.
+
+        } else { // If a unit is present add unit specific bonuses.
             mods.addAll(this.getModifierSet(id, unitType, turn));
             mods.add(colony.getProductionModifier(goodsType));
             mods.addAll(unitType.getModifierSet(id, goodsType, turn));

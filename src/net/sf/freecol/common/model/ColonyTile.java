@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -327,56 +328,52 @@ public class ColonyTile extends WorkLocation {
         if (goodsType == null) {
             throw new IllegalArgumentException("Null GoodsType.");
         }
-        List<Modifier> result = new ArrayList<Modifier>();
+        final Tile workTile = getWorkTile();
+        final TileType type = workTile.getType();
+        final String id = goodsType.getId();
         final Colony colony = getColony();
         final Player owner = colony.getOwner();
-        final TileType tileType = getWorkTile().getType();
-        final String id = goodsType.getId();
         final Turn turn = getGame().getTurn();
+
+        List<Modifier> mods = new ArrayList<Modifier>();
         if (isColonyCenterTile()) {
-            for (AbstractGoods output : getOutputs()) {
-                if (goodsType == output.getType()) {
-                    result.addAll(workTile.getProductionModifiers(goodsType, null));
-                    result.addAll(colony.getModifierSet(id, null, turn));
-                    result.add(colony.getProductionModifier(goodsType));
-                    if (owner != null) {
-                        result.addAll(owner.getModifierSet(id, null, turn));
-                    }
-                }
+            mods.addAll(workTile.getProductionModifiers(goodsType, null));
+            mods.addAll(colony.getModifierSet(id, null, turn));
+            mods.add(colony.getProductionModifier(goodsType));
+            if (owner != null) {
+                mods.addAll(owner.getModifierSet(id, null, turn));
             }
-        } else {
-            result.addAll(workTile.getProductionModifiers(goodsType, unitType));
-            // special case: a resource might provide base production
-            if (FeatureContainer.applyModifiers(0f, turn, result) > 0
-                || produces(goodsType)) {
-                result.addAll(colony.getModifierSet(id, null, turn));
-                if (unitType != null) {
-                    result.add(colony.getProductionModifier(goodsType));
-                    result.addAll(unitType.getModifierSet(id, tileType, turn));
-                    if (owner != null) {
-                        result.addAll(owner.getModifierSet(id, null, turn));
-                    }
-                } else {
-                    if (owner != null) {
-                        result.addAll(owner.getModifierSet(id, tileType, turn));
-                    }
+
+        } else if (FeatureContainer.applyModifiers(0f, turn, 
+                workTile.getProductionModifiers(goodsType, unitType)) > 0
+            || produces(goodsType)) {
+            if (unitType == null) { // Add only the tile-specific bonuses
+                mods.addAll(colony.getModifierSet(id, type, turn));
+                if (owner != null) {
+                    mods.addAll(owner.getModifierSet(id, type, turn));
+                }
+
+            } else { // If a unit is present add unit specific bonuses
+                mods.addAll(workTile.getProductionModifiers(goodsType,
+                                                            unitType));
+                mods.add(colony.getProductionModifier(goodsType));
+                mods.addAll(unitType.getModifierSet(id, type, turn));
+                if (owner != null) {
+                    mods.addAll(owner.getModifierSet(id, null, turn));
                 }
             }
         }
-        return result;
+        return mods;
     }
 
     /**
      * {@inheritDoc}
      */
     public List<ProductionType> getProductionTypes() {
-        if (workTile != null
-            && workTile.getType() != null) {
-            return workTile.getType()
-                .getProductionTypes(isColonyCenterTile());
-        } else {
-            return new ArrayList<ProductionType>();
+        if (workTile == null || workTile.getType() == null) {
+            return Collections.emptyList();
         }
+        return workTile.getType().getProductionTypes(isColonyCenterTile());
     }
 
     /**

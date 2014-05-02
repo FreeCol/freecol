@@ -57,6 +57,8 @@ public class TileTest extends FreeColTestCase {
 
     private static final ResourceType grainResource
         = spec().getResourceType("model.resource.grain");
+    private static final ResourceType lumberResource
+        = spec().getResourceType("model.resource.lumber");
     private static final ResourceType mineralsResource
         = spec().getResourceType("model.resource.minerals");
     private static final ResourceType silverResource
@@ -79,14 +81,14 @@ public class TileTest extends FreeColTestCase {
 
     private static final TileType arctic
         = spec().getTileType("model.tile.arctic");
+    private static final TileType coniferForest
+        = spec().getTileType("model.tile.coniferForest");
     private static final TileType desert
         = spec().getTileType("model.tile.desert");
     private static final TileType desertForest
         = spec().getTileType("model.tile.scrubForest");
     private static final TileType grassland
         = spec().getTileType("model.tile.grassland");
-    private static final TileType grasslandForest
-        = spec().getTileType("model.tile.coniferForest");
     private static final TileType highSeas
         = spec().getTileType("model.tile.highSeas");
     private static final TileType hills
@@ -154,7 +156,7 @@ public class TileTest extends FreeColTestCase {
 
         assertNotNull( plainsForest );
         assertNotNull( desertForest );
-        assertNotNull( grasslandForest );
+        assertNotNull( coniferForest );
         assertNotNull( prairieForest );
         assertNotNull( tundraForest );
         assertNotNull( savannahForest );
@@ -197,7 +199,7 @@ public class TileTest extends FreeColTestCase {
         // Now check the forests
         cost = new Work[] {
             new Work(tundraForest, 6, 4),
-            new Work(grasslandForest, 6, 4),
+            new Work(coniferForest, 6, 4),
             new Work(desertForest, 6, 4),
             new Work(prairieForest, 6, 4),
             new Work(savannahForest, 8, 6),

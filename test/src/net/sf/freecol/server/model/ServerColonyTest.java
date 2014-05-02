@@ -25,11 +25,15 @@ import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Resource;
+import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -54,6 +58,8 @@ public class ServerColonyTest extends FreeColTestCase {
 
     private static final GoodsType bellsType
         = spec().getGoodsType("model.goods.bells");
+    private static final GoodsType crossesType
+        = spec().getGoodsType("model.goods.crosses");
     private static final GoodsType grainType
         = spec().getGoodsType("model.goods.grain");
     private static final GoodsType hammerGoodsType
@@ -65,6 +71,11 @@ public class ServerColonyTest extends FreeColTestCase {
     private static final GoodsType foodGoodsType
         = spec().getPrimaryFoodType();
 
+    private static final ResourceType lumberResource
+        = spec().getResourceType("model.resource.lumber");
+
+    private static final TileType coniferForest
+        = spec().getTileType("model.tile.coniferForest");
     private static final TileType desert
         = spec().getTileType("model.tile.desert");
     private static final TileType marsh
@@ -74,6 +85,8 @@ public class ServerColonyTest extends FreeColTestCase {
     
     private static final UnitType colonistType
         = spec().getUnitType("model.unit.freeColonist");
+    private static final UnitType expertLumberJack
+        = spec().getUnitType("model.unit.expertLumberJack");
     private static final UnitType pioneerType
         = spec().getUnitType("model.unit.hardyPioneer");
 
@@ -305,8 +318,6 @@ public class ServerColonyTest extends FreeColTestCase {
                      initialLumber, colony.getGoodsCount(lumberGoodsType));
     }
 
-
-
     public void testLibertyAndImmigration() {
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
@@ -326,9 +337,6 @@ public class ServerColonyTest extends FreeColTestCase {
         preacher.setLocation(null);
         preacher.setLocation(church);
 
-        GoodsType bellsType = spec().getGoodsType("model.goods.bells");
-        GoodsType crossType = spec().getGoodsType("model.goods.crosses");
-
         assertEquals(0, colony.getGoodsCount(bellsType));
         ServerTestHelper.newTurn();
 
@@ -347,23 +355,101 @@ public class ServerColonyTest extends FreeColTestCase {
         assertEquals(bells, colony.getGoodsCount(bellsType));
         assertEquals(bells, colony.getEffectiveLiberty());
 
-        int crosses = colony.getTotalProductionOf(crossType)
-            - colony.getConsumptionOf(crossType);
-        assertEquals(crosses, colony.getNetProductionOf(crossType));
-        assertEquals(crosses, colony.getGoodsCount(crossType));
+        int crosses = colony.getTotalProductionOf(crossesType)
+            - colony.getConsumptionOf(crossesType);
+        assertEquals(crosses, colony.getNetProductionOf(crossesType));
+        assertEquals(crosses, colony.getGoodsCount(crossesType));
         assertEquals(crosses, colony.getImmigration());
 
-        colony.addGoods(crossType, 7);
+        colony.addGoods(crossesType, 7);
         crosses += 7;
-        assertEquals(crosses, colony.getGoodsCount(crossType));
+        assertEquals(crosses, colony.getGoodsCount(crossesType));
         assertEquals(crosses, colony.getImmigration());
 
-        colony.removeGoods(crossType, 5);
+        colony.removeGoods(crossesType, 5);
         crosses -= 5;
-        assertEquals(crosses, colony.getGoodsCount(crossType));
+        assertEquals(crosses, colony.getGoodsCount(crossesType));
         assertEquals(crosses, colony.getImmigration());
 
     }
+
+    public void testConiferForestColonyTile() {
+        Map map = getTestMap(coniferForest);
+        Game game = ServerTestHelper.startServerGame(map);
+
+        Colony colony = getStandardColony(1);
+        final Tile tile = colony.getTile();
+        tile.addRiver(1, "1111"); // allow rivers to join
+        final Iterable<Tile> tiles = tile.getSurroundingTiles(1);
+        Tile firstTile = null;
+        int i = 0;
+        for (Tile t : tiles) {
+            if (firstTile == null) firstTile = t;
+            if ((i & 0x1) == 0x1) t.addRiver(1, "1111");// must be first!
+            if ((i & 0x2) == 0x2) {
+                TileImprovement road = t.addRoad();
+                road.setTurnsToComplete(0);
+            }
+            if ((i & 0x4) == 0x4) t.addResource(new Resource(game, t, lumberResource, 99));
+            i++;
+        }
+        ColonyTile firstColonyTile = colony.getColonyTile(firstTile);
+
+System.err.println("testConifer");
+        Unit unit = colony.getUnitList().get(0);
+        assertEquals(colonistType, unit.getType());
+        unit.setLocation(firstColonyTile);
+        unit.changeWorkType(lumberGoodsType);
+        assertEquals("Added unit producing lumber", lumberGoodsType,
+            unit.getWorkType());
+
+        // production = (BASE + RESOURCE) x EXPERT + RIVER + ROAD (+ untested)
+        final int base = 6;
+        final int riverBonus = 2;
+        final int roadBonus = 2;
+        final int resourceBonus = 4;
+        final int expertBonus = 2;
+        assertEquals("Base lumber production", base,
+            firstColonyTile.getBaseProduction(lumberGoodsType));
+
+        // Check all tiles with colonist unit
+        i = 0;
+        for (Tile t : tiles) {
+            ColonyTile ct = colony.getColonyTile(t);
+            unit.setLocation(ct);
+            int result = base;
+            if (t.hasRiver()) result += riverBonus;
+            if (t.hasRoad()) result += roadBonus;
+            if (t.hasResource()) result += resourceBonus;
+            assertEquals("FreeColonist lumber production at tile " + i, result,
+                ct.getTotalProductionOf(lumberGoodsType));
+            i++;
+        }
+
+        // Try again with expert unit
+        assertEquals("Expert unit", expertLumberJack,
+            firstColonyTile.getExpertUnitType());
+        unit.setType(expertLumberJack);
+        colony.invalidateCache();
+        i = 0;
+        for (Tile t : tiles) {
+            ColonyTile ct = colony.getColonyTile(t);
+            unit.setLocation(ct);
+            int result = base * expertBonus;
+            if (t.hasRiver()) result += riverBonus;
+            if (t.hasRoad()) result += roadBonus;
+            if (t.hasResource()) result += resourceBonus * expertBonus;
+System.err.println("T " + i);
+net.sf.freecol.common.model.FreeColObject.dumpCollection(ct.getOutputs());
+System.err.println("M " + (((t.hasRiver()) ? 1 : 0) + ((t.hasRoad()) ? 2 : 0) + ((t.hasResource()) ? 4 : 0)));
+net.sf.freecol.common.model.FreeColObject.dumpCollection(ct.getProductionModifiers(unit.getWorkType(), unit.getType()));
+
+            assertEquals("Expert lumber production at tile " + i, result,
+                ct.getTotalProductionOf(lumberGoodsType));
+            i++;
+        }
+    }
+
 
     /** Disabled.  Currently no reliable way to count messages.
 
