@@ -297,6 +297,38 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
             getSpecification().getDefaultUnitType());
     }
 
+    /**
+     * Gets the maximum productivity of a unit working in this work
+     * location, considering *only* the contribution of the unit,
+     * exclusive of that of the work location.
+     *
+     * Used below, only public for the test suite.
+     *
+     * @param unit The <code>Unit</code> to check.
+     * @return The maximum return from this unit.
+     */
+    public int getUnitProduction(Unit unit, GoodsType goodsType) {
+        int productivity = 0;
+        List<AbstractGoods> outputs = getOutputs();
+        if (!(unit == null || outputs == null)) {
+            for (AbstractGoods output : outputs) {
+                if (output.getType() == goodsType) {
+                    productivity = output.getAmount();
+                    if (productivity > 0) {
+                        final UnitType unitType = unit.getType();
+                        final Turn turn = getGame().getTurn();
+
+                        productivity = (int) FeatureContainer
+                            .applyModifiers(output.getAmount(), turn,
+                                            getProductionModifiers(goodsType, unitType));
+                    }
+                    return Math.max(0, productivity);
+                }
+            }
+        }
+        return 0;
+    }
+
 
     // Interface Location
     // Inherits:
