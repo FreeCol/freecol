@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Modifier;
+import net.sf.freecol.common.model.Modifier.ModifierType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.util.Utils;
@@ -45,7 +46,7 @@ public class SimpleCombatModel extends CombatModel {
     public static final int MAXIMUM_BOMBARD_POWER = 48;
 
     public static final Modifier UNKNOWN_DEFENCE_MODIFIER
-        = new Modifier("bogus", Modifier.UNKNOWN, Modifier.Type.ADDITIVE);
+        = new Modifier("bogus", Modifier.UNKNOWN, ModifierType.ADDITIVE);
 
 
     /**
@@ -154,9 +155,9 @@ public class SimpleCombatModel extends CombatModel {
             Unit attackerUnit = (Unit) attacker;
             UnitType type = attackerUnit.getType();
             result.add(new Modifier(Modifier.OFFENCE,
-                                    Specification.BASE_OFFENCE_SOURCE,
                                     type.getOffence(),
-                                    Modifier.Type.ADDITIVE));
+                                    ModifierType.ADDITIVE,
+                                    Specification.BASE_OFFENCE_SOURCE));
             result.addAll(attackerUnit.getModifierSet(Modifier.OFFENCE));
             if (defender instanceof Ownable) {
                 result.addAll(attackerUnit
@@ -172,7 +173,7 @@ public class SimpleCombatModel extends CombatModel {
         } else if (combatIsBombard(attacker, defender)) {
             result.add(new Modifier(Modifier.BOMBARD_BONUS,
                                     getOffencePower(attacker, defender),
-                                    Modifier.Type.ADDITIVE));
+                                    ModifierType.ADDITIVE));
 
         } else {
             throw new IllegalArgumentException("Bogus combat");
@@ -193,10 +194,9 @@ public class SimpleCombatModel extends CombatModel {
             // Penalty for every unit of cargo.
             // TODO: shouldn't this be -cargo/capacity?
             // TODO: magic number to spec
-            result.add(new Modifier(Modifier.OFFENCE,
-                                    Specification.CARGO_PENALTY_SOURCE,
-                                    -12.5f * count,
-                                    Modifier.Type.PERCENTAGE));
+            result.add(new Modifier(Modifier.OFFENCE, -12.5f * count,
+                                    ModifierType.PERCENTAGE,
+                                    Specification.CARGO_PENALTY_SOURCE));
         }
 
         Specification spec = attacker.getSpecification();
@@ -247,8 +247,8 @@ public class SimpleCombatModel extends CombatModel {
                 Colony colony = (Colony)defender;
                 int bonus = colony.getSoL();
                 if (attackerUnit.getOwner().isREF()) bonus = 100 - bonus;
-                result.add(new Modifier(Modifier.POPULAR_SUPPORT, colony,
-                                        bonus, Modifier.Type.PERCENTAGE));
+                result.add(new Modifier(Modifier.POPULAR_SUPPORT, bonus,
+                                        ModifierType.PERCENTAGE, colony));
             }
         } else if (combatIsAttack(attacker, defender)) {
             Unit defenderUnit = (Unit) defender;
@@ -296,9 +296,9 @@ public class SimpleCombatModel extends CombatModel {
             || combatIsAttack(attacker, defender)) {
             Unit defenderUnit = (Unit) defender;
             result.add(new Modifier(Modifier.DEFENCE,
-                                    Specification.BASE_DEFENCE_SOURCE,
                                     defenderUnit.getType().getDefence(),
-                                    Modifier.Type.ADDITIVE));
+                                    ModifierType.ADDITIVE,
+                                    Specification.BASE_DEFENCE_SOURCE));
             result.addAll(defenderUnit.getType()
                           .getModifierSet(Modifier.DEFENCE));
             if (defenderUnit.isNaval()) {
@@ -317,7 +317,7 @@ public class SimpleCombatModel extends CombatModel {
             Unit defenderUnit = (Unit) defender;
             result.add(new Modifier(Modifier.DEFENCE,
                                     defenderUnit.getType().getDefence(),
-                                    Modifier.Type.ADDITIVE));
+                                    ModifierType.ADDITIVE));
 
         } else {
             throw new IllegalArgumentException("Bogus combat");
@@ -338,10 +338,9 @@ public class SimpleCombatModel extends CombatModel {
         if (goodsCount > 0) {
             // Penalty for every unit of cargo.
             // TODO: should this be -cargo/capacity?
-            result.add(new Modifier(Modifier.DEFENCE,
-                                    Specification.CARGO_PENALTY_SOURCE,
-                                    -12.5f * goodsCount,
-                                    Modifier.Type.PERCENTAGE));
+            result.add(new Modifier(Modifier.DEFENCE, -12.5f * goodsCount,
+                                    ModifierType.PERCENTAGE,
+                                    Specification.CARGO_PENALTY_SOURCE));
         }
     }
 

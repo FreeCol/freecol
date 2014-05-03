@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Set;
 
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
+import net.sf.freecol.common.model.Modifier;
+import net.sf.freecol.common.model.Modifier.ModifierType;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 
@@ -59,7 +61,8 @@ public class FoundingFatherTest extends FreeColTestCase {
 
         FoundingFather father2 = new FoundingFather("father2", spec());
         father2.setType(FoundingFatherType.TRADE);
-        Modifier modifier = new Modifier("some.new.modifier", father2, 2f, Modifier.Type.ADDITIVE);
+        Modifier modifier = new Modifier("some.new.modifier", 2f,
+                                         ModifierType.ADDITIVE, father2);
         father2.addModifier(modifier);
         spec().addModifier(modifier);
         dutch.addFather(father2);
@@ -71,7 +74,8 @@ public class FoundingFatherTest extends FreeColTestCase {
 
         FoundingFather father3 = new FoundingFather("father3", spec());
         father3.setType(FoundingFatherType.TRADE);
-        father3.addModifier(new Modifier("some.new.modifier", father3, 2f, Modifier.Type.ADDITIVE));
+        father3.addModifier(new Modifier("some.new.modifier", 2f,
+                                         ModifierType.ADDITIVE, father3));
         dutch.addFather(father3);
 
         assertFalse(dutch.getModifierSet("some.new.modifier").isEmpty());

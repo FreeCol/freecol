@@ -717,13 +717,13 @@ public class NativeAIPlayer extends AIPlayer {
      * @return The ship trade penalties.
      */
     private Set<Modifier> getShipTradePenalties(boolean sense) {
-        Specification spec = getSpecification();
-        List<Modifier> shipPenalties = spec.getModifiers(Modifier.SHIP_TRADE_PENALTY);
-        Set<Modifier> result = new HashSet<Modifier>();
+        final Specification spec = getSpecification();
         int penalty = spec.getInteger(GameOptions.SHIP_TRADE_PENALTY);
-        for (Modifier m : shipPenalties) {
-            result.add(new Modifier(m.getId(), m.getSource(),
-                    ((sense) ? penalty : -penalty), m.getType()));
+        Set<Modifier> result = new HashSet<Modifier>();
+        for (Modifier m : spec.getModifiers(Modifier.SHIP_TRADE_PENALTY)) {
+            Modifier n = new Modifier(m);
+            n.setValue((sense) ? penalty : -penalty);
+            result.add(n);
         }
         return result;
     }

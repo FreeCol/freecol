@@ -20,6 +20,8 @@
 package net.sf.freecol.common.model;
 
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.model.Modifier;
+import net.sf.freecol.common.model.Modifier.ModifierType;
 import net.sf.freecol.server.model.ServerBuilding;
 import net.sf.freecol.util.test.FreeColTestCase;
 
@@ -96,7 +98,6 @@ public class SettlementTest extends FreeColTestCase {
     }
 
     public void testColonyClaimsWater() {
-
         Game game = getGame();
         Map map = getTestMap();
         game.setMap(map);
@@ -112,7 +113,6 @@ public class SettlementTest extends FreeColTestCase {
                          + " should be owned by " + colony.getId(),
                          tile.getOwningSettlement(), colony);
         }
-
     }
 
     public void testLineOfSight() {
@@ -125,14 +125,11 @@ public class SettlementTest extends FreeColTestCase {
 
         BuildingType towerType = new BuildingType("tower", spec());
         Modifier modifier = new Modifier(Modifier.LINE_OF_SIGHT_BONUS, 2,
-                                         Modifier.Type.ADDITIVE);
+                                         ModifierType.ADDITIVE);
         towerType.addModifier(modifier);
         Building tower = new ServerBuilding(getGame(), colony, towerType);
         colony.addBuilding(tower);
 
         assertEquals(4, colony.getLineOfSight());
-
     }
-
-
 }

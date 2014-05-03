@@ -1891,18 +1891,18 @@ public class Colony extends Settlement implements Nameable {
         return result;
     }
 
-
     /**
-     * Returns the current production <code>Modifier</code>, which is
+     * Get the current production <code>Modifier</code>, which is
      * generated from the current production bonus.
      *
-     * @param goodsType a <code>GoodsType</code> value
-     * @return a <code>Modifier</code> value
+     * @param goodsType The <code>GoodsType</code> to produce.
+     * @return A suitable <code>Modifier</code>.
      */
     public Modifier getProductionModifier(GoodsType goodsType) {
         Modifier result = new Modifier(goodsType.getId(), 
-                                       Specification.SOL_MODIFIER_SOURCE,
-                                       productionBonus, Modifier.Type.ADDITIVE);
+                                       productionBonus,
+                                       Modifier.ModifierType.ADDITIVE,
+                                       Specification.SOL_MODIFIER_SOURCE);
         result.setIndex(Modifier.COLONY_PRODUCTION_INDEX);
         return result;
     }

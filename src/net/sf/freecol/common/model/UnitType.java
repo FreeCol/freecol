@@ -842,17 +842,22 @@ public final class UnitType extends BuildableType
 
         // @compat 0.10.6
         if (hasAbility(Ability.PERSON)) {
+            Modifier m;
             if (!containsModifierKey(Modifier.CONVERSION_SKILL)) {
-                addModifier(new Modifier(Modifier.CONVERSION_SKILL, 8.0f,
-                        Modifier.Type.ADDITIVE));
+                m = new Modifier(Modifier.CONVERSION_SKILL, 8.0f, 
+                                 Modifier.ModifierType.ADDITIVE);
+                addModifier(m);
+
                 if (hasAbility(Ability.EXPERT_MISSIONARY)) {
-                    addModifier(new Modifier(Modifier.CONVERSION_SKILL, 5.0f,
-                            Modifier.Type.ADDITIVE));
+                    m = new Modifier(Modifier.CONVERSION_SKILL, 5.0f,
+                                     Modifier.ModifierType.ADDITIVE);
+                    addModifier(m);
                 }
             }
             if (!containsModifierKey(Modifier.CONVERSION_ALARM_RATE)) {
-                addModifier(new Modifier(Modifier.CONVERSION_ALARM_RATE, 2.0f,
-                        Modifier.Type.PERCENTAGE));
+                m = new Modifier(Modifier.CONVERSION_ALARM_RATE, 2.0f,
+                                 Modifier.ModifierType.PERCENTAGE);
+                addModifier(m);
             }
         }
         // end @compat

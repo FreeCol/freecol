@@ -24,23 +24,30 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.sf.freecol.common.model.Modifier;
+import net.sf.freecol.common.model.Modifier.ModifierType;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 
 public class ModifierTest extends FreeColTestCase {
 
+    private static final UnitType carpenter
+        = spec().getUnitType("model.unit.masterCarpenter");
+    private static final UnitType frigate
+        = spec().getUnitType("model.unit.frigate");
+
 
     public void testAdditiveModifier() {
-
-        Modifier modifier = new Modifier("test", 3, Modifier.Type.ADDITIVE);
+        Modifier modifier = new Modifier("test", 3,
+                                         ModifierType.ADDITIVE);
         spec().addModifier(modifier);
 
         assertEquals(4f, modifier.applyTo(1));
     }
 
     public void testMultiplicativeModifier() {
-
-        Modifier modifier = new Modifier("test", 1.5f, Modifier.Type.MULTIPLICATIVE);
+        Modifier modifier = new Modifier("test", 1.5f,
+                                         ModifierType.MULTIPLICATIVE);
         spec().addModifier(modifier);
 
         assertEquals(1 * 1.5f, modifier.applyTo(1));
@@ -48,71 +55,80 @@ public class ModifierTest extends FreeColTestCase {
     }
 
     public void testPercentageModifier() {
-
-        Modifier modifier = new Modifier("test", 50, Modifier.Type.PERCENTAGE);
+        Modifier modifier = new Modifier("test", 50,
+                                         ModifierType.PERCENTAGE);
         spec().addModifier(modifier);
 
         assertEquals(150f, modifier.applyTo(100));
         assertEquals(4.5f, modifier.applyTo(3));
-
     }
 
     public void testCombineAdditiveModifiers() {
-
-        Modifier modifier1 = new Modifier("test", 3, Modifier.Type.ADDITIVE);
-        Modifier modifier2 = new Modifier("test", 4, Modifier.Type.ADDITIVE);
+        Modifier modifier1 = new Modifier("test", 3,
+                                          ModifierType.ADDITIVE);
+        Modifier modifier2 = new Modifier("test", 4,
+                                          ModifierType.ADDITIVE);
         Set<Modifier> modifierSet = new HashSet<Modifier>();
         modifierSet.add(modifier1);
         modifierSet.add(modifier2);
-        assertEquals(1 + 3 + 4f, FeatureContainer.applyModifierSet(1, null, modifierSet));
+        assertEquals(1 + 3 + 4f,
+            FeatureContainer.applyModifierSet(1, null, modifierSet));
     }
 
     public void testCombineMultiplicativeModifiers() {
-
-        Modifier modifier1 = new Modifier("test", 3, Modifier.Type.MULTIPLICATIVE);
-        Modifier modifier2 = new Modifier("test", 4, Modifier.Type.MULTIPLICATIVE);
+        Modifier modifier1 = new Modifier("test", 3,
+                                          ModifierType.MULTIPLICATIVE);
+        Modifier modifier2 = new Modifier("test", 4,
+                                          ModifierType.MULTIPLICATIVE);
         Set<Modifier> modifierSet = new HashSet<Modifier>();
         modifierSet.add(modifier1);
         modifierSet.add(modifier2);
-        assertEquals(2 * 3 * 4f, FeatureContainer.applyModifierSet(2, null, modifierSet));
+        assertEquals(2 * 3 * 4f,
+            FeatureContainer.applyModifierSet(2, null, modifierSet));
     }
 
     public void testCombinePercentageModifiers() {
-
-        Modifier modifier1 = new Modifier("test", 3, Modifier.Type.PERCENTAGE);
-        Modifier modifier2 = new Modifier("test", 4, Modifier.Type.PERCENTAGE);
+        Modifier modifier1 = new Modifier("test", 3,
+                                          ModifierType.PERCENTAGE);
+        Modifier modifier2 = new Modifier("test", 4,
+                                          ModifierType.PERCENTAGE);
         Set<Modifier> modifierSet = new HashSet<Modifier>();
         modifierSet.add(modifier1);
         modifierSet.add(modifier2);
-        assertEquals(107f, FeatureContainer.applyModifierSet(100, null, modifierSet));
+        assertEquals(107f,
+            FeatureContainer.applyModifierSet(100, null, modifierSet));
     }
 
     public void testCombinedModifier() {
-
-        Modifier modifier1 = new Modifier("test", 3, Modifier.Type.ADDITIVE);
-        Modifier modifier2 = new Modifier("test", 1.5f, Modifier.Type.MULTIPLICATIVE);
-        Modifier modifier3 = new Modifier("test", 50, Modifier.Type.PERCENTAGE);
+        Modifier modifier1 = new Modifier("test", 3,
+                                          ModifierType.ADDITIVE);
+        Modifier modifier2 = new Modifier("test", 1.5f,
+                                          ModifierType.MULTIPLICATIVE);
+        Modifier modifier3 = new Modifier("test", 50,
+                                          ModifierType.PERCENTAGE);
 
         Set<Modifier> modifierSet = new HashSet<Modifier>();
         modifierSet.add(modifier1);
         modifierSet.add(modifier2);
-        assertEquals((1 + 3) * 1.5f, FeatureContainer.applyModifierSet(1, null, modifierSet));
+        assertEquals((1 + 3) * 1.5f,
+            FeatureContainer.applyModifierSet(1, null, modifierSet));
 
         modifierSet.add(modifier3);
-        assertEquals(((1 + 3) * 1.5f) * 1.5f, FeatureContainer.applyModifierSet(1, null, modifierSet));
+        assertEquals(((1 + 3) * 1.5f) * 1.5f,
+            FeatureContainer.applyModifierSet(1, null, modifierSet));
 
         modifierSet.remove(modifier1);
-        assertEquals(10 * 1.5f * 1.5f, FeatureContainer.applyModifierSet(10, null, modifierSet));
+        assertEquals(10 * 1.5f * 1.5f,
+            FeatureContainer.applyModifierSet(10, null, modifierSet));
     }
 
     public void testScope() {
-
-        UnitType carpenter = spec().getUnitType("model.unit.masterCarpenter");
-        UnitType frigate = spec().getUnitType("model.unit.frigate");
-
-        Modifier modifier1 = new Modifier("test", 3, Modifier.Type.ADDITIVE);
-        Modifier modifier2 = new Modifier("test", 1.5f, Modifier.Type.MULTIPLICATIVE);
-        Modifier modifier3 = new Modifier("test", 30, Modifier.Type.PERCENTAGE);
+        Modifier modifier1 = new Modifier("test", 3,
+                                          ModifierType.ADDITIVE);
+        Modifier modifier2 = new Modifier("test", 1.5f,
+                                          ModifierType.MULTIPLICATIVE);
+        Modifier modifier3 = new Modifier("test", 30,
+                                          ModifierType.PERCENTAGE);
 
         FeatureContainer featureContainer = new FeatureContainer();
         featureContainer.addModifier(modifier1);
@@ -137,7 +153,8 @@ public class ModifierTest extends FreeColTestCase {
         assertTrue(modifier1.appliesTo(frigate));
         assertFalse(modifier1.appliesTo(carpenter));
 
-        Set<Modifier> result = featureContainer.getModifierSet("test", frigate, null);
+        Set<Modifier> result
+            = featureContainer.getModifierSet("test", frigate, null);
         assertEquals(3, result.size());
         assertEquals(((1 + 3) * 1.5f) + ((1 + 3) * 1.5f) * 30 / 100,
                 FeatureContainer.applyModifierSet(1, null, result));
@@ -157,21 +174,20 @@ public class ModifierTest extends FreeColTestCase {
         result = featureContainer.getModifierSet("test", frigate, null);
         assertEquals(3, result.size());
         assertEquals(((1 + 3) * 1.5f) + ((1 + 3) * 1.5f) * 30 / 100,
-                FeatureContainer.applyModifierSet(1, null, result));
+            FeatureContainer.applyModifierSet(1, null, result));
 
         result = featureContainer.getModifierSet("test", carpenter, null);
         assertEquals(2, result.size());
 
         assertEquals(1.5f + (1.5f * 30) / 100,
-                FeatureContainer.applyModifierSet(1, null, result));
+            FeatureContainer.applyModifierSet(1, null, result));
     }
 
     public void testTimeLimits() {
-
-        UnitType frigate = spec().getUnitType("model.unit.frigate");
-
-        Modifier modifier1 = new Modifier("test", 1, Modifier.Type.ADDITIVE);
-        Modifier modifier2 = new Modifier("test", 2, Modifier.Type.ADDITIVE);
+        Modifier modifier1 = new Modifier("test", 1,
+                                          ModifierType.ADDITIVE);
+        Modifier modifier2 = new Modifier("test", 2,
+                                          ModifierType.ADDITIVE);
 
         modifier1.setFirstTurn(new Turn(10));
         modifier1.setLastTurn(new Turn(30));
@@ -194,23 +210,24 @@ public class ModifierTest extends FreeColTestCase {
         FeatureContainer featureContainer = new FeatureContainer();
         featureContainer.addModifier(modifier1);
         featureContainer.addModifier(modifier2);
-        Set<Modifier> modifierSet = featureContainer.getModifierSet("test", frigate, new Turn(15));
+        Set<Modifier> modifierSet = featureContainer.getModifierSet("test",
+            frigate, new Turn(15));
         assertEquals(1, modifierSet.size());
         assertEquals(modifier1, modifierSet.iterator().next());
-        modifierSet = featureContainer.getModifierSet("test", frigate, new Turn(35));
+        modifierSet = featureContainer.getModifierSet("test",
+            frigate, new Turn(35));
         assertEquals(1, modifierSet.size());
         assertEquals(modifier2, modifierSet.iterator().next());
-
     }
 
     public void testIncrements() {
+        Modifier modifier1 = new Modifier("test", 1,
+                                          ModifierType.ADDITIVE);
+        Modifier modifier2 = new Modifier("test", 2,
+                                          ModifierType.ADDITIVE);
 
-        UnitType frigate = spec().getUnitType("model.unit.frigate");
-
-        Modifier modifier1 = new Modifier("test", 1, Modifier.Type.ADDITIVE);
-        Modifier modifier2 = new Modifier("test", 2, Modifier.Type.ADDITIVE);
-
-        modifier1.setIncrement(1, Modifier.Type.ADDITIVE, new Turn(10), new Turn(15));
+        modifier1.setIncrement(ModifierType.ADDITIVE, 1,
+                               new Turn(10), new Turn(15));
         assertFalse(modifier1.appliesTo(frigate, new Turn(9)));
         assertTrue(modifier1.appliesTo(frigate, new Turn(10)));
         assertTrue(modifier1.hasIncrement());
@@ -227,11 +244,9 @@ public class ModifierTest extends FreeColTestCase {
         assertEquals(9f, featureContainer.applyModifier(1, "test", frigate, new Turn(15)));
         // only modifier2
         assertEquals(3f, featureContainer.applyModifier(1, "test", frigate, new Turn(16)));
-
     }
 
     public void testHashEquals() {
-
         Scope scope1 = new Scope();
         scope1.setType("model.unit.frigate");
         scope1.setAbilityId("whatever");
@@ -252,9 +267,12 @@ public class ModifierTest extends FreeColTestCase {
         assertFalse(scope1.equals(scope3));
         assertFalse(scope1.hashCode() == scope3.hashCode());
 
-        Modifier modifier1 = new Modifier("test", 3, Modifier.Type.ADDITIVE);
-        Modifier modifier2 = new Modifier("test", 3, Modifier.Type.ADDITIVE);
-        Modifier modifier3 = new Modifier("test", 2, Modifier.Type.ADDITIVE);
+        Modifier modifier1 = new Modifier("test", 3,
+                                          ModifierType.ADDITIVE);
+        Modifier modifier2 = new Modifier("test", 3,
+                                          ModifierType.ADDITIVE);
+        Modifier modifier3 = new Modifier("test", 2,
+                                          ModifierType.ADDITIVE);
 
         assertEquals(modifier1, modifier1);
         assertEquals(modifier1.hashCode(), modifier1.hashCode());
@@ -300,7 +318,6 @@ public class ModifierTest extends FreeColTestCase {
         assertFalse(modifier1.hashCode() == modifier2.hashCode());
         assertFalse(modifier2.equals(modifier3));
         assertFalse(modifier2.hashCode() == modifier3.hashCode());
-
     }
 
     /**
@@ -308,18 +325,19 @@ public class ModifierTest extends FreeColTestCase {
      * produces an unknown result.
      */
     public void testModifierUnknown() {
-
-        Modifier modifier1 = new Modifier("test", 3, Modifier.Type.ADDITIVE);
-        Modifier modifier2 = new Modifier("test", Modifier.UNKNOWN, Modifier.Type.MULTIPLICATIVE);
-        Modifier modifier3 = new Modifier("test", 30, Modifier.Type.PERCENTAGE);
+        Modifier modifier1 = new Modifier("test", 3,
+                                          ModifierType.ADDITIVE);
+        Modifier modifier2 = new Modifier("test", Modifier.UNKNOWN,
+                                          ModifierType.MULTIPLICATIVE);
+        Modifier modifier3 = new Modifier("test", 30,
+                                          ModifierType.PERCENTAGE);
 
         FeatureContainer featureContainer = new FeatureContainer();
         featureContainer.addModifier(modifier1);
         featureContainer.addModifier(modifier2);
         featureContainer.addModifier(modifier3);
 
-        assertEquals(Modifier.UNKNOWN, featureContainer.applyModifier(1, "test", null, new Turn(15)));
-
+        assertEquals(Modifier.UNKNOWN,
+            featureContainer.applyModifier(1, "test", null, new Turn(15)));
     }
-
 }

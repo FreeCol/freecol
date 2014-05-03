@@ -30,6 +30,8 @@ import java.util.Map.Entry;
 
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColTcFile;
+import net.sf.freecol.common.model.Modifier;
+import net.sf.freecol.common.model.Modifier.ModifierType;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 
@@ -133,13 +135,13 @@ public final class SpecificationTest extends FreeColTestCase {
         // Additive Modifier
         BuildingType depot = spec.getBuildingType("model.building.depot");
         Modifier modifier = depot.getModifierSet(Modifier.WAREHOUSE_STORAGE).iterator().next();
-        assertEquals(Modifier.Type.ADDITIVE, modifier.getType());
+        assertEquals(ModifierType.ADDITIVE, modifier.getType());
         assertEquals(100f, modifier.getValue());
 
         // Multiplicative Modifier
         UnitType blackSmith = spec.getUnitType("model.unit.masterBlacksmith");
         modifier = blackSmith.getModifierSet("model.goods.tools").iterator().next();
-        assertEquals(Modifier.Type.MULTIPLICATIVE, modifier.getType());
+        assertEquals(ModifierType.MULTIPLICATIVE, modifier.getType());
         assertEquals(2f, modifier.getValue());
     }
 

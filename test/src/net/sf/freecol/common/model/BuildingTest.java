@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Modifier;
+import net.sf.freecol.common.model.Modifier.ModifierType;
 import net.sf.freecol.common.model.UnitLocation.NoAddReason;
 import net.sf.freecol.server.model.ServerBuilding;
 import net.sf.freecol.server.model.ServerUnit;
@@ -433,13 +434,13 @@ public class BuildingTest extends FreeColTestCase {
         assertEquals(1, modifierSet.size());
         Modifier modifier = modifierSet.iterator().next();
         assertEquals(50f, modifier.getValue());
-        assertEquals(Modifier.Type.PERCENTAGE, modifier.getType());
+        assertEquals(ModifierType.PERCENTAGE, modifier.getType());
 
         modifierSet = stockadeType.getModifierSet(Modifier.DEFENCE);
         assertEquals(1, modifierSet.size());
         modifier = modifierSet.iterator().next();
         assertEquals(100f, modifier.getValue());
-        assertEquals(Modifier.Type.PERCENTAGE, modifier.getType());
+        assertEquals(ModifierType.PERCENTAGE, modifier.getType());
         assertEquals(0f, stockadeType.applyModifier(0,
                 Modifier.MINIMUM_COLONY_SIZE));
 
@@ -447,7 +448,7 @@ public class BuildingTest extends FreeColTestCase {
         assertEquals(1, modifierSet.size());
         modifier = modifierSet.iterator().next();
         assertEquals(150f, modifier.getValue());
-        assertEquals(Modifier.Type.PERCENTAGE, modifier.getType());
+        assertEquals(ModifierType.PERCENTAGE, modifier.getType());
         assertEquals(0f, stockadeType.applyModifier(0,
                 Modifier.MINIMUM_COLONY_SIZE));
 
@@ -455,7 +456,7 @@ public class BuildingTest extends FreeColTestCase {
         assertEquals(1, modifierSet.size());
         modifier = modifierSet.iterator().next();
         assertEquals(200f, modifier.getValue());
-        assertEquals(Modifier.Type.PERCENTAGE, modifier.getType());
+        assertEquals(ModifierType.PERCENTAGE, modifier.getType());
         assertEquals(0f, stockadeType.applyModifier(0,
                 Modifier.MINIMUM_COLONY_SIZE));
     }
@@ -579,7 +580,7 @@ public class BuildingTest extends FreeColTestCase {
         assertEquals("Initial modifier size", 1,
                      modifiers.size());
         Modifier bellsModifier = modifiers.iterator().next();
-        assertEquals("Initial modifier type", Modifier.Type.ADDITIVE,
+        assertEquals("Initial modifier type", ModifierType.ADDITIVE,
                      bellsModifier.getType());
         assertEquals("Initial modifier value", 1.0f,
                      bellsModifier.getValue());

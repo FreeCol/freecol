@@ -27,6 +27,7 @@ import net.sf.freecol.common.model.Feature;
 import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Modifier;
+import net.sf.freecol.common.model.Modifier.ModifierType;
 import net.sf.freecol.common.model.Scope;
 import net.sf.freecol.common.model.Turn;
 
@@ -46,7 +47,8 @@ public class ModifierFormat {
         return getModifierStrings(modifier.getValue(), modifier.getType());
     }
 
-    public static final String[] getModifierStrings(float value, Modifier.Type type) {
+    public static final String[] getModifierStrings(float value,
+                                                    ModifierType type) {
         String[] result;
         String bonus = modifierFormat.format(value);
         if (value < 0) {
@@ -54,11 +56,17 @@ public class ModifierFormat {
         } else {
             result = new String[] { "+", bonus, null };
         }
-        if (type == Modifier.Type.PERCENTAGE) {
-            result[2] = "%";
-        } else if (type == Modifier.Type.MULTIPLICATIVE) {
-            // this assumes that no multiplicative modifier will ever be negative
+        switch (type) {
+        case MULTIPLICATIVE:
+            // this assumes that no multiplicative modifier will never
+            // be negative
             result[0] = "\u00D7";
+            break;
+        case PERCENTAGE:
+            result[2] = "%";
+            break;
+        default:
+            break;
         }
         return result;
     }

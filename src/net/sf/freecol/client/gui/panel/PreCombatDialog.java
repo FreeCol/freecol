@@ -40,6 +40,7 @@ import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Modifier;
+import net.sf.freecol.common.model.Modifier.ModifierType;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
@@ -189,16 +190,16 @@ public class PreCombatDialog extends FreeColConfirmDialog {
      * @return a sorted Set of <code>Modifier</code>
      */
     private Set<Modifier> sortModifiers(Set<Modifier> result) {
-        EnumMap<Modifier.Type, List<Modifier>> modifierMap =
-            new EnumMap<Modifier.Type, List<Modifier>>(Modifier.Type.class);
-        for (Modifier.Type type : Modifier.Type.values()) {
+        EnumMap<ModifierType, List<Modifier>> modifierMap
+            = new EnumMap<ModifierType, List<Modifier>>(ModifierType.class);
+        for (ModifierType type : ModifierType.values()) {
             modifierMap.put(type, new ArrayList<Modifier>());
         }
         for (Modifier modifier : result) {
             modifierMap.get(modifier.getType()).add(modifier);
         }
         Set<Modifier> sortedResult = new LinkedHashSet<Modifier>();
-        for (Modifier.Type type : Modifier.Type.values()) {
+        for (ModifierType type : ModifierType.values()) {
             sortedResult.addAll(modifierMap.get(type));
         }
         return sortedResult;

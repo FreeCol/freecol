@@ -42,6 +42,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Modifier;
+import net.sf.freecol.common.model.Modifier.ModifierType;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
@@ -1984,7 +1985,7 @@ public class InGameControllerTest extends FreeColTestCase {
         FoundingFather father = new FoundingFather("father", spec());
         father.setType(FoundingFatherType.TRADE);
         Modifier priceBonus = new Modifier(Modifier.BUILDING_PRICE_BONUS,
-                                           -100f, Modifier.Type.PERCENTAGE);
+                                           -100f, ModifierType.PERCENTAGE);
         Scope pressScope = new Scope();
         pressScope.setType("model.building.printingPress");
         List<Scope> scopeList = new ArrayList<Scope>();

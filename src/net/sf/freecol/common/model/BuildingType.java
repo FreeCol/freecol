@@ -436,7 +436,8 @@ public final class BuildingType extends BuildableType
             || getId().equals("model.building.church")
             || getId().equals("model.building.cathedral")) {
             for (Modifier m : getModifierSet()) {
-                if (m.getType() == Modifier.Type.ADDITIVE && !m.hasScope()) {
+                if (m.getType() == Modifier.ModifierType.ADDITIVE
+                    && !m.hasScope()) {
                     Scope scope = new Scope();
                     scope.setMatchNegated(true);
                     scope.setAbilityId("model.ability.person");
