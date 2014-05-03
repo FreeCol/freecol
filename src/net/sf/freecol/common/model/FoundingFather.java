@@ -82,8 +82,6 @@ public class FoundingFather extends FreeColGameObjectType {
      */
     public FoundingFather(String id, Specification specification) {
         super(id, specification);
-
-        setModifierIndex(Modifier.FATHER_PRODUCTION_INDEX);
     }
 
 
@@ -279,6 +277,17 @@ public class FoundingFather extends FreeColGameObjectType {
             if (scope.appliesTo(player)) return true;
         }
         return false;
+    }
+
+
+    // Override FreeColGameObjectType
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getModifierIndex(String id) {
+        return Modifier.FATHER_PRODUCTION_INDEX;
     }
 
 

@@ -57,8 +57,6 @@ public abstract class NationType extends FreeColGameObjectType {
      */
     public NationType(String id, Specification specification) {
         super(id, specification);
-
-        setModifierIndex(Modifier.NATION_PRODUCTION_INDEX);
     }
 
 
@@ -171,6 +169,17 @@ public abstract class NationType extends FreeColGameObjectType {
      * @return True if this is a REF nation.
      */
     public abstract boolean isREF();
+
+
+    // Override FreeColGameObjectType
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getModifierIndex(String id) {
+        return Modifier.NATION_PRODUCTION_INDEX;
+    }
 
 
     // Serialization

@@ -74,8 +74,6 @@ public final class BuildingType extends BuildableType
      */
     public BuildingType(String id, Specification specification) {
         super(id, specification);
-
-        setModifierIndex(Modifier.BUILDING_PRODUCTION_INDEX);
     }
 
 
@@ -266,22 +264,6 @@ public final class BuildingType extends BuildableType
     }
 
     /**
-     * Get the index for the given Modifier.
-     *
-     * @param modifier The <code>Modifier</code> to check.
-     * @return A modifier index.
-     */
-    @Override
-    protected final int getModifierIndex(Modifier modifier) {
-        GoodsType produces = getProducedGoodsType();
-        if (produces != null && produces.getId().equals(modifier.getId())) {
-            return Modifier.AUTO_PRODUCTION_INDEX;
-        } else {
-            return getModifierIndex();
-        }
-    }
-
-    /**
      * Is this a defence-related building type?  Such buildings
      * (stockade et al) are visible to other players.
      *
@@ -289,6 +271,20 @@ public final class BuildingType extends BuildableType
      */
     public boolean isDefenceType() {
         return containsModifierKey(Modifier.DEFENCE);
+    }
+
+
+    // Override FreeColGameObjectType
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getModifierIndex(String id) {
+        GoodsType produces = getProducedGoodsType();
+        return (produces != null && produces.getId().equals(id))
+            ? Modifier.AUTO_PRODUCTION_INDEX
+            : Modifier.BUILDING_PRODUCTION_INDEX;
     }
 
 

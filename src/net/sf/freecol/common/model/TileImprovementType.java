@@ -106,8 +106,6 @@ public final class TileImprovementType extends FreeColGameObjectType {
      */
     public TileImprovementType(String id, Specification specification) {
         super(id, specification);
-
-        setModifierIndex(Modifier.IMPROVEMENT_PRODUCTION_INDEX);
     }
 
 
@@ -436,6 +434,17 @@ public final class TileImprovementType extends FreeColGameObjectType {
             }
         }
         return value;
+    }
+
+
+    // Override FreeColGameObjectType
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getModifierIndex(String id) {
+        return Modifier.IMPROVEMENT_PRODUCTION_INDEX;
     }
 
 

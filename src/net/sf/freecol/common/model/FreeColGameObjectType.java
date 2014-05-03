@@ -24,6 +24,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.option.OptionGroup;
 
 
@@ -45,9 +46,6 @@ import net.sf.freecol.common.option.OptionGroup;
  */
 public abstract class FreeColGameObjectType extends FreeColObject
     implements Named {
-
-    /** The default index of Modifiers provided by this type. */
-    private int modifierIndex = 100;
 
     /** Whether the type is abstract, or can be instantiated. */
     private boolean abstractType;
@@ -167,8 +165,8 @@ public abstract class FreeColGameObjectType extends FreeColObject
     }
 
     /**
-     * Gets the usual suffix of this object's identifier, that is everything
-     * after the last ".".
+     * Gets the usual suffix of this object's identifier, that is
+     * everything after the last ".".
      *
      * @return The usual identifier suffix.
      */
@@ -178,44 +176,27 @@ public abstract class FreeColGameObjectType extends FreeColObject
     }
 
     /**
-     * Get the modifier index value.  This is the priority with which
-     * Modifiers provided by this type will be applied.
-     *
-     * @return The modifier index.
-     */
-    public final int getModifierIndex() {
-        return modifierIndex;
-    }
-
-    /**
-     * Get the index for the given Modifier.  By default, this returns
-     * the type's modifier index.  Override this method if the type
-     * should distinguish different modifier priorities.
-     *
-     * @param modifier The <code>Modifier</code> to check.
-     * @return The modifier index.
-     * @see BuildingType#getModifierIndex(Modifier)
-     */
-    protected int getModifierIndex(Modifier modifier) {
-        return modifierIndex;
-    }
-
-    /**
-     * Set the modifier index value.
-     *
-     * @param newModifierIndex The new modifier index.
-     */
-    public final void setModifierIndex(final int newModifierIndex) {
-        this.modifierIndex = newModifierIndex;
-    }
-
-    /**
      * Is this an abstract type?
      *
-     * @return a <code>boolean</code> value
+     * @return True if this is an abstract game object type.
      */
     public final boolean isAbstractType() {
         return abstractType;
+    }
+
+    /**
+     * Get the modifier index used to sort modifiers instantiated with
+     * this object as the source.
+     *
+     * Override in subclasses that are involved in production.  Note
+     * that the parameter allows the index to vary according to what
+     * is being produced.
+     *
+     * @param id The identifier of the object being produced.
+     * @return The modifier index.
+     */
+    public int getModifierIndex(String id) {
+        return Modifier.DEFAULT_PRODUCTION_INDEX;
     }
 
 
@@ -312,10 +293,12 @@ public abstract class FreeColGameObjectType extends FreeColObject
                 xr.closeTag(Modifier.getXMLElementTagName());
 
             } else {
-                Modifier modifier = new Modifier(xr, spec);// Closes the element
+                Modifier modifier
+                    = new Modifier(xr, spec);// Closes the element
                 if (modifier.getSource() == null) modifier.setSource(this);
                 if (modifier.getProductionIndex() < 0) {
-                    modifier.setProductionIndex(getModifierIndex(modifier));
+                    int index = this.getModifierIndex(modifier.getId());
+                    modifier.setProductionIndex(index);
                 }
                 addModifier(modifier);
                 spec.addModifier(modifier);

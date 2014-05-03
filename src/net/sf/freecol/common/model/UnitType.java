@@ -116,8 +116,6 @@ public final class UnitType extends BuildableType
      */
     public UnitType(String id, Specification specification) {
         super(id, specification);
-
-        setModifierIndex(Modifier.EXPERT_PRODUCTION_INDEX);
     }
 
 
@@ -640,6 +638,17 @@ public final class UnitType extends BuildableType
      */
     public boolean canBuildColony() {
         return hasAbility(Ability.FOUND_COLONY);
+    }
+
+
+    // Override FreeColGameObjectType
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getModifierIndex(String id) {
+        return Modifier.EXPERT_PRODUCTION_INDEX;
     }
 
 
