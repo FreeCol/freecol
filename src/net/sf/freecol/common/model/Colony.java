@@ -1903,7 +1903,7 @@ public class Colony extends Settlement implements Nameable {
                                        productionBonus,
                                        Modifier.ModifierType.ADDITIVE,
                                        Specification.SOL_MODIFIER_SOURCE);
-        result.setIndex(Modifier.COLONY_PRODUCTION_INDEX);
+        result.setProductionIndex(Modifier.COLONY_PRODUCTION_INDEX);
         return result;
     }
 

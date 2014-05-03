@@ -23,6 +23,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
 
@@ -147,7 +148,7 @@ public class Modifier extends Feature implements Comparable<Modifier> {
     private ModifierType incrementType;
 
     /** A sorting index to use with production modifiers. */
-    private int index = -1;
+    private int productionIndex = -1;
 
 
     /**
@@ -202,7 +203,7 @@ public class Modifier extends Feature implements Comparable<Modifier> {
         setType(template.getType());
         setValue(template.getValue());
         setIncrementType(template.getIncrementType());
-        setIncrementValue(template.getIncrementValue());
+        setIncrement(template.getIncrement());
     }
 
     /**
@@ -222,7 +223,8 @@ public class Modifier extends Feature implements Comparable<Modifier> {
      *
      * @param xr The <code>FreeColXMLReader</code> to read from.
      * @param specification The <code>Specification</code> to refer to.
-     * @exception XMLStreamException if there is an error reading the stream.
+     * @exception XMLStreamException if there is an error reading the
+     *     stream.
      */
     public Modifier(FreeColXMLReader xr, Specification specification) throws XMLStreamException {
         setSpecification(specification);
@@ -246,7 +248,8 @@ public class Modifier extends Feature implements Comparable<Modifier> {
      * with the specified identifier from a template modifier
      * (containing the increment and value) and given start turn.
      *
-     * Currently the only suitable template is model.modifier.colonyGoodsParty.
+     * Currently the only suitable template is
+     * "model.modifier.colonyGoodsParty".
      *
      * @param id The id for the new modifier.
      * @param template A template <code>Modifier</code> with increment.
@@ -287,9 +290,56 @@ public class Modifier extends Feature implements Comparable<Modifier> {
     }
 
     /**
-     * Get the increment type value.
+     * Get the modifier value.
      *
-     * @return The increment type for this modifier, null if none present.
+     * @return The modifier value.
+     */
+    public float getValue() {
+        return value;
+    }
+
+    /**
+     * Get the value the modifier during the given Turn.
+     *
+     * @param turn The <code>Turn</code> to check.
+     * @return The turn-dependent modifier value.
+     */
+    public float getValue(Turn turn) {
+        if (appliesTo(turn)) {
+            if (hasIncrement()) {
+                float f = (turn.getNumber() - getFirstTurn().getNumber())
+                    * increment;
+                return apply(value, f, incrementType);
+            } else {
+                return value;
+            }
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * Set the modifier value.
+     *
+     * @param value The new value.
+     */
+    public void setValue(final float value) {
+        this.value = value;
+    }
+
+    /**
+     * Does this modifier have an increment?
+     *
+     * @return True if this modifier has an increment.
+     */
+    public boolean hasIncrement() {
+        return incrementType != null;
+    }
+
+    /**
+     * Get the increment type.
+     *
+     * @return The increment <code>ModifierType</code>.
      */
     public ModifierType getIncrementType() {
         return incrementType;
@@ -309,77 +359,34 @@ public class Modifier extends Feature implements Comparable<Modifier> {
      *
      * @return The increment value.
      */
-    public float getIncrementValue() {
+    public float getIncrement() {
         return increment;
     }
 
     /**
      * Set the increment value.
      *
-     * @param newValue The new value.
+     * @param increment The new value.
      */
-    public void setIncrementValue(final float newValue) {
-        this.increment = newValue;
+    public void setIncrement(final float increment) {
+        this.increment = increment;
     }
 
     /**
-     * Get the <code>Value</code> value.
+     * Set the whole increment.
      *
-     * @return a <code>float</code> value
-     */
-    public float getValue() {
-        return value;
-    }
-
-    /**
-     * Get the <code>value</code> of the Modifier during the given
-     * Turn.
-     *
-     * @param turn a <code>Turn</code> value
-     * @return a <code>float</code> value
-     */
-    public float getValue(Turn turn) {
-        if (appliesTo(turn)) {
-            if (hasIncrement()) {
-                return apply(value, (turn.getNumber() - getFirstTurn().getNumber()) * increment, incrementType);
-            } else {
-                return value;
-            }
-        } else {
-            return 0;
-        }
-    }
-
-    /**
-     * Set the <code>Value</code> value.
-     *
-     * @param newValue The new Value value.
-     */
-    public void setValue(final float newValue) {
-        value = newValue;
-    }
-
-    /**
-     * Get the <code>Increment</code> increment.
-     *
-     * @return a <code>float</code> increment
-     */
-    public float getIncrement() {
-        return increment;
-    }
-
-    /**
-     * Set the <code>Increment</code> increment.
-     *
-     * @param incrementType The <code>ModifierType</code> for the increment.
+     * @param incrementType The new <code>ModifierType</code>.
      * @param increment The new increment value.
-     * @param firstTurn The first <code>Turn</code> this increment applies.
-     * @param lastTurn The last <code>Turn</code> this increment applies.
+     * @param firstTurn The first <code>Turn</code> the increment is
+     *     active.
+     * @param lastTurn The last <code>Turn</code> the increment is
+     *     active.
      */
-    public void setIncrement(ModifierType incrementType, float increment,
+    public void setIncrement(final ModifierType incrementType,
+                             final float increment,
                              Turn firstTurn, Turn lastTurn) {
         if (firstTurn == null) {
-            throw new IllegalArgumentException("Parameter firstTurn must not be 'null'.");
+            throw new IllegalArgumentException("Null firstTurn");
         }
         this.incrementType = incrementType;
         this.increment = increment;
@@ -388,30 +395,21 @@ public class Modifier extends Feature implements Comparable<Modifier> {
     }
 
     /**
-     * Returns <code>true</code> if this Modifier has an increment.
+     * Get the production index.
      *
-     * @return a <code>boolean</code> value
+     * @return The production index.
      */
-    public boolean hasIncrement() {
-        return incrementType != null;
+    public int getProductionIndex() {
+        return productionIndex;
     }
 
     /**
-     * Get the <code>Index</code> value.
+     * Set the production index.
      *
-     * @return an <code>int</code> value
+     * @param productionIndex The new production index value.
      */
-    public int getIndex() {
-        return index;
-    }
-
-    /**
-     * Set the <code>Index</code> value.
-     *
-     * @param newIndex The new Index value.
-     */
-    public void setIndex(final int newIndex) {
-        this.index = newIndex;
+    public void setProductionIndex(final int productionIndex) {
+        this.productionIndex = productionIndex;
     }
 
     /**
@@ -448,7 +446,6 @@ public class Modifier extends Feature implements Comparable<Modifier> {
         }
     }
 
-
     /**
      * Applies this Modifier to a number. This method does not take
      * scopes, increments or time limits into account.
@@ -461,19 +458,32 @@ public class Modifier extends Feature implements Comparable<Modifier> {
     }
 
     /**
-     * Applies this Modifier to a number. This method does take increments
-     * into account.
+     * Applies this Modifier to a number.  This method does take
+     * increments into account.
      *
      * @param number The number to modify.
      * @param turn The <code>Turn</code> to evaluate increments in.
      * @return The modified number.
      */
     public float applyTo(float number, Turn turn) {
-        if (incrementType == null) {
-            return apply(number, value);
-        } else {
-            return apply(number, getValue(turn), getType());
-        }
+        return (incrementType == null) ? apply(number, value)
+            : apply(number, getValue(turn), getType());
+    }
+
+
+    // Implement Comparable<Modifier>
+
+    /**
+     * Compares this object with the specified object for order.
+     *
+     * @param modifier The <code>Modifier</code> to compare to.
+     * @return A comparison result.
+     */
+    public int compareTo(Modifier modifier) {
+        int cmp = productionIndex - modifier.productionIndex;
+        if (cmp == 0) cmp = modifierType.compareTo(modifier.modifierType);
+        if (cmp == 0) cmp = getIdComparator().compare(this, modifier);
+        return cmp;
     }
 
 
@@ -491,7 +501,7 @@ public class Modifier extends Feature implements Comparable<Modifier> {
             : modifierType.hashCode());
         hash = hash + 31 * ((incrementType == null) ? 0
             : incrementType.hashCode());
-        hash = hash + 31 * index;
+        hash = hash + 31 * productionIndex;
         return hash;
     }
 
@@ -500,54 +510,16 @@ public class Modifier extends Feature implements Comparable<Modifier> {
      */
     @Override
     public boolean equals(Object o) {
-        if (o == this) {
-            return true;
-        } else if (o instanceof Modifier) {
-            Modifier modifier = (Modifier) o;
-            if (!super.equals(o)) {
-                return false;
-            }
-            if (value != modifier.value) {
-                return false;
-            }
-            if (increment != modifier.increment) {
-                return false;
-            }
-            if (modifierType == null) {
-                if (modifier.modifierType != null) {
-                    return false;
-                }
-            } else if (modifier.modifierType == null) {
-                return false;
-            } else if (!modifierType.equals(modifier.modifierType)) {
-                return false;
-            }
-            if (incrementType == null) {
-                if (modifier.incrementType != null) {
-                    return false;
-                }
-            } else if (modifier.incrementType == null) {
-                return false;
-            } else if (!incrementType.equals(modifier.incrementType)) {
-                return false;
-            }
-            return (index == modifier.index);
-        } else {
-            return false;
-        }
-    }
+        if (o == this) return true;
+        if (!(o instanceof Modifier)) return false;
 
-    /**
-     * Compares this object with the specified object for order.
-     *
-     * @param modifier The <code>Modifier</code> to compare to.
-     * @return A comparison result.
-     */
-    public int compareTo(Modifier modifier) {
-        int cmp = index - modifier.index;
-        if (cmp == 0) cmp = modifierType.compareTo(modifier.modifierType);
-        if (cmp == 0) cmp = getIdComparator().compare(this, modifier);
-        return cmp;
+        Modifier modifier = (Modifier) o;
+        return super.equals(o)
+            && Utils.equals(modifierType, modifier.modifierType)
+            && value == modifier.value
+            && increment == modifier.increment
+            && Utils.equals(incrementType, modifier.incrementType)
+            && productionIndex == modifier.productionIndex;
     }
 
 
@@ -576,8 +548,8 @@ public class Modifier extends Feature implements Comparable<Modifier> {
             xw.writeAttribute(INCREMENT_TAG, increment);
         }
 
-        if (index >= 0) {
-            xw.writeAttribute(INDEX_TAG, index);
+        if (productionIndex >= 0) {
+            xw.writeAttribute(INDEX_TAG, productionIndex);
         }
     }
 
@@ -599,9 +571,12 @@ public class Modifier extends Feature implements Comparable<Modifier> {
                                             (ModifierType)null);
 
             increment = xr.getAttribute(INCREMENT_TAG, UNKNOWN);
+        } else {
+            incrementType = null;
+            increment = 0;
         }
 
-        index = xr.getAttribute(INDEX_TAG, -1);
+        productionIndex = xr.getAttribute(INDEX_TAG, -1);
     }
 
     /**
@@ -611,9 +586,14 @@ public class Modifier extends Feature implements Comparable<Modifier> {
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
         sb.append("[Modifier ").append(getId());
-        if (getSource() != null) sb.append(" (" + getSource().getId() + ")");
+        if (getSource() != null) {
+            sb.append(" (" + getSource().getId() + ")");
+        }
         sb.append(" ").append(modifierType)
             .append(" ").append(value);
+        if (productionIndex >= 0) {
+            sb.append(" index=").append(productionIndex);
+        }
         for (Scope s : getScopes()) sb.append(" ").append(s.toString());
         sb.append("]");
         return sb.toString();
