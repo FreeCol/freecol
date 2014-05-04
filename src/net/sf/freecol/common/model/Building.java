@@ -267,9 +267,9 @@ public class Building extends WorkLocation implements Named, Comparable<Building
                 }
             }
         } else {
-            Turn turn = getGame().getTurn();
+            final Turn turn = getGame().getTurn();
             for (AbstractGoods output : getOutputs()) {
-                float production = 0;
+                float production = 0f;
                 for (Unit u : getUnitList()) {
                     production += getUnitProduction(u, output.getType());
                 }
@@ -463,16 +463,11 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      * {@inheritDoc}
      */
     public int getPotentialProduction(GoodsType goodsType, UnitType unitType) {
-        for (AbstractGoods output : getOutputs()) {
-            if (output.getType() == goodsType) {
-                int amount = (unitType == null) ? 0 : output.getAmount();
-                int production = (int) FeatureContainer
-                    .applyModifiers(amount, getGame().getTurn(),
-                                    getProductionModifiers(goodsType, unitType));
-                return Math.max(0, production);
-            }
-        }
-        return 0;
+        int amount = (unitType == null) ? 0 : getBaseProduction(goodsType);
+        int production = (int) FeatureContainer.applyModifiers(amount,
+            getGame().getTurn(),
+            getProductionModifiers(goodsType, unitType));
+        return Math.max(0, production);
     }
 
     /**
