@@ -160,7 +160,9 @@ public class BuildingToolTip extends JToolTip {
 
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
             List<Modifier> modifiers = new ArrayList<Modifier>();
-            modifiers.addAll(building.getProductionModifiers(output, null));
+            if (output != null) {
+                modifiers.addAll(building.getProductionModifiers(output, null));
+            }
             Collections.sort(modifiers);
             for (Modifier m : modifiers) {
                 JLabel[] mLabels = ModifierFormat.getModifierLabels(m, null,
