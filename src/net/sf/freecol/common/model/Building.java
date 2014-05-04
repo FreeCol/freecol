@@ -477,31 +477,27 @@ public class Building extends WorkLocation implements Named, Comparable<Building
                                                  UnitType unitType) {
         final BuildingType type = getType();
         final String id = (goodsType == null) ? null : goodsType.getId();
-        final Turn turn = getGame().getTurn();
+        final Colony colony = getColony();
         final Player owner = getOwner();
-        List<Modifier> mods = new ArrayList<Modifier>();
-        for (AbstractGoods output : getOutputs()) {
-            if (output.getType() != goodsType) continue;
+        final Turn turn = getGame().getTurn();
 
-            if (unitType == null) {
-                // If a unit is not present add only the bonuses
-                // specific to the building (such as the Paine bells bonus).
-                mods.addAll(getColony().getModifierSet(id, type, turn));
-                if (owner != null) {
-                    mods.addAll(owner.getModifierSet(id, type, turn));
-                }
-            } else {
-                // If a unit is present add unit specific bonuses and
-                // unspecific owner bonuses (which includes things
-                // like the Building national advantage).
-                mods.addAll(getModifierSet(id, unitType, turn));
-                mods.add(getColony().getProductionModifier(goodsType));
-                mods.addAll(unitType.getModifierSet(id, goodsType, turn));
-                if (owner != null) {
-                    mods.addAll(owner.getModifierSet(id, unitType, turn));
-                }
+        List<Modifier> mods = new ArrayList<Modifier>();
+        if (unitType == null) {
+            // If a unit is not present add only the bonuses
+            // specific to the building (such as the Paine bells
+            // bonus).
+            mods.addAll(colony.getModifierSet(id, type, turn));
+            if (owner != null) {
+                mods.addAll(owner.getModifierSet(id, type, turn));
             }
-            break;
+        } else {
+            // If a unit is present add unit specific bonuses.
+            mods.addAll(this.getModifierSet(id, unitType, turn));
+            mods.add(colony.getProductionModifier(goodsType));
+            mods.addAll(unitType.getModifierSet(id, goodsType, turn));
+            if (owner != null) {
+                mods.addAll(owner.getModifierSet(id, unitType, turn));
+            }
         }
         return mods;
     }
