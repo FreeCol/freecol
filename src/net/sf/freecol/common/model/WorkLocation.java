@@ -146,11 +146,9 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      * @return The base production.
      */
     public int getBaseProduction(GoodsType goodsType) {
-        if (productionType != null) {
-            for (AbstractGoods output : productionType.getOutputs()) {
-                if (output.getType() == goodsType) {
-                    return output.getAmount();
-                }
+        for (AbstractGoods output : getOutputs()) {
+            if (output.getType() == goodsType) {
+                return output.getAmount();
             }
         }
         return 0;
@@ -308,22 +306,21 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      * @return The maximum return from this unit.
      */
     public int getUnitProduction(Unit unit, GoodsType goodsType) {
+        if (unit == null) return 0;
         int productivity = 0;
         List<AbstractGoods> outputs = getOutputs();
-        if (!(unit == null || outputs == null)) {
-            for (AbstractGoods output : outputs) {
-                if (output.getType() == goodsType) {
-                    productivity = output.getAmount();
-                    if (productivity > 0) {
-                        final UnitType unitType = unit.getType();
-                        final Turn turn = getGame().getTurn();
-
-                        productivity = (int) FeatureContainer
-                            .applyModifiers(output.getAmount(), turn,
-                                            getProductionModifiers(goodsType, unitType));
-                    }
-                    return Math.max(0, productivity);
+        for (AbstractGoods output : outputs) {
+            if (output.getType() == goodsType) {
+                productivity = output.getAmount();
+                if (productivity > 0) {
+                    final UnitType unitType = unit.getType();
+                    final Turn turn = getGame().getTurn();
+                    
+                    productivity = (int)FeatureContainer
+                        .applyModifiers(output.getAmount(), turn,
+                            getProductionModifiers(goodsType, unitType));
                 }
+                return Math.max(0, productivity);
             }
         }
         return 0;

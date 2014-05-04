@@ -583,7 +583,8 @@ public class TileTest extends FreeColTestCase {
         ColonyTile colonyTile = colony.getColonyTile(tile);
         tile.addResource(new Resource(game, tile, mineralsResource));
         if (!colonyTile.isEmpty()) {
-            colonyTile.getUnitList().get(0).setLocation(colony.getBuilding(townHallType));
+            colonyTile.getUnitList().get(0)
+                .setLocation(colony.getBuilding(townHallType));
         }
         assertTrue(colonyTile.isEmpty());
 
@@ -593,7 +594,7 @@ public class TileTest extends FreeColTestCase {
         assertEquals(0, tundra.getProductionOf(silver, colonistType));
         assertEquals(1, tile.potential(silver, colonistType));
 
-        assertFalse(tile.getProductionModifiers(silver, unit.getType())
+        assertFalse(tile.getProductionModifiers(silver, colonistType)
             .isEmpty());
 
         assertEquals(1, colonyTile.getPotentialProduction(silver, unit.getType()));
