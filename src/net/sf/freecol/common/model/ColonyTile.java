@@ -160,6 +160,7 @@ public class ColonyTile extends WorkLocation {
      * @see ProductionCache#update
      */
     public ProductionInfo getBasicProductionInfo() {
+        final Colony colony = getColony();
         ProductionInfo pi = new ProductionInfo();
         if (isColonyCenterTile()) {
             for (AbstractGoods output : getOutputs()) {
@@ -172,32 +173,23 @@ public class ColonyTile extends WorkLocation {
                         .getTotalBonusPotential(output.getType(), null, potential,
                                                 onlyNaturalImprovements);
                 }
-                potential += Math.max(0, getColony().getProductionBonus());
-                AbstractGoods production = new AbstractGoods(output.getType(), potential);
+                potential += Math.max(0, colony.getProductionBonus());
+                AbstractGoods production
+                    = new AbstractGoods(output.getType(), potential);
                 pi.addProduction(production);
             }
         } else {
+            final Turn turn = getGame().getTurn();
             boolean onlyNaturalImprovements = false;
-            Turn turn = getGame().getTurn();
             for (AbstractGoods output : getOutputs()) {
-                GoodsType outputType = output.getType();
-                String id = outputType.getId();
-                int potential = output.getAmount();
+                final GoodsType goodsType = output.getType();
                 for (Unit unit : getUnitList()) {
-                    UnitType unitType = unit.getType();
-                    if (workTile.getTileItemContainer() != null) {
-                        potential = workTile.getTileItemContainer()
-                            .getTotalBonusPotential(outputType, unitType, potential,
-                                                    onlyNaturalImprovements);
-                    }
-                    List<Modifier> result = new ArrayList<Modifier>();
-                    result.addAll(unit.getModifierSet(id, unitType, turn));
-                    result.addAll(getColony().getModifierSet(id, null, turn));
-                    result.add(getColony().getProductionModifier(outputType));
-                    potential = (int) FeatureContainer
-                        .applyModifiers(potential, turn, result);
+                    final UnitType unitType = unit.getType();
+                    int potential = (int)FeatureContainer
+                        .applyModifiers(output.getAmount(), turn, 
+                            getProductionModifiers(goodsType, unitType));
                     if (potential > 0) {
-                        pi.addProduction(new AbstractGoods(outputType, potential));
+                        pi.addProduction(new AbstractGoods(goodsType, potential));
                     }
                 }
             }
