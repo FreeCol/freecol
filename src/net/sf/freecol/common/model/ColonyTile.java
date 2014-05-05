@@ -359,7 +359,7 @@ public class ColonyTile extends WorkLocation {
                 mods.add(colony.getProductionModifier(goodsType));
                 mods.addAll(unitType.getModifierSet(id, type, turn));
                 if (owner != null) {
-                    mods.addAll(owner.getModifierSet(id, null, turn));
+                    mods.addAll(owner.getModifierSet(id, unitType, turn));
                 }
             }
         }
