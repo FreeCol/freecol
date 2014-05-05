@@ -201,7 +201,7 @@ public class ColonyTile extends WorkLocation {
     // Interface Location
     // Inheriting
     //   FreeColObject.getId
-    //   WorkLocation.getTile (Beware, this returns the colony center tile!),
+    //   WorkLocation.getTile (Beware this returns the colony center tile!),
     //   UnitLocation.getLocationNameFor
     //   UnitLocation.contains
     //   UnitLocation.canAdd
@@ -302,33 +302,19 @@ public class ColonyTile extends WorkLocation {
     /**
      * {@inheritDoc}
      */
-    public int getProductionOf(Unit unit, GoodsType goodsType) {
-        if (unit == null) {
-            throw new IllegalArgumentException("Null unit.");
-        }
-        return getPotentialProduction(goodsType, unit.getType());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public int getPotentialProduction(GoodsType goodsType, UnitType unitType) {
+        if (isColonyCenterTile()) {
+            return (unitType == null) ? getBaseProduction(goodsType) : 0;
+        }
+
         int production = 0;
         TileType tileType = workTile.getType();
-        if (isColonyCenterTile()) {
-            if (unitType == null) {
-                production = getBaseProduction(goodsType);
-            } else {
-                production = 0;
-            }
-        } else if (workTile.isLand()
+        if (workTile.isLand()
             || getColony().hasAbility(Ability.PRODUCE_IN_WATER)) {
             production = tileType.getProductionOf(goodsType, unitType);
-            List<Modifier> mods = getProductionModifiers(goodsType, unitType);
-            if (!mods.isEmpty()) {
-                production = (int)FeatureContainer.applyModifiers(production,
-                    getGame().getTurn(), mods);
-            }
+            production = (int)FeatureContainer.applyModifiers(production,
+                getGame().getTurn(),
+                getProductionModifiers(goodsType, unitType));
         }
         return Math.max(0, production);
     }

@@ -447,24 +447,9 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     /**
      * {@inheritDoc}
      */
-    public int getProductionOf(Unit unit, GoodsType goodsType) {
-        if (unit == null) {
-            throw new IllegalArgumentException("Null unit.");
-        }
-        for (AbstractGoods goods : getOutputs()) {
-            if (goods.getType() == goodsType) {
-                return Math.max(0, getPotentialProduction(goodsType, unit.getType()));
-            }
-        }
-        return 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public int getPotentialProduction(GoodsType goodsType, UnitType unitType) {
         int amount = (unitType == null) ? 0 : getBaseProduction(goodsType);
-        int production = (int) FeatureContainer.applyModifiers(amount,
+        int production = (int)FeatureContainer.applyModifiers(amount,
             getGame().getTurn(),
             getProductionModifiers(goodsType, unitType));
         return Math.max(0, production);

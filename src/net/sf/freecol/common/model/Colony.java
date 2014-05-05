@@ -546,9 +546,10 @@ public class Colony extends Settlement implements Nameable {
             case NONE: case ALREADY_PRESENT:
                 if (workTile.getOwningSettlement() != this
                     && !allowClaim) break;
+                UnitType unitType = unit.getType();
                 for (GoodsType goodsType : goodsTypes) {
                     int prod = colonyTile.getPotentialProduction(goodsType,
-                        unit.getType());
+                                                                 unitType);
                     if (prod > bestProd) {
                         bestProd = prod;
                         best = colonyTile;
@@ -671,9 +672,10 @@ public class Colony extends Settlement implements Nameable {
                 for (ColonyTile tile : colonyTiles) {
                     switch (tile.getNoAddReason(unit)) {
                     case NONE: case ALREADY_PRESENT:
+                        UnitType unitType = unit.getType();
                         for (GoodsType type : rawTypes) {
                             int amount = tile.getPotentialProduction(type,
-                                unit.getType());
+                                                                     unitType);
                             if (amount > bestAmount) {
                                 bestAmount = amount;
                                 bestWork = type;
@@ -730,11 +732,12 @@ public class Colony extends Settlement implements Nameable {
         ColonyTile bestTile = null;
         GoodsType bestType = null;
         int bestProduction = 0;
+        UnitType unitType = unit.getType();
         for (GoodsType foodType : getSpecification().getFoodGoodsTypeList()) {
             ColonyTile colonyTile = getVacantColonyTileFor(unit, false, foodType);
             if (colonyTile != null) {
                 int production = colonyTile.getPotentialProduction(foodType,
-                    unit.getType());
+                                                                   unitType);
                 if (production > bestProduction) {
                     bestProduction = production;
                     bestTile = colonyTile;
@@ -2078,7 +2081,8 @@ public class Colony extends Settlement implements Nameable {
      */
     public Unit getBetterExpert(Unit expert) {
         GoodsType production = expert.getWorkType();
-        GoodsType expertise = expert.getType().getExpertProduction();
+        UnitType expertType = expert.getType();
+        GoodsType expertise = expertType.getExpertProduction();
         Unit bestExpert = null;
         int bestImprovement = 0;
 
@@ -2089,7 +2093,7 @@ public class Colony extends Settlement implements Nameable {
         // Check if there is a non-expert doing the job instead.
         for (Unit nonExpert : getUnitList()) {
             if (nonExpert.getWorkType() != expertise
-                || nonExpert.getType() == expert.getType()) continue;
+                || nonExpert.getType() == expertType) continue;
 
             // We have found a unit of a different type doing the
             // job of this expert's expertise now check if the
@@ -2118,8 +2122,7 @@ public class Colony extends Settlement implements Nameable {
                 nonExpertProductionNow = nwl.getPotentialProduction(expertise,
                     nonExpert.getType());
                 expertProductionPotential
-                    = nwl.getPotentialProduction(expertise,
-                        expert.getType());
+                    = nwl.getPotentialProduction(expertise, expertType);
             }
 
             // Find the unit that achieves the best improvement.

@@ -326,6 +326,25 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
         return 0;
     }
 
+    /**
+     * Gets the production of a unit of the given type of goods.
+     *
+     * @param unit The unit to do the work.
+     * @param goodsType The type of goods to get the production of.
+     * @return The production of the given type of goods.
+     */
+    public int getProductionOf(Unit unit, GoodsType goodsType) {
+        if (unit == null) throw new IllegalArgumentException("Null unit.");
+
+        final UnitType unitType = unit.getType();
+        for (AbstractGoods goods : getOutputs()) {
+            if (goods.getType() == goodsType) {
+                return Math.max(0, getPotentialProduction(goodsType, unitType));
+            }
+        }
+        return 0;
+    }
+
 
     // Interface Location
     // Inherits:
@@ -450,15 +469,6 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      *     workers.
      */
     public abstract boolean canAutoProduce();
-
-    /**
-     * Gets the production of a unit of the given type of goods.
-     *
-     * @param unit The unit to do the work.
-     * @param goodsType The type of goods to get the production of.
-     * @return The production of the given type of goods.
-     */
-    public abstract int getProductionOf(Unit unit, GoodsType goodsType);
 
     /**
      * Gets the potential production of a given goods type from
