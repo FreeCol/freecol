@@ -117,13 +117,14 @@ public class Modifier extends Feature implements Comparable<Modifier> {
 
     // index values for common modifier types
     public static final int BASIC_PRODUCTION_INDEX = 0;
-    public static final int COLONY_PRODUCTION_INDEX = 10;
-    public static final int EXPERT_PRODUCTION_INDEX = 20;
-    public static final int FATHER_PRODUCTION_INDEX = 30;
-    public static final int IMPROVEMENT_PRODUCTION_INDEX = 40;
-    public static final int AUTO_PRODUCTION_INDEX = 50;
-    public static final int BUILDING_PRODUCTION_INDEX = 60;
-    public static final int NATION_PRODUCTION_INDEX = 70;
+    public static final int RESOURCE_PRODUCTION_INDEX = 10;
+    public static final int COLONY_PRODUCTION_INDEX = 20;
+    public static final int EXPERT_PRODUCTION_INDEX = 30;
+    public static final int FATHER_PRODUCTION_INDEX = 40;
+    public static final int IMPROVEMENT_PRODUCTION_INDEX = 50;
+    public static final int AUTO_PRODUCTION_INDEX = 60;
+    public static final int BUILDING_PRODUCTION_INDEX = 70;
+    public static final int NATION_PRODUCTION_INDEX = 80;
     public static final int DEFAULT_PRODUCTION_INDEX = 100;
 
     public static enum ModifierType {

@@ -217,7 +217,8 @@ public class Resource extends TileItem {
      */
     public List<Modifier> getProductionModifiers(GoodsType goodsType,
                                                  UnitType unitType) {
-        return new ArrayList<Modifier>(getType().getModifierSet(goodsType.getId(), unitType));
+        return new ArrayList<Modifier>(getType()
+            .getModifierSet(goodsType.getId(), unitType));
     }
 
     /**

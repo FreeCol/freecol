@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -259,7 +260,7 @@ public class LostCityRumour extends TileItem {
      */
     public List<Modifier> getProductionModifiers(GoodsType goodsType,
                                                  UnitType unitType) {
-        return new ArrayList<Modifier>();
+        return Collections.emptyList();
     }
 
     /**

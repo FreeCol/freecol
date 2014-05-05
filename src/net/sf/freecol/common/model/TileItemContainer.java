@@ -386,12 +386,15 @@ public class TileItemContainer extends FreeColGameObject {
     }
 
     /**
-     * Determine the total bonus for a <code>GoodsType</code>.  Checks
-     * resources and all improvements, unless onlyNatural is
-     * <code>true</code>, in which case only natural improvements will
-     * be considered.  This is necessary in order to calculate
-     * secondary production, which does not profit from artificial
-     * improvements, such as plowing.
+     * Determine the total bonus for a goods type.  Checks resources
+     * and all improvements, unless onlyNatural is true, in which case
+     * only natural improvements will be considered.
+     *
+     * This is not used for normal production, but is necessary to
+     * calculate colony center tile secondary production, which does
+     * not profit from artificial improvements such as plowing.  It is
+     * also used to assess which goods are likely to be most
+     * productive on a tile.
      *
      * @param goodsType The <code>GoodsType</code> to check.
      * @param unitType The <code>UnitType</code> to check.
