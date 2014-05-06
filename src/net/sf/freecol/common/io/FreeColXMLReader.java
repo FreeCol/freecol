@@ -99,7 +99,6 @@ public class FreeColXMLReader extends StreamReaderDelegate {
      *
      * @param reader A <code>Reader</code> to create
      *     an <code>FreeColXMLReader</code> for.
-     * @param readScope The <code>ReadScope</code> to apply.
      * @exception IOException if thrown while creating the
      *     <code>FreeColXMLReader</code>.
      */

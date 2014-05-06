@@ -28,14 +28,19 @@ import java.lang.Throwable;
 public final class FreeColException extends Exception {
     
     /**
-     * {@inheritDoc}
+     * Build a new FreeCol specific exception with the given message.
+     *
+     * @param message The message for this exception.
      */
     public FreeColException(String message) {
         super(message);
     }
 
     /**
-     * {@inheritDoc}
+     * Build a new FreeCol specific exception with the given message.
+     *
+     * @param message The message for this exception.
+     * @param throwable The <code>Throwable</code> cause for the exception.
      */
     public FreeColException(String message, Throwable throwable) {
         super(message, throwable);

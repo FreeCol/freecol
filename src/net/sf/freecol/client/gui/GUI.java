@@ -330,7 +330,8 @@ public class GUI {
 
     /**
      * Get the sound player.
-     * Needed for access to the mixer by {@link #AudioMixerOptionUI}.
+     *
+     * Needed for access to the mixer by the audio mixer option UI.
      *
      * @return The current <code>SoundPlayer</code>.
      */

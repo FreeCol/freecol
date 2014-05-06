@@ -377,8 +377,11 @@ public class Map extends FreeColGameObject implements Location {
          * error.  It should cover all cases, but I wouldn't bet my
          * life on it.
          *
-         * @param position The other <code>Position</code> to compare.
-         * @return The distance in tiles to the other position.
+         * @param ax The x-coordinate of the first position.
+         * @param ay The y-coordinate of the first position.
+         * @param bx The x-coordinate of the second position.
+         * @param by The y-coordinate of the second position.
+         * @return The distance in tiles between the positions.
          */
         public static int getDistance(int ax, int ay, int bx, int by) {
             int r = (bx - ax) - (ay - by) / 2;

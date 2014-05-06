@@ -36,7 +36,9 @@ import net.sf.freecol.client.gui.panel.FreeColDialog;
 public class FreeColConfirmDialog extends FreeColDialog<Boolean> {
 
     /**
-     * {@inheritDoc}
+     * Internal constructor.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     protected FreeColConfirmDialog(FreeColClient freeColClient) {
         super(freeColClient);
@@ -52,7 +54,6 @@ public class FreeColConfirmDialog extends FreeColDialog<Boolean> {
      * @param icon An optional icon to display.
      * @param okKey A key for the text displayed on the "ok"-button.
      * @param cancelKey A key for the text displayed on the "cancel"-button.
-     * @return The <code>FreeColDialog</code> created.
      */
     public FreeColConfirmDialog(final FreeColClient freeColClient,
                                 boolean modal, Object obj, ImageIcon icon,

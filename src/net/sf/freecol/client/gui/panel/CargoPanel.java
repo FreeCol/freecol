@@ -65,7 +65,6 @@ public class CargoPanel extends FreeColPanel
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param withTitle Should the panel have a title?
-     * @param layout The <code>LayoutManager</code> to be used.
      */
     public CargoPanel(FreeColClient freeColClient, boolean withTitle) {
         super(freeColClient, new MigLayout("wrap 6, fill, insets 0"));

@@ -1131,14 +1131,13 @@ public final class ImageLibrary {
     }
 
     /**
-     * Returns the ImageIcon that will represent a unit with the given
-     * specifics.
+     * Gets the image icon that will represent a given unit.
      *
-     * @param unitType the type of unit to be represented
-     * @param role unit has equipment that affects its abilities/appearance
-     * @param nativeEthnicity draws the unit with native skin tones
-     * @param grayscale draws the icon in an inactive/disabled-looking state
-     * @return an <code>ImageIcon</code> value
+     * @param unitType The type of unit to be represented.
+     * @param roleId The id of the unit role.
+     * @param nativeEthnicity If true the unit is a former native.
+     * @param grayscale If true draw in inactive/disabled-looking state.
+     * @return A suitable <code>ImageIcon</code>.
      */
     public ImageIcon getUnitImageIcon(UnitType unitType, String roleId,
                                       boolean nativeEthnicity,

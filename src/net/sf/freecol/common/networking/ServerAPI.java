@@ -1130,8 +1130,6 @@ public abstract class ServerAPI {
      *
      * @param unit The <code>Unit</code> that has come ashore.
      * @param name The new land name.
-     * @param welcomer A welcoming native player with whom to make a treaty.
-     * @param accept True if the treaty was accepted.
      * @return True if the server interaction succeeded.
      */
     public boolean newLandName(Unit unit, String name) {

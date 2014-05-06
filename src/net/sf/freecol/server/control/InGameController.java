@@ -3186,7 +3186,7 @@ public final class InGameController extends Controller {
      * @param agreement The <code>DiplomaticTrade</code> to consider.
      * @param session The <code>DiplomacySession</code> underway.
      * @param message A <code>DiplomacyMessage</code> to send.
-     * @param A <code>ChangeSet</code> to contain the trade changes
+     * @param cs A <code>ChangeSet</code> to contain the trade changes
      *     if accepted.
      * @return True if a new DiplomacyMessage reply needs to be sent.
      */
@@ -3672,7 +3672,6 @@ public final class InGameController extends Controller {
     /**
      * Equip a unit in a settlement.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
      * @param unit The <code>Unit</code> to equip.
      * @param type The <code>EquipmentType</code> to equip with.
      * @param amount The change in the amount of equipment (may be negative).

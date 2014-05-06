@@ -139,76 +139,77 @@ public class TradeRouteStop extends FreeColObject {
 
 
     // Disabled routines for a proposed functionality extension.
-    /**
-     * Whether the stop has been modified. This is of interest only to the
-     * client and can be ignored for XML serialization.
-     *
-    private boolean modified = false;
 
-    /**
-     * The AbstractGoods to unload in this Location.
-     *
-    private List<AbstractGoods> goodsToUnload;
+    ///**
+    // * Whether the stop has been modified. This is of interest only to the
+    // * client and can be ignored for XML serialization.
+    // *
+    //private boolean modified = false;
+    //
+    ///**
+    // * The AbstractGoods to unload in this Location.
+    // *
+    //private List<AbstractGoods> goodsToUnload;
+    //
+    ///**
+    // * The AbstractGoods to load in this Location.
+    // *
+    //private List<AbstractGoods> goodsToLoad;
+    //
+    ///**
+    // * Get the <code>GoodsToLoad</code> value.
+    // *
+    // * @return a <code>List<AbstractGoods></code> value
+    // *
+    //public final List<AbstractGoods> getGoodsToLoad() {
+    //    return goodsToLoad;
+    //}
+    //
+    ///**
+    // * Set the <code>GoodsToLoad</code> value.
+    // *
+    // * @param newGoodsToLoad The new GoodsToLoad value.
+    // *
+    //public final void setGoodsToLoad(final List<AbstractGoods> newGoodsToLoad) {
+    //    this.goodsToLoad = newGoodsToLoad;
+    //}
+    //
+    ///**
+    // * Get the <code>GoodsToUnload</code> value.
+    // *
+    // * @return a <code>List<AbstractGoods></code> value
+    // *
+    //public final List<AbstractGoods> getGoodsToUnload() {
+    //    return goodsToUnload;
+    //}
+    //
+    ///**
+    // * Set the <code>GoodsToUnload</code> value.
+    // *
+    // * @param newGoodsToUnload The new GoodsToUnload value.
+    // *
+    //public final void setGoodsToUnload(final List<AbstractGoods> newGoodsToUnload) {
+    //    this.goodsToUnload = newGoodsToUnload;
+    //}
+    //
+    ///**
+    // * Get the <code>Modified</code> value.
+    // * 
+    // * @return a <code>boolean</code> value
+    // *
+    //public final boolean isModified() {
+    //    return modified;
+    //}
+    //
+    ///**
+    // * Set the <code>Modified</code> value.
+    // * 
+    // * @param newModified The new Modified value.
+    // *
+    //public final void setModified(final boolean newModified) {
+    //    this.modified = newModified;
+    //}
 
-    /**
-     * The AbstractGoods to load in this Location.
-     *
-    private List<AbstractGoods> goodsToLoad;
-
-    /**
-     * Get the <code>GoodsToLoad</code> value.
-     *
-     * @return a <code>List<AbstractGoods></code> value
-     *
-    public final List<AbstractGoods> getGoodsToLoad() {
-        return goodsToLoad;
-    }
-
-    /**
-     * Set the <code>GoodsToLoad</code> value.
-     *
-     * @param newGoodsToLoad The new GoodsToLoad value.
-     *
-    public final void setGoodsToLoad(final List<AbstractGoods> newGoodsToLoad) {
-        this.goodsToLoad = newGoodsToLoad;
-    }
-
-    /**
-     * Get the <code>GoodsToUnload</code> value.
-     *
-     * @return a <code>List<AbstractGoods></code> value
-     *
-    public final List<AbstractGoods> getGoodsToUnload() {
-        return goodsToUnload;
-    }
-
-    /**
-     * Set the <code>GoodsToUnload</code> value.
-     *
-     * @param newGoodsToUnload The new GoodsToUnload value.
-     *
-    public final void setGoodsToUnload(final List<AbstractGoods> newGoodsToUnload) {
-        this.goodsToUnload = newGoodsToUnload;
-    }
-
-    /**
-     * Get the <code>Modified</code> value.
-     * 
-     * @return a <code>boolean</code> value
-     *
-    public final boolean isModified() {
-        return modified;
-    }
-
-    /**
-     * Set the <code>Modified</code> value.
-     * 
-     * @param newModified The new Modified value.
-     *
-    public final void setModified(final boolean newModified) {
-        this.modified = newModified;
-    }
-    */
 
     // Serialization
 

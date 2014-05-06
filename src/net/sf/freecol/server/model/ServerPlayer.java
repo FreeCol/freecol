@@ -833,9 +833,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * Sets the tiles within the given <code>Unit</code>'s line of
      * sight to be explored by this player.
      *
-     * @param unit The <code>Unit</code>.
+     * @param tiles A list of <code>Tile</code>s.
      * @return A list of newly explored <code>Tile</code>s.
-     * @see #setExplored(Tile)
      * @see #hasExplored
      */
     public List<Tile> exploreTiles(List<Tile> tiles) {
@@ -3998,7 +3997,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
      *     a first landing in the new world and it is owned by the
      *     other player.
      * @param cs A <code>ChangeSet</code> to update.
-     * @return True if this was a first contact.
      */
     public void csNativeFirstContact(ServerPlayer other, Tile tile,
                                      ChangeSet cs) {

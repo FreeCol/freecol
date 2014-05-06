@@ -186,9 +186,8 @@ public final class FeatureContainer {
     /**
      * Add the given ability to a container.
      *
-     * @param fc The <code>FeatureContainer</code> to add to.
      * @param ability An <code>Ability</code> to add.
-     * @return True if the Ability was added.
+     * @return True if the <code>Ability</code> was added.
      */
     public boolean addAbility(Ability ability) {
         if (ability == null) return false;
@@ -311,7 +310,7 @@ public final class FeatureContainer {
      *
      * @param number The number to modify.
      * @param turn An optional applicable <code>Turn</code>.
-     * @param modifiers The <code>Modifier</code>s to apply.
+     * @param mods The <code>Modifier</code>s to apply.
      * @return The modified number.
      */
     public static float applyModifiers(float number, Turn turn,
@@ -334,7 +333,7 @@ public final class FeatureContainer {
      *
      * @param number The number to modify.
      * @param turn An optional applicable <code>Turn</code>.
-     * @param modifiers The <code>Modifier</code>s to apply.
+     * @param mods The <code>Modifier</code>s to apply.
      * @return The modified number.
      */
     public static float applyModifierSet(float number, Turn turn,

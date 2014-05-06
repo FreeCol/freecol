@@ -201,7 +201,7 @@ public class River {
      * Increases the size of this river.
      *
      * @param lastSection The last section of the river flowing into this one.
-     * @param position The tile of the confluence.
+     * @param tile The <code>Tile</code> of the confluence.
      */
     public void grow(RiverSection lastSection, Tile tile) {
 
@@ -269,8 +269,8 @@ public class River {
     /**
      * Creates a river flowing from the given tile if possible.
      *
-     * @param position A map tile.
-     * @return true if a river was created, false otherwise.
+     * @param tile An origin map <code>Tile</code>.
+     * @return True if a river was created, false otherwise.
      */
     public boolean flowFromSource(Tile tile) {
         TileImprovementType riverType =

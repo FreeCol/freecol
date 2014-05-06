@@ -58,7 +58,7 @@ public final class SelectAmountDialog extends FreeColInputDialog<Integer> {
      * @param goodsType The <code>GoodsType</code> to select an amount of.
      * @param available The amount of goods available.
      * @param defaultAmount The amount to select to start with.
-     * @param needToPay If true, check the player has sufficient funds.
+     * @param pay If true, check the player has sufficient funds.
      */
     @SuppressWarnings("unchecked") // FIXME in Java7
     public SelectAmountDialog(FreeColClient freeColClient, GoodsType goodsType,

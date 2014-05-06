@@ -51,11 +51,6 @@ import org.w3c.dom.Element;
 
 /**
  * The main component of the game model.
- *
- * If an object of this class returns a non-null result to
- * {@link #getViewOwner}, then this object just represents a view of the game
- * from a single player's perspective.  In that case, some information
- * might be missing from the model.
  */
 public class Game extends FreeColGameObject {
 

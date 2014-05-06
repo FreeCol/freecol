@@ -40,7 +40,9 @@ public abstract class FreeColInputDialog<T> extends FreeColDialog<T> {
 
 
     /**
-     * {@inheritDoc}
+     * Internal constructor.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     protected FreeColInputDialog(FreeColClient freeColClient) {
         super(freeColClient);
@@ -57,7 +59,6 @@ public abstract class FreeColInputDialog<T> extends FreeColDialog<T> {
      * @param icon An optional icon to display.
      * @param okKey The key displayed on the "ok"-button.
      * @param cancelKey The key displayed on the optional "cancel"-button.
-     * @return The <code>FreeColDialog</code> created.
      */
     public FreeColInputDialog(final FreeColClient freeColClient, boolean modal,
                               Object obj, ImageIcon icon,

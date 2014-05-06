@@ -479,7 +479,7 @@ public class Flag {
     /**
      * Generates an image of the flag.
      *
-     * @returns an image of the flag
+     * @return An image of the flag.
      */
     public BufferedImage getImage() {
         BufferedImage image = new BufferedImage((int) WIDTH, (int) HEIGHT,
@@ -611,7 +611,7 @@ public class Flag {
      * States.
      *
      * @param union The rectangular area to fill.
-     * @returns The union path
+     * @return The union path
      */
     private GeneralPath getUnionRectangle(Rectangle2D.Double union) {
 
@@ -739,7 +739,7 @@ public class Flag {
      * corner.
      *
      * @param triangle The top left triangle.
-     * @returns The transformed triangle.
+     * @return The transformed triangle.
      */
     private GeneralPath transformBend(GeneralPath triangle) {
         if (unionPosition == UnionPosition.TOP) {
@@ -765,7 +765,7 @@ public class Flag {
      * Flip or rotate a left triangle so that it fits another side.
      *
      * @param triangle The left triangle.
-     * @returns The transformed triangle.
+     * @return The transformed triangle.
      */
     private GeneralPath transformTriangle(GeneralPath triangle) {
         switch(unionPosition) {
@@ -838,7 +838,7 @@ public class Flag {
      * alignment.
      *
      * @param alignment The alignment of the stripes.
-     * @returns The width of the stripes.
+     * @return The width of the stripes.
      */
     private double getStripeWidth(Alignment alignment) {
         return (alignment == Alignment.HORIZONTAL)
@@ -850,7 +850,7 @@ public class Flag {
      * alignment.
      *
      * @param alignment The alignment of the stripes.
-     * @returns The height of the stripes.
+     * @return The height of the stripes.
      */
     private double getStripeHeight(Alignment alignment) {
         return (alignment == Alignment.VERTICAL)
@@ -1093,7 +1093,7 @@ public class Flag {
     /**
      * Return the basic five-point star.
      *
-     * @returns the basic star shape
+     * @return the basic star shape
      */
     private static GeneralPath getStar() {
         GeneralPath star = new GeneralPath(GeneralPath.WIND_NON_ZERO);
@@ -1157,7 +1157,7 @@ public class Flag {
      * given radius, centered at the origin.
      *
      * @param radius The radius of the circle.
-     * @returns The circle of stars.
+     * @return The circle of stars.
      */
     private GeneralPath getCircleOfStars(double radius) {
         double phi = Math.PI * 2 / stars;

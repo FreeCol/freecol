@@ -116,7 +116,7 @@ public final class ConnectController {
      *
      * @param publicServer If true, add to the meta-server.
      * @param singlePlayer True if this is a single player game.
-     * @param specification The <code>Specification</code> to use in this game.
+     * @param spec The <code>Specification</code> to use in this game.
      * @param port The TCP port to use for the public socket.
      * @return A new <code>FreeColServer</code> or null on error.
      */

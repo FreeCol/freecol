@@ -411,7 +411,7 @@ public class ServerIndianSettlement extends IndianSettlement
      *
      * -til: Might change tile appearance through most hated state
      *
-     * @param serverPlayer The <code>ServerPlayer</code> to modify alarm for.
+     * @param player The <code>Player</code> to modify alarm for.
      * @param add The amount to add to the current alarm level.
      * @param propagate If true, propagate the alarm change upward to the
      *     owning player.
@@ -440,7 +440,7 @@ public class ServerIndianSettlement extends IndianSettlement
      *
      * +til: Handles tile visibility changes.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> to modify alarm for.
+     * @param player The <code>Player</code> to modify alarm for.
      * @param add The amount to add to the current alarm level.
      * @param propagate If true, propagate the alarm change upward to the
      *     owning player.

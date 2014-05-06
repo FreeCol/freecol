@@ -1212,7 +1212,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *
      * -til: Changes appearance.
      *
-     * @param tileType The new <code>TileType</code>.
+     * @param type The new <code>TileType</code>.
      */
     public void changeType(TileType type) {
         setType(type);
@@ -1478,8 +1478,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * Set a players view of this tile.
      *
      * @param player The <code>Player</code> who owns the view.
-     * @param The view of the tile (either this tile, or an uninterned
-     *     copy of it).
+     * @param tile The view of the <code>Tile</code> (either this
+     *     tile, or an uninterned copy of it).
      */
     public void setCachedTile(Player player, Tile tile) {
         if (cachedTiles == null || !player.isEuropean()) return;

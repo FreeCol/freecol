@@ -475,8 +475,8 @@ public abstract class AIPlayer extends AIObject {
      *
      * @param unit The <code>Unit</code> making demands.
      * @param colony The <code>Colony</code> where demands are being made.
-     * @param goods The <code>Goods</code> demanded.
-     * @param gold The amount of gold demanded.
+     * @param type The <code>GoodsType</code> demanded.
+     * @param amount The amount of gold demanded.
      * @return True if this player accepts the demand.
      */
     public boolean indianDemand(Unit unit, Colony colony,

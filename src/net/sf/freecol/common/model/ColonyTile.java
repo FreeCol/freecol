@@ -121,7 +121,7 @@ public class ColonyTile extends WorkLocation {
      * Sets the work tile.  Needed to fix copied colonies.  Do not use
      * otherwise!
      *
-     * @param The new work <code>Tile</code>.
+     * @param workTile The new work <code>Tile</code>.
      */
     public void setWorkTile(Tile workTile) {
         this.workTile = workTile;

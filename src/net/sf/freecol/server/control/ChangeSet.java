@@ -1654,7 +1654,7 @@ public class ChangeSet {
     /**
      * Checks if a player can see a unit.
      *
-     * @param player The <code>ServerPlayer</code> looking for the unit.
+     * @param serverPlayer The <code>ServerPlayer</code> looking for the unit.
      * @param unit The <code>Unit</code> to check.
      * @return True if the <code>Unit</code> is visible to the player.
      */

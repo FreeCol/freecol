@@ -269,7 +269,6 @@ public final class TileType extends FreeColGameObjectType {
      * @param goodsType The <code>GoodsType</code> to produce.
      * @param unitType A <code>UnitType</code> that is to do the work.
      * @return The amount of goods production.
-     * @see #getProductionBonus(GoodsType)
      */
     public int getProductionOf(GoodsType goodsType, UnitType unitType) {
         int production = getProductionOf(goodsType);
@@ -282,7 +281,6 @@ public final class TileType extends FreeColGameObjectType {
      *
      * @param goodsType The <code>GoodsType</code> to produce.
      * @return The amount of goods production.
-     * @see #getProductionBonus(GoodsType)
      */
     public int getProductionOf(GoodsType goodsType) {
         int amount = 0;

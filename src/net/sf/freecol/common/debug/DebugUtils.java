@@ -718,7 +718,6 @@ public class DebugUtils {
      * be needed if/when we move getColonyValue into the AI.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param player The <code>Player</code> to evaluate the site.
      * @param tile The colony <code>Tile</code> to evaluate.
      * @return A string describing the colony value of a tile.
      */

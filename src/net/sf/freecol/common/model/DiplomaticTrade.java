@@ -199,7 +199,7 @@ public class DiplomaticTrade extends FreeColObject {
      * agreement from a player to a settlement owner.
      *
      * @param player The sending <code>Player</code>.
-     * @param settlement The <code>Settlement</code> to send to.
+     * @param sett The <code>Settlement</code> to send to.
      * @return A <code>StringTemplate</code> for the message.
      */
     public StringTemplate getSendMessage(Player player, Settlement sett) {
@@ -242,7 +242,8 @@ public class DiplomaticTrade extends FreeColObject {
     /**
      * Removes all trade items of the same class as the given argument.
      *
-     * @param someItem a <code>TradeItem</code> value
+     * @param itemClass The <code>Class</code> of
+     *     <code>TradeItem</code> to remove.
      */
     public void removeType(Class<? extends TradeItem> itemClass) {
         Iterator<TradeItem> itemIterator = items.iterator();

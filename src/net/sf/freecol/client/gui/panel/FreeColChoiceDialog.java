@@ -35,7 +35,9 @@ import net.sf.freecol.client.gui.panel.FreeColDialog;
 public class FreeColChoiceDialog<T> extends FreeColDialog<T> {
 
     /**
-     * {@inheritDoc}
+     * Internal constructor.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     protected FreeColChoiceDialog(FreeColClient freeColClient) {
         super(freeColClient);
@@ -51,7 +53,6 @@ public class FreeColChoiceDialog<T> extends FreeColDialog<T> {
      * @param icon An optional icon to display.
      * @param cancelKey Key for the text of the optional cancel button.
      * @param choices A list of <code>ChoiceItem</code>s to create buttons for.
-     * @return The <code>FreeColChoiceDialog</code> created.
      */
     public FreeColChoiceDialog(final FreeColClient freeColClient,
                                boolean modal, Object obj, ImageIcon icon,

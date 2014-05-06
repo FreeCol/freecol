@@ -56,7 +56,7 @@ public class ScaleMapSizeDialog extends FreeColDialog<Dimension> {
     /**
      * Create a ScaleMapSizeDialog.
      *
-     * @param freeColDialog The <code>FreeColDialog</code> for the game.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public ScaleMapSizeDialog(final FreeColClient freeColClient) {
         super(freeColClient);

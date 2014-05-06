@@ -70,7 +70,6 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
      * Creates a dialog to set the map generator options.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param mgo The map generator option group.
      * @param editable Whether the options may be edited.
      */
     public MapGeneratorOptionsDialog(FreeColClient freeColClient,

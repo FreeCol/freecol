@@ -162,7 +162,7 @@ public class EquipmentType extends BuildableType {
     /**
      * Set the role for this equipment type.
      *
-     * @param The new equipment related <code>Role</code>.
+     * @param role The new equipment related <code>Role</code>.
      */
     public void setRole(Role role) {
         this.role = role;

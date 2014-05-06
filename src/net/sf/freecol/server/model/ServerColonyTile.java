@@ -78,7 +78,7 @@ public class ServerColonyTile extends ColonyTile implements ServerModelObject {
         if (!isColonyCenterTile() && !isEmpty() && canBeWorked()) {
             for (Unit unit : getUnitList()) {
                 Resource resource = expendResource(workTile, unit.getWorkType(),
-                                                   unit.getType(), colony);
+                                                   unit.getType());
                 if (resource != null) {
                     cs.addMessage(See.only(owner),
                         new ModelMessage(ModelMessage.MessageType.WARNING,
@@ -102,10 +102,9 @@ public class ServerColonyTile extends ColonyTile implements ServerModelObject {
      * @param unitType The <code>UnitType</code> doing the production.
      * @return The <code>Resource</code> if it is exhausted by this
      *     call (so it can be used in a message), otherwise null.
-     * @see ResourceType
      */
     private Resource expendResource(Tile tile, GoodsType goodsType,
-                                    UnitType unitType, Settlement settlement) {
+                                    UnitType unitType) {
         if (!tile.hasResource()) return null;
 
         Resource resource = tile.getResource();
