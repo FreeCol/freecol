@@ -2127,9 +2127,12 @@ public final class ColonyPanel extends PortPanel
                 if (unit.getLocation() != colonyTile) return false;
                 // Now recheck, and see if we want to change to the
                 // expected work type.
-                if (workType != null
-                    && workType != unit.getWorkType()) {
-                    getController().changeWorkType(unit, workType);
+                if (workType == null) {
+                    workType = unit.getWorkType(); // might have been assigned
+                } else {
+                    if (workType != unit.getWorkType()) {
+                        getController().changeWorkType(unit, workType);
+                    }
                 }
 
                 if (getClientOptions()

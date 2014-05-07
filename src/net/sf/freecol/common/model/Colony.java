@@ -548,6 +548,7 @@ public class Colony extends Settlement implements Nameable {
                     && !allowClaim) break;
                 UnitType unitType = unit.getType();
                 for (GoodsType goodsType : goodsTypes) {
+                    if (goodsType == null) continue;
                     int prod = colonyTile.getPotentialProduction(goodsType,
                                                                  unitType);
                     if (prod > bestProd) {

@@ -271,6 +271,7 @@ public final class TileType extends FreeColGameObjectType {
      * @return The amount of goods production.
      */
     public int getProductionOf(GoodsType goodsType, UnitType unitType) {
+        if (goodsType == null) return 0;
         int production = getProductionOf(goodsType);
         return (int)applyModifier(production, goodsType.getId(), unitType);
     }
