@@ -147,7 +147,7 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
 
         JPanel bottom;
         if (this.okIndex >= 0) { // Confirm dialog
-            bottom = new MigPanel();
+            bottom = new MigPanel(new MigLayout("insets dialog"));
         } else { // Multi-line choice dialog
             bottom = new MigPanel(new MigLayout("wrap "
                     + getColumns(buttons.length)));
@@ -200,9 +200,16 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
                 container.add(newButtons[i]);
             }
             if (cancelIndex >= 0) {
-                container.add(newButtons[cancelIndex], "newline 20, tag cancel");
+                container.add(newButtons[cancelIndex],
+                              "newline 20, tag cancel");
             }
         }
+        // The righthand button gets truncated, so add some extra space.
+        Dimension prefer = container.getPreferredSize();
+        prefer = new Dimension((int)(prefer.getWidth() + 100),
+                               (int)prefer.getHeight());
+        container.setMinimumSize(prefer);
+        container.setPreferredSize(prefer);
     }
 
     /**
