@@ -1142,6 +1142,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 List<WorkerWish> wl = workerWishes.get(ut);
                 if (wl == null
                     || wl.isEmpty()
+                    || ut == null
                     || !ut.isAvailableTo(player)
                     || europe.getUnitPrice(ut) == UNDEFINED) continue;
                 WorkerWish ww = wl.get(0);
