@@ -1140,7 +1140,8 @@ public class EuropeanAIPlayer extends AIPlayer {
             int bestValue = Integer.MIN_VALUE;
             for (UnitType ut : workerWishes.keySet()) {
                 List<WorkerWish> wl = workerWishes.get(ut);
-                if (wl.isEmpty()
+                if (wl == null
+                    || wl.isEmpty()
                     || !ut.isAvailableTo(player)
                     || europe.getUnitPrice(ut) == UNDEFINED) continue;
                 WorkerWish ww = wl.get(0);
