@@ -237,7 +237,6 @@ public class OggVorbisDecoderFactory {
 
             // Read another two packets to complete the header.
             while (packet < 3) {
-                //System.err.println("At " + packet);
                 switch (oggStreamState.packetout(oggPacket)) {
                 case 1:
                     orbisInfo.synthesis_headerin(orbisComment, oggPacket);

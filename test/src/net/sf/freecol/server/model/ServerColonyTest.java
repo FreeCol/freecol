@@ -395,7 +395,6 @@ public class ServerColonyTest extends FreeColTestCase {
         }
         ColonyTile firstColonyTile = colony.getColonyTile(firstTile);
 
-System.err.println("testConifer");
         Unit unit = colony.getUnitList().get(0);
         assertEquals(colonistType, unit.getType());
         unit.setLocation(firstColonyTile);
@@ -439,11 +438,6 @@ System.err.println("testConifer");
             if (t.hasRiver()) result += riverBonus;
             if (t.hasRoad()) result += roadBonus;
             if (t.hasResource()) result += resourceBonus * expertBonus;
-System.err.println("T " + i);
-net.sf.freecol.common.model.FreeColObject.dumpCollection(ct.getOutputs());
-System.err.println("M " + (((t.hasRiver()) ? 1 : 0) + ((t.hasRoad()) ? 2 : 0) + ((t.hasResource()) ? 4 : 0)));
-net.sf.freecol.common.model.FreeColObject.dumpCollection(ct.getProductionModifiers(unit.getWorkType(), unit.getType()));
-
             assertEquals("Expert lumber production at tile " + i, result,
                 ct.getTotalProductionOf(lumberGoodsType));
             i++;

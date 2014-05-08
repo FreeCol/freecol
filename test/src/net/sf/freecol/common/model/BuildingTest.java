@@ -652,7 +652,6 @@ public class BuildingTest extends FreeColTestCase {
                      building.getUnitProduction(colonist, bellsType));
         assertEquals("Production(Statesman/Jefferson/2/Newspaper)", 10,
                      building.getUnitProduction(statesman, bellsType));
-        System.err.println("NEWPAGER");
         // 5 + 10 + 50% + 100% + 1 = 45
         assertEquals("Total production(Colonist/Statesman/Jefferson/2/Newspaper)", 47,
                      building.getTotalProductionOf(bellsType));

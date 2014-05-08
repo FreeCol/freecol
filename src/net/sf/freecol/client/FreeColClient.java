@@ -385,8 +385,7 @@ public final class FreeColClient {
      */
     private void fatal(String err) {
         logger.log(Level.SEVERE, err);
-        System.err.println(err);
-        System.exit(1);
+        FreeCol.fatal(err);
     }
 
 
