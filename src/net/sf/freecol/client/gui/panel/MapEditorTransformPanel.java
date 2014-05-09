@@ -266,7 +266,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
             TileImprovementType riverType =
                 tile.getSpecification().getTileImprovementType("model.improvement.river");
 
-            if (tile.getType().canHaveImprovement(riverType)
+            if (riverType.isTileTypeAllowed(tile.getType())
                 && !tile.hasRiver()) {
                 String conns = "";
                 for (Direction direction : Direction.longSides) {

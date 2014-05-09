@@ -328,41 +328,41 @@ public class TileTest extends FreeColTestCase {
                      tile3.getMaximumPotential(grain, null));
     }
 
-    public void testCanHaveImprovement() {
+    public void testIsTileTypeAllowed() {
         for (TileType tileType : spec().getTileTypeList()) {
 
             if (tileType.isWater()) {
                 if (highSeas.equals(tileType)) {
-                    assertFalse(tileType.canHaveImprovement(fishBonusLand));
-                    assertFalse(tileType.canHaveImprovement(fishBonusRiver));
+                    assertFalse(fishBonusLand.isTileTypeAllowed(tileType));
+                    assertFalse(fishBonusRiver.isTileTypeAllowed(tileType));
                 } else {
-                    assertTrue(tileType.canHaveImprovement(fishBonusLand));
-                    assertTrue(tileType.canHaveImprovement(fishBonusRiver));
+                    assertTrue(fishBonusLand.isTileTypeAllowed(tileType));
+                    assertTrue(fishBonusRiver.isTileTypeAllowed(tileType));
                 }
-                assertFalse(tileType.canHaveImprovement(river));
-                assertFalse(tileType.canHaveImprovement(road));
-                assertFalse(tileType.canHaveImprovement(plow));
-                assertFalse(tileType.canHaveImprovement(clearForest));
+                assertFalse(river.isTileTypeAllowed(tileType));
+                assertFalse(road.isTileTypeAllowed(tileType));
+                assertFalse(plow.isTileTypeAllowed(tileType));
+                assertFalse(clearForest.isTileTypeAllowed(tileType));
             } else {
                 if (tileType.isForested()) {
-                    assertTrue(tileType.canHaveImprovement(clearForest));
+                    assertTrue(clearForest.isTileTypeAllowed(tileType));
                 } else {
-                    assertFalse(tileType.canHaveImprovement(clearForest));
+                    assertFalse(clearForest.isTileTypeAllowed(tileType));
                 }
                 if (arctic.equals(tileType) || hills.equals(tileType)
                     || mountains.equals(tileType)) {
-                    assertFalse(tileType.canHaveImprovement(river));
-                    assertFalse(tileType.canHaveImprovement(plow));
+                    assertFalse(river.isTileTypeAllowed(tileType));
+                    assertFalse(plow.isTileTypeAllowed(tileType));
                 } else {
-                    assertTrue(tileType.canHaveImprovement(river));
+                    assertTrue(river.isTileTypeAllowed(tileType));
                     if (tileType.isForested()) {
-                        assertFalse(tileType.canHaveImprovement(plow));
+                        assertFalse(plow.isTileTypeAllowed(tileType));
                     } else {
-                        assertTrue(tileType.canHaveImprovement(plow));
+                        assertTrue(plow.isTileTypeAllowed(tileType));
                     }
                 }
 
-                assertTrue(tileType.canHaveImprovement(road));
+                assertTrue(road.isTileTypeAllowed(tileType));
             }
         }
     }

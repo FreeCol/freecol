@@ -393,16 +393,6 @@ public final class TileType extends FreeColGameObjectType {
     }
 
     /**
-     * Can this tile type support the a given TileImprovementType.
-     *
-     * @param improvement The <code>TileImprovementType</code> to check.
-     * @return True if the improvement is compatible.
-     */
-    public boolean canHaveImprovement(TileImprovementType improvement) {
-        return improvement != null && improvement.isTileTypeAllowed(this);
-    }
-
-    /**
      * Is this tile type suitable for a given range type value.
      *
      * @param rangeType The <code>RangeType</code> to test.

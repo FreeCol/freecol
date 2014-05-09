@@ -275,7 +275,7 @@ public class River {
     public boolean flowFromSource(Tile tile) {
         TileImprovementType riverType =
             map.getSpecification().getTileImprovementType("model.improvement.river");
-        if (!tile.getType().canHaveImprovement(riverType)) {
+        if (!riverType.isTileTypeAllowed(tile.getType())) {
             // Mountains, ocean cannot have rivers
             logger.fine("Tile (" + tile + ") can not have a river.");
             return false;
@@ -311,7 +311,7 @@ public class River {
             if (nextTile == null) continue;
 
             // is the tile suitable for this river?
-            if (!nextTile.getType().canHaveImprovement(riverType)) {
+            if (!riverType.isTileTypeAllowed(nextTile.getType())) {
                 // Mountains, ocean cannot have rivers
                 logger.fine("Tile (" + nextTile + ") can not have a river.");
                 continue;
@@ -392,7 +392,7 @@ public class River {
             section.setBranch(d, TileImprovement.SMALL_RIVER);
             deltaSections.add(new RiverSection(tile, d.getReverseDirection()));
             drawToMap(deltaSections);
-        } else if (t.getType().canHaveImprovement(riverType)) {
+        } else if (riverType.isTileTypeAllowed(t.getType())) {
             Tile t2 = t.getNeighbourOrNull(direction);
             if (!t2.isLand() && Utils.randomInt(logger, "Delta", random, 2) == 0) {
                 List<RiverSection> deltaSections = new ArrayList<RiverSection>();

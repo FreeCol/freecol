@@ -1257,9 +1257,7 @@ public class TerrainGenerator {
                 Tile tile = getRandomLandTile(map, random);
                 if (tile == null) return;
 
-                if (!tile.getType().canHaveImprovement(riverType)) {
-                    continue;
-                }
+                if (!riverType.isTileTypeAllowed(tile.getType())) continue;
 
                 // check the river source/spring is not too close to the ocean
                 for (Tile neighborTile : tile.getSurroundingTiles(2)) {
