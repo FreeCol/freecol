@@ -1119,7 +1119,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public float getDefenceValue() {
         return FeatureContainer.applyModifierSet(1.0f, null,
-            getType().getDefenceBonus());
+            getType().getDefenceModifiers());
     }
 
     /**

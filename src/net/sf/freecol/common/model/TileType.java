@@ -191,6 +191,27 @@ public final class TileType extends FreeColGameObjectType {
     }
 
     /**
+     * Is this tile type suitable for a given range type value.
+     *
+     * @param rangeType The <code>RangeType</code> to test.
+     * @param value The value to check.
+     * @return True if the tile type meets the range limits.
+     */
+    public boolean withinRange(RangeType rangeType, int value) {
+        switch (rangeType) {
+        case HUMIDITY:
+            return humidity[0] <= value && value <= humidity[1];
+        case TEMPERATURE:
+            return temperature[0] <= value && value <= temperature[1];
+        case ALTITUDE:
+            return altitude[0] <= value && value <= altitude[1];
+        default:
+            break;
+        }
+        return false;
+    }
+
+    /**
      * Gets the resources that can be placed on this tile type.
      *
      * @return A weighted list of resource types.
@@ -263,6 +284,18 @@ public final class TileType extends FreeColGameObjectType {
     }
 
     /**
+     * Add a production type.
+     *
+     * @param productionType The <code>ProductionType</code> to add.
+     */
+    private void addProductionType(ProductionType productionType) {
+        if (productionTypes == null) {
+            productionTypes = new ArrayList<ProductionType>();
+        }
+        productionTypes.add(productionType);
+    }
+
+    /**
      * Gets the production types applicable to this tile type.
      *
      * @return A list of <code>ProductionType</code>s.
@@ -307,18 +340,17 @@ public final class TileType extends FreeColGameObjectType {
         return result;
     }
 
-    /**
-     * Add a production type.
-     *
-     * @param productionType The <code>ProductionType</code> to add.
-     */
-    private void addProductionType(ProductionType productionType) {
-        if (productionTypes == null) {
-            productionTypes = new ArrayList<ProductionType>();
-        }
-        productionTypes.add(productionType);
-    }
 
+    // Utilities
+
+    /**
+     * Get the defence modifiers applicable to this tile type.
+     *
+     * @return A set of defense <code>Modifier</code>s.
+     */
+    public Set<Modifier> getDefenceModifiers() {
+        return getModifierSet(Modifier.DEFENCE);
+    }
 
     /**
      * Returns the amount of goods of given goods type the given unit
@@ -356,36 +388,6 @@ public final class TileType extends FreeColGameObjectType {
             }
         }
         return amount;
-    }
-
-    /**
-     * Gets the defence bonuses applicable to this tile type.
-     *
-     * @return A set of defensive modifiers.
-     */
-    public Set<Modifier> getDefenceBonus() {
-        return getModifierSet(Modifier.DEFENCE);
-    }
-
-    /**
-     * Is this tile type suitable for a given range type value.
-     *
-     * @param rangeType The <code>RangeType</code> to test.
-     * @param value The value to check.
-     * @return True if the tile type meets the range limits.
-     */
-    public boolean withinRange(RangeType rangeType, int value) {
-        switch (rangeType) {
-        case HUMIDITY:
-            return humidity[0] <= value && value <= humidity[1];
-        case TEMPERATURE:
-            return temperature[0] <= value && value <= temperature[1];
-        case ALTITUDE:
-            return altitude[0] <= value && value <= altitude[1];
-        default:
-            break;
-        }
-        return false;
     }
 
     /**

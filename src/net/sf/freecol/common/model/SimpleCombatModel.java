@@ -379,7 +379,7 @@ public class SimpleCombatModel extends CombatModel {
             if (settlement == null) { // In the open
                 // Terrain defensive bonus.
                 if (!isAmbush(attacker, defender)) {
-                    result.addAll(tile.getType().getDefenceBonus());
+                    result.addAll(tile.getType().getDefenceModifiers());
                 }
                 // Artillery in the Open penalty
                 if (defenderUnit.hasAbility(Ability.BOMBARD)
@@ -387,7 +387,7 @@ public class SimpleCombatModel extends CombatModel {
                     result.addAll(spec.getModifiers(Modifier.ARTILLERY_IN_THE_OPEN));
                 }
             } else { // In settlement
-                result.addAll(tile.getType().getDefenceBonus());
+                result.addAll(tile.getType().getDefenceModifiers());
                 result.addAll(settlement.getModifierSet(Modifier.DEFENCE));
                 result.addAll(settlement.getOwner()
                     .getModifierSet(Modifier.DEFENCE, settlement.getType()));

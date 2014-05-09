@@ -143,7 +143,7 @@ public class CombatTest extends FreeColTestCase {
         // this was also added by the combat model
         assertEquals(Specification.BASE_OFFENCE_SOURCE, offenceModifiers.iterator().next().getSource());
 
-        Set<Modifier> hillsModifierSet = hills.getDefenceBonus();
+        Set<Modifier> hillsModifierSet = hills.getDefenceModifiers();
         assertFalse(soldier.hasAbility(Ability.AMBUSH_BONUS));
         assertFalse(colonist.hasAbility(Ability.AMBUSH_PENALTY));
         assertEquals(1, hillsModifierSet.size());

@@ -91,7 +91,7 @@ public class TerrainDetailPanel
 
         String movementCost = String.valueOf(tileType.getBasicMoveCost() / 3);
         String defenseBonus = Messages.message("none");
-        Set<Modifier> defenceModifiers = tileType.getDefenceBonus();
+        Set<Modifier> defenceModifiers = tileType.getDefenceModifiers();
         if (!defenceModifiers.isEmpty()) {
             defenseBonus = ModifierFormat.getModifierAsString(defenceModifiers.iterator().next());
         }

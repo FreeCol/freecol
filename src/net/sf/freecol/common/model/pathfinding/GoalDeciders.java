@@ -272,8 +272,7 @@ public final class GoalDeciders {
                 if (found) {
                     float distance = 1.0f + u.getGame().getMap()
                         .getDistance(target, tile);
-                    float score = FeatureContainer.applyModifierSet(0f,
-                        null, tile.getType().getDefenceBonus()) / distance;
+                    float score = tile.getDefenceValue() / distance;
                     if (bestScore < score) {
                         bestScore = score;
                         goal = pathNode;
