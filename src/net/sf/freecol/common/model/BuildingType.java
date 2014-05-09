@@ -236,11 +236,7 @@ public final class BuildingType extends BuildableType
             return null;
         } else {
             List<AbstractGoods> inputs = productionTypes.get(0).getInputs();
-            if (inputs == null || inputs.isEmpty()) {
-                return null;
-            } else {
-                return inputs.get(0).getType();
-            }
+            return (inputs.isEmpty()) ? null : inputs.get(0).getType();
         }
     }
     // end @compat
@@ -255,11 +251,7 @@ public final class BuildingType extends BuildableType
             return null;
         } else {
             List<AbstractGoods> outputs = productionTypes.get(0).getOutputs();
-            if (outputs == null || outputs.isEmpty()) {
-                return null;
-            } else {
-                return outputs.get(0).getType();
-            }
+            return (outputs.isEmpty()) ? null : outputs.get(0).getType();
         }
     }
 

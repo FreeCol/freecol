@@ -531,8 +531,7 @@ public class ServerColony extends Colony implements ServerModelObject {
     private void csCheckMissingInput(Building building, ProductionInfo pi,
                                      ChangeSet cs) {
         List<AbstractGoods> inputs = building.getInputs();
-        if (!(inputs == null
-              || inputs.isEmpty()
+        if (!(inputs.isEmpty()
               || building.isEmpty()
               || building.canAutoProduce())
             && pi.getProduction().isEmpty()) {

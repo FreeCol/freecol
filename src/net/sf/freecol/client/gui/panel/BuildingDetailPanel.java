@@ -209,17 +209,20 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
 
             if (!(productionTypes == null || productionTypes.isEmpty())) {
                 for (ProductionType productionType : productionTypes) {
-                    panel.add(localizedLabel("colopedia.buildings.production"), "newline");
                     List<AbstractGoods> inputs = productionType.getInputs();
                     List<AbstractGoods> outputs = productionType.getOutputs();
-                    // for the moment, we assume only a single input and output type
-                    if (!(inputs == null || inputs.isEmpty())) {
+                    panel.add(localizedLabel("colopedia.buildings.production"), "newline");
+                    // for the moment, we assume only a single input
+                    // and output type
+                    if (!inputs.isEmpty()) {
                         panel.add(getGoodsButton(inputs.get(0)), "span, split 3");
                         JLabel arrow = new JLabel("\u2192");
                         arrow.setFont(arrowFont);
                         panel.add(arrow);
                     }
-                    panel.add(getGoodsButton(outputs.get(0)));
+                    if (!outputs.isEmpty()) {
+                        panel.add(getGoodsButton(outputs.get(0)));
+                    }
                 }
             }
         }

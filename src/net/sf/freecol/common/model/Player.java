@@ -3581,12 +3581,10 @@ public class Player extends FreeColGameObject implements Nameable {
         final GoodsType foodType = spec.getPrimaryFoodType();
         for (ProductionType productionType : tile.getType()
                  .getProductionTypes(true)) {
-            if (productionType.getOutputs() != null) {
-                for (AbstractGoods output : productionType.getOutputs()) {
-                    if (!output.getType().isFoodType()) continue;
-                    int amount = tile.potential(output.getType(), null);
-                    if (amount > initialFood) initialFood = amount;
-                }
+            for (AbstractGoods output : productionType.getOutputs()) {
+                if (!output.getType().isFoodType()) continue;
+                int amount = tile.potential(output.getType(), null);
+                if (amount > initialFood) initialFood = amount;
             }
         }
         if (initialFood <= FOOD_VERY_LOW) {

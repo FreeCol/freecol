@@ -1131,7 +1131,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             if (workLocation instanceof Building) {
                 Building building = (Building) workLocation;
                 List<AbstractGoods> inputs = building.getInputs();
-                if (!(inputs == null || inputs.isEmpty())) {
+                if (!inputs.isEmpty()) {
                     ProductionInfo info = colony.getProductionInfo(building);
                     if (!info.hasMaximumProduction()) {
                         for (AbstractGoods goods : inputs) {

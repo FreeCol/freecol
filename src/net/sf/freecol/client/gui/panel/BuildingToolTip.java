@@ -70,7 +70,7 @@ public class BuildingToolTip extends JToolTip {
         final int workplaces = building.getUnitCapacity();
         List<AbstractGoods> outputs = building.getOutputs();
         // TODO: consider several outputs
-        final GoodsType output = outputs.isEmpty() ? null
+        final GoodsType output = (outputs.isEmpty()) ? null
             : outputs.get(0).getType();
         final Colony colony = building.getColony();
 

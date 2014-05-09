@@ -376,13 +376,11 @@ public final class TileType extends FreeColGameObjectType {
     public int getProductionOf(GoodsType goodsType) {
         int amount = 0;
         for (ProductionType productionType : getProductionTypes(false)) {
-            if (productionType.getOutputs() != null) {
-                for (AbstractGoods output : productionType.getOutputs()) {
-                    if (output.getType() == goodsType) {
-                        int newAmount = output.getAmount();
-                        if (newAmount > amount) {
-                            amount = newAmount;
-                        }
+            for (AbstractGoods output : productionType.getOutputs()) {
+                if (output.getType() == goodsType) {
+                    int newAmount = output.getAmount();
+                    if (newAmount > amount) {
+                        amount = newAmount;
                     }
                 }
             }
@@ -403,9 +401,7 @@ public final class TileType extends FreeColGameObjectType {
         List<AbstractGoods> production = new ArrayList<AbstractGoods>();
         for (ProductionType productionType : getProductionTypes(true)) {
             List<AbstractGoods> outputs = productionType.getOutputs();
-            if (outputs != null && !outputs.isEmpty()) {
-                production.addAll(outputs);
-            }
+            if (!outputs.isEmpty()) production.addAll(outputs);
         }
         return production;
     }

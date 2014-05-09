@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -75,7 +76,8 @@ public class ProductionType extends FreeColObject {
      * @param inputs A list of the <code>AbstractGoods</code> consumed.
      * @param outputs A list of the <code>AbstractGoods</code> produced.
      */
-    public ProductionType(List<AbstractGoods> inputs, List<AbstractGoods> outputs) {
+    public ProductionType(List<AbstractGoods> inputs,
+                          List<AbstractGoods> outputs) {
         this.inputs = inputs;
         this.outputs = outputs;
     }
@@ -87,7 +89,8 @@ public class ProductionType extends FreeColObject {
      * @param center True if this is a colony center tile.
      * @param level The difficulty level key.
      */
-    public ProductionType(AbstractGoods output, boolean center, String level) {
+    public ProductionType(AbstractGoods output, boolean center,
+                          String level) {
         outputs = new ArrayList<AbstractGoods>();
         outputs.add(output);
         unattended = center;
@@ -120,8 +123,7 @@ public class ProductionType extends FreeColObject {
      * @param specification The <code>Specification</code> to refer to.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
-    public ProductionType(FreeColXMLReader xr,
-                          Specification specification) throws XMLStreamException {
+    public ProductionType(FreeColXMLReader xr, Specification specification) throws XMLStreamException {
         this(specification);
 
         readFromXML(xr);
@@ -134,6 +136,7 @@ public class ProductionType extends FreeColObject {
      * @return A list of the input <code>AbstractGoods</code>.
      */
     public final List<AbstractGoods> getInputs() {
+        if (inputs == null) return Collections.emptyList();
         return inputs;
     }
 
@@ -163,6 +166,7 @@ public class ProductionType extends FreeColObject {
      * @return A list of the output <code>AbstractGoods</code>.
      */
     public final List<AbstractGoods> getOutputs() {
+        if (outputs == null) return Collections.emptyList();
         return outputs;
     }
 
@@ -179,15 +183,13 @@ public class ProductionType extends FreeColObject {
      * Returns the goods of the given goods type produced by this
      * production type, or null.
      *
-     * @param goodsType a <code>GoodsType</code> value
-     * @return an <code>AbstractGoods</code> value
+     * @param goodsType The <code>GoodsType</code> to check.
+     * @return The <code>AbstractGoods</code> output if any, otherwise null.
      */
     public AbstractGoods getOutput(GoodsType goodsType) {
-        if (inputs == null && outputs != null) {
+        if (outputs != null) {
             for (AbstractGoods output : outputs) {
-                if (goodsType == output.getType()) {
-                    return output;
-                }
+                if (goodsType == output.getType()) return output;
             }
         }
         return null;

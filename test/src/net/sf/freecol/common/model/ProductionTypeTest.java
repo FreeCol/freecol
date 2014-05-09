@@ -50,10 +50,9 @@ public class ProductionTypeTest extends FreeColTestCase {
     private void testProduction(Map<GoodsType, Integer> production,
                                 List<ProductionType> productionTypes) {
         for (ProductionType productionType : productionTypes) {
-            assertNull("No inputs expected", productionType.getInputs());
-            List<AbstractGoods> outputs = productionType.getOutputs();
-            if (outputs == null) continue;
-            for (AbstractGoods ag : outputs) {
+            assertEquals("No inputs expected", 0,
+                         productionType.getInputs().size());
+            for (AbstractGoods ag : productionType.getOutputs()) {
                 Integer i = production.get(ag.getType());
                 assertNotNull("Production expected for " + ag.getType(), i);
                 assertEquals("Production amount mismatch for " + ag.getType(),

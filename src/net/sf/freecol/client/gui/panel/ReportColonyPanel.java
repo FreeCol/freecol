@@ -880,7 +880,7 @@ public final class ReportColonyPanel extends ReportPanel
             return null;
         } else if (wl instanceof Building) {
             List<AbstractGoods> outputs = wl.getOutputs();
-            return outputs.isEmpty() ? null : outputs.get(0).getType();
+            return (outputs.isEmpty()) ? null : outputs.get(0).getType();
         } else {
             final Specification spec = getSpecification();
             List<AbstractGoods> prod = new ArrayList<AbstractGoods>();

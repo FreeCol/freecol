@@ -2112,7 +2112,8 @@ public final class ColonyPanel extends PortPanel
                 if (workType == null) {
                     ProductionType productionType = colonyTile.getBestProductionType(unit);
                     if (productionType != null) {
-                        GoodsType goodsType = productionType.getOutputs().get(0).getType();
+                        GoodsType goodsType = productionType.getOutputs()
+                            .get(0).getType();
                         if (colonyTile.getProductionOf(unit, goodsType) > 0) {
                             workType = goodsType;
                         }

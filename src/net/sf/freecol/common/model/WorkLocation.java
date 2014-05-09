@@ -109,10 +109,8 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      * @return A list of <code>AbstractGoods</code> consumed.
      */
     public List<AbstractGoods> getInputs() {
-        if (productionType == null || productionType.getInputs() == null) {
-            return EMPTY_LIST;
-        }
-        return productionType.getInputs();
+        return (productionType == null) ? EMPTY_LIST
+            : productionType.getInputs();
     }
 
     /**
@@ -121,10 +119,8 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      * @return A list of <code>AbstractGoods</code> produced.
      */
     public List<AbstractGoods> getOutputs() {
-        if (productionType == null || productionType.getOutputs() == null) {
-            return EMPTY_LIST;
-        }
-        return productionType.getOutputs();
+        return (productionType == null) ? EMPTY_LIST
+            : productionType.getOutputs();
     }
 
     /**
@@ -160,9 +156,8 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      * @return True if there are any inputs.
      */
     public boolean hasInputs() {
-        return !(productionType == null
-                 || productionType.getInputs() == null
-                 || productionType.getInputs().isEmpty());
+        return productionType != null
+            && !productionType.getInputs().isEmpty();
     }
 
     /**
@@ -171,9 +166,8 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      * @return True if there are any outputs.
      */
     public boolean hasOutputs() {
-        return !(productionType == null
-                 || productionType.getOutputs() == null
-                 || productionType.getOutputs().isEmpty());
+        return productionType != null
+            && !productionType.getOutputs().isEmpty();
     }
 
     /**
@@ -308,8 +302,7 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
     public int getUnitProduction(Unit unit, GoodsType goodsType) {
         if (unit == null) return 0;
         int productivity = 0;
-        List<AbstractGoods> outputs = getOutputs();
-        for (AbstractGoods output : outputs) {
+        for (AbstractGoods output : getOutputs()) {
             if (output.getType() == goodsType) {
                 productivity = output.getAmount();
                 if (productivity > 0) {
@@ -510,14 +503,12 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
         ProductionType best = null;
         int amount = 0;
         for (ProductionType productionType : getProductionTypes()) {
-            if (productionType.getOutputs() != null) {
-                for (AbstractGoods output : productionType.getOutputs()) {
-                    int newAmount = getPotentialProduction(output.getType(),
-                                                           unit.getType());
-                    if (newAmount > amount) {
-                        amount = newAmount;
-                        best = productionType;
-                    }
+            for (AbstractGoods output : productionType.getOutputs()) {
+                int newAmount = getPotentialProduction(output.getType(),
+                                                       unit.getType());
+                if (newAmount > amount) {
+                    amount = newAmount;
+                    best = productionType;
                 }
             }
         }
@@ -536,14 +527,12 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
         ProductionType best = null;
         int amount = 0;
         for (ProductionType productionType : getProductionTypes()) {
-            if (productionType.getOutputs() != null) {
-                for (AbstractGoods output : productionType.getOutputs()) {
-                    if (output.getType() == goodsType) {
-                        int newAmount = output.getAmount();
-                        if (newAmount > amount) {
-                            amount = newAmount;
-                            best = productionType;
-                        }
+            for (AbstractGoods output : productionType.getOutputs()) {
+                if (output.getType() == goodsType) {
+                    int newAmount = output.getAmount();
+                    if (newAmount > amount) {
+                        amount = newAmount;
+                        best = productionType;
                     }
                 }
             }
