@@ -201,29 +201,6 @@ public final class TileType extends FreeColGameObjectType {
     }
 
     /**
-     * Gets the natural disasters than can strike this tile type.
-     *
-     * @return a <code>List<RandomChoice<Disaster>></code> value
-     */
-    public List<RandomChoice<Disaster>> getDisasters() {
-        if (disasters == null) return Collections.emptyList();
-        return disasters;
-    }
-
-    /**
-     * Add a disaster.
-     *
-     * @param disaster The <code>Disaster</code> to add.
-     * @param probability The probability of the disaster.
-     */
-    private void addDisaster(Disaster disaster, int probability) {
-        if (disasters == null) {
-            disasters = new ArrayList<RandomChoice<Disaster>>();
-        }
-        disasters.add(new RandomChoice<Disaster>(disaster, probability));
-    }
-
-    /**
      * Gets the resource types that can be found on this tile type.
      *
      * @return A list of <code>ResourceType</code>s.
@@ -261,6 +238,87 @@ public final class TileType extends FreeColGameObjectType {
     public boolean canHaveResourceType(ResourceType resourceType) {
         return getResourceTypes().contains(resourceType);
     }
+
+    /**
+     * Gets the natural disasters than can strike this tile type.
+     *
+     * @return a <code>List<RandomChoice<Disaster>></code> value
+     */
+    public List<RandomChoice<Disaster>> getDisasters() {
+        if (disasters == null) return Collections.emptyList();
+        return disasters;
+    }
+
+    /**
+     * Add a disaster.
+     *
+     * @param disaster The <code>Disaster</code> to add.
+     * @param probability The probability of the disaster.
+     */
+    private void addDisaster(Disaster disaster, int probability) {
+        if (disasters == null) {
+            disasters = new ArrayList<RandomChoice<Disaster>>();
+        }
+        disasters.add(new RandomChoice<Disaster>(disaster, probability));
+    }
+
+    /**
+     * Gets the production types applicable to this tile type.
+     *
+     * @return A list of <code>ProductionType</code>s.
+     */
+    public List<ProductionType> getProductionTypes() {
+        if (productionTypes == null) return Collections.emptyList();
+        return productionTypes;
+    }
+
+    /**
+     * Gets the production types available at the current difficulty
+     * level.
+     *
+     * @param center Whether the tile is a colony center tile.
+     * @return A list of <code>ProductionType</code>s.
+     */
+    public List<ProductionType> getProductionTypes(boolean center) {
+        return getProductionTypes(center, 
+            getSpecification().getString(GameOptions.TILE_PRODUCTION));
+    }
+
+    /**
+     * Gets the production types available for the given combination
+     * of colony center tile and production level.  If the production
+     * level is null, all production levels will be returned.
+     *
+     * @param center Whether the tile is a colony center tile.
+     * @param level The production level.
+     * @return A list of <code>ProductionType</code>s.
+     */
+    public List<ProductionType> getProductionTypes(boolean center,
+                                                   String level) {
+        List<ProductionType> result = new ArrayList<ProductionType>();
+        if (productionTypes != null) {
+            for (ProductionType productionType : productionTypes) {
+                if (productionType.isColonyCenterTile() == center
+                    && productionType.appliesTo(level)) {
+                    result.add(productionType);
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Add a production type.
+     *
+     * @param productionType The <code>ProductionType</code> to add.
+     */
+    private void addProductionType(ProductionType productionType) {
+        if (productionTypes == null) {
+            productionTypes = new ArrayList<ProductionType>();
+        }
+        productionTypes.add(productionType);
+    }
+
 
     /**
      * Returns the amount of goods of given goods type the given unit
@@ -301,89 +359,6 @@ public final class TileType extends FreeColGameObjectType {
     }
 
     /**
-     * Gets the production types applicable to this tile type.
-     *
-     * @return A list of <code>ProductionType</code>s.
-     */
-    public List<ProductionType> getProductionTypes() {
-        if (productionTypes == null) return Collections.emptyList();
-        return productionTypes;
-    }
-
-    /**
-     * Evaluate the TILE_PRODUCTION option.
-     *
-     * @return The TILE_PRODUCTION option value.
-     */
-    private String getTileProduction() {
-        return getSpecification().getString(GameOptions.TILE_PRODUCTION);
-    }
-
-    /**
-     * Gets the production types available at the current difficulty
-     * level.
-     *
-     * @param center Whether the tile is a colony center tile.
-     * @return A list of <code>ProductionType</code>s.
-     */
-    public List<ProductionType> getProductionTypes(boolean center) {
-        return getProductionTypes(center, getTileProduction());
-    }
-
-    /**
-     * Gets the production types available for the given combination
-     * of colony center tile and production level.  If the production
-     * level is null, all production levels will be returned.
-     *
-     * @param center Whether the tile is a colony center tile.
-     * @param level The production level.
-     * @return A list of <code>ProductionType</code>s.
-     */
-    public List<ProductionType> getProductionTypes(boolean center,
-                                                   String level) {
-        List<ProductionType> result = new ArrayList<ProductionType>();
-        if (productionTypes != null) {
-            for (ProductionType productionType : productionTypes) {
-                if (productionType.isColonyCenterTile() == center
-                    && productionType.appliesTo(level)) {
-                    result.add(productionType);
-                }
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Gets a list of the AbstractGoods produced by this tile type
-     * when it is not the colony center tile.
-     *
-     * @return A list of produced <code>AbstractGoods</code>.
-     */
-    public List<AbstractGoods> getProduction() {
-        List<AbstractGoods> production = new ArrayList<AbstractGoods>();
-        for (ProductionType productionType
-                 : getProductionTypes(false, getTileProduction())) {
-            List<AbstractGoods> outputs = productionType.getOutputs();
-            if (outputs != null && !outputs.isEmpty()) {
-                production.addAll(outputs);
-            }
-        }
-        return production;
-    }
-
-    /**
-     * Add a production type.
-     *
-     * @param productionType The <code>ProductionType</code> to add.
-     */
-    private void addProductionType(ProductionType productionType) {
-        if (productionTypes == null) {
-            productionTypes = new ArrayList<ProductionType>();
-        }
-        productionTypes.add(productionType);
-    }
-
-    /**
      * Gets the defence bonuses applicable to this tile type.
      *
      * @return A set of defensive modifiers.
@@ -413,6 +388,25 @@ public final class TileType extends FreeColGameObjectType {
         return false;
     }
 
+    /**
+     * Get all possible goods produced at a tile of this type.
+     *
+     * Used by static tile type displays that just list unattended
+     * production values.  Planning and production routines should use
+     * {@link getPotentialProduction(GoodsType, UnitType)}
+     *
+     * @return A list of produced <code>AbstractGoods</code>.
+     */
+    public List<AbstractGoods> getPossibleProduction() {
+        List<AbstractGoods> production = new ArrayList<AbstractGoods>();
+        for (ProductionType productionType : getProductionTypes(true)) {
+            List<AbstractGoods> outputs = productionType.getOutputs();
+            if (outputs != null && !outputs.isEmpty()) {
+                production.addAll(outputs);
+            }
+        }
+        return production;
+    }
 
     /**
      * {@inheritDoc}

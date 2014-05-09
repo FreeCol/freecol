@@ -127,12 +127,12 @@ public class ServerColonyTest extends FreeColTestCase {
 
         // Set the food production of the center tile of the colony to 2
         // This will be the only food production of the colony
-        List<AbstractGoods> colonyTileProduction = colonyTile.getType().getProduction();
-        for(int i=0; i< colonyTileProduction.size(); i++ ){
+        List<AbstractGoods> colonyTileProduction
+            = colonyTile.getType().getPossibleProduction();
+        for (int i = 0; i < colonyTileProduction.size(); i++) {
             AbstractGoods production = colonyTileProduction.get(i);
-
-            if(production.getType() == foodGoodsType){
-                colonyTile.getType().getProduction().get(i).setAmount(2);
+            if (production.getType() == foodGoodsType) {
+                production.setAmount(2);
                 break;
             }
         }

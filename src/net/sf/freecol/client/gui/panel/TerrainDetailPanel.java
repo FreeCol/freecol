@@ -127,7 +127,7 @@ public class TerrainDetailPanel
 
         panel.add(localizedLabel("colopedia.terrain.production"));
 
-        List<AbstractGoods> production = tileType.getProduction();
+        List<AbstractGoods> production = tileType.getPossibleProduction();
         if (production.size() > 0) {
             AbstractGoods goods = production.get(0);
             if (production.size() > 1) {
