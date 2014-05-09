@@ -464,6 +464,8 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
     /**
      * Gets the potential production of a given goods type from
      * optionally using a unit of a given type in this work location.
+     * If no unit type is specified, the unattended production is
+     * calculated.
      *
      * @param goodsType The <code>GoodsType</code> to produce.
      * @param unitType An optional <code>UnitType</code> to produce
@@ -474,10 +476,12 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
                                                UnitType unitType);
 
     /**
-     * Gets the production modifiers for the given type of goods and unit.
+     * Gets the production modifiers for the given type of goods and
+     * unit type.  If no unit is specified the unattended production
+     * is calculated.
      *
      * @param goodsType The <code>GoodsType</code> to produce.
-     * @param unitType The optional <code>unitType</code> to produce them.
+     * @param unitType The optional <code>UnitType</code> to produce them.
      * @return A list of the applicable modifiers.
      */
     public abstract List<Modifier> getProductionModifiers(GoodsType goodsType,

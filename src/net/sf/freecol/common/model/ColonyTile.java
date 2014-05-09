@@ -111,7 +111,8 @@ public class ColonyTile extends WorkLocation {
      * Gets the work tile, that is the actual tile being worked.
      *
      * @return The <code>Tile</code> in which this
-     *     <code>ColonyTile</code> represents a <code>WorkLocation</code> for.
+     *     <code>ColonyTile</code> represents a
+     *     <code>WorkLocation</code> for.
      */
     public Tile getWorkTile() {
         return workTile;
@@ -149,7 +150,8 @@ public class ColonyTile extends WorkLocation {
 
     /**
      * Gets the basic production information for the colony tile,
-     * ignoring any colony limits (which for now, should be irrelevant).
+     * ignoring any colony limits (which for now, should be
+     * irrelevant).
      *
      * In the original game, the following special rules apply to
      * colony center tiles: All tile improvements contribute to the
@@ -303,16 +305,17 @@ public class ColonyTile extends WorkLocation {
     /**
      * {@inheritDoc}
      */
-    public int getPotentialProduction(GoodsType goodsType, UnitType unitType) {
+    public int getPotentialProduction(GoodsType goodsType,
+                                      UnitType unitType) {
         if (isColonyCenterTile()) {
             return (unitType == null) ? getBaseProduction(goodsType) : 0;
         }
 
         int production = 0;
         TileType tileType = workTile.getType();
-        if (workTile.isLand()
-            || getColony().hasAbility(Ability.PRODUCE_IN_WATER)) {
-            production = tileType.getPotentialProduction(goodsType, unitType);
+        if (unitType == null || canBeWorked()) {
+            production = tileType.getPotentialProduction(goodsType,
+                                                         unitType);
             production = (int)FeatureContainer.applyModifiers(production,
                 getGame().getTurn(),
                 getProductionModifiers(goodsType, unitType));
