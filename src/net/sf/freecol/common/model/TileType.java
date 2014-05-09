@@ -322,16 +322,16 @@ public final class TileType extends FreeColGameObjectType {
      * of colony center tile and production level.  If the production
      * level is null, all production levels will be returned.
      *
-     * @param center Whether the tile is a colony center tile.
+     * @param unattended Whether the production is unattended.
      * @param level The production level.
      * @return A list of <code>ProductionType</code>s.
      */
-    public List<ProductionType> getProductionTypes(boolean center,
+    public List<ProductionType> getProductionTypes(boolean unattended,
                                                    String level) {
         List<ProductionType> result = new ArrayList<ProductionType>();
         if (productionTypes != null) {
             for (ProductionType productionType : productionTypes) {
-                if (productionType.isColonyCenterTile() == center
+                if (productionType.isUnattended() == unattended
                     && productionType.appliesTo(level)) {
                     result.add(productionType);
                 }
@@ -610,10 +610,9 @@ public final class TileType extends FreeColGameObjectType {
                 addProductionType(new ProductionType(goods, true,
                                                      tileProduction));
             } else if (SECONDARY_PRODUCTION_TAG.equals(tag)) {
-                for (ProductionType productionType : getProductionTypes()) {
-                    if (productionType.isColonyCenterTile()
-                        && (tileProduction == null
-                            || tileProduction.equals(productionType.getProductionLevel()))) {
+                for (ProductionType productionType : getProductionTypes(true)) {
+                    if (tileProduction == null
+                        || tileProduction.equals(productionType.getProductionLevel())) {
                         productionType.getOutputs().add(goods);
                     }
                 }

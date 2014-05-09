@@ -30,66 +30,81 @@ import net.sf.freecol.common.model.Map.Direction;
 
 public class ProductionTypeTest extends FreeColTestCase {
 
+    public static final GoodsType cotton
+        = spec().getGoodsType("model.goods.cotton");
+    public static final GoodsType grain
+        = spec().getGoodsType("model.goods.grain");
+    public static final GoodsType ore
+        = spec().getGoodsType("model.goods.ore");
+    public static final GoodsType silver
+        = spec().getGoodsType("model.goods.silver");
 
-    public void testArctic() {
-        TileType arctic = spec().getTileType("model.tile.arctic");
+    public static final TileType arctic
+        = spec().getTileType("model.tile.arctic");
+    public static final TileType plains
+        = spec().getTileType("model.tile.plains");
+    public static final TileType tundra
+        = spec().getTileType("model.tile.tundra");
 
-        List<ProductionType> production = arctic.getProductionTypes(true, "veryHigh");
-        assertEquals(1, production.size());
-        List<AbstractGoods> outputs = production.get(0).getOutputs();
-        assertEquals(1, outputs.size());
-        assertEquals(2, outputs.get(0).getAmount());
-        assertEquals("model.goods.grain", outputs.get(0).getType().getId());
 
-        production = arctic.getProductionTypes(true, "high");
-        assertEquals(1, production.size());
-        outputs = production.get(0).getOutputs();
-        assertEquals(1, outputs.size());
-        assertEquals(1, outputs.get(0).getAmount());
-        assertEquals("model.goods.grain", outputs.get(0).getType().getId());
-
-        production = arctic.getProductionTypes(true, "medium");
-        assertEquals(0, production.size());
-
-        production = arctic.getProductionTypes(true, "low");
-        assertEquals(0, production.size());
-
-        production = arctic.getProductionTypes(true, "veryLow");
-        assertEquals(0, production.size());
-
+    private void testProduction(Map<GoodsType, Integer> production,
+                                List<ProductionType> productionTypes) {
+        for (ProductionType productionType : productionTypes) {
+            assertNull("No inputs expected", productionType.getInputs());
+            List<AbstractGoods> outputs = productionType.getOutputs();
+            if (outputs == null) continue;
+            for (AbstractGoods ag : outputs) {
+                Integer i = production.get(ag.getType());
+                assertNotNull("Production expected for " + ag.getType(), i);
+                assertEquals("Production amount mismatch for " + ag.getType(),
+                    i.intValue(), ag.getAmount());
+                production.remove(ag.getType());
+            }
+        }
+        assertEquals("Production should remain", 0, production.size());
     }
 
 
-    public void testPlains() {
-        TileType plains = spec().getTileType("model.tile.plains");
-        GoodsType grain = spec().getGoodsType("model.goods.grain");
-        GoodsType cotton = spec().getGoodsType("model.goods.cotton");
-        Map<String, Integer> production = new HashMap<String, Integer>();
-        for (ProductionType productionType : plains.getProductionTypes()) {
-            assertNull(productionType.getInputs());
-            assertNull(productionType.getProductionLevel());
-            List<AbstractGoods> outputs = productionType.getOutputs();
-            if (productionType.isColonyCenterTile()) {
-                assertEquals(2, outputs.size());
-                assertEquals(grain, outputs.get(0).getType());
-                assertEquals(5, outputs.get(0).getAmount());
-                assertEquals(cotton, outputs.get(1).getType());
-                assertEquals(2, outputs.get(1).getAmount());
-            } else {
-                assertEquals(1, outputs.size());
-                production.put(outputs.get(0).getType().getId(), outputs.get(0).getAmount());
-            }
+
+    public void testArctic() {
+        Map<GoodsType, Integer> production = new HashMap<GoodsType, Integer>();
+
+        production.put(grain, 2);
+        testProduction(production,
+                       arctic.getProductionTypes(true, "veryHigh"));
+        testProduction(production,
+                       arctic.getProductionTypes(false, "veryHigh"));
+
+        production.put(grain, 1);
+        testProduction(production, 
+                       arctic.getProductionTypes(true, "high"));
+        testProduction(production,
+                       arctic.getProductionTypes(false, "high"));
+
+        for (String level : new String[] { "medium", "low", "veryLow" }) {
+            testProduction(production,
+                           arctic.getProductionTypes(true, level));
+            testProduction(production,
+                           arctic.getProductionTypes(false, level));
         }
-        assertEquals(5, (int) production.get("model.goods.grain"));
+    }
+
+    public void testPlains() {
+        Map<GoodsType, Integer> production = new HashMap<GoodsType, Integer>();
+
+        production.put(grain, 5);
+        production.put(cotton, 2);
+        testProduction(production, plains.getProductionTypes(true));
+
+        production.put(grain, 5);
+        production.put(cotton, 2);
+        production.put(ore, 1);
+        testProduction(production, plains.getProductionTypes(false));
+
         assertEquals(5, plains.getProductionOf(grain, null));
-        assertEquals(2, (int) production.get("model.goods.cotton"));
-        assertEquals(1, (int) production.get("model.goods.ore"));
     }
 
     public void testResource() {
-        TileType tundra = spec().getTileType("model.tile.tundra");
-        GoodsType silver = spec().getGoodsType("model.goods.silver");
-
         Game game = getGame();
         game.setMap(getTestMap(tundra));
 
@@ -108,7 +123,4 @@ public class ProductionTypeTest extends FreeColTestCase {
                      0, productionType.getOutput(silver).getAmount());
 
     }
-
-
-
 }

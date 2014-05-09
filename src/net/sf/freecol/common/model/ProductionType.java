@@ -205,11 +205,11 @@ public class ProductionType extends FreeColObject {
     }
 
     /**
-     * Is this production from a colony center tile?
+     * Is this unattended production?
      *
-     * @return True if this production is from a colony center tile.
+     * @return True if this is unattended production.
      */
-    public final boolean isColonyCenterTile() {
+    public final boolean isUnattended() {
         return unattended;
     }
 
@@ -357,7 +357,7 @@ public class ProductionType extends FreeColObject {
             result.append(productionLevel);
         }
         if (unattended) {
-            result.append(", colony center tile");
+            result.append(", unattended");
         }
         if (!(inputs == null || inputs.isEmpty())) {
             result.append(" [inputs: ");
