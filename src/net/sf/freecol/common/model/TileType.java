@@ -113,6 +113,7 @@ public final class TileType extends FreeColGameObjectType {
      */
     private TileType(String id, boolean water) {
         super(id, null);
+
         this.water = water;
     }
 
@@ -147,15 +148,17 @@ public final class TileType extends FreeColGameObjectType {
     /**
      * Is this tile type connected to the high seas, by definition.
      *
-     * @return True if the tile type is inherently connected to the high seas.
+     * @return True if the tile type is inherently connected to the
+     *     high seas.
      */
     public boolean isHighSeasConnected() {
         return connected;
     }
 
     /**
-     * Is this tile type directly connected to the high seas, that is, a
-     * unit on a tile of this type can move immediately to the high seas.
+     * Is this tile type directly connected to the high seas, that is,
+     * a unit on a tile of this type can move immediately to the high
+     * seas.
      *
      * @return True if the tile type is directly connected.
      */
@@ -240,14 +243,14 @@ public final class TileType extends FreeColGameObjectType {
      * Add a resource type.
      *
      * @param type The <code>ResourceType</code> to add.
-     * @param probability The percentage probability of the resource
-     *     being present.
+     * @param prob The percentage probability of the resource being
+     *     present.
      */
-    private void addResourceType(ResourceType type, int probability) {
+    private void addResourceType(ResourceType type, int prob) {
         if (resourceTypes == null) {
             resourceTypes = new ArrayList<RandomChoice<ResourceType>>();
         }
-        resourceTypes.add(new RandomChoice<ResourceType>(type, probability));
+        resourceTypes.add(new RandomChoice<ResourceType>(type, prob));
     }
 
     /**
@@ -318,13 +321,12 @@ public final class TileType extends FreeColGameObjectType {
      */
     public List<ProductionType> getProductionTypes(boolean unattended,
                                                    String level) {
+        if (productionTypes == null) return Collections.emptyList();
         List<ProductionType> result = new ArrayList<ProductionType>();
-        if (productionTypes != null) {
-            for (ProductionType productionType : productionTypes) {
-                if (productionType.isUnattended() == unattended
-                    && productionType.appliesTo(level)) {
-                    result.add(productionType);
-                }
+        for (ProductionType productionType : productionTypes) {
+            if (productionType.isUnattended() == unattended
+                && productionType.appliesTo(level)) {
+                result.add(productionType);
             }
         }
         return result;
@@ -336,46 +338,35 @@ public final class TileType extends FreeColGameObjectType {
     /**
      * Get the defence modifiers applicable to this tile type.
      *
-     * @return A set of defense <code>Modifier</code>s.
+     * @return A set of defence <code>Modifier</code>s.
      */
     public Set<Modifier> getDefenceModifiers() {
         return getModifierSet(Modifier.DEFENCE);
     }
 
     /**
-     * Returns the amount of goods of given goods type the given unit
-     * type could produce on a tile of this tile type.
+     * Get the amount of goods of given goods type the given unit type
+     * could produce on a tile of this tile type.
      *
      * @param goodsType The <code>GoodsType</code> to produce.
-     * @param unitType A <code>UnitType</code> that is to do the work.
-     * @return The amount of goods production.
+     * @param unitType An optional <code>UnitType</code> that is to do
+     *     the work, if null the unattended production is considered.
+     * @return The amount of goods produced.
      */
-    public int getProductionOf(GoodsType goodsType, UnitType unitType) {
+    public int getPotentialProduction(GoodsType goodsType,
+                                      UnitType unitType) {
         if (goodsType == null) return 0;
-        int production = getProductionOf(goodsType);
-        return (int)applyModifier(production, goodsType.getId(), unitType);
-    }
-
-    /**
-     * Returns the amount of goods of given goods type this tile type can
-     * produce.
-     *
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @return The amount of goods production.
-     */
-    public int getProductionOf(GoodsType goodsType) {
         int amount = 0;
-        for (ProductionType productionType : getProductionTypes(false)) {
+        for (ProductionType productionType
+                 : getProductionTypes(unitType == null)) {
             for (AbstractGoods output : productionType.getOutputs()) {
                 if (output.getType() == goodsType) {
                     int newAmount = output.getAmount();
-                    if (newAmount > amount) {
-                        amount = newAmount;
-                    }
+                    if (newAmount > amount) amount = newAmount;
                 }
             }
         }
-        return amount;
+        return (int)applyModifier(amount, goodsType.getId(), unitType);
     }
 
     /**

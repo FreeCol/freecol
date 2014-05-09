@@ -277,12 +277,13 @@ public class TileTest extends FreeColTestCase {
     public void testPotential() {
         Game game = getStandardGame();
         Tile tile = new Tile(game, mountains, 0, 0);
+        assertEquals(0, mountains.getPotentialProduction(silver, null));
         assertEquals(0, tile.potential(food, null));
-        assertEquals(1, tile.getType().getProductionOf(silver, null));
-        assertEquals(1, tile.potential(silver, null));
+        assertEquals(1, mountains.getPotentialProduction(silver, colonistType));
+        assertEquals(1, tile.potential(silver, colonistType));
         tile.addResource(new Resource(game, tile, silverResource));
-        assertEquals(0, tile.potential(food, null));
-        assertEquals(3, tile.potential(silver, null));
+        assertEquals(0, tile.potential(food, colonistType));
+        assertEquals(3, tile.potential(silver, colonistType));
     }
 
     public void testMaximumPotential() {
@@ -290,20 +291,20 @@ public class TileTest extends FreeColTestCase {
 
         Tile tile1 = new Tile(game, mountains, 0, 0);
         assertEquals("Mountain/food", 0,
-                     tile1.potential(food, null));
+                     tile1.potential(food, colonistType));
         assertEquals("Mountain/food max", 0,
-                     tile1.getMaximumPotential(food, null));
+                     tile1.getMaximumPotential(food, colonistType));
         assertEquals("Mountain/silver", 1,
-                     tile1.potential(silver, null));
+                     tile1.potential(silver, colonistType));
         assertEquals("Mountain/silver max", 2,
-                     tile1.getMaximumPotential(silver, null));
+                     tile1.getMaximumPotential(silver, colonistType));
         tile1.addResource(new Resource(game, tile1, silverResource));
         assertEquals("Mountain+Resource/food", 0,
-                     tile1.potential(food, null));
+                     tile1.potential(food, colonistType));
         assertEquals("Mountain+Resource/silver", 3,
-                     tile1.potential(silver, null));
+                     tile1.potential(silver, colonistType));
         assertEquals("Mountain+Resource/silver max", 4,
-                     tile1.getMaximumPotential(silver, null));
+                     tile1.getMaximumPotential(silver, colonistType));
 
         // grain-max should equal grain-potential + 1 (ploughing improvement)
         Tile tile2 = new Tile(game, plains, 0, 1);
@@ -593,7 +594,7 @@ public class TileTest extends FreeColTestCase {
         Unit unit = colony.getUnitList().get(0);
         assertEquals(colonistType, unit.getType());
         assertTrue(silver.isFarmed());
-        assertEquals(0, tundra.getProductionOf(silver, colonistType));
+        assertEquals(0, tundra.getPotentialProduction(silver, colonistType));
         assertEquals(1, tile.potential(silver, colonistType));
 
         assertFalse(tile.getProductionModifiers(silver, colonistType)

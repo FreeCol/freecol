@@ -208,7 +208,8 @@ public class ServerColonyTest extends FreeColTestCase {
         colony.invalidateCache();
 
         int consumption = colony.getFoodConsumption();
-        int production = colony.getTile().getType().getProductionOf(grainType, null);
+        int production = colony.getTile().getType()
+            .getPotentialProduction(grainType, null);
         assertEquals(6, consumption);
         assertEquals(3, production);
         assertEquals(-3, colony.getNetProductionOf(foodType));

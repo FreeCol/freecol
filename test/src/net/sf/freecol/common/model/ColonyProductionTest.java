@@ -457,7 +457,7 @@ public class ColonyProductionTest extends FreeColTestCase {
 
         assertEquals("Basic potential production of cotton on center tile"
             + " if not using a unit",
-            plainsType.getProductionOf(cottonType, null),
+            plainsType.getPotentialProduction(cottonType, null),
             colonyTile.getPotentialProduction(cottonType, null));
         assertEquals("Zero potential production of cotton on center tile"
             + " if using a unit",

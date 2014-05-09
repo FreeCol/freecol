@@ -100,7 +100,7 @@ public class ProductionTypeTest extends FreeColTestCase {
         production.put(ore, 1);
         testProduction(production, plains.getProductionTypes(false));
 
-        assertEquals(5, plains.getProductionOf(grain, null));
+        assertEquals(5, plains.getPotentialProduction(grain, null));
     }
 
     public void testResource() {

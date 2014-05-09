@@ -2053,8 +2053,8 @@ public class Colony extends Settlement implements Nameable {
                 && clearImprovement.isTileTypeAllowed(t.getType())
                 && (newType = clearImprovement.getChange(oldType)) != null) {
                 for (Unit u : ct.getUnitList()) {
-                    if (newType.getProductionOf(u.getWorkType(), u.getType())
-                        > oldType.getProductionOf(u.getWorkType(), u.getType())) {
+                    if (newType.getPotentialProduction(u.getWorkType(), u.getType())
+                        > oldType.getPotentialProduction(u.getWorkType(), u.getType())) {
                         clearTiles.add(t);
                         break;
                     }

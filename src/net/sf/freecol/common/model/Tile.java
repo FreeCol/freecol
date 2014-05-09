@@ -1276,7 +1276,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * The potential of this tile to produce a certain type of goods.
      *
-     * @param goodsType The <code>GoodsType</code> to check the potential for.
+     * @param goodsType The <code>GoodsType</code> to check the
+     *     potential for.
      * @param unitType A <code>UnitType</code> to do the work.
      * @return The normal potential of this <code>Tile</code> to
      *     produce the given <code>GoodsType</code>.
@@ -1299,7 +1300,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         // If we consider maximum potential to the effect of having
         // all possible improvements done, iterate through the
         // improvements and get the bonuses of all related ones.  If
-        // there are options to change tiletype using an improvement,
+        // there are options to change TileType using an improvement,
         // consider that too.
         final Specification spec = getSpecification();
         List<TileType> tileTypes = new ArrayList<TileType>();
@@ -1315,7 +1316,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
         int maxProduction = 0;
         for (TileType tileType : tileTypes) {
-            float potential = tileType.getProductionOf(goodsType, unitType);
+            float potential = tileType.getPotentialProduction(goodsType, unitType);
             if (tileType == type && hasResource()) {
                 for (TileItem item : tileItemContainer.getTileItems()) {
                     if (item instanceof Resource) {
@@ -1370,7 +1371,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         if (tileType == null || goodsType == null
             || !goodsType.isFarmed()) return 0;
         // Get tile potential + bonus if any
-        int potential = tileType.getProductionOf(goodsType, unitType);
+        int potential = tileType.getPotentialProduction(goodsType, unitType);
         if (tileItemContainer != null) {
             potential = tileItemContainer.getTotalBonusPotential(goodsType,
                 unitType, potential, false);

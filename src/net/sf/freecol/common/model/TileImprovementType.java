@@ -414,22 +414,26 @@ public final class TileImprovementType extends FreeColGameObjectType {
      * this tile improvement type would yield at a specified tile.
      *
      * @param tile The <code>Tile</code> to be considered.
-     * @param goodsType A preferred <code>GoodsType</code> or <code>null</code>
+     * @param goodsType An optional preferred <code>GoodsType</code>.
      * @return The increase in production
      */
     public int getImprovementValue(Tile tile, GoodsType goodsType) {
+        final UnitType colonistType
+            = getSpecification().getDefaultUnitType();
         int value = 0;
         if (goodsType.isFarmed()) {
-            TileType newTileType = getChange(tile.getType());
-            if (newTileType == null) { // simple bonus
-                int production = tile.potential(goodsType, null);
+            final int oldProduction = tile.getType()
+                .getPotentialProduction(goodsType, colonistType);
+            TileType tt = getChange(tile.getType());
+            if (tt == null) { // simple bonus
+                int production = tile.potential(goodsType, colonistType);
                 if (production > 0) {
                     float chg = applyModifier(production, goodsType.getId());
                     value = (int)(chg - production);
                 }
             } else { // tile type change
-                int chg = newTileType.getProductionOf(goodsType, null)
-                    - tile.getType().getProductionOf(goodsType, null);
+                int chg = tt.getPotentialProduction(goodsType, colonistType)
+                    - oldProduction;
                 value = chg;
             }
         }
