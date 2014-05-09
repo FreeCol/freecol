@@ -117,7 +117,8 @@ public class ProductionTypeTest extends FreeColTestCase {
         tile.addResource(new Resource(game, tile, minerals));
         productionType = colonyTile.getBestProductionType(silver);
         assertNotNull("production type should not be null", productionType);
-        assertNotNull("resource should produce silver", productionType.getOutput(silver));
+        assertNotNull("resource should produce silver",
+                      productionType.getOutput(silver));
         assertEquals("base production still must be zero",
                      0, productionType.getOutput(silver).getAmount());
 

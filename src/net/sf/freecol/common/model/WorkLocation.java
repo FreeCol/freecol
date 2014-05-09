@@ -135,17 +135,15 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
     }
 
     /**
-     * Gets the base production of the given goods type without
-     * applying any modifiers.
+     * Gets the current base production of the given goods type
+     * without applying any modifiers.
      *
      * @param goodsType The <code>GoodsType</code> to check.
      * @return The base production.
      */
     public int getBaseProduction(GoodsType goodsType) {
         for (AbstractGoods output : getOutputs()) {
-            if (output.getType() == goodsType) {
-                return output.getAmount();
-            }
+            if (output.getType() == goodsType) return output.getAmount();
         }
         return 0;
     }

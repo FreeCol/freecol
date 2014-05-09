@@ -45,6 +45,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ColonyPanel.TilesPanel.ASingleTilePanel;
 import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.client.gui.panel.UnitLabel.UnitAction;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
@@ -317,6 +318,8 @@ public final class QuickActionMenu extends JPopupMenu {
             .addAmount("%amount%", amount);
         if (claim) {
             t.addStringTemplate("%claim%", wl.getClaimTemplate());
+        } else if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
+            t.addStringTemplate("%claim%", wl.getLocationName());
         } else {
             t.addName("%claim%", "");
         }
@@ -337,7 +340,7 @@ public final class QuickActionMenu extends JPopupMenu {
         final GoodsType expertGoods = unitType.getExpertProduction();
         final Colony colony = unit.getLocation().getColony();
         final Specification spec = freeColClient.getGame().getSpecification();
-        WorkLocation current = unit.getWorkLocation();
+        final WorkLocation current = unit.getWorkLocation();
         final int bonusChange = (current != null) ? 0
             : colony.governmentChange(colony.getUnitCount() + 1);
 
@@ -346,10 +349,8 @@ public final class QuickActionMenu extends JPopupMenu {
         JMenuItem expertOwned = null;
         JMenuItem expertUnowned = null;
         for (GoodsType type : spec.getGoodsTypeList()) {
-            int bestOwnedProd = 0;
-            int bestUnownedProd = 0;
-            WorkLocation bestOwned = null;
-            WorkLocation bestUnowned = null;
+            int bestOwnedProd = bonusChange, bestUnownedProd = bonusChange;
+            WorkLocation bestOwned = null, bestUnowned = null;
             for (WorkLocation wl : colony.getAllWorkLocations()) {
                 int prod = bonusChange;
                 switch (wl.getNoAddReason(unit)) {

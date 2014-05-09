@@ -180,8 +180,7 @@ public class ProductionType extends FreeColObject {
     }
 
     /**
-     * Returns the goods of the given goods type produced by this
-     * production type, or null.
+     * Get the goods of the given goods type in this production type.
      *
      * @param goodsType The <code>GoodsType</code> to check.
      * @return The <code>AbstractGoods</code> output if any, otherwise null.
