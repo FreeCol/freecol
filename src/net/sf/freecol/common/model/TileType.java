@@ -296,24 +296,14 @@ public final class TileType extends FreeColGameObjectType {
     }
 
     /**
-     * Gets the production types applicable to this tile type.
-     *
-     * @return A list of <code>ProductionType</code>s.
-     */
-    public List<ProductionType> getProductionTypes() {
-        if (productionTypes == null) return Collections.emptyList();
-        return productionTypes;
-    }
-
-    /**
      * Gets the production types available at the current difficulty
      * level.
      *
-     * @param center Whether the tile is a colony center tile.
+     * @param unattended Whether the production is unattended.
      * @return A list of <code>ProductionType</code>s.
      */
-    public List<ProductionType> getProductionTypes(boolean center) {
-        return getProductionTypes(center, 
+    public List<ProductionType> getProductionTypes(boolean unattended) {
+        return getProductionTypes(unattended,
             getSpecification().getString(GameOptions.TILE_PRODUCTION));
     }
 
@@ -492,8 +482,10 @@ public final class TileType extends FreeColGameObjectType {
 
         xw.writeEndElement();
 
-        for (ProductionType productionType : getProductionTypes()) {
-            productionType.toXML(xw);
+        if (productionTypes != null) {
+            for (ProductionType productionType : productionTypes) {
+                productionType.toXML(xw);
+            }
         }
 
         for (RandomChoice<ResourceType> choice : getWeightedResources()) {
