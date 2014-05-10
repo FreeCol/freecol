@@ -89,7 +89,8 @@ public final class TileType extends FreeColGameObjectType {
      * the production types available if a tile of this type is a
      * colony center tile.
      */
-    private List<ProductionType> productionTypes = null;
+    private final List<ProductionType> productionTypes
+        = new ArrayList<ProductionType>();
 
 
     /**
@@ -287,18 +288,6 @@ public final class TileType extends FreeColGameObjectType {
     }
 
     /**
-     * Add a production type.
-     *
-     * @param productionType The <code>ProductionType</code> to add.
-     */
-    private void addProductionType(ProductionType productionType) {
-        if (productionTypes == null) {
-            productionTypes = new ArrayList<ProductionType>();
-        }
-        productionTypes.add(productionType);
-    }
-
-    /**
      * Gets the production types available at the current difficulty
      * level.
      *
@@ -321,7 +310,6 @@ public final class TileType extends FreeColGameObjectType {
      */
     public List<ProductionType> getProductionTypes(boolean unattended,
                                                    String level) {
-        if (productionTypes == null) return Collections.emptyList();
         List<ProductionType> result = new ArrayList<ProductionType>();
         for (ProductionType productionType : productionTypes) {
             if (productionType.isUnattended() == unattended
@@ -485,10 +473,8 @@ public final class TileType extends FreeColGameObjectType {
 
         xw.writeEndElement();
 
-        if (productionTypes != null) {
-            for (ProductionType productionType : productionTypes) {
-                productionType.toXML(xw);
-            }
+        for (ProductionType productionType : productionTypes) {
+            productionType.toXML(xw);
         }
 
         for (RandomChoice<ResourceType> choice : getWeightedResources()) {
@@ -544,7 +530,7 @@ public final class TileType extends FreeColGameObjectType {
         if (xr.shouldClearContainers()) {
             disasters = null;
             resourceTypes = null;
-            productionTypes = null;
+            productionTypes.clear();
         }
 
         super.readChildren(xr);
@@ -583,7 +569,7 @@ public final class TileType extends FreeColGameObjectType {
         } else if (PRODUCTION_TAG.equals(tag)
             && xr.getAttribute(GOODS_TYPE_TAG, (String)null) == null) {
             // new production style
-            addProductionType(new ProductionType(xr, spec));
+            productionTypes.add(new ProductionType(xr, spec));
 
         } else if (PRODUCTION_TAG.equals(tag)
             // @compat 0.10.6
@@ -598,8 +584,8 @@ public final class TileType extends FreeColGameObjectType {
             // CAUTION: this only works if the primary production is
             // defined before the secondary production
             if (PRIMARY_PRODUCTION_TAG.equals(tag)) {
-                addProductionType(new ProductionType(goods, true,
-                                                     tileProduction));
+                productionTypes.add(new ProductionType(goods, true,
+                                                       tileProduction));
             } else if (SECONDARY_PRODUCTION_TAG.equals(tag)) {
                 for (ProductionType productionType : getProductionTypes(true)) {
                     if (tileProduction == null
@@ -609,8 +595,8 @@ public final class TileType extends FreeColGameObjectType {
                 }
             // end @compat
             } else {
-                addProductionType(new ProductionType(goods, false,
-                                                     tileProduction));
+                productionTypes.add(new ProductionType(goods, false,
+                                                       tileProduction));
             }
             xr.closeTag(tag);
 
