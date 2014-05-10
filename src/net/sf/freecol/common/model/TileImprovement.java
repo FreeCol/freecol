@@ -523,11 +523,20 @@ public class TileImprovement extends TileItem implements Named {
     /**
      * {@inheritDoc}
      */
+    public boolean produces(GoodsType goodsType, UnitType unitType) {
+        // TileImprovements provide bonuses, but do *not* allow a tile
+        // that can not produce some goods to produce due to the bonus.
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public List<Modifier> getProductionModifiers(GoodsType goodsType,
                                                  UnitType unitType) {
         List<Modifier> result = new ArrayList<Modifier>();
         Modifier modifier = getProductionModifier(goodsType);
-        if (modifier != null) result.add(modifier);
+        if (modifier != null && isComplete()) result.add(modifier);
         return result;
     }
 

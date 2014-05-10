@@ -108,6 +108,17 @@ public abstract class TileItem extends FreeColGameObject implements Locatable {
                                    int potential);
 
     /**
+     * Does this tile item allow its enclosing tile to produce a given
+     * goods type?
+     *
+     * @param goodsType The <code>GoodsType</code> to produce.
+     * @param unitType The optional <code>unitType</code> to produce with.
+     * @return True if this tile item produces the goods.
+     */
+    public abstract boolean produces(GoodsType goodsType,
+                                     UnitType unitType);
+
+    /**
      * Gets the production modifiers for the given type of goods and unit.
      *
      * @param goodsType The <code>GoodsType</code> to produce.
@@ -116,7 +127,6 @@ public abstract class TileItem extends FreeColGameObject implements Locatable {
      */
     public abstract List<Modifier> getProductionModifiers(GoodsType goodsType,
                                                           UnitType unitType);
-
 
     /**
      * Is this a natural TileItem?

@@ -258,6 +258,13 @@ public class LostCityRumour extends TileItem {
     /**
      * {@inheritDoc}
      */
+    public boolean produces(GoodsType goodsType, UnitType unitType) {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public List<Modifier> getProductionModifiers(GoodsType goodsType,
                                                  UnitType unitType) {
         return Collections.emptyList();

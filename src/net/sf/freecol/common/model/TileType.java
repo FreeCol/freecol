@@ -345,6 +345,18 @@ public final class TileType extends FreeColGameObjectType {
     }
 
     /**
+     * Does a tile of this type produce a given goods type.
+     *
+     * @param goodsType The <code>GoodsType</code> to produce.
+     * @param unitType An optional <code>UnitType</code> that is to do
+     *     the work, if null the unattended production is considered.
+     * @return True if this tile type produces the goods.
+     */
+    public boolean produces(GoodsType goodsType, UnitType unitType) {
+        return getPotentialProduction(goodsType, unitType) > 0;
+    }
+
+    /**
      * Get the amount of goods of given goods type the given unit type
      * could produce on a tile of this tile type.
      *

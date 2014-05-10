@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -215,8 +216,21 @@ public class Resource extends TileItem {
     /**
      * {@inheritDoc}
      */
+    public boolean produces(GoodsType goodsType, UnitType unitType) {
+        if (goodsType == null) return false;
+        // The presence of a resource can indeed give a tile the
+        // ability to produce a goods type.
+        return (int)FeatureContainer.applyModifiers(0f,
+            getGame().getTurn(),
+            getProductionModifiers(goodsType, unitType)) > 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public List<Modifier> getProductionModifiers(GoodsType goodsType,
                                                  UnitType unitType) {
+        if (goodsType == null) return Collections.emptyList();
         return new ArrayList<Modifier>(getType()
             .getModifierSet(goodsType.getId(), unitType));
     }

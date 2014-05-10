@@ -430,6 +430,21 @@ public class TileItemContainer extends FreeColGameObject {
     }
 
     /**
+     * Does this container contain an item that allows the tile to 
+     * produce a goods type?
+     *
+     * @param goodsType The <code>GoodsType</code> to produce.
+     * @param unitType The optional <code>unitType</code> to produce with.
+     * @return True if this container allows the goods type to be produced.
+     */
+    public boolean produces(GoodsType goodsType, UnitType unitType) {
+        for (TileItem ti : tileItems) {
+            if (ti.produces(goodsType, unitType)) return true;
+        }
+        return false;
+    }
+
+    /**
      * Determine the movement cost to this <code>Tile</code> from
      * another <code>Tile</code>.
      * Does not consider special unit abilities.
