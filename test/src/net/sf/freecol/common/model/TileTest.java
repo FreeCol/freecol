@@ -666,13 +666,15 @@ public class TileTest extends FreeColTestCase {
         assertEquals(colonyTile, colony.getVacantColonyTileFor(unit, false, silver));
     }
 
-    public void testDefence() {
+    public void testDefenceModifiers() {
         for (TileType tileType : spec().getTileTypeList()) {
-            if (tileType.isForested()
+            boolean present = tileType.isForested()
                 || "model.tile.hills".equals(tileType.getId())
-                || "model.tile.mountains".equals(tileType.getId())) {
-                assertFalse(tileType.getModifierSet(Modifier.DEFENCE).isEmpty());
-            }
+                || "model.tile.marsh".equals(tileType.getId())
+                || "model.tile.mountains".equals(tileType.getId())
+                || "model.tile.swamp".equals(tileType.getId());
+            assertEquals("Defence for " + tileType.getId(), present,
+                !tileType.getDefenceModifiers().isEmpty());
         }
     }
 
