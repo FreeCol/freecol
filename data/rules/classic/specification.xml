@@ -258,15 +258,15 @@
         <output goods-type="model.goods.cotton" value="2"/>
       </production>
       <production>
-        <output goods-type="model.goods.grain"       value="5"/>
+        <output goods-type="model.goods.grain" value="5"/>
       </production>
       <production>
-        <output goods-type="model.goods.cotton"     value="2"/>
+        <output goods-type="model.goods.cotton" value="2"/>
       </production>
       <production>
-        <output goods-type="model.goods.ore"        value="1"/>
+        <output goods-type="model.goods.ore" value="1"/>
       </production>
-      <resource   type="model.resource.grain"         probability="100"/>
+      <resource type="model.resource.grain" probability="100"/>
       <disaster id="model.disaster.tornado" probability="100"/>
     </tile-type>
     <tile-type id="model.tile.grassland" basic-move-cost="3" basic-work-turns="3">
@@ -276,12 +276,12 @@
         <output goods-type="model.goods.tobacco" value="3"/>
       </production>
       <production>
-        <output goods-type="model.goods.grain"       value="3"/>
+        <output goods-type="model.goods.grain" value="3"/>
       </production>
       <production>
-        <output goods-type="model.goods.tobacco"    value="3"/>
+        <output goods-type="model.goods.tobacco" value="3"/>
       </production>
-      <resource   type="model.resource.tobacco"       probability="100"/>
+      <resource type="model.resource.tobacco" probability="100"/>
     </tile-type>
     <tile-type id="model.tile.prairie" basic-move-cost="3" basic-work-turns="3">
       <gen humidityMin="20" humidityMax="50" temperatureMin="15" temperatureMax="30" altitudeMin="1" altitudeMax="1"/>
@@ -290,12 +290,12 @@
         <output goods-type="model.goods.cotton" value="3"/>
       </production>
       <production>
-        <output goods-type="model.goods.grain"       value="3"/>
+        <output goods-type="model.goods.grain" value="3"/>
       </production>
       <production>
-        <output goods-type="model.goods.cotton"     value="3"/>
+        <output goods-type="model.goods.cotton" value="3"/>
       </production>
-      <resource   type="model.resource.cotton"        probability="100"/>
+      <resource type="model.resource.cotton" probability="100"/>
       <disaster id="model.disaster.tornado" probability="100"/>
     </tile-type>
     <tile-type id="model.tile.savannah" basic-move-cost="3" basic-work-turns="3">
@@ -305,12 +305,12 @@
         <output goods-type="model.goods.sugar" value="3"/>
       </production>
       <production>
-        <output goods-type="model.goods.grain"       value="4"/>
+        <output goods-type="model.goods.grain" value="4"/>
       </production>
       <production>
-        <output goods-type="model.goods.sugar"      value="3"/>
+        <output goods-type="model.goods.sugar" value="3"/>
       </production>
-      <resource   type="model.resource.sugar"         probability="100"/>
+      <resource type="model.resource.sugar" probability="100"/>
     </tile-type>
     <tile-type id="model.tile.marsh" basic-move-cost="6" basic-work-turns="5">
       <gen humidityMin="50" humidityMax="100" temperatureMin="5" temperatureMax="15" altitudeMin="2" altitudeMax="2"/>
@@ -320,15 +320,18 @@
         <output goods-type="model.goods.tobacco" value="2"/>
       </production>
       <production>
-        <output goods-type="model.goods.grain"       value="3"/>
+        <output goods-type="model.goods.grain" value="3"/>
       </production>
       <production>
-        <output goods-type="model.goods.tobacco"    value="2"/>
+        <output goods-type="model.goods.tobacco" value="2"/>
       </production>
       <production>
-        <output goods-type="model.goods.ore"        value="2"/>
+        <output goods-type="model.goods.ore" value="2"/>
       </production>
-      <resource   type="model.resource.minerals"         probability="100"/>
+      <production> <!-- Minerals! -->
+        <output goods-type="model.goods.silver" value="0"/>
+      </production>
+      <resource type="model.resource.minerals" probability="100"/>
       <disaster id="model.disaster.disease" probability="100"/>
     </tile-type>
     <tile-type id="model.tile.swamp" basic-move-cost="6" basic-work-turns="7">
@@ -339,15 +342,18 @@
         <output goods-type="model.goods.sugar" value="2"/>
       </production>
       <production>
-        <output goods-type="model.goods.grain"       value="3"/>
+        <output goods-type="model.goods.grain" value="3"/>
       </production>
       <production>
-        <output goods-type="model.goods.sugar"      value="2"/>
+        <output goods-type="model.goods.sugar" value="2"/>
       </production>
       <production>
-        <output goods-type="model.goods.ore"        value="2"/>
+        <output goods-type="model.goods.ore" value="2"/>
       </production>
-      <resource   type="model.resource.minerals"      probability="100"/>
+      <production> <!-- Minerals! -->
+        <output goods-type="model.goods.silver" value="0"/>
+      </production>
+      <resource type="model.resource.minerals" probability="100"/>
       <disaster id="model.disaster.disease" probability="50"/>
       <disaster id="model.disaster.flood" probability="50"/>
     </tile-type>
@@ -366,15 +372,15 @@
         <output goods-type="model.goods.cotton" value="1"/>
       </production>
       <production>
-        <output goods-type="model.goods.grain"       value="2"/>
+        <output goods-type="model.goods.grain" value="2"/>
       </production>
       <production>
-        <output goods-type="model.goods.cotton"     value="1"/>
+        <output goods-type="model.goods.cotton" value="1"/>
       </production>
       <production>
-        <output goods-type="model.goods.ore"        value="2"/>
+        <output goods-type="model.goods.ore" value="2"/>
       </production>
-      <resource   type="model.resource.oasis"         probability="100"/>
+      <resource type="model.resource.oasis" probability="100"/>
       <disaster id="model.disaster.sandstorm" probability="50"/>
       <disaster id="model.disaster.drought" probability="50"/>
     </tile-type>
@@ -385,13 +391,17 @@
         <output goods-type="model.goods.ore" value="2"/>
       </production>
       <production>
-        <output goods-type="model.goods.grain"       value="3"/>
+        <output goods-type="model.goods.grain" value="3"/>
       </production>
       <production>
-        <output goods-type="model.goods.ore"        value="2"/>
+        <output goods-type="model.goods.ore" value="2"/>
       </production>
-      <!-- Col1 had minerals here, even if not mentioned in the Colonizopedia -->
-      <resource   type="model.resource.minerals"      probability="100"/>
+      <production> <!-- Minerals! -->
+        <output goods-type="model.goods.silver" value="0"/>
+      </production>
+      <!-- Col1 had minerals here, even if not mentioned in the
+           Colonizopedia. -->
+      <resource type="model.resource.minerals" probability="100"/>
       <disaster id="model.disaster.blizzard" probability="100"/>
     </tile-type>
     <tile-type id="model.tile.mixedForest" basic-move-cost="6" basic-work-turns="4" is-forest="true">
@@ -402,19 +412,19 @@
         <output goods-type="model.goods.furs" value="3"/>
       </production>
       <production>
-        <output goods-type="model.goods.grain"       value="3"/>
+        <output goods-type="model.goods.grain" value="3"/>
       </production>
       <production>
-        <output goods-type="model.goods.cotton"     value="1"/>
+        <output goods-type="model.goods.cotton" value="1"/>
       </production>
       <production>
-        <output goods-type="model.goods.furs"       value="3"/>
+        <output goods-type="model.goods.furs" value="3"/>
       </production>
       <production>
-        <output goods-type="model.goods.lumber"     value="6"/>
+        <output goods-type="model.goods.lumber" value="6"/>
       </production>
-      <resource   type="model.resource.furs" probability="50"/>
-      <resource   type="model.resource.lumber" probability="50"/>
+      <resource type="model.resource.furs" probability="50"/>
+      <resource type="model.resource.lumber" probability="50"/>
       <ability id="model.ability.ambushTerrain" value="true"/>
     </tile-type>
     <tile-type id="model.tile.coniferForest" basic-move-cost="6" basic-work-turns="4" is-forest="true">
@@ -425,18 +435,18 @@
         <output goods-type="model.goods.furs" value="2"/>
       </production>
       <production>
-        <output goods-type="model.goods.grain"       value="2"/>
+        <output goods-type="model.goods.grain" value="2"/>
       </production>
       <production>
-        <output goods-type="model.goods.tobacco"    value="1"/>
+        <output goods-type="model.goods.tobacco" value="1"/>
       </production>
       <production>
-        <output goods-type="model.goods.furs"       value="2"/>
+        <output goods-type="model.goods.furs" value="2"/>
       </production>
       <production>
-        <output goods-type="model.goods.lumber"     value="6"/>
+        <output goods-type="model.goods.lumber" value="6"/>
       </production>
-      <resource   type="model.resource.lumber"        probability="100"/>
+      <resource type="model.resource.lumber" probability="100"/>
       <ability id="model.ability.ambushTerrain" value="true"/>
     </tile-type>
     <tile-type id="model.tile.broadleafForest" basic-move-cost="6" basic-work-turns="4" is-forest="true">
@@ -447,18 +457,18 @@
         <output goods-type="model.goods.furs" value="2"/>
       </production>
       <production>
-        <output goods-type="model.goods.grain"       value="2"/>
+        <output goods-type="model.goods.grain" value="2"/>
       </production>
       <production>
-        <output goods-type="model.goods.cotton"     value="1"/>
+        <output goods-type="model.goods.cotton" value="1"/>
       </production>
       <production>
-        <output goods-type="model.goods.furs"       value="2"/>
+        <output goods-type="model.goods.furs" value="2"/>
       </production>
       <production>
-        <output goods-type="model.goods.lumber"     value="4"/>
+        <output goods-type="model.goods.lumber" value="4"/>
       </production>
-      <resource   type="model.resource.game"          probability="100"/>
+      <resource type="model.resource.game" probability="100"/>
       <ability id="model.ability.ambushTerrain" value="true"/>
     </tile-type>
     <tile-type id="model.tile.tropicalForest" basic-move-cost="6" basic-work-turns="6" is-forest="true">
@@ -469,18 +479,18 @@
         <output goods-type="model.goods.furs" value="2"/>
       </production>
       <production>
-        <output goods-type="model.goods.grain"       value="3"/>
+        <output goods-type="model.goods.grain" value="3"/>
       </production>
       <production>
-        <output goods-type="model.goods.sugar"      value="1"/>
+        <output goods-type="model.goods.sugar" value="1"/>
       </production>
       <production>
-        <output goods-type="model.goods.furs"       value="2"/>
+        <output goods-type="model.goods.furs" value="2"/>
       </production>
       <production>
-        <output goods-type="model.goods.lumber"     value="4"/>
+        <output goods-type="model.goods.lumber" value="4"/>
       </production>
-      <resource   type="model.resource.lumber"        probability="100"/>
+      <resource type="model.resource.lumber" probability="100"/>
       <disaster id="model.disaster.hurricane" probability="100"/>
       <ability id="model.ability.ambushTerrain" value="true"/>
     </tile-type>
@@ -492,21 +502,24 @@
         <output goods-type="model.goods.furs" value="2"/>
       </production>
       <production>
-        <output goods-type="model.goods.grain"       value="2"/>
+        <output goods-type="model.goods.grain" value="2"/>
       </production>
       <production>
-        <output goods-type="model.goods.tobacco"    value="1"/>
+        <output goods-type="model.goods.tobacco" value="1"/>
       </production>
       <production>
-        <output goods-type="model.goods.furs"       value="2"/>
+        <output goods-type="model.goods.furs" value="2"/>
       </production>
       <production>
-        <output goods-type="model.goods.lumber"     value="4"/>
+        <output goods-type="model.goods.lumber" value="4"/>
       </production>
       <production>
-        <output goods-type="model.goods.ore"        value="1"/>
+        <output goods-type="model.goods.ore" value="1"/>
       </production>
-      <resource   type="model.resource.minerals"      probability="100"/>
+      <production> <!-- Minerals! -->
+        <output goods-type="model.goods.silver" value="0"/>
+      </production>
+      <resource type="model.resource.minerals" probability="100"/>
       <ability id="model.ability.ambushTerrain" value="true"/>
     </tile-type>
     <tile-type id="model.tile.rainForest" basic-move-cost="9" basic-work-turns="7" is-forest="true">
@@ -517,21 +530,24 @@
         <output goods-type="model.goods.furs" value="1"/>
       </production>
       <production>
-        <output goods-type="model.goods.grain"       value="2"/>
+        <output goods-type="model.goods.grain" value="2"/>
       </production>
       <production>
-        <output goods-type="model.goods.sugar"      value="1"/>
+        <output goods-type="model.goods.sugar" value="1"/>
       </production>
       <production>
-        <output goods-type="model.goods.furs"       value="1"/>
+        <output goods-type="model.goods.furs" value="1"/>
       </production>
       <production>
-        <output goods-type="model.goods.lumber"     value="4"/>
+        <output goods-type="model.goods.lumber" value="4"/>
       </production>
       <production>
-        <output goods-type="model.goods.ore"        value="1"/>
+        <output goods-type="model.goods.ore" value="1"/>
       </production>
-      <resource   type="model.resource.minerals"      probability="100"/>
+      <production> <!-- Minerals! -->
+        <output goods-type="model.goods.silver" value="0"/>
+      </production>
+      <resource type="model.resource.minerals" probability="100"/>
       <disaster id="model.disaster.disease" probability="100"/>
       <ability id="model.ability.ambushTerrain" value="true"/>
     </tile-type>
@@ -551,21 +567,21 @@
         <output goods-type="model.goods.furs" value="2"/>
       </production>
       <production>
-        <output goods-type="model.goods.grain"       value="2"/>
+        <output goods-type="model.goods.grain" value="2"/>
       </production>
       <production>
-        <output goods-type="model.goods.cotton"     value="1"/>
+        <output goods-type="model.goods.cotton" value="1"/>
       </production>
       <production>
-        <output goods-type="model.goods.furs"       value="2"/>
+        <output goods-type="model.goods.furs" value="2"/>
       </production>
       <production>
-        <output goods-type="model.goods.lumber"     value="2"/>
+        <output goods-type="model.goods.lumber" value="2"/>
       </production>
       <production>
-        <output goods-type="model.goods.ore"        value="1"/>
+        <output goods-type="model.goods.ore" value="1"/>
       </production>
-      <resource   type="model.resource.oasis"         probability="100"/>
+      <resource type="model.resource.oasis" probability="100"/>
       <disaster id="model.disaster.brushfire" probability="50"/>
       <disaster id="model.disaster.drought" probability="50"/>
       <ability id="model.ability.ambushTerrain" value="true"/>
@@ -578,18 +594,18 @@
         <output goods-type="model.goods.furs" value="3"/>
       </production>
       <production>
-        <output goods-type="model.goods.grain"       value="2"/>
+        <output goods-type="model.goods.grain" value="2"/>
       </production>
       <production>
-        <output goods-type="model.goods.furs"       value="3"/>
+        <output goods-type="model.goods.furs" value="3"/>
       </production>
       <production>
-        <output goods-type="model.goods.lumber"     value="4"/>
+        <output goods-type="model.goods.lumber" value="4"/>
       </production>
       <production>
-        <output goods-type="model.goods.ore"        value="1"/>
+        <output goods-type="model.goods.ore" value="1"/>
       </production>
-      <resource   type="model.resource.game"          probability="100"/>
+      <resource type="model.resource.game" probability="100"/>
       <ability id="model.ability.ambushTerrain" value="true"/>
     </tile-type>
     <tile-type id="model.tile.hills" basic-move-cost="6" basic-work-turns="4" is-elevation="true">
@@ -600,12 +616,12 @@
         <output goods-type="model.goods.ore" value="4"/>
       </production>
       <production>
-        <output goods-type="model.goods.grain"       value="2"/>
+        <output goods-type="model.goods.grain" value="2"/>
       </production>
       <production>
-        <output goods-type="model.goods.ore"        value="4"/>
+        <output goods-type="model.goods.ore" value="4"/>
       </production>
-      <resource   type="model.resource.ore"           probability="100"/>
+      <resource type="model.resource.ore" probability="100"/>
       <disaster id="model.disaster.earthquake" probability="50"/>
       <disaster id="model.disaster.landslide" probability="50"/>
       <ability id="model.ability.ambushTerrain" value="true"/>
@@ -614,12 +630,12 @@
       <gen humidityMin="0" humidityMax="100" temperatureMin="-20" temperatureMax="40" altitudeMin="3" altitudeMax="3"/>
       <modifier id="model.modifier.defence" type="percentage" value="150"/>
       <production>
-        <output goods-type="model.goods.ore"        value="4"/>
+        <output goods-type="model.goods.ore" value="4"/>
       </production>
       <production>
-        <output goods-type="model.goods.silver"     value="1"/>
+        <output goods-type="model.goods.silver" value="1"/>
       </production>
-      <resource   type="model.resource.silver"        probability="100"/>
+      <resource type="model.resource.silver" probability="100"/>
       <disaster id="model.disaster.earthquake" probability="50"/>
       <disaster id="model.disaster.landslide" probability="50"/>
       <ability id="model.ability.ambushTerrain" value="true"/>
@@ -638,25 +654,25 @@
                can-settle="false" is-connected="true">
       <gen humidityMin="0" humidityMax="100" temperatureMin="-20" temperatureMax="40" altitudeMin="-2" altitudeMax="-1"/>
       <production>
-        <output goods-type="model.goods.fish"       value="2"/>
+        <output goods-type="model.goods.fish" value="2"/>
       </production>
-      <resource   type="model.resource.fish"          probability="100"/>
+      <resource type="model.resource.fish" probability="100"/>
       <disaster id="model.disaster.stormsurge" probability="100"/>
     </tile-type>
     <tile-type id="model.tile.lake" basic-move-cost="3" basic-work-turns="4" is-water="true"
                can-settle="false" is-connected="false">
       <gen humidityMin="0" humidityMax="100" temperatureMin="-20" temperatureMax="40" altitudeMin="-2" altitudeMax="-1"/>
       <production>
-        <output goods-type="model.goods.fish"       value="2"/>
+        <output goods-type="model.goods.fish" value="2"/>
       </production>
-      <resource   type="model.resource.fish"          probability="100"/>
+      <resource type="model.resource.fish" probability="100"/>
       <disaster id="model.disaster.flood" probability="100"/>
     </tile-type>
     <tile-type id="model.tile.highSeas" basic-move-cost="3" basic-work-turns="4" is-water="true"
                can-settle="false" is-connected="true">
       <gen humidityMin="0" humidityMax="100" temperatureMin="-20" temperatureMax="40" altitudeMin="-3" altitudeMax="-2"/>
       <production>
-        <output goods-type="model.goods.fish"       value="2"/>
+        <output goods-type="model.goods.fish" value="2"/>
       </production>
       <ability id="model.ability.moveToEurope"/>
     </tile-type>
@@ -665,9 +681,9 @@
       <gen humidityMin="0" humidityMax="100" temperatureMin="-20" temperatureMax="40"
            altitudeMin="-3" altitudeMax="-2" />
       <production>
-        <output goods-type="model.goods.fish"       value="2"/>
+        <output goods-type="model.goods.fish" value="2"/>
       </production>
-      <resource   type="model.resource.fish"          probability="100"/>
+      <resource type="model.resource.fish" probability="100"/>
       <disaster id="model.disaster.flood" probability="100"/>
     </tile-type>
   </tile-types>
