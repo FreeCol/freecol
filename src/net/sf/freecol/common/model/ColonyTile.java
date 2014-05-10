@@ -375,33 +375,19 @@ public class ColonyTile extends WorkLocation {
         return mods;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public List<ProductionType> getProductionTypes() {
-        if (workTile == null || workTile.getType() == null) {
-            return Collections.emptyList();
-        }
-        return workTile.getType().getProductionTypes(isColonyCenterTile());
+        return getProductionTypes(isColonyCenterTile());
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override
-    public ProductionType getBestProductionType(GoodsType goodsType) {
-        ProductionType best = super.getBestProductionType(goodsType);
-        if (best == null) {
-            TileItemContainer container = workTile.getTileItemContainer();
-            if (container != null) {
-                int amount = container.getTotalBonusPotential(goodsType, null, 0, false);
-                if (amount > 0) {
-                    // special case: resource is present
-                    best = new ProductionType(null, goodsType, 0);
-                }
-            }
+    public List<ProductionType> getProductionTypes(boolean unattended) {
+        if (workTile == null || workTile.getType() == null
+            || unattended != isColonyCenterTile()) {
+            return Collections.emptyList();
         }
-        return best;
+        return workTile.getType().getProductionTypes(unattended);
     }
 
     /**

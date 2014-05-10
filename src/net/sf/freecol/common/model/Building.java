@@ -427,7 +427,6 @@ public class Building extends WorkLocation implements Named, Comparable<Building
 
     // Interface WorkLocation
     // Inherits:
-    //   WorkLocation.getBestProductionType(goodsType): moot for buildings.
     //   WorkLocation.getClaimTemplate: buildings do not need to be claimed.
 
     /**
@@ -494,12 +493,21 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     }
 
     /**
-     * Returns the production types available for this Building.
-     *
-     * @return available production types
+     * {@inheritDoc}
      */
     public List<ProductionType> getProductionTypes() {
-        return getType().getProductionTypes(false);
+        List<ProductionType> result = new ArrayList<ProductionType>();
+        result.addAll(getProductionTypes(false));
+        result.addAll(getProductionTypes(true));
+        return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List<ProductionType> getProductionTypes(boolean unattended) {
+        if (buildingType == null) return Collections.emptyList();
+        return getType().getProductionTypes(unattended);
     }
 
 

@@ -346,11 +346,11 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
     public ProductionType getBestProductionType(Unit unit) {
         ProductionType best = null;
         int amount = 0;
-        for (ProductionType productionType : getProductionTypes()) {
+        for (ProductionType productionType : getProductionTypes(false)) {
             for (AbstractGoods output : productionType.getOutputs()) {
                 int newAmount = getPotentialProduction(output.getType(),
                                                        unit.getType());
-                if (newAmount > amount) {
+                if (amount < newAmount) {
                     amount = newAmount;
                     best = productionType;
                 }
@@ -361,23 +361,23 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
 
     /**
      * Gets the best production type for the production of the
-     * given goods type.  This method is likely to be removed in the
-     * future.
+     * given goods type.
      *
-     * @param goodsType goods type
-     * @return production type
+     * This method is likely to be removed in the future.
+     *
+     * @param goodsType The <code>GoodsType</code> to check.
+     * @return The best <code>ProductionType</code>.
      */
     public ProductionType getBestProductionType(GoodsType goodsType) {
         ProductionType best = null;
-        int amount = 0;
+        int amount = -1; // There are outputs with amount==0
         for (ProductionType productionType : getProductionTypes()) {
             for (AbstractGoods output : productionType.getOutputs()) {
-                if (output.getType() == goodsType) {
-                    int newAmount = output.getAmount();
-                    if (newAmount > amount) {
-                        amount = newAmount;
-                        best = productionType;
-                    }
+                if (output.getType() != goodsType) continue;
+                int newAmount = output.getAmount();
+                if (amount < newAmount) {
+                    amount = newAmount;
+                    best = productionType;
                 }
             }
         }
@@ -423,20 +423,21 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
 
         // Choose a sensible work type only if none already specified
         // or it is not useful at this location.
+        GoodsType workType = unit.getWorkType(), newWorkType = null;
         ProductionType best = null;
-        if (unit.getWorkType() != null) {
-            if ((best = getBestProductionType(unit.getWorkType())) != null) {
+        if (workType != null) {
+            if ((best = getBestProductionType(workType)) != null) {
                 setProductionType(best);
+                newWorkType = workType;
             }
         }
         if (best == null) {
             if ((best = getBestProductionType(unit)) != null) {
                 setProductionType(best);
-                // TODO: unit work type needs to be a production
-                // type rather than a goods type
-                unit.changeWorkType(best.getOutputs().get(0).getType());
+                newWorkType = best.getBestOutputType();
             }
         }
+        if (newWorkType != workType) unit.changeWorkType(newWorkType);
 
         getColony().invalidateCache();
         return true;
@@ -548,11 +549,14 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
                                                           UnitType unitType);
 
     /**
-     * Returns the production types available for this WorkLocation.
+     * Get the production types available for this work location.
      *
-     * @return available production types
+     * @param unattended If true, get unattended production types.
+     * @return A list of suitable <code>ProductionType</code>s.
      */
+    public abstract List<ProductionType> getProductionTypes(boolean unattended);
     public abstract List<ProductionType> getProductionTypes();
+
 
     /**
      * Gets a template describing whether this work location can/needs-to
