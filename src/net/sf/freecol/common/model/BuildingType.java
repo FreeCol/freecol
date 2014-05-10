@@ -199,26 +199,34 @@ public final class BuildingType extends BuildableType
     }
 
     /**
-     * Get the <code>ProductionTypes</code> value.
+     * Get the production types provided by this building type at the
+     * current difficulty level.
      *
-     * @return a <code>List<ProductionType></code> value
+     * @param unattended Whether the production is unattended.
+     * @return A list of <code>ProductionType</code>s.
      */
-    public List<ProductionType> getProductionTypes() {
-        return productionTypes;
+    public List<ProductionType> getProductionTypes(boolean unattended) {
+        return getProductionTypes(unattended, null);
     }
 
     /**
-     * Return the production types available for the given production
-     * level. If the production level is null, all production levels
-     * will be returned.
+     * Gets the production types available at the current difficulty
+     * level.
      *
-     * @param level the production level
-     * @return a <code>List<ProductionType></code> value
+     * TODO: TileType.getProductionTypes(boolean, String) uses the
+     * GameOptions.TILE_PRODUCTION option.  We should implement a
+     * corresponding one for BuildingTypes.
+     *
+     * @param unattended Whether the production is unattended.
+     * @param level The production level (NYI).
+     * @return A list of <code>ProductionType</code>s.
      */
-    public List<ProductionType> getProductionTypes(String level) {
+    public List<ProductionType> getProductionTypes(boolean unattended,
+                                                   String level) {
         List<ProductionType> result = new ArrayList<ProductionType>();
         for (ProductionType productionType : productionTypes) {
-            if (level == null || level.equals(productionType.getProductionLevel())) {
+            if (productionType.isUnattended() == unattended
+                && productionType.appliesTo(level)) {
                 result.add(productionType);
             }
         }
@@ -232,12 +240,9 @@ public final class BuildingType extends BuildableType
      * @return The consumed <code>GoodsType</code>.
      */
     private GoodsType getConsumedGoodsType() {
-        if (productionTypes == null || productionTypes.isEmpty()) {
-            return null;
-        } else {
-            List<AbstractGoods> inputs = productionTypes.get(0).getInputs();
-            return (inputs.isEmpty()) ? null : inputs.get(0).getType();
-        }
+        if (productionTypes.isEmpty()) return null;
+        List<AbstractGoods> inputs = productionTypes.get(0).getInputs();
+        return (inputs.isEmpty()) ? null : inputs.get(0).getType();
     }
     // end @compat
 
@@ -247,12 +252,9 @@ public final class BuildingType extends BuildableType
      * @return The produced <code>GoodsType</code>.
      */
     public GoodsType getProducedGoodsType() {
-        if (productionTypes == null || productionTypes.isEmpty()) {
-            return null;
-        } else {
-            List<AbstractGoods> outputs = productionTypes.get(0).getOutputs();
-            return (outputs.isEmpty()) ? null : outputs.get(0).getType();
-        }
+        if (productionTypes.isEmpty()) return null;
+        List<AbstractGoods> outputs = productionTypes.get(0).getOutputs();
+        return (outputs.isEmpty()) ? null : outputs.get(0).getType();
     }
 
     /**

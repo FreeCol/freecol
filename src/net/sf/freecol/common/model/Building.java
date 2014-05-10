@@ -490,7 +490,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      * @return available production types
      */
     public List<ProductionType> getProductionTypes() {
-        return getType().getProductionTypes();
+        return getType().getProductionTypes(false);
     }
 
 

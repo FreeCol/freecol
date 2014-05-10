@@ -203,26 +203,22 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
                     count++;
                 }
             }
+
         } else {
-
-            List<ProductionType> productionTypes = buildingType.getProductionTypes();
-
-            if (!(productionTypes == null || productionTypes.isEmpty())) {
-                for (ProductionType productionType : productionTypes) {
-                    List<AbstractGoods> inputs = productionType.getInputs();
-                    List<AbstractGoods> outputs = productionType.getOutputs();
-                    panel.add(localizedLabel("colopedia.buildings.production"), "newline");
-                    // for the moment, we assume only a single input
-                    // and output type
-                    if (!inputs.isEmpty()) {
-                        panel.add(getGoodsButton(inputs.get(0)), "span, split 3");
-                        JLabel arrow = new JLabel("\u2192");
-                        arrow.setFont(arrowFont);
-                        panel.add(arrow);
-                    }
-                    if (!outputs.isEmpty()) {
-                        panel.add(getGoodsButton(outputs.get(0)));
-                    }
+            for (ProductionType pt : buildingType.getProductionTypes(false)) {
+                List<AbstractGoods> inputs = pt.getInputs();
+                List<AbstractGoods> outputs = pt.getOutputs();
+                panel.add(localizedLabel("colopedia.buildings.production"), "newline");
+                // for the moment, we assume only a single input
+                // and output type
+                if (!inputs.isEmpty()) {
+                    panel.add(getGoodsButton(inputs.get(0)), "span, split 3");
+                    JLabel arrow = new JLabel("\u2192");
+                    arrow.setFont(arrowFont);
+                    panel.add(arrow);
+                }
+                if (!outputs.isEmpty()) {
+                    panel.add(getGoodsButton(outputs.get(0)));
                 }
             }
         }
