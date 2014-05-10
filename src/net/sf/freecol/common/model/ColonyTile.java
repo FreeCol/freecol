@@ -307,20 +307,18 @@ public class ColonyTile extends WorkLocation {
      */
     public int getPotentialProduction(GoodsType goodsType,
                                       UnitType unitType) {
-        if (isColonyCenterTile()) {
-            return (unitType == null) ? getBaseProduction(goodsType) : 0;
-        }
+        final Tile workTile = getWorkTile();
+        if (!workTile.produces(goodsType, unitType)) return 0;
 
-        int production = 0;
-        TileType tileType = workTile.getType();
+        int amount = 0;
         if (unitType == null || canBeWorked()) {
-            production = tileType.getPotentialProduction(goodsType,
-                                                         unitType);
-            production = (int)FeatureContainer.applyModifiers(production,
+            amount = workTile.getBaseProduction(goodsType, unitType);
+            amount = (int)FeatureContainer.applyModifiers(amount,
                 getGame().getTurn(),
                 getProductionModifiers(goodsType, unitType));
+            if (amount < 0) amount = 0;
         }
-        return Math.max(0, production);
+        return amount;
     }
 
     /**
@@ -328,10 +326,11 @@ public class ColonyTile extends WorkLocation {
      */
     public List<Modifier> getProductionModifiers(GoodsType goodsType,
                                                  UnitType unitType) {
-        if (goodsType == null) {
-            throw new IllegalArgumentException("Null GoodsType.");
-        }
         final Tile workTile = getWorkTile();
+        if (!workTile.produces(goodsType, unitType)) {
+            return Collections.emptyList();
+        }
+
         final TileType type = workTile.getType();
         final String id = goodsType.getId();
         final Colony colony = getColony();
@@ -340,16 +339,18 @@ public class ColonyTile extends WorkLocation {
 
         List<Modifier> mods = new ArrayList<Modifier>();
         if (isColonyCenterTile()) {
-            mods.addAll(workTile.getProductionModifiers(goodsType, null));
-            mods.addAll(colony.getModifierSet(id, null, turn));
-            mods.add(colony.getProductionModifier(goodsType));
-            if (owner != null) {
-                mods.addAll(owner.getModifierSet(id, null, turn));
-            }
+            if (unitType == null) {
+                mods.addAll(workTile.getProductionModifiers(goodsType, null));
+                mods.addAll(colony.getModifierSet(id, null, turn));
+                mods.add(colony.getProductionModifier(goodsType));
+                if (owner != null) {
+                    mods.addAll(owner.getModifierSet(id, null, turn));
+                }
+            } // else attended production not possible!
 
-        } else if (FeatureContainer.applyModifiers(0f, turn, 
-                workTile.getProductionModifiers(goodsType, unitType)) > 0
-            || produces(goodsType)) {
+        } else {
+            mods.addAll(workTile.getProductionModifiers(goodsType,
+                                                        unitType));
             if (unitType == null) { // Add only the tile-specific bonuses
                 mods.addAll(colony.getModifierSet(id, type, turn));
                 if (owner != null) {
@@ -357,8 +358,6 @@ public class ColonyTile extends WorkLocation {
                 }
 
             } else { // If a unit is present add unit specific bonuses
-                mods.addAll(workTile.getProductionModifiers(goodsType,
-                                                            unitType));
                 mods.add(colony.getProductionModifier(goodsType));
                 mods.addAll(unitType.getModifierSet(id, type, turn));
                 if (owner != null) {
