@@ -310,7 +310,7 @@ public final class InfoPanel extends FreeColPanel {
                     add(moveLabel, "span 4");
 
                     for (AbstractGoods goods : tile.getType().getPossibleProduction()) {
-                        JLabel goodsLabel = new JLabel(String.valueOf(tile.potential(goods.getType(), null)),
+                        JLabel goodsLabel = new JLabel(String.valueOf(tile.getPotentialProduction(goods.getType(), null)),
                             getLibrary().getScaledGoodsImageIcon(goods.getType(), 0.50f),
                             JLabel.RIGHT);
                         goodsLabel.setToolTipText(Messages.message(goods.getType().getNameKey()));

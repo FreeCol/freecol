@@ -3150,7 +3150,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 // Only consider specific food types, not the aggregation.
                 continue;
             }
-            price += tile.potential(type, null);
+            price += tile.getPotentialProduction(type, null);
         }
         price *= spec.getInteger(GameOptions.LAND_PRICE_FACTOR);
         price += 100;
@@ -3425,7 +3425,7 @@ public class Player extends FreeColGameObject implements Nameable {
                     if (tile.getType()!=null) {
                         for (AbstractGoods production : tile.getType().getProduction()) {
                             GoodsType type = production.getType();
-                            int potential = market.getSalePrice(type, tile.potential(type, null));
+                            int potential = market.getSalePrice(type, tile.getPotentialProduction(type, null));
                             if (tile.getOwner() != null &&
                                 !this.owns(tile)) {
                                 // tile is already owned by someone (and not by us!)
@@ -3449,7 +3449,7 @@ public class Player extends FreeColGameObject implements Nameable {
                     int newValue = 0;
                     for (AbstractGoods output: productionType.getOutputs()) {
                         newValue += market.getSalePrice(output.getType(),
-                                                        t.potential(output.getType(), null));
+                                                        t.getPotentialProduction(output.getType(), null));
                     }
                     if (newValue > bestValue) {
                         bestValue = newValue;
@@ -3583,7 +3583,7 @@ public class Player extends FreeColGameObject implements Nameable {
                  .getProductionTypes(true)) {
             for (AbstractGoods output : productionType.getOutputs()) {
                 if (!output.getType().isFoodType()) continue;
-                int amount = tile.potential(output.getType(), null);
+                int amount = tile.getPotentialProduction(output.getType(), null);
                 if (amount > initialFood) initialFood = amount;
             }
         }

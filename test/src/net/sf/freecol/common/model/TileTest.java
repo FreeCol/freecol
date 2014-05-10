@@ -126,6 +126,8 @@ public class TileTest extends FreeColTestCase {
         = spec().getUnitType("model.unit.freeColonist");
     private static final UnitType expertFarmerType
         = spec().getUnitType("model.unit.expertFarmer");
+    private static final UnitType expertLumberJack
+        = spec().getUnitType("model.unit.expertLumberJack");
 
 
     private class Work {
@@ -278,12 +280,12 @@ public class TileTest extends FreeColTestCase {
         Game game = getStandardGame();
         Tile tile = new Tile(game, mountains, 0, 0);
         assertEquals(0, mountains.getPotentialProduction(silver, null));
-        assertEquals(0, tile.potential(food, null));
+        assertEquals(0, tile.getPotentialProduction(food, null));
         assertEquals(1, mountains.getPotentialProduction(silver, colonistType));
-        assertEquals(1, tile.potential(silver, colonistType));
+        assertEquals(1, tile.getPotentialProduction(silver, colonistType));
         tile.addResource(new Resource(game, tile, silverResource));
-        assertEquals(0, tile.potential(food, colonistType));
-        assertEquals(3, tile.potential(silver, colonistType));
+        assertEquals(0, tile.getPotentialProduction(food, colonistType));
+        assertEquals(3, tile.getPotentialProduction(silver, colonistType));
     }
 
     public void testMaximumPotential() {
@@ -291,40 +293,40 @@ public class TileTest extends FreeColTestCase {
 
         Tile tile1 = new Tile(game, mountains, 0, 0);
         assertEquals("Mountain/food", 0,
-                     tile1.potential(food, colonistType));
+                     tile1.getPotentialProduction(food, colonistType));
         assertEquals("Mountain/food max", 0,
                      tile1.getMaximumPotential(food, colonistType));
         assertEquals("Mountain/silver", 1,
-                     tile1.potential(silver, colonistType));
+                     tile1.getPotentialProduction(silver, colonistType));
         assertEquals("Mountain/silver max", 2,
                      tile1.getMaximumPotential(silver, colonistType));
         tile1.addResource(new Resource(game, tile1, silverResource));
         assertEquals("Mountain+Resource/food", 0,
-                     tile1.potential(food, colonistType));
+                     tile1.getPotentialProduction(food, colonistType));
         assertEquals("Mountain+Resource/silver", 3,
-                     tile1.potential(silver, colonistType));
+                     tile1.getPotentialProduction(silver, colonistType));
         assertEquals("Mountain+Resource/silver max", 4,
                      tile1.getMaximumPotential(silver, colonistType));
 
         // grain-max should equal grain-potential + 1 (ploughing improvement)
         Tile tile2 = new Tile(game, plains, 0, 1);
         assertEquals("Plains/grain", 5,
-                     tile2.potential(grain, null));
+                     tile2.getPotentialProduction(grain, null));
         assertEquals("Plains/grain max", 6,
                      tile2.getMaximumPotential(grain, null));
         tile2.addResource(new Resource(game, tile2, grainResource));
         assertEquals("Plains+Resource/grain", 7,
-                     tile2.potential(grain, null));
+                     tile2.getPotentialProduction(grain, null));
         assertEquals("Plains+Resource/grain max", 8,
                      tile2.getMaximumPotential(grain, null));
         assertEquals("Plains+Resource/grain/expertFarmer", 9,
-                     tile2.potential(grain, expertFarmerType));
+                     tile2.getPotentialProduction(grain, expertFarmerType));
         assertEquals("Plains+Resource/grain/expertFarmer max", 10,
                      tile2.getMaximumPotential(grain, expertFarmerType));
 
         Tile tile3 = new Tile(game, plainsForest, 1, 1);
         assertEquals("Forest/grain", 3,
-                     tile3.potential(grain, null));
+                     tile3.getPotentialProduction(grain, null));
         assertEquals("Forest/grain max", 6,
                      tile3.getMaximumPotential(grain, null));
     }
@@ -408,7 +410,6 @@ public class TileTest extends FreeColTestCase {
         Colony colony = getStandardColony();
 
         List<ColonyTile> colonyTiles = colony.getColonyTiles();
-
         ColonyTile colonyTile1 = null;
         ColonyTile colonyTile2 = null;
         for (ColonyTile ct : colonyTiles) {
@@ -516,7 +517,7 @@ public class TileTest extends FreeColTestCase {
 
         // 3 sugar is more expensive than 4 food
         assertNotNull(sugarPlanter);
-        assertTrue(tile1.potential(sugar, sugarPlanter) > tile1.potential(sugar, null));
+        assertTrue(tile1.getPotentialProduction(sugar, sugarPlanter) > tile1.getPotentialProduction(sugar, null));
         sortedPotential = tile1.getSortedPotential(sugarPlanter, dutch);
         assertEquals(sugar, sortedPotential.get(0).getType());
         assertEquals(6, sortedPotential.get(0).getAmount());
@@ -595,7 +596,7 @@ public class TileTest extends FreeColTestCase {
         assertEquals(colonistType, unit.getType());
         assertTrue(silver.isFarmed());
         assertEquals(0, tundra.getPotentialProduction(silver, colonistType));
-        assertEquals(1, tile.potential(silver, colonistType));
+        assertEquals(1, tile.getPotentialProduction(silver, colonistType));
 
         assertFalse(tile.getProductionModifiers(silver, colonistType)
             .isEmpty());

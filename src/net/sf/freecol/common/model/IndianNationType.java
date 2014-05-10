@@ -189,7 +189,7 @@ public class IndianNationType extends NationType {
         for (Tile t: tile.getSurroundingTiles(1)) {
             for (GoodsType goodsType : scale.keySet()) {
                 scale.put(goodsType, scale.get(goodsType).intValue()
-                          + t.potential(goodsType, null));
+                          + t.getPotentialProduction(goodsType, null));
             }
         }
 

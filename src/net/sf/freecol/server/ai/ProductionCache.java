@@ -131,7 +131,7 @@ public class ProductionCache {
         if (goodsType.isFarmed()) {
             for (ColonyTile colonyTile : colonyTiles) {
                 Tile tile = colonyTile.getWorkTile();
-                if (tile.potential(goodsType, null) > 0
+                if (tile.getPotentialProduction(goodsType, null) > 0
                     || (tile.hasResource()
                         && !tile.getTileItemContainer().getResource().getType()
                         .getModifierSet(goodsType.getId()).isEmpty())) {

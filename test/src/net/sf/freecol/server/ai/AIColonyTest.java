@@ -224,9 +224,9 @@ public class AIColonyTest extends FreeColTestCase {
         for (ColonyTile t : colony.getColonyTiles()) {
             Tile tile = t.getTile();
             assertEquals("The colony can not have tiles that produce lumber",
-                0, tile.potential(lumberType, colonistType));
+                0, tile.getPotentialProduction(lumberType, colonistType));
             assertEquals("The colony can not have tiles that produce ore",
-                0, tile.potential(oreType, colonistType));
+                0, tile.getPotentialProduction(oreType, colonistType));
         }
         assertEquals("Colony has no lumber", 0,
             colony.getGoodsCount(lumberType));

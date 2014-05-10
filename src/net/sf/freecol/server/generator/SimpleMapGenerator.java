@@ -748,7 +748,7 @@ public class SimpleMapGenerator implements MapGenerator {
 
         for (Tile t: tile.getSurroundingTiles(1)) {
             for (GoodsType goodsType : scale.keySet()) {
-                scale.put(goodsType, scale.get(goodsType).intValue() + t.potential(goodsType, null));
+                scale.put(goodsType, scale.get(goodsType).intValue() + t.getPotentialProduction(goodsType, null));
             }
         }
 

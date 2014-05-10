@@ -1621,7 +1621,7 @@ public final class InGameController implements NetworkConstants {
             for (ProductionType productionType : tile.getType()
                      .getProductionTypes(false)) {
                 int potential = (productionType.getOutput(goodsType) == null)
-                    ? 0 : tile.potential(goodsType, null);
+                    ? 0 : tile.getPotentialProduction(goodsType, null);
                 Integer oldPotential = goodsMap.get(goodsType);
                 if (oldPotential == null || potential > oldPotential) {
                     goodsMap.put(goodsType, potential);
@@ -1635,7 +1635,7 @@ public final class InGameController implements NetworkConstants {
             }
             for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
                 entry.setValue(entry.getValue().intValue()
-                    + newTile.potential(entry.getKey(), null));
+                    + newTile.getPotentialProduction(entry.getKey(), null));
             }
             Player tileOwner = newTile.getOwner();
             if (unit.getOwner() == tileOwner) {

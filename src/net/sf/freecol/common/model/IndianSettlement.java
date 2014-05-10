@@ -911,7 +911,7 @@ public class IndianSettlement extends Settlement {
         for (Tile workTile: getTile().getSurroundingTiles(getRadius())) {
             if (workTile.getOwningSettlement() == null || workTile.getOwningSettlement() == this) {
                 // TODO: make unitType brave
-                amount += workTile.potential(goodsType, null);
+                amount += workTile.getPotentialProduction(goodsType, null);
             }
         }
 
@@ -1178,7 +1178,7 @@ public class IndianSettlement extends Settlement {
         for (Tile workTile : getOwnedTiles()) {
             if (workTile != getTile() && !workTile.isOccupied()) {
                 // TODO: make unitType brave
-                potential += workTile.potential(type, null);
+                potential += workTile.getPotentialProduction(type, null);
                 tiles++;
             }
         }
@@ -1198,7 +1198,7 @@ public class IndianSettlement extends Settlement {
         }
 
         // But always add full potential of the center tile.
-        potential += getTile().potential(type, null);
+        potential += getTile().getPotentialProduction(type, null);
         return potential;
     }
 

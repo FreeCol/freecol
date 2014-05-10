@@ -1278,11 +1278,12 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *
      * @param goodsType The <code>GoodsType</code> to check the
      *     potential for.
-     * @param unitType A <code>UnitType</code> to do the work.
+     * @param unitType An optional <code>UnitType</code> to do the work.
      * @return The normal potential of this <code>Tile</code> to
      *     produce the given <code>GoodsType</code>.
      */
-    public int potential(GoodsType goodsType, UnitType unitType) {
+    public int getPotentialProduction(GoodsType goodsType,
+                                      UnitType unitType) {
         return getTileTypePotential(getType(), goodsType, unitType,
                                     getTileItemContainer());
     }
@@ -1430,7 +1431,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             // tile might have a resource that produces goods not
             // produced by the tile type.
             for (GoodsType goodsType : spec.getFarmedGoodsTypeList()) {
-                int potential = potential(goodsType, unitType);
+                int potential = getPotentialProduction(goodsType, unitType);
                 if (potential > 0) {
                     goodsTypeList.add(new AbstractGoods(goodsType, potential));
                 }

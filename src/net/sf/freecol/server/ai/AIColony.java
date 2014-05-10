@@ -599,10 +599,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 // weight.
                 float s = 0.0f;
                 for (GoodsType g : needed) {
-                    s += t.potential(g, unitType);
+                    s += t.getPotentialProduction(g, unitType);
                 }
                 for (GoodsType g : spec.getFoodGoodsTypeList()) {
-                    s += 0.1 * t.potential(g, unitType);
+                    s += 0.1 * t.getPotentialProduction(g, unitType);
                 }
                 if (s > score) {
                     score = s;
@@ -1213,7 +1213,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
         if (goodsType.isFarmed()) {
             for (ColonyTile colonyTile : colony.getColonyTiles()) {
-                if (colonyTile.getWorkTile().potential(goodsType, null) > 0) {
+                if (colonyTile.getWorkTile().getPotentialProduction(goodsType, null) > 0) {
                     return true;
                 }
             }
