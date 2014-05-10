@@ -288,9 +288,9 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
     }
 
     /**
-     * Gets the maximum productivity of a unit working in this work
-     * location, considering *only* the contribution of the unit,
-     * exclusive of that of the work location.
+     * Gets the productivity of a unit working in this work location,
+     * considering *only* the contribution of the unit, exclusive of
+     * that of the work location.
      *
      * Used below, only public for the test suite.
      *

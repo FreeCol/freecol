@@ -1274,18 +1274,75 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     //
 
     /**
-     * The potential of this tile to produce a certain type of goods.
+     * Get the base production exclusive of any bonuses.
+     *
+     * @param goodsType The <code>GoodsType</code> to produce.
+     * @param unitType An optional <code>UnitType</code> to use.
+     * @return The base production due to tile type and resources.
+     */
+    public int getBaseProduction(GoodsType goodsType, UnitType unitType) {
+        return (type == null || goodsType == null
+            || !goodsType.isFarmed()) ? 0
+            : type.getPotentialProduction(goodsType, unitType);
+    }
+
+    /**
+     * Can this tile produce a given goods type?  To produce goods
+     * either the tile type must have a suitable production type, or
+     * the tile item container contains suitable resource.
+     *
+     * @param goodsType The <code>GoodsType</code> to produce.
+     * @param unitType An optional <code>UnitType</code> to use.
+     * @return True if the tile can produce the goods.
+     */
+    public boolean produces(GoodsType goodsType, UnitType unitType) {
+        return type.produces(goodsType, unitType)
+            || (tileItemContainer != null
+                && tileItemContainer.produces(goodsType, unitType));
+    }
+
+    /**
+     * Get the potential production of this tile for a given goods type
+     * and optional worker type.
      *
      * @param goodsType The <code>GoodsType</code> to check the
      *     potential for.
      * @param unitType An optional <code>UnitType</code> to do the work.
-     * @return The normal potential of this <code>Tile</code> to
+     * @return The potential production of this <code>Tile</code> to
      *     produce the given <code>GoodsType</code>.
      */
     public int getPotentialProduction(GoodsType goodsType,
                                       UnitType unitType) {
-        return getTileTypePotential(getType(), goodsType, unitType,
-                                    getTileItemContainer());
+        if (!produces(goodsType, unitType)) return 0;
+
+        int amount = type.getPotentialProduction(goodsType, unitType);
+        amount = (int)FeatureContainer.applyModifiers(amount,
+            getGame().getTurn(),
+            getProductionModifiers(goodsType, unitType));
+        return (amount < 0) ? 0 : amount;
+        //if (tileItemContainer != null) {
+        //    amount = tileItemContainer.getTotalBonusPotential(goodsType,
+        //        unitType, amount, false);
+        //}
+    }
+
+    /**
+     * Get the production modifiers for this tile.
+     *
+     * @param goodsType The <code>GoodsType</code> to produce.
+     * @param unitType An optional <code>UnitType</code> to do the work.
+     * @return A list of production <code>Modifier</code>s.
+     */
+    public List<Modifier> getProductionModifiers(GoodsType goodsType,
+                                                 UnitType unitType) {
+        if (!produces(goodsType, unitType)) return Collections.emptyList();
+
+        List<Modifier> result = new ArrayList<Modifier>();
+        if (tileItemContainer != null) {
+            result.addAll(tileItemContainer
+                .getProductionModifiers(goodsType, unitType));
+        }
+        return result;
     }
 
     /**
@@ -1336,48 +1393,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             maxProduction = Math.max((int)potential, maxProduction);
         }
         return maxProduction;
-    }
-
-    /**
-     * Get the production modifiers for this tile.
-     *
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @param unitType A <code>UnitType</code> to do the work.
-     * @return A list of production <code>Modifier</code>s.
-     */
-    public List<Modifier> getProductionModifiers(GoodsType goodsType,
-                                                 UnitType unitType) {
-        List<Modifier> result = new ArrayList<Modifier>();
-        if (tileItemContainer != null) {
-            result.addAll(tileItemContainer.getProductionModifiers(goodsType,
-                                                                   unitType));
-        }
-        return result;
-    }
-
-    /**
-     * Calculates the potential of a certain <code>GoodsType</code>.
-     *
-     * @param tileType A type of tile to produce on.
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @param unitType A <code>UnitType</code> to do the work.
-     * @param tileItemContainer A <code>TileItemContainer</code> with any
-     *     <code>TileItem<code> to give bonuses.
-     * @return The amount of goods.
-     */
-    public static int getTileTypePotential(TileType tileType,
-                                           GoodsType goodsType,
-                                           UnitType unitType,
-                                           TileItemContainer tileItemContainer){
-        if (tileType == null || goodsType == null
-            || !goodsType.isFarmed()) return 0;
-        // Get tile potential + bonus if any
-        int potential = tileType.getPotentialProduction(goodsType, unitType);
-        if (tileItemContainer != null) {
-            potential = tileItemContainer.getTotalBonusPotential(goodsType,
-                unitType, potential, false);
-        }
-        return potential;
     }
 
     /**

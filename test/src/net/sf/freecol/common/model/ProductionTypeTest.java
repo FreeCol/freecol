@@ -32,15 +32,23 @@ public class ProductionTypeTest extends FreeColTestCase {
 
     public static final GoodsType cotton
         = spec().getGoodsType("model.goods.cotton");
+    public static final GoodsType furs
+        = spec().getGoodsType("model.goods.furs");
     public static final GoodsType grain
         = spec().getGoodsType("model.goods.grain");
+    public static final GoodsType lumber
+        = spec().getGoodsType("model.goods.lumber");
     public static final GoodsType ore
         = spec().getGoodsType("model.goods.ore");
+    public static final GoodsType tobacco
+        = spec().getGoodsType("model.goods.tobacco");
     public static final GoodsType silver
         = spec().getGoodsType("model.goods.silver");
 
     public static final TileType arctic
         = spec().getTileType("model.tile.arctic");
+    public static final TileType coniferForest
+        = spec().getTileType("model.tile.coniferForest");
     public static final TileType plains
         = spec().getTileType("model.tile.plains");
     public static final TileType tundra
@@ -101,6 +109,22 @@ public class ProductionTypeTest extends FreeColTestCase {
         testProduction(production, plains.getProductionTypes(false));
 
         assertEquals(5, plains.getPotentialProduction(grain, null));
+    }
+
+    public void testConiferForest() {
+        Map<GoodsType, Integer> production = new HashMap<GoodsType, Integer>();
+
+        production.put(grain, 2);
+        production.put(furs, 2);
+        testProduction(production,
+                       coniferForest.getProductionTypes(true));
+
+        production.put(grain, 2);
+        production.put(tobacco, 1);
+        production.put(furs, 2);
+        production.put(lumber, 6);
+        testProduction(production,
+                       coniferForest.getProductionTypes(false));
     }
 
     public void testResource() {

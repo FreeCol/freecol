@@ -450,21 +450,37 @@ public class TileTest extends FreeColTestCase {
         assertTrue(tile2.hasRoad());
         assertFalse(tile2.hasRiver());
 
+        // Savannah can produce sugar, but not lumber.  Therefore the
+        // river provides a bonus for sugar but not lumber.
+        assertTrue(tile1.produces(sugar, null));
         assertTrue(hasBonusFrom(tile1.getProductionModifiers(sugar, null),
                                 river1.getType()));
-        assertTrue(hasBonusFrom(tile1.getProductionModifiers(lumber, null),
-                                river1.getType()));
+        assertFalse(tile1.produces(lumber, null));
+        assertFalse(hasBonusFrom(tile1.getProductionModifiers(lumber, null),
+                                 river1.getType()));
+        // Hills can not produce sugar, but can produce ore.
+        assertFalse(tile2.produces(sugar, null));
         assertFalse(hasBonusFrom(tile2.getProductionModifiers(sugar, null),
                                  road2.getType()));
+        assertTrue(tile2.produces(ore, null));
         assertTrue(hasBonusFrom(tile2.getProductionModifiers(ore, null),
                                 road2.getType()));
 
+        // Add a sugar resource, there should now be two sugar bonuses
+        // on tile1.
         tile1.addResource(new Resource(game, tile1, sugarResource));
-
         assertTrue(hasBonusFrom(tile1.getProductionModifiers(sugar, null),
                                 river1.getType()));
         assertTrue(hasBonusFrom(tile1.getProductionModifiers(sugar, null),
                                 sugarResource));
+
+        // Add a minerals resource, and tile2 should now produce sugar.
+        tile2.addResource(new Resource(game, tile2, mineralsResource));
+        assertTrue(tile2.produces(silver, null));
+        assertTrue(hasBonusFrom(tile2.getProductionModifiers(silver, null),
+                                road2.getType()));
+        assertTrue(hasBonusFrom(tile2.getProductionModifiers(silver, null),
+                                mineralsResource));
     }
 
     private boolean hasBonusFrom(List<Modifier> modifierSet,
@@ -546,34 +562,76 @@ public class TileTest extends FreeColTestCase {
     }
     */
 
-    public void testArctic() {
-        assertTrue(arctic.canSettle());
+    public void testConiferForest() {
+        Map map = getTestMap(coniferForest);
+        Game game = getGame();
+        game.setMap(map);
 
-        OptionGroup difficultyLevel = spec().getDifficultyLevel("model.difficulty.veryEasy");
-        String tileProduction = difficultyLevel.getString(GameOptions.TILE_PRODUCTION);
-        List<ProductionType> productionTypes = arctic.getProductionTypes(true, tileProduction);
-        assertEquals(1, productionTypes.size());
-        ProductionType arcticProduction = productionTypes.get(0);
-        List<AbstractGoods> outputs = arcticProduction.getOutputs();
-        assertEquals(1, outputs.size());
-        assertEquals(grain, outputs.get(0).getType());
-        assertEquals(2, outputs.get(0).getAmount());
+        Colony colony = getStandardColony(1);
+        final Tile tile = colony.getTile();
+        tile.addRiver(1, "1111"); // allow rivers to join
+        final Iterable<Tile> tiles = tile.getSurroundingTiles(1);
+        Tile firstTile = null;
+        int i = 0;
+        for (Tile t : tiles) {
+            if (firstTile == null) firstTile = t;
+            if ((i & 0x1) == 0x1) t.addRiver(1, "1111");// must be first!
+            if ((i & 0x2) == 0x2) {
+                TileImprovement road = t.addRoad();
+                road.setTurnsToComplete(0);
+            }
+            if ((i & 0x4) == 0x4) t.addResource(new Resource(game, t, lumberResource, 99));
+            i++;
+        }
+        ColonyTile firstColonyTile = colony.getColonyTile(firstTile);
 
-        difficultyLevel = spec().getDifficultyLevel("model.difficulty.easy");
-        tileProduction = difficultyLevel.getString(GameOptions.TILE_PRODUCTION);
-        productionTypes = arctic.getProductionTypes(true, tileProduction);
-        assertEquals(1, productionTypes.size());
-        arcticProduction = productionTypes.get(0);
-        outputs = arcticProduction.getOutputs();
-        assertEquals(1, outputs.size());
-        assertEquals(grain, outputs.get(0).getType());
-        assertEquals(1, outputs.get(0).getAmount());
+        Unit unit = colony.getUnitList().get(0);
+        assertEquals(colonistType, unit.getType());
+        unit.setLocation(firstColonyTile);
+        unit.changeWorkType(lumber);
+        assertEquals("Added unit producing lumber", lumber,
+            unit.getWorkType());
 
-        for (String level : new String[] { "medium", "hard", "veryHard" }) {
-            difficultyLevel = spec().getDifficultyLevel("model.difficulty." + level);
-            tileProduction = difficultyLevel.getString(GameOptions.TILE_PRODUCTION);
-            productionTypes = arctic.getProductionTypes(true, tileProduction);
-            assertTrue(productionTypes.isEmpty());
+        // production = (BASE + RESOURCE) x EXPERT + RIVER + ROAD
+        //   (+ untested)
+        final int base = 6;
+        final int riverBonus = 2;
+        final int roadBonus = 2;
+        final int resourceBonus = 4;
+        final int expertBonus = 2;
+        assertEquals("Base lumber production", base,
+            firstColonyTile.getBaseProduction(lumber));
+
+        // Check all tiles with colonist unit
+        i = 0;
+        for (Tile t : tiles) {
+            ColonyTile ct = colony.getColonyTile(t);
+            unit.setLocation(ct);
+            int result = base;
+            if (t.hasRiver()) result += riverBonus;
+            if (t.hasRoad()) result += roadBonus;
+            if (t.hasResource()) result += resourceBonus;
+            assertEquals("FreeColonist lumber production at tile " + i, result,
+                ct.getTotalProductionOf(lumber));
+            i++;
+        }
+
+        // Try again with expert unit
+        assertEquals("Expert unit", expertLumberJack,
+            firstColonyTile.getExpertUnitType());
+        unit.setType(expertLumberJack);
+        colony.invalidateCache();
+        i = 0;
+        for (Tile t : tiles) {
+            ColonyTile ct = colony.getColonyTile(t);
+            unit.setLocation(ct);
+            int result = base * expertBonus;
+            if (t.hasRiver()) result += riverBonus;
+            if (t.hasRoad()) result += roadBonus;
+            if (t.hasResource()) result += resourceBonus * expertBonus;
+            assertEquals("Expert lumber production at tile " + i, result,
+                ct.getTotalProductionOf(lumber));
+            i++;
         }
     }
 
