@@ -216,7 +216,7 @@ public class Resource extends TileItem {
     /**
      * {@inheritDoc}
      */
-    public boolean produces(GoodsType goodsType, UnitType unitType) {
+    public boolean canProduce(GoodsType goodsType, UnitType unitType) {
         if (goodsType == null) return false;
         // The presence of a resource can indeed give a tile the
         // ability to produce a goods type.

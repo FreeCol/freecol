@@ -336,6 +336,54 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
         return 0;
     }
 
+    /**
+     * Gets the best production type for a unit to perform at this
+     * work location.
+     *
+     * @param unit The <code>Unit</code> to check.
+     * @return The best production type.
+     */
+    public ProductionType getBestProductionType(Unit unit) {
+        ProductionType best = null;
+        int amount = 0;
+        for (ProductionType productionType : getProductionTypes()) {
+            for (AbstractGoods output : productionType.getOutputs()) {
+                int newAmount = getPotentialProduction(output.getType(),
+                                                       unit.getType());
+                if (newAmount > amount) {
+                    amount = newAmount;
+                    best = productionType;
+                }
+            }
+        }
+        return best;
+    }
+
+    /**
+     * Gets the best production type for the production of the
+     * given goods type.  This method is likely to be removed in the
+     * future.
+     *
+     * @param goodsType goods type
+     * @return production type
+     */
+    public ProductionType getBestProductionType(GoodsType goodsType) {
+        ProductionType best = null;
+        int amount = 0;
+        for (ProductionType productionType : getProductionTypes()) {
+            for (AbstractGoods output : productionType.getOutputs()) {
+                if (output.getType() == goodsType) {
+                    int newAmount = output.getAmount();
+                    if (newAmount > amount) {
+                        amount = newAmount;
+                        best = productionType;
+                    }
+                }
+            }
+        }
+        return best;
+    }
+
 
     // Interface Location
     // Inherits:
@@ -462,6 +510,18 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
     public abstract boolean canAutoProduce();
 
     /**
+     * Can this work location produce a given goods type with
+     * an optional unit.
+     *
+     * @param goodsType The <code>GoodsType</code> to produce.
+     * @param unitType An optional <code>UnitType</code>, if null the
+     *     unattended production is considered.
+     * @return True if this location can produce the goods.
+     */
+    public abstract boolean canProduce(GoodsType goodsType,
+                                       UnitType unitType);
+
+    /**
      * Gets the potential production of a given goods type from
      * optionally using a unit of a given type in this work location.
      * If no unit type is specified, the unattended production is
@@ -493,54 +553,6 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      * @return available production types
      */
     public abstract List<ProductionType> getProductionTypes();
-
-    /**
-     * Gets the best production type for a unit to perform at this
-     * work location.
-     *
-     * @param unit The <code>Unit</code> to check.
-     * @return The best production type.
-     */
-    public ProductionType getBestProductionType(Unit unit) {
-        ProductionType best = null;
-        int amount = 0;
-        for (ProductionType productionType : getProductionTypes()) {
-            for (AbstractGoods output : productionType.getOutputs()) {
-                int newAmount = getPotentialProduction(output.getType(),
-                                                       unit.getType());
-                if (newAmount > amount) {
-                    amount = newAmount;
-                    best = productionType;
-                }
-            }
-        }
-        return best;
-    }
-
-    /**
-     * Gets the best production type for the production of the
-     * given goods type.  This method is likely to be removed in the
-     * future.
-     *
-     * @param goodsType goods type
-     * @return production type
-     */
-    public ProductionType getBestProductionType(GoodsType goodsType) {
-        ProductionType best = null;
-        int amount = 0;
-        for (ProductionType productionType : getProductionTypes()) {
-            for (AbstractGoods output : productionType.getOutputs()) {
-                if (output.getType() == goodsType) {
-                    int newAmount = output.getAmount();
-                    if (newAmount > amount) {
-                        amount = newAmount;
-                        best = productionType;
-                    }
-                }
-            }
-        }
-        return best;
-    }
 
     /**
      * Gets a template describing whether this work location can/needs-to

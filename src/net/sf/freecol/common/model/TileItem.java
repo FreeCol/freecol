@@ -115,8 +115,8 @@ public abstract class TileItem extends FreeColGameObject implements Locatable {
      * @param unitType The optional <code>unitType</code> to produce with.
      * @return True if this tile item produces the goods.
      */
-    public abstract boolean produces(GoodsType goodsType,
-                                     UnitType unitType);
+    public abstract boolean canProduce(GoodsType goodsType,
+                                       UnitType unitType);
 
     /**
      * Gets the production modifiers for the given type of goods and unit.

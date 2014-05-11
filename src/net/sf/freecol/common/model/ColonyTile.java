@@ -305,14 +305,21 @@ public class ColonyTile extends WorkLocation {
     /**
      * {@inheritDoc}
      */
+    public boolean canProduce(GoodsType goodsType, UnitType unitType) {
+        final Tile workTile = getWorkTile();
+        return workTile != null && workTile.canProduce(goodsType, unitType);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public int getPotentialProduction(GoodsType goodsType,
                                       UnitType unitType) {
-        final Tile workTile = getWorkTile();
-        if (!workTile.produces(goodsType, unitType)) return 0;
+        if (!canProduce(goodsType, unitType)) return 0;
 
         int amount = 0;
         if (unitType == null || canBeWorked()) {
-            amount = workTile.getBaseProduction(goodsType, unitType);
+            amount = getWorkTile().getBaseProduction(goodsType, unitType);
             amount = (int)FeatureContainer.applyModifiers(amount,
                 getGame().getTurn(),
                 getProductionModifiers(goodsType, unitType));
@@ -326,11 +333,11 @@ public class ColonyTile extends WorkLocation {
      */
     public List<Modifier> getProductionModifiers(GoodsType goodsType,
                                                  UnitType unitType) {
-        final Tile workTile = getWorkTile();
-        if (!workTile.produces(goodsType, unitType)) {
+        if (!canProduce(goodsType, unitType)) {
             return Collections.emptyList();
         }
 
+        final Tile workTile = getWorkTile();
         final TileType type = workTile.getType();
         final String id = goodsType.getId();
         final Colony colony = getColony();

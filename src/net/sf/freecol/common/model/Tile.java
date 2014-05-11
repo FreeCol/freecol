@@ -1295,10 +1295,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @param unitType An optional <code>UnitType</code> to use.
      * @return True if the tile can produce the goods.
      */
-    public boolean produces(GoodsType goodsType, UnitType unitType) {
-        return type.produces(goodsType, unitType)
+    public boolean canProduce(GoodsType goodsType, UnitType unitType) {
+        return type.canProduce(goodsType, unitType)
             || (tileItemContainer != null
-                && tileItemContainer.produces(goodsType, unitType));
+                && tileItemContainer.canProduce(goodsType, unitType));
     }
 
     /**
@@ -1313,17 +1313,13 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public int getPotentialProduction(GoodsType goodsType,
                                       UnitType unitType) {
-        if (!produces(goodsType, unitType)) return 0;
+        if (!canProduce(goodsType, unitType)) return 0;
 
         int amount = type.getPotentialProduction(goodsType, unitType);
         amount = (int)FeatureContainer.applyModifiers(amount,
             getGame().getTurn(),
             getProductionModifiers(goodsType, unitType));
         return (amount < 0) ? 0 : amount;
-        //if (tileItemContainer != null) {
-        //    amount = tileItemContainer.getTotalBonusPotential(goodsType,
-        //        unitType, amount, false);
-        //}
     }
 
     /**
@@ -1335,7 +1331,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public List<Modifier> getProductionModifiers(GoodsType goodsType,
                                                  UnitType unitType) {
-        if (!produces(goodsType, unitType)) return Collections.emptyList();
+        if (!canProduce(goodsType, unitType)) {
+            return Collections.emptyList();
+        }
 
         List<Modifier> result = new ArrayList<Modifier>();
         if (tileItemContainer != null) {

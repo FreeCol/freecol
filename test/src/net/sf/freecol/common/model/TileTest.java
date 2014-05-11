@@ -452,17 +452,17 @@ public class TileTest extends FreeColTestCase {
 
         // Savannah can produce sugar, but not lumber.  Therefore the
         // river provides a bonus for sugar but not lumber.
-        assertTrue(tile1.produces(sugar, null));
+        assertTrue(tile1.canProduce(sugar, null));
         assertTrue(hasBonusFrom(tile1.getProductionModifiers(sugar, null),
                                 river1.getType()));
-        assertFalse(tile1.produces(lumber, null));
+        assertFalse(tile1.canProduce(lumber, null));
         assertFalse(hasBonusFrom(tile1.getProductionModifiers(lumber, null),
                                  river1.getType()));
         // Hills can not produce sugar, but can produce ore.
-        assertFalse(tile2.produces(sugar, null));
+        assertFalse(tile2.canProduce(sugar, null));
         assertFalse(hasBonusFrom(tile2.getProductionModifiers(sugar, null),
                                  road2.getType()));
-        assertTrue(tile2.produces(ore, null));
+        assertTrue(tile2.canProduce(ore, null));
         assertTrue(hasBonusFrom(tile2.getProductionModifiers(ore, null),
                                 road2.getType()));
 
@@ -476,7 +476,7 @@ public class TileTest extends FreeColTestCase {
 
         // Add a minerals resource, and tile2 should now produce sugar.
         tile2.addResource(new Resource(game, tile2, mineralsResource));
-        assertTrue(tile2.produces(silver, null));
+        assertTrue(tile2.canProduce(silver, null));
         assertTrue(hasBonusFrom(tile2.getProductionModifiers(silver, null),
                                 road2.getType()));
         assertTrue(hasBonusFrom(tile2.getProductionModifiers(silver, null),

@@ -267,6 +267,38 @@ public final class BuildingType extends BuildableType
         return containsModifierKey(Modifier.DEFENCE);
     }
 
+    /**
+     * Can a tile of this type produce a given goods type?
+     *
+     * @param goodsType The <code>GoodsType</code> to produce.
+     * @param unitType An optional <code>UnitType</code> that is to do
+     *     the work, if null the unattended production is considered.
+     * @return True if this tile type produces the goods.
+     */
+    public boolean canProduce(GoodsType goodsType, UnitType unitType) {
+        return goodsType != null
+            && ProductionType.canProduce(goodsType,
+                getProductionTypes(unitType == null));
+    }
+
+    /**
+     * Get the amount of goods of given goods type the given unit type
+     * could produce on a tile of this tile type.
+     *
+     * @param goodsType The <code>GoodsType</code> to produce.
+     * @param unitType An optional <code>UnitType</code> that is to do
+     *     the work, if null the unattended production is considered.
+     * @return The amount of goods produced.
+     */
+    public int getPotentialProduction(GoodsType goodsType,
+                                      UnitType unitType) {
+        if (goodsType == null) return 0;
+        AbstractGoods best = ProductionType.getBestOutputFor(goodsType,
+            getProductionTypes(unitType == null));
+        return (best == null) ? 0
+            : (int)applyModifier(best.getAmount(), goodsType.getId(), unitType);
+    }
+
 
     // Override FreeColGameObjectType
 

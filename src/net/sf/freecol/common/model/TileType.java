@@ -333,15 +333,17 @@ public final class TileType extends FreeColGameObjectType {
     }
 
     /**
-     * Does a tile of this type produce a given goods type.
+     * Can a tile of this type produce a given goods type?
      *
      * @param goodsType The <code>GoodsType</code> to produce.
      * @param unitType An optional <code>UnitType</code> that is to do
      *     the work, if null the unattended production is considered.
      * @return True if this tile type produces the goods.
      */
-    public boolean produces(GoodsType goodsType, UnitType unitType) {
-        return getPotentialProduction(goodsType, unitType) > 0;
+    public boolean canProduce(GoodsType goodsType, UnitType unitType) {
+        return goodsType != null
+            && ProductionType.canProduce(goodsType,
+                getProductionTypes(unitType == null));
     }
 
     /**
@@ -356,17 +358,10 @@ public final class TileType extends FreeColGameObjectType {
     public int getPotentialProduction(GoodsType goodsType,
                                       UnitType unitType) {
         if (goodsType == null) return 0;
-        int amount = 0;
-        for (ProductionType productionType
-                 : getProductionTypes(unitType == null)) {
-            for (AbstractGoods output : productionType.getOutputs()) {
-                if (output.getType() == goodsType) {
-                    int newAmount = output.getAmount();
-                    if (newAmount > amount) amount = newAmount;
-                }
-            }
-        }
-        return (int)applyModifier(amount, goodsType.getId(), unitType);
+        AbstractGoods best = ProductionType.getBestOutputFor(goodsType,
+            getProductionTypes(unitType == null));
+        return (best == null) ? 0
+            : (int)applyModifier(best.getAmount(), goodsType.getId(), unitType);
     }
 
     /**

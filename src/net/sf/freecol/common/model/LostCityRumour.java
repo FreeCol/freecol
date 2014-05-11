@@ -258,7 +258,7 @@ public class LostCityRumour extends TileItem {
     /**
      * {@inheritDoc}
      */
-    public boolean produces(GoodsType goodsType, UnitType unitType) {
+    public boolean canProduce(GoodsType goodsType, UnitType unitType) {
         return false;
     }
 

@@ -444,10 +444,19 @@ public class Building extends WorkLocation implements Named, Comparable<Building
         return hasAbility(Ability.AUTO_PRODUCTION);
     }
 
+     /**
+      * {@inheritDoc}
+      */
+    public boolean canProduce(GoodsType goodsType, UnitType unitType) {
+        final BuildingType type = getType();
+        return type != null && type.canProduce(goodsType, unitType);
+    }
+
     /**
      * {@inheritDoc}
      */
-    public int getPotentialProduction(GoodsType goodsType, UnitType unitType) {
+    public int getPotentialProduction(GoodsType goodsType,
+                                      UnitType unitType) {
         int amount = (unitType == null) ? 0 : getBaseProduction(goodsType);
         int production = (int)FeatureContainer.applyModifiers(amount,
             getGame().getTurn(),

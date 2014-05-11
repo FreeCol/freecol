@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.stream.XMLStreamConstants;
@@ -253,6 +254,49 @@ public class ProductionType extends FreeColObject {
         return level == null
             || productionLevel == null
             || level.equals(productionLevel);
+    }
+
+    /**
+     * Convenience function to check if there is an output for a given
+     * goods type in a collection of production types.
+     *
+     * @param goodsType The <code>GoodsType</code> to use.
+     * @param types A list of <code>ProductionType</code>s to consider.
+     * @return The most productive output that produces the goods type,
+     *     or null if none found.
+     */
+    public static boolean canProduce(GoodsType goodsType,
+                                     Collection<ProductionType> types) {
+        for (ProductionType productionType : types) {
+            for (AbstractGoods output : productionType.getOutputs()) {
+                if (output.getType() == goodsType) return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Convenience function to get the best output for a given goods
+     * type from a collection of production types.
+     *
+     * @param goodsType The <code>GoodsType</code> to use.
+     * @param types A list of <code>ProductionType</code>s to consider.
+     * @return The most productive output that produces the goods type,
+     *     or null if none found.
+     */
+    public static AbstractGoods getBestOutputFor(GoodsType goodsType,
+                                                 Collection<ProductionType> types) {
+        AbstractGoods best = null;
+        for (ProductionType productionType : types) {
+            for (AbstractGoods output : productionType.getOutputs()) {
+                if (output.getType() == goodsType
+                    && (best == null
+                        || output.getAmount() > best.getAmount())) {
+                    best = output;
+                }
+            }
+        }
+        return best;
     }
 
 

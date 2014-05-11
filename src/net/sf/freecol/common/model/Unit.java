@@ -3423,19 +3423,20 @@ public class Unit extends GoodsLocation
      *     to produce).
      */
     public GoodsType chooseWorkType(WorkLocation wl) {
+        final UnitType unitType = getType();
         GoodsType workType;
         
         // Try current
         if ((workType = getWorkType()) != null
-            && wl.produces(workType)) return workType;
+            && wl.canProduce(workType, unitType)) return workType;
 
         // Try experience
         if ((workType = getExperienceType()) != null
-            && wl.produces(workType)) return workType;
+            && wl.canProduce(workType, unitType)) return workType;
         
         // Try expertise
         if ((workType = getType().getExpertProduction()) != null
-            && wl.produces(workType)) return workType;
+            && wl.canProduce(workType, unitType)) return workType;
 
         // Maximize production
         ProductionType productionType = wl.getBestProductionType(this);
