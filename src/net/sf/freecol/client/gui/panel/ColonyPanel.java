@@ -99,15 +99,17 @@ import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitLocation.NoAddReason;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.WorkLocation;
 
 
 /**
  * This is a panel for the Colony display.  It shows the units that
  * are working in the colony, the buildings and much more.
  *
- * Beware that in debug mode, this might be a server-side version of the colony
- * which is why we need to call getColony().getSpecification() to get the
- * spec that corresponds to the good types in this colony.
+ * Beware that in debug mode, this might be a server-side version of
+ * the colony which is why we need to call
+ * getColony().getSpecification() to get the spec that corresponds to
+ * the good types in this colony.
  */
 public final class ColonyPanel extends PortPanel
     implements ActionListener, PropertyChangeListener {
@@ -706,6 +708,36 @@ public final class ColonyPanel extends PortPanel
             }
         }
         colonyUnitsMenu.show(getGUI().getCanvas(), 0, 0);
+    }
+
+    /**
+     * Try to assign a unit to work in a colony work location.
+     *
+     * @param unit The <code>Unit</code> that is to work.
+     * @param wl The <code>WorkLocation</code> to work in.
+     * @return True if the unit is now in the work location.
+     */
+    private boolean tryWork(Unit unit, WorkLocation wl) {
+        // Choose the work to be done.
+        GoodsType workType = unit.chooseWorkType(wl);
+
+        // Set the unit to work.  Note this might upgrade the unit,
+        // and possibly even change its work type as the server has
+        // the right to maintain consistency.
+        getController().work(unit, wl);
+
+        // Did it work?
+        if (unit.getLocation() != wl) return false;
+
+        // Now recheck, and see if we want to change to the expected
+        // work type.
+        if (workType == null) {
+            // might have been assigned by the server in .work()
+            workType = unit.getWorkType();
+        } else if (workType != unit.getWorkType()) {
+            getController().changeWorkType(unit, workType);
+        }
+        return true;
     }
 
 
@@ -1744,11 +1776,7 @@ public final class ColonyPanel extends PortPanel
                     return false;
                 }
 
-                getController().work(unit, building);
-                // check to see if the unit actually starts working at
-                // the building some units like a teacher may not have
-                // actually started working there
-                return unit.getWorkBuilding() == building;
+                return ColonyPanel.this.tryWork(unit, building);
             }
 
 
@@ -2089,55 +2117,11 @@ public final class ColonyPanel extends PortPanel
                     return false;
                 }
 
-                // Choose the work to be done.
-                // FTM, do not change the work type unless explicitly
-                // told to as this destroys experience (TODO: allow
-                // multiple experience accumulation?).
-                GoodsType workType;
-                if ((workType = unit.getWorkType()) != null
-                    && colonyTile.getProductionOf(unit, workType) <= 0) {
-                    workType = null;
-                }
-                if (workType == null // Try experience.
-                    && (workType = unit.getExperienceType()) != null
-                    && colonyTile.getProductionOf(unit, workType) <= 0) {
-                    workType = null;
-                }
-                if (workType == null // Try expertise?
-                    && (workType = unit.getType().getExpertProduction()) != null
-                    && colonyTile.getProductionOf(unit, workType) <= 0) {
-                    workType = null;
-                }
-                // Try best work type?
-                if (workType == null) {
-                    ProductionType productionType = colonyTile.getBestProductionType(unit);
-                    if (productionType != null) {
-                        GoodsType goodsType = productionType.getOutputs()
-                            .get(0).getType();
-                        if (colonyTile.getProductionOf(unit, goodsType) > 0) {
-                            workType = goodsType;
-                        }
-                    }
-                }
-                // No good, just leave it alone then.
-                if (workType == null) workType = unit.getWorkType();
-                // Set the unit to work.  Note this might upgrade the
-                // unit, and possibly even change its work type as the
-                // server has the right to maintain consistency.
-                getController().work(unit, colonyTile);
-                if (unit.getLocation() != colonyTile) return false;
-                // Now recheck, and see if we want to change to the
-                // expected work type.
-                if (workType == null) {
-                    workType = unit.getWorkType(); // might have been assigned
-                } else {
-                    if (workType != unit.getWorkType()) {
-                        getController().changeWorkType(unit, workType);
-                    }
-                }
+                if (!ColonyPanel.this.tryWork(unit, colonyTile)) return false;
 
-                if (getClientOptions()
-                    .getBoolean(ClientOptions.SHOW_NOT_BEST_TILE)) {
+                GoodsType workType = unit.getWorkType();
+                if (workType != null
+                    && getClientOptions().getBoolean(ClientOptions.SHOW_NOT_BEST_TILE)) {
                     ColonyTile best = colony.getVacantColonyTileFor(unit, false,
                                                                     workType);
                     if (best != null && colonyTile != best

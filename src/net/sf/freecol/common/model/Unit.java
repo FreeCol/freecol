@@ -1868,13 +1868,14 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Checks if this is an defensive unit. That is: a unit which can be used to
-     * defend a <code>Settlement</code>.
+     * Checks if this is an defensive unit. That is: a unit which can
+     * be used to defend a <code>Settlement</code>.
      *
-     * Note! As this method is used by the AI it really means that the unit can
-     * defend as is. To be specific an unarmed colonist is not defensive yet,
-     * even if Paul Revere and stockpiled muskets are available. That check is
-     * only performed on an actual attack.
+     * Note! As this method is used by the AI it really means that the
+     * unit can defend as is. To be specific an unarmed colonist is
+     * not defensive yet, even if Paul Revere and stockpiled muskets
+     * are available. That check is only performed on an actual
+     * attack.
      *
      * A settlement is lost when there are no more defensive units.
      *
@@ -1933,7 +1934,8 @@ public class Unit extends GoodsLocation
      * Finds the closest <code>Location</code> to this tile where
      * this ship can be repaired.
      *
-     * @return The closest <code>Location</code> where a ship can be repaired.
+     * @return The closest <code>Location</code> where a ship can be
+     *     repaired.
      */
     public Location getRepairLocation() {
         final Player player = getOwner();
@@ -3403,6 +3405,46 @@ public class Unit extends GoodsLocation
         result.setConsumption(getType().getConsumedGoods());
         result.setMaximumConsumption(getType().getConsumedGoods());
         return result;
+    }
+
+    /**
+     * Chooses a work type for this unit to perform when moving to a
+     * work location.
+     *
+     * Try to use the existing work type first, then the experience
+     * type (to avoid a change that would destroy accumulated
+     * experience (TODO: allow multiple experience accumulation?)).
+     * If that fails, try to use the unit in its expert role if any,
+     * and then attempt to maximize the goods produced.  If all fails,
+     * just return the existing work type.
+     * 
+     * @param wl The <code>WorkLocation</code> to work at.
+     * @return The chosen work type (that is, the <code>GoodsType</code>
+     *     to produce).
+     */
+    public GoodsType chooseWorkType(WorkLocation wl) {
+        GoodsType workType;
+        
+        // Try current
+        if ((workType = getWorkType()) != null
+            && wl.produces(workType)) return workType;
+
+        // Try experience
+        if ((workType = getExperienceType()) != null
+            && wl.produces(workType)) return workType;
+        
+        // Try expertise
+        if ((workType = getType().getExpertProduction()) != null
+            && wl.produces(workType)) return workType;
+
+        // Maximize production
+        ProductionType productionType = wl.getBestProductionType(this);
+        if (productionType != null)
+            return productionType.getBestOutputType();
+            
+        // No good, just leave work type alone, even if it
+        // means the unit will be unproductive.
+        return getWorkType();
     }
 
 

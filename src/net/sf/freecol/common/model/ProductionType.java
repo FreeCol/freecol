@@ -180,6 +180,17 @@ public class ProductionType extends FreeColObject {
     }
 
     /**
+     * Add a new output.
+     *
+     * @param type The <code>GoodsType</code> to add.
+     * @param amount The amount of goods.
+     */
+    private void addOutput(GoodsType type, int amount) {
+        if (outputs == null) outputs = new ArrayList<AbstractGoods>(1);
+        outputs.add(new AbstractGoods(type, amount));
+    }
+
+    /**
      * Get the goods of the given goods type in this production type.
      *
      * @param goodsType The <code>GoodsType</code> to check.
@@ -195,14 +206,22 @@ public class ProductionType extends FreeColObject {
     }
 
     /**
-     * Add a new output.
+     * Get the type of the most productive output.
      *
-     * @param type The <code>GoodsType</code> to add.
-     * @param amount The amount of goods.
+     * @return The <code>GoodsType</code> of the most productive output.
      */
-    private void addOutput(GoodsType type, int amount) {
-        if (outputs == null) outputs = new ArrayList<AbstractGoods>(1);
-        outputs.add(new AbstractGoods(type, amount));
+    public GoodsType getBestOutputType() {
+        AbstractGoods best = null;
+        if (outputs != null) {
+            int amount = 0;
+            for (AbstractGoods output : outputs) {
+                if (amount < output.getAmount()) {
+                    amount = output.getAmount();
+                    best = output;
+                }
+            }
+        }
+        return (best == null) ? null : best.getType();
     }
 
     /**
