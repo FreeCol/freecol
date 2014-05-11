@@ -291,7 +291,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
                     GoodsType expertise = unit.getType().getExpertProduction();
                     if ((unit.getSkillLevel() > 0) && (expertise == goodsType)) {
                         if (unit.getLocation() instanceof Building) {
-                            if (!((Building) unit.getLocation()).produces(goodsType)) {
+                            if (!((Building) unit.getLocation()).canProduce(goodsType, unit.getType())) {
                                 misusedExperts.add(colony);
                             }
                         } else if (expertise != unit.getWorkType()) {
