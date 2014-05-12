@@ -1119,57 +1119,70 @@ public class TransportMission extends Mission {
 
         // Ask the parent player to retarget transportables that are not
         // on the list.
+        StringBuffer sb = (complain) ? new StringBuffer(64) : null;
         EuropeanAIPlayer euaip = getEuropeanAIPlayer();
+        PathNode path = getTrivialPath();
+        Location end = (path == null) ? null : path.getLastNode().getLocation();
+        boolean dumpReady = path == null || carrier.isAtLocation(end);
         List<Transportable> drop = new ArrayList<Transportable>();
+        if (sb != null && !unitsPresent.isEmpty()) {
+            sb.append(" found unexpected units:");
+        }
         for (Unit u : unitsPresent) {
             AIUnit aiu = getAIMain().getAIUnit(u);
             if (aiu == null) throw new IllegalStateException("Bogus:" + u);
-            if (complain) {
-                logger.warning(tag + " found unexpected unit " + aiu
-                    + " aboard: " + toFullString());
+            if (sb != null) sb.append(" ").append(aiu);
+            Cargo cargo;
+            if (!euaip.retargetCargo(aiu, aiCarrier, tCopy())
+                || (cargo = makeCargo(aiu)) == null
+                || !queueCargo(cargo, false)) {
+                drop.add(aiu);
+                if (sb != null) sb.append("(drop)");
+            } else {
+                if (sb != null) sb.append("(retargeted)");
             }
-            if (euaip.retargetCargo(aiu, aiCarrier, tCopy())) {
-                Cargo cargo = makeCargo(aiu);
-                if (cargo == null) {
-                    drop.add(aiu);
-                } else if (!queueCargo(cargo, false)) {
-                    drop.add(aiu);
-                }
-            }
+        }
+        if (sb != null && !goodsPresent.isEmpty()) {
+            if (sb.length() > 0) sb.append(", ");
+            sb.append(" found unexpected goods:");
         }
         for (Goods g : goodsPresent) {
             AIGoods aig = new AIGoods(getAIMain(), carrier, g.getType(),
                 g.getAmount(), null);
-            if (complain) {
-                logger.warning(tag + " found unexpected goods " + aig
-                    + " aboard: " + toFullString());
-            }
+            if (sb != null) sb.append(" ").append(aig);
             if (!euaip.retargetCargo(aig, aiCarrier, tCopy())
                 || !queueTransportable(aig, false)) {
                 drop.add(aig);
+                if (sb != null) sb.append("(drop)");
+            } else {
+                if (sb != null) sb.append("(retargeted)");
             }
         }
 
         if (!drop.isEmpty()) {
-            PathNode path = getTrivialPath();
-            Location end = (path == null) ? null
-                : path.getLastNode().getLocation();
-            if (path == null || carrier.isAtLocation(end)) {
+            if (dumpReady) {
+                if (sb != null) {
+                    sb.append(", dropping at: ")
+                        .append(upLoc(carrier.getLocation()));
+                }
                 while (!drop.isEmpty()) {
                     Transportable t = drop.remove(0);
                     dumpTransportable(t, true);
                 }
             } else {
-                String log = tag + " will dump ";
-                for (Transportable t : drop) log += " " + t;
-                logger.warning(log + " at " + ((FreeColGameObject)end)
-                    + ": " + toFullString());
+                if (sb != null) {
+                    sb.append(", will drop at: ").append(upLoc(end));
+                }
                 while (!drop.isEmpty()) {
                     Transportable t = drop.remove(0);
                     Cargo cargo = new Cargo(t, carrier, end);
                     queueCargo(cargo, false);
                 }
             }
+        }
+        if (sb != null && sb.length() > 0) {
+            sb.insert(0, tag);
+            logger.warning(sb.toString());
         }
     }
 

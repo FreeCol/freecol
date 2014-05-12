@@ -728,14 +728,20 @@ public class EuropeanAIPlayer extends AIPlayer {
         final Unit carrier = aiCarrier.getUnit();
         final AIUnit aiu = (t instanceof AIUnit) ? (AIUnit)t : null;
         final AIGoods aig = (t instanceof AIGoods) ? (AIGoods)t : null;
+        Unit u = (t instanceof AIUnit) ? aiu.getUnit() : null;
 
         Location dst = t.getTransportDestination();
-        Unit u = (t instanceof AIUnit) ? aiu.getUnit() : null;
-        if (dst != null
-            && (((u == null) ? carrier.getTurnsToReach(dst)
+        if (dst == null) {
+            if (aiu != null && aiu.getMission() != null
+                && aiu.getMission().isValid()) {
+                return false; // Mission ok, just does not need carrier
+            }
+        } else {
+            if (((u == null) ? carrier.getTurnsToReach(dst)
                     : u.getTurnsToReach(u.getLocation(), dst, carrier, null))
-                != INFINITY)) {
-            return true; // Existing target is good
+                != INFINITY) {
+                return true; // Existing target is good
+            }
         }
 
         // First, try to take the transportable to one of the
@@ -832,7 +838,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             if (best != null) {
                 aig.setTransportDestination(best);
                 logger.finest("RetargetCargo reluctantly unloading: " + aig);
-                return true;
+                return false;
             }
         }
 
