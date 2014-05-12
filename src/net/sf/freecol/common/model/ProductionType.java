@@ -257,6 +257,18 @@ public class ProductionType extends FreeColObject {
     }
 
     /**
+     * Does this production apply exactly to a given difficulty level,
+     * that is without using wildcard matches on null.
+     *
+     * @param level The difficulty level key to check.
+     * @return True if this production applies.
+     */
+    public boolean appliesExactly(String level) {
+        return level != null && level.equals(productionLevel);
+    }
+
+
+    /**
      * Convenience function to check if there is an output for a given
      * goods type in a collection of production types.
      *

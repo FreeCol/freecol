@@ -310,14 +310,17 @@ public final class TileType extends FreeColGameObjectType {
      */
     public List<ProductionType> getProductionTypes(boolean unattended,
                                                    String level) {
-        List<ProductionType> result = new ArrayList<ProductionType>();
+        List<ProductionType> good = new ArrayList<ProductionType>(),
+            better = new ArrayList<ProductionType>();
         for (ProductionType productionType : productionTypes) {
-            if (productionType.isUnattended() == unattended
-                && productionType.appliesTo(level)) {
-                result.add(productionType);
+            if (productionType.isUnattended() != unattended) continue;
+            if (productionType.appliesExactly(level)) {
+                better.add(productionType);
+            } else if (productionType.appliesTo(level)) {
+                good.add(productionType);
             }
         }
-        return result;
+        return (!better.isEmpty()) ? better : good;
     }
 
 

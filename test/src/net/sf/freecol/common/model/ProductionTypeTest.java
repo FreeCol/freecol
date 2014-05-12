@@ -30,29 +30,77 @@ import net.sf.freecol.common.model.Map.Direction;
 
 public class ProductionTypeTest extends FreeColTestCase {
 
-    public static final GoodsType cotton
+    private static final GoodsType cotton
         = spec().getGoodsType("model.goods.cotton");
-    public static final GoodsType furs
+    private static final GoodsType fish
+        = spec().getGoodsType("model.goods.fish");
+    private static final GoodsType furs
         = spec().getGoodsType("model.goods.furs");
-    public static final GoodsType grain
+    private static final GoodsType grain
         = spec().getGoodsType("model.goods.grain");
-    public static final GoodsType lumber
+    private static final GoodsType lumber
         = spec().getGoodsType("model.goods.lumber");
-    public static final GoodsType ore
+    private static final GoodsType ore
         = spec().getGoodsType("model.goods.ore");
-    public static final GoodsType tobacco
+    private static final GoodsType tobacco
         = spec().getGoodsType("model.goods.tobacco");
-    public static final GoodsType silver
+    private static final GoodsType silver
         = spec().getGoodsType("model.goods.silver");
+    private static final GoodsType sugar
+        = spec().getGoodsType("model.goods.sugar");
 
-    public static final TileType arctic
+    private static final TileType arctic
         = spec().getTileType("model.tile.arctic");
-    public static final TileType coniferForest
+    private static final TileType borealForest
+        = spec().getTileType("model.tile.borealForest");
+    private static final TileType broadleafForest
+        = spec().getTileType("model.tile.broadleafForest");
+    private static final TileType coniferForest
         = spec().getTileType("model.tile.coniferForest");
-    public static final TileType plains
+    private static final TileType desert
+        = spec().getTileType("model.tile.desert");
+    private static final TileType grassland
+        = spec().getTileType("model.tile.grassland");
+    private static final TileType greatRiver
+        = spec().getTileType("model.tile.greatRiver");
+    private static final TileType highSeas
+        = spec().getTileType("model.tile.highSeas");
+    private static final TileType hills
+        = spec().getTileType("model.tile.hills");
+    private static final TileType lake
+        = spec().getTileType("model.tile.lake");
+    private static final TileType marsh
+        = spec().getTileType("model.tile.marsh");
+    private static final TileType mixedForest
+        = spec().getTileType("model.tile.mixedForest");
+    private static final TileType mountains
+        = spec().getTileType("model.tile.mountains");
+    private static final TileType ocean
+        = spec().getTileType("model.tile.ocean");
+    private static final TileType plains
         = spec().getTileType("model.tile.plains");
-    public static final TileType tundra
+    private static final TileType prairie
+        = spec().getTileType("model.tile.prairie");
+    private static final TileType rainForest
+        = spec().getTileType("model.tile.rainForest");
+    private static final TileType savannah
+        = spec().getTileType("model.tile.savannah");
+    private static final TileType scrubForest
+        = spec().getTileType("model.tile.scrubForest");
+    private static final TileType swamp
+        = spec().getTileType("model.tile.swamp");
+    private static final TileType tropicalForest
+        = spec().getTileType("model.tile.tropicalForest");
+    private static final TileType tundra
         = spec().getTileType("model.tile.tundra");
+    private static final TileType wetlandForest
+        = spec().getTileType("model.tile.wetlandForest");
+
+    private static final UnitType colonistType
+        = spec().getDefaultUnitType();
+
+    private Map<GoodsType, Integer> production
+        = new HashMap<GoodsType, Integer>();
 
 
     private void testProduction(Map<GoodsType, Integer> production,
@@ -71,11 +119,12 @@ public class ProductionTypeTest extends FreeColTestCase {
         assertEquals("Production should remain", 0, production.size());
     }
 
+    private int getGenericPotential(TileType tileType, GoodsType goodsType) {
+        return tileType.getPotentialProduction(goodsType, colonistType);
+    }
 
 
     public void testArctic() {
-        Map<GoodsType, Integer> production = new HashMap<GoodsType, Integer>();
-
         production.put(grain, 2);
         testProduction(production,
                        arctic.getProductionTypes(true, "veryHigh"));
@@ -94,26 +143,46 @@ public class ProductionTypeTest extends FreeColTestCase {
             testProduction(production,
                            arctic.getProductionTypes(false, level));
         }
+
+        assertEquals(0, arctic.getPotentialProduction(grain, null));
+        assertEquals(0, getGenericPotential(arctic, grain));
     }
 
-    public void testPlains() {
-        Map<GoodsType, Integer> production = new HashMap<GoodsType, Integer>();
+    public void testBorealForest() {
+        production.put(grain, 2);
+        production.put(furs, 3);
+        testProduction(production,
+                       borealForest.getProductionTypes(true));
 
-        production.put(grain, 5);
-        production.put(cotton, 2);
-        testProduction(production, plains.getProductionTypes(true));
-
-        production.put(grain, 5);
-        production.put(cotton, 2);
+        production.put(grain, 2);
+        production.put(furs, 3);
+        production.put(lumber, 4);
         production.put(ore, 1);
-        testProduction(production, plains.getProductionTypes(false));
+        testProduction(production,
+                       borealForest.getProductionTypes(false));
 
-        assertEquals(5, plains.getPotentialProduction(grain, null));
+        assertEquals(2, borealForest.getPotentialProduction(grain, null));
+        assertEquals(2, getGenericPotential(borealForest, grain));
+    }
+
+    public void testBroadleafForest() {
+        production.put(grain, 2);
+        production.put(furs, 2);
+        testProduction(production,
+                       broadleafForest.getProductionTypes(true));
+
+        production.put(grain, 2);
+        production.put(cotton, 1);
+        production.put(furs, 2);
+        production.put(lumber, 4);
+        testProduction(production,
+                       broadleafForest.getProductionTypes(false));
+
+        assertEquals(2, broadleafForest.getPotentialProduction(grain, null));
+        assertEquals(2, getGenericPotential(broadleafForest, grain));
     }
 
     public void testConiferForest() {
-        Map<GoodsType, Integer> production = new HashMap<GoodsType, Integer>();
-
         production.put(grain, 2);
         production.put(furs, 2);
         testProduction(production,
@@ -125,26 +194,290 @@ public class ProductionTypeTest extends FreeColTestCase {
         production.put(lumber, 6);
         testProduction(production,
                        coniferForest.getProductionTypes(false));
+
+        assertEquals(2, coniferForest.getPotentialProduction(grain, null));
+        assertEquals(2, getGenericPotential(coniferForest, grain));
     }
 
-    public void testResource() {
-        Game game = getGame();
-        game.setMap(getTestMap(tundra));
+    public void testDesert() {
+        production.put(grain, 3);
+        production.put(cotton, 1);
+        testProduction(production,
+                       desert.getProductionTypes(true, "veryHigh"));
 
-        Colony colony = getStandardColony(1);
-        Tile tile = colony.getTile().getNeighbourOrNull(Direction.N);
-        ColonyTile colonyTile = colony.getColonyTile(tile);
-        ProductionType productionType = colonyTile.getBestProductionType(silver);
-        assertNull("tundra can not produce silver", productionType);
+        production.put(grain, 2);
+        production.put(cotton, 1);
+        testProduction(production,
+                       desert.getProductionTypes(true));
 
-        ResourceType minerals = spec().getResourceType("model.resource.minerals");
-        tile.addResource(new Resource(game, tile, minerals));
-        productionType = colonyTile.getBestProductionType(silver);
-        assertNotNull("production type should not be null", productionType);
-        assertNotNull("resource should produce silver",
-                      productionType.getOutput(silver));
-        assertEquals("base production still must be zero",
-                     0, productionType.getOutput(silver).getAmount());
+        production.put(grain, 1);
+        production.put(cotton, 1);
+        testProduction(production,
+                       desert.getProductionTypes(true, "veryLow"));
 
+        production.put(grain, 2);
+        production.put(cotton, 1);
+        production.put(ore, 2);
+        testProduction(production,
+                       desert.getProductionTypes(false));
+
+        assertEquals(2, desert.getPotentialProduction(grain, null));
+        assertEquals(2, getGenericPotential(desert, grain));
+    }
+
+    public void testGrassland() {
+        production.put(grain, 3);
+        production.put(tobacco, 3);
+        testProduction(production, grassland.getProductionTypes(true));
+
+        production.put(grain, 3);
+        production.put(tobacco, 3);
+        testProduction(production, grassland.getProductionTypes(false));
+
+        assertEquals(3, grassland.getPotentialProduction(grain, null));
+        assertEquals(3, getGenericPotential(grassland, grain));
+    }
+
+    public void testGreatRiver() {
+        testProduction(production, greatRiver.getProductionTypes(true));
+
+        production.put(fish, 2);
+        testProduction(production, greatRiver.getProductionTypes(false));
+
+        assertEquals(0, greatRiver.getPotentialProduction(grain, null));
+        assertEquals(0, getGenericPotential(greatRiver, grain));
+    }
+
+    public void testHighSeas() {
+        testProduction(production, highSeas.getProductionTypes(true));
+
+        production.put(fish, 2);
+        testProduction(production, highSeas.getProductionTypes(false));
+
+        assertEquals(0, highSeas.getPotentialProduction(grain, null));
+        assertEquals(0, getGenericPotential(highSeas, grain));
+    }
+
+    public void testHills() {
+        production.put(grain, 2);
+        production.put(ore, 4);
+        testProduction(production, hills.getProductionTypes(true));
+
+        production.put(grain, 2);
+        production.put(ore, 4);
+        testProduction(production, hills.getProductionTypes(false));
+
+        assertEquals(2, hills.getPotentialProduction(grain, null));
+        assertEquals(2, getGenericPotential(hills, grain));
+    }
+
+    public void testLake() {
+        testProduction(production, lake.getProductionTypes(true));
+
+        production.put(fish, 2);
+        testProduction(production, lake.getProductionTypes(false));
+
+        assertEquals(0, lake.getPotentialProduction(grain, null));
+        assertEquals(0, getGenericPotential(lake, grain));
+    }
+
+    public void testMarsh() {
+        production.put(grain, 3);
+        production.put(tobacco, 2);
+        testProduction(production, marsh.getProductionTypes(true));
+
+        production.put(grain, 3);
+        production.put(tobacco, 2);
+        production.put(ore, 2);
+        production.put(silver, 0);
+        testProduction(production, marsh.getProductionTypes(false));
+
+        assertEquals(3, marsh.getPotentialProduction(grain, null));
+        assertEquals(3, getGenericPotential(marsh, grain));
+    }
+
+    public void testMixedForest() {
+        production.put(grain, 3);
+        production.put(furs, 3);
+        testProduction(production,
+                       mixedForest.getProductionTypes(true));
+
+        production.put(grain, 3);
+        production.put(cotton, 1);
+        production.put(furs, 3);
+        production.put(lumber, 6);
+        testProduction(production,
+                       mixedForest.getProductionTypes(false));
+
+        assertEquals(3, mixedForest.getPotentialProduction(grain, null));
+        assertEquals(3, getGenericPotential(mixedForest, grain));
+    }
+
+    public void testMountains() {
+        testProduction(production, mountains.getProductionTypes(true));
+
+        production.put(ore, 4);
+        production.put(silver, 1);
+        testProduction(production, mountains.getProductionTypes(false));
+
+        assertEquals(0, mountains.getPotentialProduction(grain, null));
+        assertEquals(0, getGenericPotential(mountains, grain));
+    }
+
+    public void testOcean() {
+        testProduction(production, ocean.getProductionTypes(true));
+
+        production.put(fish, 2);
+        testProduction(production, ocean.getProductionTypes(false));
+
+        assertEquals(0, ocean.getPotentialProduction(grain, null));
+        assertEquals(0, getGenericPotential(ocean, grain));
+    }
+
+    public void testPlains() {
+        production.put(grain, 5);
+        production.put(cotton, 2);
+        testProduction(production, plains.getProductionTypes(true));
+
+        production.put(grain, 5);
+        production.put(cotton, 2);
+        production.put(ore, 1);
+        testProduction(production, plains.getProductionTypes(false));
+
+        assertEquals(5, plains.getPotentialProduction(grain, null));
+        assertEquals(5, getGenericPotential(plains, grain));
+    }
+
+    public void testPrairie() {
+        production.put(grain, 3);
+        production.put(cotton, 3);
+        testProduction(production, prairie.getProductionTypes(true));
+
+        production.put(grain, 3);
+        production.put(cotton, 3);
+        testProduction(production, prairie.getProductionTypes(false));
+
+        assertEquals(3, prairie.getPotentialProduction(grain, null));
+        assertEquals(3, getGenericPotential(prairie, grain));
+    }
+
+    public void testRainForest() {
+        production.put(grain, 2);
+        production.put(furs, 1);
+        testProduction(production, rainForest.getProductionTypes(true));
+
+        production.put(grain, 2);
+        production.put(sugar, 1);
+        production.put(furs, 1);
+        production.put(lumber, 4);
+        production.put(ore, 1);
+        production.put(silver, 0);
+        testProduction(production, rainForest.getProductionTypes(false));
+
+        assertEquals(2, rainForest.getPotentialProduction(grain, null));
+        assertEquals(2, getGenericPotential(rainForest, grain));
+    }
+
+    public void testSavannah() {
+        production.put(grain, 4);
+        production.put(sugar, 3);
+        testProduction(production, savannah.getProductionTypes(true));
+
+        production.put(grain, 4);
+        production.put(sugar, 3);
+        testProduction(production, savannah.getProductionTypes(false));
+
+        assertEquals(4, savannah.getPotentialProduction(grain, null));
+        assertEquals(4, getGenericPotential(savannah, grain));
+    }
+
+    public void testScrubForest() {
+        production.put(grain, 3);
+        production.put(furs, 2);
+        testProduction(production,
+                       scrubForest.getProductionTypes(true, "veryHigh"));
+
+        production.put(grain, 2);
+        production.put(furs, 2);
+        testProduction(production,
+                       scrubForest.getProductionTypes(true));
+
+        production.put(grain, 1);
+        production.put(furs, 2);
+        testProduction(production,
+                       scrubForest.getProductionTypes(true, "veryLow"));
+
+        production.put(grain, 2);
+        production.put(cotton, 1);
+        production.put(furs, 2);
+        production.put(lumber, 2);
+        production.put(ore, 1);
+        testProduction(production, scrubForest.getProductionTypes(false));
+
+        assertEquals(2, scrubForest.getPotentialProduction(grain, null));
+        assertEquals(2, getGenericPotential(scrubForest, grain));
+    }
+
+    public void testSwamp() {
+        production.put(grain, 3);
+        production.put(sugar, 2);
+        testProduction(production, swamp.getProductionTypes(true));
+
+        production.put(grain, 3);
+        production.put(sugar, 2);
+        production.put(ore, 2);
+        production.put(silver, 0);
+        testProduction(production, swamp.getProductionTypes(false));
+
+        assertEquals(3, swamp.getPotentialProduction(grain, null));
+        assertEquals(3, getGenericPotential(swamp, grain));
+    }
+
+    public void testTropicalForest() {
+        production.put(grain, 3);
+        production.put(furs, 2);
+        testProduction(production,
+                       tropicalForest.getProductionTypes(true));
+
+        production.put(grain, 3);
+        production.put(sugar, 1);
+        production.put(furs, 2);
+        production.put(lumber, 4);
+        testProduction(production,
+                       tropicalForest.getProductionTypes(false));
+
+        assertEquals(3, tropicalForest.getPotentialProduction(grain, null));
+        assertEquals(3, getGenericPotential(tropicalForest, grain));
+    }
+
+    public void testTundra() {
+        production.put(grain, 3);
+        production.put(ore, 2);
+        testProduction(production, tundra.getProductionTypes(true));
+
+        production.put(grain, 3);
+        production.put(ore, 2);
+        production.put(silver, 0);
+        testProduction(production, tundra.getProductionTypes(false));
+
+        assertEquals(3, tundra.getPotentialProduction(grain, null));
+        assertEquals(3, getGenericPotential(tundra, grain));
+    }
+
+    public void testWetlandForest() {
+        production.put(grain, 2);
+        production.put(furs, 2);
+        testProduction(production, wetlandForest.getProductionTypes(true));
+
+        production.put(grain, 2);
+        production.put(tobacco, 1);
+        production.put(furs, 2);
+        production.put(lumber, 4);
+        production.put(ore, 1);
+        production.put(silver, 0);
+        testProduction(production, wetlandForest.getProductionTypes(false));
+
+        assertEquals(2, wetlandForest.getPotentialProduction(grain, null));
+        assertEquals(2, getGenericPotential(wetlandForest, grain));
     }
 }

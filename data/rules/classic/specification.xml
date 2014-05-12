@@ -363,12 +363,12 @@
         <output goods-type="model.goods.grain" value="3"/>
         <output goods-type="model.goods.cotton" value="1"/>
       </production>
-      <production unattended="true">
-        <output goods-type="model.goods.grain" value="2"/>
+      <production unattended="true" productionLevel="veryLow">
+        <output goods-type="model.goods.grain" value="1"/>
         <output goods-type="model.goods.cotton" value="1"/>
       </production>
-      <production unattended="true"  productionLevel="veryLow">
-        <output goods-type="model.goods.grain" value="1"/>
+      <production unattended="true">
+        <output goods-type="model.goods.grain" value="2"/>
         <output goods-type="model.goods.cotton" value="1"/>
       </production>
       <production>
@@ -558,12 +558,12 @@
         <output goods-type="model.goods.grain" value="3"/>
         <output goods-type="model.goods.furs" value="2"/>
       </production>
-      <production unattended="true">
-        <output goods-type="model.goods.grain" value="2"/>
-        <output goods-type="model.goods.furs" value="2"/>
-      </production>
       <production unattended="true" productionLevel="veryLow">
         <output goods-type="model.goods.grain" value="1"/>
+        <output goods-type="model.goods.furs" value="2"/>
+      </production>
+      <production unattended="true">
+        <output goods-type="model.goods.grain" value="2"/>
         <output goods-type="model.goods.furs" value="2"/>
       </production>
       <production>
