@@ -188,10 +188,10 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
         int newAmount = oldAmount - amount;
         Goods removedGoods;
         if (newAmount > 0) {
-            removedGoods = new Goods(getGame(), parent, type, amount);
+            removedGoods = new Goods(getGame(), null, type, amount);
             storedGoods.put(type, newAmount);
         } else {
-            removedGoods = new Goods(getGame(), parent, type, oldAmount);
+            removedGoods = new Goods(getGame(), null, type, oldAmount);
             storedGoods.remove(type);
         }
         return removedGoods;
