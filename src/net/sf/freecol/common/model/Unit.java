@@ -754,25 +754,38 @@ public class Unit extends GoodsLocation
             && (((WorkLocation)location).canTeach()
                 == ((WorkLocation)newLocation).canTeach());
 
-        if (location != null && !location.remove(this)) {
+        // First disable education that will fail due to the move.
+        if (oldColony != null && !preserveEducation) {
+            oldColony.updateEducation(this, false);
+        }
+
+        // Move out of the old location.
+        if (location == null) {
+            ; // do nothing
+        } else if (!location.remove(this)) {//-vis
             // "Should not happen" (should always be able to remove)
             throw new RuntimeException("Failed to remove " + this
                 + " from " + location.getId());
         }
-        if (oldColony != null) {
-            if (!withinColony) oldColony.updatePopulation();
-            if (!preserveEducation) oldColony.updateEducation(this, false);
-        }
 
-        if (newLocation != null && !newLocation.add(this)) {
+        // Move in to the new location.
+        if (newLocation == null) {
+            setLocationNoUpdate(null);//-vis
+        } else if (!newLocation.add(this)) {//-vis
             // "Should not happen" (canAdd was checked above)
             throw new RuntimeException("Failed to add "
                 + this + " to " + newLocation.getId());
         }
-        setLocationNoUpdate(newLocation);//-vis
-        if (newColony != null) {
-            if (!withinColony) newColony.updatePopulation();
-            if (!preserveEducation) newColony.updateEducation(this, true);
+
+        // See if education needs to be re-enabled.
+        if (newColony != null && !preserveEducation) {
+            newColony.updateEducation(this, true);
+        }
+
+        // Update population of any colonies involved.
+        if (!withinColony) {
+            if (oldColony != null) oldColony.updatePopulation();
+            if (newColony != null) newColony.updatePopulation();
         }
     }
 
@@ -3618,7 +3631,7 @@ public class Unit extends GoodsLocation
                 // appear to come through here (which it probably should)
                 // as the ship's moves do not get zeroed.
                 spendAllMoves();
-                ((Unit)locatable).setState(UnitState.SENTRY);
+                unit.setState(UnitState.SENTRY);
                 return true;
             }
         } else if (locatable instanceof Goods) {

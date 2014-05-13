@@ -297,7 +297,9 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
                 return true;
             } else if (canAdd(unit)) {
                 synchronized (units) {
-                    return units.add(unit);
+                    if (!units.add(unit)) return false;
+                    unit.setLocationNoUpdate(this);
+                    return true;
                 }
             }
         } else if (locatable instanceof Goods) {
@@ -318,8 +320,11 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      */
     public boolean remove(Locatable locatable) {
         if (locatable instanceof Unit) {
+            Unit unit = (Unit)locatable;
             synchronized (units) {
-                return units.remove((Unit)locatable);
+                if (!units.remove(unit)) return false;
+                unit.setLocationNoUpdate(null);
+                return true;
             }
         } else {
             logger.warning("Tried to remove non-Unit " + locatable
