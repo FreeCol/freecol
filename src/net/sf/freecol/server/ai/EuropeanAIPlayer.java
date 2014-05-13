@@ -514,6 +514,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         }
 
         for (AIUnit aiu : getAIUnits()) {
+            if (aiu.hasMission() && !aiu.getMission().isValid()) continue;
             Unit u = aiu.getUnit();
             if (u.isCarrier()) {
                 if (u.isNaval()) {
