@@ -37,8 +37,9 @@ public interface Locatable {
      *
      * @param newLocation The new <code>Location</code> for the
      *     <code>Locatable</code>.
+     * @return True if the location change succeeds.
      */
-    public void setLocation(Location newLocation);
+    public boolean setLocation(Location newLocation);
 
     /**
      * Is this locatable in Europe.

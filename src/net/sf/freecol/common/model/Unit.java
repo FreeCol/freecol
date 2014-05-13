@@ -695,16 +695,9 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Gets the location of this Unit.
-     *
-     * @return The location of this Unit.
-     */
-    public Location getLocation() {
-        return location;
-    }
-
-    /**
      * Sets the units location without updating any other variables
+     *
+     * get/setLocation are in Locatable interface.
      *
      * -vis: This routine changes player visibility.
      *
@@ -712,81 +705,6 @@ public class Unit extends GoodsLocation
      */
     public void setLocationNoUpdate(Location newLocation) {
         location = newLocation;
-    }
-
-    /**
-     * Sets the location of this Unit.
-     *
-     * -vis: This routine changes player visibility.
-     * -til: While units do not contribute to tile appearance as such, if
-     *     they move in/out of a colony the visible colony size changes.
-     *
-     * @param newLocation The new <code>Location</code>.
-     */
-    public void setLocation(Location newLocation) {
-        // It is possible to add a unit to a non-specific location
-        // within a colony by specifying the colony as the new
-        // location.  Find a suitable work location.
-        if (newLocation instanceof Colony) {
-            newLocation = ((Colony)newLocation).getWorkLocationFor(this);
-            if (newLocation == null) return; // Just fail fast.
-        }
-
-        if (newLocation == location) return;
-        if (newLocation != null && !newLocation.canAdd(this)) {
-            logger.warning("Can not add " + this + " to "
-                + newLocation.getId());
-            return;
-        }
-
-        // If the unit either starts or ends this move in a colony
-        // then teaching status can change.  However, if it moves
-        // between locations within the same colony with the same
-        // teaching ability, the teaching state should *not* change.
-        // We have to handle this issue here in setLocation as this is
-        // the only place that contains information about both
-        // locations.
-        Colony oldColony = (isInColony()) ? location.getColony() : null;
-        Colony newColony = (newLocation instanceof WorkLocation)
-            ? newLocation.getColony() : null;
-        boolean withinColony = newColony != null && newColony == oldColony;
-        boolean preserveEducation = withinColony
-            && (((WorkLocation)location).canTeach()
-                == ((WorkLocation)newLocation).canTeach());
-
-        // First disable education that will fail due to the move.
-        if (oldColony != null && !preserveEducation) {
-            oldColony.updateEducation(this, false);
-        }
-
-        // Move out of the old location.
-        if (location == null) {
-            ; // do nothing
-        } else if (!location.remove(this)) {//-vis
-            // "Should not happen" (should always be able to remove)
-            throw new RuntimeException("Failed to remove " + this
-                + " from " + location.getId());
-        }
-
-        // Move in to the new location.
-        if (newLocation == null) {
-            setLocationNoUpdate(null);//-vis
-        } else if (!newLocation.add(this)) {//-vis
-            // "Should not happen" (canAdd was checked above)
-            throw new RuntimeException("Failed to add "
-                + this + " to " + newLocation.getId());
-        }
-
-        // See if education needs to be re-enabled.
-        if (newColony != null && !preserveEducation) {
-            newColony.updateEducation(this, true);
-        }
-
-        // Update population of any colonies involved.
-        if (!withinColony) {
-            if (oldColony != null) oldColony.updatePopulation();
-            if (newColony != null) newColony.updatePopulation();
-        }
     }
 
     /**
@@ -805,17 +723,6 @@ public class Unit extends GoodsLocation
      */
     public Unit getCarrier() {
         return (isOnCarrier()) ? ((Unit)getLocation()) : null;
-    }
-
-    /**
-     * Checks if this <code>Unit</code> is located in Europe.  That
-     * is; either directly or onboard a carrier which is in Europe.
-     *
-     * @return True if in <code>Europe</code>.
-     */
-    public boolean isInEurope() {
-        return (location instanceof Unit) ? ((Unit)location).isInEurope()
-            : getLocation() instanceof Europe;
     }
 
     /**
@@ -3585,6 +3492,107 @@ public class Unit extends GoodsLocation
      */
     public void setOwner(Player player) {
         this.owner = player;
+    }
+
+
+    // Interface Locatable
+    //   getTile and getSpaceTaken are shared with Location below
+
+    /**
+     * Gets the location of this unit.
+     *
+     * @return The location of this <code>Unit</code>.
+     */
+    public Location getLocation() {
+        return location;
+    }
+
+    /**
+     * Sets the location of this unit.
+     *
+     * -vis: This routine changes player visibility.
+     * -til: While units do not contribute to tile appearance as such, if
+     *     they move in/out of a colony the visible colony size changes.
+     *
+     * @param newLocation The new <code>Location</code>.
+     * @return True if the location change succeeds.
+     */
+    public boolean setLocation(Location newLocation) {
+        // It is possible to add a unit to a non-specific location
+        // within a colony by specifying the colony as the new
+        // location.  Find a suitable work location.
+        if (newLocation instanceof Colony) {
+            newLocation = ((Colony)newLocation).getWorkLocationFor(this);
+            if (newLocation == null) return false; // Just fail fast.
+        }
+
+        if (newLocation == location) return true;
+        if (newLocation != null && !newLocation.canAdd(this)) {
+            logger.warning("Can not add " + this + " to "
+                + newLocation.getId());
+            return false;
+        }
+
+        // If the unit either starts or ends this move in a colony
+        // then teaching status can change.  However, if it moves
+        // between locations within the same colony with the same
+        // teaching ability, the teaching state should *not* change.
+        // We have to handle this issue here in setLocation as this is
+        // the only place that contains information about both
+        // locations.
+        Colony oldColony = (isInColony()) ? location.getColony() : null;
+        Colony newColony = (newLocation instanceof WorkLocation)
+            ? newLocation.getColony() : null;
+        boolean withinColony = newColony != null && newColony == oldColony;
+        boolean preserveEducation = withinColony
+            && (((WorkLocation)location).canTeach()
+                == ((WorkLocation)newLocation).canTeach());
+
+        // First disable education that will fail due to the move.
+        if (oldColony != null && !preserveEducation) {
+            oldColony.updateEducation(this, false);
+        }
+
+        // Move out of the old location.
+        if (location == null) {
+            ; // do nothing
+        } else if (!location.remove(this)) {//-vis
+            // "Should not happen" (should always be able to remove)
+            throw new RuntimeException("Failed to remove " + this
+                + " from " + location.getId());
+        }
+
+        // Move in to the new location.
+        if (newLocation == null) {
+            setLocationNoUpdate(null);//-vis
+        } else if (!newLocation.add(this)) {//-vis
+            // "Should not happen" (canAdd was checked above)
+            throw new RuntimeException("Failed to add "
+                + this + " to " + newLocation.getId());
+        }
+
+        // See if education needs to be re-enabled.
+        if (newColony != null && !preserveEducation) {
+            newColony.updateEducation(this, true);
+        }
+
+        // Update population of any colonies involved.
+        if (!withinColony) {
+            if (oldColony != null) oldColony.updatePopulation();
+            if (newColony != null) newColony.updatePopulation();
+        }
+        return true;
+    }
+
+    /**
+     * Checks if this <code>Unit</code> is located in Europe.  That
+     * is; either directly or onboard a carrier which is in Europe.
+     *
+     * @return True if in <code>Europe</code>.
+     */
+    public boolean isInEurope() {
+        return (location instanceof Unit) ? ((Unit)location).isInEurope()
+            : getLocation() instanceof Europe;
     }
 
 

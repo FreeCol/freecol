@@ -161,8 +161,9 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     /**
      * {@inheritDoc}
      */
-    public void setLocation(Location location) {
+    public boolean setLocation(Location location) {
         this.location = location;
+        return true;
     }
 
     /**

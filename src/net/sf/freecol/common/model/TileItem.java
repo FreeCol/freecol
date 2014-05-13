@@ -157,10 +157,10 @@ public abstract class TileItem extends FreeColGameObject implements Locatable {
     /**
      * {@inheritDoc}
      */
-    public void setLocation(Location newLocation) {
+    public boolean setLocation(Location newLocation) {
         if (newLocation == null || newLocation instanceof Tile) {
             tile = (Tile)newLocation;
-            return;
+            return true;
         }
         throw new IllegalArgumentException("newLocation is not a Tile");
     }
