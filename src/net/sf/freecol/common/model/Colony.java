@@ -1317,6 +1317,18 @@ public class Colony extends Settlement implements Nameable {
     // Unit manipulation and population
 
     /**
+     * Special routine to handle non-specific add of unit to colony.
+     *
+     * @param unit The <code>Unit</code> to add.
+     * @return True if the add succeeds.
+     */
+    public boolean joinColony(Unit unit) {
+        WorkLocation wl = getWorkLocationFor(unit);
+        if (wl == null) return false;
+        return unit.setLocation(wl);
+    }
+
+    /**
      * Can this colony reduce its population voluntarily?
      *
      * This is generally the case, but can be prevented by buildings
@@ -1331,7 +1343,8 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
-     * Gets the message to display if the colony can not reduce its population.
+     * Gets the message to display if the colony can not reduce its
+     * population.
      *
      * @return A string to describing why a colony can not reduce its
      *     population, or null if it can.
@@ -2326,7 +2339,8 @@ public class Colony extends Settlement implements Nameable {
     }
 
 
-    // Interface Location (from Settlement via GoodsLocation via UnitLocation)
+    // Interface Location (from Settlement via GoodsLocation
+    //   via UnitLocation)
     //   The unit list in UnitLocation is replaced in Colonies.
     // Inherits
     //   FreeColObject.getId
@@ -2351,9 +2365,7 @@ public class Colony extends Settlement implements Nameable {
     @Override
     public boolean add(Locatable locatable) {
         if (locatable instanceof Unit) {
-            WorkLocation wl = getWorkLocationFor((Unit)locatable);
-            if (wl == null) return false;
-            return wl.add(locatable);
+            return joinColony((Unit)locatable);
         }
         return super.add(locatable);
     }
@@ -2382,7 +2394,10 @@ public class Colony extends Settlement implements Nameable {
     @Override
     public boolean contains(Locatable locatable) {
         if (locatable instanceof Unit) {
-            throw new UnsupportedOperationException(); // FIXME!
+            for (WorkLocation wl : getAvailableWorkLocations()) {
+                if (wl.contains(locatable)) return true;
+            }
+            return false;
         }
         return super.contains(locatable);
     }

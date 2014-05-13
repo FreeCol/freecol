@@ -3520,10 +3520,9 @@ public class Unit extends GoodsLocation
     public boolean setLocation(Location newLocation) {
         // It is possible to add a unit to a non-specific location
         // within a colony by specifying the colony as the new
-        // location.  Find a suitable work location.
+        // location.  Colony.joinColony handles this special case.
         if (newLocation instanceof Colony) {
-            newLocation = ((Colony)newLocation).getWorkLocationFor(this);
-            if (newLocation == null) return false; // Just fail fast.
+            return ((Colony)newLocation).joinColony(this);
         }
 
         if (newLocation == location) return true;
