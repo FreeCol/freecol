@@ -1067,7 +1067,13 @@ public class Map extends FreeColGameObject implements Location {
                              final Unit carrier, CostDecider costDecider) {
         // Validate the arguments, reducing to either Europe or a Tile.
         final Location realStart = findRealStart(unit, start, carrier);
-        final Location realEnd = findRealEnd(end);
+        final Location realEnd;
+        try {
+            realEnd = findRealEnd(end);
+        } catch (IllegalArgumentException iae) {
+            throw new IllegalArgumentException("Path fail: " + unit
+                + " from " + start + " to " + end + " with " + carrier, iae);
+        }
         // Do not allow finding a path into unexplored territory, as we
         // do not have the terrain type and thus can not calculate costs.
         if (realEnd instanceof Tile
