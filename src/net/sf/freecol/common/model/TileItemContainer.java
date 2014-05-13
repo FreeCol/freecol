@@ -367,6 +367,7 @@ public class TileItemContainer extends FreeColGameObject {
     public <T extends TileItem> T removeTileItem(T item) {
         boolean removed = tileItems.remove(item);
         if (removed) {
+            item.setLocation(null);
             invalidateCache();
             return item;
         }

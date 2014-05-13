@@ -435,7 +435,7 @@ public class TileImprovement extends TileItem implements Named {
             TileImprovement road = (t == null) ? null : t.getRoad();
             if (road != null && road.isComplete()) {
                 road.setConnected(d.getReverseDirection(), connect);
-                setConnected(d, connect);
+                this.setConnected(d, connect);
             }
         }
         return (style == null) ? null : style.getString();

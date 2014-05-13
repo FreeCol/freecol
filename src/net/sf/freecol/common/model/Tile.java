@@ -794,9 +794,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public TileImprovement removeRoad() {
         TileImprovement road = getRoad();
         if (road == null) return null;
-        TileImprovement result = removeTileItem(road);
-        if (result == road) road.updateRoadConnections(false);
-        return result;
+        road.updateRoadConnections(false);
+        return removeTileItem(road);
     }
 
     /**
