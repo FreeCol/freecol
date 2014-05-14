@@ -115,7 +115,7 @@ public final class ReportProductionPanel extends ReportPanel {
                 List<BuildingType> buildingTypes = new ArrayList<BuildingType>();
                 for (BuildingType buildingType : getSpecification().getBuildingTypeList()) {
                     if (goodsType.equals(buildingType.getProducedGoodsType())
-                        || !buildingType.getModifierSet(goodsType.getId()).isEmpty()) {
+                        || buildingType.hasModifier(goodsType.getId())) {
                         BuildingType firstLevel = buildingType.getFirstLevel();
                         if (!buildingTypes.contains(firstLevel)) {
                             buildingTypes.add(firstLevel);

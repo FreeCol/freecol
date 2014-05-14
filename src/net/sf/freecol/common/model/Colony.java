@@ -778,8 +778,7 @@ public class Colony extends Settlement implements Nameable {
     public Building getWarehouse() {
         // TODO: it should search for more than one building?
         for (Building building : buildingMap.values()) {
-            if (!building.getType()
-                .getModifierSet(Modifier.WAREHOUSE_STORAGE).isEmpty()) {
+            if (building.getType().hasModifier(Modifier.WAREHOUSE_STORAGE)) {
                 return building;
             }
         }
@@ -803,7 +802,7 @@ public class Colony extends Settlement implements Nameable {
     public Building getStockade() {
         // TODO: it should search for more than one building?
         for (Building building : buildingMap.values()) {
-            if (!building.getType().getModifierSet(Modifier.DEFENCE).isEmpty()) {
+            if (building.getType().hasModifier(Modifier.DEFENCE)) {
                 return building;
             }
         }

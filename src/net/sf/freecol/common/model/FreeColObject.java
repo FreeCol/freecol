@@ -353,7 +353,7 @@ public abstract class FreeColObject implements ObjectWithId {
      * @return True if the ability is present.
      */
     public boolean hasAbility(String id, FreeColGameObjectType fcgot,
-                                    Turn turn) {
+                              Turn turn) {
         return FeatureContainer.hasAbility(getAbilitySet(id, fcgot, turn));
     }
 
@@ -462,6 +462,42 @@ public abstract class FreeColObject implements ObjectWithId {
         if (fc != null) fc.removeAbilities(id);
     }
 
+
+    /**
+     * Is an modifier present in this object?
+     *
+     * @param id The object identifier.
+     * @return True if the modifier is present.
+     */
+    public final boolean hasModifier(String id) {
+        return hasModifier(id, null);
+    }
+
+    /**
+     * Is an modifier present in this object?
+     *
+     * @param id The object identifier.
+     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     *     modifier applies to.
+     * @return True if the modifier is present.
+     */
+    public final boolean hasModifier(String id, FreeColGameObjectType fcgot) {
+        return hasModifier(id, fcgot, null);
+    }
+
+    /**
+     * Is an modifier present in this object?
+     *
+     * @param id The object identifier.
+     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     *     modifier applies to.
+     * @param turn An optional applicable <code>Turn</code>.
+     * @return True if the modifier is present.
+     */
+    public boolean hasModifier(String id, FreeColGameObjectType fcgot,
+                               Turn turn) {
+        return !getModifierSet(id, fcgot, turn).isEmpty();
+    }
 
     /**
      * Checks if this object contains a given modifier key.

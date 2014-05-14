@@ -546,7 +546,7 @@ public class ColonyPlan {
                         + market.getSalePrice(g.getOutputType(), 1)) / 2;
                 }
             }
-            if (!nationType.getModifierSet(g.getId()).isEmpty()) {
+            if (nationType.hasModifier(g.getId())) {
                 value = (value * 12) / 10; // Bonus for national advantages
             }
             if (value > secondaryValue && secondaryRawMaterial != null) {
@@ -668,7 +668,7 @@ public class ColonyPlan {
         String advantage = getAIMain().getAIPlayer(player).getAIAdvantage();
         boolean ret = false;
         double factor = 1.0;
-        if (!nationType.getModifierSet(goodsType.getId()).isEmpty()) {
+        if (nationType.hasModifier(goodsType.getId())) {
             // Handles building, agriculture, furTrapping advantages
             factor *= 1.2;
         }
@@ -726,7 +726,7 @@ public class ColonyPlan {
             if (!colony.canBuild(type)) continue;
 
             // Exempt defence and export from the level check.
-            if (!type.getModifierSet(Modifier.DEFENCE).isEmpty()) {
+            if (type.hasModifier(Modifier.DEFENCE)) {
                 double factor = 1.0;
                 if ("conquest".equals(advantage)) factor = 1.1;
                 prioritize(type, FORTIFY_WEIGHT * factor,
@@ -800,22 +800,20 @@ public class ColonyPlan {
                 }
             } else {
                 for (GoodsType g : spec().getGoodsTypeList()) {
-                    if (!type.getModifierSet(g.getId()).isEmpty()) {
+                    if (type.hasModifier(g.getId())) {
                         if (!prioritizeProduction(type, g)) {
                             expectFail = true;
                         }
                     }
                 }
                 // Hacks.  No good way to make this really generic.
-                if (!type.getModifierSet(Modifier.WAREHOUSE_STORAGE)
-                    .isEmpty()) {
+                if (type.hasModifier(Modifier.WAREHOUSE_STORAGE)) {
                     double factor = 1.0;
                     if ("trade".equals(advantage)) factor = 1.1;
                     prioritize(type, STORAGE_WEIGHT * factor,
                         1.0/*FIXME: amount of goods*/);
                 }
-                if (!type.getModifierSet(Modifier.BREEDING_DIVISOR)
-                    .isEmpty()) {
+                if (type.hasModifier(Modifier.BREEDING_DIVISOR)) {
                     prioritize(type, BREEDING_WEIGHT,
                         1.0/*FIXME: horses present?*/);
                 }

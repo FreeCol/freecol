@@ -1918,7 +1918,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         if (!father.getModifierSet().isEmpty()) {
             cs.add(See.only(this), this);
             // deSoto is special
-            if (!father.getModifierSet(Modifier.LINE_OF_SIGHT_BONUS).isEmpty()) {
+            if (father.hasModifier(Modifier.LINE_OF_SIGHT_BONUS)) {
                 List<Tile> tiles = new ArrayList<Tile>();
                 for (Colony c : getColonies()) {
                     tiles.addAll(exploreForSettlement(c));
