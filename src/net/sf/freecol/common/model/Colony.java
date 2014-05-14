@@ -2233,9 +2233,9 @@ public class Colony extends Settlement implements Nameable {
             }
         }
 
-        for (Building b : getBuildingsForProducing(goodsType)) {
+        for (WorkLocation wl : getWorkLocationsForProducing(goodsType)) {
             addInsufficientProductionMessage(result,
-                productionCache.getProductionInfo(b));
+                productionCache.getProductionInfo(wl));
         }
         for (WorkLocation wl : getWorkLocationsForConsuming(goodsType)) {
             for (AbstractGoods ag : wl.getOutputs()) {
@@ -2254,38 +2254,44 @@ public class Colony extends Settlement implements Nameable {
     /**
      * adds a message about insufficient production for a building
      *
-     * @param warnings where to add the warnings
-     * @param info the <code>ProductionInfo</code> for this building
+     * @param A list of warnings to add to.
+     * @param info The <code>ProductionInfo</code> for the work location.
      */
-    private void addInsufficientProductionMessage(List<StringTemplate> warnings, ProductionInfo info) {
-        if (info != null && !info.getMaximumProduction().isEmpty()) {
-            int missingOutput = info.getMaximumProduction().get(0).getAmount()
-                - info.getProduction().get(0).getAmount();
-            if (missingOutput > 0) {
-                GoodsType outputType = info.getProduction().get(0).getType();
-                GoodsType inputType = info.getConsumption().isEmpty()
-                    ? null : info.getConsumption().get(0).getType();
-                int missingInput = info.getMaximumConsumption().get(0).getAmount()
-                    - info.getConsumption().get(0).getAmount();
-                warnings.add(StringTemplate.template("model.colony.insufficientProduction")
-                             .addAmount("%outputAmount%", missingOutput)
-                             .add("%outputType%", outputType.getNameKey())
-                             .addName("%colony%", getName())
-                             .addAmount("%inputAmount%", missingInput)
-                             .add("%inputType%", inputType.getNameKey()));
-            }
-        }
+    private void addInsufficientProductionMessage(List<StringTemplate> warnings,
+                                                  ProductionInfo info) {
+        if (info == null
+            || info.getMaximumProduction().isEmpty()) return;
+
+        GoodsType outputType = info.getProduction().get(0).getType();
+        int missingOutput = info.getMaximumProduction().get(0).getAmount()
+            - info.getProduction().get(0).getAmount();
+        if (missingOutput <= 0) return;
+
+        GoodsType inputType = info.getConsumption().isEmpty()
+            ? null : info.getConsumption().get(0).getType();
+        int missingInput = info.getMaximumConsumption().get(0).getAmount()
+            - info.getConsumption().get(0).getAmount();
+        if (inputType == null) return;
+
+        warnings.add(StringTemplate
+            .template("model.colony.insufficientProduction")
+            .addAmount("%outputAmount%", missingOutput)
+            .add("%outputType%", outputType.getNameKey())
+            .addName("%colony%", getName())
+            .addAmount("%inputAmount%", missingInput)
+            .add("%inputType%", inputType.getNameKey()));
     }
 
     /**
      * Creates a temporary copy of this colony for planning purposes.
      *
-     * A simple colony.copy() can not work because all the colony tiles
-     * will be left referring to uncopied work tiles which the colony-copy
-     * does not own, which prevents them being used as valid work locations.
-     * We have to copy the colony tile (which includes the colony), and
-     * fix up all the colony tile work tiles to point to copies of the
-     * original tile, and fix the ownership of those tiles.
+     * A simple colony.copy() can not work because all the colony
+     * tiles will be left referring to uncopied work tiles which the
+     * colony-copy does not own, which prevents them being used as
+     * valid work locations.  We have to copy the colony tile (which
+     * includes the colony), and fix up all the colony tile work tiles
+     * to point to copies of the original tile, and fix the ownership
+     * of those tiles.
      *
      * @return A scratch version of this colony.
      */
