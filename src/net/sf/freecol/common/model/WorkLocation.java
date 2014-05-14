@@ -39,9 +39,11 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
  * its owner can not be changed directly, as it is always owned by the
  * owner of the Colony.
  */
-public abstract class WorkLocation extends UnitLocation implements Ownable {
+public abstract class WorkLocation extends UnitLocation
+    implements Ownable {
 
-    public static final List<AbstractGoods> EMPTY_LIST = Collections.emptyList();
+    public static final List<AbstractGoods> EMPTY_LIST
+        = Collections.emptyList();
 
     /** The colony that contains this work location. */
     protected Colony colony;

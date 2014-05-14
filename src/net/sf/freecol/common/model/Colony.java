@@ -427,24 +427,22 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
-     * Collect the buildings for consuming the given type of goods.
+     * Collect the work locations for consuming a given type of goods.
      *
-     * @param goodsType The type of goods.
-     * @return A <code>List</code> of <code>Building</code>s which consume
-     *         the given type of goods.
-     * @see Goods
+     * @param goodsType The <code>GoodsType</code> to consume.
+     * @return A list of <code>WorkLocation</code>s which consume
+     *     the given type of goods.
      */
-    public List<Building> getBuildingsForConsuming(GoodsType goodsType) {
-        List<Building> buildings = new ArrayList<Building>();
-        for (Building building : getBuildings()) {
-            for (AbstractGoods input : building.getInputs()) {
-                if (input.getType() == goodsType) {
-                    buildings.add(building);
-                }
+    public List<WorkLocation> getWorkLocationsForConsuming(GoodsType goodsType) {
+        List<WorkLocation> result = new ArrayList<WorkLocation>();
+        for (WorkLocation wl : getCurrentWorkLocations()) {
+            for (AbstractGoods input : wl.getInputs()) {
+                if (input.getType() == goodsType) result.add(wl);
             }
         }
-        return buildings;
+        return result;
     }
+
 
     /**
      * Find a building for producing the given type of goods.
@@ -455,18 +453,6 @@ public class Colony extends Settlement implements Nameable {
      */
     public Building getBuildingForProducing(GoodsType goodsType) {
         List<Building> buildings = getBuildingsForProducing(goodsType);
-        return (buildings.isEmpty()) ? null : buildings.get(0);
-    }
-
-    /**
-     * Find a building for consuming the given type of goods.
-     *
-     * @param goodsType The type of goods.
-     * @return A <code>Building</code> which consumes the given type of goods,
-     *         or <code>null</code> if such a building can not be found.
-     */
-    public Building getBuildingForConsuming(GoodsType goodsType) {
-        List<Building> buildings = getBuildingsForConsuming(goodsType);
         return (buildings.isEmpty()) ? null : buildings.get(0);
     }
 
@@ -2198,14 +2184,13 @@ public class Colony extends Settlement implements Nameable {
             addInsufficientProductionMessage(result,
                 productionCache.getProductionInfo(b));
         }
-        Building buildingForConsuming = getBuildingForConsuming(goodsType);
-        if (buildingForConsuming != null) {
-            for (AbstractGoods goods : buildingForConsuming.getOutputs()) {
-                if (!goods.getType().isStorable()) {
-                    //the warnings are for a non-storable good, which
-                    //is not displayed in the trade report
-                    addInsufficientProductionMessage(result, productionCache
-                                                     .getProductionInfo(buildingForConsuming));
+        for (WorkLocation wl : getWorkLocationsForConsuming(goodsType)) {
+            for (AbstractGoods ag : wl.getOutputs()) {
+                if (!ag.getType().isStorable()) {
+                    // the warnings are for a non-storable good, which
+                    // is not displayed in the trade report
+                    addInsufficientProductionMessage(result, 
+                        productionCache.getProductionInfo(wl));
                 }
             }
         }
