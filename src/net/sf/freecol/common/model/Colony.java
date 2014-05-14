@@ -443,6 +443,35 @@ public class Colony extends Settlement implements Nameable {
         return result;
     }
 
+    /**
+     * Collect the work locations for producing a given type of goods.
+     *
+     * @param goodsType The <code>GoodsType</code> to produce.
+     * @return A list of <code>WorkLocation</code>s which produce
+     *     the given type of goods.
+     */
+    public List<WorkLocation> getWorkLocationsForProducing(GoodsType goodsType) {
+        List<WorkLocation> result = new ArrayList<WorkLocation>();
+        for (WorkLocation wl : getCurrentWorkLocations()) {
+            for (AbstractGoods ag : wl.getOutputs()) {
+                if (ag.getType() == goodsType) result.add(wl);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Find a work location for producing a given type of goods.
+     *
+     * @param goodsType The <code>GoodsType</code> to produce.
+     * @return A <code>WorkLocation</code>s which produces
+     *      the given type of goods, or null if not found.
+     */
+    public WorkLocation getWorkLocationForProducing(GoodsType goodsType) {
+        List<WorkLocation> wls = getWorkLocationsForProducing(goodsType);
+        return (wls.isEmpty()) ? null : wls.get(0);
+    }
+
 
     /**
      * Find a building for producing the given type of goods.
@@ -455,7 +484,7 @@ public class Colony extends Settlement implements Nameable {
         List<Building> buildings = getBuildingsForProducing(goodsType);
         return (buildings.isEmpty()) ? null : buildings.get(0);
     }
-
+ 
     /**
      * Collect the buildings for producing the given type of goods.
      *
