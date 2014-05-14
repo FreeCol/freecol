@@ -495,6 +495,14 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
     // WorkLocation subclasses.
 
     /**
+     * Get a description of the work location, with any expected extra
+     * detail.
+     *
+     * @return A label <code>StringTemplate</code> for this work location.
+     */
+    public abstract StringTemplate getLabel();
+
+    /**
      * Checks if this work location is available to the colony to be
      * worked.
      *

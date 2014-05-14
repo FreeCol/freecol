@@ -432,6 +432,14 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     /**
      * {@inheritDoc}
      */
+    public StringTemplate getLabel() {
+        return (buildingType == null) ? null
+            : StringTemplate.key(buildingType.getNameKey());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public NoAddReason getNoWorkReason() {
         return NoAddReason.NONE;
     }

@@ -89,16 +89,6 @@ public class ColonyTile extends WorkLocation {
 
 
     /**
-     * Gets a description of the tile, with the name of the tile
-     * and any improvements made to it (road/plow).
-     *
-     * @return The description label for this tile
-     */
-    public StringTemplate getLabel() {
-        return workTile.getLabel();
-    }
-
-    /**
      * Is this the tile where the <code>Colony</code> is located?
      *
      * @return True if this is the colony center tile.
@@ -258,6 +248,13 @@ public class ColonyTile extends WorkLocation {
 
 
     // Interface WorkLocation
+
+    /**
+     * {@inheritDoc}
+     */
+    public StringTemplate getLabel() {
+        return (workTile == null) ? null : workTile.getLabel();
+    }
 
     /**
      * {@inheritDoc}
