@@ -1193,39 +1193,12 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                     - colony.getGoodsCount(requiredType)));
             if (amount > 0) {
                 int value = goodsWishValue;
-                if (colonyCouldProduce(requiredType)) value /= 10;
+                if (colony.canProduce(requiredType)) value /= 10;
                 requireGoodsWish(requiredType, amount, value);
             }
         }
 
     }
-
-    /**
-     * Can a colony produce certain goods?
-     *
-     * @param goodsType The <code>GoodsType</code> to check production of.
-     * @return True if the colony can produce such goods.
-     */
-    private boolean colonyCouldProduce(GoodsType goodsType) {
-        if (goodsType.isBreedable()) {
-            return colony.getGoodsCount(goodsType)
-                >= goodsType.getBreedingNumber();
-        }
-        if (goodsType.isFarmed()) {
-            for (ColonyTile colonyTile : colony.getColonyTiles()) {
-                if (colonyTile.getWorkTile().getPotentialProduction(goodsType, null) > 0) {
-                    return true;
-                }
-            }
-        } else {
-            if (!colony.getBuildingsForProducing(goodsType).isEmpty()) {
-                return (goodsType.getInputType() == null) ? true
-                    : colonyCouldProduce(goodsType.getInputType());
-            }
-        }
-        return false;
-    }
-
 
     /**
      * Gets the tile improvements planned for this colony.

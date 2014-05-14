@@ -2014,6 +2014,30 @@ public class Colony extends Settlement implements Nameable {
         productionCache.invalidate();
     }
 
+    /**
+     * Can this colony produce certain goods?
+     *
+     * @param goodsType The <code>GoodsType</code> to check production of.
+     * @return True if the goods can be produced.
+     */
+    public boolean canProduce(GoodsType goodsType) {
+        if (getNetProductionOf(goodsType) > 0) return true; // Obviously:-)
+
+        if (goodsType.isBreedable()) {
+            return getGoodsCount(goodsType) >= goodsType.getBreedingNumber();
+        }
+
+        // Is there a work location that can produce the goods, with
+        // satisfied inputs and positive generic production potential?
+        outer: for (WorkLocation wl : getWorkLocationsForProducing(goodsType)) {
+            for (AbstractGoods ag : wl.getInputs()) {
+                if (!canProduce(ag.getType())) continue outer;
+            }
+            if (wl.getGenericPotential(goodsType) > 0) return true;
+        }
+        return false;
+    }
+
   
     // Planning support
 
