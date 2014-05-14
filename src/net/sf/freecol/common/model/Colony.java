@@ -334,6 +334,51 @@ public class Colony extends Settlement implements Nameable {
     // WorkLocations, Buildings, ColonyTiles
 
     /**
+     * Gets a list of every work location in this colony.
+     *
+     * @return The list of work locations.
+     */
+    public List<WorkLocation> getAllWorkLocations() {
+        List<WorkLocation> result = new ArrayList<WorkLocation>(colonyTiles);
+        result.addAll(buildingMap.values());
+        return result;
+    }
+
+    /**
+     * Gets a list of all freely available work locations
+     * in this colony.
+     *
+     * @return The list of available <code>WorkLocation</code>s.
+     */
+    public List<WorkLocation> getAvailableWorkLocations() {
+        List<WorkLocation> result
+            = new ArrayList<WorkLocation>(buildingMap.values());
+        for (ColonyTile ct : colonyTiles) {
+            Tile tile = ct.getWorkTile();
+            if (tile.getOwningSettlement() == this
+                || getOwner().canClaimForSettlement(tile)) {
+                result.add(ct);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Gets a list of all current work locations in this colony.
+     *
+     * @return The list of current <code>WorkLocation</code>s.
+     */
+    public List<WorkLocation> getCurrentWorkLocations() {
+        List<WorkLocation> result
+            = new ArrayList<WorkLocation>(buildingMap.values());
+        for (ColonyTile ct : colonyTiles) {
+            Tile tile = ct.getWorkTile();
+            if (tile.getOwningSettlement() == this) result.add(ct);
+        }
+        return result;
+    }
+
+    /**
      * Add a Building to this Colony.
      *
      * -til: Could change the tile appearance if the building is stockade-type
@@ -368,14 +413,15 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
-     * Gets a <code>Building</code> with the given <code>Ability</code>.
+     * Gets a work location with a given ability.
      *
      * @param ability An ability key.
-     * @return A <code>Building</code> with the ability, or null if not found.
+     * @return A <code>WorkLocation</code> with the required
+     *     <code>Ability</code>, or null if not found.
      */
-    public Building getBuildingWithAbility(String ability) {
-        for (Building building : buildingMap.values()) {
-            if (building.getType().hasAbility(ability)) return building;
+    public WorkLocation getWorkLocationWithAbility(String ability) {
+        for (WorkLocation wl : getCurrentWorkLocations()) {
+            if (wl.hasAbility(ability)) return wl;
         }
         return null;
     }
@@ -562,52 +608,6 @@ public class Colony extends Settlement implements Nameable {
             }
         }
         return best;
-    }
-
-    /**
-     * Gets a list of every work location in this colony.
-     *
-     * @return The list of work locations.
-     */
-    public List<WorkLocation> getAllWorkLocations() {
-        List<WorkLocation> result
-            = new ArrayList<WorkLocation>(buildingMap.values());
-        result.addAll(colonyTiles);
-        return result;
-    }
-
-    /**
-     * Gets a list of all freely available work locations
-     * in this colony.
-     *
-     * @return The list of available <code>WorkLocation</code>s.
-     */
-    public List<WorkLocation> getAvailableWorkLocations() {
-        List<WorkLocation> result
-            = new ArrayList<WorkLocation>(buildingMap.values());
-        for (ColonyTile ct : colonyTiles) {
-            Tile tile = ct.getWorkTile();
-            if (tile.getOwningSettlement() == this
-                || getOwner().canClaimForSettlement(tile)) {
-                result.add(ct);
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Gets a list of all current work locations in this colony.
-     *
-     * @return The list of current <code>WorkLocation</code>s.
-     */
-    public List<WorkLocation> getCurrentWorkLocations() {
-        List<WorkLocation> result
-            = new ArrayList<WorkLocation>(buildingMap.values());
-        for (ColonyTile ct : colonyTiles) {
-            Tile tile = ct.getWorkTile();
-            if (tile.getOwningSettlement() == this) result.add(ct);
-        }
-        return result;
     }
 
     /**

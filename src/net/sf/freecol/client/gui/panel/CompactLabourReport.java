@@ -47,6 +47,7 @@ import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.WorkLocation;
 
 
 /**
@@ -318,11 +319,13 @@ public final class CompactLabourReport extends ReportPanel {
             row++;
         }
 
-        Building schoolhouse = colony != null && data.isTraining() ?
-            colony.getBuildingWithAbility(Ability.TEACH) : null;
+        WorkLocation school = (colony != null && data.isTraining())
+            ? colony.getWorkLocationWithAbility(Ability.TEACH)
+            : null;
 
-        if (showBuildings && schoolhouse != null && row > buildingStartRow) {
-            reportPanel.add(createEmptyLabel(), "cell " + BUILDING_COLUMN + " " + buildingStartRow + " 1 " + (row - buildingStartRow));
+        if (showBuildings && school != null && row > buildingStartRow) {
+            reportPanel.add(createEmptyLabel(), "cell " + BUILDING_COLUMN
+                + " " + buildingStartRow + " 1 " + (row - buildingStartRow));
             buildingStartRow = row;
         }
 
@@ -369,14 +372,18 @@ public final class CompactLabourReport extends ReportPanel {
         }
 
         if (showBuildings && row > buildingStartRow) {
-            JLabel buildingLabel = new JLabel(schoolhouse != null ?
-                                              Messages.message(schoolhouse.getNameKey()) : "");
+            JLabel buildingLabel = new JLabel((school == null) ? ""
+                : Messages.message(school.getLabel()));
             buildingLabel.setBorder(CELLBORDER);
-            reportPanel.add(buildingLabel, "cell " + BUILDING_COLUMN + " " + buildingStartRow + " 1 " + (row - buildingStartRow));
+            reportPanel.add(buildingLabel, "cell " + BUILDING_COLUMN
+                + " " + buildingStartRow
+                + " 1 " + (row - buildingStartRow));
         }
 
         if (data.getUnitData().showProduction() && row > notProducingStartRow) {
-            reportPanel.add(createEmptyLabel(), "cell " + PRODUCTION_COLUMN + " " + notProducingStartRow + " 1 " + (row - notProducingStartRow));
+            reportPanel.add(createEmptyLabel(), "cell " + PRODUCTION_COLUMN
+                + " " + notProducingStartRow
+                + " 1 " + (row - notProducingStartRow));
         }
 
         return row;
