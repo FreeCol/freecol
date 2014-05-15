@@ -141,7 +141,9 @@ public class ProductionCache {
                 }
             }
         } else {
-            for (Building building : colony.getBuildingsForProducing(goodsType)) {
+            for (WorkLocation wl : colony.getWorkLocationsForProducing(goodsType)) {
+                if (!(wl instanceof Building)) continue; // TODO: fix
+                Building building = (Building)wl;
                 if (building.getType().getWorkPlaces() > 0) {
                     for (Unit unit : units) {
                         result.add(new Entry(goodsType, building, unit));
