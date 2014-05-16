@@ -472,20 +472,6 @@ public class Colony extends Settlement implements Nameable {
         return (wls.isEmpty()) ? null : wls.get(0);
     }
 
-
-    /**
-     * Find a building for producing the given type of goods.
-     *
-     * @param goodsType The type of goods.
-     * @return A <code>Building</code> which produces the given type of goods,
-     *         or <code>null</code> if such a building can not be found.
-     */
-    public Building getBuildingForProducing(GoodsType goodsType) {
-        WorkLocation wl = getWorkLocationForProducing(goodsType);
-        return (wl != null && wl instanceof Building) ? (Building)wl
-            : null;
-    }
- 
     private int getMinimumGoodsCount(List<AbstractGoods> goodsList) {
         if (goodsList == null || goodsList.isEmpty()) {
             return 0;

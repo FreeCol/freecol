@@ -97,8 +97,8 @@ public class ServerColonyTest extends FreeColTestCase {
         // Setting test colony and colonist
         Colony colony = FreeColTestUtils.getColonyBuilder()
             .colonyTile(game.getMap().getTile(5, 8)).build();
-        new ServerUnit(game, colony.getBuildingForProducing(bellsType), dutch,
-                       colonistType);
+        new ServerUnit(game, colony.getWorkLocationForProducing(bellsType),
+                       dutch, colonistType);
         assertEquals(0, colony.getGoodsCount(foodType));
 
         int quantity = colony.getFoodConsumption() * 2;
@@ -137,9 +137,8 @@ public class ServerColonyTest extends FreeColTestCase {
             }
         }
 
-        new ServerUnit(game, colony.getBuildingForProducing(bellsType), dutch,
-                       colonistType);
-
+        new ServerUnit(game, colony.getWorkLocationForProducing(bellsType),
+                       dutch, colonistType);
 
         // Verify that there is enough food stored
         colony.addGoods(foodGoodsType, colony.getFoodConsumption()*2);
@@ -161,7 +160,7 @@ public class ServerColonyTest extends FreeColTestCase {
         Colony colony = getStandardColony(unitsBeforeNewTurn);
         ServerPlayer player = (ServerPlayer) colony.getOwner();
 
-        Building townHall = colony.getBuildingForProducing(bellsType);
+        final Building townHall = colony.getBuilding(townHallType);
         for (Unit u : colony.getUnitList()) {
             u.setLocation(townHall);
         }
@@ -199,8 +198,8 @@ public class ServerColonyTest extends FreeColTestCase {
         ServerPlayer player = (ServerPlayer) colony.getOwner();
         assertEquals("Wrong number of units in colony", unitsBeforeNewTurn,
             colony.getUnitCount());
-        Building townHall = colony.getBuildingForProducing(bellsType);
 
+        final Building townHall = colony.getBuilding(townHallType);
         for (Unit u : colony.getUnitList()) {
             u.setLocation(townHall);
         }

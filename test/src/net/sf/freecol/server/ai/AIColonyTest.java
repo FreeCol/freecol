@@ -42,6 +42,10 @@ import net.sf.freecol.util.test.FreeColTestUtils;
 
 public class AIColonyTest extends FreeColTestCase {
 
+    private static final BuildingType blacksmithsHouseType
+        = spec().getBuildingType("model.building.blacksmithHouse");
+    private static final BuildingType carpentersHouseType
+        = spec().getBuildingType("model.building.carpenterHouse");
     private static final BuildingType lumberMillType
         = spec().getBuildingType("model.building.lumberMill");
     private static final BuildingType warehouseType
@@ -130,9 +134,9 @@ public class AIColonyTest extends FreeColTestCase {
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
 
         final Building carpenterHouse
-            = colony.getBuildingForProducing(hammersType);
+            = colony.getBuilding(carpentersHouseType);
         final Building blacksmithHouse
-            = colony.getBuildingForProducing(toolsType);
+            = colony.getBuilding(blacksmithsHouseType);
         AIColony aiColony = aiMain.getAIColony(colony);
         ServerPlayer player = (ServerPlayer) colony.getOwner();
 
@@ -210,9 +214,9 @@ public class AIColonyTest extends FreeColTestCase {
 
         // The number needs to be high to ensure allocation
         final Building carpenterHouse
-            = colony.getBuildingForProducing(hammersType);
+            = colony.getBuilding(carpentersHouseType);
         final Building blacksmithHouse
-            = colony.getBuildingForProducing(toolsType);
+            = colony.getBuilding(blacksmithsHouseType);
         AIColony aiColony = aiMain.getAIColony(colony);
         ServerPlayer player = (ServerPlayer) colony.getOwner();
 
