@@ -626,26 +626,8 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
-     * Gets a work location within this colony to put a unit in.
-     *
-     * @param unit The <code>Unit</code> to place.
-     * @return A work location for the unit, or null if none available.
-     */
-    public WorkLocation getWorkLocationFor(Unit unit) {
-        Occupation occupation = getOccupationFor(unit);
-        if (occupation == null) {
-            logger.warning("Could not find a WorkLocation for: "
-                + unit.toString() + " in: " + getName());
-            return null;
-        }
-        if (occupation.workType != null) {
-            unit.changeWorkType(occupation.workType);
-        }
-        return occupation.workLocation;
-    }
-
-    /**
-     * Gets a vacant <code>WorkLocation</code> for the given <code>Unit</code>.
+     * Gets a vacant <code>WorkLocation</code> for the given
+     * <code>Unit</code>.
      *
      * @param unit The <code>Unit</code>
      * @return A vacant <code>WorkLocation</code> for the given
@@ -1337,9 +1319,16 @@ public class Colony extends Settlement implements Nameable {
      * @return True if the add succeeds.
      */
     public boolean joinColony(Unit unit) {
-        WorkLocation wl = getWorkLocationFor(unit);
-        if (wl == null) return false;
-        return unit.setLocation(wl);
+        Occupation occupation = getOccupationFor(unit);
+        if (occupation == null) {
+            logger.warning("Could not find a work location for: "
+                + unit + " in: " + getName());
+            return false;
+        }
+        if (occupation.workType != unit.getWorkType()) {
+            unit.changeWorkType(occupation.workType);
+        }
+        return unit.setLocation(occupation.workLocation);
     }
 
     /**
