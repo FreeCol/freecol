@@ -255,14 +255,14 @@ public final class CompactLabourReport extends ReportPanel {
         String unitName = unit.getUnitName();
 
         String workingAs = null;
-        Building productionBuilding = null;
+        WorkLocation productionWL = null;
 
         if (!allColonists) {
             workingAs = Messages.message(unitType.getWorkingAsKey());
             if (colony != null) {
                 GoodsType expert = unitType.getExpertProduction();
                 if (expert != null) {
-                    productionBuilding = colony.getBuildingForProducing(expert);
+                    productionWL = colony.getWorkLocationForProducing(expert);
                 }
             }
         }
@@ -293,8 +293,8 @@ public final class CompactLabourReport extends ReportPanel {
         int notProducingStartRow = row;
 
         if (showBuildings) {
-            if (productionBuilding != null && row > buildingStartRow) {
-                JLabel buildingLabel = localizedLabel(productionBuilding.getNameKey());
+            if (productionWL != null && row > buildingStartRow) {
+                JLabel buildingLabel = localizedLabel(productionWL.getLabel());
                 buildingLabel.setBorder(CELLBORDER);
                 reportPanel.add(buildingLabel, "cell " + BUILDING_COLUMN + " " + buildingStartRow + " 1 " + (row - buildingStartRow));
                 buildingStartRow = row;

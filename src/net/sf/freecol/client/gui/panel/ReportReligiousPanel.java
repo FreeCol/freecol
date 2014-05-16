@@ -33,6 +33,7 @@ import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.WorkLocation;
 
 
 /**
@@ -63,8 +64,11 @@ public final class ReportReligiousPanel extends ReportPanel {
         List<Colony> colonies = freeColClient.getMySortedColonies();
         int production = 0;
         for (Colony colony : colonies) {
-            Building building = colony.getBuildingForProducing(crosses);
-            if (building == null) continue;
+            WorkLocation wl = colony.getWorkLocationForProducing(crosses);
+            if (wl == null
+                || !(wl instanceof Building)) // TODO: fix!
+                continue;
+            Building building = (Building)wl;
             reportPanel.add(createColonyButton(colony),
                             "split 2, flowy, align center");
             BuildingPanel bp = new BuildingPanel(getFreeColClient(), building);

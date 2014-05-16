@@ -212,8 +212,8 @@ public final class ReportColonyPanel extends ReportPanel
                 int stockValue = colony.getGoodsCount(goodsType);
                 if (newValue != 0 || stockValue > 0) {
                     int maxProduction = 0;
-                    for (Building building : colony.getBuildingsForProducing(goodsType)) {
-                        maxProduction += building.getMaximumProductionOf(goodsType);
+                    for (WorkLocation wl : colony.getWorkLocationsForProducing(goodsType)) {
+                        maxProduction += wl.getMaximumProductionOf(goodsType);
                     }
                     ProductionLabel productionLabel = new ProductionLabel(getFreeColClient(), goodsType, newValue);
                     if (maxProduction > 0) {
