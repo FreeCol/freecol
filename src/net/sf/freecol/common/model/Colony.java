@@ -472,59 +472,15 @@ public class Colony extends Settlement implements Nameable {
         return (wls.isEmpty()) ? null : wls.get(0);
     }
 
-    private int getMinimumGoodsCount(List<AbstractGoods> goodsList) {
-        if (goodsList == null || goodsList.isEmpty()) {
-            return 0;
-        } else {
-            int result = -1;
-            for (AbstractGoods goods : goodsList) {
-                if (result < 0) {
-                    result = getGoodsCount(goods.getType());
-                } else {
-                    result = Math.min(result, getGoodsCount(goods.getType()));
-                }
-            }
-            return result;
-        }
-    }
-
     /**
-     * Gets the Building best suited for the given Unit.
+     * Gets the work location best suited for the given unit to
+     * produce a type of goods.
      *
      * @param unit The <code>Unit</code> to get the building for.
-     * @return The best <code>Building</code>.
+     * @param goodsType The <code>GoodsType</code> to produce.
+     * @return The best <code>WorkLocation</code> found.
      */
-    public WorkLocation getBuildingFor(Unit unit) {
-        GoodsType expertProduction = unit.getType().getExpertProduction();
-        if (!(expertProduction == null || expertProduction.isFarmed())) {
-            WorkLocation best = getBuildingFor(unit, expertProduction);
-            if (best != null) return best;
-        }
-        List<Building> buildings = new ArrayList<Building>(getBuildings());
-        for (Building building : buildings) {
-            switch (building.getNoAddReason(unit)) {
-            case NONE: case ALREADY_PRESENT:
-                if (!building.hasInputs()
-                    || getMinimumGoodsCount(building.getInputs()) > 0) {
-                    return building;
-                }
-                break;
-            default:
-                break;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Gets the Building best suited for the given Unit to produce an
-     * optional type of goods.
-     *
-     * @param unit The <code>Unit</code> to get the building for.
-     * @param goodsType The optional <code>GoodsType</code> to produce.
-     * @return The best <code>Building</code>.
-     */
-    public WorkLocation getBuildingFor(Unit unit, GoodsType goodsType) {
+    public WorkLocation getWorkLocationFor(Unit unit, GoodsType goodsType) {
         WorkLocation best = null;
         int bestProd = 0;
         for (WorkLocation wl : getWorkLocationsForProducing(goodsType)) {
@@ -542,6 +498,51 @@ public class Colony extends Settlement implements Nameable {
             }
         }
         return best;
+    }
+
+    /**
+     * Get the lowest currently available amount of required goods
+     * from a list.
+     *
+     * @param goodsList A list of <code>AbstractGoods</code> to require.
+     * @return The minimum goods count.
+     */
+    private int getMinimumGoodsCount(List<AbstractGoods> goodsList) {
+        if (goodsList == null || goodsList.isEmpty()) return 0;
+        int result = -1;
+        for (AbstractGoods ag : goodsList) {
+            result = (result < 0) ? getGoodsCount(ag.getType())
+                : Math.min(result, getGoodsCount(ag.getType()));
+        }
+        return result;
+    }
+
+    /**
+     * Gets the work location best suited for the given unit.
+     *
+     * @param unit The <code>Unit</code> to check for.
+     * @return The best <code>WorkLocation</code> found.
+     */
+    public WorkLocation getWorkLocationFor(Unit unit) {
+        GoodsType workType = unit.getType().getExpertProduction();
+        if (workType == null
+            && unit.getExperience() > 0) workType = unit.getExperienceType();
+        WorkLocation best = getWorkLocationFor(unit, workType);
+        if (best != null) return best;
+
+        for (WorkLocation wl : getCurrentWorkLocations()) {
+            switch (wl.getNoAddReason(unit)) {
+            case NONE: case ALREADY_PRESENT:
+                if (!wl.hasInputs()
+                    || getMinimumGoodsCount(wl.getInputs()) > 0) {
+                    return wl;
+                }
+                break;
+            default:
+                break;
+            }
+        }
+        return null;
     }
 
     /**
@@ -683,7 +684,7 @@ public class Colony extends Settlement implements Nameable {
                 return new Occupation(colonyTile, expertProduction);
             }
         } else {
-            WorkLocation wl = getBuildingFor(unit);
+            WorkLocation wl = getWorkLocationFor(unit);
             if (wl != null) {
                 // TODO: improve this, possible extend Occupation
                 List<AbstractGoods> outputs = wl.getOutputs();
@@ -713,7 +714,7 @@ public class Colony extends Settlement implements Nameable {
         if (bestTile != null) {
             return new Occupation(bestTile, bestType);
         }
-        WorkLocation wl = getBuildingFor(unit);
+        WorkLocation wl = getWorkLocationFor(unit);
         if (wl != null) {
             // TODO: improve this, possible extend Occupation
             List<AbstractGoods> outputs = wl.getOutputs();
