@@ -486,25 +486,6 @@ public class Colony extends Settlement implements Nameable {
             : null;
     }
  
-    /**
-     * Collect the buildings for producing the given type of goods.
-     *
-     * @param goodsType The type of goods.
-     * @return A <code>List</code> of <code>Building</code>s which produce
-     *         the given type of goods.
-     */
-    public List<Building> getBuildingsForProducing(GoodsType goodsType) {
-        List<Building> buildings = new ArrayList<Building>();
-        for (Building building : getBuildings()) {
-            for (AbstractGoods output : building.getOutputs()) {
-                if (output.getType() == goodsType) {
-                    buildings.add(building);
-                }
-            }
-        }
-        return buildings;
-    }
-
     private int getMinimumGoodsCount(List<AbstractGoods> goodsList) {
         if (goodsList == null || goodsList.isEmpty()) {
             return 0;
