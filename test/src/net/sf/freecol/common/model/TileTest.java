@@ -663,7 +663,7 @@ public class TileTest extends FreeColTestCase {
         assertEquals(colonyTile.getWorkTile().getOwningSettlement(), colony);
         assertTrue(colonyTile.canBeWorked());
         assertTrue(colonyTile.canAdd(unit));
-        assertEquals(colonyTile, colony.getVacantColonyTileFor(unit, false, silver));
+        assertEquals(colonyTile, colony.getVacantColonyTileFor(unit, silver));
     }
 
     public void testDefenceModifiers() {

@@ -308,7 +308,7 @@ public class ServerBuildingTest extends FreeColTestCase {
         assertEquals(1, getUnitList(colony, masterBlacksmithType).size());
         assertEquals(2, getUnitList(colony, expertLumberJackType).size());
 
-        lumberjack.setLocation(colony.getVacantColonyTileFor(lumberjack, true,
+        lumberjack.setLocation(colony.getVacantColonyTileFor(lumberjack,
                                                              grainType));
         assertNull(lumberjack.getStudent());
         Unit smithToBe = blacksmith.getStudent();
@@ -324,7 +324,7 @@ public class ServerBuildingTest extends FreeColTestCase {
         assertEquals(1, getUnitList(colony, expertOreMinerType).size());
         assertEquals(2, getUnitList(colony, masterBlacksmithType).size());
 
-        blacksmith.setLocation(colony.getVacantColonyTileFor(blacksmith, true,
+        blacksmith.setLocation(colony.getVacantColonyTileFor(blacksmith,
                                                              grainType));
         assertNull(blacksmith.getStudent());
         veteran.setLocation(college);
@@ -336,7 +336,7 @@ public class ServerBuildingTest extends FreeColTestCase {
         assertEquals(1, getUnitList(colony, freeColonistType).size());
         assertEquals(2, getUnitList(colony, expertOreMinerType).size());
 
-        ore.setLocation(colony.getVacantColonyTileFor(ore, true, grainType));
+        ore.setLocation(colony.getVacantColonyTileFor(ore, grainType));
         assertNull(ore.getStudent());
 
         while (1 == getUnitList(colony, freeColonistType).size()) {
@@ -720,7 +720,7 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         // Now we want the colonist to be a carpenter. We just want to
         // shuffle the teachers.  Move them out of the school.
-        teacher2.setLocation(colony.getVacantColonyTileFor(teacher2, true,
+        teacher2.setLocation(colony.getVacantColonyTileFor(teacher2,
                                                            grainType));
         teacher1.setLocation(colony.getTile());
         assertNull(teacher1.getStudent());
@@ -786,7 +786,7 @@ public class ServerBuildingTest extends FreeColTestCase {
         assertEquals(3, teacher1.getTurnsOfTraining());
 
         // Then teacher2 for 1 turn
-        teacher1.setLocation(colony.getVacantColonyTileFor(teacher1, true,
+        teacher1.setLocation(colony.getVacantColonyTileFor(teacher1,
                                                            grainType));
         teacher2.setLocation(university);
         ServerTestHelper.newTurn();
@@ -961,7 +961,7 @@ public class ServerBuildingTest extends FreeColTestCase {
         ServerTestHelper.newTurn();
 
         // After 2 turns replace by miner. Progress starts from scratch.
-        lumberjack.setLocation(colony.getVacantColonyTileFor(lumberjack, true, grainType));
+        lumberjack.setLocation(colony.getVacantColonyTileFor(lumberjack, grainType));
         assertNull(lumberjack.getStudent());
         assertNull(colonist.getTeacher());
 

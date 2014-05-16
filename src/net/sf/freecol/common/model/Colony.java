@@ -552,27 +552,21 @@ public class Colony extends Settlement implements Nameable {
      *
      * @param unit The <code>Unit</code> to find a vacant
      *            <code>ColonyTile</code> for.
-     * @param allowClaim Allow claiming free tiles from other settlements.
      * @param goodsTypes The types of goods that should be produced.
      * @return The <code>ColonyTile</code> giving the highest production of
      *         the given goods for the given unit or <code>null</code> if
      *         there is no available <code>ColonyTile</code> for producing
      *         that goods.
      */
-    public ColonyTile getVacantColonyTileFor(Unit unit, boolean allowClaim,
+    public ColonyTile getVacantColonyTileFor(Unit unit,
                                              GoodsType... goodsTypes) {
+        final UnitType unitType = unit.getType();
         ColonyTile best = null;
         int bestProd = 0;
         for (ColonyTile colonyTile : colonyTiles) {
             Tile workTile = colonyTile.getWorkTile();
             switch (colonyTile.getNoAddReason(unit)) {
-            case CLAIM_REQUIRED:
-                if (owner.getLandPrice(workTile) < 0) allowClaim = false;
-                // Fall through.
             case NONE: case ALREADY_PRESENT:
-                if (workTile.getOwningSettlement() != this
-                    && !allowClaim) break;
-                UnitType unitType = unit.getType();
                 for (GoodsType goodsType : goodsTypes) {
                     if (goodsType == null) continue;
                     int prod = colonyTile.getPotentialProduction(goodsType,
@@ -672,14 +666,14 @@ public class Colony extends Settlement implements Nameable {
             if (unit.getExperience() > 0) {
                 expertProduction = unit.getWorkType();
                 if (expertProduction != null && expertProduction.isFarmed()) {
-                    ColonyTile colonyTile = getVacantColonyTileFor(unit, false, expertProduction);
+                    ColonyTile colonyTile = getVacantColonyTileFor(unit, expertProduction);
                     if (colonyTile != null) {
                         return new Occupation(colonyTile, expertProduction);
                     }
                 }
             }
         } else if (expertProduction.isFarmed()) {
-            ColonyTile colonyTile = getVacantColonyTileFor(unit, false, expertProduction);
+            ColonyTile colonyTile = getVacantColonyTileFor(unit, expertProduction);
             if (colonyTile != null) {
                 return new Occupation(colonyTile, expertProduction);
             }
@@ -700,7 +694,7 @@ public class Colony extends Settlement implements Nameable {
         int bestProduction = 0;
         UnitType unitType = unit.getType();
         for (GoodsType foodType : getSpecification().getFoodGoodsTypeList()) {
-            ColonyTile colonyTile = getVacantColonyTileFor(unit, false, foodType);
+            ColonyTile colonyTile = getVacantColonyTileFor(unit, foodType);
             if (colonyTile != null) {
                 int production = colonyTile.getPotentialProduction(foodType,
                                                                    unitType);

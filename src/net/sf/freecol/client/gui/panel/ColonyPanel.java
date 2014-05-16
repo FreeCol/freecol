@@ -2122,7 +2122,7 @@ public final class ColonyPanel extends PortPanel
                 GoodsType workType = unit.getWorkType();
                 if (workType != null
                     && getClientOptions().getBoolean(ClientOptions.SHOW_NOT_BEST_TILE)) {
-                    ColonyTile best = colony.getVacantColonyTileFor(unit, false,
+                    ColonyTile best = colony.getVacantColonyTileFor(unit,
                                                                     workType);
                     if (best != null && colonyTile != best
                         && (colonyTile.getPotentialProduction(workType, unit.getType())
