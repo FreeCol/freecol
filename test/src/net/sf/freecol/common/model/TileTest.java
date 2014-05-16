@@ -644,26 +644,23 @@ public class TileTest extends FreeColTestCase {
         Tile tile = colony.getTile().getNeighbourOrNull(Map.Direction.N);
         ColonyTile colonyTile = colony.getColonyTile(tile);
         tile.addResource(new Resource(game, tile, mineralsResource));
-        if (!colonyTile.isEmpty()) {
-            colonyTile.getUnitList().get(0)
-                .setLocation(colony.getBuilding(townHallType));
+        for (Unit u : colonyTile.getUnitList()) {
+            u.setLocation(colony.getBuilding(townHallType));
         }
         assertTrue(colonyTile.isEmpty());
+        assertEquals(colonyTile.getWorkTile().getOwningSettlement(), colony);
 
         Unit unit = colony.getUnitList().get(0);
         assertEquals(colonistType, unit.getType());
         assertTrue(silver.isFarmed());
         assertEquals(0, tundra.getPotentialProduction(silver, colonistType));
         assertEquals(1, tile.getPotentialProduction(silver, colonistType));
-
         assertFalse(tile.getProductionModifiers(silver, colonistType)
             .isEmpty());
-
         assertEquals(1, colonyTile.getPotentialProduction(silver, unit.getType()));
-        assertEquals(colonyTile.getWorkTile().getOwningSettlement(), colony);
         assertTrue(colonyTile.canBeWorked());
         assertTrue(colonyTile.canAdd(unit));
-        assertEquals(colonyTile, colony.getVacantColonyTileFor(unit, silver));
+        assertEquals(colonyTile, colony.getWorkLocationFor(unit, silver));
     }
 
     public void testDefenceModifiers() {

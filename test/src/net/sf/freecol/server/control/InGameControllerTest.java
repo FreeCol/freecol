@@ -2009,9 +2009,9 @@ public class InGameControllerTest extends FreeColTestCase {
         Unit colonist = new ServerUnit(game, map.getTile(6, 8), dutch,
                                        colonistType);
         colonist.changeWorkType(grainType);
-        ColonyTile ct = colony.getVacantColonyTileFor(colonist, grainType);
-        assertNotNull(ct);
-        colonist.setLocation(ct);
+        WorkLocation wl = colony.getWorkLocationFor(colonist, grainType);
+        assertNotNull(wl);
+        colonist.setLocation(wl);
         colonist.modifyExperience(10);
         assertTrue("Colonist should some initial experience",
                    colonist.getExperience() > 0);
