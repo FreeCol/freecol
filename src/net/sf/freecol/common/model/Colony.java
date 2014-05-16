@@ -481,8 +481,9 @@ public class Colony extends Settlement implements Nameable {
      *         or <code>null</code> if such a building can not be found.
      */
     public Building getBuildingForProducing(GoodsType goodsType) {
-        List<Building> buildings = getBuildingsForProducing(goodsType);
-        return (buildings.isEmpty()) ? null : buildings.get(0);
+        WorkLocation wl = getWorkLocationForProducing(goodsType);
+        return (wl != null && wl instanceof Building) ? (Building)wl
+            : null;
     }
  
     /**
@@ -526,13 +527,11 @@ public class Colony extends Settlement implements Nameable {
      * @param unit The <code>Unit</code> to get the building for.
      * @return The best <code>Building</code>.
      */
-    public Building getBuildingFor(Unit unit) {
+    public WorkLocation getBuildingFor(Unit unit) {
         GoodsType expertProduction = unit.getType().getExpertProduction();
         if (!(expertProduction == null || expertProduction.isFarmed())) {
-            Building best = getBuildingFor(unit, expertProduction);
-            if (best != null) {
-                return best;
-            }
+            WorkLocation best = getBuildingFor(unit, expertProduction);
+            if (best != null) return best;
         }
         List<Building> buildings = new ArrayList<Building>(getBuildings());
         for (Building building : buildings) {
@@ -558,19 +557,17 @@ public class Colony extends Settlement implements Nameable {
      * @param goodsType The optional <code>GoodsType</code> to produce.
      * @return The best <code>Building</code>.
      */
-    public Building getBuildingFor(Unit unit, GoodsType goodsType) {
-        List<Building> buildings
-            = new ArrayList<Building>(getBuildingsForProducing(goodsType));
-        Building best = null;
+    public WorkLocation getBuildingFor(Unit unit, GoodsType goodsType) {
+        WorkLocation best = null;
         int bestProd = 0;
-        for (Building building : buildings) {
-            switch (building.getNoAddReason(unit)) {
+        for (WorkLocation wl : getWorkLocationsForProducing(goodsType)) {
+            switch (wl.getNoAddReason(unit)) {
             case NONE: case ALREADY_PRESENT:
-                int prod = building.getPotentialProduction(goodsType,
-                                                           unit.getType());
-                if (prod > bestProd) {
+                int prod = wl.getPotentialProduction(goodsType,
+                                                     unit.getType());
+                if (bestProd < prod) {
                     bestProd = prod;
-                    best = building;
+                    best = wl;
                 }
                 break;
             default:
@@ -689,10 +686,10 @@ public class Colony extends Settlement implements Nameable {
                     return new Occupation(bestTile, bestWork);
                 } else {
                     for (GoodsType type : rawTypes) {
-                        for (Building building : getBuildingsForProducing(type)) {
-                            switch (building.getNoAddReason(unit)) {
+                        for (WorkLocation wl : getWorkLocationsForProducing(type)) {
+                            switch (wl.getNoAddReason(unit)) {
                             case NONE: case ALREADY_PRESENT:
-                                return new Occupation(building, type);
+                                return new Occupation(wl, type);
                             default:
                                 break;
                             }
@@ -719,11 +716,14 @@ public class Colony extends Settlement implements Nameable {
                 return new Occupation(colonyTile, expertProduction);
             }
         } else {
-            Building building = getBuildingFor(unit);
-            if (building != null) {
+            WorkLocation wl = getBuildingFor(unit);
+            if (wl != null) {
                 // TODO: improve this, possible extend Occupation
-                GoodsType output = building.getOutputs().get(0).getType();
-                return new Occupation(building, output);
+                List<AbstractGoods> outputs = wl.getOutputs();
+                if (!outputs.isEmpty()) {
+                    GoodsType output = wl.getOutputs().get(0).getType();
+                    return new Occupation(wl, output);
+                }
             }
         }
 
@@ -746,12 +746,12 @@ public class Colony extends Settlement implements Nameable {
         if (bestTile != null) {
             return new Occupation(bestTile, bestType);
         }
-        Building building = getBuildingFor(unit);
-        if (building != null) {
+        WorkLocation wl = getBuildingFor(unit);
+        if (wl != null) {
             // TODO: improve this, possible extend Occupation
-            List<AbstractGoods> outputs = building.getOutputs();
+            List<AbstractGoods> outputs = wl.getOutputs();
             if (outputs.isEmpty()) return null;
-            return new Occupation(building, outputs.get(0).getType());
+            return new Occupation(wl, outputs.get(0).getType());
         }
         return null;
     }

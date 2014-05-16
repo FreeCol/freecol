@@ -79,6 +79,7 @@ public class ColonyTest extends FreeColTestCase {
     private static final EquipmentType muskets
         = spec().getEquipmentType("model.equipment.muskets");
 
+
     public void testCurrentlyBuilding() {
         Game game = getGame();
         game.setMap(getTestMap(true));
@@ -241,15 +242,15 @@ public class ColonyTest extends FreeColTestCase {
         colonist.changeWorkType(cottonGoodsType);
         colonist.modifyExperience(100);
         nonServerJoinColony(colonist, colony);
-        assertEquals(townHallType, colony.getBuildingFor(colonist).getType());
-        assertEquals(townHallType, ((Building) colonist.getLocation()).getType());
+        assertEquals(townHall, colony.getBuildingFor(colonist));
+        assertEquals(townHall, (Building)colonist.getLocation());
         assertEquals(bellsGoodsType, colonist.getWorkType());
 
         colonist.setLocation(colony.getTile());
         colonist.setType(cottonPlanterType);
         nonServerJoinColony(colonist, colony);
-        assertEquals(townHallType, colony.getBuildingFor(colonist).getType());
-        assertEquals(townHallType, ((Building) colonist.getLocation()).getType());
+        assertEquals(townHall, colony.getBuildingFor(colonist));
+        assertEquals(townHall, (Building)colonist.getLocation());
         assertEquals(bellsGoodsType, colonist.getWorkType());
 
         // colonist produces cloth, because there is cotton now
@@ -258,8 +259,9 @@ public class ColonyTest extends FreeColTestCase {
         colony.addGoods(cottonGoodsType, 100);
         nonServerJoinColony(colonist, colony);
         assertTrue(colonist.getLocation() instanceof Building);
-        assertEquals(weaversHouseType, colony.getBuildingFor(colonist).getType());
-        assertEquals(weaversHouseType, ((Building) colonist.getLocation()).getType());
+        Building weaversHouse = colony.getBuilding(weaversHouseType);
+        assertEquals(weaversHouse, colony.getBuildingFor(colonist));
+        assertEquals(weaversHouse, (Building)colonist.getLocation());
         assertEquals(clothGoodsType, colonist.getWorkType());
     }
 

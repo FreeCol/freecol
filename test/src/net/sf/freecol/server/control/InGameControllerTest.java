@@ -1970,7 +1970,7 @@ public class InGameControllerTest extends FreeColTestCase {
                                    colonistType);
         // set the unit to work making bells
         unit.changeWorkType(bellsType);
-        unit.setLocation(colony.getBuildingsForProducing(bellsType).get(0));
+        unit.setLocation(colony.getWorkLocationForProducing(bellsType));
         ServerTestHelper.newTurn();
 
         assertNotNull("Colony should now have a stockade",
