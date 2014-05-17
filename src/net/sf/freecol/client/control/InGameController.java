@@ -1619,7 +1619,7 @@ public final class InGameController implements NetworkConstants {
                 continue;
             }
             for (ProductionType productionType : tile.getType()
-                     .getProductionTypes(false)) {
+                     .getAvailableProductionTypes(false)) {
                 int potential = (productionType.getOutput(goodsType) == null)
                     ? 0 : tile.getPotentialProduction(goodsType, null);
                 Integer oldPotential = goodsMap.get(goodsType);

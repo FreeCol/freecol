@@ -205,7 +205,8 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
             }
 
         } else {
-            for (ProductionType pt : buildingType.getProductionTypes(false)) {
+            for (ProductionType pt
+                     : buildingType.getAvailableProductionTypes(false)) {
                 List<AbstractGoods> inputs = pt.getInputs();
                 List<AbstractGoods> outputs = pt.getOutputs();
                 panel.add(localizedLabel("colopedia.buildings.production"), "newline");

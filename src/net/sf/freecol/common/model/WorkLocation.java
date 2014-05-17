@@ -348,7 +348,8 @@ public abstract class WorkLocation extends UnitLocation
     public ProductionType getBestProductionType(Unit unit) {
         ProductionType best = null;
         int amount = 0;
-        for (ProductionType productionType : getProductionTypes(false)) {
+        for (ProductionType productionType
+                 : getAvailableProductionTypes(false)) {
             for (AbstractGoods output : productionType.getOutputs()) {
                 int newAmount = getPotentialProduction(output.getType(),
                                                        unit.getType());
@@ -564,7 +565,7 @@ public abstract class WorkLocation extends UnitLocation
      * @param unattended If true, get unattended production types.
      * @return A list of suitable <code>ProductionType</code>s.
      */
-    public abstract List<ProductionType> getProductionTypes(boolean unattended);
+    public abstract List<ProductionType> getAvailableProductionTypes(boolean unattended);
     public abstract List<ProductionType> getProductionTypes();
 
 

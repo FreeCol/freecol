@@ -128,7 +128,8 @@ public final class TilePanel extends FreeColPanel {
 
             JLabel label = null;
             boolean first = true;
-            for (ProductionType productionType : tileType.getProductionTypes(false)) {
+            for (ProductionType productionType
+                     : tileType.getAvailableProductionTypes(false)) {
                 for (AbstractGoods output : productionType.getOutputs()) {
                     GoodsType goodsType = output.getType();
                     int potential = output.getAmount();

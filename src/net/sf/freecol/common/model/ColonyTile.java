@@ -373,18 +373,18 @@ public class ColonyTile extends WorkLocation {
     }
 
     public List<ProductionType> getProductionTypes() {
-        return getProductionTypes(isColonyCenterTile());
+        return getAvailableProductionTypes(isColonyCenterTile());
     }
 
     /**
      * {@inheritDoc}
      */
-    public List<ProductionType> getProductionTypes(boolean unattended) {
+    public List<ProductionType> getAvailableProductionTypes(boolean unattended) {
         if (workTile == null || workTile.getType() == null
             || unattended != isColonyCenterTile()) {
             return Collections.emptyList();
         }
-        return workTile.getType().getProductionTypes(unattended);
+        return workTile.getType().getAvailableProductionTypes(unattended);
     }
 
     /**

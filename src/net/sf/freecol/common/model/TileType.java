@@ -294,8 +294,8 @@ public final class TileType extends FreeColGameObjectType {
      * @param unattended Whether the production is unattended.
      * @return A list of <code>ProductionType</code>s.
      */
-    public List<ProductionType> getProductionTypes(boolean unattended) {
-        return getProductionTypes(unattended,
+    public List<ProductionType> getAvailableProductionTypes(boolean unattended) {
+        return getAvailableProductionTypes(unattended,
             getSpecification().getString(GameOptions.TILE_PRODUCTION));
     }
 
@@ -308,8 +308,8 @@ public final class TileType extends FreeColGameObjectType {
      * @param level The production level.
      * @return A list of <code>ProductionType</code>s.
      */
-    public List<ProductionType> getProductionTypes(boolean unattended,
-                                                   String level) {
+    public List<ProductionType> getAvailableProductionTypes(boolean unattended,
+                                                            String level) {
         List<ProductionType> good = new ArrayList<ProductionType>(),
             better = new ArrayList<ProductionType>();
         for (ProductionType productionType : productionTypes) {
@@ -346,7 +346,7 @@ public final class TileType extends FreeColGameObjectType {
     public boolean canProduce(GoodsType goodsType, UnitType unitType) {
         return goodsType != null
             && ProductionType.canProduce(goodsType,
-                getProductionTypes(unitType == null));
+                getAvailableProductionTypes(unitType == null));
     }
 
     /**
@@ -362,7 +362,7 @@ public final class TileType extends FreeColGameObjectType {
                                       UnitType unitType) {
         if (goodsType == null) return 0;
         AbstractGoods best = ProductionType.getBestOutputFor(goodsType,
-            getProductionTypes(unitType == null));
+            getAvailableProductionTypes(unitType == null));
         return (best == null) ? 0
             : (int)applyModifier(best.getAmount(), goodsType.getId(), unitType);
     }
@@ -378,7 +378,7 @@ public final class TileType extends FreeColGameObjectType {
      */
     public List<AbstractGoods> getPossibleProduction() {
         List<AbstractGoods> production = new ArrayList<AbstractGoods>();
-        for (ProductionType productionType : getProductionTypes(true)) {
+        for (ProductionType productionType : getAvailableProductionTypes(true)) {
             List<AbstractGoods> outputs = productionType.getOutputs();
             if (!outputs.isEmpty()) production.addAll(outputs);
         }
@@ -585,7 +585,8 @@ public final class TileType extends FreeColGameObjectType {
                 productionTypes.add(new ProductionType(goods, true,
                                                        tileProduction));
             } else if (SECONDARY_PRODUCTION_TAG.equals(tag)) {
-                for (ProductionType productionType : getProductionTypes(true)) {
+                for (ProductionType productionType
+                         : getAvailableProductionTypes(true)) {
                     if (tileProduction == null
                         || tileProduction.equals(productionType.getProductionLevel())) {
                         productionType.getOutputs().add(goods);

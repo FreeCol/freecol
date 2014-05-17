@@ -205,15 +205,15 @@ public final class BuildingType extends BuildableType
      * @param unattended Whether the production is unattended.
      * @return A list of <code>ProductionType</code>s.
      */
-    public List<ProductionType> getProductionTypes(boolean unattended) {
-        return getProductionTypes(unattended, null);
+    public List<ProductionType> getAvailableProductionTypes(boolean unattended) {
+        return getAvailableProductionTypes(unattended, null);
     }
 
     /**
      * Gets the production types available at the current difficulty
      * level.
      *
-     * TODO: TileType.getProductionTypes(boolean, String) uses the
+     * TODO: TileType.getAvailableProductionTypes(boolean) uses the
      * GameOptions.TILE_PRODUCTION option.  We should implement a
      * corresponding one for BuildingTypes.
      *
@@ -221,8 +221,8 @@ public final class BuildingType extends BuildableType
      * @param level The production level (NYI).
      * @return A list of <code>ProductionType</code>s.
      */
-    public List<ProductionType> getProductionTypes(boolean unattended,
-                                                   String level) {
+    public List<ProductionType> getAvailableProductionTypes(boolean unattended,
+                                                            String level) {
         List<ProductionType> result = new ArrayList<ProductionType>();
         for (ProductionType productionType : productionTypes) {
             if (productionType.isUnattended() == unattended
@@ -278,7 +278,7 @@ public final class BuildingType extends BuildableType
     public boolean canProduce(GoodsType goodsType, UnitType unitType) {
         return goodsType != null
             && ProductionType.canProduce(goodsType,
-                getProductionTypes(unitType == null));
+                getAvailableProductionTypes(unitType == null));
     }
 
     /**
@@ -294,7 +294,7 @@ public final class BuildingType extends BuildableType
                                       UnitType unitType) {
         if (goodsType == null) return 0;
         AbstractGoods best = ProductionType.getBestOutputFor(goodsType,
-            getProductionTypes(unitType == null));
+            getAvailableProductionTypes(unitType == null));
         return (best == null) ? 0
             : (int)applyModifier(best.getAmount(), goodsType.getId(), unitType);
     }

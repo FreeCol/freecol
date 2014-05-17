@@ -3444,7 +3444,7 @@ public class Player extends FreeColGameObject implements Nameable {
             // add good that could be produced by a colony on this tile
             int bestValue = 0;
             for (ProductionType productionType : t.getType()
-                     .getProductionTypes(true)) {
+                     .getAvailableProductionTypes(true)) {
                 if (productionType.getOutputs() != null) {
                     int newValue = 0;
                     for (AbstractGoods output: productionType.getOutputs()) {
@@ -3580,7 +3580,7 @@ public class Player extends FreeColGameObject implements Nameable {
         int initialFood = 0;
         final GoodsType foodType = spec.getPrimaryFoodType();
         for (ProductionType productionType : tile.getType()
-                 .getProductionTypes(true)) {
+                 .getAvailableProductionTypes(true)) {
             for (AbstractGoods output : productionType.getOutputs()) {
                 if (!output.getType().isFoodType()) continue;
                 int amount = tile.getPotentialProduction(output.getType(), null);
