@@ -163,25 +163,28 @@ public class ColonyProductionTest extends FreeColTestCase {
     }
 
     public void testBellNetProduction(){
-    	Game game = getStandardGame();
+        Game game = getStandardGame();
+        game.setMap(getTestMap());
 
-    	game.setMap(getTestMap());
-
-    	Colony colony = getStandardColony(7);
-
-    	int initialBellCount = colony.getGoodsCount(bellsType);
-    	int expectedBellCount = 0;
-    	int bellsProdPerTurn = colony.getTotalProductionOf(bellsType);
-    	int expectedBellProd = 1;
-    	int bellsUpkeep = colony.getConsumptionOf(bellsType);
-    	int expectedBellUpkeep =  colony.getUnitCount() - 2;
-    	int bellsNetProdPerTurn = colony.getNetProductionOf(bellsType);
-    	int expectedBellNetProd = expectedBellProd - expectedBellUpkeep;
-
-    	assertEquals("Wrong bell count", expectedBellCount, initialBellCount);
-    	assertEquals("Wrong bell production",expectedBellProd,bellsProdPerTurn);
-    	assertEquals("Wrong bell upkeep",expectedBellUpkeep,bellsUpkeep);
-    	assertEquals("Wrong bell net production",expectedBellNetProd,bellsNetProdPerTurn);
+        Colony colony = getStandardColony(3);
+      
+        int initialBellCount = colony.getGoodsCount(bellsType);
+        int expectedBellCount = 0;
+        int bellsProdPerTurn = colony.getTotalProductionOf(bellsType);
+        int expectedBellProd = 1;
+        int bellsUpkeep = colony.getConsumptionOf(bellsType);
+        int expectedBellUpkeep =  colony.getUnitCount() - 2;
+        int bellsNetProdPerTurn = colony.getNetProductionOf(bellsType);
+        int expectedBellNetProd = expectedBellProd - expectedBellUpkeep;
+        
+        assertEquals("Wrong bell count", expectedBellCount,
+                     initialBellCount);
+        assertEquals("Wrong bell production", expectedBellProd,
+                     bellsProdPerTurn);
+        assertEquals("Wrong bell upkeep", expectedBellUpkeep,
+                     bellsUpkeep);
+        assertEquals("Wrong bell net production", expectedBellNetProd,
+                     bellsNetProdPerTurn);
     }
 
     /**

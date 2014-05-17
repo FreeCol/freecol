@@ -415,7 +415,12 @@ public final class GoodsType extends FreeColGameObjectType {
      * raw material that can not be produced from any other.  The last
      * element of the production chain is the goods type itself.
      *
-     * @return The production chain of this <code>GoodsType</code> as a list.
+     * Note that this does not really handle goods that are stored as
+     * something else as is the case for grain etc.  TODO: fix or
+     * retire this routine?
+     *
+     * @return The production chain of this <code>GoodsType</code> as
+     *     a list.
      */
     public List<GoodsType> getProductionChain() {
         List<GoodsType> result = new ArrayList<GoodsType>();
@@ -445,6 +450,22 @@ public final class GoodsType extends FreeColGameObjectType {
         return false;
     }
 
+    /**
+     * Get all the equivalent goods types, in the sense that they are
+     * stored as this type.
+     *
+     * @return A list of equivalent <code>GoodsType</code>s, which
+     *     must include this one.
+     */
+    public List<GoodsType> getEquivalentTypes() {
+        List<GoodsType> result = new ArrayList<GoodsType>();
+        for (GoodsType type : getSpecification().getGoodsTypeList()) {
+            if (type == this
+                || type.getStoredAs() == this) result.add(type);
+        }
+        return result;
+    }
+        
     /**
      * Set the derived fields for the goods types in a specification.
      *

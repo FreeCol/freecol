@@ -1015,31 +1015,31 @@ public final class Specification {
     // -- Goods --
 
     public List<GoodsType> getGoodsTypeList() {
-        return goodsTypeList;
+        return new ArrayList<GoodsType>(goodsTypeList);
     }
 
     public List<GoodsType> getFarmedGoodsTypeList() {
-        return farmedGoodsTypeList;
+        return new ArrayList<GoodsType>(farmedGoodsTypeList);
     }
 
     public List<GoodsType> getNewWorldGoodsTypeList() {
-        return newWorldGoodsTypeList;
+        return new ArrayList<GoodsType>(newWorldGoodsTypeList);
     }
 
     public List<GoodsType> getLibertyGoodsTypeList() {
-        return libertyGoodsTypeList;
+        return new ArrayList<GoodsType>(libertyGoodsTypeList);
     }
 
     public List<GoodsType> getImmigrationGoodsTypeList() {
-        return immigrationGoodsTypeList;
+        return new ArrayList<GoodsType>(immigrationGoodsTypeList);
     }
 
     public List<GoodsType> getFoodGoodsTypeList() {
-        return foodGoodsTypeList;
+        return new ArrayList<GoodsType>(foodGoodsTypeList);
     }
 
     public final List<GoodsType> getRawBuildingGoodsTypeList() {
-        return rawBuildingGoodsTypeList;
+        return new ArrayList<GoodsType>(rawBuildingGoodsTypeList);
     }
 
     /**

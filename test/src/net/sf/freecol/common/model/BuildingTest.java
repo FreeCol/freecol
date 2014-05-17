@@ -70,6 +70,9 @@ public class BuildingTest extends FreeColTestCase {
     private static final BuildingType weaverHouseType
         = spec().getBuildingType("model.building.weaverHouse");
 
+    private static final EquipmentType missionaryEquipmentType
+        = spec().getEquipmentType("model.equipment.missionary");
+
     private static final GoodsType bellsType
         = spec().getGoodsType("model.goods.bells");
     private static final GoodsType clothType
@@ -216,36 +219,39 @@ public class BuildingTest extends FreeColTestCase {
 
         Colony colony = getStandardColony(6);
         Unit unit = colony.getUnitList().get(0);
-        EquipmentType missionary = spec().getEquipmentType("model.equipment.missionary");
 
         assertFalse(chapelType.hasAbility(Ability.DRESS_MISSIONARY));
         assertFalse(unit.hasAbility(Ability.DRESS_MISSIONARY));
-        assertFalse(unit.canBeEquippedWith(missionary));
+        assertFalse(unit.canBeEquippedWith(missionaryEquipmentType));
 
         Building church = colony.getBuilding(chapelType);
         assertTrue(church != null);
         assertFalse(colony.hasAbility(Ability.DRESS_MISSIONARY));
         assertFalse(unit.hasAbility(Ability.DRESS_MISSIONARY));
-        assertFalse(unit.canBeEquippedWith(missionary));
+        assertFalse(unit.canBeEquippedWith(missionaryEquipmentType));
         assertEquals(1, church.getPotentialProduction(crossesType, null));
 
         church.upgrade();
         assertTrue(church.getType().hasAbility(Ability.DRESS_MISSIONARY));
         assertTrue(colony.hasAbility(Ability.DRESS_MISSIONARY));
         assertTrue(unit.hasAbility(Ability.DRESS_MISSIONARY));
-        assertTrue(unit.canBeEquippedWith(missionary));
+        assertTrue(unit.canBeEquippedWith(missionaryEquipmentType));
         assertEquals(2, church.getPotentialProduction(crossesType, null));
     }
 
     public void testCanAddToBuilding() {
         Game game = getGame();
         game.setMap(getTestMap(true));
-
         Colony colony = getStandardColony(6);
+        Tile tile = colony.getTile();
         List<Unit> units = colony.getUnitList();
 
-        for (Building building : colony.getBuildings()) {
+        // Standard colony tends to place units in the town hall
+        for (Unit u : units) {
+            if (u.getLocation() instanceof Building) u.setLocation(tile);
+        }
 
+        for (Building building : colony.getBuildings()) {
             // schoolhouse is special, see testCanAddToSchool
             if (building.canTeach()) continue;
 
@@ -574,7 +580,9 @@ public class BuildingTest extends FreeColTestCase {
         Unit statesman = colony.getUnitList().get(1);
         statesman.setType(elderStatesmanType);
 
+        Tile tile = colony.getTile();
         Building building = colony.getBuilding(townHallType);
+        for (Unit u : building.getUnitList()) u.setLocation(tile);
 
         Set<Modifier> modifiers = colony.getModifierSet("model.goods.bells");
         assertEquals("Initial modifier size", 1,
@@ -664,6 +672,8 @@ public class BuildingTest extends FreeColTestCase {
         Colony colony = getStandardColony(6);
         Unit unit = colony.getUnitList().get(0);
         Building building = colony.getBuilding(townHallType);
+        Tile tile = colony.getTile();
+        for (Unit u : building.getUnitList()) u.setLocation(tile);
 
         int bellProduction = building.getTotalProductionOf(bellsType);
         int expectBellProd = 1;
@@ -689,6 +699,8 @@ public class BuildingTest extends FreeColTestCase {
         Colony colony = getStandardColony(6);
         Unit unit = colony.getUnitList().get(0);
         Building building = colony.getBuilding(townHallType);
+        Tile tile = colony.getTile();
+        for (Unit u : building.getUnitList()) u.setLocation(tile);
 
         int bellProduction = building.getTotalProductionOf(bellsType);
         int expectBellProd = 1;

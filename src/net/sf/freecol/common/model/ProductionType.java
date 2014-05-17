@@ -195,7 +195,8 @@ public class ProductionType extends FreeColObject {
      * Get the goods of the given goods type in this production type.
      *
      * @param goodsType The <code>GoodsType</code> to check.
-     * @return The <code>AbstractGoods</code> output if any, otherwise null.
+     * @return The <code>AbstractGoods</code> output if any, otherwise
+     *     null.
      */
     public AbstractGoods getOutput(GoodsType goodsType) {
         if (outputs != null) {
@@ -428,12 +429,12 @@ public class ProductionType extends FreeColObject {
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder(64);
-        result.append("[").append(getId()).append(": ");
+        result.append("[").append(getId()).append(":");
         if (productionLevel != null) {
-            result.append(productionLevel);
+            result.append(" ").append(productionLevel);
         }
         if (unattended) {
-            result.append(", unattended");
+            result.append(" unattended");
         }
         if (!(inputs == null || inputs.isEmpty())) {
             result.append(" [inputs: ");

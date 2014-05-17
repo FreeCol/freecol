@@ -136,13 +136,13 @@ public class ColonyTest extends FreeColTestCase {
     }
 
     public void testOccupationWithFood() {
-        int population = 3;
+        int population = 1;
 
         Game game = getGame();
         game.setMap(getTestMap(true));
         Colony colony = getStandardColony(population);
 
-        assertTrue("colony produces less food than it consumes",
+        assertTrue("colony should produce enough food",
                    colony.getFoodProduction() > colony.getFoodConsumption()
                    + freeColonistType.getConsumptionOf(grainGoodsType));
 
@@ -212,7 +212,6 @@ public class ColonyTest extends FreeColTestCase {
             }
         }
         assertEquals(2, modifierCount);
-
     }
 
     public void testGetWorkLocationForUnit() {
