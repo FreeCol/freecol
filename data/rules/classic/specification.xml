@@ -1496,12 +1496,12 @@ resources of 400, lost city rumours of 500
   -->
   <building-types>
     <building-type id="model.building.townHall">
+      <production unattended="true">
+        <output goods-type="model.goods.bells" value="1"/>
+      </production>
       <production>
         <output goods-type="model.goods.bells" value="3"/>
       </production>
-      <modifier id="model.goods.bells" type="additive" value="1">
-        <scope ability-id="model.ability.person" matchNegated="true"/>
-      </modifier>
     </building-type>
     <building-type id="model.building.carpenterHouse">
       <production>
@@ -1739,24 +1739,21 @@ resources of 400, lost city rumours of 500
       <ability id="model.ability.expertsUseConnections" value="true"/>
     </building-type>
     <building-type id="model.building.chapel" workplaces="0">
-      <production>
+      <production unattended="true">
         <output goods-type="model.goods.crosses" value="1"/>
       </production>
-      <modifier id="model.goods.crosses" type="additive" value="1">
-        <scope ability-id="model.ability.person" matchNegated="true"/>
-      </modifier>
     </building-type>
     <building-type id="model.building.church"
                    extends="model.building.chapel"
                    upgradesFrom="model.building.chapel"
                    workplaces="3"
                    required-population="3" upkeep="5">
+      <production unattended="true">
+        <output goods-type="model.goods.crosses" value="2"/>
+      </production>
       <production>
         <output goods-type="model.goods.crosses" value="3"/>
       </production>
-      <modifier id="model.goods.crosses" type="additive" value="1">
-        <scope ability-id="model.ability.person" matchNegated="true"/>
-      </modifier>
       <required-goods id="model.goods.hammers" value="64"/>
       <ability id="model.ability.dressMissionary" value="true"/>
     </building-type>
@@ -1764,12 +1761,12 @@ resources of 400, lost city rumours of 500
                    extends="model.building.church"
                    upgradesFrom="model.building.church"
                    required-population="8" upkeep="15">
+      <production unattended="true">
+        <output goods-type="model.goods.crosses" value="3"/>
+      </production>
       <production>
         <output goods-type="model.goods.crosses" value="6"/>
       </production>
-      <modifier id="model.goods.crosses" type="additive" value="1">
-        <scope ability-id="model.ability.person" matchNegated="true"/>
-      </modifier>
       <required-goods id="model.goods.hammers" value="176"/>
       <required-goods id="model.goods.tools" value="100"/>
     </building-type>

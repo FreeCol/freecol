@@ -633,7 +633,7 @@ public class ProductionTypeTest extends FreeColTestCase {
     }
 
     public void testBellProduction() {
-        // Not yet! outputs.put(bells, 1);
+        outputs.put(bells, 1);
         testProduction(inputs, outputs,
                        townHall.getAvailableProductionTypes(true));
 
@@ -817,15 +817,14 @@ public class ProductionTypeTest extends FreeColTestCase {
     }
 
     public void testCrossProduction() {
-        // Not yet! outputs.put(crosses, 1); 
+        outputs.put(crosses, 1); 
         testProduction(inputs, outputs,
                        chapel.getAvailableProductionTypes(true));
 
-        outputs.put(crosses, 1); 
         testProduction(inputs, outputs,
                        chapel.getAvailableProductionTypes(false));
 
-        // Not yet! outputs.put(crosses, 2); 
+        outputs.put(crosses, 2); 
         testProduction(inputs, outputs,
                        church.getAvailableProductionTypes(true));
 
@@ -833,7 +832,7 @@ public class ProductionTypeTest extends FreeColTestCase {
         testProduction(inputs, outputs,
                        church.getAvailableProductionTypes(false));
 
-        // Not yet! outputs.put(crosses, 3); 
+        outputs.put(crosses, 3); 
         testProduction(inputs, outputs,
                        cathedral.getAvailableProductionTypes(true));
 

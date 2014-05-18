@@ -576,22 +576,15 @@ public class BuildingTest extends FreeColTestCase {
         for (Unit u : building.getUnitList()) u.setLocation(tile);
 
         Set<Modifier> modifiers = colony.getModifierSet("model.goods.bells");
-        assertEquals("Initial modifier size", 1,
-                     modifiers.size());
-        Modifier bellsModifier = modifiers.iterator().next();
-        assertEquals("Initial modifier type", ModifierType.ADDITIVE,
-                     bellsModifier.getType());
-        assertEquals("Initial modifier value", 1.0f,
-                     bellsModifier.getValue());
-
-        assertEquals("Initial bell production", (int)bellsModifier.getValue(),
+        assertTrue("No initial modifiers", modifiers.isEmpty());
+        assertEquals("Initial bell production", 1,
                      building.getTotalProductionOf(bellsType));
 
         colonist.setLocation(building);
         // 3 from the colonist
         assertEquals("Production(Colonist)", 3,
                      building.getUnitProduction(colonist, bellsType));
-        // 3(colonist) + 1(autoproduced)
+        // 3(colonist) + 1(unattended)
         assertEquals("Total production(Colonist)", 4,
                      building.getTotalProductionOf(bellsType));
 
@@ -600,19 +593,19 @@ public class BuildingTest extends FreeColTestCase {
             .getFoundingFather("model.foundingFather.thomasJefferson");
         modifiers = jefferson.getModifierSet("model.goods.bells");
         assertEquals("Jefferson modifier size", 1, modifiers.size());
-        bellsModifier = modifiers.iterator().next();
+        Modifier bellsModifier = modifiers.iterator().next();
         owner.addFather(jefferson);
 
         // Jefferson is a property of the player...
-        assertTrue("Jefferson modifier present in player",
+        assertTrue("Jefferson should be present in player",
             colony.getOwner().getModifierSet("model.goods.bells")
                              .contains(bellsModifier));
         // ...not the colony,
-        assertFalse("Jefferson modifier not present in colony",
+        assertFalse("Jefferson should not be present in colony",
             colony.getModifierSet("model.goods.bells")
                   .contains(bellsModifier));
-        // ...but the building modifiers do have it.
-        assertFalse("Jefferson modifier present in building modifiers",
+        // ...and the building modifiers do not have it.
+        assertFalse("Jefferson modifier should not be present in building modifiers",
             building.getModifierSet("model.goods.bells")
                     .contains(bellsModifier));
 
@@ -644,7 +637,8 @@ public class BuildingTest extends FreeColTestCase {
                      building.getTotalProductionOf(bellsType));
 
         // Add newspaper
-        Building newspaper = new ServerBuilding(getGame(), colony, newspaperType);
+        Building newspaper = new ServerBuilding(getGame(), colony,
+                                                newspaperType);
         colony.addBuilding(newspaper);
         colony.invalidateCache();
         assertEquals("Production(Colonist/Jefferson/2/Newspaper)", 5,
