@@ -2156,7 +2156,7 @@ public class InGameControllerTest extends FreeColTestCase {
         assertEquals(gardenerType, gardener.getType());
         assertEquals(farmerType,
             gardener.getType().getTargetType(enterColony, dutch));
-        WorkLocation loc = colony.getVacantWorkLocationFor(gardener);
+        WorkLocation loc = colony.getWorkLocationFor(gardener);
         assertNotNull(loc);
         gardener.setLocation(colony.getTile());
 

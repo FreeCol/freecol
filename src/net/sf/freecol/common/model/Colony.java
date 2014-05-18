@@ -378,6 +378,23 @@ public class Colony extends Settlement implements Nameable {
     // Private Occupation routines
 
     /**
+     * Get the lowest currently available amount of required goods
+     * from a list.
+     *
+     * @param goodsList A list of <code>AbstractGoods</code> to require.
+     * @return The minimum goods count.
+     */
+    private int getMinimumGoodsCount(List<AbstractGoods> goodsList) {
+        if (goodsList == null || goodsList.isEmpty()) return INFINITY;
+        int result = -1;
+        for (AbstractGoods ag : goodsList) {
+            result = (result < 0) ? getGoodsCount(ag.getType())
+                : Math.min(result, getGoodsCount(ag.getType()));
+        }
+        return result;
+    }
+
+    /**
      * Gets the best occupation for a given unit to produce one of
      * a given set of goods types.
      *
@@ -766,23 +783,6 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
-     * Get the lowest currently available amount of required goods
-     * from a list.
-     *
-     * @param goodsList A list of <code>AbstractGoods</code> to require.
-     * @return The minimum goods count.
-     */
-    private int getMinimumGoodsCount(List<AbstractGoods> goodsList) {
-        if (goodsList == null || goodsList.isEmpty()) return INFINITY;
-        int result = -1;
-        for (AbstractGoods ag : goodsList) {
-            result = (result < 0) ? getGoodsCount(ag.getType())
-                : Math.min(result, getGoodsCount(ag.getType()));
-        }
-        return result;
-    }
-
-    /**
      * Gets the work location best suited for the given unit.
      *
      * @param unit The <code>Unit</code> to check for.
@@ -791,59 +791,6 @@ public class Colony extends Settlement implements Nameable {
     public WorkLocation getWorkLocationFor(Unit unit) {
         Occupation occupation = getOccupationFor(unit, null);
         return (occupation == null) ? null : occupation.workLocation;
-    }
-
-    /**
-     * Gets a vacant <code>WorkLocation</code> for the given
-     * <code>Unit</code>.
-     *
-     * @param unit The <code>Unit</code>
-     * @return A vacant <code>WorkLocation</code> for the given
-     *         <code>Unit</code> or <code>null</code> if there is no such
-     *         location.
-     */
-    public WorkLocation getVacantWorkLocationFor(Unit unit) {
-        Occupation occupation = getOccupationFor(unit, null);
-        return (occupation == null) ? null : occupation.workLocation;
-    }
-
-    /**
-     * Returns a vacant <code>ColonyTile</code> where the given
-     * <code>unit</code> produces the maximum output of the given
-     * <code>goodsType</code>.
-     *
-     * @param unit The <code>Unit</code> to find a vacant
-     *            <code>ColonyTile</code> for.
-     * @param goodsTypes The types of goods that should be produced.
-     * @return The <code>ColonyTile</code> giving the highest production of
-     *         the given goods for the given unit or <code>null</code> if
-     *         there is no available <code>ColonyTile</code> for producing
-     *         that goods.
-     */
-    public ColonyTile getVacantColonyTileFor(Unit unit,
-                                             GoodsType... goodsTypes) {
-        final UnitType unitType = unit.getType();
-        ColonyTile best = null;
-        int bestProd = 0;
-        for (ColonyTile colonyTile : colonyTiles) {
-            Tile workTile = colonyTile.getWorkTile();
-            switch (colonyTile.getNoAddReason(unit)) {
-            case NONE: case ALREADY_PRESENT:
-                for (GoodsType goodsType : goodsTypes) {
-                    if (goodsType == null) continue;
-                    int prod = colonyTile.getPotentialProduction(goodsType,
-                                                                 unitType);
-                    if (prod > bestProd) {
-                        bestProd = prod;
-                        best = colonyTile;
-                    }
-                }
-                break;
-            default:
-                break;
-            }
-        }
-        return best;
     }
 
     /**
