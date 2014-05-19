@@ -314,15 +314,20 @@ public class ColonyTile extends WorkLocation {
                                       UnitType unitType) {
         if (!canProduce(goodsType, unitType)) return 0;
 
-        int amount = 0;
-        if (unitType == null || canBeWorked()) {
-            amount = getWorkTile().getBaseProduction(goodsType, unitType);
-            amount = (int)FeatureContainer.applyModifiers(amount,
-                getGame().getTurn(),
-                getProductionModifiers(goodsType, unitType));
-            if (amount < 0) amount = 0;
+        if (unitType != null) {
+            switch (getNoWorkReason()) {
+            case NONE: case ALREADY_PRESENT: case CLAIM_REQUIRED:
+                break;
+            default:
+                return 0;
+            }
         }
-        return amount;
+
+        int amount = getWorkTile().getBaseProduction(goodsType, unitType);
+        amount = (int)FeatureContainer.applyModifiers(amount,
+            getGame().getTurn(),
+            getProductionModifiers(goodsType, unitType));
+        return (amount < 0) ? 0 : amount;
     }
 
     /**
