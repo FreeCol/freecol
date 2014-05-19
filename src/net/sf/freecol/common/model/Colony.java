@@ -830,23 +830,10 @@ public class Colony extends Settlement implements Nameable {
      * @return The best <code>WorkLocation</code> found.
      */
     public WorkLocation getWorkLocationFor(Unit unit, GoodsType goodsType) {
-        WorkLocation best = null;
-        int bestProd = 0;
-        for (WorkLocation wl : getWorkLocationsForProducing(goodsType)) {
-            switch (wl.getNoAddReason(unit)) {
-            case NONE: case ALREADY_PRESENT:
-                int prod = wl.getPotentialProduction(goodsType,
-                                                     unit.getType());
-                if (bestProd < prod) {
-                    bestProd = prod;
-                    best = wl;
-                }
-                break;
-            default:
-                break;
-            }
-        }
-        return best;
+        if (goodsType == null) return getWorkLocationFor(unit);
+        Occupation occupation
+            = getOccupationFor(unit, goodsType.getEquivalentTypes());
+        return (occupation == null) ? null : occupation.workLocation;
     }
 
     /**
