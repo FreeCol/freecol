@@ -518,6 +518,12 @@ public final class EuropePanel extends PortPanel {
                 }
                 final Unit unit = ((UnitLabel)comp).getUnit();
 
+                if (unit.getTradeRoute() != null) {
+                    if (!getGUI().checkClearTradeRoute(unit)
+                        || !getController().assignTradeRoute(unit, null))
+                        return null;
+                }
+
                 Location dest = destination;
                 if (unit.isInEurope()) {
                     dest = getGUI().showSelectDestinationDialog(unit);

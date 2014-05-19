@@ -1076,6 +1076,24 @@ public class GUI {
 
     // Dialog display
 
+    /**
+     * If a unit has a trade route, get confirmation that it is
+     * ok to clear it and set a destination.
+     *
+     * @param unit The <code>Unit</code> to check.
+     * @return Whether it is acceptable to set a destination for this unit.
+     */
+    public boolean checkClearTradeRoute(Unit unit) {
+        TradeRoute tr = unit.getTradeRoute();
+        if (tr == null) return true;
+        StringTemplate template
+            = StringTemplate.template("traderoute.reassignRoute")
+                .addStringTemplate("%unit%", unit.getFullLabel())
+                .addName("%route%", tr.getName());
+        return showConfirmDialog(true, unit.getTile(), template,
+                                 unit, "yes", "no");
+    }
+
     public <T> T showChoiceDialog(boolean modal, Tile tile, String text,
                                   Object obj, String cancelKey,
                                   List<ChoiceItem<T>> choices) {

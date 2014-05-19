@@ -2521,8 +2521,9 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Moves the specified unit somewhere that requires crossing the high seas.
-     * Public because this is called from the TilePopup and the Europe panel.
+     * Moves the specified unit somewhere that requires crossing the
+     * high seas.  Public because this is called from the TilePopup
+     * and the Europe panel.
      *
      * @param unit The <code>Unit</code> to be moved.
      * @param destination The <code>Location</code> to be moved to.
@@ -4338,14 +4339,7 @@ public final class InGameController implements NetworkConstants {
      * @see Unit#setDestination(Location)
      */
     public boolean setDestination(Unit unit, Location destination) {
-        if (unit.getTradeRoute() != null) {
-            StringTemplate template
-                = StringTemplate.template("traderoute.reassignRoute")
-                .addStringTemplate("%unit%", unit.getFullLabel())
-                .addName("%route%", unit.getTradeRoute().getName());
-            if (!gui.showConfirmDialog(true, unit.getTile(), template,
-                                       unit, "yes", "no")) return false;
-        }
+        if (!gui.checkClearTradeRoute(unit)) return false;
         return askServer().setDestination(unit, destination)
             && unit.getDestination() == destination;
     }
