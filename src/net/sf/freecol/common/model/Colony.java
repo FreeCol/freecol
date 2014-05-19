@@ -744,6 +744,8 @@ public class Colony extends Settlement implements Nameable {
 
     /**
      * Find a work location for producing a given type of goods.
+     * Beware that this may not be the optimal location for the
+     * production, for which {@link #getWorkLocationFor} is better.
      *
      * @param goodsType The <code>GoodsType</code> to produce.
      * @return A <code>WorkLocation</code>s which produces

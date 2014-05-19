@@ -284,7 +284,7 @@ public class FreeColTestCase extends TestCase {
     /**
      * Get a standard colony at the location 5,8 with one free colonist
      *
-     * @return
+     * @return The <code>Colony</code> as specified.
      */
     public Colony getStandardColony() {
         return getStandardColony(1, 5, 8);
@@ -293,33 +293,32 @@ public class FreeColTestCase extends TestCase {
     /**
      * Get a colony with the given number of settlers
      *
-     * @param numberOfSettlers The number of settlers to put into the colony.
-     *            Must be >= 1.
-     *
-     * @return
+     * @param numberOfSettlers The number of settlers to put into the
+     *     colony.  Must be >= 1.
+     * @return The <code>Colony</code> as specified.
      */
     public Colony getStandardColony(int numberOfSettlers) {
         return getStandardColony(numberOfSettlers, 5, 8);
     }
 
     /**
-     * Get a colony with the given number of settlers
+     * Get a colony with the given number of settlers, at a specified
+     * location.
      *
-     * @param numberOfSettlers The number of settlers to put into the colony.
-     *            Must be >= 1.
+     * @param numberOfSettlers The number of settlers to put into the
+     *     colony.  Must be >= 1.
      * @param tileX Coordinate of tile for the colony.
      * @param tileY Coordinate of tile for the colony.
-     *
-     * @return
+     * @return The <code>Colony</code> as specified.
      */
-    public Colony getStandardColony(int numberOfSettlers, int tileX, int tileY) {
+    public Colony getStandardColony(int numberOfSettlers,
+                                    int tileX, int tileY) {
         Game game = getGame();
-
         Map map = game.getMap();
-
         Tile tile = map.getTile(tileX, tileY);
 
-        FreeColTestUtils.ColonyBuilder builder = FreeColTestUtils.getColonyBuilder();
+        FreeColTestUtils.ColonyBuilder builder
+            = FreeColTestUtils.getColonyBuilder();
         builder.colonyTile(tile).initialColonists(numberOfSettlers);
 
         Colony ret = builder.build();

@@ -998,11 +998,13 @@ public class SimpleMapGenerator implements MapGenerator {
         colony.addBuilding(schoolhouse);
         unitType = spec.getUnitType("model.unit.masterCarpenter");
         Unit carpenter = new ServerUnit(game, colonyTile, player, unitType);
-        carpenter.setLocation(colony.getWorkLocationForProducing(unitType.getExpertProduction()));
+        carpenter.setLocation(colony.getWorkLocationFor(carpenter,
+                carpenter.getExpertType()));
 
         unitType = spec.getUnitType("model.unit.elderStatesman");
         Unit statesman = new ServerUnit(game, colonyTile, player, unitType);
-        statesman.setLocation(colony.getWorkLocationForProducing(unitType.getExpertProduction()));
+        statesman.setLocation(colony.getWorkLocationFor(statesman,
+                statesman.getExpertType()));
 
         unitType = spec.getUnitType("model.unit.expertLumberJack");
         Unit lumberjack = new ServerUnit(game, colony, player, unitType);
