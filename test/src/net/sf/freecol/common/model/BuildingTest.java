@@ -107,6 +107,8 @@ public class BuildingTest extends FreeColTestCase {
         = spec().getUnitType("model.unit.elderStatesman");
     private static final UnitType expertFarmerType
         = spec().getUnitType("model.unit.expertFarmer");
+    private static final UnitType firebrandPreacherType
+        = spec().getUnitType("model.unit.firebrandPreacher");
     private static final UnitType freeColonistType
         = spec().getUnitType("model.unit.freeColonist");
     private static final UnitType indenturedServantType
@@ -221,31 +223,149 @@ public class BuildingTest extends FreeColTestCase {
         Game game = getGame();
         game.setMap(getTestMap(true));
 
-        Colony colony = getStandardColony(6);
-        Unit unit = colony.getUnitList().get(0);
+        // Make a colony big enough to build a cathedral, and add enough
+        // liberty to zero the production bonus.
+        Colony colony = getStandardColony(10);
+        while (colony.getProductionBonus() < 0) colony.modifyLiberty(100);
+        Unit unit0 = colony.getUnitList().get(0);
+        Unit unit1 = colony.getUnitList().get(1);
+        Unit unit2 = colony.getUnitList().get(2);
 
         assertFalse(chapelType.hasAbility(Ability.DRESS_MISSIONARY));
-        assertFalse(unit.hasAbility(Ability.DRESS_MISSIONARY));
-        assertFalse(unit.canBeEquippedWith(missionaryEquipmentType));
+        assertFalse(unit0.hasAbility(Ability.DRESS_MISSIONARY));
+        assertFalse(unit0.canBeEquippedWith(missionaryEquipmentType));
 
         Building church = colony.getBuilding(chapelType);
-        assertTrue(church != null);
+        assertNotNull(church);
         assertFalse(colony.hasAbility(Ability.DRESS_MISSIONARY));
-        assertFalse(unit.hasAbility(Ability.DRESS_MISSIONARY));
-        assertFalse(unit.canBeEquippedWith(missionaryEquipmentType));
-        assertEquals(1, church.getPotentialProduction(crossesType, null));
+
+        assertEquals("Chapel base cross production, no unit", 1,
+            church.getBaseProduction(null, crossesType, null));
+        assertEquals("Chapel potential cross production, no unit", 1,
+            church.getPotentialProduction(crossesType, null));
+        assertEquals("Chapel total cross production, no unit", 1,
+            church.getTotalProductionOf(crossesType));
 
         church.upgrade();
+        assertTrue("model.building.church".equals(church.getType().getId()));
         assertTrue(church.getType().hasAbility(Ability.DRESS_MISSIONARY));
         assertTrue(colony.hasAbility(Ability.DRESS_MISSIONARY));
-        assertTrue(unit.hasAbility(Ability.DRESS_MISSIONARY));
-        assertTrue(unit.canBeEquippedWith(missionaryEquipmentType));
-        assertEquals(2, church.getPotentialProduction(crossesType, null));
+        assertTrue(unit0.hasAbility(Ability.DRESS_MISSIONARY));
+        assertTrue(unit0.canBeEquippedWith(missionaryEquipmentType));
+
+        assertEquals("Church base cross production, no unit", 2,
+            church.getBaseProduction(null, crossesType, null));
+        assertEquals("Church potential cross production, no unit", 2,
+            church.getPotentialProduction(crossesType, null));
+        assertEquals("Church cross production, no unit", 2,
+            church.getTotalProductionOf(crossesType));
+
+        colony.setOccupationAt(unit0, church, false);
+
+        assertEquals("Church base cross production, free colonist", 3,
+            church.getBaseProduction(church.getProductionType(), crossesType,
+                                     unit0.getType()));
+        assertEquals("Church potential cross production, free colonist", 3,
+            church.getPotentialProduction(crossesType, unit0.getType()));
+        assertEquals("Church total cross production, free colonist", 5,
+            church.getTotalProductionOf(crossesType));
+
+        colony.setOccupationAt(unit1, church, false);
+
+        assertEquals("Church base cross production, 2 x free colonist", 3,
+            church.getBaseProduction(church.getProductionType(), crossesType,
+                                     unit1.getType()));
+        assertEquals("Church potential cross production, 2 x free colonist", 3,
+            church.getPotentialProduction(crossesType, unit1.getType()));
+        assertEquals("Church total cross production, 2 x free colonist", 8,
+            church.getTotalProductionOf(crossesType));
+
+        colony.setOccupationAt(unit2, church, false);
+
+        assertEquals("Church base cross production, 3 x free colonist", 3,
+            church.getBaseProduction(church.getProductionType(), crossesType,
+                                     unit2.getType()));
+        assertEquals("Church potential cross production, 3 x free colonist", 3,
+            church.getPotentialProduction(crossesType, unit2.getType()));
+        assertEquals("Church total cross production, 3 x free colonist", 11,
+            church.getTotalProductionOf(crossesType));
+
+        Building smithy = colony.getBuilding(blacksmithType);
+        assertTrue(unit1.setLocation(smithy));
+        assertTrue(unit2.setLocation(smithy));
+        unit0.setType(firebrandPreacherType);
+
+        assertEquals("Church base cross production, firebrand preacher", 3,
+            church.getBaseProduction(church.getProductionType(), crossesType,
+                                     unit0.getType()));
+        assertEquals("Church potential cross production, firebrand preacher", 6,
+            church.getPotentialProduction(crossesType, unit0.getType()));
+        assertEquals("Church total cross production, firebrand preacher", 8,
+            church.getTotalProductionOf(crossesType));
+
+        unit0.setType(freeColonistType);
+        assertTrue(unit0.setLocation(smithy));
+        church.upgrade();
+        assertTrue("model.building.cathedral".equals(church.getType().getId()));
+        assertTrue(church.getType().hasAbility(Ability.DRESS_MISSIONARY));
+        assertTrue(colony.hasAbility(Ability.DRESS_MISSIONARY));
+        assertTrue(unit0.hasAbility(Ability.DRESS_MISSIONARY));
+        assertTrue(unit0.canBeEquippedWith(missionaryEquipmentType));
+
+        assertEquals("Cathedral base cross production, no unit", 3,
+            church.getBaseProduction(null, crossesType, null));
+        assertEquals("Cathedral potential cross production, no unit", 3,
+            church.getPotentialProduction(crossesType, null));
+        assertEquals("Cathedral cross production, no colonist", 3,
+            church.getTotalProductionOf(crossesType));
+
+        colony.setOccupationAt(unit0, church, false);
+
+        assertEquals("Cathedral base cross production, free colonist", 6,
+            church.getBaseProduction(church.getProductionType(), crossesType,
+                                     unit0.getType()));
+        assertEquals("Cathedral potential cross production, free colonist", 6,
+            church.getPotentialProduction(crossesType, unit0.getType()));
+        assertEquals("Cathedral total cross production, free colonist", 9,
+            church.getTotalProductionOf(crossesType));
+
+        colony.setOccupationAt(unit1, church, false);
+
+        assertEquals("Cathedral base cross production, 2 x free colonist", 6,
+            church.getBaseProduction(church.getProductionType(), crossesType,
+                                     unit1.getType()));
+        assertEquals("Cathedral potential cross production, 2 x free colonist", 6,
+            church.getPotentialProduction(crossesType, unit1.getType()));
+        assertEquals("Cathedral total cross production, 2 x free colonist", 15,
+            church.getTotalProductionOf(crossesType));
+
+        colony.setOccupationAt(unit2, church, false);
+
+        assertEquals("Cathedral base cross production, 3 x free colonist", 6,
+            church.getBaseProduction(church.getProductionType(), crossesType,
+                                     unit2.getType()));
+        assertEquals("Cathedral potential cross production, 3 x free colonist", 6,
+            church.getPotentialProduction(crossesType, unit2.getType()));
+        assertEquals("Cathedral total cross production, 3 x free colonist", 21,
+            church.getTotalProductionOf(crossesType));
+
+        unit1.setLocation(smithy);
+        unit2.setLocation(smithy);
+        unit0.setType(firebrandPreacherType);
+
+        assertEquals("Cathedral base cross production, firebrand preacher", 6,
+            church.getBaseProduction(church.getProductionType(), crossesType,
+                                     unit0.getType()));
+        assertEquals("Cathedral potential cross production, firebrand preacher", 12,
+            church.getPotentialProduction(crossesType, unit0.getType()));
+        assertEquals("Cathedral total cross production, firebrand preacher", 15,
+            church.getTotalProductionOf(crossesType));
     }
 
     public void testCanAddToBuilding() {
         Game game = getGame();
         game.setMap(getTestMap(true));
+
         Colony colony = getStandardColony(6);
         Tile tile = colony.getTile();
         List<Unit> units = colony.getUnitList();
@@ -480,16 +600,19 @@ public class BuildingTest extends FreeColTestCase {
         Unit colonist = units.get(0);
         Unit worker = units.get(1);
 
-        Building weaver = colony.getBuilding(weaverHouseType);
+        final Building weaver = colony.getBuilding(weaverHouseType);
+
         assertTrue(colonist.getLocation() instanceof ColonyTile);
         assertEquals(plainsType, ((ColonyTile)colonist.getLocation()).getWorkTile().getType());
         assertTrue(worker.getLocation() instanceof ColonyTile);
         assertEquals(plainsType, ((ColonyTile)worker.getLocation()).getWorkTile().getType());
 
-        worker.setLocation(weaver);
+        assertTrue(colony.setOccupationAt(worker, weaver, false));
         assertEquals(worker, weaver.getUnitList().get(0));
 
         colony.addGoods(cottonType, 2);
+        colony.invalidateCache();
+
         assertEquals(2, colony.getTotalProductionOf(cottonType));
         assertEquals(3, weaver.getTotalProductionOf(clothType));
         assertEquals(3, colony.getTotalProductionOf(clothType));
@@ -506,13 +629,14 @@ public class BuildingTest extends FreeColTestCase {
         assertEquals(3, colony.getNetProductionOf(clothType));
     }
 
-    public void testAutoProduction() {
+    public void testPasture() {
         Game game = getGame();
         game.setMap(getTestMap(true));
 
         Colony colony = getStandardColony(1);
-
         Building pasture = colony.getBuilding(countryType);
+        Unit unit = colony.getFirstUnit();
+        assertEquals(grainType, unit.getWorkType());
 
         // no horses yet
         assertEquals(8, colony.getNetProductionOf(foodType));
@@ -521,37 +645,48 @@ public class BuildingTest extends FreeColTestCase {
         assertEquals(0, pasture.getMaximumProductionOf(horsesType));
 
         colony.addGoods(horsesType, 50);
+        colony.invalidateCache();
+
         assertEquals(2, pasture.getTotalProductionOf(horsesType));
         assertEquals(2, pasture.getMaximumProductionOf(horsesType));
         assertEquals(2, colony.getNetProductionOf(horsesType));
 
         colony.addGoods(horsesType, 1);
+        colony.invalidateCache();
+
         assertEquals(4, pasture.getTotalProductionOf(horsesType));
         assertEquals(4, pasture.getMaximumProductionOf(horsesType));
         assertEquals(4, colony.getNetProductionOf(horsesType));
 
         pasture.upgrade();
         colony.removeGoods(horsesType);
-
         colony.addGoods(horsesType, 25);
+        colony.invalidateCache();
+
         assertEquals(25, colony.getGoodsCount(horsesType));
         assertEquals(2, pasture.getTotalProductionOf(horsesType));
         assertEquals(2, pasture.getMaximumProductionOf(horsesType));
         assertEquals(2, colony.getNetProductionOf(horsesType));
 
         colony.addGoods(horsesType, 1);
+        colony.invalidateCache();
+
         assertEquals(26, colony.getGoodsCount(horsesType));
         assertEquals(4, pasture.getTotalProductionOf(horsesType));
         assertEquals(4, pasture.getMaximumProductionOf(horsesType));
         assertEquals(4, colony.getNetProductionOf(horsesType));
 
         colony.addGoods(horsesType, 24);
+        colony.invalidateCache();
+
         assertEquals(50, colony.getGoodsCount(horsesType));
         assertEquals(4, pasture.getTotalProductionOf(horsesType));
         assertEquals(4, pasture.getMaximumProductionOf(horsesType));
         assertEquals(4, colony.getNetProductionOf(horsesType));
 
         colony.addGoods(horsesType, 1);
+        colony.invalidateCache();
+
         assertEquals(51, colony.getGoodsCount(horsesType));
         // no more than half the surplus production!
         assertEquals(4, pasture.getTotalProductionOf(horsesType));
@@ -612,8 +747,8 @@ public class BuildingTest extends FreeColTestCase {
         // 3(colonist)
         assertEquals("Production(Colonist/Jefferson)", 3,
                      building.getUnitProduction(colonist, bellsType));
-        // 3(colonist) + 50%(Jefferson) + 1 = 5.5
-        assertEquals("Total production(Colonist/Jefferson)", 5,
+        // 3(colonist) + 1 + 50%(Jefferson) = 6
+        assertEquals("Total production(Colonist/Jefferson)", 6,
                      building.getTotalProductionOf(bellsType));
 
         // Add statesman
@@ -621,8 +756,8 @@ public class BuildingTest extends FreeColTestCase {
         // 3 * 2(expert) = 6
         assertEquals("Production(Statesman/Jefferson)", 6,
                      building.getUnitProduction(statesman, bellsType));
-        // 3 + 6 + 50%(Jefferson) + 1 = 14
-        assertEquals("Total production(Colonist/Statesman/Jefferson)", 14,
+        // 3 + 6 + 1 + 50%(Jefferson) = 15
+        assertEquals("Total production(Colonist/Statesman/Jefferson)", 15,
                      building.getTotalProductionOf(bellsType));
 
         // Improve production
@@ -632,8 +767,8 @@ public class BuildingTest extends FreeColTestCase {
                      building.getUnitProduction(colonist, bellsType));
         assertEquals("Production(Statesman/Jefferson/2)", 10,
                      building.getUnitProduction(statesman, bellsType));
-        // 5 + 10 + 50% + 1 = 23
-        assertEquals("Total production(Colonist/Statesman/Jefferson/2)", 23,
+        // 5 + 10 + 1 + 50%(Jefferson) = 24
+        assertEquals("Total production(Colonist/Statesman/Jefferson/2)", 24,
                      building.getTotalProductionOf(bellsType));
 
         // Add newspaper
@@ -645,8 +780,8 @@ public class BuildingTest extends FreeColTestCase {
                      building.getUnitProduction(colonist, bellsType));
         assertEquals("Production(Statesman/Jefferson/2/Newspaper)", 10,
                      building.getUnitProduction(statesman, bellsType));
-        // 5 + 10 + 50% + 100% + 1 = 45
-        assertEquals("Total production(Colonist/Statesman/Jefferson/2/Newspaper)", 47,
+        // 5 + 10 + 1 + 50%(Jefferson) + 100%(Newspaper) = 48
+        assertEquals("Total production(Colonist/Statesman/Jefferson/2/Newspaper)", 48,
                      building.getTotalProductionOf(bellsType));
     }
 
