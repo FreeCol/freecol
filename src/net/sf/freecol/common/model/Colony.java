@@ -193,6 +193,10 @@ public class Colony extends Settlement implements Nameable {
     /** Contains information about production and consumption. */
     private ProductionCache productionCache = new ProductionCache(this);
 
+    /** The occupation tracing status.  Do not serialize. */
+    private boolean traceOccupation = false;
+
+
 
     /**
      * Constructor for ServerColony.
@@ -378,6 +382,27 @@ public class Colony extends Settlement implements Nameable {
     // Private Occupation routines
 
     /**
+     * Gets the occupation tracing status.
+     *
+     * @return The occupation tracing status.
+     */
+    public boolean getOccupationTrace() {
+        return this.traceOccupation;
+    }
+
+    /**
+     * Sets the occupation tracing status.
+     *
+     * @param trace The new occupation tracing status.
+     * @return The original occupation tracing status.
+     */
+    public boolean setOccupationTrace(boolean trace) {
+        boolean ret = this.traceOccupation;
+        this.traceOccupation = trace;
+        return ret;
+    }
+
+    /**
      * Get the lowest currently available amount of required goods
      * from a list.
      *
@@ -527,10 +552,6 @@ public class Colony extends Settlement implements Nameable {
         Set<GoodsType> tried = new HashSet<GoodsType>();
         Set<GoodsType> tryNext = new HashSet<GoodsType>();
         Occupation occupation = null;
-        if (sb != null) {
-            sb.append("getOccupationFor: ").append(unit)
-                .append(" in ").append(getName());
-        }
 
         // First, see if more food is needed.
         //
@@ -607,6 +628,51 @@ public class Colony extends Settlement implements Nameable {
             for (GoodsType gt : tried) sb.append(" ").append(gt);
         }
         return null;
+    }
+
+    /**
+     * Gets the best occupation for a given unit to produce one of
+     * a given set of goods types.
+     *
+     * @param unit The <code>Unit</code> to find an
+     *     <code>Occupation</code> for.
+     * @param workTypes A collection of <code>GoodsType</code> to
+     *     consider producing.
+     * @return An <code>Occupation</code> for the given unit, or null
+     *     if none found.
+     */
+    private Occupation getOccupationFor(Unit unit,
+                                        Collection<GoodsType> workTypes) {
+        StringBuffer sb = null;
+        if (getOccupationTrace()) {
+            sb = new StringBuffer(128);
+            sb.append(getName()).append(".getOccupationFor(").append(unit)
+                .append(", [").append(workTypes.size()).append("])");
+        }
+        Occupation occupation = getOccupationFor(unit, workTypes, sb);
+        if (sb != null) logger.warning(sb.toString());
+        return occupation;
+    }
+
+    /**
+     * Gets the best occupation for a given unit.
+     *
+     * @param unit The <code>Unit</code> to find an
+     *     <code>Occupation</code> for.
+     * @return An <code>Occupation</code> for the given unit, or
+     *     null if none found.
+     */
+    private Occupation getOccupationFor(Unit unit) {
+        StringBuffer sb = null;
+        if (getOccupationTrace()) {
+            sb = new StringBuffer(128);
+            sb.append(getName()).append(".getOccupationFor(").append(unit)
+                .append(")");
+        }
+
+        Occupation occupation = getOccupationFor(unit, sb);
+        if (sb != null) logger.warning(sb.toString());
+        return occupation;
     }
 
 
@@ -790,7 +856,7 @@ public class Colony extends Settlement implements Nameable {
      * @return The best <code>WorkLocation</code> found.
      */
     public WorkLocation getWorkLocationFor(Unit unit) {
-        Occupation occupation = getOccupationFor(unit, null);
+        Occupation occupation = getOccupationFor(unit);
         return (occupation == null) ? null : occupation.workLocation;
     }
 
@@ -1357,11 +1423,13 @@ public class Colony extends Settlement implements Nameable {
      * @return True if the add succeeds.
      */
     public boolean joinColony(Unit unit) {
-        Occupation occupation = getOccupationFor(unit, null);
+        Occupation occupation = getOccupationFor(unit);
         if (occupation == null) {
-            StringBuffer sb = new StringBuffer(64);
-            getOccupationFor(unit, sb);
-            logger.warning(sb.toString());
+            if (!traceOccupation) {
+                StringBuffer sb = new StringBuffer(64);
+                getOccupationFor(unit, sb);
+                logger.warning(sb.toString());
+            }
             return false;
         }
         return occupation.install(unit);
