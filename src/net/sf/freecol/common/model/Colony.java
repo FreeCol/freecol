@@ -423,13 +423,12 @@ public class Colony extends Settlement implements Nameable {
             }
             if (!present && !wl.canAdd(unit)) continue;
 
-            // Is the unit going to be alone at the work location?  If
-            // so, it can use any production type available.  If not,
-            // the other units present have already fixed the
-            // production type.
-            boolean alone = wl.isEmpty()
+            // Can the unit determine the production type at this WL?
+            // This will be true if the unit is going to be alone or
+            // if the production type is as yet unset.
+            boolean alone = wl.getProductionType() == null
+                || wl.isEmpty()
                 || (present && wl.getUnitCount() == 1);
-
             if (alone) {
                 for (ProductionType pt
                          : wl.getAvailableProductionTypes(false)) {
