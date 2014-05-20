@@ -106,7 +106,7 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
         final String okLabel = Messages.message("ok");
         final String cancelLabel = Messages.message("cancel");
         int okIndex = -1, cancelIndex = -1;
-        int maxWidth = 0;
+        int maxWidth = 0, maxHeight = 0;
         JButton[] newButtons = new JButton[buttons.length];
         for (int i = 0; i < buttons.length; i++) {
             JButton b;
@@ -131,6 +131,7 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
                 else if (cancelLabel.equals(label)) cancelIndex = i;
             }
             maxWidth = Math.max(maxWidth, b.getMinimumSize().width);
+            maxHeight = Math.max(maxHeight, b.getMinimumSize().height);
             ActionListener buttonListener = createButtonActionListener(i);
             if (buttonListener != null) b.addActionListener(buttonListener);
             newButtons[i] = b;
@@ -148,6 +149,14 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
                         }
                     }
                 });
+        }
+
+        if (maxWidth > 0) {
+            Dimension dimension = new Dimension(maxWidth, maxHeight);
+            for (int i = 0; i < buttons.length; i++) {
+                if (buttons[i] instanceof Icon) continue;
+                newButtons[i].setPreferredSize(dimension);
+            }
         }
         if (okIndex >= 0) {
             // If OK is present this is a confirm-dialog.  Put everything
@@ -170,13 +179,6 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
             }
             if (cancelIndex >= 0) {
                 container.add(newButtons[cancelIndex], "newline 20, tag cancel");
-            }
-            if (maxWidth > 0) {
-                for (int i = 0; i < buttons.length; i++) {
-                    if (buttons[i] instanceof Icon) continue;
-                    newButtons[i].setPreferredSize(new Dimension(maxWidth,
-                            newButtons[i].getHeight()));
-                }
             }
         }
     }
