@@ -233,26 +233,37 @@
   <!-- Structure for tile-types
        Notes:
        Parent options: ref, name, basic-move-cost, basic-work-turns
-       Children: gen, modifier, production, resource
-       gen child options: humidityMin, humidityMax, temperatureMin, temperatureMax, altitudeMin, altitudeMax, latitudeMin, latitudeMax
-       - humidity is a percentage of water vapor saturation (0 is absolute dryness, 100 is total saturation)
-       - temperature in degrees Celsius (from -20 to +40; 0 being the water freezing point)
-       - altitude (values of -3 to 3)
-       - land (values 1 to 3)
-       - water (values -3 to -1)
-       - less negative numbers have a higher chance of appearing near shore
-       - more negative numbers have a higher chance of appearing further from shore
-       - undefined (default = "0,0")
-       - may appear anywhere based on land/water
-       production if any must have the following structure:
-       <production goods-type="model.goods.goodname" value="X"/>
-       resource if any must have the following structure:
-       <resource type="model.resource.resourcename" probability="X"/>
-       - X is a relative probability, not necessarily a percentage value
+       Children:
+       - gen
+         - humidityMin, humidityMax,
+           - humidity is a percentage of water vapor saturation (0 is
+             absolute dryness, 100 is total saturation)
+         - temperatureMin, temperatureMax,
+           - temperature in degrees Celsius (from -20 to +40; 0 being the
+             water freezing point)
+         - altitudeMin, altitudeMax,
+           - altitude (values of -3 to 3)
+             - land (values 1 to 3), less negative numbers have a higher
+               chance of appearing near shore
+             - water (values -3 to -1), more negative numbers have a
+               higher chance of appearing further from shore
+         - latitudeMin, latitudeMax
+           - undefined (default = "0,0")
+       - production if any must have the following structure:
+         <production [unattended="<boolean>"] [productionLevel="<level>"]>
+           [<input goods-type="model.goods.goodname" value="X"/>]*
+           [<output goods-type="model.goods.goodname" value="X"/>]+
+         </production>
+       - resource if any must have the following structure:
+         <resource type="model.resource.resourcename" probability="X"/>
+         where X is a relative probability, not necessarily a percentage value
   -->
   <tile-types>
-    <tile-type id="model.tile.plains" basic-move-cost="3" basic-work-turns="3">
-      <gen humidityMin="0" humidityMax="60" temperatureMin="0" temperatureMax="15" altitudeMin="1" altitudeMax="2"/>
+    <tile-type id="model.tile.plains"
+               basic-move-cost="3" basic-work-turns="3">
+      <gen humidityMin="0" humidityMax="60"
+           temperatureMin="0" temperatureMax="15"
+           altitudeMin="1" altitudeMax="2"/>
       <production unattended="true">
         <output goods-type="model.goods.grain" value="5"/>
         <output goods-type="model.goods.cotton" value="2"/>
@@ -269,8 +280,11 @@
       <resource type="model.resource.grain" probability="100"/>
       <disaster id="model.disaster.tornado" probability="100"/>
     </tile-type>
-    <tile-type id="model.tile.grassland" basic-move-cost="3" basic-work-turns="3">
-      <gen humidityMin="25" humidityMax="70" temperatureMin="10" temperatureMax="25" altitudeMin="1" altitudeMax="1"/>
+    <tile-type id="model.tile.grassland"
+               basic-move-cost="3" basic-work-turns="3">
+      <gen humidityMin="25" humidityMax="70"
+           temperatureMin="10" temperatureMax="25"
+           altitudeMin="1" altitudeMax="1"/>
       <production unattended="true">
         <output goods-type="model.goods.grain" value="3"/>
         <output goods-type="model.goods.tobacco" value="3"/>
@@ -283,8 +297,11 @@
       </production>
       <resource type="model.resource.tobacco" probability="100"/>
     </tile-type>
-    <tile-type id="model.tile.prairie" basic-move-cost="3" basic-work-turns="3">
-      <gen humidityMin="20" humidityMax="50" temperatureMin="15" temperatureMax="30" altitudeMin="1" altitudeMax="1"/>
+    <tile-type id="model.tile.prairie"
+               basic-move-cost="3" basic-work-turns="3">
+      <gen humidityMin="20" humidityMax="50"
+           temperatureMin="15" temperatureMax="30"
+           altitudeMin="1" altitudeMax="1"/>
       <production unattended="true">
         <output goods-type="model.goods.grain" value="3"/>
         <output goods-type="model.goods.cotton" value="3"/>
@@ -298,8 +315,11 @@
       <resource type="model.resource.cotton" probability="100"/>
       <disaster id="model.disaster.tornado" probability="100"/>
     </tile-type>
-    <tile-type id="model.tile.savannah" basic-move-cost="3" basic-work-turns="3">
-      <gen humidityMin="25" humidityMax="70" temperatureMin="30" temperatureMax="40" altitudeMin="1" altitudeMax="1"/>
+    <tile-type id="model.tile.savannah"
+               basic-move-cost="3" basic-work-turns="3">
+      <gen humidityMin="25" humidityMax="70"
+           temperatureMin="30" temperatureMax="40"
+           altitudeMin="1" altitudeMax="1"/>
       <production unattended="true">
         <output goods-type="model.goods.grain" value="4"/>
         <output goods-type="model.goods.sugar" value="3"/>
@@ -312,8 +332,11 @@
       </production>
       <resource type="model.resource.sugar" probability="100"/>
     </tile-type>
-    <tile-type id="model.tile.marsh" basic-move-cost="6" basic-work-turns="5">
-      <gen humidityMin="50" humidityMax="100" temperatureMin="5" temperatureMax="15" altitudeMin="2" altitudeMax="2"/>
+    <tile-type id="model.tile.marsh"
+               basic-move-cost="6" basic-work-turns="5">
+      <gen humidityMin="50" humidityMax="100"
+           temperatureMin="5" temperatureMax="15"
+           altitudeMin="2" altitudeMax="2"/>
       <modifier id="model.modifier.defence" type="percentage" value="25"/>
       <production unattended="true">
         <output goods-type="model.goods.grain" value="3"/>
@@ -334,8 +357,11 @@
       <resource type="model.resource.minerals" probability="100"/>
       <disaster id="model.disaster.disease" probability="100"/>
     </tile-type>
-    <tile-type id="model.tile.swamp" basic-move-cost="6" basic-work-turns="7">
-      <gen humidityMin="50" humidityMax="100" temperatureMin="10" temperatureMax="40" altitudeMin="1" altitudeMax="1"/>
+    <tile-type id="model.tile.swamp"
+               basic-move-cost="6" basic-work-turns="7">
+      <gen humidityMin="50" humidityMax="100"
+           temperatureMin="10" temperatureMax="40"
+           altitudeMin="1" altitudeMax="1"/>
       <modifier id="model.modifier.defence" type="percentage" value="25"/>
       <production unattended="true">
         <output goods-type="model.goods.grain" value="3"/>
@@ -357,8 +383,11 @@
       <disaster id="model.disaster.disease" probability="50"/>
       <disaster id="model.disaster.flood" probability="50"/>
     </tile-type>
-    <tile-type id="model.tile.desert" basic-move-cost="3" basic-work-turns="3">
-      <gen humidityMin="0" humidityMax="25" temperatureMin="10" temperatureMax="40" altitudeMin="1" altitudeMax="2"/>
+    <tile-type id="model.tile.desert"
+               basic-move-cost="3" basic-work-turns="3">
+      <gen humidityMin="0" humidityMax="25"
+           temperatureMin="10" temperatureMax="40"
+           altitudeMin="1" altitudeMax="2"/>
       <production unattended="true" productionLevel="veryHigh">
         <output goods-type="model.goods.grain" value="3"/>
         <output goods-type="model.goods.cotton" value="1"/>
@@ -384,8 +413,11 @@
       <disaster id="model.disaster.sandstorm" probability="50"/>
       <disaster id="model.disaster.drought" probability="50"/>
     </tile-type>
-    <tile-type id="model.tile.tundra" basic-move-cost="3" basic-work-turns="4">
-      <gen humidityMin="0" humidityMax="100" temperatureMin="-5" temperatureMax="5" altitudeMin="1" altitudeMax="3"/>
+    <tile-type id="model.tile.tundra"
+               basic-move-cost="3" basic-work-turns="4">
+      <gen humidityMin="0" humidityMax="100"
+           temperatureMin="-5" temperatureMax="5"
+           altitudeMin="1" altitudeMax="3"/>
       <production unattended="true">
         <output goods-type="model.goods.grain" value="3"/>
         <output goods-type="model.goods.ore" value="2"/>
@@ -404,8 +436,11 @@
       <resource type="model.resource.minerals" probability="100"/>
       <disaster id="model.disaster.blizzard" probability="100"/>
     </tile-type>
-    <tile-type id="model.tile.mixedForest" basic-move-cost="6" basic-work-turns="4" is-forest="true">
-      <gen humidityMin="0" humidityMax="60" temperatureMin="0" temperatureMax="15" altitudeMin="1" altitudeMax="2"/>
+    <tile-type id="model.tile.mixedForest"
+               basic-move-cost="6" basic-work-turns="4" is-forest="true">
+      <gen humidityMin="0" humidityMax="60"
+           temperatureMin="0" temperatureMax="15"
+           altitudeMin="1" altitudeMax="2"/>
       <modifier id="model.modifier.defence" type="percentage" value="50"/>
       <production unattended="true">
         <output goods-type="model.goods.grain" value="3"/>
@@ -427,8 +462,11 @@
       <resource type="model.resource.lumber" probability="50"/>
       <ability id="model.ability.ambushTerrain" value="true"/>
     </tile-type>
-    <tile-type id="model.tile.coniferForest" basic-move-cost="6" basic-work-turns="4" is-forest="true">
-      <gen humidityMin="25" humidityMax="70" temperatureMin="10" temperatureMax="25" altitudeMin="1" altitudeMax="1"/>
+    <tile-type id="model.tile.coniferForest"
+               basic-move-cost="6" basic-work-turns="4" is-forest="true">
+      <gen humidityMin="25" humidityMax="70"
+           temperatureMin="10" temperatureMax="25"
+           altitudeMin="1" altitudeMax="1"/>
       <modifier id="model.modifier.defence" type="percentage" value="50"/>
       <production unattended="true">
         <output goods-type="model.goods.grain" value="2"/>
@@ -449,8 +487,11 @@
       <resource type="model.resource.lumber" probability="100"/>
       <ability id="model.ability.ambushTerrain" value="true"/>
     </tile-type>
-    <tile-type id="model.tile.broadleafForest" basic-move-cost="6" basic-work-turns="4" is-forest="true">
-      <gen humidityMin="20" humidityMax="50" temperatureMin="15" temperatureMax="30" altitudeMin="1" altitudeMax="1"/>
+    <tile-type id="model.tile.broadleafForest"
+               basic-move-cost="6" basic-work-turns="4" is-forest="true">
+      <gen humidityMin="20" humidityMax="50"
+           temperatureMin="15" temperatureMax="30"
+           altitudeMin="1" altitudeMax="1"/>
       <modifier id="model.modifier.defence" type="percentage" value="50"/>
       <production unattended="true">
         <output goods-type="model.goods.grain" value="2"/>
@@ -471,9 +512,12 @@
       <resource type="model.resource.game" probability="100"/>
       <ability id="model.ability.ambushTerrain" value="true"/>
     </tile-type>
-    <tile-type id="model.tile.tropicalForest" basic-move-cost="6" basic-work-turns="6" is-forest="true">
+    <tile-type id="model.tile.tropicalForest"
+               basic-move-cost="6" basic-work-turns="6" is-forest="true">
+      <gen humidityMin="25" humidityMax="70"
+           temperatureMin="30" temperatureMax="40"
+           altitudeMin="1" altitudeMax="1"/>
       <modifier id="model.modifier.defence" type="percentage" value="50"/>
-      <gen humidityMin="25" humidityMax="70" temperatureMin="30" temperatureMax="40" altitudeMin="1" altitudeMax="1"/>
       <production unattended="true">
         <output goods-type="model.goods.grain" value="3"/>
         <output goods-type="model.goods.furs" value="2"/>
@@ -494,8 +538,11 @@
       <disaster id="model.disaster.hurricane" probability="100"/>
       <ability id="model.ability.ambushTerrain" value="true"/>
     </tile-type>
-    <tile-type id="model.tile.wetlandForest" basic-move-cost="9" basic-work-turns="6" is-forest="true">
-      <gen humidityMin="50" humidityMax="100" temperatureMin="5" temperatureMax="15" altitudeMin="2" altitudeMax="2"/>
+    <tile-type id="model.tile.wetlandForest"
+               basic-move-cost="9" basic-work-turns="6" is-forest="true">
+      <gen humidityMin="50" humidityMax="100"
+           temperatureMin="5" temperatureMax="15"
+           altitudeMin="2" altitudeMax="2"/>
       <modifier id="model.modifier.defence" type="percentage" value="50"/>
       <production unattended="true">
         <output goods-type="model.goods.grain" value="2"/>
@@ -522,8 +569,11 @@
       <resource type="model.resource.minerals" probability="100"/>
       <ability id="model.ability.ambushTerrain" value="true"/>
     </tile-type>
-    <tile-type id="model.tile.rainForest" basic-move-cost="9" basic-work-turns="7" is-forest="true">
-      <gen humidityMin="50" humidityMax="100" temperatureMin="10" temperatureMax="40" altitudeMin="1" altitudeMax="1"/>
+    <tile-type id="model.tile.rainForest"
+               basic-move-cost="9" basic-work-turns="7" is-forest="true">
+      <gen humidityMin="50" humidityMax="100"
+           temperatureMin="10" temperatureMax="40"
+           altitudeMin="1" altitudeMax="1"/>
       <modifier id="model.modifier.defence" type="percentage" value="75"/>
       <production unattended="true">
         <output goods-type="model.goods.grain" value="2"/>
@@ -551,8 +601,11 @@
       <disaster id="model.disaster.disease" probability="100"/>
       <ability id="model.ability.ambushTerrain" value="true"/>
     </tile-type>
-    <tile-type id="model.tile.scrubForest" basic-move-cost="3" basic-work-turns="4" is-forest="true">
-      <gen humidityMin="0" humidityMax="25" temperatureMin="10" temperatureMax="40" altitudeMin="1" altitudeMax="2"/>
+    <tile-type id="model.tile.scrubForest"
+               basic-move-cost="3" basic-work-turns="4" is-forest="true">
+      <gen humidityMin="0" humidityMax="25"
+           temperatureMin="10" temperatureMax="40"
+           altitudeMin="1" altitudeMax="2"/>
       <modifier id="model.modifier.defence" type="percentage" value="50"/>
       <production unattended="true" productionLevel="veryHigh">
         <output goods-type="model.goods.grain" value="3"/>
@@ -586,8 +639,11 @@
       <disaster id="model.disaster.drought" probability="50"/>
       <ability id="model.ability.ambushTerrain" value="true"/>
     </tile-type>
-    <tile-type id="model.tile.borealForest" basic-move-cost="6" basic-work-turns="4" is-forest="true">
-      <gen humidityMin="0" humidityMax="100" temperatureMin="-5" temperatureMax="5" altitudeMin="1" altitudeMax="3"/>
+    <tile-type id="model.tile.borealForest"
+               basic-move-cost="6" basic-work-turns="4" is-forest="true">
+      <gen humidityMin="0" humidityMax="100"
+           temperatureMin="-5" temperatureMax="5"
+           altitudeMin="1" altitudeMax="3"/>
       <modifier id="model.modifier.defence" type="percentage" value="50"/>
       <production unattended="true">
         <output goods-type="model.goods.grain" value="2"/>
@@ -608,8 +664,11 @@
       <resource type="model.resource.game" probability="100"/>
       <ability id="model.ability.ambushTerrain" value="true"/>
     </tile-type>
-    <tile-type id="model.tile.hills" basic-move-cost="6" basic-work-turns="4" is-elevation="true">
-      <gen humidityMin="0" humidityMax="100" temperatureMin="-20" temperatureMax="40" altitudeMin="2" altitudeMax="3"/>
+    <tile-type id="model.tile.hills"
+               basic-move-cost="6" basic-work-turns="4" is-elevation="true">
+      <gen humidityMin="0" humidityMax="100"
+           temperatureMin="-20" temperatureMax="40"
+           altitudeMin="2" altitudeMax="3"/>
       <modifier id="model.modifier.defence" type="percentage" value="100"/>
       <production unattended="true">
         <output goods-type="model.goods.grain" value="2"/>
@@ -626,8 +685,12 @@
       <disaster id="model.disaster.landslide" probability="50"/>
       <ability id="model.ability.ambushTerrain" value="true"/>
     </tile-type>
-    <tile-type id="model.tile.mountains" basic-move-cost="9" basic-work-turns="7" is-elevation="true" can-settle="false">
-      <gen humidityMin="0" humidityMax="100" temperatureMin="-20" temperatureMax="40" altitudeMin="3" altitudeMax="3"/>
+    <tile-type id="model.tile.mountains"
+               basic-move-cost="9" basic-work-turns="7"
+               is-elevation="true" can-settle="false">
+      <gen humidityMin="0" humidityMax="100"
+           temperatureMin="-20" temperatureMax="40"
+           altitudeMin="3" altitudeMax="3"/>
       <modifier id="model.modifier.defence" type="percentage" value="150"/>
       <production>
         <output goods-type="model.goods.ore" value="4"/>
@@ -640,8 +703,11 @@
       <disaster id="model.disaster.landslide" probability="50"/>
       <ability id="model.ability.ambushTerrain" value="true"/>
     </tile-type>
-    <tile-type id="model.tile.arctic" basic-move-cost="6" basic-work-turns="4">
-      <gen humidityMin="0" humidityMax="100" temperatureMin="-20" temperatureMax="0" altitudeMin="1" altitudeMax="3"/>
+    <tile-type id="model.tile.arctic"
+               basic-move-cost="6" basic-work-turns="4">
+      <gen humidityMin="0" humidityMax="100"
+           temperatureMin="-20" temperatureMax="0"
+           altitudeMin="1" altitudeMax="3"/>
       <production unattended="true" productionLevel="veryHigh">
         <output goods-type="model.goods.grain" value="2"/>
       </production>
@@ -650,35 +716,46 @@
       </production>
       <disaster id="model.disaster.blizzard" probability="100"/>
     </tile-type>
-    <tile-type id="model.tile.ocean" basic-move-cost="3" basic-work-turns="4" is-water="true"
+    <tile-type id="model.tile.ocean"
+               basic-move-cost="3" basic-work-turns="4" is-water="true"
                can-settle="false" is-connected="true">
-      <gen humidityMin="0" humidityMax="100" temperatureMin="-20" temperatureMax="40" altitudeMin="-2" altitudeMax="-1"/>
+      <gen humidityMin="0" humidityMax="100"
+           temperatureMin="-20" temperatureMax="40"
+           altitudeMin="-2" altitudeMax="-1"/>
       <production>
         <output goods-type="model.goods.fish" value="2"/>
       </production>
       <resource type="model.resource.fish" probability="100"/>
       <disaster id="model.disaster.stormsurge" probability="100"/>
     </tile-type>
-    <tile-type id="model.tile.lake" basic-move-cost="3" basic-work-turns="4" is-water="true"
+    <tile-type id="model.tile.lake"
+               basic-move-cost="3" basic-work-turns="4" is-water="true"
                can-settle="false" is-connected="false">
-      <gen humidityMin="0" humidityMax="100" temperatureMin="-20" temperatureMax="40" altitudeMin="-2" altitudeMax="-1"/>
+      <gen humidityMin="0" humidityMax="100"
+           temperatureMin="-20" temperatureMax="40"
+           altitudeMin="-2" altitudeMax="-1"/>
       <production>
         <output goods-type="model.goods.fish" value="2"/>
       </production>
       <resource type="model.resource.fish" probability="100"/>
       <disaster id="model.disaster.flood" probability="100"/>
     </tile-type>
-    <tile-type id="model.tile.highSeas" basic-move-cost="3" basic-work-turns="4" is-water="true"
+    <tile-type id="model.tile.highSeas"
+               basic-move-cost="3" basic-work-turns="4" is-water="true"
                can-settle="false" is-connected="true">
-      <gen humidityMin="0" humidityMax="100" temperatureMin="-20" temperatureMax="40" altitudeMin="-3" altitudeMax="-2"/>
+      <gen humidityMin="0" humidityMax="100"
+           temperatureMin="-20" temperatureMax="40"
+           altitudeMin="-3" altitudeMax="-2"/>
       <production>
         <output goods-type="model.goods.fish" value="2"/>
       </production>
       <ability id="model.ability.moveToEurope"/>
     </tile-type>
-    <tile-type id="model.tile.greatRiver" basic-move-cost="3" basic-work-turns="4" is-water="true"
+    <tile-type id="model.tile.greatRiver"
+               basic-move-cost="3" basic-work-turns="4" is-water="true"
                can-settle="false">
-      <gen humidityMin="0" humidityMax="100" temperatureMin="-20" temperatureMax="40"
+      <gen humidityMin="0" humidityMax="100"
+           temperatureMin="-20" temperatureMax="40"
            altitudeMin="-3" altitudeMax="-2" />
       <production>
         <output goods-type="model.goods.fish" value="2"/>
@@ -687,7 +764,6 @@
       <disaster id="model.disaster.flood" probability="100"/>
     </tile-type>
   </tile-types>
-
 
   <disasters>
     <disaster id="model.disaster.common" abstract="true" effects="SEVERAL"
@@ -1436,7 +1512,8 @@ resources of 400, lost city rumours of 500
         <scope type="model.unit.wagonTrain"/>
       </ability>
     </building-type>
-    <building-type id="model.building.lumberMill" extends="model.building.carpenterHouse"
+    <building-type id="model.building.lumberMill"
+                   extends="model.building.carpenterHouse"
                    upgradesFrom="model.building.carpenterHouse"
                    required-population="3" upkeep="10">
       <production>
@@ -1444,7 +1521,8 @@ resources of 400, lost city rumours of 500
         <output goods-type="model.goods.hammers" value="6"/>
       </production>
       <required-goods id="model.goods.hammers" value="52"/>
-      <modifier id="model.modifier.tileTypeChangeProduction" value="3" type="multiplicative">
+      <modifier id="model.modifier.tileTypeChangeProduction"
+                value="3" type="multiplicative">
         <scope type="model.goods.lumber" />
       </modifier>
     </building-type>
@@ -1458,8 +1536,10 @@ resources of 400, lost city rumours of 500
         <scope type="model.equipment.muskets"/>
       </ability>
     </building-type>
-    <building-type id="model.building.blacksmithShop" extends="model.building.blacksmithHouse"
-                   upgradesFrom="model.building.blacksmithHouse" upkeep="5">
+    <building-type id="model.building.blacksmithShop"
+                   extends="model.building.blacksmithHouse"
+                   upgradesFrom="model.building.blacksmithHouse"
+                   upkeep="5">
       <production>
         <input goods-type="model.goods.ore" value="6"/>
         <output goods-type="model.goods.tools" value="6"/>
@@ -1467,8 +1547,10 @@ resources of 400, lost city rumours of 500
       <required-goods id="model.goods.hammers" value="64"/>
       <required-goods id="model.goods.tools" value="20"/>
     </building-type>
-    <building-type id="model.building.ironWorks" extends="model.building.blacksmithShop"
-                   upgradesFrom="model.building.blacksmithShop" required-population="8" upkeep="15">
+    <building-type id="model.building.ironWorks"
+                   extends="model.building.blacksmithShop"
+                   upgradesFrom="model.building.blacksmithShop"
+                   required-population="8" upkeep="15">
       <production>
         <input goods-type="model.goods.ore" value="6"/>
         <output goods-type="model.goods.tools" value="9"/>
@@ -1484,8 +1566,10 @@ resources of 400, lost city rumours of 500
         <output goods-type="model.goods.cigars" value="3"/>
       </production>
     </building-type>
-    <building-type id="model.building.tobacconistShop" extends="model.building.tobacconistHouse"
-                   upgradesFrom="model.building.tobacconistHouse" upkeep="5">
+    <building-type id="model.building.tobacconistShop"
+                   extends="model.building.tobacconistHouse"
+                   upgradesFrom="model.building.tobacconistHouse"
+                   upkeep="5">
       <production>
         <input goods-type="model.goods.tobacco" value="6"/>
         <output goods-type="model.goods.cigars" value="6"/>
@@ -1493,8 +1577,10 @@ resources of 400, lost city rumours of 500
       <required-goods id="model.goods.hammers" value="64"/>
       <required-goods id="model.goods.tools" value="20"/>
     </building-type>
-    <building-type id="model.building.cigarFactory" extends="model.building.tobacconistShop"
-                   upgradesFrom="model.building.tobacconistShop" required-population="8" upkeep="15">
+    <building-type id="model.building.cigarFactory"
+                   extends="model.building.tobacconistShop"
+                   upgradesFrom="model.building.tobacconistShop"
+                   required-population="8" upkeep="15">
       <production>
         <input goods-type="model.goods.tobacco" value="6"/>
         <output goods-type="model.goods.cigars" value="9"/>
@@ -1510,8 +1596,10 @@ resources of 400, lost city rumours of 500
         <output goods-type="model.goods.cloth" value="3"/>
       </production>
     </building-type>
-    <building-type id="model.building.weaverShop" extends="model.building.weaverHouse"
-                   upgradesFrom="model.building.weaverHouse" upkeep="5">
+    <building-type id="model.building.weaverShop"
+                   extends="model.building.weaverHouse"
+                   upgradesFrom="model.building.weaverHouse"
+                   upkeep="5">
       <production>
         <input goods-type="model.goods.cotton" value="6"/>
         <output goods-type="model.goods.cloth" value="6"/>
@@ -1519,8 +1607,10 @@ resources of 400, lost city rumours of 500
       <required-goods id="model.goods.hammers" value="64"/>
       <required-goods id="model.goods.tools" value="20"/>
     </building-type>
-    <building-type id="model.building.textileMill" extends="model.building.weaverShop"
-                   upgradesFrom="model.building.weaverShop" required-population="8" upkeep="15">
+    <building-type id="model.building.textileMill"
+                   extends="model.building.weaverShop"
+                   upgradesFrom="model.building.weaverShop"
+                   required-population="8" upkeep="15">
       <production>
         <input goods-type="model.goods.cotton" value="6"/>
         <output goods-type="model.goods.cloth" value="9"/>
@@ -1536,8 +1626,10 @@ resources of 400, lost city rumours of 500
         <output goods-type="model.goods.rum" value="3"/>
       </production>
     </building-type>
-    <building-type id="model.building.rumDistillery" extends="model.building.distillerHouse"
-                   upgradesFrom="model.building.distillerHouse" upkeep="5">
+    <building-type id="model.building.rumDistillery"
+                   extends="model.building.distillerHouse"
+                   upgradesFrom="model.building.distillerHouse"
+                   upkeep="5">
       <production>
         <input goods-type="model.goods.sugar" value="6"/>
         <output goods-type="model.goods.rum" value="6"/>
@@ -1545,8 +1637,10 @@ resources of 400, lost city rumours of 500
       <required-goods id="model.goods.hammers" value="64"/>
       <required-goods id="model.goods.tools" value="20"/>
     </building-type>
-    <building-type id="model.building.rumFactory" extends="model.building.rumDistillery"
-                   upgradesFrom="model.building.rumDistillery" required-population="8" upkeep="15">
+    <building-type id="model.building.rumFactory"
+                   extends="model.building.rumDistillery"
+                   upgradesFrom="model.building.rumDistillery"
+                   required-population="8" upkeep="15">
       <production>
         <input goods-type="model.goods.sugar" value="6"/>
         <output goods-type="model.goods.rum" value="9"/>
@@ -1562,8 +1656,10 @@ resources of 400, lost city rumours of 500
         <output goods-type="model.goods.coats" value="3"/>
       </production>
     </building-type>
-    <building-type id="model.building.furTradingPost" extends="model.building.furTraderHouse"
-                   upgradesFrom="model.building.furTraderHouse" upkeep="5">
+    <building-type id="model.building.furTradingPost"
+                   extends="model.building.furTraderHouse"
+                   upgradesFrom="model.building.furTraderHouse"
+                   upkeep="5">
       <production>
         <input goods-type="model.goods.furs" value="6"/>
         <output goods-type="model.goods.coats" value="6"/>
@@ -1571,8 +1667,10 @@ resources of 400, lost city rumours of 500
       <required-goods id="model.goods.hammers" value="56"/>
       <required-goods id="model.goods.tools" value="20"/>
     </building-type>
-    <building-type id="model.building.furFactory" extends="model.building.furTradingPost"
-                   upgradesFrom="model.building.furTradingPost" required-population="6" upkeep="15">
+    <building-type id="model.building.furFactory"
+                   extends="model.building.furTradingPost"
+                   upgradesFrom="model.building.furTradingPost"
+                   required-population="6" upkeep="15">
       <production>
         <input goods-type="model.goods.furs" value="6"/>
         <output goods-type="model.goods.coats" value="9"/>
@@ -1582,24 +1680,30 @@ resources of 400, lost city rumours of 500
       <required-ability id="model.ability.buildFactory"/>
       <ability id="model.ability.expertsUseConnections" value="true"/>
     </building-type>
-    <building-type id="model.building.schoolhouse" workplaces="1" minSkill="1" maxSkill="1"
+    <building-type id="model.building.schoolhouse"
+                   workplaces="1" minSkill="1" maxSkill="1"
                    required-population="4" upkeep="5">
       <required-goods id="model.goods.hammers" value="64"/>
       <ability id="model.ability.teach" value="true"/>
     </building-type>
-    <building-type id="model.building.college" extends="model.building.schoolhouse"
-                   workplaces="2" maxSkill="2" upgradesFrom="model.building.schoolhouse"
+    <building-type id="model.building.college"
+                   extends="model.building.schoolhouse"
+                   workplaces="2" maxSkill="2"
+                   upgradesFrom="model.building.schoolhouse"
                    required-population="8" upkeep="10">
       <required-goods id="model.goods.hammers" value="160"/>
       <required-goods id="model.goods.tools" value="50"/>
     </building-type>
-    <building-type id="model.building.university" extends="model.building.college"
-                   workplaces="3" maxSkill="4" upgradesFrom="model.building.college"
+    <building-type id="model.building.university"
+                   extends="model.building.college"
+                   workplaces="3" maxSkill="4"
+                   upgradesFrom="model.building.college"
                    required-population="10" upkeep="15">
       <required-goods id="model.goods.hammers" value="200"/>
       <required-goods id="model.goods.tools" value="100"/>
     </building-type>
-    <building-type id="model.building.armory" upkeep="5" priority="400">
+    <building-type id="model.building.armory"
+                   priority="400" upkeep="5">
       <production>
         <input goods-type="model.goods.tools" value="3"/>
         <output goods-type="model.goods.muskets" value="3"/>
@@ -1610,8 +1714,10 @@ resources of 400, lost city rumours of 500
         <scope type="model.unit.artillery"/>
       </ability>
     </building-type>
-    <building-type id="model.building.magazine" extends="model.building.armory" upkeep="10"
-                   upgradesFrom="model.building.armory" required-population="8">
+    <building-type id="model.building.magazine"
+                   extends="model.building.armory"
+                   upgradesFrom="model.building.armory"
+                   required-population="8" upkeep="10">
       <production>
         <input goods-type="model.goods.tools" value="6"/>
         <output goods-type="model.goods.muskets" value="6"/>
@@ -1619,8 +1725,10 @@ resources of 400, lost city rumours of 500
       <required-goods id="model.goods.hammers" value="120"/>
       <required-goods id="model.goods.tools" value="50"/>
     </building-type>
-    <building-type id="model.building.arsenal" extends="model.building.magazine" upkeep="15"
-                   upgradesFrom="model.building.magazine">
+    <building-type id="model.building.arsenal"
+                   extends="model.building.magazine"
+                   upgradesFrom="model.building.magazine"
+                   upkeep="15">
       <production>
         <input goods-type="model.goods.tools" value="9"/>
         <output goods-type="model.goods.muskets" value="9"/>
@@ -1638,120 +1746,157 @@ resources of 400, lost city rumours of 500
         <scope ability-id="model.ability.person" matchNegated="true"/>
       </modifier>
     </building-type>
-    <building-type id="model.building.church" extends="model.building.chapel"
+    <building-type id="model.building.church"
+                   extends="model.building.chapel"
                    upgradesFrom="model.building.chapel"
-                   workplaces="3" required-population="3" upkeep="5">
+                   workplaces="3"
+                   required-population="3" upkeep="5">
       <production>
         <output goods-type="model.goods.crosses" value="3"/>
       </production>
-      <required-goods id="model.goods.hammers" value="64"/>
       <modifier id="model.goods.crosses" type="additive" value="1">
         <scope ability-id="model.ability.person" matchNegated="true"/>
       </modifier>
+      <required-goods id="model.goods.hammers" value="64"/>
       <ability id="model.ability.dressMissionary" value="true"/>
     </building-type>
-    <building-type id="model.building.cathedral" extends="model.building.church"
+    <building-type id="model.building.cathedral"
+                   extends="model.building.church"
                    upgradesFrom="model.building.church"
                    required-population="8" upkeep="15">
       <production>
         <output goods-type="model.goods.crosses" value="6"/>
       </production>
-      <required-goods id="model.goods.hammers" value="176"/>
-      <required-goods id="model.goods.tools" value="100"/>
       <modifier id="model.goods.crosses" type="additive" value="1">
         <scope ability-id="model.ability.person" matchNegated="true"/>
       </modifier>
+      <required-goods id="model.goods.hammers" value="176"/>
+      <required-goods id="model.goods.tools" value="100"/>
     </building-type>
-    <building-type id="model.building.stockade" workplaces="0" required-population="3">
+    <building-type id="model.building.stockade"
+                   workplaces="0" required-population="3">
       <required-goods id="model.goods.hammers" value="64"/>
-      <modifier id="model.modifier.defence" type="percentage" value="100"/>
-      <modifier id="model.modifier.minimumColonySize" type="additive" value="3"/>
+      <modifier id="model.modifier.defence"
+                type="percentage" value="100"/>
+      <modifier id="model.modifier.minimumColonySize"
+                type="additive" value="3"/>
       <!-- TODO: abilties to prevent the effects of Indian raids. -->
     </building-type>
-    <building-type id="model.building.fort" extends="model.building.stockade"
-                   upgradesFrom="model.building.stockade" upkeep="10">
+    <building-type id="model.building.fort"
+                   extends="model.building.stockade"
+                   upgradesFrom="model.building.stockade"
+                   upkeep="10">
       <required-goods id="model.goods.hammers" value="120"/>
       <required-goods id="model.goods.tools" value="100"/>
       <modifier id="model.modifier.defence" delete="true" />
-      <modifier id="model.modifier.defence" type="percentage" value="150"/>
+      <modifier id="model.modifier.defence"
+                type="percentage" value="150"/>
       <ability id="model.ability.bombardShips" value="true"/>
     </building-type>
-    <building-type id="model.building.fortress" extends="model.building.fort"
-                   upgradesFrom="model.building.fort" upkeep="15"
-                   required-population="8">
+    <building-type id="model.building.fortress"
+                   extends="model.building.fort"
+                   upgradesFrom="model.building.fort"
+                   required-population="8" upkeep="15">
       <required-goods id="model.goods.hammers" value="320"/>
       <required-goods id="model.goods.tools" value="200"/>
       <modifier id="model.modifier.defence" delete="true" />
-      <modifier id="model.modifier.defence" type="percentage" value="200"/>
+      <modifier id="model.modifier.defence"
+                type="percentage" value="200"/>
     </building-type>
-    <building-type id="model.building.depot" workplaces="0" priority="750">
-      <modifier id="model.modifier.warehouseStorage" type="additive" value="100"/>
+    <building-type id="model.building.depot"
+                   workplaces="0" priority="750">
+      <modifier id="model.modifier.warehouseStorage"
+                type="additive" value="100"/>
     </building-type>
-    <building-type id="model.building.warehouse" extends="model.building.depot"
-                   upgradesFrom="model.building.depot" upkeep="5">
+    <building-type id="model.building.warehouse"
+                   extends="model.building.depot"
+                   upgradesFrom="model.building.depot"
+                   upkeep="5">
       <required-goods id="model.goods.hammers" value="80"/>
-      <modifier id="model.modifier.warehouseStorage" type="additive" value="100"/>
+      <modifier id="model.modifier.warehouseStorage"
+                type="additive" value="100"/>
     </building-type>
-    <building-type id="model.building.warehouseExpansion" extends="model.building.warehouse"
-                   upgradesFrom="model.building.warehouse" upkeep="5">
+    <building-type id="model.building.warehouseExpansion"
+                   extends="model.building.warehouse"
+                   upgradesFrom="model.building.warehouse"
+                   upkeep="5">
       <required-goods id="model.goods.hammers" value="80"/>
       <required-goods id="model.goods.tools" value="20"/>
-      <modifier id="model.modifier.warehouseStorage" type="additive" value="100"/>
+      <modifier id="model.modifier.warehouseStorage"
+                type="additive" value="100"/>
     </building-type>
-    <building-type id="model.building.country" workplaces="0" priority="700">
+    <building-type id="model.building.country"
+                   workplaces="0" priority="700">
       <production>
         <input goods-type="model.goods.food" value="1"/>
         <output goods-type="model.goods.horses" value="1"/>
       </production>
-      <modifier id="model.modifier.breedingDivisor" type="additive" value="50"/>
-      <modifier id="model.modifier.breedingFactor" type="additive" value="2"/>
-      <modifier id="model.goods.horses" type="multiplicative" value="1.0"/>
-      <modifier id="model.modifier.consumeOnlySurplusProduction" type="multiplicative" value="0.5" />
+      <modifier id="model.modifier.breedingDivisor"
+                type="additive" value="50"/>
+      <modifier id="model.modifier.breedingFactor"
+                type="additive" value="2"/>
+      <modifier id="model.goods.horses"
+                type="multiplicative" value="1.0"/>
+      <modifier id="model.modifier.consumeOnlySurplusProduction"
+                type="multiplicative" value="0.5" />
       <ability id="model.ability.autoProduction"/>
       <ability id="model.ability.avoidExcessProduction"/>
       <ability id="model.ability.build">
         <scope type="model.equipment.horses"/>
       </ability>
     </building-type>
-    <building-type id="model.building.stables" extends="model.building.country"
-                   upgradesFrom="model.building.country" upkeep="5">
+    <building-type id="model.building.stables"
+                   extends="model.building.country"
+                   upgradesFrom="model.building.country"
+                   upkeep="5">
       <production>
         <input goods-type="model.goods.food" value="1"/>
         <output goods-type="model.goods.horses" value="1"/>
       </production>
-      <modifier id="model.modifier.breedingDivisor" type="multiplicative" value="0.5" />
+      <modifier id="model.modifier.breedingDivisor"
+                type="multiplicative" value="0.5" />
       <required-goods id="model.goods.hammers" value="64"/>
     </building-type>
-    <building-type id="model.building.docks" workplaces="0" upkeep="5">
+    <building-type id="model.building.docks"
+                   workplaces="0"
+                   upkeep="5">
       <required-ability id="model.ability.hasPort" value="true" />
       <required-goods id="model.goods.hammers" value="52"/>
       <ability id="model.ability.produceInWater" value="true"/>
     </building-type>
-    <building-type id="model.building.drydock" extends="model.building.docks"
-                   upgradesFrom="model.building.docks" required-population="4" upkeep="10">
+    <building-type id="model.building.drydock"
+                   extends="model.building.docks"
+                   upgradesFrom="model.building.docks"
+                   required-population="4" upkeep="10">
       <required-goods id="model.goods.hammers" value="80"/>
       <required-goods id="model.goods.tools" value="50"/>
       <ability id="model.ability.repairUnits" value="true">
         <scope ability-id="model.ability.navalUnit"/>
       </ability>
     </building-type>
-    <building-type id="model.building.shipyard" extends="model.building.drydock"
-                   upgradesFrom="model.building.drydock" required-population="8" upkeep="15">
+    <building-type id="model.building.shipyard"
+                   extends="model.building.drydock"
+                   upgradesFrom="model.building.drydock"
+                   required-population="8" upkeep="15">
       <required-goods id="model.goods.hammers" value="240"/>
       <required-goods id="model.goods.tools" value="100"/>
       <ability id="model.ability.build">
         <scope ability-id="model.ability.navalUnit"/>
       </ability>
     </building-type>
-    <building-type id="model.building.printingPress" workplaces="0" upkeep="5">
+    <building-type id="model.building.printingPress"
+                   workplaces="0"
+                   upkeep="5">
       <required-goods id="model.goods.hammers" value="52"/>
       <required-goods id="model.goods.tools" value="20"/>
       <modifier id="model.goods.bells" type="percentage" value="50">
         <scope ability-id="model.ability.person" matchNegated="true"/>
       </modifier>
     </building-type>
-    <building-type id="model.building.newspaper" extends="model.building.printingPress"
-                   upgradesFrom="model.building.printingPress" required-population="4" upkeep="10">
+    <building-type id="model.building.newspaper"
+                   extends="model.building.printingPress"
+                   upgradesFrom="model.building.printingPress"
+                   required-population="4" upkeep="10">
       <required-goods id="model.goods.hammers" value="120"/>
       <required-goods id="model.goods.tools" value="50"/>
       <modifier id="model.goods.bells" delete="true" />
@@ -1759,7 +1904,9 @@ resources of 400, lost city rumours of 500
         <scope ability-id="model.ability.person" matchNegated="true"/>
       </modifier>
     </building-type>
-    <building-type id="model.building.customHouse" workplaces="0" upkeep="15">
+    <building-type id="model.building.customHouse"
+                   workplaces="0"
+                   upkeep="15">
       <required-goods id="model.goods.hammers" value="160"/>
       <required-goods id="model.goods.tools" value="50"/>
       <required-ability id="model.ability.buildCustomHouse"/>
