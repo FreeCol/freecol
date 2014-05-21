@@ -43,6 +43,7 @@ import net.sf.freecol.util.test.FreeColTestUtils;
 
 
 public class ServerColonyTest extends FreeColTestCase {
+
     private static final BuildingType depotType
         = spec().getBuildingType("model.building.depot");
     private static final BuildingType warehouseType
@@ -116,14 +117,10 @@ public class ServerColonyTest extends FreeColTestCase {
     public void testEqualFoodProductionConsumptionCase() {
         Game game = ServerTestHelper.startServerGame(getTestMap(desert));
 
-        Player dutch = game.getPlayer("model.nation.dutch");
-
-        //////////////////////
         // Setting test colony
-
         Tile colonyTile = game.getMap().getTile(5, 8);
-
-        Colony colony = FreeColTestUtils.getColonyBuilder().colonyTile(colonyTile).build();
+        Colony colony = FreeColTestUtils.getColonyBuilder()
+            .colonyTile(colonyTile).initialColonists(1).build();
 
         // Set the food production of the center tile of the colony to 2
         // This will be the only food production of the colony
@@ -136,21 +133,21 @@ public class ServerColonyTest extends FreeColTestCase {
                 break;
             }
         }
-
-        new ServerUnit(game, colony.getWorkLocationForProducing(bellsType),
-                       dutch, colonistType);
+        Unit unit = colony.getUnitList().get(0);
+        unit.setLocation(colony.getWorkLocationFor(unit, bellsType));
 
         // Verify that there is enough food stored
-        colony.addGoods(foodGoodsType, colony.getFoodConsumption()*2);
+        colony.addGoods(foodGoodsType, colony.getFoodConsumption() * 2);
+
+        assertEquals("Production not equal to consumption",
+                     colony.getFoodConsumption(), colony.getFoodProduction());
 
         int colonists = colony.getUnitCount();
+        assertEquals("Unexpected change of colonists in colony", colonists,
+                     colony.getUnitCount());
 
-        String errMsg = "Production not equal to consumption, required to setup test";
-        assertEquals(errMsg,colony.getFoodConsumption(),colony.getFoodProduction());
-
-        assertEquals("Unexpected change of colonists in colony",colonists,colony.getUnitCount());
-
-        assertEquals("Unexpected change of production/consumption ratio",colony.getFoodProduction(),colony.getFoodConsumption());
+        assertEquals("Unexpected change of production/consumption ratio",
+                     colony.getFoodProduction(), colony.getFoodConsumption());
     }
 
     public void testDeathByStarvation() {
