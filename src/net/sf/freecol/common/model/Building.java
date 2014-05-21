@@ -242,7 +242,6 @@ public class Building extends WorkLocation implements Named, Comparable<Building
         if (!hasOutputs()) return result;
 
         // first, calculate the maximum production
-
         double minimumRatio = Double.MAX_VALUE;
         double maximumRatio = 0;
         if (canAutoProduce()) {
@@ -252,10 +251,10 @@ public class Building extends WorkLocation implements Named, Comparable<Building
                 if (available >= outputType.getBreedingNumber()) {
                     // we need at least these many horses/animals to breed
                     double newRatio = 0;
-                    int divisor = (int) getType()
+                    int divisor = (int)getType()
                         .applyModifier(0f, Modifier.BREEDING_DIVISOR);
                     if (divisor > 0) {
-                        int factor = (int) getType()
+                        int factor = (int)getType()
                             .applyModifier(0f, Modifier.BREEDING_FACTOR);
                         int maximumOutput = ((available - 1) / divisor + 1) * factor;
                         newRatio = maximumOutput / output.getAmount();
@@ -273,7 +272,8 @@ public class Building extends WorkLocation implements Named, Comparable<Building
                 for (Unit u : getUnitList()) {
                     production += getUnitProduction(u, output.getType());
                 }
-                List<Modifier> productionModifiers = getProductionModifiers(output.getType(), null);
+                List<Modifier> productionModifiers
+                    = getProductionModifiers(output.getType(), null);
                 production = FeatureContainer
                     .applyModifiers(production, turn, productionModifiers);
                 double newRatio = production / output.getAmount();
@@ -283,7 +283,6 @@ public class Building extends WorkLocation implements Named, Comparable<Building
         }
 
         // then, check whether the required inputs are available
-
         for (AbstractGoods input : getInputs()) {
             int required = (int) (input.getAmount() * minimumRatio);
             int available = getAvailable(input.getType(), inputs);
@@ -313,20 +312,21 @@ public class Building extends WorkLocation implements Named, Comparable<Building
 
         // finally, check whether there is space enough to store the
         // goods produced in order to avoid excess production
-
         if (hasAbility(Ability.AVOID_EXCESS_PRODUCTION)) {
-            int capacity = getColony().getWarehouseCapacity();
+            final int capacity = getColony().getWarehouseCapacity();
             for (AbstractGoods output : getOutputs()) {
-                double production = (output.getAmount() * minimumRatio);
-                if (production > 0) {
-                    int amountPresent = getAvailable(output.getType(), outputs);
-                    if (production + amountPresent > capacity) {
-                        // don't produce more than the warehouse can hold
-                        double newRatio = (capacity - amountPresent) / output.getAmount();
-                        minimumRatio = Math.min(minimumRatio, newRatio);
-                        // and don't claim that more could be produced
-                        maximumRatio = minimumRatio;
-                    }
+                double production = output.getAmount() * minimumRatio;
+                if (production <= 0) continue;
+                int amountPresent = getAvailable(output.getType(), outputs);
+                // Clamp production at warehouse capacity
+                if (production + amountPresent > capacity) {
+                    minimumRatio = Math.min(minimumRatio,
+                        (capacity - amountPresent) / output.getAmount());
+                }
+                production = output.getAmount() * maximumRatio;
+                if (production + amountPresent > capacity) {
+                    maximumRatio = Math.min(maximumRatio, 
+                        (capacity - amountPresent) / output.getAmount());
                 }
             }
         }

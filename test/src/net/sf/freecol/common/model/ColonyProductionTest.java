@@ -197,8 +197,10 @@ public class ColonyProductionTest extends FreeColTestCase {
         game.setMap(getTestMap());
 
         Colony colony = getStandardColony(1);
-
         Building pasture = colony.getBuilding(countryType);
+        Unit unit = colony.getFirstUnit();
+        unit.setLocation(colony.getWorkLocationFor(unit, bellsType));
+
         List<AbstractGoods> outputs = pasture.getOutputs();
         assertEquals(1, outputs.size());
         assertEquals(horsesType, outputs.get(0).getType());
@@ -207,9 +209,10 @@ public class ColonyProductionTest extends FreeColTestCase {
 
         // Still room for more
         colony.addGoods(horsesType, 99);
+        colony.invalidateCache();
+
         assertEquals(99, colony.getGoodsCount(horsesType));
         assertTrue(colony.getNetProductionOf(foodType) > 0);
-
         assertEquals("Wrong horse production", 1,
             pasture.getTotalProductionOf(horsesType));
         assertEquals("Wrong maximum horse production", 1,
@@ -219,6 +222,8 @@ public class ColonyProductionTest extends FreeColTestCase {
 
         // No more room available
         colony.addGoods(horsesType, 1);
+        colony.invalidateCache();
+
         assertEquals("Wrong number of horses in colony",
             colony.getWarehouseCapacity(), colony.getGoodsCount(horsesType));
         assertEquals("Wrong horse production", 0,

@@ -29,16 +29,20 @@ import java.util.List;
 public class ProductionInfo {
 
     /** The maximum production possible given unlimited input. */
-    private List<AbstractGoods> maximumProduction = new ArrayList<AbstractGoods>();
+    private List<AbstractGoods> maximumProduction
+        = new ArrayList<AbstractGoods>();
 
     /** The actual production. */
-    private List<AbstractGoods> production = new ArrayList<AbstractGoods>();
+    private List<AbstractGoods> production
+        = new ArrayList<AbstractGoods>();
 
     /** The maximum consumption possible given unlimited input. */
-    private List<AbstractGoods> maximumConsumption = new ArrayList<AbstractGoods>();
+    private List<AbstractGoods> maximumConsumption
+        = new ArrayList<AbstractGoods>();
 
     /** The actual consumption. */
-    private List<AbstractGoods> consumption = new ArrayList<AbstractGoods>();
+    private List<AbstractGoods> consumption
+        = new ArrayList<AbstractGoods>();
 
 
     /**
@@ -132,20 +136,18 @@ public class ProductionInfo {
     }
 
     /**
-     * Returns true if production equals maximum production.
+     * Does production equal maximum production?
      *
-     * @return a <code>boolean</code> value
+     * @return True if at maximum production.
      */
     public boolean hasMaximumProduction() {
-        if (maximumProduction.isEmpty()) {
-            return true;
-        }
+        if (maximumProduction.isEmpty()) return true;
+
         for (int index = 0; index < production.size(); index++) {
-            if (maximumProduction.size() < index) {
-                return true;
-            } else if (maximumProduction.get(index).getAmount() > production.get(index).getAmount()) {
-                return false;
-            }
+            if (maximumProduction.size() < index) return true;
+
+            if (maximumProduction.get(index).getAmount()
+                > production.get(index).getAmount()) return false;
         }
         return true;
     }
@@ -177,19 +179,22 @@ public class ProductionInfo {
         maximumConsumption.add(goods);
     }
 
-    private void append(StringBuilder result, String key, List<AbstractGoods> list) {
-        if (!list.isEmpty()) {
-            result.append(key + ": ");
-            for (AbstractGoods goods : list) {
-                result.append(goods.toString());
-                if (goods.getType().getStoredAs() != goods.getType()) {
-                    result.append(" [" + goods.getType().getStoredAs().getId() + "]");
-                }
-                result.append(", ");
+    private void append(StringBuilder result, String key,
+                        List<AbstractGoods> list) {
+        if (list.isEmpty()) return;
+
+        result.append(key).append(": ");
+        for (AbstractGoods goods : list) {
+            result.append(goods.toString());
+            if (goods.getType().getStoredAs() != goods.getType()) {
+                result.append(" [")
+                    .append(goods.getType().getStoredAs().getId())
+                    .append("]");
             }
-            int length = result.length();
-            result.replace(length - 2, length, "\n");
+            result.append(", ");
         }
+        int length = result.length();
+        result.replace(length - 2, length, "\n");
     }
 
     /**

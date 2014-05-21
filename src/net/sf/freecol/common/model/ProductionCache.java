@@ -44,14 +44,21 @@ public class ProductionCache {
      */
     private Colony colony;
 
-    private TypeCountMap<GoodsType> netProduction =
-        new TypeCountMap<GoodsType>();
+    /** A map of net production by goods type. */
+    private TypeCountMap<GoodsType> netProduction
+        = new TypeCountMap<GoodsType>();
 
-    private Map<Object, ProductionInfo> productionAndConsumption =
-        new HashMap<Object, ProductionInfo>();
+    /** A map of production info for various producers and consumers. */
+    private Map<Object, ProductionInfo> productionAndConsumption
+        = new HashMap<Object, ProductionInfo>();
 
+    /** A set of the goods used by the colony. */
     private Set<GoodsType> goodsUsed = new HashSet<GoodsType>();
 
+    /**
+     * Flag to indicate whether the cache is up to date, or not and
+     * needs {@link #update} to be called.
+     */
     private boolean upToDate = false;
 
 
@@ -98,7 +105,7 @@ public class ProductionCache {
         }
 
         final Specification spec = colony.getSpecification();
-        GoodsType bells = spec.getGoodsType("model.goods.bells");
+        final GoodsType bells = spec.getGoodsType("model.goods.bells");
         int unitsThatUseNoBells = spec.getInteger(GameOptions.UNITS_THAT_USE_NO_BELLS);
         int amount = Math.min(unitsThatUseNoBells, colony.getUnitCount());
         ProductionInfo bellsInfo = new ProductionInfo();
@@ -123,7 +130,7 @@ public class ProductionCache {
             }
             ProductionInfo info = null;
             if (consumer instanceof Building) {
-                Building building = (Building) consumer;
+                Building building = (Building)consumer;
                 List<AbstractGoods> outputs = new ArrayList<AbstractGoods>();
                 for (AbstractGoods output : building.getOutputs()) {
                     GoodsType outputType = output.getType();
