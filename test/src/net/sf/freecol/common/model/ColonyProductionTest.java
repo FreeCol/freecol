@@ -51,37 +51,42 @@ public class ColonyProductionTest extends FreeColTestCase {
     private static final GoodsType horsesType
         = spec().getGoodsType("model.goods.horses");
 
+    private static final ResourceType grainResource
+        = spec().getResourceType("model.resource.grain");
+
     private static final TileType plainsType
         = spec().getTileType("model.tile.plains");
 
+    private static final UnitType pioneerType
+        = spec().getUnitType("model.unit.hardyPioneer");
+    private static final UnitType veteranSoldierType
+        = spec().getUnitType("model.unit.veteranSoldier");
+
 
     public void testProductionSoldier() {
-
         Game game = getStandardGame();
         Map map = getTestMap();
         game.setMap(map);
         Player dutch = game.getPlayer("model.nation.dutch");
 
         Tile tile = map.getTile(5, 8);
-        Resource grain = new Resource(game, tile, spec().getResourceType("model.resource.grain"));
+        Resource grain = new Resource(game, tile, grainResource);
         tile.addResource(grain);
 
-        UnitType veteran = spec().getUnitType("model.unit.veteranSoldier");
-        Unit soldier = new ServerUnit(game, map.getTile(6, 8), dutch, veteran);
+        Tile tileOfColony = map.getTile(6, 8);
+        Unit soldier = new ServerUnit(game, tileOfColony, dutch,
+            veteranSoldierType);
 
-        Colony colony = new ServerColony(game, dutch, "New Amsterdam", soldier.getTile());
+        Colony colony = new ServerColony(game, dutch, "New Amsterdam",
+                                         tileOfColony);
         dutch.addSettlement(colony);
-        GoodsType foodType = grainType;
-        soldier.changeWorkType(foodType);
         nonServerBuildColony(soldier, colony);
+        soldier.setLocation(colony.getWorkLocationFor(soldier, grainType));
 
         // Test the colony
         assertEquals(map.getTile(6, 8), colony.getTile());
-
         assertEquals("New Amsterdam", colony.getName());
-
         assertEquals(colony, colony.getTile().getSettlement());
-
         assertEquals(dutch, colony.getTile().getOwner());
 
         // Disabled.  Removal of equipment has moved to the server, so
@@ -96,46 +101,39 @@ public class ColonyProductionTest extends FreeColTestCase {
         //    else
         //        assertEquals(type.toString(), 0, colony.getGoodsCount(type));
         //}
+        //assertEquals(false, soldier.isArmed());
 
         // Test the state of the soldier
         // Soldier should be working on the field with the bonus
 
-        assertEquals(foodType, soldier.getWorkType());
-
-        assertEquals(colony.getColonyTile(tile).getTile(), soldier.getTile());
-
+        assertEquals(grainType, soldier.getWorkType());
+        assertEquals(tileOfColony, soldier.getTile());
         assertEquals(0, soldier.getMovesLeft());
-
-        //assertEquals(false, soldier.isArmed());
     }
 
     public void testProductionPioneer() {
-
         Game game = getStandardGame();
         Map map = getTestMap();
         game.setMap(map);
         Player dutch = game.getPlayer("model.nation.dutch");
 
         Tile tile = map.getTile(5, 8);
-        Resource grain = new Resource(game, tile, spec().getResourceType("model.resource.grain"));
+        Resource grain = new Resource(game, tile, grainResource);
         tile.addResource(grain);
 
-        UnitType pioneerType = spec().getUnitType("model.unit.hardyPioneer");
-        GoodsType foodType = grainType;
-        Unit pioneer = new ServerUnit(game, map.getTile(6, 8), dutch, pioneerType);
+        Tile tileOfColony = map.getTile(6, 8);
+        Unit pioneer = new ServerUnit(game, tileOfColony, dutch, pioneerType);
 
-        Colony colony = new ServerColony(game, dutch, "New Amsterdam", pioneer.getTile());
+        Colony colony = new ServerColony(game, dutch, "New Amsterdam",
+                                         tileOfColony);
         dutch.addSettlement(colony);
-        pioneer.changeWorkType(foodType);
         nonServerBuildColony(pioneer, colony);
+        pioneer.setLocation(colony.getWorkLocationFor(pioneer, grainType));
 
         // Test the colony
         assertEquals(map.getTile(6, 8), colony.getTile());
-
         assertEquals("New Amsterdam", colony.getName());
-
         assertEquals(colony, colony.getTile().getSettlement());
-
         assertEquals(dutch, colony.getTile().getOwner());
 
         // Disabled.  Removal of equipment has moved to the server, so
@@ -150,16 +148,13 @@ public class ColonyProductionTest extends FreeColTestCase {
         //    else
         //        assertEquals(type.toString(), 0, colony.getGoodsCount(type));
         //}
+        //assertEquals(false, pioneer.isArmed());
 
         // Test the state of the pioneer
         // Pioneer should be working on the field with the bonus
-        assertEquals(foodType, pioneer.getWorkType());
-
-        assertEquals(colony.getColonyTile(tile).getTile(), pioneer.getTile());
-
+        assertEquals(grainType, pioneer.getWorkType());
+        assertEquals(tileOfColony, pioneer.getTile());
         assertEquals(0, pioneer.getMovesLeft());
-
-        //assertEquals(false, pioneer.isArmed());
     }
 
     public void testBellNetProduction(){
@@ -302,10 +297,7 @@ public class ColonyProductionTest extends FreeColTestCase {
         // population queue comes last
         assertTrue(consumers.get(offset + 2).toString(),
                    consumers.get(offset + 2) instanceof BuildQueue);
-
-
     }
-
 
     public void testProductionMap() {
         ProductionMap pm = new ProductionMap();
@@ -326,7 +318,6 @@ public class ColonyProductionTest extends FreeColTestCase {
         assertEquals(11, pm.get(foodType).getAmount());
     }
 
-
     public void testProduction() {
         Game game = getGame();
         game.setMap(getTestMap());
@@ -335,7 +326,6 @@ public class ColonyProductionTest extends FreeColTestCase {
         ColonyTile tile = colony.getColonyTile(colony.getTile());
 
         assertEquals(0, colony.getGoodsCount(foodType));
-
         assertEquals(grainType, tile.getProduction().get(0).getType());
         assertEquals(5, tile.getProduction().get(0).getAmount());
         assertEquals(cottonType, tile.getProduction().get(1).getType());
@@ -346,10 +336,18 @@ public class ColonyProductionTest extends FreeColTestCase {
             assertNotNull(unitInfo);
             assertEquals(2, unitInfo.getConsumption().size());
             assertEquals(2, unitInfo.getMaximumConsumption().size());
-            ProductionInfo tileInfo = colony.getProductionInfo(unit.getLocation());
-            assertEquals(1, tileInfo.getProduction().size());
-            assertEquals(grainType, tileInfo.getProduction().get(0).getType());
-            assertEquals(5, tileInfo.getProduction().get(0).getAmount());
+            ProductionInfo pi = colony.getProductionInfo(unit.getLocation());
+            if (unit.getLocation() instanceof ColonyTile) {
+                // Producing grain to satisfy food demand
+                assertEquals(1, pi.getProduction().size());
+                assertEquals(grainType, pi.getProduction().get(0).getType());
+                assertEquals(5, pi.getProduction().get(0).getAmount());
+            } else {
+                // Producing bells to satisfy bells demand
+                assertEquals(1, pi.getProduction().size());
+                assertEquals(bellsType, pi.getProduction().get(0).getType());
+                assertEquals(3, pi.getProduction().get(0).getAmount());
+            }
         }
 
         /*
