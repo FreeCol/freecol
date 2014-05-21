@@ -967,7 +967,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public boolean isLandLocked() {
         if (!isLand()) return false;
         for (Tile t : getSurroundingTiles(1)) {
-            if (t.getType().isWater()) return false;
+            if (!t.isLand()) return false;
         }
         return true;
     }
@@ -1117,8 +1117,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return The defence value.
      */
     public float getDefenceValue() {
-        return FeatureContainer.applyModifierSet(1.0f, null,
-            getType().getDefenceModifiers());
+        final TileType type = getType();
+        return (type == null) ? 0.0f
+            : FeatureContainer.applyModifierSet(1.0f, null,
+                                                type.getDefenceModifiers());
     }
 
     /**
