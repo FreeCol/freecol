@@ -424,23 +424,8 @@ public abstract class WorkLocation extends UnitLocation
         unit.setState(Unit.UnitState.IN_COLONY);
         unit.setMovesLeft(0);
 
-        // Choose a sensible work type only if none already specified
-        // or it is not useful at this location.
-        GoodsType workType = unit.getWorkType(), newWorkType = null;
-        ProductionType best = null;
-        if (workType != null) {
-            if ((best = getBestProductionType(workType)) != null) {
-                setProductionType(best);
-                newWorkType = workType;
-            }
-        }
-        if (best == null) {
-            if ((best = getBestProductionType(unit)) != null) {
-                setProductionType(best);
-                newWorkType = best.getBestOutputType();
-            }
-        }
-        if (newWorkType != workType) unit.changeWorkType(newWorkType);
+        // Choose a sensible work type.
+        getColony().setOccupationAt(unit, this);
 
         getColony().invalidateCache();
         return true;

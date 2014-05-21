@@ -411,14 +411,154 @@ public class Colony extends Settlement implements Nameable {
      */
     private int getMinimumGoodsCount(List<AbstractGoods> goodsList) {
         if (goodsList == null || goodsList.isEmpty()) return INFINITY;
-        int result = -1;
+        int result = INFINITY;
         for (AbstractGoods ag : goodsList) {
-            result = (result < 0) ? getGoodsCount(ag.getType())
-                : Math.min(result, getGoodsCount(ag.getType()));
+            result = Math.min(result, 
+                              Math.max(getGoodsCount(ag.getType()),
+                                       getNetProductionOf(ag.getType())));
         }
         return result;
     }
 
+    private void logWorkTypes(StringBuffer sb, Collection<GoodsType> workTypes) {
+        sb.append("[");
+        for (GoodsType gt : workTypes) {
+            sb.append(gt.getSuffix()).append(" ");
+        }
+        sb.setLength(sb.length()-1);
+        sb.append("]");
+    }
+        
+    private void accumulateChoices(Collection<GoodsType> workTypes,
+                                   Collection<GoodsType> tried,
+                                   List<Collection<GoodsType>> result) {
+        workTypes.removeAll(tried);
+        if (!workTypes.isEmpty()) {
+            result.add(workTypes);
+            tried.addAll(workTypes);
+        }
+    }
+
+    private void accumulateChoice(GoodsType workType,
+                                  Collection<GoodsType> tried,
+                                  List<Collection<GoodsType>> result) {
+        if (workType == null) return;
+        accumulateChoices(workType.getEquivalentTypes(), tried, result);
+    }
+
+    /**
+     * Get a list of collections of goods types, in order of priority
+     * to try to produce in this colony by a given unit.
+     *
+     * @param unit The <code>Unit</code> to check.
+     * @param userMode If a user requested this, favour the current
+     *     work type, if not favour goods that the unit requires.
+     * @return The list of collections of <code>GoodsType</code>s.
+     */
+    public List<Collection<GoodsType>> getWorkTypeChoices(Unit unit,
+                                                          boolean userMode) {
+        final Specification spec = getSpecification();
+        List<Collection<GoodsType>> result
+            = new ArrayList<Collection<GoodsType>>();
+        Set<GoodsType> tried = new HashSet<GoodsType>();
+
+        // Find the food and non-food goods types required by the unit.
+        Set<GoodsType> food = new HashSet<GoodsType>();
+        Set<GoodsType> nonFood = new HashSet<GoodsType>();
+        for (AbstractGoods ag : unit.getType().getConsumedGoods()) {
+            if (productionCache.getNetProductionOf(ag.getType())
+                < ag.getAmount()) {
+                if (ag.getType().isFoodType()) {
+                    food.addAll(ag.getType().getEquivalentTypes());
+                } else {
+                    nonFood.addAll(ag.getType().getEquivalentTypes());
+                }
+            }
+        }
+
+        if (userMode) { // Favour current and expert types in user mode
+            accumulateChoice(unit.getWorkType(), tried, result);
+            accumulateChoice(unit.getType().getExpertProduction(), tried, result);
+            accumulateChoice(unit.getExperienceType(), tried, result);
+            accumulateChoices(food, tried, result);
+            accumulateChoices(nonFood, tried, result);
+        } else { // Otherwise favour the required goods types 
+            accumulateChoices(food, tried, result);
+            accumulateChoices(nonFood, tried, result);
+            accumulateChoice(unit.getWorkType(), tried, result);
+            accumulateChoice(unit.getType().getExpertProduction(), tried, result);
+            accumulateChoice(unit.getExperienceType(), tried, result);
+        }
+        accumulateChoices(spec.getFoodGoodsTypeList(), tried, result);
+        accumulateChoices(spec.getNewWorldLuxuryGoodsTypeList(), tried, result);
+        accumulateChoices(spec.getGoodsTypeList(), tried, result);
+        return result;
+    }
+
+    /**
+     * Check a particular work location for the best available production
+     * for the given unit.
+     *
+     * @param unit The <code>Unit</code> to produce the goods.
+     * @param wl The <code>WorkLocation</code> to check.
+     * @param best The best <code>Occupation</code> found so far.
+     * @param bestAmount The amount of goods produced.
+     * @param workTypes A collection of <code>GoodsType</code> to
+     *     consider producing.
+     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @return The updated best amount of production found.
+     */
+    private int getOccupationAt(Unit unit, WorkLocation wl,
+                                Occupation best, int bestAmount,
+                                Collection<GoodsType> workTypes,
+                                StringBuffer sb) {
+        final UnitType type = unit.getType();
+
+        // Can the unit work at this wl?
+        boolean present = unit.getLocation() == wl;
+        if (sb != null) {
+            sb.append("\n    ").append(wl);
+            if (!present && !wl.canAdd(unit)) sb.append(" no-add");
+        }
+        if (!present && !wl.canAdd(unit)) return bestAmount;
+
+        // Can the unit determine the production type at this WL?
+        // This will be true if the unit is going to be alone or
+        // if the production type is as yet unset.
+        boolean alone = wl.getProductionType() == null
+            || wl.isEmpty()
+            || (present && wl.getUnitCount() == 1);
+        if (sb != null) sb.append(" alone=").append(alone);
+
+        // Try the available production types for the best production.
+        List<ProductionType> productionTypes = new ArrayList<ProductionType>();
+        if (alone) {
+            productionTypes.addAll(wl.getAvailableProductionTypes(false));
+        } else {
+            productionTypes.add(wl.getProductionType());
+        }
+        for (ProductionType pt : productionTypes) {
+            if (sb != null) sb.append("\n      try=").append(pt);
+            for (GoodsType gt : workTypes) {
+                if (pt.getOutput(gt) == null) continue;
+                int amount = getMinimumGoodsCount(pt.getInputs());
+                amount = Math.min(amount, wl.getPotentialProduction(gt, type));
+                if (sb != null) {
+                    sb.append(" ").append(gt.getSuffix())
+                        .append("=").append(amount);
+                    if (bestAmount < amount) sb.append("!");
+                }
+                if (bestAmount < amount) {
+                    bestAmount = amount;
+                    best.workLocation = wl;
+                    best.productionType = pt;
+                    best.workType = gt;
+                }
+            }
+        }
+        return bestAmount;   
+    }
+        
     /**
      * Gets the best occupation for a given unit to produce one of
      * a given set of goods types.
@@ -435,106 +575,18 @@ public class Colony extends Settlement implements Nameable {
                                         Collection<GoodsType> workTypes,
                                         StringBuffer sb) {
         if (workTypes.isEmpty()) return null;
-        final UnitType type = unit.getType();
 
         Occupation best = new Occupation(null, null, null);
         int bestAmount = 0;
         for (WorkLocation wl : getCurrentWorkLocations()) {
-            // Can the unit work at this wl?
-            boolean present = unit.getLocation() == wl;
-            if (sb != null) {
-                sb.append("\n    ").append(wl);
-                if (!present && !wl.canAdd(unit)) sb.append(" no-add");
-            }
-            if (!present && !wl.canAdd(unit)) continue;
-
-            // Can the unit determine the production type at this WL?
-            // This will be true if the unit is going to be alone or
-            // if the production type is as yet unset.
-            boolean alone = wl.getProductionType() == null
-                || wl.isEmpty()
-                || (present && wl.getUnitCount() == 1);
-            if (alone) {
-                for (ProductionType pt
-                         : wl.getAvailableProductionTypes(false)) {
-                    if (sb != null) {
-                        sb.append("\n      try=").append(pt);
-                    }
-                    for (GoodsType gt : workTypes) {
-                        if (sb != null) {
-                            sb.append(" ").append(gt.getSuffix());
-                        }
-                        if (pt.getOutput(gt) == null) continue;
-                        int amount = getMinimumGoodsCount(pt.getInputs());
-                        amount = Math.min(amount, 
-                            wl.getPotentialProduction(gt, type));
-                        if (sb != null) {
-                            sb.append("=").append(amount);
-                            if (bestAmount < amount) sb.append("!");
-                        }
-                        if (bestAmount < amount) {
-                            bestAmount = amount;
-                            best.workLocation = wl;
-                            best.productionType = pt;
-                            best.workType = gt;
-                        }
-                    }
-                }
-            } else {
-                ProductionType pt = wl.getProductionType();
-                if (sb != null) {
-                    sb.append("\n      fixed=").append(pt);
-                }
-                for (GoodsType gt : workTypes) {
-                    if (sb != null) {
-                        sb.append(" ").append(gt.getSuffix());
-                    }
-                    if (pt.getOutput(gt) == null) continue;
-                    int amount = getMinimumGoodsCount(pt.getInputs());
-                    amount = Math.min(amount, 
-                        wl.getPotentialProduction(gt, type));
-                    if (sb != null) {
-                        sb.append("=").append(amount);
-                        if (bestAmount < amount) sb.append("!");
-                    }
-                    if (bestAmount < amount) {
-                        bestAmount = amount;
-                        best.workLocation = wl;
-                        best.productionType = pt;
-                        best.workType = gt;
-                    }
-                }
-            }
+            bestAmount = getOccupationAt(unit, wl, best, bestAmount,
+                                         workTypes, sb);
         }
 
         if (sb != null && best.workLocation != null) {
-            sb.append("\n  => ").append(best);
+            sb.append("\n  => ").append(best).append(" = ").append(bestAmount);
         }
         return (best.workLocation == null) ? null : best;
-    }
-
-    /**
-     * Try to find an occupation for a unit while maintaining a
-     * candidate and tried set of work types.
-     *
-     * @param unit The <code>Unit</code> to find an
-     *     <code>Occupation</code> for.
-     * @param todo A collection of <code>GoodsType</code>s to try as
-     *     the unit work type.
-     * @param done A collection of <code>GoodsType</code>s not to try
-     *     because they have already failed.
-     * @param sb An optional <code>StringBuffer</code> to log to.
-     * @return An <code>Occupation</code> for the given unit, or
-     *     null if none found.
-     */
-    private Occupation getOccupationFor(Unit unit,
-                                        Collection<GoodsType> todo,
-                                        Collection<GoodsType> done,
-                                        StringBuffer sb) {
-        todo.removeAll(done);
-        Occupation occupation = getOccupationFor(unit, todo, sb);
-        done.addAll(todo);
-        return occupation;
     }
 
     /**
@@ -542,91 +594,24 @@ public class Colony extends Settlement implements Nameable {
      *
      * @param unit The <code>Unit</code> to find an
      *     <code>Occupation</code> for.
+     * @param userMode If a user requested this, favour the current
+     *     work type, if not favour goods that the unit requires.
      * @param sb An optional <code>StringBuffer</code> to log to.
      * @return An <code>Occupation</code> for the given unit, or
      *     null if none found.
      */
-    private Occupation getOccupationFor(Unit unit, StringBuffer sb) {
-        final Specification spec = getSpecification();
-        final UnitType unitType = unit.getType();
-        Set<GoodsType> tried = new HashSet<GoodsType>();
-        Set<GoodsType> tryNext = new HashSet<GoodsType>();
-        Occupation occupation = null;
-
-        // First, see if more food is needed.
-        //
-        // TODO: this should consider a list of all consumed goods,
-        // weighted by priority. This, in turn, would require the
-        // consumption element to state the consequences if
-        // consumption can not be satisfied.  For now, just favour
-        // food types.
-        for (AbstractGoods ag : unit.getType().getConsumedGoods()) {
-            if (productionCache.getNetProductionOf(ag.getType())
-                < ag.getAmount()) {
-                if (ag.getType().isFoodType()) {
-                    if (sb != null) {
-                        sb.append("\n  needs food: ")
-                            .append(ag.getType().getSuffix())
-                            .append(" ->");
-                        for (GoodsType gt : ag.getType().getEquivalentTypes()) {
-                            sb.append(" ").append(gt.getSuffix());
-                        }
-                    }
-                    occupation = getOccupationFor(unit,
-                        ag.getType().getEquivalentTypes(), tried, sb);
-                    if (occupation != null) return occupation;
-                } else {
-                    tryNext.add(ag.getType());
-                }
-            }
-        }
-        // Then other consumed goods.
-        for (GoodsType gt : tryNext) {
+    private Occupation getOccupationFor(Unit unit, boolean userMode,
+                                        StringBuffer sb) {
+        for (Collection<GoodsType> types
+                 : getWorkTypeChoices(unit, userMode)) {
             if (sb != null) {
-                sb.append("\n  needs other ").append(gt.getSuffix());
+                sb.append("\n  ");
+                logWorkTypes(sb, types);
             }
-            occupation = getOccupationFor(unit, gt.getEquivalentTypes(),
-                                          tried, sb);
+            Occupation occupation = getOccupationFor(unit, types, sb);
             if (occupation != null) return occupation;
         }
-
-        // Now try production that the unit has an affinity for.
-        // First its expert output, then the expertise output, and
-        // finally the current work type.
-        for (GoodsType wt : new GoodsType[] {
-                unitType.getExpertProduction(),
-                unit.getExperienceType(),
-                unit.getWorkType() }) {
-            if (wt == null || tried.contains(wt)) continue;
-            if (sb != null) {
-                sb.append("\n  consider ").append(wt.getSuffix());
-            }
-            occupation = getOccupationFor(unit, wt.getEquivalentTypes(),
-                                          tried, sb);
-            if (occupation != null) return occupation;
-        }
-
-        // Try any remaining food.
-        if (sb != null) {
-            sb.append("\n  remaining food:");
-        }
-        occupation = getOccupationFor(unit, spec.getFoodGoodsTypeList(),
-                                      tried, sb);
-        if (occupation != null) return occupation;
-        
-        // Running out of choices, try what is left.
-        if (sb != null) {
-            sb.append("\n  remaining production:");
-        }
-        occupation = getOccupationFor(unit, spec.getGoodsTypeList(),
-                                      tried, sb);
-        if (occupation != null) return occupation;
-        
-        // Failed!
-        if (sb != null) {
-            sb.append("\n  tried:");
-            for (GoodsType gt : tried) sb.append(" ").append(gt);
-        }
+        if (sb != null) sb.append("\n  => FAILED");
         return null;
     }
 
@@ -647,8 +632,11 @@ public class Colony extends Settlement implements Nameable {
         if (getOccupationTrace()) {
             sb = new StringBuffer(128);
             sb.append(getName()).append(".getOccupationFor(").append(unit)
-                .append(", [").append(workTypes.size()).append("])");
+                .append(", ");
+            logWorkTypes(sb, workTypes);
+            sb.append(")");
         }
+
         Occupation occupation = getOccupationFor(unit, workTypes, sb);
         if (sb != null) logger.warning(sb.toString());
         return occupation;
@@ -659,10 +647,12 @@ public class Colony extends Settlement implements Nameable {
      *
      * @param unit The <code>Unit</code> to find an
      *     <code>Occupation</code> for.
+     * @param userMode If a user requested this, favour the current
+     *     work type, if not favour goods that the unit requires.
      * @return An <code>Occupation</code> for the given unit, or
      *     null if none found.
      */
-    private Occupation getOccupationFor(Unit unit) {
+    private Occupation getOccupationFor(Unit unit, boolean userMode) {
         StringBuffer sb = null;
         if (getOccupationTrace()) {
             sb = new StringBuffer(128);
@@ -670,9 +660,64 @@ public class Colony extends Settlement implements Nameable {
                 .append(")");
         }
 
-        Occupation occupation = getOccupationFor(unit, sb);
+        Occupation occupation = getOccupationFor(unit, userMode, sb);
         if (sb != null) logger.warning(sb.toString());
         return occupation;
+    }
+
+    /**
+     * Gets the best occupation for a given unit at a given work location.
+     *
+     * @param unit The <code>Unit</code> to find an
+     *     <code>Occupation</code> for.
+     * @param wl The <code>WorkLocation</code> to work at.
+     * @param userMode If a user requested this, favour the current
+     *     work type, if not favour goods that the unit requires.
+     * @return An <code>Occupation</code> for the given unit, or
+     *     null if none found.
+     */
+    private Occupation getOccupationAt(Unit unit, WorkLocation wl,
+                                       boolean userMode) {
+        StringBuffer sb = null;
+        if (getOccupationTrace()) {
+            sb = new StringBuffer(128);
+            sb.append(getName()).append(".getOccupationAt(").append(unit)
+                .append(", ").append(wl).append(")");
+        }
+
+        Occupation best = new Occupation(null, null, null);
+        int bestAmount = 0;
+        for (Collection<GoodsType> types
+                 : getWorkTypeChoices(unit, userMode)) {
+            if (sb != null) {
+                sb.append("\n  ");
+                logWorkTypes(sb, types);
+            }
+            bestAmount = getOccupationAt(unit, wl, best, bestAmount,
+                                         types, sb);
+            if (best.workType != null) {
+                if (sb != null) sb.append("\n  => ").append(best);
+                break;
+            }
+        }
+        if (sb != null) {
+            if (best.workType == null) sb.append("\n  FAILED");
+            logger.warning(sb.toString());
+        }      
+        return (best.workType == null) ? null : best;
+    }
+
+    /**
+     * Install a unit at the best occupation for it at a given work
+     * location.  Public for {@link #WorkLocation.add}.
+     *
+     * @param unit The <code>Unit</code> to install.
+     * @param wl The <code>WorkLocation</code> to install the unit.
+     * @return True if the installation succeeds.
+     */
+    public boolean setOccupationAt(Unit unit, WorkLocation wl) {
+        Occupation occupation = getOccupationAt(unit, wl, false);
+        return occupation != null && occupation.install(unit);
     }
 
 
@@ -843,8 +888,21 @@ public class Colony extends Settlement implements Nameable {
      * @return The best <code>WorkLocation</code> found.
      */
     public WorkLocation getWorkLocationFor(Unit unit) {
-        Occupation occupation = getOccupationFor(unit);
+        Occupation occupation = getOccupationFor(unit, false);
         return (occupation == null) ? null : occupation.workLocation;
+    }
+
+    /**
+     * Get the best work type for a unit at a work location in this colony.
+     *
+     * @param unit The <code>Unit</code> to find a work type for.
+     * @param wl The <code>WorkLocation</code> to work at.
+     * @return The best work <code>GoodsType</code> for the unit, or null
+     *     if none found.
+     */
+    public GoodsType getWorkTypeFor(Unit unit, WorkLocation wl) {
+        Occupation occupation = getOccupationAt(unit, wl, true);
+        return (occupation == null) ? null : occupation.workType;
     }
 
     /**
@@ -1410,11 +1468,11 @@ public class Colony extends Settlement implements Nameable {
      * @return True if the add succeeds.
      */
     public boolean joinColony(Unit unit) {
-        Occupation occupation = getOccupationFor(unit);
+        Occupation occupation = getOccupationFor(unit, false);
         if (occupation == null) {
             if (!traceOccupation) {
                 StringBuffer sb = new StringBuffer(64);
-                getOccupationFor(unit, sb);
+                getOccupationFor(unit, false, sb);
                 logger.warning(sb.toString());
             }
             return false;

@@ -201,6 +201,8 @@ public final class Specification {
         = new ArrayList<GoodsType>();
     private final List<GoodsType> newWorldGoodsTypeList
         = new ArrayList<GoodsType>();
+    private final List<GoodsType> newWorldLuxuryGoodsTypeList
+        = new ArrayList<GoodsType>();
     private final List<GoodsType> libertyGoodsTypeList
         = new ArrayList<GoodsType>();
     private final List<GoodsType> immigrationGoodsTypeList
@@ -431,6 +433,7 @@ public final class Specification {
         farmedGoodsTypeList.clear();
         foodGoodsTypeList.clear();
         newWorldGoodsTypeList.clear();
+        newWorldLuxuryGoodsTypeList.clear();
         libertyGoodsTypeList.clear();
         immigrationGoodsTypeList.clear();
         rawBuildingGoodsTypeList.clear();
@@ -444,6 +447,9 @@ public final class Specification {
             }
             if (goodsType.isNewWorldGoodsType()) {
                 newWorldGoodsTypeList.add(goodsType);
+                if (goodsType.isNewWorldLuxuryType()) {
+                    newWorldLuxuryGoodsTypeList.add(goodsType);
+                }
             }
             if (goodsType.isLibertyType()) {
                 libertyGoodsTypeList.add(goodsType);
@@ -1024,6 +1030,10 @@ public final class Specification {
 
     public List<GoodsType> getNewWorldGoodsTypeList() {
         return new ArrayList<GoodsType>(newWorldGoodsTypeList);
+    }
+
+    public List<GoodsType> getNewWorldLuxuryGoodsTypeList() {
+        return new ArrayList<GoodsType>(newWorldLuxuryGoodsTypeList);
     }
 
     public List<GoodsType> getLibertyGoodsTypeList() {

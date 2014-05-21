@@ -20,7 +20,9 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -454,11 +456,11 @@ public final class GoodsType extends FreeColGameObjectType {
      * Get all the equivalent goods types, in the sense that they are
      * stored as this type.
      *
-     * @return A list of equivalent <code>GoodsType</code>s, which
+     * @return A set of equivalent <code>GoodsType</code>s, which
      *     must include this one.
      */
-    public List<GoodsType> getEquivalentTypes() {
-        List<GoodsType> result = new ArrayList<GoodsType>();
+    public Set<GoodsType> getEquivalentTypes() {
+        Set<GoodsType> result = new HashSet<GoodsType>();
         for (GoodsType type : getSpecification().getGoodsTypeList()) {
             if (type == this
                 || type.getStoredAs() == this) result.add(type);

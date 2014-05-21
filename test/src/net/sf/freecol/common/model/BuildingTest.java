@@ -30,6 +30,8 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Modifier.ModifierType;
 import net.sf.freecol.common.model.UnitLocation.NoAddReason;
+import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.server.model.ServerBuilding;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -93,6 +95,8 @@ public class BuildingTest extends FreeColTestCase {
         = spec().getGoodsType("model.goods.lumber");
     private static final GoodsType musketsType
         = spec().getGoodsType("model.goods.muskets");
+    private static final GoodsType oreType
+        = spec().getGoodsType("model.goods.ore");
     private static final GoodsType toolsType
         = spec().getGoodsType("model.goods.tools");
 
@@ -762,38 +766,68 @@ public class BuildingTest extends FreeColTestCase {
         game.setMap(getTestMap(true));
 
         Colony colony = getStandardColony(8);
+        Tile tile = colony.getTile();
         List<Unit> units = colony.getUnitList();
         assertEquals(8, units.size());
-        // make sure there are enough goods to get started
-        //colony.addGoods(spec().getGoodsType("model.goods.food"), 100);
-        colony.addGoods(spec().getGoodsType("model.goods.ore"), 100);
-        // make sure no penalties apply
-        colony.addGoods(spec().getGoodsType("model.goods.bells"),
-                        Colony.LIBERTY_PER_REBEL * 3);
+
+        // Make sure there are enough goods to get started, and make
+        // sure enough bells and food are being produced.
+        // colony.addGoods(spec().getGoodsType("model.goods.food"), 100);
+        colony.addGoods(bellsType, Colony.LIBERTY_PER_REBEL * 3);
+        units.get(0).setLocation(tile);
+        units.get(1).setLocation(tile);
+        units.get(2).setLocation(tile);
+        units.get(3).setLocation(tile);
+        assertTrue(colony.setOccupationAt(units.get(4),
+                colony.getColonyTile(tile.getNeighbourOrNull(Direction.N))));
+        assertTrue(colony.setOccupationAt(units.get(5),
+                colony.getColonyTile(tile.getNeighbourOrNull(Direction.E))));
+        assertTrue(colony.setOccupationAt(units.get(6),
+                colony.getColonyTile(tile.getNeighbourOrNull(Direction.S))));
+        assertTrue(colony.setOccupationAt(units.get(7),
+                colony.getBuilding(townHallType)));
 
         Building smithy = colony.getBuilding(blacksmithType);
-        units.get(0).setLocation(smithy);
-        units.get(1).setLocation(smithy);
+        assertFalse(colony.setOccupationAt(units.get(0), smithy));
+        colony.addGoods(oreType, 50); // Add ore so the smithy becomes viable
+        assertTrue(colony.setOccupationAt(units.get(0), smithy));
+        assertTrue(colony.setOccupationAt(units.get(1), smithy));
+
         Building armory = new ServerBuilding(game, colony, armoryType);
         colony.addBuilding(armory);
-        units.get(2).setLocation(armory);
-        units.get(3).setLocation(armory);
+        colony.invalidateCache();
 
+        assertTrue(colony.setOccupationAt(units.get(2), armory));
+        assertTrue(colony.setOccupationAt(units.get(3), armory));
+
+        assertEquals(toolsType,   units.get(0).getWorkType());
+        assertEquals(toolsType,   units.get(1).getWorkType());
+        assertEquals(musketsType, units.get(2).getWorkType());
+        assertEquals(musketsType, units.get(3).getWorkType());
         assertEquals(6, smithy.getTotalProductionOf(toolsType));
         assertEquals(6, armory.getTotalProductionOf(musketsType));
 
+        // Upgrade the buildings
         smithy.upgrade();
         armory.upgrade();
 
+        assertEquals(toolsType,   units.get(0).getWorkType());
+        assertEquals(toolsType,   units.get(1).getWorkType());
+        assertEquals(musketsType, units.get(2).getWorkType());
+        assertEquals(musketsType, units.get(3).getWorkType());
         assertEquals(12, smithy.getTotalProductionOf(toolsType));
         assertEquals(12, armory.getTotalProductionOf(musketsType));
 
-        // make sure we can build factory level buildings
-        colony.getOwner().addFather(spec().getFoundingFather("model.foundingFather.adamSmith"));
-
+        // Upgrade to factory level
+        colony.getOwner().addFather(spec()
+            .getFoundingFather("model.foundingFather.adamSmith"));
         smithy.upgrade();
         armory.upgrade();
 
+        assertEquals(toolsType,   units.get(0).getWorkType());
+        assertEquals(toolsType,   units.get(1).getWorkType());
+        assertEquals(musketsType, units.get(2).getWorkType());
+        assertEquals(musketsType, units.get(3).getWorkType());
         assertEquals(18, smithy.getTotalProductionOf(toolsType));
         //assertEquals("According to bug report #3430371, the arsenal does not enjoy "
         //            + "the usual factory level production bonus of 50%",

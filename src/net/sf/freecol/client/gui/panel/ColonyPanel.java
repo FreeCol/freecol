@@ -718,8 +718,8 @@ public final class ColonyPanel extends PortPanel
      * @return True if the unit is now in the work location.
      */
     private boolean tryWork(Unit unit, WorkLocation wl) {
-        // Choose the work to be done.
-        GoodsType workType = unit.chooseWorkType(wl);
+        // Choose the best work type.
+        GoodsType workType = colony.getWorkTypeFor(unit, wl);
 
         // Set the unit to work.  Note this might upgrade the unit,
         // and possibly even change its work type as the server has
@@ -731,10 +731,7 @@ public final class ColonyPanel extends PortPanel
 
         // Now recheck, and see if we want to change to the expected
         // work type.
-        if (workType == null) {
-            // might have been assigned by the server in .work()
-            workType = unit.getWorkType();
-        } else if (workType != unit.getWorkType()) {
+        if (workType != null && workType != unit.getWorkType()) {
             getController().changeWorkType(unit, workType);
         }
         return true;

@@ -165,6 +165,7 @@ public class ColonyTest extends FreeColTestCase {
         // expert will produce expert goods
         colonist.setLocation(colony.getTile());
         colonist.setType(cottonPlanterType);
+        colonist.changeWorkType(null);
         nonServerJoinColony(colonist, colony);
         assertTrue(colonist.getLocation() instanceof ColonyTile);
         assertEquals(cottonGoodsType, colonist.getWorkType());
@@ -172,11 +173,12 @@ public class ColonyTest extends FreeColTestCase {
         // expert will produce expert goods
         colonist.setLocation(colony.getTile());
         colonist.setType(elderStatesmanType);
+        colonist.changeWorkType(null);
         nonServerJoinColony(colonist, colony);
         assertTrue(colonist.getLocation() instanceof Building);
         assertEquals(townHallType,
                      ((Building) colonist.getLocation()).getType());
-
+        assertEquals(bellsGoodsType, colonist.getWorkType());
     }
 
     private Modifier createTeaPartyModifier(Turn turn) {
@@ -195,10 +197,10 @@ public class ColonyTest extends FreeColTestCase {
         colony.addModifier(createTeaPartyModifier(game.getTurn()));
 
         int modifierCount = 0;
-        for (Modifier existingModifier : colony.getModifierSet("model.goods.bells")) {
-            if (Specification.COLONY_GOODS_PARTY_SOURCE.equals(existingModifier.getSource())) {
-                modifierCount++;
-            }
+        for (Modifier existingModifier
+                 : colony.getModifierSet("model.goods.bells")) {
+            if (Specification.COLONY_GOODS_PARTY_SOURCE
+                .equals(existingModifier.getSource())) modifierCount++;
         }
         assertEquals(1, modifierCount);
 
@@ -206,15 +208,15 @@ public class ColonyTest extends FreeColTestCase {
         colony.addModifier(createTeaPartyModifier(newTurn));
 
         modifierCount = 0;
-        for (Modifier existingModifier : colony.getModifierSet("model.goods.bells")) {
-            if (Specification.COLONY_GOODS_PARTY_SOURCE.equals(existingModifier.getSource())) {
-                modifierCount++;
-            }
+        for (Modifier existingModifier
+                 : colony.getModifierSet("model.goods.bells")) {
+            if (Specification.COLONY_GOODS_PARTY_SOURCE
+                .equals(existingModifier.getSource())) modifierCount++;
         }
         assertEquals(2, modifierCount);
     }
 
-    public void testGetWorkLocationForUnit() {
+    public void testAddUnitToColony() {
         int population = 1;
         GoodsType food = spec().getPrimaryFoodType();
 
@@ -224,21 +226,18 @@ public class ColonyTest extends FreeColTestCase {
         Game game = getGame();
         game.setMap(getTestMap(arcticTileType, true));
         Colony colony = getStandardColony(population);
+        assertTrue("colony should produce less food than it consumes",
+            colony.getFoodProduction() < colony.getFoodConsumption()
+            + freeColonistType.getConsumptionOf(food));
 
-        assertTrue("colony produces more food than it consumes",
-                   colony.getFoodProduction() < colony.getFoodConsumption() +
-                   freeColonistType.getConsumptionOf(food));
-
-        // colonist produces bells because they require no input
-        Unit colonist = new ServerUnit(game, colony.getTile(),
-                                       colony.getOwner(), freeColonistType);
-        nonServerJoinColony(colonist, colony);
-        assertTrue(colonist.getLocation() instanceof Building);
+        // colonist produces bells, the colony needs them
+        Unit colonist = colony.getUnitList().get(0);
         Building townHall = colony.getBuilding(townHallType);
         assertEquals(townHall, colonist.getLocation());
         assertEquals(townHall, colony.getWorkLocationFor(colonist));
         assertEquals(bellsGoodsType, colonist.getWorkType());
 
+        // colonist might have experience, but the colony still needs bells
         colonist.setLocation(colony.getTile());
         colonist.changeWorkType(cottonGoodsType);
         colonist.modifyExperience(100);
@@ -247,21 +246,60 @@ public class ColonyTest extends FreeColTestCase {
         assertEquals(townHall, (Building)colonist.getLocation());
         assertEquals(bellsGoodsType, colonist.getWorkType());
 
+        // Add a statesman and have it deal with the bells problem
         colonist.setLocation(colony.getTile());
+        Unit statesman = new ServerUnit(game, colony.getTile(),
+                                        colony.getOwner(), elderStatesmanType);
+        nonServerJoinColony(statesman, colony);
+        assertEquals(townHall, statesman.getLocation());
+        assertEquals(bellsGoodsType, statesman.getWorkType());
+
+        // Add one plains tile
+        Tile plainsTile = colony.getTile().getNeighbourOrNull(Direction.S);
+        plainsTile.setType(plainsTileType);
+        ColonyTile colonyTile = colony.getColonyTile(plainsTile);
+        assertTrue(colonyTile.isEmpty());
+
+        // colonist experience might be cotton, but the colony needs food
+        colonist.setLocation(colony.getTile());
+        colonist.changeWorkType(cottonGoodsType);
+        colonist.modifyExperience(100);
+        nonServerJoinColony(colonist, colony);
+        assertEquals(colonyTile, colonist.getLocation());
+        assertEquals(grainGoodsType, colonist.getWorkType());
+
+        // Change the center tile to plains to improve the food situation
+        colony.getTile().setType(plainsTileType);
+        colony.getColonyTile(colony.getTile()).updateProductionType();
+        colony.invalidateCache();
+        assertTrue("colony should produce more food than it consumes",
+            colony.getFoodProduction() >= colony.getFoodConsumption()
+            + freeColonistType.getConsumptionOf(food));
+
+        // colonist experience will now encourage cotton production
+        colonist.setLocation(colony.getTile());
+        colonist.changeWorkType(cottonGoodsType);
+        colonist.modifyExperience(100);
+        nonServerJoinColony(colonist, colony);
+        assertEquals(colonyTile, colonist.getLocation());
+        assertEquals(cottonGoodsType, colonist.getWorkType());
+
+        // colonist should still make cotton due to expertise
+        colonist.setLocation(colony.getTile());
+        colonist.changeWorkType(null);
         colonist.setType(cottonPlanterType);
         nonServerJoinColony(colonist, colony);
-        assertEquals(townHall, colony.getWorkLocationFor(colonist));
-        assertEquals(townHall, (Building)colonist.getLocation());
-        assertEquals(bellsGoodsType, colonist.getWorkType());
+        assertEquals(colonyTile, colonist.getLocation());
+        assertEquals(cottonGoodsType, colonist.getWorkType());
 
         // colonist produces cloth, because there is cotton now
         colonist.setLocation(colony.getTile());
+        colonist.changeWorkType(null);
         colonist.setType(masterWeaverType);
         colony.addGoods(cottonGoodsType, 100);
         nonServerJoinColony(colonist, colony);
         assertTrue(colonist.getLocation() instanceof Building);
         Building weaversHouse = colony.getBuilding(weaversHouseType);
-        assertEquals(weaversHouse, colony.getWorkLocationFor(colonist));
         assertEquals(weaversHouse, (Building)colonist.getLocation());
         assertEquals(clothGoodsType, colonist.getWorkType());
     }

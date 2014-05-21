@@ -607,6 +607,7 @@ public class TileTest extends FreeColTestCase {
         for (Tile t : tiles) {
             ColonyTile ct = colony.getColonyTile(t);
             unit.setLocation(ct);
+            unit.changeWorkType(lumber);
             int result = base;
             if (t.hasRiver()) result += riverBonus;
             if (t.hasRoad()) result += roadBonus;
@@ -625,6 +626,7 @@ public class TileTest extends FreeColTestCase {
         for (Tile t : tiles) {
             ColonyTile ct = colony.getColonyTile(t);
             unit.setLocation(ct);
+            unit.changeWorkType(lumber);
             int result = base * expertBonus;
             if (t.hasRiver()) result += riverBonus;
             if (t.hasRoad()) result += roadBonus;
