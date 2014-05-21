@@ -392,9 +392,9 @@ public class UnitTest extends FreeColTestCase {
 
     public void testUnitLocationAfterBuildingColony() {
         Game game = getStandardGame();
-        Player dutch = game.getPlayer("model.nation.dutch");
         Map map = getTestMap();
         game.setMap(map);
+        Player dutch = game.getPlayer("model.nation.dutch");
 
         Tile colonyTile = map.getTile(6, 8);
 
@@ -417,7 +417,7 @@ public class UnitTest extends FreeColTestCase {
         nonServerBuildColony(soldier, colony);
 
         assertTrue("Soldier should be inside the colony",
-                   soldier.getLocation() instanceof ColonyTile);
+                   soldier.isInColony());
         assertEquals("Soldier tile should be the colony tile", colonyTile,
                      soldier.getTile());
         for (Unit u : colonyTile.getUnitList()) {
@@ -430,11 +430,10 @@ public class UnitTest extends FreeColTestCase {
         }
         assertTrue("Soldier should be in a work location in the colony",
                    found);
-        ColonyTile workTile = soldier.getWorkTile();
-        assertTrue("Soldier should be in a work tile in the colony",
-                   workTile != null);
+        WorkLocation wl = soldier.getWorkLocation();
+        assertNotNull("Soldier should be in a work location in the colony", wl);
         assertFalse("Soldier should not be working in central tile",
-                    workTile == colony.getColonyTile(colonyTile));
+                    colony.getColonyTile(colonyTile) == wl);
     }
 
     public void testUnitLosesExperienceWithRoleChange() {
