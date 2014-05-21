@@ -342,10 +342,17 @@ public class ServerUnitTest extends FreeColTestCase {
 
         assertEquals("Colonist should not have any experience",
                      0, colonist.getExperience());
+        assertEquals("Colonist should be free colonist",
+                     colonistType, colonist.getType());
 
-        // colonist either in building or colony work tile
+        // make sure colonist is on a colony tile
         WorkLocation loc = colonist.getWorkLocation();
-        if (loc == null) loc = colonist.getWorkTile();
+        if (!(loc instanceof ColonyTile)) {
+            colonist.setLocation(colony.getWorkLocationFor(colonist, foodType));
+        }
+        assertTrue(colonist.getLocation() instanceof ColonyTile);
+        assertNotNull(colonist.getWorkType());
+        assertTrue(colonist.getWorkType().isFoodType());
 
         // produces goods
         ServerTestHelper.newTurn();
