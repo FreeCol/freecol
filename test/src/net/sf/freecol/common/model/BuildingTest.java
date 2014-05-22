@@ -779,26 +779,30 @@ public class BuildingTest extends FreeColTestCase {
         units.get(2).setLocation(tile);
         units.get(3).setLocation(tile);
         assertTrue(colony.setOccupationAt(units.get(4),
-                colony.getColonyTile(tile.getNeighbourOrNull(Direction.N))));
+                colony.getColonyTile(tile.getNeighbourOrNull(Direction.N)),
+                false));
         assertTrue(colony.setOccupationAt(units.get(5),
-                colony.getColonyTile(tile.getNeighbourOrNull(Direction.E))));
+                colony.getColonyTile(tile.getNeighbourOrNull(Direction.E)),
+                false));
         assertTrue(colony.setOccupationAt(units.get(6),
-                colony.getColonyTile(tile.getNeighbourOrNull(Direction.S))));
+                colony.getColonyTile(tile.getNeighbourOrNull(Direction.S)),
+                false));
         assertTrue(colony.setOccupationAt(units.get(7),
-                colony.getBuilding(townHallType)));
+                colony.getBuilding(townHallType),
+                false));
 
         Building smithy = colony.getBuilding(blacksmithType);
-        assertFalse(colony.setOccupationAt(units.get(0), smithy));
+        assertFalse(colony.setOccupationAt(units.get(0), smithy, false));
         colony.addGoods(oreType, 50); // Add ore so the smithy becomes viable
-        assertTrue(colony.setOccupationAt(units.get(0), smithy));
-        assertTrue(colony.setOccupationAt(units.get(1), smithy));
+        assertTrue(colony.setOccupationAt(units.get(0), smithy, false));
+        assertTrue(colony.setOccupationAt(units.get(1), smithy, false));
 
         Building armory = new ServerBuilding(game, colony, armoryType);
         colony.addBuilding(armory);
         colony.invalidateCache();
 
-        assertTrue(colony.setOccupationAt(units.get(2), armory));
-        assertTrue(colony.setOccupationAt(units.get(3), armory));
+        assertTrue(colony.setOccupationAt(units.get(2), armory, false));
+        assertTrue(colony.setOccupationAt(units.get(3), armory, false));
 
         assertEquals(toolsType,   units.get(0).getWorkType());
         assertEquals(toolsType,   units.get(1).getWorkType());
@@ -810,6 +814,7 @@ public class BuildingTest extends FreeColTestCase {
         // Upgrade the buildings
         smithy.upgrade();
         armory.upgrade();
+        colony.invalidateCache();
 
         assertEquals(toolsType,   units.get(0).getWorkType());
         assertEquals(toolsType,   units.get(1).getWorkType());
@@ -823,6 +828,7 @@ public class BuildingTest extends FreeColTestCase {
             .getFoundingFather("model.foundingFather.adamSmith"));
         smithy.upgrade();
         armory.upgrade();
+        colony.invalidateCache();
 
         assertEquals(toolsType,   units.get(0).getWorkType());
         assertEquals(toolsType,   units.get(1).getWorkType());

@@ -248,8 +248,8 @@ public abstract class WorkLocation extends UnitLocation
 
     /**
      * Update production type on the basis of the current work
-     * location type type (which might change due to an upgrade) and
-     * the work type of units present.
+     * location type (which might change due to an upgrade) and the
+     * work type of units present.
      */
     public void updateProductionType() {
         Unit unit = getFirstUnit();
@@ -258,12 +258,24 @@ public abstract class WorkLocation extends UnitLocation
             setProductionType((production.isEmpty()) ? null
                 : production.get(0));
         } else {
-            setProductionType(getBestProductionType(unit.getWorkType()));
+            GoodsType workType = unit.getWorkType();
+            ProductionType best = null;
+            int amount = 0;
+            for (ProductionType pt : getAvailableProductionTypes(false)) {
+                for (AbstractGoods output : pt.getOutputs()) {
+                    if (output.getType() != workType) continue;
+                    if (amount < output.getAmount()) {
+                        amount = output.getAmount();
+                        best = pt;
+                    }
+                }
+            }
+            setProductionType(best);
         }
     }
 
     /**
-     * Gets the unit type that is the expert for this <code>WorkLocation</code>
+     * Gets the unit type that is the expert for this work location
      * using its first output for which an expert type can be found.
      *
      * @return The expert <code>UnitType</code>.
@@ -338,55 +350,6 @@ public abstract class WorkLocation extends UnitLocation
         return 0;
     }
 
-    /**
-     * Gets the best production type for a unit to perform at this
-     * work location.
-     *
-     * @param unit The <code>Unit</code> to check.
-     * @return The best production type.
-     */
-    public ProductionType getBestProductionType(Unit unit) {
-        ProductionType best = null;
-        int amount = 0;
-        for (ProductionType productionType
-                 : getAvailableProductionTypes(false)) {
-            for (AbstractGoods output : productionType.getOutputs()) {
-                int newAmount = getPotentialProduction(output.getType(),
-                                                       unit.getType());
-                if (amount < newAmount) {
-                    amount = newAmount;
-                    best = productionType;
-                }
-            }
-        }
-        return best;
-    }
-
-    /**
-     * Gets the best production type for the production of the
-     * given goods type.
-     *
-     * This method is likely to be removed in the future.
-     *
-     * @param goodsType The <code>GoodsType</code> to check.
-     * @return The best <code>ProductionType</code>.
-     */
-    public ProductionType getBestProductionType(GoodsType goodsType) {
-        ProductionType best = null;
-        int amount = -1; // There are outputs with amount==0
-        for (ProductionType productionType : getProductionTypes()) {
-            for (AbstractGoods output : productionType.getOutputs()) {
-                if (output.getType() != goodsType) continue;
-                int newAmount = output.getAmount();
-                if (amount < newAmount) {
-                    amount = newAmount;
-                    best = productionType;
-                }
-            }
-        }
-        return best;
-    }
-
 
     // Interface Location
     // Inherits:
@@ -425,7 +388,7 @@ public abstract class WorkLocation extends UnitLocation
         unit.setMovesLeft(0);
 
         // Choose a sensible work type.
-        getColony().setOccupationAt(unit, this);
+        getColony().setOccupationAt(unit, this, false);
 
         getColony().invalidateCache();
         return true;

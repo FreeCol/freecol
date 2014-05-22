@@ -713,10 +713,13 @@ public class Colony extends Settlement implements Nameable {
      *
      * @param unit The <code>Unit</code> to install.
      * @param wl The <code>WorkLocation</code> to install the unit.
+     * @param userMode If a user requested this, favour the current
+     *     work type, if not favour goods that the unit requires.
      * @return True if the installation succeeds.
      */
-    public boolean setOccupationAt(Unit unit, WorkLocation wl) {
-        Occupation occupation = getOccupationAt(unit, wl, false);
+    public boolean setOccupationAt(Unit unit, WorkLocation wl,
+                                   boolean userMode) {
+        Occupation occupation = getOccupationAt(unit, wl, userMode);
         return occupation != null && occupation.install(unit);
     }
 
