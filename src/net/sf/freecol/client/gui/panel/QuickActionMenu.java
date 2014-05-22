@@ -343,34 +343,36 @@ public final class QuickActionMenu extends JPopupMenu {
         final WorkLocation current = unit.getWorkLocation();
         final int bonusChange = (current != null) ? 0
             : colony.governmentChange(colony.getUnitCount() + 1);
+        final int bonus = colony.getProductionBonus();
 
         Map<JMenuItem, Integer> items = new HashMap<JMenuItem, Integer>();
         Map<JMenuItem, Integer> extras = new HashMap<JMenuItem, Integer>();
         JMenuItem expertOwned = null;
         JMenuItem expertUnowned = null;
         for (GoodsType type : spec.getGoodsTypeList()) {
-            int bestOwnedProd = bonusChange, bestUnownedProd = bonusChange;
+            int bestOwnedProd = bonus + bonusChange,
+                bestUnownedProd = bonus + bonusChange;
             WorkLocation bestOwned = null, bestUnowned = null;
             for (WorkLocation wl : colony.getAllWorkLocations()) {
-                int prod = bonusChange;
+                int prod = 0;
                 switch (wl.getNoAddReason(unit)) {
                 case NONE:
-                    prod += wl.getPotentialProduction(type, unitType);
-                    if (prod > bestOwnedProd) {
+                    prod = wl.getPotentialProduction(type, unitType);
+                    if (bestOwnedProd < prod) {
                         bestOwnedProd = prod;
                         bestOwned = wl;
                     }
                     break;
                 case ALREADY_PRESENT:
-                    prod += wl.getPotentialProduction(type, unitType);
-                    if (prod > bestOwnedProd) {
+                    prod = wl.getPotentialProduction(type, unitType);
+                    if (bestOwnedProd < prod) {
                         bestOwnedProd = prod;
                         bestOwned = (unit.getWorkType() == type) ? null : wl;
                     }
                     break;
                 case CLAIM_REQUIRED:
-                    prod += wl.getPotentialProduction(type, unitType);
-                    if (prod > bestUnownedProd) {
+                    prod = wl.getPotentialProduction(type, unitType);
+                    if (bestUnownedProd < prod) {
                         bestUnownedProd = prod;
                         bestUnowned = wl;
                     }
