@@ -242,25 +242,19 @@ public abstract class WorkLocation extends UnitLocation
      */
     public void updateProductionType() {
         Unit unit = getFirstUnit();
-        if (unit == null) {
-            List<ProductionType> production = getProductionTypes();
-            setProductionType((production.isEmpty()) ? null
-                : production.get(0));
-        } else {
-            GoodsType workType = unit.getWorkType();
-            ProductionType best = null;
-            int amount = 0;
-            for (ProductionType pt : getAvailableProductionTypes(false)) {
-                for (AbstractGoods output : pt.getOutputs()) {
-                    if (output.getType() != workType) continue;
-                    if (amount < output.getAmount()) {
-                        amount = output.getAmount();
-                        best = pt;
-                    }
+        GoodsType workType = (unit == null) ? null : unit.getWorkType();
+        ProductionType best = null;
+        int amount = 0;
+        for (ProductionType pt : getAvailableProductionTypes(unit == null)) {
+            for (AbstractGoods output : pt.getOutputs()) {
+                if (workType != null && workType != output.getType()) continue;
+                if (amount < output.getAmount()) {
+                    amount = output.getAmount();
+                    best = pt;
                 }
             }
-            setProductionType(best);
         }
+        setProductionType(best);
     }
 
     /**
@@ -557,7 +551,6 @@ public abstract class WorkLocation extends UnitLocation
      * @return A list of suitable <code>ProductionType</code>s.
      */
     public abstract List<ProductionType> getAvailableProductionTypes(boolean unattended);
-    public abstract List<ProductionType> getProductionTypes();
 
 
     /**

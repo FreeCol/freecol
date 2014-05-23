@@ -361,10 +361,6 @@ public class ColonyTile extends WorkLocation {
         return mods;
     }
 
-    public List<ProductionType> getProductionTypes() {
-        return getAvailableProductionTypes(isColonyCenterTile());
-    }
-
     /**
      * {@inheritDoc}
      */

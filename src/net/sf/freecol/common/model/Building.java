@@ -501,16 +501,6 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     /**
      * {@inheritDoc}
      */
-    public List<ProductionType> getProductionTypes() {
-        List<ProductionType> result = new ArrayList<ProductionType>();
-        result.addAll(getAvailableProductionTypes(false));
-        result.addAll(getAvailableProductionTypes(true));
-        return result;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public List<ProductionType> getAvailableProductionTypes(boolean unattended) {
         if (buildingType == null) return Collections.emptyList();
         return getType().getAvailableProductionTypes(unattended);

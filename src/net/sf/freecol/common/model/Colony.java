@@ -545,7 +545,9 @@ public class Colony extends Settlement implements Nameable {
                 amount = Math.min(amount, wl.getPotentialProduction(gt, type));
                 if (sb != null) {
                     sb.append(" ").append(gt.getSuffix())
-                        .append("=").append(amount);
+                        .append("=").append(amount)
+                        .append("/").append(getMinimumGoodsCount(pt.getInputs()))
+                        .append("/").append(wl.getPotentialProduction(gt, type));
                     if (bestAmount < amount) sb.append("!");
                 }
                 if (bestAmount < amount) {
