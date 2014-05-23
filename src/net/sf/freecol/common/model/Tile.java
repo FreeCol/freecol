@@ -1275,19 +1275,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     //
 
     /**
-     * Get the base production exclusive of any bonuses.
-     *
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @param unitType An optional <code>UnitType</code> to use.
-     * @return The base production due to tile type and resources.
-     */
-    public int getBaseProduction(GoodsType goodsType, UnitType unitType) {
-        return (type == null || goodsType == null
-            || !goodsType.isFarmed()) ? 0
-            : type.getPotentialProduction(goodsType, unitType);
-    }
-
-    /**
      * Can this tile produce a given goods type?  To produce goods
      * either the tile type must have a suitable production type, or
      * the tile item container contains suitable resource.
@@ -1300,6 +1287,19 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         return type.canProduce(goodsType, unitType)
             || (tileItemContainer != null
                 && tileItemContainer.canProduce(goodsType, unitType));
+    }
+
+    /**
+     * Get the base production exclusive of any bonuses.
+     *
+     * @param goodsType The <code>GoodsType</code> to produce.
+     * @param unitType An optional <code>UnitType</code> to use.
+     * @return The base production due to tile type and resources.
+     */
+    public int getBaseProduction(GoodsType goodsType, UnitType unitType) {
+        return (type == null || goodsType == null
+            || !goodsType.isFarmed()) ? 0
+            : type.getBaseProduction(goodsType, unitType);
     }
 
     /**
@@ -1316,7 +1316,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                                       UnitType unitType) {
         if (!canProduce(goodsType, unitType)) return 0;
 
-        int amount = type.getPotentialProduction(goodsType, unitType);
+        int amount = getBaseProduction(goodsType, unitType);
         amount = (int)FeatureContainer.applyModifiers(amount,
             getGame().getTurn(),
             getProductionModifiers(goodsType, unitType));

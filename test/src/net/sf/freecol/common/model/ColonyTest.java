@@ -53,6 +53,8 @@ public class ColonyTest extends FreeColTestCase {
         = spec().getGoodsType("model.goods.cloth");
     private static final GoodsType cottonGoodsType
         = spec().getGoodsType("model.goods.cotton");
+    private static final GoodsType foodGoodsType
+        = spec().getPrimaryFoodType();
     private static final GoodsType grainGoodsType
         = spec().getGoodsType("model.goods.grain");
     private static final GoodsType hammerGoodsType
@@ -217,18 +219,17 @@ public class ColonyTest extends FreeColTestCase {
     }
 
     public void testAddUnitToColony() {
-        int population = 1;
-        GoodsType food = spec().getPrimaryFoodType();
-
-        assertEquals(2, freeColonistType.getConsumptionOf(food));
-        assertEquals(2, masterWeaverType.getConsumptionOf(food));
-
         Game game = getGame();
         game.setMap(getTestMap(arcticTileType, true));
+
+        int population = 1;
         Colony colony = getStandardColony(population);
         assertTrue("colony should produce less food than it consumes",
             colony.getFoodProduction() < colony.getFoodConsumption()
-            + freeColonistType.getConsumptionOf(food));
+            + freeColonistType.getConsumptionOf(foodGoodsType));
+
+        assertEquals(2, freeColonistType.getConsumptionOf(foodGoodsType));
+        assertEquals(2, masterWeaverType.getConsumptionOf(foodGoodsType));
 
         // colonist produces bells, the colony needs them
         Unit colonist = colony.getUnitList().get(0);
@@ -274,7 +275,7 @@ public class ColonyTest extends FreeColTestCase {
         colony.invalidateCache();
         assertTrue("colony should produce more food than it consumes",
             colony.getFoodProduction() >= colony.getFoodConsumption()
-            + freeColonistType.getConsumptionOf(food));
+            + freeColonistType.getConsumptionOf(foodGoodsType));
 
         // colonist experience will now encourage cotton production
         colonist.setLocation(colony.getTile());

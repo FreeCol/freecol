@@ -600,7 +600,7 @@ public class TileTest extends FreeColTestCase {
         final int resourceBonus = 4;
         final int expertBonus = 2;
         assertEquals("Base lumber production", base,
-            firstColonyTile.getBaseProduction(lumber));
+            coniferForest.getBaseProduction(lumber, colonistType));
 
         // Check all tiles with colonist unit
         i = 0;

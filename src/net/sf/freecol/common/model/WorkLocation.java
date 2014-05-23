@@ -133,7 +133,10 @@ public abstract class WorkLocation extends UnitLocation
      *     given <code>GoodsType</code>.
      */
     public boolean produces(GoodsType goodsType) {
-        return getBaseProduction(goodsType) > 0;
+        for (AbstractGoods output : getOutputs()) {
+            if (output.getType() == goodsType) return true;
+        }
+        return false;
     }
 
     /**
@@ -142,13 +145,13 @@ public abstract class WorkLocation extends UnitLocation
      *
      * @param goodsType The <code>GoodsType</code> to check.
      * @return The base production.
-     */
     public int getBaseProduction(GoodsType goodsType) {
         for (AbstractGoods output : getOutputs()) {
             if (output.getType() == goodsType) return output.getAmount();
         }
         return 0;
     }
+     */
 
     /**
      * Does this work location have any inputs.
@@ -350,6 +353,58 @@ public abstract class WorkLocation extends UnitLocation
         return 0;
     }
 
+    /**
+     * Get the potential production of a given goods type at this
+     * location.  An optional unit type to do the production may be
+     * specified, however if null the unattended production will be
+     * calculated.
+     *
+     * Usually if a unit type is specified and a unit can not be added
+     * to the work location, zero production is returned.  However,
+     * this routine is intended to be used for planning purposes, so
+     * some exceptions are allowed --- the calculation proceeds:
+     *
+     *   - for unclaimed tiles
+     *   - when the location is currently full of units
+     *
+     * which are conditions that an AI might plausibly be able and
+     * willing to change (a case could be made for including the
+     * OCCUPIED_BY_ENEMY condition).
+     *
+     * @param goodsType The <code>GoodsType</code> to produce.
+     * @param unitType The optional <code>UnitType</code> to do the work.
+     * @return The potential production with the given goods type and
+     *     unit type.
+     */
+    public int getPotentialProduction(GoodsType goodsType,
+                                      UnitType unitType) {
+        if (!canProduce(goodsType, unitType)) return 0;
+
+        if (unitType != null) {
+            switch (getNoWorkReason()) {
+            case NONE: case ALREADY_PRESENT: case CLAIM_REQUIRED:
+                break;
+            case CAPACITY_EXCEEDED:
+                if (getUnitCapacity() > 0) break; // Could work after reorg!
+                // Fall through
+            case WRONG_TYPE: case OWNED_BY_ENEMY: case ANOTHER_COLONY:
+            case COLONY_CENTER: case MISSING_ABILITY: case MISSING_SKILL:
+            case MINIMUM_SKILL: case MAXIMUM_SKILL:
+            case OCCUPIED_BY_ENEMY: // Arguable!
+            default:
+                // Non-transient or inapplicable conditions.  Production
+                // is impossible.
+                return 0;
+            }
+        }
+
+        int amount = getBaseProduction(goodsType, unitType);
+        amount = (int)FeatureContainer.applyModifiers(amount,
+            getGame().getTurn(),
+            getProductionModifiers(goodsType, unitType));
+        return (amount < 0) ? 0 : amount;
+    }
+
 
     // Interface Location
     // Inherits:
@@ -482,18 +537,18 @@ public abstract class WorkLocation extends UnitLocation
                                        UnitType unitType);
 
     /**
-     * Gets the potential production of a given goods type from
-     * optionally using a unit of a given type in this work location.
-     * If no unit type is specified, the unattended production is
-     * calculated.
+     * Gets the base production of a given goods type optionally using
+     * a unit of a given type in this work location.  That is, the
+     * production exclusive of any modifiers.  If no unit type is
+     * specified, the unattended production is calculated.
      *
      * @param goodsType The <code>GoodsType</code> to produce.
      * @param unitType An optional <code>UnitType</code> to produce
      *     the goods.
      * @return The amount of goods potentially produced.
      */
-    public abstract int getPotentialProduction(GoodsType goodsType,
-                                               UnitType unitType);
+    public abstract int getBaseProduction(GoodsType goodsType,
+                                          UnitType unitType);
 
     /**
      * Gets the production modifiers for the given type of goods and
