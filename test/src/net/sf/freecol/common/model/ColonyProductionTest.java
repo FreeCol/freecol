@@ -57,6 +57,8 @@ public class ColonyProductionTest extends FreeColTestCase {
     private static final TileType plainsType
         = spec().getTileType("model.tile.plains");
 
+    private static final UnitType freeColonistType
+        = spec().getUnitType("model.unit.freeColonist");
     private static final UnitType pioneerType
         = spec().getUnitType("model.unit.hardyPioneer");
     private static final UnitType veteranSoldierType
@@ -157,28 +159,77 @@ public class ColonyProductionTest extends FreeColTestCase {
         assertEquals(0, pioneer.getMovesLeft());
     }
 
-    public void testBellNetProduction(){
+    public void testBellNetProduction() {
         Game game = getStandardGame();
         game.setMap(getTestMap());
 
-        Colony colony = getStandardColony(3);
-      
+        // Get a minimal colony so that the units-that-use-no-bells
+        // parameter will not be relevant.
+        final Colony colony = getStandardColony(1);
+        final Player player = colony.getOwner();
+        final int noBellUnits = colony.getSpecification()
+            .getInteger(GameOptions.UNITS_THAT_USE_NO_BELLS);
+
+        // Clear the town hall
+        Building townHall = colony.getBuilding(townHallType);
+        for (Unit u : townHall.getUnitList()) {
+            u.setLocation(colony.getWorkLocationFor(u, foodType));
+        }
+        assertTrue(townHall.isEmpty());
+
         int initialBellCount = colony.getGoodsCount(bellsType);
         int expectedBellCount = 0;
-        int bellsProdPerTurn = colony.getTotalProductionOf(bellsType);
-        int expectedBellProd = 1;
-        int bellsUpkeep = colony.getConsumptionOf(bellsType);
-        int expectedBellUpkeep =  colony.getUnitCount() - 2;
-        int bellsNetProdPerTurn = colony.getNetProductionOf(bellsType);
-        int expectedBellNetProd = expectedBellProd - expectedBellUpkeep;
-        
-        assertEquals("Wrong bell count", expectedBellCount,
+        assertEquals("Wrong initial bell count", expectedBellCount,
                      initialBellCount);
-        assertEquals("Wrong bell production", expectedBellProd,
-                     bellsProdPerTurn);
+
+        // Check the consumption absent the unit threshold
+        int bellsUpkeep = colony.getConsumptionOf(bellsType);
+        int expectedBellUpkeep = Math.max(colony.getUnitCount() - noBellUnits,
+                                          0);
         assertEquals("Wrong bell upkeep", expectedBellUpkeep,
                      bellsUpkeep);
-        assertEquals("Wrong bell net production", expectedBellNetProd,
+
+        // Add enough units to activate the units-that-use-no-bells.
+        for (int i = 0; i < noBellUnits; i++) {
+            Unit u = new ServerUnit(game, colony.getTile(), player,
+                                    freeColonistType);
+            assertTrue(u.setLocation(colony.getWorkLocationFor(u, foodType)));
+        }
+        assertTrue(townHall.isEmpty());
+        colony.invalidateCache();
+
+        // Recheck the consumption
+        bellsUpkeep = colony.getConsumptionOf(bellsType);
+        expectedBellUpkeep = Math.max(colony.getUnitCount() - noBellUnits, 0);
+        assertEquals("Wrong bell upkeep (more units)", expectedBellUpkeep,
+                     bellsUpkeep);
+
+        int bellsProdPerTurn = colony.getTotalProductionOf(bellsType);
+        int expectedBellProd = townHallType.getBaseProduction(null, bellsType,
+                                                              null);
+        assertEquals("Wrong unattended bell production", expectedBellProd,
+                     bellsProdPerTurn);
+
+        int bellsNetProdPerTurn = colony.getNetProductionOf(bellsType);
+        int expectedBellNetProd = expectedBellProd - expectedBellUpkeep;
+        assertEquals("Wrong unattended bell net production", expectedBellNetProd,
+                     bellsNetProdPerTurn);
+        
+        Unit unit = colony.getFirstUnit();
+        assertTrue(unit.setLocation(townHall));
+        colony.invalidateCache();
+
+        ProductionType productionType = townHall.getProductionType();
+        bellsProdPerTurn = colony.getTotalProductionOf(bellsType);
+        expectedBellProd = townHallType.getBaseProduction(productionType,
+            bellsType, unit.getType())
+            + townHallType.getBaseProduction(null, bellsType, null);
+        assertEquals("Wrong attended bell production", expectedBellProd,
+                     bellsProdPerTurn);
+
+        bellsNetProdPerTurn = colony.getNetProductionOf(bellsType);
+        expectedBellNetProd = expectedBellProd - expectedBellUpkeep;
+        assertEquals("Wrong attended bell net production", expectedBellNetProd,
                      bellsNetProdPerTurn);
     }
 
