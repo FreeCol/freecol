@@ -300,14 +300,13 @@ public abstract class WorkLocation extends UnitLocation
         final Turn turn = getGame().getTurn();
         int bestAmount = 0;
         for (AbstractGoods output : getOutputs()) {
-            if (output.getType() == goodsType) {
-                int amount = getBaseProduction(getProductionType(), goodsType,
-                                               unitType);
-                if (amount > 0) {
-                    amount = (int)FeatureContainer.applyModifiers(amount,
-                        turn, getProductionModifiers(goodsType, unitType));
-                    if (bestAmount < amount) bestAmount = amount;
-                }
+            if (output.getType() != goodsType) continue;
+            int amount = getBaseProduction(getProductionType(), goodsType,
+                                           unitType);
+            if (amount > 0) {
+                amount = (int)FeatureContainer.applyModifiers(amount,
+                    turn, getProductionModifiers(goodsType, unitType));
+                if (bestAmount < amount) bestAmount = amount;
             }
         }
         return bestAmount;

@@ -268,14 +268,17 @@ public class Building extends WorkLocation implements Named, Comparable<Building
         } else {
             final Turn turn = getGame().getTurn();
             for (AbstractGoods output : getOutputs()) {
+                GoodsType goodsType = output.getType();
                 float production = 0f;
                 for (Unit u : getUnitList()) {
-                    production += getUnitProduction(u, output.getType());
+                    production += getUnitProduction(u, goodsType);
                 }
-                List<Modifier> productionModifiers
-                    = getProductionModifiers(output.getType(), null);
-                production = FeatureContainer
-                    .applyModifiers(production, turn, productionModifiers);
+                // Unattended production always applies for buildings!
+                production += getBaseProduction(null, goodsType, null);
+                production = FeatureContainer.applyModifiers(production,
+                    turn, getProductionModifiers(goodsType, null));
+                // Beware!  If we ever unify this code with ColonyTile,
+                // ColonyTiles have outputs with zero amount.
                 double newRatio = production / output.getAmount();
                 minimumRatio = Math.min(minimumRatio, newRatio);
                 maximumRatio = Math.max(maximumRatio, newRatio);
@@ -345,8 +348,9 @@ public class Building extends WorkLocation implements Named, Comparable<Building
             GoodsType type = output.getType();
             // minimize production, but add a magic little something
             // to counter rounding errors
-            int production = (int) Math.floor(output.getAmount() * minimumRatio + 0.0001);
-            int maximumProduction = (int) Math.floor(output.getAmount() * maximumRatio);
+            int production = (int)Math.floor(output.getAmount() * minimumRatio
+                + 0.0001);
+            int maximumProduction = (int)Math.floor(output.getAmount() * maximumRatio);
             result.addProduction(new AbstractGoods(type, production));
             if (production < maximumProduction) {
                 result.addMaximumProduction(new AbstractGoods(type, maximumProduction));

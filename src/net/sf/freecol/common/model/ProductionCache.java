@@ -88,6 +88,9 @@ public class ProductionCache {
      */
     private synchronized void update() {
         if (upToDate) return; // nothing to do
+        final Specification spec = colony.getSpecification();
+        final GoodsType bells = spec.getGoodsType("model.goods.bells");
+
         productionAndConsumption.clear();
         netProduction.clear();
         goodsUsed.clear();
@@ -104,9 +107,10 @@ public class ProductionCache {
             }
         }
 
-        final Specification spec = colony.getSpecification();
-        final GoodsType bells = spec.getGoodsType("model.goods.bells");
-        int unitsThatUseNoBells = spec.getInteger(GameOptions.UNITS_THAT_USE_NO_BELLS);
+        // Add bell production to compensate for the units-that-use-no-bells
+        // as this is not handled by the unit conumption.
+        int unitsThatUseNoBells
+            = spec.getInteger(GameOptions.UNITS_THAT_USE_NO_BELLS);
         int amount = Math.min(unitsThatUseNoBells, colony.getUnitCount());
         ProductionInfo bellsInfo = new ProductionInfo();
         bellsInfo.addProduction(new AbstractGoods(bells, amount));
@@ -123,7 +127,7 @@ public class ProductionCache {
                 if (modifier.isEmpty()) {
                     surplus.setAmount(surplus.getAmount() + getGoodsCount(g.getType()));
                 } else {
-                    surplus.setAmount((int) FeatureContainer.applyModifierSet(surplus.getAmount(),
+                    surplus.setAmount((int)FeatureContainer.applyModifierSet(surplus.getAmount(),
                                                                               null, modifier));
                 }
                 goods.add(surplus);
