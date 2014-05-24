@@ -419,13 +419,17 @@ public class TileItemContainer extends FreeColGameObject {
      *
      * @param goodsType The <code>GoodsType</code> to produce.
      * @param unitType The optional <code>unitType</code> to produce them.
+     * @param base If true, collect modifiers that apply to the base
+     *     tile production, otherwise collect additional modifiers.
      * @return A list of the applicable modifiers.
      */
     public List<Modifier> getProductionModifiers(GoodsType goodsType,
-                                                 UnitType unitType) {
+                                                 UnitType unitType,
+                                                 boolean base) {
         List<Modifier> result = new ArrayList<Modifier>();
         for (TileItem item : tileItems) {
-            result.addAll(item.getProductionModifiers(goodsType, unitType));
+            result.addAll(item.getProductionModifiers(goodsType, unitType,
+                                                      base));
         }
         return result;
     }

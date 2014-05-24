@@ -179,8 +179,8 @@ public class ColonyTile extends WorkLocation {
                 for (Unit unit : getUnitList()) {
                     final UnitType unitType = unit.getType();
                     int potential = (int)FeatureContainer
-                        .applyModifiers(output.getAmount(), turn, 
-                            getProductionModifiers(goodsType, unitType));
+                        .applyModifiers(getBaseProduction(goodsType, unitType),
+                            turn, getProductionModifiers(goodsType, unitType));
                     if (potential > 0) {
                         pi.addProduction(new AbstractGoods(goodsType, potential));
                     }

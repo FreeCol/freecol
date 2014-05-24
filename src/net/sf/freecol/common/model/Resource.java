@@ -222,15 +222,17 @@ public class Resource extends TileItem {
         // ability to produce a goods type.
         return (int)FeatureContainer.applyModifiers(0f,
             getGame().getTurn(),
-            getProductionModifiers(goodsType, unitType)) > 0;
+            getProductionModifiers(goodsType, unitType, true)) > 0;
     }
 
     /**
      * {@inheritDoc}
      */
     public List<Modifier> getProductionModifiers(GoodsType goodsType,
-                                                 UnitType unitType) {
-        if (goodsType == null) return Collections.emptyList();
+                                                 UnitType unitType,
+                                                 boolean base) {
+        // Resource modifiers apply to base production
+        if (goodsType == null || !base) return Collections.emptyList();
         return new ArrayList<Modifier>(getType()
             .getModifierSet(goodsType.getId(), unitType));
     }

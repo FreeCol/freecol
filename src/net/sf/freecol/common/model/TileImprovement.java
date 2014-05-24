@@ -533,11 +533,17 @@ public class TileImprovement extends TileItem implements Named {
      * {@inheritDoc}
      */
     public List<Modifier> getProductionModifiers(GoodsType goodsType,
-                                                 UnitType unitType) {
-        List<Modifier> result = new ArrayList<Modifier>();
-        Modifier modifier = getProductionModifier(goodsType);
-        if (modifier != null && isComplete()) result.add(modifier);
-        return result;
+                                                 UnitType unitType,
+                                                 boolean base) {
+        if (goodsType != null && !base) {
+            Modifier modifier = getProductionModifier(goodsType);
+            if (modifier != null && isComplete()) {
+                List<Modifier> result = new ArrayList<Modifier>();
+                result.add(modifier);
+                return result;
+            }
+        }
+        return Collections.emptyList();
     }
 
     /**

@@ -1297,9 +1297,17 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return The base production due to tile type and resources.
      */
     public int getBaseProduction(GoodsType goodsType, UnitType unitType) {
-        return (type == null || goodsType == null
-            || !goodsType.isFarmed()) ? 0
-            : type.getBaseProduction(goodsType, unitType);
+        if (type == null || goodsType == null
+            || !goodsType.isFarmed()) return 0;
+        int amount = type.getBaseProduction(goodsType, unitType);
+        if (tileItemContainer != null) {
+            // Some tile item bonuses apply to base tile production
+            amount = (int)FeatureContainer.applyModifiers(amount,
+                getGame().getTurn(),
+                tileItemContainer.getProductionModifiers(goodsType, unitType,
+                                                         true));
+        }
+        return (amount < 0) ? 0 : amount;
     }
 
     /**
@@ -1338,8 +1346,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
         List<Modifier> result = new ArrayList<Modifier>();
         if (tileItemContainer != null) {
+            // Only apply the non-base production modifiers.
             result.addAll(tileItemContainer
-                .getProductionModifiers(goodsType, unitType));
+                .getProductionModifiers(goodsType, unitType, false));
         }
         return result;
     }
