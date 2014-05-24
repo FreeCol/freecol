@@ -448,27 +448,26 @@ public class ColonyProductionTest extends FreeColTestCase {
         assertEquals(plainsType, colony.getTile().getType());
         Building townHall = colony.getBuilding(townHallType);
         assertNotNull(townHall);
+        assertTrue(townHall.isEmpty());
         UnitType colonistType = spec().getDefaultUnitType();
         assertNotNull(colonistType);
 
         assertEquals("Zero potential production of cotton in town hall", 0,
-            townHall.getPotentialProduction(cottonType, colonistType));
-        List<AbstractGoods> outputs = townHall.getOutputs();
-        assertEquals(1, outputs.size());
-        assertEquals(bellsType, outputs.get(0).getType());
+            townHall.getPotentialProduction(cottonType, null));
         assertEquals("Basic potential production of bells in town hall",
-            (int) FeatureContainer.applyModifiers(outputs.get(0).getAmount(), game.getTurn(),
-                townHall.getProductionModifiers(bellsType, colonistType)),
+            townHallType.getBaseProduction(null, bellsType, null),
+            townHall.getPotentialProduction(bellsType, null));
+        assertEquals("Unit potential production of bells in town hall",
+            townHallType.getBaseProduction(null, bellsType, colonistType),
             townHall.getPotentialProduction(bellsType, colonistType));
 
-        assertEquals("Basic potential production of cotton on center tile"
-            + " if not using a unit",
-            plainsType.getPotentialProduction(cottonType, null),
+        assertEquals("Zero potential production of bells on center tile", 0,
+            colonyTile.getPotentialProduction(bellsType, null));
+        assertEquals("Basic potential production of cotton on center tile",
+            plainsType.getBaseProduction(null, cottonType, null),
             colonyTile.getPotentialProduction(cottonType, null));
-        assertEquals("Zero potential production of cotton on center tile"
-            + " if using a unit",
-            0, colonyTile.getPotentialProduction(cottonType, colonistType));
-        assertEquals("Zero potential production of cotton in town hall", 0,
-            townHall.getPotentialProduction(cottonType, colonistType));
+        assertEquals("Zero unit potential production of cotton on center tile",
+            0,
+            colonyTile.getPotentialProduction(cottonType, colonistType));
     }
 }
