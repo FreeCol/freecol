@@ -176,12 +176,8 @@ public class ColonyTile extends WorkLocation {
             boolean onlyNaturalImprovements = false;
             for (AbstractGoods output : getOutputs()) {
                 final GoodsType goodsType = output.getType();
-                for (Unit unit : getUnitList()) {
-                    final UnitType unitType = unit.getType();
-                    int amount = getBaseProduction(getProductionType(),
-                                                   goodsType, unitType);
-                    amount = (int)FeatureContainer.applyModifiers(amount,
-                        turn, getProductionModifiers(goodsType, unitType));
+                for (Unit u : getUnitList()) {
+                    int amount = getUnitProduction(u, goodsType);
                     if (amount > 0) {
                         pi.addProduction(new AbstractGoods(goodsType, amount));
                     }
