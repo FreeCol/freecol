@@ -345,14 +345,17 @@ public class IndividualFatherTest extends FreeColTestCase {
         Game game = getGame();
         game.setMap(getTestMap(true));
 
-        assertEquals(1, thomasJefferson.getModifierSet("model.goods.bells").size());
-        Modifier modifier = thomasJefferson.getModifierSet("model.goods.bells").iterator().next();
+        Set<Modifier> jeffersonModifiers
+            = thomasJefferson.getModifierSet("model.goods.bells");
+        assertEquals(1, jeffersonModifiers.size());
+        Modifier modifier = jeffersonModifiers.iterator().next();
         assertTrue(modifier.appliesTo(townHallType));
 
         Colony colony = getStandardColony(4);
         Player player = colony.getOwner();
         Building townHall = colony.getBuilding(townHallType);
-        colony.getUnitList().get(0).setLocation(townHall);
+        Unit unit = colony.getFirstUnit();
+        colony.setOccupationAt(unit, townHall, false);
 
         assertEquals(0, player.getModifierSet("model.goods.bells").size());
         assertEquals(1, colony.getModifierSet("model.goods.bells").size());

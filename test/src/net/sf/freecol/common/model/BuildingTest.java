@@ -481,13 +481,6 @@ public class BuildingTest extends FreeColTestCase {
         Unit worker = units.get(1);
 
         Building weaver = colony.getBuilding(weaverHouseType);
-        List<AbstractGoods> inputs = weaver.getInputs();
-        assertEquals(1, inputs.size());
-        assertEquals(cottonType, inputs.get(0).getType());
-        List<AbstractGoods> outputs = weaver.getOutputs();
-        assertEquals(1, outputs.size());
-        assertEquals(clothType, outputs.get(0).getType());
-
         assertTrue(colonist.getLocation() instanceof ColonyTile);
         assertEquals(plainsType, ((ColonyTile)colonist.getLocation()).getWorkTile().getType());
         assertTrue(worker.getLocation() instanceof ColonyTile);
@@ -520,12 +513,6 @@ public class BuildingTest extends FreeColTestCase {
         Colony colony = getStandardColony(1);
 
         Building pasture = colony.getBuilding(countryType);
-        List<AbstractGoods> inputs = pasture.getInputs();
-        assertEquals(1, inputs.size());
-        assertEquals(grainType, inputs.get(0).getType());
-        List<AbstractGoods> outputs = pasture.getOutputs();
-        assertEquals(1, outputs.size());
-        assertEquals(horsesType, outputs.get(0).getType());
 
         // no horses yet
         assertEquals(8, colony.getNetProductionOf(foodType));
