@@ -44,18 +44,18 @@ import net.sf.freecol.util.test.FreeColTestUtils;
 
 public class ServerColonyTest extends FreeColTestCase {
 
-    private static final BuildingType depotType
-        = spec().getBuildingType("model.building.depot");
-    private static final BuildingType warehouseType
-        = spec().getBuildingType("model.building.warehouse");
+    private static final BuildingType chapelType
+        = spec().getBuildingType("model.building.chapel");
     private static final BuildingType carpenterHouseType
         = spec().getBuildingType("model.building.carpenterHouse");
+    private static final BuildingType depotType
+        = spec().getBuildingType("model.building.depot");
     private static final BuildingType lumberMillType
         = spec().getBuildingType("model.building.lumberMill");
-    private static final BuildingType churchType
-        = spec().getBuildingType("model.building.chapel");
     private static final BuildingType townHallType
         = spec().getBuildingType("model.building.townHall");
+    private static final BuildingType warehouseType
+        = spec().getBuildingType("model.building.warehouse");
 
     private static final GoodsType bellsType
         = spec().getGoodsType("model.goods.bells");
@@ -318,21 +318,21 @@ public class ServerColonyTest extends FreeColTestCase {
     public void testLibertyAndImmigration() {
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
-        int population = 3;
+        final int population = 3;
         Colony colony = getStandardColony(population);
 
-        ServerBuilding townHall = new ServerBuilding(getGame(), colony, townHallType);
-        colony.addBuilding(townHall);
+        ServerBuilding townHall
+            = (ServerBuilding)colony.getBuilding(townHallType);
         Unit statesman = colony.getUnitList().get(0);
-        statesman.setLocation(null);
-        statesman.setLocation(townHall);
+        colony.setOccupationAt(statesman, townHall, false);
+        assertEquals(bellsType, statesman.getWorkType());
 
-        ServerBuilding church = new ServerBuilding(getGame(), colony, churchType);
-        colony.addBuilding(church);
+        ServerBuilding church
+            = (ServerBuilding)colony.getBuilding(chapelType);
         church.upgrade();
         Unit preacher = colony.getUnitList().get(1);
-        preacher.setLocation(null);
-        preacher.setLocation(church);
+        colony.setOccupationAt(preacher, church, false);
+        assertEquals(crossesType, preacher.getWorkType());
 
         assertEquals(0, colony.getGoodsCount(bellsType));
         ServerTestHelper.newTurn();
