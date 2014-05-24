@@ -462,10 +462,11 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     /**
      * {@inheritDoc}
      */
-    public int getBaseProduction(GoodsType goodsType, UnitType unitType) {
+    public int getBaseProduction(ProductionType productionType,
+                                 GoodsType goodsType, UnitType unitType) {
         final BuildingType type = getType();
         return (type == null) ? 0
-            : getType().getBaseProduction(goodsType, unitType);
+            : getType().getBaseProduction(productionType, goodsType, unitType);
     }
 
     /**

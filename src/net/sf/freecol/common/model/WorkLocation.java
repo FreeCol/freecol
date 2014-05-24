@@ -140,20 +140,6 @@ public abstract class WorkLocation extends UnitLocation
     }
 
     /**
-     * Gets the current base production of the given goods type
-     * without applying any modifiers.
-     *
-     * @param goodsType The <code>GoodsType</code> to check.
-     * @return The base production.
-    public int getBaseProduction(GoodsType goodsType) {
-        for (AbstractGoods output : getOutputs()) {
-            if (output.getType() == goodsType) return output.getAmount();
-        }
-        return 0;
-    }
-     */
-
-    /**
      * Does this work location have any inputs.
      *
      * @return True if there are any inputs.
@@ -316,22 +302,21 @@ public abstract class WorkLocation extends UnitLocation
      */
     public int getUnitProduction(Unit unit, GoodsType goodsType) {
         if (unit == null) return 0;
-        int productivity = 0;
+        final UnitType unitType = unit.getType();
+        final Turn turn = getGame().getTurn();
+        int bestAmount = 0;
         for (AbstractGoods output : getOutputs()) {
             if (output.getType() == goodsType) {
-                productivity = output.getAmount();
-                if (productivity > 0) {
-                    final UnitType unitType = unit.getType();
-                    final Turn turn = getGame().getTurn();
-                    
-                    productivity = (int)FeatureContainer
-                        .applyModifiers(output.getAmount(), turn,
-                            getProductionModifiers(goodsType, unitType));
+                int amount = getBaseProduction(getProductionType(), goodsType,
+                                               unitType);
+                if (amount > 0) {
+                    amount = (int)FeatureContainer.applyModifiers(amount,
+                        turn, getProductionModifiers(goodsType, unitType));
+                    if (bestAmount < amount) bestAmount = amount;
                 }
-                return Math.max(0, productivity);
             }
         }
-        return 0;
+        return bestAmount;
     }
 
     /**
@@ -398,7 +383,7 @@ public abstract class WorkLocation extends UnitLocation
             }
         }
 
-        int amount = getBaseProduction(goodsType, unitType);
+        int amount = getBaseProduction(null, goodsType, unitType);
         amount = (int)FeatureContainer.applyModifiers(amount,
             getGame().getTurn(),
             getProductionModifiers(goodsType, unitType));
@@ -542,12 +527,15 @@ public abstract class WorkLocation extends UnitLocation
      * production exclusive of any modifiers.  If no unit type is
      * specified, the unattended production is calculated.
      *
+     * @param productionType An optional <code>ProductionType</code> to use,
+     *     if null the best available one is used.
      * @param goodsType The <code>GoodsType</code> to produce.
      * @param unitType An optional <code>UnitType</code> to produce
      *     the goods.
      * @return The amount of goods potentially produced.
      */
-    public abstract int getBaseProduction(GoodsType goodsType,
+    public abstract int getBaseProduction(ProductionType productionType,
+                                          GoodsType goodsType,
                                           UnitType unitType);
 
     /**

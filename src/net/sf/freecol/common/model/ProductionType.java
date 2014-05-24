@@ -289,11 +289,39 @@ public class ProductionType extends FreeColObject {
     }
 
     /**
+     * Get the production type with the greatest total output of an
+     * optional goods type from a collection of production types
+     *
+     * @param goodsType An optional <code>GoodsType</code> to restrict the
+     *     choice of outputs with.
+     * @param types A collection of <code>ProductionType</code>s to consider.
+     * @return The most productive <code>ProductionType</code>.
+     */
+    public static ProductionType getBestProductionType(GoodsType goodsType,
+        Collection<ProductionType> types) {
+        ProductionType best = null;
+        int bestSum = 0;
+        for (ProductionType pt : types) {
+            int sum = 0;
+            for (AbstractGoods output : pt.getOutputs()) {
+                if (goodsType == null || goodsType == output.getType()) {
+                    sum += output.getAmount();
+                }
+            }
+            if (bestSum < sum) {
+                bestSum = sum;
+                best = pt;
+            }
+        }
+        return best;
+    }
+
+    /**
      * Convenience function to get the best output for a given goods
      * type from a collection of production types.
      *
      * @param goodsType The <code>GoodsType</code> to use.
-     * @param types A list of <code>ProductionType</code>s to consider.
+     * @param types A collection of <code>ProductionType</code>s to consider.
      * @return The most productive output that produces the goods type,
      *     or null if none found.
      */

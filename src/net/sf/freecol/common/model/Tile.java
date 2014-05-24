@@ -1292,14 +1292,18 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Get the base production exclusive of any bonuses.
      *
+     * @param productionType An optional <code>ProductionType</code> to use,
+     *     if null the best available one is used.
      * @param goodsType The <code>GoodsType</code> to produce.
      * @param unitType An optional <code>UnitType</code> to use.
      * @return The base production due to tile type and resources.
      */
-    public int getBaseProduction(GoodsType goodsType, UnitType unitType) {
+    public int getBaseProduction(ProductionType productionType,
+                                 GoodsType goodsType, UnitType unitType) {
         if (type == null || goodsType == null
             || !goodsType.isFarmed()) return 0;
-        int amount = type.getBaseProduction(goodsType, unitType);
+        int amount = type.getBaseProduction(productionType, goodsType,
+                                            unitType);
         if (tileItemContainer != null) {
             // Some tile item bonuses apply to base tile production
             amount = (int)FeatureContainer.applyModifiers(amount,
@@ -1324,7 +1328,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                                       UnitType unitType) {
         if (!canProduce(goodsType, unitType)) return 0;
 
-        int amount = getBaseProduction(goodsType, unitType);
+        int amount = getBaseProduction(null, goodsType, unitType);
         amount = (int)FeatureContainer.applyModifiers(amount,
             getGame().getTurn(),
             getProductionModifiers(goodsType, unitType));

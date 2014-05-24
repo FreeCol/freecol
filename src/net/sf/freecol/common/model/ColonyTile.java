@@ -178,11 +178,12 @@ public class ColonyTile extends WorkLocation {
                 final GoodsType goodsType = output.getType();
                 for (Unit unit : getUnitList()) {
                     final UnitType unitType = unit.getType();
-                    int potential = (int)FeatureContainer
-                        .applyModifiers(getBaseProduction(goodsType, unitType),
-                            turn, getProductionModifiers(goodsType, unitType));
-                    if (potential > 0) {
-                        pi.addProduction(new AbstractGoods(goodsType, potential));
+                    int amount = getBaseProduction(getProductionType(),
+                                                   goodsType, unitType);
+                    amount = (int)FeatureContainer.applyModifiers(amount,
+                        turn, getProductionModifiers(goodsType, unitType));
+                    if (amount > 0) {
+                        pi.addProduction(new AbstractGoods(goodsType, amount));
                     }
                 }
             }
@@ -310,10 +311,11 @@ public class ColonyTile extends WorkLocation {
     /**
      * {@inheritDoc}
      */
-    public int getBaseProduction(GoodsType goodsType, UnitType unitType) {
+    public int getBaseProduction(ProductionType productionType,
+                                 GoodsType goodsType, UnitType unitType) {
         Tile tile = getWorkTile();
         return (tile == null) ? 0
-            : tile.getBaseProduction(goodsType, unitType);
+            : tile.getBaseProduction(productionType, goodsType, unitType);
     }
 
     /**

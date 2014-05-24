@@ -469,10 +469,10 @@ public class TileTest extends FreeColTestCase {
         // Add a sugar resource, there should now be two sugar bonuses
         // on tile1, but resource bonuses apply to the *base* production
         // and will not appear in Tile.getProductionModifiers.
-        int sugarProduction = tile1.getBaseProduction(sugar, null);
+        int sugarProduction = tile1.getBaseProduction(null, sugar, null);
         Resource addedSugar = new Resource(game, tile1, sugarResource);
         tile1.addResource(addedSugar);
-        assertEquals(tile1.getBaseProduction(sugar, null),
+        assertEquals(tile1.getBaseProduction(null, sugar, null),
             (int)FeatureContainer.applyModifiers(sugarProduction,
                 getGame().getTurn(),
                 addedSugar.getProductionModifiers(sugar, null, true)));
@@ -482,10 +482,10 @@ public class TileTest extends FreeColTestCase {
                                  sugarResource));
 
         // Add a minerals resource, and tile2 should now produce silver.
-        int silverProduction = tile2.getBaseProduction(silver, null);
+        int silverProduction = tile2.getBaseProduction(null, silver, null);
         Resource addedSilver = new Resource(game, tile2, mineralsResource);
         tile2.addResource(addedSilver);
-        assertEquals(tile2.getBaseProduction(silver, null),
+        assertEquals(tile2.getBaseProduction(null, silver, null),
             (int)FeatureContainer.applyModifiers(silverProduction,
                 getGame().getTurn(),
                 addedSilver.getProductionModifiers(silver, null, true)));
@@ -613,7 +613,7 @@ public class TileTest extends FreeColTestCase {
         final int resourceBonus = 4;
         final int expertBonus = 2;
         assertEquals("Base lumber production", base,
-            coniferForest.getBaseProduction(lumber, colonistType));
+            coniferForest.getBaseProduction(null, lumber, colonistType));
 
         // Check all tiles with colonist unit
         i = 0;

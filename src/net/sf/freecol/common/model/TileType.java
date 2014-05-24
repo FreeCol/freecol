@@ -353,15 +353,22 @@ public final class TileType extends FreeColGameObjectType {
      * Get the base production of a given goods type for an optional
      * unit type.
      * 
+     * @param productionType An optional <code>ProductionType</code> to use,
+     *     if null the best available one is used.
      * @param goodsType The <code>GoodsType</code> to produce.
      * @param unitType An optional <code>UnitType</code> that is to do
      *     the work, if null the unattended production is considered.
      * @return The amount of goods produced.
      */
-    public int getBaseProduction(GoodsType goodsType, UnitType unitType) {
+    public int getBaseProduction(ProductionType productionType,
+                                 GoodsType goodsType, UnitType unitType) {
         if (goodsType == null) return 0;
-        AbstractGoods best = ProductionType.getBestOutputFor(goodsType,
-            getAvailableProductionTypes(unitType == null));
+        if (productionType == null) {
+            productionType = ProductionType.getBestProductionType(goodsType,
+                getAvailableProductionTypes(unitType == null));
+        }
+        if (productionType == null) return 0;
+        AbstractGoods best = productionType.getOutput(goodsType);
         return (best == null) ? 0 : best.getAmount();
     }
 
@@ -377,7 +384,8 @@ public final class TileType extends FreeColGameObjectType {
     public int getPotentialProduction(GoodsType goodsType,
                                       UnitType unitType) {
         if (goodsType == null) return 0;
-        int amount = (int)applyModifier(getBaseProduction(goodsType, unitType),
+        int amount = (int)applyModifier(getBaseProduction(null, goodsType,
+                                                          unitType),
                                         goodsType.getId(), unitType);
         return (amount < 0) ? 0 : amount;
     }
