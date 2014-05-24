@@ -119,6 +119,10 @@ public class FreeColTestCase extends TestCase {
         return getSpecification("freecol");
     }
 
+    public static Specification spec(String name) {
+        return getSpecification(name);
+    }
+
     public static Specification getSpecification(String name) {
         Specification result = specifications.get(name);
         if (result == null) {
@@ -127,14 +131,13 @@ public class FreeColTestCase extends TestCase {
                 result = tc.getSpecification();
                 result.applyDifficultyLevel("model.difficulty.medium");
                 specifications.put(name, result);
-            } catch(Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 return null;
             }
         }
         return result;
     }
-
 
     /**
      * Returns a new game, with all players set.
@@ -158,7 +161,7 @@ public class FreeColTestCase extends TestCase {
      * @return A new game with with players for each nation added.
      */
     public static Game getStandardGame(String specName) {
-        Specification specification = getSpecification(specName);
+        Specification specification = spec(specName);
         game = new ServerGame(specification);
         NationOptions nationOptions = new NationOptions(specification);
         for (Nation nation : specification.getEuropeanNations()) {

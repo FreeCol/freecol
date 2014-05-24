@@ -162,7 +162,7 @@ public class PlayerTest extends FreeColTestCase {
         // the initialization code is basically the same as in
         // getStandardGame(), except that all European nations are
         // available
-        Specification specification = getSpecification("freecol");
+        Specification specification = spec("freecol");
         Game game = new ServerGame(specification);
         NationOptions nationOptions = new NationOptions(specification);
         for (Nation nation : specification.getEuropeanNations()) {
