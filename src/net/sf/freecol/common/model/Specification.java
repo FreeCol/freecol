@@ -2002,6 +2002,35 @@ public final class Specification {
                 m.setProductionIndex(Modifier.RESOURCE_PRODUCTION_INDEX);
             }
         }
+
+        // TownHall, Chapel et al now have unattended production types
+        // (replacing modifiers).
+        BuildingType townHallType = getBuildingType("model.building.townHall");
+        if (townHallType.hasModifier("model.goods.bells")) {
+            GoodsType bellsType = getGoodsType("model.goods.bells");
+            AbstractGoods ag = new AbstractGoods(bellsType, 1);
+            ProductionType pt = new ProductionType(ag, true, null);
+            townHallType.addProductionType(pt);
+            townHallType.removeModifiers("model.goods.bells");
+            logger.info("Added backward compatibility production " + pt
+                + " to " + townHallType);
+        }
+        GoodsType crossesType = getGoodsType("model.goods.crosses");
+        int a = 1;
+        for (BuildingType bt : new BuildingType[] {
+                getBuildingType("model.building.chapel"),
+                getBuildingType("model.building.church"),
+                getBuildingType("model.building.cathedral") }) {
+            if (bt.hasModifier("model.goods.crosses")) {
+                AbstractGoods ag = new AbstractGoods(crossesType, a);
+                a++;
+                ProductionType pt = new ProductionType(ag, true, null);
+                bt.addProductionType(pt);
+                bt.removeModifiers("model.goods.crosses");
+                logger.info("Added backward compatibility production " + pt
+                    + " to " + bt);
+            }
+        }
         // end @compat 0.10.7
     }
     // end @compat 0.10.x

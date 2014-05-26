@@ -199,6 +199,15 @@ public final class BuildingType extends BuildableType
     }
 
     /**
+     * Add a production type to this building type.
+     *
+     * @param productionType The <code>ProductionType</code> to add.
+     */
+    public void addProductionType(ProductionType productionType) {
+        if (productionType != null) productionTypes.add(productionType);
+    }
+
+    /**
      * Get the production types provided by this building type at the
      * current difficulty level.
      *
@@ -508,7 +517,7 @@ public final class BuildingType extends BuildableType
                 xr.closeTag(PRODUCTION_TAG);
 
             } else {
-                productionTypes.add(new ProductionType(xr, spec));
+                addProductionType(new ProductionType(xr, spec));
             }
 
         } else {

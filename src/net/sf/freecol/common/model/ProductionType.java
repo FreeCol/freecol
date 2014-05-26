@@ -87,15 +87,15 @@ public class ProductionType extends FreeColObject {
      * Convenience constructor for a production type with a single output.
      *
      * @param output The <code>AbstractGoods</code> produced.
-     * @param center True if this is a colony center tile.
+     * @param unattended True if this is unattended production.
      * @param level The difficulty level key.
      */
-    public ProductionType(AbstractGoods output, boolean center,
+    public ProductionType(AbstractGoods output, boolean unattended,
                           String level) {
-        outputs = new ArrayList<AbstractGoods>();
-        outputs.add(output);
-        unattended = center;
-        productionLevel = level;
+        this.outputs = new ArrayList<AbstractGoods>();
+        this.outputs.add(output);
+        this.unattended = unattended;
+        this.productionLevel = level;
     }
 
     /**
