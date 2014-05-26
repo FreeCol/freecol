@@ -478,35 +478,6 @@ public final class BuildingType extends BuildableType
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-
-        super.readChildren(xr);
-
-        // @compat 0.10.x
-        // Town Hall and Chapel* unattended production modifiers
-        // require a scope.
-        if (getId().equals("model.building.townHall")
-            || getId().equals("model.building.chapel")
-            || getId().equals("model.building.church")
-            || getId().equals("model.building.cathedral")) {
-            for (Modifier m : getModifierSet()) {
-                if (m.getType() == Modifier.ModifierType.ADDITIVE
-                    && !m.hasScope()) {
-                    Scope scope = new Scope();
-                    scope.setMatchNegated(true);
-                    scope.setAbilityId("model.ability.person");
-                    m.addScope(scope);
-                    break;
-                }
-            }
-        }
-        // end @compat
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
         final String tag = xr.getLocalName();
