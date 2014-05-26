@@ -2031,6 +2031,17 @@ public final class Specification {
                     + " to " + bt);
             }
         }
+        // Country and stables production is now defined as unattended.
+        for (BuildingType bt : new BuildingType[] {
+                getBuildingType("model.building.country"),
+                getBuildingType("model.building.stables") }) {
+            for (ProductionType pt : bt.getAvailableProductionTypes(false)) {
+                pt.setUnattended(true);
+                logger.info("Switched production " + pt
+                    + " to unattended at " + bt);
+            }
+        }
+            
         // end @compat 0.10.7
     }
     // end @compat 0.10.x

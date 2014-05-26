@@ -250,14 +250,15 @@ public class Building extends WorkLocation implements Named, Comparable<Building
                 int available = getColony().getGoodsCount(outputType);
                 if (available >= outputType.getBreedingNumber()) {
                     // we need at least these many horses/animals to breed
-                    double newRatio = 0;
+                    double newRatio = 0.0;
                     int divisor = (int)getType()
                         .applyModifier(0f, Modifier.BREEDING_DIVISOR);
                     if (divisor > 0) {
                         int factor = (int)getType()
                             .applyModifier(0f, Modifier.BREEDING_FACTOR);
-                        int maximumOutput = ((available - 1) / divisor + 1) * factor;
-                        newRatio = maximumOutput / output.getAmount();
+                        int maximumOutput = ((available - 1) / divisor + 1)
+                            * factor;
+                        newRatio = (double)maximumOutput / output.getAmount();
                     }
                     minimumRatio = Math.min(minimumRatio, newRatio);
                     maximumRatio = Math.max(maximumRatio, newRatio);

@@ -236,6 +236,15 @@ public class ProductionType extends FreeColObject {
     }
 
     /**
+     * Set the unattended state of this production.
+     *
+     * @param unattended The new unattended production state.
+     */
+    public final void setUnattended(boolean unattended) {
+        this.unattended = unattended;
+    }
+
+    /**
      * The production level of this type of production (used by
      * difficulty levels).
      *

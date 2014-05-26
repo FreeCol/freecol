@@ -124,7 +124,6 @@ public abstract class WorkLocation extends UnitLocation
                 }
             }
         }
-        System.err.println("UPT this=" + this + " unit=" + unit + " work=" + workType + " best=" + best + " APT=" + getAvailableProductionTypes(unit==null));
         setProductionType(best);
     }
 
