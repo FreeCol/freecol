@@ -256,15 +256,18 @@ public class ServerColonyTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
         Colony colony = getStandardColony(2);
-        ServerBuilding carpenterHouse
-            = new ServerBuilding(getGame(), colony, carpenterHouseType);
-        colony.addBuilding(carpenterHouse);
+        Building carpenterHouse = colony.getBuilding(carpenterHouseType);
+        assertEquals("Colony should not have lumber mill", carpenterHouse,
+                     colony.getBuilding(lumberMillType));
         assertFalse("Colony should not be able to build lumber mill",
                     colony.canBuild(lumberMillType));
         colony.setCurrentlyBuilding(lumberMillType);
-        assertTrue("Colony should be building lumber mill",
-                   colony.getCurrentlyBuilding() == lumberMillType);
-        // add sufficient goods to build lumber mill
+        assertEquals("Colony should be building lumber mill", lumberMillType,
+                     colony.getCurrentlyBuilding());
+        // Add sufficient units and goods to build lumber mill.
+        Unit unit = new ServerUnit(game, colony.getTile(), colony.getOwner(),
+                                   colonistType);
+        unit.setLocation(colony);
         for (AbstractGoods ag : lumberMillType.getRequiredGoods()) {
             GoodsType type = ag.getType();
             int amount = ag.getAmount() + 1;
@@ -273,14 +276,11 @@ public class ServerColonyTest extends FreeColTestCase {
                          colony.getGoodsCount(type));
         }
 
-        // test
-        assertFalse("Colony should not have lumber mill",
-                    colony.getBuilding(lumberMillType).getType() == lumberMillType);
-
+        // Allow the building to finish
         ServerTestHelper.newTurn();
 
-        assertFalse("Colony should not have lumber mill",
-                    colony.getBuilding(lumberMillType).getType() == lumberMillType);
+        assertEquals("Colony should have lumber mill", lumberMillType,
+                     colony.getBuilding(lumberMillType).getType());
         assertFalse("Colony should no longer be building lumber mill",
                     colony.getCurrentlyBuilding() == lumberMillType);
     }
@@ -289,29 +289,30 @@ public class ServerColonyTest extends FreeColTestCase {
         Game game = getGame();
         game.setMap(getTestMap(true));
 
-        Colony colony = getStandardColony();
-        ServerBuilding carpenterHouse = new ServerBuilding(getGame(), colony, carpenterHouseType);
-        colony.addBuilding(carpenterHouse);
-        Unit unit = colony.getUnitList().get(0);
-        unit.setLocation(colony.getBuilding(carpenterHouseType));
+        Colony colony = getStandardColony(4);
+        Building carpenterHouse = colony.getBuilding(carpenterHouseType);
+        Unit unit = colony.getFirstUnit();
         // necessary for work production
         int initialLumber = 100;
         int initialHammers = 0;
         colony.addGoods(lumberGoodsType, initialLumber);
         colony.setCurrentlyBuilding(null);
 
-        assertEquals("Wrong initial lumber quantity, ",
+        assertEquals("Wrong initial lumber quantity.",
                      initialLumber, colony.getGoodsCount(lumberGoodsType));
-        assertTrue("Colony shoud be able to produce work (hammers)",
-            colony.getTotalProductionOf(hammerGoodsType) > 0);
-        assertEquals("Colony shold not have any work production(hammers) initially, ",
+        assertEquals("Colony should not have initial hammers.",
                      initialHammers, colony.getGoodsCount(hammerGoodsType));
+
+        unit.setLocation(carpenterHouse);
+
+        assertTrue("Colony should be producing hammers.",
+                   colony.getTotalProductionOf(hammerGoodsType) > 0);
 
         ServerTestHelper.newTurn();
 
-        assertEquals("Colony shold not have any work production(hammers) after, ",
+        assertEquals("Colony should not have produced hammers.",
                      initialHammers, colony.getGoodsCount(hammerGoodsType));
-        assertEquals("Wrong final lumber quantity, ",
+        assertEquals("Wrong final lumber quantity.",
                      initialLumber, colony.getGoodsCount(lumberGoodsType));
     }
 

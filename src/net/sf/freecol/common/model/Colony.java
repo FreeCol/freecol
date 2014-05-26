@@ -237,10 +237,13 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
-     * Gets a <code>Building</code> of the specified type.
+     * Get building of the specified general type (note: *not*
+     * necessarily the exact building type supplied, but the building
+     * present in the colony that is a descendant of the ultimate
+     * ancestor of the specified type).
      *
      * @param type The type of the building to get.
-     * @return The <code>Building</code>.
+     * @return The <code>Building</code> found.
      */
     public Building getBuilding(BuildingType type) {
         return buildingMap.get(type.getFirstLevel().getId());
