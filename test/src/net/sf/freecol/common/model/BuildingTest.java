@@ -630,58 +630,61 @@ public class BuildingTest extends FreeColTestCase {
     }
 
     public void testPasture() {
+System.err.println("TP");
         Game game = getGame();
         game.setMap(getTestMap(true));
 
         Colony colony = getStandardColony(1);
-        Building pasture = colony.getBuilding(countryType);
+        Building country = colony.getBuilding(countryType);
+        assertNotNull(country.getProductionType());
+
         Unit unit = colony.getFirstUnit();
         assertEquals(grainType, unit.getWorkType());
 
         // no horses yet
         assertEquals(8, colony.getNetProductionOf(foodType));
-        assertEquals(0, pasture.getTotalProductionOf(horsesType));
+        assertEquals(0, country.getTotalProductionOf(horsesType));
         assertEquals(0, colony.getNetProductionOf(horsesType));
-        assertEquals(0, pasture.getMaximumProductionOf(horsesType));
+        assertEquals(0, country.getMaximumProductionOf(horsesType));
 
         colony.addGoods(horsesType, 50);
         colony.invalidateCache();
 
-        assertEquals(2, pasture.getTotalProductionOf(horsesType));
-        assertEquals(2, pasture.getMaximumProductionOf(horsesType));
+        assertEquals(2, country.getTotalProductionOf(horsesType));
+        assertEquals(2, country.getMaximumProductionOf(horsesType));
         assertEquals(2, colony.getNetProductionOf(horsesType));
 
         colony.addGoods(horsesType, 1);
         colony.invalidateCache();
 
-        assertEquals(4, pasture.getTotalProductionOf(horsesType));
-        assertEquals(4, pasture.getMaximumProductionOf(horsesType));
+        assertEquals(4, country.getTotalProductionOf(horsesType));
+        assertEquals(4, country.getMaximumProductionOf(horsesType));
         assertEquals(4, colony.getNetProductionOf(horsesType));
 
-        pasture.upgrade();
+        country.upgrade();
         colony.removeGoods(horsesType);
         colony.addGoods(horsesType, 25);
         colony.invalidateCache();
 
         assertEquals(25, colony.getGoodsCount(horsesType));
-        assertEquals(2, pasture.getTotalProductionOf(horsesType));
-        assertEquals(2, pasture.getMaximumProductionOf(horsesType));
+        assertEquals(2, country.getTotalProductionOf(horsesType));
+        assertEquals(2, country.getMaximumProductionOf(horsesType));
         assertEquals(2, colony.getNetProductionOf(horsesType));
 
         colony.addGoods(horsesType, 1);
         colony.invalidateCache();
 
         assertEquals(26, colony.getGoodsCount(horsesType));
-        assertEquals(4, pasture.getTotalProductionOf(horsesType));
-        assertEquals(4, pasture.getMaximumProductionOf(horsesType));
+        assertEquals(4, country.getTotalProductionOf(horsesType));
+        assertEquals(4, country.getMaximumProductionOf(horsesType));
         assertEquals(4, colony.getNetProductionOf(horsesType));
 
         colony.addGoods(horsesType, 24);
         colony.invalidateCache();
 
         assertEquals(50, colony.getGoodsCount(horsesType));
-        assertEquals(4, pasture.getTotalProductionOf(horsesType));
-        assertEquals(4, pasture.getMaximumProductionOf(horsesType));
+        assertEquals(4, country.getTotalProductionOf(horsesType));
+        assertEquals(4, country.getMaximumProductionOf(horsesType));
         assertEquals(4, colony.getNetProductionOf(horsesType));
 
         colony.addGoods(horsesType, 1);
@@ -689,8 +692,8 @@ public class BuildingTest extends FreeColTestCase {
 
         assertEquals(51, colony.getGoodsCount(horsesType));
         // no more than half the surplus production!
-        assertEquals(4, pasture.getTotalProductionOf(horsesType));
-        assertEquals(6, pasture.getMaximumProductionOf(horsesType));
+        assertEquals(4, country.getTotalProductionOf(horsesType));
+        assertEquals(6, country.getMaximumProductionOf(horsesType));
         assertEquals("Horse production should equal food surplus.",
                      colony.getNetProductionOf(foodType),
                      colony.getNetProductionOf(horsesType));

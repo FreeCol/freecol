@@ -270,8 +270,7 @@ public class ColonyTest extends FreeColTestCase {
         assertEquals(grainGoodsType, colonist.getWorkType());
 
         // Change the center tile to plains to improve the food situation
-        colony.getTile().setType(plainsTileType);
-        colony.getColonyTile(colony.getTile()).updateProductionType();
+        colony.getTile().changeType(plainsTileType);
         colony.invalidateCache();
         assertTrue("colony should produce more food than it consumes",
             colony.getFoodProduction() >= colony.getFoodConsumption()

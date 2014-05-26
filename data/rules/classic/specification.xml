@@ -1824,7 +1824,7 @@ resources of 400, lost city rumours of 500
     </building-type>
     <building-type id="model.building.country"
                    workplaces="0" priority="700">
-      <production>
+      <production unattended="true">
         <input goods-type="model.goods.food" value="1"/>
         <output goods-type="model.goods.horses" value="1"/>
       </production>
@@ -1846,7 +1846,7 @@ resources of 400, lost city rumours of 500
                    extends="model.building.country"
                    upgradesFrom="model.building.country"
                    upkeep="5">
-      <production>
+      <production unattended="true">
         <input goods-type="model.goods.food" value="1"/>
         <output goods-type="model.goods.horses" value="1"/>
       </production>

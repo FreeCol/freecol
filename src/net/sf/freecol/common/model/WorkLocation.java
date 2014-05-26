@@ -106,6 +106,29 @@ public abstract class WorkLocation extends UnitLocation
     }
 
     /**
+     * Update production type on the basis of the current work
+     * location type (which might change due to an upgrade) and the
+     * work type of units present.
+     */
+    public void updateProductionType() {
+        Unit unit = getFirstUnit();
+        GoodsType workType = (unit == null) ? null : unit.getWorkType();
+        ProductionType best = null;
+        int amount = 0;
+        for (ProductionType pt : getAvailableProductionTypes(unit == null)) {
+            for (AbstractGoods output : pt.getOutputs()) {
+                if (workType != null && workType != output.getType()) continue;
+                if (amount < output.getAmount()) {
+                    amount = output.getAmount();
+                    best = pt;
+                }
+            }
+        }
+        System.err.println("UPT this=" + this + " unit=" + unit + " work=" + workType + " best=" + best + " APT=" + getAvailableProductionTypes(unit==null));
+        setProductionType(best);
+    }
+
+    /**
      * Get the <code>AbstractGoods</code> consumed by this work location.
      *
      * @return A list of <code>AbstractGoods</code> consumed.
@@ -233,28 +256,6 @@ public abstract class WorkLocation extends UnitLocation
             }
         }
         return getTotalProductionOf(goodsType);
-    }
-
-    /**
-     * Update production type on the basis of the current work
-     * location type (which might change due to an upgrade) and the
-     * work type of units present.
-     */
-    public void updateProductionType() {
-        Unit unit = getFirstUnit();
-        GoodsType workType = (unit == null) ? null : unit.getWorkType();
-        ProductionType best = null;
-        int amount = 0;
-        for (ProductionType pt : getAvailableProductionTypes(unit == null)) {
-            for (AbstractGoods output : pt.getOutputs()) {
-                if (workType != null && workType != output.getType()) continue;
-                if (amount < output.getAmount()) {
-                    amount = output.getAmount();
-                    best = pt;
-                }
-            }
-        }
-        setProductionType(best);
     }
 
     /**

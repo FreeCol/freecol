@@ -42,7 +42,7 @@
     </building-type>
     <building-type id="model.building.country" preserve="true">
       <production delete="true"/>
-      <production>
+      <production unattended="true">
         <input goods-type="model.goods.grain" value="1"/>
         <output goods-type="model.goods.horses" value="1"/>
       </production>
@@ -50,7 +50,7 @@
     <building-type id="model.building.stables" extends="model.building.country"
                    preserve="true">
       <production delete="true"/>
-      <production>
+      <production unattended="true">
         <input goods-type="model.goods.grain" value="1"/>
         <output goods-type="model.goods.horses" value="1"/>
       </production>

@@ -842,19 +842,19 @@ public class ProductionTypeTest extends FreeColTestCase {
     }
 
     public void testHorseProduction() {
+        inputs.put(food, 1);
+        outputs.put(horses, 1);
         testProduction(inputs, outputs,
                        country.getAvailableProductionTypes(true));
 
-        inputs.put(food, 1);
-        outputs.put(horses, 1);
         testProduction(inputs, outputs,
                        country.getAvailableProductionTypes(false));
 
+        inputs.put(food, 1);
+        outputs.put(horses, 1);
         testProduction(inputs, outputs,
                        stables.getAvailableProductionTypes(true));
 
-        inputs.put(food, 1);
-        outputs.put(horses, 1);
         testProduction(inputs, outputs,
                        stables.getAvailableProductionTypes(false));
     }
