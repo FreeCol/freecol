@@ -116,6 +116,9 @@ public class WorkProductionPanel extends FreeColPanel {
             shortName = Messages.getName(building.getType());
             longName = shortName;
             image = lib.getBuildingImage(building);
+
+        } else {
+            throw new IllegalStateException("WorkLocation OO fail.");
         }
 
         add(new JLabel(longName), "span, align center, wrap 30");
@@ -146,8 +149,15 @@ public class WorkProductionPanel extends FreeColPanel {
         finalResult.setBorder(border);
         add(finalResult, "wrap 30");
 
-        Collections.sort(unattendedModifiers);
-        output(unattendedModifiers, unitType);
+        if (wl instanceof Building) { // Unattended production also applies.
+            result = wl.getBaseProduction(null, workType, null);
+            if (result > 0) {
+                add(new JLabel(Messages.message(wl.getLabel())));
+                add(new JLabel(ModifierFormat.format(result)), "wrap 30");
+                Collections.sort(unattendedModifiers);
+                output(unattendedModifiers, unitType);
+            }
+        }
 
         add(okButton, "newline, span, tag ok");
         setSize(getPreferredSize());
