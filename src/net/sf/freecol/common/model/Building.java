@@ -494,12 +494,13 @@ public class Building extends WorkLocation implements Named, Comparable<Building
 
         } else { // If a unit is present add unit specific bonuses.
             mods.addAll(this.getModifierSet(id, unitType, turn));
-            mods.add(colony.getProductionModifier(goodsType));
+            mods.addAll(colony.getProductionModifiers(goodsType));
             mods.addAll(unitType.getModifierSet(id, goodsType, turn));
             if (owner != null) {
                 mods.addAll(owner.getModifierSet(id, unitType, turn));
             }
         }
+        Collections.sort(mods);
         return mods;
     }
 

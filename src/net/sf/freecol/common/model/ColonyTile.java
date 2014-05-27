@@ -335,7 +335,7 @@ public class ColonyTile extends WorkLocation {
             if (unitType == null) {
                 mods.addAll(workTile.getProductionModifiers(goodsType, null));
                 mods.addAll(colony.getModifierSet(id, null, turn));
-                mods.add(colony.getProductionModifier(goodsType));
+                mods.addAll(colony.getProductionModifiers(goodsType));
                 if (owner != null) {
                     mods.addAll(owner.getModifierSet(id, type, turn));
                 }
@@ -351,7 +351,7 @@ public class ColonyTile extends WorkLocation {
             } else { // If a unit is present add unit specific bonuses
                 mods.addAll(workTile.getProductionModifiers(goodsType,
                                                             unitType));
-                mods.add(colony.getProductionModifier(goodsType));
+                mods.addAll(colony.getProductionModifiers(goodsType));
                 mods.addAll(unitType.getModifierSet(id, type, turn));
                 if (owner != null) {
                     mods.addAll(owner.getModifierSet(id, unitType, turn));
