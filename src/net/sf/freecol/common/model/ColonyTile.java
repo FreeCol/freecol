@@ -331,31 +331,22 @@ public class ColonyTile extends WorkLocation {
         final Turn turn = getGame().getTurn();
 
         List<Modifier> mods = new ArrayList<Modifier>();
-        if (isColonyCenterTile()) {
-            if (unitType == null) {
+        if (unitType == null) {
+            if (isColonyCenterTile()) { // Unattended only possible in center
                 mods.addAll(workTile.getProductionModifiers(goodsType, null));
-                mods.addAll(colony.getModifierSet(id, null, turn));
                 mods.addAll(colony.getProductionModifiers(goodsType));
+                mods.addAll(colony.getModifierSet(id, null, turn));
                 if (owner != null) {
                     mods.addAll(owner.getModifierSet(id, type, turn));
                 }
-            } // else attended production not possible!
+            }
 
         } else {
-            if (unitType == null) { // Add only the tile-specific bonuses
-                mods.addAll(colony.getModifierSet(id, type, turn));
-                if (owner != null) {
-                    mods.addAll(owner.getModifierSet(id, type, turn));
-                }
-
-            } else { // If a unit is present add unit specific bonuses
-                mods.addAll(workTile.getProductionModifiers(goodsType,
-                                                            unitType));
-                mods.addAll(colony.getProductionModifiers(goodsType));
-                mods.addAll(unitType.getModifierSet(id, type, turn));
-                if (owner != null) {
-                    mods.addAll(owner.getModifierSet(id, unitType, turn));
-                }
+            mods.addAll(workTile.getProductionModifiers(goodsType, unitType));
+            mods.addAll(colony.getProductionModifiers(goodsType));
+            mods.addAll(unitType.getModifierSet(id, type, turn));
+            if (owner != null) {
+                mods.addAll(owner.getModifierSet(id, unitType, turn));
             }
         }
         return mods;
