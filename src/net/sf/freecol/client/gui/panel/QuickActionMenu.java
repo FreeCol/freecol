@@ -413,7 +413,7 @@ public final class QuickActionMenu extends JPopupMenu {
         }
         if (container.getItemCount() > 0) this.add(container);
 
-        if (current != null) {
+        if (current != null && unit.getWorkType() != null) {
             JMenuItem ji = new JMenuItem(Messages.message("showProductivity"));
             ji.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent event) {

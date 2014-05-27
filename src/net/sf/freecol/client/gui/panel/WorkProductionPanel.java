@@ -84,52 +84,38 @@ public class WorkProductionPanel extends FreeColPanel {
         final Colony colony = unit.getColony();
         final UnitType unitType = unit.getType();
         final WorkLocation wl = (WorkLocation)unit.getLocation();
-        final List<AbstractGoods> outputs = wl.getOutputs();
-        final GoodsType goodsType = (outputs.isEmpty()) ? null
-            : outputs.get(0).getType();
+        final GoodsType workType = unit.getWorkType();
 
-        List<Modifier> modifiers = new ArrayList<Modifier>();
-        List<Modifier> moreModifiers = new ArrayList<Modifier>();
-        List<Modifier> mods;
+        List<Modifier> attendedModifiers
+            = wl.getProductionModifiers(workType, unitType);
+        List<Modifier> unattendedModifiers
+            = wl.getProductionModifiers(workType, null);
         String shortName = "";
         String longName = "";
         Image image = null;
-        float result = (outputs.isEmpty()) ? 0.0f
-            : outputs.get(0).getAmount();
+        float result = wl.getBaseProduction(wl.getProductionType(), 
+                                            workType, unitType);
 
-        if (!outputs.isEmpty()) {
-            if (wl instanceof ColonyTile) {
-                final ColonyTile colonyTile = (ColonyTile)wl;
-                mods = wl.getProductionModifiers(goodsType, unitType);
-                if (FeatureContainer.applyModifiers(result, turn, mods) > 0) {
-                    modifiers.addAll(mods);
-                    mods = wl.getProductionModifiers(goodsType, null);
-                    moreModifiers.addAll(mods);
-                }
-
-                final Tile tile = colonyTile.getWorkTile();
-                final TileType tileType = tile.getType();
-                shortName = Messages.getName(tileType);
-                longName = Messages.message(colonyTile.getLabel());
-                Image terrain = lib.getTerrainImage(tileType, tile.getX(),
-                                                    tile.getY());
-                image = new BufferedImage(terrain.getWidth(null),
-                                          terrain.getHeight(null),
-                                          BufferedImage.TYPE_INT_ARGB);
-                getGUI().displayColonyTile((Graphics2D)image.getGraphics(),
-                                           tile, colony);
-
-            } else if (wl instanceof Building) {
-                final Building building = (Building)wl;
-                mods = wl.getProductionModifiers(goodsType, unitType);
-                modifiers.addAll(mods);
-                mods = wl.getProductionModifiers(goodsType, null);
-                moreModifiers.addAll(mods);
-
-                shortName = Messages.getName(building.getType());
-                longName = shortName;
-                image = lib.getBuildingImage(building);
-            }
+        // TODO: Fix OO.
+        if (wl instanceof ColonyTile) {
+            final ColonyTile colonyTile = (ColonyTile)wl;
+            final Tile tile = colonyTile.getWorkTile();
+            final TileType tileType = tile.getType();
+            shortName = Messages.getName(tileType);
+            longName = Messages.message(colonyTile.getLabel());
+            Image terrain = lib.getTerrainImage(tileType,
+                                                tile.getX(), tile.getY());
+            image = new BufferedImage(terrain.getWidth(null),
+                                      terrain.getHeight(null),
+                                      BufferedImage.TYPE_INT_ARGB);
+            getGUI().displayColonyTile((Graphics2D)image.getGraphics(),
+                                       tile, colony);
+            
+        } else if (wl instanceof Building) {
+            final Building building = (Building)wl;
+            shortName = Messages.getName(building.getType());
+            longName = shortName;
+            image = lib.getBuildingImage(building);
         }
 
         add(new JLabel(longName), "span, align center, wrap 30");
@@ -138,10 +124,10 @@ public class WorkProductionPanel extends FreeColPanel {
         add(new JLabel(shortName));
         add(new JLabel(ModifierFormat.format(result)));
 
-        Collections.sort(modifiers);
-        output(modifiers, unitType);
+        Collections.sort(attendedModifiers);
+        output(attendedModifiers, unitType);
 
-        result = wl.getPotentialProduction(goodsType, unitType);
+        result = wl.getPotentialProduction(workType, unitType);
         if (result < 0.0f) {
             add(new JLabel(Messages.message("model.source.zeroThreshold.name")),
                            "newline");
@@ -160,8 +146,8 @@ public class WorkProductionPanel extends FreeColPanel {
         finalResult.setBorder(border);
         add(finalResult, "wrap 30");
 
-        Collections.sort(moreModifiers);
-        output(moreModifiers, unitType);
+        Collections.sort(unattendedModifiers);
+        output(unattendedModifiers, unitType);
 
         add(okButton, "newline, span, tag ok");
         setSize(getPreferredSize());
