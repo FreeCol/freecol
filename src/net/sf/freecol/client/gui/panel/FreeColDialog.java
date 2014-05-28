@@ -183,8 +183,8 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
         this.pane.setBorder(dialogBorder);
         this.pane.setName("FreeColDialog");
         this.pane.setValue(JOptionPane.UNINITIALIZED_VALUE);
-        if (ci != null) this.pane.setInitialSelectionValue(ci);
         this.pane.addPropertyChangeListener(this);
+        setComponentOrientation(this.pane.getComponentOrientation());
         if (options.size() <= 20) {
             this.scrollPane = null;
         } else {
@@ -196,11 +196,8 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
             this.scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         }
         Container contentPane = getContentPane();
-        contentPane.setLayout(new BorderLayout());
         contentPane.add((this.scrollPane != null) ? this.scrollPane
-            : this.pane, BorderLayout.CENTER);
-
-        setComponentOrientation(this.pane.getComponentOrientation());
+            : this.pane);
         setResizable(false);
         setUndecorated(true);
         setModal(modal);
