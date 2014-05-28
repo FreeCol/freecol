@@ -176,7 +176,7 @@ public class ChoiceItem<T> {
      * @return True if this is the "cancel" choice.
      */
     public boolean isCancel() {
-        return false;
+        return optionCancel;
     }
 
     /**
