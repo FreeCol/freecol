@@ -975,7 +975,9 @@ public class Map extends FreeColGameObject implements Location {
     private PathNode getBestEntryPath(Unit unit, Tile tile, Unit carrier,
                                       CostDecider costDecider) {
         return searchMap(unit, tile, GoalDeciders.getHighSeasGoalDecider(),
-                         costDecider, INFINITY, carrier, null);
+            ((costDecider != null) ? costDecider
+                : CostDeciders.avoidSettlementsAndBlockingUnits()),
+            INFINITY, carrier, null);
     }
 
     /**
