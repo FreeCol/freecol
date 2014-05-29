@@ -1550,6 +1550,11 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public Tile getTileToCache() {
         Tile tile = this.copy(getGame(), Tile.class);
         tile.clearUnitList();
+        // Set the unit count for a copied colony
+        Colony colony = getColony();
+        if (colony != null) {
+            tile.getColony().setDisplayUnitCount(colony.getUnitCount());
+        }
         return tile;
     }
 
