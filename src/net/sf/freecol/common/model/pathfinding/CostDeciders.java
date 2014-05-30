@@ -19,9 +19,11 @@
 
 package net.sf.freecol.common.model.pathfinding;
 
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
@@ -169,24 +171,34 @@ public final class CostDeciders {
      */
     private static class AvoidNavalDangerCostDecider
         extends AvoidSettlementsAndBlockingUnitsCostDecider {
+
         @Override
         public int getCost(Unit unit, Location oldLocation,
                            Location newLocation, int movesLeft) {
             int cost = super.getCost(unit, oldLocation, newLocation, movesLeft);
             Tile tile = newLocation.getTile();
-            if (cost != ILLEGAL_MOVE && cost != Map.INFINITY
-                && tile != null) {
-                if (tile.isDangerousToShip(unit)) cost = ILLEGAL_MOVE;
+            if (cost != ILLEGAL_MOVE && cost != Map.INFINITY && tile != null) {
+                if (tile.isDangerousToShip(unit)) {
+                    cost = ILLEGAL_MOVE;
+                } else {
+                    final Player owner = unit.getOwner();
+                    tiles: for (Tile t : tile.getSurroundingTiles(1)) {
+                        for (Unit u : t.getUnitList()) {
+                            if (u.getOwner() == owner) break;
+                            if (u.hasAbility(Ability.PIRACY)
+                                || (u.getOwner().atWarWith(owner)
+                                    && u.isOffensiveUnit())) {
+                                this.movesLeft = 0;
+                                this.newTurns++;
+                                break tiles;
+                            }
+                        }
+                    }
+                }
             }
             return cost;
         }
     };
-
-    /**
-     * An instance of the naval-danger-avoidance cost decider.
-     */
-    private static final AvoidNavalDangerCostDecider
-        avoidNavalDangerCostDecider = new AvoidNavalDangerCostDecider();
 
 
     // Public interface
@@ -329,6 +341,6 @@ public final class CostDeciders {
      * @return The <code>CostDecider</code>.
      */
     public static CostDecider avoidNavalDanger() {
-        return avoidNavalDangerCostDecider;
+        return new AvoidNavalDangerCostDecider();
     }
 }
