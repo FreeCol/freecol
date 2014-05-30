@@ -93,72 +93,90 @@ public class REFAIPlayer extends EuropeanAIPlayer {
     }
 
 
+    /** Container class for REF target colony information. */
+    private class TargetTuple implements Comparable<TargetTuple> {
+        public Colony colony;
+        public PathNode path;
+        public double score;
+        public Tile disembarkTile;
+
+        public TargetTuple(Colony colony, PathNode path, double score) {
+            this.colony = colony;
+            this.path = path;
+            this.score = score;
+            this.disembarkTile = null;
+        }
+
+        public Tile getEntry() {
+            for (PathNode p = path; p != null; p = p.next) {
+                Tile t = p.getTile();
+                if (t != null) return t;
+            }
+            return null;
+        }
+
+        // Interface Comparable<TargetTuple>
+
+        public int compareTo(TargetTuple other) {
+            double cmp = other.score - score;
+            return (cmp < 0.0) ? -1 : (cmp > 0.0) ? 1 : 0;
+        }
+    }
+
     /**
      * Find suitable colony targets.
      *
      * @param aiu The <code>AIUnit</code> to search with.
-     * @param colonies An array of <code>Colony</code>s to fill in.
      * @param port If true, insist on the colonies being ports.
-     * @return The number of colonies filled into the array.
+     * @return A list of <code>TargetTuple</code> target choices.
      */
-    private int findColonyTargets(AIUnit aiu, Colony[] colonies, boolean port) {
+    private List<TargetTuple> findColonyTargets(AIUnit aiu, boolean port) {
         final Player player = getPlayer();
         final Unit unit = aiu.getUnit();
         final Unit carrier = unit.getCarrier();
-        final Map<Colony, Double> scores = new HashMap<Colony, Double>();
+        final List<TargetTuple> targets = new ArrayList<TargetTuple>();
         for (Player p : player.getRebels()) {
             for (Colony c : p.getColonies()) {
-                if (!port || c.isConnectedPort()) {
-                    PathNode path = unit.findPath(carrier, c, carrier, null);
-                    int score = UnitSeekAndDestroyMission.scorePath(aiu, path);
-                    scores.put(c, (double)score);
-                }
+                if (port && !c.isConnectedPort()) continue;
+                PathNode path = unit.findPath(carrier, c, carrier, null);
+                if (path == null) continue;
+                int score = UnitSeekAndDestroyMission.scorePath(aiu, path);
+                targets.add(new TargetTuple(c, path, score));
             }
         }
 
         // Increase score for drydock/s, musket and tools suppliers,
         // but decrease for fortifications.
         // TODO: use Modifiers?
-        for (Colony c : scores.keySet()) {
-            double score = scores.get(c);
-            score *= 0.01 * (101 - Math.min(100, c.getSoL()));
-            for (Building b : c.getBuildings()) {
+        for (TargetTuple t : targets) {
+            t.score *= 0.01 * (101 - Math.min(100, t.colony.getSoL()));
+            for (Building b : t.colony.getBuildings()) {
                 if (b.getLevel() > 1) {
-                    if (b.hasAbility(Ability.REPAIR_UNITS)) score *= 1.5;
+                    if (b.hasAbility(Ability.REPAIR_UNITS)) t.score *= 1.5;
                     for (AbstractGoods ag : b.getOutputs()) {
                         if (ag.getType().isMilitaryGoods()) {
-                            score *= 2.0;
+                            t.score *= 2.0;
                         } else if (ag.getType().isBuildingMaterial()
                             && ag.getType().isRefined()) {
-                            score *= 1.5;
+                            t.score *= 1.5;
                         }
                     }
                 }
             }
-            int stockade = (!c.hasStockade()) ? 0
-                : c.getStockade().getLevel();
-            score *= (6 - stockade) / 6.0;
-            scores.put(c, score);
+            int stockade = (!t.colony.hasStockade()) ? 0
+                : t.colony.getStockade().getLevel();
+            t.score *= (6 - stockade) / 6.0;
         }
-
-        Colony[] best = scores.keySet().toArray(new Colony[0]);
-        Arrays.sort(best, new Comparator<Colony>() {
-                public int compare(Colony c1, Colony c2) {
-                    double cmp = scores.get(c2) - scores.get(c1);
-                    return (cmp < 0) ? -1 : (cmp > 0) ? 1 : 0;
-                }
-            });
-        int n = Math.min(colonies.length, best.length);
-        for (int i = 0; i < n; i++) colonies[i] = best[i];
+        Collections.sort(targets);
 
         StringBuffer sb = new StringBuffer(32);
         sb.append("REF found colony targets:");
-        for (int i = 0; i < n; i++) {
-            sb.append(" ").append(colonies[i].getName())
-                .append("(").append(scores.get(colonies[i])).append(")");
+        for (TargetTuple t : targets) {
+            sb.append(" ").append(t.colony.getName())
+                .append("(").append(t.score).append(")");
         }
         logger.fine(sb.toString());
-        return n;
+        return targets;
     }
 
     /**
@@ -212,38 +230,36 @@ public class REFAIPlayer extends EuropeanAIPlayer {
             return false;
         }
 
-        Colony best[] = { null, null };
-        int n = findColonyTargets(aiUnit, best, true);
-        if (n == 0) {
+        List<TargetTuple> targets = findColonyTargets(aiUnit, true);
+        if (targets.isEmpty()) {
             logger.warning("REF found no targets.");
             return false;
         }
-        final Player rebel = best[0].getOwner();
+        final Player rebel = targets.get(0).colony.getOwner();
         double ratio = getStrengthRatio(rebel);
-        if (ratio < 1.0) n = 1; // Just go for one place
+        int n = (ratio < 1.0) ? 1 // Just go for one place
+            : (ratio < 2.0) ? Math.min(2, targets.size())
+            : Math.min(3, targets.size());
 
         // For each target search from the target position to find a
-        // Tile to disembark to.  If teleporting in, the navy will appear
-        // at this location, otherwise at the best entry location for it.
-        Tile[] entry = new Tile[n];
+        // Tile to disembark to.  If teleporting in, the navy will
+        // appear at this location, otherwise at the best entry
+        // location for it.
         for (int i = 0; i < n; i++) {
-            final Tile target = best[i].getTile();
-            entry[i] = carrier.getBestEntryTile(target);
-            final GoalDecider gd = GoalDeciders.getDisembarkGoalDecider(target);
-            PathNode path = unit.search(entry[i], gd, null, 10, carrier);
+            final TargetTuple t = targets.get(i);
+            Tile entry = t.getEntry();
+            final GoalDecider gd = GoalDeciders
+                .getDisembarkGoalDecider(t.colony.getTile());
+            PathNode path = unit.search(entry, gd, null, 10, carrier);
             if (path == null) {
                 logger.severe("Can not find suitable REF landing site for: "
-                    + upLoc(target));
+                    + t.colony);
                 return false;
             }
-            entry[i] = path.getTile();
-            if (teleport) {
-                // Step forward to the point the unit is about to
-                // disembark.  This is where the carrier should
-                // teleport to.
-                while (path.isOnCarrier()) path = path.next;
-                entry[i] = path.previous.getTile();
-            }
+            // Step forward to the point the unit is about to disembark.
+            // This is where the carrier should teleport to.
+            while (path.isOnCarrier()) path = path.next;
+            t.disembarkTile = path.previous.getTile();
         }
 
         // Give the land units seek-and-destroy missions for the
@@ -253,35 +269,40 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         StringBuffer sb = new StringBuffer(256);
         List<AIUnit> navy = new ArrayList<AIUnit>();
         int land = getPlayer().getNumberOfKingLandUnits();
-        int used, bIndex = 0;
-        sb.append("REF attacking\n  [").append(upLoc(best[bIndex]))
-            .append(" from ").append(entry[bIndex])
-            .append(" with ");
-        for (AIUnit aiu : getAIUnits()) {
-            if (!aiu.getUnit().isNaval()) continue;
-            Unit ship = aiu.getUnit();
-            if (ship.isEmpty()) navy.add(aiu); else {
+        int used;
+        for (int i = 0; i < n; i++) {
+            final TargetTuple t = targets.get(i);
+            sb.append("REF attacking\n  [").append(t.colony)
+                .append(" from ").append(t.getEntry())
+                .append(" with ");
+            for (AIUnit aiu : getAIUnits()) {
+                if (!aiu.getUnit().isNaval()) continue;
+                Unit ship = aiu.getUnit();
+                if (ship.isEmpty()) {
+                    navy.add(aiu);
+                    continue;
+                }
+                ship.setEntryLocation(t.getEntry());
                 sb.append("[").append(ship);
                 used = 0;
                 for (Unit u : aiu.getUnit().getUnitList()) {
                     AIUnit laiu = aiMain.getAIUnit(u);
                     laiu.setMission(new UnitSeekAndDestroyMission(aiMain,
-                            laiu, best[bIndex]));
+                            laiu, t.colony));
                     used++;
                     sb.append(" ").append(u);
                 }
                 sb.append("]");
                 TransportMission tm = new TransportMission(aiMain, aiu);
                 aiu.setMission(tm);
-                if (bIndex < n-1 && used >= (int)Math.floor(land * 0.66)) {
+                if (i < n-1 && used >= (int)Math.floor(land * 0.66)) {
                     land -= used;
                     used = 0;
-                    bIndex++;
-                    sb.append("]\n  [").append(upLoc(best[bIndex]))
-                        .append(" from " ).append(entry[bIndex])
+                    sb.append("]\n  [").append(t.colony)
+                        .append(" from " ).append(t.getEntry())
                         .append(" with ");
+                    break;
                 }
-                ship.setEntryLocation(entry[bIndex]);
             }
         }
         sb.append("]");
@@ -306,7 +327,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                 }
             };
         for (int i = 0; i < n; i++) {
-            carrier.search(entry[i], navyGD, null,
+            carrier.search(targets.get(i).getEntry(), navyGD, null,
                            carrier.getInitialMovesLeft() * 2, null);
         }
 
@@ -327,7 +348,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
             }
             if (ui == null) {
                 aiu.setMission(new UnitWanderHostileMission(aiMain, aiu));
-                u.setEntryLocation(entry[0]);
+                u.setEntryLocation(targets.get(0).getEntry());
             } else {
                 Unit target = ui.next();
                 aiu.setMission(new UnitSeekAndDestroyMission(aiMain, aiu,
