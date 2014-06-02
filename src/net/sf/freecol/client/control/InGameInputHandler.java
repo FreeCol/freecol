@@ -809,13 +809,16 @@ public final class InGameInputHandler extends InputHandler {
         final Player winner
             = getGame().getFreeColGameObject(element.getAttribute("winner"),
                                              Player.class);
+        final boolean highScore
+            = "true".equalsIgnoreCase(element.getAttribute("highScore"));
 
         if (winner == freeColClient.getMyPlayer()) {
-            invokeAndWait(new Runnable() {
+            SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        igc().victory();
+                        igc().displayHighScores(highScore);
                     }
                 });
+            getGUI().showVictoryDialog();
         }
         return null;
     }

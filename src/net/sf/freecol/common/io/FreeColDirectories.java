@@ -707,7 +707,7 @@ public class FreeColDirectories {
      * @return The high score file, if it exists.
      */
     public static File getHighScoreFile() {
-        return new File(getDataDirectory(), HIGH_SCORE_FILE);
+        return new File(getUserDataDirectory(), HIGH_SCORE_FILE);
     }
 
     /**

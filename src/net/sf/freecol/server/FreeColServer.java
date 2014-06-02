@@ -21,14 +21,11 @@ package net.sf.freecol.server;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.BindException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -123,7 +120,6 @@ public final class FreeColServer {
 
     public static final String ACTIVE_UNIT_TAG = "activeUnit";
     public static final String DEBUG_TAG = "debug";
-    public static final String HIGH_SCORES_TAG = "highScores";
     public static final String RANDOM_STATE_TAG = "randomState";
     public static final String OWNER_TAG = "owner";
     public static final String PUBLIC_SERVER_TAG = "publicServer";
@@ -133,8 +129,6 @@ public final class FreeColServer {
     public static final String VERSION_TAG = "version";
 
     private static final int META_SERVER_UPDATE_INTERVAL = 60000;
-
-    private static final int NUMBER_OF_HIGH_SCORES = 10;
 
     /**
      * The save game format used for saving games.
@@ -163,14 +157,6 @@ public final class FreeColServer {
      * may not be readily available.
      */
     public static final String DEFAULT_SPEC = "freecol";
-
-    /** A comparator for high scores. */       
-    public static final Comparator<HighScore> highScoreComparator
-        = new Comparator<HighScore>() {
-        public int compare(HighScore score1, HighScore score2) {
-            return score2.getScore() - score1.getScore();
-        }
-    };
 
     /** Games are either starting, ending or being played. */
     public static enum GameState { STARTING_GAME, IN_GAME, ENDING_GAME }
@@ -222,9 +208,6 @@ public final class FreeColServer {
 
     /** An active unit specified in a saved game. */
     private Unit activeUnit = null;
-
-    /** The high scores on this server.  */
-    private List<HighScore> highScores = null;
 
 
     /**
@@ -1456,114 +1439,8 @@ public final class FreeColServer {
     }
 
     /**
-     * Get the high scores.
-     *
-     * @return A list of <code>HighScore</code>s.
+     * Shut down this FreeColServer.
      */
-    public List<HighScore> getHighScores() {
-        if (highScores == null) {
-            try {
-                loadHighScores();
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Failed to load high scores.", e);
-                highScores = new ArrayList<HighScore>();
-            }
-        }
-        return highScores;
-    }
-
-    /**
-     * Tries to adds a new high score for player.
-     *
-     * @param player The <code>Player</code> to add a high score for.
-     * @return True if the score was high enough to be added to the
-     *     high score list.
-     */
-    public boolean newHighScore(Player player) {
-        if (FreeColDebugger.isInDebugMode()) return false;
-        getHighScores();
-        int lowScore = (highScores.isEmpty()) ? -1
-            : highScores.get(highScores.size()-1).getScore();
-        if (player.getScore() <= lowScore) return false;
-        highScores.add(new HighScore(player, new Date()));
-        Collections.sort(highScores, highScoreComparator);
-        if (highScores.size() > NUMBER_OF_HIGH_SCORES) {
-            highScores = highScores.subList(0, NUMBER_OF_HIGH_SCORES - 1);
-        }
-        return saveHighScores();
-    }
-
-    /**
-     * Saves high scores.
-     *
-     * @return True if the high scores were saved.
-     */
-    public boolean saveHighScores() {
-        boolean ret = false;
-        if (highScores == null || highScores.isEmpty()) return false;
-        Collections.sort(highScores, highScoreComparator);
-
-        FreeColXMLWriter xw = null;
-        try {
-            xw = new FreeColXMLWriter(new FileOutputStream(FreeColDirectories.getHighScoreFile()),
-                FreeColXMLWriter.WriteScope.toSave(), true);
-            ret = true;
-        } catch (FileNotFoundException fnfe) {
-            logger.log(Level.WARNING, "Failed to open high scores file.", fnfe);
-        } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Error creating FreeColXMLWriter.", ioe);
-        }
-
-        if (ret) {
-            try {
-                xw.writeStartDocument("UTF-8", "1.0");
-                xw.writeStartElement(HIGH_SCORES_TAG);
-                int count = 0;
-                for (HighScore score : highScores) {
-                    score.toXML(xw);
-                    count++;
-                    if (count == NUMBER_OF_HIGH_SCORES) break;
-                }
-                xw.writeEndElement();
-                xw.writeEndDocument();
-                xw.flush();
-            } catch (XMLStreamException xse) {
-                logger.log(Level.WARNING, "Failed to write high scores file.",
-                           xse);
-                ret = false;
-            }
-        }
-        if (xw != null) xw.close();
-        return ret;
-    }
-
-    /**
-     * Load the high scores.
-     */
-    public void loadHighScores() {
-        highScores = new ArrayList<HighScore>();
-        File hsf = FreeColDirectories.getHighScoreFile();
-        if (!hsf.exists()) return;
-        FreeColXMLReader xr = null;
-        try {
-            xr = new FreeColXMLReader(new FileInputStream(hsf));
-            xr.nextTag();
-
-            while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                final String tag = xr.getLocalName();
-                if (HighScore.getXMLElementTagName().equals(tag)) {
-                    highScores.add(new HighScore(xr));
-                }
-            }
-
-        } catch (Exception e) { // Do not crash on high score fail.
-            logger.log(Level.WARNING, "Error loading high scores.", e);
-        } finally {
-            if (xr != null) xr.close();
-        }
-        Collections.sort(highScores, highScoreComparator);
-    }
-
     public void shutdown() {
         server.shutdown();
     }

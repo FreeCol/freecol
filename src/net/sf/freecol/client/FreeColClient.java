@@ -780,7 +780,7 @@ public final class FreeColClient {
             Player player = getMyPlayer();
             player.setPlayerType(Player.PlayerType.RETIRED);
             askServer().retire();
-            gui.showHighScoresPanel(null);
+            gui.showHighScoresPanel(null, askServer().getHighScores());
         }
     }
 

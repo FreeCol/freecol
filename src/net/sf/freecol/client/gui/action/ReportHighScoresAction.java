@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.InGameController;
 
 
 /**
@@ -48,6 +49,6 @@ public class ReportHighScoresAction extends FreeColAction {
      * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) {
-        getGUI().showHighScoresPanel(null);
+        getInGameController().displayHighScores(null);
     }
 }

@@ -19,13 +19,24 @@
 
 package net.sf.freecol.common.model;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.common.debug.FreeColDebugger;
+import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 
@@ -35,9 +46,12 @@ import org.w3c.dom.Element;
 /**
  * A FreeCol high score record.
  */
-public class HighScore extends FreeColObject {
+public class HighScore extends FreeColObject implements Comparable<HighScore> {
 
     private static final Logger logger = Logger.getLogger(HighScore.class.getName());
+
+    /** The number of high scores to allow in the high scores list. */
+    public static final int NUMBER_OF_HIGH_SCORES = 10;
 
     /**
      * On retirement, an object will be named in honour of the
@@ -298,6 +312,153 @@ public class HighScore extends FreeColObject {
      */
     public final Date getDate() {
         return date;
+    }
+
+
+    // Utilities for manipulating lists of high scores, and serialization
+    // with the high scores file.
+
+    private static final String HIGH_SCORES_TAG = "highScores";
+
+    /**
+     * Tidy a list of scores into canonical form.  That is, sorted and
+     * with no more that NUMBER_OF_HIGH_SCORES members.
+     *
+     * @param scores The list of <code>HighScore</code>s to operate on.
+     */
+    private static void tidyScores(List<HighScore> scores) {
+        if (scores.size() > NUMBER_OF_HIGH_SCORES) {
+            scores = scores.subList(0, NUMBER_OF_HIGH_SCORES - 1);
+        }
+        Collections.sort(scores);
+    }
+
+    /**
+     * Can a given score be added to a high score list.
+     *
+     * @param score The score to check.
+     * @param scores A list of <code>HighScore</code> to check against.
+     * @return True if the given score can be added to the list.
+     */
+    public static boolean checkHighScore(int score, List<HighScore> scores) {
+        return !FreeColDebugger.isInDebugMode()
+            && score >= 0
+            && (scores.size() < NUMBER_OF_HIGH_SCORES
+                || score > scores.get(scores.size()-1).getScore());
+    }
+
+    /**
+     * Tries to adds a new high score for player.
+     *
+     * @param player The <code>Player</code> to add a high score for.
+     * @return True if the score was high enough to be added to the
+     *     high score list.
+     */
+    public static boolean newHighScore(Player player) {
+        List<HighScore> scores = loadHighScores();
+        if (!checkHighScore(player.getScore(), scores)) return false;
+        HighScore hs = new HighScore(player, new Date());
+        scores.add(hs);
+        tidyScores(scores);
+        return saveHighScores(scores);
+    }
+
+    /**
+     * Load the high scores.
+     *
+     * @return A list of <code>HighScore</code>s from the high score file.
+     */
+    public static List<HighScore> loadHighScores() {
+        List<HighScore> scores = new ArrayList<HighScore>();
+        File hsf = FreeColDirectories.getHighScoreFile();
+        if (!hsf.exists()) {
+            try {
+                hsf.createNewFile();
+                saveHighScores(scores);
+                logger.info("Created empty high score file: " + hsf.getPath());
+            } catch (IOException ioe) {
+                scores = null;
+                logger.log(Level.WARNING, "Unable to create high score file: "
+                           + hsf.getPath(), ioe);
+            }
+            return scores;
+        }
+
+        FreeColXMLReader xr = null;
+        try {
+            xr = new FreeColXMLReader(new FileInputStream(hsf));
+            xr.nextTag();
+
+            while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                final String tag = xr.getLocalName();
+                if (HighScore.getXMLElementTagName().equals(tag)) {
+                    scores.add(new HighScore(xr));
+                }
+            }
+
+        } catch (Exception e) { // Do not crash on high score fail.
+            logger.log(Level.WARNING, "Error loading high scores.", e);
+        } finally {
+            if (xr != null) xr.close();
+        }
+        tidyScores(scores);
+        return scores;
+    }
+
+    /**
+     * Saves high scores.
+     *
+     * @param scores The list of <code>HighScore</code>s to save.
+     * @return True if the high scores were saved to the high score file.
+     */
+    public static boolean saveHighScores(List<HighScore> scores) {
+        boolean ret = false;
+        if (scores == null) return false;
+        tidyScores(scores);
+
+        File hsf = FreeColDirectories.getHighScoreFile();
+        FreeColXMLWriter xw = null;
+        try {
+            xw = new FreeColXMLWriter(new FileOutputStream(hsf),
+                FreeColXMLWriter.WriteScope.toSave(), true);
+            ret = true;
+        } catch (FileNotFoundException fnfe) {
+            logger.log(Level.WARNING, "Failed to open high scores file.", fnfe);
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Error creating FreeColXMLWriter.", ioe);
+        }
+
+        if (ret) {
+            try {
+                xw.writeStartDocument("UTF-8", "1.0");
+                xw.writeStartElement(HIGH_SCORES_TAG);
+                int count = 0;
+                for (HighScore score : scores) {
+                    score.toXML(xw);
+                    count++;
+                }
+                xw.writeEndElement();
+                xw.writeEndDocument();
+                xw.flush();
+            } catch (XMLStreamException xse) {
+                logger.log(Level.WARNING, "Failed to write high scores file.",
+                           xse);
+                ret = false;
+            } finally {
+                xw.close();
+            }
+        }
+        return ret;
+    }
+
+
+    // Implement Comparable<HighScore>
+
+    /**
+     * {@inheritDoc}
+     */
+    public int compareTo(HighScore other) {
+        return other.getScore() - getScore();
     }
 
 

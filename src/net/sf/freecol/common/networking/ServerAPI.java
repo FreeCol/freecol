@@ -601,20 +601,6 @@ public abstract class ServerAPI {
     }
 
     /**
-     * Server query-response for checking the high score.
-     *
-     * @return True if the player has achieved a new high score.
-     */
-    public boolean checkHighScore() {
-        HashMap<String, String> results = loadMap("highScore");
-        return (askHandling(new TrivialMessage("checkHighScore"),
-                            null, results)
-            && results.get("highScore") != null)
-            ? Boolean.parseBoolean(results.get("highScore"))
-            : false;
-    }
-
-    /**
      * Send a chooseFoundingFather message.
      *
      * @param ffs A list of <code>FoundingFather</code>s to choose from.

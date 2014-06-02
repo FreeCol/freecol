@@ -1407,6 +1407,21 @@ public final class InGameController implements NetworkConstants {
         displayModelMessages(false);
     }
 
+    /**
+     * Display the high scores.
+     *
+     * @param high A <code>Boolean</code> whose values indicates whether
+     *     a new high score has been achieved, or no information if null.
+     */
+    public void displayHighScores(Boolean high) {
+        int score = freeColClient.getMyPlayer().getScore();
+        List<HighScore> scores = askServer().getHighScores();
+        gui.showHighScoresPanel((high == null) ? null
+            : (high.booleanValue()) ? "highscores.yes"
+            : "highscores.no",
+            scores);
+    }
+
 
     // All the routines from here on are called from actions.
     // They (usually) then make requests to the server.
@@ -4536,10 +4551,7 @@ public final class InGameController implements NetworkConstants {
     /**
      * The player has won!
      */
-    public void victory() {
-        boolean high = askServer().checkHighScore();
-        gui.showHighScoresPanel((high) ? "highscores.yes" : "highscores.no");
-        boolean quit = gui.showVictoryDialog();
+    public void victory(Boolean quit) {
         if (quit) {
             freeColClient.quit();
         } else {

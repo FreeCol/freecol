@@ -34,15 +34,9 @@ import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
- * This panel gets displayed to the player who have won the game.
+ * This dialog is displayed to a player who has won the game.
  */
 public final class VictoryDialog extends FreeColConfirmDialog {
-
-    private static final String CONTINUE = "CONTINUE";
-
-    private JButton continueButton
-        = new JButton(Messages.message("victory.continue"));
-
 
     /**
      * Create a Victory dialog.
@@ -55,9 +49,10 @@ public final class VictoryDialog extends FreeColConfirmDialog {
         MigPanel panel = new MigPanel(new MigLayout("wrap 1", "", ""));
         panel.add(GUI.getDefaultHeader(Messages.message("victory.text")),
                   "align center, wrap 20");
-        panel.add(new JLabel(new ImageIcon(ResourceManager.getImage("VictoryImage"))),
-            "align center");
+        Image image = ResourceManager.getImage("VictoryImage");
+        panel.add(new JLabel(new ImageIcon(image)),
+                  "align center");
 
-        initialize(true, panel, null, "victory.yes", "victory.continue");
+        initialize(false, panel, null, "victory.yes", "victory.continue");
     }
 }

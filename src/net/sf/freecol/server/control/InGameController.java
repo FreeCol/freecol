@@ -679,14 +679,18 @@ public final class InGameController extends Controller {
     /**
      * Ends the turn of the given player.
      *
+     * Note: sends messages to other players.
+     *
      * @param serverPlayer The <code>ServerPlayer</code> to end the turn of.
-     * @return Null.
+     * @return An <code>Element</code> encapsulating the end of turn changes
+     *     for the given player.
      */
     public Element endTurn(ServerPlayer serverPlayer) {
-        FreeColServer freeColServer = getFreeColServer();
-        ServerGame game = getGame();
-        ServerPlayer player = (ServerPlayer)game.getCurrentPlayer();
+        final FreeColServer freeColServer = getFreeColServer();
+        final ServerGame game = getGame();
+        final ServerPlayer winner = (ServerPlayer)game.checkForWinner();
 
+        ServerPlayer player = (ServerPlayer)game.getCurrentPlayer();
         if (serverPlayer != player) {
             throw new IllegalArgumentException("It is not "
                 + serverPlayer.getName() + "'s turn, it is "
@@ -696,44 +700,6 @@ public final class InGameController extends Controller {
         for (;;) {
             logger.finest("Ending turn for " + player.getName());
             player.clearModelMessages();
-
-            // Has anyone won?
-            // Do not end single player games where an AI has won,
-            // that would stop revenge mode.
-            Player winner = game.checkForWinner();
-            if (winner != null
-                && !(freeColServer.isSinglePlayer() && winner.isAI())) {
-                ChangeSet cs = new ChangeSet();
-                cs.addTrivial(See.all(), "gameEnded",
-                              ChangePriority.CHANGE_NORMAL,
-                              "winner", winner.getId());
-                sendToOthers(serverPlayer, cs);
-                return cs.build(serverPlayer);
-            }
-
-            // Are there humans left?
-            // TODO: see if this can be relaxed so we can run large
-            // AI-only simulations.
-            boolean human = false;
-            for (Player p : game.getPlayers()) {
-                if (!p.isDead() && !p.isAI()
-                    && ((ServerPlayer) p).isConnected()) {
-                    human = true;
-                    break;
-                }
-            }
-            if (!human) {
-                if (debugOnlyAITurns > 0) { // Complete debug runs
-                    FreeColDebugger.signalEndDebugRun();
-                }
-                game.setCurrentPlayer(null);
-
-                ChangeSet cs = new ChangeSet();
-                cs.addTrivial(See.all(), "gameEnded",
-                              ChangePriority.CHANGE_NORMAL);
-                sendToOthers(serverPlayer, cs);
-                return cs.build(serverPlayer);
-            }
 
             // Check for new turn
             ChangeSet cs = new ChangeSet();
@@ -781,6 +747,41 @@ public final class InGameController extends Controller {
                 ((ServerPlayer)player).csEmigrate(0, MigrationType.SURVIVAL,
                                                   random, cs);
                 break;
+            }
+            // Are there humans left?
+            // TODO: see if this can be relaxed so we can run large
+            // AI-only simulations.
+            boolean human = false;
+            for (Player p : game.getPlayers()) {
+                if (!p.isDead() && !p.isAI()
+                    && ((ServerPlayer)p).isConnected()) {
+                    human = true;
+                    break;
+                }
+            }
+            if (!human) {
+                if (debugOnlyAITurns > 0) { // Complete debug runs
+                    FreeColDebugger.signalEndDebugRun();
+                }
+                game.setCurrentPlayer(null);
+
+                cs.addTrivial(See.all(), "gameEnded",
+                              ChangePriority.CHANGE_NORMAL);
+                sendToOthers(serverPlayer, cs);
+                return cs.build(serverPlayer);
+            }
+
+            // Has the player won?
+            // Do not end single player games where an AI has won,
+            // that would stop revenge mode.
+            if (winner == player
+                && !(freeColServer.isSinglePlayer() && winner.isAI())) {
+                boolean highScore = !winner.isAI()
+                    && HighScore.newHighScore((ServerPlayer)winner);
+                cs.addTrivial(See.all(), "gameEnded",
+                              ChangePriority.CHANGE_NORMAL,
+                              "highScore", String.valueOf(highScore),
+                              "winner", winner.getId());
             }
 
             // Do "new turn"-like actions that need to wait until right
@@ -869,13 +870,15 @@ public final class InGameController extends Controller {
             // which conflict with these updates.  Finally return to the
             // current player which requested the end-of-turn, unless
             // it is doing a debug run.
-            sendToList(getOtherPlayers(serverPlayer, (ServerPlayer)player), cs);
-            sendElement((ServerPlayer)player, cs);
-            if (!player.isAI()
+            boolean debugSkip = !player.isAI()
                 && freeColServer.isSinglePlayer()
-                && debugOnlyAITurns > 0) {
+                && debugOnlyAITurns > 0;
+            sendToList(getOtherPlayers(serverPlayer, (ServerPlayer)player), cs);
+            if (debugSkip) {
+                sendElement(serverPlayer, cs);
                 continue;
             }
+            sendElement((ServerPlayer)player, cs);
             return cs.build(serverPlayer);
         }
     }
@@ -1184,28 +1187,13 @@ public final class InGameController extends Controller {
     }
 
     /**
-     * Check the high scores.
-     *
-     * @param serverPlayer The <code>ServerPlayer</code> that is retiring.
-     * @return An element indicating the players high score state.
-     */
-    public Element checkHighScore(ServerPlayer serverPlayer) {
-        serverPlayer.updateScore();
-        boolean highScore = getFreeColServer().newHighScore(serverPlayer);
-        ChangeSet cs = new ChangeSet();
-        cs.addAttribute(See.only(serverPlayer),
-                        "highScore", Boolean.toString(highScore));
-        return cs.build(serverPlayer);
-    }
-
-    /**
      * Handle a player retiring.
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is retiring.
      * @return An element cleaning up the player.
      */
     public Element retire(ServerPlayer serverPlayer) {
-        boolean highScore = getFreeColServer().newHighScore(serverPlayer);
+        boolean highScore = HighScore.newHighScore(serverPlayer);
         ChangeSet cs = new ChangeSet();
         serverPlayer.csWithdraw(cs); // Clean up the player.
         sendToOthers(serverPlayer, cs);
@@ -1237,13 +1225,12 @@ public final class InGameController extends Controller {
                 .setValue(false);
             spec.getBooleanOption(GameOptions.VICTORY_DEFEAT_HUMANS)
                 .setValue(false);
-            // The victory panel is shown after end turn, end turn again
-            // to start turn of next player.
-            reply = endTurn((ServerPlayer) game.getCurrentPlayer());
+            logger.info("Disabled victory conditions, as "
+                        + serverPlayer.getName()
+                        + " has won, but is continuing to play.");
         }
-        return reply;
+        return null;
     }
-
 
     /**
      * Cash in a treasure train.
@@ -4220,12 +4207,15 @@ public final class InGameController extends Controller {
      * @return An <code>Element</code> encapsulating this action.
      */
     public Element getHighScores(ServerPlayer serverPlayer) {
+        List<HighScore> scores = HighScore.loadHighScores();
         ChangeSet cs = new ChangeSet();
         cs.addTrivial(See.only(serverPlayer), "getHighScores",
                       ChangePriority.CHANGE_NORMAL);
         Element reply = cs.build(serverPlayer);
-        for (HighScore score : getFreeColServer().getHighScores()) {
-            reply.appendChild(score.toXMLElement(reply.getOwnerDocument()));
+        if (scores != null) {
+            for (HighScore score : scores) {
+                reply.appendChild(score.toXMLElement(reply.getOwnerDocument()));
+            }
         }
         return reply;
     }

@@ -98,6 +98,7 @@ import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.HighScore;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelMessage;
@@ -1407,9 +1408,9 @@ public class GUI {
         return canvas.showGameOptionsDialog(editable, custom);
     }
 
-    public void showHighScoresPanel(String messageId) {
+    public void showHighScoresPanel(String messageId, List<HighScore> scores) {
         if (canvas == null) return;
-        canvas.showHighScoresPanel(messageId);
+        canvas.showHighScoresPanel(messageId, scores);
     }
 
     public void showIndianSettlementPanel(IndianSettlement indianSettlement) {
@@ -1786,9 +1787,13 @@ public class GUI {
                                               canEstablish, canDenounce);
     }
 
-    public boolean showVictoryDialog() {
-        if (canvas == null) return true;
-        return canvas.showVictoryDialog();
+    public void showVictoryDialog() {
+        if (canvas == null) return;
+        canvas.showVictoryDialog(new DialogHandler<Boolean>() {
+                public void handle(Boolean result) {
+                    igc().victory(result);
+                }
+            });
     }
 
     public boolean showWarehouseDialog(Colony colony) {

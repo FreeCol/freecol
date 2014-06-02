@@ -161,6 +161,7 @@ import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.HighScore;
 import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
@@ -1695,6 +1696,7 @@ public final class Canvas extends JDesktopPane {
      * Display the EndTurnDialog with given units that could still move.
      *
      * @param units A list of <code>Unit</code>s that could still move.
+     * @param handler A <code>DialogHandler</code> for the dialog response.
      */
     public void showEndTurnDialog(List<Unit> units,
                                   DialogHandler<Boolean> handler) {
@@ -1826,9 +1828,10 @@ public final class Canvas extends JDesktopPane {
      * Displays the high scores panel.
      *
      * @param messageId An optional message to add to the high scores panel.
+     * @param scores The list of <code>HighScore</code>s to display.
      */
-    public void showHighScoresPanel(String messageId) {
-        showSubPanel(new ReportHighScoresPanel(freeColClient, messageId),
+    public void showHighScoresPanel(String messageId, List<HighScore> scores) {
+        showSubPanel(new ReportHighScoresPanel(freeColClient, messageId, scores),
                      PopupPosition.ORIGIN, false);
     }
 
@@ -2734,9 +2737,13 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Display the victory dialog.
+     *
+     * @param handler A <code>DialogHandler</code> for the dialog response.
      */
-    public boolean showVictoryDialog() {
-        return showFreeColDialog(new VictoryDialog(freeColClient), null);
+    public void showVictoryDialog(DialogHandler<Boolean> handler) {
+        SwingUtilities.invokeLater(
+            new DialogCallback<Boolean>(new VictoryDialog(freeColClient),
+                                        null, handler));
     }
 
     /**

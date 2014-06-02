@@ -3272,10 +3272,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             
         // Get it off the map and off the owners list.
         settlement.exciseSettlement();//-vis(owner),-til
-        if (!owner.removeSettlement(settlement)) {
-            throw new IllegalStateException("Failed to remove settlement: "
-                + settlement);
-        }
+        owner.removeSettlement(settlement);
         if (owner.hasSettlement(settlement)) {
             throw new IllegalStateException("Still has settlement: "
                 + settlement);

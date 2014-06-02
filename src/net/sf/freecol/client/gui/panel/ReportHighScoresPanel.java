@@ -25,7 +25,6 @@ import java.util.List;
 
 import javax.swing.JLabel;
 
-import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -34,32 +33,31 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Turn;
 
+import net.miginfocom.swing.MigLayout;
+
 
 /**
  * This panel displays the high scores.
  */
 public final class ReportHighScoresPanel extends ReportPanel {
 
-
     /**
      * Creates the high scores report.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param prefix An optional message to add at the top of the panel.
+     * @param highScores The list of <code>HighScore</code>s.
      */
-    public ReportHighScoresPanel(FreeColClient freeColClient, String prefix) {
+    public ReportHighScoresPanel(FreeColClient freeColClient, String prefix,
+                                 List<HighScore> highScores) {
         super(freeColClient, Messages.message("reportHighScoresAction.name"));
 
-        // Display Panel
         reportPanel.removeAll();
-
-        List<HighScore> highScores = getController().getHighScores();
-
-        reportPanel.setLayout(new MigLayout("wrap 3, gapx 30", "[][][align right]", ""));
-
+        reportPanel.setLayout(new MigLayout("wrap 3, gapx 30",
+                                            "[][][align right]", ""));
         if (prefix != null) {
-            reportPanel.add(new JLabel(Messages.message(prefix)),
-                "span, wrap 10");
+            reportPanel.add(localizedLabel(prefix),
+                            "span, wrap 10");
         }
 
         for (HighScore highScore : highScores) {
@@ -67,74 +65,57 @@ public final class ReportHighScoresPanel extends ReportPanel {
             scoreValue.setFont(GUI.SMALL_HEADER_FONT);
             reportPanel.add(scoreValue);
 
-            String messageID = null;
-            if (highScore.getIndependenceTurn() > 0) {
-                messageID = "report.highScores.president";
-            } else {
-                messageID = "report.highScores.governor";
-            }
-            String country = highScore.getNewLandName();
-            JLabel headline = localizedLabel(Messages.message(StringTemplate.template(messageID)
-                                                              .addName("%name%", highScore.getPlayerName())
-                                                              .addName("%nation%", country)));
+            String messageId = (highScore.getIndependenceTurn() > 0)
+                ? "report.highScores.president"
+                : "report.highScores.governor";
+            StringTemplate template = StringTemplate.template(messageId)
+                .addName("%name%", highScore.getPlayerName())
+                .addName("%nation%", highScore.getNewLandName());
+            JLabel headline = localizedLabel(template);
             headline.setFont(GUI.SMALL_HEADER_FONT);
-            reportPanel.add(headline, "span, wrap 10");
-
-            reportPanel.add(new JLabel(Messages.message("report.highScores.turn")), "skip");
+            reportPanel.add(headline,
+                            "span, wrap 10");
+            reportPanel.add(localizedLabel("report.highScores.turn"),
+                            "skip");
             int retirementTurn = highScore.getRetirementTurn();
-            String retirementTurnStr = (retirementTurn <= 0)
-                ? Messages.message("N/A")
-                : Messages.message(Turn.getLabel(retirementTurn));
-            reportPanel.add(new JLabel(retirementTurnStr));
-
-            reportPanel.add(new JLabel(Messages.message("report.highScores.score")), "skip");
+            reportPanel.add((retirementTurn <= 0)
+                ? localizedLabel("notApplicable.short")
+                : localizedLabel(Turn.getLabel(retirementTurn)));
+            reportPanel.add(localizedLabel("report.highScores.score"),
+                            "skip");
             reportPanel.add(new JLabel(String.valueOf(highScore.getScore())));
-
-            reportPanel.add(new JLabel(Messages.message("report.highScores.difficulty")), "skip");
-            reportPanel.add(new JLabel(Messages.message(highScore.getDifficulty())));
-
-            reportPanel.add(new JLabel(Messages.message("report.highScores.independence")), "skip");
+            reportPanel.add(localizedLabel("report.highScores.difficulty"),
+                            "skip");
+            reportPanel.add(new JLabel(Messages.getName(highScore.getDifficulty())));
+            reportPanel.add(localizedLabel("report.highScores.independence"),
+                            "skip");
             int independenceTurn = highScore.getIndependenceTurn();
-            String independence = (independenceTurn <= 0)
-                ? Messages.message("no")
-                : Messages.message(Turn.getLabel(independenceTurn));
-            reportPanel.add(new JLabel(independence));
-
-            reportPanel.add(new JLabel(Messages.message("report.highScores.nation")), "skip");
-            if (highScore.getIndependenceTurn() > 0) {
-                reportPanel.add(new JLabel(highScore.getNationName()));
-            } else {
-                reportPanel.add(new JLabel(Messages.message(highScore.getOldNationNameKey())));
-            }
-
-            reportPanel.add(new JLabel(Messages.message("report.highScores.nationType")), "skip");
-            reportPanel.add(new JLabel(Messages.message(highScore.getNationTypeId() + ".name")));
-
-            reportPanel.add(new JLabel(Messages.message("report.highScores.units")), "skip");
+            reportPanel.add((independenceTurn <= 0)
+                ? localizedLabel("no")
+                : localizedLabel(Turn.getLabel(independenceTurn)));
+            reportPanel.add(localizedLabel("report.highScores.nation"),
+                            "skip");
+            reportPanel.add(new JLabel((highScore.getIndependenceTurn() > 0)
+                    ? highScore.getNationName()
+                    : highScore.getOldNationNameKey()));
+            reportPanel.add(localizedLabel("report.highScores.nationType"),
+                            "skip");
+            reportPanel.add(localizedLabel(highScore.getNationTypeId() + ".name"));
+            reportPanel.add(localizedLabel("report.highScores.units"),
+                            "skip");
             reportPanel.add(new JLabel(String.valueOf(highScore.getUnits())));
 
-            reportPanel.add(new JLabel(Messages.message("report.highScores.colonies")), "skip");
+            reportPanel.add(localizedLabel("report.highScores.colonies"),
+                            "skip");
             reportPanel.add(new JLabel(String.valueOf(highScore.getColonies())));
-
-            reportPanel.add(new JLabel(Messages.message("report.highScores.retired")), "skip");
-            DateFormat format = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
-            reportPanel.add(new JLabel(format.format(highScore.getDate())), "wrap 20");
+            reportPanel.add(localizedLabel("report.highScores.retired"),
+                            "skip");
+            DateFormat format = DateFormat
+                .getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
+            reportPanel.add(new JLabel(format.format(highScore.getDate())),
+                            "wrap 20");
         }
 
         reportPanel.doLayout();
-    }
-
-
-    // Interface ActionListener
-
-    /**
-     * {@inheritDoc}
-     */
-    public void actionPerformed(ActionEvent event) {
-        super.actionPerformed(event);
-        if (getFreeColClient().getMyPlayer()
-            .getPlayerType() == Player.PlayerType.RETIRED) {
-            getFreeColClient().quit();
-        }
     }
 }
