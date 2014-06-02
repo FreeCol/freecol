@@ -316,15 +316,6 @@ public class DebugMenu extends JMenu {
             });
         panelMenu.add(monarchDialog);
 
-        final JMenuItem victoryPanel = new JMenuItem(
-            Messages.message("menuBar.debug.displayVictoryPanel"));
-        victoryPanel.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    gui.showVictoryPanel();
-                }
-            });
-        panelMenu.add(victoryPanel);
-
         final JMenuItem errorMessage = new JMenuItem(
             Messages.message("menuBar.debug.displayErrorMessage"));
         errorMessage.addActionListener(new ActionListener() {

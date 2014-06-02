@@ -117,11 +117,6 @@ public final class InGameInputHandler extends InputHandler {
                 igc().reconnect();
             }
         };
-    private final Runnable showVictoryPanelRunnable = new Runnable() {
-            public void run() {
-                getGUI().showVictoryPanel();
-            }
-        };
     private final Runnable updateMenuBarRunnable = new Runnable() {
             public void run() {
                 getGUI().updateMenuBar();
@@ -816,8 +811,12 @@ public final class InGameInputHandler extends InputHandler {
                                              Player.class);
 
         if (winner == freeColClient.getMyPlayer()) {
-            SwingUtilities.invokeLater(showVictoryPanelRunnable);
-        } // else: The client has already received the message of defeat.
+            invokeAndWait(new Runnable() {
+                    public void run() {
+                        igc().victory();
+                    }
+                });
+        }
         return null;
     }
 

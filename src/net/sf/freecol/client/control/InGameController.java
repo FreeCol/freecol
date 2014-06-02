@@ -4534,6 +4534,20 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
+     * The player has won!
+     */
+    public void victory() {
+        boolean high = askServer().checkHighScore();
+        gui.showHighScoresPanel((high) ? "highscores.yes" : "highscores.no");
+        boolean quit = gui.showVictoryDialog();
+        if (quit) {
+            freeColClient.quit();
+        } else {
+            askServer().continuePlaying();
+        }
+    }
+        
+    /**
      * Tell a unit to wait.
      */
     public void waitActiveUnit() {

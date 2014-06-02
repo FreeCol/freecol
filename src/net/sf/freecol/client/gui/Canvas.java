@@ -144,7 +144,7 @@ import net.sf.freecol.client.gui.panel.TilePanel;
 import net.sf.freecol.client.gui.panel.TradeRoutePanel;
 import net.sf.freecol.client.gui.panel.TradeRouteInputPanel;
 import net.sf.freecol.client.gui.panel.TrainPanel;
-import net.sf.freecol.client.gui.panel.VictoryPanel;
+import net.sf.freecol.client.gui.panel.VictoryDialog;
 import net.sf.freecol.client.gui.panel.WarehouseDialog;
 import net.sf.freecol.client.gui.panel.WorkProductionPanel;
 import net.sf.freecol.client.gui.video.VideoComponent;
@@ -2733,10 +2733,10 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Display the victory panel.
+     * Display the victory dialog.
      */
-    public void showVictoryPanel() {
-        showSubPanel(new VictoryPanel(freeColClient), true);
+    public boolean showVictoryDialog() {
+        return showFreeColDialog(new VictoryDialog(freeColClient), null);
     }
 
     /**

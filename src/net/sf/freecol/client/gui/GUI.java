@@ -1786,9 +1786,9 @@ public class GUI {
                                               canEstablish, canDenounce);
     }
 
-    public void showVictoryPanel() {
-        if (canvas == null) return;
-        canvas.showVictoryPanel();
+    public boolean showVictoryDialog() {
+        if (canvas == null) return true;
+        return canvas.showVictoryDialog();
     }
 
     public boolean showWarehouseDialog(Colony colony) {
