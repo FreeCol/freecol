@@ -449,10 +449,6 @@ public class Player extends FreeColGameObject implements Nameable {
     // Constants
     //
 
-    /** An ability to apply post-declaration. */
-    public static final Ability ABILITY_INDEPENDENCE_DECLARED
-        = new Ability(Ability.INDEPENDENCE_DECLARED, true);
-
     /** A comparator for ordering players. */
     public static final Comparator<Player> playerComparator
         = new Comparator<Player>() {
@@ -3911,25 +3907,6 @@ public class Player extends FreeColGameObject implements Nameable {
         return featureContainer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Set<Ability> getAbilitySet(String id, FreeColGameObjectType fcgot,
-                                      Turn turn) {
-        Set<Ability> result = super.getAbilitySet(id, fcgot, turn);
-        if (id == null || id == Ability.INDEPENDENCE_DECLARED) {
-            switch (playerType) {
-            case REBEL: case INDEPENDENT:
-                result.add(ABILITY_INDEPENDENCE_DECLARED);
-                break;
-            default: // No other special abilities, just silence the warning.
-                break;
-            }
-        }
-        return result;
-    }
-
 
     // Serialization
 
@@ -4238,6 +4215,14 @@ public class Player extends FreeColGameObject implements Nameable {
         super.readChildren(xr);
 
         recalculateBellsBonus(); // Bells bonuses depend on tax
+
+        // Regenerate magic abilities that are added at d-o-i.
+        switch (getPlayerType()) {
+        case REBEL: case INDEPENDENT:
+            addAbility(new Ability(Ability.INDEPENDENCE_DECLARED, true));
+            addAbility(new Ability(Ability.INDEPENDENT_NATION, true));
+            break;
+        }
     }
 
     /**
