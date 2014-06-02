@@ -183,7 +183,7 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @return The Mercenary Force.
      */
     public Force getMercenaryForce() {
-        return interventionForce;
+        return mercenaryForce;
     }
 
     /**
