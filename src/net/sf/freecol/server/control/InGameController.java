@@ -2883,7 +2883,7 @@ public final class InGameController extends Controller {
                     new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                                      "buildColony.others", settlement)
                         .addStringTemplate("%nation%", nation)
-                        .addName("%colony%", settlement.getLocationNameFor(sp))
+                        .addStringTemplate("%colony%", settlement.getLocationNameFor(sp))
                         .addName("%region%", tile.getRegion().getName()));
             }
         } else {
