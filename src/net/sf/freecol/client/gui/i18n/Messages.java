@@ -677,7 +677,7 @@ public class Messages {
                     .addAmount("%number%", number));
         }
         StringTemplate baseTemplate
-            = StringTemplate.template(typeId + ".name")
+            = StringTemplate.template(typeId + NAME_SUFFIX)
                 .addAmount("%number%", number);
         StringTemplate roleTemplate = StringTemplate.label("");
         String roleKey = Role.getRoleKey(roleId);
@@ -847,7 +847,7 @@ public class Messages {
         // Fall back to generic names.
         if (name == null) {
             String rtype = "model.region."
-                + regionType.toString().toLowerCase(Locale.US) + ".name";
+                + regionType.toString().toLowerCase(Locale.US) + NAME_SUFFIX;
             do {
                 name = message(StringTemplate.template("model.region.default")
                     .addStringTemplate("%nation%", player.getNationName())
