@@ -282,7 +282,11 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                     navy.add(aiu);
                     continue;
                 }
-                ship.setEntryLocation(t.getEntry());
+                if (teleport) {
+                    ship.setEntryLocation(t.disembarkTile);
+                } else {
+                    ship.setEntryLocation(t.getEntry());
+                }
                 sb.append("[").append(ship);
                 used = 0;
                 for (Unit u : aiu.getUnit().getUnitList()) {
