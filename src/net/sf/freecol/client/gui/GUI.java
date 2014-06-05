@@ -1367,8 +1367,10 @@ public class GUI {
         if (canvas == null) return;
         canvas.showEndTurnDialog(units,
             new DialogHandler<Boolean>() {
-                public void handle(Boolean result) {
-                    if (result) igc().endTurn();
+                public void handle(Boolean value) {
+                    if (value != null && value.booleanValue()) {
+                        igc().endTurn();
+                    }
                 }
             });
     }
