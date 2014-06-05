@@ -1156,8 +1156,7 @@ public class InGameControllerTest extends FreeColTestCase {
         // the new nation name or combat crashes in message generation.
         assertFalse("Colonial Regulars should not yet be available",
                     colonialType.isAvailableTo(dutch));
-        dutch.setPlayerType(PlayerType.REBEL);
-        dutch.addAbility(new Ability(Ability.INDEPENDENCE_DECLARED));
+        dutch.changePlayerType(PlayerType.REBEL);
         dutch.setIndependentNationName("Vrije Nederlands");
         assertTrue("Colonial Regulars should be available",
                    colonialType.isAvailableTo(dutch));

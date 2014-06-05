@@ -83,7 +83,7 @@ public class MonarchTest extends FreeColTestCase {
         assertTrue(choicesContain(choices, MonarchAction.LOWER_TAX_WAR));
         assertTrue(choicesContain(choices, MonarchAction.LOWER_TAX_OTHER));
 
-        dutch.setPlayerType(Player.PlayerType.REBEL);
+        dutch.changePlayerType(Player.PlayerType.REBEL);
         choices = dutch.getMonarch().getActionChoices();
         assertTrue(choices.isEmpty());
 

@@ -157,10 +157,10 @@ public final class InGameController extends Controller {
     public static final Turn.Season SCORE_INDEPENDENCE_SEASON
         = Turn.Season.SPRING;
     
-    // The server random number source.
+    /** The server random number source. */
     private final Random random;
 
-    // Debug helpers
+    /** Debug helpers, do not serialize. */
     private int debugOnlyAITurns = 0;
     private MonarchAction debugMonarchAction = null;
     private ServerPlayer debugMonarchPlayer = null;
@@ -895,7 +895,7 @@ public final class InGameController extends Controller {
     private void csGiveIndependence(ServerPlayer serverPlayer,
                                     ServerPlayer independent, ChangeSet cs) {
         serverPlayer.csChangeStance(Stance.PEACE, independent, true, cs);
-        independent.setPlayerType(PlayerType.INDEPENDENT);
+        independent.changePlayerType(PlayerType.INDEPENDENT);
         Game game = getGame();
         Turn turn = game.getTurn();
         independent.setTax(0);
@@ -1299,7 +1299,7 @@ public final class InGameController extends Controller {
         StringTemplate oldNation = serverPlayer.getNationName();
         serverPlayer.setIndependentNationName(nationName);
         serverPlayer.setNewLandName(countryName);
-        serverPlayer.setPlayerType(PlayerType.REBEL);
+        serverPlayer.changePlayerType(PlayerType.REBEL);
 
         // Do not add history event to cs as we are going to update the
         // entire player.  Likewise clear model messages.
@@ -4307,7 +4307,7 @@ public final class InGameController extends Controller {
                 "Choose undead army", random, landUnits.size()));
         new ServerUnit(game, theFlyingDutchman, serverPlayer, landType);//-vis
         serverPlayer.setDead(false);
-        serverPlayer.setPlayerType(PlayerType.UNDEAD);
+        serverPlayer.changePlayerType(PlayerType.UNDEAD);
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
 
         // No one likes the undead.

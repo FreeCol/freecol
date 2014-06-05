@@ -1031,8 +1031,31 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param type The new player type.
      * @see #getPlayerType
      */
-    public void setPlayerType(PlayerType type) {
+    private void setPlayerType(PlayerType type) {
         playerType = type;
+    }
+
+    /**
+     * Change the player type.
+     *
+     * Handle special abilities that are added following declaration
+     * of independence.  Do not bother removing them ATM, only cases are
+     * when going undead and retiring where they are moot.
+     *
+     * @param type The new player type.
+     */
+    public void changePlayerType(PlayerType type) {
+        if (playerType != PlayerType.REBEL
+            && playerType != PlayerType.INDEPENDENT) {
+            switch (type) {
+            case REBEL: case INDEPENDENT:
+                addAbility(new Ability(Ability.INDEPENDENCE_DECLARED, true));
+                addAbility(new Ability(Ability.INDEPENDENT_NATION, true));
+                break;
+            }
+        }
+
+        setPlayerType(type);
     }
 
     /**
@@ -4166,8 +4189,8 @@ public class Player extends FreeColGameObject implements Nameable {
 
         tax = xr.getAttribute(TAX_TAG, 0);
 
-        playerType = xr.getAttribute(PLAYER_TYPE_TAG,
-                                     PlayerType.class, (PlayerType)null);
+        changePlayerType(xr.getAttribute(PLAYER_TYPE_TAG,
+                                         PlayerType.class, (PlayerType)null));
 
         currentFather = xr.getType(spec, CURRENT_FATHER_TAG,
                                    FoundingFather.class, (FoundingFather)null);
@@ -4215,14 +4238,6 @@ public class Player extends FreeColGameObject implements Nameable {
         super.readChildren(xr);
 
         recalculateBellsBonus(); // Bells bonuses depend on tax
-
-        // Regenerate magic abilities that are added at d-o-i.
-        switch (getPlayerType()) {
-        case REBEL: case INDEPENDENT:
-            addAbility(new Ability(Ability.INDEPENDENCE_DECLARED, true));
-            addAbility(new Ability(Ability.INDEPENDENT_NATION, true));
-            break;
-        }
     }
 
     /**

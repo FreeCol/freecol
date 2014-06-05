@@ -419,7 +419,8 @@ public final class UnitType extends BuildableType
      * @param player The <code>Player</code> to check.
      * @return Any <code>UnitTypeChange</code> found, or null if none.
      */
-    public UnitTypeChange getUnitTypeChange(ChangeType changeType, Player player) {
+    public UnitTypeChange getUnitTypeChange(ChangeType changeType,
+                                            Player player) {
         for (UnitTypeChange change : getTypeChanges()) {
             if (change.asResultOf(changeType) && change.appliesTo(player)) {
                 UnitType result = change.getNewUnitType();
@@ -437,9 +438,7 @@ public final class UnitType extends BuildableType
      */
     public UnitTypeChange getUnitTypeChange(UnitType newType) {
         for (UnitTypeChange change : getTypeChanges()) {
-            if (change.getNewUnitType() == newType) {
-                return change;
-            }
+            if (change.getNewUnitType() == newType) return change;
         }
         return null;
     }
