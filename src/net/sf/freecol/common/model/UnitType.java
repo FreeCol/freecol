@@ -34,8 +34,7 @@ import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 /**
  * The various types of units in FreeCol.
  */
-public final class UnitType extends BuildableType
-    implements Comparable<UnitType>, Consumer {
+public final class UnitType extends BuildableType implements Consumer {
 
     /** The default offence value. */
     public static final int DEFAULT_OFFENCE = 0;
@@ -591,14 +590,22 @@ public final class UnitType extends BuildableType
     }
 
 
-    // Interface Comparable
+    // Override FreeColObject
 
     /**
      * {@inheritDoc}
      */
-    public int compareTo(UnitType other) {
-        return getIndex() - other.getIndex();
+    @Override
+    public int compareTo(FreeColObject other) {
+        int cmp = 0;
+        if (other instanceof UnitType) {
+            UnitType ut = (UnitType)other;
+            cmp = getIndex() - ut.getIndex();
+        }
+        if (cmp == 0) cmp = super.compareTo(other);
+        return cmp;
     }
+
 
     // Interface Consumer
 

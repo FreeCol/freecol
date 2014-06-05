@@ -110,6 +110,8 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
             this.locale = newLocale;
         }
 
+        // Implement Comparable<Language>
+
         /**
          * {@inheritDoc}
          */

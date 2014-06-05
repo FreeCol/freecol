@@ -81,6 +81,8 @@ public class ForestMaker {
             this.y = y;
         }
 
+        // Implement Comparable<ImageLocation>
+
         public int compareTo(ImageLocation other) {
             int dy = other.y - this.y;
             if (dy == 0) {

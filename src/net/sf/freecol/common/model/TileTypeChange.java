@@ -102,20 +102,17 @@ public class TileTypeChange implements Comparable<TileTypeChange> {
     // Interface Comparable<TileTypeChange>
 
     /**
-     * Compares this object with the specified object.
-     *
-     * @param other The <code>TileTypeChange</code> to compare to.
-     * @return A comparison result.
+     * {@inheritDoc}
      */
     public int compareTo(TileTypeChange other) {
         int cmp;
         cmp = (from == null) ? ((other.from == null) ? 0 : -1)
             : (other.from == null) ? 1
-            : from.getId().compareTo(other.from.getId());
+            : FreeColObject.compareIds(from, other.from);
         if (cmp != 0) return cmp;
         cmp = (to == null) ? ((other.to == null) ? 0 : -1)
             : (other.to == null) ? 1
-            : to.getId().compareTo(other.to.getId());
+            : FreeColObject.compareIds(to, other.to);
         return cmp;
     }
 

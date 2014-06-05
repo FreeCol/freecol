@@ -120,7 +120,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
             }
         }
 
-        // Interface Comparable<TargetTuple>
+        // Implement Comparable<TargetTuple>
 
         public int compareTo(TargetTuple other) {
             double cmp = other.score - score;

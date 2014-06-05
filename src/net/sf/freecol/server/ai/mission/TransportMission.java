@@ -281,17 +281,6 @@ public class TransportMission extends Mission {
         }
 
         /**
-         * Compares this cargo to another.  Cargoes that reduce the
-         * cargo amount should sort before those that do not.
-         *
-         * @param other The other <code>Cargo</code> to compare to.
-         * @return A comparison result.
-         */
-        public int compareTo(Cargo other) {
-            return getNewSpace() - other.getNewSpace();
-        }
-
-        /**
          * Sets the target for this cargo, possibly also changing its mode.
          *
          * @return A reason the targeting failed, null if it succeeded.
@@ -450,6 +439,18 @@ public class TransportMission extends Mission {
                 return "carrier usurped"; // On another carrier!
             }
             return null;
+        }
+
+
+        // Implement Comparable<Cargo>
+
+        /**
+         * {@inheritDoc}
+         */
+        public int compareTo(Cargo other) {
+            // Cargoes that reduce the carried amount should sort
+            // before those that do not.
+            return getNewSpace() - other.getNewSpace();
         }
 
         /**

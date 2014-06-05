@@ -4102,8 +4102,8 @@ public class Player extends FreeColGameObject implements Nameable {
             for (ModelMessage m : getModelMessages()) m.toXML(xw);
 
             if (lastSales != null) {
-                for (LastSale sale : getSortedCopy(lastSales.values())) {
-                    sale.toXML(xw);
+                for (LastSale ls : getSortedCopy(lastSales.values())) {
+                    ls.toXML(xw);
                 }
             }
 

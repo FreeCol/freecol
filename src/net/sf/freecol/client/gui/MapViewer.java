@@ -122,6 +122,8 @@ public final class MapViewer {
             this.index = index;
         }
 
+        // Implement Comparable<SortableImage>
+
         public int compareTo(SortableImage other) {
             return other.index - this.index;
         }

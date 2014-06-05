@@ -70,6 +70,8 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
             return mixerInfo;
         }
 
+        // Implement Comparable<MixerWrapper>
+
         public int compareTo(MixerWrapper mw) {
             return getKey().compareTo(mw.getKey());
         }

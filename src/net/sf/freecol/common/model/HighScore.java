@@ -46,7 +46,7 @@ import org.w3c.dom.Element;
 /**
  * A FreeCol high score record.
  */
-public class HighScore extends FreeColObject implements Comparable<HighScore> {
+public class HighScore extends FreeColObject {
 
     private static final Logger logger = Logger.getLogger(HighScore.class.getName());
 
@@ -452,13 +452,20 @@ public class HighScore extends FreeColObject implements Comparable<HighScore> {
     }
 
 
-    // Implement Comparable<HighScore>
+    // Override FreeColObject
 
     /**
      * {@inheritDoc}
      */
-    public int compareTo(HighScore other) {
-        return other.getScore() - getScore();
+    @Override
+    public int compareTo(FreeColObject other) {
+        int cmp = 0;
+        if (other instanceof HighScore) {
+            HighScore hs = (HighScore)other;
+            cmp = hs.getScore() - getScore();
+        }
+        if (cmp == 0) cmp = super.compareTo(other);
+        return cmp;
     }
 
 

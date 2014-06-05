@@ -35,7 +35,8 @@ import net.sf.freecol.common.util.Utils;
 /**
  * Represents a building in a colony.
  */
-public class Building extends WorkLocation implements Named, Comparable<Building>, Consumer {
+public class Building extends WorkLocation
+    implements Named, Consumer {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(Building.class.getName());
@@ -361,16 +362,6 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     }
 
 
-    // Interface Comparable
-
-    /**
-     * {@inheritDoc}
-     */
-    public int compareTo(Building other) {
-        return getType().compareTo(other.getType());
-    }
-
-
     // Interface Location
     // Inherits:
     //   FreeColObject.getId
@@ -560,6 +551,20 @@ public class Building extends WorkLocation implements Named, Comparable<Building
                                         Turn turn) {
         // Buildings have no modifiers independent of type
         return getType().getModifierSet(id, fcgot, turn);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int compareTo(FreeColObject other) {
+        int cmp = 0;
+        if (other instanceof Building) {
+            Building building = (Building)other;
+            cmp = getType().compareTo(building.getType());
+        }
+        if (cmp == 0) cmp = super.compareTo(other);
+        return cmp;
     }
 
 

@@ -82,28 +82,6 @@ public class UnitWas implements Comparable<UnitWas> {
     }
 
     /**
-     * Compares this UnitWas with another.
-     *
-     * Order by decreasing capacity of the location the unit is to be
-     * moved to, so that if we traverse a sorted list of UnitWas we
-     * minimize the chance of a unit being moved to a full location.
-     * Unfortunately this also tends to move units that need equipment
-     * first, leading to failures to rearm, so it is best to make two
-     * passes anyway.  See revertAll() below.  However we can still
-     * try our best by using the amount of equipment the unit needs as
-     * a secondary criterion (favouring the least equipped).
-     *
-     * @param uw The <code>UnitWas</code> to compare to.
-     * @return A comparison result.
-     */
-    public int compareTo(UnitWas uw) {
-        int cmp = ((UnitLocation)uw.loc).getUnitCapacity()
-            - ((UnitLocation)this.loc).getUnitCapacity();
-        if (cmp != 0) return cmp;
-        return this.equipment.keySet().size() - uw.equipment.keySet().size();
-    }
-
-    /**
      * Fire any property changes resulting from actions of a unit.
      */
     public void fireChanges() {
@@ -203,6 +181,31 @@ public class UnitWas implements Comparable<UnitWas> {
         }
         return 0;
     }
+
+    // Implement Comparable<UnitWas>
+
+    /**
+     * {@inheritDoc}
+     */
+    public int compareTo(UnitWas uw) {
+        // Order by decreasing capacity of the location the unit is to
+        // be moved to, so that if we traverse a sorted list of
+        // UnitWas we minimize the chance of a unit being moved to a
+        // full location.
+        //
+        // Unfortunately this also tends to move units that need
+        // equipment first, leading to failures to rearm, so it is
+        // best to make two passes anyway.  See revertAll().  However
+        // we can still try our best by using the amount of equipment
+        // the unit needs as a secondary criterion (favouring the
+        // least equipped).
+        int cmp = ((UnitLocation)uw.loc).getUnitCapacity()
+            - ((UnitLocation)this.loc).getUnitCapacity();
+        if (cmp == 0) cmp = this.equipment.keySet().size()
+                          - uw.equipment.keySet().size();
+        return cmp;
+    }
+
 
     /**
      * {@inheritDoc}

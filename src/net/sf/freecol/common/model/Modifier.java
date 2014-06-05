@@ -23,6 +23,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
@@ -34,7 +35,7 @@ import org.w3c.dom.Element;
  * combat. The Modifier may be applicable only to certain Objects
  * specified by means of <code>Scope</code> objects.
  */
-public class Modifier extends Feature implements Comparable<Modifier> {
+public class Modifier extends Feature {
 
     public static final String AMPHIBIOUS_ATTACK
         = "model.modifier.amphibiousAttack";
@@ -472,18 +473,20 @@ public class Modifier extends Feature implements Comparable<Modifier> {
     }
 
 
-    // Implement Comparable<Modifier>
+    // Override FreeColObject
 
     /**
-     * Compares this object with the specified object for order.
-     *
-     * @param modifier The <code>Modifier</code> to compare to.
-     * @return A comparison result.
+     * {@inheritDoc}
      */
-    public int compareTo(Modifier modifier) {
-        int cmp = productionIndex - modifier.productionIndex;
-        if (cmp == 0) cmp = modifierType.compareTo(modifier.modifierType);
-        if (cmp == 0) cmp = getIdComparator().compare(this, modifier);
+    @Override
+    public int compareTo(FreeColObject other) {
+        int cmp = 0;
+        if (other instanceof Modifier) {
+            Modifier modifier = (Modifier)other;
+            cmp = productionIndex - modifier.productionIndex;
+            if (cmp == 0) cmp = modifierType.compareTo(modifier.modifierType);
+        }
+        if (cmp == 0) cmp = super.compareTo(other);
         return cmp;
     }
 

@@ -23,6 +23,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.FreeColObject;
 
 import org.w3c.dom.Element;
 
@@ -31,12 +32,9 @@ import org.w3c.dom.Element;
  * Abstract class of AI object with a simple enclosed comparable
  * integer value.
  */
-public abstract class ValuedAIObject extends AIObject
-    implements Comparable<ValuedAIObject> {
+public abstract class ValuedAIObject extends AIObject {
 
-    /**
-     * The value of this AIObject.
-     */
+    /** The value of this AIObject. */
     private int value;
 
 
@@ -107,16 +105,20 @@ public abstract class ValuedAIObject extends AIObject
     }
 
 
-    // Comparable interface
+    // Override FreeColObject
 
     /**
-     * Compare valued AI objects by value.
-     *
-     * @param other The other <code>ValuedAIObject</code>.
-     * @return A comparison value.
+     * {@inheritDoc}
      */
-    public final int compareTo(ValuedAIObject other) {
-        return other.value - this.value;
+    @Override
+    public int compareTo(FreeColObject other) {
+        int cmp = 0;
+        if (other instanceof ValuedAIObject) {
+            ValuedAIObject vao = (ValuedAIObject)other;
+            cmp = vao.value - this.value;
+        }
+        if (cmp == 0) cmp = super.compareTo(other);
+        return cmp;
     }
 
 

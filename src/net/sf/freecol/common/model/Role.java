@@ -38,7 +38,7 @@ import net.sf.freecol.common.util.Utils;
 /**
  * The role of a unit.
  */
-public class Role extends BuildableType implements Comparable<Role> {
+public class Role extends BuildableType {
 
     /** The ID of the default role. */
     public static final String DEFAULT_ID = "model.role.default";
@@ -288,18 +288,6 @@ public class Role extends BuildableType implements Comparable<Role> {
         return result;
     }
 
-    public int compareTo(Role other) {
-        int diff = other.getAbilityIndex() - this.getAbilityIndex();
-        if (diff == 0) {
-            diff = other.getRequiredGoods().size()
-                - this.getRequiredGoods().size();
-        }
-        if (diff == 0) {
-            getId().compareTo(other.getId());
-        }
-        return diff;
-    }
-
     private int getAbilityIndex() {
         if (requiresAbility(Ability.NATIVE)) {
             return 10;
@@ -348,6 +336,27 @@ public class Role extends BuildableType implements Comparable<Role> {
         // abilities required.
         throw new RuntimeException("isAvailableTo inappropriate for Role: "
             + this);
+    }
+
+
+    // Override BuildingType
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int compareTo(FreeColObject other) {
+        int cmp = 0;
+        if (other instanceof Role) {
+            Role role = (Role)other;
+            cmp = role.getAbilityIndex() - this.getAbilityIndex();
+            if (cmp == 0) {
+                cmp = role.getRequiredGoods().size()
+                    - this.getRequiredGoods().size();
+            }
+        }
+        if (cmp == 0) cmp = super.compareTo(other);
+        return cmp;
     }
 
 

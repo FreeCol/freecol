@@ -67,7 +67,8 @@ import org.xml.sax.SAXException;
  * The FreeCol root class.  Maintains an identifier, and an optional link
  * to the specification this object uses.
  */
-public abstract class FreeColObject implements ObjectWithId {
+public abstract class FreeColObject
+    implements Comparable<FreeColObject>, ObjectWithId {
 
     protected static Logger logger = Logger.getLogger(FreeColObject.class.getName());
 
@@ -189,16 +190,13 @@ public abstract class FreeColObject implements ObjectWithId {
     }
 
     /**
-     * Get a comparator by object identifier for <code>FreeColObject</code>s.
+     * Base for Comparable implementations.
      *
-     * @return A new object identifier comparator.
+     * @param other The other <code>FreeColObject</code> subclass to compare.
+     * @return The comparison result.
      */
-    public static <T extends FreeColObject> Comparator<T> getIdComparator() {
-        return new Comparator<T>() {
-            public int compare(T fco1, T fco2) {
-                return compareIds((FreeColObject)fco1, (FreeColObject)fco2);
-            }
-        };
+    public int compareTo(FreeColObject other) {
+        return compareIds(this, other);
     }
 
     /**
@@ -209,7 +207,7 @@ public abstract class FreeColObject implements ObjectWithId {
      */
     public static <T extends FreeColObject> List<T> getSortedCopy(Collection<T> c) {
         List<T> newC = new ArrayList<T>(c);
-        Collections.sort(newC, getIdComparator());
+        Collections.sort(newC); // Use natural order if implemented.
         return newC;
     }
 

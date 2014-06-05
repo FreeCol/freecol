@@ -35,8 +35,7 @@ import net.sf.freecol.common.model.UnitLocation.NoAddReason;
  * {@link Building}, such as the number of workplaces, and the types
  * of goods it produces and consumes.
  */
-public final class BuildingType extends BuildableType
-    implements Comparable<BuildingType> {
+public final class BuildingType extends BuildableType {
 
     /** The level of building. */
     private int level = 1;
@@ -346,18 +345,21 @@ public final class BuildingType extends BuildableType
     }
 
 
-    // Interface Comparable
+    // Override FreeColObject
 
     /**
-     * Compares this BuildingType to another.  BuildingTypes are
-     * simply sorted according to the order in which they are defined
-     * in the specification.
-     *
-     * @param other The other <code>BuildingType</code> to compare with.
-     * @return A comparison result.
+     * {@inheritDoc}
      */
-    public int compareTo(BuildingType other) {
-        return getIndex() - other.getIndex();
+    public int compareTo(FreeColObject other) {
+        int cmp = 0;
+        if (other instanceof BuildingType) {
+            BuildingType bt = (BuildingType)other;
+            // BuildingTypes are simply sorted according to the order in
+            // which they are defined in the specification.
+            cmp = getIndex() - bt.getIndex();
+        }
+        if (cmp == 0) cmp = super.compareTo(other);
+        return cmp;
     }
 
 
