@@ -20,13 +20,13 @@
 package net.sf.freecol.server.ai;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -43,8 +43,10 @@ import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
+import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
 import net.sf.freecol.server.ai.mission.Mission;
 import net.sf.freecol.server.ai.mission.TransportMission;
@@ -99,20 +101,23 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         public PathNode path;
         public double score;
         public Tile disembarkTile;
+        public Tile entry;
 
         public TargetTuple(Colony colony, PathNode path, double score) {
             this.colony = colony;
             this.path = path;
             this.score = score;
             this.disembarkTile = null;
-        }
-
-        public Tile getEntry() {
-            for (PathNode p = path; p != null; p = p.next) {
-                Tile t = p.getTile();
-                if (t != null) return t;
+            this.entry = null;
+            if (path != null) {
+                for (PathNode p = path; p != null; p = p.next) {
+                    Tile t = p.getTile();
+                    if (t != null) {
+                        this.entry = t;
+                        break;
+                    }
+                }
             }
-            return null;
         }
 
         // Interface Comparable<TargetTuple>
@@ -148,6 +153,11 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         // Increase score for drydock/s, musket and tools suppliers,
         // but decrease for fortifications.
         // TODO: use Modifiers?
+        final int percentTwiddle = 20; // Perturb score by +/-20%
+        int[] twiddle = Utils.randomInts(logger, "REF target twiddle",
+                                         getAIRandom(), 2*percentTwiddle+1,
+                                         targets.size());
+        int twidx = 0;
         for (TargetTuple t : targets) {
             t.score *= 0.01 * (101 - Math.min(100, t.colony.getSoL()));
             for (Building b : t.colony.getBuildings()) {
@@ -166,6 +176,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
             int stockade = (!t.colony.hasStockade()) ? 0
                 : t.colony.getStockade().getLevel();
             t.score *= (6 - stockade) / 6.0;
+            t.score *= 1.0 + 0.01 * (twiddle[twidx++] - percentTwiddle);
         }
         Collections.sort(targets);
 
@@ -205,6 +216,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
      */
     public boolean initialize(boolean teleport) {
         final AIMain aiMain = getAIMain();
+        final Random aiRandom = getAIRandom();
         // Find a representative offensive land unit to use to search
         // for the initial target.
         AIUnit aiUnit = null;
@@ -235,47 +247,101 @@ public class REFAIPlayer extends EuropeanAIPlayer {
             logger.warning("REF found no targets.");
             return false;
         }
+
         final Player rebel = targets.get(0).colony.getOwner();
         double ratio = getStrengthRatio(rebel);
-        int n = (ratio < 1.0) ? 1 // Just go for one place
-            : (ratio < 2.0) ? Math.min(2, targets.size())
-            : Math.min(3, targets.size());
+        int n = targets.size();
+        StringBuffer sb = new StringBuffer(256);
+        sb.append("REF attacking ").append(rebel.getName())
+            .append(" ratio=").append(ratio);
 
         // For each target search from the target position to find a
         // Tile to disembark to.  If teleporting in, the navy will
         // appear at this location, otherwise at the best entry
         // location for it.
+        int fail = 0;
         for (int i = 0; i < n; i++) {
             final TargetTuple t = targets.get(i);
-            Tile entry = t.getEntry();
             final GoalDecider gd = GoalDeciders
                 .getDisembarkGoalDecider(t.colony.getTile());
-            PathNode path = unit.search(entry, gd, null, 10, carrier);
+            PathNode path = unit.search(t.entry, gd, null, 10, carrier);
             if (path == null) {
-                logger.severe("Can not find suitable REF landing site for: "
-                    + t.colony);
-                return false;
+                t.disembarkTile = null;
+                fail++;
+            } else {
+                // Step forward to the point the unit is about to
+                // disembark.  This is where the carrier should teleport to.
+                t.disembarkTile = path.getTransportDropNode()
+                    .previous.getTile();
             }
-            // Step forward to the point the unit is about to disembark.
-            // This is where the carrier should teleport to.
-            while (path.isOnCarrier()) path = path.next;
-            t.disembarkTile = path.previous.getTile();
+        }
+        if (fail > 0) {
+            if (fail < n) { // Drop targets without a decent disembark tile
+                sb.append(" (");
+                int i = 0;
+                while (i < targets.size()) {
+                    final TargetTuple t = targets.get(i);
+                    if (t.disembarkTile == null) {
+                        sb.append(" ").append(t.colony.getName());
+                        targets.remove(i);
+                        n--;
+                    } else {
+                        i++;
+                    }
+                }
+                sb.append(")");
+            } else { // They were all bad, just use the existing simple path
+                for (int i = 0; i < n; i++) {
+                    final TargetTuple t = targets.get(i);
+                    t.disembarkTile = t.path.getTransportDropNode()
+                        .previous.getTile();
+                }
+            }
+        }
+        // Reset N, now we have eliminated bad landing sites.
+        n = (ratio < 1.0) ? 1 // Just go for one place
+            : (ratio < 2.0) ? Math.min(2, targets.size())
+            : Math.min(3, targets.size());
+        sb.append(" => #targets=").append(n);
+
+        if (!teleport) {
+            // Try to arrive on the map without being seen, while retaining
+            // a path to the disembark tile that is at worst one turn
+            // slower than the existing one.
+            GoalDecider stealthGD = GoalDeciders.getComposedGoalDecider(true,
+                GoalDeciders.getHighSeasGoalDecider(),
+                GoalDeciders.getStealthyGoalDecider(rebel));
+            for (int i = 0; i < n; i++) {
+                final TargetTuple t = targets.get(i);
+                if (!rebel.canSee(t.entry)) continue;
+                PathNode path = carrier.search(t.disembarkTile, stealthGD,
+                    CostDeciders.avoidSettlementsAndBlockingUnits(),
+                    t.path.getTotalTurns() + 1, null);
+                if (path != null) {
+                    t.entry = path.getLastNode().getTile();
+                    t.score *= 1.5; // Prefer invisible paths
+                }
+            }
+            Collections.sort(targets); // Re-sort with new scores
         }
 
         // Give the land units seek-and-destroy missions for the
         // target.  A valid target is needed before giving the carrier
         // a valid transport missions.  Send roughly 2/3 of the force
         // at the best target, decreasing from there.
-        StringBuffer sb = new StringBuffer(256);
         List<AIUnit> navy = new ArrayList<AIUnit>();
+        Iterator<AIUnit> auIterator = getAIUnits().iterator();
         int land = getPlayer().getNumberOfKingLandUnits();
         int used;
         for (int i = 0; i < n; i++) {
+            if (!auIterator.hasNext()) break;
             final TargetTuple t = targets.get(i);
-            sb.append("REF attacking\n  [").append(t.colony)
-                .append(" from ").append(t.getEntry())
+            sb.append("\n  Attack ").append(t.colony.getName())
+                .append(" from ").append(t.entry)
+                .append(" via ").append(t.disembarkTile)
                 .append(" with ");
-            for (AIUnit aiu : getAIUnits()) {
+            while (auIterator.hasNext()) {
+                AIUnit aiu = auIterator.next();
                 if (!aiu.getUnit().isNaval()) continue;
                 Unit ship = aiu.getUnit();
                 if (ship.isEmpty()) {
@@ -285,7 +351,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                 if (teleport) {
                     ship.setEntryLocation(t.disembarkTile);
                 } else {
-                    ship.setEntryLocation(t.getEntry());
+                    ship.setEntryLocation(t.entry);
                 }
                 sb.append("[").append(ship);
                 used = 0;
@@ -296,20 +362,15 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                     used++;
                     sb.append(" ").append(u);
                 }
-                sb.append("]");
+                sb.append(" ]");
                 TransportMission tm = new TransportMission(aiMain, aiu);
                 aiu.setMission(tm);
                 if (i < n-1 && used >= (int)Math.floor(land * 0.66)) {
                     land -= used;
-                    used = 0;
-                    sb.append("]\n  [").append(t.colony)
-                        .append(" from " ).append(t.getEntry())
-                        .append(" with ");
                     break;
                 }
             }
         }
-        sb.append("]");
 
         // Try to find some rebel naval units near the entry locations
         // for the targets.
@@ -320,10 +381,10 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                 public boolean check(Unit unit, PathNode pathNode) {
                     Tile tile = pathNode.getTile();
                     if (tile != null && !tile.isEmpty()
-                        && (!tile.isLand() || tile.hasSettlement())
+                        && !tile.isLand()
                         && rebel.owns(tile.getFirstUnit())) {
                         for (Unit u : tile.getUnitList()) {
-                            if (u.isOffensiveUnit()
+                            if (u.isOffensiveUnit() && u.isNaval()
                                 && !rebelNavy.contains(u)) rebelNavy.add(u);
                         }
                     }
@@ -331,7 +392,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                 }
             };
         for (int i = 0; i < n; i++) {
-            carrier.search(targets.get(i).getEntry(), navyGD, null,
+            carrier.search(targets.get(i).entry, navyGD, null,
                            carrier.getInitialMovesLeft() * 2, null);
         }
 
@@ -339,33 +400,34 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         Comparator<Unit> militaryStrength
             = Unit.getMilitaryStrengthComparator(getGame().getCombatModel());
         Collections.sort(rebelNavy, militaryStrength);
-        Iterator<Unit> ui = (rebelNavy.isEmpty()) ? null
-            : rebelNavy.iterator();
-        String nonspecific = "\n  [nonspecific-naval with";
-        if (ui == null) sb.append(nonspecific);
+        Iterator<Unit> ui = rebelNavy.iterator();
+        List<Tile> entries = new ArrayList<Tile>();
+        entries.add(rebel.getEntryLocation().getTile());
         while (!navy.isEmpty()) {
             final AIUnit aiu = navy.remove(0);
             final Unit u = aiu.getUnit();
-            if (ui != null && !ui.hasNext()) {
-                ui = null;
-                sb.append(nonspecific);
-            }
-            if (ui == null) {
+            final Unit enemy = (ui.hasNext()) ? ui.next() : null;
+            Tile start;
+            if (enemy == null) {
                 aiu.setMission(new UnitWanderHostileMission(aiMain, aiu));
-                u.setEntryLocation(targets.get(0).getEntry());
-            } else {
-                Unit target = ui.next();
-                aiu.setMission(new UnitSeekAndDestroyMission(aiMain, aiu,
-                                                             target));
-                Tile start = u.getBestEntryTile(target.getTile());
+                start = Utils.getRandomMember(logger, "REF patrol entry",
+                                              entries, aiRandom);
                 u.setEntryLocation(start);
-                sb.append("\n  [").append(target)
+                sb.append("\n  Patrol ")
                     .append(" from ").append(start)
-                    .append(" with ").append(u).append("]");
+                    .append(" with ").append(u);
+            } else {
+                aiu.setMission(new UnitSeekAndDestroyMission(aiMain, aiu,
+                                                             enemy));
+                start = u.getBestEntryTile(enemy.getTile());
+                u.setEntryLocation(start);
+                entries.add(start);
+                sb.append("\n  Suppress ").append(enemy)
+                    .append(" from ").append(start)
+                    .append(" with ").append(u);
             }
         }
-        sb.append("]");
-        logger.info(sb.toString());
+        logger.fine(sb.toString());
         return true;
     }
 
