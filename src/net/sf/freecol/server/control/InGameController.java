@@ -1329,51 +1329,54 @@ public final class InGameController extends Controller {
                     .addStringTemplate("%units%", seized));
         }
 
-        // Generalized continental army muster
+        // Generalized continental army muster.
+        // Do not use UnitType.getTargetType.
         java.util.Map<UnitType, UnitType> upgrades
             = new HashMap<UnitType, UnitType>();
-        Specification spec = getGame().getSpecification();
+        final Specification spec = getGame().getSpecification();
         for (UnitType unitType : spec.getUnitTypeList()) {
             UnitType upgrade = unitType.getTargetType(ChangeType.INDEPENDENCE,
                                                       serverPlayer);
             if (upgrade != null) upgrades.put(unitType, upgrade);
         }
         for (Colony colony : serverPlayer.getColonies()) {
-            int sol = colony.getSoL();
-            if (sol > 50) {
-                java.util.Map<UnitType, List<Unit>> unitMap
-                    = new HashMap<UnitType, List<Unit>>();
-                List<Unit> allUnits = colony.getTile().getUnitList();
-                allUnits.addAll(colony.getUnitList());
-                for (Unit unit : allUnits) {
-                    if (upgrades.containsKey(unit.getType())) {
-                        List<Unit> unitList = unitMap.get(unit.getType());
-                        if (unitList == null) {
-                            unitList = new ArrayList<Unit>();
-                            unitMap.put(unit.getType(), unitList);
-                        }
-                        unitList.add(unit);
+            List<Unit> allUnits = new ArrayList<Unit>();
+            allUnits.addAll(colony.getTile().getUnitList());
+            allUnits.addAll(colony.getUnitList());
+            int limit = (allUnits.size() + 2) * (colony.getSoL() - 50) / 100;
+            if (limit <= 0) continue;
+
+            java.util.Map<UnitType, List<Unit>> unitMap
+                = new HashMap<UnitType, List<Unit>>();
+            for (Unit unit : allUnits) {
+                if (upgrades.containsKey(unit.getType())) {
+                    List<Unit> unitList = unitMap.get(unit.getType());
+                    if (unitList == null) {
+                        unitList = new ArrayList<Unit>();
+                        unitMap.put(unit.getType(), unitList);
                     }
+                    unitList.add(unit);
                 }
-                for (Entry<UnitType, List<Unit>> entry : unitMap.entrySet()) {
-                    int limit = (entry.getValue().size() + 2) * (sol - 50) / 100;
-                    if (limit > 0) {
-                        for (int index = 0; index < limit; index++) {
-                            Unit unit = entry.getValue().get(index);
-                            if (unit == null) break;
-                            unit.changeType(upgrades.get(entry.getKey()));//-vis
-                            cs.add(See.only(serverPlayer), unit);
-                        }
-                        cs.addMessage(See.only(serverPlayer),
-                            new ModelMessage(ModelMessage.MessageType.UNIT_IMPROVED,
-                                             "model.player.continentalArmyMuster",
-                                             serverPlayer, colony)
-                                .addName("%colony%", colony.getName())
-                                .addAmount("%number%", limit)
-                                .add("%oldUnit%", entry.getKey().getNameKey())
-                                .add("%unit%", upgrades.get(entry.getKey()).getNameKey()));
-                    }
+            }
+            for (Entry<UnitType, List<Unit>> entry : unitMap.entrySet()) {
+                int n = 0;
+                UnitType type = entry.getKey();
+                List<Unit> units = entry.getValue();
+                while (!units.isEmpty() && n < limit) {
+                    Unit unit = units.remove(0);
+                    unit.changeType(upgrades.get(type));//-vis
+                    cs.add(See.only(serverPlayer), unit);
+                    n++;
                 }
+                cs.addMessage(See.only(serverPlayer),
+                    new ModelMessage(ModelMessage.MessageType.UNIT_IMPROVED,
+                        "model.player.continentalArmyMuster",
+                        serverPlayer, colony)
+                    .addName("%colony%", colony.getName())
+                    .addAmount("%number%", n)
+                    .add("%oldUnit%", type.getNameKey())
+                    .add("%unit%", upgrades.get(type).getNameKey()));
+                limit -= n;
             }
         }
 
