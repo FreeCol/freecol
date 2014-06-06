@@ -166,7 +166,7 @@ public class CashInTreasureTrainMission extends Mission {
                     return false;
                 }
             };
-        return (deferOK) ? GoalDeciders.getComposedGoalDecider(gd,
+        return (deferOK) ? GoalDeciders.getComposedGoalDecider(false, gd,
             GoalDeciders.getOurClosestSettlementGoalDecider())
             : gd;
     }

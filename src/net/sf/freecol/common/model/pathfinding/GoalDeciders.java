@@ -45,33 +45,56 @@ public final class GoalDeciders {
      * Gets a composite goal decider composed of two or more individual
      * goal deciders.  The first one dominates the second etc.
      *
+     * @param all If true, all deciders must succeed (and-semantics),
+     *     if false, any decide may succeed (or-semantics).
      * @param gds A series (two minimum) of <code>GoalDecider</code>s
      *     to compose.
      * @return A new <code>GoalDecider</code> composed of the argument
      *     goal deciders.
      */
-    public static GoalDecider getComposedGoalDecider(final GoalDecider... gds) {
+    public static GoalDecider getComposedGoalDecider(final boolean all,
+        final GoalDecider... gds) {
         if (gds.length < 2) {
             throw new IllegalArgumentException("Short GoalDecider list");
         }
 
         return new GoalDecider() {
-            private GoalDecider[] goalDeciders = gds;
+            private int winner = gds.length;
+            private PathNode goal = null;
 
-            public PathNode getGoal() {
-                for (int i = 0; i < goalDeciders.length; i++) {
-                    PathNode path = goalDeciders[i].getGoal();
-                    if (path != null) return path;
+            public PathNode getGoal() { return goal; }
+            public boolean hasSubGoals() {
+                for (int i = 0; i < gds.length; i++) {
+                    if (!all && i > this.winner) break;
+                    if (gds[i].hasSubGoals()) {
+                        if (!all) return true;
+                    } else {
+                        if (all) return false;
+                    }
                 }
-                return null;
+                return !all;
             }
-            public boolean hasSubGoals() { return true; }
             public boolean check(Unit u, PathNode path) {
-                boolean ret = false;
-                for (int i = goalDeciders.length-1; i >= 0; i--) {
-                    ret = goalDeciders[i].check(u, path);
+                for (int i = 0; i < gds.length; i++) {
+                    if (!all && i > this.winner) break;
+                    if (gds[i].check(u, path)) {
+                        if (!all) {
+                            this.winner = i;
+                            this.goal = path;
+                            return true;
+                        }
+                    } else {
+                        if (all) {
+                            return false;
+                        }
+                    }
                 }
-                return ret;
+                if (all) {
+                    this.winner = 0;
+                    this.goal = path;
+                    return true;
+                }
+                return false;
             }
         };
     }
@@ -284,7 +307,27 @@ public final class GoalDeciders {
         };
     }
         
+    /**
+     * Get a goal decider to find tiles that an enemy player can not see.
+     *
+     * @param enemy The enemy <code>Player</code> to avoid.
+     * @return A suitable <code>GoalDecider</code>.
+     */
+    public static GoalDecider getStealthyGoalDecider(final Player enemy) {
+        return new GoalDecider() {
+            private PathNode goal = null;
 
+            public PathNode getGoal() { return goal; }
+            public boolean hasSubGoals() { return true; }
+            public boolean check(Unit u, PathNode pathNode) {
+                Tile tile = pathNode.getTile();
+                if (enemy.canSee(tile)) return false;
+                this.goal = pathNode;
+                return true;
+            }
+        };
+    }
+        
     /**
      * A class to wrap a goal decider that searches for paths to an
      * adjacent tile to a set of locations, and the results of such a
