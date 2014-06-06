@@ -1010,9 +1010,11 @@ public final class ColonyPanel extends PortPanel
             updatePopulationPanel();
             updateNetProductionPanel(); // food production changes
         } else if (ColonyChangeEvent.BONUS_CHANGE.toString().equals(property)) {
-            ModelMessage msg = colony.checkForGovMgtChangeMessage();
-            if (msg != null) {
-                getGUI().showInformationMessage(colony, msg);
+            if (colony.getUnitCount() > 0) { // Ignore messages when abandoning
+                ModelMessage msg = colony.checkForGovMgtChangeMessage();
+                if (msg != null) {
+                    getGUI().showInformationMessage(colony, msg);
+                }
             }
             updatePopulationPanel();
         } else if (ColonyChangeEvent.UNIT_TYPE_CHANGE.toString().equals(property)) {
