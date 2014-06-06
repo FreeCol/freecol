@@ -147,18 +147,19 @@ public class ServerIndianSettlement extends IndianSettlement
         // Check for braves converted by missionaries
         final Unit missionary = getMissionary();
         if (missionary == null) return;
+        final ServerPlayer other = (ServerPlayer)missionary.getOwner();
+        final Tile tile = getTile();
 
-        ServerPlayer other = (ServerPlayer)missionary.getOwner();
-        float convert = missionary.applyModifier(0f,Modifier.CONVERSION_SKILL);
+        float convert = getConvertProgress();
+        convert += missionary.applyModifier(0f, Modifier.CONVERSION_SKILL);
         // The convert rate increases by a percentage of the current alarm.
         int alarm = Math.min(getAlarm(other).getValue(), Tension.TENSION_MAX);
-        convert += getConvertProgress() - alarm
-            + missionary.applyModifier(alarm, Modifier.CONVERSION_ALARM_RATE);
-        final Tile tile = getTile();
-        Settlement colony = null;
+        convert += missionary.applyModifier(alarm, Modifier.CONVERSION_ALARM_RATE);
+        Settlement colony = tile.getNearestSettlement(other,
+            MAX_CONVERT_DISTANCE, true);
         if (convert < (float)getType().getConvertThreshold()
             || (getUnitCount() + tile.getUnitCount()) <= 2
-            || (colony = tile.getNearestSettlement(other, MAX_CONVERT_DISTANCE)) == null) {
+            || colony == null) {
             setConvertProgress((int)Math.floor(convert));
         } else {
             setConvertProgress(0);

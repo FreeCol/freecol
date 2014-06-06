@@ -1065,13 +1065,16 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *
      * @param owner If non-null, the settlement should be owned by this player.
      * @param radius The maximum radius of the search.
+     * @param same If true, require the settlement to be on the same land mass.
      * @return The nearest settlement, or null if none.
      */
-    public Settlement getNearestSettlement(Player owner, int radius) {
+    public Settlement getNearestSettlement(Player owner, int radius,
+                                           boolean same) {
         if (radius <= 0) radius = INFINITY;
         Map map = getGame().getMap();
         for (Tile t : map.getCircleTiles(this, true, radius)) {
-            if (t == this) continue;
+            if (t == this
+                || (same && !map.isSameContiguity(this, t))) continue;
             Settlement settlement = t.getSettlement();
             if (settlement != null
                 && (owner == null || owner.owns(settlement))) {
