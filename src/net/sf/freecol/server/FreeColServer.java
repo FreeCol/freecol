@@ -1244,14 +1244,18 @@ public final class FreeColServer {
      * @exception FreeColException on map generation failure.
      */
     public Game buildGame() throws FreeColException {
-        Game game = getGame();
+        final Game game = getGame();
+        final Specification spec = game.getSpecification();
+        final AIMain aiMain = initializeAI(true);
 
-        AIMain aiMain = initializeAI(true);
+        // We need a fake unknown-enemy player
+        game.setUnknownEnemy(new ServerPlayer(game, Player.UNKNOWN_ENEMY,
+                false, spec.getNation("model.nation.unknownEnemy"),
+                null, null));
 
         // Save the old GameOptions as possibly set by clients..
         // TODO: This might not be the best way to do it, the
         // createMap should not really use the entire loadGame method.
-        final Specification spec = game.getSpecification();
         OptionGroup gameOptions = spec.getGameOptions();
         Element oldGameOptions = gameOptions.toXMLElement(DOMMessage.createMessage("oldGameOptions").getOwnerDocument());
 
@@ -1302,15 +1306,14 @@ public final class FreeColServer {
      * @return The AI.
      */
     public AIMain initializeAI(boolean allNations) {
-        Game game = getGame();
+        final Game game = getGame();
+        final Specification spec = game.getSpecification();
 
         AIMain aiMain = new AIMain(this);
         setAIMain(aiMain);
 
         if (allNations) {
             game.setFreeColGameObjectListener(aiMain);
-            game.setUnknownEnemy(new ServerPlayer(game, Player.UNKNOWN_ENEMY,
-                                                  false, null, null, null));
             Set<Entry<Nation, NationState>> entries
                 = new HashSet<Entry<Nation, NationState>>(game.getNationOptions()
                     .getNations().entrySet());
@@ -1321,7 +1324,7 @@ public final class FreeColServer {
                 }
             }
         } else {
-            for (Nation nation : game.getSpecification().getIndianNations()) {
+            for (Nation nation : spec.getIndianNations()) {
                 addAIPlayer(nation);
             }
         }

@@ -84,7 +84,7 @@ public class PreCombatDialog extends FreeColConfirmDialog {
         String defenderName = null;
         JLabel defenderLabel = null;
         if (combatModel.combatIsAttack(attacker, defender)) {
-            Unit defenderUnit = (Unit) defender;
+            Unit defenderUnit = (Unit)defender;
             defenderName = Messages.getLabel(defenderUnit);
             defenderLabel = new UnitLabel(freeColClient, defenderUnit,
                                           false, true);

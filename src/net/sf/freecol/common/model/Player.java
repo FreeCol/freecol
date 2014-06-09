@@ -1169,11 +1169,10 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Gets this Player's nation.
      *
-     * @return The player <code>Nation</code>, or null if the unknown enemy.
+     * @return The player <code>Nation</code>.
      */
     public Nation getNation() {
-        return (isUnknownEnemy()) ? null
-            : getSpecification().getNation(nationId);
+        return getSpecification().getNation(nationId);
     }
 
     /**
@@ -1320,7 +1319,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *         royal expeditionary force.
      */
     public Player getREFPlayer() {
-        Nation ref = (isUnknownEnemy()) ? null : getNation().getREFNation();
+        Nation ref = getNation().getREFNation();
         return (ref == null) ? null : getGame().getPlayer(ref.getId());
     }
 
@@ -1330,10 +1329,9 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The <code>Color</code>.
      */
     public Color getNationColor() {
-        Color color;
-        return (isUnknownEnemy()) ? Nation.UNKNOWN_NATION_COLOR
-            : ((color = getNation().getColor()) != null) ? color
-            : getNation().forceDefaultColor();
+        final Nation nation = getNation();
+        Color color = nation.getColor();
+        return (color != null) ? color : nation.forceDefaultColor();
     }
 
 

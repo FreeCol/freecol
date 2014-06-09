@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -1321,6 +1322,9 @@ public final class Specification {
         return getType(id, Nation.class);
     }
 
+    /**
+     * Clear all European advantages.  Implements the Advantages==NONE setting.
+     */
     public void clearEuropeanNationalAdvantages() {
         for (Nation n : getEuropeanNations()) {
             n.setType(getDefaultNationType());
@@ -2041,7 +2045,13 @@ public final class Specification {
                     + " to unattended at " + bt);
             }
         }
-            
+
+        // 0.10.x had no unknown enemy nation, just an unknown enemy player
+        if (getNation("model.nation.unknownEnemy") == null) {
+            Nation ue = new Nation("model.nation.unknownEnemy", this);
+            ue.setColor(Color.BLACK);
+        }
+
         // end @compat 0.10.7
     }
     // end @compat 0.10.x
