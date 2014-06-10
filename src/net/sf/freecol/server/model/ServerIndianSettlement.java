@@ -151,7 +151,8 @@ public class ServerIndianSettlement extends IndianSettlement
         final Tile tile = getTile();
 
         float convert = getConvertProgress();
-        convert += missionary.applyModifier(0f, Modifier.CONVERSION_SKILL);
+        convert += missionary.applyModifier(missionary.getType().getSkill(),
+                                            Modifier.CONVERSION_SKILL);
         // The convert rate increases by a percentage of the current alarm.
         int alarm = Math.min(getAlarm(other).getValue(), Tension.TENSION_MAX);
         convert += missionary.applyModifier(alarm, Modifier.CONVERSION_ALARM_RATE);

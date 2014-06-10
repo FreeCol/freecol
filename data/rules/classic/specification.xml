@@ -1123,6 +1123,8 @@ resources of 400, lost city rumours of 500
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
+      <modifier id="model.modifier.conversionSkill" type="additive" value="6"/>
+      <modifier id="model.modifier.conversionAlarmRate" type="percentage" value="2"/>
       <downgrade unit="model.unit.undead" undead="100"/>
       <downgrade unit="model.unit.freeColonist" clearSkill="100"/>
       <consumes id="model.goods.food" value="2" />
@@ -1156,8 +1158,6 @@ resources of 400, lost city rumours of 500
       <upgrade unit="model.unit.hardyPioneer" turnsToLearn="4"/>
       <upgrade unit="model.unit.veteranSoldier" turnsToLearn="6" promotion="100"/>
       <upgrade unit="model.unit.jesuitMissionary" turnsToLearn="8"/>
-      <modifier id="model.modifier.conversionSkill" type="additive" value="6"/>
-      <modifier id="model.modifier.conversionAlarmRate" type="percentage" value="2"/>
     </unit-type>
     <unit-type id="model.unit.expertFarmer" extends="colonist" price="1100"
                skill="1" recruitProbability="1" expert-production="model.goods.grain"
@@ -1277,7 +1277,6 @@ resources of 400, lost city rumours of 500
       <default-role id="model.role.missionary"/>
       <downgrade unit="model.unit.freeColonist" capture="100" clearSkill="100"/>
       <ability id="model.ability.expertMissionary" value="true"/>
-      <modifier id="model.modifier.conversionSkill" type="additive" value="3"/>
       <modifier id="model.modifier.missionaryTradeBonus" type="percentage" value="10"/>
     </unit-type>
     <unit-type id="model.unit.indenturedServant" extends="colonist"
