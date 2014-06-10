@@ -324,7 +324,8 @@ public final class PlayersTable extends JTable {
             int row, int column) {
             Nation nation = (Nation) value;
             setText(Messages.message(nation.getNameKey()));
-            setIcon(new ImageIcon(library.getCoatOfArmsImage(nation, 0.5)));
+            ImageIcon icon = new ImageIcon(library.getCoatOfArmsImage(nation, 0.5));
+            if (icon != null) setIcon(icon);
             return this;
         }
     }
@@ -443,6 +444,7 @@ public final class PlayersTable extends JTable {
             nations = new ArrayList<Nation>();
             players = new HashMap<Nation, Player>();
             for (Nation nation : thisPlayer.getSpecification().getNations()) {
+                if (nation.isUnknownEnemy()) continue;
                 NationState state = nationOptions.getNations().get(nation);
                 if (state != null) {
                     nations.add(nation);
@@ -457,6 +459,7 @@ public final class PlayersTable extends JTable {
                 players.put(nation, null);
             }
             for (Player player : thisPlayer.getGame().getPlayers()) {
+                if (player.isUnknownEnemy()) continue;
                 players.put(player.getNation(), player);
             }
             fireTableDataChanged();

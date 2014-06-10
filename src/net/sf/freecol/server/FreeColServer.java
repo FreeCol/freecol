@@ -1250,7 +1250,7 @@ public final class FreeColServer {
 
         // We need a fake unknown-enemy player
         game.setUnknownEnemy(new ServerPlayer(game, Player.UNKNOWN_ENEMY,
-                false, spec.getNation("model.nation.unknownEnemy"),
+                false, spec.getNation(Nation.UNKNOWN_NATION_ID),
                 null, null));
 
         // Save the old GameOptions as possibly set by clients..

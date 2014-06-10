@@ -114,6 +114,15 @@ public class Nation extends FreeColGameObjectType {
 
 
     /**
+     * Is this the unknown enemy nation?
+     *
+     * @return True if this is the unknown enemy.
+     */
+    public final boolean isUnknownEnemy() {
+        return UNKNOWN_NATION_ID.equals(getId());
+    }
+
+    /**
      * Get the nation type.
      *
      * @return The nation type.
