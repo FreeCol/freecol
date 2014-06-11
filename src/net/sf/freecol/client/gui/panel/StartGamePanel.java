@@ -221,6 +221,7 @@ public final class StartGamePanel extends FreeColPanel {
             for (Entry<Nation, NationState> e
                      : getGame().getNationOptions().getNations().entrySet()) {
                 if (e.getKey().getType().isEuropean()
+                    && !e.getKey().isUnknownEnemy()
                     && e.getValue() != NationState.NOT_AVAILABLE) n++;
             }
             if (n == 0) {

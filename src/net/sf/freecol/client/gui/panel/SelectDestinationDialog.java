@@ -486,8 +486,8 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
         }
         
         List<Location> locs = new ArrayList<Location>();
-        for (Player p : game.getPlayers()) {
-            if (p == player || !p.hasContacted(player)
+        for (Player p : game.getLivePlayers(player)) {
+            if (!p.hasContacted(player)
                 || (p.isEuropean() && !canTrade)) continue;
 
             for (Settlement s : p.getSettlements()) {

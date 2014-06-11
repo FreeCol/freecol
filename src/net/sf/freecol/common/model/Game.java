@@ -460,16 +460,51 @@ public class Game extends FreeColGameObject {
     }
 
     /**
+     * Get live players in the game.
+     *
+     * @param other An optional <code>Player</code> to omit.
+     * @return The list of live <code>Player</code>s.
+     */
+    public List<Player> getLivePlayers(Player other) {
+        List<Player> result = new ArrayList<Player>();
+        for (Player player : players) {
+            if (player.isUnknownEnemy() || player.isDead()
+                || player == other) continue;
+            result.add(player);
+        }
+        return result;
+    }
+
+    /**
      * Get the live European players in this game.
      *
+     * @param other An optional <code>Player</code> to omit.
      * @return A list of live European <code>Player</code>s in this game.
      */
-    public List<Player> getLiveEuropeanPlayers() {
-        List<Player> europeans = new ArrayList<Player>();
+    public List<Player> getLiveEuropeanPlayers(Player other) {
+        List<Player> result = new ArrayList<Player>();
         for (Player player : players) {
-            if (player.isEuropean() && !player.isDead()) europeans.add(player);
+            if (player.isUnknownEnemy() || player.isDead()
+                || !player.isEuropean() || player == other) continue;
+            result.add(player);
         }
-        return europeans;
+        return result;
+    }
+
+    /**
+     * Get the live native players in this game.
+     *
+     * @param other An optional <code>Player</code> to omit.
+     * @return A list of live native <code>Player</code>s in this game.
+     */
+    public List<Player> getLiveNativePlayers(Player other) {
+        List<Player> result = new ArrayList<Player>();
+        for (Player player : players) {
+            if (player.isUnknownEnemy() || player.isDead()
+                || !player.isIndian() || player == other) continue;
+            result.add(player);
+        }
+        return result;
     }
 
     /**
@@ -513,7 +548,7 @@ public class Game extends FreeColGameObject {
         do {
             if (++index >= players.size()) index = 0;
             Player player = players.get(index);
-            if (!player.isDead()) return player;
+            if (!player.isUnknownEnemy() && !player.isDead()) return player;
         } while (index != start);
         return null;
     }
@@ -593,7 +628,7 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Gets the "Unknown Enemy" player, which is used for privateers.
+     * Gets the unknown enemy player, which is used for privateers.
      *
      * @return The unknown enemy <code>Player</code>.
      */
@@ -602,7 +637,7 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Sets the "Unknown Enemy" Player.
+     * Sets the unknown enemy player.
      *
      * @param player The <code>Player</code> to serve as the unknown enemy.
      */
@@ -676,7 +711,7 @@ public class Game extends FreeColGameObject {
      */
     public void setMap(Map newMap) {
         if (this.map != newMap) {
-            for (Player player : getPlayers()) {
+            for (Player player : getLivePlayers(null)) {
                 if (player.getHighSeas() != null) {
                     player.getHighSeas().removeDestination(this.map);
                     player.getHighSeas().addDestination(newMap);
@@ -886,7 +921,7 @@ public class Game extends FreeColGameObject {
      * @return True if all players are ready to launch.
      */
     public boolean allPlayersReadyToLaunch() {
-        for (Player player : getPlayers()) {
+        for (Player player : getLivePlayers(null)) {
             if (!player.isReady()) return false;
         }
         return true;
@@ -901,7 +936,7 @@ public class Game extends FreeColGameObject {
      *     specified name (the settlement might not be visible to a client).
      */
     public Settlement getSettlement(String name) {
-        for (Player p : getPlayers()) {
+        for (Player p : getLivePlayers(null)) {
             for (Settlement s : p.getSettlements()) {
                 if (name.equals(s.getName())) return s;
             }
@@ -1142,10 +1177,9 @@ public class Game extends FreeColGameObject {
 
         nationOptions.toXML(xw);
 
-        for (Player p : getSortedCopy(getPlayers())) p.toXML(xw);
-
-        Player enemy = getUnknownEnemy();
-        if (enemy != null) enemy.toXML(xw);
+        List<Player> players = getSortedCopy(getPlayers());
+        players.add(getUnknownEnemy());
+        for (Player p : players) p.toXML(xw);
 
         if (map != null) map.toXML(xw);
     }
@@ -1188,7 +1222,7 @@ public class Game extends FreeColGameObject {
         super.readChildren(xr);
 
         // @compat 0.10.7
-        for (Player player : getLiveEuropeanPlayers()) {
+        for (Player player : getLiveEuropeanPlayers(null)) {
             for (Unit unit : player.getUnits()) {
                 if (unit.isInColony()) {
                     unit.getWorkLocation().updateProductionType();

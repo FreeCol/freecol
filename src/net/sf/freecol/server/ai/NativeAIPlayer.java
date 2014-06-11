@@ -137,14 +137,13 @@ public class NativeAIPlayer extends AIPlayer {
      * That is: should we declare war?
      */
     private void determineStances() {
-        Player player = getPlayer();
-        for (Player p : getGame().getPlayers()) {
-            if (p != player && !p.isDead()) {
-                Stance newStance = determineStance(p);
-                if (newStance != player.getStance(p)) {
-                    getAIMain().getFreeColServer().getInGameController()
-                        .changeStance(player, newStance, p, true);
-                }
+        final Player player = getPlayer();
+
+        for (Player p : getGame().getLivePlayers(player)) {
+            Stance newStance = determineStance(p);
+            if (newStance != player.getStance(p)) {
+                getAIMain().getFreeColServer().getInGameController()
+                    .changeStance(player, newStance, p, true);
             }
         }
     }

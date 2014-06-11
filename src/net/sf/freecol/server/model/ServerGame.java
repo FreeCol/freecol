@@ -171,7 +171,7 @@ public class ServerGame extends Game implements ServerModelObject {
     public Player checkForWinner() {
         Specification spec = getSpecification();
         if (spec.getBoolean(GameOptions.VICTORY_DEFEAT_REF)) {
-            for (Player player : getLiveEuropeanPlayers()) {
+            for (Player player : getLiveEuropeanPlayers(null)) {
                 if (player.getPlayerType() == Player.PlayerType.INDEPENDENT) {
                     return player;
                 }
@@ -179,7 +179,7 @@ public class ServerGame extends Game implements ServerModelObject {
         }
         if (spec.getBoolean(GameOptions.VICTORY_DEFEAT_EUROPEANS)) {
             Player winner = null;
-            for (Player player : getLiveEuropeanPlayers()) {
+            for (Player player : getLiveEuropeanPlayers(null)) {
                 if (!player.isREF()) {
                     if (winner != null) { // A live European player
                         winner = null;
@@ -192,7 +192,7 @@ public class ServerGame extends Game implements ServerModelObject {
         }
         if (spec.getBoolean(GameOptions.VICTORY_DEFEAT_HUMANS)) {
             Player winner = null;
-            for (Player player : getLiveEuropeanPlayers()) {
+            for (Player player : getLiveEuropeanPlayers(null)) {
                 if (!player.isAI()) {
                     if (winner != null) { // A live human player
                         winner = null;
@@ -244,10 +244,8 @@ public class ServerGame extends Game implements ServerModelObject {
      * @param cs A <code>ChangeSet</code> to update.
      */
     public void csNewTurn(Random random, ChangeSet cs) {
-        for (Player player : getPlayers()) {
-            if (!player.isUnknownEnemy() && !player.isDead()) {
-                ((ServerPlayer)player).csNewTurn(random, cs);
-            }
+        for (Player player : getLivePlayers(null)) {
+            ((ServerPlayer)player).csNewTurn(random, cs);
         }
 
         final Specification spec = getSpecification();
@@ -274,7 +272,7 @@ public class ServerGame extends Game implements ServerModelObject {
             = event.getLimit("model.limit.spanishSuccession.strongestPlayer");
         Map<Player, Integer> scores = new HashMap<Player, Integer>();
         boolean ready = false;
-        for (Player player : getLiveEuropeanPlayers()) {
+        for (Player player : getLiveEuropeanPlayers(null)) {
             if (player.isREF()) continue;
             ready |= strongLimit.evaluate(player);
             // Human players can trigger the event, but only transfer assets
@@ -316,8 +314,7 @@ public class ServerGame extends Game implements ServerModelObject {
         List<Tile> tiles = new ArrayList<Tile>();
         ServerPlayer strongest = (ServerPlayer)strongestAIPlayer;
         ServerPlayer weakest = (ServerPlayer)weakestAIPlayer;
-        for (Player player : getPlayers()) {
-            if (!player.isIndian()) continue;
+        for (Player player : getLiveNativePlayers(null)) {
             for (IndianSettlement is : player.getIndianSettlements()) {
                 if (!is.hasMissionary(weakest)) continue;
                 sb.append(" ").append(is.getName()).append("(mission)");

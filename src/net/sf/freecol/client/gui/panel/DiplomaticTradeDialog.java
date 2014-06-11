@@ -443,8 +443,8 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             setLayout(new MigLayout("wrap 1", "", ""));
 
             available.clear();
-            for (Player p : getGame().getPlayers()) {
-                if (p == this.source || p == this.other || p.isDead()
+            for (Player p : getGame().getLivePlayers(this.source)) {
+                if (p == this.other
                     || this.source.getStance(p) == Stance.ALLIANCE
                     || this.source.getStance(p) == Stance.WAR) continue;
                 available.add(p);

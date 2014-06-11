@@ -1483,7 +1483,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * Update player explored tiles after a change to this tile.
      */
     private void updateColonyTiles() {
-        for (Player player : getGame().getLiveEuropeanPlayers()) {
+        for (Player player : getGame().getLiveEuropeanPlayers(null)) {
             for (Colony colony : player.getColonies()) {
                 for (ColonyTile colonyTile : colony.getColonyTiles()) {
                     if (colonyTile.getWorkTile() == this) {
@@ -1524,7 +1524,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * forcibly such as when a native settlement is removed.
      */
     public void seeTile() {
-        for (Player p : getGame().getLiveEuropeanPlayers()) {
+        for (Player p : getGame().getLiveEuropeanPlayers(null)) {
             if (p.canSee(this)) seeTile(p);
         }
     }
@@ -1596,9 +1596,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public void cacheUnseen(Player player, Tile copied) {
         if (cachedTiles == null) return;
-        for (Player p : getGame().getLiveEuropeanPlayers()) {
-            if (p != player && !p.canSee(this)
-                && getCachedTile(p) == this) {
+        for (Player p : getGame().getLiveEuropeanPlayers(player)) {
+            if (!p.canSee(this) && getCachedTile(p) == this) {
                 if (copied == null) copied = getTileToCache();
                 setCachedTile(p, copied);
             }
@@ -2212,7 +2211,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
         // Save the cached tiles to saved games.
         if (xw.validForSave() && cachedTiles != null) {
-            for (Player p : getGame().getLiveEuropeanPlayers()) {
+            for (Player p : getGame().getLiveEuropeanPlayers(null)) {
                 Tile t = getCachedTile(p);
                 if (t == null) continue;
 

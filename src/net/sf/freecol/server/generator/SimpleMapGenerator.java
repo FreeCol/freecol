@@ -253,8 +253,7 @@ public class SimpleMapGenerator implements MapGenerator {
         final Specification spec = game.getSpecification();
         int nSettlements = 0;
 
-        for (Player player : importGame.getPlayers()) {
-            if (!player.isIndian()) continue;
+        for (Player player : importGame.getLiveNativePlayers(null)) {
             Player indian = game.getPlayer(player.getNationId());
             if (indian == null) {
                 Nation nation = spec.getNation(player.getNationId());
@@ -352,7 +351,6 @@ public class SimpleMapGenerator implements MapGenerator {
         }
         
         final Game game = map.getGame();
-        final List<Player> players = game.getPlayers();
         final Specification spec = game.getSpecification();
         float shares = 0f;
         List<IndianSettlement> settlements = new ArrayList<IndianSettlement>();
@@ -360,9 +358,8 @@ public class SimpleMapGenerator implements MapGenerator {
         HashMap<String, Territory> territoryMap
             = new HashMap<String, Territory>();
 
-        for (Player player : players) {
-            if (!player.isIndian()) continue;
-            switch (((IndianNationType) player.getNationType())
+        for (Player player : game.getLiveNativePlayers(null)) {
+            switch (((IndianNationType)player.getNationType())
                     .getNumberOfSettlements()) {
             case HIGH:
                 shares += 4;
@@ -1177,7 +1174,7 @@ public class SimpleMapGenerator implements MapGenerator {
         Map map = game.getMap();
         makeNativeSettlements(map, importGame);
         makeLostCityRumours(map, importGame);
-        createEuropeanUnits(map, game.getPlayers());
+        createEuropeanUnits(map, game.getLiveEuropeanPlayers(null));
 
         // If importing as a result of "Start Game" in the map editor,
         // consume the file.

@@ -176,7 +176,18 @@ public class ServerPlayer extends Player implements ServerModelObject {
         this.name = name;
         this.admin = admin;
         this.immigration = 0;
-        if (nation != null && nation.getType() != null) {
+        if (nation == null) {
+            throw new IllegalArgumentException("Null nation");
+        } else if (nation.isUnknownEnemy()) {
+            // virtual "enemy privateer" player
+            this.nationType = null;
+            this.nationId = nation.getId();
+            this.playerType = PlayerType.COLONIAL;
+            this.europe = null;
+            this.monarch = null;
+            this.gold = 0;
+            this.setAI(true);
+        } else if (nation.getType() != null) {
             this.nationType = nation.getType();
             this.nationId = nation.getId();
             try {
@@ -211,14 +222,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 this.gold = Player.GOLD_NOT_ACCOUNTED;
             }
         } else {
-            // virtual "enemy privateer" player
-            // or undead ?
-            this.nationType = null;
-            this.nationId = Nation.UNKNOWN_NATION_ID;
-            this.playerType = PlayerType.COLONIAL;
-            this.europe = null;
-            this.monarch = null;
-            this.gold = 0;
+            throw new IllegalArgumentException("Bogus nation: " + nation);
         }
         this.market = new Market(getGame(), this);
         this.liberty = 0;
@@ -305,7 +309,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param random A pseudo-random number source.
      */
     public void randomizeGame(Random random) {
-        if (!isEuropean() || isREF()) return;
+        if (!isEuropean() || isREF() || isUnknownEnemy()) return;
         final Specification spec = getGame().getSpecification();
 
         // Set initial immigration target
@@ -361,6 +365,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      *      colonist units to keep this player alive.
      */
     public int checkForDeath() {
+        if (isUnknownEnemy()) return IS_ALIVE;
         final Specification spec = getGame().getSpecification();
         /*
          * Die if: (isNative && (no colonies or units))
@@ -558,8 +563,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         cs.addDead(this);
 
         // Clean up missions and remove tension/alarm/stance.
-        for (Player other : getGame().getPlayers()) {
-            if (other == this) continue;
+        for (Player other : getGame().getLivePlayers(this)) {
             if (isEuropean() && other.isIndian()) {
                 for (IndianSettlement s : other.getIndianSettlements()) {
                     if (s.hasMissionary(this)) {
@@ -1334,10 +1338,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
             Stance sta = getStance(s);
             boolean war = sta == Stance.WAR;
             if (sta == Stance.UNCONTACTED) continue;
-            for (Player p : getGame().getLiveEuropeanPlayers()) {
+            for (Player p : getGame().getLiveEuropeanPlayers(this)) {
                 ServerPlayer sp = (ServerPlayer) p;
-                if (sp == this || p == s
-                    || !p.hasContacted(this) || !p.hasContacted(p)) continue;
+                if (p == s || !p.hasContacted(this)
+                    || !p.hasContacted(s)) continue;
                 if (p.hasAbility(Ability.BETTER_FOREIGN_AFFAIRS_REPORT)
                     || war) {
                     cs.addStance(See.only(sp), this, sta, s);
@@ -1615,8 +1619,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         // Do not need to update the clients here, these changes happen
         // while it is not their turn.
-        for (Player p : getGame().getLiveEuropeanPlayers()) {
-            if (p == this) continue;
+        for (Player p : getGame().getLiveEuropeanPlayers(this)) {
             Market market = p.getMarket();
             if (market != null) market.addGoodsToMarket(type, amount);
         }
@@ -1722,7 +1725,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 java.util.Map<Player, Tension.Level> oldLevel
                     = new HashMap<Player, Tension.Level>();
                 oldLevels.put(settlement, oldLevel);
-                for (Player enemy : game.getLiveEuropeanPlayers()) {
+                for (Player enemy : game.getLiveEuropeanPlayers(this)) {
                     Tension alarm = settlement.getAlarm(enemy);
                     oldLevel.put(enemy,
                         (alarm == null) ? null : alarm.getLevel());
@@ -1733,7 +1736,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             for (IndianSettlement settlement : allSettlements) {
                 java.util.Map<Player, Integer> extra
                     = new HashMap<Player, Integer>();
-                for (Player enemy : game.getLiveEuropeanPlayers()) {
+                for (Player enemy : game.getLiveEuropeanPlayers(this)) {
                     extra.put(enemy, new Integer(0));
                 }
 
@@ -1795,7 +1798,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
 
             // Calm down a bit at the whole-tribe level.
-            for (Player enemy : game.getLiveEuropeanPlayers()) {
+            for (Player enemy : game.getLiveEuropeanPlayers(this)) {
                 if (getTension(enemy).getValue() > 0) {
                     int change = -getTension(enemy).getValue()/100 - 4;
                     csModifyTension(enemy, change, cs);//+til
@@ -1925,8 +1928,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 }
                 for (Unit u : getUnits()) tiles.addAll(exploreForUnit(u));
                 if (hasAbility(Ability.SEE_ALL_COLONIES)) {
-                    for (Player other : getGame().getLiveEuropeanPlayers()) {
-                        if (this.equals(other)) continue;
+                    for (Player other : getGame().getLiveEuropeanPlayers(this)) {
                         for (Colony c : other.getColonies()) {
                             tiles.addAll(exploreForSettlement(c));
                         }
@@ -1940,19 +1942,18 @@ public class ServerPlayer extends Player implements ServerModelObject {
         for (Event event : father.getEvents()) {
             String eventId = event.getId();
             if (eventId.equals("model.event.resetNativeAlarm")) {
-                for (Player p : game.getPlayers()) {
-                    if (!p.isDead() && p.isIndian() && p.hasContacted(this)) {
-                        p.setTension(this, new Tension(Tension.TENSION_MIN));
-                        for (IndianSettlement is : p.getIndianSettlements()) {
-                            if (is.hasContacted(this)) {
-                                is.getTile().cacheUnseen();//+til
-                                is.setAlarm(this,
-                                    new Tension(Tension.TENSION_MIN));//-til
-                                cs.add(See.only(this), is);
-                            }
+                for (Player p : game.getLiveNativePlayers(null)) {
+                    if (!p.hasContacted(this)) continue;
+                    p.setTension(this, new Tension(Tension.TENSION_MIN));
+                    for (IndianSettlement is : p.getIndianSettlements()) {
+                        if (is.hasContacted(this)) {
+                            is.getTile().cacheUnseen();//+til
+                            is.setAlarm(this,
+                                new Tension(Tension.TENSION_MIN));//-til
+                            cs.add(See.only(this), is);
                         }
-                        csChangeStance(Stance.PEACE, (ServerPlayer)p, true, cs);
                     }
+                    csChangeStance(Stance.PEACE, (ServerPlayer)p, true, cs);
                 }
 
             } else if (eventId.equals("model.event.boycottsLifted")) {

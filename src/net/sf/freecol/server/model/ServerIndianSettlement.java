@@ -371,7 +371,7 @@ public class ServerIndianSettlement extends IndianSettlement
         Player old = mostHated;
         mostHated = null;
         int bestValue = Integer.MIN_VALUE;
-        for (Player p : getGame().getLiveEuropeanPlayers()) {
+        for (Player p : getGame().getLiveEuropeanPlayers(null)) {
             Tension alarm = getAlarm(p);
             if (alarm == null
                 || alarm.getLevel() == Tension.Level.HAPPY) continue;

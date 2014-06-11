@@ -1057,7 +1057,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         float navalAverage = 0;
         float navalStrength = 0;
         int nPlayers = 0;
-        for (Player p : getGame().getLiveEuropeanPlayers()) {
+        for (Player p : getGame().getLiveEuropeanPlayers(null)) {
             if (p.isREF()) continue;
             if (p == player) {
                 navalStrength = AIMessage.askGetNationSummary(this, p)
@@ -1209,7 +1209,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             //   crush the weak
             List<Player> enemies = new ArrayList<Player>();
             List<Player> preferred = new ArrayList<Player>();
-            for (Player p : game.getPlayers()) {
+            for (Player p : game.getLivePlayers(player)) {
                 if (player.atWarWith(p)) {
                     enemies.add(p);
                     double strength = getStrengthRatio(p);
@@ -2074,16 +2074,14 @@ public class EuropeanAIPlayer extends AIPlayer {
     private void determineStances() {
         final Player player = getPlayer();
 
-        for (Player p : getGame().getPlayers()) {
-            if (p != player && !p.isDead()) {
-                Stance newStance = determineStance(p);
-                if (newStance != player.getStance(p)) {
-                    if (newStance == Stance.WAR && peaceHolds(p)) {
-                        ; // Peace treaty holds for now
-                    } else {
-                        getAIMain().getFreeColServer().getInGameController()
-                            .changeStance(player, newStance, p, true);
-                    }
+        for (Player p : getGame().getLivePlayers(player)) {
+            Stance newStance = determineStance(p);
+            if (newStance != player.getStance(p)) {
+                if (newStance == Stance.WAR && peaceHolds(p)) {
+                    ; // Peace treaty holds for now
+                } else {
+                    getAIMain().getFreeColServer().getInGameController()
+                        .changeStance(player, newStance, p, true);
                 }
             }
         }

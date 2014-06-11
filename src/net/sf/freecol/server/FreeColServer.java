@@ -707,16 +707,10 @@ public final class FreeColServer {
      *     by the AI.
      */
     public int getSlotsAvailable() {
-        List<Player> players = game.getPlayers();
         int n = 0;
-        for (int i = 0; i < players.size(); i++) {
-            ServerPlayer p = (ServerPlayer) players.get(i);
-            if (!p.isEuropean() || p.isREF()) {
-                continue;
-            }
-            if (!(p.isDead() || p.isConnected() && !p.isAI())) {
-                n++;
-            }
+        for (Player player : game.getLiveEuropeanPlayers(null)) {
+            ServerPlayer sp = (ServerPlayer)player;
+            if (!sp.isREF() && sp.isAI() && !sp.isConnected()) n++;
         }
         return n;
     }
@@ -728,11 +722,9 @@ public final class FreeColServer {
      */
     public int getNumberOfLivingHumanPlayers() {
         int n = 0;
-        for (Player p : game.getPlayers()) {
-            ServerPlayer serverPlayer = (ServerPlayer)p;
-            if (!serverPlayer.isAI()
-                && !serverPlayer.isDead()
-                && !serverPlayer.isConnected()) n++;
+        for (Player player : game.getLivePlayers(null)) {
+            ServerPlayer sp = (ServerPlayer)player;
+            if (!sp.isAI() && sp.isConnected()) n++;
         }
         return n;
     }
@@ -1033,6 +1025,15 @@ public final class FreeColServer {
         game.getMap().resetContiguity();
         // end @compat
 
+        // @compat 0.10.x
+        Player unknown = game.getUnknownEnemy();
+        if (unknown == null) {
+            establishUnknownEnemy(game);
+        } else {
+            unknown.setName(Nation.UNKNOWN_NATION_ID);
+        }
+        // end @compat
+
         // Ensure that critical option groups can not be edited.
         try {
             specification = getSpecification();
@@ -1058,9 +1059,9 @@ public final class FreeColServer {
         game.setFreeColGameObjectListener(aiMain);
 
         Collections.sort(game.getPlayers(), Player.playerComparator);
-        for (Player player : game.getPlayers()) {
-            ServerPlayer serverPlayer = (ServerPlayer) player;
+        for (Player player : game.getLivePlayers(null)) {
             if (player.isAI()) {
+                ServerPlayer serverPlayer = (ServerPlayer)player;
                 DummyConnection theConnection
                     = new DummyConnection("Server-Server-" + player.getName(),
                         getInGameInputHandler());
@@ -1237,6 +1238,22 @@ public final class FreeColServer {
     }
 
     /**
+     * Establish a new unknown enemy player.
+     *
+     * @param game The <code>Game</code> to establish the enemy within.
+     * @return The new unknown enemy <code>Player</code>.
+     */
+    private ServerPlayer establishUnknownEnemy(Game game) {
+        final Specification spec = game.getSpecification();
+
+        Nation unknown = spec.getNation(Nation.UNKNOWN_NATION_ID);
+        ServerPlayer enemy = new ServerPlayer(game, Nation.UNKNOWN_NATION_ID,
+                                              false, unknown, null, null);
+        game.setUnknownEnemy(enemy);
+        return enemy;
+    }
+
+    /**
      * Builds a new game using the parameters that exist in the game
      * as it stands.
      *
@@ -1248,10 +1265,8 @@ public final class FreeColServer {
         final Specification spec = game.getSpecification();
         final AIMain aiMain = initializeAI(true);
 
-        // We need a fake unknown-enemy player
-        game.setUnknownEnemy(new ServerPlayer(game, Player.UNKNOWN_ENEMY,
-                false, spec.getNation(Nation.UNKNOWN_NATION_ID),
-                null, null));
+        // We need a fake unknown enemy player
+        establishUnknownEnemy(game);
 
         // Save the old GameOptions as possibly set by clients..
         // TODO: This might not be the best way to do it, the
@@ -1269,19 +1284,17 @@ public final class FreeColServer {
         // Initial stances and randomizations for all players.
         spec.generateDynamicOptions();
         Random random = getServerRandom();
-        for (Player player : game.getPlayers()) {
+        for (Player player : game.getLivePlayers(null)) {
             ((ServerPlayer)player).randomizeGame(random);
             if (player.isIndian()) {
                 // Indian players know about each other, but European colonial
                 // players do not.
                 final int alarm = (Tension.Level.HAPPY.getLimit()
                     + Tension.Level.CONTENT.getLimit()) / 2;
-                for (Player other : game.getPlayers()) {
-                    if (other != player && other.isIndian()) {
-                        player.setStance(other, Stance.PEACE);
-                        for (IndianSettlement is : player.getIndianSettlements()) {
-                            is.setAlarm(other, new Tension(alarm));
-                        }
+                for (Player other : game.getLiveNativePlayers(player)) {
+                    player.setStance(other, Stance.PEACE);
+                    for (IndianSettlement is : player.getIndianSettlements()) {
+                        is.setAlarm(other, new Tension(alarm));
                     }
                 }
             }
@@ -1318,6 +1331,7 @@ public final class FreeColServer {
                 = new HashSet<Entry<Nation, NationState>>(game.getNationOptions()
                     .getNations().entrySet());
             for (Entry<Nation, NationState> entry : entries) {
+                if (entry.getKey().isUnknownEnemy()) continue;
                 if (entry.getValue() != NationState.NOT_AVAILABLE
                     && game.getPlayer(entry.getKey().getId()) == null) {
                     addAIPlayer(entry.getKey());
@@ -1341,7 +1355,7 @@ public final class FreeColServer {
      * @return The new AI <code>ServerPlayer</code>.
      */
     public ServerPlayer addAIPlayer(Nation nation) {
-        String name = nation.getRulerNameKey();
+        String name = nation.getId();
         DummyConnection theConnection =
             new DummyConnection("Server connection - " + name,
                 getInGameInputHandler());
@@ -1391,7 +1405,7 @@ public final class FreeColServer {
      * @param reveal If true, reveal, if false, hide.
      */
     public void exploreMapForAllPlayers(boolean reveal) {
-        for (Player player : getGame().getLiveEuropeanPlayers()) {
+        for (Player player : getGame().getLiveEuropeanPlayers(null)) {
             ((ServerPlayer)player).exploreMap(reveal);
         }
      
@@ -1406,7 +1420,7 @@ public final class FreeColServer {
             fogOfWarSetting.setValue(FreeColDebugger.getNormalGameFogOfWar());
         }
 
-        for (Player player : getGame().getLiveEuropeanPlayers()) {
+        for (Player player : getGame().getLiveEuropeanPlayers(null)) {
             try {
                 ((ServerPlayer)player).getConnection()
                     .sendDumping(DOMMessage.createMessage("reconnect"));
@@ -1426,7 +1440,9 @@ public final class FreeColServer {
     public ServerPlayer getPlayer(Connection connection) {
         for (Player p : game.getPlayers()) {
             ServerPlayer serverPlayer = (ServerPlayer)p;
-            if (serverPlayer.getConnection() == connection) return serverPlayer;
+            if (serverPlayer.getConnection() == connection) {
+                return serverPlayer;
+            }
         }
         return null;
     }

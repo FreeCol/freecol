@@ -70,12 +70,14 @@ public final class ReportIndianPanel extends ReportPanel {
         super(freeColClient, Messages.message("reportIndianAction.name"));
 
         Player player = getMyPlayer();
-        reportPanel.setLayout(new MigLayout("wrap 6, fillx, insets 0", "[]20px[center]", "[top]"));
+        reportPanel.setLayout(new MigLayout("wrap 6, fillx, insets 0",
+                                            "[]20px[center]", "[top]"));
         boolean needsSeperator = false;
-        for (Player opponent : getGame().getPlayers()) {
-            if (opponent.isIndian() && !opponent.isDead() && player.hasContacted(opponent)) {
-                if(needsSeperator == true) {
-                    reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "newline 20, span, growx, wrap 20");
+        for (Player opponent : getGame().getLiveNativePlayers(null)) {
+            if (player.hasContacted(opponent)) {
+                if (needsSeperator) {
+                    reportPanel.add(new JSeparator(JSeparator.HORIZONTAL),
+                        "newline 20, span, growx, wrap 20");
                 }
                 buildIndianAdvisorPanel(player, opponent);
                 needsSeperator = true;

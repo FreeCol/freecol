@@ -491,8 +491,7 @@ public class DebugUtils {
         final Game game = freeColClient.getGame();
 
         List<ChoiceItem<Player>> pcs = new ArrayList<ChoiceItem<Player>>();
-        for (Player p : game.getLiveEuropeanPlayers()) {
-            if (p == colony.getOwner()) continue;
+        for (Player p : game.getLiveEuropeanPlayers(colony.getOwner())) {
             String msg = Messages.message(p.getNationName());
             pcs.add(new ChoiceItem<Player>(msg, p));
         }
@@ -526,7 +525,7 @@ public class DebugUtils {
         final Game game = unit.getGame();
 
         List<ChoiceItem<Player>> pcs = new ArrayList<ChoiceItem<Player>>();
-        for (Player p : game.getPlayers()) {
+        for (Player p : game.getLivePlayers(null)) {
             if (unit.getType().isAvailableTo(p)) {
                 String msg = Messages.message(p.getNationName());
                 pcs.add(new ChoiceItem<Player>(msg, p));
@@ -745,7 +744,7 @@ public class DebugUtils {
         final AIMain aiMain = server.getAIMain();
 
         StringBuilder sb = new StringBuilder();
-        for (Player tp : sGame.getPlayers()) {
+        for (Player tp : sGame.getLiveEuropeanPlayers(null)) {
             Player p = sGame.getFreeColGameObject(tp.getId(), Player.class);
             if (p.getEurope() == null) continue;
             List<Unit> inEurope = new ArrayList<Unit>();
@@ -1130,7 +1129,7 @@ public class DebugUtils {
         StringBuilder sb = new StringBuilder(sis.getName());
         sb.append("\n\nAlarm\n");
         Player mostHated = sis.getMostHated();
-        for (Player p : sGame.getLiveEuropeanPlayers()) {
+        for (Player p : sGame.getLiveEuropeanPlayers(null)) {
             Tension tension = sis.getAlarm(p);
             sb.append(Messages.message(p.getNationName())
                 + " " + ((tension == null) ? "(none)"

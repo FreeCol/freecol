@@ -49,7 +49,7 @@ public final class ReportForeignAffairPanel extends ReportPanel {
         reportPanel.setLayout(new MigLayout("wrap 2", "[]push[]",
                                             "[align top]"));
 
-        for (Player enemy : getGame().getLiveEuropeanPlayers()) {
+        for (Player enemy : getGame().getLiveEuropeanPlayers(null)) {
             int n;
             NationSummary ns = getController().getNationSummary(enemy);
             if (ns == null) continue;

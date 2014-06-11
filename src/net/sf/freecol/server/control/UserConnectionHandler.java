@@ -139,7 +139,7 @@ public final class UserConnectionHandler extends FreeColServerHolder
 
         Element reply = DOMMessage.createMessage("vacantPlayers");
         Document doc = reply.getOwnerDocument();
-        for (Player p : game.getLiveEuropeanPlayers()) {
+        for (Player p : game.getLiveEuropeanPlayers(null)) {
             if (!p.isREF()
                 && (p.isAI() || !((ServerPlayer)p).isConnected())) {
                 Element playerElement = doc.createElement("player");
@@ -207,7 +207,7 @@ public final class UserConnectionHandler extends FreeColServerHolder
             }
 
             // Create and add the new player:
-            boolean admin = game.getPlayers().size() == 0;
+            boolean admin = game.getLivePlayers(null).size() == 0;
             player = new ServerPlayer(game, userName, admin,
                                       game.getVacantNation(),
                                       connection.getSocket(), connection);
@@ -229,7 +229,7 @@ public final class UserConnectionHandler extends FreeColServerHolder
                 StringBuilder sb = new StringBuilder("Player \"");
                 sb.append(userName).append("\" is not present in the game.")
                     .append("\n  Known players = ( ");
-                for (Player p : game.getLiveEuropeanPlayers()) {
+                for (Player p : game.getLiveEuropeanPlayers(null)) {
                     sb.append(p.getName()).append(" ");
                 }
                 sb.append(")");

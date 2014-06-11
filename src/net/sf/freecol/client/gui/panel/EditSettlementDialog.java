@@ -160,7 +160,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
 
     private Player getOwnerPlayer() {
         Nation n = getOwnerNation();
-        for (Player player : settlement.getGame().getPlayers()) {
+        for (Player player : settlement.getGame().getLivePlayers(null)) {
             if (player.getNationId().equals(n.getId())) return player;
         }
         return null;

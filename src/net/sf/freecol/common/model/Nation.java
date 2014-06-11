@@ -36,6 +36,7 @@ import net.sf.freecol.common.resources.ResourceManager;
  */
 public class Nation extends FreeColGameObjectType {
 
+    /** The unknown enemy id. */
     public static String UNKNOWN_NATION_ID = "model.nation.unknownEnemy";
 
     public static Color UNKNOWN_NATION_COLOR = Color.BLACK;

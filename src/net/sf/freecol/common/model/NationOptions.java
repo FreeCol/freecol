@@ -79,7 +79,7 @@ public class NationOptions extends FreeColObject {
         if (specification != null) {
             int counter = 0, maxEuropeans = FreeCol.getEuropeanCount();
             for (Nation nation : specification.getNations()) {
-                if (nation.getType().isREF()) {
+                if (nation.isUnknownEnemy() || nation.getType().isREF()) {
                     continue;
                 } else if (nation.getType().isEuropean()
                     && nation.isSelectable()) {

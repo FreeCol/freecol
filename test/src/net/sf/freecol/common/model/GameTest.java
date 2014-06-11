@@ -54,7 +54,8 @@ public class GameTest extends FreeColTestCase {
 
         int counter = 0;
         for (Nation n : spec().getNations()) {
-            if (defaultOptions.getNationState(n) == NationOptions.NationState.NOT_AVAILABLE) {
+            if (defaultOptions.getNationState(n)
+                == NationOptions.NationState.NOT_AVAILABLE) {
                 counter++;
             } else {
                 Player p = new ServerPlayer(game, n.getType().getNameKey(),

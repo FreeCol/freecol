@@ -94,18 +94,18 @@ public final class PreGameController extends Controller {
         Game game = freeColServer.buildGame();
 
         // Inform the clients.
-        for (Player player : new ArrayList<Player>(game.getPlayers())) {
-            if (!player.isAI()) {
-                player.invalidateCanSeeTiles();//Send clean copy of the game
-                Connection conn = ((ServerPlayer)player).getConnection();
-                Element update = DOMMessage.createMessage("updateGame");
-                update.appendChild(game.toXMLElement(update.getOwnerDocument(),
-                        player));
-                try {
-                    conn.askDumping(update);
-                } catch (IOException e) {
-                    logger.log(Level.WARNING, "Unable to updateGame", e);
-                }
+        for (Player player : game.getLivePlayers(null)) {
+            if (player.isAI()) continue;
+
+            player.invalidateCanSeeTiles();//Send clean copy of the game
+            Connection conn = ((ServerPlayer)player).getConnection();
+            Element update = DOMMessage.createMessage("updateGame");
+            update.appendChild(game.toXMLElement(update.getOwnerDocument(),
+                                                 player));
+            try {
+                conn.askDumping(update);
+            } catch (IOException e) {
+                logger.log(Level.WARNING, "Unable to updateGame", e);
             }
         }
 

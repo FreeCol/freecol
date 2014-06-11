@@ -68,7 +68,7 @@ public final class FindSettlementPanel extends FreeColPanel
 
     private JList settlementList;
 
-    private static enum displayListOption {
+    private static enum DisplayListOption {
         ALL,
         ONLY_NATIVES,
         ONLY_EUROPEAN
@@ -88,7 +88,7 @@ public final class FindSettlementPanel extends FreeColPanel
         add(header);
 
         settlementList = new JList();
-        updateSearch(displayListOption.valueOf("ALL"));
+        updateSearch(DisplayListOption.valueOf("ALL"));
         settlementList.setCellRenderer(new SettlementRenderer());
         settlementList.setFixedCellHeight(48);
         JScrollPane listScroller = new JScrollPane(settlementList);
@@ -137,14 +137,27 @@ public final class FindSettlementPanel extends FreeColPanel
     }
 
     @SuppressWarnings("unchecked") // FIXME in Java7
-    private void updateSearch(displayListOption displayListOption) {
+    private void updateSearch(DisplayListOption displayListOption) {
         DefaultListModel model = new DefaultListModel();
         Object selected = settlementList.getSelectedValue();
 
-        for (Player player : getGame().getPlayers()) {
-            if ((player.isIndian() && displayListOption.equals(displayListOption.ONLY_NATIVES)) ||
-                    (player.isEuropean() && displayListOption.equals(displayListOption.ONLY_EUROPEAN)) ||
-                    (displayListOption.equals(displayListOption.ALL))) {
+        for (Player player : getGame().getLivePlayers(null)) {
+            boolean ok;
+            switch (displayListOption) {
+            case ONLY_NATIVES:
+                ok = player.isIndian();
+                break;
+            case ONLY_EUROPEAN:
+                ok = player.isEuropean();
+                break;
+            case ALL:
+                ok = true;
+                break;
+            default:
+                ok = false;
+                break;
+            }
+            if (ok) {
                 for (Settlement s : player.getSettlements()) {
                     model.addElement(s);
                 }
@@ -185,13 +198,13 @@ public final class FindSettlementPanel extends FreeColPanel
         switch(displayOptionBox.getSelectedIndex()) {
         case 0:
         default:
-            updateSearch(displayListOption.valueOf("ALL"));
+            updateSearch(DisplayListOption.valueOf("ALL"));
             break;
         case 1:
-            updateSearch(displayListOption.valueOf("ONLY_NATIVES"));
+            updateSearch(DisplayListOption.valueOf("ONLY_NATIVES"));
             break;
         case 2:
-            updateSearch(displayListOption.valueOf("ONLY_EUROPEAN"));
+            updateSearch(DisplayListOption.valueOf("ONLY_EUROPEAN"));
         }
     }
 

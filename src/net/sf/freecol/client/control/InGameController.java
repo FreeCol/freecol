@@ -3791,12 +3791,9 @@ public final class InGameController implements NetworkConstants {
             }
             break;
         case INCITE_INDIANS:
-            List<Player> enemies = new ArrayList<Player>(freeColClient
-                .getGame().getLiveEuropeanPlayers());
-            enemies.remove(player);
             List<ChoiceItem<Player>> choices
                 = new ArrayList<ChoiceItem<Player>>();
-            for (Player p : enemies) {
+            for (Player p : freeColClient.getGame().getLiveEuropeanPlayers(player)) {
                 String label = Messages.message(p.getNationName());
                 choices.add(new ChoiceItem<Player>(label, p));
             }

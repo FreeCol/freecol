@@ -80,7 +80,7 @@ public class NationDetailPanel extends ColopediaGameObjectTypePanel<Nation> {
 
         Nation nation = getSpecification().getNation(id);
         NationType currentNationType = nation.getType();
-        for (Player player : getGame().getPlayers()) {
+        for (Player player : getGame().getLivePlayers(null)) {
             if (player.getNation() == nation) {
                 currentNationType = player.getNationType();
                 break;
@@ -105,6 +105,4 @@ public class NationDetailPanel extends ColopediaGameObjectTypePanel<Nation> {
         panel.add(localizedLabel("colopedia.nation.currentAdvantage"));
         panel.add(getButton(currentNationType), "wrap push");
     }
-
-
 }

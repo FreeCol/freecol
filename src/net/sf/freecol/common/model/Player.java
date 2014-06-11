@@ -476,9 +476,6 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public static final String ASSIGN_SETTLEMENT_NAME = "";
 
-    /** The name of the unknown enemy. */
-    public static final String UNKNOWN_ENEMY = "unknown enemy";
-
 
     //
     // Class variables
@@ -730,7 +727,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if this player is the unknown enemy.
      */
     public boolean isUnknownEnemy() {
-        return UNKNOWN_ENEMY.equals(name);
+        return Nation.UNKNOWN_NATION_ID.equals(nationId);
     }
 
     /**
@@ -1303,7 +1300,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public List<Player> getRebels() {
         List<Player> rebels = new ArrayList<Player>();
-        for (Player p : getGame().getLiveEuropeanPlayers()) {
+        for (Player p : getGame().getLiveEuropeanPlayers(this)) {
             if (p.getREFPlayer() == this
                 && (p.getPlayerType() == PlayerType.REBEL
                     || p.getPlayerType() == PlayerType.UNDEAD)) rebels.add(p);
@@ -1949,10 +1946,9 @@ public class Player extends FreeColGameObject implements Nameable {
                 return true;
             }
             if (hasAbility(Ability.CUSTOM_HOUSE_TRADES_WITH_FOREIGN_COUNTRIES)) {
-                for (Player otherPlayer : getGame().getLiveEuropeanPlayers()) {
-                    if (otherPlayer != this
-                        && (getStance(otherPlayer) == Stance.PEACE
-                            || getStance(otherPlayer) == Stance.ALLIANCE)) {
+                for (Player other : getGame().getLiveEuropeanPlayers(this)) {
+                    if (getStance(other) == Stance.PEACE
+                        || getStance(other) == Stance.ALLIANCE) {
                         return true;
                     }
                 }
@@ -2942,10 +2938,7 @@ public class Player extends FreeColGameObject implements Nameable {
         // All missions if using enhanced missionaries.
         if (isEuropean()
                 && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
-            for (Player other : getGame().getPlayers()) {
-                if (this.equals(other) || !other.isIndian()) {
-                    continue;
-                }
+            for (Player other : getGame().getLiveNativePlayers(this)) {
                 for (IndianSettlement is : other.getIndianSettlements()) {
                     if (!is.hasMissionary(this)) {
                         continue;
@@ -2960,10 +2953,7 @@ public class Player extends FreeColGameObject implements Nameable {
         }
         // All other European settlements if can see all colonies.
         if (isEuropean() && hasAbility(Ability.SEE_ALL_COLONIES)) {
-            for (Player other : getGame().getPlayers()) {
-                if (this.equals(other) || !other.isEuropean()) {
-                    continue;
-                }
+            for (Player other : getGame().getLiveEuropeanPlayers(this)) {
                 for (Colony colony : other.getColonies()) {
                     for (Tile t : colony.getTile().getSurroundingTiles(0,
                             colony.getLineOfSight())) {
@@ -3078,7 +3068,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if this player is at war with any other.
      */
     public boolean isAtWar() {
-        for (Player player : getGame().getPlayers()) {
+        for (Player player : getGame().getLivePlayers(null)) {
             if (atWarWith(player)) return true;
         }
         return false;
@@ -3100,10 +3090,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if this <code>Player</code> has contacted any Europeans.
      */
     public boolean hasContactedEuropeans() {
-        for (Player other : getGame().getLiveEuropeanPlayers()) {
-            if (other != this && hasContacted(other)) {
-                return true;
-            }
+        for (Player other : getGame().getLiveEuropeanPlayers(this)) {
+            if (hasContacted(other)) return true;
         }
         return false;
     }
@@ -3114,11 +3102,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if this <code>Player</code> has contacted any natives.
      */
     public boolean hasContactedIndians() {
-        for (Player other : getGame().getPlayers()) {
-            if (other != this && !other.isDead() && other.isIndian()
-                && hasContacted(other)) {
-                return true;
-            }
+        for (Player other : getGame().getLiveNativePlayers(this)) {
+            if (hasContacted(other)) return true;
         }
         return false;
     }

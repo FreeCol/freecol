@@ -536,7 +536,7 @@ public final class InGameController extends Controller {
      */
     private List<ServerPlayer> getOtherPlayers(ServerPlayer... serverPlayers) {
         List<ServerPlayer> result = new ArrayList<ServerPlayer>();
-        outer: for (Player otherPlayer : getGame().getPlayers()) {
+        outer: for (Player otherPlayer : getGame().getLivePlayers(null)) {
             ServerPlayer enemyPlayer = (ServerPlayer) otherPlayer;
             if (!enemyPlayer.isConnected()) continue;
             for (ServerPlayer exclude : serverPlayers) {
@@ -752,9 +752,8 @@ public final class InGameController extends Controller {
             // TODO: see if this can be relaxed so we can run large
             // AI-only simulations.
             boolean human = false;
-            for (Player p : game.getPlayers()) {
-                if (!p.isDead() && !p.isAI()
-                    && ((ServerPlayer)p).isConnected()) {
+            for (Player p : game.getLivePlayers(null)) {
+                if (!p.isAI() && ((ServerPlayer)p).isConnected()) {
                     human = true;
                     break;
                 }
@@ -912,8 +911,7 @@ public final class InGameController extends Controller {
         // here, and generate the bonus with a special case in
         // ServerPlayer.updateScore().
         int n = 0;
-        for (Player p : game.getLiveEuropeanPlayers()) {
-            if ((ServerPlayer)p == independent) continue;
+        for (Player p : game.getLiveEuropeanPlayers(independent)) {
             if (p.getPlayerType() == PlayerType.INDEPENDENT) n++;
         }
         h.setScore(n);
@@ -2896,7 +2894,7 @@ public final class InGameController extends Controller {
             }
             serverPlayer.addSettlement(settlement);
             settlement.placeSettlement(true);//-vis(serverPlayer),-til
-            for (Player p : getGame().getPlayers()) {
+            for (Player p : getGame().getLivePlayers(serverPlayer)) {
                 if ((ServerPlayer)p == serverPlayer) continue;
                 ((IndianSettlement)settlement).setAlarm(p, (p.isIndian())
                     ? new Tension(Tension.Level.CONTENT.getLimit())
@@ -4314,9 +4312,8 @@ public final class InGameController extends Controller {
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
 
         // No one likes the undead.
-        for (Player p : game.getPlayers()) {
-            if (serverPlayer != (ServerPlayer)p
-                && serverPlayer.hasContacted(p)) {
+        for (Player p : game.getLivePlayers(serverPlayer)) {
+            if (serverPlayer.hasContacted(p)) {
                 serverPlayer.csChangeStance(Stance.WAR, (ServerPlayer)p,
                                             true, cs);
             }

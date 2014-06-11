@@ -204,8 +204,8 @@ public class Operand extends Scope {
             return game.getSpecification().getInteger(getType());
         default:
             List<FreeColObject> list = new LinkedList<FreeColObject>();
-            for (Player player : game.getPlayers()) {
-                switch(operandType) {
+            for (Player player : game.getLivePlayers(null)) {
+                switch (operandType) {
                 case UNITS:
                     list.addAll(player.getUnits());
                     break;

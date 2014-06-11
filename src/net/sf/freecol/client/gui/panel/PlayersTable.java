@@ -458,8 +458,7 @@ public final class PlayersTable extends JTable {
             for (Nation nation : nations) {
                 players.put(nation, null);
             }
-            for (Player player : thisPlayer.getGame().getPlayers()) {
-                if (player.isUnknownEnemy()) continue;
+            for (Player player : thisPlayer.getGame().getLivePlayers(null)) {
                 players.put(player.getNation(), player);
             }
             fireTableDataChanged();

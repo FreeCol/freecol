@@ -178,7 +178,7 @@ public final class PreGameInputHandler extends InputHandler {
 
         // Check that no two players have the same nation
         ArrayList<Nation> nations = new ArrayList<Nation>();
-        for (Player player : getGame().getPlayers()) {
+        for (Player player : getGame().getLivePlayers(null)) {
             final Nation nation = getGame().getSpecification()
                 .getNation(player.getNationId());
             if (nations.contains(nation)) {

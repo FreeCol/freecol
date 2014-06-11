@@ -167,7 +167,7 @@ public class DebugMenu extends JMenu {
             });
         this.add(cvpMenu);
         cvpMenu.addSeparator();
-        for (Player p : game.getLiveEuropeanPlayers()) {
+        for (Player p : game.getLiveEuropeanPlayers(null)) {
             final JRadioButtonMenuItem cv2
                 = new JRadioButtonMenuItem(Messages.message(p.getNationName()),
                     FreeColDebugger.debugDisplayColonyValuePlayer() == p);
