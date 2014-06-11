@@ -350,8 +350,8 @@ public abstract class FreeColObject
      * @param turn An optional applicable <code>Turn</code>.
      * @return True if the ability is present.
      */
-    public boolean hasAbility(String id, FreeColGameObjectType fcgot,
-                              Turn turn) {
+    public final boolean hasAbility(String id, FreeColGameObjectType fcgot,
+                                    Turn turn) {
         return FeatureContainer.hasAbility(getAbilitySet(id, fcgot, turn));
     }
 

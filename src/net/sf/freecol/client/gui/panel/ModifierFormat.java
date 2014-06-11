@@ -95,9 +95,6 @@ public class ModifierFormat {
     public static JLabel[] getModifierLabels(Modifier modifier,
                                              FreeColGameObjectType fcgot,
                                              Turn turn) {
-        float value = modifier.getValue(turn);
-        if (value == 0) return new JLabel[0];
-
         String sourceName = getSourceName(modifier.getSource());
         if (fcgot != null) {
             for (Scope scope : modifier.getScopes()) {
@@ -107,6 +104,7 @@ public class ModifierFormat {
                 }
             }
         }
+        float value = modifier.getValue(turn);
         String[] bonus = getModifierStrings(value, modifier.getType());
         JLabel[] result = new JLabel[3];
         result[0] = new JLabel(sourceName);

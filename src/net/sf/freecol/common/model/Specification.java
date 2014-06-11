@@ -107,28 +107,28 @@ public final class Specification {
         public String getXMLTagName() { return "source"; }
     };
 
-    public static final Source MOVEMENT_PENALTY_SOURCE
-        = new Source("model.source.movementPenalty");
+    public static final Source AMBUSH_BONUS_SOURCE
+        = new Source("model.source.ambushBonus");
+    public static final Source AMPHIBIOUS_ATTACK_PENALTY_SOURCE
+        = new Source("model.source.amphibiousAttack");
     public static final Source ARTILLERY_PENALTY_SOURCE
         = new Source("model.source.artilleryInTheOpen");
     public static final Source ATTACK_BONUS_SOURCE
         = new Source("model.source.attackBonus");
+    public static final Source BASE_DEFENCE_SOURCE
+        = new Source("model.source.baseDefence");
+    public static final Source BASE_OFFENCE_SOURCE
+        = new Source("model.source.baseOffence");
+    public static final Source CARGO_PENALTY_SOURCE
+        = new Source("model.source.cargoPenalty");
+    public static final Source COLONY_GOODS_PARTY_SOURCE
+        = new Source("model.source.colonyGoodsParty");
     public static final Source FORTIFICATION_BONUS_SOURCE
         = new Source("model.source.fortified");
     public static final Source INDIAN_RAID_BONUS_SOURCE
         = new Source("model.source.artilleryAgainstRaid");
-    public static final Source AMPHIBIOUS_ATTACK_PENALTY_SOURCE
-        = new Source("model.source.amphibiousAttack");
-    public static final Source BASE_OFFENCE_SOURCE
-        = new Source("model.source.baseOffence");
-    public static final Source BASE_DEFENCE_SOURCE
-        = new Source("model.source.baseDefence");
-    public static final Source CARGO_PENALTY_SOURCE
-        = new Source("model.source.cargoPenalty");
-    public static final Source AMBUSH_BONUS_SOURCE
-        = new Source("model.source.ambushBonus");
-    public static final Source COLONY_GOODS_PARTY_SOURCE
-        = new Source("model.source.colonyGoodsParty");
+    public static final Source MOVEMENT_PENALTY_SOURCE
+        = new Source("model.source.movementPenalty");
     public static final Source SHIP_TRADE_PENALTY_SOURCE
         = new Source("model.source.shipTradePenalty");
     public static final Source SOL_MODIFIER_SOURCE

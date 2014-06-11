@@ -4145,8 +4145,8 @@ public class Player extends FreeColGameObject implements Nameable {
         if (isUnknownEnemy()) {
             nationType = null;
         } else {
-            changeNationType(xr.getType(spec, NATION_TYPE_TAG,
-                                        NationType.class, (NationType)null));;
+            nationType = xr.getType(spec, NATION_TYPE_TAG,
+                                    NationType.class, (NationType)null);
         }
 
         admin = xr.getAttribute(ADMIN_TAG, false);

@@ -167,7 +167,6 @@ public class CombatTest extends FreeColTestCase {
     }
 
     public void testGalleonAttackedByPrivateer() throws Exception {
-
         Game game = getStandardGame();
         CombatModel combatModel = game.getCombatModel();
         Player dutch = game.getPlayer("model.nation.dutch");

@@ -484,7 +484,9 @@ public class Modifier extends Feature {
         if (other instanceof Modifier) {
             Modifier modifier = (Modifier)other;
             cmp = productionIndex - modifier.productionIndex;
-            if (cmp == 0) cmp = modifierType.compareTo(modifier.modifierType);
+            if (cmp == 0) {
+                cmp = modifierType.ordinal() - modifier.modifierType.ordinal();
+            }
         }
         if (cmp == 0) cmp = super.compareTo(other);
         return cmp;

@@ -89,12 +89,13 @@ public class SimpleCombatModel extends CombatModel {
         float result = 0.0f;
         if (attacker == null) {
             throw new IllegalStateException("Null attacker");
+
         } else if (combatIsAttackMeasurement(attacker, defender)
             || combatIsAttack(attacker, defender)
             || combatIsSettlementAttack(attacker, defender)) {
             result = FeatureContainer.applyModifierSet(0,
-                    attacker.getGame().getTurn(),
-                    getOffensiveModifiers(attacker, defender));
+                attacker.getGame().getTurn(),
+                getOffensiveModifiers(attacker, defender));
 
         } else if (combatIsBombard(attacker, defender)) {
             Settlement attackerSettlement = (Settlement) attacker;
@@ -106,6 +107,7 @@ public class SimpleCombatModel extends CombatModel {
                 }
             }
             if (result > MAXIMUM_BOMBARD_POWER) result = MAXIMUM_BOMBARD_POWER;
+
         } else {
             throw new IllegalArgumentException("Bogus combat");
         }
@@ -124,12 +126,11 @@ public class SimpleCombatModel extends CombatModel {
         float result;
         if (combatIsDefenceMeasurement(attacker, defender)
             || combatIsAttack(attacker, defender)
-            || combatIsSettlementAttack(attacker, defender)) {
+            || combatIsSettlementAttack(attacker, defender)
+            || combatIsBombard(attacker, defender)) {
             result = FeatureContainer.applyModifierSet(0,
-                    defender.getGame().getTurn(),
-                    getDefensiveModifiers(attacker, defender));
-        } else if (combatIsBombard(attacker, defender)) {
-            result = ((Unit) defender).getType().getDefence();
+                defender.getGame().getTurn(),
+                getDefensiveModifiers(attacker, defender));
 
         } else {
             throw new IllegalArgumentException("Bogus combat");
@@ -152,21 +153,25 @@ public class SimpleCombatModel extends CombatModel {
         } else if (combatIsAttackMeasurement(attacker, defender)
             || combatIsAttack(attacker, defender)
             || combatIsSettlementAttack(attacker, defender)) {
-            Unit attackerUnit = (Unit)attacker;
-            UnitType type = attackerUnit.getType();
-            // Base offense
+            final Specification spec = attacker.getSpecification();
+            final Unit attackerUnit = (Unit)attacker;
+
+            // Base offence
             result.add(new Modifier(Modifier.OFFENCE,
-                                    type.getOffence(),
+                                    attackerUnit.getType().getOffence(),
                                     ModifierType.ADDITIVE,
                                     Specification.BASE_OFFENCE_SOURCE));
-            // Unit modifiers
+
+            // Unit offensive modifiers, including role+equipment
             result.addAll(attackerUnit.getModifierSet(Modifier.OFFENCE));
-            // Special attacks
+
+            // Special bonuses against certain defenders
             if (defender instanceof Ownable) {
                 result.addAll(attackerUnit
                               .getModifierSet(Modifier.OFFENCE_AGAINST,
-                                              (Ownable) defender));
+                                              (Ownable)defender));
             }
+
             // Land/naval specific
             if (attackerUnit.isNaval()) {
                 addNavalOffensiveModifiers(attackerUnit, result);
@@ -175,9 +180,7 @@ public class SimpleCombatModel extends CombatModel {
             }
 
         } else if (combatIsBombard(attacker, defender)) {
-            result.add(new Modifier(Modifier.BOMBARD_BONUS,
-                                    getOffencePower(attacker, defender),
-                                    ModifierType.ADDITIVE));
+            ; // Bombard strength handled by getOffensePower
 
         } else {
             throw new IllegalArgumentException("Bogus combat");
@@ -241,12 +244,11 @@ public class SimpleCombatModel extends CombatModel {
         if (combatIsAttackMeasurement(attacker, defender)) {
             ; // No defender information available
         } else if (combatIsSettlementAttack(attacker, defender)) {
-            // Settlement present, REF bombardment bonus
-            result.addAll(attackerUnit
-                          .getModifierSet(Modifier.BOMBARD_BONUS));
+            // Settlement present, apply bombardment bonus
+            result.addAll(attackerUnit.getModifierSet(Modifier.BOMBARD_BONUS));
             if (combatIsWarOfIndependence(attacker, defender)) {
                 Colony colony = (Colony)defender;
-                int bonus = colony.getSoL();
+                int bonus = Math.max(100, colony.getSoL());
                 if (attackerUnit.getOwner().isREF()) bonus = 100 - bonus;
                 result.add(new Modifier(Modifier.POPULAR_SUPPORT, bonus,
                                         ModifierType.PERCENTAGE, colony));
@@ -294,15 +296,18 @@ public class SimpleCombatModel extends CombatModel {
                                                FreeColGameObject defender) {
         Set<Modifier> result = new LinkedHashSet<Modifier>();
         if (combatIsDefenceMeasurement(attacker, defender)
-            || combatIsAttack(attacker, defender)) {
+            || combatIsAttack(attacker, defender)
+            || combatIsBombard(attacker, defender)) {
             Unit defenderUnit = (Unit)defender;
             // Base defence
             result.add(new Modifier(Modifier.DEFENCE,
                                     defenderUnit.getType().getDefence(),
                                     ModifierType.ADDITIVE,
                                     Specification.BASE_DEFENCE_SOURCE));
+
             // Unit specific
             result.addAll(defenderUnit.getModifierSet(Modifier.DEFENCE));
+
             // Land/naval split
             if (defenderUnit.isNaval()) {
                 addNavalDefensiveModifiers(defender, result);
@@ -315,12 +320,6 @@ public class SimpleCombatModel extends CombatModel {
             // to the pre-combat dialog--- the actual attack is on the
             // unit chosen to defend.
             result.add(UNKNOWN_DEFENCE_MODIFIER);
-
-        } else if (combatIsBombard(attacker, defender)) {
-            Unit defenderUnit = (Unit) defender;
-            result.add(new Modifier(Modifier.DEFENCE,
-                                    defenderUnit.getType().getDefence(),
-                                    ModifierType.ADDITIVE));
 
         } else {
             throw new IllegalArgumentException("Bogus combat");

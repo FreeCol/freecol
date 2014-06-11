@@ -132,6 +132,7 @@ public abstract class CombatModel {
                                             FreeColGameObject defender) {
         return attacker instanceof Unit && defender instanceof Settlement;
     }
+
     /**
      * Is this combat a bombardment?
      *
@@ -142,7 +143,7 @@ public abstract class CombatModel {
     public boolean combatIsBombard(FreeColGameObject attacker,
                                    FreeColGameObject defender) {
         return attacker instanceof Settlement && defender instanceof Unit
-            && ((Unit) defender).isNaval();
+            && ((Unit)defender).isNaval();
     }
 
     /**
