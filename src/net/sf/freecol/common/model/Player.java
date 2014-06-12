@@ -716,6 +716,15 @@ public class Player extends FreeColGameObject implements Nameable {
         return name;
     }
 
+    /**
+     * Set the player name.
+     *
+     * @param newName The new name value.
+     */
+    public void setName(String newName) {
+        this.name = newName;
+    }
+
     // TODO: remove this again
     public String getNameKey() {
         return getName();
@@ -728,28 +737,6 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public boolean isUnknownEnemy() {
         return Nation.UNKNOWN_NATION_ID.equals(nationId);
-    }
-
-    /**
-     * Gets the name to display for this player.
-     *
-     * TODO: This is a kludge that should be fixed.
-     *
-     * @return The name to display for this player.
-     */
-    public String getDisplayName() {
-        return (getName().startsWith("model.nation."))
-            ? Messages.message(getName())
-            : getName();
-    }
-
-    /**
-     * Set the player name.
-     *
-     * @param newName The new name value.
-     */
-    public void setName(String newName) {
-        this.name = newName;
     }
 
     /**

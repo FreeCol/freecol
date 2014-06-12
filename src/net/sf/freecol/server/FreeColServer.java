@@ -1355,16 +1355,15 @@ public final class FreeColServer {
      * @return The new AI <code>ServerPlayer</code>.
      */
     public ServerPlayer addAIPlayer(Nation nation) {
-        String name = nation.getId();
-        DummyConnection theConnection =
-            new DummyConnection("Server connection - " + name,
+        DummyConnection theConnection
+            = new DummyConnection("Server connection - " + nation.getId(),
                 getInGameInputHandler());
         ServerPlayer aiPlayer
-            = new ServerPlayer(getGame(), name, false, nation,
-                               null, theConnection);
+            = new ServerPlayer(getGame(), nation.getRulerNameKey(), false,
+                               nation, null, theConnection);
         aiPlayer.setAI(true);
         DummyConnection aiConnection
-            = new DummyConnection("AI connection - " + name,
+            = new DummyConnection("AI connection - " + nation.getId(),
                 new AIInGameInputHandler(this, aiPlayer, getAIMain()));
 
         aiConnection.setOutgoingMessageHandler(theConnection);
@@ -1440,9 +1439,7 @@ public final class FreeColServer {
     public ServerPlayer getPlayer(Connection connection) {
         for (Player p : game.getPlayers()) {
             ServerPlayer serverPlayer = (ServerPlayer)p;
-            if (serverPlayer.getConnection() == connection) {
-                return serverPlayer;
-            }
+            if (serverPlayer.getConnection() == connection) return serverPlayer;
         }
         return null;
     }

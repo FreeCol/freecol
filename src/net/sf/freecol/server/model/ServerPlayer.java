@@ -173,7 +173,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         final Specification spec = getSpecification();
 
-        this.name = name;
+        this.name = (name.startsWith("model.nation.")) ? Messages.message(name)
+            : name;
         this.admin = admin;
         this.immigration = 0;
         if (nation == null) {
@@ -2056,8 +2057,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                                  true, cs);
             }
         }
-        logger.finest(this.getDisplayName() + " claimed " + tile
-            + " from " + ((owner == null) ? "no-one" : owner.getDisplayName())
+        logger.finest(this.getName() + " claimed " + tile
+            + " from " + ((owner == null) ? "no-one" : owner.getName())
             + ", price: " + ((price == 0) ? "free" : (price < 0) ? "stolen"
                 : price));
     }
