@@ -2052,6 +2052,18 @@ public final class Specification {
             ue.setColor(Color.BLACK);
         }
 
+        // Ambush terrain ability not present in older specs.
+        if (getAbilities(Ability.AMBUSH_TERRAIN) == null) {
+            Ability ambush = new Ability(Ability.AMBUSH_TERRAIN, null, true);
+            addAbility(ambush);
+            for (TileType tt : getTileTypeList()) {
+                if ((tt.isElevation() || tt.isForested())
+                    && !tt.hasAbility(Ability.AMBUSH_TERRAIN)) {
+                    tt.addAbility(new Ability(Ability.AMBUSH_TERRAIN, tt, true));
+                }
+            }
+        }
+
         // end @compat 0.10.7
     }
     // end @compat 0.10.x
