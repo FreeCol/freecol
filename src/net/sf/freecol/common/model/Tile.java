@@ -2032,6 +2032,21 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         super.dispose();
     }
 
+
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<Ability> getAbilitySet(String id,
+                                      FreeColGameObjectType fcgot,
+                                      Turn turn) {
+        // Delegate to type
+        return getType().getAbilitySet(id, fcgot, turn);
+    }
+
+
     //
     // Miscellaneous low level
     //
