@@ -21,21 +21,21 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Font;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
+
+import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.CombatModel;
+import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Modifier.ModifierType;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 
 import net.miginfocom.swing.MigLayout;
@@ -65,12 +66,18 @@ public class PreCombatDialog extends FreeColConfirmDialog {
                            FreeColGameObject attacker,
                            FreeColGameObject defender) {
         super(freeColClient);
-
-        final CombatModel combatModel = attacker.getGame().getCombatModel();
-        final Set<Modifier> offence = sortModifiers(combatModel
-                .getOffensiveModifiers(attacker, defender));
-        final Set<Modifier> defence = sortModifiers(combatModel
-                .getDefensiveModifiers(attacker, defender));
+        
+        final Game game = attacker.getGame();
+        final CombatModel combatModel = game.getCombatModel();
+        final Turn turn = game.getTurn();
+        final Set<Modifier> attackModifiers
+            = combatModel.getOffensiveModifiers(attacker, defender);
+        final Set<Modifier> defenceModifiers
+            = combatModel.getDefensiveModifiers(attacker, defender);
+        final List<Modifier> offence = new ArrayList<Modifier>(attackModifiers);
+        Collections.sort(offence);
+        final List<Modifier> defence = new ArrayList<Modifier>(defenceModifiers);
+        Collections.sort(defence);
 
         MigPanel panel = new MigPanel(new MigLayout("wrap 6",
                 "[sg label]20[sg value, right]1px[sg percent]40"
@@ -100,29 +107,33 @@ public class PreCombatDialog extends FreeColConfirmDialog {
         panel.add(new JLabel(defenderName), "span 3, align center");
         panel.add(attackerLabel, "span 3, align center");
         panel.add(defenderLabel, "span 3, align center");
-        panel.add(new JSeparator(JSeparator.HORIZONTAL), "newline, span 3, growx");
-        panel.add(new JSeparator(JSeparator.HORIZONTAL), "span 3, growx");
+        panel.add(new JSeparator(JSeparator.HORIZONTAL),
+                  "newline, span 3, growx");
+        panel.add(new JSeparator(JSeparator.HORIZONTAL),
+                  "span 3, growx");
 
-        Iterator<Modifier> offenceModifiers = offence.iterator();
-        Iterator<Modifier> defenceModifiers = defence.iterator();
-        while (offenceModifiers.hasNext() || defenceModifiers.hasNext()) {
+        Iterator<Modifier> offenceI = offence.iterator();
+        Iterator<Modifier> defenceI = defence.iterator();
+        while (offenceI.hasNext() || defenceI.hasNext()) {
             int skip = 0;
-            boolean hasOffence = offenceModifiers.hasNext();
+            boolean hasOffence = offenceI.hasNext();
             if (hasOffence) {
-                if (!addModifier(panel, offenceModifiers.next(), true, 0)) {
-                    skip = 1;
-                }
+                JLabel[] labels = ModifierFormat
+                    .getModifierLabels(offenceI.next(), null, turn);
+                skip = addLabels(panel, labels, true, 0);
             } else {
                 skip = 3;
             }
-            if (defenceModifiers.hasNext()) {
-                addModifier(panel, defenceModifiers.next(), !hasOffence, skip);
+            if (defenceI.hasNext()) {
+                JLabel[] labels = ModifierFormat
+                    .getModifierLabels(defenceI.next(), null, turn);
+                addLabels(panel, labels, !hasOffence, skip);
             }
         }
 
         Font bigFont = getFont().deriveFont(Font.BOLD, 20f);
-        float offenceResult = FeatureContainer.applyModifierSet(0,
-            attacker.getGame().getTurn(), offence);
+        float offenceResult
+            = FeatureContainer.applyModifierSet(0, turn, attackModifiers);
         JLabel finalOffenceLabel
             = new JLabel(Messages.message("model.source.finalResult.name"));
         finalOffenceLabel.setFont(bigFont);
@@ -135,15 +146,14 @@ public class PreCombatDialog extends FreeColConfirmDialog {
         finalOffenceResult.setFont(bigFont);
         panel.add(finalOffenceResult);
 
-        float defenceResult = FeatureContainer.applyModifierSet(0,
-            attacker.getGame().getTurn(), defence);
+        float defenceResult
+            = FeatureContainer.applyModifierSet(0, turn, defenceModifiers);
         JLabel finalDefenceLabel
             = new JLabel(Messages.message("model.source.finalResult.name"));
         finalDefenceLabel.setFont(bigFont);
         panel.add(finalDefenceLabel, "skip");
-        JLabel finalDefenceResult = (defenceResult == Modifier.UNKNOWN)
-            ? new JLabel("???")
-            : new JLabel(ModifierFormat.format(defenceResult));
+        JLabel finalDefenceResult
+            = new JLabel(ModifierFormat.format(defenceResult));
         finalDefenceResult.setFont(bigFont);
         panel.add(finalDefenceResult);
         panel.setSize(panel.getPreferredSize());
@@ -151,12 +161,12 @@ public class PreCombatDialog extends FreeColConfirmDialog {
         initialize(true, panel, null, "ok", "cancel");
     }
 
-    private boolean addModifier(JPanel panel, Modifier modifier,
-                                boolean newline, int skip) {
-        String constraint = null;
-        if (newline) {
-            constraint = "newline";
-        }
+    private int addLabels(JPanel panel, JLabel[] labels, boolean newline,
+                          int skip) {
+        int len = labels.length;
+        for (int i = 0; i < len; i++) if (labels[i] == null) len = i;
+ 
+        String constraint = (newline) ? "newline" : null;
         if (skip > 0) {
             if (constraint == null) {
                 constraint = "skip " + skip;
@@ -164,44 +174,14 @@ public class PreCombatDialog extends FreeColConfirmDialog {
                 constraint += ", skip " + skip;
             }
         }
-        FreeColObject source = modifier.getSource();
-        String sourceName = "???";
-        if (source != null) {
-            sourceName = Messages.getName(source);
+        for (int i = 0; i < len; i++) {
+            if (constraint != null) {
+                panel.add(labels[i], constraint);
+                constraint = null;
+            } else {
+                panel.add(labels[i]);
+            }
         }
-        panel.add(new JLabel(sourceName), constraint);
-        String[] bonus = ModifierFormat.getModifierStrings(modifier);
-        panel.add(new JLabel(bonus[0] + bonus[1]));
-        if (bonus[2] == null) {
-            return false;
-        } else {
-            panel.add(new JLabel(bonus[2]));
-            return true;
-        }
-    }
-
-    /**
-     * Sort the given modifiers according to type.
-     *
-     * TODO: Check this agrees with the FeatureContainer.applyModifier
-     * ordering.
-     *
-     * @param result Set of <code>Modifier</code>
-     * @return a sorted Set of <code>Modifier</code>
-     */
-    private Set<Modifier> sortModifiers(Set<Modifier> result) {
-        EnumMap<ModifierType, List<Modifier>> modifierMap
-            = new EnumMap<ModifierType, List<Modifier>>(ModifierType.class);
-        for (ModifierType type : ModifierType.values()) {
-            modifierMap.put(type, new ArrayList<Modifier>());
-        }
-        for (Modifier modifier : result) {
-            modifierMap.get(modifier.getType()).add(modifier);
-        }
-        Set<Modifier> sortedResult = new LinkedHashSet<Modifier>();
-        for (ModifierType type : ModifierType.values()) {
-            sortedResult.addAll(modifierMap.get(type));
-        }
-        return sortedResult;
+        return 3 - len;
     }
 }

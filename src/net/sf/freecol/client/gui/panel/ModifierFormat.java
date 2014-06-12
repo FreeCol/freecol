@@ -28,19 +28,25 @@ import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Modifier.ModifierType;
+import net.sf.freecol.common.model.Nameable;
+import net.sf.freecol.common.model.Named;
 import net.sf.freecol.common.model.Scope;
 import net.sf.freecol.common.model.Turn;
 
+
 public class ModifierFormat {
 
-    // The decimal format to use for Modifiers
+    /** Generic unknown result.  TODO: transfer to strings file. */
+    private static final String UNKNOWN = "???";
+
+    /** The decimal format to use for Modifiers. */
     private static final DecimalFormat modifierFormat
         = new DecimalFormat("0.00");
 
 
-
     public static final String format(double value) {
-        return modifierFormat.format(value);
+        return (value == Modifier.UNKNOWN) ? UNKNOWN
+            : modifierFormat.format(value);
     }
 
     public static final String[] getModifierStrings(Modifier modifier) {
@@ -49,17 +55,16 @@ public class ModifierFormat {
 
     public static final String[] getModifierStrings(float value,
                                                     ModifierType type) {
-        String[] result;
         String bonus = modifierFormat.format(value);
-        if (value < 0) {
-            result = new String[] { "-", bonus.substring(1), null };
-        } else {
-            result = new String[] { "+", bonus, null };
+        if (value == Modifier.UNKNOWN) {
+            return new String[] { " ", bonus, null };
         }
+        String[] result = (value < 0)
+            ? new String[] { "-", bonus.substring(1), null }
+            : new String[] { "+", bonus, null };
         switch (type) {
         case MULTIPLICATIVE:
-            // this assumes that no multiplicative modifier will never
-            // be negative
+            // assumes multiplicative modifiers will never be negative
             result[0] = "\u00D7";
             break;
         case PERCENTAGE:
@@ -71,22 +76,34 @@ public class ModifierFormat {
         return result;
     }
 
+    private static String getSourceName(FreeColObject source) {
+        if (source == null) return UNKNOWN;
+
+        String result = null;
+        if (result == null && source instanceof Nameable) {
+            result = ((Nameable)source).getName();
+            if ("".equals(result)) result = null;
+        }
+        if (result == null && source instanceof Named) {
+            result = Messages.message(((Named)source).getNameKey());
+            if ("".equals(result)) result = null;
+        }
+        if (result == null) result = Messages.getName(source);
+        return result;
+    }
+
     public static JLabel[] getModifierLabels(Modifier modifier,
                                              FreeColGameObjectType fcgot,
                                              Turn turn) {
         float value = modifier.getValue(turn);
         if (value == 0) return new JLabel[0];
 
-        FreeColObject source = modifier.getSource();
-        String sourceName;
-        if (source == null) {
-            sourceName = "???";
-        } else {
-            sourceName = Messages.getName(source);
+        String sourceName = getSourceName(modifier.getSource());
+        if (fcgot != null) {
             for (Scope scope : modifier.getScopes()) {
                 if (scope.appliesTo(fcgot)) {
-                    sourceName += (fcgot == null) ? " ()"
-                        : " (" + Messages.message(fcgot.getNameKey()) + ")";
+                    sourceName += " (" + Messages.message(fcgot.getNameKey())
+                        + ")";
                 }
             }
         }
@@ -94,8 +111,7 @@ public class ModifierFormat {
         JLabel[] result = new JLabel[3];
         result[0] = new JLabel(sourceName);
         result[1] = new JLabel(bonus[0] + bonus[1]);
-        result[2] = (bonus[2] == null) ? null
-            : new JLabel(bonus[2]);
+        result[2] = (bonus[2] == null) ? null : new JLabel(bonus[2]);
         return result;
     }
 
@@ -129,5 +145,4 @@ public class ModifierFormat {
         }
         return result;
     }
-
 }
