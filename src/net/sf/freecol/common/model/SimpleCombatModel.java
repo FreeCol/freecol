@@ -152,18 +152,22 @@ public class SimpleCombatModel extends CombatModel {
         } else if (combatIsAttackMeasurement(attacker, defender)
             || combatIsAttack(attacker, defender)
             || combatIsSettlementAttack(attacker, defender)) {
-            Unit attackerUnit = (Unit) attacker;
+            Unit attackerUnit = (Unit)attacker;
             UnitType type = attackerUnit.getType();
+            // Base offense
             result.add(new Modifier(Modifier.OFFENCE,
                                     type.getOffence(),
                                     ModifierType.ADDITIVE,
                                     Specification.BASE_OFFENCE_SOURCE));
+            // Unit modifiers
             result.addAll(attackerUnit.getModifierSet(Modifier.OFFENCE));
+            // Special attacks
             if (defender instanceof Ownable) {
                 result.addAll(attackerUnit
                               .getModifierSet(Modifier.OFFENCE_AGAINST,
                                               (Ownable) defender));
             }
+            // Land/naval specific
             if (attackerUnit.isNaval()) {
                 addNavalOffensiveModifiers(attackerUnit, result);
             } else {
@@ -213,23 +217,20 @@ public class SimpleCombatModel extends CombatModel {
     private void addLandOffensiveModifiers(FreeColGameObject attacker,
                                            FreeColGameObject defender,
                                            Set<Modifier> result) {
-        Unit attackerUnit = (Unit) attacker;
-        Specification spec = attackerUnit.getSpecification();
-        // Equipment bonuses
-        TypeCountMap<EquipmentType> equip = attackerUnit.getEquipment();
-        if (equip != null) {
-            for (EquipmentType et : equip.keySet()) {
-                result.addAll(et.getModifierSet(Modifier.OFFENCE));
-            }
-        }
+        final Unit attackerUnit = (Unit)attacker;
+        final Specification spec = attackerUnit.getSpecification();
+
         // Attack bonus
         result.addAll(spec.getModifiers(Modifier.ATTACK_BONUS));
+
         // Movement penalty
-        int movesLeft = attackerUnit.getMovesLeft();
-        if (movesLeft == 1) {
+        switch (attackerUnit.getMovesLeft()) {
+        case 1:
             result.addAll(spec.getModifiers(Modifier.BIG_MOVEMENT_PENALTY));
-        } else if (movesLeft == 2) {
+            break;
+        case 2:
             result.addAll(spec.getModifiers(Modifier.SMALL_MOVEMENT_PENALTY));
+            break;
         }
 
         // Amphibious attack?
@@ -294,13 +295,15 @@ public class SimpleCombatModel extends CombatModel {
         Set<Modifier> result = new LinkedHashSet<Modifier>();
         if (combatIsDefenceMeasurement(attacker, defender)
             || combatIsAttack(attacker, defender)) {
-            Unit defenderUnit = (Unit) defender;
+            Unit defenderUnit = (Unit)defender;
+            // Base defence
             result.add(new Modifier(Modifier.DEFENCE,
                                     defenderUnit.getType().getDefence(),
                                     ModifierType.ADDITIVE,
                                     Specification.BASE_DEFENCE_SOURCE));
-            result.addAll(defenderUnit.getType()
-                          .getModifierSet(Modifier.DEFENCE));
+            // Unit specific
+            result.addAll(defenderUnit.getModifierSet(Modifier.DEFENCE));
+            // Land/naval split
             if (defenderUnit.isNaval()) {
                 addNavalDefensiveModifiers(defender, result);
             } else {
@@ -354,21 +357,9 @@ public class SimpleCombatModel extends CombatModel {
     private void addLandDefensiveModifiers(FreeColGameObject attacker,
                                            FreeColGameObject defender,
                                            Set<Modifier> result) {
-        Unit defenderUnit = (Unit) defender;
-        Specification spec = defender.getSpecification();
-        // Auto-equip and equipment bonuses.
-        TypeCountMap<EquipmentType> equip = defenderUnit.getEquipment();
-        if (equip != null) {
-            for (EquipmentType et : equip.keySet()) {
-                result.addAll(et.getModifierSet(Modifier.DEFENCE));
-            }
-        }
-        equip = defenderUnit.getAutomaticEquipment();
-        if (equip != null) {
-            for (EquipmentType et : equip.keySet()) {
-                result.addAll(et.getModifierSet(Modifier.DEFENCE));
-            }
-        }
+        final Unit defenderUnit = (Unit)defender;
+        final Specification spec = defender.getSpecification();
+
         // Fortify bonus
         if (defenderUnit.getState() == Unit.UnitState.FORTIFIED) {
             result.addAll(spec.getModifiers(Modifier.FORTIFIED));
@@ -396,6 +387,14 @@ public class SimpleCombatModel extends CombatModel {
                     && attacker != null
                     && ((Unit)attacker).getOwner().isIndian()) {
                     result.addAll(spec.getModifiers(Modifier.ARTILLERY_AGAINST_RAID));
+                }
+                // Automatic equipment?
+                if (defenderUnit.getAutomaticEquipment() != null
+                    && defenderUnit.isInColony()
+                    && defenderUnit.getRole() == spec.getDefaultRole()) {
+                    // FIXME: hard coded model.role.soldier, move to spec
+                    result.addAll(spec.getRole("model.role.soldier")
+                        .getModifierSet(Modifier.DEFENCE));
                 }
             }
         }

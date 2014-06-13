@@ -853,91 +853,146 @@
   </disasters>
 
   <roles>
-    <role id="model.role.default" />
-    <role id="model.role.scout" expertUnit="model.unit.seasonedScout">
-      <required-ability id="model.ability.canBeEquipped" />
-      <required-goods id="model.goods.horses" value="50" />
-      <ability id="model.ability.captureUnits"/>
-      <ability id="model.ability.speakWithChief"/>
-      <ability id="model.ability.demandTribute"/>
-      <ability id="model.ability.spyOnColony"/>
-      <ability id="model.ability.negotiate"/>
-      <ability id="model.ability.disposeOnCombatLoss"/>
+    <role id="model.role.default"/>
+
+    <role id="model.role.scout"
+          expertUnit="model.unit.seasonedScout">
+      <required-ability id="model.ability.canBeEquipped" value="true"/>
+      <required-ability id="model.ability.native" value="false"/>
+      <required-goods id="model.goods.horses" value="50"/>
+
+      <ability id="model.ability.armed" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="false"/>
+      <ability id="model.ability.captureUnits" value="true"/>
+      <ability id="model.ability.demandTribute" value="true"/>
+      <ability id="model.ability.disposeOnCombatLoss" value="true"/>
+      <ability id="model.ability.mounted" value="true"/>
+      <ability id="model.ability.negotiate" value="true"/>
+      <ability id="model.ability.speakWithChief" value="true"/>
+      <ability id="model.ability.spyOnColony" value="true"/>
       <modifier id="model.modifier.defence" type="additive" value="1"/>
       <modifier id="model.modifier.offence" type="additive" value="1"/>
       <modifier id="model.modifier.lineOfSightBonus" type="additive" value="1"/>
       <modifier id="model.modifier.movementBonus" type="additive" value="9"/>
     </role>
-    <role id="model.role.soldier" expertUnit="model.unit.veteranSoldier">
-      <required-ability id="model.ability.canBeEquipped" />
-      <required-goods id="model.goods.muskets" value="50" />
-      <ability id="model.ability.captureUnits"/>
+
+    <role id="model.role.soldier"
+          expertUnit="model.unit.veteranSoldier">
+      <required-ability id="model.ability.canBeEquipped" value="true"/>
+      <required-ability id="model.ability.native" value="false"/>
+      <required-goods id="model.goods.muskets" value="50"/>
+
+      <ability id="model.ability.armed" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="false"/>
+      <ability id="model.ability.captureUnits" value="true"/>
+      <ability id="model.ability.demandTribute" value="true"/>
       <modifier id="model.modifier.defence" type="additive" value="1"/>
       <modifier id="model.modifier.offence" type="additive" value="2"/>
     </role>
-    <role id="model.role.dragoon" downgrade="model.role.soldier" expertUnit="model.unit.veteranSoldier">
-      <required-ability id="model.ability.canBeEquipped" />
-      <required-goods id="model.goods.muskets" value="50" />
-      <required-goods id="model.goods.horses" value="50" />
+
+    <role id="model.role.dragoon" downgrade="model.role.soldier"
+          expertUnit="model.unit.veteranSoldier">
+      <required-ability id="model.ability.canBeEquipped" value="true"/>
+      <required-ability id="model.ability.native" value="false"/>
+      <required-ability id="model.ability.refUnit" value="false"/>
+      <required-goods id="model.goods.muskets" value="50"/>
+      <required-goods id="model.goods.horses" value="50"/>
+
+      <ability id="model.ability.armed" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="false"/>
       <ability id="model.ability.captureUnits" value="true"/>
+      <ability id="model.ability.demandTribue" value="true"/>
+      <ability id="model.ability.mounted" value="true"/>
       <modifier id="model.modifier.defence" type="additive" value="2"/>
       <modifier id="model.modifier.offence" type="additive" value="3"/>
       <modifier id="model.modifier.movementBonus" type="additive" value="9"/>
     </role>
-    <role id="model.role.pioneer" maximumCount="5" expertUnit="model.unit.hardyPioneer">
-      <required-ability id="model.ability.canBeEquipped" />
-      <required-goods id="model.goods.tools" value="20" />
-      <ability id="model.ability.disposeOnCombatLoss"/>
-      <ability id="model.ability.improveTerrain"/>
+
+    <role id="model.role.pioneer"
+          expertUnit="model.unit.hardyPioneer" maximumCount="5">
+      <required-ability id="model.ability.canBeEquipped" value="true"/>
+      <required-ability id="model.ability.native" value="false"/>
+      <required-goods id="model.goods.tools" value="20"/>
+
+      <ability id="model.ability.disposeOnCombatLoss" value="true"/>
+      <ability id="model.ability.improveTerrain" value="true"/>
     </role>
-    <role id="model.role.missionary" expertUnit="model.unit.jesuitMissionary">
-      <required-ability id="model.ability.canBeEquipped" />
-      <required-ability id="model.ability.dressMissionary" />
+
+    <role id="model.role.missionary"
+          expertUnit="model.unit.jesuitMissionary">
+      <required-ability id="model.ability.canBeEquipped" value="true"/>
+      <required-ability id="model.ability.native" value="false"/>
+      <required-ability id="model.ability.dressMissionary" value="true"/>
+
+      <ability id="model.ability.denounceHeresy" value="true"/>
+      <ability id="model.ability.establishMission" value="true"/>
+      <ability id="model.ability.inciteNatives" value="true"/>
+      <modifier id="model.modifier.missionaryTradeBonus" type="percentage" value="10"/>
       <modifier id="model.modifier.movementBonus" type="additive" value="3"/>
-      <ability id="model.ability.establishMission" />
-      <ability id="model.ability.denounceHeresy" />
-      <ability id="model.ability.inciteNatives" />
     </role>
-    <role id="model.role.infantry">
-      <required-ability id="model.ability.canBeEquipped" />
-      <required-ability id="model.ability.royalExpeditionaryForce" value="true"/>
+
+    <role id="model.role.infantry"
+          expertUnit="model.unit.kingsRegular">
+      <required-ability id="model.ability.canBeEquipped" value="true"/>
+      <required-ability id="model.ability.native" value="false"/>
       <required-ability id="model.ability.refUnit" value="true"/>
-      <required-goods id="model.goods.muskets" value="50" />
-      <ability id="model.ability.captureUnits"/>
-      <ability id="model.ability.disposeOnCombatLoss"/>
+      <required-ability id="model.ability.royalExpeditionaryForce" value="true"/>
+      <required-goods id="model.goods.muskets" value="50"/>
+
+      <ability id="model.ability.armed" value="true"/>
+      <ability id="model.ability.captureUnits" value="true"/>
+      <ability id="model.ability.demandTribute" value="true"/>
+      <ability id="model.ability.disposeOnCombatLoss" value="true"/>
       <modifier id="model.modifier.defence" type="additive" value="1"/>
       <modifier id="model.modifier.offence" type="additive" value="2"/>
     </role>
-    <role id="model.role.cavalry" downgrade="model.role.infantry">
-      <required-ability id="model.ability.canBeEquipped" />
-      <required-ability id="model.ability.royalExpeditionaryForce" value="true"/>
+
+    <role id="model.role.cavalry" downgrade="model.role.infantry"
+          expertUnit="model.unit.kingsRegular">
+      <required-ability id="model.ability.canBeEquipped" value="true"/>
+      <required-ability id="model.ability.native" value="false"/>
       <required-ability id="model.ability.refUnit" value="true"/>
-      <required-goods id="model.goods.muskets" value="50" />
-      <required-goods id="model.goods.horses" value="50" />
+      <required-ability id="model.ability.royalExpeditionaryForce" value="true"/>
+      <required-goods id="model.goods.muskets" value="50"/>
+      <required-goods id="model.goods.horses" value="50"/>
+
+      <ability id="model.ability.armed" value="true"/>
       <ability id="model.ability.captureUnits" value="true"/>
+      <ability id="model.ability.demandTribute" value="true"/>
+      <ability id="model.ability.mounted" value="true"/>
       <modifier id="model.modifier.defence" type="additive" value="2"/>
       <modifier id="model.modifier.offence" type="additive" value="3"/>
       <modifier id="model.modifier.movementBonus" type="additive" value="9"/>
     </role>
+
     <role id="model.role.mountedBrave">
-      <required-ability id="model.ability.native" />
-      <required-goods id="model.goods.horses" value="25" />
-      <ability id="model.ability.disposeOnCombatLoss"/>
+      <required-ability id="model.ability.native" value="true"/>
+      <required-goods id="model.goods.horses" value="25"/>
+
+      <ability id="model.ability.disposeOnCombatLoss" value="true"/>
+      <ability id="model.ability.mounted" value="true"/>
       <modifier id="model.modifier.defence" type="additive" value="1"/>
       <modifier id="model.modifier.offence" type="additive" value="1"/>
       <modifier id="model.modifier.movementBonus" type="additive" value="9"/>
     </role>
+
     <role id="model.role.armedBrave">
-      <required-ability id="model.ability.native"/>
-      <required-goods id="model.goods.muskets" value="25" />
-      <ability id="model.ability.disposeOnCombatLoss"/>
+      <required-ability id="model.ability.native" value="true"/>
+      <required-goods id="model.goods.muskets" value="25"/>
+
+      <ability id="model.ability.armed" value="true"/>
+      <ability id="model.ability.disposeOnCombatLoss" value="true"/>
       <modifier id="model.modifier.defence" type="additive" value="1"/>
       <modifier id="model.modifier.offence" type="additive" value="2"/>
     </role>
+
     <role id="model.role.nativeDragoon" downgrade="model.role.armedBrave">
-      <required-ability id="model.ability.native"/>
-      <required-goods id="model.goods.muskets" value="25" />
-      <required-goods id="model.goods.horses" value="25" />
+      <required-ability id="model.ability.native" value="true"/>
+      <required-goods id="model.goods.muskets" value="25"/>
+      <required-goods id="model.goods.horses" value="25"/>
+
+      <ability id="model.ability.armed" value="true"/>
+      <ability id="model.ability.mounted" value="true"/>
       <modifier id="model.modifier.defence" type="additive" value="2"/>
       <modifier id="model.modifier.offence" type="additive" value="3"/>
       <modifier id="model.modifier.movementBonus" type="additive" value="9"/>
@@ -947,77 +1002,43 @@
   <equipment-types>
     <equipment-type id="model.equipment.horses" combat-loss-priority="20"
                     role="model.role.scout">
-      <modifier id="model.modifier.defence" type="additive" value="1"/>
-      <modifier id="model.modifier.offence" type="additive" value="1"/>
-      <modifier id="model.modifier.lineOfSightBonus" type="additive" value="1"/>
-      <modifier id="model.modifier.movementBonus" type="additive" value="9"/>
-      <ability id="model.ability.scoutIndianSettlement" value="true"/>
-      <ability id="model.ability.spyOnColony" value="true"/>
-      <ability id="model.ability.canBeCaptured" value="false"/>
-      <ability id="model.ability.disposeOnAllEquipLost" value="true"/>
-      <ability id="model.ability.mounted" value="true"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
-      <required-ability id="model.ability.bornInIndianSettlement" value="false"/>
+      <required-ability id="model.ability.native" value="false"/>
       <required-goods id="model.goods.horses" value="50"/>
       <compatible-equipment id="model.equipment.muskets"/>
       <capture-equipment id="model.equipment.indian.horses" by-indians="true"/>
     </equipment-type>
     <equipment-type id="model.equipment.muskets" combat-loss-priority="10"
                     role="model.role.soldier">
-      <modifier id="model.modifier.defence" type="additive" value="1"/>
-      <modifier id="model.modifier.offence" type="additive" value="2"/>
-      <ability id="model.ability.scoutIndianSettlement" value="false"/>
-      <ability id="model.ability.spyOnColony" value="false"/>
-      <ability id="model.ability.captureUnits" value="true"/>
-      <ability id="model.ability.canBeCaptured" value="false"/>
-      <ability id="model.ability.armed" value="true"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
-      <required-ability id="model.ability.bornInIndianSettlement" value="false"/>
+      <required-ability id="model.ability.native" value="false"/>
       <required-goods id="model.goods.muskets" value="50"/>
       <compatible-equipment id="model.equipment.horses"/>
       <capture-equipment id="model.equipment.indian.muskets" by-indians="true"/>
     </equipment-type>
     <equipment-type id="model.equipment.tools" maximum-count="5"
                     role="model.role.pioneer">
-      <ability id="model.ability.improveTerrain" value="true"/>
-      <ability id="model.ability.disposeOnCombatLoss" value="true"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
-      <required-ability id="model.ability.bornInIndianSettlement" value="false"/>
+      <required-ability id="model.ability.native" value="false"/>
       <required-goods id="model.goods.tools" value="20"/>
     </equipment-type>
     <equipment-type id="model.equipment.missionary"
                     role="model.role.missionary">
-      <modifier id="model.modifier.movementBonus" type="additive" value="3"/>
-      <ability id="model.ability.missionary" value="true"/>
-      <ability id="model.ability.establishMission" value="true"/>
-      <ability id="model.ability.denounceHeresy" value="true"/>
-      <ability id="model.ability.inciteNatives" value="true"/>
-      <modifier id="model.modifier.missionaryTradeBonus" type="percentage" value="10"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-ability id="model.ability.dressMissionary" value="true"/>
     </equipment-type>
     <equipment-type id="model.equipment.indian.horses" combat-loss-priority="20"
-                    role="model.role.scout">
-      <modifier id="model.modifier.defence" type="additive" value="1"/>
-      <modifier id="model.modifier.offence" type="additive" value="1"/>
-      <modifier id="model.modifier.lineOfSightBonus" type="additive" value="1"/>
-      <modifier id="model.modifier.movementBonus" type="additive" value="9"/>
-      <ability id="model.ability.canBeCaptured" value="false"/>
-      <ability id="model.ability.mounted" value="true"/>
+                    role="model.role.mountedBrave">
       <required-ability id="model.ability.canBeEquipped" value="true"/>
-      <required-ability id="model.ability.bornInIndianSettlement" value="true"/>
+      <required-ability id="model.ability.native" value="true"/>
       <required-goods id="model.goods.horses" value="25"/>
       <compatible-equipment id="model.equipment.indian.muskets"/>
       <capture-equipment id="model.equipment.horses" by-indians="false"/>
     </equipment-type>
     <equipment-type id="model.equipment.indian.muskets" combat-loss-priority="10"
-                    role="model.role.soldier">
-      <modifier id="model.modifier.defence" type="additive" value="1"/>
-      <modifier id="model.modifier.offence" type="additive" value="2"/>
-      <ability id="model.ability.canBeCaptured" value="false"/>
-      <ability id="model.ability.armed" value="true"/>
+                    role="model.role.armedBrave">
       <required-ability id="model.ability.canBeEquipped" value="true"/>
-      <required-ability id="model.ability.bornInIndianSettlement" value="true"/>
+      <required-ability id="model.ability.native" value="true"/>
       <required-goods id="model.goods.muskets" value="25"/>
       <compatible-equipment id="model.equipment.indian.horses"/>
       <capture-equipment id="model.equipment.muskets" by-indians="false"/>
@@ -2062,7 +2083,7 @@ resources of 400, lost city rumours of 500
     <founding-father id="model.foundingFather.fatherJeanDeBrebeuf" type="religious"
                      weight1="6" weight2="6" weight3="1">
       <ability id="model.ability.expertMissionary" value="true">
-        <scope ability-id="model.ability.missionary"/>
+        <scope ability-id="model.ability.establishMission"/>
       </ability>
     </founding-father>
     <founding-father id="model.foundingFather.juanDeSepulveda" type="religious"

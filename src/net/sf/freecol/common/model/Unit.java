@@ -3758,20 +3758,16 @@ public class Unit extends GoodsLocation
         final Player owner = getOwner();
         final UnitType unitType = getType();
         Set<Ability> result = new HashSet<Ability>();
-        if (turn == null) turn = getGame().getTurn();
 
         // UnitType abilities always apply.
         result.addAll(unitType.getAbilitySet(id));
+
         // Roles apply with qualification.
         result.addAll(role.getAbilitySet(id, fcgot, turn));
+
         // The player's abilities require more qualification.
         result.addAll(owner.getAbilitySet(id, fcgot, turn));
-        // EquipmentType abilities always apply.
-        for (EquipmentType equipmentType : equipment.keySet()) {
-            result.addAll(equipmentType.getAbilitySet(id));
-            // Player abilities may also apply to equipment (e.g. missionary).
-            result.addAll(owner.getAbilitySet(id, equipmentType, turn));
-        }
+
         // Location abilities may apply.
         // TODO: extend this to all locations?  May simplify
         // code.  Units are also Locations however, which complicates
@@ -3794,18 +3790,16 @@ public class Unit extends GoodsLocation
         final Player owner = getOwner();
         final UnitType unitType = getType();
         Set<Modifier> result = new HashSet<Modifier>();
-        if (turn == null) turn = getGame().getTurn();
 
         // UnitType modifiers always apply
         result.addAll(unitType.getModifierSet(id));
-        // the player's modifiers may not apply
+
+        // The player's modifiers may not all apply
         result.addAll(owner.getModifierSet(id, unitType, turn));
-        // EquipmentType modifiers always apply
-        for (EquipmentType equipmentType : equipment.keySet()) {
-            result.addAll(equipmentType.getModifierSet(id));
-            // player modifiers may also apply to equipment (unused)
-            result.addAll(owner.getModifierSet(id, equipmentType, turn));
-        }
+        
+        // Role modifiers apply
+        result.addAll(role.getModifierSet(id, fcgot, turn));
+
         return result;
     }
 

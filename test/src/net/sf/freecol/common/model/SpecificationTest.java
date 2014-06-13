@@ -181,25 +181,25 @@ public final class SpecificationTest extends FreeColTestCase {
         equipmentTypeStr = "model.equipment.horses";
         expectAbilities = new Hashtable<String,Boolean>();
         expectAbilities.put(Ability.CAN_BE_EQUIPPED, true);
-        expectAbilities.put(Ability.BORN_IN_INDIAN_SETTLEMENT, false);
+        expectAbilities.put(Ability.NATIVE, false);
         eqTypesAbilities.put(equipmentTypeStr, expectAbilities);
 
         equipmentTypeStr = "model.equipment.muskets";
         expectAbilities = new Hashtable<String,Boolean>();
         expectAbilities.put(Ability.CAN_BE_EQUIPPED, true);
-        expectAbilities.put(Ability.BORN_IN_INDIAN_SETTLEMENT, false);
+        expectAbilities.put(Ability.NATIVE, false);
         eqTypesAbilities.put(equipmentTypeStr, expectAbilities);
 
         equipmentTypeStr = "model.equipment.indian.horses";
         expectAbilities = new Hashtable<String,Boolean>();
         expectAbilities.put(Ability.CAN_BE_EQUIPPED, true);
-        expectAbilities.put(Ability.BORN_IN_INDIAN_SETTLEMENT, true);
+        expectAbilities.put(Ability.NATIVE, true);
         eqTypesAbilities.put(equipmentTypeStr, expectAbilities);
 
         equipmentTypeStr = "model.equipment.indian.muskets";
         expectAbilities = new Hashtable<String,Boolean>();
         expectAbilities.put(Ability.CAN_BE_EQUIPPED, true);
-        expectAbilities.put(Ability.BORN_IN_INDIAN_SETTLEMENT, true);
+        expectAbilities.put(Ability.NATIVE, true);
         eqTypesAbilities.put(equipmentTypeStr, expectAbilities);
 
         // Verify

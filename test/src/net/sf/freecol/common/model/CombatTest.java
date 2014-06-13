@@ -51,6 +51,19 @@ public class CombatTest extends FreeColTestCase {
     private static final EquipmentType tools
         = spec().getEquipmentType("model.equipment.tools");
 
+    private static final Role armedBraveRole
+        = spec().getRole("model.role.armedBrave");
+    private static final Role cavalryRole
+        = spec().getRole("model.role.cavalry");
+    private static final Role dragoonRole
+        = spec().getRole("model.role.dragoon");
+    private static final Role missionaryRole
+        = spec().getRole("model.role.missionary");
+    private static final Role nativeDragoonRole
+        = spec().getRole("model.role.nativeDragoon");
+    private static final Role soldierRole
+        = spec().getRole("model.role.soldier");
+
     private static final TileType hills
         = spec().getTileType("model.tile.hills");
     private static final TileType ocean
@@ -107,57 +120,50 @@ public class CombatTest extends FreeColTestCase {
 
         Unit colonist = new ServerUnit(game, tile1, dutch, colonistType);
         colonist.setStateUnchecked(Unit.UnitState.FORTIFIED);
-        Role dragoonRole = spec().getRole("model.role.dragoon");
-        Unit soldier = new ServerUnit(game, tile2, french, veteranType, dragoonRole);
+        Unit soldier = new ServerUnit(game, tile2, french,
+                                      veteranType, dragoonRole);
         soldier.setMovesLeft(1);
-
-        Modifier bigMovementPenalty = spec().getModifiers(Modifier.BIG_MOVEMENT_PENALTY)
-            .get(0);
-        Modifier attackBonus = spec().getModifiers(Modifier.ATTACK_BONUS).get(0);
-        Modifier fortified = spec().getModifiers(Modifier.FORTIFIED).get(0);
-
-        Set<Modifier> veteranModifierSet = veteranType.getModifierSet(Modifier.OFFENCE);
-        assertEquals(1, veteranModifierSet.size());
-        Modifier veteranModifier = veteranModifierSet.iterator().next();
-
-        Set<Modifier> musketModifierSet = muskets.getModifierSet(Modifier.OFFENCE);
-        assertEquals(1, musketModifierSet.size());
-        Modifier musketModifier = musketModifierSet.iterator().next();
-
-        Set<Modifier> horsesModifierSet = horses.getModifierSet(Modifier.OFFENCE);
-        assertEquals(1, horsesModifierSet.size());
-        Modifier horsesModifier = horsesModifierSet.iterator().next();
-
-        Set<Modifier> offenceModifiers = combatModel.getOffensiveModifiers(soldier, colonist);
-        assertEquals(6, offenceModifiers.size());
-        assertTrue(offenceModifiers.contains(bigMovementPenalty));
-        offenceModifiers.remove(bigMovementPenalty);
-        assertTrue(offenceModifiers.contains(veteranModifier));
-        offenceModifiers.remove(veteranModifier);
-        assertTrue(offenceModifiers.contains(musketModifier));
-        offenceModifiers.remove(musketModifier);
-        assertTrue(offenceModifiers.contains(horsesModifier));
-        offenceModifiers.remove(horsesModifier);
-        assertTrue(offenceModifiers.contains(attackBonus));
-        offenceModifiers.remove(attackBonus);
-        // this was also added by the combat model
-        assertEquals(Specification.BASE_OFFENCE_SOURCE, offenceModifiers.iterator().next().getSource());
-
-        Set<Modifier> hillsModifierSet = hills.getDefenceModifiers();
         assertFalse(soldier.hasAbility(Ability.AMBUSH_BONUS));
         assertFalse(colonist.hasAbility(Ability.AMBUSH_PENALTY));
+
+        final Modifier bigMovementPenalty
+            = spec().getModifiers(Modifier.BIG_MOVEMENT_PENALTY).get(0);
+        final Modifier attackModifier
+            = spec().getModifiers(Modifier.ATTACK_BONUS).get(0);
+        final Set<Modifier> veteranModifierSet
+            = veteranType.getModifierSet(Modifier.OFFENCE);
+        assertEquals(1, veteranModifierSet.size());
+        final Modifier veteranModifier = veteranModifierSet.iterator().next();
+
+        Set<Modifier> offenceModifiers
+            = combatModel.getOffensiveModifiers(soldier, colonist);
+        assertEquals(5, offenceModifiers.size());
+        assertTrue(offenceModifiers.contains(bigMovementPenalty));
+        offenceModifiers.remove(bigMovementPenalty);
+        assertTrue(offenceModifiers.contains(attackModifier));
+        offenceModifiers.remove(attackModifier);
+        assertTrue(offenceModifiers.contains(veteranModifier));
+        offenceModifiers.remove(veteranModifier);
+        // this was also added by the combat model
+        assertEquals(Specification.BASE_OFFENCE_SOURCE,
+            offenceModifiers.iterator().next().getSource());
+
+        final Modifier fortifiedModifier
+            = spec().getModifiers(Modifier.FORTIFIED).get(0);
+        final Set<Modifier> hillsModifierSet = hills.getDefenceModifiers();
         assertEquals(1, hillsModifierSet.size());
         Modifier hillsModifier = hillsModifierSet.iterator().next();
 
-        Set<Modifier> defenceModifiers = combatModel.getDefensiveModifiers(soldier, colonist);
+        Set<Modifier> defenceModifiers
+            = combatModel.getDefensiveModifiers(soldier, colonist);
         assertEquals(3, defenceModifiers.size());
+        assertTrue(defenceModifiers.contains(fortifiedModifier));
+        defenceModifiers.remove(fortifiedModifier);
         assertTrue(defenceModifiers.contains(hillsModifier));
         defenceModifiers.remove(hillsModifier);
-        assertTrue(defenceModifiers.contains(fortified));
-        defenceModifiers.remove(fortified);
         // this was also added by the combat model
-        assertEquals(Specification.BASE_DEFENCE_SOURCE, defenceModifiers.iterator().next().getSource());
-
+        assertEquals(Specification.BASE_DEFENCE_SOURCE,
+            defenceModifiers.iterator().next().getSource());
     }
 
     public void testGalleonAttackedByPrivateer() throws Exception {
@@ -273,19 +279,18 @@ public class CombatTest extends FreeColTestCase {
         Tile tile2 = map.getTile(4, 8);
         tile2.setExplored(dutch, true);
 
-        Role soldierRole = spec().getRole("model.role.armedBrave");
         Unit colonist = colony.getUnitIterator().next();
         Unit attacker = new ServerUnit(getGame(), tile2, inca, braveType,
-                                       soldierRole);
+                                       armedBraveRole);
 
         assertEquals(colonist, colony.getDefendingUnit(attacker));
         assertEquals(colonist, colony.getTile().getDefendingUnit(attacker));
 
         Unit defender = new ServerUnit(getGame(), colony.getTile(), dutch,
                                        colonistType);
-        assertFalse("Colonist should not be defensive unit",defender.isDefensiveUnit());
+        assertFalse("Colonist should not be defensive unit",
+                    defender.isDefensiveUnit());
         assertEquals(defender, colony.getTile().getDefendingUnit(attacker));
-
     }
 
     public void testDefendColonyWithRevere() {
@@ -303,11 +308,10 @@ public class CombatTest extends FreeColTestCase {
         tile2.setExplored(dutch, true);
 
         Unit colonist = colony.getUnitIterator().next();
-        Role soldierRole = spec().getRole("model.role.armedBrave");
-        Unit attacker = new ServerUnit(getGame(), tile2, inca, braveType, soldierRole);
+        Unit attacker = new ServerUnit(getGame(), tile2, inca, braveType,
+                                       armedBraveRole);
 
         assertEquals(colonist, colony.getDefendingUnit(attacker));
-
         dutch.addFather(spec().getFoundingFather("model.foundingFather.paulRevere"));
         for (EquipmentType equipment : dragoonEquipment) {
             for (AbstractGoods goods : equipment.getRequiredGoods()) {
@@ -315,12 +319,10 @@ public class CombatTest extends FreeColTestCase {
             }
         }
 
-        Set<Modifier> defenceModifiers = combatModel.getDefensiveModifiers(attacker, colonist);
-        for (Modifier defenceModifier : muskets.getModifierSet(Modifier.DEFENCE)) {
-            assertTrue(defenceModifiers.contains(defenceModifier));
-        }
-        for (Modifier defenceModifier : horses.getModifierSet(Modifier.DEFENCE)) {
-            assertFalse(defenceModifiers.contains(defenceModifier));
+        Set<Modifier> defenceModifiers = combatModel
+            .getDefensiveModifiers(attacker, colonist);
+        for (Modifier modifier : soldierRole.getModifierSet(Modifier.DEFENCE)) {
+            assertTrue(defenceModifiers.contains(modifier));
         }
     }
 
@@ -339,26 +341,25 @@ public class CombatTest extends FreeColTestCase {
         Tile tile2 = map.getTile(4, 8);
         tile2.setExplored(dutch, true);
 
-        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
-        IndianSettlement settlement = builder.player(inca).settlementTile(tile1).skillToTeach(null).capital(true).build();
+        FreeColTestCase.IndianSettlementBuilder builder
+            = new FreeColTestCase.IndianSettlementBuilder(game);
+        IndianSettlement settlement = builder.player(inca)
+            .settlementTile(tile1).skillToTeach(null).capital(true).build();
 
-        //IndianSettlement settlement = new IndianSettlement(game, inca, tile1, true, null, false, null);
-        Unit defender = new ServerUnit(game, settlement, inca, braveType);
-        Role dragoonRole = spec().getRole("model.role.dragoon");
-        Unit attacker = new ServerUnit(game, tile2, dutch, colonistType, dragoonRole);
+        Unit defender = new ServerUnit(game, settlement, inca, braveType,
+                                       nativeDragoonRole);
+        Unit attacker = new ServerUnit(game, tile2, dutch, colonistType,
+                                       dragoonRole);
 
         for (EquipmentType equipment : dragoonEquipment) {
             for (AbstractGoods goods : equipment.getRequiredGoods()) {
                 settlement.addGoods(goods);
             }
         }
-
-        Set<Modifier> defenceModifiers = combatModel.getDefensiveModifiers(attacker, defender);
-        for (Modifier defenceModifier : indianMuskets.getModifierSet(Modifier.DEFENCE)) {
-            assertTrue(defenceModifiers.contains(defenceModifier));
-        }
-        for (Modifier defenceModifier : indianHorses.getModifierSet(Modifier.DEFENCE)) {
-            assertTrue(defenceModifiers.contains(defenceModifier));
+        Set<Modifier> defenceModifiers = combatModel
+            .getDefensiveModifiers(attacker, defender);
+        for (Modifier modifier : nativeDragoonRole.getModifierSet(Modifier.DEFENCE)) {
+            assertTrue(defenceModifiers.contains(modifier));
         }
     }
 
@@ -378,7 +379,6 @@ public class CombatTest extends FreeColTestCase {
 
         Unit colonist = new ServerUnit(game, tile1, dutch, colonistType);
         colonist.setStateUnchecked(Unit.UnitState.FORTIFIED);
-        Role dragoonRole = spec().getRole("model.role.dragoon");
         Unit soldier = new ServerUnit(game, tile2, french, veteranType,
                                       dragoonRole);
         soldier.setStateUnchecked(Unit.UnitState.FORTIFIED);
@@ -411,7 +411,6 @@ public class CombatTest extends FreeColTestCase {
         spanish.setStance(tupi, Player.Stance.WAR);
         tupi.setStance(spanish, Player.Stance.WAR);
 
-        Role soldierRole = spec().getRole("model.role.soldier");
         Unit soldier = new ServerUnit(game, tile1, spanish, colonistType,
                                       soldierRole);
         Unit brave = new ServerUnit(game, tile2, tupi, braveType);
@@ -484,7 +483,7 @@ public class CombatTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(getTestMap(plains, true));
         InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer french = (ServerPlayer) game.getPlayer("model.nation.french");
+        ServerPlayer french = (ServerPlayer)game.getPlayer("model.nation.french");
         french.addAbility(new Ability(Ability.INDEPENDENCE_DECLARED));
         ServerPlayer refPlayer = igc.createREFPlayer(french);
 
@@ -494,18 +493,16 @@ public class CombatTest extends FreeColTestCase {
         Tile tile1 = map.getTile(5, 8);
         Tile tile2 = map.getTile(4, 8);
 
-        Role dragoonRole = spec().getRole("model.role.dragoon");
         Unit colonial = new ServerUnit(game, tile1, french, colonialRegularType,
                                        dragoonRole);
 
-        Role cavalryRole = spec().getRole("model.role.cavalry");
         Unit regular = new ServerUnit(game, tile2, refPlayer, kingsRegularType,
                                       cavalryRole);
 
-        // (regular + muskets + horses) * attack bonus
+        // (regular + dragoon + horses) * attack bonus
         float offence = (4 + 2 + 1) * 1.5f;
         assertEquals(offence, combatModel.getOffencePower(regular, colonial));
-        // colonial + muskets + horses + defence bonus
+        // colonial + dragoon + defence bonus
         float defence = 3 + 1 + 1 + 1;
         assertEquals(defence, combatModel.getDefencePower(regular, colonial));
 
@@ -561,7 +558,7 @@ public class CombatTest extends FreeColTestCase {
         Tile tile2 = map.getTile(4, 8);
         tile2.setExplored(dutch, true);
         Unit missionary = new ServerUnit(game, null, dutch,
-            jesuitMissionaryType, spec().getRole("model.role.missionary"));
+                                         jesuitMissionaryType, missionaryRole);
         FreeColTestCase.IndianSettlementBuilder builder
             = new FreeColTestCase.IndianSettlementBuilder(game);
         IndianSettlement settlement = builder.player(inca)
@@ -572,7 +569,6 @@ public class CombatTest extends FreeColTestCase {
         assertNotNull(io);
         io.setValue(100);
 
-        Role soldierRole = spec().getRole("model.role.soldier");
         Unit soldier = new ServerUnit(game, tile2, dutch, colonistType,
                                       soldierRole);
         Unit defender = settlement.getDefendingUnit(soldier);

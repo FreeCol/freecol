@@ -218,24 +218,34 @@ public class MovementTest extends FreeColTestCase {
         tile3.setExplored(dutch, true);
 
         Colony colony = getStandardColony();
-
         assertEquals(tile1.getColony(), colony);
 
         Unit colonist = new ServerUnit(game, tile2, french, colonistType);
         assertEquals(Unit.MoveType.MOVE_NO_ACCESS_SETTLEMENT,
                      colonist.getMoveType(tile1));
-        colonist.changeEquipment(horses, 1);
+        colonist.setRole(spec().getRole("model.role.pioneer"));
+        assertEquals(Unit.MoveType.MOVE_NO_ACCESS_SETTLEMENT,
+                     colonist.getMoveType(tile1));
+        colonist.setRole(spec().getRole("model.role.missionary"));
+        assertEquals(Unit.MoveType.MOVE_NO_ACCESS_SETTLEMENT,
+                     colonist.getMoveType(tile1));
+        colonist.setRole(spec().getRole("model.role.scout"));
         assertEquals(Unit.MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT,
                      colonist.getMoveType(tile1));
-        colonist.changeEquipment(muskets, 1);
+        colonist.setRole(spec().getRole("model.role.soldier"));
+        assertEquals(Unit.MoveType.ATTACK_SETTLEMENT,
+                     colonist.getMoveType(tile1));
+        colonist.setRole(spec().getRole("model.role.dragoon"));
         assertEquals(Unit.MoveType.ATTACK_SETTLEMENT,
                      colonist.getMoveType(tile1));
 
         Unit brave = new ServerUnit(game, tile3, iroquois, braveType);
         assertEquals(Unit.MoveType.ATTACK_SETTLEMENT, brave.getMoveType(tile1));
-        brave.changeEquipment(indianHorses, 1);
+        brave.setRole(spec().getRole("model.role.mountedBrave"));
         assertEquals(Unit.MoveType.ATTACK_SETTLEMENT, brave.getMoveType(tile1));
-        brave.changeEquipment(indianMuskets, 1);
+        brave.setRole(spec().getRole("model.role.armedBrave"));
+        assertEquals(Unit.MoveType.ATTACK_SETTLEMENT, brave.getMoveType(tile1));
+        brave.setRole(spec().getRole("model.role.nativeDragoon"));
         assertEquals(Unit.MoveType.ATTACK_SETTLEMENT, brave.getMoveType(tile1));
     }
 
@@ -266,18 +276,29 @@ public class MovementTest extends FreeColTestCase {
         Player.makeContact(french, inca);
         assertEquals(Unit.MoveType.ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST,
                      colonist.getMoveType(tile1));
-        colonist.changeEquipment(horses, 1);
+        colonist.setRole(spec().getRole("model.role.pioneer"));
+        assertEquals(Unit.MoveType.ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST,
+                     colonist.getMoveType(tile1));
+        colonist.setRole(spec().getRole("model.role.missionary"));
+        assertEquals(Unit.MoveType.ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY,
+                     colonist.getMoveType(tile1));
+        colonist.setRole(spec().getRole("model.role.scout"));
         assertEquals(Unit.MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT,
                      colonist.getMoveType(tile1));
-        colonist.changeEquipment(muskets, 1);
+        colonist.setRole(spec().getRole("model.role.soldier"));
+        assertEquals(Unit.MoveType.ATTACK_SETTLEMENT,
+                     colonist.getMoveType(tile1));
+        colonist.setRole(spec().getRole("model.role.dragoon"));
         assertEquals(Unit.MoveType.ATTACK_SETTLEMENT,
                      colonist.getMoveType(tile1));
 
         Unit brave = new ServerUnit(game, tile3, iroquois, braveType);
         assertEquals(Unit.MoveType.ATTACK_SETTLEMENT, brave.getMoveType(tile1));
-        brave.changeEquipment(indianHorses, 1);
+        brave.setRole(spec().getRole("model.role.mountedBrave"));
         assertEquals(Unit.MoveType.ATTACK_SETTLEMENT, brave.getMoveType(tile1));
-        brave.changeEquipment(indianMuskets, 1);
+        brave.setRole(spec().getRole("model.role.armedBrave"));
+        assertEquals(Unit.MoveType.ATTACK_SETTLEMENT, brave.getMoveType(tile1));
+        brave.setRole(spec().getRole("model.role.nativeDragoon"));
         assertEquals(Unit.MoveType.ATTACK_SETTLEMENT, brave.getMoveType(tile1));
     }
 }
