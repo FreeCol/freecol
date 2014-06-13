@@ -336,7 +336,7 @@ public class Role extends BuildableType {
     }
 
 
-    // Override BuildingType
+    // Override FreeColObject
 
     /**
      * {@inheritDoc}

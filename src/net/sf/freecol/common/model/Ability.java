@@ -299,10 +299,6 @@ public final class Ability extends Feature {
     public static final String MERCENARY_UNIT
         = "model.ability.mercenaryUnit";
 
-    /** The ability to operate a mission. */
-    public static final String MISSIONARY
-        = "model.ability.missionary";
-
     /** Equipment type ability denoting the holder is mounted. */
     public static final String MOUNTED
         = "model.ability.mounted";
@@ -368,10 +364,6 @@ public final class Ability extends Feature {
     /** LCRs always yield positive results (deSoto). */
     public static final String RUMOURS_ALWAYS_POSITIVE
         = "model.ability.rumoursAlwaysPositive";
-
-    /** The ability to scout native settlements. */
-    public static final String SCOUT_INDIAN_SETTLEMENT
-        = "model.ability.scoutIndianSettlement";
 
     /** The ability to see all colonies (Coronado). */
     public static final String SEE_ALL_COLONIES

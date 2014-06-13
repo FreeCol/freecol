@@ -59,9 +59,7 @@ public class SaveLoadTest extends FreeColTestCase {
     public void testImmediateLoading() {
         File file = ServerTestHelper.createRandomSaveGame();
         ServerTestHelper.stopServer();
-System.err.println("FOO");
         FreeColServer server = ServerTestHelper.startServer(file, false, true);
-System.err.println("BAR");
         assertNotNull(server.getGame());
         assertNotNull(server.getGame().getMap());
         file.delete();

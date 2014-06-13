@@ -137,8 +137,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 boolean a1 = u1.hasAbility(Ability.EXPERT_SCOUT);
                 boolean a2 = u2.hasAbility(Ability.EXPERT_SCOUT);
                 if (a1 != a2) return (a1) ? -1 : 1;
-                a1 = u1.hasAbility(Ability.SCOUT_INDIAN_SETTLEMENT);
-                a2 = u2.hasAbility(Ability.SCOUT_INDIAN_SETTLEMENT);
+                a1 = u1.hasAbility(Ability.SPEAK_WITH_CHIEF);
+                a2 = u2.hasAbility(Ability.SPEAK_WITH_CHIEF);
                 if (a1 != a2) return (a1) ? -1 : 1;
                 return u1.getType().getSkill() - u2.getType().getSkill();
             }
@@ -438,7 +438,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             Mission m = null;
             if (u.isArmed()) {
                 m = new DefendSettlementMission(aiMain, aiU, colony);
-            } else if (u.hasAbility(Ability.SCOUT_INDIAN_SETTLEMENT)) {
+            } else if (u.hasAbility(Ability.SPEAK_WITH_CHIEF)) {
                 if (preferScouts) m = aip.getScoutingMission(aiU);
             } else if (u.hasAbility(Ability.IMPROVE_TERRAIN)) {
                 if (pioneersWanted) m = aip.getPioneeringMission(aiU);

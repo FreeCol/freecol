@@ -1897,6 +1897,7 @@ public final class Specification {
             veryGoodGovernmentLimit.setValue(100);
             allOptions.put(id, veryGoodGovernmentLimit);
         }
+
         EquipmentType missionaryEquipment
             = getEquipmentType("model.equipment.missionary");
         if (missionaryEquipment != null) {
@@ -1909,6 +1910,19 @@ public final class Specification {
                 }
             }
         }
+        // model.ability.missionary was split into distinct parts,
+        // which should be fixed by the roles work, but the Brebeuf
+        // scope was left hanging.
+        FoundingFather brebeuf
+            = getFoundingFather("model.foundingFather.fatherJeanDeBrebeuf");
+        for (Ability ability : brebeuf.getAbilitySet()) {
+            for (Scope scope : ability.getScopes()) {
+                if ("model.ability.missionary".equals(scope.getAbilityId())) {
+                    scope.setAbilityId(Ability.ESTABLISH_MISSION);
+                }
+            }
+        }
+        
         // end @compat
 
         // @compat 0.10.7

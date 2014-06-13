@@ -742,7 +742,7 @@ public class Unit extends GoodsLocation
      * @return True if this unit is running a mission.
      */
     public boolean isInMission() {
-        return hasAbility(Ability.MISSIONARY)
+        return hasAbility(Ability.ESTABLISH_MISSION)
             && (getLocation() instanceof IndianSettlement
                 // TODO: remove this when PET missionary serialization is fixed
                 || getLocation() == null);
@@ -2211,9 +2211,16 @@ public class Unit extends GoodsLocation
             } else if (isTradingUnit()) {
                 return getTradeMoveType(settlement);
             } else if (isColonist()) {
-                // Check for scout before offensive, scouts are offensive.
-                if (hasAbility(Ability.SCOUT_INDIAN_SETTLEMENT)) {
-                    return getScoutMoveType(from, settlement);
+                if (settlement instanceof Colony
+                    && hasAbility(Ability.NEGOTIATE)) {
+                    return (allowMoveFrom(from))
+                        ? MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT
+                        : MoveType.MOVE_NO_ACCESS_WATER;
+                } else if (settlement instanceof IndianSettlement
+                    && hasAbility(Ability.SPEAK_WITH_CHIEF)) {
+                    return (allowMoveFrom(from))
+                        ? MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT
+                        : MoveType.MOVE_NO_ACCESS_WATER;
                 } else if (isOffensiveUnit()) {
                     return (allowMoveFrom(from))
                         ? MoveType.ATTACK_SETTLEMENT
@@ -2309,26 +2316,6 @@ public class Unit extends GoodsLocation
                 : (!allowMoveFrom(from))
                 ? MoveType.MOVE_NO_ACCESS_WATER
                 : MoveType.ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY;
-        } else {
-            return MoveType.MOVE_ILLEGAL; // should not happen
-        }
-    }
-
-    /**
-     * Get the <code>MoveType</code> when moving a scout to a settlement.
-     *
-     * @param from The <code>Tile</code> to move from.
-     * @param settlement The <code>Settlement</code> to move to.
-     * @return The appropriate <code>MoveType</code>.
-     */
-    private MoveType getScoutMoveType(Tile from, Settlement settlement) {
-        if (settlement instanceof Colony) {
-            // No allowMoveFrom check for Colonies
-            return MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT;
-        } else if (settlement instanceof IndianSettlement) {
-            return (!allowMoveFrom(from))
-                ? MoveType.MOVE_NO_ACCESS_WATER
-                : MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT;
         } else {
             return MoveType.MOVE_ILLEGAL; // should not happen
         }

@@ -108,7 +108,7 @@ public class ScoutingMission extends Mission {
      */
     private static boolean canScoutNatives(AIUnit aiUnit) {
         return aiUnit.getUnit()
-            .hasAbility(Ability.SCOUT_INDIAN_SETTLEMENT);
+            .hasAbility(Ability.SPEAK_WITH_CHIEF);
     }
 
     /**

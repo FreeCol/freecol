@@ -25,19 +25,18 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class EuropeTest extends FreeColTestCase {
 
-    public void testMissionary() {
+    private static final UnitType colonistType
+        = spec().getUnitType("model.unit.freeColonist");
 
+
+    public void testMissionary() {
         Game game = getGame();
         Player dutch = game.getPlayer("model.nation.dutch");
         Europe amsterdam = dutch.getEurope();
 
-        UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
         Unit colonist = new ServerUnit(game, amsterdam, dutch, colonistType);
 
         assertTrue(amsterdam.hasAbility(Ability.DRESS_MISSIONARY));
         assertTrue(colonist.hasAbility(Ability.DRESS_MISSIONARY));
-
     }
-
-
 }

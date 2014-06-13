@@ -93,9 +93,9 @@ public class ScoutIndianSettlementMessage extends DOMMessage {
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
-        if (!unit.hasAbility(Ability.SCOUT_INDIAN_SETTLEMENT)) {
+        if (!unit.hasAbility(Ability.SPEAK_WITH_CHIEF)) {
             return DOMMessage.clientError("Unit lacks ability"
-                + " to scout native settlement: " + unitId);
+                + " to speak to chief: " + unitId);
         }
 
         Tile tile;

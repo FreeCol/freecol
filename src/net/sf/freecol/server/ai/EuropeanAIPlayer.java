@@ -177,7 +177,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                     || unit.getLocation() == null
                     || !unit.isColonist()) {
                     return -1000;
-                } else if (unit.hasAbility(Ability.SCOUT_INDIAN_SETTLEMENT)) {
+                } else if (unit.hasAbility(Ability.SPEAK_WITH_CHIEF)) {
                     return 900 + ((unit.hasTile()) ? 100 : 0);
                 } else if (unit.hasAbility(Ability.EXPERT_SCOUT)) {
                     return 600;

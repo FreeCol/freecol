@@ -43,6 +43,9 @@ public class ScoutingMissionTest extends FreeColTestCase {
     private static final EquipmentType horsesEqType
         = spec().getEquipmentType("model.equipment.horses");
 
+    private static final Role scoutRole
+        = spec().getRole("model.role.scout");
+
     private static final UnitType scoutType
         = spec().getUnitType("model.unit.seasonedScout");
 
@@ -71,14 +74,17 @@ public class ScoutingMissionTest extends FreeColTestCase {
         Player.makeContact(inca, dutch);
 
         Tile unitTile = map.getTile(2, 2);
-        Role scoutRole = spec().getRole("model.role.scout");
-        Unit scout = new ServerUnit(game, unitTile, dutch, scoutType, scoutRole);
+        Unit scout = new ServerUnit(game, unitTile, dutch,
+                                    scoutType, scoutRole);
+        assertEquals(scoutRole, scout.getRole());
 
         AIUnit aiUnit = aiMain.getAIUnit(scout);
         aiUnit.abortMission("test");
         assertNotNull("The scout should be an AI unit", aiUnit);
-        assertTrue("Scout should have the scout role",
-            scout.hasAbility(Ability.SCOUT_INDIAN_SETTLEMENT));
+        assertEquals("Scout should have the scout role", scoutRole,
+            scout.getRole());
+        
+        assertTrue(scout.hasAbility(Ability.SPEAK_WITH_CHIEF));
         assertEquals("The Inca settlement should be a scouting target", null,
             ScoutingMission.invalidReason(aiUnit, is));
         assertEquals("The Inca settlement should be found as scouting target",
@@ -98,7 +104,7 @@ public class ScoutingMissionTest extends FreeColTestCase {
         // Invalidate the mission by losing the horses.
         scout.changeEquipment(horsesEqType, -1);
         assertFalse("Scout should not have the scout role",
-            scout.hasAbility(Ability.SCOUT_INDIAN_SETTLEMENT));
+            scout.hasAbility(Ability.SPEAK_WITH_CHIEF));
         assertNotNull("Scouting mission should be invalid",
             aiUnit.getMission().invalidReason());
         assertNotNull("Scouting mission should be impossible for this unit",

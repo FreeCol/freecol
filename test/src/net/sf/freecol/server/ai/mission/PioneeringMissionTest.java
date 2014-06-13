@@ -21,6 +21,7 @@ package net.sf.freecol.server.ai.mission;
 
 import java.util.List;
 
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Game;
@@ -46,11 +47,14 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class PioneeringMissionTest extends FreeColTestCase {
 
+    private static final EquipmentType toolsEqType
+        = spec().getEquipmentType("model.equipment.tools");
+
     private static final GoodsType toolsGoodsType
         = spec().getGoodsType("model.goods.tools");
 
-    private static final EquipmentType toolsEqType
-        = spec().getEquipmentType("model.equipment.tools");
+    private static final Role pioneerRole
+        = spec().getRole("model.role.pioneer");
 
     private static final UnitType colonistType
         = spec().getUnitType("model.unit.freeColonist");
@@ -65,20 +69,21 @@ public class PioneeringMissionTest extends FreeColTestCase {
 
 
     public void testImprovementNoLongerValid() {
-        Game game = ServerTestHelper.startServerGame(getTestMap());
-        AIMain aiMain = ServerTestHelper.getServer().getAIMain();
+        final Game game = ServerTestHelper.startServerGame(getTestMap());
+        final AIMain aiMain = ServerTestHelper.getServer().getAIMain();
 
         // Get player, colony and unit
-        ServerPlayer player = (ServerPlayer) game.getPlayer("model.nation.dutch");
-        EuropeanAIPlayer aiPlayer = (EuropeanAIPlayer) aiMain.getAIPlayer(player);
-        Colony colony = getStandardColony();
-        AIColony aiColony = aiMain.getAIColony(colony);
-        Unit colonist = new ServerUnit(game, colony.getTile(), player,
-            colonistType);
-        Role pioneer = spec().getRole("model.role.pioneer");
+        final ServerPlayer player
+            = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        final EuropeanAIPlayer aiPlayer
+            = (EuropeanAIPlayer)aiMain.getAIPlayer(player);
+        final Colony colony = getStandardColony();
+        final AIColony aiColony = aiMain.getAIColony(colony);
+        final Unit colonist = new ServerUnit(game, colony.getTile(), player,
+                                             colonistType);
         final List<EquipmentType> pioneerEquipment
-            = colonist.getRoleEquipment(pioneer);
-        AIUnit aiUnit = aiMain.getAIUnit(colonist);
+            = colonist.getRoleEquipment(pioneerRole);
+        final AIUnit aiUnit = aiMain.getAIUnit(colonist);
         assertNotNull(aiUnit);
         aiUnit.abortMission("Test");
 
@@ -93,6 +98,7 @@ public class PioneeringMissionTest extends FreeColTestCase {
             aiPlayer.pioneersNeeded() > 0);
 
         // Setup mission
+        assertFalse(colonist.hasAbility(Ability.IMPROVE_TERRAIN));
         assertEquals("Pioneering should be valid (despite no tools)", null,
             PioneeringMission.invalidReason(aiUnit));
         assertNull("Pioneering should find no targets though",
@@ -101,16 +107,18 @@ public class PioneeringMissionTest extends FreeColTestCase {
         // Add some tools to the colony, mission should become viable.
         colony.addGoods(toolsGoodsType, 100);
         assertTrue("Colony can provide tools",
-            colony.canProvideEquipment(pioneer.getRequiredGoods()));
+            colony.canProvideEquipment(pioneerRole.getRequiredGoods()));
         assertEquals("Colony found", colony,
             PioneeringMission.findTarget(aiUnit, 10, false));
         assertEquals("Pioneer has no mission", null, aiUnit.getMission());
         assertEquals("Pioneering should be valid (tools present in colony)",
             null, PioneeringMission.invalidReason(aiUnit));
 
-        // Move tools to the unit and try again.
+        // Remove the tools as if to the unit and try again.
         colony.addGoods(toolsGoodsType, -100);
-        colonist.changeEquipment(toolsEqType, 1);
+        colonist.setRole(pioneerRole);
+        assertEquals(pioneerRole, colonist.getRole());
+        assertTrue(colonist.hasAbility(Ability.IMPROVE_TERRAIN));
         assertNotNull("TileImprovementPlan found",
             PioneeringMission.findTarget(aiUnit, 10, false));
         assertEquals("Pioneering should be valid (unit has tools)", null,

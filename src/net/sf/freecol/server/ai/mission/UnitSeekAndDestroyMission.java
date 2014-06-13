@@ -373,7 +373,7 @@ public class UnitSeekAndDestroyMission extends Mission {
             ? reason
             : (!aiUnit.getUnit().isOffensiveUnit())
             ? Mission.UNITNOTOFFENSIVE
-            : (aiUnit.getUnit().hasAbility(Ability.SCOUT_INDIAN_SETTLEMENT))
+            : (aiUnit.getUnit().hasAbility(Ability.SPEAK_WITH_CHIEF))
             ? "scouts-should-not-seek-and-destroy"
             : null;
     }

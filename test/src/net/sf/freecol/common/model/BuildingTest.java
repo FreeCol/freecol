@@ -630,7 +630,6 @@ public class BuildingTest extends FreeColTestCase {
     }
 
     public void testPasture() {
-System.err.println("TP");
         Game game = getGame();
         game.setMap(getTestMap(true));
 

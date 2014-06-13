@@ -21,9 +21,9 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
+import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.UnitLocation.NoAddReason;
 import net.sf.freecol.server.model.ServerUnit;
@@ -71,6 +71,9 @@ public class IndividualFatherTest extends FreeColTestCase {
         = spec().getGoodsType("model.goods.bells");
     private static final GoodsType musketsType
         = spec().getGoodsType("model.goods.muskets");
+
+    private static final Role missionaryRole
+        = spec().getRole("model.role.missionary");
 
     private static final UnitType servantType
         = spec().getUnitType("model.unit.indenturedServant");
@@ -292,18 +295,11 @@ public class IndividualFatherTest extends FreeColTestCase {
         assertTrue(jeanDeBrebeuf.hasAbility(ability));
         assertFalse(dutch.hasAbility(ability));
 
-        game.setMap(getTestMap());
-        FreeColTestCase.IndianSettlementBuilder builder
-            = new FreeColTestCase.IndianSettlementBuilder(game);
-        IndianSettlement camp = builder.build();
-
-        Role missionaryRole = spec().getRole("model.role.missionary");
-        Unit missionary = new ServerUnit(game, null, dutch, colonistType,
-                                         missionaryRole);
-        camp.setMissionary(missionary);
-
-        assertTrue(bibleType.hasAbility(Ability.MISSIONARY));
-        assertTrue(missionary.hasAbility(Ability.MISSIONARY));
+        Unit missionary = new ServerUnit(game, null, dutch, 
+                                         colonistType, missionaryRole);
+        assertEquals(missionaryRole, missionary.getRole());
+        assertTrue(missionary.hasAbility(Ability.ESTABLISH_MISSION));
+        assertFalse(missionary.hasAbility(ability));
 
         dutch.addFather(jeanDeBrebeuf);
         assertTrue(dutch.hasAbility(ability));
@@ -374,11 +370,11 @@ public class IndividualFatherTest extends FreeColTestCase {
         Game game = getGame();
         game.setMap(getTestMap(true));
 
-        Map<UnitType, UnitType> upgrades = bartolomeDeLasCasas.getUpgrades();
+        java.util.Map<UnitType, UnitType> upgrades = bartolomeDeLasCasas.getUpgrades();
 
         assertFalse(upgrades.isEmpty());
 
-        for (Map.Entry<UnitType, UnitType> entry : upgrades.entrySet()) {
+        for (java.util.Map.Entry<UnitType, UnitType> entry : upgrades.entrySet()) {
             assertEquals(entry.getKey(), spec().getUnitType(entry.getKey().getId()));
             assertEquals(entry.getValue(), spec().getUnitType(entry.getValue().getId()));
         }
@@ -387,7 +383,7 @@ public class IndividualFatherTest extends FreeColTestCase {
         Player player = colony.getOwner();
         Unit unit = colony.getUnitList().get(0);
 
-        Map.Entry<UnitType, UnitType> entry = upgrades.entrySet().iterator().next();
+        java.util.Map.Entry<UnitType, UnitType> entry = upgrades.entrySet().iterator().next();
         unit.setType(entry.getKey());
 
         player.addFather(bartolomeDeLasCasas);

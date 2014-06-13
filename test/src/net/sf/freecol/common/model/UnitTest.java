@@ -56,6 +56,9 @@ public class UnitTest extends FreeColTestCase {
     private static final GoodsType foodType
         = spec().getPrimaryFoodType();
 
+    private static final Role missionaryRole
+        = spec().getRole("model.role.missionary");
+
     private static final TileType ocean
         = spec().getTileType("model.tile.ocean");
     private static final TileType plains
@@ -217,12 +220,12 @@ public class UnitTest extends FreeColTestCase {
         Unit colonist = new ServerUnit(game, colony, dutch, colonistType);
 
         // check abilities
-        assertFalse(colonist.hasAbility(Ability.MISSIONARY));
-        colonist.changeEquipment(missionaryEquipmentType, 1);
-        assertTrue(colonist.hasAbility(Ability.MISSIONARY));
-        assertFalse(colonist.hasAbility(Ability.EXPERT_MISSIONARY));
-        assertTrue(jesuit.hasAbility(Ability.MISSIONARY));
-        assertTrue(jesuit.hasAbility(Ability.EXPERT_MISSIONARY));
+        assertFalse(colonist.hasAbility(Ability.ESTABLISH_MISSION));
+        colonist.setRole(missionaryRole);
+        assertTrue(colonist.hasAbility(Ability.ESTABLISH_MISSION));
+
+        assertEquals(missionaryRole, jesuit.getRole());
+        assertTrue(jesuit.hasAbility(Ability.ESTABLISH_MISSION));
 
         // check mission creation
         FreeColTestCase.IndianSettlementBuilder builder
