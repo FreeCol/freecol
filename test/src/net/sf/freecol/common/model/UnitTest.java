@@ -667,4 +667,9 @@ public class UnitTest extends FreeColTestCase {
 
     }
 
+    public void testDefaultRole() {
+        for (UnitType type : spec().getUnitTypeList()) {
+            assertNotNull(type.getDefaultRole());
+        }
+    }
 }

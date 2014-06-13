@@ -115,6 +115,8 @@ public final class UnitType extends BuildableType implements Consumer {
      */
     public UnitType(String id, Specification specification) {
         super(id, specification);
+
+        this.defaultRole = specification.getDefaultRole();
     }
 
 
@@ -832,14 +834,15 @@ public final class UnitType extends BuildableType implements Consumer {
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        final Specification spec = getSpecification();
+
         // Clear containers.
         if (xr.shouldClearContainers()) {
             consumption = null;
-            defaultRole = null;
             typeChanges = null;
         }
+        defaultRole = spec.getDefaultRole();
 
-        final Specification spec = getSpecification();
         UnitType parent = xr.getType(spec, EXTENDS_TAG, UnitType.class, this);
         if (parent != this) {
             defaultRole = parent.defaultRole;
