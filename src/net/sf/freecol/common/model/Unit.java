@@ -125,7 +125,7 @@ public class Unit extends GoodsLocation
     protected GoodsType workType;
 
     /** What type of goods this unit last earned experience producing. */
-    private GoodsType experienceType;
+    protected GoodsType experienceType;
 
     /** The mount of experience a unit has earned. */
     protected int experience = 0;

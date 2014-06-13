@@ -117,6 +117,10 @@ public class ServerUnit extends Unit implements ServerModelObject {
     /**
      * Create a new ServerUnit from a template.
      *
+     * Note all FCGOTs are looked up in the specification by id,
+     * allowing the template to derive from a different specification
+     * as might happen when loading a scenario map.
+     *
      * -vis: Visibility issues depending on location.
      * -til: Changes appearance if unit goes into a colony.
      *
@@ -131,23 +135,16 @@ public class ServerUnit extends Unit implements ServerModelObject {
         final Specification spec = getSpecification();
         setNationality(template.getNationality());
         setEthnicity(template.getEthnicity());
-        visibleGoodsCount = -1;
-        if (getType().canCarryGoods()) {
-            setGoodsContainer(new GoodsContainer(game, this));
-        }
         workLeft = template.getWorkLeft();
         workType = spec.getGoodsType(template.getWorkType().getId());
         movesLeft = template.getMovesLeft();
         hitPoints = template.getType().getHitPoints();
-        for (EquipmentType equipmentType : template.getEquipment().keySet()) {
-            EquipmentType et = spec.getEquipmentType(equipmentType.getId());
-            int amount = template.getEquipment().getCount(equipmentType);
-            equipment.incrementCount(et, amount);
-        }
-        setRole();
+        initializeRoleEquipment(spec.getRole(template.getRole().getId()));
         setStateUnchecked(template.getState());
-
-        getOwner().addUnit(this);
+        if (getType().canCarryGoods()) {
+            setGoodsContainer(new GoodsContainer(game, this));
+        }
+        this.visibleGoodsCount = -1;
     }
 
     /**
@@ -166,43 +163,66 @@ public class ServerUnit extends Unit implements ServerModelObject {
                       UnitType type, Role role) {
         super(game);
 
-
-        if (type.canCarryGoods()) {
-            setGoodsContainer(new GoodsContainer(game, this));
-        }
-
         UnitType newType = type.getTargetType(ChangeType.CREATION, owner);
         this.unitType = (newType == null) ? type : newType;
         this.owner = owner;
+        this.state = UnitState.ACTIVE; // placeholder
+        this.role = getSpecification().getDefaultRole(); // placeholder
+        this.location = null;
+        this.entryLocation = null;
         if (unitType.hasAbility(Ability.PERSON)) {
             this.nationality = owner.getNationId();
             this.ethnicity = nationality;
+        } else {
+            this.nationality = null;
+            this.ethnicity = null;
         }
-        this.location = null;
 
         this.workLeft = -1;
         this.workType = null;
-
         this.movesLeft = getInitialMovesLeft();
         this.hitPoints = unitType.getHitPoints();
+        this.experienceType = null;
+        this.experience = 0;
+        this.workImprovement = null;
+        this.student = this.teacher = null;
+        this.turnsOfTraining = 0;
+        this.indianSettlement = null;
+        this.hitPoints = unitType.getHitPoints();
+        this.destination = null;
+        this.tradeRoute = null;
+        this.currentStop = -1;
+        this.treasureAmount = 0;
+        this.attrition = 0;
+        this.visibleGoodsCount = -1;
+        this.equipment.clear();
 
-        if (role != null) {
-            List<EquipmentType> initialEquipment = getSpecification()
-                .getRoleEquipment(role.getId(), true);
-            for (EquipmentType equipmentType : initialEquipment) {
-                if (EquipmentType.NO_EQUIPMENT.equals(equipmentType)) {
-                    this.equipment.clear();
-                    break;
-                }
-                this.equipment.incrementCount(equipmentType, 1);
+        // Fix up role, state and location now other values are present.
+        initializeRoleEquipment(role);
+        setStateUnchecked(state);
+        setLocation(location);//-vis(owner),-til
+        if (getType().canCarryGoods()) {
+            setGoodsContainer(new GoodsContainer(game, this));
+        }
+
+        owner.addUnit(this);
+    }
+
+    /**
+     * Set the equipment present based on a specified role.
+     *
+     * @param role The <code>Role</code> that defines the equipment to use.
+     */
+    private void initializeRoleEquipment(Role role) {
+        final Specification spec = getSpecification();
+        for (EquipmentType et : spec.getRoleEquipment(role.getId(), true)) {
+            if (EquipmentType.NO_EQUIPMENT.equals(et)) {
+                this.equipment.clear();
+                break;
             }
+            this.equipment.incrementCount(et, 1);
         }
         setRole();
-        setStateUnchecked(state);
-        this.visibleGoodsCount = -1;
-
-        setLocation(location);//-vis(owner),-til
-        owner.addUnit(this);
     }
 
 
