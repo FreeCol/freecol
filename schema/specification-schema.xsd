@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- XSD for specification version 0.83
+<!-- XSD for specification version 0.84
      CHANGELOG:
      0.26: add capture-equipment
      0.27: add limits
@@ -60,6 +60,7 @@
      0.81: Percentage option values are PercentageType.
      0.82: Add conversion update type.
      0.83: Add delete attribute to production.
+     0.84: Add is-military to goods type.
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:annotation>
@@ -130,6 +131,7 @@
       <xs:attribute name="id" use="required" type="xs:ID"/>
       <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
       <xs:attribute name="is-farmed" type="xs:boolean"/>
+      <xs:attribute name="is-military" type="xs:boolean"/>
       <xs:attribute name="ignore-limit" type="xs:boolean"/>
       <xs:attribute name="is-food" type="xs:boolean"/>
       <xs:attribute name="made-from" type="GoodsTypeId"/>

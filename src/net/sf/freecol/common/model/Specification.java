@@ -2080,6 +2080,12 @@ public final class Specification {
             }
         }
 
+        // is-military was added to goods type
+        GoodsType goodsType = getGoodsType("model.goods.horses");
+        goodsType.setMilitary();
+        goodsType = getGoodsType("model.goods.muskets");
+        goodsType.setMilitary();
+
         // end @compat 0.10.7
     }
     // end @compat 0.10.x

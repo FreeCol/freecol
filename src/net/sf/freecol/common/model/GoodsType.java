@@ -57,16 +57,16 @@ public final class GoodsType extends FreeColGameObjectType {
     private boolean newWorldGoods;
 
     /**
+     * Whether this type of goods is required for building equipment
+     * that grants an offence bonus or defence bonus.
+     */
+    private boolean isMilitary = false;
+
+    /**
      * Whether this type of goods is required for building. (Derived
      * attribute)
      */
     private boolean buildingMaterial = false;
-
-    /**
-     * Whether this type of goods is required for building equipment
-     * that grants an offence bonus or defence bonus. (Derived attribute)
-     */
-    private boolean militaryGoods = false;
 
     /** Whether these are trade goods that can only be obtained in Europe. */
     private boolean tradeGoods;
@@ -154,6 +154,22 @@ public final class GoodsType extends FreeColGameObjectType {
     }
 
     /**
+     * Is this goods type a military goods type?
+     *
+     * @return True if this is a military goods type.
+     */
+    public boolean isMilitaryGoods() {
+        return isMilitary;
+    }
+
+    // @compat 0.10.x
+    // Needed by Specification fixup010x()
+    public void setMilitary() {
+        this.isMilitary = true;
+    }
+    // end @compat 0.10.x
+
+    /**
      * Do warehouse storage limits not apply to this goods type?
      *
      * @return True if unlimited amounts of this goods type can be stored.
@@ -188,15 +204,6 @@ public final class GoodsType extends FreeColGameObjectType {
      */
     public boolean isBuildingMaterial() {
         return buildingMaterial;
-    }
-
-    /**
-     * Is this goods type a military goods type?
-     *
-     * @return True if this is a military goods type.
-     */
-    public boolean isMilitaryGoods() {
-        return militaryGoods;
     }
 
     /**
@@ -471,13 +478,11 @@ public final class GoodsType extends FreeColGameObjectType {
     /**
      * Set the derived fields for the goods types in a specification.
      *
-     * The "derived" fields are: buildingMaterial, makes, militaryGoods
+     * The "derived" fields are: buildingMaterial + makes
      * - buildingMaterial depends on whether a GoodsType is present on
      *   a BuildableType requiredGoods list
      * - makes depends on whether a GoodsType madeFrom field refers
      *   to another
-     * - militaryGoods depends on whether a GoodsType is present on a
-     *   military EquipmentType requiredGoods list
      *   
      * This is called from Specification.clean() when the
      * specification is fully read.  We must wait until then as the
@@ -493,7 +498,6 @@ public final class GoodsType extends FreeColGameObjectType {
         for (GoodsType g : spec.getGoodsTypeList()) {
             g.buildingMaterial = false;
             g.makes = null;
-            g.militaryGoods = false;
         }
 
         // Set buildingMaterial attribute
@@ -511,15 +515,6 @@ public final class GoodsType extends FreeColGameObjectType {
         for (GoodsType g : spec.getGoodsTypeList()) {
             if (g.madeFrom != null) g.madeFrom.makes = g;
         }
-
-        // Set militaryGoods attribute
-        for (EquipmentType e : spec.getEquipmentTypeList()) {
-            if (e.isMilitaryEquipment()) {
-                for (AbstractGoods ag : e.getRequiredGoods()) {
-                    ag.getType().militaryGoods = true;
-                }
-            }
-        }
     }
 
 
@@ -531,6 +526,7 @@ public final class GoodsType extends FreeColGameObjectType {
     private static final String INITIAL_PRICE_TAG = "initial-price";
     private static final String IS_FARMED_TAG = "is-farmed";
     private static final String IS_FOOD_TAG = "is-food";
+    private static final String IS_MILITARY_TAG = "is-military";
     private static final String LOW_PRODUCTION_THRESHOLD_TAG = "low-production-threshold";
     private static final String MADE_FROM_TAG = "made-from";
     private static final String MARKET_TAG = "market";
@@ -554,6 +550,8 @@ public final class GoodsType extends FreeColGameObjectType {
         xw.writeAttribute(IS_FARMED_TAG, isFarmed);
 
         xw.writeAttribute(IS_FOOD_TAG, isFood);
+
+        xw.writeAttribute(IS_MILITARY_TAG, isMilitary);
 
         xw.writeAttribute(IGNORE_LIMIT_TAG, ignoreLimit);
 
@@ -624,6 +622,9 @@ public final class GoodsType extends FreeColGameObjectType {
         isFarmed = xr.getAttribute(IS_FARMED_TAG, false);
 
         isFood = xr.getAttribute(IS_FOOD_TAG, false);
+
+        isMilitary = xr.getAttribute(IS_MILITARY_TAG, false);
+        if (isMilitary) System.err.println("MILITARY = " + getId());
 
         ignoreLimit = xr.getAttribute(IGNORE_LIMIT_TAG, false);
 

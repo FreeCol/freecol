@@ -52,6 +52,7 @@
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
       <xs:attribute name="is-farmed" type="xs:boolean"/>
+      <xs:attribute name="is-military" type="xs:boolean"/>
       <xs:attribute name="ignore-limit" type="xs:boolean"/>
       <xs:attribute name="is-food" type="xs:boolean"/>
       <xs:attribute name="made-from" type="GoodsTypeId"/>
