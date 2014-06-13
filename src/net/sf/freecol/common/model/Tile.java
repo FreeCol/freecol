@@ -2031,6 +2031,22 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         super.dispose();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int checkIntegrity(boolean fix) {
+        int result = super.checkIntegrity(fix);
+        Settlement settlement = getSettlement();
+        if (settlement != null) {
+            result = Math.min(result, settlement.checkIntegrity(fix));
+        }
+        if (tileItemContainer != null) {
+            result = Math.min(result, tileItemContainer.checkIntegrity(fix));
+        }
+        return result;
+    }
+
 
     // Override FreeColObject
 
@@ -2043,30 +2059,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                                       Turn turn) {
         // Delegate to type
         return getType().getAbilitySet(id, fcgot, turn);
-    }
-
-
-    //
-    // Miscellaneous low level
-    //
-
-    /**
-     * Check for any tile integrity problems.
-     *
-     * @param fix Fix problems if possible.
-     * @return Negative if there are problems remaining, zero if
-     *     problems were fixed, positive if no problems found at all.
-     */
-    public int checkIntegrity(boolean fix) {
-        int result = 1;
-        Settlement settlement = getSettlement();
-        if (settlement != null) {
-            result = Math.min(result, settlement.checkIntegrity(fix));
-        }
-        if (tileItemContainer != null) {
-            result = Math.min(result, tileItemContainer.checkIntegrity(fix));
-        }
-        return result;
     }
 
 

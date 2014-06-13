@@ -2875,11 +2875,15 @@ public class Colony extends Settlement implements Nameable {
         return result;
     }
 
+
+    // Override FreeColGameObject
+
     /**
      * {@inheritDoc}
      */
+    @Override
     public int checkIntegrity(boolean fix) {
-        int result = 1;
+        int result = super.checkIntegrity(fix);
 
         // @compat 0.10.x
         if (!isLandLocked() && !hasAbility(Ability.HAS_PORT)) {

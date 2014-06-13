@@ -278,9 +278,13 @@ public class LostCityRumour extends TileItem {
         return false;
     }
 
+
+    // Override FreeColGameObject
+
     /**
      * {@inheritDoc}
      */
+    @Override
     public int checkIntegrity(boolean fix) {
         return (type == RumourType.NO_SUCH_RUMOUR) ? -1 : 1;
     }

@@ -441,47 +441,6 @@ public class TileImprovement extends TileItem implements Named {
         return (style == null) ? null : style.getString();
     }
 
-    /**
-     * Fixes any tile improvement style discontinuities.
-     *
-     * We check only if this improvement is not connected to a neighbour
-     * that *is* connected to this one, and connect this one.
-     *
-     * TODO: drop this one day when we never have style discontinuities.
-     * This alas is not the case in 0.10.x.
-     *
-     * @param fix Fix problems if possible.
-     * @return Negative if there are problems remaining, zero if
-     *     problems were fixed, positive if no problems found at all.
-     */
-    public int checkIntegrity(boolean fix) {
-        String curr = (style == null) ? null : style.getString();
-        String found = (isRiver()) ? updateRiverConnections(curr)
-            : (isRoad() && isComplete()) ? updateRoadConnections(true)
-            : null;
-        int result;
-        if ((found == null && curr == null)
-            || (found != null && curr != null && found.equals(curr))) {
-            result = 1;
-        } else if (fix) {
-            this.style = TileImprovementStyle.getInstance(found);
-            if ((this.style != null)
-                != (isRiver() || (isRoad() && isComplete()))) {
-                logger.warning("Bad style for improvement: " + this);
-                result = -1;
-            } else {
-                logger.warning("Fixing improvement style from "
-                    + curr + " to " + found + " at " + tile);
-                result = 0;
-            }
-        } else {
-            logger.warning("Broken improvement style " + curr
-                + " should be " + found + " at " + tile);
-            result = -1;
-        }
-        return result;
-    }
-
 
     // Interface TileItem
 
@@ -551,6 +510,49 @@ public class TileImprovement extends TileItem implements Named {
      */
     public boolean isNatural() {
         return type.isNatural();
+    }
+
+
+    // Override FreeColGameObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int checkIntegrity(boolean fix) {
+        int result = super.checkIntegrity(fix);
+        // @compat 0.10.x
+        // We check only if this improvement is not connected to a
+        // neighbour that *is* connected to this one, and connect this
+        // one.
+        //
+        // TODO: drop this one day when we never have style
+        // discontinuities.  This alas is not the case in 0.10.x.
+        String curr = (style == null) ? null : style.getString();
+        String found = (isRiver()) ? updateRiverConnections(curr)
+            : (isRoad() && isComplete()) ? updateRoadConnections(true)
+            : null;
+        if ((found == null && curr == null)
+            || (found != null && curr != null && found.equals(curr))) {
+            result = Math.min(1, result);
+        } else if (fix) {
+            this.style = TileImprovementStyle.getInstance(found);
+            if ((this.style != null)
+                != (isRiver() || (isRoad() && isComplete()))) {
+                logger.warning("Bad style for improvement: " + this);
+                result = -1;
+            } else {
+                logger.warning("Fixing improvement style from "
+                    + curr + " to " + found + " at " + tile);
+                result = Math.min(0, result);
+            }
+        } else {
+            logger.warning("Broken improvement style " + curr
+                + " should be " + found + " at " + tile);
+            result = -1;
+        }
+        // end @compat 0.10.x
+        return result;
     }
 
 

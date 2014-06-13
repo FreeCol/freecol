@@ -215,6 +215,19 @@ public abstract class FreeColGameObject extends FreeColObject {
                 && Utils.equals(this.getId(), o.getId()));
     }
 
+    /**
+     * Checks the integrity of this game object.
+     *
+     * To be overridden by subclasses where this is meaningful.
+     * 
+     * @param fix If true, fix problems if possible.
+     * @return Negative if there are problems remaining, zero if
+     *     problems were fixed, positive if no problems found at all.
+     */
+    public int checkIntegrity(boolean fix) {
+        return 1;
+    }
+
 
     // Override FreeColObject
 

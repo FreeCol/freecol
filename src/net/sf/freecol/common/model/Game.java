@@ -1062,20 +1062,14 @@ public class Game extends FreeColGameObject {
     }
 
 
+    // Override FreeColGameObject
+
     /**
-     * Checks the integrity of this <code>Game</code>.
-     * 
-     * - Detects {@link FreeColGameObject#isUninitialized() uninitialized}
-     *   <code>FreeColGameObject</code>s
-     * - Detects map inconsistencies
-     * - Detects player inconsistencies
-     *
-     * @param fix Fix problems if possible.
-     * @return Negative if there are problems remaining, zero if
-     *     problems were fixed, positive if no problems found at all.
+     * {@inheritDoc}
      */
+    @Override
     public int checkIntegrity(boolean fix) {
-        int result = 1;
+        int result = super.checkIntegrity(fix);
         Iterator<FreeColGameObject> iterator = getFreeColGameObjectIterator();
         while (iterator.hasNext()) {
             FreeColGameObject fcgo = iterator.next();
@@ -1094,12 +1088,10 @@ public class Game extends FreeColGameObject {
                 }
             }
         }
-        
+
         Map map = getMap();
         if (map != null) {
-            for (Tile t : map.getAllTiles()) {
-                result = Math.min(result, t.checkIntegrity(fix));
-            }
+            result = Math.min(result, getMap().checkIntegrity(fix));
         }
         for (Player player : getPlayers()) {
             result = Math.min(result, player.checkIntegrity(fix));

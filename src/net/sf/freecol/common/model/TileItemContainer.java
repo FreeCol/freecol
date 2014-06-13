@@ -548,15 +548,15 @@ public class TileItemContainer extends FreeColGameObject {
         super.dispose();
     }
 
+
+    // Override FreeColGameObject
+
     /**
-     * Check for any integrity problems.
-     *
-     * @param fix Fix problems if possible.
-     * @return Negative if there are problems remaining, zero if
-     *     problems were fixed, positive if no problems found at all.
+     * {@inheritDoc}
      */
+    @Override
     public int checkIntegrity(boolean fix) {
-        int result = 1;
+        int result = super.checkIntegrity(fix);
         for (TileItem ti : new ArrayList<TileItem>(tileItems)) {
             int integ = ti.checkIntegrity(fix);
             if (fix) {

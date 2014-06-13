@@ -244,9 +244,13 @@ public class Resource extends TileItem {
         return true;
     }
 
+
+    // Override FreeColGameObject
+
     /**
      * {@inheritDoc}
      */
+    @Override
     public int checkIntegrity(boolean fix) {
         return (type == null) ? -1 : 1;
     }

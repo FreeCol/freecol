@@ -3873,15 +3873,15 @@ public class Player extends FreeColGameObject implements Nameable {
         }
     }
 
+
+    // Override FreeColGameObject
+
     /**
-     * Try to fix integrity problems with units that have no owner.
-     *
-     * @param fix Fix problems if possible.
-     * @return Negative if there are problems remaining, zero if
-     *     problems were fixed, positive if no problems found at all.
+     * {@inheritDoc}
      */
+    @Override
     public int checkIntegrity(boolean fix) {
-        int result = 1;
+        int result = super.checkIntegrity(fix);
         for (Unit unit : getUnits()) {
             if (unit.getOwner() == null) {
                 if (fix) {
@@ -3893,6 +3893,7 @@ public class Player extends FreeColGameObject implements Nameable {
                     result = -1;
                 }
             }
+            result = Math.min(result, unit.checkIntegrity(fix));
         }
         if (monarch != null) {
             result = Math.min(result, monarch.checkIntegrity(fix));

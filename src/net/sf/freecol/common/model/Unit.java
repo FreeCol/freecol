@@ -3740,6 +3740,25 @@ public class Unit extends GoodsLocation
         return objects;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int checkIntegrity(boolean fix) {
+        int result = super.checkIntegrity(fix);
+        if (this.role == null) {
+            if (fix) {
+                this.role = getSpecification().getDefaultRole();
+                logger.warning("Fixed missing role for: " + getId());
+                result = 0;
+            } else {
+                logger.warning("Missing role for: " + getId());
+                result = -1;
+            }
+        }
+        return result;
+    }
+
 
     // Override FreeColObject
 

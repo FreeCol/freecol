@@ -1212,11 +1212,14 @@ public class IndianSettlement extends Settlement {
             .addStringTemplate("%nation%", getOwner().getNationName());
     }
 
+
+    // Override FreeColGameObject
+
     /**
      * {@inheritDoc}
      */
     public int checkIntegrity(boolean fix) {
-        return 1;
+        return super.checkIntegrity(fix);
     }
 
 

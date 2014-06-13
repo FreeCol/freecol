@@ -2416,6 +2416,21 @@ public class Map extends FreeColGameObject implements Location {
     }
 
 
+    // Override FreeColGameObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int checkIntegrity(boolean fix) {
+        int result = super.checkIntegrity(fix);
+        for (Tile t : getAllTiles()) {
+            result = Math.min(result, t.checkIntegrity(fix));
+        }
+        return result;
+    }
+
+
     // Serialization
 
     private static final String HEIGHT_TAG = "height";
