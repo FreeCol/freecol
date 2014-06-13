@@ -34,8 +34,8 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -466,7 +466,7 @@ public class ScoutingMission extends Mission {
         if (completed instanceof Colony) {
             if (getTarget() == null || getTarget() == completed) {
                 if (canScoutNatives(aiUnit)) {
-                    aiUnit.equipForRole(Role.DEFAULT_ID, false);
+                    aiUnit.equipForRole(Specification.DEFAULT_ROLE_ID, false);
                 }
                 setTarget(null);
             }

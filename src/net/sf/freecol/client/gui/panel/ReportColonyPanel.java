@@ -58,7 +58,6 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -672,15 +671,17 @@ public final class ReportColonyPanel extends ReportPanel
                 - u.getTurnsOfTraining();
             if (left <= 0) {
                 b = colourButton(cac, Integer.toString(0),
-                    lib.getUnitImageIcon(u.getType(), Role.DEFAULT_ID,
-                        true, 0.333), cAlarm,
+                    lib.getUnitImageIcon(u.getType(),
+                        Specification.DEFAULT_ROLE_ID, true, 0.333),
+                    cAlarm,
                     stpl("report.colony.making.noteach.description")
                         .addName("%colony%", colony.getName())
                         .addStringTemplate("%teacher%", Messages.getLabelTemplate(u)));
             } else {
                 b = colourButton(cac, Integer.toString(left),
-                    lib.getUnitImageIcon(u.getType(), Role.DEFAULT_ID,
-                        true, 0.333), Color.BLACK,
+                    lib.getUnitImageIcon(u.getType(),
+                        Specification.DEFAULT_ROLE_ID, true, 0.333),
+                    Color.BLACK,
                     stpl("report.colony.making.educating.description")
                         .addName("%colony%", colony.getName())
                         .addStringTemplate("%teacher%", Messages.getLabelTemplate(u))
@@ -740,7 +741,7 @@ public final class ReportColonyPanel extends ReportPanel
         final UnitType colonistType = getSpecification().getDefaultUnitType();
         ImageIcon colonistIcon
             = getGUI().getImageLibrary().getUnitImageIcon(colonistType,
-                Role.DEFAULT_ID, true, 0.333);
+                Specification.DEFAULT_ROLE_ID, true, 0.333);
         reportPanel.add(newLabel(null, colonistIcon, null,
                                  stpl("report.colony.birth.description")));
         reportPanel.add(newLabel("report.colony.making.header", null, null,
@@ -854,8 +855,8 @@ public final class ReportColonyPanel extends ReportPanel
             }
             Suggestion suggestion = suggestions.get(type);
             String label = Integer.toString(suggestion.amount);
-            ImageIcon ii = lib.getUnitImageIcon(type, Role.DEFAULT_ID,
-                                                true, 0.333);
+            ImageIcon ii = lib.getUnitImageIcon(type,
+                Specification.DEFAULT_ROLE_ID, true, 0.333);
             StringTemplate tip = (suggestion.oldType == null)
                 ? stpl("report.colony.wanting.description")
                     .addName("%colony%", colony.getName())

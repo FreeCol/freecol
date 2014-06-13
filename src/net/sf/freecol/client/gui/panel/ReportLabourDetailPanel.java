@@ -35,9 +35,9 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.Role;
 
 
 /**
@@ -80,15 +80,9 @@ public final class ReportLabourDetailPanel extends ReportPanel implements Action
                                             ""));
         detailPanel.setOpaque(false);
 
-        String roleId = Role.DEFAULT_ID;
-        if (unitType.hasAbility(Ability.EXPERT_PIONEER)) {
-            roleId = "model.role.pioneer";
-        } else if (unitType.hasAbility(Ability.EXPERT_MISSIONARY)) {
-            roleId = "model.role.missionary";
-        }
 
         // summary
-        detailPanel.add(new JLabel(getLibrary().getUnitImageIcon(unitType, roleId)), "spany");
+        detailPanel.add(new JLabel(getLibrary().getUnitImageIcon(unitType)), "spany");
         detailPanel.add(localizedLabel(unitType.getNameKey()));
         detailPanel.add(new JLabel(String.valueOf(unitCount.getCount(unitType))), "wrap 10");
         boolean canTrain = false;

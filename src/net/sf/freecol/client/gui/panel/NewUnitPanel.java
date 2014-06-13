@@ -36,8 +36,8 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
-import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.UnitType;
 
 import net.miginfocom.swing.MigLayout;
@@ -111,8 +111,8 @@ public class NewUnitPanel extends FreeColPanel {
             boolean enable = player.checkGold(price);
             JButton newButton = new JButton();
             newButton.setLayout(new MigLayout("wrap 2", "[60]", "[30][30]"));
-            ImageIcon icon = getLibrary()
-                .getUnitImageIcon(ut, Role.DEFAULT_ID, !enable, 0.66);
+            ImageIcon icon = getLibrary().getUnitImageIcon(ut,
+                Specification.DEFAULT_ROLE_ID, !enable, 0.66);
             JLabel name = localizedLabel(ut.getNameKey());
             name.setEnabled(enable);
             JLabel gold = localizedLabel(StringTemplate.template("goldAmount")

@@ -33,6 +33,7 @@ import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
@@ -369,7 +370,7 @@ public class MessagesTest extends FreeColTestCase {
 
     public void testAbstractUnitLabels() {
         AbstractUnit unit = new AbstractUnit("model.unit.merchantman",
-                                             Role.DEFAULT_ID, 1);
+                                             Specification.DEFAULT_ROLE_ID, 1);
         assertEquals("one Merchantman", Messages.message(unit.getLabel()));
 
     }

@@ -56,7 +56,7 @@ import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.common.option.StringOption;
 import net.sf.freecol.common.option.UnitListOption;
-
+import net.sf.freecol.common.util.Utils;
 
 /**
  * This class encapsulates any parts of the "specification" for
@@ -70,6 +70,9 @@ public final class Specification {
 
     /** Roles backward compatibility fragment. */
     public static final String ROLES_COMPAT_FILE_NAME = "roles-compat.xml";
+
+    /** The default role. */
+    public static final String DEFAULT_ROLE_ID = "model.role.default";
 
     public static class Source extends FreeColGameObjectType {
 
@@ -1393,7 +1396,7 @@ public final class Specification {
      * @return The default <code>Role</code>.
      */
     public Role getDefaultRole() {
-        return getRole(Role.DEFAULT_ID);
+        return getRole(DEFAULT_ROLE_ID);
     }
 
 
@@ -1781,26 +1784,25 @@ public final class Specification {
 
     // @compat 0.10.x
     private void fixupRoles() {
-        if (roles.isEmpty()) { // @compat 0.10.0-5 (no <role> definitions)
-            try {
-                logger.info("Loading role backward compatibility fragment: "
-                            + ROLES_COMPAT_FILE_NAME);
-                File base = FreeColDirectories.getBaseDirectory();
-                load(new FileInputStream(new File(base, ROLES_COMPAT_FILE_NAME)));
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Failed to load remedial roles.", e);
-            }
-        } else { // @compat 0.10.6-7
-            if (findType(Role.DEFAULT_ID) == null) {
-                Role role = getDefaultRole();
-                roles.add(role);
-                allTypes.put(role.getId(), role);
-            }
-            Role scout = (Role)findType("model.role.scout");
-            if (!scout.hasAbility(Ability.CAPTURE_UNITS)) {
-                scout.addAbility(new Ability(Ability.CAPTURE_UNITS));
-            }
+        boolean zero10X;
+        try {
+            zero10X = Double.parseDouble(version) < 0.84;
+        } catch (Exception e) {
+            zero10X = true;
         }
+        if (!zero10X) return;
+        try {
+            File base = FreeColDirectories.getBaseDirectory();
+            load(new FileInputStream(new File(base, ROLES_COMPAT_FILE_NAME)));
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Failed to load remedial roles.", e);
+            return;
+        }
+        List<String> roles = new ArrayList<String>();
+        for (Role r : getRoles()) roles.add(r.getId());
+        logger.info("Loading role backward compatibility fragment: "
+            + ROLES_COMPAT_FILE_NAME
+            + " with roles: " + Utils.join(" ", roles));
     }
 
     private void fixup010x() {
@@ -1849,12 +1851,12 @@ public final class Specification {
             AbstractUnitOption artillery
                 = new AbstractUnitOption(id + ".artillery", this);
             artillery.setValue(new AbstractUnit("model.unit.artillery",
-                                                Role.DEFAULT_ID, 2));
+                                                DEFAULT_ROLE_ID, 2));
             interventionForce.getValue().add(artillery);
             AbstractUnitOption menOfWar
                 = new AbstractUnitOption(id + ".menOfWar", this);
             menOfWar.setValue(new AbstractUnit("model.unit.manOWar",
-                                               Role.DEFAULT_ID, 2));
+                                               DEFAULT_ROLE_ID, 2));
             interventionForce.getValue().add(menOfWar);
             allOptions.put(id, interventionForce);
         }
@@ -1874,12 +1876,12 @@ public final class Specification {
             AbstractUnitOption artillery
                 = new AbstractUnitOption(id + ".artillery", this);
             artillery.setValue(new AbstractUnit("model.unit.artillery",
-                                                Role.DEFAULT_ID, 2));
+                                                DEFAULT_ROLE_ID, 2));
             mercenaryForce.getValue().add(artillery);
             AbstractUnitOption menOfWar
                 = new AbstractUnitOption(id + ".menOfWar", this);
             menOfWar.setValue(new AbstractUnit("model.unit.manOWar",
-                                               Role.DEFAULT_ID, 2));
+                                               DEFAULT_ROLE_ID, 2));
             mercenaryForce.getValue().add(menOfWar);
             allOptions.put(id, mercenaryForce);
         }
@@ -1942,7 +1944,7 @@ public final class Specification {
             for (AbstractUnit au
                      : ((UnitListOption)refSize).getOptionValues()) {
                 if ("DEFAULT".equals(au.getRoleId())) {
-                    au.setRoleId(Role.DEFAULT_ID);
+                    au.setRoleId(DEFAULT_ROLE_ID);
                 } else if ("model.role.soldier".equals(au.getRoleId())
                     || "SOLDIER".equals(au.getRoleId())) {
                     au.setRoleId("model.role.infantry");
@@ -1965,11 +1967,11 @@ public final class Specification {
                 for (AbstractUnit au : ((UnitListOption)o).getOptionValues()) {
                     String roleId = au.getRoleId();
                     if (roleId == null) {
-                        au.setRoleId(Role.DEFAULT_ID);
+                        au.setRoleId(DEFAULT_ROLE_ID);
                     } else if (au.getRoleId().startsWith("model.role.")) {
                         ; // OK
                     } else if ("DEFAULT".equals(au.getRoleId())) {
-                        au.setRoleId(Role.DEFAULT_ID);
+                        au.setRoleId(DEFAULT_ROLE_ID);
                     } else if ("DRAGOON".equals(au.getRoleId())) {
                         au.setRoleId("model.role.dragoon");
                     } else if ("MISSIONARY".equals(au.getRoleId())) {
@@ -1983,7 +1985,7 @@ public final class Specification {
                     } else if ("SOLDIER".equals(au.getRoleId())) {
                         au.setRoleId("model.role.soldier");
                     } else {
-                        au.setRoleId(Role.DEFAULT_ID);
+                        au.setRoleId(DEFAULT_ROLE_ID);
                     }
                 }
             }

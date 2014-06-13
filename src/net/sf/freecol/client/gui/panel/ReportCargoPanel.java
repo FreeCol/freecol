@@ -26,9 +26,9 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.UnitType;
 
 
@@ -60,7 +60,8 @@ public final class ReportCargoPanel extends ReportUnitPanel {
         for (UnitType unitType : getSpecification().getUnitTypeList()) {
             if (unitType.isAvailableTo(player)
                 && (unitType.canCarryUnits() || unitType.canCarryGoods())) {
-                AbstractUnit unit = new AbstractUnit(unitType, Role.DEFAULT_ID,
+                AbstractUnit unit = new AbstractUnit(unitType,
+                    Specification.DEFAULT_ROLE_ID,
                     getCount("carriers", unitType));
                 reportPanel.add(createUnitTypeLabel(unit), "sg");
             }

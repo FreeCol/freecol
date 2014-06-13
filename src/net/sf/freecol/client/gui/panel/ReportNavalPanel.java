@@ -31,7 +31,6 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
@@ -81,7 +80,8 @@ public final class ReportNavalPanel extends ReportUnitPanel {
         for (UnitType unitType : getSpecification().getUnitTypeList()) {
             if (unitType.isAvailableTo(player)
                 && unitType.hasAbility(Ability.NAVAL_UNIT)) {
-                AbstractUnit unit = new AbstractUnit(unitType, Role.DEFAULT_ID,
+                AbstractUnit unit = new AbstractUnit(unitType,
+                    Specification.DEFAULT_ROLE_ID,
                     getCount("naval", unitType));
                 reportPanel.add(createUnitTypeLabel(unit), "sg");
             }

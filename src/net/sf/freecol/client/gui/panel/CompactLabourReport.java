@@ -43,7 +43,7 @@ import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.Role;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -618,15 +618,8 @@ public final class CompactLabourReport extends ReportPanel {
         return isSummary() ? null : unitData.getUnitType().getExpertProduction();
     }
 
-    private ImageIcon getUnitIcon(UnitType unit) {
-        String roleId = Role.DEFAULT_ID;
-        if (unit.hasAbility(Ability.EXPERT_PIONEER)) {
-            roleId = "model.role.pioneer";
-        } else if (unit.hasAbility(Ability.EXPERT_MISSIONARY)) {
-            roleId = "model.role.missionary";
-        }
-
-        return getLibrary().getUnitImageIcon(unit, roleId);
+    private ImageIcon getUnitIcon(UnitType unitType) {
+        return getLibrary().getUnitImageIcon(unitType);
     }
 
     /**

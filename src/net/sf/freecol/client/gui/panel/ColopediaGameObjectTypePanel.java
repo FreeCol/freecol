@@ -47,7 +47,7 @@ import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.ResourceType;
-import net.sf.freecol.common.model.Role;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.UnitType;
 
 
@@ -193,7 +193,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
     }
 
     protected JButton getUnitButton(final UnitType unitType) {
-        return getUnitButton(unitType, Role.DEFAULT_ID);
+        return getUnitButton(unitType, Specification.DEFAULT_ROLE_ID);
     }
 
     public JComponent getModifierComponent(Modifier modifier) {

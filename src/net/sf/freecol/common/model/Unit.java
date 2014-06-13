@@ -614,7 +614,7 @@ public class Unit extends GoodsLocation
      * @return True if the unit has the default <code>Role</code>.
      */
     public boolean hasDefaultRole() {
-        return Role.DEFAULT_ID.equals(role.getId());
+        return Specification.DEFAULT_ROLE_ID.equals(role.getId());
     }
 
     /**

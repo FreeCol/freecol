@@ -32,7 +32,6 @@ import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
@@ -110,7 +109,6 @@ public final class ReportMilitaryPanel extends ReportUnitPanel {
     protected void addOwnUnits() {
         final Specification spec = getSpecification();
         final Player player = getMyPlayer();
-        final Role defaultRole = spec.getDefaultRole();
         final UnitType defaultType = spec.getDefaultUnitType();
         
         StringTemplate t;
@@ -136,7 +134,8 @@ public final class ReportMilitaryPanel extends ReportUnitPanel {
                     soldierUnits.add(new AbstractUnit(unitType,
                             "model.role.soldier", getCount("soldiers", unitType)));
                 } else {
-                    units.add(new AbstractUnit(unitType, Role.DEFAULT_ID,
+                    units.add(new AbstractUnit(unitType,
+                                               Specification.DEFAULT_ROLE_ID,
                                                getCount("others", unitType)));
                 }
             }

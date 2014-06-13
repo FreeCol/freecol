@@ -22,6 +22,7 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.util.test.FreeColTestCase;
 
@@ -117,7 +118,7 @@ public class NationTypeTest extends FreeColTestCase {
                             assertFalse("Wrong type of pioneer: " + type.toString(),
                                         "model.unit.hardyPioneer".equals(unitTypeId));
                         }
-                    } else if (Role.DEFAULT_ID.equals(au.getRoleId())) {
+                    } else if (Specification.DEFAULT_ROLE_ID.equals(au.getRoleId())) {
                         assertTrue("Ship is not naval: " + type.toString(),
                                    spec().getUnitType(au.getId()).hasAbility(Ability.NAVAL_UNIT));
                         if ("model.nationType.trade".equals(type.getId())

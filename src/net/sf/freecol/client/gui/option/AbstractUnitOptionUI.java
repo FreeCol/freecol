@@ -38,10 +38,9 @@ import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
-import net.sf.freecol.common.model.Role;
-import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.AbstractUnitOption;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.StringOption;
@@ -147,7 +146,7 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
             box.setEnabled(roleEditable);
         } else {
             box.setModel(new DefaultComboBoxModel(new String[] {
-                        Role.DEFAULT_ID }));
+                        Specification.DEFAULT_ROLE_ID }));
             box.setEnabled(false);
         }
     }
@@ -174,7 +173,7 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
                 .getValue();
             String key = au.getId();
             if (au.getType(spec).hasAbility(Ability.CAN_BE_EQUIPPED)
-                && !Role.DEFAULT_ID.equals(au.getRoleId())) {
+                && !Specification.DEFAULT_ROLE_ID.equals(au.getRoleId())) {
                 key = au.getRoleId();
             }
             StringTemplate template = StringTemplate.template(key + ".name")

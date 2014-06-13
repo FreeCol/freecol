@@ -54,9 +54,9 @@ import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.UnitType;
 
 
@@ -120,14 +120,9 @@ public final class ReportLabourPanel extends ReportPanel {
 
         for (UnitType unitType : getSpecification().getUnitTypeList()) {
             if (unitType.isPerson() && unitType.isAvailableTo(getMyPlayer())) {
-                String roleId = Role.DEFAULT_ID;
-                if (unitType.hasAbility(Ability.EXPERT_PIONEER)) {
-                    roleId = "model.role.pioneer";
-                } else if (unitType.hasAbility(Ability.EXPERT_MISSIONARY)) {
-                    roleId = "model.role.missionary";
-                }
                 int count = unitCount.getCount(unitType);
-                model.addElement(new LabourUnitPanel(unitType, roleId, count));
+                model.addElement(new LabourUnitPanel(unitType,
+                        unitType.getDisplayRoleId(), count));
             }
         }
         list = new JList(model);

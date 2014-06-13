@@ -129,17 +129,18 @@ public class BaseCostDeciderTest extends FreeColTestCase {
         game.setMap(map);
         
         Tile unitTile = map.getTile(10, 9);
-        assertFalse("Unit tile should be ocean",unitTile.isLand());
+        assertFalse("Unit tile should be ocean", unitTile.isLand());
 
-        Unit unit = new ServerUnit(game, unitTile, game.getCurrentPlayer(), galleonType);
+        Unit unit = new ServerUnit(game, unitTile, game.getCurrentPlayer(),
+                                   galleonType);
         
         Tile landTile = map.getTile(9, 9);
-        assertTrue("Tile should be land",landTile.isLand());        
+        assertTrue("Tile should be land", landTile.isLand());
         
         // Execute
         final CostDecider decider = CostDeciders.avoidSettlements();
         int cost = decider.getCost(unit, unitTile, landTile, 4);
-        assertTrue("Move should be invalid",cost == CostDecider.ILLEGAL_MOVE);
+        assertTrue("Move should be invalid", cost == CostDecider.ILLEGAL_MOVE);
     }
     
     /**

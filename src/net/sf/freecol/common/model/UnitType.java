@@ -341,8 +341,7 @@ public final class UnitType extends BuildableType implements Consumer {
     }
 
     /**
-     * Gets the default role of this unit type, mostly
-     * Role.DEFAULT_ID.
+     * Gets the default role of this unit type, mostly model.role.default.
      *
      * @return The default <code>Role</code>.
      */
@@ -364,6 +363,16 @@ public final class UnitType extends BuildableType implements Consumer {
             }
         }
         return result;
+    }
+
+    /**
+     * Get a role identifier for display routines to use for this unit type.
+     *
+     * @return A suitable role identifier for display purposes.
+     */
+    public String getDisplayRoleId() {
+        for (Role r : getExpertRoles()) return r.getId();
+        return Specification.DEFAULT_ROLE_ID;
     }
 
     /**
@@ -740,7 +749,9 @@ public final class UnitType extends BuildableType implements Consumer {
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        if (defaultRole != null) {
+        final Specification spec = getSpecification();
+
+        if (defaultRole != null && defaultRole != spec.getDefaultRole()) {
             xw.writeStartElement(DEFAULT_ROLE_TAG);
 
             xw.writeAttribute(ID_ATTRIBUTE_TAG, defaultRole);
@@ -895,16 +906,15 @@ public final class UnitType extends BuildableType implements Consumer {
         // @compat 0.10.7
         } else if (DEFAULT_EQUIPMENT_TAG.equals(tag)) {
             String id = xr.getAttribute(ID_ATTRIBUTE_TAG, null);
-            String roleId = Role.DEFAULT_ID;
-            if ("model.equipment.horses".equals(id)) {
-                roleId = "model.role.scout";
-            } else if ("model.equipment.muskets".equals(id)) {
-                roleId = "model.role.soldier";
-            } else if ("model.equipment.tools".equals(id)) {
-                roleId = "model.role.pioneer";
-            } else if ("model.equipment.missionary".equals(id)) {
-                roleId = "model.role.missionary";
-            }
+            String roleId = ("model.equipment.horses".equals(id))
+                ? "model.role.scout"
+                : ("model.equipment.muskets".equals(id))
+                ? "model.role.soldier"
+                : ("model.equipment.tools".equals(id))
+                ? "model.role.pioneer"
+                : ("model.equipment.missionary".equals(id))
+                ? "model.role.missionary"
+                : Specification.DEFAULT_ROLE_ID;
             defaultRole = spec.getRole(roleId);
             xr.closeTag(DEFAULT_EQUIPMENT_TAG);
         // end @compat

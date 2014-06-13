@@ -59,12 +59,12 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.SettlementType;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementStyle;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -1087,47 +1087,47 @@ public final class ImageLibrary {
      * @return an <code>ImageIcon</code> value
      */
     public ImageIcon getUnitImageIcon(UnitType unitType) {
-        return getUnitImageIcon(unitType, Role.DEFAULT_ID, false,
-                                false, scalingFactor);
+        return getUnitImageIcon(unitType, unitType.getDisplayRoleId(),
+                                false, false, scalingFactor);
     }
 
     public ImageIcon getUnitImageIcon(UnitType unitType, boolean grayscale) {
-        return getUnitImageIcon(unitType, Role.DEFAULT_ID, false,
-                                grayscale, scalingFactor);
+        return getUnitImageIcon(unitType, unitType.getDisplayRoleId(),
+                                false, grayscale, scalingFactor);
     }
 
     public ImageIcon getUnitImageIcon(UnitType unitType, boolean grayscale,
                                       double scale) {
-        return getUnitImageIcon(unitType, Role.DEFAULT_ID, false,
-                                grayscale, scale);
+        return getUnitImageIcon(unitType, unitType.getDisplayRoleId(),
+                                false, grayscale, scale);
     }
 
     public ImageIcon getUnitImageIcon(UnitType unitType, double scale) {
-        return getUnitImageIcon(unitType, Role.DEFAULT_ID, false,
-                                false, scale);
+        return getUnitImageIcon(unitType, unitType.getDisplayRoleId(),
+                                false, false, scale);
     }
 
     public ImageIcon getUnitImageIcon(UnitType unitType, String roleId) {
-        return getUnitImageIcon(unitType, roleId, false,
-                                false, scalingFactor);
+        return getUnitImageIcon(unitType, roleId,
+                                false, false, scalingFactor);
     }
 
     public ImageIcon getUnitImageIcon(UnitType unitType, String roleId,
                                       boolean grayscale) {
-        return getUnitImageIcon(unitType, roleId, false,
-                                grayscale, scalingFactor);
+        return getUnitImageIcon(unitType, roleId,
+                                false, grayscale, scalingFactor);
     }
 
     public ImageIcon getUnitImageIcon(UnitType unitType, String roleId,
                                       boolean grayscale, double scale) {
-        return getUnitImageIcon(unitType, roleId, false,
-                                grayscale, scale);
+        return getUnitImageIcon(unitType, roleId,
+                                false, grayscale, scale);
     }
 
     public ImageIcon getUnitImageIcon(UnitType unitType, String roleId,
                                       double scale) {
-        return getUnitImageIcon(unitType, roleId, false,
-                                false, scale);
+        return getUnitImageIcon(unitType, roleId,
+                                false, false, scale);
     }
 
     /**
@@ -1155,7 +1155,7 @@ public final class ImageLibrary {
         }
 
         // try to get an image matching the key
-        String roleQual = (Role.DEFAULT_ID.equals(roleId)) ? ""
+        String roleQual = (Specification.DEFAULT_ROLE_ID.equals(roleId)) ? ""
             : "." + Utils.lastPart(roleId, ".");
         String key = unitType.getId() + roleQual
             + ((nativeEthnicity) ? ".native" : "")

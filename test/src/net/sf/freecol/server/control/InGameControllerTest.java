@@ -50,6 +50,7 @@ import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Scope;
 import net.sf.freecol.common.model.SimpleCombatModel;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StanceTradeItem;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tension.Level;
@@ -1855,8 +1856,8 @@ public class InGameControllerTest extends FreeColTestCase {
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
         assertTrue(dutch.getUnits().isEmpty());
         List<AbstractUnit> units = new ArrayList<AbstractUnit>();
-        units.add(new AbstractUnit(colonistType, Role.DEFAULT_ID, 1));
-        units.add(new AbstractUnit(statesmanType, Role.DEFAULT_ID, 1));
+        units.add(new AbstractUnit(colonistType, Specification.DEFAULT_ROLE_ID, 1));
+        units.add(new AbstractUnit(statesmanType, Specification.DEFAULT_ROLE_ID, 1));
         FoundingFather father = new FoundingFather("father", spec());
         father.setType(FoundingFatherType.TRADE);
         father.setUnits(units);

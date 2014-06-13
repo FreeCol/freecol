@@ -40,9 +40,6 @@ import net.sf.freecol.common.util.Utils;
  */
 public class Role extends BuildableType {
 
-    /** The ID of the default role. */
-    public static final String DEFAULT_ID = "model.role.default";
-
     /**
      * The Role to downgrade to after losing a battle. Defaults to
      * <code>null</code>. Note that some UnitTypes and Roles may be
@@ -133,7 +130,7 @@ public class Role extends BuildableType {
      * @return A message key, which is null for the default role.
      */
     public static String getRoleKey(String roleId) {
-        return (Role.DEFAULT_ID.equals(roleId)) ? null
+        return (Specification.DEFAULT_ROLE_ID.equals(roleId)) ? null
             : getRoleSuffix(roleId);
     }
 
