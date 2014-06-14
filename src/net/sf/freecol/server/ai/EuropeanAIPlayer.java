@@ -1244,7 +1244,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 }
             }
             // Otherwise attack something near a weak colony
-            if (target == null) {
+            if (target == null && !colonies.isEmpty()) {
                 List<AIColony> bad = new ArrayList<AIColony>();
                 for (AIColony aic : getAIColonies()) {
                     if (aic.isBadlyDefended()) bad.add(aic);
