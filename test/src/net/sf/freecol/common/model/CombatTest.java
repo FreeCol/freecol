@@ -57,6 +57,8 @@ public class CombatTest extends FreeColTestCase {
         = spec().getRole("model.role.cavalry");
     private static final Role dragoonRole
         = spec().getRole("model.role.dragoon");
+    private static final Role infantryRole
+        = spec().getRole("model.role.infantry");
     private static final Role missionaryRole
         = spec().getRole("model.role.missionary");
     private static final Role nativeDragoonRole
@@ -293,30 +295,31 @@ public class CombatTest extends FreeColTestCase {
     }
 
     public void testDefendColonyWithRevere() {
-        Game game = getGame();
-        Map map = getTestMap(true);
+        final Game game = getGame();
+        final Map map = getTestMap(true);
         game.setMap(map);
 
-        Colony colony = getStandardColony();
-
-        SimpleCombatModel combatModel = new SimpleCombatModel();
+        final SimpleCombatModel combatModel = new SimpleCombatModel();
         Player dutch = game.getPlayer("model.nation.dutch");
         Player inca = game.getPlayer("model.nation.inca");
-
+        Colony colony = getStandardColony();
         Tile tile2 = map.getTile(4, 8);
         tile2.setExplored(dutch, true);
-
         Unit colonist = colony.getUnitIterator().next();
         Unit attacker = new ServerUnit(getGame(), tile2, inca, braveType,
                                        armedBraveRole);
 
+        // Colonist will defend
         assertEquals(colonist, colony.getDefendingUnit(attacker));
+
+        // Set up for auto-equip
         dutch.addFather(spec().getFoundingFather("model.foundingFather.paulRevere"));
-        for (EquipmentType equipment : dragoonEquipment) {
-            for (AbstractGoods goods : equipment.getRequiredGoods()) {
-                colony.addGoods(goods);
-            }
+        for (AbstractGoods ag : soldierRole.getRequiredGoods()) {
+            colony.addGoods(ag);
         }
+
+        // Colonist will auto arm
+        assertEquals(soldierRole, colonist.getAutomaticRole());
 
         Set<Modifier> defenceModifiers = combatModel
             .getDefensiveModifiers(attacker, colonist);
@@ -504,42 +507,43 @@ public class CombatTest extends FreeColTestCase {
         float defence = 0 + 3 + 3;
         assertEquals(defence, combatModel.getDefencePower(regular, colonial));
 
-        List<CombatResult> result
+        List<CombatResult> crs
             = combatModel.generateAttackResult(random, regular, colonial);
-        assertEquals(CombatResult.LOSE, result.get(0));
-        assertEquals(CombatResult.LOSE_EQUIP, result.get(1));
-        refPlayer.csCombat(regular, colonial, result, random, new ChangeSet());
+        checkCombat("Regular v Colonial", crs,
+            CombatResult.LOSE, CombatResult.LOSE_EQUIP);
+        refPlayer.csCombat(regular, colonial, crs, random, new ChangeSet());
+        assertEquals(infantryRole, regular.getRole());
 
         // (colonist + regular + infantry) * attack bonus
         offence = (0 + 4 + 2) * 1.5f;
         assertEquals(offence, combatModel.getOffencePower(regular, colonial));
 
         // slaughter King's Regular
-        result = combatModel.generateAttackResult(random, colonial, regular);
-        assertEquals(CombatResult.WIN, result.get(0));
-        assertEquals("Regular should be slaughtered upon losing all equipment.",
-                     CombatResult.SLAUGHTER_UNIT, result.get(1));
+        crs = combatModel.generateAttackResult(random, colonial, regular);
+        checkCombat("Regular should be slaughtered upon losing all equipment",
+            crs, CombatResult.WIN, CombatResult.LOSE_EQUIP, CombatResult.SLAUGHTER_UNIT);
 
         regular = new ServerUnit(game, tile2, french, kingsRegularType,
                                  cavalryRole);
 
-        result = combatModel.generateAttackResult(random, regular, colonial);
-        assertEquals(CombatResult.WIN, result.get(0));
-        assertEquals(CombatResult.LOSE_EQUIP, result.get(1));
-        refPlayer.csCombat(regular, colonial, result, random, new ChangeSet());
+        crs = combatModel.generateAttackResult(random, regular, colonial);
+        checkCombat("Regular v Colonial (2)", crs,
+            CombatResult.WIN, CombatResult.LOSE_EQUIP);
+        refPlayer.csCombat(regular, colonial, crs, random, new ChangeSet());
+        assertEquals(soldierRole, colonial.getRole());
 
-        result = combatModel.generateAttackResult(random, regular, colonial);
-        assertEquals(CombatResult.WIN, result.get(0));
-        assertEquals(CombatResult.LOSE_EQUIP, result.get(1));
-        assertEquals(CombatResult.DEMOTE_UNIT, result.get(2));
-        refPlayer.csCombat(regular, colonial, result, random, new ChangeSet());
+        crs = combatModel.generateAttackResult(random, regular, colonial);
+        checkCombat("Regular v Colonial (3)", crs,
+            CombatResult.WIN, CombatResult.LOSE_EQUIP, CombatResult.DEMOTE_UNIT);
+        refPlayer.csCombat(regular, colonial, crs, random, new ChangeSet());
         assertFalse(colonial.isArmed());
         assertEquals(veteranType, colonial.getType());
+        assertEquals(spec().getDefaultRole(), colonial.getRole());
 
-        result = combatModel.generateAttackResult(random, regular, colonial);
-        assertEquals(CombatResult.WIN, result.get(0));
-        assertEquals(CombatResult.CAPTURE_UNIT, result.get(1));
-        refPlayer.csCombat(regular, colonial, result, random, new ChangeSet());
+        crs = combatModel.generateAttackResult(random, regular, colonial);
+        checkCombat("Regular v Colonial (4)", crs,
+            CombatResult.WIN, CombatResult.CAPTURE_UNIT);
+        refPlayer.csCombat(regular, colonial, crs, random, new ChangeSet());
     }
 
     public void testCaptureConvert() {
@@ -567,7 +571,7 @@ public class CombatTest extends FreeColTestCase {
         assertNotNull(io);
         io.setValue(100);
 
-        Unit soldier = new ServerUnit(game, tile2, dutch, colonistType,
+        Unit soldier = new ServerUnit(game, tile2, dutch, veteranType,
                                       soldierRole);
         Unit defender = settlement.getDefendingUnit(soldier);
         assertNotNull(defender);
@@ -578,17 +582,12 @@ public class CombatTest extends FreeColTestCase {
         il.add(new Integer(0));
         random.setNextNumbers(il, true);
 
-        List<CombatResult> result = combatModel.generateAttackResult(random,
+        List<CombatResult> crs = combatModel.generateAttackResult(random,
             soldier, defender);
-        assertTrue("Capture convert results", result.size() >= 3);
-        assertEquals("Capture convert wins", CombatResult.WIN,
-            result.get(0));
-        assertEquals("Capture convert kills", CombatResult.SLAUGHTER_UNIT,
-            result.get(1));
-        assertEquals("Capture convert converts", CombatResult.CAPTURE_CONVERT,
-            result.get(2));
+        checkCombat("Capture convert", crs,
+            CombatResult.WIN, CombatResult.CAPTURE_CONVERT, CombatResult.SLAUGHTER_UNIT);
         assertEquals("One unit on tile", 1, tile2.getUnitList().size());
-        dutch.csCombat(soldier, defender, result, new Random(),
+        dutch.csCombat(soldier, defender, crs, new Random(),
                        new ChangeSet());
         assertEquals("Two units on tile", 2, tile2.getUnitList().size());
         assertEquals("Convert on tile", tile2.getUnitList().get(1).getType(),

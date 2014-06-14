@@ -26,6 +26,8 @@ import java.util.Set;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.UnitLocation.NoAddReason;
+import net.sf.freecol.server.control.ChangeSet;
+import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
 
@@ -69,9 +71,13 @@ public class IndividualFatherTest extends FreeColTestCase {
 
     private static final GoodsType bellsType
         = spec().getGoodsType("model.goods.bells");
+    private static final GoodsType horsesType
+        = spec().getGoodsType("model.goods.horses");
     private static final GoodsType musketsType
         = spec().getGoodsType("model.goods.muskets");
 
+    private static final Role soldierRole
+        = spec().getRole("model.role.soldier");
     private static final Role missionaryRole
         = spec().getRole("model.role.missionary");
 
@@ -83,23 +89,88 @@ public class IndividualFatherTest extends FreeColTestCase {
         = spec().getUnitType("model.unit.elderStatesman");
 
 
-    public void testPeterStuyvesant() {
+    public void testBolivar() {
         Game game = getGame();
         game.setMap(getTestMap(true));
 
         Colony colony = getStandardColony(4);
         Player player = colony.getOwner();
+        List<AbstractGoods> empty = new ArrayList<AbstractGoods>();
+        Building townHall = colony.getBuilding(townHallType);
 
-        // The custom house is not buildable initially
-        assertFalse(colony.canBuild(customHouseType));
+        assertEquals(0, colony.getLiberty());
+        assertEquals(0, colony.getEffectiveLiberty());
+        final int inc = 400;
+        colony.addLiberty(inc);
+        assertEquals(inc, colony.getLiberty());
+        assertEquals(inc, colony.getEffectiveLiberty());
 
-        // But it should become available after Peter Stuyvesant has
-        // joined continental congress
-        player.addFather(peterStuyvesant);
-        assertTrue(colony.canBuild(customHouseType));
+        player.addFather(simonBolivar);
+
+        assertEquals(inc, colony.getLiberty());
+        assertEquals(inc + inc/5, colony.getEffectiveLiberty());
+
+        Set<Modifier> modifierSet
+            = player.getModifierSet(Modifier.LIBERTY);
+        assertEquals(1, modifierSet.size());
+        Modifier bolivarModifier = modifierSet.iterator().next();
+        assertEquals(simonBolivar, bolivarModifier.getSource());
+
+        assertEquals(inc, player.getLiberty());
+        assertEquals(inc + inc/5, player.getEffectiveLiberty());
     }
 
-    public void testHernanCortes() {
+    public void testBrebeuf() {
+        Game game = getGame();
+        Player dutch = game.getPlayer("model.nation.dutch");
+        String ability = Ability.EXPERT_MISSIONARY;
+
+        assertTrue(jeanDeBrebeuf.hasAbility(ability));
+        assertFalse(dutch.hasAbility(ability));
+
+        Unit missionary = new ServerUnit(game, null, dutch, 
+                                         colonistType, missionaryRole);
+        assertEquals(missionaryRole, missionary.getRole());
+        assertTrue(missionary.hasAbility(Ability.ESTABLISH_MISSION));
+        assertFalse(missionary.hasAbility(ability));
+
+        dutch.addFather(jeanDeBrebeuf);
+        assertTrue(dutch.hasAbility(ability));
+        assertTrue(missionary.hasAbility(ability));
+    }
+
+    public void testBrewster() {
+        Game game = getGame();
+        Player dutch = game.getPlayer("model.nation.dutch");
+
+        String ability = Ability.CAN_RECRUIT_UNIT;
+        assertTrue(dutch.hasAbility(ability));
+
+        for (UnitType unitType : spec().getUnitTypeList()) {
+            if (unitType.isRecruitable()) {
+                assertTrue("Unable to recruit " + unitType.toString(),
+                    dutch.hasAbility(ability, unitType));
+            }
+        }
+
+        dutch.addFather(williamBrewster);
+        // ability is no longer general, but limited to certain unit types
+        assertFalse(dutch.hasAbility(ability));
+
+        for (UnitType unitType : spec().getUnitTypeList()) {
+            if (unitType.isRecruitable()) {
+                if (unitType.getSkill() < 0) {
+                    assertFalse("Able to recruit " + unitType.toString(),
+                        dutch.hasAbility(ability, unitType));
+                } else {
+                    assertTrue("Unable to recruit " + unitType.toString(),
+                        dutch.hasAbility(ability, unitType));
+                }
+            }
+        }
+    }
+
+    public void testCortes() {
         Game game = getGame();
         game.setMap(getTestMap(true));
 
@@ -118,6 +189,84 @@ public class IndividualFatherTest extends FreeColTestCase {
 
         range = incaCity.getPlunderRange(unit);
         assertEquals(3100, range.getFactor());
+    }
+
+    public void testDeLasCasas() {
+        Game game = getGame();
+        game.setMap(getTestMap(true));
+
+        java.util.Map<UnitType, UnitType> upgrades = bartolomeDeLasCasas.getUpgrades();
+
+        assertFalse(upgrades.isEmpty());
+
+        for (java.util.Map.Entry<UnitType, UnitType> entry : upgrades.entrySet()) {
+            assertEquals(entry.getKey(), spec().getUnitType(entry.getKey().getId()));
+            assertEquals(entry.getValue(), spec().getUnitType(entry.getValue().getId()));
+        }
+
+        Colony colony = getStandardColony(4);
+        ServerPlayer player = (ServerPlayer)colony.getOwner();
+        Unit unit = colony.getUnitList().get(0);
+
+        java.util.Map.Entry<UnitType, UnitType> entry = upgrades.entrySet().iterator().next();
+        unit.setType(entry.getKey());
+
+        player.csAddFoundingFather(bartolomeDeLasCasas, null, new ChangeSet());
+        assertEquals(unit.getType(), entry.getValue());
+    }
+
+    public void testDeWitt() {
+        Game game = getGame();
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Player french = game.getPlayer("model.nation.french");
+        dutch.getMarket().setArrears(musketsType, 1);
+
+        assertFalse(dutch.canTrade(musketsType, Market.Access.EUROPE));
+        assertFalse(dutch.canTrade(musketsType, Market.Access.CUSTOM_HOUSE));
+
+        dutch.addFather(janDeWitt);
+
+        assertFalse(dutch.canTrade(musketsType, Market.Access.EUROPE));
+        assertFalse(dutch.canTrade(musketsType, Market.Access.CUSTOM_HOUSE));
+
+        dutch.setStance(french, Player.Stance.WAR);
+
+        assertFalse(dutch.canTrade(musketsType, Market.Access.EUROPE));
+        assertFalse(dutch.canTrade(musketsType, Market.Access.CUSTOM_HOUSE));
+
+        dutch.setStance(french, Player.Stance.PEACE);
+
+        assertFalse(dutch.canTrade(musketsType, Market.Access.EUROPE));
+        assertTrue(dutch.canTrade(musketsType, Market.Access.CUSTOM_HOUSE));
+    }
+
+    public void testJefferson() {
+        Game game = getGame();
+        game.setMap(getTestMap(true));
+
+        Set<Modifier> jeffersonModifiers
+            = thomasJefferson.getModifierSet("model.goods.bells");
+        assertEquals(1, jeffersonModifiers.size());
+        Modifier modifier = jeffersonModifiers.iterator().next();
+        assertTrue(modifier.appliesTo(townHallType));
+
+        Colony colony = getStandardColony(4);
+        Player player = colony.getOwner();
+        Building townHall = colony.getBuilding(townHallType);
+        Unit unit = colony.getFirstUnit();
+        colony.setOccupationAt(unit, townHall, false);
+
+        assertEquals(0, player.getModifierSet("model.goods.bells").size());
+        assertEquals(0, colony.getModifierSet("model.goods.bells").size());
+        int expected = 4;
+        assertEquals(expected, townHall.getTotalProductionOf(bellsType));
+
+        player.addFather(thomasJefferson);
+        expected += expected * 0.5; // Add Jefferson bonus
+        assertEquals(1, player.getModifierSet("model.goods.bells").size());
+        assertEquals(0, colony.getModifierSet("model.goods.bells").size());
+        assertEquals(1, townHall.getProductionModifiers(bellsType, null).size());
+        assertEquals(expected, townHall.getTotalProductionOf(bellsType));
     }
 
     public void testMinuit() {
@@ -208,37 +357,6 @@ public class IndividualFatherTest extends FreeColTestCase {
         assertEquals(expected, townHall.getTotalProductionOf(bellsType));
     }
 
-    public void testBolivar() {
-        Game game = getGame();
-        game.setMap(getTestMap(true));
-
-        Colony colony = getStandardColony(4);
-        Player player = colony.getOwner();
-        List<AbstractGoods> empty = new ArrayList<AbstractGoods>();
-        Building townHall = colony.getBuilding(townHallType);
-
-        assertEquals(0, colony.getLiberty());
-        assertEquals(0, colony.getEffectiveLiberty());
-        final int inc = 400;
-        colony.addLiberty(inc);
-        assertEquals(inc, colony.getLiberty());
-        assertEquals(inc, colony.getEffectiveLiberty());
-
-        player.addFather(simonBolivar);
-
-        assertEquals(inc, colony.getLiberty());
-        assertEquals(inc + inc/5, colony.getEffectiveLiberty());
-
-        Set<Modifier> modifierSet
-            = player.getModifierSet(Modifier.LIBERTY);
-        assertEquals(1, modifierSet.size());
-        Modifier bolivarModifier = modifierSet.iterator().next();
-        assertEquals(simonBolivar, bolivarModifier.getSource());
-
-        assertEquals(inc, player.getLiberty());
-        assertEquals(inc + inc/5, player.getEffectiveLiberty());
-    }
-
     public void testRevere() {
         Game game = getGame();
         game.setMap(getTestMap());
@@ -247,146 +365,41 @@ public class IndividualFatherTest extends FreeColTestCase {
         Player player = colony.getOwner();
         Unit colonist = colony.getUnitList().get(0);
 
-        assertNull("Unit should not be able to automatically arm, Revere not in congress yet",
-            colonist.getAutomaticEquipment());
+        assertNull("No Revere, no auto-equip.",
+                   colonist.getAutomaticRole());
 
-        // adding Revere to congress
+        // Add Revere to congress
         player.addFather(paulRevere);
 
-        assertNull("Unit should not be able to automatically arm, no muskets available",
-            colonist.getAutomaticEquipment());
+        assertNull("No muskets, no auto-equip",
+                   colonist.getAutomaticRole());
 
+        // Add muskets
         colony.addGoods(musketsType, 100);
 
-        assertNotNull("Unit be able to automatically arm, has muskets and Paul Revere",
-            colonist.getAutomaticEquipment());
+        assertEquals("Auto equip to soldier role.", soldierRole,
+                     colonist.getAutomaticRole());
+
+        // Add horses, but still expect soldier
+        colony.addGoods(horsesType, 100);
+
+        assertEquals("Auto equip to soldier role despite horses.", soldierRole,
+                     colonist.getAutomaticRole());
     }
 
-    public void testDeWitt() {
-        Game game = getGame();
-        Player dutch = game.getPlayer("model.nation.dutch");
-        Player french = game.getPlayer("model.nation.french");
-        dutch.getMarket().setArrears(musketsType, 1);
-
-        assertFalse(dutch.canTrade(musketsType, Market.Access.EUROPE));
-        assertFalse(dutch.canTrade(musketsType, Market.Access.CUSTOM_HOUSE));
-
-        dutch.addFather(janDeWitt);
-
-        assertFalse(dutch.canTrade(musketsType, Market.Access.EUROPE));
-        assertFalse(dutch.canTrade(musketsType, Market.Access.CUSTOM_HOUSE));
-
-        dutch.setStance(french, Player.Stance.WAR);
-
-        assertFalse(dutch.canTrade(musketsType, Market.Access.EUROPE));
-        assertFalse(dutch.canTrade(musketsType, Market.Access.CUSTOM_HOUSE));
-
-        dutch.setStance(french, Player.Stance.PEACE);
-
-        assertFalse(dutch.canTrade(musketsType, Market.Access.EUROPE));
-        assertTrue(dutch.canTrade(musketsType, Market.Access.CUSTOM_HOUSE));
-    }
-
-    public void testBrebeuf() {
-        Game game = getGame();
-        Player dutch = game.getPlayer("model.nation.dutch");
-        String ability = Ability.EXPERT_MISSIONARY;
-
-        assertTrue(jeanDeBrebeuf.hasAbility(ability));
-        assertFalse(dutch.hasAbility(ability));
-
-        Unit missionary = new ServerUnit(game, null, dutch, 
-                                         colonistType, missionaryRole);
-        assertEquals(missionaryRole, missionary.getRole());
-        assertTrue(missionary.hasAbility(Ability.ESTABLISH_MISSION));
-        assertFalse(missionary.hasAbility(ability));
-
-        dutch.addFather(jeanDeBrebeuf);
-        assertTrue(dutch.hasAbility(ability));
-        assertTrue(missionary.hasAbility(ability));
-    }
-
-    public void testBrewster() {
-        Game game = getGame();
-        Player dutch = game.getPlayer("model.nation.dutch");
-
-        String ability = Ability.CAN_RECRUIT_UNIT;
-        assertTrue(dutch.hasAbility(ability));
-
-        for (UnitType unitType : spec().getUnitTypeList()) {
-            if (unitType.isRecruitable()) {
-                assertTrue("Unable to recruit " + unitType.toString(),
-                    dutch.hasAbility(ability, unitType));
-            }
-        }
-
-        dutch.addFather(williamBrewster);
-        // ability is no longer general, but limited to certain unit types
-        assertFalse(dutch.hasAbility(ability));
-
-        for (UnitType unitType : spec().getUnitTypeList()) {
-            if (unitType.isRecruitable()) {
-                if (unitType.getSkill() < 0) {
-                    assertFalse("Able to recruit " + unitType.toString(),
-                        dutch.hasAbility(ability, unitType));
-                } else {
-                    assertTrue("Unable to recruit " + unitType.toString(),
-                        dutch.hasAbility(ability, unitType));
-                }
-            }
-        }
-    }
-
-    public void testJefferson() {
+    public void testStuyvesant() {
         Game game = getGame();
         game.setMap(getTestMap(true));
 
-        Set<Modifier> jeffersonModifiers
-            = thomasJefferson.getModifierSet("model.goods.bells");
-        assertEquals(1, jeffersonModifiers.size());
-        Modifier modifier = jeffersonModifiers.iterator().next();
-        assertTrue(modifier.appliesTo(townHallType));
-
         Colony colony = getStandardColony(4);
         Player player = colony.getOwner();
-        Building townHall = colony.getBuilding(townHallType);
-        Unit unit = colony.getFirstUnit();
-        colony.setOccupationAt(unit, townHall, false);
 
-        assertEquals(0, player.getModifierSet("model.goods.bells").size());
-        assertEquals(0, colony.getModifierSet("model.goods.bells").size());
-        int expected = 4;
-        assertEquals(expected, townHall.getTotalProductionOf(bellsType));
+        // The custom house is not buildable initially
+        assertFalse(colony.canBuild(customHouseType));
 
-        player.addFather(thomasJefferson);
-        expected += expected * 0.5; // Add Jefferson bonus
-        assertEquals(1, player.getModifierSet("model.goods.bells").size());
-        assertEquals(0, colony.getModifierSet("model.goods.bells").size());
-        assertEquals(1, townHall.getProductionModifiers(bellsType, null).size());
-        assertEquals(expected, townHall.getTotalProductionOf(bellsType));
-    }
-
-    public void lasCasas() {
-        Game game = getGame();
-        game.setMap(getTestMap(true));
-
-        java.util.Map<UnitType, UnitType> upgrades = bartolomeDeLasCasas.getUpgrades();
-
-        assertFalse(upgrades.isEmpty());
-
-        for (java.util.Map.Entry<UnitType, UnitType> entry : upgrades.entrySet()) {
-            assertEquals(entry.getKey(), spec().getUnitType(entry.getKey().getId()));
-            assertEquals(entry.getValue(), spec().getUnitType(entry.getValue().getId()));
-        }
-
-        Colony colony = getStandardColony(4);
-        Player player = colony.getOwner();
-        Unit unit = colony.getUnitList().get(0);
-
-        java.util.Map.Entry<UnitType, UnitType> entry = upgrades.entrySet().iterator().next();
-        unit.setType(entry.getKey());
-
-        player.addFather(bartolomeDeLasCasas);
-        assertEquals(unit.getType(), entry.getValue());
+        // But it should become available after Peter Stuyvesant has
+        // joined continental congress
+        player.addFather(peterStuyvesant);
+        assertTrue(colony.canBuild(customHouseType));
     }
 }

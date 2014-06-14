@@ -23,27 +23,37 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 
 public class IndianSettlementTest extends FreeColTestCase {
-    private static GoodsType musketsType = spec().getGoodsType("model.goods.muskets");
-    private static GoodsType horsesType = spec().getGoodsType("model.goods.horses");
+
+    private static final GoodsType horsesType
+        = spec().getGoodsType("model.goods.horses");
+    private static final GoodsType musketsType
+        = spec().getGoodsType("model.goods.muskets");
+
+    private static final Role armedBraveRole
+        = spec().getRole("model.role.armedBrave");
+    private static final Role nativeDragoonRole
+        = spec().getRole("model.role.nativeDragoon");
 
 
-    public void testAutomaticEquipBraves(){
+    public void testAutomaticEquipBraves() {
         Game game = getStandardGame();
         Map map = getTestMap();
         game.setMap(map);
 
-        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
+        FreeColTestCase.IndianSettlementBuilder builder
+            = new FreeColTestCase.IndianSettlementBuilder(game);
         IndianSettlement camp = builder.initialBravesInCamp(1).build();
 
         Unit indianBrave = camp.getUnitList().get(0);
 
-        String errMsg = "Unit should not be able to automatically equip, no muskets available";
-        assertTrue(errMsg, indianBrave.getAutomaticEquipment() == null);
-
+        assertNull("No auto-equip, no muskets",
+                   indianBrave.getAutomaticRole());
         camp.addGoods(musketsType, 100);
-
-        errMsg = "Unit should be able to automatically equip, camp has muskets available";
-        assertFalse(errMsg, indianBrave.getAutomaticEquipment() == null);
+        assertEquals("Auto-equip to armed brave, muskets present",
+                     armedBraveRole, indianBrave.getAutomaticRole());
+        camp.addGoods(horsesType, 100);
+        assertEquals("Auto-equip to native dragoon, horses and muskets present",
+                     nativeDragoonRole, indianBrave.getAutomaticRole());
     }
 
     /*

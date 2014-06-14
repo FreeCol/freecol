@@ -624,7 +624,6 @@ public final class GoodsType extends FreeColGameObjectType {
         isFood = xr.getAttribute(IS_FOOD_TAG, false);
 
         isMilitary = xr.getAttribute(IS_MILITARY_TAG, false);
-        if (isMilitary) System.err.println("MILITARY = " + getId());
 
         ignoreLimit = xr.getAttribute(IGNORE_LIMIT_TAG, false);
 

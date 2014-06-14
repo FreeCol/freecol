@@ -18,7 +18,7 @@
     *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
     *
   -->
-<freecol-specification id="rolesCompat" version="0.84">
+<freecol-specification id="rolesCompat" version="0.85">
 <!--
     A copy of the latest roles section of classic/specification.xml
     to be loaded into the specification of games lacking a roles
@@ -146,6 +146,9 @@
       <modifier id="model.modifier.defence" type="additive" value="1"/>
       <modifier id="model.modifier.offence" type="additive" value="1"/>
       <modifier id="model.modifier.movementBonus" type="additive" value="9"/>
+      <role-change from="model.role.default" capture="model.role.scout"/>
+      <role-change from="model.role.default" capture="model.role.dragoon"/>
+      <role-change from="model.role.default" capture="model.role.cavalry"/>
     </role>
 
     <role id="model.role.armedBrave">
@@ -156,6 +159,8 @@
       <ability id="model.ability.disposeOnCombatLoss" value="true"/>
       <modifier id="model.modifier.defence" type="additive" value="1"/>
       <modifier id="model.modifier.offence" type="additive" value="2"/>
+      <role-change from="model.role.default" capture="model.role.soldier"/>
+      <role-change from="model.role.default" capture="model.role.infantry"/>
     </role>
 
     <role id="model.role.nativeDragoon" downgrade="model.role.armedBrave">
@@ -168,6 +173,11 @@
       <modifier id="model.modifier.defence" type="additive" value="2"/>
       <modifier id="model.modifier.offence" type="additive" value="3"/>
       <modifier id="model.modifier.movementBonus" type="additive" value="9"/>
+      <role-change from="model.role.mountedBrave" capture="model.role.soldier"/>
+      <role-change from="model.role.mountedBrave" capture="model.role.infantry"/>
+      <role-change from="model.role.armedBrave" capture="model.role.scout"/>
+      <role-change from="model.role.armedBrave" capture="model.role.dragoon"/>
+      <role-change from="model.role.armedBrave" capture="model.role.cavalry"/>
     </role>
   </roles>
 </freecol-specification>

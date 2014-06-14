@@ -2717,10 +2717,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     private void csCaptureAutoEquip(Unit attacker, Unit defender,
                                     ChangeSet cs) {
-        EquipmentType equip
-            = defender.getBestCombatEquipmentType(defender.getAutomaticEquipment());
+        Role role = defender.getAutomaticRole();
         csLoseAutoEquip(attacker, defender, cs);
-        csCaptureEquipment(attacker, defender, equip, cs);
+        csCaptureEquipment(attacker, defender, role, cs);
     }
 
     /**
@@ -2854,10 +2853,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param cs A <code>ChangeSet</code> to update.
      */
     private void csCaptureEquip(Unit winner, Unit loser, ChangeSet cs) {
-        EquipmentType equip
-            = loser.getBestCombatEquipmentType(loser.getEquipment());
+        Role role = loser.getRole();
         csLoseEquip(winner, loser, cs);
-        csCaptureEquipment(winner, loser, equip, cs);
+        csCaptureEquipment(winner, loser, role, cs);
     }
 
     /**
@@ -2865,19 +2863,20 @@ public class ServerPlayer extends Player implements ServerModelObject {
      *
      * @param winner The <code>Unit</code> that is capturing equipment.
      * @param loser The <code>Unit</code> that is losing equipment.
-     * @param equip The <code>EquipmentType</code> to capture.
+     * @param role The <code>Role</code> wrest from the loser.
      * @param cs A <code>ChangeSet</code> to update.
      */
     private void csCaptureEquipment(Unit winner, Unit loser,
-                                    EquipmentType equip, ChangeSet cs) {
+                                    Role role, ChangeSet cs) {
         ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
         ServerPlayer loserPlayer = (ServerPlayer) loser.getOwner();
-        if ((equip = winner.canCaptureEquipment(equip, loser)) != null) {
-            // TODO: what if winner captures equipment that is
-            // incompatible with their current equipment?
-            // Currently, can-not-happen, so ignoring the return from
-            // changeEquipment.  Beware.
-            winner.changeEquipment(equip, 1);
+        Role newRole = winner.canCaptureEquipment(role);
+        if (newRole != null) {
+            Role oldRole = winner.getRole();
+            winner.changeRole(newRole);
+            List<AbstractGoods> newGoods
+                = Role.getGoodsDifference(oldRole, newRole);
+            GoodsType goodsType = newGoods.get(0).getType();
 
             // Currently can not capture equipment back so this only
             // makes sense for native players, and the message is
@@ -2889,7 +2888,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                                                "model.unit.equipmentCaptured",
                                                winnerPlayer)
                               .addStringTemplate("%nation%", winnerNation)
-                              .add("%equipment%", equip.getNameKey()));
+                              .add("%equipment%", goodsType.getNameKey()));
 
                 // CHEAT: Immediately transferring the captured goods
                 // back to a potentially remote settlement is pretty
@@ -2897,9 +2896,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 // to give the capturing unit a go-home-with-plunder mission.
                 IndianSettlement settlement = winner.getHomeIndianSettlement();
                 if (settlement != null) {
-                    for (AbstractGoods goods : equip.getRequiredGoods()) {
-                        settlement.addGoods(goods);
-                        winnerPlayer.logCheat("teleported " + goods.toString()
+                    for (AbstractGoods ag : newGoods) {
+                        settlement.addGoods(ag);
+                        winnerPlayer.logCheat("teleported " + ag.toString()
                             + " back to " + settlement.getName());
                     }
                     cs.add(See.only(winnerPlayer), settlement);
@@ -3436,8 +3435,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         Settlement settlement = defender.getSettlement();
         StringTemplate defenderLocation = defender.getLocation()
             .getLocationNameFor(defenderPlayer);
-        EquipmentType equip = defender
-            .getBestCombatEquipmentType(defender.getAutomaticEquipment());
+        Role role = defender.getAutomaticRole();
         ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
         StringTemplate attackerLocation = attacker.getLocation()
             .getLocationNameFor(attackerPlayer);
@@ -3445,8 +3443,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         // Autoequipment is not actually with the unit, it is stored
         // in the settlement of the unit.  Remove it from there.
-        for (AbstractGoods goods : equip.getRequiredGoods()) {
-            settlement.removeGoods(goods);
+        for (AbstractGoods ag : role.getRequiredGoods()) {
+            settlement.removeGoods(ag);
         }
 
         cs.addMessage(See.only(attackerPlayer),
@@ -3477,6 +3475,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param cs A <code>ChangeSet</code> to update.
      */
     private void csLoseEquip(Unit winner, Unit loser, ChangeSet cs) {
+        final Specification spec = getSpecification();
         ServerPlayer loserPlayer = (ServerPlayer) loser.getOwner();
         StringTemplate loserNation = loserPlayer.getNationName();
         StringTemplate loserLocation = loser.getLocation()
@@ -3486,17 +3485,21 @@ public class ServerPlayer extends Player implements ServerModelObject {
         StringTemplate winnerNation = winner.getApparentOwnerName();
         StringTemplate winnerLocation = winner.getLocation()
             .getLocationNameFor(winnerPlayer);
-        EquipmentType equip
-            = loser.getBestCombatEquipmentType(loser.getEquipment());
+        Role role = loser.getRole();
 
-        // Remove the equipment, accounting for possible loss of
-        // mobility due to horses going away.
-        loser.changeEquipment(equip, -1);
+        Role downgrade = role.getDowngrade();
+        if (downgrade != null) {
+            loser.changeRole(downgrade);
+        } else {
+            loser.changeRole(spec.getDefaultRole());
+        }
+
+        // Account for possible loss of mobility due to horses going away.
         loser.setMovesLeft(Math.min(loser.getMovesLeft(),
                                     loser.getInitialMovesLeft()));
 
         String messageId;
-        if (loser.getEquipment().isEmpty()) {
+        if (!loser.isArmed()) {
             messageId = "model.unit.unitDemotedToUnarmed";
             loser.setState(Unit.UnitState.ACTIVE);
         } else {
@@ -3816,14 +3819,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     HistoryEvent.EventType.DESTROY_NATION, winnerPlayer)
                 .addStringTemplate("%nation%", winnerNation)
                 .addStringTemplate("%nativeNation%", nativeNation));
-        }
-
-        // Transfer equipment, do not generate messages for the loser.
-        EquipmentType equip;
-        while ((equip = loser.getBestCombatEquipmentType(loser.getEquipment()))
-               != null) {
-            loser.changeEquipment(equip, -loser.getEquipmentCount(equip));
-            csCaptureEquipment(winner, loser, equip, cs);
         }
 
         // Destroy unit.

@@ -179,6 +179,7 @@
         <xs:element ref="ability"/>
         <xs:element ref="required-ability"/>
         <xs:element ref="required-goods"/>
+        <xs:element ref="role-change"/>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
       <xs:attribute name="maximumCount" type="xs:nonNegativeInteger"/>
@@ -837,6 +838,13 @@
     <xs:complexType>
       <xs:attribute name="id" use="required" type="GoodsTypeId"/>
       <xs:attribute name="value" type="xs:nonNegativeInteger"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="role-change">
+    <xs:complexType>
+      <xs:attribute name="from" use="required" type="xs:string"/>
+      <xs:attribute name="capture" use="required" type="xs:string"/>
     </xs:complexType>
   </xs:element>
 

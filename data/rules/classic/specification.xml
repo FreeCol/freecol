@@ -20,7 +20,7 @@
     In case of incompatible changes, please update version number and
     XSD schema for validation.
 -->
-<freecol-specification id="classic" version="0.84">
+<freecol-specification id="classic" version="0.85">
 
   <!-- Modifiers that are not attached to other game object
        types. They may be modified, but MUST NOT be removed. -->
@@ -974,6 +974,9 @@
       <modifier id="model.modifier.defence" type="additive" value="1"/>
       <modifier id="model.modifier.offence" type="additive" value="1"/>
       <modifier id="model.modifier.movementBonus" type="additive" value="9"/>
+      <role-change from="model.role.default" capture="model.role.scout"/>
+      <role-change from="model.role.default" capture="model.role.dragoon"/>
+      <role-change from="model.role.default" capture="model.role.cavalry"/>
     </role>
 
     <role id="model.role.armedBrave">
@@ -984,6 +987,8 @@
       <ability id="model.ability.disposeOnCombatLoss" value="true"/>
       <modifier id="model.modifier.defence" type="additive" value="1"/>
       <modifier id="model.modifier.offence" type="additive" value="2"/>
+      <role-change from="model.role.default" capture="model.role.soldier"/>
+      <role-change from="model.role.default" capture="model.role.infantry"/>
     </role>
 
     <role id="model.role.nativeDragoon" downgrade="model.role.armedBrave">
@@ -996,6 +1001,11 @@
       <modifier id="model.modifier.defence" type="additive" value="2"/>
       <modifier id="model.modifier.offence" type="additive" value="3"/>
       <modifier id="model.modifier.movementBonus" type="additive" value="9"/>
+      <role-change from="model.role.mountedBrave" capture="model.role.soldier"/>
+      <role-change from="model.role.mountedBrave" capture="model.role.infantry"/>
+      <role-change from="model.role.armedBrave" capture="model.role.scout"/>
+      <role-change from="model.role.armedBrave" capture="model.role.dragoon"/>
+      <role-change from="model.role.armedBrave" capture="model.role.cavalry"/>
     </role>
   </roles>
 
@@ -2019,7 +2029,7 @@ resources of 400, lost city rumours of 500
     <founding-father id="model.foundingFather.paulRevere" type="military"
                      weight1="10" weight2="2" weight3="1">
       <ability id="model.ability.automaticEquipment" value="true">
-        <scope type="model.equipment.muskets"/>
+        <scope type="model.role.soldier"/>
       </ability>
     </founding-father>
     <founding-father id="model.foundingFather.francisDrake" type="military"
@@ -2155,8 +2165,8 @@ resources of 400, lost city rumours of 500
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundsColonies" value="false"/>
       <ability id="model.ability.automaticEquipment" value="true">
-        <scope type="model.equipment.indian.muskets"/>
-        <scope type="model.equipment.indian.horses"/>
+        <scope type="model.role.nativeDragoon"/>
+        <scope type="model.role.armedBrave"/>
       </ability>
       <ability id="model.ability.native"/>
     </indian-nation-type>

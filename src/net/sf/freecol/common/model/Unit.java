@@ -66,9 +66,6 @@ public class Unit extends GoodsLocation
 
     private static final Logger logger = Logger.getLogger(Unit.class.getName());
 
-    private static final EquipmentType horsesEq[] = { null, null };
-    private static final EquipmentType musketsEq[] = { null, null };
-
     /** A comparator to order units by skill level. */
     private static Comparator<Unit> skillLevelComp
         = new Comparator<Unit>() {
@@ -625,6 +622,19 @@ public class Unit extends GoodsLocation
      */
     public String getRoleSuffix() {
         return Role.getRoleSuffix(role.getId());
+    }
+
+    /**
+     * Hopefully, a temporary hack.
+     */
+    public void changeRole(Role role) {
+        setRole(role);
+
+        Specification spec = getSpecification();
+        clearEquipment();
+        for (EquipmentType et : spec.getRoleEquipment(role.getId())) {
+            equipment.incrementCount(et, 1);
+        }
     }
 
     /**
@@ -1497,21 +1507,36 @@ public class Unit extends GoodsLocation
     // More complex equipment manipulation.
 
     /**
-     * Does the unit have arms?
+     * Gets a role that can be equipped automatically assumed
+     * in case of an attack.
      *
-     * @return True if the unit has arms.
+     * Paul Revere makes an unarmed colonist in a settlement pick up a
+     * stock-piled musket if attacked, so the bonus should be applied
+     * for unarmed colonists inside colonies where there are muskets
+     * available.  Indians can also pick up equipment.
+     *
+     * @return A <code>Role</code> that can be automatically assumed
+     *     by this unit, or null if none.
      */
-    public boolean isArmed() {
-        return hasAbility(Ability.ARMED);
-    }
+    public Role getAutomaticRole() {
+        if (!hasDefaultRole()) return null;
+        Set<Ability> autoDefence = getAbilitySet(Ability.AUTOMATIC_EQUIPMENT);
+        if (autoDefence.isEmpty()) return null;
+        Settlement settlement = (isInColony()) ? getColony()
+            : (getLocation() instanceof IndianSettlement)
+            ? (Settlement)getLocation()
+            : null;
+        if (settlement == null) return null;
 
-    /**
-     * Does the unit have a mount?
-     *
-     * @return True if the unit have a mount.
-     */
-    public boolean isMounted() {
-        return hasAbility(Ability.MOUNTED);
+        final Specification spec = getSpecification();
+        for (Ability ability : autoDefence) {
+            for (Scope scope : ability.getScopes()) {
+                Role role = spec.getRole(scope.getType());
+                if (role != null
+                    && settlement.canBuildRoleEquipment(role) >= 0) return role;
+            }
+        }
+        return null;
     }
 
     /**
@@ -1542,130 +1567,41 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * After winning a battle, can this unit capture the loser's equipment?
+     * After winning a battle, can this unit capture the loser's role
+     * equipment?
      *
-     * @param equip The <code>EquipmentType</code> to consider.
-     * @param loser The loser <code>Unit</code>.
-     * @return The <code>EquipmentType</code> to capture, which may
-     *     differ from the equip parameter due to transformations such
-     *     as to the native versions of horses and muskets.
-     *     Or return null if capture is not possible.
+     * @param role The loser unit <code>Role</code>.
+     * @return The <code>Role</code> available to this unit as a result
+     *     of capturing the loser equipment.
      */
-    public EquipmentType canCaptureEquipment(EquipmentType equip, Unit loser) {
-        if (hasAbility(Ability.CAPTURE_EQUIPMENT)) {
-            if (getOwner().isIndian() != loser.getOwner().isIndian()) {
-                equip = equip.getCaptureEquipment(getOwner().isIndian());
-            }
-            return (canBeEquippedWith(equip)) ? equip : null;
-        }
-        return null;
-    }
-
-    /**
-     * Gets the available equipment that can be equipped automatically
-     * in case of an attack.
-     *
-     * @return The equipment that can be automatically equipped by
-     *     this unit, or null if none.
-     */
-    public TypeCountMap<EquipmentType> getAutomaticEquipment() {
-        // Paul Revere makes an unarmed colonist in a settlement pick up
-        // a stock-piled musket if attacked, so the bonus should be applied
-        // for unarmed colonists inside colonies where there are muskets
-        // available. Indians can also pick up equipment.
-        if (isArmed()) return null;
-
-        if (!getOwner().hasAbility(Ability.AUTOMATIC_EQUIPMENT)) {
-            return null;
-        }
-
-        Settlement settlement = (isInColony()) ? getColony()
-            : (getLocation() instanceof IndianSettlement) ? (Settlement)getLocation()
+    public Role canCaptureEquipment(Role role) {
+        Role newRole;
+        return (hasAbility(Ability.CAPTURE_EQUIPMENT)
+            && (newRole = getSpecification().getRoleChange(getRole(), role))
+                != null
+            && newRole.isAvailableTo(getOwner(), getType())) 
+            ? newRole
             : null;
-        if (settlement == null) return null;
-
-        TypeCountMap<EquipmentType> equipmentList = null;
-        // Check for necessary equipment in the settlement
-        Set<Ability> autoDefence = new HashSet<Ability>();
-        autoDefence.addAll(getOwner()
-            .getAbilitySet(Ability.AUTOMATIC_EQUIPMENT));
-
-        for (EquipmentType equipment : getSpecification().getEquipmentTypeList()) {
-            for (Ability ability : autoDefence) {
-                if (!ability.appliesTo(equipment)) continue;
-
-                if (!canBeEquippedWith(equipment)) continue;
-
-                boolean hasReqGoods = true;
-                for (AbstractGoods ag : equipment.getRequiredGoods()) {
-                    if (settlement.getGoodsCount(ag.getType()) < ag.getAmount()){
-                        hasReqGoods = false;
-                        break;
-                    }
-                }
-                if (hasReqGoods) {
-                    // lazy initialization, required
-                    if (equipmentList == null) {
-                        equipmentList = new TypeCountMap<EquipmentType>();
-                    }
-                    equipmentList.incrementCount(equipment, 1);
-                }
-            }
-        }
-        return equipmentList;
     }
 
     /**
      * Does losing a piece of equipment mean the death of this unit?
      *
-     * @param lose The <code>EquipmentType</code> to lose.
      * @return True if the unit is doomed.
      */
-    public boolean losingEquipmentKillsUnit(EquipmentType lose) {
-        if (hasAbility(Ability.DISPOSE_ON_ALL_EQUIPMENT_LOST)) {
-            for (EquipmentType equip : getEquipment().keySet()) {
-                if (equip != lose) return false;
-            }
-            return true;
-        }
-        return false;
+    public boolean losingEquipmentKillsUnit() {
+        return hasAbility(Ability.DISPOSE_ON_ALL_EQUIPMENT_LOST)
+            && getRole().getDowngrade() == null;
     }
 
     /**
-     * Does losing a piece of equipment mean the demotion of this unit?
+     * Does losing equipment mean the demotion of this unit?
      *
-     * @param lose The <code>EquipmentType</code> to lose.
      * @return True if the unit is to be demoted.
      */
-    public boolean losingEquipmentDemotesUnit(EquipmentType lose) {
-        if (hasAbility(Ability.DEMOTE_ON_ALL_EQUIPMENT_LOST)) {
-            for (EquipmentType equip : getEquipment().keySet()) {
-                if (equip != lose) return false;
-            }
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Gets the best combat equipment type that this unit has.
-     *
-     * @param equipment The equipment to look through, such as returned by
-     *     @see Unit#getEquipment() and/or @see Unit#getAutomaticEquipment().
-     * @return The equipment type to lose, or null if none.
-     */
-    public EquipmentType getBestCombatEquipmentType(TypeCountMap<EquipmentType> equipment) {
-        EquipmentType lose = null;
-        if (equipment != null) {
-            int priority = -1;
-            for (EquipmentType equipmentType : equipment.keySet()) {
-                if (equipmentType.getCombatLossPriority() > priority) {
-                    lose = equipmentType;
-                    priority = equipmentType.getCombatLossPriority();
-                }
-            }
-        }
-        return lose;
+    public boolean losingEquipmentDemotesUnit() {
+        return hasAbility(Ability.DEMOTE_ON_ALL_EQUIPMENT_LOST)
+            && getRole().getDowngrade() == null;
     }
 
     /**
@@ -1757,15 +1693,32 @@ public class Unit extends GoodsLocation
      *     goods.
      */
     public void clearEquipment(Settlement settlement) {
-        Role defaultRole = getSpecification().getDefaultRole();
-        settlement.equipForRole(this, defaultRole);
+        settlement.equipForRole(this, getSpecification().getDefaultRole());
 
-        assert getRole() == defaultRole;
+        assert hasDefaultRole();
     }
     
 
 
     // Combat routines
+
+    /**
+     * Does the unit have arms?
+     *
+     * @return True if the unit has arms.
+     */
+    public boolean isArmed() {
+        return hasAbility(Ability.ARMED);
+    }
+
+    /**
+     * Does the unit have a mount?
+     *
+     * @return True if the unit have a mount.
+     */
+    public boolean isMounted() {
+        return hasAbility(Ability.MOUNTED);
+    }
 
     /**
      * Is the unit a beached ship?

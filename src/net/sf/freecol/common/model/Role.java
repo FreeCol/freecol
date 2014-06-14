@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -32,6 +33,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Ability;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -39,6 +41,26 @@ import net.sf.freecol.common.util.Utils;
  * The role of a unit.
  */
 public class Role extends BuildableType {
+
+    /** Container for valid role changes. */
+    public class RoleChange {
+
+        public String from;
+        public String capture;
+
+        RoleChange(String from, String capture) {
+            this.from = from;
+            this.capture = capture;
+        }
+
+        public Role getFrom(Specification spec) {
+            return spec.getRole(from);
+        }
+
+        public Role getCapture(Specification spec) {
+            return spec.getRole(capture);
+        }
+    };
 
     /**
      * The Role to downgrade to after losing a battle. Defaults to
@@ -58,6 +80,10 @@ public class Role extends BuildableType {
      * expert for the pioneer role.
      */
     private UnitType expertUnit = null;
+
+    /** The role changes by capture available for this role. */
+    private List<RoleChange> roleChanges = null;
+
 
     /** Sorts roles by descending defensive power. */
     public static final Comparator<Role> defensiveComparator
@@ -189,6 +215,27 @@ public class Role extends BuildableType {
     }
 
     /**
+     * Get the role changes that can allow a unit to assume this role.
+     *
+     * @return A list of <code>RoleChange</code>s.
+     */
+    public final List<RoleChange> getRoleChanges() {
+        if (roleChanges == null) return Collections.emptyList();
+        return this.roleChanges;
+    }
+
+    /**
+     * Add a new role change.
+     *
+     * @param from The source role identifier.
+     * @param capture The identifier for the role to capture.
+     */
+    public void addRoleChange(String from, String capture) {
+        if (roleChanges == null) roleChanges = new ArrayList<RoleChange>();
+        roleChanges.add(new RoleChange(from, capture));
+    }
+
+    /**
      * Get the offense value for this role.
      *
      * @return The offense value.
@@ -255,19 +302,24 @@ public class Role extends BuildableType {
         }
     }
 
-
+    /**
+     * Get the goods that become available when the unit is downgraded.
+     *
+     * @return A list of <code>AbstractGoods</code>.
+     */
     public List<AbstractGoods> getDowngradeGoods() {
         return getGoodsDifference(this, downgrade);
     }
 
     /**
-     * Returns a list of goods required to change from the first role
-     * to the second. The first role may be <code>null</code>, the
+     * Gets a list of goods required to change from the first role
+     * to the second.  The first role may be <code>null</code>, the
      * second must not.
      *
-     * @param from The current role.
-     * @param to The role to assume.
-     * @return The goods required to make the change.
+     * @param from The current <code>Role</code>.
+     * @param to The <code>Role</code> to assume.
+     * @return The a list of <code>AbstractGoods</code> required to
+     *     make the change.
      */
     public static List<AbstractGoods> getGoodsDifference(Role from, Role to) {
         List<AbstractGoods> result = new ArrayList<AbstractGoods>();
@@ -359,9 +411,12 @@ public class Role extends BuildableType {
 
     // Serialization
 
+    private static final String CAPTURE_TAG = "capture";
     private static final String DOWNGRADE_TAG = "downgrade";
+    private static final String FROM_TAG = "from";
     private static final String EXPERT_UNIT_TAG = "expertUnit";
     private static final String MAXIMUM_COUNT_TAG = "maximumCount";
+    private static final String ROLE_CHANGE_TAG = "role-change";
 
 
     /**
@@ -388,6 +443,24 @@ public class Role extends BuildableType {
      * {@inheritDoc}
      */
     @Override
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
+
+        for (RoleChange rc : getRoleChanges()) {
+            xw.writeStartElement(ROLE_CHANGE_TAG);
+
+            xw.writeAttribute(FROM_TAG, rc.from);
+
+            xw.writeAttribute(CAPTURE_TAG, rc.capture);
+
+            xw.writeEndElement();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
@@ -400,6 +473,37 @@ public class Role extends BuildableType {
                                 UnitType.class, (UnitType)null);
 
         maximumCount = xr.getAttribute(MAXIMUM_COUNT_TAG, 1);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        // Clear containers.
+        if (xr.shouldClearContainers()) {
+            roleChanges = null;
+        }
+
+        super.readChildren(xr);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
+        final String tag = xr.getLocalName();
+
+        if (ROLE_CHANGE_TAG.equals(tag)) {
+            String from = xr.getAttribute(FROM_TAG, (String)null);
+            String capture = xr.getAttribute(CAPTURE_TAG, (String)null);
+            addRoleChange(from, capture);
+            xr.closeTag(ROLE_CHANGE_TAG);
+
+        } else {
+            super.readChild(xr);
+        }
     }
 
     /**

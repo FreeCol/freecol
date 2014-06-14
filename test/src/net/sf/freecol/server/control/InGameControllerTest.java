@@ -231,7 +231,6 @@ public class InGameControllerTest extends FreeColTestCase {
         super.tearDown();
     }
 
-
     public void testDeclarationOfWarFromPeace() {
         Game game = ServerTestHelper.startServerGame(getTestMap());
         InGameController igc = ServerTestHelper.getInGameController();
@@ -527,10 +526,8 @@ public class InGameControllerTest extends FreeColTestCase {
 
         // Privateer should win, loot and damage the galleon
         crs = fakeAttackResult(CombatResult.WIN, privateer, galleon);
-        assertTrue("Privateer v galleon failed", crs.size() == 3
-                   && crs.get(0) == CombatResult.WIN
-                   && crs.get(1) == CombatResult.LOOT_SHIP
-                   && crs.get(2) == CombatResult.DAMAGE_SHIP_ATTACK);
+        checkCombat("Privateer v galleon", crs,
+            CombatResult.WIN, CombatResult.LOOT_SHIP, CombatResult.DAMAGE_SHIP_ATTACK);
         igc.combat((ServerPlayer) dutch, privateer, galleon, crs);
 
         assertTrue("Galleon should be in Europe repairing",
@@ -583,14 +580,8 @@ public class InGameControllerTest extends FreeColTestCase {
 
         // Veteran attacks and demotes the Colonial Regular
         crs = fakeAttackResult(CombatResult.WIN, soldier, colonial);
-        assertEquals("Soldier v Colonial failed",
-                     3, crs.size());
-        assertEquals("Soldier v Colonial failed",
-                     CombatResult.WIN, crs.get(0));
-        assertEquals("Soldier v Colonial failed",
-                     CombatResult.LOSE_EQUIP, crs.get(1));
-        assertEquals("Soldier v Colonial failed",
-                     CombatResult.DEMOTE_UNIT, crs.get(2));
+        checkCombat("Soldier v Colonial (1)", crs,
+            CombatResult.WIN, CombatResult.LOSE_EQUIP, CombatResult.DEMOTE_UNIT);
         igc.combat((ServerPlayer) french, soldier, colonial, crs);
 
         assertEquals("Colonial Regular is demoted",
@@ -598,12 +589,8 @@ public class InGameControllerTest extends FreeColTestCase {
 
         // Veteran attacks and captures the Colonial Regular
         crs = fakeAttackResult(CombatResult.WIN, soldier, colonial);
-        assertEquals("Soldier v Colonial failed",
-                     2, crs.size());
-        assertEquals("Soldier v Colonial failed",
-                     CombatResult.WIN, crs.get(0));
-        assertEquals("Soldier v Colonial failed",
-                     CombatResult.CAPTURE_UNIT, crs.get(1));
+        checkCombat("Soldier v Colonial (2)", crs,
+            CombatResult.WIN, CombatResult.CAPTURE_UNIT);
         igc.combat((ServerPlayer) french, soldier, colonial, crs);
 
         assertEquals("Colonial Regular is demoted",
@@ -642,9 +629,8 @@ public class InGameControllerTest extends FreeColTestCase {
 
         // Attacker wins and defender loses horses
         crs = fakeAttackResult(CombatResult.WIN, attacker, defender);
-        assertTrue("Veteran v Colony (1) failed", crs.size() == 2
-                   && crs.get(0) == CombatResult.WIN
-                   && crs.get(1) == CombatResult.LOSE_EQUIP);
+        checkCombat("Veteran v Colony (1)", crs,
+            CombatResult.WIN, CombatResult.LOSE_EQUIP);
         igc.combat((ServerPlayer) french, attacker, defender, crs);
 
         assertTrue("Attacker should be mounted",
@@ -664,9 +650,8 @@ public class InGameControllerTest extends FreeColTestCase {
 
         // Attacker loses and loses horses
         crs = fakeAttackResult(CombatResult.LOSE, attacker, defender);
-        assertTrue("Veteran v Colony (2) failed ", crs.size() == 2
-                   && crs.get(0) == CombatResult.LOSE
-                   && crs.get(1) == CombatResult.LOSE_EQUIP);
+        checkCombat("Veteran v Colony (2) ", crs,
+            CombatResult.LOSE, CombatResult.LOSE_EQUIP);
         igc.combat((ServerPlayer) french, attacker, defender, crs);
 
         assertFalse("Attacker should not be mounted",
@@ -686,9 +671,8 @@ public class InGameControllerTest extends FreeColTestCase {
 
         // Attacker wins and defender loses muskets
         crs = fakeAttackResult(CombatResult.WIN, attacker, defender);
-        assertTrue("Veteran v Colony (3) failed", crs.size() == 2
-                   && crs.get(0) == CombatResult.WIN
-                   && crs.get(1) == CombatResult.LOSE_EQUIP);
+        checkCombat("Veteran v Colony (3)", crs,
+            CombatResult.WIN, CombatResult.LOSE_EQUIP);
         igc.combat((ServerPlayer) french, attacker, defender, crs);
 
         assertFalse("Attacker should not be mounted",
@@ -708,9 +692,8 @@ public class InGameControllerTest extends FreeColTestCase {
 
         // Attacker wins and captures the settlement
         crs = fakeAttackResult(CombatResult.WIN, attacker, defender);
-        assertTrue("Veteran v Colony (4) failed", crs.size() == 2
-                   && crs.get(0) == CombatResult.WIN
-                   && crs.get(1) == CombatResult.CAPTURE_COLONY);
+        checkCombat("Veteran v Colony (4)", crs,
+            CombatResult.WIN, CombatResult.CAPTURE_COLONY);
         igc.combat((ServerPlayer) french, attacker, defender, crs);
 
         assertFalse("Attacker should not be mounted",
@@ -764,9 +747,8 @@ public class InGameControllerTest extends FreeColTestCase {
 
         // Attacker wins and defender loses horses
         crs = fakeAttackResult(CombatResult.WIN, attacker, defender);
-        assertTrue("Brave v Colony (1) failed", crs.size() == 2
-                   && crs.get(0) == CombatResult.WIN
-                   && crs.get(1) == CombatResult.LOSE_EQUIP);
+        checkCombat("Brave v Colony (1)", crs,
+            CombatResult.WIN, CombatResult.LOSE_EQUIP);
         igc.combat((ServerPlayer) inca, attacker, defender, crs);
 
         assertEquals("Colony size should be 1",
@@ -790,9 +772,8 @@ public class InGameControllerTest extends FreeColTestCase {
 
         // Attacker wins and defender loses muskets
         crs = fakeAttackResult(CombatResult.WIN, attacker, defender);
-        assertTrue("Brave v Colony (2) failed", crs.size() == 2
-                   && crs.get(0) == CombatResult.WIN
-                   && crs.get(1) == CombatResult.LOSE_EQUIP);
+        checkCombat("Brave v Colony (2)", crs,
+            CombatResult.WIN, CombatResult.LOSE_EQUIP);
         igc.combat((ServerPlayer) inca, attacker, defender, crs);
 
         assertEquals("Colony size should be 1",
@@ -820,9 +801,8 @@ public class InGameControllerTest extends FreeColTestCase {
 
         // Attacker wins and slaughters the defender.
         crs = fakeAttackResult(CombatResult.WIN, attacker, defender);
-        assertTrue("Brave v Colony (3) failed", crs.size() == 2
-                   && crs.get(0) == CombatResult.WIN
-                   && crs.get(1) == CombatResult.SLAUGHTER_UNIT);
+        checkCombat("Brave v Colony (3)", crs,
+            CombatResult.WIN, CombatResult.SLAUGHTER_UNIT);
         igc.combat((ServerPlayer) inca, attacker, defender, crs);
 
         assertEquals("Colony size should be 1",
@@ -847,9 +827,8 @@ public class InGameControllerTest extends FreeColTestCase {
         assertTrue("Colony has school, should be pillageable",
                    colony.canBePillaged(attacker));
         crs = fakeAttackResult(CombatResult.WIN, attacker, defender);
-        assertTrue("Brave v Colony (4) failed", crs.size() == 2
-                   && crs.get(0) == CombatResult.WIN
-                   && crs.get(1) == CombatResult.PILLAGE_COLONY);
+        checkCombat("Brave v Colony (4)", crs,
+            CombatResult.WIN, CombatResult.PILLAGE_COLONY);
         igc.combat((ServerPlayer) inca, attacker, defender, crs);
 
         assertTrue("Attacker should be mounted",
@@ -872,9 +851,8 @@ public class InGameControllerTest extends FreeColTestCase {
         assertTrue("Colony has ship, should be pillageable",
                    colony.canBePillaged(attacker));
         crs = fakeAttackResult(CombatResult.WIN, attacker, defender);
-        assertTrue("Brave v Colony (5) failed", crs.size() == 2
-                   && crs.get(0) == CombatResult.WIN
-                   && crs.get(1) == CombatResult.PILLAGE_COLONY);
+        checkCombat("Brave v Colony (5)", crs,
+            CombatResult.WIN, CombatResult.PILLAGE_COLONY);
         igc.combat((ServerPlayer) inca, attacker, defender, crs);
 
         assertTrue("Attacker should be mounted",
@@ -897,9 +875,8 @@ public class InGameControllerTest extends FreeColTestCase {
         assertTrue("Colony has goods, should be pillageable",
                    colony.canBePillaged(attacker));
         crs = fakeAttackResult(CombatResult.WIN, attacker, defender);
-        assertTrue("Brave v Colony (6) failed", crs.size() == 2
-                   && crs.get(0) == CombatResult.WIN
-                   && crs.get(1) == CombatResult.PILLAGE_COLONY);
+        checkCombat("Brave v Colony (6)", crs,
+            CombatResult.WIN, CombatResult.PILLAGE_COLONY);
         igc.combat((ServerPlayer) inca, attacker, defender, crs);
 
         assertTrue("Attacker should be mounted",
@@ -921,9 +898,8 @@ public class InGameControllerTest extends FreeColTestCase {
         assertTrue("Dutch have gold, colony should be pillageable",
                    colony.canBePillaged(attacker));
         crs = fakeAttackResult(CombatResult.WIN, attacker, defender);
-        assertTrue("Brave v Colony (7) failed", crs.size() == 2
-                   && crs.get(0) == CombatResult.WIN
-                   && crs.get(1) == CombatResult.PILLAGE_COLONY);
+        checkCombat("Brave v Colony (7)", crs,
+            CombatResult.WIN, CombatResult.PILLAGE_COLONY);
         igc.combat((ServerPlayer) inca, attacker, defender, crs);
 
         assertTrue("Attacker should be mounted",
@@ -942,10 +918,8 @@ public class InGameControllerTest extends FreeColTestCase {
 
         // Attacker wins and destroys the colony
         crs = fakeAttackResult(CombatResult.WIN, attacker, defender);
-        assertTrue("Brave v Colony (8) failed", crs.size() == 3
-                   && crs.get(0) == CombatResult.WIN
-                   && crs.get(1) == CombatResult.SLAUGHTER_UNIT
-                   && crs.get(2) == CombatResult.DESTROY_COLONY);
+        checkCombat("Brave v Colony (8)", crs,
+            CombatResult.WIN, CombatResult.SLAUGHTER_UNIT, CombatResult.DESTROY_COLONY);
         igc.combat((ServerPlayer) inca, attacker, defender, crs);
 
         assertTrue("Attacker should be mounted",
@@ -991,10 +965,8 @@ public class InGameControllerTest extends FreeColTestCase {
 
         // Attacker wins, defender autoequips, but loses the muskets
         crs = fakeAttackResult(CombatResult.WIN, attacker, colonist);
-        assertTrue("Inca v Colony failed", crs.size() == 3
-                   && crs.get(0) == CombatResult.WIN
-                   && crs.get(1) == CombatResult.AUTOEQUIP_UNIT
-                   && crs.get(2) == CombatResult.LOSE_AUTOEQUIP);
+        checkCombat("Inca v Colony", crs,
+            CombatResult.WIN, CombatResult.AUTOEQUIP_UNIT, CombatResult.LOSE_AUTOEQUIP);
         igc.combat((ServerPlayer) inca, attacker, colonist, crs);
 
         assertFalse("Colonist should not be disposed",
@@ -1030,9 +1002,8 @@ public class InGameControllerTest extends FreeColTestCase {
 
         // Soldier wins and kills the pioneer
         crs = fakeAttackResult(CombatResult.WIN, soldier, pioneer);
-        assertTrue("Soldier v Pioneer failed", crs.size() == 2
-                   && crs.get(0) == CombatResult.WIN
-                   && crs.get(1) == CombatResult.SLAUGHTER_UNIT);
+        checkCombat("Soldier v Pioneer", crs,
+            CombatResult.WIN, CombatResult.SLAUGHTER_UNIT);
         igc.combat((ServerPlayer) french, soldier, pioneer, crs);
 
         assertTrue("Pioneer should be dead",
@@ -1040,13 +1011,11 @@ public class InGameControllerTest extends FreeColTestCase {
     }
 
     public void testScoutDiesNotLosesEquipment() {
-        Game game = ServerTestHelper.startServerGame(getTestMap());
-        Map map = game.getMap();
-        InGameController igc = ServerTestHelper.getInGameController();
-
-        List<CombatResult> crs;
-        Player dutch = game.getPlayer("model.nation.dutch");
-        Player french = game.getPlayer("model.nation.french");
+        final Game game = ServerTestHelper.startServerGame(getTestMap());
+        final Map map = game.getMap();
+        final InGameController igc = ServerTestHelper.getInGameController();
+        final Player dutch = game.getPlayer("model.nation.dutch");
+        final Player french = game.getPlayer("model.nation.french");
         igc.changeStance(dutch, Stance.WAR, french, true);
 
         Tile tile1 = map.getTile(5, 8);
@@ -1055,19 +1024,22 @@ public class InGameControllerTest extends FreeColTestCase {
         Tile tile2 = map.getTile(4, 8);
         tile2.setExplored(dutch, true);
         tile2.setExplored(french, true);
-        Unit scout = new ServerUnit(game, tile1, dutch, colonistType, scoutRole);
-        Unit soldier = new ServerUnit(game, tile2, french, veteranType, dragoonRole);
+        Unit scout = new ServerUnit(game, tile1, dutch, colonistType,
+                                    scoutRole);
+        Unit soldier = new ServerUnit(game, tile2, french, veteranType,
+                                      soldierRole);
         scout.setMovesLeft(1);
 
         // Soldier wins and kills the scout
-        crs = fakeAttackResult(CombatResult.WIN, soldier, scout);
-        assertTrue("Soldier v scout failed", crs.size() == 2
-                   && crs.get(0) == CombatResult.WIN
-                   && crs.get(1) == CombatResult.SLAUGHTER_UNIT);
-        igc.combat((ServerPlayer) french, soldier, scout, crs);
+        List<CombatResult> crs
+            = fakeAttackResult(CombatResult.WIN, soldier, scout);
+        checkCombat("Soldier v scout", crs,
+            CombatResult.WIN, CombatResult.LOSE_EQUIP, CombatResult.SLAUGHTER_UNIT);
+        igc.combat((ServerPlayer)french, soldier, scout, crs);
 
         assertTrue("Scout should be dead",
                    scout.isDisposed());
+        assertEquals(soldierRole, soldier.getRole());
     }
 
     public void testPromotion() {
@@ -1119,10 +1091,8 @@ public class InGameControllerTest extends FreeColTestCase {
 
         // Criminal -> Servant
         crs = fakeAttackResult(CombatResult.WIN, unit, soldier);
-        assertTrue("Criminal promotion failed", crs.size() == 3
-                   && crs.get(0) == CombatResult.WIN
-                   && crs.get(1) == CombatResult.LOSE_EQUIP
-                   && crs.get(2) == CombatResult.PROMOTE_UNIT);
+        checkCombat("Criminal promotion", crs,
+            CombatResult.WIN, CombatResult.LOSE_EQUIP, CombatResult.PROMOTE_UNIT);
         igc.combat((ServerPlayer) dutch, unit, soldier, crs);
 
         assertEquals("Criminal should be promoted to servant",
@@ -1131,10 +1101,8 @@ public class InGameControllerTest extends FreeColTestCase {
         // Servant -> Colonist
         soldier.changeEquipment(muskets, 1);
         crs = fakeAttackResult(CombatResult.WIN, unit, soldier);
-        assertTrue("Servant promotion failed", crs.size() == 3
-                   && crs.get(0) == CombatResult.WIN
-                   && crs.get(1) == CombatResult.LOSE_EQUIP
-                   && crs.get(2) == CombatResult.PROMOTE_UNIT);
+        checkCombat("Servant promotion", crs,
+            CombatResult.WIN, CombatResult.LOSE_EQUIP, CombatResult.PROMOTE_UNIT);
         igc.combat((ServerPlayer) dutch, unit, soldier, crs);
 
         assertEquals("Servant should be promoted to colonist",
@@ -1143,10 +1111,8 @@ public class InGameControllerTest extends FreeColTestCase {
         // Colonist -> Veteran
         soldier.changeEquipment(muskets, 1);
         crs = fakeAttackResult(CombatResult.WIN, unit, soldier);
-        assertTrue("Colonist promotion failed", crs.size() == 3
-                   && crs.get(0) == CombatResult.WIN
-                   && crs.get(1) == CombatResult.LOSE_EQUIP
-                   && crs.get(2) == CombatResult.PROMOTE_UNIT);
+        checkCombat("Colonist promotion failed", crs,
+            CombatResult.WIN, CombatResult.LOSE_EQUIP, CombatResult.PROMOTE_UNIT);
         igc.combat((ServerPlayer) dutch, unit, soldier, crs);
 
         assertEquals("Colonist should be promoted to Veteran",
@@ -1168,10 +1134,8 @@ public class InGameControllerTest extends FreeColTestCase {
         // Veteran -> Colonial Regular
         soldier.changeEquipment(muskets, 1);
         crs = fakeAttackResult(CombatResult.WIN, unit, soldier);
-        assertTrue("Veteran promotion failed", crs.size() == 3
-                   && crs.get(0) == CombatResult.WIN
-                   && crs.get(1) == CombatResult.LOSE_EQUIP
-                   && crs.get(2) == CombatResult.PROMOTE_UNIT);
+        checkCombat("Veteran promotion", crs,
+            CombatResult.WIN, CombatResult.LOSE_EQUIP, CombatResult.PROMOTE_UNIT);
         igc.combat((ServerPlayer) dutch, unit, soldier, crs);
 
         assertEquals("Veteran should be promoted to Colonial Regular",
@@ -1180,10 +1144,8 @@ public class InGameControllerTest extends FreeColTestCase {
         // No further promotion should work
         soldier.changeEquipment(muskets, 1);
         crs = fakeAttackResult(CombatResult.WIN, unit, soldier);
-        assertTrue("Colonial Regular over-promotion failed",
-                   crs.size() == 2
-                   && crs.get(0) == CombatResult.WIN
-                   && crs.get(1) == CombatResult.LOSE_EQUIP);
+        checkCombat("Colonial Regular over-promotion failed", crs,
+            CombatResult.WIN, CombatResult.LOSE_EQUIP);
         igc.combat((ServerPlayer) dutch, unit, soldier, crs);
 
         assertEquals("Colonial Regular should still be Colonial Regular",
@@ -1219,9 +1181,8 @@ public class InGameControllerTest extends FreeColTestCase {
 
         // Colonist loses and is captured
         crs = fakeAttackResult(CombatResult.LOSE, colonist, soldier);
-        assertTrue("Colonist v Soldier failed", crs.size() == 2
-                   && crs.get(0) == CombatResult.LOSE
-                   && crs.get(1) == CombatResult.CAPTURE_UNIT);
+        checkCombat("Colonist v Soldier", crs,
+            CombatResult.LOSE, CombatResult.CAPTURE_UNIT);
         igc.combat((ServerPlayer)dutch, colonist, soldier, crs);
 
         assertEquals("Colonist should still be a colonist",
@@ -1253,9 +1214,8 @@ public class InGameControllerTest extends FreeColTestCase {
 
         // Soldier loses and loses muskets
         crs = fakeAttackResult(CombatResult.LOSE, soldier1, soldier2);
-        assertTrue("Soldier should lose equipment", crs.size() == 2
-                   && crs.get(0) == CombatResult.LOSE
-                   && crs.get(1) == CombatResult.LOSE_EQUIP);
+        checkCombat("Soldier should lose equipment", crs,
+            CombatResult.LOSE, CombatResult.LOSE_EQUIP);
         igc.combat((ServerPlayer) dutch, soldier1, soldier2, crs);
 
         assertEquals("Soldier should be a colonist",
@@ -1269,9 +1229,8 @@ public class InGameControllerTest extends FreeColTestCase {
 
         // Soldier loses and is captured
         crs = fakeAttackResult(CombatResult.LOSE, soldier1, soldier2);
-        assertTrue("Soldier v soldier failed", crs.size() == 2
-                   && crs.get(0) == CombatResult.LOSE
-                   && crs.get(1) == CombatResult.CAPTURE_UNIT);
+        checkCombat("Soldier v soldier", crs,
+            CombatResult.LOSE, CombatResult.CAPTURE_UNIT);
         igc.combat((ServerPlayer) dutch, soldier1, soldier2, crs);
 
         assertEquals("Soldier should be a colonist",
@@ -1309,9 +1268,8 @@ public class InGameControllerTest extends FreeColTestCase {
 
         // Dragoon loses and loses horses
         crs = fakeAttackResult(CombatResult.LOSE, dragoon, soldier);
-        assertTrue("Dragoon v soldier (1) failed", crs.size() == 2
-                   && crs.get(0) == CombatResult.LOSE
-                   && crs.get(1) == CombatResult.LOSE_EQUIP);
+        checkCombat("Dragoon v soldier (1)", crs,
+            CombatResult.LOSE, CombatResult.LOSE_EQUIP);
         igc.combat((ServerPlayer) dutch, dragoon, soldier, crs);
 
         assertEquals("Dragoon should be a dragoon",
@@ -1330,9 +1288,8 @@ public class InGameControllerTest extends FreeColTestCase {
                      0, dragoon.getMovesLeft());
 
         crs = fakeAttackResult(CombatResult.LOSE, dragoon, soldier);
-        assertTrue("Dragoon v soldier (2) failed", crs.size() == 2
-                   && crs.get(0) == CombatResult.LOSE
-                   && crs.get(1) == CombatResult.LOSE_EQUIP);
+        checkCombat("Dragoon v soldier (2)", crs,
+            CombatResult.LOSE, CombatResult.LOSE_EQUIP);
         igc.combat((ServerPlayer) dutch, dragoon, soldier, crs);
 
         assertEquals("Dragoon should be a dragoon",
@@ -1345,9 +1302,8 @@ public class InGameControllerTest extends FreeColTestCase {
                    dragoon.getEquipment().isEmpty());
 
         crs = fakeAttackResult(CombatResult.LOSE, dragoon, soldier);
-        assertTrue("Dragoon v soldier (3) failed", crs.size() == 2
-                   && crs.get(0) == CombatResult.LOSE
-                   && crs.get(1) == CombatResult.CAPTURE_UNIT);
+        checkCombat("Dragoon v soldier (3)", crs,
+            CombatResult.LOSE, CombatResult.CAPTURE_UNIT);
         igc.combat((ServerPlayer) dutch, dragoon, soldier, crs);
 
         assertEquals("Dragoon should be demoted",
@@ -1381,42 +1337,39 @@ public class InGameControllerTest extends FreeColTestCase {
         builder.reset().player(inca).settlementTile(map.getTile(8, 8))
             .skillToTeach(null);
         IndianSettlement settlement2 = builder.build();
-        Unit dragoon = new ServerUnit(game, tile1, dutch, colonistType, dragoonRole);
-        Unit brave = new ServerUnit(game, tile2, inca, braveType);
+        Unit dragoon = new ServerUnit(game, tile1, dutch, colonistType,
+                                      dragoonRole);
+        Unit brave = new ServerUnit(game, tile2, inca, braveType,
+                                    spec().getDefaultRole());
         brave.setHomeIndianSettlement(settlement1);
 
+System.err.println("TDDBB");
         // Dragoon loses and brave captures its horses
         crs = fakeAttackResult(CombatResult.LOSE, dragoon, brave);
-        assertTrue("Dragoon v Brave (1) failed", crs.size() == 2
-                   && crs.get(0) == CombatResult.LOSE
-                   && crs.get(1) == CombatResult.CAPTURE_EQUIP);
-        igc.combat((ServerPlayer) dutch, dragoon, brave, crs);
+        checkCombat("Dragoon v Brave (1)", crs,
+            CombatResult.LOSE, CombatResult.CAPTURE_EQUIP);
+        igc.combat((ServerPlayer)dutch, dragoon, brave, crs);
 
-        assertEquals("Colonist should be a dragoon",
+        assertEquals("Dragoon should be a colonist",
                      colonistType, dragoon.getType());
         assertEquals("Dragoon should be Dutch",
                      dutch, dragoon.getOwner());
         assertEquals("Dragoon should be on Tile1",
                      tile1, dragoon.getTile());
-        assertEquals("Dragoon should have equipment",
-                     1, dragoon.getEquipment().size());
-        assertEquals("Dragoon should have muskets",
-                     1, dragoon.getEquipment().getCount(muskets));
-        assertEquals("Brave should have equipment",
-                     1, brave.getEquipment().size());
-        assertEquals("Brave should have Indian Horses",
-                     1, brave.getEquipment().getCount(indianHorses));
-        assertEquals("Braves settlement should have 25 Indian Horses",
+        assertEquals("Dragoon should now be soldier",
+                     soldierRole, dragoon.getRole());
+        assertEquals("Brave should now be mounted",
+                     mountedBraveRole, brave.getRole());
+        assertEquals("Brave settlement should have Horses",
                      25, settlement1.getGoodsCount(horsesType));
         assertEquals("Other settlement should not have horses",
                      0, settlement2.getGoodsCount(horsesType));
 
         // Dragoon loses and brave captures its muskets
         crs = fakeAttackResult(CombatResult.LOSE, dragoon, brave);
-        assertTrue("Dragoon v Brave (2) failed", crs.size() == 2
-                   && crs.get(0) == CombatResult.LOSE
-                   && crs.get(1) == CombatResult.CAPTURE_EQUIP);
-        igc.combat((ServerPlayer) dutch, dragoon, brave, crs);
+        checkCombat("Dragoon v Brave (2)", crs,
+            CombatResult.LOSE, CombatResult.CAPTURE_EQUIP);
+        igc.combat((ServerPlayer)dutch, dragoon, brave, crs);
 
         assertEquals("Colonist should be a dragoon",
                      colonistType, dragoon.getType());
@@ -1439,9 +1392,8 @@ public class InGameControllerTest extends FreeColTestCase {
 
         // Dragoon loses and is slaughtered
         crs = fakeAttackResult(CombatResult.LOSE, dragoon, brave);
-        assertTrue("Dragoon v Brave (3) failed", crs.size() == 2
-                   && crs.get(0) == CombatResult.LOSE
-                   && crs.get(1) == CombatResult.SLAUGHTER_UNIT);
+        checkCombat("Dragoon v Brave (3)", crs,
+            CombatResult.LOSE, CombatResult.SLAUGHTER_UNIT);
         igc.combat((ServerPlayer) dutch, dragoon, brave, crs);
 
         assertTrue("Dragoon should be disposed",
@@ -1464,18 +1416,20 @@ public class InGameControllerTest extends FreeColTestCase {
         Tile tile2 = map.getTile(4, 8);
         tile2.setExplored(dutch, true);
         tile2.setExplored(french, true);
-        Unit scout = new ServerUnit(game, tile1, dutch, colonistType, scoutRole);
-        Unit soldier = new ServerUnit(game, tile2, french, colonistType, scoutRole);
+        Unit scout = new ServerUnit(game, tile1, dutch, colonistType,
+                                    scoutRole);
+        Unit soldier = new ServerUnit(game, tile2, french, colonistType,
+                                      soldierRole);
 
         // Scout loses and is slaughtered
         crs = fakeAttackResult(CombatResult.LOSE, scout, soldier);
-        assertTrue("Scout v Soldier failed", crs.size() == 2
-                   && crs.get(0) == CombatResult.LOSE
-                   && crs.get(1) == CombatResult.SLAUGHTER_UNIT);
-        igc.combat((ServerPlayer) dutch, scout, soldier, crs);
+        checkCombat("Scout v Soldier", crs,
+            CombatResult.LOSE, CombatResult.LOSE_EQUIP, CombatResult.SLAUGHTER_UNIT);
+        igc.combat((ServerPlayer)dutch, scout, soldier, crs);
 
         assertTrue("Scout should be disposed",
                    scout.isDisposed());
+        assertEquals(soldierRole, soldier.getRole());
     }
 
     public void testVeteranSoldierDemotedBySoldier() {
@@ -1502,9 +1456,8 @@ public class InGameControllerTest extends FreeColTestCase {
 
         // Soldier loses and loses equipment
         crs = fakeAttackResult(CombatResult.LOSE, soldier1, soldier2);
-        assertTrue("Soldier v Soldier failed", crs.size() == 2
-                   && crs.get(0) == CombatResult.LOSE
-                   && crs.get(1) == CombatResult.LOSE_EQUIP);
+        checkCombat("Soldier v Soldier", crs,
+            CombatResult.LOSE, CombatResult.LOSE_EQUIP);
         igc.combat((ServerPlayer) dutch, soldier1, soldier2, crs);
 
         assertEquals("Soldier1 should be a Veteran",
@@ -1518,9 +1471,8 @@ public class InGameControllerTest extends FreeColTestCase {
 
         // Soldier1 loses and is captured
         crs = fakeAttackResult(CombatResult.LOSE, soldier1, soldier2);
-        assertTrue("Soldier1 v Soldier2 failed", crs.size() == 2
-                   && crs.get(0) == CombatResult.LOSE
-                   && crs.get(1) == CombatResult.CAPTURE_UNIT);
+        checkCombat("Soldier1 v Soldier2", crs,
+            CombatResult.LOSE, CombatResult.CAPTURE_UNIT);
         igc.combat((ServerPlayer) dutch, soldier1, soldier2, crs);
 
         assertEquals("Soldier1 should be a colonist",
@@ -1555,9 +1507,8 @@ public class InGameControllerTest extends FreeColTestCase {
 
         // Artillery loses and is demoted
         crs = fakeAttackResult(CombatResult.LOSE, artillery, soldier);
-        assertTrue("Artillery v Soldier (1) failed", crs.size() == 2
-                   && crs.get(0) == CombatResult.LOSE
-                   && crs.get(1) == CombatResult.DEMOTE_UNIT);
+        checkCombat("Artillery v Soldier (1)", crs,
+            CombatResult.LOSE, CombatResult.DEMOTE_UNIT);
         igc.combat((ServerPlayer) dutch, artillery, soldier, crs);
 
         assertEquals("Artillery should be damaged artillery",
@@ -1569,9 +1520,8 @@ public class InGameControllerTest extends FreeColTestCase {
 
         // Artillery loses and is slaughtered
         crs = fakeAttackResult(CombatResult.LOSE, artillery, soldier);
-        assertTrue("Artillery v Soldier (2) failed", crs.size() == 2
-                   && crs.get(0) == CombatResult.LOSE
-                   && crs.get(1) == CombatResult.SLAUGHTER_UNIT);
+        checkCombat("Artillery v Soldier (2)", crs,
+            CombatResult.LOSE, CombatResult.SLAUGHTER_UNIT);
         igc.combat((ServerPlayer) dutch, artillery, soldier, crs);
 
         assertTrue("Artillery should be disposed",

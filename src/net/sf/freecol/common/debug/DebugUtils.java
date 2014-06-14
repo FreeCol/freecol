@@ -574,11 +574,7 @@ public class DebugUtils {
         if (roleChoice == null) return;
 
         sUnit.clearEquipment();
-        final Specification sSpec = server.getSpecification();
-        for (EquipmentType et : sUnit.getRoleEquipment(roleChoice)) {
-            sUnit.changeEquipment(et, 1);
-        }
-        sUnit.setRole(roleChoice);
+        sUnit.changeRole(roleChoice);
         freeColClient.getConnectController().reconnect();
     }
 

@@ -654,4 +654,34 @@ public class FreeColTestCase extends TestCase {
         } while (crs.get(0) != result);
         return crs;
     }
+
+    /**
+     * Check a combat result list.
+     *
+     * @param name A base string for the error message.
+     * @param crs The list of <code>CombatResult</code> to check.
+     * @param results The expected <code>CombatResult</code>s.
+     */
+    public void checkCombat(String name, List<CombatResult> crs,
+                            CombatResult... results) {
+        int i = 0;
+        for (CombatResult cr : results) {
+            CombatResult expect = (i < crs.size()) ? crs.get(i) : null;
+            if (expect != cr) break;
+            i++;
+        }
+        if (i == results.length) {
+            if (crs.size() == i) return;
+            i++;
+        }
+        String err = name + ", failed at " + i + ":";
+        for (CombatResult cr : results) {
+            err += " " + cr;
+        }
+        err += " !=";
+        for (CombatResult cr : crs) {
+            err += " " + cr;
+        }
+        fail(err);
+    }               
 }
