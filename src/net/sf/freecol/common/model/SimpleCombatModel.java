@@ -196,18 +196,19 @@ public class SimpleCombatModel extends CombatModel {
      */
     private void addNavalOffensiveModifiers(Unit attacker,
                                             Set<Modifier> result) {
+        // Attack bonus
+        Specification spec = attacker.getSpecification();
+        result.addAll(spec.getModifiers(Modifier.ATTACK_BONUS));
+
+        // Goods penalty always applies
         int count = attacker.getGoodsSpaceTaken();
         if (count > 0) {
-            // Penalty for every unit of cargo.
             // TODO: shouldn't this be -cargo/capacity?
             // TODO: magic number to spec
             result.add(new Modifier(Modifier.OFFENCE, -12.5f * count,
                                     ModifierType.PERCENTAGE,
                                     Specification.CARGO_PENALTY_SOURCE));
         }
-
-        Specification spec = attacker.getSpecification();
-        result.addAll(spec.getModifiers(Modifier.ATTACK_BONUS));
     }
 
     /**
@@ -243,9 +244,12 @@ public class SimpleCombatModel extends CombatModel {
 
         if (combatIsAttackMeasurement(attacker, defender)) {
             ; // No defender information available
+
         } else if (combatIsSettlementAttack(attacker, defender)) {
             // Settlement present, apply bombardment bonus
             result.addAll(attackerUnit.getModifierSet(Modifier.BOMBARD_BONUS));
+
+            // Popular support bonus
             if (combatIsWarOfIndependence(attacker, defender)) {
                 Colony colony = (Colony)defender;
                 int bonus = Math.max(100, colony.getSoL());
@@ -253,16 +257,17 @@ public class SimpleCombatModel extends CombatModel {
                 result.add(new Modifier(Modifier.POPULAR_SUPPORT, bonus,
                                         ModifierType.PERCENTAGE, colony));
             }
+
         } else if (combatIsAttack(attacker, defender)) {
             Unit defenderUnit = (Unit) defender;
             Tile tile = defenderUnit.getTile();
             if (tile != null) {
                 if (tile.hasSettlement()) {
+                    // Bombard bonus applies to settlement defence
                     result.addAll(attackerUnit
                                   .getModifierSet(Modifier.BOMBARD_BONUS));
                 } else {
-                    // Ambush bonus in the open = defender's defence
-                    // bonus, if defender is REF, or attacker is indian.
+                    // Ambush bonus in the open = defender's defence bonus
                     if (isAmbush(attacker, defender)) {
                         for (Modifier m : tile.getType()
                                  .getModifierSet(Modifier.DEFENCE)) {
@@ -271,14 +276,15 @@ public class SimpleCombatModel extends CombatModel {
                             result.add(mod);
                         }
                     }
-                    // Artillery in the open penalty, must be on a
-                    // tile and not in a settlement.
-                    if (attackerUnit.hasAbility(Ability.BOMBARD)
-                        && attackerUnit.getLocation() instanceof Tile
-                        && attackerUnit.getSettlement() == null) {
-                        result.addAll(spec.getModifiers(Modifier.ARTILLERY_IN_THE_OPEN));
-                    }
                 }
+            }
+
+            // Artillery in the open penalty, attacker must be on a
+            // tile and not in a settlement.
+            if (attackerUnit.hasAbility(Ability.BOMBARD)
+                && attackerUnit.getLocation() instanceof Tile
+                && attackerUnit.getSettlement() == null) {
+                result.addAll(spec.getModifiers(Modifier.ARTILLERY_IN_THE_OPEN));
             }
         } else {
             throw new IllegalStateException("Bogus combat");
@@ -298,7 +304,8 @@ public class SimpleCombatModel extends CombatModel {
         if (combatIsDefenceMeasurement(attacker, defender)
             || combatIsAttack(attacker, defender)
             || combatIsBombard(attacker, defender)) {
-            Unit defenderUnit = (Unit)defender;
+            final Unit defenderUnit = (Unit)defender;
+
             // Base defence
             result.add(new Modifier(Modifier.DEFENCE,
                                     defenderUnit.getType().getDefence(),
@@ -335,10 +342,11 @@ public class SimpleCombatModel extends CombatModel {
      */
     private void addNavalDefensiveModifiers(FreeColGameObject defender,
                                             Set<Modifier> result) {
-        Unit defenderUnit = (Unit) defender;
+        final Unit defenderUnit = (Unit)defender;
+
+        // Cargo penalty always applies
         int goodsCount = defenderUnit.getVisibleGoodsCount();
         if (goodsCount > 0) {
-            // Penalty for every unit of cargo.
             // TODO: should this be -cargo/capacity?
             result.add(new Modifier(Modifier.DEFENCE, -12.5f * goodsCount,
                                     ModifierType.PERCENTAGE,
@@ -356,37 +364,47 @@ public class SimpleCombatModel extends CombatModel {
     private void addLandDefensiveModifiers(FreeColGameObject attacker,
                                            FreeColGameObject defender,
                                            Set<Modifier> result) {
-        final Unit defenderUnit = (Unit)defender;
         final Specification spec = defender.getSpecification();
+        final Unit defenderUnit = (Unit)defender;
+        final Tile tile = defenderUnit.getTile();
 
         // Fortify bonus
         if (defenderUnit.getState() == Unit.UnitState.FORTIFIED) {
             result.addAll(spec.getModifiers(Modifier.FORTIFIED));
         }
-        Tile tile = defenderUnit.getTile();
+
         if (tile != null) {
-            Settlement settlement = tile.getSettlement();
-            if (settlement == null) { // In the open
-                // Terrain defensive bonus.
+            // Tile defence bonus
+            result.addAll(tile.getType().getDefenceModifiers());
+
+            final Settlement settlement = tile.getSettlement();
+            if (settlement == null) {
+                // Ambush defensive bonus.
                 if (!isAmbush(attacker, defender)) {
                     result.addAll(tile.getType().getDefenceModifiers());
                 }
+
                 // Artillery in the Open penalty
                 if (defenderUnit.hasAbility(Ability.BOMBARD)
                     && defenderUnit.getState() != Unit.UnitState.FORTIFIED) {
                     result.addAll(spec.getModifiers(Modifier.ARTILLERY_IN_THE_OPEN));
                 }
+
             } else { // In settlement
-                result.addAll(tile.getType().getDefenceModifiers());
+                // Settlement defence bonus
                 result.addAll(settlement.getModifierSet(Modifier.DEFENCE));
+
+                // Owner settlement-specific bonus
                 result.addAll(settlement.getOwner()
                     .getModifierSet(Modifier.DEFENCE, settlement.getType()));
+
                 // Artillery defence bonus against an Indian raid
                 if (defenderUnit.hasAbility(Ability.BOMBARD)
                     && attacker != null
                     && ((Unit)attacker).getOwner().isIndian()) {
                     result.addAll(spec.getModifiers(Modifier.ARTILLERY_AGAINST_RAID));
                 }
+
                 // Automatic equipment?
                 if (defenderUnit.getAutomaticEquipment() != null
                     && defenderUnit.isInColony()

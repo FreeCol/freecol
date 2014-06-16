@@ -218,11 +218,10 @@ public class CombatTest extends FreeColTestCase {
         Iterator<Modifier> privIt = offenceModifiers.iterator();
         assertEquals(3, offenceModifiers.size());
         assertEquals(Specification.BASE_OFFENCE_SOURCE, privIt.next().getSource());
+        assertEquals(Specification.ATTACK_BONUS_SOURCE, privIt.next().getSource());
         Modifier goodsPenalty1 = privIt.next();
         assertEquals(Specification.CARGO_PENALTY_SOURCE, goodsPenalty1.getSource());
         assertEquals(-12.5f, goodsPenalty1.getValue());
-        Modifier attackPenalty2 = privIt.next();
-        assertEquals(Specification.ATTACK_BONUS_SOURCE, attackPenalty2.getSource());
 
         Goods goods2 = new Goods(game, null, lumberType, 150);
         galleon.add(goods2);
@@ -254,6 +253,7 @@ public class CombatTest extends FreeColTestCase {
         assertEquals(Specification.BASE_OFFENCE_SOURCE, privIt.next().getSource());
         Modifier newDrakeModifier = privIt.next();
         assertEquals(drakeModifier, newDrakeModifier);
+        assertEquals(Specification.ATTACK_BONUS_SOURCE, privIt.next().getSource());
         goodsPenalty1 = privIt.next();
         assertEquals(Specification.CARGO_PENALTY_SOURCE, goodsPenalty1.getSource());
         assertEquals(-12.5f, goodsPenalty1.getValue());
@@ -492,17 +492,16 @@ public class CombatTest extends FreeColTestCase {
         Tile tile1 = map.getTile(5, 8);
         Tile tile2 = map.getTile(4, 8);
 
+        Unit regular = new ServerUnit(game, tile2, refPlayer, kingsRegularType,
+                                      cavalryRole);
         Unit colonial = new ServerUnit(game, tile1, french, colonialRegularType,
                                        dragoonRole);
 
-        Unit regular = new ServerUnit(game, tile2, refPlayer, kingsRegularType,
-                                      cavalryRole);
-
-        // (regular + dragoon + horses) * attack bonus
-        float offence = (4 + 2 + 1) * 1.5f;
+        // colonist + regular + cavalry * attack bonus
+        float offence = (0 + 4 + 3) * 1.5f;
         assertEquals(offence, combatModel.getOffencePower(regular, colonial));
-        // colonial + dragoon + defence bonus
-        float defence = 3 + 1 + 1 + 1;
+        // colonist + colonial + dragoon
+        float defence = 0 + 3 + 3;
         assertEquals(defence, combatModel.getDefencePower(regular, colonial));
 
         List<CombatResult> result
@@ -511,8 +510,8 @@ public class CombatTest extends FreeColTestCase {
         assertEquals(CombatResult.LOSE_EQUIP, result.get(1));
         refPlayer.csCombat(regular, colonial, result, random, new ChangeSet());
 
-        // (regular + muskets) * attack bonus
-        offence = (4 + 2) * 1.5f;
+        // (colonist + regular + infantry) * attack bonus
+        offence = (0 + 4 + 2) * 1.5f;
         assertEquals(offence, combatModel.getOffencePower(regular, colonial));
 
         // slaughter King's Regular
