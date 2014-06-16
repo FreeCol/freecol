@@ -1170,7 +1170,8 @@ public class Game extends FreeColGameObject {
         nationOptions.toXML(xw);
 
         List<Player> players = getSortedCopy(getPlayers());
-        players.add(getUnknownEnemy());
+        Player unknown = getUnknownEnemy();
+        if (unknown != null) players.add(unknown);
         for (Player p : players) p.toXML(xw);
 
         if (map != null) map.toXML(xw);
