@@ -221,7 +221,7 @@ public class NativeAIPlayer extends AIPlayer {
 
         // Prioritize promoting partially equipped units to full dragoon
         Iterator<Unit> ui = units.iterator();
-        while (!ui.hasNext()) {
+        while (ui.hasNext()) {
             Unit u = ui.next();
             if (u.getRole() == nativeDragoon) {
                 ui.remove();
