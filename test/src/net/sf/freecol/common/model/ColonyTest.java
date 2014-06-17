@@ -24,6 +24,7 @@ import java.util.List;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.NoClaimReason;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
 
@@ -62,6 +63,9 @@ public class ColonyTest extends FreeColTestCase {
     private static final GoodsType lumberGoodsType
         = spec().getGoodsType("model.goods.lumber");
 
+    private static final Role soldierRole
+        = spec().getRole("model.role.soldier");
+
     private static final TileType arcticTileType
         = spec().getTileType("model.tile.arctic");
     private static final TileType plainsTileType
@@ -79,9 +83,6 @@ public class ColonyTest extends FreeColTestCase {
         = spec().getUnitType("model.unit.wagonTrain");
     private static final UnitType braveType
         = spec().getUnitType("model.unit.brave");
-
-    private static final EquipmentType muskets
-        = spec().getEquipmentType("model.equipment.muskets");
 
 
     public void testCurrentlyBuilding() {
@@ -466,7 +467,7 @@ public class ColonyTest extends FreeColTestCase {
         assertTrue("Enemy combat units outnumber friendly combat units.",
                    colony.isUnderSiege());
 
-        colonist.changeEquipment(muskets, 1);
+        colonist.changeRole(soldierRole);
         assertFalse("Equal number of friendly and enemy combat units.",
                     colony.isUnderSiege());
     }

@@ -19,10 +19,11 @@
 
 package net.sf.freecol.server.ai;
 
-import net.sf.freecol.common.model.EquipmentType;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -30,25 +31,33 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class StandardAIPlayerTest extends FreeColTestCase {
 
-    private static final EquipmentType horsesEqType
-        = spec().getEquipmentType("model.equipment.horses");
-    private static final EquipmentType musketsEqType
-        = spec().getEquipmentType("model.equipment.muskets");
-    private static final EquipmentType indianHorsesEqType
-        = spec().getEquipmentType("model.equipment.indian.horses");
-    private static final EquipmentType indianMusketsEqType
-        = spec().getEquipmentType("model.equipment.indian.muskets");
-
     private static final GoodsType horsesType
         = spec().getGoodsType("model.goods.horses");
     private static final GoodsType musketsType
         = spec().getGoodsType("model.goods.muskets");
+
+    private static final Role nativeDragoonRole
+        = spec().getRole("model.role.nativeDragoon");
+
+    private int horsesReqPerUnit = 0, musketsReqPerUnit = 0;
 
 
     @Override
     public void tearDown() throws Exception {
         ServerTestHelper.stopServerGame();
         super.tearDown();
+    }
+
+    private void setupNativeDragoons() {
+        for (AbstractGoods ag : nativeDragoonRole.getRequiredGoods()) {
+            if (ag.getType() == horsesType) {
+                horsesReqPerUnit = ag.getAmount();
+            } else if (ag.getType() == musketsType) {
+                musketsReqPerUnit = ag.getAmount();
+            }
+        }
+        assertFalse(horsesReqPerUnit == 0);
+        assertFalse(musketsReqPerUnit == 0);
     }
 
     public void testEquipBraves() {
@@ -61,9 +70,8 @@ public class StandardAIPlayerTest extends FreeColTestCase {
         NativeAIPlayer player = (NativeAIPlayer) aiMain.getAIPlayer(camp.getOwner());
         game.setCurrentPlayer(camp.getOwner());
 
+        setupNativeDragoons();
         int bravesToEquip = camp.getUnitCount();
-        int horsesReqPerUnit = indianHorsesEqType.getRequiredAmountOf(horsesType);
-        int musketsReqPerUnit = indianMusketsEqType.getRequiredAmountOf(musketsType);
         int totalHorsesReq = bravesToEquip * horsesReqPerUnit;
         int totalMusketsReq = bravesToEquip * musketsReqPerUnit;
         int totalHorsesAvail = totalHorsesReq*2;
@@ -76,8 +84,10 @@ public class StandardAIPlayerTest extends FreeColTestCase {
             camp.getGoodsCount(musketsType));
 
         for (Unit unit : camp.getUnitList()) {
-            if (unit.isMounted()) fail("Indian should not have mounted braves");
-            if (unit.isArmed()) fail("Indian should not have armed braves");
+            assertFalse("Indian should not have mounted braves",
+                unit.isMounted());
+            assertFalse("Indian should not have armed braves",
+                unit.isArmed());
         }
 
         // Setup
@@ -117,9 +127,8 @@ public class StandardAIPlayerTest extends FreeColTestCase {
         NativeAIPlayer player = (NativeAIPlayer) aiMain.getAIPlayer(camp.getOwner());
         game.setCurrentPlayer(camp.getOwner());
 
+        setupNativeDragoons();
         int bravesToEquip = camp.getUnitCount() - 1;
-        int horsesReqPerUnit = indianHorsesEqType.getRequiredAmountOf(horsesType);
-        int musketsReqPerUnit = indianMusketsEqType.getRequiredAmountOf(musketsType);
         int totalHorsesAvail = bravesToEquip * horsesReqPerUnit
             + horsesType.getBreedingNumber();
         int totalMusketsAvail = bravesToEquip * musketsReqPerUnit;

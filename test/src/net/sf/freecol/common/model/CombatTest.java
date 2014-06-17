@@ -40,17 +40,6 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class CombatTest extends FreeColTestCase {
 
-    private static final EquipmentType horses
-        = spec().getEquipmentType("model.equipment.horses");
-    private static final EquipmentType indianMuskets
-        = spec().getEquipmentType("model.equipment.indian.muskets");
-    private static final EquipmentType indianHorses
-        = spec().getEquipmentType("model.equipment.indian.horses");
-    private static final EquipmentType muskets
-        = spec().getEquipmentType("model.equipment.muskets");
-    private static final EquipmentType tools
-        = spec().getEquipmentType("model.equipment.tools");
-
     private static final Role armedBraveRole
         = spec().getRole("model.role.armedBrave");
     private static final Role cavalryRole
@@ -99,8 +88,6 @@ public class CombatTest extends FreeColTestCase {
         = spec().getUnitType("model.unit.privateer");
     private static final UnitType veteranType
         = spec().getUnitType("model.unit.veteranSoldier");
-
-    EquipmentType[] dragoonEquipment = new EquipmentType[] { horses, muskets };
 
 
     public void testColonistAttackedByVeteran() throws Exception {
@@ -352,12 +339,10 @@ public class CombatTest extends FreeColTestCase {
                                        nativeDragoonRole);
         Unit attacker = new ServerUnit(game, tile2, dutch, colonistType,
                                        dragoonRole);
-
-        for (EquipmentType equipment : dragoonEquipment) {
-            for (AbstractGoods goods : equipment.getRequiredGoods()) {
-                settlement.addGoods(goods);
-            }
+        for (AbstractGoods ag : nativeDragoonRole.getRequiredGoods()) {
+            settlement.addGoods(ag);
         }
+
         Set<Modifier> defenceModifiers = combatModel
             .getDefensiveModifiers(attacker, defender);
         for (Modifier modifier : nativeDragoonRole.getModifierSet(Modifier.DEFENCE)) {
@@ -554,6 +539,8 @@ public class CombatTest extends FreeColTestCase {
 
         ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
         ServerPlayer inca = (ServerPlayer)game.getPlayer("model.nation.inca");
+        dutch.setStance(inca, Player.Stance.WAR);
+        inca.setStance(dutch, Player.Stance.WAR);
 
         Tile tile1 = map.getTile(5, 8);
         tile1.setExplored(dutch, true);

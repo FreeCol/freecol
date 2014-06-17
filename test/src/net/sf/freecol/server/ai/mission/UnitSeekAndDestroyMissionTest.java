@@ -19,7 +19,6 @@
 
 package net.sf.freecol.server.ai.mission;
 
-import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player.Stance;
@@ -36,9 +35,6 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 
 public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
-
-    private static final EquipmentType muskets
-        = spec().getEquipmentType("model.equipment.muskets");
 
     private static final UnitType veteranType
         = spec().getUnitType("model.unit.veteranSoldier");

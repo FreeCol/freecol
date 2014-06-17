@@ -25,6 +25,11 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class MovementTest extends FreeColTestCase {
 
+    private static final TileImprovementType riverType
+        = spec().getTileImprovementType("model.improvement.river");
+    private static final TileImprovementType roadType
+        = spec().getTileImprovementType("model.improvement.road");
+
     private static final TileType hills
         = spec().getTileType("model.tile.hills");
     private static final TileType ocean
@@ -32,26 +37,29 @@ public class MovementTest extends FreeColTestCase {
     private static final TileType plains
         = spec().getTileType("model.tile.plains");
 
+    private static final Role armedBraveRole
+        = spec().getRole("model.role.armedBrave");
+    private static final Role dragoonRole
+        = spec().getRole("model.role.dragoon");
+    private static final Role missionaryRole
+        = spec().getRole("model.role.missionary");
+    private static final Role mountedBraveRole
+        = spec().getRole("model.role.mountedBrave");
+    private static final Role nativeDragoonRole
+        = spec().getRole("model.role.nativeDragoon");
+    private static final Role pioneerRole
+        = spec().getRole("model.role.pioneer");
+    private static final Role scoutRole
+        = spec().getRole("model.role.scout");
+    private static final Role soldierRole
+        = spec().getRole("model.role.soldier");
+
     private static final UnitType braveType
         = spec().getUnitType("model.unit.brave");
     private static final UnitType colonistType
         = spec().getUnitType("model.unit.freeColonist");
     private static final UnitType galleonType
         = spec().getUnitType("model.unit.galleon");
-
-    private static final EquipmentType horses
-        = spec().getEquipmentType("model.equipment.horses");
-    private static final EquipmentType indianHorses
-        = spec().getEquipmentType("model.equipment.indian.horses");
-    private static final EquipmentType indianMuskets
-        = spec().getEquipmentType("model.equipment.indian.muskets");
-    private static final EquipmentType muskets
-        = spec().getEquipmentType("model.equipment.muskets");
-    
-    private static final TileImprovementType riverType
-        = spec().getTileImprovementType("model.improvement.river");
-    private static final TileImprovementType roadType
-        = spec().getTileImprovementType("model.improvement.road");
 
 
     public void testMoveFromPlainsToPlains() throws Exception {
@@ -223,29 +231,29 @@ public class MovementTest extends FreeColTestCase {
         Unit colonist = new ServerUnit(game, tile2, french, colonistType);
         assertEquals(Unit.MoveType.MOVE_NO_ACCESS_SETTLEMENT,
                      colonist.getMoveType(tile1));
-        colonist.setRole(spec().getRole("model.role.pioneer"));
+        colonist.setRole(pioneerRole);
         assertEquals(Unit.MoveType.MOVE_NO_ACCESS_SETTLEMENT,
                      colonist.getMoveType(tile1));
-        colonist.setRole(spec().getRole("model.role.missionary"));
+        colonist.setRole(missionaryRole);
         assertEquals(Unit.MoveType.MOVE_NO_ACCESS_SETTLEMENT,
                      colonist.getMoveType(tile1));
-        colonist.setRole(spec().getRole("model.role.scout"));
+        colonist.setRole(scoutRole);
         assertEquals(Unit.MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT,
                      colonist.getMoveType(tile1));
-        colonist.setRole(spec().getRole("model.role.soldier"));
+        colonist.setRole(soldierRole);
         assertEquals(Unit.MoveType.ATTACK_SETTLEMENT,
                      colonist.getMoveType(tile1));
-        colonist.setRole(spec().getRole("model.role.dragoon"));
+        colonist.setRole(dragoonRole);
         assertEquals(Unit.MoveType.ATTACK_SETTLEMENT,
                      colonist.getMoveType(tile1));
 
         Unit brave = new ServerUnit(game, tile3, iroquois, braveType);
         assertEquals(Unit.MoveType.ATTACK_SETTLEMENT, brave.getMoveType(tile1));
-        brave.setRole(spec().getRole("model.role.mountedBrave"));
+        brave.setRole(mountedBraveRole);
         assertEquals(Unit.MoveType.ATTACK_SETTLEMENT, brave.getMoveType(tile1));
-        brave.setRole(spec().getRole("model.role.armedBrave"));
+        brave.setRole(armedBraveRole);
         assertEquals(Unit.MoveType.ATTACK_SETTLEMENT, brave.getMoveType(tile1));
-        brave.setRole(spec().getRole("model.role.nativeDragoon"));
+        brave.setRole(nativeDragoonRole);
         assertEquals(Unit.MoveType.ATTACK_SETTLEMENT, brave.getMoveType(tile1));
     }
 

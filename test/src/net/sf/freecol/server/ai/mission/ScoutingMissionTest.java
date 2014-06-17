@@ -40,9 +40,6 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class ScoutingMissionTest extends FreeColTestCase {
 
-    private static final EquipmentType horsesEqType
-        = spec().getEquipmentType("model.equipment.horses");
-
     private static final Role scoutRole
         = spec().getRole("model.role.scout");
 
@@ -102,7 +99,7 @@ public class ScoutingMissionTest extends FreeColTestCase {
             is, aiUnit.getMission().getTarget());
 
         // Invalidate the mission by losing the horses.
-        scout.changeEquipment(horsesEqType, -1);
+        scout.changeRole(spec().getDefaultRole());
         assertFalse("Scout should not have the scout role",
             scout.hasAbility(Ability.SPEAK_WITH_CHIEF));
         assertNotNull("Scouting mission should be invalid",
@@ -111,7 +108,7 @@ public class ScoutingMissionTest extends FreeColTestCase {
             ScoutingMission.invalidReason(aiUnit));
         
         // Restore the horses.
-        scout.changeEquipment(horsesEqType, 1);
+        scout.changeRole(scoutRole);
         assertTrue("Scouting mission should be valid again",
             aiUnit.getMission().isValid());
 

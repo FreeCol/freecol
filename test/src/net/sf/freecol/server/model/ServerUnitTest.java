@@ -52,8 +52,6 @@ public class ServerUnitTest extends FreeColTestCase {
     private static final BuildingType townHallType
         = spec().getBuildingType("model.building.townHall");
 
-    private static final EquipmentType horsesType
-        = spec().getEquipmentType("model.equipment.horses");
     private static final EquipmentType toolsType
         = spec().getEquipmentType("model.equipment.tools");
 
@@ -75,6 +73,11 @@ public class ServerUnitTest extends FreeColTestCase {
         = spec().getTileType("model.tile.savannah");
     private static final TileType savannahForest
         = spec().getTileType("model.tile.tropicalForest");
+
+    private static final Role pioneerRole
+        = spec().getRole("model.role.pioneer");
+    private static final Role scoutRole
+        = spec().getRole("model.role.scout");
 
     private static final UnitType colonistType
         = spec().getUnitType("model.unit.freeColonist");
@@ -116,13 +119,13 @@ public class ServerUnitTest extends FreeColTestCase {
 
         assertEquals(scout.getInitialMovesLeft(), scout.getMovesLeft());
         int colonistMoves = scout.getMovesLeft();
-        scout.changeEquipment(horsesType, 1);
+        scout.changeRole(scoutRole);
 
         ServerTestHelper.newTurn();
 
         assertTrue("Scout should have more moves than a colonist",
                    scout.getMovesLeft() > colonistMoves);
-        scout.changeEquipment(horsesType, -1);
+        scout.changeRole(spec().getDefaultRole());
 
         ServerTestHelper.newTurn();
 
@@ -149,7 +152,7 @@ public class ServerUnitTest extends FreeColTestCase {
         assertEquals(3, hardyPioneer.getMovesLeft());
         assertEquals(Unit.UnitState.ACTIVE, hardyPioneer.getState());
         assertEquals(-1, hardyPioneer.getWorkLeft());
-        assertEquals(100, hardyPioneer.getEquipmentCount(toolsType) * 20);
+        assertEquals(pioneerRole, hardyPioneer.getRole());
 
         //TileImprovement plowImprovement
         //    = new TileImprovement(game, plain, plow);
@@ -160,7 +163,7 @@ public class ServerUnitTest extends FreeColTestCase {
         assertEquals(0, hardyPioneer.getMovesLeft());
         assertEquals(Unit.UnitState.IMPROVING, hardyPioneer.getState());
         assertEquals(5, hardyPioneer.getWorkLeft());
-        assertEquals(100, hardyPioneer.getEquipmentCount(toolsType) * 20);
+        assertEquals(pioneerRole, hardyPioneer.getRole());
 
         // Advance to finish
         while (hardyPioneer.getWorkLeft() > 0) {
@@ -172,7 +175,7 @@ public class ServerUnitTest extends FreeColTestCase {
         assertEquals(0, hardyPioneer.getMovesLeft());
         assertEquals(Unit.UnitState.ACTIVE, hardyPioneer.getState());
         assertEquals(-1, hardyPioneer.getWorkLeft());
-        assertEquals(80, hardyPioneer.getEquipmentCount(toolsType) * 20);
+        assertEquals(pioneerRole, hardyPioneer.getRole());
     }
 
     public void testColonyProfitFromEnhancement() {

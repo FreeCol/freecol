@@ -23,7 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -36,6 +36,14 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 
 public final class SpecificationTest extends FreeColTestCase {
+
+    private static final GoodsType horsesType
+        = spec().getGoodsType("model.goods.horses");
+    private static final GoodsType musketsType
+        = spec().getGoodsType("model.goods.muskets");
+    private static final GoodsType toolsType
+        = spec().getGoodsType("model.goods.tools");
+
 
     /**
      * Make sure that a specification object can be created without an exception
@@ -170,56 +178,120 @@ public final class SpecificationTest extends FreeColTestCase {
 
     }
 
-    public void testReqAbilitiesForEquipmentTypes() {
-        String equipmentTypeStr;
-        Map<String,Boolean> abilitiesReq, expectAbilities;
-        Specification spec = spec();
+    private void checkRequiredGoods(String roleId, AbstractGoods... check) {
+        Role role = spec().getRole(roleId);
+        assertNotNull(role);
+        List<AbstractGoods> required
+            = new ArrayList<AbstractGoods>(role.getRequiredGoods());
+        for (AbstractGoods ag : check) {
+            assertTrue(roleId + " requires " + ag, required.contains(ag));
+            required.remove(ag);
+        }
+        assertTrue(roleId + " requires more goods", required.isEmpty());
+    }
+              
+    public void testRequiredAbilitiesForRoles() {
+        final Specification spec = spec();
+        Map<String, Boolean> abilitiesReq, expectAbilities;
+        Map<String, Map<String, Boolean>> roleAbilities
+            = new HashMap<String,Map<String,Boolean>>();
 
-        Map<String,Map<String,Boolean>> eqTypesAbilities = new Hashtable<String,Map<String,Boolean>>();
-
-        // Abilities
-        equipmentTypeStr = "model.equipment.horses";
-        expectAbilities = new Hashtable<String,Boolean>();
+        expectAbilities = new HashMap<String, Boolean>();
         expectAbilities.put(Ability.CAN_BE_EQUIPPED, true);
         expectAbilities.put(Ability.NATIVE, false);
-        eqTypesAbilities.put(equipmentTypeStr, expectAbilities);
+        roleAbilities.put("model.role.scout", expectAbilities);
 
-        equipmentTypeStr = "model.equipment.muskets";
-        expectAbilities = new Hashtable<String,Boolean>();
+        expectAbilities = new HashMap<String, Boolean>();
         expectAbilities.put(Ability.CAN_BE_EQUIPPED, true);
         expectAbilities.put(Ability.NATIVE, false);
-        eqTypesAbilities.put(equipmentTypeStr, expectAbilities);
+        roleAbilities.put("model.role.soldier", expectAbilities);
 
-        equipmentTypeStr = "model.equipment.indian.horses";
-        expectAbilities = new Hashtable<String,Boolean>();
+        expectAbilities = new HashMap<String, Boolean>();
         expectAbilities.put(Ability.CAN_BE_EQUIPPED, true);
-        expectAbilities.put(Ability.NATIVE, true);
-        eqTypesAbilities.put(equipmentTypeStr, expectAbilities);
+        expectAbilities.put(Ability.NATIVE, false);
+        roleAbilities.put("model.role.dragoon", expectAbilities);
 
-        equipmentTypeStr = "model.equipment.indian.muskets";
-        expectAbilities = new Hashtable<String,Boolean>();
+        expectAbilities = new HashMap<String, Boolean>();
         expectAbilities.put(Ability.CAN_BE_EQUIPPED, true);
+        expectAbilities.put(Ability.NATIVE, false);
+        roleAbilities.put("model.role.pioneer", expectAbilities);
+
+        expectAbilities = new HashMap<String, Boolean>();
+        expectAbilities.put(Ability.CAN_BE_EQUIPPED, true);
+        expectAbilities.put(Ability.NATIVE, false);
+        expectAbilities.put(Ability.DRESS_MISSIONARY, true);
+        roleAbilities.put("model.role.missionary", expectAbilities);
+
+        expectAbilities = new HashMap<String, Boolean>();
+        expectAbilities.put(Ability.CAN_BE_EQUIPPED, true);
+        expectAbilities.put(Ability.NATIVE, false);
+        expectAbilities.put(Ability.REF_UNIT, true);
+        expectAbilities.put(Ability.ROYAL_EXPEDITIONARY_FORCE, true);
+        roleAbilities.put("model.role.infantry", expectAbilities);
+
+        expectAbilities = new HashMap<String, Boolean>();
+        expectAbilities.put(Ability.CAN_BE_EQUIPPED, true);
+        expectAbilities.put(Ability.NATIVE, false);
+        expectAbilities.put(Ability.REF_UNIT, true);
+        expectAbilities.put(Ability.ROYAL_EXPEDITIONARY_FORCE, true);
+        roleAbilities.put("model.role.cavalry", expectAbilities);
+
+        expectAbilities = new HashMap<String, Boolean>();
         expectAbilities.put(Ability.NATIVE, true);
-        eqTypesAbilities.put(equipmentTypeStr, expectAbilities);
+        roleAbilities.put("model.role.mountedBrave", expectAbilities);
+
+        expectAbilities = new HashMap<String, Boolean>();
+        expectAbilities.put(Ability.NATIVE, true);
+        roleAbilities.put("model.role.armedBrave", expectAbilities);
+
+        expectAbilities = new HashMap<String, Boolean>();
+        expectAbilities.put(Ability.NATIVE, true);
+        roleAbilities.put("model.role.nativeDragoon", expectAbilities);
 
         // Verify
-        for (Entry<String, Map<String, Boolean>> entry : eqTypesAbilities.entrySet()){
-            equipmentTypeStr = entry.getKey();
+        for (Entry<String, Map<String, Boolean>> entry
+                 : roleAbilities.entrySet()) {
+            Role role = spec.getRole(entry.getKey());
+            Map<String, Boolean> required = role.getRequiredAbilities();
             expectAbilities = entry.getValue();
-
-            EquipmentType equipmentType = spec.getEquipmentType(equipmentTypeStr);
-            abilitiesReq = equipmentType.getRequiredAbilities();
-            for (Entry<String, Boolean> ability : expectAbilities.entrySet()) {
-                String key = ability.getKey();
-                boolean hasAbility = abilitiesReq.containsKey(key);
-                assertTrue(equipmentTypeStr + " missing req. ability " + key,hasAbility);
-                assertEquals(equipmentTypeStr + " has wrong value for req. ability " + key,abilitiesReq.get(key),ability.getValue());
+            for (String key : required.keySet()) {
+                Boolean req = required.get(key);
+                Boolean val = expectAbilities.get(key);
+                assertNotNull(role.getId() + " missing " + key, val);
+                assertEquals(role.getId() + " " + key + " value != " + req,
+                    req, val);
+                expectAbilities.remove(key);
             }
+            assertEquals(role.getId() + " excess abilities", 0,
+                expectAbilities.size());
         }
+
+        checkRequiredGoods("model.role.default");
+        checkRequiredGoods("model.role.scout",
+            new AbstractGoods(horsesType, 50));
+        checkRequiredGoods("model.role.soldier",
+            new AbstractGoods(musketsType, 50));
+        checkRequiredGoods("model.role.dragoon",
+            new AbstractGoods(horsesType, 50),
+            new AbstractGoods(musketsType, 50));
+        checkRequiredGoods("model.role.pioneer",
+            new AbstractGoods(toolsType, 20));
+        checkRequiredGoods("model.role.missionary");
+        checkRequiredGoods("model.role.infantry",
+            new AbstractGoods(musketsType, 50));
+        checkRequiredGoods("model.role.cavalry",
+            new AbstractGoods(horsesType, 50),
+            new AbstractGoods(musketsType, 50));
+        checkRequiredGoods("model.role.mountedBrave",
+            new AbstractGoods(horsesType, 25));
+        checkRequiredGoods("model.role.armedBrave",
+            new AbstractGoods(musketsType, 25));
+        checkRequiredGoods("model.role.nativeDragoon",
+            new AbstractGoods(horsesType, 25),
+            new AbstractGoods(musketsType, 25));
     }
 
     public void testGoodsTypes() {
-
         GoodsType food = spec().getPrimaryFoodType();
         assertTrue(food.isFarmed());
         assertTrue(spec().getFarmedGoodsTypeList().contains(food));
@@ -231,7 +303,6 @@ public final class SpecificationTest extends FreeColTestCase {
         assertTrue(spec().getFarmedGoodsTypeList().contains(fish));
         assertTrue(fish.isFoodType());
         assertTrue(spec().getFoodGoodsTypeList().contains(fish));
-
     }
 
     public void testExtends() {

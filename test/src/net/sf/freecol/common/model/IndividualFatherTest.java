@@ -43,9 +43,6 @@ public class IndividualFatherTest extends FreeColTestCase {
     private static final BuildingType townHallType
         = spec().getBuildingType("model.building.townHall");
 
-    private static final EquipmentType bibleType
-        = spec().getEquipmentType("model.equipment.missionary");
-
     private static final FoundingFather bartolomeDeLasCasas
         = spec().getFoundingFather("model.foundingFather.bartolomeDeLasCasas");
     private static final FoundingFather hernanCortes

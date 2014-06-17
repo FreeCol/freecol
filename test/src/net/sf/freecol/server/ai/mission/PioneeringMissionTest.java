@@ -23,7 +23,6 @@ import java.util.List;
 
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
@@ -46,9 +45,6 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 
 public class PioneeringMissionTest extends FreeColTestCase {
-
-    private static final EquipmentType toolsEqType
-        = spec().getEquipmentType("model.equipment.tools");
 
     private static final GoodsType toolsGoodsType
         = spec().getGoodsType("model.goods.tools");
@@ -81,8 +77,6 @@ public class PioneeringMissionTest extends FreeColTestCase {
         final AIColony aiColony = aiMain.getAIColony(colony);
         final Unit colonist = new ServerUnit(game, colony.getTile(), player,
                                              colonistType);
-        final List<EquipmentType> pioneerEquipment
-            = colonist.getRoleEquipment(pioneerRole);
         final AIUnit aiUnit = aiMain.getAIUnit(colonist);
         assertNotNull(aiUnit);
         aiUnit.abortMission("Test");
