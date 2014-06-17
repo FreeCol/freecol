@@ -431,7 +431,7 @@ public class CashInTreasureTrainMission extends Mission {
                 if (cashin) {
                     if (AIMessage.askCashInTreasureTrain(aiUnit)) {
                         logger.finest(tag + " completed cash in at "
-                            + upLoc(unit.getLocation()) + ": " + this);
+                            + getTarget() + ": " + this);
                     } else {
                         logger.warning(tag + " failed to cash in at "
                             + upLoc(unit.getLocation()) + ": " + this);
