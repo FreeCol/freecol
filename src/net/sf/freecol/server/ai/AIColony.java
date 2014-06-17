@@ -1154,15 +1154,17 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // Add materials required to build military equipment,
         // but make sure there is a unit present that can use it.
         if (isBadlyDefended()) {
-            for (EquipmentType type : spec.getEquipmentTypeList()) {
-                if (!type.isMilitaryEquipment()) continue;
-                for (Unit unit : colony.getTile().getUnitList()) {
-                    if (!unit.canBeEquippedWith(type)) continue;
-                    for (AbstractGoods ag : type.getRequiredGoods()) {
-                        required.incrementCount(ag.getType(), ag.getAmount());
-                    }
-                    break;
+            Role role = spec.getMilitaryRoles().get(0);
+            Player owner = colony.getOwner();
+            for (Unit unit : colony.getTile().getUnitList()) {
+                if (!role.isAvailableTo(owner, unit.getType())
+                    || (!unit.hasDefaultRole()
+                        && !Role.isCompatibleWith(role, unit.getRole())))
+                    continue;
+                for (AbstractGoods ag : role.getRequiredGoods()) {
+                    required.incrementCount(ag.getType(), ag.getAmount());
                 }
+                break;
             }
         }
 
