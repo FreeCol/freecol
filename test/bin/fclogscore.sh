@@ -26,6 +26,10 @@ countinlog () {
     echo -n 'Count seek+dests: '  ; grep -c 'AI seek+destroyer attacking' "$1"
     echo -n 'Count transports: '  ; grep -c 'AI transport completed' "$1"
     echo -n 'Count wishes: '      ; grep -c 'AI wisher completed' "$1"
+    echo -n 'Count Cibola: '      ; grep -c 'is exploring rumour CIBOLA' "$1"
+    echo -n 'Count fountain: '    ; grep -c 'is exploring rumour FOUNTAIN' "$1"
+    echo -n 'Count colony-fall: ' ; grep -c 'DESTROY_COLONY' "$1"
+    echo -n 'Count native-fall: ' ; grep -c 'DESTROY_SETTLEMENT' "$1"
     echo -n 'Average turn: '  
     avg=`sed -n -e 's/^.*duration = \(.*\)ms$/\1/p' "$1" | statit`
     echo "scale=3; $avg / 1000.0" | bc

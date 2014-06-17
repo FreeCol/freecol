@@ -7,7 +7,6 @@
 #   btan.sh <tag> < <fc-log-score-output>
 #
 nations="dutch english french spanish danish portuguese swedish russian"
-declare -A nat
 
 if test "x$1" = "x" ; then name=Unknown ; else name="$1" ; fi
 name=`date +%Y%m%d`-"$name"
@@ -59,16 +58,32 @@ section "Building#"
 (for r in $runs ; do eval $r ; echo $NB ;   done) | statit
 blockit
 
-section "Cashins"
-sed -n -e 's/^Count cashins: *\(.*\)$/\1/p' "$tmp" | statit
-blockit
-
 section "Colony#"
 (for r in $runs ; do eval $r ; echo $NC ;   done) | statit
 blockit
 
 section "ColonySize"
 (for r in $runs ; do eval $r ; echo $MEAN ; done) | statit
+blockit
+
+section "ColonyFalls"
+sed -n -e 's/^Count colony-fall: *\(.*\)$/\1/p' "$tmp" | statit
+blockit
+
+section "SettlementFalls"
+sed -n -e 's/^Count native-fall: *\(.*\)$/\1/p' "$tmp" | statit
+blockit
+
+section "Cibola Finds"
+sed -n -e 's/^Count Cibola: *\(.*\)$/\1/p' "$tmp" | statit
+blockit
+
+section "Fountain Finds"
+sed -n -e 's/^Count fountain: *\(.*\)$/\1/p' "$tmp" | statit
+blockit
+
+section "Cashins"
+sed -n -e 's/^Count cashins: *\(.*\)$/\1/p' "$tmp" | statit
 blockit
 
 section "Defences"
