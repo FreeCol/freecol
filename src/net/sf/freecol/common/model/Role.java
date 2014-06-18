@@ -136,6 +136,15 @@ public class Role extends BuildableType {
 
 
     /**
+     * Is this the default role?
+     *
+     * @return True if this is the default role.
+     */
+    public boolean isDefaultRole() {
+        return Specification.DEFAULT_ROLE_ID.equals(getId());
+    }
+
+    /**
      * Get a message key for this role.
      *
      * @return A message key, which is null for the default role.

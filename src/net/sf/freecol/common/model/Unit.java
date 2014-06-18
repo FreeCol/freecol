@@ -109,6 +109,12 @@ public class Unit extends GoodsLocation
     /** Current unit role. */
     protected Role role;
 
+    /**
+     * The amount of role-equipment this unit carries, subject to
+     * role.getMaximumCount().  Currently zero or one except for pioneers.
+     */
+    protected int roleCount;
+
     /** The current unit location. */
     protected Location location;
 
@@ -606,12 +612,43 @@ public class Unit extends GoodsLocation
     }
 
     /**
+     * Get the role count.
+     *
+     * @return The current role count.
+     */    
+    public int getRoleCount() {
+        return roleCount;
+    }
+
+    /**
+     * Set the role count.
+     *
+     * @param roleCount The new role count.
+     */    
+    public void setRoleCount(int roleCount) {
+        this.roleCount = roleCount;
+    }
+
+    /**
+     * Change the current role count.  On zero, revert to default role.
+     *
+     * @param delta The change to apply to the role count.
+     * @return True if the role count reached zero.
+     */
+    public boolean changeRoleCount(int delta) {
+        this.roleCount = Math.max(0, this.roleCount + delta);
+        if (this.roleCount != 0) return false;
+        this.role = getSpecification().getDefaultRole();
+        return true;
+    }
+
+    /**
      * Does this unit have the default role?
      *
      * @return True if the unit has the default <code>Role</code>.
      */
     public boolean hasDefaultRole() {
-        return Specification.DEFAULT_ROLE_ID.equals(role.getId());
+        return role.isDefaultRole();
     }
 
     /**
@@ -627,13 +664,14 @@ public class Unit extends GoodsLocation
     /**
      * Hopefully, a temporary hack.
      */
-    public void changeRole(Role role) {
+    public void changeRole(Role role, int roleCount) {
         setRole(role);
+        setRoleCount((role.isDefaultRole()) ? 0 : roleCount);
 
-        Specification spec = getSpecification();
+        final Specification spec = getSpecification();
         clearEquipment();
         for (EquipmentType et : spec.getRoleEquipment(role.getId())) {
-            equipment.incrementCount(et, 1);
+            equipment.incrementCount(et, roleCount);
         }
     }
 
@@ -702,6 +740,7 @@ public class Unit extends GoodsLocation
     public void clearRoleAndEquipment() {
         clearEquipment();
         setRole(getSpecification().getDefaultRole());
+        setRoleCount(0);
     }
 
     /**

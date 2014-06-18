@@ -574,7 +574,7 @@ public class DebugUtils {
         if (roleChoice == null) return;
 
         sUnit.clearEquipment();
-        sUnit.changeRole(roleChoice);
+        sUnit.changeRole(roleChoice, roleChoice.getMaximumCount());
         freeColClient.getConnectController().reconnect();
     }
 

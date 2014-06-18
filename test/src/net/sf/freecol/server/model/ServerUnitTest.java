@@ -119,13 +119,13 @@ public class ServerUnitTest extends FreeColTestCase {
 
         assertEquals(scout.getInitialMovesLeft(), scout.getMovesLeft());
         int colonistMoves = scout.getMovesLeft();
-        scout.changeRole(scoutRole);
+        scout.changeRole(scoutRole, 1);
 
         ServerTestHelper.newTurn();
 
         assertTrue("Scout should have more moves than a colonist",
                    scout.getMovesLeft() > colonistMoves);
-        scout.changeRole(spec().getDefaultRole());
+        scout.changeRole(spec().getDefaultRole(), 0);
 
         ServerTestHelper.newTurn();
 

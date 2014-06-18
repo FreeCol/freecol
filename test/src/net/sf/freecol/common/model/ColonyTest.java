@@ -467,7 +467,7 @@ public class ColonyTest extends FreeColTestCase {
         assertTrue("Enemy combat units outnumber friendly combat units.",
                    colony.isUnderSiege());
 
-        colonist.changeRole(soldierRole);
+        colonist.changeRole(soldierRole, 1);
         assertFalse("Equal number of friendly and enemy combat units.",
                     colony.isUnderSiege());
     }

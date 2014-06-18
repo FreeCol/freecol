@@ -2871,7 +2871,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         Role newRole = winner.canCaptureEquipment(role);
         if (newRole != null) {
             Role oldRole = winner.getRole();
-            winner.changeRole(newRole);
+            winner.changeRole(newRole, 1);
             List<AbstractGoods> newGoods
                 = Role.getGoodsDifference(oldRole, newRole);
             GoodsType goodsType = newGoods.get(0).getType();
@@ -3487,9 +3487,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         Role downgrade = role.getDowngrade();
         if (downgrade != null) {
-            loser.changeRole(downgrade);
+            loser.changeRole(downgrade, 1);
         } else {
-            loser.changeRole(spec.getDefaultRole());
+            loser.changeRole(spec.getDefaultRole(), 0);
         }
 
         // Account for possible loss of mobility due to horses going away.

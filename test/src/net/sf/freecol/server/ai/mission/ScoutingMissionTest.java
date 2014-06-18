@@ -99,7 +99,7 @@ public class ScoutingMissionTest extends FreeColTestCase {
             is, aiUnit.getMission().getTarget());
 
         // Invalidate the mission by losing the horses.
-        scout.changeRole(spec().getDefaultRole());
+        scout.changeRole(spec().getDefaultRole(), 0);
         assertFalse("Scout should not have the scout role",
             scout.hasAbility(Ability.SPEAK_WITH_CHIEF));
         assertNotNull("Scouting mission should be invalid",
@@ -108,7 +108,7 @@ public class ScoutingMissionTest extends FreeColTestCase {
             ScoutingMission.invalidReason(aiUnit));
         
         // Restore the horses.
-        scout.changeRole(scoutRole);
+        scout.changeRole(scoutRole, 1);
         assertTrue("Scouting mission should be valid again",
             aiUnit.getMission().isValid());
 
