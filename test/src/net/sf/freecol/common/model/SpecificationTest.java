@@ -178,18 +178,6 @@ public final class SpecificationTest extends FreeColTestCase {
 
     }
 
-    private void checkRequiredGoods(String roleId, AbstractGoods... check) {
-        Role role = spec().getRole(roleId);
-        assertNotNull(role);
-        List<AbstractGoods> required
-            = new ArrayList<AbstractGoods>(role.getRequiredGoods());
-        for (AbstractGoods ag : check) {
-            assertTrue(roleId + " requires " + ag, required.contains(ag));
-            required.remove(ag);
-        }
-        assertTrue(roleId + " requires more goods", required.isEmpty());
-    }
-              
     public void testRequiredAbilitiesForRoles() {
         final Specification spec = spec();
         Map<String, Boolean> abilitiesReq, expectAbilities;
@@ -266,27 +254,60 @@ public final class SpecificationTest extends FreeColTestCase {
                 expectAbilities.size());
         }
 
-        checkRequiredGoods("model.role.default");
-        checkRequiredGoods("model.role.scout",
+        Role role;
+        role = spec.getRole("model.role.default");
+        assertNotNull(role);
+        checkGoods(role.getId(), role.getRequiredGoods());
+
+        role = spec.getRole("model.role.scout");
+        assertNotNull(role);
+        checkGoods(role.getId(), role.getRequiredGoods(),
             new AbstractGoods(horsesType, 50));
-        checkRequiredGoods("model.role.soldier",
+
+        role = spec.getRole("model.role.soldier");
+        assertNotNull(role);
+        checkGoods(role.getId(), role.getRequiredGoods(),
             new AbstractGoods(musketsType, 50));
-        checkRequiredGoods("model.role.dragoon",
+
+        role = spec.getRole("model.role.dragoon");
+        assertNotNull(role);
+        checkGoods(role.getId(), role.getRequiredGoods(),
             new AbstractGoods(horsesType, 50),
             new AbstractGoods(musketsType, 50));
-        checkRequiredGoods("model.role.pioneer",
+
+        role = spec.getRole("model.role.pioneer");
+        assertNotNull(role);
+        checkGoods(role.getId(), role.getRequiredGoods(),
             new AbstractGoods(toolsType, 20));
-        checkRequiredGoods("model.role.missionary");
-        checkRequiredGoods("model.role.infantry",
+
+        role = spec.getRole("model.role.missionary");
+        assertNotNull(role);
+        checkGoods(role.getId(), role.getRequiredGoods());
+
+        role = spec.getRole("model.role.infantry");
+        assertNotNull(role);
+        checkGoods(role.getId(), role.getRequiredGoods(),
             new AbstractGoods(musketsType, 50));
-        checkRequiredGoods("model.role.cavalry",
+
+        role = spec.getRole("model.role.cavalry");
+        assertNotNull(role);
+        checkGoods(role.getId(), role.getRequiredGoods(),
             new AbstractGoods(horsesType, 50),
             new AbstractGoods(musketsType, 50));
-        checkRequiredGoods("model.role.mountedBrave",
+
+        role = spec.getRole("model.role.mountedBrave");
+        assertNotNull(role);
+        checkGoods(role.getId(), role.getRequiredGoods(),
             new AbstractGoods(horsesType, 25));
-        checkRequiredGoods("model.role.armedBrave",
+
+        role = spec.getRole("model.role.armedBrave");
+        assertNotNull(role);
+        checkGoods(role.getId(), role.getRequiredGoods(),
             new AbstractGoods(musketsType, 25));
-        checkRequiredGoods("model.role.nativeDragoon",
+
+        role = spec.getRole("model.role.nativeDragoon");
+        assertNotNull(role);
+        checkGoods(role.getId(), role.getRequiredGoods(),
             new AbstractGoods(horsesType, 25),
             new AbstractGoods(musketsType, 25));
     }

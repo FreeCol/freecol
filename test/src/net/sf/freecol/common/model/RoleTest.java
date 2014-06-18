@@ -31,6 +31,11 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class RoleTest extends FreeColTestCase {
 
+    private static final GoodsType horses
+        = spec().getGoodsType("model.goods.horses");
+    private static final GoodsType muskets
+        = spec().getGoodsType("model.goods.muskets");
+
     private static final Role none
         = spec().getDefaultRole();
     private static final Role scout
@@ -159,32 +164,30 @@ public class RoleTest extends FreeColTestCase {
 
     public void testGoodsDifference() {
         assertTrue(Role.getGoodsDifference(null, none).isEmpty());
-        assertTrue(Role.getGoodsDifference(soldier, none).isEmpty());
         assertTrue(Role.getGoodsDifference(none, none).isEmpty());
         assertTrue(Role.getGoodsDifference(none, missionary).isEmpty());
         assertTrue(Role.getGoodsDifference(missionary, none).isEmpty());
 
-        GoodsType muskets = spec().getGoodsType("model.goods.muskets");
         List<AbstractGoods> goods = Role.getGoodsDifference(none, soldier);
-        assertEquals(1, goods.size());
-        assertEquals(muskets, goods.get(0).getType());
-        assertEquals(50, goods.get(0).getAmount());
+        checkGoods("->soldier", goods,
+            new AbstractGoods(muskets, 50));
 
-        GoodsType horses = spec().getGoodsType("model.goods.horses");
         goods = Role.getGoodsDifference(soldier, dragoon);
-        assertEquals(1, goods.size());
-        assertEquals(horses, goods.get(0).getType());
-        assertEquals(50, goods.get(0).getAmount());
+        checkGoods("soldier->dragoon", goods,
+            new AbstractGoods(horses, 50));
 
         goods = Role.getGoodsDifference(missionary, dragoon);
-        assertEquals(2, goods.size());
-        assertTrue(horses == goods.get(0).getType()
-                   || muskets == goods.get(0).getType());
-        assertEquals(50, goods.get(0).getAmount());
-        assertTrue(horses == goods.get(1).getType()
-                   || muskets == goods.get(1).getType());
-        assertEquals(50, goods.get(1).getAmount());
+        checkGoods("missionary->dragoon", goods,
+            new AbstractGoods(horses, 50),
+            new AbstractGoods(muskets, 50));
 
+        goods = Role.getGoodsDifference(soldier, none);
+System.err.println("TGD");soldier.dumpCollection(goods);
+        checkGoods("soldier->", goods,
+            new AbstractGoods(muskets, -50));
+
+        goods = Role.getGoodsDifference(nativeDragoon, armedBrave);
+        checkGoods("nativeDragoon->armedBrave", goods,
+            new AbstractGoods(horses, -25));
     }
-
 }

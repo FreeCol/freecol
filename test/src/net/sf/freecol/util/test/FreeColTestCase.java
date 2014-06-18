@@ -31,6 +31,7 @@ import java.util.Set;
 import junit.framework.TestCase;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.io.FreeColTcFile;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.CombatModel.CombatOdds;
@@ -684,4 +685,21 @@ public class FreeColTestCase extends TestCase {
         }
         fail(err);
     }               
+
+    /**
+     * Check a list of goods.
+     *
+     * @param err A base string for the error message.
+     * @param goods A list of expected <code>AbstractGoods</code> to check.
+     * @param results The expected <code>AbstractGoods</code>.
+     */
+    public void checkGoods(String err, List<AbstractGoods> goods,
+                           AbstractGoods... results) {
+        List<AbstractGoods> check = new ArrayList<AbstractGoods>(goods);
+        for (AbstractGoods ag : results) {
+            assertTrue(err + " requires " + ag, check.contains(ag));
+            check.remove(ag);
+        }
+        assertTrue(err + " requires more goods", check.isEmpty());
+    }
 }

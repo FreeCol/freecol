@@ -317,18 +317,11 @@ public class Role extends BuildableType {
     }
 
     /**
-     * Get the goods that become available when the unit is downgraded.
-     *
-     * @return A list of <code>AbstractGoods</code>.
-     */
-    public List<AbstractGoods> getDowngradeGoods() {
-        return getGoodsDifference(this, downgrade);
-    }
-
-    /**
-     * Gets a list of goods required to change from the first role
-     * to the second.  The first role may be <code>null</code>, the
-     * second must not.
+     * Gets a list of goods required to change from the first role to
+     * the second.  The first role may be <code>null</code> implying
+     * the default role, the second must not.  Note that excess goods
+     * that are left over after the change will appear on the list
+     * with negative amounts.
      *
      * @param from The current <code>Role</code>.
      * @param to The <code>Role</code> to assume.
@@ -343,9 +336,13 @@ public class Role extends BuildableType {
             for (AbstractGoods ag : to.getRequiredGoods()) {
                 int amount = ag.getAmount()
                     - from.getRequiredAmountOf(ag.getType());
-                if (amount > 0) {
+                if (amount != 0) {
                     result.add(new AbstractGoods(ag.getType(), amount));
                 }
+            }
+            for (AbstractGoods ag : from.getRequiredGoods()) {
+                if (to.getRequiredAmountOf(ag.getType()) != 0) continue;
+                result.add(new AbstractGoods(ag.getType(), -ag.getAmount()));
             }
         }
         return result;
