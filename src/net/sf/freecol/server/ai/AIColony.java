@@ -467,6 +467,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     private void resetExports() {
         final Specification spec = getSpecification();
+        final Player player = colony.getOwner();
+
         if (fullExport.isEmpty()) {
             // Initialize the exportable sets.
             // Luxury goods, non-raw materials (silver), and raw
@@ -487,11 +489,13 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                     }
                 }
             }
-            for (EquipmentType e : spec.getEquipmentTypeList()) {
-                for (AbstractGoods ag : e.getRequiredGoods()) {
-                    if (fullExport.contains(ag.getType())) {
-                        fullExport.remove(ag.getType());
-                        partExport.add(ag.getType());
+            for (Role role : spec.getRoles()) {
+                if (role.isAvailableTo(player, spec.getDefaultUnitType())) {
+                    for (AbstractGoods ag : role.getRequiredGoods()) {
+                        if (fullExport.contains(ag.getType())) {
+                            fullExport.remove(ag.getType());
+                            partExport.add(ag.getType());
+                        }
                     }
                 }
             }
