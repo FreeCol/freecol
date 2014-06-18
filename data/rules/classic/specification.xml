@@ -894,7 +894,6 @@
           expertUnit="model.unit.veteranSoldier">
       <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-ability id="model.ability.native" value="false"/>
-      <required-ability id="model.ability.refUnit" value="false"/>
       <required-goods id="model.goods.muskets" value="50"/>
       <required-goods id="model.goods.horses" value="50"/>
 
