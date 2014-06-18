@@ -511,9 +511,10 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      *
      * @param unit The <code>Unit</code> to equip.
      * @param role The <code>Role</code> to build for.
+     * @param roleCount The role count.
      * @return True if the equipping succeeded.
      */
-    public boolean equipForRole(Unit unit, Role role) {
+    public boolean equipForRole(Unit unit, Role role, int roleCount) {
         return false;
     }
 

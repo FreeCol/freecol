@@ -491,11 +491,13 @@ public class AIMessage {
      *
      * @param aiUnit The <code>AIUnit</code> to equip.
      * @param role The <code>Role</code> to equip for.
+     * @param roleCount The role count.
      * @return True if the message was sent, and a non-error reply returned.
      */
-    public static boolean askEquipForRole(AIUnit aiUnit, Role role) {
+    public static boolean askEquipForRole(AIUnit aiUnit, Role role,
+                                          int roleCount) {
         return sendMessage(aiUnit.getAIOwner().getConnection(),
-                           new EquipForRoleMessage(aiUnit.getUnit(), role));
+            new EquipForRoleMessage(aiUnit.getUnit(), role, roleCount));
     }
 
 
@@ -660,8 +662,7 @@ public class AIMessage {
                 && u.getRole() == su.getRole()) continue;
             message.addChange(u,
                 (Location)colony.getCorresponding((FreeColObject)su.getLocation()),
-                su.getWorkType(),
-                su.getRole());
+                su.getWorkType(), su.getRole(), su.getRoleCount());
         }
         return (message.isEmpty()) ? false
             : sendMessage(aiColony.getAIOwner().getConnection(), message);

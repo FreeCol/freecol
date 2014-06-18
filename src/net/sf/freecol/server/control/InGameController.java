@@ -2860,7 +2860,7 @@ public final class InGameController extends Controller {
 
             // Remove equipment from founder in case role confuses
             // placement.
-            settlement.equipForRole(unit, spec.getDefaultRole());
+            settlement.equipForRole(unit, spec.getDefaultRole(), 0);
 
             // Coronado
             for (ServerPlayer sp : getOtherPlayers(serverPlayer)) {
@@ -2935,7 +2935,7 @@ public final class InGameController extends Controller {
         tile.cacheUnseen();//+til
         unit.setLocation(colony);//-vis: safe/colony,-til
         unit.setMovesLeft(0);
-        colony.equipForRole(unit, spec.getDefaultRole());
+        colony.equipForRole(unit, spec.getDefaultRole(), 0);
 
         // Update with colony tile, and tiles now owned.
         cs.add(See.only(serverPlayer), tile);
@@ -3455,7 +3455,7 @@ public final class InGameController extends Controller {
             }
         }
 
-        colony.equipForRole(unit, spec.getDefaultRole());
+        colony.equipForRole(unit, spec.getDefaultRole(), 0);
 
         // Check for upgrade.
         UnitType oldType = unit.getType();
@@ -3712,18 +3712,19 @@ public final class InGameController extends Controller {
      * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
      * @param unit The <code>Unit</code> to equip.
      * @param role The <code>Role</code> to equip for.
+     * @param roleCount The role count.
      * @return An <code>Element</code> encapsulating this action.
      */
     public Element equipForRole(ServerPlayer serverPlayer, Unit unit,
-                                Role role) {
+                                Role role, int roleCount) {
         UnitLocation loc = (unit.isInEurope()) ? serverPlayer.getEurope()
             : unit.getSettlement();
         if (loc == null) {
             return DOMMessage.clientError("Unsuitable equip location for: "
                 + unit.getId());
-        } else if (!loc.equipForRole(unit, role)) {
+        } else if (!loc.equipForRole(unit, role, roleCount)) {
             return DOMMessage.clientError("Can not build " + role.getId()
-                + " equipment at " + loc + " for: " + unit.getId());
+                + "." + roleCount + " at " + loc + " for: " + unit.getId());
         }
 
         ChangeSet cs = new ChangeSet();
@@ -4351,7 +4352,7 @@ public final class InGameController extends Controller {
         for (UnitChange uc : unitChanges) {
             uc.unit.setLocation(tile);//-til
             if (!uc.unit.hasDefaultRole()) {
-                colony.equipForRole(uc.unit, defaultRole);
+                colony.equipForRole(uc.unit, defaultRole, 0);
             }
         }
 
@@ -4392,10 +4393,11 @@ public final class InGameController extends Controller {
             Collections.reverse(unitChanges);
             for (UnitChange uc : unitChanges) {
                 if (uc.role != defaultRole) {
-                    if (!colony.equipForRole(uc.unit, uc.role)) {
+                    if (!colony.equipForRole(uc.unit, uc.role, uc.roleCount)) {
                         // Should not happen if we equip simplest first
                         return DOMMessage.clientError("Failed to equip "
-                            + uc.unit.getId() + " for role " + uc.role);
+                            + uc.unit.getId() + " for role " + uc.role
+                            + " at " + colony);
                     }
                 }
             }

@@ -345,10 +345,9 @@ public class Europe extends UnitLocation implements Ownable, Named {
      * {@inheritDoc}
      */
     @Override
-    public boolean equipForRole(Unit unit, Role role) {
+    public boolean equipForRole(Unit unit, Role role, int roleCount) {
         throw new RuntimeException("Only valid in the server.");
     }
-
 
 
     // Interface Named

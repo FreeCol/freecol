@@ -672,7 +672,10 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Hopefully, a temporary hack.
+     * Change the current role of this unit.
+     *
+     * @param role The new <code>Role</code>.
+     * @param roleCount The new role count.
      */
     public void changeRole(Role role, int roleCount) {
         final Specification spec = getSpecification();
@@ -1640,7 +1643,7 @@ public class Unit extends GoodsLocation
         return (hasAbility(Ability.CAPTURE_EQUIPMENT)
             && (newRole = getSpecification().getRoleChange(getRole(), role))
                 != null
-            && newRole.isAvailableTo(getOwner(), getType())) 
+            && roleIsAvailable(newRole))
             ? newRole
             : null;
     }

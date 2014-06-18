@@ -73,57 +73,37 @@ public class ServerEurope extends Europe implements ServerModelObject {
      * {@inheritDoc}
      */
     @Override
-    public boolean equipForRole(Unit unit, Role role) {
-        if (!unit.isPerson()) return false;
-        int price = priceGoods(unit.getGoodsDifference(role, 1));
+    public boolean equipForRole(Unit unit, Role role, int roleCount) {
+        if (!unit.roleIsAvailable(role)) return false;
+
+        // Get the change in goods
+        List<AbstractGoods> required = unit.getGoodsDifference(role, roleCount);
+
+        // Check the pricing
+        int price = priceGoods(required);
         if (price < 0 || !unit.getOwner().checkGold(price)) return false;
 
-        // Get the equipment changes.
+        // Sell any excess
         final ServerPlayer owner = (ServerPlayer)getOwner();
-        TypeCountMap<EquipmentType> change
-            = unit.getEquipmentChangeForRole(role);
-
-        // Sell what is no longer needed.
-        for (Entry<EquipmentType, Integer> entry
-                 : change.getValues().entrySet()) {
-            EquipmentType et = entry.getKey();
-            int count = entry.getValue().intValue();
-            if (count < 0) {
-                unit.changeEquipment(et, count);
-                for (AbstractGoods ag : et.getRequiredGoods()) {
-                    if (owner.canTrade(ag.getType(), Market.Access.EUROPE)) {
-                        int rm = owner.sell(null, ag.getType(),
-                                            ag.getAmount() * count);
-                        if (rm > 0) {
-                            owner.addExtraTrade(new AbstractGoods(ag.getType(), rm));
-                        }
-                    }
+        for (AbstractGoods ag : required) {
+            if (ag.getAmount() >= 0) continue;
+            if (owner.canTrade(ag.getType(), Market.Access.EUROPE)) {
+                int rm = owner.sell(null, ag.getType(), -ag.getAmount());
+                if (rm > 0) {
+                    owner.addExtraTrade(new AbstractGoods(ag.getType(), rm));
                 }
             }
         }
-
-        // Buy what is needed.  The canBuildRoleEquipment
-        // test above should guarantee this will succeed.
-        for (Entry<EquipmentType, Integer> entry
-                 : change.getValues().entrySet()) {
-            EquipmentType et = entry.getKey();
-            int count = entry.getValue().intValue();
-            if (count > 0) {
-                unit.changeEquipment(et, count);
-                for (AbstractGoods ag : et.getRequiredGoods()) {
-                    if (owner.canTrade(ag.getType(), Market.Access.EUROPE)) {
-                        int m = owner.buy(null, ag.getType(),
-                                          ag.getAmount() * count);
-                        if (m > 0) {
-                            owner.addExtraTrade(new AbstractGoods(ag.getType(), -m));
-                        }
-                    }
-                }
+        // Buy what is needed
+        for (AbstractGoods ag : required) {
+            int m = owner.buy(null, ag.getType(), ag.getAmount());
+            if (m > 0) {
+                owner.addExtraTrade(new AbstractGoods(ag.getType(), -m));
             }
         }
 
-        unit.setRole();
-        return unit.getRole() == role;
+        unit.changeRole(role, roleCount);
+        return true;
     }
 
     /**

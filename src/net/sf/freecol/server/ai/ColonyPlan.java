@@ -1207,9 +1207,9 @@ public class ColonyPlan {
     private static boolean fullEquipUnit(Specification spec, Unit unit,
                                          Role role, Colony colony) {
         return ("model.role.soldier".equals(role.getId()))
-            ? colony.equipForRole(unit, spec.getRole("model.role.dragoon"))
-                || colony.equipForRole(unit, spec.getRole("model.role.soldier"))
-            : colony.equipForRole(unit, role);
+            ? colony.equipForRole(unit, spec.getRole("model.role.dragoon"), 1)
+            || colony.equipForRole(unit, spec.getRole("model.role.soldier"), 1)
+            : colony.equipForRole(unit, role, 1);
     }
 
     /**
@@ -1250,7 +1250,7 @@ public class ColonyPlan {
         // or active pioneers should be on the worker list.
         for (Unit u : workers) {
             u.setLocation(tile);
-            col.equipForRole(u, spec().getDefaultRole());
+            col.equipForRole(u, spec().getDefaultRole(), 0);
         }
 
         // Move outdoor experts outside if possible.

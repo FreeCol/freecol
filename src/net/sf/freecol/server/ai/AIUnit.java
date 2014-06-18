@@ -19,6 +19,7 @@
 
 package net.sf.freecol.server.ai;
 
+import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -347,18 +348,27 @@ public class AIUnit extends AIObject implements Transportable {
         final Specification spec = getSpecification();
         Role r = spec.getRole(roleId);
         final Player player = unit.getOwner();
-        UnitLocation loc = (unit.isInEurope()) ? player.getEurope()
-            : unit.getSettlement();
-        if (loc == null) return false;
-        int price = loc.priceGoods(getUnit().getGoodsDifference(r, 1));
-        if (price < 0) return false;
-        if (!player.checkGold(price)) {
-            if (!cheat) return false;
-            player.logCheat("minted " + price + " gold to equip " + unit
-                + " for " + r);
-            player.modifyGold(price);
+        Location loc = upLoc(unit.getLocation());
+        if (!(loc instanceof UnitLocation)) return false;
+        int count = r.getMaximumCount();
+        if (count > 0) {
+            for (; count > 0; count--) {
+                List<AbstractGoods> req = unit.getGoodsDifference(r, count);
+                int price = ((UnitLocation)loc).priceGoods(req);
+                if (price < 0) continue;
+                if (player.checkGold(price)) break;
+                if (cheat) {
+                    player.logCheat("minted " + price
+                        + " gold to equip " + unit
+                        + " for " + r + "." + count);
+                    player.modifyGold(price);
+                    break;
+                }
+            }
+            if (count <= 0) return false;
         }
-        return AIMessage.askEquipForRole(this, r) && unit.getRole() == r;
+        return AIMessage.askEquipForRole(this, r, count)
+            && unit.getRole() == r && unit.getRoleCount() == count;
     }
 
     /**

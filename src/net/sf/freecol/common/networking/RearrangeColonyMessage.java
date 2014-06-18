@@ -50,26 +50,36 @@ public class RearrangeColonyMessage extends DOMMessage {
         public Location loc;
         public GoodsType work;
         public Role role;
+        public int roleCount;
 
         public UnitChange() {} // deliberately empty
 
-        public UnitChange(Unit unit, Location loc, GoodsType work, Role role) {
+        public UnitChange(Unit unit, Location loc, GoodsType work,
+                          Role role, int roleCount) {
             this.unit = unit;
             this.loc = loc;
             this.work = work;
             this.role = role;
+            this.roleCount = roleCount;
         }
 
-        public UnitChange(Game game, String unitId, String locId, String workId, String roleId) {
-            init(game, unitId, locId, workId, roleId);
+        public UnitChange(Game game, String unitId, String locId, String workId,
+                          String roleId, String roleCount) {
+            init(game, unitId, locId, workId, roleId, roleCount);
         }
 
-        public void init(Game game, String unitId, String locId, String workId, String roleId) {
+        public void init(Game game, String unitId, String locId, String workId,
+                         String roleId, String roleCount) {
             this.unit = game.getFreeColGameObject(unitId, Unit.class);
             this.loc = game.findFreeColLocation(locId);
             this.work = (workId == null || "".equals(workId)) ? null
                 : game.getSpecification().getGoodsType(workId);
             this.role = game.getSpecification().getRole(roleId);
+            try {
+                this.roleCount = Integer.parseInt(roleCount);
+            } catch (NumberFormatException nfe) {
+                this.roleCount = 0;
+            }
         }
 
         public void writeToElement(Element e, int i) {
@@ -79,6 +89,7 @@ public class RearrangeColonyMessage extends DOMMessage {
                 e.setAttribute(workKey(i), this.work.getId());
             }
             e.setAttribute(roleKey(i), this.role.toString());
+            e.setAttribute(roleCountKey(i), String.valueOf(this.roleCount));
         }
 
         public UnitChange readFromElement(Game game, Element e, int i) {
@@ -86,7 +97,8 @@ public class RearrangeColonyMessage extends DOMMessage {
                 e.getAttribute(unitKey(i)),
                 e.getAttribute(locKey(i)),
                 e.getAttribute(workKey(i)),
-                e.getAttribute(roleKey(i)));
+                e.getAttribute(roleKey(i)),
+                e.getAttribute(roleCountKey(i)));
             return this;
         }
 
@@ -106,9 +118,13 @@ public class RearrangeColonyMessage extends DOMMessage {
             return "x" + i + "role";
         }
 
+        public String roleCountKey(int i) {
+            return "x" + i + "count";
+        }
+
         public String toString() {
             return "[UnitChange " + unit.getId() + " at " + loc.getId()
-                + " " + role.getRoleSuffix()
+                + " " + role.getRoleSuffix() + "." + roleCount
                 + ((work == null) ? "" : " work " + work.getId()) + "]";
         }
     }
@@ -117,7 +133,9 @@ public class RearrangeColonyMessage extends DOMMessage {
     public static final Comparator<UnitChange> roleComparator
         = new Comparator<UnitChange>() {
             public int compare(UnitChange uc1, UnitChange uc2) {
-                return uc1.role.compareTo(uc2.role);
+                int cmp = uc1.role.compareTo(uc2.role);
+                if (cmp == 0) cmp = uc1.roleCount - uc2.roleCount;
+                return cmp;
             }
         };
 
@@ -183,11 +201,12 @@ public class RearrangeColonyMessage extends DOMMessage {
      * @param loc The destination <code>Location</code> for the unit.
      * @param work The <code>GoodsType</code> to produce (may be null).
      * @param role The unit <code>Role</code>.
+     * @param roleCount The role count.
      */
-    public void addChange(Unit unit, Location loc, GoodsType work, Role role) {
-        unitChanges.add(new UnitChange(unit, loc, work, role));
+    public void addChange(Unit unit, Location loc, GoodsType work,
+                          Role role, int roleCount) {
+        unitChanges.add(new UnitChange(unit, loc, work, role, roleCount));
     }
-
 
     /**
      * Handle a "rearrangeColony"-message.
@@ -223,6 +242,9 @@ public class RearrangeColonyMessage extends DOMMessage {
             }
             if (uc.role == null) {
                 return DOMMessage.clientError("Invalid role " + i);
+            }
+            if (uc.roleCount < 0) {
+                return DOMMessage.clientError("Invalid role count " + i);
             }
         }
 

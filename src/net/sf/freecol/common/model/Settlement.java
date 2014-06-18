@@ -579,48 +579,22 @@ public abstract class Settlement extends GoodsLocation
      * {@inheritDoc}
      */
     @Override
-    public boolean equipForRole(Unit unit, Role role) {
-        if (!getGame().isInServer()) {
-            throw new RuntimeException("Must be in server");
-        }
-        if (!unit.isPerson()) return false;
-        int price = priceGoods(unit.getGoodsDifference(role, 1));
-        if (price < 0 || !owner.checkGold(price)) return false;
+    public boolean equipForRole(Unit unit, Role role, int roleCount) {
+        if (!unit.roleIsAvailable(role)) return false;
 
-        // Get the equipment changes.
-        TypeCountMap<EquipmentType> change
-            = unit.getEquipmentChangeForRole(role);
+        // Get the change in goods
+        List<AbstractGoods> required = unit.getGoodsDifference(role, roleCount);
 
-        // First drop all non-required equipment, this should succeed.
-        for (Entry<EquipmentType, Integer> entry
-                 : change.getValues().entrySet()) {
-            EquipmentType et = entry.getKey();
-            int count = entry.getValue().intValue();
-            if (count < 0) {
-                unit.changeEquipment(et, count);
-                if (!addEquipment(et, -count)) {
-                    throw new RuntimeException("equipForRole drop failure"
-                        + " for " + unit + " / " + role + " at " + this);
-                }
-            }
-        }
-        // Then collect all required equipment.  The canBuildRoleEquipment
-        // test above should guarantee this will succeed.
-        for (Entry<EquipmentType, Integer> entry
-                 : change.getValues().entrySet()) {
-            EquipmentType et = entry.getKey();
-            int count = entry.getValue().intValue();
-            if (count > 0) {
-                unit.changeEquipment(et, count);
-                if (!addEquipment(et, -count)) {
-                    throw new RuntimeException("equipForRole take failure"
-                        + " for " + unit + " / " + role + " at " + this);
-                }
-            }
+        // Check if the required goods are available
+        if (priceGoods(required) < 0) return false;
+
+        // Make the change
+        for (AbstractGoods ag : required) {
+            addGoods(ag.getType(), -ag.getAmount());
         }
 
-        unit.setRole();
-        return unit.getRole() == role;
+        unit.changeRole(role, roleCount);
+        return true;
     }
 
 

@@ -39,6 +39,9 @@ public class EquipForRoleMessage extends DOMMessage {
     /** The Role identifier. */
     private String roleId;
 
+    /** The role count. */
+    private String roleCount;
+
 
     /**
      * Create a new <code>EquipForRoleMessage</code> for the supplied
@@ -46,12 +49,14 @@ public class EquipForRoleMessage extends DOMMessage {
      *
      * @param unit The <code>Unit</code> to equip.
      * @param role The <code>Role</code> to equip for.
+     * @param roleCount The role count.
      */
-    public EquipForRoleMessage(Unit unit, Role role) {
+    public EquipForRoleMessage(Unit unit, Role role, int roleCount) {
         super(getXMLElementTagName());
 
         this.unitId = unit.getId();
         this.roleId = role.getId();
+        this.roleCount = String.valueOf(roleCount);
     }
 
     /**
@@ -65,6 +70,7 @@ public class EquipForRoleMessage extends DOMMessage {
 
         this.unitId = element.getAttribute("unit");
         this.roleId = element.getAttribute("role");
+        this.roleCount = element.getAttribute("count");
     }
 
 
@@ -102,10 +108,20 @@ public class EquipForRoleMessage extends DOMMessage {
         if (role == null) {
             return DOMMessage.clientError("Not a role: " + roleId);
         }
+        int count;
+        try {
+            count = Integer.parseInt(roleCount);
+        } catch (NumberFormatException nfe) {
+            return DOMMessage.clientError("Role count is not an integer: " +
+                roleCount);
+        }
+        if (count < 0 || count > role.getMaximumCount()) {
+            return DOMMessage.clientError("Invalid role count: " + roleCount);
+        }
 
         // Proceed to equip.
         return server.getInGameController()
-            .equipForRole(serverPlayer, unit, role); 
+            .equipForRole(serverPlayer, unit, role, count); 
     }
 
     /**
@@ -116,7 +132,8 @@ public class EquipForRoleMessage extends DOMMessage {
     public Element toXMLElement() {
         return createMessage(getXMLElementTagName(),
             "unit", unitId,
-            "role", roleId);
+            "role", roleId,
+            "count", roleCount);
     }
 
     /**
