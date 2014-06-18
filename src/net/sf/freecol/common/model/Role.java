@@ -63,6 +63,45 @@ public class Role extends BuildableType {
     };
 
     /**
+     * A comparator to order roles by descending total military
+     * effectiveness.
+     */
+    public static final Comparator<Role> militaryComparator
+        = new Comparator<Role>() {
+            public int compare(Role role1, Role role2) {
+                float amount1 = role1.getOffence() + role1.getDefence();
+                float amount2 = role2.getOffence() + role2.getDefence();
+                return (amount1 > amount2) ? 1
+                    : (amount1 < amount2) ? -1
+                    : 0;
+            }
+        };
+
+    /** A comparator to sort roles by descending defensive power. */
+    public static final Comparator<Role> defensiveComparator
+        = new Comparator<Role>() {
+            public int compare(Role role1, Role role2) {
+                float defence1 = role1.getDefence();
+                float defence2 = role2.getDefence();
+                return (defence1 > defence2) ? 1
+                    : (defence1 < defence2) ? -1
+                    : 0;
+            }
+        };
+
+    /** A comparator to sort roles by descending offensive power. */
+    public static final Comparator<Role> offensiveComparator
+        = new Comparator<Role>() {
+            public int compare(Role role1, Role role2) {
+                float offence1 = role1.getOffence();
+                float offence2 = role2.getOffence();
+                return (offence1 > offence2) ? 1
+                    : (offence1 < offence2) ? -1
+                    : 0;
+            }
+        };
+
+    /**
      * The Role to downgrade to after losing a battle. Defaults to
      * <code>null</code>. Note that some UnitTypes and Roles may be
      * disposed instead of downgraded when losing a battle.
@@ -83,31 +122,6 @@ public class Role extends BuildableType {
 
     /** The role changes by capture available for this role. */
     private List<RoleChange> roleChanges = null;
-
-
-    /** Sorts roles by descending defensive power. */
-    public static final Comparator<Role> defensiveComparator
-        = new Comparator<Role>() {
-            public int compare(Role role1, Role role2) {
-                float defence1 = role1.getDefence();
-                float defence2 = role2.getDefence();
-                return (defence1 > defence2) ? 1
-                    : (defence1 < defence2) ? -1
-                    : 0;
-            }
-        };
-
-    /** Sorts roles by descending offensive power. */
-    public static final Comparator<Role> offensiveComparator
-        = new Comparator<Role>() {
-            public int compare(Role role1, Role role2) {
-                float offence1 = role1.getOffence();
-                float offence2 = role2.getOffence();
-                return (offence1 > offence2) ? 1
-                    : (offence1 < offence2) ? -1
-                    : 0;
-            }
-        };
 
 
     /**

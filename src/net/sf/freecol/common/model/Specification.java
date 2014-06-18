@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -248,6 +249,8 @@ public final class Specification {
     private final Map<String, List<Ability>> allAbilities
         = new HashMap<String, List<Ability>>();
 
+    /** A cache of the military roles in decreasing order.  Do not serialize. */
+    private List<Role> militaryRoles = null;
 
     private boolean initialized = false;
 
@@ -1378,6 +1381,32 @@ public final class Specification {
     }
 
     /**
+     * Get the default role.
+     *
+     * @return The default <code>Role</code>.
+     */
+    public Role getDefaultRole() {
+        return getRole(DEFAULT_ROLE_ID);
+    }
+
+    /**
+     * Get the military roles in this specification, in decreasing order
+     * of effectiveness.
+     *
+     * @return A list of military <code>Role</code>s.
+     */
+    public List<Role> getMilitaryRoles() {
+        if (militaryRoles == null) {
+            militaryRoles = new ArrayList<Role>();
+            for (Role role : roles) {
+                if (role.isOffensive()) militaryRoles.add(role);
+            }
+            Collections.sort(militaryRoles, Role.militaryComparator);
+        }
+        return militaryRoles;
+    }
+
+    /**
      * Get any possible role change when a unit with a given role captures
      * the role/equipment of another unit.
      *
@@ -1431,15 +1460,6 @@ public final class Specification {
             }
         }
         return result;
-    }
-
-    /**
-     * Get the default role.
-     *
-     * @return The default <code>Role</code>.
-     */
-    public Role getDefaultRole() {
-        return getRole(DEFAULT_ROLE_ID);
     }
 
 
