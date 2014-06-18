@@ -3156,8 +3156,8 @@ public class Player extends FreeColGameObject implements Nameable {
         }
         price *= spec.getInteger(GameOptions.LAND_PRICE_FACTOR);
         price += 100;
-        return (int) applyModifier(price, Modifier.LAND_PAYMENT_MODIFIER,
-                                   null, getGame().getTurn());
+        return (int)applyModifier(price, Modifier.LAND_PAYMENT_MODIFIER,
+                                  null, getGame().getTurn());
     }
 
 

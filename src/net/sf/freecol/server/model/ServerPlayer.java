@@ -3879,14 +3879,14 @@ public class ServerPlayer extends Player implements ServerModelObject {
             market.setArrears(goodsType, arrears);
 
             Turn turn = getGame().getTurn();
-            List<Modifier> modifiers
-                = spec.getModifiers(Modifier.COLONY_GOODS_PARTY);
-            Modifier template = modifiers.get(0);
-            Modifier modifier = Modifier.makeTimedModifier("model.goods.bells",
-                                                           template, turn);
-            cs.addFeatureChange(this, colony, modifier, true);
-            cs.add(See.only(this), colony.getGoodsContainer());
-            cs.add(See.only(this), market.getMarketData(goodsType));
+            for (Modifier modifier
+                     : spec.getModifiers(Modifier.COLONY_GOODS_PARTY)) {
+                Modifier m = Modifier.makeTimedModifier("model.goods.bells",
+                                                        modifier, turn);
+                cs.addFeatureChange(this, colony, m, true);
+                cs.add(See.only(this), colony.getGoodsContainer());
+                cs.add(See.only(this), market.getMarketData(goodsType));
+            }
 
             String messageId = goodsType.getId() + ".destroyed";
             if (!Messages.containsKey(messageId)) {
