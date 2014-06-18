@@ -358,7 +358,7 @@ public final class Ability extends Feature {
         = "model.ability.repairUnits";
 
     /** A national ability required to generate a REF. */
-    public static final String ROYAL_EXPEDITIIONARY_FORCE
+    public static final String ROYAL_EXPEDITIONARY_FORCE
         = "model.ability.royalExpeditionaryForce";
 
     /** LCRs always yield positive results (deSoto). */
