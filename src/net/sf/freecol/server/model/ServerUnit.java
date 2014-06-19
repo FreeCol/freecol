@@ -129,8 +129,10 @@ public class ServerUnit extends Unit implements ServerModelObject {
      * @param template A <code>Unit</code> to copy from.
      */
     public ServerUnit(Game game, Location location, Unit template) {
-        this(game, location, game.getPlayer(template.getOwner().getNationId()),
-            game.getSpecification().getUnitType(template.getType().getId()));
+        this(game, location,
+            game.getPlayer(template.getOwner().getNationId()),
+            game.getSpecification().getUnitType(template.getType().getId()),
+            game.getSpecification().getDefaultRole());
 
         final Specification spec = getSpecification();
         setNationality(template.getNationality());
@@ -139,7 +141,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
         workType = spec.getGoodsType(template.getWorkType().getId());
         movesLeft = template.getMovesLeft();
         hitPoints = template.getType().getHitPoints();
-        initializeRoleEquipment(spec.getRole(template.getRole().getId()));
+        changeRole(spec.getRole(template.getRole().getId()),
+                   template.getRoleCount());
         setStateUnchecked(template.getState());
         if (getType().canCarryGoods()) {
             setGoodsContainer(new GoodsContainer(game, this));
@@ -198,7 +201,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         this.equipment.clear();
 
         // Fix up role, state and location now other values are present.
-        initializeRoleEquipment(role);
+        changeRole(role, role.getMaximumCount());
         setStateUnchecked(state);
         setLocation(location);//-vis(owner),-til
         if (getType().canCarryGoods()) {
@@ -206,23 +209,6 @@ public class ServerUnit extends Unit implements ServerModelObject {
         }
 
         owner.addUnit(this);
-    }
-
-    /**
-     * Set the equipment present based on a specified role.
-     *
-     * @param role The <code>Role</code> that defines the equipment to use.
-     */
-    private void initializeRoleEquipment(Role role) {
-        final Specification spec = getSpecification();
-        for (EquipmentType et : spec.getRoleEquipment(role.getId(), true)) {
-            if (EquipmentType.NO_EQUIPMENT.equals(et)) {
-                this.equipment.clear();
-                break;
-            }
-            this.equipment.incrementCount(et, 1);
-        }
-        setRole();
     }
 
 

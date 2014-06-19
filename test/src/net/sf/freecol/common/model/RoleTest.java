@@ -99,69 +99,6 @@ public class RoleTest extends FreeColTestCase {
         assertFalse(missionary.isCompatibleWith(dragoon));
     }
 
-    public void testSetRole() {
-        Game game = getStandardGame();
-        Player dutch = game.getPlayer("model.nation.dutch");
-        Player dutchREF = game.getPlayer("model.nation.dutchREF");
-        Player sioux = game.getPlayer("model.nation.sioux");
-        /*
-        TileType plains = spec().getTileType("model.tile.plains");
-        game.setMap(getTestMap(plains, true));
-
-        Tile tile1 = game.getMap().getTile(6, 8);
-        Tile tile2 = game.getMap().getTile(6, 9);
-        */
-
-        EquipmentType muskets = spec().getEquipmentType("model.equipment.muskets");
-        EquipmentType horses = spec().getEquipmentType("model.equipment.horses");
-
-        UnitType merchantmanType = spec().getUnitType("model.unit.merchantman");
-        Unit merchantman = new ServerUnit(game, null, dutch, merchantmanType);
-        assertEquals(none, merchantman.getRole());
-
-        UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
-        Unit colonist = new ServerUnit(game, null, dutch, colonistType);
-        assertEquals(none, colonist.getRole());
-        colonist = new ServerUnit(game, null, dutch, colonistType, soldier);
-        assertEquals(soldier, colonist.getRole());
-        colonist = new ServerUnit(game, null, dutch, colonistType, scout);
-        assertEquals(scout, colonist.getRole());
-        colonist = new ServerUnit(game, null, dutch, colonistType, dragoon);
-        assertEquals(dragoon, colonist.getRole());
-        colonist = new ServerUnit(game, null, dutch, colonistType, pioneer);
-        assertEquals(pioneer, colonist.getRole());
-        colonist = new ServerUnit(game, null, dutch, colonistType, missionary);
-        assertEquals(missionary, colonist.getRole());
-
-        UnitType regularType = spec().getUnitType("model.unit.kingsRegular");
-        Unit regular = new ServerUnit(game, null, dutchREF, regularType);
-        assertEquals(none, regular.getRole());
-        regular = new ServerUnit(game, null, dutchREF, regularType, infantry);
-        assertEquals(infantry, regular.getRole());
-        regular = new ServerUnit(game, null, dutchREF, regularType, cavalry);
-        assertEquals(cavalry, regular.getRole());
-
-        // Veterans do not become infantry or cavalry even if they are owned
-        // by the REF.
-        UnitType veteranType = spec().getUnitType("model.unit.veteranSoldier");
-        Unit veteran = new ServerUnit(game, null, dutchREF, veteranType, none);
-        assertEquals(none, veteran.getRole());
-        veteran = new ServerUnit(game, null, dutchREF, veteranType, infantry);
-        assertEquals(soldier, veteran.getRole());
-        veteran = new ServerUnit(game, null, dutchREF, veteranType, cavalry);
-        assertEquals(dragoon, veteran.getRole());
-
-        UnitType braveType = spec().getUnitType("model.unit.brave");
-        Unit brave = new ServerUnit(game, null, sioux, braveType);
-        assertEquals(none, brave.getRole());
-        brave = new ServerUnit(game, null, sioux, braveType, armedBrave);
-        assertEquals(armedBrave, brave.getRole());
-        brave = new ServerUnit(game, null, sioux, braveType, mountedBrave);
-        assertEquals(mountedBrave, brave.getRole());
-        brave = new ServerUnit(game, null, sioux, braveType, nativeDragoon);
-        assertEquals(nativeDragoon, brave.getRole());
-    }
-
     public void testGoodsDifference() {
         assertTrue(Role.getGoodsDifference(null, none).isEmpty());
         assertTrue(Role.getGoodsDifference(none, none).isEmpty());
@@ -182,7 +119,6 @@ public class RoleTest extends FreeColTestCase {
             new AbstractGoods(muskets, 50));
 
         goods = Role.getGoodsDifference(soldier, none);
-System.err.println("TGD");soldier.dumpCollection(goods);
         checkGoods("soldier->", goods,
             new AbstractGoods(muskets, -50));
 

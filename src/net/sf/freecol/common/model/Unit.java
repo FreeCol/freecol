@@ -662,13 +662,23 @@ public class Unit extends GoodsLocation
     }
 
     /**
+     * Is a role available to this unit?
+     *
+     * @param role The <code>Role</code> to test.
+     * @return True if the role is available to this unit.
+     */
+    public boolean roleIsAvailable(Role role) {
+        return role.isAvailableTo(getOwner(), getType());
+    }
+
+    /**
      * Hopefully, a temporary hack.
      */
     public void changeRole(Role role, int roleCount) {
+        final Specification spec = getSpecification();
         setRole(role);
         setRoleCount((role.isDefaultRole()) ? 0 : roleCount);
 
-        final Specification spec = getSpecification();
         clearEquipment();
         for (EquipmentType et : spec.getRoleEquipment(role.getId())) {
             equipment.incrementCount(et, roleCount);
@@ -679,9 +689,11 @@ public class Unit extends GoodsLocation
      * Set the unit role based on its equipment.
      */
     public void setRole() {
+        final Specification spec = getSpecification();
         Role oldRole = role;
-        role = getSpecification().getDefaultRole();
+        role = spec.getDefaultRole();
         boolean horses = false, muskets = false;
+        int count = 1;
         for (EquipmentType type : equipment.keySet()) {
             if ("model.equipment.horses".equals(type.getId())
                 || "model.equipment.indian.horses".equals(type.getId())) {
@@ -691,31 +703,34 @@ public class Unit extends GoodsLocation
                 muskets = true;
             } else {
                 role = type.getRole();
+                if ("model.equipment.tools".equals(type.getId())) {
+                    count = equipment.getCount(type);
+                }
             }
         }
         if (horses && muskets) {
             if (owner.isIndian()) {
-                role = getSpecification().getRole("model.role.nativeDragoon");
+                role = spec.getRole("model.role.nativeDragoon");
             } else if (owner.isREF() && hasAbility(Ability.REF_UNIT)) {
-                role = getSpecification().getRole("model.role.cavalry");
+                role = spec.getRole("model.role.cavalry");
             } else {
-                role = getSpecification().getRole("model.role.dragoon");
+                role = spec.getRole("model.role.dragoon");
             }
         } else if (horses) {
             if (owner.isIndian()) {
-                role = getSpecification().getRole("model.role.mountedBrave");
-            } else if (owner.isREF()) {
+                role = spec.getRole("model.role.mountedBrave");
+            } else if (owner.isREF() && hasAbility(Ability.REF_UNIT)) {
                 logger.warning("Undefined role: REF Scout");
             } else {
-                role = getSpecification().getRole("model.role.scout");
+                role = spec.getRole("model.role.scout");
             }
         } else if (muskets) {
             if (owner.isIndian()) {
-                role = getSpecification().getRole("model.role.armedBrave");
+                role = spec.getRole("model.role.armedBrave");
             } else if (owner.isREF() && hasAbility(Ability.REF_UNIT)) {
-                role = getSpecification().getRole("model.role.infantry");
+                role = spec.getRole("model.role.infantry");
             } else {
-                role = getSpecification().getRole("model.role.soldier");
+                role = spec.getRole("model.role.soldier");
             }
         }
 
@@ -730,6 +745,7 @@ public class Unit extends GoodsLocation
         if (!role.isCompatibleWith(oldRole)) {
             experience = 0;
         }
+        setRoleCount(count);
     }
 
     /**
