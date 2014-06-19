@@ -35,7 +35,6 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
-import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
@@ -1027,6 +1026,8 @@ public class ColonyPlan {
      * @return The unit that was replaced by the expert, or null if none.
      */
     private Unit trySwapExpert(Unit expert, List<Unit> others, Colony colony) {
+        Role oldRole = expert.getRole();
+        int oldRoleCount = expert.getRoleCount();
         GoodsType work = expert.getType().getExpertProduction();
         GoodsType oldWork = expert.getWorkType();
         for (int i = 0; i < others.size(); i++) {
@@ -1041,12 +1042,10 @@ public class ColonyPlan {
                 expert.changeWorkType(work);
                 other.setLocation(l1);
                 if (oldWork != null) other.changeWorkType(oldWork);
-                TypeCountMap<EquipmentType> equipment = expert.getEquipment();
-                for (EquipmentType e : new ArrayList<EquipmentType>(equipment.keySet())) {
-                    int n = equipment.getCount(e);
-                    expert.changeEquipment(e, -n);
-                    other.changeEquipment(e, n);
-                }
+                Role tmpRole = other.getRole();
+                int tmpRoleCount = other.getRoleCount();
+                other.changeRole(oldRole, oldRoleCount);
+                expert.changeRole(tmpRole, tmpRoleCount);
                 return other;
             }
         }
