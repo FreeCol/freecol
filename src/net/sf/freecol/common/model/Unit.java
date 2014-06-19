@@ -2844,16 +2844,17 @@ public class Unit extends GoodsLocation
      * @return The line of sight of this <code>Unit</code>.
      */
     public int getLineOfSight() {
-        Turn turn = getGame().getTurn();
-        Set<Modifier> modifierSet = new HashSet<Modifier>();
-        modifierSet.addAll(getModifierSet(Modifier.LINE_OF_SIGHT_BONUS));
+        final Turn turn = getGame().getTurn();
+        Set<Modifier> result = new HashSet<Modifier>();
+        result.addAll(getModifierSet(Modifier.LINE_OF_SIGHT_BONUS,
+                                     unitType, turn));
         if (hasTile() && getTile().isExplored()) {
-            modifierSet.addAll(getTile().getType()
+            result.addAll(getTile().getType()
                 .getModifierSet(Modifier.LINE_OF_SIGHT_BONUS, unitType, turn));
         }
         return (int)FeatureContainer
             .applyModifierSet((float)unitType.getLineOfSight(),
-                              turn, modifierSet);
+                              turn, result);
     }
 
 
