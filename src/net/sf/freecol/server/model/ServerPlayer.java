@@ -2287,8 +2287,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 break;
             case CAPTURE_AUTOEQUIP:
                 ok = isAttack && result == CombatResult.WIN
-                    && settlement != null
-                    && defenderPlayer.isEuropean();
+                    && settlement != null;
                 if (ok) {
                     csCaptureAutoEquip(attackerUnit, defenderUnit, cs);
                     attackerTileDirty = defenderTileDirty = true;
@@ -2432,8 +2431,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 break;
             case LOSE_AUTOEQUIP:
                 ok = isAttack && result == CombatResult.WIN
-                    && settlement != null
-                    && defenderPlayer.isEuropean();
+                    && settlement != null;
                 if (ok) {
                     csLoseAutoEquip(attackerUnit, defenderUnit, cs);
                     defenderTileDirty = true;
