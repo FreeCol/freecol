@@ -165,11 +165,12 @@ public class SimpleCombatModel extends CombatModel {
             // Unit offensive modifiers, including role+equipment
             result.addAll(attackerUnit.getModifierSet(Modifier.OFFENCE));
 
-            // Special bonuses against certain defenders
+            // Special bonuses against certain nation types
             if (defender instanceof Ownable) {
+                Player owner = ((Ownable)defender).getOwner();
                 result.addAll(attackerUnit
-                              .getModifierSet(Modifier.OFFENCE_AGAINST,
-                                              (Ownable)defender));
+                    .getModifierSet(Modifier.OFFENCE_AGAINST,
+                                    owner.getNationType()));
             }
 
             // Land/naval specific

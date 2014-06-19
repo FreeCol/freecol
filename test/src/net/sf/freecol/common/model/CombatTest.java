@@ -382,8 +382,9 @@ public class CombatTest extends FreeColTestCase {
     }
 
     public void testSpanishAgainstNatives() throws Exception {
-        Game game = getStandardGame();
-        Player spanish = game.getPlayer("model.nation.spanish");
+        final Game game = getStandardGame();
+        final Player spanish = game.getPlayer("model.nation.spanish");
+        final Player dutch = game.getPlayer("model.nation.dutch");
         Player tupi = game.getPlayer("model.nation.tupi");
         Map map = getTestMap(plains, true);
         game.setMap(map);
@@ -405,7 +406,9 @@ public class CombatTest extends FreeColTestCase {
         assertEquals(tile1, soldier.getLocation());
         assertEquals(tile2, brave.getLocation());
 
-        Set<Modifier> offenceModifiers = combatModel.getOffensiveModifiers(soldier, brave);
+        // Spanish should have special bonus v natives...
+        Set<Modifier> offenceModifiers
+            = combatModel.getOffensiveModifiers(soldier, brave);
         Modifier offenceAgainst = null;
         for (Modifier modifier : offenceModifiers) {
             if (Modifier.OFFENCE_AGAINST.equals(modifier.getId())) {
@@ -415,6 +418,20 @@ public class CombatTest extends FreeColTestCase {
         }
         assertNotNull(offenceAgainst);
         assertEquals(50, (int) offenceAgainst.getValue());
+
+        // but not against Europeans.
+        Tile tile3 = map.getTile(6, 8);
+        Unit dutchSoldier = new ServerUnit(game, tile3, dutch, colonistType,
+                                           soldierRole);
+        offenceAgainst = null;
+        for (Modifier modifier
+                 : combatModel.getOffensiveModifiers(soldier, dutchSoldier)) {
+            if (Modifier.OFFENCE_AGAINST.equals(modifier.getId())) {
+                offenceAgainst = modifier;
+                break;
+            }
+        }
+        assertNull(offenceAgainst);
     }
 
     public void testAttackShipWithLandUnit() {

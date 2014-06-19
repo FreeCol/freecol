@@ -3263,26 +3263,6 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Get a modifier that applies to the given Ownable. This is used
-     * for the offenceAgainst and defenceAgainst modifiers.
-     *
-     * @param id The object identifier to test.
-     * @param ownable a <code>Ownable</code> value
-     * @return a <code>Modifier</code> value
-     */
-    public Set<Modifier> getModifierSet(String id, Ownable ownable) {
-        Set<Modifier> result = new HashSet<Modifier>();
-        Turn turn = getGame().getTurn();
-        NationType nationType = ownable.getOwner().getNationType();
-        result.addAll(unitType.getModifierSet(id, nationType, turn));
-        result.addAll(getOwner().getModifierSet(id, nationType, turn));
-        for (EquipmentType equipmentType : equipment.keySet()) {
-            result.addAll(equipmentType.getModifierSet(id, nationType, turn));
-        }
-        return result;
-    }
-
-    /**
      * Gets the appropriate trade bonuses due to a missionary unit.
      *
      * @param sense The sense to apply the modifiers.
@@ -3801,10 +3781,10 @@ public class Unit extends GoodsLocation
         Set<Modifier> result = new HashSet<Modifier>();
 
         // UnitType modifiers always apply
-        result.addAll(unitType.getModifierSet(id));
+        result.addAll(unitType.getModifierSet(id, fcgot, turn));
 
         // The player's modifiers may not all apply
-        result.addAll(owner.getModifierSet(id, unitType, turn));
+        result.addAll(owner.getModifierSet(id, fcgot, turn));
         
         // Role modifiers apply
         result.addAll(role.getModifierSet(id, fcgot, turn));
