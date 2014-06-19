@@ -259,14 +259,17 @@
       <xs:attribute name="natural" type="xs:boolean"/>
       <xs:attribute name="add-work-turns" type="xs:nonNegativeInteger"/>
       <xs:attribute name="occupation-string" type="xs:string"/>
-      <xs:attribute name="expended-equipment-type" type="EquipmentTypeId"/>
-      <xs:attribute name="expended-amount" type="xs:nonNegativeInteger"/>
-      <xs:attribute name="deliver-goods-type" type="GoodsTypeId"/>
-      <xs:attribute name="deliver-amount" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="required-role" use="optional" type="RoleId"/>
+      <xs:attribute name="expended-amount" use="optional" type="xs:nonNegativeInteger"/>
       <xs:attribute name="magnitude" type="xs:nonNegativeInteger"/>
       <xs:attribute name="movement-cost" type="xs:nonNegativeInteger"/>
       <xs:attribute name="zIndex" type="xs:nonNegativeInteger"/>
       <xs:attribute name="exposeResourcePercent" type="xs:nonNegativeInteger"/>
+      <!-- @compat 0.10.x -->
+      <xs:attribute name="expended-equipment-type" type="EquipmentTypeId"/>
+      <xs:attribute name="deliver-goods-type" type="GoodsTypeId"/>
+      <xs:attribute name="deliver-amount" type="xs:nonNegativeInteger"/>
+      <!-- end @compat 0.10.x -->
     </xs:complexType>
   </xs:element>
 

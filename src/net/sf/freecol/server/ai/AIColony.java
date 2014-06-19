@@ -1124,8 +1124,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         // Add materials required to improve tiles.
         for (TileImprovementPlan plan : tileImprovementPlans) {
-            for (AbstractGoods ag : plan.getType()
-                     .getExpendedEquipmentType().getRequiredGoods()) {
+            Role role = plan.getType().getRequiredRole();
+            if (role == null) continue;
+            for (AbstractGoods ag : role.getRequiredGoods()) {
                 required.incrementCount(ag.getType(), ag.getAmount());
             }
         }

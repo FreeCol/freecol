@@ -20,7 +20,6 @@
 package net.sf.freecol.server.ai.mission;
 
 import net.sf.freecol.common.model.Ability;
-import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.LostCityRumour;

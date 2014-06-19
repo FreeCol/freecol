@@ -25,7 +25,6 @@ import java.util.List;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
-import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.GoodsType;
@@ -51,9 +50,6 @@ public class ServerUnitTest extends FreeColTestCase {
 
     private static final BuildingType townHallType
         = spec().getBuildingType("model.building.townHall");
-
-    private static final EquipmentType toolsType
-        = spec().getEquipmentType("model.equipment.tools");
 
     private static final GoodsType foodType
         = spec().getPrimaryFoodType();
@@ -146,6 +142,7 @@ public class ServerUnitTest extends FreeColTestCase {
 
         ServerUnit hardyPioneer = new ServerUnit(game, plain, dutch,
                                                  pioneerType);
+        hardyPioneer.setRoleCount(1);
 
         // Before
         assertFalse(hasImprovement(plain, plow));
@@ -175,7 +172,7 @@ public class ServerUnitTest extends FreeColTestCase {
         assertEquals(0, hardyPioneer.getMovesLeft());
         assertEquals(Unit.UnitState.ACTIVE, hardyPioneer.getState());
         assertEquals(-1, hardyPioneer.getWorkLeft());
-        assertEquals(pioneerRole, hardyPioneer.getRole());
+        assertEquals(spec().getDefaultRole(), hardyPioneer.getRole());
     }
 
     public void testColonyProfitFromEnhancement() {
@@ -272,21 +269,21 @@ public class ServerUnitTest extends FreeColTestCase {
         map.getTile(5, 8).setExplored(dutch, true);
 
         ServerUnit hardyPioneer1 = new ServerUnit(game, tile, dutch,
-                                                  pioneerType);
+                                                  pioneerType, pioneerRole);
         ServerUnit hardyPioneer2 = new ServerUnit(game, tile, dutch,
-                                                  pioneerType);
+                                                  pioneerType, pioneerRole);
         ServerUnit hardyPioneer3 = new ServerUnit(game, tile, dutch,
-                                                  pioneerType);
+                                                  pioneerType, pioneerRole);
 
         // Before
         assertEquals(false, tile.hasRoad());
         assertEquals(3, hardyPioneer1.getMovesLeft());
         assertEquals(-1, hardyPioneer1.getWorkLeft());
-        assertEquals(100, hardyPioneer1.getEquipmentCount(toolsType) * 20);
+        assertEquals(5, hardyPioneer1.getRoleCount());
         assertEquals(Unit.UnitState.ACTIVE, hardyPioneer1.getState());
         assertEquals(3, hardyPioneer2.getMovesLeft());
         assertEquals(-1, hardyPioneer2.getWorkLeft());
-        assertEquals(100, hardyPioneer2.getEquipmentCount(toolsType) * 20);
+        assertEquals(5, hardyPioneer2.getRoleCount());
         assertEquals(Unit.UnitState.ACTIVE, hardyPioneer2.getState());
 
         // Now do it
@@ -316,14 +313,14 @@ public class ServerUnitTest extends FreeColTestCase {
         assertEquals(-1, hardyPioneer2.getWorkLeft());
         assertEquals(Unit.UnitState.ACTIVE, hardyPioneer2.getState());
 
-        assertEquals(180, 20 * (hardyPioneer1.getEquipmentCount(toolsType)
-                                + hardyPioneer2.getEquipmentCount(toolsType)));
+        assertEquals(9,
+            hardyPioneer1.getRoleCount() + hardyPioneer2.getRoleCount());
 
         // Pioneer clearing forest is not affected
         assertEquals(3, hardyPioneer3.getMovesLeft());
         assertEquals(4, hardyPioneer3.getWorkLeft());
         assertEquals(Unit.UnitState.IMPROVING, hardyPioneer3.getState());
-        assertEquals(100, hardyPioneer3.getEquipmentCount(toolsType) * 20);
+        assertEquals(5, hardyPioneer3.getRoleCount());
 
         // Finish
         while (hardyPioneer3.getWorkLeft() > 0) {
@@ -334,7 +331,7 @@ public class ServerUnitTest extends FreeColTestCase {
         assertEquals(0, hardyPioneer3.getMovesLeft());
         assertEquals(-1, hardyPioneer3.getWorkLeft());
         assertEquals(Unit.UnitState.ACTIVE, hardyPioneer3.getState());
-        assertEquals(80, hardyPioneer3.getEquipmentCount(toolsType) * 20);
+        assertEquals(4, hardyPioneer3.getRoleCount());
     }
 
     public void testUnitGetsExperienceThroughWork() {

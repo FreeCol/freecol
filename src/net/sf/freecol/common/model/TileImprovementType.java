@@ -51,8 +51,8 @@ public final class TileImprovementType extends FreeColGameObjectType {
     /** Any improvement that is required before this one. */
     private TileImprovementType requiredImprovementType;
 
-    /** Equipment expended in making this improvement. */
-    private EquipmentType expendedEquipmentType;
+    /** The role required to make this improvement. */
+    private Role requiredRole;
 
     /** The amount of the equipment expended in making this improvement. */
     private int expendedAmount;
@@ -146,12 +146,12 @@ public final class TileImprovementType extends FreeColGameObjectType {
     }
 
     /**
-     * Gets the expended equipment type to build this improvement type.
+     * Get the role required to perform this improvement, if any.
      *
-     * @return The expended equipment, if any.
+     * @return The required <code>Role</code>.
      */
-    public EquipmentType getExpendedEquipmentType() {
-        return expendedEquipmentType;
+    public Role getRequiredRole() {
+        return requiredRole;
     }
 
     /**
@@ -271,8 +271,7 @@ public final class TileImprovementType extends FreeColGameObjectType {
      */
     public boolean isWorkerAllowed(Unit unit) {
         return isWorkerTypeAllowed(unit.getType())
-            && (unit.getEquipment().getCount(expendedEquipmentType)
-                >= expendedAmount);
+            && (requiredRole == null || unit.getRole() == requiredRole);
     }
 
     /**
@@ -460,7 +459,6 @@ public final class TileImprovementType extends FreeColGameObjectType {
     private static final String DELIVER_GOODS_TYPE_TAG = "deliver-goods-type";
     private static final String DISASTER_TAG = "disaster";
     private static final String EXPENDED_AMOUNT_TAG = "expended-amount";
-    private static final String EXPENDED_EQUIPMENT_TYPE_TAG = "expended-equipment-type";
     private static final String EXPOSE_RESOURCE_PERCENT_TAG = "exposeResourcePercent";
     private static final String FROM_TAG = "from";
     private static final String MAGNITUDE_TAG = "magnitude";
@@ -468,9 +466,13 @@ public final class TileImprovementType extends FreeColGameObjectType {
     private static final String NATURAL_TAG = "natural";
     private static final String PROBABILITY_TAG = "probability";
     private static final String REQUIRED_IMPROVEMENT_TAG = "required-improvement";
+    private static final String REQUIRED_ROLE_TAG = "required-role";
     private static final String TO_TAG = "to";
     private static final String WORKER_TAG = "worker";
     private static final String ZINDEX_TAG = "zIndex";
+    // @compat 0.10.x
+    private static final String EXPENDED_EQUIPMENT_TYPE_TAG = "expended-equipment-type";
+    // end @compat 0.10.x
 
 
     /**
@@ -491,10 +493,11 @@ public final class TileImprovementType extends FreeColGameObjectType {
                            requiredImprovementType);
         }
 
-        if (expendedEquipmentType != null) {
-            xw.writeAttribute(EXPENDED_EQUIPMENT_TYPE_TAG, 
-                           expendedEquipmentType);
+        if (requiredRole != null) {
+            xw.writeAttribute(REQUIRED_ROLE_TAG, requiredRole);
+        }
 
+        if (expendedAmount != 0) {
             xw.writeAttribute(EXPENDED_AMOUNT_TAG, expendedAmount);
         }
 
@@ -560,8 +563,13 @@ public final class TileImprovementType extends FreeColGameObjectType {
         requiredImprovementType = xr.getType(spec, REQUIRED_IMPROVEMENT_TAG,
             TileImprovementType.class, (TileImprovementType)null);
 
-        expendedEquipmentType = xr.getType(spec, EXPENDED_EQUIPMENT_TYPE_TAG,
-            EquipmentType.class, (EquipmentType)null);
+        requiredRole = xr.getType(spec, REQUIRED_ROLE_TAG,
+            Role.class, (Role)null);
+        // @compat 0.10.x
+        if (xr.hasAttribute(EXPENDED_EQUIPMENT_TYPE_TAG)) {
+            requiredRole = spec.getRole("model.role.pioneer");
+        }
+        // end @compat 0.10.x
 
         expendedAmount = xr.getAttribute(EXPENDED_AMOUNT_TAG, 0);
 

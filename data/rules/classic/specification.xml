@@ -20,7 +20,7 @@
     In case of incompatible changes, please update version number and
     XSD schema for validation.
 -->
-<freecol-specification id="classic" version="0.85">
+<freecol-specification id="classic" version="0.86">
 
   <!-- Modifiers that are not attached to other game object
        types. They may be modified, but MUST NOT be removed. -->
@@ -1056,20 +1056,25 @@
 
   <!--
       Parent options: name, add-work-turns, natural, type, required-improvement,
-      expended-goods-type, expended-amount, deliver-goods-type, deliver-amount
-      - natural="true" means that this improvement cannot be built, but may be present on its own
-      - expended goods/amount are the 'cost' of building this improvement
+      required-role, expended-amount, deliver-goods-type, deliver-amount
+      - natural="true" means that this improvement cannot be built,
+        but may be present on its own
+      - required-role/expended-amount are the 'cost' of building this
+        improvement in terms of Unit.roleCount
       Children: worker, type, tiles, tile, effect, change
-      - deliver goods/amount are the instant reward that will be given to the nearby colony (eg. lumber from deforestation)
-      worker child options: id
-      type child options: id, magnitude
-      - id is a string identifier, there must be a "river" and a "road" id among the tileimprovement-types
+      - deliver goods/amount are the instant reward that will be given
+        to the nearby colony (eg. lumber from deforestation)
+      - worker child options: id
+      - type child options: id, magnitude
+      - id is a string identifier, there must be a "river" and a
+        "road" id among the tileimprovement-types
       - to get the movement-bonus, must travel from a similar 'id' to this id
       - magnitude is a number to decide overwriting,
       a similar id tileimprovement will be replaced with one with a higher magnitude
       tiles child options: all-land-tiles, all-forest-tiles, all-water-tiles
       - putting all-water-tiles="false" is redundant, but serves as a reminder
-      - putting all-land-tiles="true" all-forest-tiles="false" will result in all non-forested land tiles.
+      - putting all-land-tiles="true" all-forest-tiles="false" will
+        result in all non-forested land tiles.
       tile child options: id
       change child options: from, to
 
@@ -1078,7 +1083,8 @@ tile overlays (e.g. hills) have a zIndex of 100, forests of 200,
 resources of 400, lost city rumours of 500
   -->
   <tileimprovement-types>
-    <tileimprovement-type id="model.improvement.river" natural="true" add-work-turns="0" magnitude="1"
+    <tileimprovement-type id="model.improvement.river" natural="true"
+                          add-work-turns="0" magnitude="1"
                           movement-cost="1" zIndex="150">
       <scope method-name="isWater" method-value="false" />
       <scope type="model.tile.arctic" matchNegated="true" />
@@ -1094,8 +1100,9 @@ resources of 400, lost city rumours of 500
       <modifier id="model.goods.silver" type="additive" value="1"/>
       <disaster id="model.disaster.flood"/>
     </tileimprovement-type>
-    <tileimprovement-type id="model.improvement.road" add-work-turns="0"
-                          expended-equipment-type="model.equipment.tools" expended-amount="1" magnitude="1"
+    <tileimprovement-type id="model.improvement.road"
+                          add-work-turns="0" magnitude="1"
+                          required-role="model.role.pioneer" expended-amount="1"
                           movement-cost="1" zIndex="350">
       <scope method-name="isWater" method-value="false" />
       <modifier id="model.goods.furs" type="additive" value="2"/>
@@ -1103,8 +1110,10 @@ resources of 400, lost city rumours of 500
       <modifier id="model.goods.ore" type="additive" value="1"/>
       <modifier id="model.goods.silver" type="additive" value="1"/>
     </tileimprovement-type>
-    <tileimprovement-type id="model.improvement.plow" add-work-turns="2" zIndex="120"
-                          expended-equipment-type="model.equipment.tools" expended-amount="1" magnitude="1">
+    <tileimprovement-type id="model.improvement.plow"
+                          add-work-turns="2" magnitude="1"
+                          required-role="model.role.pioneer" expended-amount="1"
+                          zIndex="120">
       <scope method-name="isWater" method-value="false" />
       <scope method-name="isForested" method-value="false" />
       <scope type="model.tile.arctic" matchNegated="true" />
@@ -1115,9 +1124,10 @@ resources of 400, lost city rumours of 500
       <modifier id="model.goods.tobacco" type="additive" value="1"/>
       <modifier id="model.goods.cotton" type="additive" value="1"/>
     </tileimprovement-type>
-    <tileimprovement-type id="model.improvement.clearForest" add-work-turns="2"
-                          expended-equipment-type="model.equipment.tools" expended-amount="1"
-                          magnitude="1" exposeResourcePercent="5">
+    <tileimprovement-type id="model.improvement.clearForest"
+                          add-work-turns="2" magnitude="1"
+                          required-role="model.role.pioneer" expended-amount="1"
+                          exposeResourcePercent="5">
       <scope method-name="isForested" method-value="true" />
       <change from="model.tile.mixedForest"     to="model.tile.plains">
         <production goods-type="model.goods.lumber" value="20" />
@@ -1144,12 +1154,14 @@ resources of 400, lost city rumours of 500
         <production goods-type="model.goods.lumber" value="20" />
       </change>
     </tileimprovement-type>
-    <tileimprovement-type id="model.improvement.fishBonusLand" natural="true" zIndex="250">
+    <tileimprovement-type id="model.improvement.fishBonusLand" natural="true"
+                          zIndex="250">
       <scope method-name="isWater" method-value="true" />
       <scope type="model.tile.highSeas" matchNegated="true" />
       <modifier id="model.goods.fish" type="additive" value="2"/>
     </tileimprovement-type>
-    <tileimprovement-type id="model.improvement.fishBonusRiver" natural="true" zIndex="250">
+    <tileimprovement-type id="model.improvement.fishBonusRiver" natural="true"
+                          zIndex="250">
       <scope method-name="isWater" method-value="true" />
       <scope type="model.tile.highSeas" matchNegated="true" />
       <modifier id="model.goods.fish" type="additive" value="1"/>

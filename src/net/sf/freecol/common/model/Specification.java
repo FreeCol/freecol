@@ -1849,7 +1849,7 @@ public final class Specification {
     private void fixupRoles() {
         boolean zero10X;
         try {
-            zero10X = Double.parseDouble(version) < 0.85;
+            zero10X = Double.parseDouble(version) < 0.86;
         } catch (Exception e) {
             zero10X = true;
         }

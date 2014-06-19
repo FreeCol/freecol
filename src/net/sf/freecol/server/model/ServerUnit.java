@@ -476,24 +476,11 @@ public class ServerUnit extends Unit implements ServerModelObject {
             }
         }
 
-        // Expend equipment
-        EquipmentType type = ti.getType().getExpendedEquipmentType();
-        changeEquipment(type, -ti.getType().getExpendedAmount());
-        for (Unit unit : tile.getUnitList()) {
-            if (unit.getWorkImprovement() != null
-                && unit.getWorkImprovement().getType() == ti.getType()
-                && unit.getState() == UnitState.IMPROVING) {
-                unit.setWorkLeft(-1);
-                unit.setWorkImprovement(null);
-                unit.setState(UnitState.ACTIVE);
-                unit.setMovesLeft(0);
-            }
-        }
-        // TODO: make this more generic, currently assumes tools used
-        EquipmentType tools = getSpecification()
-            .getEquipmentType("model.equipment.tools");
-        if (type == tools && getEquipmentCount(tools) == 0) {
-            ServerPlayer owner = (ServerPlayer) getOwner();
+        // Expend equipment.
+        if (changeRoleCount(-ti.getType().getExpendedAmount())) {
+            // FIXME: assumes tools, make more generic, use
+            // ti.getType().getRequiredRole().getRequiredGoods()
+            ServerPlayer owner = (ServerPlayer)getOwner();
             StringTemplate locName
                 = getLocation().getLocationNameFor(owner);
             String messageId = getType() + ".noMoreTools";
@@ -505,6 +492,18 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     messageId, this)
                 .addStringTemplate("%unit%", getLabel())
                 .addStringTemplate("%location%", locName));
+        }
+
+        // Cancel other co-located improvements of the same type
+        for (Unit unit : tile.getUnitList()) {
+            if (unit.getWorkImprovement() != null
+                && unit.getWorkImprovement().getType() == ti.getType()
+                && unit.getState() == UnitState.IMPROVING) {
+                unit.setWorkLeft(-1);
+                unit.setWorkImprovement(null);
+                unit.setState(UnitState.ACTIVE);
+                unit.setMovesLeft(0);
+            }
         }
     }
 
