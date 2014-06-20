@@ -71,8 +71,8 @@ public class Role extends BuildableType {
             public int compare(Role role1, Role role2) {
                 float amount1 = role1.getOffence() + role1.getDefence();
                 float amount2 = role2.getOffence() + role2.getDefence();
-                return (amount1 > amount2) ? 1
-                    : (amount1 < amount2) ? -1
+                return (amount1 < amount2) ? 1
+                    : (amount1 > amount2) ? -1
                     : 0;
             }
         };

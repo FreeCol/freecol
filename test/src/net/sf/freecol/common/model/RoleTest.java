@@ -61,9 +61,15 @@ public class RoleTest extends FreeColTestCase {
     private static final Role nativeDragoon
         = spec().getRole("model.role.nativeDragoon");
 
+    private static final UnitType braveType
+        = spec().getUnitType("model.unit.brave");
+    private static final UnitType colonistType
+        = spec().getUnitType("model.unit.freeColonist");
+    private static final UnitType kingsRegularType
+        = spec().getUnitType("model.unit.kingsRegular");
+
 
     public void testComparators() {
-
         List<Role> roles = new ArrayList<Role>();
         roles.add(soldier);
         roles.add(dragoon);
@@ -82,7 +88,6 @@ public class RoleTest extends FreeColTestCase {
 
         assertEquals(-1,  Role.defensiveComparator.compare(missionary, soldier));
         assertEquals(-1,  Role.defensiveComparator.compare(missionary, dragoon));
-
     }
 
     public void testCompatibleRoles() {
@@ -133,5 +138,36 @@ public class RoleTest extends FreeColTestCase {
         checkGoods("soldier->pioneer(4)", goods,
             new AbstractGoods(muskets, -50),
             new AbstractGoods(tools, 80));
+    }
+
+    public void testMilitaryRoles() {
+        final Game game = getStandardGame();
+        final List<Role> military = spec().getMilitaryRoles();
+
+        List<Role> expectedRoles = new ArrayList<Role>();
+        expectedRoles.add(dragoon);
+        expectedRoles.add(soldier);
+        expectedRoles.add(scout);
+        List<Role> colonialRoles
+            = Role.getAvailableRoles(game.getPlayer("model.nation.dutch"),
+                                     colonistType, military);
+        assertTrue(expectedRoles.equals(colonialRoles));
+
+        expectedRoles.clear();
+        expectedRoles.add(cavalry);
+        expectedRoles.add(infantry);
+        List<Role> royalRoles
+            = Role.getAvailableRoles(game.getPlayer("model.nation.dutchREF"),
+                                     kingsRegularType, military);
+        assertTrue(expectedRoles.equals(royalRoles));
+
+        expectedRoles.clear();
+        expectedRoles.add(nativeDragoon);
+        expectedRoles.add(armedBrave);
+        expectedRoles.add(mountedBrave);
+        List<Role> nativeRoles
+            = Role.getAvailableRoles(game.getPlayer("model.nation.inca"),
+                                     braveType, military);
+        assertTrue(expectedRoles.equals(nativeRoles));
     }
 }

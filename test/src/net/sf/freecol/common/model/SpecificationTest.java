@@ -37,12 +37,47 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public final class SpecificationTest extends FreeColTestCase {
 
+    private static final BuildingType depotType
+        = spec().getBuildingType("model.building.depot");
+
+    private static final GoodsType fishType
+        = spec().getGoodsType("model.goods.fish");
+    private static final GoodsType foodType
+        = spec().getPrimaryFoodType();
     private static final GoodsType horsesType
         = spec().getGoodsType("model.goods.horses");
     private static final GoodsType musketsType
         = spec().getGoodsType("model.goods.muskets");
     private static final GoodsType toolsType
         = spec().getGoodsType("model.goods.tools");
+
+    private static final Role armedBraveRole
+        = spec().getRole("model.role.armedBrave");
+    private static final Role cavalryRole
+        = spec().getRole("model.role.cavalry");
+    private static final Role dragoonRole
+        = spec().getRole("model.role.dragoon");
+    private static final Role infantryRole
+        = spec().getRole("model.role.infantry");
+    private static final Role missionaryRole
+        = spec().getRole("model.role.missionary");
+    private static final Role nativeDragoonRole
+        = spec().getRole("model.role.nativeDragoon");
+    private static final Role soldierRole
+        = spec().getRole("model.role.soldier");
+
+    private static final UnitType blackSmithType
+        = spec().getUnitType("model.unit.masterBlacksmith");
+    private static final UnitType braveType
+        = spec().getUnitType("model.unit.brave");
+    private static final UnitType caravelType
+        = spec().getUnitType("model.unit.caravel");
+    private static final UnitType colonistType
+        = spec().getUnitType("model.unit.freeColonist");
+    private static final UnitType privateerType
+        = spec().getUnitType("model.unit.privateer");
+    private static final UnitType wagonType
+        = spec().getUnitType("model.unit.wagonTrain");
 
 
     /**
@@ -53,7 +88,7 @@ public final class SpecificationTest extends FreeColTestCase {
         Specification spec = null;
         try {
             spec = new FreeColTcFile("freecol").getSpecification();
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             fail();
         }
@@ -64,55 +99,47 @@ public final class SpecificationTest extends FreeColTestCase {
      * Test for some typical abilities.
      */
     public void testUnitAbilities() {
-        Specification spec = spec();
+        assertTrue(colonistType.hasAbility(Ability.FOUND_COLONY));
+        assertFalse(colonistType.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT));
+        assertTrue(colonistType.isRecruitable());
+        assertFalse(colonistType.hasAbility(Ability.NAVAL_UNIT));
+        assertFalse(colonistType.hasAbility(Ability.CARRY_GOODS));
+        assertFalse(colonistType.hasAbility(Ability.CARRY_UNITS));
+        assertFalse(colonistType.hasAbility(Ability.CAPTURE_GOODS));
 
-        UnitType colonist = spec.getUnitType("model.unit.freeColonist");
-        assertTrue(colonist.hasAbility(Ability.FOUND_COLONY));
-        assertFalse(colonist.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT));
-        assertTrue(colonist.isRecruitable());
-        assertFalse(colonist.hasAbility(Ability.NAVAL_UNIT));
-        assertFalse(colonist.hasAbility(Ability.CARRY_GOODS));
-        assertFalse(colonist.hasAbility(Ability.CARRY_UNITS));
-        assertFalse(colonist.hasAbility(Ability.CAPTURE_GOODS));
+        assertFalse(wagonType.hasAbility(Ability.FOUND_COLONY));
+        assertFalse(wagonType.isRecruitable());
+        assertFalse(wagonType.hasAbility(Ability.NAVAL_UNIT));
+        assertTrue(wagonType.hasAbility(Ability.CARRY_GOODS));
+        assertFalse(wagonType.hasAbility(Ability.CARRY_UNITS));
+        assertFalse(wagonType.hasAbility(Ability.CAPTURE_GOODS));
 
-        UnitType wagon = spec.getUnitType("model.unit.wagonTrain");
-        assertFalse(wagon.hasAbility(Ability.FOUND_COLONY));
-        assertFalse(wagon.isRecruitable());
-        assertFalse(wagon.hasAbility(Ability.NAVAL_UNIT));
-        assertTrue(wagon.hasAbility(Ability.CARRY_GOODS));
-        assertFalse(wagon.hasAbility(Ability.CARRY_UNITS));
-        assertFalse(wagon.hasAbility(Ability.CAPTURE_GOODS));
-
-        UnitType brave = spec.getUnitType("model.unit.brave");
         //assertFalse(brave.hasAbility(Ability.FOUND_COLONY));
-        assertTrue(brave.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT));
-        assertFalse(brave.isRecruitable());
-        assertFalse(brave.hasAbility(Ability.NAVAL_UNIT));
-        assertTrue(brave.hasAbility(Ability.CARRY_GOODS));
-        assertFalse(brave.hasAbility(Ability.CARRY_UNITS));
-        assertFalse(brave.hasAbility(Ability.CAPTURE_GOODS));
+        assertTrue(braveType.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT));
+        assertFalse(braveType.isRecruitable());
+        assertFalse(braveType.hasAbility(Ability.NAVAL_UNIT));
+        assertTrue(braveType.hasAbility(Ability.CARRY_GOODS));
+        assertFalse(braveType.hasAbility(Ability.CARRY_UNITS));
+        assertFalse(braveType.hasAbility(Ability.CAPTURE_GOODS));
 
-        UnitType caravel = spec.getUnitType("model.unit.caravel");
-        assertFalse(caravel.hasAbility(Ability.FOUND_COLONY));
-        assertFalse(caravel.isRecruitable());
-        assertTrue(caravel.hasAbility(Ability.NAVAL_UNIT));
-        assertTrue(caravel.hasAbility(Ability.CARRY_GOODS));
-        assertTrue(caravel.hasAbility(Ability.CARRY_UNITS));
-        assertFalse(caravel.hasAbility(Ability.CAPTURE_GOODS));
+        assertFalse(caravelType.hasAbility(Ability.FOUND_COLONY));
+        assertFalse(caravelType.isRecruitable());
+        assertTrue(caravelType.hasAbility(Ability.NAVAL_UNIT));
+        assertTrue(caravelType.hasAbility(Ability.CARRY_GOODS));
+        assertTrue(caravelType.hasAbility(Ability.CARRY_UNITS));
+        assertFalse(caravelType.hasAbility(Ability.CAPTURE_GOODS));
 
-        UnitType privateer = spec.getUnitType("model.unit.privateer");
-        assertFalse(privateer.hasAbility(Ability.FOUND_COLONY));
-        assertFalse(privateer.isRecruitable());
-        assertTrue(privateer.hasAbility(Ability.NAVAL_UNIT));
-        assertTrue(privateer.hasAbility(Ability.CARRY_GOODS));
-        assertTrue(privateer.hasAbility(Ability.CARRY_UNITS));
-        assertTrue(privateer.hasAbility(Ability.CAPTURE_GOODS));
+        assertFalse(privateerType.hasAbility(Ability.FOUND_COLONY));
+        assertFalse(privateerType.isRecruitable());
+        assertTrue(privateerType.hasAbility(Ability.NAVAL_UNIT));
+        assertTrue(privateerType.hasAbility(Ability.CARRY_GOODS));
+        assertTrue(privateerType.hasAbility(Ability.CARRY_UNITS));
+        assertTrue(privateerType.hasAbility(Ability.CAPTURE_GOODS));
     }
 
     public void testFoundingFathers() {
-        Specification spec = spec();
-
-        FoundingFather smith = spec.getFoundingFather("model.foundingFather.adamSmith");
+        final FoundingFather smith
+            = spec().getFoundingFather("model.foundingFather.adamSmith");
         assertFalse(smith == null);
         assertTrue(smith.getType() == FoundingFather.FoundingFatherType.TRADE);
         // weight is some value in [0, 10]
@@ -130,8 +157,6 @@ public final class SpecificationTest extends FreeColTestCase {
     }
 
     public void testModifiers() {
-        Specification spec = spec();
-
         // Percentage Modifier
         /*
         BuildingType ironWorks = spec.getBuildingType("model.building.ironWorks");
@@ -141,14 +166,13 @@ public final class SpecificationTest extends FreeColTestCase {
         */
 
         // Additive Modifier
-        BuildingType depot = spec.getBuildingType("model.building.depot");
-        Modifier modifier = depot.getModifierSet(Modifier.WAREHOUSE_STORAGE).iterator().next();
+        Modifier modifier = depotType
+            .getModifierSet(Modifier.WAREHOUSE_STORAGE).iterator().next();
         assertEquals(ModifierType.ADDITIVE, modifier.getType());
         assertEquals(100f, modifier.getValue());
 
         // Multiplicative Modifier
-        UnitType blackSmith = spec.getUnitType("model.unit.masterBlacksmith");
-        modifier = blackSmith.getModifierSet("model.goods.tools").iterator().next();
+        modifier = blackSmithType.getModifierSet("model.goods.tools").iterator().next();
         assertEquals(ModifierType.MULTIPLICATIVE, modifier.getType());
         assertEquals(2f, modifier.getValue());
     }
@@ -168,8 +192,7 @@ public final class SpecificationTest extends FreeColTestCase {
     }
 
     public void testNationTypes() {
-
-        Specification spec = spec();
+        final Specification spec = spec();
 
         List<IndianNationType> indianNationTypes = spec.getIndianNationTypes();
         assertEquals(8, indianNationTypes.size());
@@ -187,27 +210,32 @@ public final class SpecificationTest extends FreeColTestCase {
         expectAbilities = new HashMap<String, Boolean>();
         expectAbilities.put(Ability.CAN_BE_EQUIPPED, true);
         expectAbilities.put(Ability.NATIVE, false);
+        expectAbilities.put(Ability.REF_UNIT, false);
         roleAbilities.put("model.role.scout", expectAbilities);
 
         expectAbilities = new HashMap<String, Boolean>();
         expectAbilities.put(Ability.CAN_BE_EQUIPPED, true);
         expectAbilities.put(Ability.NATIVE, false);
+        expectAbilities.put(Ability.REF_UNIT, false);
         roleAbilities.put("model.role.soldier", expectAbilities);
 
         expectAbilities = new HashMap<String, Boolean>();
         expectAbilities.put(Ability.CAN_BE_EQUIPPED, true);
         expectAbilities.put(Ability.NATIVE, false);
+        expectAbilities.put(Ability.REF_UNIT, false);
         roleAbilities.put("model.role.dragoon", expectAbilities);
 
         expectAbilities = new HashMap<String, Boolean>();
         expectAbilities.put(Ability.CAN_BE_EQUIPPED, true);
         expectAbilities.put(Ability.NATIVE, false);
+        expectAbilities.put(Ability.REF_UNIT, false);
         roleAbilities.put("model.role.pioneer", expectAbilities);
 
         expectAbilities = new HashMap<String, Boolean>();
         expectAbilities.put(Ability.CAN_BE_EQUIPPED, true);
-        expectAbilities.put(Ability.NATIVE, false);
         expectAbilities.put(Ability.DRESS_MISSIONARY, true);
+        expectAbilities.put(Ability.NATIVE, false);
+        expectAbilities.put(Ability.REF_UNIT, false);
         roleAbilities.put("model.role.missionary", expectAbilities);
 
         expectAbilities = new HashMap<String, Boolean>();
@@ -226,14 +254,17 @@ public final class SpecificationTest extends FreeColTestCase {
 
         expectAbilities = new HashMap<String, Boolean>();
         expectAbilities.put(Ability.NATIVE, true);
+        expectAbilities.put(Ability.REF_UNIT, false);
         roleAbilities.put("model.role.mountedBrave", expectAbilities);
 
         expectAbilities = new HashMap<String, Boolean>();
         expectAbilities.put(Ability.NATIVE, true);
+        expectAbilities.put(Ability.REF_UNIT, false);
         roleAbilities.put("model.role.armedBrave", expectAbilities);
 
         expectAbilities = new HashMap<String, Boolean>();
         expectAbilities.put(Ability.NATIVE, true);
+        expectAbilities.put(Ability.REF_UNIT, false);
         roleAbilities.put("model.role.nativeDragoon", expectAbilities);
 
         // Verify
@@ -313,17 +344,15 @@ public final class SpecificationTest extends FreeColTestCase {
     }
 
     public void testGoodsTypes() {
-        GoodsType food = spec().getPrimaryFoodType();
-        assertTrue(food.isFarmed());
-        assertTrue(spec().getFarmedGoodsTypeList().contains(food));
-        assertTrue(food.isFoodType());
-        assertTrue(spec().getFoodGoodsTypeList().contains(food));
+        assertTrue(foodType.isFarmed());
+        assertTrue(spec().getFarmedGoodsTypeList().contains(foodType));
+        assertTrue(foodType.isFoodType());
+        assertTrue(spec().getFoodGoodsTypeList().contains(foodType));
 
-        GoodsType fish = spec().getGoodsType("model.goods.fish");
-        assertTrue(fish.isFarmed());
-        assertTrue(spec().getFarmedGoodsTypeList().contains(fish));
-        assertTrue(fish.isFoodType());
-        assertTrue(spec().getFoodGoodsTypeList().contains(fish));
+        assertTrue(fishType.isFarmed());
+        assertTrue(spec().getFarmedGoodsTypeList().contains(fishType));
+        assertTrue(fishType.isFoodType());
+        assertTrue(spec().getFoodGoodsTypeList().contains(fishType));
     }
 
     public void testExtends() {

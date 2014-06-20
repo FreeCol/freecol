@@ -31,6 +31,7 @@
           expertUnit="model.unit.seasonedScout">
       <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-ability id="model.ability.native" value="false"/>
+      <required-ability id="model.ability.refUnit" value="false"/>
       <required-goods id="model.goods.horses" value="50"/>
 
       <ability id="model.ability.armed" value="true"/>
@@ -52,6 +53,7 @@
           expertUnit="model.unit.veteranSoldier">
       <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-ability id="model.ability.native" value="false"/>
+      <required-ability id="model.ability.refUnit" value="false"/>
       <required-goods id="model.goods.muskets" value="50"/>
 
       <ability id="model.ability.armed" value="true"/>
@@ -66,6 +68,7 @@
           expertUnit="model.unit.veteranSoldier">
       <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-ability id="model.ability.native" value="false"/>
+      <required-ability id="model.ability.refUnit" value="false"/>
       <required-goods id="model.goods.muskets" value="50"/>
       <required-goods id="model.goods.horses" value="50"/>
 
@@ -83,6 +86,7 @@
           expertUnit="model.unit.hardyPioneer" maximumCount="5">
       <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-ability id="model.ability.native" value="false"/>
+      <required-ability id="model.ability.refUnit" value="false"/>
       <required-goods id="model.goods.tools" value="20"/>
 
       <ability id="model.ability.disposeOnCombatLoss" value="true"/>
@@ -92,8 +96,9 @@
     <role id="model.role.missionary"
           expertUnit="model.unit.jesuitMissionary">
       <required-ability id="model.ability.canBeEquipped" value="true"/>
-      <required-ability id="model.ability.native" value="false"/>
       <required-ability id="model.ability.dressMissionary" value="true"/>
+      <required-ability id="model.ability.native" value="false"/>
+      <required-ability id="model.ability.refUnit" value="false"/>
 
       <ability id="model.ability.denounceHeresy" value="true"/>
       <ability id="model.ability.establishMission" value="true"/>
@@ -138,6 +143,7 @@
 
     <role id="model.role.mountedBrave">
       <required-ability id="model.ability.native" value="true"/>
+      <required-ability id="model.ability.dressMissionary" value="true"/>
       <required-goods id="model.goods.horses" value="25"/>
 
       <ability id="model.ability.disposeOnCombatLoss" value="true"/>
@@ -152,6 +158,7 @@
 
     <role id="model.role.armedBrave">
       <required-ability id="model.ability.native" value="true"/>
+      <required-ability id="model.ability.dressMissionary" value="true"/>
       <required-goods id="model.goods.muskets" value="25"/>
 
       <ability id="model.ability.armed" value="true"/>

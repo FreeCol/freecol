@@ -61,17 +61,6 @@ public class IndianSettlement extends Settlement {
         SCOUTED          // Scouting bonus consumed
     };
 
-    // When choosing what goods to buy, sort goods types descending by price.
-    private final Comparator<GoodsType> wantedGoodsComparator
-        = new Comparator<GoodsType>() {
-            public int compare(GoodsType goodsType1, GoodsType goodsType2) {
-                return (getNormalGoodsPriceToBuy(goodsType2,
-                        GoodsContainer.CARGO_SIZE)
-                    - getNormalGoodsPriceToBuy(goodsType1,
-                        GoodsContainer.CARGO_SIZE));
-            }
-        };
-
     // When choosing what goods to sell, sort goods with new world
     // goods first, then by price, then amount.
     private final Comparator<Goods> exportGoodsComparator
@@ -727,22 +716,23 @@ public class IndianSettlement extends Settlement {
      * @return The amount of goods wanted.
      */
     protected int getWantedGoodsAmount(GoodsType type) {
+        if (getUnitCount() <= 0) return 0;
+
         final Specification spec = getSpecification();
+        final UnitType unitType = getFirstUnit().getType();
+        final Role militaryRole = Role.getAvailableRoles(getOwner(),
+            unitType, spec.getMilitaryRoles()).get(0);
 
         if (type.isMilitaryGoods()) {
             // Retain enough goods to fully arm.
             int need = 0;
-            int toArm = 0;
-            if (type == spec.getGoodsType("model.goods.muskets")) {
-                for (Unit u : ownedUnits) if (!u.isArmed()) need++;
-                toArm = spec.getEquipmentType("model.equipment.indian.muskets")
-                    .getRequiredAmountOf(type);
-            } else if (type == spec.getGoodsType("model.goods.horses")) {
-                for (Unit u : ownedUnits) if (!u.isMounted()) need++;
-                toArm = spec.getEquipmentType("model.equipment.indian.horses")
-                    .getRequiredAmountOf(type);
+            for (Unit u : ownedUnits) {
+                if (u.getRole() == militaryRole) continue;
+                List<AbstractGoods> required
+                    = u.getGoodsDifference(militaryRole, 1);
+                need += AbstractGoods.getCount(type, required);
             }
-            return need * toArm;
+            return need;
         }
 
         int consumption = getConsumptionOf(type);
@@ -927,8 +917,20 @@ public class IndianSettlement extends Settlement {
      * is hidden from the clients.
      */
     public void updateWantedGoods() {
-        List<GoodsType> goodsTypes = new ArrayList<GoodsType>(getSpecification().getGoodsTypeList());
-        Collections.sort(goodsTypes, wantedGoodsComparator);
+        final Specification spec = getSpecification();
+        List<GoodsType> goodsTypes
+            = new ArrayList<GoodsType>(spec.getGoodsTypeList());
+        final java.util.Map<GoodsType, Integer> prices
+            = new HashMap<GoodsType, Integer>();
+        for (GoodsType gt : goodsTypes) {
+            prices.put(gt, getNormalGoodsPriceToBuy(gt, GoodsContainer.CARGO_SIZE));
+        }
+        Collections.sort(goodsTypes, new Comparator<GoodsType>() {
+                public int compare(GoodsType goodsType1, GoodsType goodsType2) {
+                    return prices.get(goodsType2) - prices.get(goodsType1);
+                }
+            });
+
         int wantedIndex = 0;
         for (GoodsType goodsType : goodsTypes) {
             // The natives do not trade military or non-storable goods.
