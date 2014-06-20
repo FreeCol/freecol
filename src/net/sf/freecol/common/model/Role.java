@@ -393,6 +393,23 @@ public class Role extends BuildableType {
     }
 
     /**
+     * Filter a list of available proposed roles.
+     *
+     * @param player The <code>Player</code> to own the unit.
+     * @param type The <code>UnitType</code> to check.
+     * @param roles A list of proposed <code>Role</code>s.
+     * @return A list of available <code>Role</code>s.
+     */
+    public static List<Role> getAvailableRoles(Player player, UnitType type,
+                                               List<Role> roles) {
+        List<Role> result = new ArrayList<Role>();
+        for (Role r : roles) {
+            if (r.isAvailableTo(player, type)) result.add(r);
+        }
+        return result;
+    }
+       
+    /**
      * Is this role available to a proposed unit?
      *
      * @param player The <code>Player</code> to own the unit.
