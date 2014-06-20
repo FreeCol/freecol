@@ -100,12 +100,11 @@ public class ProductionMap {
                 throw new IllegalArgumentException(goods.getType().getId() + " is not stored as "
                                                    + root.getType());
             } else {
-                for (AbstractGoods leaf : leafs) {
-                    if (leaf.getType() == goods.getType()) {
-                        leaf.setAmount(leaf.getAmount() + goods.getAmount());
-                        root.setAmount(root.getAmount() + goods.getAmount());
-                        return;
-                    }
+                AbstractGoods leaf = AbstractGoods.findByType(goods.getType(), leafs);
+                if (leaf != null) {
+                    leaf.setAmount(leaf.getAmount() + goods.getAmount());
+                    root.setAmount(root.getAmount() + goods.getAmount());
+                    return;
                 }
                 leafs.add(new AbstractGoods(goods));
                 root.setAmount(root.getAmount() + goods.getAmount());
@@ -120,12 +119,10 @@ public class ProductionMap {
                     leaf.setAmount(Math.min(leaf.getAmount(), root.getAmount()));
                 }
             } else {
-                for (AbstractGoods leaf : leafs) {
-                    if (leaf.getType() == goods.getType()) {
-                        leaf.setAmount(leaf.getAmount() - consumed);
-                        root.setAmount(root.getAmount() - consumed);
-                        break;
-                    }
+                AbstractGoods leaf = AbstractGoods.findByType(goods.getType(), leafs);
+                if (leaf != null) {
+                    leaf.setAmount(leaf.getAmount() - consumed);
+                    root.setAmount(root.getAmount() - consumed);
                 }
             }
             return consumed;
@@ -135,10 +132,9 @@ public class ProductionMap {
             if (root.getType() == type) {
                 return root;
             } else {
-                for (AbstractGoods leaf : leafs) {
-                    if (leaf.getType() == type) {
-                        return new AbstractGoods(type, leaf.getAmount());
-                    }
+                AbstractGoods leaf = AbstractGoods.findByType(type, leafs);
+                if (leaf != null) {
+                    return new AbstractGoods(type, leaf.getAmount());
                 }
             }
             return null;

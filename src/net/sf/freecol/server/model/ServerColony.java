@@ -510,9 +510,9 @@ public class ServerColony extends Colony implements ServerModelObject {
         buildables.addAll(spec.getUnitTypesWithoutAbility(Ability.PERSON));
         for (BuildableType bt : buildables) {
             if (canBuild(bt)) {
-                for (AbstractGoods ag : bt.getRequiredGoods()) {
-                    if (ag.getType() == goodsType) return true;
-                }
+                AbstractGoods ag = AbstractGoods.findByType(goodsType,
+                    bt.getRequiredGoods());
+                if (ag != null) return true;
             }
         }
         return false;

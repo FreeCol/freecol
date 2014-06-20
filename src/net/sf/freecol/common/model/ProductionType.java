@@ -200,9 +200,8 @@ public class ProductionType extends FreeColObject {
      */
     public AbstractGoods getOutput(GoodsType goodsType) {
         if (outputs != null) {
-            for (AbstractGoods output : outputs) {
-                if (goodsType == output.getType()) return output;
-            }
+            AbstractGoods output = AbstractGoods.findByType(goodsType, outputs);
+            if (output != null) return output;
         }
         return null;
     }
@@ -290,9 +289,9 @@ public class ProductionType extends FreeColObject {
     public static boolean canProduce(GoodsType goodsType,
                                      Collection<ProductionType> types) {
         for (ProductionType productionType : types) {
-            for (AbstractGoods output : productionType.getOutputs()) {
-                if (output.getType() == goodsType) return true;
-            }
+            AbstractGoods output = AbstractGoods.findByType(goodsType,
+                productionType.getOutputs());
+            if (output != null) return true;
         }
         return false;
     }

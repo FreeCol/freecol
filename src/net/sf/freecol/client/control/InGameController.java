@@ -681,14 +681,13 @@ public final class InGameController implements NetworkConstants {
         // Make a list of goods to load at this stop.  Collapse multiple
         // loads of the same goods type.
         List<AbstractGoods> toLoad = new ArrayList<AbstractGoods>();
-        outer: for (GoodsType type : stop.getCargo()) {
-            for (AbstractGoods g : toLoad) {
-                if (g.getType() == type) {
-                    g.setAmount(g.getAmount() + GoodsContainer.CARGO_SIZE);
-                    continue outer;
-                }
+        for (GoodsType type : stop.getCargo()) {
+            AbstractGoods ag = AbstractGoods.findByType(type, toLoad);
+            if (ag != null) {
+                ag.setAmount(ag.getAmount() + GoodsContainer.CARGO_SIZE);
+            } else {
+                toLoad.add(new AbstractGoods(type, GoodsContainer.CARGO_SIZE));
             }
-            toLoad.add(new AbstractGoods(type, GoodsContainer.CARGO_SIZE));
         }
 
         // Adjust for what is already being carried.

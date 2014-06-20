@@ -181,19 +181,16 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
             List<AbstractGoods> consumption = new ArrayList<AbstractGoods>();
             for (AbstractGoods ag : current.getRequiredGoods()) {
                 boolean satisfied = false;
-                for (AbstractGoods available : input) {
-                    if (ag.getType() == available.getType()
-                        && ag.getAmount() <= available.getAmount()) {
-                        int amount = (overflow || ag.getType().isStorable())
-                            ? ag.getAmount()
-                            : available.getAmount();
-                        consumption.add(new AbstractGoods(ag.getType(), amount));
-                        satisfied = true;
-                        break;
-                    }
+                AbstractGoods available = AbstractGoods.findByType(ag.getType(), input);
+                if (available != null
+                    && ag.getAmount() <= available.getAmount()) {
+                    int amount = (overflow || ag.getType().isStorable())
+                        ? ag.getAmount()
+                        : available.getAmount();
+                    consumption.add(new AbstractGoods(ag.getType(), amount));
+                    satisfied = true;
                 }
-                if (!satisfied) {
-                    // don't build anything
+                if (!satisfied) { // don't build anything
                     return result;
                 }
             }

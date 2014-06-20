@@ -221,10 +221,7 @@ public class Building extends WorkLocation
      * @return The goods amount, or zero if none found.
      */
     private int getAvailable(GoodsType type, List<AbstractGoods> available) {
-        for (AbstractGoods goods : available) {
-            if (goods.getType() == type) return goods.getAmount();
-        }
-        return 0;
+        return AbstractGoods.getCount(type, available);
     }
 
     /**

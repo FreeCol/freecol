@@ -209,13 +209,13 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
 
     private <T extends BuildableType> boolean filterBuildables(List<T> input, List<T> output, GoodsType type) {
         boolean result = true;
-        loop: for (T buildableType : input) {
+        for (T buildableType : input) {
             if (buildableType.needsGoodsToBuild()) {
-                for (AbstractGoods goods : buildableType.getRequiredGoods()) {
-                    if (type == goods.getType()) {
-                        output.add(buildableType);
-                        continue loop;
-                    }
+                AbstractGoods goods = AbstractGoods.findByType(type,
+                    buildableType.getRequiredGoods());
+                if (goods != null) {
+                    output.add(buildableType);
+                    continue;
                 }
                 result = false;
             }

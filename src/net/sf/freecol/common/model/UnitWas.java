@@ -164,20 +164,7 @@ public class UnitWas implements Comparable<UnitWas> {
     private int getAmount(Location location, GoodsType goodsType) {
         if (goodsType != null && location instanceof WorkLocation) {
             ProductionInfo info = ((WorkLocation)location).getProductionInfo();
-            for (AbstractGoods ag : info.getProduction()) {
-                if (ag.getType() == goodsType) return ag.getAmount();
-            }
-            /*
-            if (location instanceof Building) {
-                Building building = (Building) location;
-                ProductionInfo info = building.getProductionInfo();
-                return (info == null || info.getProduction() == null
-                    || info.getProduction().size() == 0) ? 0
-                    : info.getProduction().get(0).getAmount();
-            } else if (location instanceof ColonyTile) {
-                return ((ColonyTile)location).getTotalProductionOf(goodsType);
-            }
-            */
+            return AbstractGoods.getCount(goodsType, info.getProduction());
         }
         return 0;
     }

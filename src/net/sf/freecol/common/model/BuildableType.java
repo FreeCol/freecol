@@ -159,10 +159,7 @@ public abstract class BuildableType extends FreeColGameObjectType {
      * @return The amount of goods required.
      */
     public int getRequiredAmountOf(GoodsType type) {
-        for (AbstractGoods goods : getRequiredGoods()) {
-            if (goods.getType() == type) return goods.getAmount();
-        }
-        return 0;
+        return AbstractGoods.getCount(type, getRequiredGoods());
     }
 
     /**

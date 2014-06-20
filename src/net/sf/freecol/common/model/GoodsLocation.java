@@ -101,6 +101,17 @@ public abstract class GoodsLocation extends UnitLocation {
     }
 
     /**
+     * Adds a list of goods to this location.
+     *
+     * @param goods The list of <code>AbstractGoods</code> to add.
+     * @return True if the goods were all added.
+     */
+    public final boolean addGoods(List<AbstractGoods> goods) {
+        for (AbstractGoods ag : goods) if (!addGoods(ag)) return false;
+        return true;
+    }
+
+    /**
      * Removes the some goods from this location.
      *
      * @param goods The <code>AbstractGoods</code> to remove.
@@ -130,6 +141,20 @@ public abstract class GoodsLocation extends UnitLocation {
     public final int getGoodsCount(GoodsType type) {
         return (goodsContainer == null) ? 0
             : goodsContainer.getGoodsCount(type);
+    }
+
+    /**
+     * Does this location contain enough goods to satisfy a list of
+     * requirements?
+     *
+     * @param goods A list of <code>AbstractGoods</code> to check.
+     * @return True if the goods are all present.
+     */
+    public final boolean containsGoods(List<AbstractGoods> goods) {
+        for (AbstractGoods ag : goods) {
+            if (getGoodsCount(ag.getType()) < ag.getAmount()) return false;
+        }
+        return true;
     }
 
     /**

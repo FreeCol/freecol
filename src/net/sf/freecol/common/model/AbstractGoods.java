@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.Collection;
 import java.util.Comparator;
 
 import javax.xml.stream.XMLStreamException;
@@ -113,6 +114,37 @@ public class AbstractGoods extends FreeColObject implements Named {
      */
     public final void setAmount(final int newAmount) {
         this.amount = newAmount;
+    }
+
+
+    /**
+     * Convenience lookup of the member of a collection of abstract goods that
+     * matches a given goods type.
+     *
+     * @param type The <code>GoodsType</code> to look for.
+     * @param goods The collection of <code>AbstractGoods</code> to look in.
+     * @return The <code>AbstractGoods</code> found, or null if not.
+     */
+    public static AbstractGoods findByType(GoodsType type,
+                                           Collection<AbstractGoods> goods) {
+        for (AbstractGoods ag : goods) {
+            if (ag.getType() == type) return ag;
+        }
+        return null;
+    }
+
+    /**
+     * Convenience lookup of the goods count in a collection of
+     * abstract goods given a goods type.
+     * 
+     * @param type The <code>GoodsType</code> to look for.
+     * @param goods The collection of <code>AbstractGoods</code> to look in.
+     * @return The goods count found, or zero if not found.
+     */
+    public static int getCount(GoodsType type,
+                               Collection<AbstractGoods> goods) {
+        AbstractGoods ag = findByType(type, goods);
+        return (ag == null) ? 0 : ag.getAmount();
     }
 
 

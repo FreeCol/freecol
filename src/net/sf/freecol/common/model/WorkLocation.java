@@ -155,10 +155,7 @@ public abstract class WorkLocation extends UnitLocation
      *     given <code>GoodsType</code>.
      */
     public boolean produces(GoodsType goodsType) {
-        for (AbstractGoods output : getOutputs()) {
-            if (output.getType() == goodsType) return true;
-        }
-        return false;
+        return AbstractGoods.findByType(goodsType, getOutputs()) != null;
     }
 
     /**
@@ -232,10 +229,7 @@ public abstract class WorkLocation extends UnitLocation
         if (goodsType == null) {
             throw new IllegalArgumentException("Null GoodsType.");
         }
-        for (AbstractGoods ag : getProduction()) {
-            if (ag.getType() == goodsType) return ag.getAmount();
-        }
-        return 0;
+        return AbstractGoods.getCount(goodsType, getProduction());
     }
 
     /**
@@ -250,9 +244,8 @@ public abstract class WorkLocation extends UnitLocation
         if (info == null) return 0;
         List<AbstractGoods> production = info.getMaximumProduction();
         if (production != null) {
-            for (AbstractGoods ag : production) {
-                if (ag.getType() == goodsType) return ag.getAmount();
-            }
+            AbstractGoods ag = AbstractGoods.findByType(goodsType, production);
+            if (ag != null) return ag.getAmount();
         }
         return getTotalProductionOf(goodsType);
     }
@@ -323,12 +316,9 @@ public abstract class WorkLocation extends UnitLocation
         if (unit == null) throw new IllegalArgumentException("Null unit.");
 
         final UnitType unitType = unit.getType();
-        for (AbstractGoods goods : getOutputs()) {
-            if (goods.getType() == goodsType) {
-                return Math.max(0, getPotentialProduction(goodsType, unitType));
-            }
-        }
-        return 0;
+        AbstractGoods goods = AbstractGoods.findByType(goodsType, getOutputs());
+        return (goods == null) ? 0
+            : Math.max(0, getPotentialProduction(goodsType, unitType));
     }
 
     /**

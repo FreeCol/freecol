@@ -1059,12 +1059,10 @@ public class Colony extends Settlement implements Nameable {
             goodsMissing = true;
             int amountProduced = productionCache.getNetProductionOf(ag.getType());
             if (info != null) {
-                for (AbstractGoods consumed : info.getConsumption()) {
-                    if (consumed.getType() == ag.getType()) {
-                        // add the amount the build queue itself will consume
-                        amountProduced += consumed.getAmount();
-                        break;
-                    }
+                AbstractGoods consumed = AbstractGoods.findByType(ag.getType(), info.getConsumption());
+                if (consumed != null) {
+                    // add the amount the build queue itself will consume
+                    amountProduced += consumed.getAmount();
                 }
             }
             if (amountProduced <= 0) {
@@ -2123,12 +2121,8 @@ public class Colony extends Settlement implements Nameable {
                                                          populationQueue }) {
             ProductionInfo info = productionCache.getProductionInfo(queue);
             if (info != null) {
-                for (AbstractGoods goods : info.getConsumption()) {
-                    if (goods.getType() == goodsType) {
-                        result += goods.getAmount();
-                        break;
-                    }
-                }
+                AbstractGoods goods = AbstractGoods.findByType(goodsType, info.getConsumption());
+                if (goods != null) result += goods.getAmount();
             }
         }
         return result;
@@ -2803,12 +2797,8 @@ public class Colony extends Settlement implements Nameable {
             }
 
             if (buildable != null) {
-                for (AbstractGoods ag : buildable.getRequiredGoods()) {
-                    if (ag.getType() == goods.getType()) {
-                        available -= ag.getAmount();
-                        break;
-                    }
-                }
+                available -= AbstractGoods.getCount(goods.getType(),
+                    buildable.getRequiredGoods());
             }
 
             if (available < goods.getAmount()) return false;
