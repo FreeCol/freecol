@@ -28,7 +28,6 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.BuildingType;
-import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.UnitType;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
@@ -504,7 +503,7 @@ public final class GoodsType extends FreeColGameObjectType {
         List<BuildableType> buildableTypes = new ArrayList<BuildableType>();
         buildableTypes.addAll(spec.getBuildingTypeList());
         buildableTypes.addAll(spec.getUnitTypeList());
-        buildableTypes.addAll(spec.getEquipmentTypeList());
+        buildableTypes.addAll(spec.getRoles());
         for (BuildableType b : buildableTypes) {
             for (AbstractGoods ag : b.getRequiredGoods()) {
                 ag.getType().buildingMaterial = true;

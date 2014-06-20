@@ -161,9 +161,8 @@ public class GoodsTest extends FreeColTestCase {
     }
 
     public void testBuildingMaterials() {
-        // for EquipmentType horses
+        // for dragoon role
         assertTrue(horsesType.isBuildingMaterial());
-        // for EquipmentType muskets
         assertTrue(musketsType.isBuildingMaterial());
         // for buildings and units
         assertTrue(hammersType.isBuildingMaterial());
