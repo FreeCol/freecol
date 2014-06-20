@@ -238,6 +238,23 @@ public class Role extends BuildableType {
     }
 
     /**
+     * Get the required goods for this role, considering also the role count.
+     *
+     * @param roleCount The role count.
+     * @return A list of required goods.
+     */
+    public List<AbstractGoods> getRequiredGoods(int roleCount) {
+        List<AbstractGoods> result
+            = new ArrayList<AbstractGoods>(getRequiredGoods());
+        if (roleCount > 1 && !result.isEmpty()) {
+            for (AbstractGoods ag : result) {
+                ag.setAmount(roleCount * ag.getAmount());
+            }
+        }
+        return result;
+    }
+
+    /**
      * Get the role changes that can allow a unit to assume this role.
      *
      * @return A list of <code>RoleChange</code>s.
