@@ -350,25 +350,33 @@ public class Role extends BuildableType {
      * with negative amounts.
      *
      * @param from The current <code>Role</code>.
-     * @param to The <code>Role</code> to assume.
-     * @return The a list of <code>AbstractGoods</code> required to
+     * @param fromCount The role count for the current role.
+     * @param to The new <code>Role</code> to assume.
+     * @param toCount The role count for the new role.
+     * @return A list of <code>AbstractGoods</code> required to
      *     make the change.
      */
-    public static List<AbstractGoods> getGoodsDifference(Role from, Role to) {
+    public static List<AbstractGoods> getGoodsDifference(Role from,
+        int fromCount, Role to, int toCount) {
         List<AbstractGoods> result = new ArrayList<AbstractGoods>();
-        if (from == null || from.getRequiredGoods().isEmpty()) {
-            result.addAll(to.getRequiredGoods());
-        } else if (to != from) {
-            for (AbstractGoods ag : to.getRequiredGoods()) {
-                int amount = ag.getAmount()
-                    - from.getRequiredAmountOf(ag.getType());
+        List<AbstractGoods> fromGoods = (from == null)
+            ? new ArrayList<AbstractGoods>()
+            : from.getRequiredGoods();
+        if (from == null && to.isDefaultRole()) from = to;
+        if (from != to) {
+            List<AbstractGoods> toGoods = to.getRequiredGoods();
+            for (AbstractGoods ag : toGoods) {
+                int amount = ag.getAmount() * toCount
+                    - AbstractGoods.getCount(ag.getType(), fromGoods) * fromCount;
                 if (amount != 0) {
                     result.add(new AbstractGoods(ag.getType(), amount));
                 }
             }
-            for (AbstractGoods ag : from.getRequiredGoods()) {
-                if (to.getRequiredAmountOf(ag.getType()) != 0) continue;
-                result.add(new AbstractGoods(ag.getType(), -ag.getAmount()));
+            for (AbstractGoods ag : fromGoods) {
+                if (AbstractGoods.findByType(ag.getType(), toGoods) == null) {
+                    result.add(new AbstractGoods(ag.getType(),
+                                                 -ag.getAmount() * fromCount));
+                }
             }
         }
         return result;

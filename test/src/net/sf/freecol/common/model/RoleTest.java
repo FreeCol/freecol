@@ -35,6 +35,8 @@ public class RoleTest extends FreeColTestCase {
         = spec().getGoodsType("model.goods.horses");
     private static final GoodsType muskets
         = spec().getGoodsType("model.goods.muskets");
+    private static final GoodsType tools
+        = spec().getGoodsType("model.goods.tools");
 
     private static final Role none
         = spec().getDefaultRole();
@@ -100,30 +102,36 @@ public class RoleTest extends FreeColTestCase {
     }
 
     public void testGoodsDifference() {
-        assertTrue(Role.getGoodsDifference(null, none).isEmpty());
-        assertTrue(Role.getGoodsDifference(none, none).isEmpty());
-        assertTrue(Role.getGoodsDifference(none, missionary).isEmpty());
-        assertTrue(Role.getGoodsDifference(missionary, none).isEmpty());
+        assertTrue(Role.getGoodsDifference(null, 1, none, 1).isEmpty());
+        assertTrue(Role.getGoodsDifference(none, 1, none, 1).isEmpty());
+        assertTrue(Role.getGoodsDifference(none, 1, missionary, 1).isEmpty());
+        assertTrue(Role.getGoodsDifference(missionary, 1, none, 1).isEmpty());
 
-        List<AbstractGoods> goods = Role.getGoodsDifference(none, soldier);
+        List<AbstractGoods> goods
+            = Role.getGoodsDifference(none, 1, soldier, 1);
         checkGoods("->soldier", goods,
             new AbstractGoods(muskets, 50));
 
-        goods = Role.getGoodsDifference(soldier, dragoon);
+        goods = Role.getGoodsDifference(soldier, 1, dragoon, 1);
         checkGoods("soldier->dragoon", goods,
             new AbstractGoods(horses, 50));
 
-        goods = Role.getGoodsDifference(missionary, dragoon);
+        goods = Role.getGoodsDifference(missionary, 1, dragoon, 1);
         checkGoods("missionary->dragoon", goods,
             new AbstractGoods(horses, 50),
             new AbstractGoods(muskets, 50));
 
-        goods = Role.getGoodsDifference(soldier, none);
+        goods = Role.getGoodsDifference(soldier, 1, none, 1);
         checkGoods("soldier->", goods,
             new AbstractGoods(muskets, -50));
 
-        goods = Role.getGoodsDifference(nativeDragoon, armedBrave);
+        goods = Role.getGoodsDifference(nativeDragoon, 1, armedBrave, 1);
         checkGoods("nativeDragoon->armedBrave", goods,
             new AbstractGoods(horses, -25));
+
+        goods = Role.getGoodsDifference(soldier, 1, pioneer, 4);
+        checkGoods("soldier->pioneer(4)", goods,
+            new AbstractGoods(muskets, -50),
+            new AbstractGoods(tools, 80));
     }
 }

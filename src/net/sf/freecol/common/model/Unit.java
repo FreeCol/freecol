@@ -686,6 +686,19 @@ public class Unit extends GoodsLocation
     }
 
     /**
+     * Get the change in goods required to change to a new role/count.
+     *
+     * @param role The new <code>Role</code> to change to.
+     * @param roleCount The new role count.
+     * @return A list of <code>AbstractGoods</code> defining the change
+     *     in goods required.
+     */
+    public List<AbstractGoods> getGoodsDifference(Role role, int roleCount) {
+        return Role.getGoodsDifference(getRole(), getRoleCount(),
+                                       role, roleCount);
+    }
+
+    /**
      * Set the unit role based on its equipment.
      */
     public void setRole() {

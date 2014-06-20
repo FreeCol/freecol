@@ -2870,11 +2870,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
         ServerPlayer loserPlayer = (ServerPlayer) loser.getOwner();
         Role newRole = winner.canCaptureEquipment(role);
         if (newRole != null) {
-            Role oldRole = winner.getRole();
+            List<AbstractGoods> newGoods = winner.getGoodsDifference(newRole, 1);
+            GoodsType goodsType = newGoods.get(0).getType(); // TODO: generalize
             winner.changeRole(newRole, 1);
-            List<AbstractGoods> newGoods
-                = Role.getGoodsDifference(oldRole, newRole);
-            GoodsType goodsType = newGoods.get(0).getType();
 
             // Currently can not capture equipment back so this only
             // makes sense for native players, and the message is
