@@ -350,7 +350,7 @@ public class AIUnit extends AIObject implements Transportable {
         UnitLocation loc = (unit.isInEurope()) ? player.getEurope()
             : unit.getSettlement();
         if (loc == null) return false;
-        int price = loc.canBuildRoleEquipment(r);
+        int price = loc.priceRoleEquipment(r, 1);
         if (price < 0) return false;
         if (!player.checkGold(price)) {
             if (!cheat) return false;

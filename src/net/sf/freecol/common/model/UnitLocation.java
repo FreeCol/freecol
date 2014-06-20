@@ -496,13 +496,14 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     }
 
     /**
-     * Can equipment for a given role built here?
+     * What would building role-equipment cost at this location.
      *
      * @param role The <code>Role</code> to build for.
+     * @param roleCount The role count.
      * @return Negative if the equipment can not be built, otherwise the
      *     price to build the required equipment (may be zero).
      */
-    public int canBuildRoleEquipment(Role role) {
+    public int priceRoleEquipment(Role role, int roleCount) {
         return -1;
     }
 

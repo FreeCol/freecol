@@ -120,6 +120,26 @@ public class Europe extends UnitLocation implements Ownable, Named {
 
 
     /**
+     * Price a list of goods.
+     *
+     * @param goods The list of <code>AbstractGoods</code> to price.
+     * @return The price for the goods, negative if any are not available.
+     */
+    protected int priceGoods(List<AbstractGoods> goods) {
+        Player player = getOwner();
+        Market market = player.getMarket();
+        int price = 0;
+        for (AbstractGoods ag : goods) {
+            if (ag.getAmount() <= 0) continue;
+            GoodsType goodsType = ag.getType();
+            // Refuse to trade in boycotted goods
+            if (!player.canTrade(goodsType)) return -1;
+            price += market.getBidPrice(goodsType, ag.getAmount());
+        }
+        return price;
+    }
+
+    /**
      * Are any of the recruitables not of the same type?
      *
      * @return True if the recruitables are not all of the same type.
@@ -324,11 +344,11 @@ public class Europe extends UnitLocation implements Ownable, Named {
      * {@inheritDoc}
      */
     @Override
-    public int canBuildRoleEquipment(Role role) {
+    public int priceRoleEquipment(Role role, int roleCount) {
         Player player = getOwner();
         Market market = player.getMarket();
         int price = 0;
-        for (AbstractGoods ag : role.getRequiredGoods()) {
+        for (AbstractGoods ag : role.getRequiredGoods(roleCount)) {
             GoodsType goodsType = ag.getType();
             // Refuse to trade in boycotted goods
             if (!player.canTrade(goodsType)) return -1;

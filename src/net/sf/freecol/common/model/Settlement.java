@@ -394,23 +394,6 @@ public abstract class Settlement extends GoodsLocation
     }
 
     /**
-     * Return true if this Settlement could provide at least one item of
-     * all the given EquipmentTypes.  This is designed specifically to
-     * mesh with getRoleEquipment().
-     *
-     * @param equipment A list of <code>EquipmentType</code>s to build.
-     * @return True if the settlement can provide all the equipment.
-     */
-    /*
-    public boolean canProvideEquipment(List<EquipmentType> equipment) {
-        for (EquipmentType e : equipment) {
-            if (!canProvideEquipment(e)) return false;
-        }
-        return true;
-    }
-    */
-
-    /**
      * Gets the storage capacity of this settlement.
      *
      * @return The storage capacity of this settlement.
@@ -585,8 +568,8 @@ public abstract class Settlement extends GoodsLocation
      * {@inheritDoc}
      */
     @Override
-    public int canBuildRoleEquipment(Role role) {
-        for (AbstractGoods ag : role.getRequiredGoods()) {
+    public int priceRoleEquipment(Role role, int roleCount) {
+        for (AbstractGoods ag : role.getRequiredGoods(roleCount)) {
             if (getGoodsCount(ag.getType()) < ag.getAmount()) return -1;
         }
         return 0;
@@ -601,7 +584,7 @@ public abstract class Settlement extends GoodsLocation
             throw new RuntimeException("Must be in server");
         }
         if (!unit.isPerson()) return false;
-        int price = canBuildRoleEquipment(role);
+        int price = priceRoleEquipment(role, 1);
         if (price < 0 || !owner.checkGold(price)) return false;
 
         // Get the equipment changes.

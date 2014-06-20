@@ -75,7 +75,7 @@ public class ServerEurope extends Europe implements ServerModelObject {
     @Override
     public boolean equipForRole(Unit unit, Role role) {
         if (!unit.isPerson()) return false;
-        int price = canBuildRoleEquipment(role);
+        int price = priceRoleEquipment(role, 1);
         if (price < 0 || !unit.getOwner().checkGold(price)) return false;
 
         // Get the equipment changes.

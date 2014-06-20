@@ -211,8 +211,8 @@ public class NativeAIPlayer extends AIPlayer {
         final Role nativeDragoon = spec.getRole("model.role.nativeDragoon");
         final Role armedBrave = spec.getRole("model.role.armedBrave");
         final Role mountedBrave = spec.getRole("model.role.mountedBrave");
-        boolean moreHorses = is.canBuildRoleEquipment(mountedBrave) >= 0;
-        boolean moreMuskets = is.canBuildRoleEquipment(armedBrave) >= 0;
+        boolean moreHorses = is.priceRoleEquipment(mountedBrave, 1) >= 0;
+        boolean moreMuskets = is.priceRoleEquipment(armedBrave, 1) >= 0;
         if (!moreHorses && !moreMuskets) return;
 
         // Find all the units
@@ -228,13 +228,13 @@ public class NativeAIPlayer extends AIPlayer {
             } else if (u.getRole() == armedBrave) {
                 if (moreHorses
                     && getAIUnit(u).equipForRole(nativeDragoon.getId(), false)) {
-                    moreHorses = is.canBuildRoleEquipment(mountedBrave) >= 0;
+                    moreHorses = is.priceRoleEquipment(mountedBrave, 1) >= 0;
                 }
                 ui.remove();
             } else if (u.getRole() == mountedBrave) {
                 if (moreMuskets
                     && getAIUnit(u).equipForRole(nativeDragoon.getId(), false)) {
-                    moreMuskets = is.canBuildRoleEquipment(armedBrave) >= 0;
+                    moreMuskets = is.priceRoleEquipment(armedBrave, 1) >= 0;
                 }
                 ui.remove();
             }
@@ -244,16 +244,16 @@ public class NativeAIPlayer extends AIPlayer {
         for (Unit u : units) {
             if (moreHorses && moreMuskets) {
                 if (getAIUnit(u).equipForRole(nativeDragoon.getId(), false)) {
-                    moreHorses = is.canBuildRoleEquipment(mountedBrave) >= 0;
-                    moreMuskets = is.canBuildRoleEquipment(armedBrave) >= 0;
+                    moreHorses = is.priceRoleEquipment(mountedBrave, 1) >= 0;
+                    moreMuskets = is.priceRoleEquipment(armedBrave, 1) >= 0;
                 }
             } else if (moreMuskets) {
                 if (getAIUnit(u).equipForRole(armedBrave.getId(), false)) {
-                    moreMuskets = is.canBuildRoleEquipment(armedBrave) >= 0;
+                    moreMuskets = is.priceRoleEquipment(armedBrave, 1) >= 0;
                 }
             } else if (moreHorses) {
                 if (getAIUnit(u).equipForRole(mountedBrave.getId(), false)) {
-                    moreHorses = is.canBuildRoleEquipment(mountedBrave) >= 0;
+                    moreHorses = is.priceRoleEquipment(mountedBrave, 1) >= 0;
                 }
             } else break;
         }
