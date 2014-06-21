@@ -56,7 +56,6 @@ import net.sf.freecol.common.model.ColonyWas;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeContext;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
-import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.EuropeWas;
 import net.sf.freecol.common.model.Event;
@@ -90,6 +89,7 @@ import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.ProductionType;
 import net.sf.freecol.common.model.Region;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StanceTradeItem;
@@ -2183,46 +2183,57 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Change the amount of equipment a unit has.
+     * Change the role-equipment a unit has.
      *
      * @param unit The <code>Unit</code>.
-     * @param type The <code>EquipmentType</code> to equip with.
-     * @param amount How to change the amount of equipment the unit has.
+     * @param role The <code>Role</code> to assume.
+     * @param roleCount The role count.
+     * @return True if the role was changed.
      */
-    public void equipUnit(Unit unit, EquipmentType type, int amount) {
-        if (!requireOurTurn() || amount == 0) return;
+    public boolean equipUnitForRole(Unit unit, Role role, int roleCount) {
+        if (!requireOurTurn() || unit == null || role == null
+            || roleCount < 0 || roleCount > role.getMaximumCount()
+            || (role == unit.getRole() && roleCount == unit.getRoleCount())) {
+            return false;
+        }
 
-        Player player = freeColClient.getMyPlayer();
-        Colony colony = null;
+        final Player player = freeColClient.getMyPlayer();
+        final Colony colony = unit.getColony();
+
+        List<AbstractGoods> req = unit.getGoodsDifference(role, roleCount);
         if (unit.isInEurope()) {
-            for (AbstractGoods goods : type.getRequiredGoods()) {
-                GoodsType goodsType = goods.getType();
+            for (AbstractGoods ag : req) {
+                GoodsType goodsType = ag.getType();
                 if (!player.canTrade(goodsType) && !payArrears(goodsType)) {
-                    return; // payment failed for some reason
+                    return false; // payment failed
+                }
+            }
+            int price = player.getEurope().priceGoods(req);
+            if (price < 0 || !player.checkGold(price)) return false;
+        } else if (colony != null) {
+            for (AbstractGoods ag : req) {
+                if (colony.getGoodsCount(ag.getType()) < ag.getAmount()) {
+                    gui.showInformationMessage(unit,
+                        StringTemplate.template("equipUnit.impossible")
+                            .addName("%colony%", colony.getName())
+                            .add("%equipment%", ag.getType().getNameKey())
+                            .addStringTemplate("%unit%", unit.getFullLabel()));
+                    return false;
                 }
             }
         } else {
-            colony = unit.getColony();
-            if (colony == null) {
-                throw new IllegalStateException("Equip unit not in settlement/Europe");
-            }
-            if (!colony.canBuildEquipment(type, amount)) {
-                gui.showInformationMessage(unit,
-                    StringTemplate.template("equipUnit.impossible")
-                        .addName("%colony%", colony.getName())
-                        .add("%equipment%", type.getNameKey())
-                        .addStringTemplate("%unit%", unit.getFullLabel()));
-                return;
-            }
+            throw new IllegalStateException("Unit not in settlement/Europe");
         }
 
         ColonyWas colonyWas = (colony == null) ? null : new ColonyWas(colony);
         UnitWas unitWas = new UnitWas(unit);
-        if (askServer().equipUnit(unit, type, amount)) {
+        if (askServer().equipUnitForRole(unit, role, roleCount)) {
             if (colonyWas != null) colonyWas.fireChanges();
             unitWas.fireChanges();
             gui.updateMenuBar();
+            return true;
         }
+        return false;
     }
 
     /**

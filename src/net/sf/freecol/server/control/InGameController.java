@@ -3735,6 +3735,8 @@ public final class InGameController extends Controller {
             loc.getTile().cacheUnseen();//+til
             unit.setLocation(loc.getTile());//-vis: safe/colony,-til
             cs.add(See.perhaps(), unit.getTile());
+        } else if (loc instanceof Settlement) {
+            cs.add(See.only(serverPlayer), unit.getTile());
         } else {
             cs.add(See.only(serverPlayer), unit);
         }

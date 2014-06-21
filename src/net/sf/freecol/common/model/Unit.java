@@ -630,19 +630,6 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Change the current role count.  On zero, revert to default role.
-     *
-     * @param delta The change to apply to the role count.
-     * @return True if the role count reached zero.
-     */
-    public boolean changeRoleCount(int delta) {
-        this.roleCount = Math.max(0, this.roleCount + delta);
-        if (this.roleCount != 0) return false;
-        this.role = getSpecification().getDefaultRole();
-        return true;
-    }
-
-    /**
      * Does this unit have the default role?
      *
      * @return True if the unit has the default <code>Role</code>.
@@ -662,16 +649,6 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Is a role available to this unit?
-     *
-     * @param role The <code>Role</code> to test.
-     * @return True if the role is available to this unit.
-     */
-    public boolean roleIsAvailable(Role role) {
-        return role.isAvailableTo(this);
-    }
-
-    /**
      * Change the current role of this unit.
      *
      * @param role The new <code>Role</code>.
@@ -686,6 +663,45 @@ public class Unit extends GoodsLocation
         for (EquipmentType et : spec.getRoleEquipment(role.getId())) {
             equipment.incrementCount(et, roleCount);
         }
+    }
+
+    /**
+     * Change the current role count.  On zero, revert to default role.
+     *
+     * @param delta The change to apply to the role count.
+     * @return True if the role count reached zero.
+     */
+    public boolean changeRoleCount(int delta) {
+        this.roleCount = Math.max(0, this.roleCount + delta);
+        if (this.roleCount != 0) return false;
+        this.role = getSpecification().getDefaultRole();
+        return true;
+    }
+
+    /**
+     * Is a role available to this unit?
+     *
+     * @param role The <code>Role</code> to test.
+     * @return True if the role is available to this unit.
+     */
+    public boolean roleIsAvailable(Role role) {
+        return role.isAvailableTo(this);
+    }
+
+    /**
+     * Filter a list of roles to return only those available to this unit.
+     *
+     * @param roles The list of <code>Role</code>s to filter, if null all
+     *     available roles are used.
+     * @return A list of available <code>Role</code>s.
+     */
+    public List<Role> getAvailableRoles(List<Role> roles) {
+        if (roles == null) roles = getSpecification().getRoles();
+        List<Role> result = new ArrayList<Role>();
+        for (Role role : roles) {
+            if (roleIsAvailable(role)) result.add(role);
+        }
+        return result;
     }
 
     /**

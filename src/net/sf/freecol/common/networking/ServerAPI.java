@@ -38,7 +38,6 @@ import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
-import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -55,6 +54,7 @@ import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
@@ -852,15 +852,15 @@ public abstract class ServerAPI {
     }
 
     /**
-     * Server query-response for equipping a unit.
+     * Server query-response for equipping a unit for a role.
      *
-     * @param unit The <code>Unit</code> to equip on.
-     * @param type The <code>EquipmentType</code> to equip with.
-     * @param amount The amount of equipment.
+     * @param unit The <code>Unit</code> to equip.
+     * @param role The <code>Role</code> to assume.
+     * @param roleCount The role count.
      * @return True if the server interaction succeeded.
      */
-    public boolean equipUnit(Unit unit, EquipmentType type, int amount) {
-        return askHandling(new EquipUnitMessage(unit, type, amount),
+    public boolean equipUnitForRole(Unit unit, Role role, int roleCount) {
+        return askHandling(new EquipForRoleMessage(unit, role, roleCount),
             null, null);
     }
 
