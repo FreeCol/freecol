@@ -668,7 +668,7 @@ public class Unit extends GoodsLocation
      * @return True if the role is available to this unit.
      */
     public boolean roleIsAvailable(Role role) {
-        return role.isAvailableTo(getOwner(), getType());
+        return role.isAvailableTo(this);
     }
 
     /**

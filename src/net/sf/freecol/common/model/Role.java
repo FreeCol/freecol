@@ -410,6 +410,24 @@ public class Role extends BuildableType {
     }
        
     /**
+     * Is this role available to an actual unit?
+     *
+     * @param unit The <code>Unit</code> to check.
+     * @return True if the role is available.
+     */
+    public boolean isAvailableTo(Unit unit) {
+        Map<String, Boolean> required = getRequiredAbilities();
+        if (required == null) return true;
+
+        for (Entry<String, Boolean> entry : required.entrySet()) {
+            if (unit.hasAbility(entry.getKey()) != entry.getValue()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Is this role available to a proposed unit?
      *
      * @param player The <code>Player</code> to own the unit.
@@ -418,21 +436,22 @@ public class Role extends BuildableType {
      */
     public boolean isAvailableTo(Player player, UnitType type) {
         Map<String, Boolean> required = getRequiredAbilities();
-        if (required != null) {
-            Set<Ability> abilities = new HashSet<Ability>();
-            abilities.addAll(player.getAbilitySet());
-            abilities.addAll(type.getAbilitySet());
-            for (Entry<String, Boolean> entry : required.entrySet()) {
-                Ability found = null;
-                for (Ability a : abilities) {
-                    if (a.getId().equals(entry.getKey())) {
-                        found = a;
-                        break;
-                    }
+        if (required == null) return true;
+
+        Set<Ability> abilities = new HashSet<Ability>();
+        abilities.addAll(player.getAbilitySet());
+        abilities.addAll(type.getAbilitySet());
+
+        for (Entry<String, Boolean> entry : required.entrySet()) {
+            Ability found = null;
+            for (Ability a : abilities) {
+                if (a.getId().equals(entry.getKey())) {
+                    found = a;
+                    break;
                 }
-                boolean value = (found == null) ? false : found.getValue();
-                if (value != entry.getValue()) return false;
             }
+            boolean value = (found == null) ? false : found.getValue();
+            if (value != entry.getValue()) return false;
         }
         return true;
     }

@@ -72,9 +72,6 @@ public class BuildingTest extends FreeColTestCase {
     private static final BuildingType weaverHouseType
         = spec().getBuildingType("model.building.weaverHouse");
 
-    private static final EquipmentType missionaryEquipmentType
-        = spec().getEquipmentType("model.equipment.missionary");
-
     private static final GoodsType bellsType
         = spec().getGoodsType("model.goods.bells");
     private static final GoodsType clothType
@@ -99,6 +96,9 @@ public class BuildingTest extends FreeColTestCase {
         = spec().getGoodsType("model.goods.ore");
     private static final GoodsType toolsType
         = spec().getGoodsType("model.goods.tools");
+
+    private static final Role missionaryRole
+        = spec().getRole("model.role.missionary");
 
     private static final TileType plainsType
         = spec().getTileType("model.tile.plains");
@@ -233,7 +233,7 @@ public class BuildingTest extends FreeColTestCase {
 
         assertFalse(chapelType.hasAbility(Ability.DRESS_MISSIONARY));
         assertFalse(unit0.hasAbility(Ability.DRESS_MISSIONARY));
-        assertFalse(unit0.canBeEquippedWith(missionaryEquipmentType));
+        assertFalse(unit0.roleIsAvailable(missionaryRole));
 
         Building church = colony.getBuilding(chapelType);
         assertNotNull(church);
@@ -251,7 +251,7 @@ public class BuildingTest extends FreeColTestCase {
         assertTrue(church.getType().hasAbility(Ability.DRESS_MISSIONARY));
         assertTrue(colony.hasAbility(Ability.DRESS_MISSIONARY));
         assertTrue(unit0.hasAbility(Ability.DRESS_MISSIONARY));
-        assertTrue(unit0.canBeEquippedWith(missionaryEquipmentType));
+        assertTrue(unit0.roleIsAvailable(missionaryRole));
 
         assertEquals("Church base cross production, no unit", 2,
             church.getBaseProduction(null, crossesType, null));
@@ -310,7 +310,7 @@ public class BuildingTest extends FreeColTestCase {
         assertTrue(church.getType().hasAbility(Ability.DRESS_MISSIONARY));
         assertTrue(colony.hasAbility(Ability.DRESS_MISSIONARY));
         assertTrue(unit0.hasAbility(Ability.DRESS_MISSIONARY));
-        assertTrue(unit0.canBeEquippedWith(missionaryEquipmentType));
+        assertTrue(unit0.roleIsAvailable(missionaryRole));
 
         assertEquals("Cathedral base cross production, no unit", 3,
             church.getBaseProduction(null, crossesType, null));
