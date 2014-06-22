@@ -1162,7 +1162,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             Role role = spec.getMilitaryRoles().get(0);
             Player owner = colony.getOwner();
             for (Unit unit : colony.getTile().getUnitList()) {
-                if (!role.isAvailableTo(owner, unit.getType())
+                if (!unit.roleIsAvailable(role)
                     || (!unit.hasDefaultRole()
                         && !Role.isCompatibleWith(role, unit.getRole())))
                     continue;

@@ -1206,10 +1206,11 @@ public class ColonyPlan {
      */
     private static boolean fullEquipUnit(Specification spec, Unit unit,
                                          Role role, Colony colony) {
-        return ("model.role.soldier".equals(role.getId()))
-            ? colony.equipForRole(unit, spec.getRole("model.role.dragoon"), 1)
-            || colony.equipForRole(unit, spec.getRole("model.role.soldier"), 1)
-            : colony.equipForRole(unit, role, 1);
+        if ("model.role.soldier".equals(role.getId())) {
+            Role r = spec.getRole("model.role.dragoon");
+            if (colony.equipForRole(unit, r, r.getMaximumCount())) return true;
+        }
+        return colony.equipForRole(unit, role, role.getMaximumCount());
     }
 
     /**
@@ -1581,7 +1582,7 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
         for (Unit u : workers) {
             report.append(u.getId()).append("(")
                 .append(u.getType().getSuffix()).append(") -> UNUSED\n");
-        }                
+        }
         report.append("Final population = ").append(col.getUnitCount());
         if (col.getUnitCount() <= 0) {
             report.append("\nassignWorkers at ").append(name)
