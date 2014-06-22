@@ -758,7 +758,7 @@ public class Unit extends GoodsLocation
         if (!role.isCompatibleWith(oldRole)) {
             experience = 0;
         }
-        setRoleCount(count);
+        setRoleCount(Math.min(role.getMaximumCount(), count));
     }
 
     /**
@@ -3825,6 +3825,7 @@ public class Unit extends GoodsLocation
     private static final String NATIONALITY_TAG = "nationality";
     private static final String OWNER_TAG = "owner";
     private static final String ROLE_TAG = "role";
+    private static final String ROLE_COUNT_TAG = "roleCount";
     private static final String STATE_TAG = "state";
     private static final String STUDENT_TAG = "student";
     private static final String TRADE_ROUTE_TAG = "tradeRoute";
@@ -3861,6 +3862,8 @@ public class Unit extends GoodsLocation
         xw.writeAttribute(STATE_TAG, state);
 
         xw.writeAttribute(ROLE_TAG, role);
+
+        xw.writeAttribute(ROLE_COUNT_TAG, roleCount);
 
         if (!full && hasAbility(Ability.PIRACY)) {
             // Pirates do not disclose national characteristics.
@@ -3988,6 +3991,8 @@ public class Unit extends GoodsLocation
         role = xr.getRole(spec, ROLE_TAG, Role.class,
                           spec.getDefaultRole());
 
+        roleCount = xr.getAttribute(ROLE_COUNT_TAG, role.getMaximumCount());
+
         location = xr.getLocationAttribute(game, LOCATION_TAG, true);
 
         entryLocation = xr.getLocationAttribute(game, ENTRY_LOCATION_TAG,
@@ -4055,7 +4060,9 @@ public class Unit extends GoodsLocation
 
         super.readChildren(xr);
 
+        // @compat 0.10.x
         setRole();
+        // end @compat 0.10.x
 
         // @compat 0.10.x
         // There was a bug in 0.10.x that did not clear tile
@@ -4081,17 +4088,19 @@ public class Unit extends GoodsLocation
         final Game game = getGame();
         final String tag = xr.getLocalName();
 
+        // @compat 0.10.x
         if (EQUIPMENT_TAG.equals(tag)) {
             equipment.incrementCount(spec.getEquipmentType(xr.readId()),
                                      xr.getAttribute(COUNT_TAG, 0));
             xr.closeTag(EQUIPMENT_TAG);
+        // end @compat 0.10.x
 
         // @compat 0.10.5
         } else if (OLD_UNITS_TAG.equals(tag)) {
             while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 super.readChild(xr);
             }
-        // end @compat
+        // end @compat 0.10.5
 
         } else if (TileImprovement.getXMLElementTagName().equals(tag)) {
             workImprovement = xr.readFreeColGameObject(game,

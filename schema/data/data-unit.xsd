@@ -92,10 +92,13 @@
     <xs:attribute name="unitType" type="xs:string" use="required"/>
     <xs:attribute name="movesLeft" type="xs:int" use="required"/>
     <xs:attribute name="state" type="UnitState" use="required"/>
-    <!-- @compat 0.10.7
+    <!-- 
+       Should be:
          <xs:attribute name="role" type="RoleId" use="required"/>
-    -->
+         <xs:attribute name="roleCount" type="xs:int" use="required"/>
+       However, @compat 0.10.7 -->
     <xs:attribute name="role" type="xs:string" use="required"/>
+    <xs:attribute name="roleCount" type="xs:int" use="optional"/>
     <!-- end @compat -->
     <xs:attribute name="owner" type="PlayerId" use="required"/>
     <xs:attribute name="turnsOfTraining" type="xs:int" use="required"/>
@@ -154,7 +157,5 @@
       <!-- end @compat 0.10.x -->
     </xs:restriction>
   </xs:simpleType>
-
-
 
 </xs:schema>
