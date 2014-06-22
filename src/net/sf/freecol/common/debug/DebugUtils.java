@@ -573,7 +573,6 @@ public class DebugUtils {
                                                "cancel", rcs);
         if (roleChoice == null) return;
 
-        sUnit.clearEquipment();
         sUnit.changeRole(roleChoice, roleChoice.getMaximumCount());
         freeColClient.getConnectController().reconnect();
     }
