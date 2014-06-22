@@ -970,6 +970,7 @@
     </role>
 
     <role id="model.role.mountedBrave">
+      <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-ability id="model.ability.native" value="true"/>
       <required-ability id="model.ability.refUnit" value="false"/>
       <required-goods id="model.goods.horses" value="25"/>
@@ -985,6 +986,7 @@
     </role>
 
     <role id="model.role.armedBrave">
+      <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-ability id="model.ability.native" value="true"/>
       <required-ability id="model.ability.refUnit" value="false"/>
       <required-goods id="model.goods.muskets" value="25"/>
@@ -998,6 +1000,7 @@
     </role>
 
     <role id="model.role.nativeDragoon" downgrade="model.role.armedBrave">
+      <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-ability id="model.ability.native" value="true"/>
       <required-ability id="model.ability.refUnit" value="false"/>
       <required-goods id="model.goods.muskets" value="25"/>

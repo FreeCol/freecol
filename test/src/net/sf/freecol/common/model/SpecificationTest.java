@@ -253,16 +253,19 @@ public final class SpecificationTest extends FreeColTestCase {
         roleAbilities.put("model.role.cavalry", expectAbilities);
 
         expectAbilities = new HashMap<String, Boolean>();
+        expectAbilities.put(Ability.CAN_BE_EQUIPPED, true);
         expectAbilities.put(Ability.NATIVE, true);
         expectAbilities.put(Ability.REF_UNIT, false);
         roleAbilities.put("model.role.mountedBrave", expectAbilities);
 
         expectAbilities = new HashMap<String, Boolean>();
+        expectAbilities.put(Ability.CAN_BE_EQUIPPED, true);
         expectAbilities.put(Ability.NATIVE, true);
         expectAbilities.put(Ability.REF_UNIT, false);
         roleAbilities.put("model.role.armedBrave", expectAbilities);
 
         expectAbilities = new HashMap<String, Boolean>();
+        expectAbilities.put(Ability.CAN_BE_EQUIPPED, true);
         expectAbilities.put(Ability.NATIVE, true);
         expectAbilities.put(Ability.REF_UNIT, false);
         roleAbilities.put("model.role.nativeDragoon", expectAbilities);
