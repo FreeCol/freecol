@@ -244,8 +244,7 @@ public class Role extends BuildableType {
      * @return A list of required goods.
      */
     public List<AbstractGoods> getRequiredGoods(int roleCount) {
-        List<AbstractGoods> result
-            = new ArrayList<AbstractGoods>(getRequiredGoods());
+        List<AbstractGoods> result = getRequiredGoods();
         if (roleCount > 1 && !result.isEmpty()) {
             for (AbstractGoods ag : result) {
                 ag.setAmount(roleCount * ag.getAmount());
@@ -359,23 +358,21 @@ public class Role extends BuildableType {
     public static List<AbstractGoods> getGoodsDifference(Role from,
         int fromCount, Role to, int toCount) {
         List<AbstractGoods> result = new ArrayList<AbstractGoods>();
-        List<AbstractGoods> fromGoods = (from == null)
-            ? new ArrayList<AbstractGoods>()
-            : from.getRequiredGoods();
-        if (from == null && to.isDefaultRole()) from = to;
-        if (from != to) {
-            List<AbstractGoods> toGoods = to.getRequiredGoods();
+        if (from != to && !(from == null && to.isDefaultRole())) {
+            List<AbstractGoods> fromGoods = (from == null)
+                ? new ArrayList<AbstractGoods>()
+                : from.getRequiredGoods(fromCount);
+            List<AbstractGoods> toGoods = to.getRequiredGoods(toCount);
             for (AbstractGoods ag : toGoods) {
-                int amount = ag.getAmount() * toCount
-                    - AbstractGoods.getCount(ag.getType(), fromGoods) * fromCount;
+                int amount = ag.getAmount()
+                    - AbstractGoods.getCount(ag.getType(), fromGoods);
                 if (amount != 0) {
                     result.add(new AbstractGoods(ag.getType(), amount));
                 }
             }
             for (AbstractGoods ag : fromGoods) {
                 if (AbstractGoods.findByType(ag.getType(), toGoods) == null) {
-                    result.add(new AbstractGoods(ag.getType(),
-                                                 -ag.getAmount() * fromCount));
+                    result.add(new AbstractGoods(ag.getType(), -ag.getAmount()));
                 }
             }
         }

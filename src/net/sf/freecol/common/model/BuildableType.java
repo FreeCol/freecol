@@ -131,7 +131,6 @@ public abstract class BuildableType extends FreeColGameObjectType {
      */
     public boolean isAvailableTo(Player player) {
         if (requiredAbilities != null) {
-
             for (Entry<String, Boolean> entry : requiredAbilities.entrySet()) {
                 if (player.hasAbility(entry.getKey()) != entry.getValue()) {
                     return false;
@@ -144,11 +143,18 @@ public abstract class BuildableType extends FreeColGameObjectType {
     /**
      * Get the goods required to build an instance of this buildable.
      *
-     * @return A list of required goods.
+     * Note we must take care to return a deep copy, as these lists
+     * are subject to complex manipulations in the role code.
+     *
+     * @return A deep copy of the list of required goods.
      */
     public List<AbstractGoods> getRequiredGoods() {
         if (requiredGoods == null) return Collections.emptyList();
-        return requiredGoods;
+        List<AbstractGoods> result = new ArrayList<AbstractGoods>();
+        for (AbstractGoods ag : requiredGoods) {
+            result.add(new AbstractGoods(ag.getType(), ag.getAmount()));
+        }
+        return result;
     }
 
     /**
@@ -160,15 +166,6 @@ public abstract class BuildableType extends FreeColGameObjectType {
      */
     public int getRequiredAmountOf(GoodsType type) {
         return AbstractGoods.getCount(type, getRequiredGoods());
-    }
-
-    /**
-     * Set the required goods.
-     *
-     * @param newGoods The new required goods.
-     */
-    public void setRequiredGoods(List<AbstractGoods> newGoods) {
-        this.requiredGoods = newGoods;
     }
 
     /**
