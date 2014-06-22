@@ -88,11 +88,11 @@ public abstract class BuildableType extends FreeColGameObjectType {
     /**
      * Gets the abilities required by this type.
      *
-     * @return The required abilities.
+     * @return A copy of the required abilities map.
      */
     public Map<String, Boolean> getRequiredAbilities() {
-        return (requiredAbilities != null) ? requiredAbilities
-            : new HashMap<String, Boolean>();
+        if (requiredAbilities == null) return Collections.emptyMap();
+        return new HashMap<String, Boolean>(requiredAbilities);
     }
 
     public boolean requiresAbility(String key) {
