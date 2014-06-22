@@ -99,7 +99,6 @@ public class StandardAIPlayerTest extends FreeColTestCase {
         assertEquals("Wrong initial number of muskets in Indian camp",
             totalMusketsAvail, camp.getGoodsCount(musketsType));
 
-        // Exercise SUT
         player.equipBraves(camp);
 
         // Verify results
@@ -157,7 +156,6 @@ public class StandardAIPlayerTest extends FreeColTestCase {
         assertEquals("Wrong initial number of muskets in Indian camp",
             totalMusketsAvail, camp.getGoodsCount(musketsType));
 
-        // Exercise SUT
         player.equipBraves(camp);
 
         // Verify results

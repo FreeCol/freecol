@@ -211,51 +211,28 @@ public class NativeAIPlayer extends AIPlayer {
         final Role nativeDragoon = spec.getRole("model.role.nativeDragoon");
         final Role armedBrave = spec.getRole("model.role.armedBrave");
         final Role mountedBrave = spec.getRole("model.role.mountedBrave");
-        boolean moreHorses = is.priceRoleEquipment(mountedBrave, 1) >= 0;
-        boolean moreMuskets = is.priceRoleEquipment(armedBrave, 1) >= 0;
-        if (!moreHorses && !moreMuskets) return;
 
         // Find all the units
         List<Unit> units = is.getUnitList();
         units.addAll(is.getTile().getUnitList());
 
         // Prioritize promoting partially equipped units to full dragoon
-        Iterator<Unit> ui = units.iterator();
-        while (ui.hasNext()) {
-            Unit u = ui.next();
-            if (u.getRole() == nativeDragoon) {
-                ui.remove();
-            } else if (u.getRole() == armedBrave) {
-                if (moreHorses
-                    && getAIUnit(u).equipForRole(nativeDragoon.getId(), false)) {
-                    moreHorses = is.priceRoleEquipment(mountedBrave, 1) >= 0;
-                }
-                ui.remove();
-            } else if (u.getRole() == mountedBrave) {
-                if (moreMuskets
-                    && getAIUnit(u).equipForRole(nativeDragoon.getId(), false)) {
-                    moreMuskets = is.priceRoleEquipment(armedBrave, 1) >= 0;
-                }
-                ui.remove();
-            }
-        }
+        Collections.sort(units,
+            Unit.getMilitaryStrengthComparator(getGame().getCombatModel()));
 
-        // Only unarmed braves remain, give them what is left
+        boolean moreHorses = true, moreMuskets = true;
         for (Unit u : units) {
-            if (moreHorses && moreMuskets) {
-                if (getAIUnit(u).equipForRole(nativeDragoon.getId(), false)) {
-                    moreHorses = is.priceRoleEquipment(mountedBrave, 1) >= 0;
-                    moreMuskets = is.priceRoleEquipment(armedBrave, 1) >= 0;
-                }
-            } else if (moreMuskets) {
-                if (getAIUnit(u).equipForRole(armedBrave.getId(), false)) {
-                    moreMuskets = is.priceRoleEquipment(armedBrave, 1) >= 0;
-                }
-            } else if (moreHorses) {
-                if (getAIUnit(u).equipForRole(mountedBrave.getId(), false)) {
-                    moreHorses = is.priceRoleEquipment(mountedBrave, 1) >= 0;
-                }
-            } else break;
+            if (!u.isArmed()) {
+                Role r = (u.isMounted()) ? nativeDragoon : armedBrave;
+                moreMuskets = is.priceRoleEquipment(r, 1) == 0
+                    && getAIUnit(u).equipForRole(r.getId(), false);
+            }
+            if (!u.isMounted()) {
+                Role r = (u.isArmed()) ? nativeDragoon : mountedBrave;
+                moreHorses = is.priceRoleEquipment(r, 1) == 0
+                    && getAIUnit(u).equipForRole(r.getId(), false);
+            }
+            if (!moreHorses && !moreMuskets) break;
         }
     }
 
