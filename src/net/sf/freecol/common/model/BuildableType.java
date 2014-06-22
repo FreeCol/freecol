@@ -124,17 +124,21 @@ public abstract class BuildableType extends FreeColGameObjectType {
     }
 
     /**
-     * Is this buildable available to a given Player?
+     * Is this buildable available to a given FreeColObject?
      *
-     * @param player The <code>Player</code> to check.
+     * @param fco The <code>FreeColObject</code>s to check.
      * @return True if the buildable is available.
      */
-    public boolean isAvailableTo(Player player) {
+    public boolean isAvailableTo(FreeColObject... fco) {
         if (requiredAbilities != null) {
+            FreeColObject[] objects = fco;
             for (Entry<String, Boolean> entry : requiredAbilities.entrySet()) {
-                if (player.hasAbility(entry.getKey()) != entry.getValue()) {
-                    return false;
+                boolean found = false;
+                for (int i = 0; i < objects.length; i++) {
+                    found = objects[i].hasAbility(entry.getKey());
+                    if (found) break;
                 }
+                if (found != entry.getValue()) return false;
             }
         }
         return true;
