@@ -29,6 +29,7 @@ import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
@@ -559,9 +560,15 @@ public class PioneeringMission extends Mission {
                 && hasTools())
                 ? " and equips"
                 : " but fails to equip";
-            setTarget(newTarget = findTarget(aiUnit, 10, false));
-            logMe += ", retargeting " + newTarget
-                + "/" + tileImprovementPlan + ": " + this;
+            newTarget = findTarget(aiUnit, 10, false);
+            if (!hasTools() && Map.isSameLocation(newTarget, getTarget())) {
+                newTarget = null;
+                logMe += ", cancelling: " + this;
+            } else {
+                logMe += ", retargeting " + newTarget
+                    + "/" + tileImprovementPlan + ": " + this;
+            }
+            setTarget(newTarget);
             logger.finest(logMe);
             if (newTarget == null) return;
         }
