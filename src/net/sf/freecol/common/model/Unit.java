@@ -765,15 +765,6 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Clear any special role and equipment.
-     *
-     * This is often useful prior to a unit type change or ownership change.
-     */
-    public void clearRoleAndEquipment() {
-        changeRole(getSpecification().getDefaultRole(), 0);
-    }
-
-    /**
      * Sets the units location without updating any other variables
      *
      * get/setLocation are in Locatable interface.

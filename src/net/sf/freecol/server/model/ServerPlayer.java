@@ -2819,6 +2819,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     private void csCaptureConvert(Unit attacker, IndianSettlement is,
                                   Random random, ChangeSet cs) {
+        final Specification spec = getGame().getSpecification();
         ServerPlayer attackerPlayer = (ServerPlayer)attacker.getOwner();
         ServerPlayer nativePlayer = (ServerPlayer)is.getOwner();
         StringTemplate convertNation = nativePlayer.getNationName();
@@ -2830,7 +2831,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                                        ChangeType.CONVERSION,
                                        attacker.getTile(),
                                        cs)) { //-vis(attackerPlayer)
-            convert.clearRoleAndEquipment();
+            convert.changeRole(spec.getDefaultRole(), 0);
             convert.setMovesLeft(0);
             convert.setState(Unit.UnitState.ACTIVE);
             cs.add(See.only(nativePlayer), is.getTile());

@@ -144,12 +144,13 @@ public class ServerIndianSettlement extends IndianSettlement
      * @param cs A <code>ChangeSet</code> to update.
      */
     public void csStartTurn(Random random, ChangeSet cs) {
-        // Check for braves converted by missionaries
+        final Specification spec = getSpecification();
         final Unit missionary = getMissionary();
         if (missionary == null) return;
         final ServerPlayer other = (ServerPlayer)missionary.getOwner();
         final Tile tile = getTile();
 
+        // Check for braves converted by missionaries
         float convert = getConvertProgress();
         convert += missionary.applyModifier(missionary.getType().getSkill(),
                                             Modifier.CONVERSION_SKILL);
@@ -175,7 +176,7 @@ public class ServerIndianSettlement extends IndianSettlement
             ServerPlayer owner = (ServerPlayer)getOwner();
             if (owner.csChangeOwner(brave, other, ChangeType.CONVERSION, 
                                     colony.getTile(), cs)) { //-vis(other)
-                brave.clearRoleAndEquipment();
+                brave.changeRole(spec.getDefaultRole(), 0);
                 brave.setMovesLeft(0);
                 brave.setState(Unit.UnitState.ACTIVE);
                 cs.addDisappear(other, tile, brave);
