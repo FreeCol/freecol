@@ -3970,7 +3970,12 @@ public class Unit extends GoodsLocation
         role = xr.getRole(spec, ROLE_TAG, Role.class,
                           spec.getDefaultRole());
 
-        roleCount = xr.getAttribute(ROLE_COUNT_TAG, role.getMaximumCount());
+        roleCount = xr.getAttribute(ROLE_COUNT_TAG,
+            // @compat 0.10.x
+            -1
+            // Should be role.getMaximumCount()
+            // end @compat 0.10.x
+            );
 
         location = xr.getLocationAttribute(game, LOCATION_TAG, true);
 
@@ -4040,7 +4045,14 @@ public class Unit extends GoodsLocation
         super.readChildren(xr);
 
         // @compat 0.10.x
-        setRole();
+        if (roleCount < 0) {
+            // If roleCount was not present, set it from equipment
+            roleCount = role.getMaximumCount();
+            setRole(); // from equipment
+        } else {
+            // If roleCount was present, we are now ignoring equipment.
+            equipment.clear();
+        }
         // end @compat 0.10.x
 
         // @compat 0.10.x
