@@ -1250,7 +1250,7 @@ public class ColonyPlan {
         // or active pioneers should be on the worker list.
         for (Unit u : workers) {
             u.setLocation(tile);
-            u.clearEquipment(col);
+            col.equipForRole(u, spec().getDefaultRole());
         }
 
         // Move outdoor experts outside if possible.

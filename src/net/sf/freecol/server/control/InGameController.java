@@ -971,8 +971,8 @@ public final class InGameController extends Controller {
 
     private StringTemplate abstractUnitTemplate(String base,
                                                 List<AbstractUnit> units) {
+        final Specification spec = getGame().getSpecification();
         StringTemplate template = StringTemplate.label(base);
-        Specification spec = getGame().getSpecification();
         for (AbstractUnit au : units) {
             template.addStringTemplate(au.getLabel());
         }
@@ -1207,7 +1207,7 @@ public final class InGameController extends Controller {
      * @return Null.
      */
     public Element continuePlaying(ServerPlayer serverPlayer) {
-        ServerGame game = (ServerGame) getGame();
+        final ServerGame game = (ServerGame)getGame();
         Element reply = null;
         if (!getFreeColServer().isSinglePlayer()) {
             logger.warning("Can not continue playing in multiplayer!");
@@ -1216,7 +1216,7 @@ public final class InGameController extends Controller {
                            + serverPlayer.getName()
                            + " has not won the game!");
         } else {
-            Specification spec = game.getSpecification();
+            final Specification spec = game.getSpecification();
             spec.getBooleanOption(GameOptions.VICTORY_DEFEAT_REF)
                 .setValue(false);
             spec.getBooleanOption(GameOptions.VICTORY_DEFEAT_EUROPEANS)
@@ -2833,8 +2833,9 @@ public final class InGameController extends Controller {
      */
     public Element buildSettlement(ServerPlayer serverPlayer, Unit unit,
                                    String name) {
+        final Game game = serverPlayer.getGame();
+        final Specification spec = game.getSpecification();
         ChangeSet cs = new ChangeSet();
-        Game game = serverPlayer.getGame();
 
         // Build settlement
         Tile tile = unit.getTile();
@@ -2859,7 +2860,7 @@ public final class InGameController extends Controller {
 
             // Remove equipment from founder in case role confuses
             // placement.
-            unit.clearEquipment(settlement);
+            settlement.equipForRole(unit, spec.getDefaultRole());
 
             // Coronado
             for (ServerPlayer sp : getOtherPlayers(serverPlayer)) {
@@ -2882,7 +2883,7 @@ public final class InGameController extends Controller {
                                    nationType.generateSkillsForTile(tile),
                                    random);
             if (skill == null) { // Seasoned Scout
-                List<UnitType> scouts = getGame().getSpecification()
+                List<UnitType> scouts = spec
                     .getUnitTypesWithAbility(Ability.EXPERT_SCOUT);
                 skill = Utils.getRandomMember(logger, "Choose scout",
                                               scouts, random);
@@ -2925,6 +2926,7 @@ public final class InGameController extends Controller {
      */
     public Element joinColony(ServerPlayer serverPlayer, Unit unit,
                               Colony colony) {
+        final Specification spec = getGame().getSpecification();
         ChangeSet cs = new ChangeSet();
         List<Tile> ownedTiles = colony.getOwnedTiles();
         Tile tile = colony.getTile();
@@ -2933,7 +2935,7 @@ public final class InGameController extends Controller {
         tile.cacheUnseen();//+til
         unit.setLocation(colony);//-vis: safe/colony,-til
         unit.setMovesLeft(0);
-        unit.clearEquipment(colony);
+        colony.equipForRole(unit, spec.getDefaultRole());
 
         // Update with colony tile, and tiles now owned.
         cs.add(See.only(serverPlayer), tile);
@@ -3440,6 +3442,7 @@ public final class InGameController extends Controller {
      */
     public Element work(ServerPlayer serverPlayer, Unit unit,
                         WorkLocation workLocation) {
+        final Specification spec = getGame().getSpecification();
         ChangeSet cs = new ChangeSet();
         Colony colony = workLocation.getColony();
         colony.getGoodsContainer().saveState();
@@ -3452,7 +3455,7 @@ public final class InGameController extends Controller {
             }
         }
 
-        unit.clearEquipment(colony); // Remove any unit equipment
+        colony.equipForRole(unit, spec.getDefaultRole());
 
         // Check for upgrade.
         UnitType oldType = unit.getType();

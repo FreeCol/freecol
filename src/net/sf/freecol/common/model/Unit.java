@@ -679,7 +679,7 @@ public class Unit extends GoodsLocation
         setRole(role);
         setRoleCount((role.isDefaultRole()) ? 0 : roleCount);
 
-        clearEquipment();
+        equipment.clear();
         for (EquipmentType et : spec.getRoleEquipment(role.getId())) {
             equipment.incrementCount(et, roleCount);
         }
@@ -767,9 +767,7 @@ public class Unit extends GoodsLocation
      * This is often useful prior to a unit type change or ownership change.
      */
     public void clearRoleAndEquipment() {
-        clearEquipment();
-        setRole(getSpecification().getDefaultRole());
-        setRoleCount(0);
+        changeRole(getSpecification().getDefaultRole(), 0);
     }
 
     /**
@@ -1540,13 +1538,6 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Clears all <code>Equipment</code> held by this unit.
-     */
-    public void clearEquipment() {
-        equipment.clear();
-    }
-
-    /**
      * Get the amount of an equipment type this unit has.
      *
      * @param equipmentType The <code>EquipmentType</code> to check.
@@ -1752,20 +1743,6 @@ public class Unit extends GoodsLocation
         }
         return change;
     }
-
-    /**
-     * Convenience function to remove all equipment this unit has and
-     * drop it in a settlement.
-     *
-     * @param settlement The <code>Settlement</code> to collect the equipment
-     *     goods.
-     */
-    public void clearEquipment(Settlement settlement) {
-        settlement.equipForRole(this, getSpecification().getDefaultRole());
-
-        assert hasDefaultRole();
-    }
-    
 
 
     // Combat routines
