@@ -4127,7 +4127,11 @@ public class Unit extends GoodsLocation
         } else {
             sb.append(" ").append(Utils.lastPart(owner.getNationId(), "."))
                 .append(" ").append(getType().getSuffix());
-            if (!hasDefaultRole()) sb.append("-").append(getRoleSuffix());
+            if (!hasDefaultRole()) {
+                sb.append("-").append(getRoleSuffix());
+                int count = getRoleCount();
+                if (count > 1) sb.append(".").append(count);
+            }
             sb.append(" ").append(getMovesAsString());
         }
         sb.append("]");
