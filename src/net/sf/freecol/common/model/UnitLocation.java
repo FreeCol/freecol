@@ -496,14 +496,13 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     }
 
     /**
-     * What would building role-equipment cost at this location.
+     * What would the price be for a collection of goods at this location?
      *
-     * @param role The <code>Role</code> to build for.
-     * @param roleCount The role count.
-     * @return Negative if the equipment can not be built, otherwise the
-     *     price to build the required equipment (may be zero).
+     * @param goods The list of <code>AbstractGoods</code> to check for.
+     * @return Negative if the goods are unavailable, otherwise the
+     *     price (may be zero).
      */
-    public int priceRoleEquipment(Role role, int roleCount) {
+    public int priceGoods(List<AbstractGoods> goods) {
         return -1;
     }
 

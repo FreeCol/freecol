@@ -568,8 +568,8 @@ public abstract class Settlement extends GoodsLocation
      * {@inheritDoc}
      */
     @Override
-    public int priceRoleEquipment(Role role, int roleCount) {
-        for (AbstractGoods ag : role.getRequiredGoods(roleCount)) {
+    public int priceGoods(List<AbstractGoods> goods) {
+        for (AbstractGoods ag : goods) {
             if (getGoodsCount(ag.getType()) < ag.getAmount()) return -1;
         }
         return 0;
@@ -584,7 +584,7 @@ public abstract class Settlement extends GoodsLocation
             throw new RuntimeException("Must be in server");
         }
         if (!unit.isPerson()) return false;
-        int price = priceRoleEquipment(role, 1);
+        int price = priceGoods(unit.getGoodsDifference(role, 1));
         if (price < 0 || !owner.checkGold(price)) return false;
 
         // Get the equipment changes.

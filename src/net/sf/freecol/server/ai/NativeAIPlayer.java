@@ -224,12 +224,12 @@ public class NativeAIPlayer extends AIPlayer {
         for (Unit u : units) {
             if (!u.isArmed()) {
                 Role r = (u.isMounted()) ? nativeDragoon : armedBrave;
-                moreMuskets = is.priceRoleEquipment(r, 1) == 0
+                moreMuskets = is.priceGoods(u.getGoodsDifference(r, 1)) == 0
                     && getAIUnit(u).equipForRole(r.getId(), false);
             }
             if (!u.isMounted()) {
                 Role r = (u.isArmed()) ? nativeDragoon : mountedBrave;
-                moreHorses = is.priceRoleEquipment(r, 1) == 0
+                moreHorses = is.priceGoods(u.getGoodsDifference(r, 1)) == 0
                     && getAIUnit(u).equipForRole(r.getId(), false);
             }
             if (!moreHorses && !moreMuskets) break;

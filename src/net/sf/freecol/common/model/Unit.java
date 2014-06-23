@@ -1592,7 +1592,9 @@ public class Unit extends GoodsLocation
             for (Scope scope : ability.getScopes()) {
                 Role role = spec.getRole(scope.getType());
                 if (role != null
-                    && settlement.priceRoleEquipment(role, 1) >= 0) return role;
+                    && settlement.containsGoods(getGoodsDifference(role, 1))) {
+                    return role;
+                }
             }
         }
         return null;

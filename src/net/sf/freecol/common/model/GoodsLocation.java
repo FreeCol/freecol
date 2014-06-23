@@ -272,7 +272,7 @@ public abstract class GoodsLocation extends UnitLocation {
     //   UnitLocation.clearUnitList,
     //   UnitLocation.getUnitCapacity
     //   UnitLocation.canBuildEquipment
-    //   UnitLocation.priceRoleEquipment
+    //   UnitLocation.priceGoods
     //   UnitLocation.equipForRole
 
     /**
