@@ -747,69 +747,6 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Set the unit role based on its equipment.
-     */
-    public void setRole() {
-        final Specification spec = getSpecification();
-        Role oldRole = role;
-        role = spec.getDefaultRole();
-        boolean horses = false, muskets = false;
-        int count = 1;
-        for (EquipmentType type : equipment.keySet()) {
-            if ("model.equipment.horses".equals(type.getId())
-                || "model.equipment.indian.horses".equals(type.getId())) {
-                horses = true;
-            } else if ("model.equipment.muskets".equals(type.getId())
-                       || "model.equipment.indian.muskets".equals(type.getId())) {
-                muskets = true;
-            } else {
-                role = type.getRole();
-                if ("model.equipment.tools".equals(type.getId())) {
-                    count = equipment.getCount(type);
-                }
-            }
-        }
-        if (horses && muskets) {
-            if (owner.isIndian()) {
-                role = spec.getRole("model.role.nativeDragoon");
-            } else if (owner.isREF() && hasAbility(Ability.REF_UNIT)) {
-                role = spec.getRole("model.role.cavalry");
-            } else {
-                role = spec.getRole("model.role.dragoon");
-            }
-        } else if (horses) {
-            if (owner.isIndian()) {
-                role = spec.getRole("model.role.mountedBrave");
-            } else if (owner.isREF() && hasAbility(Ability.REF_UNIT)) {
-                logger.warning("Undefined role: REF Scout");
-            } else {
-                role = spec.getRole("model.role.scout");
-            }
-        } else if (muskets) {
-            if (owner.isIndian()) {
-                role = spec.getRole("model.role.armedBrave");
-            } else if (owner.isREF() && hasAbility(Ability.REF_UNIT)) {
-                role = spec.getRole("model.role.infantry");
-            } else {
-                role = spec.getRole("model.role.soldier");
-            }
-        }
-
-        if (getState() == UnitState.IMPROVING
-            && !hasAbility(Ability.IMPROVE_TERRAIN)) {
-            setStateUnchecked(UnitState.ACTIVE);
-            setMovesLeft(0);
-        }
-
-        // Check for role change for reseting the experience.
-        // Soldier and Dragoon are compatible, no loss of experience.
-        if (!role.isCompatibleWith(oldRole)) {
-            experience = 0;
-        }
-        setRoleCount(Math.min(role.getMaximumCount(), count));
-    }
-
-    /**
      * Sets the units location without updating any other variables
      *
      * get/setLocation are in Locatable interface.
@@ -4035,8 +3972,50 @@ public class Unit extends GoodsLocation
         // @compat 0.10.x
         if (roleCount < 0) {
             // If roleCount was not present, set it from equipment
-            roleCount = role.getMaximumCount();
-            setRole(); // from equipment
+            final Specification spec = getSpecification();
+            Role role = spec.getDefaultRole();
+            boolean horses = false, muskets = false;
+            int count = 1;
+            for (EquipmentType type : equipment.keySet()) {
+                if ("model.equipment.horses".equals(type.getId())
+                    || "model.equipment.indian.horses".equals(type.getId())) {
+                    horses = true;
+                } else if ("model.equipment.muskets".equals(type.getId())
+                    || "model.equipment.indian.muskets".equals(type.getId())) {
+                    muskets = true;
+                } else {
+                    role = type.getRole();
+                    if ("model.equipment.tools".equals(type.getId())) {
+                        count = equipment.getCount(type);
+                    }
+                }
+            }
+            if (horses && muskets) {
+                if (owner.isIndian()) {
+                    role = spec.getRole("model.role.nativeDragoon");
+                } else if (owner.isREF() && hasAbility(Ability.REF_UNIT)) {
+                    role = spec.getRole("model.role.cavalry");
+                } else {
+                    role = spec.getRole("model.role.dragoon");
+                }
+            } else if (horses) {
+                if (owner.isIndian()) {
+                    role = spec.getRole("model.role.mountedBrave");
+                } else if (owner.isREF() && hasAbility(Ability.REF_UNIT)) {
+                    logger.warning("Undefined role: REF Scout");
+                } else {
+                    role = spec.getRole("model.role.scout");
+                }
+            } else if (muskets) {
+                if (owner.isIndian()) {
+                    role = spec.getRole("model.role.armedBrave");
+                } else if (owner.isREF() && hasAbility(Ability.REF_UNIT)) {
+                    role = spec.getRole("model.role.infantry");
+                } else {
+                    role = spec.getRole("model.role.soldier");
+                }
+            }
+            setRoleCount(Math.min(role.getMaximumCount(), count));
         } else {
             // If roleCount was present, we are now ignoring equipment.
             equipment.clear();
