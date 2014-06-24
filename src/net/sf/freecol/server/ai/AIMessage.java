@@ -487,7 +487,7 @@ public class AIMessage {
 
 
     /**
-     * Change the equipment of a unit.
+     * Change the role of a unit.
      *
      * @param aiUnit The <code>AIUnit</code> to equip.
      * @param role The <code>Role</code> to equip for.

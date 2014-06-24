@@ -55,7 +55,6 @@ import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.EmbarkMessage;
 import net.sf.freecol.common.networking.EmigrateUnitMessage;
 import net.sf.freecol.common.networking.EquipForRoleMessage;
-import net.sf.freecol.common.networking.EquipUnitMessage;
 import net.sf.freecol.common.networking.FirstContactMessage;
 import net.sf.freecol.common.networking.GetNationSummaryMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
@@ -330,14 +329,6 @@ public final class InGameInputHandler extends InputHandler
             public Element handle(Player player, Connection connection,
                                   Element element) {
                 return new EquipForRoleMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
-            }});
-        register(EquipUnitMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
-                return new EquipUnitMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
         register("getREFUnits",
