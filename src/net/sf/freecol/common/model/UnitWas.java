@@ -41,11 +41,11 @@ public class UnitWas implements Comparable<UnitWas> {
     private Unit unit;
     private UnitType type;
     private Role role;
+    private int roleCount;
     private Location loc;
     private GoodsType work;
     private int workAmount;
     private Colony colony;
-    private TypeCountMap<EquipmentType> equipment;
 
 
     /**
@@ -57,12 +57,11 @@ public class UnitWas implements Comparable<UnitWas> {
         this.unit = unit;
         this.type = unit.getType();
         this.role = unit.getRole();
+        this.roleCount = unit.getRoleCount();
         this.loc = unit.getLocation();
         this.work = unit.getWorkType();
         this.workAmount = getAmount(loc, work);
         this.colony = unit.getColony();
-        this.equipment = new TypeCountMap<EquipmentType>();
-        this.equipment.add(unit.getEquipment());
         if (unit.getGoodsContainer() != null) {
             unit.getGoodsContainer().saveState();
         }
@@ -87,19 +86,19 @@ public class UnitWas implements Comparable<UnitWas> {
     public void fireChanges() {
         UnitType newType = null;
         Role newRole = null;
+        int newRoleCount = 0;
         Location newLoc = null;
         GoodsType newWork = null;
         int newWorkAmount = 0;
-        TypeCountMap<EquipmentType> newEquipment = null;
         if (!unit.isDisposed()) {
             newLoc = unit.getLocation();
             if (colony != null) {
                 newType = unit.getType();
                 newRole = unit.getRole();
+                newRoleCount = unit.getRoleCount();
                 newWork = unit.getWorkType();
                 newWorkAmount = (newWork == null) ? 0
                     : getAmount(newLoc, newWork);
-                newEquipment = unit.getEquipment();
             }
         }
 
@@ -133,17 +132,10 @@ public class UnitWas implements Comparable<UnitWas> {
                                            workAmount, newWorkAmount);
             }
         }
-        if (newEquipment != null) {
-            Set<EquipmentType> keys = new HashSet<EquipmentType>();
-            keys.addAll(equipment.keySet());
-            keys.addAll(newEquipment.keySet());
-            for (EquipmentType e : keys) {
-                int cOld = equipment.getCount(e);
-                int cNew = newEquipment.getCount(e);
-                if (cOld != cNew) {
-                    unit.firePropertyChange(Unit.EQUIPMENT_CHANGE, cOld, cNew);
-                }
-            }
+        if (role != newRole && newRole != null) {
+            unit.firePropertyChange(Unit.ROLE_CHANGE, role, newRole);
+        } else if (roleCount != newRoleCount && newRoleCount >= 0) {
+            unit.firePropertyChange(Unit.ROLE_CHANGE, roleCount, newRoleCount);
         }
         if (unit.getGoodsContainer() != null) {
             unit.getGoodsContainer().fireChanges();
@@ -186,10 +178,12 @@ public class UnitWas implements Comparable<UnitWas> {
         // we can still try our best by using the amount of equipment
         // the unit needs as a secondary criterion (favouring the
         // least equipped).
+        List<Role> roles = this.unit.getAvailableRoles(null);
         int cmp = ((UnitLocation)uw.loc).getUnitCapacity()
             - ((UnitLocation)this.loc).getUnitCapacity();
-        if (cmp == 0) cmp = this.equipment.keySet().size()
-                          - uw.equipment.keySet().size();
+        if (cmp == 0) {
+            cmp = roles.indexOf(this.role) - roles.indexOf(uw.role);
+        }
         return cmp;
     }
 
@@ -200,30 +194,26 @@ public class UnitWas implements Comparable<UnitWas> {
     @Override
     public String toString() {
         Tile tile = colony.getTile();
-        String eqStr = "/";
-        for (EquipmentType e : equipment.keySet()) {
-            eqStr += e.toString().substring(16, 17);
-        }
+        String roleStr = "/" + role.getSuffix();
+        if (roleCount > 0) roleStr += "." + roleCount;
         String locStr = (loc == null) ? ""
             : (loc instanceof Building)
             ? ((Building)loc).getType().getSuffix()
             : (loc instanceof ColonyTile)
             ? tile.getDirection(((ColonyTile)loc).getWorkTile()).toString()
             : (loc instanceof Tile)
-            ? (loc.getId() + eqStr)
+            ? (loc.getId() + roleStr)
             : loc.getId();
         Location newLoc = unit.getLocation();
-        String newEqStr = "/";
-        for (EquipmentType e : unit.getEquipment().keySet()) {
-            newEqStr += e.toString().substring(16, 17);
-        }
+        String newRoleStr = "/" + unit.getRole().getSuffix();
+        if (unit.getRoleCount() > 0) newRoleStr += "." + unit.getRoleCount();
         String newLocStr = (newLoc == null) ? ""
             : (newLoc instanceof Building)
             ? ((Building)newLoc).getType().getSuffix()
             : (newLoc instanceof ColonyTile)
             ? tile.getDirection(((ColonyTile)newLoc).getWorkTile()).toString()
             : (newLoc instanceof Tile)
-            ? (newLoc.getId() + newEqStr)
+            ? (newLoc.getId() + newRoleStr)
             : newLoc.getId();
         GoodsType newWork = unit.getWorkType();
         int newWorkAmount = (newWork == null) ? 0 : getAmount(newLoc, newWork);

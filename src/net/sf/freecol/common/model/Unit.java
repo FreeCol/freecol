@@ -76,7 +76,7 @@ public class Unit extends GoodsLocation
 
 
     public static final String CARGO_CHANGE = "CARGO_CHANGE";
-    public static final String EQUIPMENT_CHANGE = "EQUIPMENT_CHANGE";
+    public static final String ROLE_CHANGE = "ROLE_CHANGE";
 
     /** A state a Unit can have. */
     public static enum UnitState {
