@@ -187,7 +187,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 int base = (unit.isInEurope()) ? 500
                     : (unit.getLocation().getColony() != null
                         && unit.getLocation().getColony()
-                        .canProvideEquipment(roleEquipment)) ? 400
+                        .canProvideGoods(roleEquipment)) ? 400
                     : -1000;
                 if (!unit.getEquipment().isEmpty()) {
                     base -= 400;
@@ -230,7 +230,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 int base = (unit.isInEurope()) ? 500
                     : (unit.getLocation().getColony() != null
                         && unit.getLocation().getColony()
-                        .canProvideEquipment(roleEquipment)) ? 400
+                        .canProvideGoods(roleEquipment)) ? 400
                     : -1000;
                 if (!unit.getEquipment().isEmpty()) {
                     base -= 400;

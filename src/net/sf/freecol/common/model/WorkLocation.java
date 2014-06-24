@@ -450,8 +450,6 @@ public abstract class WorkLocation extends UnitLocation
     //   UnitLocation.moveToFront
     //   UnitLocation.clearUnitList
     //   UnitLocation.getUnitCapacity
-    //   UnitLocation.canBuildEquipment
-    //   UnitLocation.canBuildRoleEquipment
     //   UnitLocation.equipForRole
 
     /**

@@ -144,8 +144,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
 
     // Some useful utilities, marked final as they will work as long
     // as working implementations of getUnitList(), getUnitCount(),
-    // getUnitCapacity(), getSettlement() and canBuildEquipment() are
-    // provided.
+    // getUnitCapacity() and getSettlement() are provided.
 
     /**
      * Is this unit location empty?
@@ -231,16 +230,6 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
             if (u.isNaval()) shipList.add(u);
         }
         return shipList;
-    }
-
-    /**
-     * Can at least one item of the given EquipmentType be built here?
-     *
-     * @param equipmentType The <code>EquipmentType</code> to build.
-     * @return True if the equipment can be built.
-     */
-    public boolean canBuildEquipment(EquipmentType equipmentType) {
-        return canBuildEquipment(equipmentType, 1);
     }
 
 
@@ -482,17 +471,6 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      */
     public int getUnitCapacity() {
         return Integer.MAX_VALUE;
-    }
-
-    /**
-     * Can some amount of the given EquipmentType be built here?
-     *
-     * @param equipmentType The <code>EquipmentType</code> to build.
-     * @param amount The number of instances of equipment to build.
-     * @return True if the equipment can be built.
-     */
-    public boolean canBuildEquipment(EquipmentType equipmentType, int amount) {
-        return false;
     }
 
     /**

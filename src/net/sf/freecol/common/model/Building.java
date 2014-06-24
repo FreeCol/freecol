@@ -388,8 +388,6 @@ public class Building extends WorkLocation
     //   UnitLocation.getSpaceTaken
     //   UnitLocation.moveToFront
     //   UnitLocation.clearUnitList
-    //   UnitLocation.canBuildEquipment
-    //   UnitLocation.canBuildRoleEquipment
     //   UnitLocation.equipForRole
     
     /**

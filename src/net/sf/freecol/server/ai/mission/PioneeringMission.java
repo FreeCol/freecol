@@ -424,7 +424,7 @@ public class PioneeringMission extends Mission {
         return (reason != null)
             ? reason
             : (!hasTools(aiUnit)
-               && !colony.canProvideEquipment(role.getRequiredGoods()))
+               && !colony.canProvideGoods(role.getRequiredGoods()))
             ? "colony-can-not-provide-equipment"
             : null;
     }

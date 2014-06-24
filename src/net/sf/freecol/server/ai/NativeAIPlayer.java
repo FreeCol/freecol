@@ -453,8 +453,8 @@ public class NativeAIPlayer extends AIPlayer {
 
                 // Go home for new equipment if the home settlement has them.
                 || (is != null
-                    && ((!unit.isMounted() && is.canProvideEquipment(scoutEq))
-                        || (!unit.isArmed() && is.canProvideEquipment(soldierEq)))
+                    && ((!unit.isMounted() && is.canProvideGoods(scoutEq))
+                        || (!unit.isArmed() && is.canProvideGoods(soldierEq)))
                     && (m = new DefendSettlementMission(aiMain, aiUnit,
                             is)) != null)
 

@@ -372,15 +372,14 @@ public abstract class Settlement extends GoodsLocation
     }
 
     /**
-     * Determines if this settlement can build the given type of equipment.
-     * Unlike canBuildEquipment, this takes goods "reserved"
-     * for other purposes into account (e.g. breeding).
+     * Determines if this settlement can build the given type of
+     * equipment.  Unlike priceGoods, this takes goods "reserved" for
+     * other purposes into account (e.g. breeding).
      *
      * @param goods A list of <code>AbstractGoods</code>
      * @return True if the settlement can provide the equipment.
-     * @see Settlement#canBuildEquipment(EquipmentType equipmentType)
      */
-    public boolean canProvideEquipment(List<AbstractGoods> goods) {
+    public boolean canProvideGoods(List<AbstractGoods> goods) {
         for (AbstractGoods ag : goods) {
             int available = getGoodsCount(ag.getType());
 
@@ -549,19 +548,6 @@ public abstract class Settlement extends GoodsLocation
             return NoAddReason.NONE;
         }
         return super.getNoAddReason(locatable);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean canBuildEquipment(EquipmentType equipmentType, int amount) {
-        for (AbstractGoods ag : equipmentType.getRequiredGoods()) {
-            if (getGoodsCount(ag.getType()) < ag.getAmount() * amount) {
-                return false;
-            }
-        }
-        return true;
     }
 
     /**

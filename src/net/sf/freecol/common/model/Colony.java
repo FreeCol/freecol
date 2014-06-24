@@ -2617,8 +2617,6 @@ public class Colony extends Settlement implements Nameable {
     //   UnitLocation.getSpaceTaken [Irrelevant!]
     //   UnitLocation.moveToFront [Irrelevant!]
     //   UnitLocation.clearUnitList [Irrelevant!]
-    //   Settlement.canBuildEquipment
-    //   Settlement.canBuildRoleEquipment
     //   Settlement.equipForRole
     //   Settlement.getNoAddReason
 
@@ -2784,9 +2782,9 @@ public class Colony extends Settlement implements Nameable {
      * {@inheritDoc}
      */
     @Override
-    public boolean canProvideEquipment(List<AbstractGoods> requiredGoods) {
-        // Unlike canBuildEquipment, this takes goods "reserved"
-        // for other purposes into account.
+    public boolean canProvideGoods(List<AbstractGoods> requiredGoods) {
+        // Unlike priceGoods, this takes goods "reserved" for other
+        // purposes into account.
         BuildableType buildable = getCurrentlyBuilding();
         for (AbstractGoods goods : requiredGoods) {
             int available = getGoodsCount(goods.getType());

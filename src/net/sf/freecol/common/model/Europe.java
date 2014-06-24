@@ -304,26 +304,6 @@ public class Europe extends UnitLocation implements Ownable, Named {
      * {@inheritDoc}
      */
     @Override
-    public boolean canBuildEquipment(EquipmentType eq, int amount) {
-        Player player = getOwner();
-        Market market = player.getMarket();
-        int price = 0;
-        for (AbstractGoods goods : eq.getRequiredGoods()) {
-            GoodsType goodsType = goods.getType();
-            // Refuse to trade in boycotted goods
-            if (!player.canTrade(goodsType)) return false;
-            if (amount > 0) {
-                price += market.getBidPrice(goodsType,
-                    amount * goods.getAmount());
-            }
-        }
-        return player.checkGold(price);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public int priceGoods(List<AbstractGoods> goods) {
         Player player = getOwner();
         Market market = player.getMarket();
