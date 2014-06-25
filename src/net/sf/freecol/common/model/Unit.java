@@ -1298,8 +1298,6 @@ public class Unit extends GoodsLocation
             // doesn't work as expected
             return getGame().getSpecification().getNation(ethnicity)
                 .getType().isIndian();
-            // return getGame().getSpecification().getNationType(ethnicity).hasAbility("model.ability.native");
-            // return getGame().getSpecification().getIndianNationTypes().contains(getNationType(ethnicity));
         } catch (Exception e) {
             return false;
         }
