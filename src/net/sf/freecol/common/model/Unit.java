@@ -193,9 +193,11 @@ public class Unit extends GoodsLocation
      */
     protected int visibleGoodsCount;
 
-    /** The equipment this Unit carries. */
+    // @compat 0.10.x
+    /** The equipment this Unit carries.  Now subsumed into roles. */
     protected final TypeCountMap<EquipmentType> equipment
         = new TypeCountMap<EquipmentType>();
+    // end @compat 0.10.x
 
 
     /**
@@ -703,6 +705,30 @@ public class Unit extends GoodsLocation
         List<Role> result = new ArrayList<Role>();
         for (Role role : roles) {
             if (roleIsAvailable(role)) result.add(role);
+        }
+        return result;
+    }
+
+    /**
+     * Get a description of the unit's role-equipment.
+     *
+     * @return A <code>StringTemplate</code> summarizing the role-equipment.
+     */
+    public StringTemplate getRoleLabel() {
+        if (hasDefaultRole()) return null;
+
+        StringTemplate result = StringTemplate.label("/");
+        List<AbstractGoods> req = getRole().getRequiredGoods(getRoleCount());
+        if ("model.role.missionary".equals(role.getId())) {
+            result.addStringTemplate(StringTemplate.template("model.goods.goodsAmount")
+                .add("%goods%", "model.equipment.missionary.name")
+                .addName("%amount%", Integer.toString(getRoleCount())));
+        } else {
+            for (AbstractGoods ag : req) {
+                result.addStringTemplate(StringTemplate.template("model.goods.goodsAmount")
+                    .add("%goods%", ag.getType().getNameKey())
+                    .addName("%amount%", Integer.toString(ag.getAmount())));
+            }
         }
         return result;
     }
@@ -1611,33 +1637,6 @@ public class Unit extends GoodsLocation
             }
         }
         return null;
-    }
-
-    /**
-     * Get a description of the unit's equipment.
-     *
-     * @return A <code>StringTemplate</code> summarizing the equipment.
-     */
-    public StringTemplate getEquipmentLabel() {
-        if (equipment.isEmpty()) return null;
-        StringTemplate result = StringTemplate.label("/");
-        for (java.util.Map.Entry<EquipmentType, Integer> entry
-                 : equipment.getValues().entrySet()) {
-            EquipmentType type = entry.getKey();
-            int amount = entry.getValue().intValue();
-            if (!type.needsGoodsToBuild()) {
-                result.addStringTemplate(StringTemplate.template("model.goods.goodsAmount")
-                    .add("%goods%", type.getNameKey())
-                    .addName("%amount%", Integer.toString(amount)));
-            } else {
-                for (AbstractGoods goods : type.getRequiredGoods()) {
-                    result.addStringTemplate(StringTemplate.template("model.goods.goodsAmount")
-                        .add("%goods%", goods.getType().getNameKey())
-                        .addName("%amount%", Integer.toString(amount * goods.getAmount())));
-                }
-            }
-        }
-        return result;
     }
 
     /**

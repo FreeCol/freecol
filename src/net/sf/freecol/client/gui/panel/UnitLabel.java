@@ -304,17 +304,17 @@ public final class UnitLabel extends JLabel
         }
     }
 
-
+    /**
+     * Update the icon for this unit label.
+     */
     public void updateIcon() {
         ImageLibrary lib = gui.getImageLibrary();
         setIcon(lib.getUnitImageIcon(unit));
         setDisabledIcon(lib.getUnitImageIcon(unit, true));
-        setDescriptionLabel(Messages.message(unit.getFullLabel()));
-        StringTemplate label = unit.getEquipmentLabel();
-        if (label != null) {
-            setDescriptionLabel(getDescriptionLabel() + " ("
-                                + Messages.message(label) + ")");
-        }
+        String base = Messages.message(unit.getFullLabel());
+        StringTemplate label = unit.getRoleLabel();
+        if (label != null) base += " (" + Messages.message(label) + ")";
+        setDescriptionLabel(base);
         setSmall(isSmall);
         // repaint(0, 0, getWidth(), getHeight());
         // uc.refresh();
@@ -330,7 +330,6 @@ public final class UnitLabel extends JLabel
         return getUnit().hasAbility(Ability.CAN_BE_EQUIPPED)
             && (data instanceof GoodsLabel || data instanceof MarketLabel);
     }
-
 
     /**
      * Gets a string corresponding to the UnitAction to work at a work
