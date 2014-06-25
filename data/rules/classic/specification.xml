@@ -2384,7 +2384,7 @@ resources of 400, lost city rumours of 500
 
   <nations>
     <nation id="model.nation.unknownEnemy" color="0x000000"
-            nation-type="model.nationType.conquest" selectable="false"/>
+            nation-type="model.nationType.default" selectable="false"/>
 
     <nation id="model.nation.dutch" color="0xff9d3c"
             nation-type="model.nationType.trade" selectable="true"

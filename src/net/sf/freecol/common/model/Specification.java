@@ -480,7 +480,9 @@ public final class Specification {
         indianNations.clear();
         for (Nation nation : nations) {
             if (nation.getType().isEuropean()) {
-                if (nation.getType().isREF()) {
+                if (nation.isUnknownEnemy()) {
+                    continue;
+                } else if (nation.getType().isREF()) {
                     REFNations.add(nation);
                 } else {
                     europeanNations.add(nation);

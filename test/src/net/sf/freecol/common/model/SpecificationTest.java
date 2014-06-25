@@ -178,9 +178,11 @@ public final class SpecificationTest extends FreeColTestCase {
     }
 
     public void testNations() {
-        // 4 original European nations, 4 in freecol rules, 1 unknown enemy
+        // 4 original European nations, 4 in freecol rules
+        // The unknown enemy is deliberately absent from the European
+        // nations list
         List<Nation> europeanNations = spec().getEuropeanNations();
-        assertEquals(9, europeanNations.size());
+        assertEquals(8, europeanNations.size());
 
         // 8 original native nations
         List<Nation> indianNations = spec().getIndianNations();
@@ -188,7 +190,7 @@ public final class SpecificationTest extends FreeColTestCase {
 
         // Unknown enemy has no REF
         List<Nation> REFNations = spec().getREFNations();
-        assertEquals(REFNations.size(), europeanNations.size() - 1);
+        assertEquals(europeanNations.size(), REFNations.size());
     }
 
     public void testNationTypes() {
