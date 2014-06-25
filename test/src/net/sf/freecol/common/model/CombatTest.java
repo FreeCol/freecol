@@ -589,7 +589,8 @@ public class CombatTest extends FreeColTestCase {
         List<CombatResult> crs = combatModel.generateAttackResult(random,
             soldier, defender);
         checkCombat("Capture convert", crs,
-            CombatResult.WIN, CombatResult.CAPTURE_CONVERT, CombatResult.SLAUGHTER_UNIT);
+                    CombatResult.WIN, CombatResult.SLAUGHTER_UNIT,
+                    CombatResult.CAPTURE_CONVERT);
         assertEquals("One unit on tile", 1, tile2.getUnitList().size());
         dutch.csCombat(soldier, defender, crs, new Random(),
                        new ChangeSet());

@@ -609,7 +609,18 @@ public class SimpleCombatModel extends CombatModel {
                 // Native settlements fall when there are no units
                 // present either in-settlement or on the settlement
                 // tile.
-                int lose = (loserMustDie) ? 1 : 0;
+                int lose = 0;
+                if (loserMustDie) {
+                    // Add death of loser before any convert captures,
+                    // or the RNG might randomly decide to convert the
+                    // unit that is then slaughtered.
+                    crs.add(CombatResult.SLAUGHTER_UNIT);
+                    lose++;
+                    // For now, no usual unit combat actions can proceed,
+                    // which means we can not expect to capture equipment
+                    // from settlements without untangling this dependency.
+                    done = true;
+                }
                 if (attackerWon) {
                     if (r < winner.getConvertProbability()) {
                         if (is.getUnitCount() + tile.getUnitCount() > lose
@@ -629,7 +640,6 @@ public class SimpleCombatModel extends CombatModel {
                     }
                 }
                 if (settlement.getUnitCount() + tile.getUnitCount() <= lose) {
-                    if (loserMustDie) crs.add(CombatResult.SLAUGHTER_UNIT);
                     crs.add(CombatResult.DESTROY_SETTLEMENT);
                     done = true;
                 }
