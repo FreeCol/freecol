@@ -321,11 +321,61 @@ public class ServerUnit extends Unit implements ServerModelObject {
             }
         }
 
-        if (getWorkLeft() == 0) locDirty |= csCompleteWork(random, cs);
-
         if (getState() == UnitState.SKIPPED) {
             setState(UnitState.ACTIVE);
             unitDirty = true;
+        }
+
+        if (getWorkLeft() == 0) {
+            setWorkLeft(-1);
+            unitDirty = true;
+            if (getLocation() instanceof HighSeas) {
+                Europe europe = owner.getEurope();
+                Map map = getGame().getMap();
+                Location dst = getDestination();
+                Location result = resolveDestination();
+                if (result == europe) {
+                    logger.info(this + " arrives in Europe");
+                    if (getTradeRoute() == null) {
+                        setDestination(null);
+                        cs.addMessage(See.only(owner),
+                            new ModelMessage(ModelMessage.MessageType.DEFAULT,
+                                "model.unit.arriveInEurope",
+                                europe, this)
+                            .add("%europe%", europe.getNameKey()));
+                    }
+                    setState(UnitState.ACTIVE);
+                    setLocation(europe);//-vis: safe/Europe
+                    cs.add(See.only(owner), owner.getHighSeas());
+                    locDirty = true;
+                } else if (result instanceof Tile) {
+                    Tile tile = ((Tile)result).getSafeTile(owner, random);
+                    logger.info(this + " arrives in America at " + tile
+                        + ((dst == null) ? "" : ", sailing for " + dst));
+                    if (dst instanceof Map) setDestination(null);
+                    csMove(tile, random, cs);
+                    locDirty = unitDirty = false; // loc update present
+                } else {
+                    logger.warning(this + " has unsupported destination "
+                        + getDestination());
+                }
+            } else {
+                switch (getState()) {
+                case FORTIFYING:
+                    setState(UnitState.FORTIFIED);
+                    break;
+                case IMPROVING:
+                    csImproveTile(random, cs);
+                    setWorkImprovement(null);
+                    locDirty = true;
+                    break;
+                default:
+                    logger.warning("Unknown work completed, state="
+                        + getState());
+                    setState(UnitState.ACTIVE);
+                    break;
+                }
+            }
         }
 
         if (locDirty) {
@@ -335,64 +385,6 @@ public class ServerUnit extends Unit implements ServerModelObject {
         } else {
             cs.addPartial(See.only(owner), this, "movesLeft");
         }
-    }
-
-    /**
-     * Complete the work a unit is doing.
-     *
-     * @param random A pseudo-random number source.
-     * @param cs A <code>ChangeSet</code> to update.
-     * @return True if the unit location needs an update.
-     */
-    private boolean csCompleteWork(Random random, ChangeSet cs) {
-        setWorkLeft(-1);
-
-        if (getLocation() instanceof HighSeas) {
-            ServerPlayer owner = (ServerPlayer)getOwner();
-            Europe europe = owner.getEurope();
-            Map map = getGame().getMap();
-            Location dst = getDestination();
-            Location result = resolveDestination();
-            if (result == europe) {
-                logger.info(this + " arrives in Europe");
-                if (getTradeRoute() == null) {
-                    setDestination(null);
-                    cs.addMessage(See.only(owner),
-                        new ModelMessage(ModelMessage.MessageType.DEFAULT,
-                                         "model.unit.arriveInEurope",
-                                         europe, this)
-                        .add("%europe%", europe.getNameKey()));
-                }
-                setState(UnitState.ACTIVE);
-                setLocation(europe);//-vis: safe/Europe
-                cs.add(See.only(owner), owner.getHighSeas());
-                return true;
-            } else if (result instanceof Tile) {
-                Tile tile = ((Tile)result).getSafeTile(owner, random);
-                logger.info(this + " arrives in America at " + tile
-                    + ((dst == null) ? "" : ", sailing for " + dst));
-                if (dst instanceof Map) setDestination(null);
-                csMove(tile, random, cs);
-            } else {
-                logger.warning(this + " has unsupported destination "
-                               + getDestination());
-            }
-        } else {
-            switch (getState()) {
-            case FORTIFYING:
-                setState(UnitState.FORTIFIED);
-                break;
-            case IMPROVING:
-                csImproveTile(random, cs);
-                setWorkImprovement(null);
-                return true;
-            default:
-                logger.warning("Unknown work completed, state=" + getState());
-                setState(UnitState.ACTIVE);
-                break;
-            }
-        }
-        return false;
     }
 
     /**

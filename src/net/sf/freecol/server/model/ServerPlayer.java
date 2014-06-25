@@ -400,7 +400,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         if (!getColonies().isEmpty()) return IS_ALIVE;
 
         // Do not kill the observing player during a debug run.
-        if (!isAI() && FreeColDebugger.getDebugRunTurns() >= 0) 
+        if (!isAI() && FreeColDebugger.getDebugRunTurns() >= 0) return IS_ALIVE;
 
         // Do not kill the unknown enemy!
         if (isUnknownEnemy()) return IS_ALIVE;

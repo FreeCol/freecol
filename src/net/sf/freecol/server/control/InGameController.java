@@ -873,12 +873,13 @@ public final class InGameController extends Controller {
             boolean debugSkip = !player.isAI()
                 && freeColServer.isSinglePlayer()
                 && debugOnlyAITurns > 0;
-            sendToList(getOtherPlayers(serverPlayer, (ServerPlayer)player), cs);
             if (debugSkip) {
-                sendElement(serverPlayer, cs);
+                sendToOthers(player, cs);
+                sendElement(player, cs);
                 continue;
             }
-            sendElement((ServerPlayer)player, cs);
+            sendToList(getOtherPlayers(player, serverPlayer), cs);
+            if (player != serverPlayer) sendElement(player, cs);
             return cs.build(serverPlayer);
         }
     }

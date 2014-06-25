@@ -89,10 +89,10 @@ public class ChangeSet {
 
     private static Comparator<Change> changeComparator
         = new Comparator<Change>() {
-        public int compare(final Change c1, final Change c2) {
-            return c1.getPriority() - c2.getPriority();
-        }
-    };
+            public int compare(final Change c1, final Change c2) {
+                return c1.getPriority() - c2.getPriority();
+            }
+        };
 
     /**
      * Class to control the visibility of a change.
@@ -751,9 +751,11 @@ public class ChangeSet {
             if (fcgo instanceof WorkLocation) {
                 return false;
             }
-            return fcgo instanceof Location
-                && ((Location)fcgo).getTile() != null
-                && serverPlayer.canSee(((Location)fcgo).getTile());
+            if (fcgo instanceof Location) {
+                Tile tile = ((Location)fcgo).getTile();
+                return serverPlayer.canSee(tile);
+            }
+            return false;
         }
 
         /**
