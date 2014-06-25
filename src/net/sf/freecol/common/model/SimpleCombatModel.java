@@ -162,8 +162,10 @@ public class SimpleCombatModel extends CombatModel {
                                     ModifierType.ADDITIVE,
                                     Specification.BASE_OFFENCE_SOURCE));
 
-            // Unit offensive modifiers, including role+equipment
-            result.addAll(attackerUnit.getModifierSet(Modifier.OFFENCE));
+            // Unit offensive modifiers, including role+equipment,
+            // qualified by unit type so that scopes work
+            result.addAll(attackerUnit.getModifierSet(Modifier.OFFENCE,
+                          attackerUnit.getType()));
 
             // Special bonuses against certain nation types
             if (defender instanceof Ownable) {
