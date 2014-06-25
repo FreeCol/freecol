@@ -170,4 +170,24 @@ public class RoleTest extends FreeColTestCase {
                                      braveType, military);
         assertTrue(expectedRoles.equals(nativeRoles));
     }
+
+    public void testGetRoleWithAbility() {
+        Role r;
+
+        r = spec().getRoleWithAbility(Ability.IMPROVE_TERRAIN, null);
+        assertNotNull(r);
+        assertEquals("model.role.pioneer", r.getId());
+
+        r = spec().getRoleWithAbility(Ability.SPEAK_WITH_CHIEF, null);
+        assertNotNull(r);
+        assertEquals("model.role.scout", r.getId());
+
+        r = spec().getRoleWithAbility(Ability.INCITE_NATIVES, null);
+        assertNotNull(r);
+        assertEquals("model.role.missionary", r.getId());
+
+        r = spec().getRoleWithAbility(Ability.INCITE_NATIVES, null);
+        assertNotNull(r);
+        assertEquals("model.role.missionary", r.getId());
+    }
 }

@@ -1411,6 +1411,23 @@ public final class Specification {
     }
 
     /**
+     * Get a role with an ability.
+     *
+     * @param a The ability identifier to look for.
+     * @param roles An optional list of <code>Role</code>s to look in,
+     *     if null all roles are used.
+     * @return The first <code>Role</code> found with the required
+     *     ability, or null if none found.
+     */
+    public Role getRoleWithAbility(String id, List<Role> roles) {
+        if (roles == null) roles = getRoles();
+        for (Role r : roles) {
+            if (r.hasAbility(id)) return r;
+        }
+        return null;
+    }
+
+    /**
      * Get any possible role change when a unit with a given role captures
      * the role-equipment of another unit.
      *

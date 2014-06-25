@@ -1206,9 +1206,12 @@ public class ColonyPlan {
      */
     private static boolean fullEquipUnit(Specification spec, Unit unit,
                                          Role role, Colony colony) {
-        if ("model.role.soldier".equals(role.getId())) {
-            Role r = spec.getRole("model.role.dragoon");
-            if (colony.equipForRole(unit, r, r.getMaximumCount())) return true;
+        if (role.isOffensive()) {
+            for (Role r : unit.getAvailableRoles(spec.getMilitaryRoles())) {
+                if (colony.equipForRole(unit, 
+                                        r, r.getMaximumCount())) return true;
+            }
+            return false;
         }
         return colony.equipForRole(unit, role, role.getMaximumCount());
     }
@@ -1256,9 +1259,11 @@ public class ColonyPlan {
 
         // Move outdoor experts outside if possible.
         // Prefer scouts in early game if there are very few.
-        Role[] outdoorRoles = new Role[] { spec().getRole("model.role.pioneer"),
-                                           spec().getRole("model.role.soldier"),
-                                           spec().getRole("model.role.scout") };
+        Role[] outdoorRoles = new Role[] {
+            spec().getRoleWithAbility(Ability.IMPROVE_TERRAIN, null),
+            null,
+            spec().getRoleWithAbility(Ability.SPEAK_WITH_CHIEF, null)
+        };
         if (preferScout) {
             Role tmp = outdoorRoles[1];
             outdoorRoles[1] = outdoorRoles[2];
@@ -1267,12 +1272,17 @@ public class ColonyPlan {
         for (int j = 0; j < outdoorRoles.length; j++) {
             for (Unit u : new ArrayList<Unit>(workers)) {
                 if (workers.size() <= 1) break;
-                if (u.getType() == outdoorRoles[j].getExpertUnit()
-                    && fullEquipUnit(spec(), u, outdoorRoles[j], col)) {
+                Role role = outdoorRoles[j];
+                if (role == null) {
+                    role = u.getAvailableRoles(spec().getMilitaryRoles())
+                        .get(0);
+                }
+                if (u.getType() == role.getExpertUnit()
+                    && fullEquipUnit(spec(), u, role, col)) {
                     workers.remove(u);
                     report.append(u.getId()).append("(")
                         .append(u.getType().getSuffix())
-                        .append(") -> ").append(outdoorRoles[j]).append("\n");
+                        .append(") -> ").append(role.getSuffix()).append("\n");
                 }
             }
         }
@@ -1305,7 +1315,8 @@ public class ColonyPlan {
         for (Unit u : new ArrayList<Unit>(workers)) {
             if (workers.size() <= 1) break;
             if (!AIColony.isBadlyDefended(col)) break;
-            if (fullEquipUnit(spec(), u, spec().getRole("model.role.soldier"), col)) {
+            Role role = u.getAvailableRoles(spec().getMilitaryRoles()).get(0);
+            if (fullEquipUnit(spec(), u, role, col)) {
                 workers.remove(u);
                 report.append(u.getId()).append("(")
                     .append(u.getType().getSuffix())
@@ -1568,7 +1579,8 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
         // Rearm what remains as far as possible.
         Collections.sort(workers, soldierComparator);
         for (Unit u : new ArrayList<Unit>(workers)) {
-            if (fullEquipUnit(spec(), u, spec().getRole("model.role.soldier"), col)) {
+            Role role = u.getAvailableRoles(spec().getMilitaryRoles()).get(0);
+            if (fullEquipUnit(spec(), u, role, col)) {
                 report.append(u.getId()).append("(")
                     .append(u.getType().getSuffix())
                     .append(") -> ").append(u.getRoleSuffix()).append("\n");
