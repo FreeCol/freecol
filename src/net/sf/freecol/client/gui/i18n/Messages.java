@@ -742,7 +742,7 @@ public class Messages {
             if (role.getMaximumCount() > 1) {
                 List<AbstractGoods> requiredGoods = role.getRequiredGoods();
                 if (!requiredGoods.isEmpty()) {
-                    int count = unit.getEquipmentCount();
+                    int count = unit.getRoleCount();
                     AbstractGoods goods = requiredGoods.get(0);
                     roleName = unitName;
                     extra = message(StringTemplate.template("model.goods.goodsAmount")
