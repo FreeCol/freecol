@@ -1589,6 +1589,12 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
                 .append(" failed.");
             col = null;
         }
+        for (Unit u : col.getUnitList()) {
+            if (!u.hasDefaultRole()) {
+                logger.warning("assignWorkers bogus role for " + u);
+                u.changeRole(spec().getDefaultRole(), 0);
+            }
+        }
 
         logger.finest(report.toString());
         return col;

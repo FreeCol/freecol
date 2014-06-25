@@ -659,7 +659,8 @@ public class AIMessage {
             Unit su = scratch.getCorresponding(u);
             if (u.getLocation().getId() == su.getLocation().getId()
                 && u.getWorkType() == su.getWorkType()
-                && u.getRole() == su.getRole()) continue;
+                && u.getRole() == su.getRole()
+                && u.getRoleCount() == su.getRoleCount()) continue;
             message.addChange(u,
                 (Location)colony.getCorresponding((FreeColObject)su.getLocation()),
                 su.getWorkType(), su.getRole(), su.getRoleCount());
