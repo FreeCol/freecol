@@ -38,7 +38,6 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Map.Direction;
@@ -50,6 +49,10 @@ import net.sf.freecol.common.model.TradeRouteStop;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.util.EmptyIterator;
 import net.sf.freecol.common.util.Utils;
+
+// @compat 0.10.x
+import net.sf.freecol.common.model.EquipmentType;
+// end @compat 0.10.x
 
 import org.w3c.dom.Element;
 
@@ -193,12 +196,6 @@ public class Unit extends GoodsLocation
      */
     protected int visibleGoodsCount;
 
-    // @compat 0.10.x
-    /** The equipment this Unit carries.  Now subsumed into roles. */
-    protected final TypeCountMap<EquipmentType> equipment
-        = new TypeCountMap<EquipmentType>();
-    // end @compat 0.10.x
-
 
     /**
      * Constructor for ServerUnit.
@@ -284,7 +281,7 @@ public class Unit extends GoodsLocation
      * Get a string template for a unit in a human readable form.  The
      * label consists of the three items of getLabel() plus extra
      * information about treasure (for treasure trains) or missing
-     * expected equipment.
+     * expected role-equipment.
      *
      * @return The <code>StringTemplate</code> to describe the given unit.
      */
@@ -663,11 +660,6 @@ public class Unit extends GoodsLocation
         }
         setRole(role);
         setRoleCount((role.isDefaultRole()) ? 0 : roleCount);
-
-        equipment.clear();
-        for (EquipmentType et : getSpecification().getRoleEquipment(role.getId())) {
-            equipment.incrementCount(et, roleCount);
-        }
     }
 
     /**
@@ -711,6 +703,9 @@ public class Unit extends GoodsLocation
 
     /**
      * Get a description of the unit's role-equipment.
+     *
+     * FIXME: missionary equipment needs work, but has been left as is
+     * for now.
      *
      * @return A <code>StringTemplate</code> summarizing the role-equipment.
      */
@@ -1503,43 +1498,8 @@ public class Unit extends GoodsLocation
             : getGoodsSpaceTaken();
     }
 
-    /**
-     * Get the <code>Equipment</code> value.
-     *
-     * @return A counted map of the <code>EquipmentType</code>s
-     *     carried by this unit.
-     */
-    public final TypeCountMap<EquipmentType> getEquipment() {
-        return equipment;
-    }
 
-    /**
-     * Get the amount of an equipment type this unit has.
-     *
-     * @param equipmentType The <code>EquipmentType</code> to check.
-     * @return The amount of equipment.
-     */
-    public int getEquipmentCount(EquipmentType equipmentType) {
-        return equipment.getCount(equipmentType);
-    }
-
-    /**
-     * Get the amount of equipment this unit has.
-     *
-     * @return The amount of equipment.
-     */
-    public int getEquipmentCount() {
-        // TODO: introduce equipmentCount field
-        if (!(equipment == null || equipment.isEmpty())) {
-            for (Integer result : equipment.values()) {
-                return result;
-            }
-        }
-        return 0;
-    }
-
-
-    // More complex equipment manipulation.
+    // Combat routines
 
     /**
      * Gets a role that can be equipped automatically assumed
@@ -1548,7 +1508,7 @@ public class Unit extends GoodsLocation
      * Paul Revere makes an unarmed colonist in a settlement pick up a
      * stock-piled musket if attacked, so the bonus should be applied
      * for unarmed colonists inside colonies where there are muskets
-     * available.  Indians can also pick up equipment.
+     * available.  Natives can also auto-arm.
      *
      * @return A <code>Role</code> that can be automatically assumed
      *     by this unit, or null if none.
@@ -1613,66 +1573,6 @@ public class Unit extends GoodsLocation
         return hasAbility(Ability.DEMOTE_ON_ALL_EQUIPMENT_LOST)
             && getRole().getDowngrade() == null;
     }
-
-    /**
-     * Checks whether this unit can be equipped with the given
-     * <code>EquipmentType</code> at the current
-     * <code>Location</code>. This is the case if all requirements of
-     * the EquipmentType are met.
-     *
-     * @param equipmentType an <code>EquipmentType</code> value
-     * @return whether this unit can be equipped with the given
-     *         <code>EquipmentType</code> at the current location.
-     */
-    public boolean canBeEquippedWith(EquipmentType equipmentType) {
-        if (!equipmentType.isAvailableTo(this)) return false;
-        if (equipment.getCount(equipmentType) >= equipmentType.getMaximumCount()) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Get the equipment types needed for this unit to perform a given role.
-     * Does not take account of current equipment.
-     *
-     * @param role The <code>Role</code> to perform.
-     * @return A list of <code>EquipmentType</code>s.
-     */
-    public List<EquipmentType> getRoleEquipment(Role role) {
-        List<EquipmentType> equipment
-            = getSpecification().getRoleEquipment(role.getId());
-        Iterator<EquipmentType> i = equipment.iterator();
-        while (i.hasNext()) {
-            EquipmentType et = i.next();
-            if (!et.isAvailableTo(this)) i.remove();
-        }
-        return equipment;
-    }
-
-    /**
-     * Get a map of equipment type changes needed by this unit to assume
-     * a new role.
-     *
-     * @param role The <code>Role</code> to assume.
-     * @return A map of equipment type changes.
-     */
-    public TypeCountMap<EquipmentType> getEquipmentChangeForRole(Role role) {
-        final Specification spec = getSpecification();
-        final List<EquipmentType> roleEq = getRoleEquipment(role);
-        TypeCountMap<EquipmentType> change = new TypeCountMap<EquipmentType>();
-        for (EquipmentType et : spec.getEquipmentTypeList()) {
-            int oldCount = getEquipmentCount(et);
-            int newCount = (roleEq.contains(et)) ? 1 : 0;
-            if (newCount != oldCount) {
-                change.incrementCount(et, newCount - oldCount);
-            }
-        }
-        return change;
-    }
-
-
-    // Combat routines
 
     /**
      * Does the unit have arms?
@@ -3717,7 +3617,6 @@ public class Unit extends GoodsLocation
     private static final String CURRENT_STOP_TAG = "currentStop";
     private static final String DESTINATION_TAG = "destination";
     private static final String ENTRY_LOCATION_TAG = "entryLocation";
-    private static final String EQUIPMENT_TAG = "equipment";
     private static final String ETHNICITY_TAG = "ethnicity";
     private static final String EXPERIENCE_TAG = "experience";
     private static final String EXPERIENCE_TYPE_TAG = "experienceType";
@@ -3745,7 +3644,11 @@ public class Unit extends GoodsLocation
     // end @compat
     // @compat 0.10.7
     private static final String OLD_HIT_POINTS_TAG = "hitpoints";
-    // end @compat
+    private static final String EQUIPMENT_TAG = "equipment";
+    /** The equipment this Unit carries.  Now subsumed into roles. */
+    private final TypeCountMap<EquipmentType> equipment
+        = new TypeCountMap<EquipmentType>();
+    // end @compat 0.10.x
 
 
     /**
@@ -3856,16 +3759,6 @@ public class Unit extends GoodsLocation
 
         } else if (getType().canCarryGoods()) {
             xw.writeAttribute(VISIBLE_GOODS_COUNT_TAG, getVisibleGoodsCount());
-        }
-
-        for (EquipmentType et : getSortedCopy(equipment.keySet())) {
-            xw.writeStartElement(EQUIPMENT_TAG);
-
-            xw.writeAttribute(ID_ATTRIBUTE_TAG, et);
-
-            xw.writeAttribute(COUNT_TAG, equipment.getCount(et));
-
-            xw.writeEndElement();
         }
     }
 

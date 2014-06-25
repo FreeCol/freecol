@@ -198,7 +198,6 @@ public class ServerUnit extends Unit implements ServerModelObject {
         this.treasureAmount = 0;
         this.attrition = 0;
         this.visibleGoodsCount = -1;
-        this.equipment.clear();
 
         // Fix up role, state and location now other values are present.
         changeRole(role, role.getMaximumCount());
