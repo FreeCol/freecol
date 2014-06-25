@@ -42,22 +42,19 @@ public class UnitTest extends FreeColTestCase {
     private static final BuildingType churchType
         = spec().getBuildingType("model.building.chapel");
 
-    private static final EquipmentType horsesEquipmentType
-        = spec().getEquipmentType("model.equipment.horses");
-    private static final EquipmentType missionaryEquipmentType
-        = spec().getEquipmentType("model.equipment.missionary");
-    private static final EquipmentType musketsEquipmentType
-        = spec().getEquipmentType("model.equipment.muskets");
-    private static final EquipmentType toolsEquipmentType
-        = spec().getEquipmentType("model.equipment.tools");
-
     private static final GoodsType cottonType
         = spec().getGoodsType("model.goods.cotton");
     private static final GoodsType foodType
         = spec().getPrimaryFoodType();
 
+    private static final Role dragoonRole
+        = spec().getRole("model.role.dragoon");
     private static final Role missionaryRole
         = spec().getRole("model.role.missionary");
+    private static final Role scoutRole
+        = spec().getRole("model.role.scout");
+    private static final Role soldierRole
+        = spec().getRole("model.role.soldier");
 
     private static final TileType ocean
         = spec().getTileType("model.tile.ocean");
@@ -260,8 +257,7 @@ public class UnitTest extends FreeColTestCase {
         assertEquals(1, colonist.getLineOfSight());
         assertTrue(colonist.hasAbility(Ability.CAN_BE_EQUIPPED));
 
-        assertTrue(colonist.canBeEquippedWith(horsesEquipmentType));
-        colonist.changeEquipment(horsesEquipmentType, 1);
+        colonist.changeRole(scoutRole, 1);
         assertEquals(2, colonist.getLineOfSight());
 
         // with Hernando De Soto, land units should see further
@@ -364,35 +360,6 @@ public class UnitTest extends FreeColTestCase {
         assertTrue(colonialRegularType.isAvailableTo(european));
     }
 
-    public void testChangeEquipment() {
-        Game game = getGame();
-        game.setMap(getTestMap(true));
-
-        Colony colony = getStandardColony(6);
-        assertFalse(churchType.hasAbility(Ability.DRESS_MISSIONARY));
-        Building church = colony.getBuilding(churchType);
-        church.upgrade();
-        assertTrue(colony.hasAbility(Ability.DRESS_MISSIONARY));
-
-        Unit colonist = colony.getUnitList().get(0);
-        assertEquals("Colonist is not a missionary", 0,
-                     colonist.getEquipmentCount(missionaryEquipmentType));
-        assertTrue("Changing to missionary should not dump equipment",
-            colonist.changeEquipment(missionaryEquipmentType, 1).isEmpty());
-        assertEquals("Colonist should now be a missionary", 1,
-                     colonist.getEquipmentCount(missionaryEquipmentType));
-        assertEquals("Colonist should not have muskets", 0,
-                     colonist.getEquipmentCount(musketsEquipmentType));
-        List<EquipmentType> remove
-            = colonist.changeEquipment(musketsEquipmentType, 1);
-        assertTrue("Arming the colonist should remove missionary dress",
-            remove.size() == 1 && remove.get(0) == missionaryEquipmentType);
-        assertEquals("Colonist should be armed", 1,
-                     colonist.getEquipmentCount(musketsEquipmentType));
-        assertEquals("Colonist should have missionary dress", 1,
-                     colonist.getEquipmentCount(missionaryEquipmentType));
-    }
-
     public void testUnitLocationAfterBuildingColony() {
         Game game = getStandardGame();
         Map map = getTestMap();
@@ -453,16 +420,12 @@ public class UnitTest extends FreeColTestCase {
         assertTrue("Colonist should some initial experience",
                    colonist.getExperience() > 0);
 
-        colonist.changeEquipment(musketsEquipmentType, 1);
-        assertEquals(spec().getRole("model.role.soldier"),
-                     colonist.getRole());
-        assertEquals("Colonist should have lost all experience and role", 0,
+        colonist.changeRole(soldierRole, 1);
+        assertEquals("Colonist should have lost all experience", 0,
                      colonist.getExperience());
 
         colonist.modifyExperience(10);
-        colonist.changeEquipment(horsesEquipmentType, 1);
-        assertEquals(spec().getRole("model.role.dragoon"),
-                     colonist.getRole());
+        colonist.changeRole(dragoonRole, 1);
         assertTrue("Colonist should not have lost experience, compatible role",
                    colonist.getExperience() > 0);
     }

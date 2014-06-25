@@ -655,12 +655,15 @@ public class Unit extends GoodsLocation
      * @param roleCount The new role count.
      */
     public void changeRole(Role role, int roleCount) {
-        final Specification spec = getSpecification();
+        if (!role.isCompatibleWith(getRole())) {
+            // Clear experience if changing to an incompatible role.
+            setExperience(0);
+        }
         setRole(role);
         setRoleCount((role.isDefaultRole()) ? 0 : roleCount);
 
         equipment.clear();
-        for (EquipmentType et : spec.getRoleEquipment(role.getId())) {
+        for (EquipmentType et : getSpecification().getRoleEquipment(role.getId())) {
             equipment.incrementCount(et, roleCount);
         }
     }
@@ -1709,30 +1712,6 @@ public class Unit extends GoodsLocation
             if (!et.isAvailableTo(this)) i.remove();
         }
         return equipment;
-    }
-
-    /**
-     * Changes the equipment a unit has and returns a list of equipment
-     * it still has but needs to drop due to the changed equipment being
-     * incompatible.
-     *
-     * @param type The <code>EquipmentType</code> to change.
-     * @param amount The amount to change by (may be negative).
-     * @return A list of equipment types that the unit must now drop.
-     */
-    public List<EquipmentType> changeEquipment(EquipmentType type, int amount) {
-        List<EquipmentType> result = new ArrayList<EquipmentType>();
-        equipment.incrementCount(type, amount);
-        if (amount > 0) {
-            for (EquipmentType oldType
-                     : new HashSet<EquipmentType>(equipment.keySet())) {
-                if (!oldType.isCompatibleWith(type)) {
-                    result.add(oldType);
-                }
-            }
-        }
-        setRole();
-        return result;
     }
 
     /**
