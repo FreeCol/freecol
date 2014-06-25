@@ -116,41 +116,6 @@ public final class QuickActionMenu extends JPopupMenu {
     }
 
     /**
-     * Prompt for the amount of goods to use in making equipment for a unit.
-     *
-     * @param unit The <code>Unit</code> to equip.
-     * @param et The <code>EquipmentType</code> to equip with.
-     * @param n The maximum amount of the equipment.
-     * @param add True if adding equipment, false if removing.
-     * @return A number of equipment items to use.
-     */
-    private int promptForEquipment(final Unit unit, final EquipmentType et,
-                                   int n, boolean add) {
-        List<AbstractGoods> required = et.getRequiredGoods();
-        if (required.isEmpty()) return n;
-        AbstractGoods least = null;
-        int divisor = 1;
-        if (add) {
-            for (AbstractGoods ag : required) {
-                int present = (unit.isInEurope()) ? GoodsContainer.CARGO_SIZE
-                    : unit.getColony().getGoodsCount(ag.getType());
-                if (least == null || least.getAmount() > present) {
-                    least = new AbstractGoods(ag.getType(), present);
-                    divisor = ag.getAmount();
-                }
-            }
-        } else {
-            AbstractGoods ag = required.get(0);
-            least = new AbstractGoods(ag.getType(),
-                unit.getEquipmentCount(et) * ag.getAmount());
-            divisor = ag.getAmount();
-        }
-        if (least == null) return n;
-        promptForGoods(least);
-        return least.getAmount() / divisor;
-    }
-
-    /**
      * Creates a popup menu for a Unit.
      */
     public void createUnitMenu(final UnitLabel unitLabel) {
