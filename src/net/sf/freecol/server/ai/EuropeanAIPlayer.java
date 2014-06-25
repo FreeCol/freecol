@@ -148,7 +148,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 if (a == null || (unit = a.getUnit()) == null
                     || BuildColonyMission.invalidReason(a) != null)
                     return -1000;
-                int base = (!unit.getEquipment().isEmpty()) ? 0
+                int base = (!unit.hasDefaultRole()) ? 0
                     : (unit.getSkillLevel() > 0) ? 100
                     : 500 + 100 * unit.getSkillLevel();
                 if (unit.hasTile()) base += 50;
@@ -189,7 +189,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                         && unit.getLocation().getColony()
                         .canProvideGoods(roleEquipment)) ? 400
                     : -1000;
-                if (!unit.getEquipment().isEmpty()) {
+                if (!unit.hasDefaultRole()) {
                     base -= 400;
                 } else if (unit.getSkillLevel() > 0) {
                     base -= 200;
@@ -232,7 +232,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                         && unit.getLocation().getColony()
                         .canProvideGoods(roleEquipment)) ? 400
                     : -1000;
-                if (!unit.getEquipment().isEmpty()) {
+                if (!unit.hasDefaultRole()) {
                     base -= 400;
                 } else if (unit.getSkillLevel() > 0) {
                     base -= 200;
