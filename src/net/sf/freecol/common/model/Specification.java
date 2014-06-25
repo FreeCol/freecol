@@ -148,9 +148,10 @@ public final class Specification {
     // readerMap("disasters")
     private final List<Disaster> disasters
         = new ArrayList<Disaster>();
-    // readerMap("equipment-types")
+    // @compat 0.10.x readerMap("equipment-types")
     private final List<EquipmentType> equipmentTypes
         = new ArrayList<EquipmentType>();
+    // end @compat 0.10.x
     // readerMap("european-nation-types")
     private final List<EuropeanNationType> europeanNationTypes
         = new ArrayList<EuropeanNationType>();
@@ -291,8 +292,10 @@ public final class Specification {
                       new TypeReader<BuildingType>(BuildingType.class, buildingTypeList));
         readerMap.put(DISASTERS_TAG,
                       new TypeReader<Disaster>(Disaster.class, disasters));
+        // @compat 0.10.x
         readerMap.put(EQUIPMENT_TYPES_TAG,
                       new TypeReader<EquipmentType>(EquipmentType.class, equipmentTypes));
+        // end @compat 0.10.x
         readerMap.put(EUROPEAN_NATION_TYPES_TAG,
                       new TypeReader<EuropeanNationType>(EuropeanNationType.class, europeanNationTypes));
         readerMap.put(EVENTS_TAG,
@@ -583,7 +586,6 @@ public final class Specification {
             + ", " + allAbilities.size() + " Abilities"
             + ", " + buildingTypeList.size() + " BuildingTypes"
             + ", " + disasters.size() + " Disasters"
-            + ", " + equipmentTypes.size() + " EquipmentTypes"
             + ", " + europeanNationTypes.size() + " EuropeanNationTypes"
             + ", " + events.size() + " Events"
             + ", " + foundingFathers.size() + " FoundingFathers"
@@ -1410,7 +1412,7 @@ public final class Specification {
 
     /**
      * Get any possible role change when a unit with a given role captures
-     * the role/equipment of another unit.
+     * the role-equipment of another unit.
      *
      * @param from The current <code>Role</code> of the capturing
      *     <code>Unit</code>.
@@ -1424,55 +1426,12 @@ public final class Specification {
         return (change == null) ? null : change.get(other);
     }
 
-    /**
-     * This is compatibility code to be removed as soon as
-     * EquipmentType has been completely replaced by Role.
-     */
-    public List<EquipmentType> getRoleEquipment(String roleId) {
-        return getRoleEquipment(roleId, false);
-    }
 
-    public List<EquipmentType> getRoleEquipment(String roleId, boolean max) {
-        Role role = getRole(roleId);
-        List<EquipmentType> result = new ArrayList<EquipmentType>();
-        if (role.getRequiredGoods().isEmpty()) {
-            if ("model.role.missionary".equals(roleId)) {
-                result.add(getEquipmentType("model.equipment.missionary"));
-            }
-        } else {
-            for (AbstractGoods goods : role.getRequiredGoods()) {
-                if ("model.goods.horses".equals(goods.getType().getId())) {
-                    if (role.requiresAbility(Ability.NATIVE)) {
-                        result.add(getEquipmentType("model.equipment.indian.horses"));
-                    } else {
-                        result.add(getEquipmentType("model.equipment.horses"));
-                    }
-                } else if ("model.goods.muskets".equals(goods.getType().getId())) {
-                    if (role.requiresAbility(Ability.NATIVE)) {
-                        result.add(getEquipmentType("model.equipment.indian.muskets"));
-                    } else {
-                        result.add(getEquipmentType("model.equipment.muskets"));
-                    }
-                } else if ("model.goods.tools".equals(goods.getType().getId())) {
-                    int equipmentCount = max ? role.getMaximumCount() : 1;
-                    for (int index = 0; index < equipmentCount; index++) {
-                        result.add(getEquipmentType("model.equipment.tools"));
-                    }
-                }
-            }
-        }
-        return result;
-    }
-
-
-    // -- EquipmentTypes --
-
-    public List<EquipmentType> getEquipmentTypeList() {
-        return equipmentTypes;
-    }
+    // @compat 0.10.x -- EquipmentTypes --
 
     /**
      * Get an equipment type by identifier.
+     * Still needed by backward compatibility code in Unit.readChild.
      *
      * @param id The object identifier.
      * @return The <code>EquipmentType</code> found.
@@ -1480,6 +1439,7 @@ public final class Specification {
     public EquipmentType getEquipmentType(String id) {
         return getType(id, EquipmentType.class);
     }
+    // end @compat 0.10.x
 
     // -- DifficultyLevels --
 
@@ -1713,7 +1673,6 @@ public final class Specification {
     private static final String BUILDING_TYPES_TAG = "building-types";
     private static final String DIFFICULTY_LEVEL_TAG = "difficultyLevel";
     private static final String DISASTERS_TAG = "disasters";
-    private static final String EQUIPMENT_TYPES_TAG = "equipment-types";
     private static final String EUROPEAN_NATION_TYPES_TAG = "european-nation-types";
     private static final String EVENTS_TAG = "events";
     private static final String FOUNDING_FATHERS_TAG = "founding-fathers";
@@ -1728,6 +1687,9 @@ public final class Specification {
     private static final String TILEIMPROVEMENT_TYPES_TAG = "tileimprovement-types";
     private static final String UNIT_TYPES_TAG = "unit-types";
     private static final String VERSION_TAG = "version";
+    // @compat 0.10.x
+    private static final String EQUIPMENT_TYPES_TAG = "equipment-types";
+    // end @compat 0.10.x
 
 
     /**
@@ -1758,7 +1720,6 @@ public final class Specification {
         writeSection(xw, RESOURCE_TYPES_TAG, resourceTypeList);
         writeSection(xw, TILE_TYPES_TAG, tileTypeList);
         writeSection(xw, ROLES_TAG, roles);
-        writeSection(xw, EQUIPMENT_TYPES_TAG, equipmentTypes);
         writeSection(xw, TILEIMPROVEMENT_TYPES_TAG, tileImprovementTypeList);
         writeSection(xw, UNIT_TYPES_TAG, unitTypeList);
         writeSection(xw, BUILDING_TYPES_TAG, buildingTypeList);
@@ -1834,7 +1795,8 @@ public final class Specification {
             // spec.  Alas, specs pre-0.10.6 had no roles section.
             // The next section after roles in modern specs is
             // "equipment-types", which is also the first place roles
-            // are referred to directly.  So this is the last chance
+            // are referred to directly, and better still is completely
+            // replaced by roles in 0.11.x.  So this is the last chance
             // to fix any role omissions.
             if ("equipment-types".equals(childName)) fixupRoles();
             // end @compat 0.10.x
@@ -1963,18 +1925,6 @@ public final class Specification {
             allOptions.put(id, veryGoodGovernmentLimit);
         }
 
-        EquipmentType missionaryEquipment
-            = getEquipmentType("model.equipment.missionary");
-        if (missionaryEquipment != null) {
-            for (String as : new String[] { Ability.ESTABLISH_MISSION,
-                                            Ability.DENOUNCE_HERESY,
-                                            Ability.INCITE_NATIVES }) {
-                List<Ability> al = allAbilities.get(as);
-                if (al != null) {
-                    for (Ability a : al) missionaryEquipment.addAbility(a);
-                }
-            }
-        }
         // model.ability.missionary was split into distinct parts,
         // which should be fixed by the roles work, but the Brebeuf
         // scope was left hanging.
@@ -1997,16 +1947,6 @@ public final class Specification {
                 ent.addAbility(new Ability(Ability.FOUNDS_COLONIES, ent, true));
             }
         }
-        getEquipmentType("model.equipment.horses")
-            .addAbility(new Ability(Ability.MOUNTED));
-        EquipmentType ih = getEquipmentType("model.equipment.indian.horses");
-        ih.addAbility(new Ability(Ability.MOUNTED));
-        ih.setRole(getRole("model.role.mountedBrave")); // was scout
-        getEquipmentType("model.equipment.muskets")
-            .addAbility(new Ability(Ability.ARMED));
-        EquipmentType im = getEquipmentType("model.equipment.indian.muskets");
-        im.addAbility(new Ability(Ability.ARMED));
-        im.setRole(getRole("model.role.armedBrave")); // was soldier
 
         // Fix REF roles, soldier -> infantry, dragoon -> cavalry
         // Older specs (<= 0.10.5 ?) had refSize directly under difficulty

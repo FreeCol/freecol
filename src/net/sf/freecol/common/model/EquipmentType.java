@@ -32,6 +32,10 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 
 
 /**
+ * @compat 0.10.x
+ * EquipmentTypes are now subsumed by roles.
+ * Delete this whole file in due course.
+ *
  * A type of equipment.  Equipment differs from goods (although it is often
  * derived from it) in that it must be attached to a unit.
  */

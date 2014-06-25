@@ -434,7 +434,7 @@ public class ServerColony extends Colony implements ServerModelObject {
         // any goods types useful for BuildableTypes, except if that
         // type is the input to some other form of production.  (Note:
         // isBuildingMaterial is also true for goods used to produce
-        // EquipmentTypes, hence neededForBuildableType).  Such
+        // role-equipment, hence neededForBuildableType).  Such
         // production probably means we forgot to reset the build
         // queue.  Thus, if hammers are being produced it is worth
         // warning about, but not if producing tools.
