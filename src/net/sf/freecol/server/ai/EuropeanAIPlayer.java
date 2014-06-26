@@ -32,6 +32,7 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Ability;
@@ -2097,29 +2098,44 @@ public class EuropeanAIPlayer extends AIPlayer {
     }
 
     private int evaluateColony(Colony colony) {
-        if (getPlayer().getEurope() == null) return Integer.MIN_VALUE;
+        if (colony == null) return 0;
+        final Player player = getPlayer();
+        int result = 0;
 
-        int result = 0, v;
-        for (WorkLocation wl : colony.getAvailableWorkLocations()) {
-            for (Unit u : wl.getUnitList()) {
+        if (player.owns(colony)) {
+            int v;
+            for (WorkLocation wl : colony.getAvailableWorkLocations()) {
+                for (Unit u : wl.getUnitList()) {
+                    result += evaluateUnit(u);
+                }
+                if (wl instanceof Building) {
+                    for (AbstractGoods ag : ((Building)wl).getType()
+                             .getRequiredGoods()) {
+                        result += evaluateGoods(ag);
+                    }
+                } else if (wl instanceof ColonyTile) {
+                    for (AbstractGoods ag : ((ColonyTile)wl).getProductionInfo().getProduction()) {
+                        result += evaluateGoods(ag);
+                    }
+                }
+            }
+            for (Unit u : colony.getTile().getUnitList()) {
                 result += evaluateUnit(u);
             }
-            if (wl instanceof Building) {
-                for (AbstractGoods ag : ((Building)wl).getType()
-                         .getRequiredGoods()) {
-                    result += evaluateGoods(ag);
-                }
-            } else if (wl instanceof ColonyTile) {
-                for (AbstractGoods ag : ((ColonyTile)wl).getProductionInfo().getProduction()) {
-                    result += evaluateGoods(ag);
-                }
+            for (Goods g : colony.getCompactGoods()) {
+                result += evaluateGoods(g);
             }
-        }
-        for (Unit u : colony.getTile().getUnitList()) {
-            result += evaluateUnit(u);
-        }
-        for (Goods g : colony.getCompactGoods()) {
-            result += evaluateGoods(g);
+        } else {
+            // Much guesswork
+            result += colony.getDisplayUnitCount() * 1000;
+            result += 500; // Some useful goods?
+            for (Tile t : colony.getTile().getSurroundingTiles(1)) {
+                if (t.getOwningSettlement() == colony) result += 200;
+            }
+            Building stockade = colony.getStockade();
+            if (stockade != null) {
+                result *= stockade.getLevel();
+            }
         }
         return result;
     }
@@ -2127,14 +2143,14 @@ public class EuropeanAIPlayer extends AIPlayer {
     private int evaluateUnit(Unit unit) {
         final Europe europe = getPlayer().getEurope();
 
-        return (europe == null) ? Integer.MIN_VALUE
+        return (europe == null) ? 0
             : europe.getUnitPrice(unit.getType());
     }
 
     private int evaluateGoods(AbstractGoods ag) {
         final Market market = getPlayer().getMarket();
 
-        return (market == null) ? Integer.MIN_VALUE
+        return (market == null) ? 0
             : market.getSalePrice(ag.getType(), ag.getAmount());
     }
 
@@ -2294,6 +2310,10 @@ public class EuropeanAIPlayer extends AIPlayer {
             = new HashMap<TradeItem, Integer>();
         TradeItem peace = null;
         TradeItem cash = null;
+        StringBuffer sb = new StringBuffer(64);
+        sb.append("Evaluate trade offer from ").append(other.getName())
+            .append(":");
+        TradeStatus result = null;
 
         int unacceptable = 0;
         for (TradeItem item : agreement.getTradeItems()) {
@@ -2312,10 +2332,10 @@ public class EuropeanAIPlayer extends AIPlayer {
                     if (player.getNumberOfSettlements() < 5) {
                         value = Integer.MIN_VALUE;
                     } else {
-                        value = -evaluateColony(item.getColony());
+                        value = -evaluateColony(item.getColony(getGame()));
                     }
                 } else {
-                    value = evaluateColony(item.getColony());
+                    value = evaluateColony(item.getColony(getGame()));
                 }
 
             } else if (item instanceof GoodsTradeItem) {
@@ -2406,56 +2426,80 @@ public class EuropeanAIPlayer extends AIPlayer {
 
             if (value == Integer.MIN_VALUE) unacceptable++;
             scores.put(item, new Integer(value));
+            sb.append(" ").append(Messages.message(item.getDescription()))
+                .append(" = ").append(value);
         }
 
         // If too many items are unacceptable, reject
         double ratio = (double)unacceptable
             / (unacceptable + agreement.getTradeItems().size());
         if (ratio > 0.5 - 0.5 * agreement.getVersion()) {
-            return rejectAgreement(peace, agreement);
+            result = rejectAgreement(peace, agreement);
+            sb.append(", Too many (").append(unacceptable)
+                .append(") unacceptable");
         }
 
-        // Dump the unacceptable offers, sum the rest
         int value = 0;
-        for (Entry<TradeItem, Integer> entry : scores.entrySet()) {
-            if (entry.getValue() == Integer.MIN_VALUE) {
-                agreement.remove(entry.getKey());
-            } else {
-                value += entry.getValue();
+        if (result == null) {
+            // Dump the unacceptable offers, sum the rest
+            for (Entry<TradeItem, Integer> entry : scores.entrySet()) {
+                if (entry.getValue() == Integer.MIN_VALUE) {
+                    agreement.remove(entry.getKey());
+                } else {
+                    value += entry.getValue();
+                }
+            }
+            // If the result is non-negative,
+            // accept/propose-without-unacceptable
+            if (value >= 0) {
+                result = (agreement.getContext() == DiplomaticTrade.TradeContext.CONTACT
+                    && agreement.getVersion() == 0) ? TradeStatus.PROPOSE_TRADE
+                    : (unacceptable == 0) ? TradeStatus.ACCEPT_TRADE
+                    : (agreement.isEmpty()) ? TradeStatus.REJECT_TRADE
+                    : TradeStatus.PROPOSE_TRADE;
+                sb.append(", Value = ").append(value);
             }
         }
-        // If the result is non-negative, accept/propose-without-unacceptable
-        if (value >= 0) {
-            return (agreement.getContext() == DiplomaticTrade.TradeContext.CONTACT
-                && agreement.getVersion() == 0) ? TradeStatus.PROPOSE_TRADE
-                : (unacceptable == 0) ? TradeStatus.ACCEPT_TRADE
-                : TradeStatus.PROPOSE_TRADE;
+
+        if (result == null) {
+            // Give up?
+            if (Utils.randomInt(logger, "Enough diplomacy?", getAIRandom(),
+                                1 + agreement.getVersion()) > 5) {
+                result = rejectAgreement(peace, agreement);
+                sb.append(", Ran out of patience at ")
+                    .append(agreement.getVersion());
+            }
         }
 
-        // Give up?
-        if (Utils.randomInt(logger, "Enough diplomacy?", getAIRandom(),
-                            1 + agreement.getVersion()) > 5) {
-            return rejectAgreement(peace, agreement);
+        if (result == null) {
+            // Dump the negative offers until the sum is positive.
+            // Return a proposal with items we like/can accept, or reject
+            // if none are left.
+            List<TradeItem> items
+                = new ArrayList<TradeItem>(agreement.getTradeItems());
+            Collections.sort(items, new Comparator<TradeItem>() {
+                    public int compare(TradeItem t1, TradeItem t2) {
+                        return scores.get(t1) - scores.get(t2);
+                    }
+                });
+            while (!items.isEmpty()) {
+                TradeItem item = items.remove(0);
+                value += scores.get(item);
+                agreement.remove(item);
+                if (value > 0) break;
+            }
+            if (value > 0 && !items.isEmpty()) {
+                result = TradeStatus.PROPOSE_TRADE;
+                sb.append(", Pruned until acceptable at ").append(value);
+            } else {
+                result = rejectAgreement(peace, agreement);
+                sb.append(", Agreement unsalvageable");
+            }
         }
 
-        // Dump the negative offers until the sum is positive.
-        // Return a proposal with items we like/can accept, or reject
-        // if none are left.
-        List<TradeItem> items
-            = new ArrayList<TradeItem>(agreement.getTradeItems());
-        Collections.sort(items, new Comparator<TradeItem>() {
-                public int compare(TradeItem t1, TradeItem t2) {
-                    return scores.get(t1) - scores.get(t2);
-                }
-            });
-        while (!items.isEmpty()) {
-            TradeItem item = items.remove(0);
-            value += scores.get(item);
-            agreement.remove(item);
-            if (value > 0) break;
-        }
-        return (value > 0 && !items.isEmpty()) ? TradeStatus.PROPOSE_TRADE
-            : rejectAgreement(peace, agreement);
+        sb.append(" => ").append(result);
+        logger.info(sb.toString());
+        return result;
     }
 
 

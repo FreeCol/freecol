@@ -143,16 +143,10 @@ public abstract class TradeItem extends FreeColObject {
     /**
      * Get the colony to trade.
      *
+     * @param game A <code>Game</code> to look for the colony in.
      * @return The <code>Colony</code> to trade.
      */
-    public Colony getColony() { return null; }
-
-    /**
-     * Set the colony to trade.
-     *
-     * @param colony The new <code>Colony</code> to trade.
-     */
-    public void setColony(Colony colony) {}
+    public Colony getColony(Game game) { return null; }
 
     /**
      * Get the goods to trade.

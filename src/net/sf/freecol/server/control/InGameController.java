@@ -3059,7 +3059,7 @@ public final class InGameController extends Controller {
                 && !source.csChangeStance(stance, dest, true, cs)) {
                 logger.warning("Stance trade failure: " + stance);
             }
-            Colony colony = tradeItem.getColony();
+            Colony colony = tradeItem.getColony(getGame());
             if (colony != null) {
                 ServerPlayer former = (ServerPlayer) colony.getOwner();
                 for (Tile t : colony.getOwnedTiles()) {

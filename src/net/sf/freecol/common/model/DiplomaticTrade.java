@@ -271,6 +271,15 @@ public class DiplomaticTrade extends FreeColObject {
     }
 
     /**
+     * Are there no trade items present?
+     *
+     * @return True if there are no trade items present.
+     */
+    public final boolean isEmpty() {
+        return items.isEmpty();
+    }
+
+    /**
      * Get an iterator for all the TradeItems.
      *
      * @return An iterator for all TradeItems.
@@ -316,7 +325,7 @@ public class DiplomaticTrade extends FreeColObject {
         List<Colony> colonyList = new ArrayList<Colony>();
         for (TradeItem ti : items) {
             if (ti instanceof ColonyTradeItem && player == ti.getSource()) {
-                colonyList.add(((ColonyTradeItem)ti).getColony());
+                colonyList.add(((ColonyTradeItem)ti).getColony(player.getGame()));
             }
         }
         return colonyList;

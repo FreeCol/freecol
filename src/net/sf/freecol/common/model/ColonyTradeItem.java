@@ -33,10 +33,10 @@ public class ColonyTradeItem extends TradeItem {
     /** The identifier of the colony to change hands. */
     private String colonyId;
 
-    /** The colony to change hands. */
-    private Colony colony;
-
-    /** The colony name, when the colony is unknown to the offer recipient. */
+    /**
+     * The colony name, which is useful when the colony is unknown to
+     * the offer recipient.
+     */
     private String colonyName;
 
 
@@ -51,9 +51,16 @@ public class ColonyTradeItem extends TradeItem {
     public ColonyTradeItem(Game game, Player source, Player destination,
                            Colony colony) {
         super(game, "tradeItem.colony", source, destination);
-        this.colony = colony;
         colonyId = colony.getId();
         colonyName = colony.getName();
+        if (colony.getOwner() != source) {
+            throw new IllegalArgumentException("Bad source for colony "
+                + colony.getId());
+        }
+        if (destination == null || !destination.isEuropean()) {
+            throw new IllegalArgumentException("Bad destination: "
+                + destination);
+        }
     }
 
     /**
@@ -73,8 +80,7 @@ public class ColonyTradeItem extends TradeItem {
      * {@inheritDoc}
      */
     public boolean isValid() {
-        return (colony.getOwner() == getSource() &&
-                getDestination().isEuropean());
+        return colonyId != null;
     }
 
     /**
@@ -96,16 +102,8 @@ public class ColonyTradeItem extends TradeItem {
      * {@inheritDoc}
      */
     @Override
-    public Colony getColony() {
-        return colony;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setColony(Colony colony) {
-        this.colony = colony;
+    public Colony getColony(Game game) {
+        return game.getFreeColGameObject(colonyId, Colony.class);
     }
 
 
@@ -134,9 +132,7 @@ public class ColonyTradeItem extends TradeItem {
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        Colony colony = xr.getAttribute(getGame(), COLONY_TAG,
-                                        Colony.class, (Colony)null);
-        colonyId = (colony == null) ? null : colony.getId();
+        colonyId = xr.getAttribute(COLONY_TAG, (String)null);
 
         colonyName = xr.getAttribute(COLONY_NAME_TAG, (String)null);
     }
