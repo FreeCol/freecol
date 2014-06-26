@@ -616,7 +616,10 @@ public class PioneeringMission extends Mission {
         switch (mt) {
         case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
             return;
-        case MOVE_ILLEGAL: case MOVE_NO_ATTACK_CIVILIAN:
+        case MOVE_ILLEGAL:
+            if (unit.isInEurope()) return;
+            // Fall through
+        case MOVE_NO_ATTACK_CIVILIAN:
             // Might be a temporary blockage due to an occupying unit
             // at the target.  Move randomly and retry if adjacent.
             Direction d = unit.getTile().getDirection(getTarget().getTile());
