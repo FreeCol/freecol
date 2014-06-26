@@ -2192,9 +2192,9 @@ public class Unit extends GoodsLocation
      *     each turn.
      */
     public int getInitialMovesLeft() {
+        final Turn turn = getGame().getTurn();
         return (int)FeatureContainer.applyModifierSet(unitType.getMovement(),
-            getGame().getTurn(),
-            getModifierSet(Modifier.MOVEMENT_BONUS));
+            turn, getModifierSet(Modifier.MOVEMENT_BONUS, unitType, turn));
     }
 
     /**
