@@ -863,7 +863,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     public List<Tile> exploreForSettlement(Settlement settlement) {
         List<Tile> tiles = new ArrayList<Tile>(settlement.getOwnedTiles());
         tiles.addAll(settlement.getTile().getSurroundingTiles(1,
-                settlement.getLineOfSight()));
+                     settlement.getLineOfSight()));
         return exploreTiles(tiles);
     }
 
@@ -877,7 +877,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     public List<Tile> exploreForUnit(Unit unit) {
         if (getGame() == null || getGame().getMap() == null || unit == null
-            || !unit.hasTile()) return Collections.emptyList();
+            || !(unit.getLocation() instanceof Tile)) return Collections.emptyList();
 
         return exploreTiles(unit.getTile().getSurroundingTiles(0,
                 unit.getLineOfSight()));

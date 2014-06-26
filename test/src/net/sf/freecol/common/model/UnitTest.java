@@ -239,14 +239,15 @@ public class UnitTest extends FreeColTestCase {
         assertFalse("Missionary not removed", s.hasMissionary());
     }
 
-    public void testLineOfSight() {
-        Game game = getStandardGame();
-        Map map = getTestMap(plains, true);
+    public void testGetLineOfSight() {
+        final Game game = getStandardGame();
+        final Map map = getTestMap(plains, true);
         game.setMap(map);
+
         Player player = game.getPlayer("model.nation.dutch");
         Tile tile = map.getTile(6, 9);
-
         Unit frigate = new ServerUnit(game, tile, player, frigateType);
+
         assertEquals(2, frigate.getLineOfSight());
         assertTrue(frigate.hasAbility(Ability.NAVAL_UNIT));
 
