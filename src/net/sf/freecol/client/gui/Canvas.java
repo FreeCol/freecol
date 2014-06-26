@@ -1551,8 +1551,6 @@ public final class Canvas extends JDesktopPane {
      * @see ColonyPanel
      */
     public ColonyPanel showColonyPanel(Colony colony, Unit unit) {
-        if (!freeColClient.getMyPlayer().owns(colony)) return null;
-
         ColonyPanel panel = getColonyPanel(colony);
         if (panel == null) {
             panel = new ColonyPanel(freeColClient, colony);
