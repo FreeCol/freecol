@@ -22,6 +22,7 @@ package net.sf.freecol.common.model;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 
@@ -140,6 +141,18 @@ public class GoodsTradeItem extends TradeItem {
         } else {
             super.readChild(xr);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer(16);
+        sb.append("[").append(getId())
+            .append(" ").append(goods.getAmount()).append(" ")
+            .append(Messages.message(goods.getNameKey())).append("]");
+        return sb.toString();
     }
 
     /**

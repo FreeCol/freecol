@@ -121,6 +121,17 @@ public class StanceTradeItem extends TradeItem {
      * {@inheritDoc}
      */
     @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer(16);
+        sb.append("[").append(getId())
+            .append(" ").append(stance).append("]");
+        return sb.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 

@@ -129,6 +129,16 @@ public class GoldTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer(16);
+        sb.append("[").append(getId()).append(" ").append(gold).append("]");
+        return sb.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

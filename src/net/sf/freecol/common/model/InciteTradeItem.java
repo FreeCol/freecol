@@ -124,6 +124,17 @@ public class InciteTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer(16);
+        sb.append("[").append(getId())
+            .append(" ").append(victim.getId()).append("]");
+        return sb.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**
