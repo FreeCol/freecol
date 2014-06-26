@@ -326,7 +326,6 @@ public final class InGameInputHandler extends InputHandler {
             && fcc.currentPlayerIsMyPlayer()) {
             SwingUtilities.invokeLater(displayModelMessagesRunnable);
         }
-
         return reply;
     }
 
@@ -345,7 +344,7 @@ public final class InGameInputHandler extends InputHandler {
         final Specification spec = game.getSpecification();
         NodeList nodes = element.getChildNodes();
         for (int i = 0; i < nodes.getLength(); i++) {
-            Element e = (Element) nodes.item(i);
+            Element e = (Element)nodes.item(i);
             String owner = e.getAttribute("owner");
             Player player = game.getFreeColGameObject(owner, Player.class);
             if (player == null) {

@@ -245,6 +245,8 @@ public final class InGameController extends Controller {
                                   FoundingFather father) {
         ChangeSet cs = new ChangeSet();
         serverPlayer.csAddFoundingFather(father, random, cs);
+        cs.addAttribute(See.only(serverPlayer), "flush",
+                        Boolean.TRUE.toString());
         sendElement(serverPlayer, cs);
     }
 
