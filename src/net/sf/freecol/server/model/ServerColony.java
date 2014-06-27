@@ -774,6 +774,9 @@ public class ServerColony extends Colony implements ServerModelObject {
             exportDatum.setExported(false);
         }
 
+        // Clear the build queue
+        buildQueue.clear();
+
         // Changing the owner might alter bonuses applied by founding fathers:
         updateSoL();
         updateProductionBonus();
