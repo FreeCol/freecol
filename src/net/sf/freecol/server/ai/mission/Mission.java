@@ -425,11 +425,13 @@ public abstract class Mission extends AIObject {
         final AIUnit aiUnit = getAIUnit();
         final Unit unit = getUnit();
         final Location transportTarget = getTransportDestination();
+        Direction d;
         if (unit.isOnCarrier()
             && transportTarget instanceof Tile
             && unit.hasTile()
-            && unit.getTile().isAdjacent((Tile)transportTarget)) {
-            Direction d = unit.getTile().getDirection((Tile)transportTarget);
+            && unit.getTile().isAdjacent((Tile)transportTarget)
+            && (d = unit.getTile().getDirection((Tile)transportTarget)) != null
+            && unit.getMoveType(d).isLegal()) {
             if (!aiUnit.leaveTransport(d)) {
                 logger.warning(tag + " at " + unit.getLocation()
                     + " failed to disembark to " + transportTarget
