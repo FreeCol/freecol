@@ -1776,6 +1776,16 @@ public class EuropeanAIPlayer extends AIPlayer {
                     nScouts--;
                 } else if (m instanceof TransportMission) {
                     TransportMission tm = (TransportMission)m;
+                    // Consider reassigning quiescent transport
+                    // missions to privateer missions
+                    if (tm.isEmpty() && unit.isNaval()
+                        && unit.isOffensiveUnit()) {
+                        navalUnits.add(aiUnit);
+                        done.add(aiUnit);
+                        continue;
+                    }
+                    // If there is capacity in this mission, consider adding
+                    // more cargoes
                     if (tm.destinationCapacity() > 0) {
                         transportMissions.add(tm);
                     }

@@ -470,6 +470,15 @@ public class TransportMission extends Mission {
     }
 
     /**
+     * Is there nothing currently queued for this carrier?
+     *
+     * @return True if there is no work allocated to this carrier.
+     */
+    public boolean isEmpty() {
+        return tSize() == 0;
+    }
+
+    /**
      * For a given transportable, work out where the carrier has to go to
      * advance the cargo (target), and what to do there (mode), allowing
      * a new <code>Cargo</code> to be defined.
