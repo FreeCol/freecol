@@ -265,7 +265,7 @@ public final class CostDeciders {
             ? avoidIllegal()
             : (unit.isNaval())
             ? avoidNavalDanger()
-            : (unit.isOffensiveUnit() && unit.getRole().isOffensive())
+            : (unit.isOffensiveUnit())
             ? avoidSettlements()
             : avoidSettlementsAndBlockingUnits();
     }

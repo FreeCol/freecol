@@ -290,7 +290,7 @@ public class Role extends BuildableType {
      * @return True if this is an offensive role.
      */
     public boolean isOffensive() {
-        return getOffence() > 1;
+        return hasModifier(Modifier.OFFENCE);
     }
 
     /**
@@ -309,7 +309,7 @@ public class Role extends BuildableType {
      * @return True if this is an defensive role.
      */
     public boolean isDefensive() {
-        return getDefence() > 1;
+        return hasModifier(Modifier.DEFENCE);
     }
 
     /**

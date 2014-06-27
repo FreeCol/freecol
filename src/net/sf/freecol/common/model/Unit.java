@@ -1640,7 +1640,7 @@ public class Unit extends GoodsLocation
      * @return True if this is an offensive unit.
      */
     public boolean isOffensiveUnit() {
-        return unitType.isOffensive() || isArmed() || isMounted();
+        return unitType.isOffensive() || getRole().isOffensive();
     }
 
     /**
