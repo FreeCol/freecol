@@ -221,10 +221,11 @@ public final class ImageLibrary {
      * @return A suitable foreground <code>Color</code>.
      */
     public Color getForegroundColor(Color background) {
-        return (background.getRed() * 0.3
-                + background.getGreen() * 0.59
-                + background.getBlue() * 0.11 < 126) ? Color.WHITE
-            : Color.BLACK;
+        return (background == null
+            || (background.getRed() * 0.3 + background.getGreen() * 0.59
+                + background.getBlue() * 0.11 >= 126))
+            ? Color.BLACK
+            : Color.WHITE;
     }
 
     /**
