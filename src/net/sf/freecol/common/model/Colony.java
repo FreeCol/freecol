@@ -2837,8 +2837,6 @@ public class Colony extends Settlement implements Nameable {
                 assumeBuilt.add(bt);
             } else if (fix) {
                 buildQueue.remove(i);
-                logger.warning("Removed bogus buildable " + bt
-                    + ": " + reason);
                 result = Math.min(result, 0);
             } else {
                 result = -1;
@@ -2853,8 +2851,6 @@ public class Colony extends Settlement implements Nameable {
                 assumeBuilt.add(ut);
             } else if (fix) {                
                 populationQueue.remove(i);
-                logger.warning("Removed bogus unit type " + ut
-                    + ": " + reason);
                 result = Math.min(result, 0);
             } else {
                 result = -1;
