@@ -420,7 +420,7 @@ public class CashInTreasureTrainMission extends Mission {
                         Mission m = aiCarrier.getMission();
                         if (!(m instanceof TransportMission)) {
                             m = new TransportMission(aiMain, aiCarrier);
-                            aiCarrier.setMission(m);
+                            aiCarrier.changeMission(m, "TreasureTrain");
                         }
                         ((TransportMission)m).queueTransportable(aiUnit, false);
                         logger.finest(tag + " at " + upLoc(unit.getLocation())

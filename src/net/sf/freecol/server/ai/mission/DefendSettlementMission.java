@@ -331,7 +331,7 @@ public class DefendSettlementMission extends Mission {
                 || (unit.isPerson() && colony.getUnitCount() <= 1)) {
                 m = new WorkInsideColonyMission(aiMain, aiUnit,
                     aiMain.getAIColony(colony));
-                aiUnit.setMission(m);
+                aiUnit.changeMission(m, "Bolster-Colony");
                 m.doMission();
                 return; // No log, setMission logs this mission going away.
             }

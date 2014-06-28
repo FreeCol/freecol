@@ -425,7 +425,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 == this) {
                 ;// Do nothing
             } else {
-                aiU.setMission(new WorkInsideColonyMission(aiMain, aiU, this));
+                Mission m = new WorkInsideColonyMission(aiMain, aiU, this);
+                aiU.changeMission(m, "Work-in-" + colony.getName());
             }
         }
         EuropeanAIPlayer aip = (EuropeanAIPlayer)aiMain.getAIPlayer(player);
@@ -444,7 +445,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             } else if (u.hasAbility(Ability.ESTABLISH_MISSION)) {
                 m = aip.getMissionaryMission(aiU);
             }
-            if (m != null) aiU.setMission(m);
+            if (m != null) aiU.changeMission(m, "Out-of-" + colony.getName());
         }
 
         // Change the export settings when required.

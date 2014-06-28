@@ -179,15 +179,15 @@ public class WishRealizationMission extends Mission {
             logger.finest(tag + " completed at " + colony + ": " + this);
             // Replace the mission, with a defensive one if this is a
             // military unit or a simple working one if not.  Beware
-            // that setMission() will dispose of this mission which is
+            // that changeMission() will dispose of this mission which is
             // why this is done last.
             if (unit.getType().isOffensive()) {
-                aiUnit.setMission(new DefendSettlementMission(getAIMain(),
-                                  aiUnit, colony));
+                Mission m = new DefendSettlementMission(getAIMain(), aiUnit, colony);
+                aiUnit.changeMission(m, "Defend-" + colony.getName());
             } else {                
                 aiColony.requestRearrange();
-                aiUnit.setMission(new WorkInsideColonyMission(getAIMain(),
-                                  aiUnit, aiColony));
+                Mission m = new WorkInsideColonyMission(getAIMain(), aiUnit, aiColony);
+                aiUnit.changeMission(m, "Work-" + colony.getName());
             }
         } else {
             logger.warning(tag + " unknown destination type " + wish

@@ -127,6 +127,7 @@ public class PioneeringMissionTest extends FreeColTestCase {
         assertNotNull("Mission should have a plan", tip);
         Tile target = tip.getTarget();
         assertNotNull("Plan should have a target", target);
-        aiUnit.setMission(mission);
+        aiUnit.changeMission(mission, "test");
+        assertEquals("Mission should stick", mission, aiUnit.getMission());
     }
 }

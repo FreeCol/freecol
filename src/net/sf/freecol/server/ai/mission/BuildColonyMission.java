@@ -371,8 +371,9 @@ public class BuildColonyMission extends Mission {
             } else {
                 logger.finest(tag + " gives up and joins " + name
                     + ": " + this);
-                aiUnit.setMission(new WorkInsideColonyMission(aiMain, aiUnit,
-                        aiMain.getAIColony((Colony)getTarget())));
+                Mission m = new WorkInsideColonyMission(aiMain, aiUnit,
+                    aiMain.getAIColony((Colony)getTarget()));
+                aiUnit.changeMission(m, "Join-" + ((Colony)getTarget()).getName());
             }
             return;
 
@@ -439,8 +440,9 @@ public class BuildColonyMission extends Mission {
                 Colony colony = tile.getColony();
                 logger.finest(tag + " completed " + colony.getName()
                     + ": " + this);
-                aiUnit.setMission(new WorkInsideColonyMission(aiMain, aiUnit,
-                        aiMain.getAIColony(colony)));
+                Mission m = new WorkInsideColonyMission(aiMain, aiUnit,
+                    aiMain.getAIColony(colony));
+                aiUnit.changeMission(m, "Built-" + colony.getName());
             } else {
                 logger.warning(tag + " unexpected failure at " + tile
                     + ": " + this);

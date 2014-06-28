@@ -296,60 +296,13 @@ public abstract class AIPlayer extends AIObject {
     }
 
     /**
-     * Aborts the mission for a unit, but tries to recover the unit onto
-     * a neighbouring carrier.
-     *
-     * @param aiU The <code>AIUnit</code> whose mission is ended.
-     * @param why A reason for aborting the mission.
-     */
-    private void abortUnitMission(AIUnit aiU, String why) {
-        aiU.abortMission(why);
-        // There is a common stuffup where the AIs converge on the
-        // same location on a small island.  First mover gets the
-        // colony, the rest get stuck there when their mission is aborted.
-        //
-        // TODO: drop this when a more general `marooned unit rescue'
-        // mission is written.
-        Unit unit = aiU.getUnit();
-        Tile tile = unit.getTile();
-        if (!unit.isCarrier() && !unit.isOnCarrier() && tile != null
-            && tile.getColony() == null) {
-            for (Tile t : tile.getSurroundingTiles(1)) {
-                for (Unit u : t.getUnitList()) {
-                    if (u.getOwner() == unit.getOwner()
-                        && u.isCarrier()
-                        && u.canAdd(unit)
-                        && unit.getMovesLeft() > 0) {
-                        AIMessage.askEmbark(getAIMain().getAIUnit(u), unit,
-                            tile.getDirection(t));
-                        return; // Let the carrier update its transport list.
-                    }
-                }
-            }
-        }
-    }
-
-    /**
      * Aborts all the missions which are no longer valid.
      */
     protected void abortInvalidMissions() {
         for (AIUnit au : getAIUnits()) {
             Mission mission = au.getMission();
             String reason = (mission == null) ? null : mission.invalidReason();
-            if (reason != null) abortUnitMission(au, reason);
-        }
-    }
-
-    /**
-     * Aborts all the missions which are no longer valid.
-     */
-    protected void abortInvalidAndOneTimeMissions() {
-        for (AIUnit au : getAIUnits()) {
-            Mission mission = au.getMission();
-            String reason = (mission == null) ? null
-                : (mission.isOneTime()) ? "oneTime"
-                : mission.invalidReason();
-            if (reason != null) abortUnitMission(au, reason);
+            if (reason != null) au.abortMission(reason);
         }
     }
 

@@ -184,7 +184,7 @@ public class UnitWanderHostileMission extends Mission {
                                                                     false);
                 if (loc != null) {
                     m = new UnitSeekAndDestroyMission(aiMain, aiUnit, loc);
-                    aiUnit.setMission(m);
+                    aiUnit.changeMission(m, "Target-" + upLoc(loc).getId());
                     m.doMission();
                     return;
                 }

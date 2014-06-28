@@ -357,14 +357,15 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                 used = 0;
                 for (Unit u : aiu.getUnit().getUnitList()) {
                     AIUnit laiu = aiMain.getAIUnit(u);
-                    laiu.setMission(new UnitSeekAndDestroyMission(aiMain,
-                            laiu, t.colony));
+                    Mission m = new UnitSeekAndDestroyMission(aiMain, laiu,
+                                                              t.colony);
+                    laiu.changeMission(m, "Assault-0");
                     used++;
                     sb.append(" ").append(u);
                 }
                 sb.append(" ]");
                 TransportMission tm = new TransportMission(aiMain, aiu);
-                aiu.setMission(tm);
+                aiu.changeMission(tm, "Invade-0");
                 if (i < n-1 && used >= (int)Math.floor(land * 0.66)) {
                     land -= used;
                     break;
@@ -409,7 +410,8 @@ public class REFAIPlayer extends EuropeanAIPlayer {
             final Unit enemy = (ui.hasNext()) ? ui.next() : null;
             Tile start;
             if (enemy == null) {
-                aiu.setMission(new UnitWanderHostileMission(aiMain, aiu));
+                Mission m = new UnitWanderHostileMission(aiMain, aiu);
+                aiu.changeMission(m, "Harass");
                 start = Utils.getRandomMember(logger, "REF patrol entry",
                                               entries, aiRandom);
                 u.setEntryLocation(start);
@@ -417,8 +419,8 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                     .append(" from ").append(start)
                     .append(" with ").append(u);
             } else {
-                aiu.setMission(new UnitSeekAndDestroyMission(aiMain, aiu,
-                                                             enemy));
+                Mission m = new UnitSeekAndDestroyMission(aiMain, aiu, enemy);
+                aiu.changeMission(m, "Suppress-" + enemy.getId());
                 start = u.getBestEntryTile(enemy.getTile());
                 u.setEntryLocation(start);
                 entries.add(start);
@@ -456,10 +458,14 @@ public class REFAIPlayer extends EuropeanAIPlayer {
             if (u.isOffensiveUnit()) {
                 Location target = UnitSeekAndDestroyMission.findTarget(aiu, 
                     seekAndDestroyRange, false);
-                Mission m = (target == null)
-                    ? new UnitWanderHostileMission(getAIMain(), aiu)
-                    : new UnitSeekAndDestroyMission(getAIMain(), aiu, target);
-                aiu.setMission(m);
+                if (target == null) {
+                    Mission m = new UnitWanderHostileMission(getAIMain(), aiu);
+                    aiu.changeMission(m, "Harass");
+                } else {                    
+                    Mission m = new UnitSeekAndDestroyMission(getAIMain(), aiu,
+                                                              target);
+                    aiu.changeMission(m, "Suppress-" + target.getId());
+                }
             }
         }
 

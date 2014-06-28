@@ -135,7 +135,6 @@ public class EuropeanAIPlayer extends AIPlayer {
     /** Maximum number of turns to travel to a scouting target. */
     private static final int scoutingRange = 20;
 
-
     /**
      * A comparator to sort units by suitability for a BuildColonyMission.
      *
@@ -757,9 +756,8 @@ public class EuropeanAIPlayer extends AIPlayer {
                 if (aiu != null && w instanceof WorkerWish) {
                     WorkerWish ww = (WorkerWish)w;
                     if (aiu.getUnit().getType() == ww.getUnitType()) {
-                        aiu.setMission(consumeWorkerWish(aiu, ww));
-                        logger.finest("RetargetCargo succeeded on course: "
-                            + aiu.getMission());
+                        aiu.changeMission(consumeWorkerWish(aiu, ww),
+                            "WorkerWish-" + upLoc(ww.getDestination()));
                         found = w;
                         break;
                     }
@@ -799,9 +797,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 if (m.getTransportDestination() == null) m = null;
             }
             if (m != null) {
-                aiu.setMission(m);
-                logger.finest("RetargetCargo succeeded with new mission: "
-                              + aiu.getMission());
+                aiu.changeMission(m, "retargetCargo");
                 return true;
             }
             // TODO: perhaps we need a `Get onto land' mission?
@@ -1188,10 +1184,11 @@ public class EuropeanAIPlayer extends AIPlayer {
                     : trainAIUnitInEurope(unitType);
                 if (aiUnit != null) {
                     if (bestWish != null) {
-                        aiUnit.setMission(consumeWorkerWish(aiUnit, bestWish));
+                        aiUnit.changeMission(consumeWorkerWish(aiUnit, bestWish),
+                                             "Best-worker-wish");
                     } else {
                         Mission m = getSimpleMission(aiUnit);
-                        if (m != null) aiUnit.setMission(m);
+                        if (m != null) aiUnit.changeMission(m, "No-such-wish");
                     }
                     player.logCheat((unitType == null)
                         ? " recruit " + aiUnit.getUnit().getType().toString()
@@ -1259,15 +1256,17 @@ public class EuropeanAIPlayer extends AIPlayer {
                     30);
                 if (t != null) target = t.getSettlement();
             }
-            if (target != null) {
+            if (target == null) {
+                logger.warning("Failed to find offensive land unit cheat target");
+            } else {
                 List<Unit> mercs = ((ServerPlayer)player)
                     .createUnits(player.getMonarch().getMercenaries(air),
                                  europe);
                 for (Unit u : mercs) {
                     AIUnit aiu = getAIUnit(u);
                     if (aiu == null) continue; // Can not happen
-                    aiu.setMission(new UnitSeekAndDestroyMission(aiMain,
-                            aiu, target));
+                    Mission m = new UnitSeekAndDestroyMission(aiMain, aiu, target);
+                    aiu.changeMission(m, "New-mercenary");
                 }
                 logger.info("AI offensive land unit cheat ("
                     + mercs.size() + ") targeted: " + target);
@@ -1361,8 +1360,6 @@ public class EuropeanAIPlayer extends AIPlayer {
         final Player player = getPlayer();
         final int turnNumber = getGame().getTurn().getNumber();
         reasons.clear();
-        List<TransportMission> transportMissions
-            = new ArrayList<TransportMission>();
         nBuilders = buildersNeeded();
         nPioneers = pioneersNeeded();
         nScouts = scoutsNeeded();
@@ -1371,12 +1368,13 @@ public class EuropeanAIPlayer extends AIPlayer {
         // mission.  If it is not a candidate remove it from the
         // aiUnits list (reporting why not).  Adjust the
         // Build/Pioneer/Scout counts according to the existing valid
-        // missions.
+        // missions.  Accumulate potentially usable transport missions.
         List<AIUnit> aiUnits = getAIUnits();
         List<AIUnit> navalUnits = new ArrayList<AIUnit>();
-        int allUnits = aiUnits.size(), i = 0;
-        while (i < aiUnits.size()) {
-            final AIUnit aiUnit = aiUnits.get(i);
+        List<AIUnit> done = new ArrayList<AIUnit>();
+        List<TransportMission> transportMissions
+            = new ArrayList<TransportMission>();
+        for (AIUnit aiUnit : aiUnits) {
             final Unit unit = aiUnit.getUnit();
             Mission m = aiUnit.getMission();
 
@@ -1386,17 +1384,21 @@ public class EuropeanAIPlayer extends AIPlayer {
             } else if (unit.getState() == UnitState.IN_COLONY
                 && unit.getColony().getUnitCount() <= 1) {
                 // The unit has its hand full keeping the colony alive.
+                Colony colony = unit.getColony();
                 if (!(aiUnit.getMission() instanceof WorkInsideColonyMission)){
                     logger.warning(aiUnit + " should WorkInsideColony at "
-                        + unit.getColony().getName());
+                        + colony.getName());
                     m = new WorkInsideColonyMission(aiMain, aiUnit,
-                        aiMain.getAIColony(unit.getColony()));
+                                                    aiMain.getAIColony(colony));
+                    aiUnit.changeMission(m, "Vital-to-" + colony.getName());
                 }
-                putReason(aiUnit,
-                    "Vital-to-" + unit.getSettlement().getName());
+                putReason(aiUnit, "Vital-to-" + colony.getName());
 
             } else if (unit.isInMission()) {
                 putReason(aiUnit, "In-Mission");
+
+            } else if (unit.isAtSea()) { // Wait for it to emerge
+                putReason(aiUnit, "At-Sea");
 
             } else if (m != null && m.isValid() && !m.isOneTime()) {
                 if (m instanceof BuildColonyMission) {
@@ -1413,32 +1415,28 @@ public class EuropeanAIPlayer extends AIPlayer {
                 }
                 putReason(aiUnit, "Valid");
 
-            } else if (unit.isAtSea()) { // Wait for it to emerge
-                putReason(aiUnit, "At-Sea");
-
             } else if (unit.isNaval()) {
                 navalUnits.add(aiUnit);
 
             } else { // Unit needs a mission
-                if (m != null) { // Abort invalid missions now
-                    String reason = m.invalidReason();
-                    if (reason != null) aiUnit.abortMission(reason);
-                }
-                i++;
                 continue;
             }
-            aiUnits.remove(i);
+            done.add(aiUnit);
         }
+        aiUnits.removeAll(done);
+        done.clear();
+
         StringBuffer sb = null;
         if (logger.isLoggable(Level.FINE)) {
             sb = new StringBuffer(256);
-            sb.append(Utils.lastPart(getPlayer().getNationId(), "."))
+            sb.append(getPlayer().getNation().getSuffix())
                 .append(".giveNormalMissions(turn=").append(turnNumber)
-                .append(" colonies=").append(getPlayer().getNumberOfSettlements())
-                .append(" all-units=").append(allUnits)
-                .append(" free-land-units=").append(aiUnits.size())
-                .append(" free-naval-units=").append(navalUnits.size())
-                .append(" builders=").append(nBuilders)
+                .append(" colonies=").append(player.getNumberOfSettlements())
+                .append(" free-land-units=");
+            for (AIUnit aiu : aiUnits) sb.append(" ").append(aiu);
+            sb.append(" free-naval-units=");
+            for (AIUnit aiu : navalUnits) sb.append(" ").append(aiu);
+            sb.append(" builders=").append(nBuilders)
                 .append(" pioneers=").append(nPioneers)
                 .append(" scouts=").append(nScouts)
                 .append(" naval-carriers=").append(nNavalCarrier)
@@ -1446,14 +1444,15 @@ public class EuropeanAIPlayer extends AIPlayer {
         }
 
         // First try to satisfy the demand for missions with a defined quota.
+        // Builders first to keep weak players in the game, scouts next
+        // as they are profitable.
         if (nBuilders > 0) {
             Collections.sort(aiUnits, builderComparator);
-            while (!aiUnits.isEmpty()) {
-                AIUnit aiUnit = aiUnits.get(0);
+            for (AIUnit aiUnit : aiUnits) {
                 Mission m = getBuildColonyMission(aiUnit);
-                if (m == null) break; // Reached the unsuitable units
-                aiUnits.remove(0);
-                aiUnit.setMission(m);
+                if (m == null) continue;
+                done.add(aiUnit);
+                aiUnit.changeMission(m, "Builder " + nBuilders);
                 if (requestsTransport(aiUnit)) {
                     Utils.appendToMapList(transportSupply,
                         upLoc(aiUnit.getTransportSource()), aiUnit);
@@ -1461,15 +1460,16 @@ public class EuropeanAIPlayer extends AIPlayer {
                 putReason(aiUnit, "New");
                 if (--nBuilders <= 0) break;
             }
+            aiUnits.removeAll(done);
+            done.clear();
         }
         if (nScouts > 0) {
             Collections.sort(aiUnits, scoutComparator);
-            while (!aiUnits.isEmpty()) {
-                AIUnit aiUnit = aiUnits.get(0);
+            for (AIUnit aiUnit : aiUnits) {
                 Mission m = getScoutingMission(aiUnit);
-                if (m == null) break; // Reached the unsuitable units
-                aiUnits.remove(0);
-                aiUnit.setMission(m);
+                if (m == null) continue;
+                done.add(aiUnit);
+                aiUnit.changeMission(m, "Scout " + nScouts);
                 if (requestsTransport(aiUnit)) {
                     Utils.appendToMapList(transportSupply,
                         upLoc(aiUnit.getTransportSource()), aiUnit);
@@ -1477,15 +1477,16 @@ public class EuropeanAIPlayer extends AIPlayer {
                 putReason(aiUnit, "New");
                 if (--nScouts <= 0) break;
             }
+            aiUnits.removeAll(done);
+            done.clear();
         }
         if (nPioneers > 0) {
             Collections.sort(aiUnits, pioneerComparator);
-            while (!aiUnits.isEmpty()) {
-                AIUnit aiUnit = aiUnits.get(0);
+            for (AIUnit aiUnit : aiUnits) {
                 Mission m = getPioneeringMission(aiUnit);
-                if (m == null) break; // Reached the unsuitable units
-                aiUnits.remove(0);
-                aiUnit.setMission(m);
+                if (m == null) continue;
+                done.add(aiUnit);
+                aiUnit.changeMission(m, "Pioneer " + nPioneers);
                 if (requestsTransport(aiUnit)) {
                     Utils.appendToMapList(transportSupply,
                         upLoc(aiUnit.getTransportSource()), aiUnit);
@@ -1493,39 +1494,37 @@ public class EuropeanAIPlayer extends AIPlayer {
                 putReason(aiUnit, "New");
                 if (--nPioneers <= 0) break;
             }
+            aiUnits.removeAll(done);
+            done.clear();
         }
 
         // Give the remaining land units a valid mission.
-        i = 0;
-        while (i < aiUnits.size()) {
-            final AIUnit aiUnit = aiUnits.get(i);
+        for (AIUnit aiUnit : aiUnits) {
             final Unit unit = aiUnit.getUnit();
             Mission m = getSimpleMission(aiUnit);
 
             if (m != null) {
-                aiUnit.setMission(m);
+                aiUnit.changeMission(m, "New-Land");
+                putReason(aiUnit, "New-Land");
+                done.add(aiUnit);
                 if (requestsTransport(aiUnit)) {
                     Utils.appendToMapList(transportSupply,
                         upLoc(aiUnit.getTransportSource()), aiUnit);
                 }
-                putReason(aiUnit, "New");
-                aiUnits.remove(i);
-            } else {
-                i++;
             }
         }
+        aiUnits.removeAll(done);
+        done.clear();
 
         // Process the free naval units, possibly adding to the usable
         // transport missions.
-        i = 0;
-        while (i < navalUnits.size()) {
-            final AIUnit aiUnit = navalUnits.get(i);
+        for (AIUnit aiUnit : navalUnits) {
             Mission m = getSimpleMission(aiUnit);
 
             if (m != null) {
-                aiUnit.setMission(m);
-                putReason(aiUnit, "New");
-                navalUnits.remove(i);
+                aiUnit.changeMission(m, "New-Naval");
+                putReason(aiUnit, "New-Naval");
+                done.add(aiUnit);
                 if (m instanceof TransportMission) {
                     TransportMission tm = (TransportMission)m;
                     if (tm.destinationCapacity() > 0) {
@@ -1543,10 +1542,10 @@ public class EuropeanAIPlayer extends AIPlayer {
                         }
                     }
                 }
-            } else {
-                i++;
             }
         }
+        navalUnits.removeAll(done);
+        done.clear();
 
         // Now see if transport can be found
         allocateTransportables(transportMissions);
@@ -1561,12 +1560,12 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
 
             if (aiUnit.getMission() instanceof IdleAtSettlementMission) {
-                m = aiUnit.getMission();
+                ; // already idle
             } else {
                 m = new IdleAtSettlementMission(aiMain, aiUnit);
-                aiUnit.setMission(m);
+                aiUnit.changeMission(m, "Idle");
             }
-            putReason(aiUnit, "UNUSED");
+            putReason(aiUnit, "Idle");
         }
 
         // We are done.  Report.
@@ -1589,9 +1588,7 @@ public class EuropeanAIPlayer extends AIPlayer {
     }
 
     private void putReason(AIUnit aiUnit, String reason) {
-        final Unit unit = aiUnit.getUnit();
-        final Mission mission = aiUnit.getMission();
-        reasons.put(unit, reason);
+        reasons.put(aiUnit.getUnit(), reason);
     }
 
     /**
@@ -1990,8 +1987,10 @@ public class EuropeanAIPlayer extends AIPlayer {
      * conditions.
      */
     private void initializeMissions() {
-        List<AIUnit> aiUnits = getAIUnits();
         final AIMain aiMain = getAIMain();
+        List<AIUnit> aiUnits = getAIUnits();
+        StringBuffer sb = new StringBuffer(64);
+        sb.append("Initialize missions");
 
         // Find all the carriers with potential colony builders on board,
         // give them missions.
@@ -2002,17 +2001,24 @@ public class EuropeanAIPlayer extends AIPlayer {
             Unit carrier = aiCarrier.getUnit();
             if (!carrier.isNaval()) continue;
             target = null;
+            Mission tm = null;
             for (Unit u : carrier.getUnitList()) {
                 AIUnit aiu = aiMain.getAIUnit(u);
                 if (target == null) {
                     target = BuildColonyMission.findTarget(aiu,
                         buildingRange*3, false);
                     if (target == null) continue carrier;
+                    sb.append(", with carrier ").append(carrier)
+                        .append(" for target ").append(target)
+                        .append(" with units:");
                 }
-                aiu.setMission(new BuildColonyMission(aiMain, aiu, target));
-            }
-            if (target != null) {
-                aiCarrier.setMission(new TransportMission(aiMain, aiCarrier));
+                if (tm == null) {
+                    tm = new TransportMission(aiMain, aiCarrier);
+                    aiCarrier.changeMission(tm, "Transport-0");
+                }
+                Mission m = new BuildColonyMission(aiMain, aiu, target);
+                aiu.changeMission(m, "Builder-0");
+                sb.append(" ").append(u);
             }
         }
 
@@ -2020,8 +2026,13 @@ public class EuropeanAIPlayer extends AIPlayer {
         for (AIUnit aiu : aiUnits) {
             if (aiu.hasMission()) continue;
             Mission m = getSimpleMission(aiu);
-            if (m != null) aiu.setMission(m);
+            if (m != null) {
+                aiu.changeMission(m, "Simple-0");
+                sb.append(", backup ").append(m.getClass())
+                    .append(" ").append(aiu.getUnit());
+            }
         }
+        logger.fine(sb.toString());
     }
 
     /**
@@ -2173,8 +2184,8 @@ public class EuropeanAIPlayer extends AIPlayer {
      * {@inheritDoc}
      */
     public void startWorking() {
-        Player player = getPlayer();
-        Turn turn = getGame().getTurn();
+        final Player player = getPlayer();
+        final Turn turn = getGame().getTurn();
         logger.finest(getClass().getName() + " in " + turn
             + " declare=" + (player.checkDeclareIndependence() == null)
             + " strength=" + player.getRebelStrengthRatio()

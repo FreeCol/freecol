@@ -218,7 +218,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
             assertNotNull("Got null while getting the camps units", brave);
             AIUnit aiUnit = aiMain.getAIUnit(brave);
             assertNotNull("Couldnt get the ai object for the brave", aiUnit);
-            aiUnit.setMission(new UnitWanderHostileMission(aiMain, aiUnit));
+            aiUnit.changeMission(new UnitWanderHostileMission(aiMain, aiUnit), "test");
             assertTrue("Should be UnitWanderHostileMission", 
                 aiUnit.getMission() instanceof UnitWanderHostileMission);
             assertEquals("Unit should be candidate for seek+destroy", null,
@@ -288,7 +288,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
         for (Unit brave : camp.getUnitList()) {
             AIUnit aiUnit = aiMain.getAIUnit(brave);
             assertNotNull(aiUnit);
-            aiUnit.setMission(new UnitWanderHostileMission(aiMain, aiUnit));
+            aiUnit.changeMission(new UnitWanderHostileMission(aiMain, aiUnit), "test");
             assertEquals("No enemy units present",
                 UnitWanderHostileMission.class,
                 aiUnit.getMission().getClass());
@@ -302,7 +302,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
                      Tension.Level.HATEFUL.getLimit(),
                      inca.getTension(dutch).getValue());
 
-        aiInca.abortInvalidAndOneTimeMissions();
+        aiInca.abortInvalidMissions();
         aiInca.secureIndianSettlement(camp);
         boolean seeking = false;
         for (Unit brave : inca.getUnits()) {

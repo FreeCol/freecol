@@ -218,43 +218,54 @@ public class AIUnit extends AIObject implements Transportable {
     }
 
     /**
-     * Assigns a mission to unit. The dynamic priority is reset.
-     * Do not call setMission(null), use abortMission above.
+     * Assigns a mission to unit. 
      *
      * @param mission The new <code>Mission</code>.
      */
     public void setMission(Mission mission) {
-        if (this.mission == mission) {
-            return;
-        } else if (this.mission == null) {
-            if (!mission.isOneTime()) {
-                logger.fine("Replacing null mission with " + mission);
-            }
-        } else {
-            abortMission("replaced");
-        }
         this.mission = mission;
-        this.dynamicPriority = 0;
     }
 
     /**
-     * Aborts a mission.  Always use this instead of setMission(null),
-     * and provide a useful reason so that AI mission thrashing can be
-     * tracked down.
+     * Change the mission of a unit.
+     * The dynamic priority is reset.
      *
-     * @param why A string describing why the mission is to be aborted
-     *     (e.g. "invalid").
+     * @param mission The new <code>Mission</code>.
+     * @param why A reason to change the mission.
+     */
+    public void changeMission(Mission mission, String why) {
+        if (this.mission == mission) return;
+        if (this.mission == null) {
+            if (!mission.isOneTime()) {
+                logger.fine("Mission replaced (" + why + ") null -> "
+                    + mission + ": " + this);
+            }
+        } else {
+            if (!this.mission.isOneTime()
+                || (mission != null && !mission.isOneTime())) {
+                logger.fine("Mission replaced (" + why + ") " + this.mission
+                    + " -> " + mission + ": " + this);
+            }
+            this.mission.dispose();
+        }
+       
+        removeTransport(why);
+        setMission(mission);
+        this.dynamicPriority = 0;
+        if (mission != null && getUnit().isOnCarrier()) {
+            if (!requeueOnCurrentCarrier()) {
+                logger.warning("Requeue on mission changed failed: " + this);
+            }
+        }            
+    }
+
+    /**
+     * Aborts a mission.
+     *
+     * @param why A reason to abort the mission.
      */
     public void abortMission(String why) {
-        if (mission != null) {
-            if (!mission.isOneTime()) {
-                logger.fine("Mission-ABORT(" + why + "): " + mission);
-            }
-            removeTransport(why);
-            mission.dispose();
-            mission = null;
-            this.dynamicPriority = 0;
-        }
+        changeMission(null, why);
     }
 
     /**
@@ -293,6 +304,24 @@ public class AIUnit extends AIObject implements Transportable {
         return AIMessage.askMoveTo(this, unit.getOwner().getEurope());
     }
 
+    /**
+     * Requeue this unit on its current carrier, if any.
+     *
+     * @return True if the requeue succeeds.
+     */
+    private boolean requeueOnCurrentCarrier() {
+        final Unit carrier = getUnit().getCarrier();
+        if (carrier == null) return false;
+        final AIUnit aiCarrier = getAIMain().getAIUnit(carrier);
+        if (aiCarrier == null) return false;
+        Mission m = aiCarrier.getMission();
+        if (!(m instanceof TransportMission)
+            || !((TransportMission)m).queueTransportable(this, false))
+            return false;
+        setTransport(aiCarrier, "requeued");
+        return true;
+    }
+        
     /**
      * If this unit is scheduled for transport, deschedule.
      *
@@ -602,7 +631,6 @@ public class AIUnit extends AIObject implements Transportable {
             logger.warning("Disposing of " + getId() + " but owner is null!");
         }
         abortMission("AIUnit-disposed");
-        setTransport(null, "disposing");
         super.dispose();
     }
 

@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -103,6 +104,13 @@ public class NativeAIPlayer extends AIPlayer {
     private HashMap<String, Integer> sessionRegister
         = new HashMap<String, Integer>();
 
+    /**
+     * Debug helper to keep track of why/what the units are doing.
+     * Do not serialize.
+     */
+    private final java.util.Map<Unit, String> reasons
+        = new HashMap<Unit, String>();
+
 
     /**
      * Creates a new <code>AIPlayer</code>.
@@ -167,11 +175,13 @@ public class NativeAIPlayer extends AIPlayer {
             while (units.size() > defence) {
                 Unit u = units.remove(0);
                 AIUnit aiu = getAIUnit(u);
-                aiu.setMission(new UnitWanderHostileMission(aiMain, aiu));
+                aiu.changeMission(new UnitWanderHostileMission(aiMain, aiu),
+                                  "Wander-0");
             }
             for (Unit u : units) {
                 AIUnit aiu = getAIUnit(u);
-                aiu.setMission(new DefendSettlementMission(aiMain, aiu, is));
+                aiu.changeMission(new DefendSettlementMission(aiMain, aiu, is),
+                                  "Defend-" + is.getName());
             }
         }
     }
@@ -349,7 +359,8 @@ public class NativeAIPlayer extends AIPlayer {
             while (!units.isEmpty()) {
                 Unit u = units.remove(0);
                 AIUnit aiu = aiMain.getAIUnit(u);
-                aiu.setMission(new DefendSettlementMission(aiMain, aiu, is));
+                aiu.changeMission(new DefendSettlementMission(aiMain, aiu, is),
+                                  "Defend-" + is.getName());
                 sb.append(" [+").append(u.getId()).append("+]");
                 defenders.add(u);
                 if (defenders.size() >= needed) break;
@@ -393,8 +404,8 @@ public class NativeAIPlayer extends AIPlayer {
             sb.append("\n  Sends ").append(aiUnit.toString())
                 .append(" to attack ").append(target.toString())
                 .append(" at ").append(tile.toString());
-            aiUnit.setMission(new UnitSeekAndDestroyMission(aiMain, aiUnit,
-                                                            target));
+            Mission m = new UnitSeekAndDestroyMission(aiMain, aiUnit, target);
+            aiUnit.changeMission(m, "Raid-" + target.getId());
         }
         logger.finest(sb.toString());
     }
@@ -404,6 +415,7 @@ public class NativeAIPlayer extends AIPlayer {
      */
     private void giveNormalMissions() {
         final AIMain aiMain = getAIMain();
+        final Player player = getPlayer();
         final Specification spec = aiMain.getGame().getSpecification();
         final int turnNumber = getGame().getTurn().getNumber();
         List<AIUnit> aiUnits = getAIUnits();
@@ -413,61 +425,73 @@ public class NativeAIPlayer extends AIPlayer {
         final List<AbstractGoods> soldierEq = spec.getRole("model.role.armedBrave")
             .getRequiredGoods();
 
-        StringBuffer sb = new StringBuffer(256);
-        Iterator<AIUnit> ai = aiUnits.iterator();
-        while (ai.hasNext()) {
-            final AIUnit aiUnit = ai.next();
+        List<AIUnit> done = new ArrayList<AIUnit>();
+        reasons.clear();
+        for (AIUnit aiUnit : aiUnits) {
             final Unit unit = aiUnit.getUnit();
             Mission m = aiUnit.getMission();
             String reason = null;
 
             if (unit.isUninitialized() || unit.isDisposed()) {
-                reason = "Invalid-" + aiUnit.toString();
+                putReason(aiUnit, "Invalid");
+
             } else if (m != null && m.isValid() && !m.isOneTime()) {
-                reason = "Valid-" + m.toString();
-            }
+                putReason(aiUnit, "Valid");
 
-            if (reason != null) {
-                sb.append("\n  ").append(reason);
-                ai.remove();
+            } else { // Unit needs a mission
+                continue;
             }
+            done.add(aiUnit);
         }
-        sb.insert(0, Utils.lastPart(getPlayer().getNationId(), ".")
-            + ".giveNormalMissions(turn=" + turnNumber
-            + " all-units=" + allUnits + " free-land-units=" + aiUnits.size()
-            + ")");
+        aiUnits.removeAll(done);
+        done.clear();
 
-        ai = aiUnits.iterator();
-        while (ai.hasNext()) {
-            final AIUnit aiUnit = ai.next();
+        StringBuffer sb = null;
+        if (logger.isLoggable(Level.FINE)) {
+            sb = new StringBuffer(256);
+            sb.append(player.getNation().getSuffix())
+                .append(".giveNormalMissions(turn=").append(turnNumber)
+                .append(" settlements=").append(player.getNumberOfSettlements())
+                .append(" free-land-units=");
+            for (AIUnit aiu : aiUnits) sb.append(" ").append(aiu);
+            sb.append(")");
+        }
+
+        for (AIUnit aiUnit : aiUnits) {
             final Unit unit = aiUnit.getUnit();
-            Mission m;
-            Settlement settlement = unit.getSettlement();
-            IndianSettlement is = unit.getHomeIndianSettlement();
+            final Settlement settlement = unit.getSettlement();
+            final IndianSettlement is = unit.getHomeIndianSettlement();
 
-            // First see to local settlement defence
-            if ((settlement != null && (settlement.getUnitCount()
-                        + settlement.getTile().getUnitCount() <= 1)
-                    && (m = new DefendSettlementMission(aiMain, aiUnit,
-                            settlement)) != null)
+            Mission m = null;
+            String reason = null;
+            if (settlement != null
+                && (settlement.getUnitCount() + settlement.getTile().getUnitCount() <= 1)
+                && (m = new DefendSettlementMission(aiMain, aiUnit,
+                        settlement)) != null) {
+                // First see to local settlement defence
+                putReason(aiUnit, "Defend-" + settlement.getName());
 
-                // Go home for new equipment if the home settlement has them.
-                || (is != null
-                    && ((!unit.isMounted() && is.canProvideGoods(scoutEq))
-                        || (!unit.isArmed() && is.canProvideGoods(soldierEq)))
-                    && (m = new DefendSettlementMission(aiMain, aiUnit,
-                            is)) != null)
+            } else if (is != null
+                && ((!unit.isMounted() && is.canProvideGoods(scoutEq))
+                    || (!unit.isArmed() && is.canProvideGoods(soldierEq)))
+                && (m = new DefendSettlementMission(aiMain, aiUnit, is)) != null) {
+                // Go home for new equipment if the home settlement has it
+                putReason(aiUnit, "Equip-" + is.getName());
 
+            } else if (UnitWanderHostileMission.invalidReason(aiUnit) == null
+                && (m = new UnitWanderHostileMission(aiMain, aiUnit)) != null) {
                 // Go out looking for trouble
-                || (UnitWanderHostileMission.invalidReason(aiUnit) == null
-                    && (m = new UnitWanderHostileMission(aiMain, aiUnit))
-                    != null)
-                ) {
-                aiUnit.setMission(m);
-                sb.append("\n  New-").append(m.toString());
-                ai.remove();
+                putReason(aiUnit, "Patrol");
+
+            } else {
+                continue; // Failed!
             }
+
+            aiUnit.changeMission(m, reason);
+            done.add(aiUnit);
         }
+        aiUnits.removeAll(done);
+        done.clear();
 
         for (AIUnit aiUnit : aiUnits) {
             Mission m;
@@ -475,12 +499,26 @@ public class NativeAIPlayer extends AIPlayer {
                 m = aiUnit.getMission();
             } else {
                 m = new IdleAtSettlementMission(aiMain, aiUnit);
-                aiUnit.setMission(m);
+                aiUnit.changeMission(m, "Idle");
             }
-            sb.append("\n  UNUSED-").append(m.toString())
-                .append(" at ").append(aiUnit.getUnit().getLocation());
+            putReason(aiUnit, "Idle");
         }
-        logger.fine(sb.toString());
+        if (sb != null) {
+            for (AIUnit aiu : getAIUnits()) {
+                Unit u = aiu.getUnit();
+                String reason = reasons.get(u);
+                if (reason == null) reason = "OMITTED";
+                Mission m = aiu.getMission();
+                sb.append("\n  ").append(u.getLocation())
+                    .append(" ").append(reason)
+                    .append("-").append((m == null) ? "NoMission" : m.toString());
+            }
+            logger.fine(sb.toString());
+        }
+    }
+
+    private void putReason(AIUnit aiUnit, String reason) {
+        reasons.put(aiUnit.getUnit(), reason);
     }
 
     /**
@@ -575,10 +613,9 @@ public class NativeAIPlayer extends AIPlayer {
             }
 
             // Send the unit.
-            logger.finest("Assigning gift " + gift + " from " + is.getName()
-                + " to " + target.getName() + ": " + unit);
-            aiUnit.setMission(new IndianBringGiftMission(getAIMain(),
-                              aiUnit, target));
+            Mission m = new IndianBringGiftMission(getAIMain(), aiUnit, target);
+            aiUnit.changeMission(m, "Gift-" + gift + "-" + is.getName()
+                + "->" + target.getName());
         }
     }
 
@@ -679,10 +716,9 @@ public class NativeAIPlayer extends AIPlayer {
             }
 
             // Send the unit.
-            logger.finest("Assigning demand from " + is.getName()
-                + " to " + target.getName() + ": " + unit);
-            aiUnit.setMission(new IndianDemandMission(getAIMain(),
-                              aiUnit, target));
+            Mission m = new IndianDemandMission(getAIMain(), aiUnit, target);
+            aiUnit.changeMission(m, "Demand-" + is.getName()
+                + "->" + target.getName());
         }
     }
 
@@ -726,7 +762,7 @@ public class NativeAIPlayer extends AIPlayer {
         if (turn.isFirstTurn()) {
             initializeMissions();
         } else {
-            abortInvalidAndOneTimeMissions();
+            abortInvalidMissions();
             secureSettlements();
             bringGifts();
             demandTribute();

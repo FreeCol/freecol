@@ -518,8 +518,8 @@ public class UnitSeekAndDestroyMission extends Mission {
             if (settlement != null && settlement.getUnitCount() < 2) {
                 // Do not risk attacking out of a settlement that
                 // might collapse.  Defend instead.
-                aiUnit.setMission(new DefendSettlementMission(getAIMain(),
-                        aiUnit, settlement));
+                Mission m = new DefendSettlementMission(getAIMain(), aiUnit, settlement);
+                aiUnit.changeMission(m, "Desperate-defence-" + settlement.getName());
                 return;
             }
             Direction dirn = unitTile.getDirection(currentTarget.getTile());

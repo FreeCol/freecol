@@ -386,7 +386,8 @@ public class PrivateerMission extends Mission {
         final AIMain aiMain = getAIMain();
         final AIUnit aiUnit = getAIUnit();
         if (aiUnit.hasCargo()) { // Deliver the goods
-            aiUnit.setMission(new TransportMission(aiMain, aiUnit));
+            aiUnit.changeMission(new TransportMission(aiMain, aiUnit),
+                                 "TransportOverride");
             aiUnit.getMission().doMission();
             return;
         }
