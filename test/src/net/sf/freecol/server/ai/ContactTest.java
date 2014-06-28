@@ -110,8 +110,8 @@ public class ContactTest extends FreeColTestCase {
         Unit colonist = new ServerUnit(game, tile1, dutch, colonistType);
         colonist.setState(Unit.UnitState.FORTIFYING);
         colonist.setState(Unit.UnitState.FORTIFIED);
-        @SuppressWarnings("unused")
         Unit soldier = new ServerUnit(game, tile3, iroquois, braveType);
+        assertNotNull(soldier);
 
         igc.move(dutch, colonist, tile2);
 
@@ -208,8 +208,8 @@ public class ContactTest extends FreeColTestCase {
         Unit brave = new ServerUnit(game, tile1, apache, braveType);
         brave.setState(Unit.UnitState.FORTIFYING);
         brave.setState(Unit.UnitState.FORTIFIED);
-        @SuppressWarnings("unused")
         Unit colonist = new ServerUnit(game, tile3, french, colonistType);
+        assertNotNull(colonist);
         igc.move(apache, brave, tile2);
 
         assertTrue(french.hasContacted(apache));
@@ -235,8 +235,8 @@ public class ContactTest extends FreeColTestCase {
         Unit brave1 = new ServerUnit(game, tile1, apache, braveType);
         brave1.setState(Unit.UnitState.FORTIFYING);
         brave1.setState(Unit.UnitState.FORTIFIED);
-        @SuppressWarnings("unused")
         Unit brave2 = new ServerUnit(game, tile3, iroquois, braveType);
+        assertNotNull(brave2);
         igc.move(apache, brave1, tile2);
 
         assertTrue(iroquois.hasContacted(apache));
@@ -262,8 +262,8 @@ public class ContactTest extends FreeColTestCase {
         assertFalse(dutch.hasContacted(apache));
         assertFalse(apache.hasContacted(dutch));
 
-        @SuppressWarnings("unused")
         Colony colony = getStandardColony(1, 5, 8);
+        assertNotNull(colony);
         Unit brave = new ServerUnit(game, tile3, apache, braveType);
         igc.move(apache, brave, tile2);
 
@@ -324,8 +324,8 @@ public class ContactTest extends FreeColTestCase {
         Unit ship1 = new ServerUnit(game, tile1, dutch, galleonType);
         ship1.setState(Unit.UnitState.FORTIFYING);
         ship1.setState(Unit.UnitState.FORTIFIED);
-        @SuppressWarnings("unused")
         Unit ship2 = new ServerUnit(game, tile3, french, galleonType);
+        assertNotNull(ship2);
         igc.move(dutch, ship1, tile2);
 
         assertFalse(french.hasContacted(dutch));

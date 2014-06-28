@@ -95,8 +95,6 @@ public class TensionTest extends FreeColTestCase {
         UnitType unitType = spec().getUnitType("model.unit.hardyPioneer");
         Unit unit1 = new ServerUnit(game, tile2, european, unitType);
         european.exploreForUnit(unit1);
-        @SuppressWarnings("unused") Unit unit2
-            = new ServerUnit(game, map.getTile(5, 9), european, unitType);
 
         // the european player steals 1 tile from the indians
         assertEquals(indian, tile2.getOwner());

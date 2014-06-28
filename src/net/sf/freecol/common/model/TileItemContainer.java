@@ -43,7 +43,6 @@ import net.sf.freecol.common.model.Map.Layer;
  */
 public class TileItemContainer extends FreeColGameObject {
 
-    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(TileItemContainer.class.getName());
 
     /** A comparator to sort by ascending zIndex. */

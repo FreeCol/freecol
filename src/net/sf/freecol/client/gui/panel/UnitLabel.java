@@ -64,7 +64,7 @@ public final class UnitLabel extends JLabel
     implements ActionListener, Draggable {
 
     @SuppressWarnings("unused")
-        private static Logger logger = Logger.getLogger(UnitLabel.class.getName());
+    private static Logger logger = Logger.getLogger(UnitLabel.class.getName());
 
     public static enum UnitAction {
         ASSIGN,

@@ -156,7 +156,6 @@ public class Modifier extends Feature {
     /**
      * Deliberately empty constructor.
      */
-    @SuppressWarnings("unused")
     protected Modifier() {}
 
     /**

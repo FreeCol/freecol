@@ -258,9 +258,6 @@ public class CombatTest extends FreeColTestCase {
         game.setMap(map);
 
         Colony colony = getStandardColony();
-
-        @SuppressWarnings("unused")
-        SimpleCombatModel combatModel = new SimpleCombatModel();
         Player dutch = game.getPlayer("model.nation.dutch");
         Player inca = game.getPlayer("model.nation.inca");
 

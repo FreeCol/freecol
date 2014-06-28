@@ -34,7 +34,6 @@ import net.sf.freecol.common.model.Specification;
  */
 public class IntegerOption extends AbstractOption<Integer> {
 
-    @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(IntegerOption.class.getName());
 
     /** The value of this option. */

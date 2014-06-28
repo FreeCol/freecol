@@ -922,19 +922,14 @@ public class SimpleMapGenerator implements MapGenerator {
         // In debug mode give each player a few more units and a colony.
         UnitType unitType = spec.getUnitType("model.unit.galleon");
         Unit unit4 = new ServerUnit(game, startTile, player, unitType);
-
         unitType = spec.getUnitType("model.unit.privateer");
         Unit privateer = new ServerUnit(game, startTile, player, unitType);
         ((ServerPlayer)player).exploreForUnit(privateer);
-
         unitType = spec.getUnitType("model.unit.freeColonist");
-        @SuppressWarnings("unused")
         Unit unit5 = new ServerUnit(game, unit4, player, unitType);
         unitType = spec.getUnitType("model.unit.veteranSoldier");
-        @SuppressWarnings("unused")
         Unit unit6 = new ServerUnit(game, unit4, player, unitType);
         unitType = spec.getUnitType("model.unit.jesuitMissionary");
-        @SuppressWarnings("unused")
         Unit unit7 = new ServerUnit(game, unit4, player, unitType);
 
         Tile colonyTile = null;
@@ -1022,38 +1017,23 @@ public class SimpleMapGenerator implements MapGenerator {
         ((ServerPlayer)player).exploreForUnit(scout);
 
         unitType = spec.getUnitType("model.unit.veteranSoldier");
-        @SuppressWarnings("unused")
         Unit unit8 = new ServerUnit(game, colonyTile, player, unitType);
-
-        @SuppressWarnings("unused")
         Unit unit9 = new ServerUnit(game, colonyTile, player, unitType);
-
         unitType = spec.getUnitType("model.unit.artillery");
-        @SuppressWarnings("unused")
         Unit unit10 = new ServerUnit(game, colonyTile, player, unitType);
-
-        @SuppressWarnings("unused")
         Unit unit11 = new ServerUnit(game, colonyTile, player, unitType);
-
-        @SuppressWarnings("unused")
         Unit unit12 = new ServerUnit(game, colonyTile, player, unitType);
-
         unitType = spec.getUnitType("model.unit.treasureTrain");
         Unit unit13 = new ServerUnit(game, colonyTile, player, unitType);
         unit13.setTreasureAmount(10000);
-
         unitType = spec.getUnitType("model.unit.wagonTrain");
         Unit unit14 = new ServerUnit(game, colonyTile, player, unitType);
         GoodsType cigarsType = spec.getGoodsType("model.goods.cigars");
         Goods cigards = new Goods(game, unit14, cigarsType, 5);
         unit14.add(cigards);
-
         unitType = spec.getUnitType("model.unit.jesuitMissionary");
-        @SuppressWarnings("unused")
         Unit unit15 = new ServerUnit(game, colonyTile, player, unitType);
-        @SuppressWarnings("unused")
         Unit unit16 = new ServerUnit(game, colonyTile, player, unitType);
-        // END DEBUG
 
         ((ServerPlayer)player).exploreForSettlement(colony);
     }
