@@ -536,6 +536,21 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
+     * Is this tile on or adjacent to a navigable river.
+     *
+     * @return True if on a navigable river.
+     */
+    public boolean isOnRiver() {
+        final TileType greatRiver
+            = getSpecification().getTileType("model.tile.greatRiver");
+        if (getType() == greatRiver) return true;
+        for (Tile t : getSurroundingTiles(1)) {
+            if (t.getType() == greatRiver) return true;
+        }
+        return false;
+    }
+
+    /**
      * Gets the <code>IndianSettlementInternals</code> for the given player.
      *
      * @param player The <code>Player</code> to query.

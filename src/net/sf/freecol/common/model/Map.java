@@ -1108,17 +1108,20 @@ public class Map extends FreeColGameObject implements Location {
             path = findMapPath(unit, tile, (Tile)realEnd,
                                carrier, costDecider);
             if (path == null) {
-                boolean old = traceSearch;
-                setSearchTrace(true);
-                path = findMapPath(unit, tile, (Tile)realEnd,
-                                   carrier, costDecider);
-                setSearchTrace(old);
-                logger.warning("Fail in findPath(" + unit + ", " + tile
-                    + ", " + ((Tile)realEnd) + ", " + carrier + ")\n"
-                    + p.fullPathToString());
-                //throw new IllegalStateException("FINDPATH-FAIL: " + unit
-                //    + "/" + carrier + " from " + tile + " to " + end
-                //    + "\n" + p.fullPathToString());
+                // There are "expected" failures when rivers block
+                // due to foreign ship movement.  There are also other
+                // failures which we would like to log.  Try to filter
+                // out the first case.
+                if (!((Tile)realEnd).isOnRiver()) {
+                    boolean old = traceSearch;
+                    setSearchTrace(true);
+                    path = findMapPath(unit, tile, (Tile)realEnd,
+                                       carrier, costDecider);
+                    setSearchTrace(old);
+                    logger.warning("Fail in findPath(" + unit + ", " + tile
+                        + ", " + ((Tile)realEnd) + ", " + carrier + ")\n"
+                        + p.fullPathToString());
+                }
                 return null;
             }
 
