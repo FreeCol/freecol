@@ -1259,18 +1259,13 @@ public class EuropeanAIPlayer extends AIPlayer {
                     30);
                 if (t != null) target = t.getSettlement();
             }
-            if (target == null) {
-                logger.warning("Failed to find offensive land unit cheat target");
-            } else {
+            if (target != null) {
                 List<Unit> mercs = ((ServerPlayer)player)
                     .createUnits(player.getMonarch().getMercenaries(air),
                                  europe);
                 for (Unit u : mercs) {
                     AIUnit aiu = getAIUnit(u);
-                    if (aiu == null) {
-                        logger.warning("AIUNIT FAIL " + u);
-                        aiu = new AIUnit(aiMain, u);
-                    }
+                    if (aiu == null) continue; // Can not happen
                     aiu.setMission(new UnitSeekAndDestroyMission(aiMain,
                             aiu, target));
                 }
