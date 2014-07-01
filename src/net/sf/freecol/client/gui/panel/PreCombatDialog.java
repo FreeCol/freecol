@@ -75,9 +75,9 @@ public class PreCombatDialog extends FreeColConfirmDialog {
         final Set<Modifier> defenceModifiers
             = combatModel.getDefensiveModifiers(attacker, defender);
         final List<Modifier> offence = new ArrayList<Modifier>(attackModifiers);
-        //Collections.sort(offence);
+        Collections.sort(offence);
         final List<Modifier> defence = new ArrayList<Modifier>(defenceModifiers);
-        //Collections.sort(defence);
+        Collections.sort(defence);
 
         MigPanel panel = new MigPanel(new MigLayout("wrap 6",
                 "[sg label]20[sg value, right]1px[sg percent]40"
@@ -95,10 +95,12 @@ public class PreCombatDialog extends FreeColConfirmDialog {
             defenderName = Messages.getLabel(defenderUnit);
             defenderLabel = new UnitLabel(freeColClient, defenderUnit,
                                           false, true);
+
         } else if (combatModel.combatIsSettlementAttack(attacker, defender)) {
             Settlement settlement = (Settlement) defender;
             defenderName = settlement.getName();
             defenderLabel = new JLabel(getGUI().getImageIcon(settlement, false));
+
         } else {
             throw new IllegalStateException("Bogus attack");
         }
