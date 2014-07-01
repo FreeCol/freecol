@@ -2243,8 +2243,8 @@ public class EuropeanAIPlayer extends AIPlayer {
         sb.append("doMissions, normal: ");
         List<AIUnit> aiUnits = getAIUnits();
         for (AIUnit aiu : aiUnits) {
-            sb.append(aiu);
             if (aiu.getMission() instanceof TransportMission) continue;
+            sb.append(aiu);
             try {
                 aiu.doMission();
             } catch (Exception e) {
@@ -2253,8 +2253,8 @@ public class EuropeanAIPlayer extends AIPlayer {
         }
         sb.append(", transport: ");
         for (AIUnit aiu : aiUnits) {
-            sb.append(aiu);
             if (!(aiu.getMission() instanceof TransportMission)) continue;
+            sb.append(aiu);
             try {
                 aiu.doMission();
             } catch (Exception e) {
