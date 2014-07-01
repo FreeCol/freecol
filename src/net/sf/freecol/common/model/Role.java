@@ -429,6 +429,17 @@ public class Role extends BuildableType {
     }
 
         
+    // Override FreeColGameObjectType
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getModifierIndex(String id) {
+        return Modifier.DEFAULT_MODIFIER_INDEX;
+    }
+
+
     // Override FreeColObject
 
     /**

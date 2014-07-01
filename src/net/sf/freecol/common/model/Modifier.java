@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.List;
+
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
@@ -117,7 +119,7 @@ public class Modifier extends Feature {
     public static final float UNKNOWN = Float.MIN_VALUE;
 
     // index values for common modifier types
-    public static final int BASIC_PRODUCTION_INDEX = 0;
+    public static final int DEFAULT_MODIFIER_INDEX = 0;
     public static final int RESOURCE_PRODUCTION_INDEX = 10;
     public static final int COLONY_PRODUCTION_INDEX = 20;
     public static final int EXPERT_PRODUCTION_INDEX = 30;
@@ -150,7 +152,7 @@ public class Modifier extends Feature {
     private ModifierType incrementType;
 
     /** A sorting index to use with production modifiers. */
-    private int productionIndex = -1;
+    private int modifierIndex = DEFAULT_MODIFIER_INDEX;
 
 
     /**
@@ -396,21 +398,21 @@ public class Modifier extends Feature {
     }
 
     /**
-     * Get the production index.
+     * Get the modifier index.
      *
-     * @return The production index.
+     * @return The modifier index.
      */
-    public int getProductionIndex() {
-        return productionIndex;
+    public int getModifierIndex() {
+        return modifierIndex;
     }
 
     /**
-     * Set the production index.
+     * Set the modifier index.
      *
-     * @param productionIndex The new production index value.
+     * @param modifierIndex The new modifier index value.
      */
-    public void setProductionIndex(final int productionIndex) {
-        this.productionIndex = productionIndex;
+    public void setModifierIndex(final int modifierIndex) {
+        this.modifierIndex = modifierIndex;
     }
 
     /**
@@ -482,9 +484,12 @@ public class Modifier extends Feature {
         int cmp = 0;
         if (other instanceof Modifier) {
             Modifier modifier = (Modifier)other;
-            cmp = productionIndex - modifier.productionIndex;
+            cmp = modifierIndex - modifier.modifierIndex;
             if (cmp == 0) {
                 cmp = modifierType.ordinal() - modifier.modifierType.ordinal();
+            }
+            if (cmp == 0) {
+                cmp = getSource().compareTo(modifier.getSource());
             }
         }
         if (cmp == 0) cmp = super.compareTo(other);
@@ -506,7 +511,7 @@ public class Modifier extends Feature {
             : modifierType.hashCode());
         hash = hash + 31 * ((incrementType == null) ? 0
             : incrementType.hashCode());
-        hash = hash + 31 * productionIndex;
+        hash = hash + 31 * modifierIndex;
         return hash;
     }
 
@@ -524,7 +529,7 @@ public class Modifier extends Feature {
             && value == modifier.value
             && increment == modifier.increment
             && Utils.equals(incrementType, modifier.incrementType)
-            && productionIndex == modifier.productionIndex;
+            && modifierIndex == modifier.modifierIndex;
     }
 
 
@@ -553,8 +558,8 @@ public class Modifier extends Feature {
             xw.writeAttribute(INCREMENT_TAG, increment);
         }
 
-        if (productionIndex >= 0) {
-            xw.writeAttribute(INDEX_TAG, productionIndex);
+        if (modifierIndex >= 0) {
+            xw.writeAttribute(INDEX_TAG, modifierIndex);
         }
     }
 
@@ -581,7 +586,7 @@ public class Modifier extends Feature {
             increment = 0;
         }
 
-        productionIndex = xr.getAttribute(INDEX_TAG, -1);
+        modifierIndex = xr.getAttribute(INDEX_TAG, DEFAULT_MODIFIER_INDEX);
     }
 
     /**
@@ -596,10 +601,15 @@ public class Modifier extends Feature {
         }
         sb.append(" ").append(modifierType)
             .append(" ").append(value);
-        if (productionIndex >= 0) {
-            sb.append(" index=").append(productionIndex);
+        if (modifierIndex >= DEFAULT_MODIFIER_INDEX) {
+            sb.append(" index=").append(modifierIndex);
         }
-        for (Scope s : getScopes()) sb.append(" ").append(s.toString());
+        List<Scope> scopes = getScopes();
+        if (!scopes.isEmpty()) {
+            sb.append(" [");
+            for (Scope s : scopes) sb.append(" ").append(s.toString());
+            sb.append(" ]");
+        }
         sb.append("]");
         return sb.toString();
     }

@@ -296,9 +296,10 @@ public abstract class FreeColGameObjectType extends FreeColObject
                 Modifier modifier
                     = new Modifier(xr, spec);// Closes the element
                 if (modifier.getSource() == null) modifier.setSource(this);
-                if (modifier.getProductionIndex() < 0) {
+                if (modifier.getModifierIndex()
+                    <= Modifier.DEFAULT_MODIFIER_INDEX) {
                     int index = this.getModifierIndex(modifier.getId());
-                    modifier.setProductionIndex(index);
+                    modifier.setModifierIndex(index);
                 }
                 addModifier(modifier);
                 spec.addModifier(modifier);

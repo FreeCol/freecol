@@ -2074,11 +2074,11 @@ public class Colony extends Settlement implements Nameable {
      * @return A list of suitable <code>Modifier</code>s.
      */
     public List<Modifier> getProductionModifiers(GoodsType goodsType) {
-        if (productionBonus == 0) return Collections.emptyList();
+        if (productionBonus == 0) return Collections.<Modifier>emptyList();
         Modifier mod = new Modifier(goodsType.getId(), productionBonus,
                                     Modifier.ModifierType.ADDITIVE,
                                     Specification.SOL_MODIFIER_SOURCE);
-        mod.setProductionIndex(Modifier.COLONY_PRODUCTION_INDEX);
+        mod.setModifierIndex(Modifier.COLONY_PRODUCTION_INDEX);
         List<Modifier> result = new ArrayList<Modifier>();
         result.add(mod);
         return result;

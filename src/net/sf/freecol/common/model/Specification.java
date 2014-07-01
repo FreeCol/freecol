@@ -2041,7 +2041,7 @@ public final class Specification {
         // Resource type modifiers had the wrong priority
         for (ResourceType rt : resourceTypeList) {
             for (Modifier m : rt.getModifierSet()) {
-                m.setProductionIndex(Modifier.RESOURCE_PRODUCTION_INDEX);
+                m.setModifierIndex(Modifier.RESOURCE_PRODUCTION_INDEX);
             }
         }
 
