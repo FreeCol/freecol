@@ -743,12 +743,18 @@ public class TransportMission extends Mission {
     private void retarget() {
         Cargo cargo = tFirst();
         PathNode path;
-        Location loc = (cargo != null) ? cargo.getTarget()
-            : ((path = getTrivialPath()) == null) ? null
-            : upLoc(path.getLastNode().getLocation());
-        setTarget(loc);
-        logger.finest(tag + " retargeted "
-            + ((loc == null) ? "null" : loc.getId()));
+        if (cargo != null) {
+            setTarget(cargo.getTarget());
+            logger.finest(tag + " retargeted for cargo: "
+                + upLoc(cargo.getTarget()));
+        } else if ((path = getTrivialPath()) != null) {
+            Location loc = upLoc(path.getLastNode().getLocation());
+            setTarget(loc);
+            logger.finest(tag + " retargeted safe port: " + loc);
+        } else {
+            setTarget(null);
+            logger.finest(tag + " unable to retarget safe port: " + this);
+        }
     }
 
     /**
@@ -933,7 +939,7 @@ public class TransportMission extends Mission {
 
         if (result) {
             logger.finest(tag + " removed " + cargo.toString()
-                + " (" + reason + "): " + toFullString());
+                + " (" + reason + "): " + this);
         } else {
             logger.finest(tag + " remove " + cargo.toString()
                 + " failed: " + toFullString());
@@ -1163,7 +1169,7 @@ public class TransportMission extends Mission {
         if (!drop.isEmpty()) {
             if (dumpReady) {
                 if (sb != null) {
-                    sb.append(", dropping at: ")
+                    sb.append(", dropping at ")
                         .append(upLoc(carrier.getLocation()));
                 }
                 while (!drop.isEmpty()) {
@@ -1172,7 +1178,7 @@ public class TransportMission extends Mission {
                 }
             } else {
                 if (sb != null) {
-                    sb.append(", will drop at: ").append(upLoc(end));
+                    sb.append(", will drop at ").append(upLoc(end));
                 }
                 while (!drop.isEmpty()) {
                     Transportable t = drop.remove(0);
@@ -1385,7 +1391,7 @@ public class TransportMission extends Mission {
      * @param index The index of where to add the cargo.
      * @return True if the <code>Transportable</code> was added.
      */
-    private boolean addTransportable(Transportable t, int index) {
+    public boolean addTransportable(Transportable t, int index) {
         if (tFind(t) != null) return false;
 
         AIUnit oldCarrier = t.getTransport();
@@ -1832,8 +1838,8 @@ public class TransportMission extends Mission {
                 }
                 break;
             default:
-                logger.warning(tag + " unexpected move " + mt
-                    + ": " + toFullString());
+                logger.warning(tag + " at " + carrier.getLocation()
+                    + " unexpected move " + mt + ": " + toFullString());
                 return;
             }
         }
