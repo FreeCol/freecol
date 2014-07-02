@@ -433,10 +433,10 @@ public class NativeAIPlayer extends AIPlayer {
             String reason = null;
 
             if (unit.isUninitialized() || unit.isDisposed()) {
-                putReason(aiUnit, "Invalid");
+                reasons.put(unit, "Invalid");
 
             } else if (m != null && m.isValid() && !m.isOneTime()) {
-                putReason(aiUnit, "Valid");
+                reasons.put(unit, "Valid");
 
             } else { // Unit needs a mission
                 continue;
@@ -461,48 +461,38 @@ public class NativeAIPlayer extends AIPlayer {
             final Unit unit = aiUnit.getUnit();
             final Settlement settlement = unit.getSettlement();
             final IndianSettlement is = unit.getHomeIndianSettlement();
+            final Class now = (aiUnit.hasMission())
+                ? aiUnit.getMission().getClass() : null;
 
             Mission m = null;
             String reason = null;
-            if (settlement != null
-                && (settlement.getUnitCount() + settlement.getTile().getUnitCount() <= 1)
-                && (m = new DefendSettlementMission(aiMain, aiUnit,
-                        settlement)) != null) {
+            if (settlement != null && settlement.getUnitCount()
+                + settlement.getTile().getUnitCount() <= 1) {
                 // First see to local settlement defence
-                putReason(aiUnit, "Defend-" + settlement.getName());
+                m = new DefendSettlementMission(aiMain, aiUnit,
+                                                settlement);
+                reasons.put(unit, "Defend-" + settlement.getName());
 
             } else if (is != null
                 && ((!unit.isMounted() && is.canProvideGoods(scoutEq))
-                    || (!unit.isArmed() && is.canProvideGoods(soldierEq)))
-                && (m = new DefendSettlementMission(aiMain, aiUnit, is)) != null) {
+                    || (!unit.isArmed() && is.canProvideGoods(soldierEq)))) {
                 // Go home for new equipment if the home settlement has it
-                putReason(aiUnit, "Equip-" + is.getName());
-
-            } else if (UnitWanderHostileMission.invalidReason(aiUnit) == null
-                && (m = new UnitWanderHostileMission(aiMain, aiUnit)) != null) {
-                // Go out looking for trouble
-                putReason(aiUnit, "Patrol");
+                m = new DefendSettlementMission(aiMain, aiUnit, is);
+                reasons.put(unit, "Equip-" + is.getName());
 
             } else {
-                continue; // Failed!
+                // Go out looking for trouble
+                m = (now == UnitWanderHostileMission.class) ? null
+                    : new UnitWanderHostileMission(aiMain, aiUnit);
+                reasons.put(unit, "Patrol");
             }
 
-            aiUnit.changeMission(m, reason);
+            if (m != null) aiUnit.changeMission(m, reason);
             done.add(aiUnit);
         }
         aiUnits.removeAll(done);
         done.clear();
 
-        for (AIUnit aiUnit : aiUnits) {
-            Mission m;
-            if (aiUnit.getMission() instanceof IdleAtSettlementMission) {
-                m = aiUnit.getMission();
-            } else {
-                m = new IdleAtSettlementMission(aiMain, aiUnit);
-                aiUnit.changeMission(m, "Idle");
-            }
-            putReason(aiUnit, "Idle");
-        }
         if (sb != null) {
             for (AIUnit aiu : getAIUnits()) {
                 Unit u = aiu.getUnit();
@@ -511,14 +501,10 @@ public class NativeAIPlayer extends AIPlayer {
                 Mission m = aiu.getMission();
                 sb.append("\n  ").append(u.getLocation())
                     .append(" ").append(reason)
-                    .append("-").append((m == null) ? "NoMission" : m.toString());
+                    .append("-").append((m == null) ? "NONE" : m.toString());
             }
             logger.fine(sb.toString());
         }
-    }
-
-    private void putReason(AIUnit aiUnit, String reason) {
-        reasons.put(aiUnit.getUnit(), reason);
     }
 
     /**

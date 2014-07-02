@@ -1364,23 +1364,31 @@ public class EuropeanAIPlayer extends AIPlayer {
         nPioneers = pioneersNeeded();
         nScouts = scoutsNeeded();
 
-        // For all units, check if it is a candidate for a new
-        // mission.  If it is not a candidate remove it from the
-        // aiUnits list (reporting why not).  Adjust the
-        // Build/Pioneer/Scout counts according to the existing valid
-        // missions.  Accumulate potentially usable transport missions.
         List<AIUnit> aiUnits = getAIUnits();
         List<AIUnit> navalUnits = new ArrayList<AIUnit>();
         List<AIUnit> done = new ArrayList<AIUnit>();
         List<TransportMission> transportMissions
             = new ArrayList<TransportMission>();
+
+        // For all units, check if it is a candidate for a new
+        // mission.  If it is not a candidate remove it from the
+        // aiUnits list (reporting why not).  Adjust the
+        // Build/Pioneer/Scout counts according to the existing valid
+        // missions.  Accumulate potentially usable transport missions.
         for (AIUnit aiUnit : aiUnits) {
             final Unit unit = aiUnit.getUnit();
             Mission m = aiUnit.getMission();
 
             if (unit.isUninitialized() || unit.isDisposed()) {
-                putReason(aiUnit, "Invalid");
+                reasons.put(unit, "Invalid");
 
+            } else if (unit.isDamaged()) { // Damaged units must wait
+                if (!(aiUnit.getMission() instanceof IdleAtSettlementMission)) {
+                    m = new IdleAtSettlementMission(aiMain, aiUnit);
+                    aiUnit.changeMission(m, "Damaged");
+                }
+                reasons.put(unit, "Damaged");
+                    
             } else if (unit.getState() == UnitState.IN_COLONY
                 && unit.getColony().getUnitCount() <= 1) {
                 // The unit has its hand full keeping the colony alive.
@@ -1392,13 +1400,13 @@ public class EuropeanAIPlayer extends AIPlayer {
                                                     aiMain.getAIColony(colony));
                     aiUnit.changeMission(m, "Vital-to-" + colony.getName());
                 }
-                putReason(aiUnit, "Vital-to-" + colony.getName());
+                reasons.put(unit, "Vital-to-" + colony.getName());
 
             } else if (unit.isInMission()) {
-                putReason(aiUnit, "In-Mission");
+                reasons.put(unit, "In-Mission");
 
             } else if (unit.isAtSea()) { // Wait for it to emerge
-                putReason(aiUnit, "At-Sea");
+                reasons.put(unit, "At-Sea");
 
             } else if (m != null && m.isValid() && !m.isOneTime()) {
                 if (m instanceof BuildColonyMission) {
@@ -1413,7 +1421,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                         transportMissions.add(tm);
                     }
                 }
-                putReason(aiUnit, "Valid");
+                reasons.put(unit, "Valid");
 
             } else if (unit.isNaval()) {
                 navalUnits.add(aiUnit);
@@ -1449,6 +1457,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         if (nBuilders > 0) {
             Collections.sort(aiUnits, builderComparator);
             for (AIUnit aiUnit : aiUnits) {
+                final Unit unit = aiUnit.getUnit();
                 Mission m = getBuildColonyMission(aiUnit);
                 if (m == null) continue;
                 done.add(aiUnit);
@@ -1457,7 +1466,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                     Utils.appendToMapList(transportSupply,
                         upLoc(aiUnit.getTransportSource()), aiUnit);
                 }
-                putReason(aiUnit, "New");
+                reasons.put(unit, "New");
                 if (--nBuilders <= 0) break;
             }
             aiUnits.removeAll(done);
@@ -1466,6 +1475,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         if (nScouts > 0) {
             Collections.sort(aiUnits, scoutComparator);
             for (AIUnit aiUnit : aiUnits) {
+                final Unit unit = aiUnit.getUnit();
                 Mission m = getScoutingMission(aiUnit);
                 if (m == null) continue;
                 done.add(aiUnit);
@@ -1474,7 +1484,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                     Utils.appendToMapList(transportSupply,
                         upLoc(aiUnit.getTransportSource()), aiUnit);
                 }
-                putReason(aiUnit, "New");
+                reasons.put(unit, "New");
                 if (--nScouts <= 0) break;
             }
             aiUnits.removeAll(done);
@@ -1483,6 +1493,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         if (nPioneers > 0) {
             Collections.sort(aiUnits, pioneerComparator);
             for (AIUnit aiUnit : aiUnits) {
+                final Unit unit = aiUnit.getUnit();
                 Mission m = getPioneeringMission(aiUnit);
                 if (m == null) continue;
                 done.add(aiUnit);
@@ -1491,7 +1502,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                     Utils.appendToMapList(transportSupply,
                         upLoc(aiUnit.getTransportSource()), aiUnit);
                 }
-                putReason(aiUnit, "New");
+                reasons.put(unit, "New");
                 if (--nPioneers <= 0) break;
             }
             aiUnits.removeAll(done);
@@ -1505,7 +1516,7 @@ public class EuropeanAIPlayer extends AIPlayer {
 
             if (m != null) {
                 aiUnit.changeMission(m, "New-Land");
-                putReason(aiUnit, "New-Land");
+                reasons.put(unit, "New-Land");
                 done.add(aiUnit);
                 if (requestsTransport(aiUnit)) {
                     Utils.appendToMapList(transportSupply,
@@ -1519,11 +1530,12 @@ public class EuropeanAIPlayer extends AIPlayer {
         // Process the free naval units, possibly adding to the usable
         // transport missions.
         for (AIUnit aiUnit : navalUnits) {
+            final Unit unit = aiUnit.getUnit();
             Mission m = getSimpleMission(aiUnit);
 
             if (m != null) {
                 aiUnit.changeMission(m, "New-Naval");
-                putReason(aiUnit, "New-Naval");
+                reasons.put(unit, "New-Naval");
                 done.add(aiUnit);
                 if (m instanceof TransportMission) {
                     TransportMission tm = (TransportMission)m;
@@ -1538,7 +1550,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                         if (um != null && um.isValid()
                             && aiUnits.contains(aiu)) {
                             aiUnits.remove(aiu);
-                            putReason(aiu, "New");
+                            reasons.put(aiu.getUnit(), "New");
                         }
                     }
                 }
@@ -1553,6 +1565,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         // Give remaining units the fallback mission.
         aiUnits.addAll(navalUnits);
         for (AIUnit aiUnit : aiUnits) {
+            final Unit unit = aiUnit.getUnit();
             Mission m = aiUnit.getMission();
             if (m != null && m.isValid() && !m.isOneTime()) {
                 // Might have picked up a reason in allocateTransportables
@@ -1565,7 +1578,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 m = new IdleAtSettlementMission(aiMain, aiUnit);
                 aiUnit.changeMission(m, "Idle");
             }
-            putReason(aiUnit, "Idle");
+            reasons.put(unit, "Idle");
         }
 
         // We are done.  Report.
@@ -1587,10 +1600,6 @@ public class EuropeanAIPlayer extends AIPlayer {
         }
     }
 
-    private void putReason(AIUnit aiUnit, String reason) {
-        reasons.put(aiUnit.getUnit(), reason);
-    }
-
     /**
      * Choose a mission for an AIUnit.
      *
@@ -1599,54 +1608,91 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     private Mission getSimpleMission(AIUnit aiUnit) {
         final Unit unit = aiUnit.getUnit();
+        final Mission now = (aiUnit.hasMission()) ? aiUnit.getMission() : null;
+        final Class type = (now == null) ? null : now.getClass();
         Mission m;
 
         if (unit.isNaval()) {
-            if ((m = getPrivateerMission(aiUnit)) != null
-                || (m = getTransportMission(aiUnit)) != null
-                || (m = getSeekAndDestroyMission(aiUnit, 8)) != null
-                || (m = getWanderHostileMission(aiUnit)) != null
-                ) return m;
+            // Try to suppress other shipping
+            if (unit.isOffensiveUnit()
+                && (m = (type == PrivateerMission.class) ? now
+                    : getPrivateerMission(aiUnit)) != null) {
+                ;
+            // Then help with transport
+            } else if (unit.isCarrier()
+                && (m = (type == TransportMission.class) ? now
+                    : getTransportMission(aiUnit)) != null) {
+                ;
+            // Look for specific targets
+            } else if (unit.isOffensiveUnit()
+                && (m = (type == UnitSeekAndDestroyMission.class) ? now
+                    : getSeekAndDestroyMission(aiUnit, 8)) != null) {
+                ;
+            // Just wander around
+            } else if (unit.isOffensiveUnit()
+                && (m = (type == UnitWanderHostileMission.class) ? now
+                    : getWanderHostileMission(aiUnit)) != null) {
+                ;
+            } else {
+                m = null;
+            }
 
         } else if (unit.isCarrier()) {
-            return getTransportMission(aiUnit);
+            m = (type == TransportMission.class) ? now
+                : getTransportMission(aiUnit);
 
         } else {
             // CashIn missions are obvious
-            if ((m = getCashInTreasureTrainMission(aiUnit)) != null
-
-                // Try to maintain defence
-                || (unit.isDefensiveUnit()
-                    && (m = getDefendSettlementMission(aiUnit, false)) != null)
-
-                // Favour wish realization for expert units
-                || (unit.isColonist() && unit.getSkillLevel() > 0
-                    && (m = getWishRealizationMission(aiUnit)) != null)
-
-                // Try nearby offence
-                || (unit.isOffensiveUnit()
-                    && (m = getSeekAndDestroyMission(aiUnit, 8)) != null)
-
-                // Missionary missions are only available to some units
-                || (m = getMissionaryMission(aiUnit)) != null
-
-                // Try to satisfy any remaining wishes, such as population
-                || ((m = getWishRealizationMission(aiUnit)) != null)
-
-                // Another try to defend, with relaxed cost decider
-                || (unit.isDefensiveUnit()
-                    && (m = getDefendSettlementMission(aiUnit, true)) != null)
-
-                // Another try to attack, at longer range
-                || (unit.isOffensiveUnit()
-                    && (m = getSeekAndDestroyMission(aiUnit, 16)) != null)
-
-                // Leftover offensive units should go out looking for trouble
-                || (unit.isOffensiveUnit()
-                    && (m = getWanderHostileMission(aiUnit)) != null)
-                ) return m;
+            if (unit.canCarryTreasure()
+                && (m = (type == CashInTreasureTrainMission.class) ? now
+                    : getCashInTreasureTrainMission(aiUnit)) != null) {
+                ;
+            // Try to maintain defence
+            } else if (unit.isDefensiveUnit()
+                && (m = (type == DefendSettlementMission.class) ? now
+                    : getDefendSettlementMission(aiUnit, false)) != null) {
+                ;
+            // Favour wish realization for expert units
+            } else if (unit.isColonist() && unit.getSkillLevel() > 0
+                && (m = (type == WishRealizationMission.class) ? now
+                    : getWishRealizationMission(aiUnit)) != null) {
+                ;
+            // Try nearby offence
+            } else if (unit.isOffensiveUnit()
+                && (m = (type == UnitSeekAndDestroyMission.class) ? now
+                    : getSeekAndDestroyMission(aiUnit, 8)) != null) {
+                ;
+            // Missionary missions might be available
+            } else if (unit.isPerson()
+                && (m = (type == MissionaryMission.class) ? now
+                    : getMissionaryMission(aiUnit)) != null) {
+                ;
+            // Try to satisfy any remaining wishes, such as population
+            } else if (workerWishes.get(unit.getType()) != null
+                && (m = (type == WishRealizationMission.class) ? now
+                    : getWishRealizationMission(aiUnit)) != null) {
+                ;
+            // Another try to defend, with relaxed cost decider
+            } else if (unit.isDefensiveUnit()
+                && (m = (type == DefendSettlementMission.class) ? now
+                    : getDefendSettlementMission(aiUnit, true)) != null) {
+                ;
+            // Another try to attack, at longer range
+            } else if (unit.isOffensiveUnit()
+                && (m = (type == UnitSeekAndDestroyMission.class) ? now
+                    : getSeekAndDestroyMission(aiUnit, 16)) != null) {
+                ;
+            // Leftover offensive units should go out looking for trouble
+            } else if (unit.isOffensiveUnit()
+                && (m = (type == UnitWanderHostileMission.class) ? now
+                    : getWanderHostileMission(aiUnit)) != null) {
+                ;
+            } else {
+                m = null;
+            }
         }
-        return null;
+
+        return m;
     }
 
     /**
@@ -1917,7 +1963,8 @@ public class EuropeanAIPlayer extends AIPlayer {
     private Mission getTransportMission(AIUnit aiUnit) {
         String reason = TransportMission.invalidReason(aiUnit);
         if (reason != null) return null;
-        return new TransportMission(getAIMain(), aiUnit);
+        Mission m = new TransportMission(getAIMain(), aiUnit);
+        return (m.isValid()) ? m : null;
     }
 
     /**
