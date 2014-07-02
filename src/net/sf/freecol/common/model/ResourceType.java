@@ -87,17 +87,6 @@ public final class ResourceType extends FreeColGameObjectType {
     }
 
 
-    // Override FreeColGameObjectType
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getModifierIndex(String id) {
-        return Modifier.RESOURCE_PRODUCTION_INDEX;
-    }
-
-
     // Serialization
 
     private static final String MAXIMUM_VALUE_TAG = "maximum-value";

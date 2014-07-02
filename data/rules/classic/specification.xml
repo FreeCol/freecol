@@ -188,53 +188,75 @@
 
   <resource-types>
     <resource-type id="model.resource.game">
-      <modifier id="model.goods.grain" type="additive" value="2"/>
-      <modifier id="model.goods.grain" type="additive" value="2">
+      <modifier id="model.goods.grain" index="10"
+                type="additive" value="2"/>
+      <modifier id="model.goods.grain" index="10"
+                type="additive" value="2">
         <scope type="model.unit.expertFarmer" matchesNull="false"/>
       </modifier>
-      <modifier id="model.goods.furs" type="additive" value="2"/>
+      <modifier id="model.goods.furs" index="10"
+                type="additive" value="2"/>
     </resource-type>
-    <resource-type id="model.resource.minerals" minimum-value="40" maximum-value="400">
-      <modifier id="model.goods.ore" type="additive" value="3"/>
-      <!-- Col1 had silver here, even if not mentioned in the Colonizopedia -->
-      <modifier id="model.goods.silver" type="additive" value="1"/>
+    <resource-type id="model.resource.minerals"
+                   minimum-value="40" maximum-value="400">
+      <modifier id="model.goods.ore" index="10"
+                type="additive" value="3"/>
+      <!-- Col1 had silver here, although it was undocmented in the
+           Colonizopedia -->
+      <modifier id="model.goods.silver" index="10"
+                type="additive" value="1"/>
     </resource-type>
-    <resource-type id="model.resource.ore" minimum-value="200" maximum-value="4000">
-      <modifier id="model.goods.ore" type="additive" value="2"/>
+    <resource-type id="model.resource.ore"
+                   minimum-value="200" maximum-value="4000">
+      <modifier id="model.goods.ore" index="10"
+                type="additive" value="2"/>
     </resource-type>
-    <resource-type id="model.resource.silver" minimum-value="80" maximum-value="800">
-      <modifier id="model.goods.silver" type="additive" value="2"/>
+    <resource-type id="model.resource.silver"
+                   minimum-value="80" maximum-value="800">
+      <modifier id="model.goods.silver" index="10"
+                type="additive" value="2"/>
     </resource-type>
     <resource-type id="model.resource.lumber">
-      <modifier id="model.goods.lumber" type="additive" value="4"/>
+      <modifier id="model.goods.lumber" index="10"
+                type="additive" value="4"/>
     </resource-type>
     <resource-type id="model.resource.furs">
-      <modifier id="model.goods.furs" type="additive" value="3"/>
+      <modifier id="model.goods.furs" index="10"
+                type="additive" value="3"/>
     </resource-type>
     <resource-type id="model.resource.tobacco">
-      <modifier id="model.goods.tobacco" type="multiplicative" value="2"/>
+      <modifier id="model.goods.tobacco" index="10"
+                type="multiplicative" value="2"/>
     </resource-type>
     <resource-type id="model.resource.sugar">
-      <modifier id="model.goods.sugar" type="multiplicative" value="2"/>
+      <modifier id="model.goods.sugar" index="10"
+                type="multiplicative" value="2"/>
     </resource-type>
     <resource-type id="model.resource.cotton">
-      <modifier id="model.goods.cotton" type="multiplicative" value="2"/>
+      <modifier id="model.goods.cotton" index="10"
+                type="multiplicative" value="2"/>
     </resource-type>
     <resource-type id="model.resource.oasis">
-      <modifier id="model.goods.grain" type="additive" value="2"/>
-      <modifier id="model.goods.grain" type="additive" value="2">
+      <modifier id="model.goods.grain" index="10"
+                type="additive" value="2"/>
+      <modifier id="model.goods.grain" index="10"
+                type="additive" value="2">
         <scope type="model.unit.expertFarmer" matchesNull="false"/>
       </modifier>
     </resource-type>
     <resource-type id="model.resource.grain">
-      <modifier id="model.goods.grain" type="additive" value="2"/>
-      <modifier id="model.goods.grain" type="additive" value="2">
+      <modifier id="model.goods.grain" index="10"
+                type="additive" value="2"/>
+      <modifier id="model.goods.grain" index="10"
+                type="additive" value="2">
         <scope type="model.unit.expertFarmer" matchesNull="false"/>
       </modifier>
     </resource-type>
     <resource-type id="model.resource.fish">
-      <modifier id="model.goods.fish" type="additive" value="3"/>
-      <modifier id="model.goods.fish" type="additive" value="3">
+      <modifier id="model.goods.fish" index="10"
+                type="additive" value="3"/>
+      <modifier id="model.goods.fish" index="10"
+                type="additive" value="3">
         <scope type="model.unit.expertFisherman" matchesNull="false"/>
       </modifier>
     </resource-type>
