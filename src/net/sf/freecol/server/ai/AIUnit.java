@@ -237,14 +237,14 @@ public class AIUnit extends AIObject implements Transportable {
         if (this.mission == mission) return;
         if (this.mission == null) {
             if (!mission.isOneTime()) {
-                logger.fine("Mission replaced (" + why + ") null -> "
-                    + mission + ": " + this);
+                logger.fine("Mission replaced (" + why + ") null"
+                    + " -> " + mission);
             }
         } else {
             if (!this.mission.isOneTime()
                 || (mission != null && !mission.isOneTime())) {
                 logger.fine("Mission replaced (" + why + ") " + this.mission
-                    + " -> " + mission + ": " + this);
+                    + " -> " + mission);
             }
             this.mission.dispose();
         }
@@ -254,7 +254,7 @@ public class AIUnit extends AIObject implements Transportable {
         this.dynamicPriority = 0;
         if (mission != null && getUnit().isOnCarrier()) {
             if (!requeueOnCurrentCarrier()) {
-                logger.warning("Requeue on mission changed failed: " + this);
+                logger.warning("Requeue on mission changed failed: " + mission);
             }
         }            
     }
