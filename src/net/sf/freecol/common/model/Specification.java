@@ -2045,6 +2045,15 @@ public final class Specification {
             }
         }
 
+        // Unit type indexes moved into the spec
+        for (UnitType ut : unitTypeList) {
+            for (Modifier m : ut.getModifierSet()) {
+                if (allTypes.get(m.getId()) instanceof GoodsType) {
+                    m.setModifierIndex(Modifier.EXPERT_PRODUCTION_INDEX);
+                }
+            }
+        }
+
         // TownHall, Chapel et al now have unattended production types
         // (replacing modifiers).
         BuildingType townHallType = getBuildingType("model.building.townHall");

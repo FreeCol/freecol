@@ -658,17 +658,6 @@ public final class UnitType extends BuildableType implements Consumer {
     }
 
 
-    // Override FreeColGameObjectType
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getModifierIndex(String id) {
-        return Modifier.EXPERT_PRODUCTION_INDEX;
-    }
-
-
     // Serialization
 
     private static final String CONSUMES_TAG = "consumes";
