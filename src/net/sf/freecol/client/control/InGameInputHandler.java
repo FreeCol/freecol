@@ -497,37 +497,46 @@ public final class InGameInputHandler extends InputHandler {
 
         String unitId = element.getAttribute("unit");
         if (unitId == null) {
-            throw new IllegalStateException("Animation for: " + player.getId()
+            logger.warning("Animation for: " + player.getId()
                 + " missing unitId.");
+            return null;
         }
         Unit u = game.getFreeColGameObject(unitId, Unit.class);
-        if (u == null) u = selectUnitFromElement(game, element, unitId);
         if (u == null) {
-            throw new IllegalStateException("Animation for: " + player.getId()
+            u = selectUnitFromElement(game, element, unitId);
+            //if (u != null) logger.info("Added unit from element: " + unitId);
+        }
+        if (u == null) {
+            logger.warning("Animation for: " + player.getId()
                 + " missing unit:" + unitId);
+            return null;
         }
         final Unit unit = u;
 
         String oldTileId = element.getAttribute("oldTile");
         if (oldTileId == null) {
-            throw new IllegalStateException("Animation for: " + player.getId()
+            logger.warning("Animation for: " + player.getId()
                 + " missing oldTileId");
+            return null;
         }
         final Tile oldTile = game.getFreeColGameObject(oldTileId, Tile.class);
         if (oldTile == null) {
-            throw new IllegalStateException("Animation for: " + player.getId()
+            logger.warning("Animation for: " + player.getId()
                 + " missing oldTile: " + oldTileId);
+            return null;
         }
 
         String newTileId = element.getAttribute("newTile");
         if (newTileId == null) {
-            throw new IllegalStateException("Animation for: " + player.getId()
+            logger.warning("Animation for: " + player.getId()
                 + " missing newTileId");
+            return null;
         }
         final Tile newTile = game.getFreeColGameObject(newTileId, Tile.class);
         if (newTile == null) {
-            throw new IllegalStateException("Animation for: " + player.getId()
+            logger.warning("Animation for: " + player.getId()
                 + " missing newTile: " + newTileId);
+            return null;
         }
 
         final boolean focus = unit != lastAnimatedUnit;
@@ -1026,8 +1035,10 @@ public final class InGameInputHandler extends InputHandler {
             String idString = FreeColObject.readId(element);
             FreeColGameObject fcgo = game.getFreeColGameObject(idString);
             if (fcgo == null) {
-                logger.warning("Could not find FreeColGameObject: "
-                               + idString);
+                // This can happen legitimately when an update that
+                // removes pointers to a disappearing unit happens,
+                // then a gc which drops the weak reference in
+                // freeColGameObjects, before this remove is processed.
                 continue;
             }
             if (divert != null) {
