@@ -557,7 +557,7 @@ public class SimpleCombatModel extends CombatModel {
 
         } else { // loser is land unit
             // Autoequip the defender?
-            Role autoRole = loser.getAutomaticRole();
+            Role autoRole = (attackerWon) ? loser.getAutomaticRole() : null;
             if (autoRole != null) crs.add(CombatResult.AUTOEQUIP_UNIT);
 
             // Special handling for settlements
