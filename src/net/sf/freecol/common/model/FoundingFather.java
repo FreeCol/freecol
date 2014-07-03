@@ -280,17 +280,6 @@ public class FoundingFather extends FreeColGameObjectType {
     }
 
 
-    // Override FreeColGameObjectType
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getModifierIndex(String id) {
-        return Modifier.FATHER_PRODUCTION_INDEX;
-    }
-
-
     // Serialization
 
     private static final String FROM_ID_TAG = "from-id";

@@ -2054,6 +2054,15 @@ public final class Specification {
             }
         }
 
+        // Father production modifiers have moved to the spec
+        for (FoundingFather ff : foundingFathers) {
+            for (Modifier m : ff.getModifierSet()) {
+                if (allTypes.get(m.getId()) instanceof GoodsType) {
+                    m.setModifierIndex(Modifier.FATHER_PRODUCTION_INDEX);
+                }
+            }
+        }
+
         // TownHall, Chapel et al now have unattended production types
         // (replacing modifiers).
         BuildingType townHallType = getBuildingType("model.building.townHall");

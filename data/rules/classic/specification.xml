@@ -2099,7 +2099,8 @@ resources of 400, lost city rumours of 500
     <founding-father id="model.foundingFather.peterMinuit" type="trade"
                      weight1="9" weight2="1" weight3="1">
       <!-- Player saves 100% percent, i.e. pays nothing. -->
-      <modifier id="model.modifier.landPaymentModifier" type="percentage" value="-100"/>
+      <modifier id="model.modifier.landPaymentModifier"
+                type="percentage" value="-100"/>
     </founding-father>
     <founding-father id="model.foundingFather.peterStuyvesant" type="trade"
                      weight1="2" weight2="4" weight3="8">
@@ -2113,10 +2114,12 @@ resources of 400, lost city rumours of 500
     </founding-father>
     <founding-father id="model.foundingFather.ferdinandMagellan" type="exploration"
                      weight1="2" weight2="10" weight3="10">
-      <modifier id="model.modifier.movementBonus" type="additive" value="3">
+      <modifier id="model.modifier.movementBonus"
+                type="additive" value="3">
         <scope ability-id="model.ability.navalUnit" ability-value="true"/>
       </modifier>
-      <modifier id="model.modifier.sailHighSeas" type="additive" value="-1">
+      <modifier id="model.modifier.sailHighSeas"
+                type="additive" value="-1">
         <scope ability-id="model.ability.navalUnit" ability-value="true"/>
       </modifier>
       <event id="model.event.movementChange"/>
@@ -2128,28 +2131,32 @@ resources of 400, lost city rumours of 500
     </founding-father>
     <founding-father id="model.foundingFather.hernandoDeSoto" type="exploration"
                      weight1="5" weight2="10" weight3="5">
-      <modifier id="model.modifier.lineOfSightBonus" type="additive" value="1">
+      <modifier id="model.modifier.lineOfSightBonus"
+                type="additive" value="1">
         <scope ability-id="model.ability.navalUnit" ability-value="false"/>
       </modifier>
       <ability id="model.ability.rumoursAlwaysPositive" value="true"/>
     </founding-father>
     <founding-father id="model.foundingFather.henryHudson" type="exploration"
                      weight1="10" weight2="1" weight3="1">
-      <modifier id="model.goods.furs" type="percentage" value="100">
+      <modifier id="model.goods.furs" index="40"
+                type="percentage" value="100">
         <scope ability-id="model.ability.person" matchNegated="true"/>
       </modifier>
     </founding-father>
     <founding-father id="model.foundingFather.laSalle" type="exploration"
                      weight1="7" weight2="5" weight3="3">
       <event id="model.event.freeBuilding" value="model.building.stockade"/>
-      <modifier id="model.modifier.buildingPriceBonus" type="percentage" value="-100">
+      <modifier id="model.modifier.buildingPriceBonus"
+                type="percentage" value="-100">
         <scope type="model.building.stockade"/>
       </modifier>
     </founding-father>
     <founding-father id="model.foundingFather.hernanCortes" type="military"
                      weight1="6" weight2="5" weight3="1">
       <ability id="model.ability.plunderNatives"/>
-      <modifier id="model.modifier.treasureTransportFee" type="percentage" value="-100"/>
+      <modifier id="model.modifier.treasureTransportFee"
+                type="percentage" value="-100"/>
     </founding-father>
     <founding-father id="model.foundingFather.georgeWashington" type="military"
                      weight1="0" weight2="4" weight3="10">
@@ -2167,7 +2174,8 @@ resources of 400, lost city rumours of 500
                 type="percentage" value="50">
         <scope type="model.unit.privateer"/>
       </modifier>
-      <modifier id="model.modifier.defence" type="percentage" value="50">
+      <modifier id="model.modifier.defence"
+                type="percentage" value="50">
         <scope type="model.unit.privateer"/>
       </modifier>
     </founding-father>
@@ -2177,33 +2185,39 @@ resources of 400, lost city rumours of 500
     </founding-father>
     <founding-father id="model.foundingFather.thomasJefferson" type="political"
                      weight1="4" weight2="5" weight3="6">
-      <modifier id="model.goods.bells" type="percentage" value="50">
+      <modifier id="model.goods.bells" index="40"
+                type="percentage" value="50">
         <scope ability-id="model.ability.person" matchNegated="true"/>
       </modifier>
     </founding-father>
     <founding-father id="model.foundingFather.pocahontas" type="political"
                      weight1="7" weight2="5" weight3="3">
-      <modifier id="model.modifier.nativeAlarmModifier" type="percentage" value="-50"/>
+      <modifier id="model.modifier.nativeAlarmModifier"
+                type="percentage" value="-50"/>
       <event id="model.event.resetNativeAlarm"/>
     </founding-father>
     <founding-father id="model.foundingFather.thomasPaine" type="political"
                      weight1="1" weight2="2" weight3="8">
       <ability id="model.ability.addTaxToBells" value="true"/>
-      <!-- The value of the modifier is intentionally zero.
-           It will be set to the current tax. -->
-      <modifier id="model.goods.bells" type="percentage" value="0">
+      <!-- The value of the modifier is intentionally zero.  This
+           modifier is used as a template and the value in the copy is
+           set to the current tax. -->
+      <modifier id="model.goods.bells" index="40"
+                type="percentage" value="0">
         <scope ability-id="model.ability.person" matchNegated="true"/>
       </modifier>
     </founding-father>
     <founding-father id="model.foundingFather.simonBolivar" type="political"
                      weight1="0" weight2="4" weight3="6">
-      <modifier id="model.modifier.liberty" type="percentage" value="20"/>
+      <modifier id="model.modifier.liberty" index="40"
+                type="percentage" value="20"/>
     </founding-father>
     <founding-father id="model.foundingFather.benjaminFranklin" type="political"
                      weight1="5" weight2="5" weight3="5">
       <ability id="model.ability.ignoreEuropeanWars" value="true"/>
       <ability id="model.ability.alwaysOfferedPeace" value="true"/>
-      <modifier id="model.modifier.peaceTreaty" type="percentage" value="50"/>
+      <modifier id="model.modifier.peaceTreaty"
+                type="percentage" value="50"/>
     </founding-father>
     <founding-father id="model.foundingFather.williamBrewster" type="religious"
                      weight1="7" weight2="4" weight3="1">
@@ -2216,7 +2230,8 @@ resources of 400, lost city rumours of 500
     </founding-father>
     <founding-father id="model.foundingFather.williamPenn" type="religious"
                      weight1="8" weight2="5" weight3="2">
-      <modifier id="model.goods.crosses" type="percentage" value="50">
+      <modifier id="model.goods.crosses" index="40"
+                type="percentage" value="50">
         <scope ability-id="model.ability.person" matchNegated="true"/>
       </modifier>
     </founding-father>
@@ -2228,7 +2243,8 @@ resources of 400, lost city rumours of 500
     </founding-father>
     <founding-father id="model.foundingFather.juanDeSepulveda" type="religious"
                      weight1="3" weight2="8" weight3="3">
-      <modifier id="model.modifier.nativeConvertBonus" type="percentage" value="20"/>
+      <modifier id="model.modifier.nativeConvertBonus"
+                type="percentage" value="20"/>
     </founding-father>
     <founding-father id="model.foundingFather.bartolomeDeLasCasas" type="religious"
                      weight1="0" weight2="5" weight3="10">
