@@ -440,17 +440,6 @@ public final class TileImprovementType extends FreeColGameObjectType {
     }
 
 
-    // Override FreeColGameObjectType
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getModifierIndex(String id) {
-        return Modifier.IMPROVEMENT_PRODUCTION_INDEX;
-    }
-
-
     // Serialization
 
     private static final String ADD_WORK_TURNS_TAG = "add-work-turns";

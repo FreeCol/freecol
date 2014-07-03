@@ -171,17 +171,6 @@ public abstract class NationType extends FreeColGameObjectType {
     public abstract boolean isREF();
 
 
-    // Override FreeColGameObjectType
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getModifierIndex(String id) {
-        return Modifier.NATION_PRODUCTION_INDEX;
-    }
-
-
     // Serialization
 
     private static final String AGGRESSION_TAG = "aggression";

@@ -2083,6 +2083,15 @@ public final class Specification {
             }
         }
 
+        // European nation type production modifier indexes moved to the spec
+        for (EuropeanNationType et : europeanNationTypes) {
+            for (Modifier m : et.getModifierSet()) {
+                if (allTypes.get(m.getId()) instanceof GoodsType) {
+                    m.setModifierIndex(Modifier.NATION_PRODUCTION_INDEX);
+                }
+            }
+        }
+
         // TownHall, Chapel et al now have unattended production types
         // (replacing modifiers).
         BuildingType townHallType = getBuildingType("model.building.townHall");

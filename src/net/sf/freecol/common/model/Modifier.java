@@ -118,7 +118,9 @@ public class Modifier extends Feature {
 
     public static final float UNKNOWN = Float.MIN_VALUE;
 
-    // index values for common modifier types
+    // @compat 0.10.x
+    // These are now attached to modifiers in the spec, but
+    // Specification.fixup010x() still needs them for now.
     public static final int DEFAULT_MODIFIER_INDEX = 0;
     public static final int RESOURCE_PRODUCTION_INDEX = 10;
     public static final int COLONY_PRODUCTION_INDEX = 20;
@@ -128,6 +130,8 @@ public class Modifier extends Feature {
     public static final int AUTO_PRODUCTION_INDEX = 60;
     public static final int BUILDING_PRODUCTION_INDEX = 70;
     public static final int NATION_PRODUCTION_INDEX = 80;
+    // end @compat 0.10.x
+
     public static final int DEFAULT_PRODUCTION_INDEX = 100;
 
     public static enum ModifierType {
@@ -151,7 +155,7 @@ public class Modifier extends Feature {
     /** The type of increment. */
     private ModifierType incrementType;
 
-    /** A sorting index to use with production modifiers. */
+    /** A sorting index. */
     private int modifierIndex = DEFAULT_MODIFIER_INDEX;
 
 
