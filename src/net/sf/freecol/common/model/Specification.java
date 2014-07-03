@@ -2063,6 +2063,15 @@ public final class Specification {
             }
         }
 
+        // Tile improvement type modifier index has moved to the spec
+        for (TileImprovementType ti : tileImprovementTypeList) {
+            for (Modifier m : ti.getModifierSet()) {
+                if (allTypes.get(m.getId()) instanceof GoodsType) {
+                    m.setModifierIndex(Modifier.IMPROVEMENT_PRODUCTION_INDEX);
+                }
+            }
+        }
+
         // TownHall, Chapel et al now have unattended production types
         // (replacing modifiers).
         BuildingType townHallType = getBuildingType("model.building.townHall");
