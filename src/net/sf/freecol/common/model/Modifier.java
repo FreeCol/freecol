@@ -508,33 +508,32 @@ public class Modifier extends Feature {
      * {@inheritDoc}
      */
     @Override
-    public int hashCode() {
-        int hash = super.hashCode();
-        hash = hash + 31 * Float.floatToIntBits(value);
-        hash = hash + 31 * Float.floatToIntBits(increment);
-        hash = hash + 31 * ((modifierType == null) ? 0
-            : modifierType.hashCode());
-        hash = hash + 31 * ((incrementType == null) ? 0
-            : incrementType.hashCode());
-        hash = hash + 31 * modifierIndex;
-        return hash;
+    public boolean equals(Object o) {
+        if (o == this) return true;
+        if (o instanceof Modifier) { 
+            Modifier m = (Modifier)o;
+            return Utils.equals(this.modifierType, m.modifierType)
+                && this.value == m.value
+                && this.increment == m.increment
+                && Utils.equals(this.incrementType, m.incrementType)
+                && this.modifierIndex == m.modifierIndex
+                && super.equals(o);
+        }
+        return false;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Object o) {
-        if (o == this) return true;
-        if (!(o instanceof Modifier)) return false;
-
-        Modifier modifier = (Modifier) o;
-        return super.equals(o)
-            && Utils.equals(modifierType, modifier.modifierType)
-            && value == modifier.value
-            && increment == modifier.increment
-            && Utils.equals(incrementType, modifier.incrementType)
-            && modifierIndex == modifier.modifierIndex;
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 31 * hash + Float.floatToIntBits(value);
+        hash = 31 * hash + Float.floatToIntBits(increment);
+        hash = 31 * hash + Utils.hashCode(modifierType);
+        hash = 31 * hash + Utils.hashCode(incrementType);
+        hash = 31 * hash + modifierIndex;
+        return hash;
     }
 
 

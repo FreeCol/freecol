@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -374,20 +375,12 @@ public class StringTemplate extends FreeColObject {
      */
     @Override
     public boolean equals(Object o) {
+        if (this == o) return true;
         if (o instanceof StringTemplate) {
             StringTemplate t = (StringTemplate)o;
-            if (!getId().equals(t.getId()) || templateType != t.templateType) {
-                return false;
-            }
-            if (defaultId == null) {
-                if (t.defaultId != null) {
-                    return false;
-                }
-            } else if (t.defaultId == null) {
-                return false;
-            } else if (!defaultId.equals(t.defaultId)) {
-                return false;
-            }
+            if (!super.equals(o)
+                || this.templateType != t.templateType
+                || !Utils.equals(defaultId, t.defaultId)) return false;
             if (templateType == TemplateType.LABEL) {
                 if ((replacements == null) != (t.replacements == null))
                     return false;
@@ -422,9 +415,8 @@ public class StringTemplate extends FreeColObject {
                 }
             }
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
@@ -432,27 +424,24 @@ public class StringTemplate extends FreeColObject {
      */
     @Override
     public int hashCode() {
-        int result = 17;
-        result = result * 31 + getId().hashCode();
-        result = result * 31 + templateType.ordinal();
-        if (defaultId != null) {
-            result = result * 31 + defaultId.hashCode();
-        }
+        int hash = super.hashCode();
+        hash = 31 * hash + templateType.ordinal();
+        hash = 31 * hash + Utils.hashCode(defaultId);
         if (templateType == TemplateType.LABEL) {
             if (replacements != null) {
                 for (StringTemplate replacement : replacements) {
-                    result = result * 31 + replacement.hashCode();
+                    hash = 31 * hash + Utils.hashCode(replacement);
                 }
             }
         } else if (templateType == TemplateType.TEMPLATE) {
             if (keys != null && replacements != null) {
                 for (int index = 0; index < keys.size(); index++) {
-                    result = result * 31 + keys.get(index).hashCode();
-                    result = result * 31 + replacements.get(index).hashCode();
+                    hash = 31 * hash + Utils.hashCode(keys.get(index));
+                    hash = 31 * hash + Utils.hashCode(replacements.get(index));
                 }
             }
         }
-        return result;
+        return hash;
     }
 
 

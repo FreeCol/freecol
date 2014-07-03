@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
 
@@ -213,10 +214,10 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Object other) {
-        if (other instanceof Goods) {
-            Goods g = (Goods)other;
-            return location == g.location && super.equals(g);
+    public boolean equals(Object o) {
+        if (o instanceof Goods) {
+            Goods g = (Goods)o;
+            return this.location == g.location && super.equals(g);
         }
         return false;
     }
@@ -226,12 +227,9 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
      */
     @Override
     public int hashCode() {
-        int value = 19;
-        value = 303 * value + ((location == null) ? 1
-            : location.getId().hashCode());
-        value = 303 * value + getType().hashCode();
-        value = 303 * value + getAmount();
-        return value;
+        int hash = super.hashCode();
+        hash = 31 * hash + Utils.hashCode(this.location);
+        return hash;
     }
 
 

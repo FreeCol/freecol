@@ -201,21 +201,6 @@ public abstract class FreeColGameObject extends FreeColObject {
     }
 
     /**
-     * FreeColGameObjects are equal if the two fcgos are in the same
-     * game and have the same identifier.  Take care to use Utils.equals
-     * which guards against nulls.
-     *
-     * @param o The <code>FreeColGameObject</code> to compare against
-     *     this object.
-     * @return True if the <code>FreeColGameObject</code> is equal to this one.
-     */
-    public boolean equals(FreeColGameObject o) {
-        return (o == null) ? false
-            : (Utils.equals(this.getGame(), o.getGame())
-                && Utils.equals(this.getId(), o.getId()));
-    }
-
-    /**
      * Checks the integrity of this game object.
      *
      * To be overridden by subclasses where this is meaningful.
@@ -272,8 +257,15 @@ public abstract class FreeColGameObject extends FreeColObject {
      */
     @Override
     public boolean equals(Object o) {
-        return (o instanceof FreeColGameObject) ? equals((FreeColGameObject)o)
-            : false;
+        if (this == o) return true;
+        if (o instanceof FreeColGameObject) {
+            // FreeColGameObjects are equal if the two fcgos are in
+            // the same game and have the same identifier.
+            FreeColGameObject fco = (FreeColGameObject)o;
+            return Utils.equals(this.getGame(), fco.getGame())
+                && super.equals(o);
+        }
+        return false;
     }
 
     /**
@@ -281,7 +273,9 @@ public abstract class FreeColGameObject extends FreeColObject {
      */
     @Override
     public int hashCode() {
-        return getId().hashCode();
+        int hash = super.hashCode();
+        hash = 31 * hash + Utils.hashCode(this.game);
+        return hash;
     }
 
 

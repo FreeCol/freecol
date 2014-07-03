@@ -92,6 +92,16 @@ public class Utils {
     }
 
     /**
+     * Get a hash code for an object, even null.
+     *
+     * @param object The <code>Object</code> to use.
+     * @return A hash code.
+     */
+    public static int hashCode(Object object) {
+        return (object == null) ? 31 : object.hashCode();
+    }
+
+    /**
      * Gets the last part of a string after a supplied delimiter.
      *
      * @param s The string to operate on.

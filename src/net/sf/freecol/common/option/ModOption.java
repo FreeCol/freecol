@@ -29,6 +29,7 @@ import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.Mods;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -130,14 +131,23 @@ public class ModOption extends AbstractOption<FreeColModFile> {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Object other) {
-        if (other instanceof ModOption) {
-            ModOption mod = (ModOption)other;
-            return (value == null) ? mod.getValue() == null
-                : (mod.getValue() == null) ? false
-                : value.getId().equals(mod.getValue().getId());
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o instanceof ModOption) {
+            ModOption mod = (ModOption)o;
+            return Utils.equals(this.value, mod.value)
+                && super.equals(o);
         }
         return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        return 31 * hash + Utils.hashCode(this.value);
     }
 
 

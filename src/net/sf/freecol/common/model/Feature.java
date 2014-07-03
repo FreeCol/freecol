@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -281,57 +282,28 @@ public abstract class Feature extends FreeColObject {
     /**
      * {@inheritDoc}
      */
-    public int hashCode() {
-        int hash = 7;
-        hash += 31 * hash + (getId() == null ? 0 : getId().hashCode());
-        hash += 31 * hash + (source == null ? 0 : source.hashCode());
-        hash += 31 * hash + (firstTurn == null ? 0 : firstTurn.getNumber());
-        hash += 31 * hash + (lastTurn == null ? 0 : lastTurn.getNumber());
-        hash += 31 * hash + duration;
-        hash += 31 * (temporary ? 1 : 0);
-        if (scopes != null) {
-            for (Scope scope : scopes) {
-                // TODO: is this safe? It is an easy way to ignore the order
-                // of scope elements.
-                hash += scope.hashCode();
-            }
-        }
-        return hash;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean equals(Object o) {
-        if (o == this) {
-            return true;
-        } else if (o instanceof Feature) {
-            Feature feature = (Feature) o;
-            if (getId() == null) {
-                if (feature.getId() != null) {
-                    return false;
-                }
-            } else if (feature.getId() == null) {
+        if (o == this) return true;
+        if (o instanceof Feature) {
+            Feature feature = (Feature)o;
+            if (!super.equals(o)
+                || this.source != feature.source
+                || this.duration != feature.duration
+                || this.temporary != feature.temporary)
                 return false;
-            } else if (!getId().equals(feature.getId())) {
-                return false;
-            }
-            if (source != feature.source) {
-                return false;
-            }
             if (firstTurn == null) {
-                if (feature.firstTurn != null) {
-                    return false;
-                }
+                if (feature.firstTurn != null) return false;
             } else if (feature.firstTurn == null) {
                 return false;
             } else if (firstTurn.getNumber() != feature.firstTurn.getNumber()) {
                 return false;
             }
-            if (duration != feature.duration) {
+            if (lastTurn == null) {
+                if (feature.lastTurn != null) return false;
+            } else if (feature.lastTurn == null) {
                 return false;
-            }
-            if (temporary != feature.temporary) {
+            } else if (lastTurn.getNumber() != feature.lastTurn.getNumber()) {
                 return false;
             }
             if (scopes == null) {
@@ -355,9 +327,29 @@ public abstract class Feature extends FreeColObject {
                 }
             }
             return true;
-        } else {
-            return false;
         }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash += 31 * hash + Utils.hashCode(source);
+        hash += 31 * hash + ((firstTurn == null) ? 0 : firstTurn.getNumber());
+        hash += 31 * hash + ((lastTurn == null) ? 0 : lastTurn.getNumber());
+        hash += 31 * hash + duration;
+        hash += 31 * ((temporary) ? 1 : 0);
+        if (scopes != null) {
+            for (Scope scope : scopes) {
+                // TODO: is this safe? It is an easy way to ignore the order
+                // of scope elements.
+                hash += Utils.hashCode(scope);
+            }
+        }
+        return hash;
     }
 
 

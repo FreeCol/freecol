@@ -38,6 +38,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.IntegerOption;
@@ -1101,16 +1102,25 @@ public class Game extends FreeColGameObject {
 
 
     // Interface Object
+    // Two games are not the same just because they have the same
+    // identifier, but to avoid having to check everything in the Game
+    // just insist on object equality for the equals() test, and
+    // accept the basic id-based hashCode().
 
     /**
      * {@inheritDoc}
      */
     @Override
     public boolean equals(Object o) {
-        // We need to override the behavior of equals inherited from
-        // FreeColGameObject, since two games are not the same if they
-        // have the same identifier.
         return this == o;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return Utils.hashCode(getId());
     }
 
 

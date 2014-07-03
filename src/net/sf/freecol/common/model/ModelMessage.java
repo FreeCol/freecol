@@ -365,13 +365,12 @@ public class ModelMessage extends StringTemplate {
      */
     @Override
     public boolean equals(Object o) {
+        if (this == o) return true;
         if (o instanceof ModelMessage) {
-            ModelMessage m = (ModelMessage) o;
-            if (sourceId.equals(m.sourceId)
-                && getId().equals(m.getId())
-                && messageType == m.messageType) {
-                return super.equals(m);
-            }
+            ModelMessage m = (ModelMessage)o;
+            return sourceId.equals(m.sourceId)
+                && messageType == m.messageType
+                && super.equals(m);
         }
         return false;
     }
@@ -381,12 +380,10 @@ public class ModelMessage extends StringTemplate {
      */
     @Override
     public int hashCode() {
-        int value = 1;
-        value = 37 * value + sourceId.hashCode();
-        value = 37 * value + getId().hashCode();
-        value = 37 * value + messageType.ordinal();
-        value = 37 * value + super.hashCode();
-        return value;
+        int hash = super.hashCode();
+        hash = 37 * hash + sourceId.hashCode();
+        hash = 37 * hash + messageType.ordinal();
+        return hash;
     }
 
 

@@ -56,6 +56,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.io.FreeColXMLWriter.WriteScope;
 import net.sf.freecol.common.util.Introspector;
+import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -849,6 +850,30 @@ public abstract class FreeColObject
         } finally {
             if (xr != null) xr.close();
         }
+    }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o instanceof FreeColObject) {
+            FreeColObject fco = (FreeColObject)o;
+            return Utils.equals(this.id, fco.id);
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return Utils.hashCode(this.id);
     }
 
 

@@ -26,6 +26,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -164,12 +165,21 @@ public class AbstractGoods extends FreeColObject implements Named {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Object other) {
-        if (other instanceof AbstractGoods) {
-            AbstractGoods ag = (AbstractGoods)other;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o instanceof AbstractGoods) {
+            AbstractGoods ag = (AbstractGoods)o;
             return type == ag.type && amount == ag.amount;
         }
         return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return 31 * Utils.hashCode(type) + amount;
     }
 
 

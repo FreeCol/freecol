@@ -497,24 +497,23 @@ public final class Ability extends Feature {
      * {@inheritDoc}
      */
     @Override
-    public int hashCode() {
-        int hash = super.hashCode();
-        hash += (value ? 1 : 0);
-        return hash;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o instanceof Ability) {
+            return this.value == ((Ability)o).value
+                && super.equals(o);
+        }
+        return false;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        } else if (o instanceof Ability) {
-            return super.equals(o) && (value == ((Ability)o).value);
-        } else {
-            return false;
-        }
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash += (value) ? 1 : 0;
+        return hash;
     }
 
 

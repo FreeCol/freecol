@@ -272,21 +272,6 @@ public class Turn {
     }
 
     /**
-     * Checks if this turn is equal to another turn.
-     */
-    public boolean equals(Object o) {
-        return (o instanceof Turn) ? turn == ((Turn)o).turn : false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String toString() {
-        return toString(turn);
-    }
-
-    /**
      * Gets a non-localized string representation of the given turn.
      *
      * @return A string with the format: "<i>season year</i>".
@@ -295,5 +280,35 @@ public class Turn {
     public static String toString(int turn) {
         return getSeason(turn).toString()
             + " " + Integer.toString(getYear(turn));
+    }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Turn) {
+            return this.turn == ((Turn)o).turn;
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return turn;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return toString(turn);
     }
 }

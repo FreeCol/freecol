@@ -340,37 +340,6 @@ public class Map extends FreeColGameObject implements Location {
         }
 
         /**
-         * Compares the other Position based on the coordinates.
-         *
-         * @param other The other object to compare with.
-         * @return True iff the coordinates match.
-         */
-        @Override
-        public boolean equals(Object other) {
-            if (this == other) {
-                return true;
-            } else if (other == null) {
-                return false;
-            } else if (!(other instanceof Position)) {
-                return false;
-            } else {
-                return x == ((Position)other).x && y == ((Position)other).y;
-            }
-        }
-
-        /**
-         * Gets a hash code value.  The current implementation
-         * (which may change at any time) works well as long as the
-         * maximum coordinates fit in 16 bits.
-         *
-         * @return A hash code value for this object.
-         */
-        @Override
-        public int hashCode() {
-            return x | (y << 16);
-        }
-
-        /**
          * Gets the distance in tiles between two map positions.
          * With an isometric map this is a non-trivial task.
          * The formula below has been developed largely through trial and
@@ -422,6 +391,29 @@ public class Map extends FreeColGameObject implements Location {
                 if (x == other.x && y == other.y) return d;
             }
             return null;
+        }
+
+        // Override Object
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o instanceof Position) {
+                Position p = (Position)o;
+                return x == p.x && y == p.y;
+            }
+            return false;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int hashCode() {
+            return x | (y << 16);
         }
 
         /**

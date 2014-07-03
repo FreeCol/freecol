@@ -36,6 +36,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -119,14 +120,30 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
             return toString().compareTo(l.toString());
         }
 
+        // Override Object
+
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean equals(Object o) {
-            if ((o instanceof Language) && ((Language)o).getKey().equals(key)) {
-                return true;
+            if (this == o) return true;
+            if (o instanceof Language) {
+                Language l = (Language)o;
+                return Utils.equals(this.key, l.key)
+                    && super.equals(o);
             }
             return false;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int hashCode() {
+            int hash = super.hashCode();
+            hash = 31 * hash + Utils.hashCode(this.key);
+            return hash;
         }
 
         /**
