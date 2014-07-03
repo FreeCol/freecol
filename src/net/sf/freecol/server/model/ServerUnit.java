@@ -625,12 +625,13 @@ public class ServerUnit extends Unit implements ServerModelObject {
      *
      * @param random A pseudo-random number source.
      * @param cs A <code>ChangeSet</code> to add changes to.
+     * @return True if the unit survives.
      */
-    private void csExploreLostCityRumour(Random random, ChangeSet cs) {
+    private boolean csExploreLostCityRumour(Random random, ChangeSet cs) {
         ServerPlayer serverPlayer = (ServerPlayer) getOwner();
         Tile tile = getTile();
         LostCityRumour lostCity = tile.getLostCityRumour();
-        if (lostCity == null) return;
+        if (lostCity == null) return true;
 
         Game game = getGame();
         Specification spec = game.getSpecification();
@@ -707,13 +708,10 @@ public class ServerUnit extends Unit implements ServerModelObject {
             csNativeBurialGround(cs);
             break;
         case EXPEDITION_VANISHES:
-            cs.addDispose(See.perhaps().always(serverPlayer), tile,
-                          this);//-vis(serverPlayer)
-            serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                     "lostCityRumour.expeditionVanishes", serverPlayer));
-            break;
+            return false;
         case NOTHING:
             if (game.getTurn().getYear() % 100 == 12
                 && Utils.randomInt(logger, "Mayans?", random, 4) == 0) {
@@ -865,6 +863,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         }
         tile.cacheUnseen();//+til
         tile.removeLostCityRumour();//-til
+        return true;
     }
 
     /**
@@ -937,11 +936,12 @@ public class ServerUnit extends Unit implements ServerModelObject {
             oldLocation.getTile().cacheUnseen();//+til
         }
         setLocation(newTile);//-vis(serverPlayer),-til if in colony
-        if (newTile.hasLostCityRumour() && serverPlayer.isEuropean()) {
-            csExploreLostCityRumour(random, cs);//+vis(serverPlayer)
-        } else {
-            serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
+        if (newTile.hasLostCityRumour() && serverPlayer.isEuropean()
+            && !csExploreLostCityRumour(random, cs)) {
+            cs.addDispose(See.perhaps().always(serverPlayer), oldLocation,
+                          this);//-vis(serverPlayer)
         }
+        serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
 
         // Unless moving in from off-map, update the old location and
         // make sure the move is always visible even if the unit

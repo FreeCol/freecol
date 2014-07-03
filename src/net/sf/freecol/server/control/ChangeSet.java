@@ -635,11 +635,13 @@ public class ChangeSet {
          * see the unit after the move, it should be removed.
          *
          * @param serverPlayer The <code>ServerPlayer</code> to notify.
-         * @return A RemoveChange if the unit disappears.
+         * @return A RemoveChange if the unit disappears (but not if it
+         *     is destroyed, that is handled elsewhere).
          */
         @Override
         public List<Change> consequences(ServerPlayer serverPlayer) {
-            if (seeOld(serverPlayer) && !seeNew(serverPlayer)) {
+            if (seeOld(serverPlayer) && !seeNew(serverPlayer)
+                && !unit.isDisposed()) {
                 List<Unit> units = new ArrayList<Unit>();
                 units.add(unit);
                 List<Change> changes = new ArrayList<Change>();
