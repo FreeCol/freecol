@@ -2072,6 +2072,17 @@ public final class Specification {
             }
         }
 
+        // Building type modifier indexes have moved to the spec
+        for (BuildingType bt : buildingTypeList) {
+            for (Modifier m : bt.getModifierSet()) {
+                if (allTypes.get(m.getId()) instanceof GoodsType) {
+                    m.setModifierIndex((bt.hasAbility(Ability.AUTO_PRODUCTION))
+                        ? Modifier.AUTO_PRODUCTION_INDEX
+                        : Modifier.BUILDING_PRODUCTION_INDEX);
+                }
+            }
+        }
+
         // TownHall, Chapel et al now have unattended production types
         // (replacing modifiers).
         BuildingType townHallType = getBuildingType("model.building.townHall");

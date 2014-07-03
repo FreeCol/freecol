@@ -1675,10 +1675,10 @@ resources of 400, lost city rumours of 500
 
   <!--
       The priority value determines the order in which consumers are
-      granted access to goods. Units have a priority of 1000,
+      granted access to goods.  Units have a priority of 1000,
       buildings have a default priority of 800, the colony's build
       queue has a priority of 500, and the colony's population queue
-      has a priority of 300. Consumers with a higher priority are
+      has a priority of 300.  Consumers with a higher priority are
       served first.
   -->
   <building-types>
@@ -1695,7 +1695,7 @@ resources of 400, lost city rumours of 500
         <input goods-type="model.goods.lumber" value="3"/>
         <output goods-type="model.goods.hammers" value="3"/>
       </production>
-      <ability id="model.ability.build">
+      <ability id="model.ability.build" value="true">
         <scope type="model.unit.wagonTrain"/>
       </ability>
     </building-type>
@@ -1710,7 +1710,7 @@ resources of 400, lost city rumours of 500
       <required-goods id="model.goods.hammers" value="52"/>
       <modifier id="model.modifier.tileTypeChangeProduction"
                 value="3" type="multiplicative">
-        <scope type="model.goods.lumber" />
+        <scope type="model.goods.lumber"/>
       </modifier>
     </building-type>
     <building-type id="model.building.blacksmithHouse">
@@ -1718,7 +1718,7 @@ resources of 400, lost city rumours of 500
         <input goods-type="model.goods.ore" value="3"/>
         <output goods-type="model.goods.tools" value="3"/>
       </production>
-      <ability id="model.ability.build">
+      <ability id="model.ability.build" value="true">
         <scope type="model.equipment.tools"/>
         <scope type="model.equipment.muskets"/>
       </ability>
@@ -1897,7 +1897,7 @@ resources of 400, lost city rumours of 500
       </production>
       <!-- priority should be less than the colony's build queue -->
       <required-goods id="model.goods.hammers" value="52"/>
-      <ability id="model.ability.build">
+      <ability id="model.ability.build" value="true">
         <scope type="model.unit.artillery"/>
       </ability>
     </building-type>
@@ -2015,19 +2015,19 @@ resources of 400, lost city rumours of 500
         <input goods-type="model.goods.food" value="1"/>
         <output goods-type="model.goods.horses" value="1"/>
       </production>
-      <modifier id="model.modifier.breedingDivisor"
-                type="additive" value="50"/>
-      <modifier id="model.modifier.breedingFactor"
-                type="additive" value="2"/>
-      <modifier id="model.goods.horses"
-                type="multiplicative" value="1.0"/>
-      <modifier id="model.modifier.consumeOnlySurplusProduction"
-                type="multiplicative" value="0.5" />
       <ability id="model.ability.autoProduction"/>
       <ability id="model.ability.avoidExcessProduction"/>
-      <ability id="model.ability.build">
+      <ability id="model.ability.build" value="true">
         <scope type="model.equipment.horses"/>
       </ability>
+      <modifier id="model.modifier.breedingDivisor" index="60"
+                type="additive" value="50"/>
+      <modifier id="model.modifier.breedingFactor" index="60"
+                type="additive" value="2"/>
+      <modifier id="model.goods.horses" index="60"
+                type="multiplicative" value="1.0"/>
+      <modifier id="model.modifier.consumeOnlySurplusProduction" index="60"
+                type="multiplicative" value="0.5" />
     </building-type>
     <building-type id="model.building.stables"
                    extends="model.building.country"
@@ -2037,9 +2037,9 @@ resources of 400, lost city rumours of 500
         <input goods-type="model.goods.food" value="1"/>
         <output goods-type="model.goods.horses" value="1"/>
       </production>
-      <modifier id="model.modifier.breedingDivisor"
-                type="multiplicative" value="0.5" />
       <required-goods id="model.goods.hammers" value="64"/>
+      <modifier id="model.modifier.breedingDivisor" index="60"
+                type="multiplicative" value="0.5" />
     </building-type>
     <building-type id="model.building.docks"
                    workplaces="0"
@@ -2064,7 +2064,7 @@ resources of 400, lost city rumours of 500
                    required-population="8" upkeep="15">
       <required-goods id="model.goods.hammers" value="240"/>
       <required-goods id="model.goods.tools" value="100"/>
-      <ability id="model.ability.build">
+      <ability id="model.ability.build" value="true">
         <scope ability-id="model.ability.navalUnit"/>
       </ability>
     </building-type>
@@ -2073,7 +2073,8 @@ resources of 400, lost city rumours of 500
                    upkeep="5">
       <required-goods id="model.goods.hammers" value="52"/>
       <required-goods id="model.goods.tools" value="20"/>
-      <modifier id="model.goods.bells" type="percentage" value="50">
+      <modifier id="model.goods.bells" index="70"
+                type="percentage" value="50">
         <scope ability-id="model.ability.person" matchNegated="true"/>
       </modifier>
     </building-type>
@@ -2084,7 +2085,8 @@ resources of 400, lost city rumours of 500
       <required-goods id="model.goods.hammers" value="120"/>
       <required-goods id="model.goods.tools" value="50"/>
       <modifier id="model.goods.bells" delete="true" />
-      <modifier id="model.goods.bells" type="percentage" value="100">
+      <modifier id="model.goods.bells" index="70"
+                type="percentage" value="100">
         <scope ability-id="model.ability.person" matchNegated="true"/>
       </modifier>
     </building-type>

@@ -331,20 +331,6 @@ public final class BuildingType extends BuildableType {
     }
 
 
-    // Override FreeColGameObjectType
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getModifierIndex(String id) {
-        GoodsType produces = getProducedGoodsType();
-        return (produces != null && produces.getId().equals(id))
-            ? Modifier.AUTO_PRODUCTION_INDEX
-            : Modifier.BUILDING_PRODUCTION_INDEX;
-    }
-
-
     // Override FreeColObject
 
     /**
