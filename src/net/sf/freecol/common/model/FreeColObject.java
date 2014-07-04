@@ -176,6 +176,11 @@ public abstract class FreeColObject
      * @return The comparison result.
      */
     public static int compareIds(FreeColObject fco1, FreeColObject fco2) {
+        if (fco1 == null) {
+            return (fco2 == null) ? 0 : -1;
+        } else if (fco2 == null) {
+            return 1;
+        }
         String id1 = fco1.getId();
         String id2 = fco2.getId();
         if (id1 == null) {
