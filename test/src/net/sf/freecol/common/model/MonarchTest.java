@@ -56,7 +56,8 @@ public class MonarchTest extends FreeColTestCase {
         Player dutch = game.getPlayer("model.nation.dutch");
 
         // grace period has not yet expired
-        List<RandomChoice<MonarchAction>> choices = dutch.getMonarch().getActionChoices();
+        List<RandomChoice<MonarchAction>> choices
+            = dutch.getMonarch().getActionChoices();
         assertTrue(choices.isEmpty());
 
         Colony colony = getStandardColony();

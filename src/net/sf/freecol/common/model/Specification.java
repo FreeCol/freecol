@@ -1520,6 +1520,23 @@ public final class Specification {
         return (change == null) ? null : change.get(other);
     }
 
+    /**
+     * Gets the roles suitable for a REF unit.
+     *
+     * @param naval If true, choose roles for naval units, if not, land units.
+     */
+    public List<Role> getREFRoles(boolean naval) {
+        List<Role> roles = new ArrayList<Role>();
+        if (naval) {
+            roles.add(getDefaultRole());
+        } else {
+            for (Role r : getMilitaryRoles()) {
+                if (r.requiresAbility(Ability.REF_UNIT)) roles.add(r);
+            }
+        }
+        return roles;
+    }
+
 
     // @compat 0.10.x -- EquipmentTypes --
     /**

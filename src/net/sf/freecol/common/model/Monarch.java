@@ -326,7 +326,6 @@ public final class Monarch extends FreeColGameObject implements Named {
     private Force mercenaryForce = new Force();
 
     // Caches.  Do not serialize.
-
     /** The naval unit types suitable for support actions. */
     private List<UnitType> navalTypes = null;
     /** The bombard unit types suitable for support actions. */
@@ -334,7 +333,7 @@ public final class Monarch extends FreeColGameObject implements Named {
     /** The land unit types suitable for support actions. */
     private List<UnitType> landTypes = null;
     /** The roles identifiers suitable for land units with support actions. */
-    private String mountedRole = null, armedRole = null;
+    private Role mountedRole = null, armedRole = null;
     /** The land unit types suitable for mercenary support. */
     private List<UnitType> mercenaryTypes = null;
     /** The naval unit types suitable for the REF. */
@@ -474,6 +473,8 @@ public final class Monarch extends FreeColGameObject implements Named {
         bombardTypes = new ArrayList<UnitType>();
         landTypes = new ArrayList<UnitType>();
         mercenaryTypes = new ArrayList<UnitType>();
+        navalREFUnitTypes = spec.getREFUnitTypes(true);
+        landREFUnitTypes = spec.getREFUnitTypes(false);
 
         for (UnitType unitType : spec.getUnitTypeList()) {
             if (unitType.hasAbility(Ability.SUPPORT_UNIT)) {
@@ -494,32 +495,11 @@ public final class Monarch extends FreeColGameObject implements Named {
                 boolean armed = r.hasAbility(Ability.ARMED);
                 boolean mounted = r.hasAbility(Ability.MOUNTED);
                 if (mountedRole == null && armed && mounted) {
-                    mountedRole = r.getId();
+                    mountedRole = r;
                 } else if (armedRole == null && armed && !mounted) {
-                    armedRole = r.getId();
+                    armedRole = r;
                 }
             }
-        }
-    }
-
-    /**
-     * Collect the REF unit types.
-     *
-     * @param naval If true, choose naval unit types, if not, land
-     *     unit types.
-     * @return A list of possible REF unit types.
-     */
-    public List<UnitType> collectREFUnitTypes(boolean naval) {
-        if (naval) {
-            if (navalREFUnitTypes == null) {
-                navalREFUnitTypes = getSpecification().getREFUnitTypes(true);
-            }
-            return navalREFUnitTypes;
-        } else {
-            if (landREFUnitTypes == null) {
-                landREFUnitTypes = getSpecification().getREFUnitTypes(false);
-            }
-            return landREFUnitTypes;
         }
     }
 
@@ -576,6 +556,8 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @return True if the action is valid.
      */
     public boolean actionIsValid(MonarchAction action) {
+        initializeCaches();
+
         switch (action) {
         case NO_ACTION:
             return true;
@@ -588,8 +570,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         case WAIVE_TAX:
             return true;
         case ADD_TO_REF:
-            return !(collectREFUnitTypes(true).isEmpty()
-                || collectREFUnitTypes(false).isEmpty());
+            return !(navalREFUnitTypes.isEmpty() || landREFUnitTypes.isEmpty());
         case DECLARE_PEACE:
             return !collectPotentialFriends().isEmpty();
         case DECLARE_WAR:
@@ -697,6 +678,18 @@ public final class Monarch extends FreeColGameObject implements Named {
         return Math.max(oldTax - adjust, Monarch.MINIMUM_TAX_RATE);
     }
 
+    // @compat 0.10.5
+    /**
+     * Get a unit type for the REF navy.  Bugfix workaround.
+     *
+     * @return A naval REF unit type.
+     */
+    public UnitType getNavalREFUnitType() {
+        initializeCaches();
+        return navalREFUnitTypes.get(0);
+    }
+    // end @compat 0.10.5
+
     /**
      * Gets units to be added to the Royal Expeditionary Force.
      *
@@ -704,32 +697,31 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @return An addition to the Royal Expeditionary Force.
      */
     public AbstractUnit chooseForREF(Random random) {
+        initializeCaches();
+
         final Specification spec = getSpecification();
         // Preserve some extra naval capacity so that not all the REF
         // navy is completely loaded
         // TODO: magic number 2.5 * Manowar-capacity = 15
         boolean needNaval = expeditionaryForce.getCapacity()
             < expeditionaryForce.getSpaceRequired() + 15;
-        List<UnitType> types = collectREFUnitTypes(needNaval);
+        List<UnitType> types = (needNaval) ? navalREFUnitTypes
+            : landREFUnitTypes;
         if (types.isEmpty()) return null;
         UnitType unitType = getRandomMember(logger, "Choose REF unit",
                                             types, random);
-        Role role;
-        if (needNaval || !unitType.hasAbility(Ability.CAN_BE_EQUIPPED)) {
-            role = spec.getDefaultRole();
-        } else {
-            List<Role> roles = new ArrayList<Role>();
-            for (Role r : spec.getMilitaryRoles()) {
-                if (r.requiresAbility(Ability.REF_UNIT)) roles.add(r);
-            }
-            role = getRandomMember(logger, "Choose land role", roles, random);
-        }
+        Role role = (needNaval
+            || !unitType.hasAbility(Ability.CAN_BE_EQUIPPED))
+            ? spec.getDefaultRole()
+            : (randomInt(logger, "Choose land role", random, 3) == 0)
+            ? mountedRole
+            : armedRole;
         int number = (needNaval) ? 1
             : randomInt(logger, "Choose land#", random, 3) + 1;
         AbstractUnit result = new AbstractUnit(unitType, role.getId(), number);
-        logger.info("Add to REF: capacity=" + expeditionaryForce.getCapacity()
+        logger.info("Add to " + player.getDebugName()
+            + " REF: capacity=" + expeditionaryForce.getCapacity()
             + " spaceRequired=" + expeditionaryForce.getSpaceRequired()
-            + " => " + number + " " + unitType + " (" + role + ")"
             + " => " + result);
         return result;
     }
@@ -775,8 +767,9 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @return An addition to the colonial forces.
      */
     public List<AbstractUnit> getSupport(Random random, boolean naval) {
-        final Specification spec = getSpecification();
         initializeCaches();
+
+        final Specification spec = getSpecification();
         List<AbstractUnit> support = new ArrayList<AbstractUnit>();
         
         if (naval) {
@@ -802,33 +795,33 @@ public final class Monarch extends FreeColGameObject implements Named {
                         Specification.DEFAULT_ROLE_ID, 1));
             support.add(new AbstractUnit(getRandomMember(logger,
                         "Choose mounted", landTypes, random),
-                        mountedRole, 2));
+                        mountedRole.getId(), 2));
             break;
         case 3:
             support.add(new AbstractUnit(getRandomMember(logger,
                         "Choose mounted", landTypes, random),
-                        mountedRole, 2));
+                        mountedRole.getId(), 2));
             support.add(new AbstractUnit(getRandomMember(logger,
                         "Choose soldier", landTypes, random),
-                        armedRole, 1));
+                        armedRole.getId(), 1));
             break;
         case 2:
             support.add(new AbstractUnit(getRandomMember(logger,
                         "Choose mounted", landTypes, random),
-                        mountedRole, 2));
+                        mountedRole.getId(), 2));
             break;
         case 1:
             support.add(new AbstractUnit(getRandomMember(logger,
                         "Choose mounted", landTypes, random),
-                        mountedRole, 1));
+                        mountedRole.getId(), 1));
             support.add(new AbstractUnit(getRandomMember(logger,
                         "Choose soldier", landTypes, random),
-                        armedRole, 1));
+                        armedRole.getId(), 1));
             break;
         case 0:
             support.add(new AbstractUnit(getRandomMember(logger,
                         "Choose soldier", landTypes, random),
-                        armedRole, 1));
+                        armedRole.getId(), 1));
             break;
         default:
             break;
@@ -843,9 +836,14 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @return A troop of mercenaries.
      */
     public List<AbstractUnit> getMercenaries(Random random) {
-        Specification spec = getSpecification();
-        final int mercPrice = spec.getInteger(GameOptions.MERCENARY_PRICE);
         initializeCaches();
+
+        final Specification spec = getSpecification();
+        final Role defaultRole = spec.getDefaultRole();
+        final int mercPrice = spec.getInteger(GameOptions.MERCENARY_PRICE);
+        List<Role> landRoles = new ArrayList<Role>();
+        landRoles.add(armedRole);
+        landRoles.add(mountedRole);
 
         // FIXME: magic numbers for 2-4 mercs
         List<AbstractUnit> mercs = new ArrayList<AbstractUnit>();
@@ -854,40 +852,35 @@ public final class Monarch extends FreeColGameObject implements Named {
         UnitType unitType = null;
         List<UnitType> unitTypes = new ArrayList<UnitType>(mercenaryTypes);
         while (!unitTypes.isEmpty() && count > 0) {
-            unitType = getRandomMember(logger, "Choose unit",
+            unitType = getRandomMember(logger, "Merc unit",
                                        unitTypes, random);
             unitTypes.remove(unitType);
-            String[] roles = (unitType.hasAbility(Ability.CAN_BE_EQUIPPED))
-                ? ((randomInt(logger, "Swap role", random, 2) == 0)
-                    ? new String[] { armedRole, mountedRole }
-                    : new String[] { mountedRole, armedRole })
-                : new String[] { Specification.DEFAULT_ROLE_ID };
-            for (int r = 0; r < roles.length; r++) {
-                int n = randomInt(logger, "Choose number " + unitType,
-                                  random, Math.min(count, 2)) + 1;
-                AbstractUnit au = new AbstractUnit(unitType, roles[r], n);
-                for (;;) {
-                    int newPrice = player.getPrice(au) * mercPrice / 100;
-                    if (player.checkGold(price + newPrice)) {
-                        mercs.add(au);
-                        price += newPrice;
-                        count -= n;
-                        break;
-                    }
-                    if (--n <= 0) break;
-                    au.setNumber(n);
+            Role role = (unitType.hasAbility(Ability.CAN_BE_EQUIPPED))
+                ? getRandomMember(logger, "Merc role",
+                                  landRoles, random)
+                : defaultRole;
+            int n = randomInt(logger, "Merc count " + unitType,
+                              random, Math.min(count, 2)) + 1;
+            AbstractUnit au = new AbstractUnit(unitType, role.getId(), n);
+            for (;;) {
+                int newPrice = player.getPrice(au) * mercPrice / 100;
+                if (player.checkGold(price + newPrice)) {
+                    mercs.add(au);
+                    price += newPrice;
+                    count -= n;
+                    break;
                 }
-                if (count <= 0) break;
+                if (--n <= 0) break;
+                au.setNumber(n);
             }
+            if (count <= 0) break;
         }
 
         /* Always return something, even if it is not affordable */
         if (mercs.isEmpty() && unitType != null) {
-            mercs.add(new AbstractUnit(unitType, 
-                    ((unitType.hasAbility(Ability.CAN_BE_EQUIPPED))
-                        ? armedRole
-                        : Specification.DEFAULT_ROLE_ID),
-                    1));
+            Role r = (unitType.hasAbility(Ability.CAN_BE_EQUIPPED))
+                ? armedRole : defaultRole;
+            mercs.add(new AbstractUnit(unitType, r.getId(), 1));
         }
         return mercs;
     }
