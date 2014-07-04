@@ -184,21 +184,6 @@ public abstract class FreeColGameObjectType extends FreeColObject
         return abstractType;
     }
 
-    /**
-     * Get the modifier index used to sort modifiers instantiated with
-     * this object as the source.
-     *
-     * Override in subclasses that are involved in production.  Note
-     * that the parameter allows the index to vary according to what
-     * is being produced.
-     *
-     * @param id The identifier of the object being produced.
-     * @return The modifier index.
-     */
-    public int getModifierIndex(String id) {
-        return Modifier.DEFAULT_PRODUCTION_INDEX;
-    }
-
 
     // Interface Named
 
@@ -293,14 +278,8 @@ public abstract class FreeColGameObjectType extends FreeColObject
                 xr.closeTag(Modifier.getXMLElementTagName());
 
             } else {
-                Modifier modifier
-                    = new Modifier(xr, spec);// Closes the element
+                Modifier modifier = new Modifier(xr, spec);// Closes the element
                 if (modifier.getSource() == null) modifier.setSource(this);
-                if (modifier.getModifierIndex()
-                    <= Modifier.DEFAULT_MODIFIER_INDEX) {
-                    int index = this.getModifierIndex(modifier.getId());
-                    modifier.setModifierIndex(index);
-                }
                 addModifier(modifier);
                 spec.addModifier(modifier);
             }
