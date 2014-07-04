@@ -493,7 +493,8 @@ public class Modifier extends Feature {
                 cmp = modifierType.ordinal() - modifier.modifierType.ordinal();
             }
             if (cmp == 0) {
-                cmp = getSource().compareTo(modifier.getSource());
+                cmp = FreeColObject.compareIds(getSource(), 
+                                               modifier.getSource());
             }
         }
         if (cmp == 0) cmp = super.compareTo(other);
