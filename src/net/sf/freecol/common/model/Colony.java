@@ -313,9 +313,8 @@ public class Colony extends Settlement implements Nameable {
      * @return The current effective liberty.
      */
     public int getEffectiveLiberty() {
-        return (int)FeatureContainer.applyModifierSet((float)getLiberty(),
-            getGame().getTurn(),
-            getOwner().getModifierSet(Modifier.LIBERTY));
+        return (int)applyModifiers((float)getLiberty(), getGame().getTurn(),
+                                   getOwner().getModifierSet(Modifier.LIBERTY));
     }
 
     /**
@@ -1001,8 +1000,8 @@ public class Colony extends Settlement implements Nameable {
      * @return True if the building is available at zero cost.
      */
     public boolean isAutomaticBuild(BuildingType buildingType) {
-        float value = owner.applyModifier(100f, Modifier.BUILDING_PRICE_BONUS,
-                                          buildingType, getGame().getTurn());
+        float value = owner.applyModifiers(100f, getGame().getTurn(),
+            Modifier.BUILDING_PRICE_BONUS, buildingType);
         return value == 0f && canBuild(buildingType);
     }
 
@@ -1495,9 +1494,8 @@ public class Colony extends Settlement implements Nameable {
      * @return True if the population can be reduced.
      */
     public boolean canReducePopulation() {
-        return getUnitCount() >
-            FeatureContainer.applyModifierSet(0f, getGame().getTurn(),
-                getModifierSet(Modifier.MINIMUM_COLONY_SIZE));
+        return getUnitCount() > applyModifiers(0f, getGame().getTurn(),
+                                               Modifier.MINIMUM_COLONY_SIZE);
     }
 
     /**
@@ -2627,8 +2625,8 @@ public class Colony extends Settlement implements Nameable {
      * {@inheritDoc}
      */
     public int getGoodsCapacity() {
-        return (int) applyModifier(0f, Modifier.WAREHOUSE_STORAGE,
-                                   null, getGame().getTurn());
+        return (int)applyModifiers(0f, getGame().getTurn(),
+                                   Modifier.WAREHOUSE_STORAGE);
     }
 
     /**
@@ -2654,23 +2652,20 @@ public class Colony extends Settlement implements Nameable {
     }
 
     private void modifySpecialGoods(GoodsType goodsType, int amount) {
-        Set<Modifier> libertyModifiers
-            = goodsType.getModifierSet(Modifier.LIBERTY);
-        if (!libertyModifiers.isEmpty()) {
-            int newLiberty = (int)FeatureContainer
-                .applyModifierSet(amount, getGame().getTurn(),
-                                  libertyModifiers);
-            modifyLiberty(newLiberty);
+        final Turn turn = getGame().getTurn();
+        Set<Modifier> mods;
+
+        mods = goodsType.getModifierSet(Modifier.LIBERTY);
+        if (!mods.isEmpty()) {
+            int liberty = (int)applyModifiers(amount, turn, mods);
+            modifyLiberty(liberty);
         }
 
-        Set<Modifier> immigrationModifiers
-            = goodsType.getModifierSet(Modifier.IMMIGRATION);
-        if (!immigrationModifiers.isEmpty()) {
-            int newImmigration = (int)FeatureContainer
-                .applyModifierSet(amount, getGame().getTurn(),
-                                  immigrationModifiers);
-            modifyImmigration(newImmigration);
-            getOwner().modifyImmigration(newImmigration);
+        mods = goodsType.getModifierSet(Modifier.IMMIGRATION);
+        if (!mods.isEmpty()) {
+            int migration = (int)applyModifiers(amount, turn, mods);
+            modifyImmigration(migration);
+            getOwner().modifyImmigration(migration);
         }
     }
 

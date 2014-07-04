@@ -39,6 +39,7 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
@@ -149,14 +150,16 @@ public class ServerIndianSettlement extends IndianSettlement
         if (missionary == null) return;
         final ServerPlayer other = (ServerPlayer)missionary.getOwner();
         final Tile tile = getTile();
+        final Turn turn = getGame().getTurn();
 
         // Check for braves converted by missionaries
         float convert = getConvertProgress();
-        convert += missionary.applyModifier(missionary.getType().getSkill(),
-                                            Modifier.CONVERSION_SKILL);
+        convert += missionary.applyModifiers(missionary.getType().getSkill(),
+                                             turn, Modifier.CONVERSION_SKILL);
         // The convert rate increases by a percentage of the current alarm.
         int alarm = Math.min(getAlarm(other).getValue(), Tension.TENSION_MAX);
-        convert += missionary.applyModifier(alarm, Modifier.CONVERSION_ALARM_RATE);
+        convert += missionary.applyModifiers(alarm, turn,
+                                             Modifier.CONVERSION_ALARM_RATE);
         Settlement colony = tile.getNearestSettlement(other,
             MAX_CONVERT_DISTANCE, true);
         if (convert < (float)getType().getConvertThreshold()

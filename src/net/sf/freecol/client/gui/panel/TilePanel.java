@@ -140,7 +140,8 @@ public final class TilePanel extends FreeColPanel {
                     int expertPotential = potential;
                     UnitType expert = getSpecification().getExpertForProducing(goodsType);
                     if (expert != null) {
-                        expertPotential = (int)expert.applyModifier(potential, goodsType.getId());
+                        expertPotential = (int)expert.applyModifiers(potential,
+                            getGame().getTurn(), goodsType.getId());
                     }
                     if (potential > 0) {
                         label = new JLabel(String.valueOf(potential),

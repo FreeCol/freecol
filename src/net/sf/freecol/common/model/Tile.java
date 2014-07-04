@@ -1137,8 +1137,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public float getDefenceValue() {
         final TileType type = getType();
         return (type == null) ? 0.0f
-            : FeatureContainer.applyModifierSet(1.0f, null,
-                                                type.getDefenceModifiers());
+            : applyModifiers(1.0f, null, type.getDefenceModifiers());
     }
 
     /**
@@ -1324,8 +1323,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                                             unitType);
         if (tileItemContainer != null) {
             // Some tile item bonuses apply to base tile production
-            amount = (int)FeatureContainer.applyModifiers(amount,
-                getGame().getTurn(),
+            amount = (int)applyModifiers(amount, getGame().getTurn(),
                 tileItemContainer.getProductionModifiers(goodsType, unitType,
                                                          true));
         }
@@ -1347,8 +1345,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         if (!canProduce(goodsType, unitType)) return 0;
 
         int amount = getBaseProduction(null, goodsType, unitType);
-        amount = (int)FeatureContainer.applyModifiers(amount,
-            getGame().getTurn(),
+        amount = (int)applyModifiers(amount, getGame().getTurn(),
             getProductionModifiers(goodsType, unitType));
         return (amount < 0) ? 0 : amount;
     }

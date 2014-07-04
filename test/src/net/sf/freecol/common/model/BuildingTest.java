@@ -555,7 +555,8 @@ public class BuildingTest extends FreeColTestCase {
     }
 
     public void testStockade() {
-        Game game = getGame();
+        final Game game = getGame();
+        final Turn turn = game.getTurn();
         game.setMap(getTestMap(true));
         Set<Modifier> modifierSet;
 
@@ -571,7 +572,7 @@ public class BuildingTest extends FreeColTestCase {
         modifier = modifierSet.iterator().next();
         assertEquals(100f, modifier.getValue());
         assertEquals(ModifierType.PERCENTAGE, modifier.getType());
-        assertEquals(0f, stockadeType.applyModifier(0,
+        assertEquals(0f, stockadeType.applyModifiers(0f, turn,
                 Modifier.MINIMUM_COLONY_SIZE));
 
         modifierSet = fortType.getModifierSet(Modifier.DEFENCE);
@@ -579,7 +580,7 @@ public class BuildingTest extends FreeColTestCase {
         modifier = modifierSet.iterator().next();
         assertEquals(150f, modifier.getValue());
         assertEquals(ModifierType.PERCENTAGE, modifier.getType());
-        assertEquals(0f, stockadeType.applyModifier(0,
+        assertEquals(0f, stockadeType.applyModifiers(0f, turn,
                 Modifier.MINIMUM_COLONY_SIZE));
 
         modifierSet = fortressType.getModifierSet(Modifier.DEFENCE);
@@ -587,7 +588,7 @@ public class BuildingTest extends FreeColTestCase {
         modifier = modifierSet.iterator().next();
         assertEquals(200f, modifier.getValue());
         assertEquals(ModifierType.PERCENTAGE, modifier.getType());
-        assertEquals(0f, stockadeType.applyModifier(0,
+        assertEquals(0f, stockadeType.applyModifiers(0f, turn,
                 Modifier.MINIMUM_COLONY_SIZE));
     }
 

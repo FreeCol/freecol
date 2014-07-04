@@ -854,8 +854,8 @@ public class IndianSettlement extends Settlement {
                 amount = GoodsContainer.CARGO_SIZE;
             }
             if (unit != null) {
-                amount = Math.round(FeatureContainer
-                    .applyModifierSet((float) amount, getGame().getTurn(),
+                amount = (int)Math.round(applyModifiers((float)amount,
+                        getGame().getTurn(),
                         unit.getModifierSet(Modifier.TRADE_VOLUME_PENALTY)));
             }
             if (amount < TRADE_MINIMUM_SIZE) continue;

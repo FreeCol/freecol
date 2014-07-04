@@ -18,6 +18,8 @@
  */
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -244,8 +246,8 @@ public final class FeatureContainer {
      * @param turn An optional applicable <code>Turn</code>.
      * @return A set of modifiers.
      */
-    public Set<Modifier> getModifierSet(String id,
-        FreeColGameObjectType fcgot, Turn turn) {
+    public Set<Modifier> getModifierSet(String id, FreeColGameObjectType fcgot,
+                                        Turn turn) {
         Set<Modifier> result = new HashSet<Modifier>();
         if (!modifiersPresent()) return result;
 
@@ -268,45 +270,23 @@ public final class FeatureContainer {
     }
 
     /**
-     * Applies the modifiers with the given identifier to the given number.
+     * Applies this objects modifiers with the given identifier to the
+     * given number.
      *
-     * @param fc The <code>FeatureContainer</code> to query.
      * @param number The number to modify.
+     * @param turn An optional applicable <code>Turn</code>.
      * @param id The object identifier.
      * @param fcgot An optional <code>FreeColGameObjectType</code> the
      *     modifier applies to.
-     * @param turn An optional applicable <code>Turn</code>.
      * @return The modified number.
      */
-    public static float applyModifier(FeatureContainer fc,
-                                      float number, String id,
-                                      FreeColGameObjectType fcgot, Turn turn) {
-        return (fc == null || !fc.modifiersPresent()) ? number
-            : fc.applyModifier(number, id, fcgot, turn);
+    public final float applyModifiers(float number, Turn turn,
+                                      String id, FreeColGameObjectType fcgot) {
+        return applyModifiers(number, turn, getModifierSet(id, fcgot, turn));
     }
 
     /**
-     * Applies the modifiers with the given identifier to the given number.
-     *
-     * @param number The number to modify.
-     * @param id The object identifier.
-     * @param fcgot An optional <code>FreeColGameObjectType</code> the
-     *     modifier applies to.
-     * @param turn An optional applicable <code>Turn</code>.
-     * @return The modified number.
-     */
-    public float applyModifier(float number, String id,
-                               FreeColGameObjectType fcgot, Turn turn) {
-        return applyModifierSet(number, turn, getModifierSet(id, fcgot, turn));
-    }
-
-    /**
-     * Applies a list of modifiers to the given float value.
-     *
-     * This routine is required for Col1-compatibility throughout the
-     * production code, almost all other code should/does call
-     * applyModifierSet().  The algorithms are quite similar, but different,
-     * which is unsatisfactory, but appears to be necessary.
+     * Applies a collection of modifiers to the given float value.
      *
      * @param number The number to modify.
      * @param turn An optional applicable <code>Turn</code>.
@@ -314,11 +294,12 @@ public final class FeatureContainer {
      * @return The modified number.
      */
     public static float applyModifiers(float number, Turn turn,
-                                       List<Modifier> mods) {
+                                       Collection<Modifier> mods) {
         if (mods == null || mods.isEmpty()) return number;
-        Collections.sort(mods);
+        List<Modifier> modifiers = new ArrayList<Modifier>(mods);
+        Collections.sort(modifiers);
         float result = number;
-        for (Modifier m : mods) {
+        for (Modifier m : modifiers) {
             float value = m.getValue(turn);
             if (value == Modifier.UNKNOWN) return value;
             result = m.apply(result, value);

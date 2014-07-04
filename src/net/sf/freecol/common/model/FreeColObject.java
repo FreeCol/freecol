@@ -582,11 +582,12 @@ public abstract class FreeColObject
      * given number.
      *
      * @param number The number to modify.
+     * @param turn An optional applicable <code>Turn</code>.
      * @param id The object identifier.
      * @return The modified number.
      */
-    public final float applyModifier(float number, String id) {
-        return applyModifier(number, id, null);
+    public final float applyModifiers(float number, Turn turn, String id) {
+        return applyModifiers(number, turn, id, null);
     }
 
     /**
@@ -594,30 +595,28 @@ public abstract class FreeColObject
      * given number.
      *
      * @param number The number to modify.
+     * @param turn An optional applicable <code>Turn</code>.
      * @param id The object identifier.
      * @param fcgot An optional <code>FreeColGameObjectType</code> the
      *     modifier applies to.
      * @return The modified number.
      */
-    public final float applyModifier(float number, String id,
-                                     FreeColGameObjectType fcgot) {
-        return applyModifier(number, id, fcgot, null);
+    public final float applyModifiers(float number, Turn turn,
+                                      String id, FreeColGameObjectType fcgot) {
+        return applyModifiers(number, turn, getModifierSet(id, fcgot, turn));
     }
 
     /**
-     * Applies this objects modifiers with the given identifier to the
-     * given number.
+     * Applies a collection of modifiers to the given number.
      *
      * @param number The number to modify.
-     * @param id The object identifier.
-     * @param fcgot An optional <code>FreeColGameObjectType</code> the
-     *     modifier applies to.
+     * @param turn An optional applicable <code>Turn</code>.
+     * @param mods The <code>Modifier</code>s to apply.
      * @return The modified number.
      */
-    public final float applyModifier(float number, String id,
-                                     FreeColGameObjectType fcgot, Turn turn) {
-        return FeatureContainer.applyModifierSet(number, turn,
-                                                 getModifierSet(id, fcgot, turn));
+    public static final float applyModifiers(float number, Turn turn,
+                                             Collection<Modifier> mods) {
+        return FeatureContainer.applyModifiers(number, turn, mods);
     }
 
     /**

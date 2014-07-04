@@ -63,6 +63,7 @@ import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.TradeRouteStop;
+import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
@@ -400,13 +401,14 @@ public class ServerUnit extends Unit implements ServerModelObject {
         tile.cacheUnseen();//+til
         AbstractGoods deliver = getWorkImprovement().getType().getProduction(tile.getType());
         if (deliver != null) { // Deliver goods if any
+            final Turn turn = getGame().getTurn();
             int amount = deliver.getAmount();
             if (getType().hasAbility(Ability.EXPERT_PIONEER)) {
                 amount *= 2;
             }
             Settlement settlement = tile.getSettlement();
             if (settlement != null && owner.owns(settlement)) {
-                amount = (int)settlement.applyModifier(amount,
+                amount = (int)settlement.applyModifiers(amount, turn,
                     Modifier.TILE_TYPE_CHANGE_PRODUCTION, deliver.getType());
                 settlement.addGoods(deliver.getType(), amount);
             } else {
@@ -416,8 +418,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     Settlement ts = t.getSettlement();
                     if (ts != null && owner.owns(ts)) {
                         adjacent.add(ts);
-                        int modAmount = (int)ts.applyModifier((float)amount,
-                            Modifier.TILE_TYPE_CHANGE_PRODUCTION,
+                        int modAmount = (int)ts.applyModifiers((float)amount,
+                            turn, Modifier.TILE_TYPE_CHANGE_PRODUCTION,
                             deliver.getType());
                         if (modAmount > newAmount) {
                             newAmount = modAmount;

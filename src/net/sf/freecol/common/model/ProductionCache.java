@@ -118,17 +118,17 @@ public class ProductionCache {
         netProduction.incrementCount(bells, amount);
 
         for (Consumer consumer : colony.getConsumers()) {
-            Set<Modifier> modifier = consumer
+            Set<Modifier> modifiers = consumer
                 .getModifierSet(Modifier.CONSUME_ONLY_SURPLUS_PRODUCTION);
             List<AbstractGoods> goods = new ArrayList<AbstractGoods>();
             for (AbstractGoods g : consumer.getConsumedGoods()) {
                 goodsUsed.add(g.getType());
                 AbstractGoods surplus = new AbstractGoods(production.get(g.getType()));
-                if (modifier.isEmpty()) {
+                if (modifiers.isEmpty()) {
                     surplus.setAmount(surplus.getAmount() + getGoodsCount(g.getType()));
                 } else {
-                    surplus.setAmount((int)FeatureContainer.applyModifierSet(surplus.getAmount(),
-                                                                              null, modifier));
+                    surplus.setAmount((int)FeatureContainer
+                        .applyModifiers(surplus.getAmount(), null, modifiers));
                 }
                 goods.add(surplus);
             }

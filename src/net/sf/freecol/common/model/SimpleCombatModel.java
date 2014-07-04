@@ -93,7 +93,7 @@ public class SimpleCombatModel extends CombatModel {
         } else if (combatIsAttackMeasurement(attacker, defender)
             || combatIsAttack(attacker, defender)
             || combatIsSettlementAttack(attacker, defender)) {
-            result = FeatureContainer.applyModifierSet(0,
+            result = FreeColObject.applyModifiers(0,
                 attacker.getGame().getTurn(),
                 getOffensiveModifiers(attacker, defender));
 
@@ -128,7 +128,7 @@ public class SimpleCombatModel extends CombatModel {
             || combatIsAttack(attacker, defender)
             || combatIsSettlementAttack(attacker, defender)
             || combatIsBombard(attacker, defender)) {
-            result = FeatureContainer.applyModifierSet(0,
+            result = FeatureContainer.applyModifiers(0f,
                 defender.getGame().getTurn(),
                 getDefensiveModifiers(attacker, defender));
 

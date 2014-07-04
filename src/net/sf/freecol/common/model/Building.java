@@ -238,6 +238,8 @@ public class Building extends WorkLocation
                                                     List<AbstractGoods> outputs) {
         ProductionInfo result = new ProductionInfo();
         if (!hasOutputs()) return result;
+        final Specification spec = getSpecification();
+        final Turn turn = getGame().getTurn();
 
         // first, calculate the maximum production
         double minimumRatio = Double.MAX_VALUE;
@@ -249,11 +251,11 @@ public class Building extends WorkLocation
                 if (available >= outputType.getBreedingNumber()) {
                     // we need at least these many horses/animals to breed
                     double newRatio = 0.0;
-                    int divisor = (int)getType()
-                        .applyModifier(0f, Modifier.BREEDING_DIVISOR);
+                    int divisor = (int)getType().applyModifiers(0f, turn,
+                        Modifier.BREEDING_DIVISOR);
                     if (divisor > 0) {
-                        int factor = (int)getType()
-                            .applyModifier(0f, Modifier.BREEDING_FACTOR);
+                        int factor = (int)getType().applyModifiers(0f, turn,
+                            Modifier.BREEDING_FACTOR);
                         int maximumOutput = ((available - 1) / divisor + 1)
                             * factor;
                         newRatio = (double)maximumOutput / output.getAmount();
@@ -265,7 +267,6 @@ public class Building extends WorkLocation
                 }
             }
         } else {
-            final Turn turn = getGame().getTurn();
             for (AbstractGoods output : getOutputs()) {
                 GoodsType goodsType = output.getType();
                 float production = 0f;
@@ -274,8 +275,8 @@ public class Building extends WorkLocation
                 }
                 // Unattended production always applies for buildings!
                 production += getBaseProduction(null, goodsType, null);
-                production = FeatureContainer.applyModifiers(production,
-                    turn, getProductionModifiers(goodsType, null));
+                production = applyModifiers(production, turn,
+                    getProductionModifiers(goodsType, null));
                 // Beware!  If we ever unify this code with ColonyTile,
                 // ColonyTiles have outputs with zero amount.
                 double newRatio = production / output.getAmount();
@@ -294,7 +295,7 @@ public class Building extends WorkLocation
             // certain amount of goods even when no input is available
             if (available < required
                 && hasAbility(Ability.EXPERTS_USE_CONNECTIONS)
-                && getSpecification().getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS)) {
+                && spec.getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS)) {
                 int minimumGoodsInput = 0;
                 for (Unit unit: getUnitList()) {
                     if (unit.getType() == getExpertUnitType()) {

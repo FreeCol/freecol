@@ -1509,14 +1509,15 @@ public class Player extends FreeColGameObject implements Nameable {
         if (!isColonial()) return;
 
         final Specification spec = getSpecification();
+        final Turn turn = getGame().getTurn();
         final int current = immigrationRequired;
         int base = spec.getInteger(GameOptions.CROSSES_INCREMENT);
         // If the religious unrest bonus is present, immigrationRequired
         // has already been reduced.  We want to apply the bonus to the
         // sum of the *unreduced* immigration target and the increment.
         int unreduced = (int)Math.round(current
-            / applyModifier(1.0f, Modifier.RELIGIOUS_UNREST_BONUS));
-        immigrationRequired = (int)applyModifier(unreduced + base,
+            / applyModifiers(1f, turn, Modifier.RELIGIOUS_UNREST_BONUS));
+        immigrationRequired = (int)applyModifiers(unreduced + base, turn,
             Modifier.RELIGIOUS_UNREST_BONUS);;
         logger.finest("Immigration for " + getId() + " updated " + current
             + " -> " + immigrationRequired);
@@ -1555,8 +1556,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The effective amount of liberty points.
      */
     public int getEffectiveLiberty() {
-        return (int)applyModifier((float)getLiberty(), Modifier.LIBERTY,
-                                  null, getGame().getTurn());
+        return (int)applyModifiers((float)getLiberty(), getGame().getTurn(),
+                                   Modifier.LIBERTY);
     }
 
     /**
@@ -1616,8 +1617,8 @@ public class Player extends FreeColGameObject implements Nameable {
                 nextTurn += colony.getTotalProductionOf(libertyGoods);
             }
         }
-        return (int)applyModifier((float)nextTurn, Modifier.LIBERTY,
-                                  null, getGame().getTurn());
+        return (int)applyModifiers((float)nextTurn, getGame().getTurn(),
+                                   Modifier.LIBERTY);
     }
 
     /**
@@ -3143,8 +3144,8 @@ public class Player extends FreeColGameObject implements Nameable {
         }
         price *= spec.getInteger(GameOptions.LAND_PRICE_FACTOR);
         price += 100;
-        return (int)applyModifier(price, Modifier.LAND_PAYMENT_MODIFIER,
-                                  null, getGame().getTurn());
+        return (int)applyModifiers(price, getGame().getTurn(),
+                                   Modifier.LAND_PAYMENT_MODIFIER);
     }
 
 

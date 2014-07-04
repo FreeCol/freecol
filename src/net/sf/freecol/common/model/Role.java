@@ -280,8 +280,7 @@ public class Role extends BuildableType {
      * @return The offense value.
      */
     public float getOffence() {
-        return getFeatureContainer()
-            .applyModifier(1, Modifier.OFFENCE, null, null);
+        return applyModifiers(0f, null, Modifier.OFFENCE);
     }
 
     /**
@@ -299,8 +298,7 @@ public class Role extends BuildableType {
      * @return The defence value.
      */
     private float getDefence() {
-        return getFeatureContainer()
-            .applyModifier(1, Modifier.DEFENCE, null, null);
+        return applyModifiers(0f, null, Modifier.DEFENCE);
     }
 
     /**

@@ -314,7 +314,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         // Set initial immigration target
         int i0 = spec.getInteger(GameOptions.INITIAL_IMMIGRATION);
-        immigrationRequired = (int)applyModifier((float)i0,
+        immigrationRequired = (int)applyModifiers((float)i0, null,
             Modifier.RELIGIOUS_UNREST_BONUS);
 
         // Add initial gold
@@ -1081,9 +1081,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         if (container != null) container.addGoods(type, amount);
         market.modifyIncomeBeforeTaxes(type, -price);
         market.modifyIncomeAfterTaxes(type, -price);
-        int marketAmount = (int)applyModifier((float)amount,
-                                              Modifier.TRADE_BONUS,
-                                              type, getGame().getTurn());
+        int marketAmount = (int)applyModifiers((float)amount,
+            getGame().getTurn(), Modifier.TRADE_BONUS, type);
         market.addGoodsToMarket(type, -marketAmount);
         return marketAmount;
     }
@@ -1111,9 +1110,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         if (container != null) container.addGoods(type, -amount);
         market.modifyIncomeBeforeTaxes(type, incomeBeforeTaxes);
         market.modifyIncomeAfterTaxes(type, incomeAfterTaxes);
-        int marketAmount = (int)applyModifier((float)amount,
-                                              Modifier.TRADE_BONUS,
-                                              type, getGame().getTurn());
+        int marketAmount = (int)applyModifiers((float)amount,
+            getGame().getTurn(), Modifier.TRADE_BONUS, type);
         market.addGoodsToMarket(type, marketAmount);
         return marketAmount;
     }
@@ -1786,9 +1784,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     Player player = entry.getKey();
                     int change = entry.getValue().intValue();
                     if (change != 0) {
-                        change = (int)player.applyModifier((float)change,
-                            Modifier.NATIVE_ALARM_MODIFIER,
-                            null, game.getTurn());
+                        change = (int)player.applyModifiers((float)change,
+                            game.getTurn(), Modifier.NATIVE_ALARM_MODIFIER);
                         ServerIndianSettlement sis
                             = (ServerIndianSettlement)settlement;
                         sis.csModifyAlarm((ServerPlayer)player, change,

@@ -297,8 +297,8 @@ public abstract class WorkLocation extends UnitLocation
             int amount = getBaseProduction(getProductionType(), goodsType,
                                            unitType);
             if (amount > 0) {
-                amount = (int)FeatureContainer.applyModifiers(amount,
-                    turn, getProductionModifiers(goodsType, unitType));
+                amount = (int)applyModifiers(amount, turn,
+                    getProductionModifiers(goodsType, unitType));
                 if (bestAmount < amount) bestAmount = amount;
             }
         }
@@ -367,8 +367,7 @@ public abstract class WorkLocation extends UnitLocation
         }
 
         int amount = getBaseProduction(null, goodsType, unitType);
-        amount = (int)FeatureContainer.applyModifiers(amount,
-            getGame().getTurn(),
+        amount = (int)applyModifiers(amount, getGame().getTurn(),
             getProductionModifiers(goodsType, unitType));
         return (amount < 0) ? 0 : amount;
     }

@@ -2115,11 +2115,10 @@ public class EuropeanAIPlayer extends AIPlayer {
         int n = turn.getNumber() - peaceTurn;
         float prob = (float)Math.pow(peaceProb, n);
         // Apply Franklin's modifier
-        prob = FeatureContainer.applyModifierSet(prob, turn,
-            p.getModifierSet(Modifier.PEACE_TREATY));
+        prob = p.applyModifiers(prob, turn, Modifier.PEACE_TREATY);
         return prob > 0.0f
-            && Utils.randomInt(logger, "Peace holds?", 
-                               getAIRandom(), 100) < (int)(100.0f * prob);
+            && (Utils.randomInt(logger, "Peace holds?",  getAIRandom(), 100)
+                < (int)(100.0f * prob));
     }
 
     /**
@@ -2584,7 +2583,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             if (is.hasMissionary(buyer)
                 && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
                 Unit u = is.getMissionary();
-                price = (int)FeatureContainer.applyModifierSet(price,
+                price = (int)FeatureContainer.applyModifiers(price,
                     getGame().getTurn(), u.getMissionaryTradeModifiers(false));
             }
             sessionRegister.put(goldKey, new Integer(price));

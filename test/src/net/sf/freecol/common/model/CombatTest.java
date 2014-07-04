@@ -499,6 +499,7 @@ public class CombatTest extends FreeColTestCase {
         Unit colonial = new ServerUnit(game, tile1, french, colonialRegularType,
                                        dragoonRole);
 
+System.err.println("TR");
         // colonist + regular + cavalry * attack bonus
         float offence = (0 + 4 + 3) * 1.5f;
         assertEquals(offence, combatModel.getOffencePower(regular, colonial));

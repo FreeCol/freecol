@@ -2192,9 +2192,9 @@ public class Unit extends GoodsLocation
      *     each turn.
      */
     public int getInitialMovesLeft() {
-        final Turn turn = getGame().getTurn();
-        return (int)FeatureContainer.applyModifierSet(unitType.getMovement(),
-            turn, getModifierSet(Modifier.MOVEMENT_BONUS, unitType, turn));
+        Turn turn = getGame().getTurn();
+        return (int)applyModifiers(unitType.getMovement(), turn,
+                                   Modifier.MOVEMENT_BONUS, unitType);
     }
 
     /**
@@ -2225,9 +2225,9 @@ public class Unit extends GoodsLocation
      */
     public int getSailTurns() {
         float base = getSpecification().getInteger(GameOptions.TURNS_TO_SAIL);
-        return (int)getOwner().applyModifier(base,
-                                             Modifier.SAIL_HIGH_SEAS,
-                                             unitType, getGame().getTurn());
+        return (int)getOwner().applyModifiers(base, getGame().getTurn(),
+                                              Modifier.SAIL_HIGH_SEAS,
+                                              unitType);
     }
 
     /**
@@ -2710,23 +2710,22 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Gets the line of sight of this <code>Unit</code>. That is the distance
-     * this <code>Unit</code> can spot new tiles, enemy unit e.t.c.
+     * Gets the line of sight of this <code>Unit</code>.  That is the
+     * distance this <code>Unit</code> can sight new tiles.
      *
      * @return The line of sight of this <code>Unit</code>.
      */
     public int getLineOfSight() {
         final Turn turn = getGame().getTurn();
         Set<Modifier> result = new HashSet<Modifier>();
-        result.addAll(getModifierSet(Modifier.LINE_OF_SIGHT_BONUS,
-                                     unitType, turn));
+        result.addAll(this.getModifierSet(Modifier.LINE_OF_SIGHT_BONUS,
+                                          unitType, turn));
         if (hasTile() && getTile().isExplored()) {
             result.addAll(getTile().getType()
                 .getModifierSet(Modifier.LINE_OF_SIGHT_BONUS, unitType, turn));
         }
-        return (int)FeatureContainer
-            .applyModifierSet((float)unitType.getLineOfSight(),
-                              turn, result);
+        float base = unitType.getLineOfSight();
+        return (int)applyModifiers(base, turn, result);
     }
 
 
@@ -2962,9 +2961,8 @@ public class Unit extends GoodsLocation
     public float getConvertProbability() {
         final Specification spec = getSpecification();
         int opt = spec.getInteger(GameOptions.NATIVE_CONVERT_PROBABILITY);
-        return 0.01f * FeatureContainer.applyModifierSet(opt,
-            getGame().getTurn(),
-            getModifierSet(Modifier.NATIVE_CONVERT_BONUS));
+        return 0.01f * applyModifiers(opt, getGame().getTurn(),
+                                      Modifier.NATIVE_CONVERT_BONUS);
     }
 
     /**
@@ -3042,9 +3040,8 @@ public class Unit extends GoodsLocation
             float fee = (getSpecification()
                 .getInteger(GameOptions.TREASURE_TRANSPORT_FEE)
                 * getTreasureAmount()) / 100;
-            return (int)getOwner().applyModifier(fee,
-                Modifier.TREASURE_TRANSPORT_FEE,
-                unitType, getGame().getTurn());
+            return (int)getOwner().applyModifiers(fee, getGame().getTurn(),
+                Modifier.TREASURE_TRANSPORT_FEE, unitType);
         }
         return 0;
     }

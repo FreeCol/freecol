@@ -834,7 +834,7 @@ public class NativeAIPlayer extends AIPlayer {
             if (unit.isNaval()) {
                 modifiers.addAll(getShipTradePenalties(false));
             }
-            price = (int) FeatureContainer.applyModifierSet((float)price,
+            price = (int)FeatureContainer.applyModifiers((float)price,
                 getGame().getTurn(), modifiers);
             sessionRegister.put(goldKey, new Integer(price));
             return price;
@@ -901,7 +901,7 @@ public class NativeAIPlayer extends AIPlayer {
             if (unit.isNaval()) {
                 modifiers.addAll(getShipTradePenalties(true));
             }
-            price = (int) FeatureContainer.applyModifierSet((float)price,
+            price = (int)FeatureContainer.applyModifiers((float)price,
                 getGame().getTurn(), modifiers);
             if (price <= 0) return 0;
             sessionRegister.put(goldKey, new Integer(price));

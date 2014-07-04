@@ -162,8 +162,8 @@ public class LostCityRumour extends TileItem {
         // Expert scouts have a beneficial modifier that works on both
         // percentages
         if (unit != null) {
-            float mod = unit.applyModifier(1.0f,
-                Modifier.EXPLORE_LOST_CITY_RUMOUR);
+            float mod = unit.applyModifiers(1.0f, getGame().getTurn(),
+                                            Modifier.EXPLORE_LOST_CITY_RUMOUR);
             percentBad = (int)Math.round(percentBad * mod);
             percentGood = (int)Math.round(percentGood * mod);
         }

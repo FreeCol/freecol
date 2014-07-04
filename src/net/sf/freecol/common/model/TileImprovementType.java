@@ -427,7 +427,8 @@ public final class TileImprovementType extends FreeColGameObjectType {
             if (tt == null) { // simple bonus
                 int production = tile.getPotentialProduction(goodsType, colonistType);
                 if (production > 0) {
-                    float chg = applyModifier(production, goodsType.getId());
+                    float chg = applyModifiers(production, null,
+                                               goodsType.getId());
                     value = (int)(chg - production);
                 }
             } else { // tile type change

@@ -135,7 +135,7 @@ public class PreCombatDialog extends FreeColConfirmDialog {
 
         Font bigFont = getFont().deriveFont(Font.BOLD, 20f);
         float offenceResult
-            = FeatureContainer.applyModifierSet(0, turn, attackModifiers);
+            = FeatureContainer.applyModifiers(0, turn, attackModifiers);
         JLabel finalOffenceLabel
             = new JLabel(Messages.message("model.source.finalResult.name"));
         finalOffenceLabel.setFont(bigFont);
@@ -149,7 +149,7 @@ public class PreCombatDialog extends FreeColConfirmDialog {
         panel.add(finalOffenceResult);
 
         float defenceResult
-            = FeatureContainer.applyModifierSet(0, turn, defenceModifiers);
+            = FeatureContainer.applyModifiers(0, turn, defenceModifiers);
         JLabel finalDefenceLabel
             = new JLabel(Messages.message("model.source.finalResult.name"));
         finalDefenceLabel.setFont(bigFont);

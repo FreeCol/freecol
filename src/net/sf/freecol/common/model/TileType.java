@@ -384,9 +384,9 @@ public final class TileType extends FreeColGameObjectType {
     public int getPotentialProduction(GoodsType goodsType,
                                       UnitType unitType) {
         if (goodsType == null) return 0;
-        int amount = (int)applyModifier(getBaseProduction(null, goodsType,
-                                                          unitType),
-                                        goodsType.getId(), unitType);
+        int base = getBaseProduction(null, goodsType, unitType);
+        int amount = (int)applyModifiers((float)base, null, goodsType.getId(),
+                                         unitType);
         return (amount < 0) ? 0 : amount;
     }
 

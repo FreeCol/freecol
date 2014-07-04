@@ -206,8 +206,7 @@ public class Resource extends TileItem {
     public int applyBonus(GoodsType goodsType, UnitType unitType,
                           int potential) {
         Set<Modifier> bonus = type.getModifierSet(goodsType.getId(), unitType);
-        int amount = (int)FeatureContainer.applyModifierSet(potential, null,
-                                                            bonus) - potential;
+        int amount = (int)applyModifiers(potential, null, bonus) - potential;
         return potential
             + ((quantity == UNLIMITED || quantity > amount) ? amount
                 : quantity);
@@ -220,8 +219,7 @@ public class Resource extends TileItem {
         if (goodsType == null) return false;
         // The presence of a resource can indeed give a tile the
         // ability to produce a goods type.
-        return (int)FeatureContainer.applyModifiers(0f,
-            getGame().getTurn(),
+        return (int)applyModifiers(0f, getGame().getTurn(),
             getProductionModifiers(goodsType, unitType, true)) > 0;
     }
 
