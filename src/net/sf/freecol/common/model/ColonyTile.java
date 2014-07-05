@@ -326,7 +326,7 @@ public class ColonyTile extends WorkLocation {
     public List<Modifier> getProductionModifiers(GoodsType goodsType,
                                                  UnitType unitType) {
         if (!canProduce(goodsType, unitType)) {
-            return Collections.emptyList();
+            return Collections.<Modifier>emptyList();
         }
 
         final Tile workTile = getWorkTile();
@@ -362,11 +362,10 @@ public class ColonyTile extends WorkLocation {
      * {@inheritDoc}
      */
     public List<ProductionType> getAvailableProductionTypes(boolean unattended) {
-        if (workTile == null || workTile.getType() == null
-            || unattended != isColonyCenterTile()) {
-            return Collections.emptyList();
-        }
-        return workTile.getType().getAvailableProductionTypes(unattended);
+        return (workTile == null || workTile.getType() == null
+            || unattended != isColonyCenterTile())
+            ? Collections.<ProductionType>emptyList()
+            : workTile.getType().getAvailableProductionTypes(unattended);
     }
 
     /**

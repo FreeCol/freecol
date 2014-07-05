@@ -148,8 +148,8 @@ public class StringTemplate extends FreeColObject {
      * @return A list of keys.
      */
     public final List<String> getKeys() {
-        if (keys == null) return Collections.emptyList();
-        return keys;
+        return (keys == null) ? Collections.<String>emptyList()
+            : keys;
     }
 
     /**
@@ -168,8 +168,8 @@ public class StringTemplate extends FreeColObject {
      * @return A list of replacements.
      */
     public final List<StringTemplate> getReplacements() {
-        if (replacements == null) return Collections.emptyList();
-        return replacements;
+        return (replacements == null) ? Collections.<StringTemplate>emptyList()
+            : replacements;
     }
     
     /**

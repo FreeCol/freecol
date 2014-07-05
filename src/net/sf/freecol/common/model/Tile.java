@@ -599,8 +599,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return A list of all the <code>TileImprovements</code>.
      */
     public List<TileImprovement> getTileImprovements() {
-        if (tileItemContainer == null) return Collections.emptyList();
-        return tileItemContainer.getImprovements();
+        return (tileItemContainer == null)
+            ? Collections.<TileImprovement>emptyList()
+            : tileItemContainer.getImprovements();
     }
 
     /**
@@ -609,8 +610,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return A list of all completed <code>TileImprovements</code>.
      */
     public List<TileImprovement> getCompletedTileImprovements() {
-        if (tileItemContainer == null) return Collections.emptyList();
-        return tileItemContainer.getCompletedImprovements();
+        return (tileItemContainer == null)
+            ? Collections.<TileImprovement>emptyList()
+            : tileItemContainer.getCompletedImprovements();
     }
 
     /**
@@ -1408,7 +1410,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public List<Modifier> getProductionModifiers(GoodsType goodsType,
                                                  UnitType unitType) {
         if (!canProduce(goodsType, unitType)) {
-            return Collections.emptyList();
+            return Collections.<Modifier>emptyList();
         }
 
         List<Modifier> result = new ArrayList<Modifier>();

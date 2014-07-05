@@ -1153,7 +1153,9 @@ public class Colony extends Settlement implements Nameable {
                 }
             }
         }
-        if (assumeBuilt == null) assumeBuilt = Collections.emptyList();
+        if (assumeBuilt == null) {
+            assumeBuilt = Collections.<BuildableType>emptyList();
+        }
         if (buildableType instanceof BuildingType) {
             BuildingType newBuildingType = (BuildingType) buildableType;
             Building colonyBuilding = this.getBuilding(newBuildingType);

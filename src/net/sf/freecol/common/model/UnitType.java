@@ -383,8 +383,8 @@ public final class UnitType extends BuildableType implements Consumer {
      * @return The list of type changes.
      */
     public List<UnitTypeChange> getTypeChanges() {
-        if (typeChanges == null) return Collections.emptyList();
-        return typeChanges;
+        return (typeChanges == null) ? Collections.<UnitTypeChange>emptyList()
+            : typeChanges;
     }
 
     /**

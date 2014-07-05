@@ -99,8 +99,8 @@ public class IndianNationType extends NationType {
      * @return A list of regions identifiers.
      */
     public List<String> getRegionNames() {
-        if (regions == null) return Collections.emptyList();
-        return regions;
+        return (regions == null) ? Collections.<String>emptyList()
+            : regions;
     }
 
     /**
@@ -154,8 +154,9 @@ public class IndianNationType extends NationType {
      * @return A list of national skills.
      */
     public List<RandomChoice<UnitType>> getSkills() {
-        if (skills == null) return Collections.emptyList();
-        return skills;
+        return (skills == null)
+            ? Collections.<RandomChoice<UnitType>>emptyList()
+            : skills;
     }
 
     /**

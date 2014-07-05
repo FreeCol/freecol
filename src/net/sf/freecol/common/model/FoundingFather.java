@@ -141,8 +141,8 @@ public class FoundingFather extends FreeColGameObjectType {
      * @return A list of <code>Event</code>s.
      */
     public final List<Event> getEvents() {
-        if (events == null) return Collections.emptyList();
-        return events;
+        return (events == null) ? Collections.<Event>emptyList()
+            : events;
     }
 
     /**
@@ -172,8 +172,8 @@ public class FoundingFather extends FreeColGameObjectType {
      * @return A list of <code>Scope</code>s.
      */
     public final List<Scope> getScopes() {
-        if (scopes == null) return Collections.emptyList();
-        return scopes;
+        return (scopes == null) ? Collections.<Scope>emptyList()
+            : scopes;
     }
 
     /**
@@ -203,8 +203,8 @@ public class FoundingFather extends FreeColGameObjectType {
      * @return A map of old to new <code>UnitType</code>s.
      */
     public final Map<UnitType, UnitType> getUpgrades() {
-        if (upgrades == null) return Collections.emptyMap();
-        return upgrades;
+        return (upgrades == null) ? Collections.<UnitType, UnitType>emptyMap()
+            : upgrades;
     }
 
     /**
@@ -237,8 +237,8 @@ public class FoundingFather extends FreeColGameObjectType {
      * @return A list of <code>AbstractUnit</code>s.
      */
     public final List<AbstractUnit> getUnits() {
-        if (units == null) return Collections.emptyList();
-        return units;
+        return (units == null) ? Collections.<AbstractUnit>emptyList()
+            : units;
     }
 
     /**

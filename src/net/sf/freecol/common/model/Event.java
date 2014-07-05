@@ -93,8 +93,8 @@ public class Event extends FreeColGameObjectType {
      * @return A list of limits.
      */
     public final Collection<Limit> getLimits() {
-        if (limits == null) return Collections.emptyList();
-        return limits.values();
+        return (limits == null) ? Collections.<Limit>emptyList()
+            : limits.values();
     }
 
     /**

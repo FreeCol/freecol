@@ -492,7 +492,7 @@ public class FreeColXMLReader extends StreamReaderDelegate {
         expectTag(tag);
 
         final int length = getAttribute(FreeColObject.ARRAY_SIZE_TAG, -1);
-        if (length < 0) return Collections.emptyList();
+        if (length < 0) return Collections.<T>emptyList();
 
         List<T> list = new ArrayList<T>(length);
         for (int x = 0; x < length; x++) {
@@ -537,7 +537,7 @@ public class FreeColXMLReader extends StreamReaderDelegate {
         expectTag(tag);
 
         final int length = getAttribute(FreeColObject.ARRAY_SIZE_TAG, -1);
-        if (length < 0) return Collections.emptyList();
+        if (length < 0) return Collections.<T>emptyList();
 
         List<T> list = new ArrayList<T>(length);
         for (int x = 0; x < length; x++) {

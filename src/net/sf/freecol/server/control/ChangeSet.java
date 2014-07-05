@@ -284,7 +284,7 @@ public class ChangeSet {
          *     empty list if there are none, which is usually the case.
          */
         public List<Change> consequences(ServerPlayer serverPlayer) {
-            return Collections.emptyList();
+            return Collections.<Change>emptyList();
         }
 
         /**
@@ -645,7 +645,7 @@ public class ChangeSet {
                                              unit.getLocation(), units));
                 return changes;
             }
-            return Collections.emptyList();
+            return Collections.<Change>emptyList();
         }
 
         /**

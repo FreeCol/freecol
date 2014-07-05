@@ -2294,9 +2294,8 @@ public final class InGameController implements NetworkConstants {
      * @return a <code>List</code> value
      */
     public List<AbstractUnit> getREFUnits() {
-        if (!requireOurTurn()) return Collections.emptyList();
-
-        return askServer().getREFUnits();
+        return (!requireOurTurn()) ? Collections.<AbstractUnit>emptyList()
+            : askServer().getREFUnits();
     }
 
     /**

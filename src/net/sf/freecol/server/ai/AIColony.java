@@ -1342,8 +1342,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * @return A list of planned <code>BuildableType</code>.
      */
     public List<BuildableType> getPlannedBuildableTypes() {
-        if (colonyPlan == null) return Collections.emptyList();
-        return colonyPlan.getBuildableTypes();
+        return (colonyPlan == null) ? Collections.<BuildableType>emptyList()
+            : colonyPlan.getBuildableTypes();
     }
 
     /**

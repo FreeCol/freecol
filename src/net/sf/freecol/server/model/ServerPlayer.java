@@ -876,11 +876,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @see #hasExplored
      */
     public List<Tile> exploreForUnit(Unit unit) {
-        if (getGame() == null || getGame().getMap() == null || unit == null
-            || !(unit.getLocation() instanceof Tile)) return Collections.emptyList();
-
-        return exploreTiles(unit.getTile().getSurroundingTiles(0,
-                unit.getLineOfSight()));
+        return (getGame() == null || getGame().getMap() == null || unit == null
+            || !(unit.getLocation() instanceof Tile)) 
+            ? Collections.<Tile>emptyList()
+            : exploreTiles(unit.getTile().getSurroundingTiles(0,
+                    unit.getLineOfSight()));
     }
 
     /**

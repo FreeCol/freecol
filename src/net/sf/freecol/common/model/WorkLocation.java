@@ -43,7 +43,7 @@ public abstract class WorkLocation extends UnitLocation
     implements Ownable {
 
     public static final List<AbstractGoods> EMPTY_LIST
-        = Collections.emptyList();
+        = Collections.<AbstractGoods>emptyList();
 
     /** The colony that contains this work location. */
     protected Colony colony;
@@ -133,7 +133,7 @@ public abstract class WorkLocation extends UnitLocation
      * @return A list of <code>AbstractGoods</code> consumed.
      */
     public List<AbstractGoods> getInputs() {
-        return (productionType == null) ? EMPTY_LIST
+        return (productionType == null) ? Collections.<AbstractGoods>emptyList()
             : productionType.getInputs();
     }
 
@@ -214,8 +214,8 @@ public abstract class WorkLocation extends UnitLocation
      */
     public List<AbstractGoods> getProduction() {
         ProductionInfo info = getProductionInfo();
-        if (info == null) return Collections.emptyList();
-        return info.getProduction();
+        return (info == null) ? Collections.<AbstractGoods>emptyList()
+            : info.getProduction();
     }
 
     /**

@@ -431,7 +431,7 @@ public abstract class FreeColObject
                                      FreeColGameObjectType fcgot,
                                      Turn turn) {
         FeatureContainer fc = getFeatureContainer();
-        return (fc == null) ? new HashSet<Ability>()
+        return (fc == null) ? Collections.<Ability>emptySet()
             : fc.getAbilities(id, fcgot, turn);
     }
 

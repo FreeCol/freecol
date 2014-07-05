@@ -306,7 +306,7 @@ public class TileImprovement extends TileItem implements Named {
      */
     public Map<Direction, Integer> getConnections() {
         List<Direction> dirns = getConnectionDirections();
-        if (dirns == null) return Collections.emptyMap();
+        if (dirns == null) return Collections.<Direction, Integer>emptyMap();
         Map<Direction, Integer> result
             = new EnumMap<Direction, Integer>(Direction.class);
         for (Direction d : dirns) {
@@ -500,7 +500,7 @@ public class TileImprovement extends TileItem implements Named {
                 return result;
             }
         }
-        return Collections.emptyList();
+        return Collections.<Modifier>emptyList();
     }
 
     /**

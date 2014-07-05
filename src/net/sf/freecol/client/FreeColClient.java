@@ -702,9 +702,9 @@ public final class FreeColClient {
      * @return The players colonies sorted according to the chosen comparator.
      */
     public List<Colony> getMySortedColonies() {
-        if (clientOptions == null
-            || player == null) return Collections.emptyList();
-        return clientOptions.getSortedColonies(player);
+        return (clientOptions == null || player == null)
+            ? Collections.<Colony>emptyList()
+            : clientOptions.getSortedColonies(player);
     }
 
     /**

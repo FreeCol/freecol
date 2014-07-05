@@ -502,8 +502,8 @@ public class Building extends WorkLocation
      * {@inheritDoc}
      */
     public List<ProductionType> getAvailableProductionTypes(boolean unattended) {
-        if (buildingType == null) return Collections.emptyList();
-        return getType().getAvailableProductionTypes(unattended);
+        return (buildingType == null) ? Collections.<ProductionType>emptyList()
+            : getType().getAvailableProductionTypes(unattended);
     }
 
 

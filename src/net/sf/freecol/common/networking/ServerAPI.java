@@ -895,9 +895,8 @@ public abstract class ServerAPI {
             = new GoodsForSaleMessage(unit, settlement, null);
         Element reply = askExpecting(message,
             GoodsForSaleMessage.getXMLElementTagName(), null);
-        if (reply == null) return Collections.emptyList();
-
-        return new GoodsForSaleMessage(game, reply).getGoods();
+        return (reply == null) ? Collections.<Goods>emptyList()
+            : new GoodsForSaleMessage(game, reply).getGoods();
     }
 
     /**
@@ -908,7 +907,7 @@ public abstract class ServerAPI {
     public List<HighScore> getHighScores() {
         Element reply = askExpecting(new TrivialMessage("getHighScores"),
             null, null);
-        if (reply == null) return Collections.emptyList();
+        if (reply == null) return Collections.<HighScore>emptyList();
 
         List<HighScore> result = new ArrayList<HighScore>();
         NodeList childElements = reply.getChildNodes();
@@ -951,7 +950,7 @@ public abstract class ServerAPI {
     public List<AbstractUnit> getREFUnits() {
         Element reply = askExpecting(new TrivialMessage("getREFUnits"),
             null, null);
-        if (reply == null) return Collections.emptyList();
+        if (reply == null) return Collections.<AbstractUnit>emptyList();
 
         List<AbstractUnit> result = new ArrayList<AbstractUnit>();
         NodeList childElements = reply.getChildNodes();

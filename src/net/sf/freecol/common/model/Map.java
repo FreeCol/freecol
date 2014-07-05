@@ -2361,7 +2361,7 @@ public class Map extends FreeColGameObject implements Location {
      * {@inheritDoc}
      */
     public List<Unit> getUnitList() {
-        return Collections.emptyList();
+        return Collections.<Unit>emptyList();
     }
 
     /**

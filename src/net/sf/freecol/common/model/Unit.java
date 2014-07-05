@@ -2734,8 +2734,8 @@ public class Unit extends GoodsLocation
      * @return A list of <code>Goods</code>.
      */
     public List<Goods> getGoodsList() {
-        if (getGoodsContainer() == null) return Collections.emptyList();
-        return getGoodsContainer().getGoods();
+        return (getGoodsContainer() == null) ? Collections.<Goods>emptyList()
+            : getGoodsContainer().getGoods();
     }
 
     /**
@@ -2744,8 +2744,8 @@ public class Unit extends GoodsLocation
      * @return A compact list of <code>Goods</code>.
      */
     public List<Goods> getCompactGoodsList() {
-        if (getGoodsContainer() == null) return Collections.emptyList();
-        return getGoodsContainer().getCompactGoods();
+        return (getGoodsContainer() == null) ? Collections.<Goods>emptyList()
+            : getGoodsContainer().getCompactGoods();
     }
 
     /**

@@ -90,8 +90,9 @@ public class Disaster extends FreeColGameObjectType {
      * @return A list of random <code>Effect</code> choices.
      */
     public final List<RandomChoice<Effect>> getEffects() {
-        if (effects == null) return Collections.emptyList();
-        return effects;
+        return (effects == null)
+            ? Collections.<RandomChoice<Effect>>emptyList()
+            : effects;
     }
 
     /**

@@ -66,8 +66,9 @@ public abstract class NationType extends FreeColGameObjectType {
      * @return A list of <code>SettlementType</code>s.
      */
     public final List<SettlementType> getSettlementTypes() {
-        if (settlementTypes == null) return Collections.emptyList();
-        return settlementTypes;
+        return (settlementTypes == null)
+            ? Collections.<SettlementType>emptyList()
+            : settlementTypes;
     }
 
     /**

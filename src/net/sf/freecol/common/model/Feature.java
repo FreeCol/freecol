@@ -148,8 +148,8 @@ public abstract class Feature extends FreeColObject {
      * @return A list of <code>Scope</code>s.
      */
     public final List<Scope> getScopes() {
-        if (scopes == null) return Collections.emptyList();
-        return scopes;
+        return (scopes == null) ? Collections.<Scope>emptyList()
+            : scopes;
     }
 
     /**

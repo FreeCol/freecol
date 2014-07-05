@@ -100,8 +100,8 @@ public class PlayerExploredTile extends FreeColGameObject {
      * @return A list of <code>TileItems</code>.
      */
     private List<TileItem> getTileItems() {
-        if (tileItems == null) return Collections.emptyList();
-        return tileItems;
+        return (tileItems == null) ? Collections.<TileItem>emptyList()
+            : tileItems;
     }
 
     /**

@@ -221,8 +221,9 @@ public final class TileType extends FreeColGameObjectType {
      * @return A weighted list of resource types.
      */
     public List<RandomChoice<ResourceType>> getWeightedResources() {
-        if (resourceTypes == null) return Collections.emptyList();
-        return resourceTypes;
+        return (resourceTypes == null)
+            ? Collections.<RandomChoice<ResourceType>>emptyList()
+            : resourceTypes;
     }
 
     /**
@@ -270,8 +271,9 @@ public final class TileType extends FreeColGameObjectType {
      * @return a <code>List<RandomChoice<Disaster>></code> value
      */
     public List<RandomChoice<Disaster>> getDisasters() {
-        if (disasters == null) return Collections.emptyList();
-        return disasters;
+        return (disasters == null)
+            ? Collections.<RandomChoice<Disaster>>emptyList()
+            : disasters;
     }
 
     /**

@@ -228,10 +228,9 @@ public class Resource extends TileItem {
      */
     public List<Modifier> getProductionModifiers(GoodsType goodsType,
                                                  UnitType unitType) {
-        // Resource modifiers apply to base production
-        if (goodsType == null) return Collections.emptyList();
-        return new ArrayList<Modifier>(getType()
-            .getModifiers(goodsType.getId(), unitType));
+        return (goodsType == null) ? Collections.<Modifier>emptyList()
+            : new ArrayList<Modifier>(getType()
+                .getModifiers(goodsType.getId(), unitType));
     }
 
     /**

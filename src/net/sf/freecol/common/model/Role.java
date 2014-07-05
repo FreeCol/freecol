@@ -259,8 +259,8 @@ public class Role extends BuildableType {
      * @return A list of <code>RoleChange</code>s.
      */
     public final List<RoleChange> getRoleChanges() {
-        if (roleChanges == null) return Collections.emptyList();
-        return this.roleChanges;
+        return (roleChanges == null) ? Collections.<RoleChange>emptyList()
+            : this.roleChanges;
     }
 
     /**

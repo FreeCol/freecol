@@ -137,8 +137,8 @@ public class ProductionType extends FreeColObject {
      * @return A list of the input <code>AbstractGoods</code>.
      */
     public final List<AbstractGoods> getInputs() {
-        if (inputs == null) return Collections.emptyList();
-        return inputs;
+        return (inputs == null) ? Collections.<AbstractGoods>emptyList()
+            : inputs;
     }
 
     /**
@@ -167,8 +167,8 @@ public class ProductionType extends FreeColObject {
      * @return A list of the output <code>AbstractGoods</code>.
      */
     public final List<AbstractGoods> getOutputs() {
-        if (outputs == null) return Collections.emptyList();
-        return outputs;
+        return (outputs == null) ? Collections.<AbstractGoods>emptyList()
+            : outputs;
     }
 
     /**

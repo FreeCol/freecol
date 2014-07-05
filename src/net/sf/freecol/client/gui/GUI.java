@@ -1314,8 +1314,8 @@ public class GUI {
     }
 
     public List<String> showConfirmDeclarationDialog() {
-        if (canvas == null) return Collections.emptyList();
-        return canvas.showConfirmDeclarationDialog();
+        return (canvas == null) ? Collections.<String>emptyList()
+            : canvas.showConfirmDeclarationDialog();
     }
 
     public void showDeclarationPanel() {

@@ -248,8 +248,8 @@ public class Region extends FreeColGameObject implements Nameable {
      * @return The child regions.
      */
     public final List<Region> getChildren() {
-        if (children == null) return Collections.emptyList();
-        return children;
+        return (children == null) ? Collections.<Region>emptyList()
+            : children;
     }
 
     /**

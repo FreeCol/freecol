@@ -180,8 +180,8 @@ public final class TileImprovementType extends FreeColGameObjectType {
      * @return A list of <code>Scope</code>s.
      */
     public List<Scope> getScopes() {
-        if (scopes == null) return Collections.emptyList();
-        return scopes;
+        return (scopes == null) ? Collections.<Scope>emptyList()
+            : scopes;
     }
 
     /**
@@ -203,8 +203,9 @@ public final class TileImprovementType extends FreeColGameObjectType {
      * @return A random choice list of <code>Disaster</code>s.
      */
     public List<RandomChoice<Disaster>> getDisasters() {
-        if (disasters == null) return Collections.emptyList();
-        return disasters;
+        return (disasters == null)
+            ? Collections.<RandomChoice<Disaster>>emptyList()
+            : disasters;
     }
 
     /**

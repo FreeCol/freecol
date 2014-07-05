@@ -91,8 +91,9 @@ public abstract class BuildableType extends FreeColGameObjectType {
      * @return A copy of the required abilities map.
      */
     public Map<String, Boolean> getRequiredAbilities() {
-        if (requiredAbilities == null) return Collections.emptyMap();
-        return new HashMap<String, Boolean>(requiredAbilities);
+        return (requiredAbilities == null)
+            ? Collections.<String, Boolean>emptyMap()
+            : new HashMap<String, Boolean>(requiredAbilities);
     }
 
     public boolean requiresAbility(String key) {
@@ -153,7 +154,7 @@ public abstract class BuildableType extends FreeColGameObjectType {
      * @return A deep copy of the list of required goods.
      */
     public List<AbstractGoods> getRequiredGoods() {
-        if (requiredGoods == null) return Collections.emptyList();
+        if (requiredGoods == null) return Collections.<AbstractGoods>emptyList();
         List<AbstractGoods> result = new ArrayList<AbstractGoods>();
         for (AbstractGoods ag : requiredGoods) {
             result.add(new AbstractGoods(ag.getType(), ag.getAmount()));
@@ -199,8 +200,8 @@ public abstract class BuildableType extends FreeColGameObjectType {
      * @return A <code>List<Limit></code> of limits.
      */
     public List<Limit> getLimits() {
-        if (limits == null) return Collections.emptyList();
-        return limits;
+        return (limits == null) ? Collections.<Limit>emptyList()
+            : limits;
     }
 
     /**

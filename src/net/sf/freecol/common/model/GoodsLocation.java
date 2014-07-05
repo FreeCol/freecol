@@ -176,8 +176,8 @@ public abstract class GoodsLocation extends UnitLocation {
      * @return A list of goods.
      */
     public final List<Goods> getGoods() {
-        if (goodsContainer == null) return Collections.emptyList();
-        return goodsContainer.getGoods();
+        return (goodsContainer == null) ? Collections.<Goods>emptyList()
+            : goodsContainer.getGoods();
     }
 
     /**
@@ -188,8 +188,8 @@ public abstract class GoodsLocation extends UnitLocation {
      * @return A list of goods.
      */
     public final List<Goods> getCompactGoods() {
-        if (goodsContainer == null) return Collections.emptyList();
-        return goodsContainer.getCompactGoods();
+        return (goodsContainer == null) ? Collections.<Goods>emptyList()
+            : goodsContainer.getCompactGoods();
     }
 
 
