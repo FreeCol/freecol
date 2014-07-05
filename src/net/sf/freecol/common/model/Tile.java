@@ -2066,11 +2066,11 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * {@inheritDoc}
      */
     @Override
-    public Set<Ability> getAbilitySet(String id,
-                                      FreeColGameObjectType fcgot,
-                                      Turn turn) {
+    public Set<Ability> getAbilities(String id,
+                                     FreeColGameObjectType fcgot,
+                                     Turn turn) {
         // Delegate to type
-        return getType().getAbilitySet(id, fcgot, turn);
+        return getType().getAbilities(id, fcgot, turn);
     }
 
 

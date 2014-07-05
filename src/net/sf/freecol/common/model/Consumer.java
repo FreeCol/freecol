@@ -101,6 +101,6 @@ public interface Consumer {
      * @param id The object identifier.
      * @return The set of <code>Modifier</code>s found.
      */
-    public Set<Modifier> getModifierSet(String id);
+    public Set<Modifier> getModifiers(String id);
 
 }

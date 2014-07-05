@@ -1515,7 +1515,7 @@ public class Unit extends GoodsLocation
      */
     public Role getAutomaticRole() {
         if (!hasDefaultRole()) return null;
-        Set<Ability> autoDefence = getAbilitySet(Ability.AUTOMATIC_EQUIPMENT);
+        Set<Ability> autoDefence = getAbilities(Ability.AUTOMATIC_EQUIPMENT);
         if (autoDefence.isEmpty()) return null;
         Settlement settlement = (isInColony()) ? getColony()
             : (getLocation() instanceof IndianSettlement)
@@ -2718,11 +2718,11 @@ public class Unit extends GoodsLocation
     public int getLineOfSight() {
         final Turn turn = getGame().getTurn();
         Set<Modifier> result = new HashSet<Modifier>();
-        result.addAll(this.getModifierSet(Modifier.LINE_OF_SIGHT_BONUS,
-                                          unitType, turn));
+        result.addAll(this.getModifiers(Modifier.LINE_OF_SIGHT_BONUS,
+                                        unitType, turn));
         if (hasTile() && getTile().isExplored()) {
             result.addAll(getTile().getType()
-                .getModifierSet(Modifier.LINE_OF_SIGHT_BONUS, unitType, turn));
+                .getModifiers(Modifier.LINE_OF_SIGHT_BONUS, unitType, turn));
         }
         float base = unitType.getLineOfSight();
         return (int)applyModifiers(base, turn, result);
@@ -3084,7 +3084,7 @@ public class Unit extends GoodsLocation
      */
     public Set<Modifier> getMissionaryTradeModifiers(boolean sense) {
         HashSet<Modifier> result = new HashSet<Modifier>();
-        for (Modifier m : getModifierSet(Modifier.MISSIONARY_TRADE_BONUS)) {
+        for (Modifier m : getModifiers(Modifier.MISSIONARY_TRADE_BONUS)) {
             Modifier modifier = new Modifier(m);
             if (!sense) modifier.setValue(-m.getValue());
             result.add(modifier);
@@ -3556,20 +3556,20 @@ public class Unit extends GoodsLocation
      * {@inheritDoc}
      */
     @Override
-    public Set<Ability> getAbilitySet(String id, FreeColGameObjectType fcgot,
-                                      Turn turn) {
+    public Set<Ability> getAbilities(String id, FreeColGameObjectType fcgot,
+                                     Turn turn) {
         final Player owner = getOwner();
         final UnitType unitType = getType();
         Set<Ability> result = new HashSet<Ability>();
 
         // UnitType abilities always apply.
-        result.addAll(unitType.getAbilitySet(id));
+        result.addAll(unitType.getAbilities(id));
 
         // Roles apply with qualification.
-        result.addAll(role.getAbilitySet(id, fcgot, turn));
+        result.addAll(role.getAbilities(id, fcgot, turn));
 
         // The player's abilities require more qualification.
-        result.addAll(owner.getAbilitySet(id, fcgot, turn));
+        result.addAll(owner.getAbilities(id, fcgot, turn));
 
         // Location abilities may apply.
         // TODO: extend this to all locations?  May simplify
@@ -3577,9 +3577,9 @@ public class Unit extends GoodsLocation
         // the issue as we do not want Units aboard other Units to share
         // the abilities of the carriers.
         if (getSettlement() != null) {
-            result.addAll(getSettlement().getAbilitySet(id, unitType, turn));
+            result.addAll(getSettlement().getAbilities(id, unitType, turn));
         } else if (isInEurope()) {
-            result.addAll(owner.getEurope().getAbilitySet(id, unitType, turn));
+            result.addAll(owner.getEurope().getAbilities(id, unitType, turn));
         }
         return result;
     }
@@ -3588,20 +3588,20 @@ public class Unit extends GoodsLocation
      * {@inheritDoc}
      */
     @Override
-    public Set<Modifier> getModifierSet(String id, FreeColGameObjectType fcgot,
-                                        Turn turn) {
+    public Set<Modifier> getModifiers(String id, FreeColGameObjectType fcgot,
+                                      Turn turn) {
         final Player owner = getOwner();
         final UnitType unitType = getType();
         Set<Modifier> result = new HashSet<Modifier>();
 
         // UnitType modifiers always apply
-        result.addAll(unitType.getModifierSet(id, fcgot, turn));
+        result.addAll(unitType.getModifiers(id, fcgot, turn));
 
         // The player's modifiers may not all apply
-        result.addAll(owner.getModifierSet(id, fcgot, turn));
+        result.addAll(owner.getModifiers(id, fcgot, turn));
         
         // Role modifiers apply
-        result.addAll(role.getModifierSet(id, fcgot, turn));
+        result.addAll(role.getModifiers(id, fcgot, turn));
 
         return result;
     }

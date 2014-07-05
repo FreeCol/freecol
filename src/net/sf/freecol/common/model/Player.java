@@ -1586,9 +1586,9 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if a bells bonus was set.
      */
     protected boolean recalculateBellsBonus() {
-        Set<Modifier> libertyBonus = getModifierSet("model.goods.bells");
+        Set<Modifier> libertyBonus = getModifiers("model.goods.bells");
         boolean ret = false;
-        for (Ability ability : getAbilitySet(Ability.ADD_TAX_TO_BELLS)) {
+        for (Ability ability : getAbilities(Ability.ADD_TAX_TO_BELLS)) {
             FreeColObject source = ability.getSource();
             if (source != null) {
                 for (Modifier modifier : libertyBonus) {

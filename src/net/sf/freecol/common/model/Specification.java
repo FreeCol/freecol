@@ -1947,7 +1947,7 @@ public final class Specification {
         // scope was left hanging.
         FoundingFather brebeuf
             = getFoundingFather("model.foundingFather.fatherJeanDeBrebeuf");
-        for (Ability ability : brebeuf.getAbilitySet()) {
+        for (Ability ability : brebeuf.getAbilities()) {
             for (Scope scope : ability.getScopes()) {
                 if ("model.ability.missionary".equals(scope.getAbilityId())) {
                     scope.setAbilityId(Ability.ESTABLISH_MISSION);
@@ -2040,14 +2040,14 @@ public final class Specification {
 
         // Resource type modifiers had the wrong priority
         for (ResourceType rt : resourceTypeList) {
-            for (Modifier m : rt.getModifierSet()) {
+            for (Modifier m : rt.getModifiers()) {
                 m.setModifierIndex(Modifier.RESOURCE_PRODUCTION_INDEX);
             }
         }
 
         // Unit type indexes moved into the spec
         for (UnitType ut : unitTypeList) {
-            for (Modifier m : ut.getModifierSet()) {
+            for (Modifier m : ut.getModifiers()) {
                 if (allTypes.get(m.getId()) instanceof GoodsType) {
                     m.setModifierIndex(Modifier.EXPERT_PRODUCTION_INDEX);
                 }
@@ -2056,7 +2056,7 @@ public final class Specification {
 
         // Father production modifiers have moved to the spec
         for (FoundingFather ff : foundingFathers) {
-            for (Modifier m : ff.getModifierSet()) {
+            for (Modifier m : ff.getModifiers()) {
                 if (allTypes.get(m.getId()) instanceof GoodsType) {
                     m.setModifierIndex(Modifier.FATHER_PRODUCTION_INDEX);
                 }
@@ -2065,7 +2065,7 @@ public final class Specification {
 
         // Tile improvement type modifier index has moved to the spec
         for (TileImprovementType ti : tileImprovementTypeList) {
-            for (Modifier m : ti.getModifierSet()) {
+            for (Modifier m : ti.getModifiers()) {
                 if (allTypes.get(m.getId()) instanceof GoodsType) {
                     m.setModifierIndex(Modifier.IMPROVEMENT_PRODUCTION_INDEX);
                 }
@@ -2074,7 +2074,7 @@ public final class Specification {
 
         // Building type modifier indexes have moved to the spec
         for (BuildingType bt : buildingTypeList) {
-            for (Modifier m : bt.getModifierSet()) {
+            for (Modifier m : bt.getModifiers()) {
                 if (allTypes.get(m.getId()) instanceof GoodsType) {
                     m.setModifierIndex((bt.hasAbility(Ability.AUTO_PRODUCTION))
                         ? Modifier.AUTO_PRODUCTION_INDEX
@@ -2085,7 +2085,7 @@ public final class Specification {
 
         // European nation type production modifier indexes moved to the spec
         for (EuropeanNationType et : europeanNationTypes) {
-            for (Modifier m : et.getModifierSet()) {
+            for (Modifier m : et.getModifiers()) {
                 if (allTypes.get(m.getId()) instanceof GoodsType) {
                     m.setModifierIndex(Modifier.NATION_PRODUCTION_INDEX);
                 }
@@ -2157,7 +2157,7 @@ public final class Specification {
 
         // automaticEquipment scope types are now roles
         for (NationType nt : indianNationTypes) {
-            for (Ability ability : nt.getAbilitySet(Ability.AUTOMATIC_EQUIPMENT)) {
+            for (Ability ability : nt.getAbilities(Ability.AUTOMATIC_EQUIPMENT)) {
                 for (Scope scope : ability.getScopes()) {
                     String type = scope.getType();
                     if ("model.equipment.indian.muskets".equals(type)) {
@@ -2171,7 +2171,7 @@ public final class Specification {
         {
             FoundingFather revere
                 = getFoundingFather("model.foundingFather.paulRevere");
-            for (Ability ability : revere.getAbilitySet(Ability.AUTOMATIC_EQUIPMENT)) {
+            for (Ability ability : revere.getAbilities(Ability.AUTOMATIC_EQUIPMENT)) {
                 for (Scope scope : ability.getScopes()) {
                     String type = scope.getType();
                     if ("model.equipment.muskets".equals(type)) {

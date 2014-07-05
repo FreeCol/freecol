@@ -318,7 +318,7 @@ public final class TileImprovementType extends FreeColGameObjectType {
     }
 
     public Modifier getProductionModifier(GoodsType goodsType) {
-        Set<Modifier> modifierSet = getModifierSet(goodsType.getId());
+        Set<Modifier> modifierSet = getModifiers(goodsType.getId());
         if (modifierSet == null || modifierSet.isEmpty()) {
             return null;
         } else {

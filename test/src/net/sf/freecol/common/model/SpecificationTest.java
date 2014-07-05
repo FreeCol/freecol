@@ -160,19 +160,19 @@ public final class SpecificationTest extends FreeColTestCase {
         // Percentage Modifier
         /*
         BuildingType ironWorks = spec.getBuildingType("model.building.ironWorks");
-        Modifier modifier = ironWorks.getModifierSet("model.goods.tools").iterator().next();
+        Modifier modifier = ironWorks.getModifiers("model.goods.tools").iterator().next();
         assertEquals(Modifier.Type.PERCENTAGE, modifier.getType());
         assertEquals(50f, modifier.getValue());
         */
 
         // Additive Modifier
         Modifier modifier = depotType
-            .getModifierSet(Modifier.WAREHOUSE_STORAGE).iterator().next();
+            .getModifiers(Modifier.WAREHOUSE_STORAGE).iterator().next();
         assertEquals(ModifierType.ADDITIVE, modifier.getType());
         assertEquals(100f, modifier.getValue());
 
         // Multiplicative Modifier
-        modifier = blackSmithType.getModifierSet("model.goods.tools").iterator().next();
+        modifier = blackSmithType.getModifiers("model.goods.tools").iterator().next();
         assertEquals(ModifierType.MULTIPLICATIVE, modifier.getType());
         assertEquals(2f, modifier.getValue());
     }

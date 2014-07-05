@@ -208,7 +208,7 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
 
         List<Modifier> bonusList = new ArrayList<Modifier>();
         for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
-            bonusList.addAll(type.getModifierSet(goodsType.getId()));
+            bonusList.addAll(type.getModifiers(goodsType.getId()));
         }
         int bonusNumber = bonusList.size();
         if (bonusNumber > 0) {

@@ -67,7 +67,7 @@ public class FoundingFatherTest extends FreeColTestCase {
         spec().addModifier(modifier);
         dutch.addFather(father2);
 
-        Set<Modifier> modifierSet = dutch.getModifierSet("some.new.modifier");
+        Set<Modifier> modifierSet = dutch.getModifiers("some.new.modifier");
         assertEquals(1, modifierSet.size());
         assertEquals(2f, modifierSet.iterator().next().getValue());
         assertEquals(4f, FeatureContainer.applyModifiers(2, null, modifierSet));
@@ -78,7 +78,7 @@ public class FoundingFatherTest extends FreeColTestCase {
                                          ModifierType.ADDITIVE, father3));
         dutch.addFather(father3);
 
-        assertFalse(dutch.getModifierSet("some.new.modifier").isEmpty());
+        assertFalse(dutch.getModifiers("some.new.modifier").isEmpty());
         assertEquals(6f, dutch.applyModifiers(2, null, "some.new.modifier"));
 
         FoundingFather father4 = new FoundingFather("father4", spec());

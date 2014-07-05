@@ -474,17 +474,17 @@ public class Building extends WorkLocation
 
         List<Modifier> mods = new ArrayList<Modifier>();
         if (unitType == null) { // Add only the building-specific bonuses
-            mods.addAll(colony.getModifierSet(id, type, turn));
+            mods.addAll(colony.getModifiers(id, type, turn));
             if (owner != null) {
-                mods.addAll(owner.getModifierSet(id, type, turn));
+                mods.addAll(owner.getModifiers(id, type, turn));
             }
 
         } else { // If a unit is present add unit specific bonuses.
-            mods.addAll(this.getModifierSet(id, unitType, turn));
+            mods.addAll(this.getModifiers(id, unitType, turn));
             mods.addAll(colony.getProductionModifiers(goodsType));
-            mods.addAll(unitType.getModifierSet(id, goodsType, turn));
+            mods.addAll(unitType.getModifiers(id, goodsType, turn));
             if (owner != null) {
-                mods.addAll(owner.getModifierSet(id, unitType, turn));
+                mods.addAll(owner.getModifiers(id, unitType, turn));
             }
         }
         Collections.sort(mods);
@@ -533,20 +533,20 @@ public class Building extends WorkLocation
      * {@inheritDoc}
      */
     @Override
-    public Set<Ability> getAbilitySet(String id, FreeColGameObjectType type,
-                                      Turn turn) {
+    public Set<Ability> getAbilities(String id, FreeColGameObjectType type,
+                                     Turn turn) {
         // Buildings have no abilities independent of their type (for now).
-        return getType().getAbilitySet(id, type, turn);
+        return getType().getAbilities(id, type, turn);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Set<Modifier> getModifierSet(String id, FreeColGameObjectType fcgot,
-                                        Turn turn) {
+    public Set<Modifier> getModifiers(String id, FreeColGameObjectType fcgot,
+                                      Turn turn) {
         // Buildings have no modifiers independent of type
-        return getType().getModifierSet(id, fcgot, turn);
+        return getType().getModifiers(id, fcgot, turn);
     }
 
     /**

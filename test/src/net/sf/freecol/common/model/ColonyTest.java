@@ -201,7 +201,7 @@ public class ColonyTest extends FreeColTestCase {
 
         int modifierCount = 0;
         for (Modifier existingModifier
-                 : colony.getModifierSet("model.goods.bells")) {
+                 : colony.getModifiers("model.goods.bells")) {
             if (Specification.COLONY_GOODS_PARTY_SOURCE
                 .equals(existingModifier.getSource())) modifierCount++;
         }
@@ -212,7 +212,7 @@ public class ColonyTest extends FreeColTestCase {
 
         modifierCount = 0;
         for (Modifier existingModifier
-                 : colony.getModifierSet("model.goods.bells")) {
+                 : colony.getModifiers("model.goods.bells")) {
             if (Specification.COLONY_GOODS_PARTY_SOURCE
                 .equals(existingModifier.getSource())) modifierCount++;
         }

@@ -232,7 +232,7 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
     /**
      * {@inheritDoc}
      */
-    public Set<Modifier> getModifierSet(String id) {
+    public Set<Modifier> getModifiers(String id) {
         return Collections.emptySet();
     }
 

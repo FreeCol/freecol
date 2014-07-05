@@ -107,8 +107,7 @@ public class IndividualFatherTest extends FreeColTestCase {
         assertEquals(inc, colony.getLiberty());
         assertEquals(inc + inc/5, colony.getEffectiveLiberty());
 
-        Set<Modifier> modifierSet
-            = player.getModifierSet(Modifier.LIBERTY);
+        Set<Modifier> modifierSet = player.getModifiers(Modifier.LIBERTY);
         assertEquals(1, modifierSet.size());
         Modifier bolivarModifier = modifierSet.iterator().next();
         assertEquals(simonBolivar, bolivarModifier.getSource());
@@ -242,7 +241,7 @@ public class IndividualFatherTest extends FreeColTestCase {
         game.setMap(getTestMap(true));
 
         Set<Modifier> jeffersonModifiers
-            = thomasJefferson.getModifierSet("model.goods.bells");
+            = thomasJefferson.getModifiers("model.goods.bells");
         assertEquals(1, jeffersonModifiers.size());
         Modifier modifier = jeffersonModifiers.iterator().next();
         assertTrue(modifier.appliesTo(townHallType));
@@ -253,15 +252,15 @@ public class IndividualFatherTest extends FreeColTestCase {
         Unit unit = colony.getFirstUnit();
         colony.setOccupationAt(unit, townHall, false);
 
-        assertEquals(0, player.getModifierSet("model.goods.bells").size());
-        assertEquals(0, colony.getModifierSet("model.goods.bells").size());
+        assertEquals(0, player.getModifiers("model.goods.bells").size());
+        assertEquals(0, colony.getModifiers("model.goods.bells").size());
         int expected = 4;
         assertEquals(expected, townHall.getTotalProductionOf(bellsType));
 
         player.addFather(thomasJefferson);
         expected += expected * 0.5; // Add Jefferson bonus
-        assertEquals(1, player.getModifierSet("model.goods.bells").size());
-        assertEquals(0, colony.getModifierSet("model.goods.bells").size());
+        assertEquals(1, player.getModifiers("model.goods.bells").size());
+        assertEquals(0, colony.getModifiers("model.goods.bells").size());
         assertEquals(1, townHall.getProductionModifiers(bellsType, null).size());
         assertEquals(expected, townHall.getTotalProductionOf(bellsType));
     }
@@ -336,8 +335,7 @@ public class IndividualFatherTest extends FreeColTestCase {
         player.recalculateBellsBonus();
 
         assertTrue(player.hasAbility(Ability.ADD_TAX_TO_BELLS));
-        Set<Modifier> modifierSet
-            = player.getModifierSet("model.goods.bells");
+        Set<Modifier> modifierSet = player.getModifiers("model.goods.bells");
         assertEquals(1, modifierSet.size());
 
         Modifier paineModifier = modifierSet.iterator().next();

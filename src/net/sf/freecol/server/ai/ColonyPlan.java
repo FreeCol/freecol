@@ -771,7 +771,7 @@ public class ColonyPlan {
                 double factor = 1.0;
                 if ("building".equals(advantage)) factor = 1.1;
                 double support = 1.0;
-                for (Ability a : type.getAbilitySet(Ability.BUILD)) {
+                for (Ability a : type.getAbilities(Ability.BUILD)) {
                     List<Scope> scopes = a.getScopes();
                     if (scopes != null && !scopes.isEmpty()) support = 0.1;
                 }

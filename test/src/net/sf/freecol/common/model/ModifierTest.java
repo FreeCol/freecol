@@ -154,12 +154,12 @@ public class ModifierTest extends FreeColTestCase {
         assertFalse(modifier1.appliesTo(carpenter));
 
         Set<Modifier> result
-            = featureContainer.getModifierSet("test", frigate, null);
+            = featureContainer.getModifiers("test", frigate, null);
         assertEquals(3, result.size());
         assertEquals(((1 + 3) * 1.5f) + ((1 + 3) * 1.5f) * 30 / 100,
                 FeatureContainer.applyModifiers(1, null, result));
 
-        result = featureContainer.getModifierSet("test", carpenter, null);
+        result = featureContainer.getModifiers("test", carpenter, null);
         assertEquals(2, result.size());
         assertEquals(1.5f + (1.5f * 30) / 100,
                 FeatureContainer.applyModifiers(1, null, result));
@@ -171,12 +171,12 @@ public class ModifierTest extends FreeColTestCase {
         assertTrue(modifier2.appliesTo(frigate));
         assertTrue(modifier2.appliesTo(carpenter));
 
-        result = featureContainer.getModifierSet("test", frigate, null);
+        result = featureContainer.getModifiers("test", frigate, null);
         assertEquals(3, result.size());
         assertEquals(((1 + 3) * 1.5f) + ((1 + 3) * 1.5f) * 30 / 100,
             FeatureContainer.applyModifiers(1, null, result));
 
-        result = featureContainer.getModifierSet("test", carpenter, null);
+        result = featureContainer.getModifiers("test", carpenter, null);
         assertEquals(2, result.size());
 
         assertEquals(1.5f + (1.5f * 30) / 100,
@@ -210,11 +210,11 @@ public class ModifierTest extends FreeColTestCase {
         FeatureContainer featureContainer = new FeatureContainer();
         featureContainer.addModifier(modifier1);
         featureContainer.addModifier(modifier2);
-        Set<Modifier> modifierSet = featureContainer.getModifierSet("test",
+        Set<Modifier> modifierSet = featureContainer.getModifiers("test",
             frigate, new Turn(15));
         assertEquals(1, modifierSet.size());
         assertEquals(modifier1, modifierSet.iterator().next());
-        modifierSet = featureContainer.getModifierSet("test",
+        modifierSet = featureContainer.getModifiers("test",
             frigate, new Turn(35));
         assertEquals(1, modifierSet.size());
         assertEquals(modifier2, modifierSet.iterator().next());

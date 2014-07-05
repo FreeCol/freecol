@@ -139,7 +139,7 @@ public final class FeatureContainer {
      */
     public boolean hasAbility(String id, FreeColGameObjectType fcgot,
                               Turn turn) {
-        return FeatureContainer.hasAbility(getAbilitySet(id, fcgot, turn));
+        return FeatureContainer.hasAbility(getAbilities(id, fcgot, turn));
     }
 
     /**
@@ -149,7 +149,7 @@ public final class FeatureContainer {
      * @return True if the key is present.
      */
     public boolean containsAbilityKey(String key) {
-        return !getAbilitySet(key, null, null).isEmpty();
+        return !getAbilities(key, null, null).isEmpty();
     }
 
     /**
@@ -162,8 +162,8 @@ public final class FeatureContainer {
      * @param turn An optional applicable <code>Turn</code>.
      * @return A set of abilities.
      */
-    public Set<Ability> getAbilitySet(String id, FreeColGameObjectType fcgot,
-                                      Turn turn) {
+    public Set<Ability> getAbilities(String id, FreeColGameObjectType fcgot,
+                                     Turn turn) {
         Set<Ability> result = new HashSet<Ability>();
         if (!abilitiesPresent()) return result;
 
@@ -246,8 +246,8 @@ public final class FeatureContainer {
      * @param turn An optional applicable <code>Turn</code>.
      * @return A set of modifiers.
      */
-    public Set<Modifier> getModifierSet(String id, FreeColGameObjectType fcgot,
-                                        Turn turn) {
+    public Set<Modifier> getModifiers(String id, FreeColGameObjectType fcgot,
+                                      Turn turn) {
         Set<Modifier> result = new HashSet<Modifier>();
         if (!modifiersPresent()) return result;
 
@@ -282,7 +282,7 @@ public final class FeatureContainer {
      */
     public final float applyModifiers(float number, Turn turn,
                                       String id, FreeColGameObjectType fcgot) {
-        return applyModifiers(number, turn, getModifierSet(id, fcgot, turn));
+        return applyModifiers(number, turn, getModifiers(id, fcgot, turn));
     }
 
     /**
@@ -304,43 +304,6 @@ public final class FeatureContainer {
             if (value == Modifier.UNKNOWN) return value;
             result = m.apply(result, value);
         }
-        return result;
-    }
-
-    /**
-     * Applies a set of modifiers to the given float value.
-     *
-     * Use this generally.  Only use applyModifiers in the production code.
-     *
-     * @param number The number to modify.
-     * @param turn An optional applicable <code>Turn</code>.
-     * @param mods The <code>Modifier</code>s to apply.
-     * @return The modified number.
-     */
-    public static float applyModifierSet(float number, Turn turn,
-                                         Set<Modifier> mods) {
-        float additive = 0, percentage = 0, multiplicative = 1;
-        for (Modifier m : mods) {
-            float value = m.getValue(turn);
-            if (value == Modifier.UNKNOWN) return Modifier.UNKNOWN;
-            switch (m.getType()) {
-            case ADDITIVE:
-                additive += value;
-                break;
-            case MULTIPLICATIVE:
-                multiplicative *= value;
-                break;
-            case PERCENTAGE:
-                percentage += value;
-                // If we want cumulative percentage modifiers:
-                //   percentage += (percentage * value) / 100 + value;
-                break;
-            }
-        }
-        float result = number;
-        result += additive;
-        result *= multiplicative;
-        result += (result * percentage) / 100;
         return result;
     }
 
@@ -510,7 +473,7 @@ public final class FeatureContainer {
      */
     public void replaceSource(FreeColGameObjectType oldSource,
                               FreeColGameObjectType newSource) {
-        for (Ability ability : getAbilitySet(null, null, null)) {
+        for (Ability ability : getAbilities(null, null, null)) {
             if (oldSource == null || ability.getSource() == oldSource) {
                 removeAbility(ability);
                 Ability newAbility = new Ability(ability);
@@ -519,7 +482,7 @@ public final class FeatureContainer {
             }
         }
 
-        for (Modifier modifier : getModifierSet(null, null, null)) {
+        for (Modifier modifier : getModifiers(null, null, null)) {
             if (oldSource == null || modifier.getSource() == oldSource) {
                 removeModifier(modifier);
                 Modifier newModifier = new Modifier(modifier);
@@ -536,18 +499,18 @@ public final class FeatureContainer {
     public String toString() {
         StringBuilder sb = new StringBuilder(256);
         sb.append("[FeatureContainer");
-        Set<Ability> abilities = getAbilitySet(null, null, null);
+        Set<Ability> abilities = getAbilities(null, null, null);
         if (!abilities.isEmpty()) {
             sb.append(" [abilities");
-            for (Ability ability : getAbilitySet(null, null, null)) {
+            for (Ability ability : getAbilities(null, null, null)) {
                 sb.append(" ").append(ability.toString());
             }
             sb.append("]");
         }
-        Set<Modifier> modifiers = getModifierSet(null, null, null);
+        Set<Modifier> modifiers = getModifiers(null, null, null);
         if (!modifiers.isEmpty()) {
             sb.append(" [modifiers");
-            for (Modifier modifier : getModifierSet(null, null, null)) {
+            for (Modifier modifier : getModifiers(null, null, null)) {
                 sb.append(" ").append(modifier.toString());
             }
             sb.append("]");

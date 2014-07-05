@@ -205,7 +205,7 @@ public class Resource extends TileItem {
      */
     public int applyBonus(GoodsType goodsType, UnitType unitType,
                           int potential) {
-        Set<Modifier> bonus = type.getModifierSet(goodsType.getId(), unitType);
+        Set<Modifier> bonus = type.getModifiers(goodsType.getId(), unitType);
         int amount = (int)applyModifiers(potential, null, bonus) - potential;
         return potential
             + ((quantity == UNLIMITED || quantity > amount) ? amount
@@ -232,7 +232,7 @@ public class Resource extends TileItem {
         // Resource modifiers apply to base production
         if (goodsType == null || !base) return Collections.emptyList();
         return new ArrayList<Modifier>(getType()
-            .getModifierSet(goodsType.getId(), unitType));
+            .getModifiers(goodsType.getId(), unitType));
     }
 
     /**

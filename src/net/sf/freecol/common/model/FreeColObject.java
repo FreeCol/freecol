@@ -357,7 +357,7 @@ public abstract class FreeColObject
      */
     public final boolean hasAbility(String id, FreeColGameObjectType fcgot,
                                     Turn turn) {
-        return FeatureContainer.hasAbility(getAbilitySet(id, fcgot, turn));
+        return FeatureContainer.hasAbility(getAbilities(id, fcgot, turn));
     }
 
     /**
@@ -367,7 +367,7 @@ public abstract class FreeColObject
      * @return True if the key is present.
      */
     public boolean containsAbilityKey(String key) {
-        return !getAbilitySet(key, null, null).isEmpty();
+        return !getAbilities(key, null, null).isEmpty();
     }
 
     /**
@@ -377,7 +377,7 @@ public abstract class FreeColObject
      */
     public final List<Ability> getSortedAbilities() {
         List<Ability> abilities = new ArrayList<Ability>();
-        abilities.addAll(getAbilitySet());
+        abilities.addAll(getAbilities());
         Collections.sort(abilities);
         return abilities;
     }
@@ -387,8 +387,8 @@ public abstract class FreeColObject
      *
      * @return A set of abilities.
      */
-    public final Set<Ability> getAbilitySet() {
-        return getAbilitySet(null);
+    public final Set<Ability> getAbilities() {
+        return getAbilities(null);
     }
 
     /**
@@ -397,8 +397,8 @@ public abstract class FreeColObject
      * @param id The object identifier.
      * @return A set of abilities.
      */
-    public final Set<Ability> getAbilitySet(String id) {
-        return getAbilitySet(id, null);
+    public final Set<Ability> getAbilities(String id) {
+        return getAbilities(id, null);
     }
 
     /**
@@ -409,9 +409,9 @@ public abstract class FreeColObject
      *     ability applies to.
      * @return A set of abilities.
      */
-    public final Set<Ability> getAbilitySet(String id,
-                                            FreeColGameObjectType fcgot) {
-        return getAbilitySet(id, fcgot, null);
+    public final Set<Ability> getAbilities(String id,
+                                           FreeColGameObjectType fcgot) {
+        return getAbilities(id, fcgot, null);
     }
 
     /**
@@ -425,12 +425,12 @@ public abstract class FreeColObject
      * @param turn An optional applicable <code>Turn</code>.
      * @return A set of abilities.
      */
-    public Set<Ability> getAbilitySet(String id,
-                                      FreeColGameObjectType fcgot,
-                                      Turn turn) {
+    public Set<Ability> getAbilities(String id,
+                                     FreeColGameObjectType fcgot,
+                                     Turn turn) {
         FeatureContainer fc = getFeatureContainer();
         return (fc == null) ? new HashSet<Ability>()
-            : fc.getAbilitySet(id, fcgot, turn);
+            : fc.getAbilities(id, fcgot, turn);
     }
 
     /**
@@ -499,7 +499,7 @@ public abstract class FreeColObject
      */
     public boolean hasModifier(String id, FreeColGameObjectType fcgot,
                                Turn turn) {
-        return !getModifierSet(id, fcgot, turn).isEmpty();
+        return !getModifiers(id, fcgot, turn).isEmpty();
     }
 
     /**
@@ -509,7 +509,7 @@ public abstract class FreeColObject
      * @return True if the key is present.
      */
     public final boolean containsModifierKey(String key) {
-        Set<Modifier> set = getModifierSet(key);
+        Set<Modifier> set = getModifiers(key);
         return (set == null) ? false : !set.isEmpty();
     }
 
@@ -520,7 +520,7 @@ public abstract class FreeColObject
      */
     public final List<Modifier> getSortedModifiers() {
         List<Modifier> modifiers = new ArrayList<Modifier>();
-        modifiers.addAll(getModifierSet());
+        modifiers.addAll(getModifiers());
         Collections.sort(modifiers);
         return modifiers;
     }
@@ -530,8 +530,8 @@ public abstract class FreeColObject
      *
      * @return A set of modifiers.
      */
-    public final Set<Modifier> getModifierSet() {
-        return getModifierSet(null);
+    public final Set<Modifier> getModifiers() {
+        return getModifiers(null);
     }
 
     /**
@@ -540,8 +540,8 @@ public abstract class FreeColObject
      * @param id The object identifier.
      * @return A set of modifiers.
      */
-    public final Set<Modifier> getModifierSet(String id) {
-        return getModifierSet(id, null);
+    public final Set<Modifier> getModifiers(String id) {
+        return getModifiers(id, null);
     }
 
     /**
@@ -552,9 +552,9 @@ public abstract class FreeColObject
      *     modifier applies to.
      * @return A set of modifiers.
      */
-    public final Set<Modifier> getModifierSet(String id,
-                                              FreeColGameObjectType fcgot) {
-        return getModifierSet(id, fcgot, null);
+    public final Set<Modifier> getModifiers(String id,
+                                            FreeColGameObjectType fcgot) {
+        return getModifiers(id, fcgot, null);
     }
 
     /**
@@ -569,12 +569,12 @@ public abstract class FreeColObject
      * @param turn An optional applicable <code>Turn</code>.
      * @return A set of modifiers.
      */
-    public Set<Modifier> getModifierSet(String id,
-                                        FreeColGameObjectType fcgot,
-                                        Turn turn) {
+    public Set<Modifier> getModifiers(String id,
+                                      FreeColGameObjectType fcgot,
+                                      Turn turn) {
         FeatureContainer fc = getFeatureContainer();
         return (fc == null) ? new HashSet<Modifier>()
-            : fc.getModifierSet(id, fcgot, turn);
+            : fc.getModifiers(id, fcgot, turn);
     }
 
     /**
@@ -603,7 +603,7 @@ public abstract class FreeColObject
      */
     public final float applyModifiers(float number, Turn turn,
                                       String id, FreeColGameObjectType fcgot) {
-        return applyModifiers(number, turn, getModifierSet(id, fcgot, turn));
+        return applyModifiers(number, turn, getModifiers(id, fcgot, turn));
     }
 
     /**

@@ -561,13 +561,13 @@ public class BuildingTest extends FreeColTestCase {
         Set<Modifier> modifierSet;
 
         Colony colony = getStandardColony(2);
-        modifierSet = colony.getModifierSet(Modifier.DEFENCE);
+        modifierSet = colony.getModifiers(Modifier.DEFENCE);
         assertEquals(1, modifierSet.size());
         Modifier modifier = modifierSet.iterator().next();
         assertEquals(50f, modifier.getValue());
         assertEquals(ModifierType.PERCENTAGE, modifier.getType());
 
-        modifierSet = stockadeType.getModifierSet(Modifier.DEFENCE);
+        modifierSet = stockadeType.getModifiers(Modifier.DEFENCE);
         assertEquals(1, modifierSet.size());
         modifier = modifierSet.iterator().next();
         assertEquals(100f, modifier.getValue());
@@ -575,7 +575,7 @@ public class BuildingTest extends FreeColTestCase {
         assertEquals(0f, stockadeType.applyModifiers(0f, turn,
                 Modifier.MINIMUM_COLONY_SIZE));
 
-        modifierSet = fortType.getModifierSet(Modifier.DEFENCE);
+        modifierSet = fortType.getModifiers(Modifier.DEFENCE);
         assertEquals(1, modifierSet.size());
         modifier = modifierSet.iterator().next();
         assertEquals(150f, modifier.getValue());
@@ -583,7 +583,7 @@ public class BuildingTest extends FreeColTestCase {
         assertEquals(0f, stockadeType.applyModifiers(0f, turn,
                 Modifier.MINIMUM_COLONY_SIZE));
 
-        modifierSet = fortressType.getModifierSet(Modifier.DEFENCE);
+        modifierSet = fortressType.getModifiers(Modifier.DEFENCE);
         assertEquals(1, modifierSet.size());
         modifier = modifierSet.iterator().next();
         assertEquals(200f, modifier.getValue());
@@ -713,7 +713,7 @@ public class BuildingTest extends FreeColTestCase {
         Building building = colony.getBuilding(townHallType);
         for (Unit u : building.getUnitList()) u.setLocation(tile);
 
-        Set<Modifier> modifiers = colony.getModifierSet("model.goods.bells");
+        Set<Modifier> modifiers = colony.getModifiers("model.goods.bells");
         assertTrue("No initial modifiers", modifiers.isEmpty());
         assertEquals("Initial bell production", 1,
                      building.getTotalProductionOf(bellsType));
@@ -729,22 +729,22 @@ public class BuildingTest extends FreeColTestCase {
         // Add Jefferson.
         FoundingFather jefferson = spec()
             .getFoundingFather("model.foundingFather.thomasJefferson");
-        modifiers = jefferson.getModifierSet("model.goods.bells");
+        modifiers = jefferson.getModifiers("model.goods.bells");
         assertEquals("Jefferson modifier size", 1, modifiers.size());
         Modifier bellsModifier = modifiers.iterator().next();
         owner.addFather(jefferson);
 
         // Jefferson is a property of the player...
         assertTrue("Jefferson should be present in player",
-            colony.getOwner().getModifierSet("model.goods.bells")
+            colony.getOwner().getModifiers("model.goods.bells")
                              .contains(bellsModifier));
         // ...not the colony,
         assertFalse("Jefferson should not be present in colony",
-            colony.getModifierSet("model.goods.bells")
+            colony.getModifiers("model.goods.bells")
                   .contains(bellsModifier));
         // ...and the building modifiers do not have it.
         assertFalse("Jefferson modifier should not be present in building modifiers",
-            building.getModifierSet("model.goods.bells")
+            building.getModifiers("model.goods.bells")
                     .contains(bellsModifier));
 
         // 3(colonist)
@@ -870,7 +870,7 @@ public class BuildingTest extends FreeColTestCase {
                         }
                         if (expected != output.getAmount()) {
                             assertFalse("ModifierSet should not be empty!",
-                                        type.getModifierSet(outputType.getId()).isEmpty());
+                                        type.getModifiers(outputType.getId()).isEmpty());
                         }
                         assertEquals("Wrong productivity for " + type, expected,
                                      productivity);

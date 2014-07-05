@@ -1370,7 +1370,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 // the only effects of a disaster that can be reversed
                 // are the modifiers
                 for (RandomChoice<Effect> effect: bankruptcy.getEffects()) {
-                    for (Modifier modifier : effect.getObject().getModifierSet()) {
+                    for (Modifier modifier : effect.getObject().getModifiers()) {
                         cs.addFeatureChange(this, this, modifier, false);
                     }
                 }
@@ -1479,7 +1479,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             if (colony == null) {
                 // currently, the only effects that can apply to the
                 // player itself are production modifiers
-                for (Modifier modifier : effect.getModifierSet()) {
+                for (Modifier modifier : effect.getModifiers()) {
                     if (modifier.getDuration() > 0) {
                         Modifier timedModifier = Modifier
                             .makeTimedModifier(modifier.getId(), modifier, getGame().getTurn());
@@ -1555,7 +1555,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 } else {
                     messages.add(new ModelMessage(ModelMessage.MessageType.DEFAULT,
                                                   effect.getId(), colony));
-                    for (Modifier modifier : effect.getModifierSet()) {
+                    for (Modifier modifier : effect.getModifiers()) {
                         if (modifier.getDuration() > 0) {
                             Modifier timedModifier = Modifier
                                 .makeTimedModifier(modifier.getId(), modifier, getGame().getTurn());
@@ -1915,7 +1915,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
         }
 
-        if (!father.getModifierSet().isEmpty()) {
+        if (!father.getModifiers().isEmpty()) {
             cs.add(See.only(this), this);
             // deSoto is special
             if (father.hasModifier(Modifier.LINE_OF_SIGHT_BONUS)) {
@@ -2772,7 +2772,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
 
         // Remove goods party modifiers as they apply to a different monarch.
-        for (Modifier m : colony.getModifierSet()) {
+        for (Modifier m : colony.getModifiers()) {
             if (Modifier.COLONY_GOODS_PARTY.equals(m.getSource())) {
                 colony.removeModifier(m);
             }

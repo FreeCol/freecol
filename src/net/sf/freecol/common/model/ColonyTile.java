@@ -333,18 +333,18 @@ public class ColonyTile extends WorkLocation {
             if (isColonyCenterTile()) { // Unattended only possible in center
                 mods.addAll(workTile.getProductionModifiers(goodsType, null));
                 mods.addAll(colony.getProductionModifiers(goodsType));
-                mods.addAll(colony.getModifierSet(id, null, turn));
+                mods.addAll(colony.getModifiers(id, null, turn));
                 if (owner != null) {
-                    mods.addAll(owner.getModifierSet(id, type, turn));
+                    mods.addAll(owner.getModifiers(id, type, turn));
                 }
             }
 
         } else {
             mods.addAll(workTile.getProductionModifiers(goodsType, unitType));
             mods.addAll(colony.getProductionModifiers(goodsType));
-            mods.addAll(unitType.getModifierSet(id, type, turn));
+            mods.addAll(unitType.getModifiers(id, type, turn));
             if (owner != null) {
-                mods.addAll(owner.getModifierSet(id, unitType, turn));
+                mods.addAll(owner.getModifiers(id, unitType, turn));
             }
         }
         return mods;

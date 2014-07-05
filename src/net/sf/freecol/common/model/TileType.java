@@ -332,7 +332,7 @@ public final class TileType extends FreeColGameObjectType {
      * @return A set of defence <code>Modifier</code>s.
      */
     public Set<Modifier> getDefenceModifiers() {
-        return getModifierSet(Modifier.DEFENCE);
+        return getModifiers(Modifier.DEFENCE);
     }
 
     /**

@@ -164,14 +164,14 @@ public class SimpleCombatModel extends CombatModel {
 
             // Unit offensive modifiers, including role+equipment,
             // qualified by unit type so that scopes work
-            result.addAll(attackerUnit.getModifierSet(Modifier.OFFENCE,
+            result.addAll(attackerUnit.getModifiers(Modifier.OFFENCE,
                           attackerUnit.getType()));
 
             // Special bonuses against certain nation types
             if (defender instanceof Ownable) {
                 Player owner = ((Ownable)defender).getOwner();
                 result.addAll(attackerUnit
-                    .getModifierSet(Modifier.OFFENCE_AGAINST,
+                    .getModifiers(Modifier.OFFENCE_AGAINST,
                                     owner.getNationType()));
             }
 
@@ -250,7 +250,7 @@ public class SimpleCombatModel extends CombatModel {
 
         } else if (combatIsSettlementAttack(attacker, defender)) {
             // Settlement present, apply bombardment bonus
-            result.addAll(attackerUnit.getModifierSet(Modifier.BOMBARD_BONUS));
+            result.addAll(attackerUnit.getModifiers(Modifier.BOMBARD_BONUS));
 
             // Popular support bonus
             if (combatIsWarOfIndependence(attacker, defender)) {
@@ -268,13 +268,13 @@ public class SimpleCombatModel extends CombatModel {
                 if (tile.hasSettlement()) {
                     // Bombard bonus applies to settlement defence
                     result.addAll(attackerUnit
-                                  .getModifierSet(Modifier.BOMBARD_BONUS));
+                                  .getModifiers(Modifier.BOMBARD_BONUS));
                 } else {
                     // Ambush bonus in the open = defender's defence
                     // bonus, if defender is REF, or attacker is indian.
                     if (isAmbush(attacker, defender)) {
                         for (Modifier m : tile.getType()
-                                 .getModifierSet(Modifier.DEFENCE)) {
+                                 .getModifiers(Modifier.DEFENCE)) {
                             Modifier mod = new Modifier(Modifier.OFFENCE, m);
                             mod.setSource(Specification.AMBUSH_BONUS_SOURCE);
                             result.add(mod);
@@ -317,7 +317,7 @@ public class SimpleCombatModel extends CombatModel {
                                     Specification.BASE_DEFENCE_SOURCE));
 
             // Unit specific
-            result.addAll(defenderUnit.getModifierSet(Modifier.DEFENCE));
+            result.addAll(defenderUnit.getModifiers(Modifier.DEFENCE));
 
             // Land/naval split
             if (defenderUnit.isNaval()) {
@@ -392,11 +392,11 @@ public class SimpleCombatModel extends CombatModel {
 
             } else { // In settlement
                 // Settlement defence bonus
-                result.addAll(settlement.getModifierSet(Modifier.DEFENCE));
+                result.addAll(settlement.getModifiers(Modifier.DEFENCE));
 
                 // Owner settlement-specific bonus
                 result.addAll(settlement.getOwner()
-                    .getModifierSet(Modifier.DEFENCE, settlement.getType()));
+                    .getModifiers(Modifier.DEFENCE, settlement.getType()));
 
                 // Artillery defence bonus against an Indian raid
                 if (defenderUnit.hasAbility(Ability.BOMBARD)
@@ -408,7 +408,7 @@ public class SimpleCombatModel extends CombatModel {
                 // Automatic defensive role (e.g. Revere)
                 Role autoRole = defenderUnit.getAutomaticRole();
                 if (autoRole != null) {
-                    result.addAll(autoRole.getModifierSet(Modifier.DEFENCE));
+                    result.addAll(autoRole.getModifiers(Modifier.DEFENCE));
                 }
             }
         }

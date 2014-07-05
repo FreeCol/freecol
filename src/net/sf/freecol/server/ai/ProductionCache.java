@@ -134,7 +134,7 @@ public class ProductionCache {
                 if (tile.getPotentialProduction(goodsType, null) > 0
                     || (tile.hasResource()
                         && !tile.getTileItemContainer().getResource().getType()
-                        .getModifierSet(goodsType.getId()).isEmpty())) {
+                        .getModifiers(goodsType.getId()).isEmpty())) {
                     for (Unit unit : units) {
                         result.add(new Entry(goodsType, colonyTile, unit));
                     }

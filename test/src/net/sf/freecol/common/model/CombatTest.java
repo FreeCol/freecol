@@ -120,7 +120,7 @@ public class CombatTest extends FreeColTestCase {
         final Modifier attackModifier
             = spec().getModifiers(Modifier.ATTACK_BONUS).get(0);
         final Set<Modifier> veteranModifierSet
-            = veteranType.getModifierSet(Modifier.OFFENCE);
+            = veteranType.getModifiers(Modifier.OFFENCE);
         assertEquals(1, veteranModifierSet.size());
         final Modifier veteranModifier = veteranModifierSet.iterator().next();
 
@@ -227,12 +227,12 @@ public class CombatTest extends FreeColTestCase {
          * Francis Drake
          */
         FoundingFather drake = spec().getFoundingFather("model.foundingFather.francisDrake");
-        Set<Modifier> drakeModifiers = drake.getModifierSet(Modifier.OFFENCE, privateerType);
+        Set<Modifier> drakeModifiers = drake.getModifiers(Modifier.OFFENCE, privateerType);
         assertEquals(1, drakeModifiers.size());
         Modifier drakeModifier = drakeModifiers.iterator().next();
 
         french.addFather(drake);
-        drakeModifiers = french.getModifierSet(Modifier.OFFENCE, privateerType);
+        drakeModifiers = french.getModifiers(Modifier.OFFENCE, privateerType);
         assertEquals(1, drakeModifiers.size());
         assertEquals(drakeModifier, drakeModifiers.iterator().next());
 
@@ -307,7 +307,7 @@ public class CombatTest extends FreeColTestCase {
 
         Set<Modifier> defenceModifiers = combatModel
             .getDefensiveModifiers(attacker, colonist);
-        for (Modifier modifier : soldierRole.getModifierSet(Modifier.DEFENCE)) {
+        for (Modifier modifier : soldierRole.getModifiers(Modifier.DEFENCE)) {
             assertTrue(defenceModifiers.contains(modifier));
         }
     }
@@ -342,7 +342,7 @@ public class CombatTest extends FreeColTestCase {
 
         Set<Modifier> defenceModifiers = combatModel
             .getDefensiveModifiers(attacker, defender);
-        for (Modifier modifier : nativeDragoonRole.getModifierSet(Modifier.DEFENCE)) {
+        for (Modifier modifier : nativeDragoonRole.getModifiers(Modifier.DEFENCE)) {
             assertTrue(defenceModifiers.contains(modifier));
         }
     }

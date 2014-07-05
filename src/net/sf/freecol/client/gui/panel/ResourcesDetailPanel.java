@@ -92,7 +92,7 @@ public class ResourcesDetailPanel extends ColopediaGameObjectTypePanel<ResourceT
         panel.add(localizedLabel("colopedia.resource.bonusProduction"));
         JPanel goodsPanel = new JPanel();
         goodsPanel.setOpaque(false);
-        for (Modifier modifier : type.getModifierSet()) {
+        for (Modifier modifier : type.getModifiers()) {
             String text = ModifierFormat.getModifierAsString(modifier);
             if (modifier.hasScope()) {
                 List<String> scopeStrings = new ArrayList<String>();

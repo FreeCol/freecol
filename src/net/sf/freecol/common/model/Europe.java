@@ -362,9 +362,9 @@ public class Europe extends UnitLocation implements Ownable, Named {
     /**
      * {@inheritDoc}
      */
-    public Set<Ability> getAbilitySet(String id, FreeColGameObjectType fcgot,
-                                      Turn turn) {
-        Set<Ability> result = super.getAbilitySet(id, fcgot, turn);
+    public Set<Ability> getAbilities(String id, FreeColGameObjectType fcgot,
+                                     Turn turn) {
+        Set<Ability> result = super.getAbilities(id, fcgot, turn);
         // Always able to dress a missionary.
         if (id == null || Ability.DRESS_MISSIONARY.equals(id)) {
             result.add(ABILITY_DRESS_MISSIONARY);

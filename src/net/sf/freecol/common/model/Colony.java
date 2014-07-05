@@ -314,7 +314,7 @@ public class Colony extends Settlement implements Nameable {
      */
     public int getEffectiveLiberty() {
         return (int)applyModifiers((float)getLiberty(), getGame().getTurn(),
-                                   getOwner().getModifierSet(Modifier.LIBERTY));
+                                   getOwner().getModifiers(Modifier.LIBERTY));
     }
 
     /**
@@ -1508,8 +1508,7 @@ public class Colony extends Settlement implements Nameable {
     public String getReducePopulationMessage() {
         if (canReducePopulation()) return null;
         String message = "";
-        Set<Modifier> modifierSet
-            = getModifierSet(Modifier.MINIMUM_COLONY_SIZE);
+        Set<Modifier> modifierSet = getModifiers(Modifier.MINIMUM_COLONY_SIZE);
         for (Modifier modifier : modifierSet) {
             FreeColObject source = modifier.getSource();
             if (source instanceof BuildingType) {
@@ -2494,12 +2493,12 @@ public class Colony extends Settlement implements Nameable {
      * {@inheritDoc}
      */
     @Override
-    public Set<Ability> getAbilitySet(String id, FreeColGameObjectType type,
-                                      Turn turn) {
+    public Set<Ability> getAbilities(String id, FreeColGameObjectType type,
+                                     Turn turn) {
         if (turn == null) turn = getGame().getTurn();
-        Set<Ability> result = super.getAbilitySet(id, type, turn);
+        Set<Ability> result = super.getAbilities(id, type, turn);
         // Owner abilities also apply to colonies
-        if (owner != null) result.addAll(owner.getAbilitySet(id, type, turn));
+        if (owner != null) result.addAll(owner.getAbilities(id, type, turn));
         return result;
     }
 
@@ -2655,13 +2654,13 @@ public class Colony extends Settlement implements Nameable {
         final Turn turn = getGame().getTurn();
         Set<Modifier> mods;
 
-        mods = goodsType.getModifierSet(Modifier.LIBERTY);
+        mods = goodsType.getModifiers(Modifier.LIBERTY);
         if (!mods.isEmpty()) {
             int liberty = (int)applyModifiers(amount, turn, mods);
             modifyLiberty(liberty);
         }
 
-        mods = goodsType.getModifierSet(Modifier.IMMIGRATION);
+        mods = goodsType.getModifiers(Modifier.IMMIGRATION);
         if (!mods.isEmpty()) {
             int migration = (int)applyModifiers(amount, turn, mods);
             modifyImmigration(migration);
