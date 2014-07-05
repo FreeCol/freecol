@@ -3784,8 +3784,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
             .getLocationNameFor(winnerPlayer);
         ServerPlayer loserPlayer = (ServerPlayer) loser.getOwner();
         StringTemplate loserNation = loser.getApparentOwnerName();
-        StringTemplate loserLocation = loser.getLocation()
-            .getLocationNameFor(loserPlayer);
+        Location loserLoc = loser.getLocation();
+        StringTemplate loserLocation = loserLoc.getLocationNameFor(loserPlayer);
         String messageId = loser.getType().getId() + ".destroyed";
 
         cs.addMessage(See.only(winnerPlayer),
@@ -3815,9 +3815,15 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 .addStringTemplate("%nativeNation%", nativeNation));
         }
 
-        // Destroy unit.
-        cs.addDispose(See.perhaps().always(loserPlayer),
-                      loser.getLocation(), loser);//-vis(loserPlayer)
+        // Destroy unit.  Note See.only visibility used to handle the
+        // case that the unit is the last at a settlement.  If
+        // See.perhaps was used there, the settlement will be gone
+        // when perhaps() is processed, which would erroneously make
+        // the unit visible.
+        cs.addDispose((loserLoc.getSettlement() != null)
+            ? See.only(loserPlayer)
+            : See.perhaps().always(loserPlayer),
+            loserLoc, loser);//-vis(loserPlayer)
         loserPlayer.invalidateCanSeeTiles();//+vis(loserPlayer)
     }
 
