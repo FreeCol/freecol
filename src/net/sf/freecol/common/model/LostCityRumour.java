@@ -266,8 +266,7 @@ public class LostCityRumour extends TileItem {
      * {@inheritDoc}
      */
     public List<Modifier> getProductionModifiers(GoodsType goodsType,
-                                                 UnitType unitType,
-                                                 boolean base) {
+                                                 UnitType unitType) {
         return Collections.emptyList();
     }
 

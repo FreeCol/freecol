@@ -324,9 +324,9 @@ public final class BuildingType extends BuildableType {
     public int getPotentialProduction(GoodsType goodsType,
                                       UnitType unitType) {
         if (goodsType == null) return 0;
-        int base = getBaseProduction(null, goodsType, unitType);
-        int amount = (int)applyModifiers((float)base, null, goodsType.getId(),
-                                         unitType);
+        int amount = getBaseProduction(null, goodsType, unitType);
+        amount = (int)applyModifiers(amount, null, goodsType.getId(),
+                                     unitType);
         return (amount < 0) ? 0 : amount;
     }
 

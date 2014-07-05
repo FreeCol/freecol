@@ -123,13 +123,10 @@ public abstract class TileItem extends FreeColGameObject implements Locatable {
      *
      * @param goodsType The <code>GoodsType</code> to produce.
      * @param unitType The optional <code>unitType</code> to produce them.
-     * @param base If true, collect modifiers that apply to the base
-     *     tile production, otherwise collect additional modifiers.
      * @return A list of the applicable modifiers.
      */
     public abstract List<Modifier> getProductionModifiers(GoodsType goodsType,
-                                                          UnitType unitType,
-                                                          boolean base);
+                                                          UnitType unitType);
 
     /**
      * Is this a natural TileItem?

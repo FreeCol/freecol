@@ -217,20 +217,19 @@ public class Resource extends TileItem {
      */
     public boolean canProduce(GoodsType goodsType, UnitType unitType) {
         if (goodsType == null) return false;
-        // The presence of a resource can indeed give a tile the
-        // ability to produce a goods type.
+        // The presence of a resource can give a tile the ability to
+        // produce a goods type.
         return (int)applyModifiers(0f, getGame().getTurn(),
-            getProductionModifiers(goodsType, unitType, true)) > 0;
+            getProductionModifiers(goodsType, unitType)) > 0;
     }
 
     /**
      * {@inheritDoc}
      */
     public List<Modifier> getProductionModifiers(GoodsType goodsType,
-                                                 UnitType unitType,
-                                                 boolean base) {
+                                                 UnitType unitType) {
         // Resource modifiers apply to base production
-        if (goodsType == null || !base) return Collections.emptyList();
+        if (goodsType == null) return Collections.emptyList();
         return new ArrayList<Modifier>(getType()
             .getModifiers(goodsType.getId(), unitType));
     }

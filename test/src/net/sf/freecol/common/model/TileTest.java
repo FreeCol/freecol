@@ -467,33 +467,46 @@ public class TileTest extends FreeColTestCase {
                                 road2.getType()));
 
         // Add a sugar resource, there should now be two sugar bonuses
-        // on tile1, but resource bonuses apply to the *base* production
-        // and will not appear in Tile.getProductionModifiers.
-        int sugarProduction = tile1.getBaseProduction(null, sugar, null);
+        // on tile1.
+        final Turn turn = getGame().getTurn();
+        assertTrue(tile1.canProduce(sugar, null));
+        int oldBase = tile1.getBaseProduction(null, sugar, null);
         Resource addedSugar = new Resource(game, tile1, sugarResource);
         tile1.addResource(addedSugar);
-        assertEquals(tile1.getBaseProduction(null, sugar, null),
-            (int)FeatureContainer.applyModifiers(sugarProduction,
-                getGame().getTurn(),
-                addedSugar.getProductionModifiers(sugar, null, true)));
+        int newBase = tile1.getBaseProduction(null, sugar, null);
+        assertEquals(oldBase, newBase);
+        assertEquals(
+            (int)FeatureContainer.applyModifiers(newBase, turn,
+                tile1.getProductionModifiers(sugar, null)),
+            (int)FeatureContainer.applyModifiers(oldBase, turn,
+                addedSugar.getProductionModifiers(sugar, null))
+            + (int)FeatureContainer.applyModifiers(0f, turn,
+                river1.getProductionModifiers(sugar, null)));
         assertTrue(hasBonusFrom(tile1.getProductionModifiers(sugar, null),
                                 river1.getType()));
-        assertFalse(hasBonusFrom(tile1.getProductionModifiers(sugar, null),
-                                 sugarResource));
+        assertTrue(hasBonusFrom(tile1.getProductionModifiers(sugar, null),
+                                sugarResource));
 
         // Add a minerals resource, and tile2 should now produce silver.
-        int silverProduction = tile2.getBaseProduction(null, silver, null);
+        assertFalse(tile2.canProduce(silver, null));
+        oldBase = tile2.getBaseProduction(null, silver, null);
         Resource addedSilver = new Resource(game, tile2, mineralsResource);
         tile2.addResource(addedSilver);
-        assertEquals(tile2.getBaseProduction(null, silver, null),
-            (int)FeatureContainer.applyModifiers(silverProduction,
-                getGame().getTurn(),
-                addedSilver.getProductionModifiers(silver, null, true)));
+        newBase = tile2.getBaseProduction(null, silver, null);
+        assertTrue(tile2.canProduce(silver, null));
+        assertEquals(oldBase, newBase);
+        assertEquals(
+            (int)FeatureContainer.applyModifiers(newBase, turn,
+                tile2.getProductionModifiers(silver, null)),
+            (int)FeatureContainer.applyModifiers(oldBase, turn,
+                addedSilver.getProductionModifiers(silver, null))
+            + (int)FeatureContainer.applyModifiers(0f, turn,
+                road2.getProductionModifiers(silver, null)));
         assertTrue(tile2.canProduce(silver, null));
         assertTrue(hasBonusFrom(tile2.getProductionModifiers(silver, null),
                                 road2.getType()));
-        assertFalse(hasBonusFrom(tile2.getProductionModifiers(silver, null),
-                                 mineralsResource));
+        assertTrue(hasBonusFrom(tile2.getProductionModifiers(silver, null),
+                                mineralsResource));
     }
 
     private boolean hasBonusFrom(List<Modifier> modifierSet,
@@ -670,8 +683,7 @@ public class TileTest extends FreeColTestCase {
         assertTrue(silver.isFarmed());
         assertEquals(0, tundra.getPotentialProduction(silver, colonistType));
         assertEquals(1, tile.getPotentialProduction(silver, colonistType));
-        assertTrue(tile.getProductionModifiers(silver, colonistType)
-            .isEmpty()); // Resource modifiers apply to base production
+        assertEquals(1, tile.getProductionModifiers(silver, colonistType).size());
         assertEquals(1, colonyTile.getPotentialProduction(silver, unit.getType()));
         assertTrue(colonyTile.canBeWorked());
         assertTrue(colonyTile.canAdd(unit));

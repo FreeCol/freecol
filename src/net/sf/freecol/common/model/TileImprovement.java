@@ -492,9 +492,8 @@ public class TileImprovement extends TileItem implements Named {
      * {@inheritDoc}
      */
     public List<Modifier> getProductionModifiers(GoodsType goodsType,
-                                                 UnitType unitType,
-                                                 boolean base) {
-        if (goodsType != null && !base) {
+                                                 UnitType unitType) {
+        if (goodsType != null) {
             Modifier modifier = getProductionModifier(goodsType);
             if (modifier != null && isComplete()) {
                 List<Modifier> result = new ArrayList<Modifier>();
