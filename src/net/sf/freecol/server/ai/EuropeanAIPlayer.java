@@ -1608,91 +1608,54 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     private Mission getSimpleMission(AIUnit aiUnit) {
         final Unit unit = aiUnit.getUnit();
-        final Mission now = (aiUnit.hasMission()) ? aiUnit.getMission() : null;
-        final Class type = (now == null) ? null : now.getClass();
         Mission m;
 
         if (unit.isNaval()) {
-            // Try to suppress other shipping
-            if (unit.isOffensiveUnit()
-                && (m = (type == PrivateerMission.class) ? now
-                    : getPrivateerMission(aiUnit)) != null) {
-                ;
-            // Then help with transport
-            } else if (unit.isCarrier()
-                && (m = (type == TransportMission.class) ? now
-                    : getTransportMission(aiUnit)) != null) {
-                ;
-            // Look for specific targets
-            } else if (unit.isOffensiveUnit()
-                && (m = (type == UnitSeekAndDestroyMission.class) ? now
-                    : getSeekAndDestroyMission(aiUnit, 8)) != null) {
-                ;
-            // Just wander around
-            } else if (unit.isOffensiveUnit()
-                && (m = (type == UnitWanderHostileMission.class) ? now
-                    : getWanderHostileMission(aiUnit)) != null) {
-                ;
-            } else {
-                m = null;
-            }
+            if ((m = getPrivateerMission(aiUnit)) != null
+                || (m = getTransportMission(aiUnit)) != null
+                || (m = getSeekAndDestroyMission(aiUnit, 8)) != null
+                || (m = getWanderHostileMission(aiUnit)) != null
+                ) return m;
 
         } else if (unit.isCarrier()) {
-            m = (type == TransportMission.class) ? now
-                : getTransportMission(aiUnit);
+            return getTransportMission(aiUnit);
 
         } else {
             // CashIn missions are obvious
-            if (unit.canCarryTreasure()
-                && (m = (type == CashInTreasureTrainMission.class) ? now
-                    : getCashInTreasureTrainMission(aiUnit)) != null) {
-                ;
-            // Try to maintain defence
-            } else if (unit.isDefensiveUnit()
-                && (m = (type == DefendSettlementMission.class) ? now
-                    : getDefendSettlementMission(aiUnit, false)) != null) {
-                ;
-            // Favour wish realization for expert units
-            } else if (unit.isColonist() && unit.getSkillLevel() > 0
-                && (m = (type == WishRealizationMission.class) ? now
-                    : getWishRealizationMission(aiUnit)) != null) {
-                ;
-            // Try nearby offence
-            } else if (unit.isOffensiveUnit()
-                && (m = (type == UnitSeekAndDestroyMission.class) ? now
-                    : getSeekAndDestroyMission(aiUnit, 8)) != null) {
-                ;
-            // Missionary missions might be available
-            } else if (unit.isPerson()
-                && (m = (type == MissionaryMission.class) ? now
-                    : getMissionaryMission(aiUnit)) != null) {
-                ;
-            // Try to satisfy any remaining wishes, such as population
-            } else if (workerWishes.get(unit.getType()) != null
-                && (m = (type == WishRealizationMission.class) ? now
-                    : getWishRealizationMission(aiUnit)) != null) {
-                ;
-            // Another try to defend, with relaxed cost decider
-            } else if (unit.isDefensiveUnit()
-                && (m = (type == DefendSettlementMission.class) ? now
-                    : getDefendSettlementMission(aiUnit, true)) != null) {
-                ;
-            // Another try to attack, at longer range
-            } else if (unit.isOffensiveUnit()
-                && (m = (type == UnitSeekAndDestroyMission.class) ? now
-                    : getSeekAndDestroyMission(aiUnit, 16)) != null) {
-                ;
-            // Leftover offensive units should go out looking for trouble
-            } else if (unit.isOffensiveUnit()
-                && (m = (type == UnitWanderHostileMission.class) ? now
-                    : getWanderHostileMission(aiUnit)) != null) {
-                ;
-            } else {
-                m = null;
-            }
-        }
+            if ((m = getCashInTreasureTrainMission(aiUnit)) != null
 
-        return m;
+                // Try to maintain defence
+                || (unit.isDefensiveUnit()
+                    && (m = getDefendSettlementMission(aiUnit, false)) != null)
+
+                // Favour wish realization for expert units
+                || (unit.isColonist() && unit.getSkillLevel() > 0
+                    && (m = getWishRealizationMission(aiUnit)) != null)
+
+                // Try nearby offence
+                || (unit.isOffensiveUnit()
+                    && (m = getSeekAndDestroyMission(aiUnit, 8)) != null)
+
+                // Missionary missions are only available to some units
+                || (m = getMissionaryMission(aiUnit)) != null
+
+                // Try to satisfy any remaining wishes, such as population
+                || ((m = getWishRealizationMission(aiUnit)) != null)
+
+                // Another try to defend, with relaxed cost decider
+                || (unit.isDefensiveUnit()
+                    && (m = getDefendSettlementMission(aiUnit, true)) != null)
+
+                // Another try to attack, at longer range
+                || (unit.isOffensiveUnit()
+                    && (m = getSeekAndDestroyMission(aiUnit, 16)) != null)
+
+                // Leftover offensive units should go out looking for trouble
+                || (unit.isOffensiveUnit()
+                    && (m = getWanderHostileMission(aiUnit)) != null)
+                ) return m;
+        }
+        return null;
     }
 
     /**
@@ -1963,8 +1926,7 @@ public class EuropeanAIPlayer extends AIPlayer {
     private Mission getTransportMission(AIUnit aiUnit) {
         String reason = TransportMission.invalidReason(aiUnit);
         if (reason != null) return null;
-        Mission m = new TransportMission(getAIMain(), aiUnit);
-        return (m.isValid()) ? m : null;
+        return new TransportMission(getAIMain(), aiUnit);
     }
 
     /**
