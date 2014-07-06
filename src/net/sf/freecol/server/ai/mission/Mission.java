@@ -424,21 +424,36 @@ public abstract class Mission extends AIObject {
     protected int checkDisembark(String tag) {
         final AIUnit aiUnit = getAIUnit();
         final Unit unit = getUnit();
-        final Location transportTarget = getTransportDestination();
+        Location transportTarget;
+        Tile tile;
         Direction d;
-        if (unit.isOnCarrier()
-            && transportTarget instanceof Tile
+        if (unit != null
             && unit.hasTile()
-            && unit.getTile().isAdjacent((Tile)transportTarget)
-            && (d = unit.getTile().getDirection((Tile)transportTarget)) != null
-            && unit.getMoveType(d).isLegal()) {
-            if (!aiUnit.leaveTransport(d)) {
-                logger.warning(tag + " at " + unit.getLocation()
-                    + " failed to disembark to " + transportTarget
-                    + ": " + this);
+            && unit.isOnCarrier()
+            && (transportTarget = getTransportDestination()) != null
+            && (tile = transportTarget.getTile()) != null
+            && (d = unit.getTile().getDirection(tile)) != null) {
+            switch (unit.getMoveType(d)) {
+            case MOVE:
+                if (!aiUnit.leaveTransport(d)) {
+                    logger.warning(tag + " at " + unit.getLocation()
+                        + " failed to disembark to " + transportTarget
+                        + ": " + this);
+                    return -1;
+                }
+                return 1;
+            case ATTACK_UNIT:
+                Unit other = tile.getFirstUnit();
+                if (unit.getOwner().atWarWith(other.getOwner())) {
+                    AIMessage.askAttack(aiUnit, d);
+                }
+                // Return failure as even if the attack succeeds the
+                // disembark has failed and the unit has consumed its
+                // moves so no further progress is possible.
                 return -1;
+            default:
+                break;
             }
-            return 1;
         }
         return 0;
     }
@@ -788,10 +803,17 @@ public abstract class Mission extends AIObject {
      * @return True if a non-null target was found.
      */
     public boolean retargetMission(String tag, String reason) {
+        final AIUnit aiu = getAIUnit();
+        final Location loc = aiu.getTransportSource();
+        String claim = (loc == null) ? "no-loc"
+            : (!getPlayer().isEuropean()) ? "native"
+            : (((EuropeanAIPlayer)getAIPlayer()).claimTransportable(aiu, loc))
+            ? "cancelled"
+            : "cancel-failed";
         Location newTarget = findTarget();
         setTarget(newTarget);
         logger.finest(tag + " retargetting(" + reason + ") -> " + newTarget
-            + ": " + this);
+            + "(transport " + claim + "): " + this);
         return newTarget != null;
     }
 
