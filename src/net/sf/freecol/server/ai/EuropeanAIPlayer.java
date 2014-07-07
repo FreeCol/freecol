@@ -1405,9 +1405,6 @@ public class EuropeanAIPlayer extends AIPlayer {
             } else if (unit.isInMission()) {
                 reasons.put(unit, "In-Mission");
 
-            } else if (unit.isAtSea()) { // Wait for it to emerge
-                reasons.put(unit, "At-Sea");
-
             } else if (m != null && m.isValid() && !m.isOneTime()) {
                 if (m instanceof BuildColonyMission) {
                     nBuilders--;
@@ -1425,6 +1422,9 @@ public class EuropeanAIPlayer extends AIPlayer {
 
             } else if (unit.isNaval()) {
                 navalUnits.add(aiUnit);
+
+            } else if (unit.isAtSea()) { // Wait for it to emerge
+                reasons.put(unit, "At-Sea");
 
             } else { // Unit needs a mission
                 continue;
