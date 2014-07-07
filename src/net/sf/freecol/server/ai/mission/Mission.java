@@ -426,33 +426,43 @@ public abstract class Mission extends AIObject {
         final Unit unit = getUnit();
         Location transportTarget;
         Tile tile;
-        Direction d;
         if (unit != null
             && unit.hasTile()
             && unit.isOnCarrier()
             && (transportTarget = getTransportDestination()) != null
-            && (tile = transportTarget.getTile()) != null
-            && (d = unit.getTile().getDirection(tile)) != null) {
-            switch (unit.getMoveType(d)) {
-            case MOVE:
-                if (!aiUnit.leaveTransport(d)) {
+            && (tile = transportTarget.getTile()) != null) {
+            if (unit.getTile() == tile) {
+                if (!aiUnit.leaveTransport(null)) {
                     logger.warning(tag + " at " + unit.getLocation()
-                        + " failed to disembark to " + transportTarget
+                        + " failed simple disembark to " + transportTarget
                         + ": " + this);
                     return -1;
                 }
                 return 1;
-            case ATTACK_UNIT:
-                Unit other = tile.getFirstUnit();
-                if (unit.getOwner().atWarWith(other.getOwner())) {
-                    AIMessage.askAttack(aiUnit, d);
+            }
+            Direction d = unit.getTile().getDirection(tile);
+            if (d != null) {
+                switch (unit.getMoveType(d)) {
+                case MOVE:
+                    if (!aiUnit.leaveTransport(d)) {
+                        logger.warning(tag + " at " + unit.getLocation()
+                            + " failed disembark " + d
+                            + " to " + transportTarget + ": " + this);
+                        return -1;
+                    }
+                    return 1;
+                case ATTACK_UNIT:
+                    Unit other = tile.getFirstUnit();
+                    if (unit.getOwner().atWarWith(other.getOwner())) {
+                        AIMessage.askAttack(aiUnit, d);
+                    }
+                    // Return failure as even if the attack succeeds the
+                    // disembark has failed and the unit has consumed its
+                    // moves so no further progress is possible.
+                    return -1;
+                default:
+                    break;
                 }
-                // Return failure as even if the attack succeeds the
-                // disembark has failed and the unit has consumed its
-                // moves so no further progress is possible.
-                return -1;
-            default:
-                break;
             }
         }
         return 0;
