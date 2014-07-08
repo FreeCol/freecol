@@ -237,7 +237,7 @@ public final class FreeColServer {
         preGameInputHandler = new PreGameInputHandler(this);
         inGameInputHandler = new InGameInputHandler(this);
 
-        random = new Random(FreeColSeed.getFreeColSeed());
+        random = new Random(FreeColSeed.getFreeColSeed(true));
         inGameController = new InGameController(this, random);
         mapGenerator = new SimpleMapGenerator(random, specification);
 
@@ -288,9 +288,11 @@ public final class FreeColServer {
         game = loadGame(savegame, specification, server);
         // NationOptions will be read from the saved game.
         TransactionSession.clearAll();
-        if (random == null) {
-            // Should have been read from the saved game, but lets be sure.
-            this.random = new Random(FreeColSeed.getFreeColSeed());
+        // Replace the PRNG in the game if it is missing or a command line
+        // option was present.
+        long seed = FreeColSeed.getFreeColSeed(random == null);
+        if (seed != FreeColSeed.DEFAULT_SEED) {
+            this.random = new Random(seed);
         }
         inGameController = new InGameController(this, random);
         mapGenerator = new SimpleMapGenerator(random, getSpecification());

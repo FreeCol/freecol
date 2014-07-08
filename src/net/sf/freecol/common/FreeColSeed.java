@@ -30,16 +30,19 @@ public class FreeColSeed {
 
     private static final Logger logger = Logger.getLogger(FreeColSeed.class.getName());
 
-    private static long freeColSeed = 0L;
+    public static final long DEFAULT_SEED = 0L;
+
+    private static long freeColSeed = DEFAULT_SEED;
     
 
     /**
      * Gets the seed for the PRNG.
      *
+     * @param generate Force generation of a new seed.
      * @return The seed.
      */
-    public static long getFreeColSeed() {
-        if (freeColSeed == 0L) {
+    public static long getFreeColSeed(boolean generate) {
+        if (generate) {
             freeColSeed = new SecureRandom().nextLong();
             logger.info("Using seed: " + freeColSeed);
         }
@@ -61,7 +64,7 @@ public class FreeColSeed {
      * Increments the seed for the PRNG.
      */
     public static void incrementFreeColSeed() {
-        freeColSeed = getFreeColSeed() + 1;
+        freeColSeed = getFreeColSeed(false) + 1;
         logger.info("Reseeded with: " + freeColSeed);
     }
 }
