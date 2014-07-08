@@ -1021,7 +1021,7 @@ public class TransportMission extends Mission {
      * @param cargo The <code>Cargo</code> to retarget.
      * @return True if the retargeting succeeded.
      */
-    private boolean retargetCargo(Cargo cargo) {
+    public boolean requeueCargo(Cargo cargo) {
         Transportable t = cargo.getTransportable();
         Location dst = t.getTransportDestination();
         int result = 0;
@@ -1423,7 +1423,8 @@ public class TransportMission extends Mission {
      */
     public boolean retargetTransportable(Transportable t) {
         Cargo cargo = tFind(t);
-        return (cargo == null) ? false : retargetCargo(cargo);
+        return (cargo == null) ? queueTransportable(t, false)
+            : requeueCargo(cargo);
     }
 
     /**
@@ -1437,7 +1438,11 @@ public class TransportMission extends Mission {
      */
     public boolean queueTransportable(Transportable t, boolean requireMatch) {
         Cargo cargo = makeCargo(t);
-        return (cargo == null) ? false : queueCargo(cargo, requireMatch);
+        if (cargo == null) {
+            logger.warning(tag + " failed to make cargo of " + t + ": " + this);
+            return false;
+        }
+        return queueCargo(cargo, requireMatch);
     }
 
     /**

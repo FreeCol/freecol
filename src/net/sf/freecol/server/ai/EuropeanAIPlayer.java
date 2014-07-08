@@ -2021,14 +2021,11 @@ public class EuropeanAIPlayer extends AIPlayer {
                         .append(" for target ").append(target)
                         .append(" with units:");
                 }
-                if (tm == null) {
-                    tm = new TransportMission(aiMain, aiCarrier);
-                    aiCarrier.changeMission(tm, "Transport-0");
-                }
-                Mission m = new BuildColonyMission(aiMain, aiu, target);
-                aiu.changeMission(m, "Builder-0");
+                aiu.setMission(new BuildColonyMission(aiMain, aiu, target));
                 sb.append(" ").append(u);
             }
+            tm = new TransportMission(aiMain, aiCarrier);
+            aiCarrier.setMission(tm);
         }
 
         // Put in some backup missions.

@@ -254,7 +254,7 @@ public class AIUnit extends AIObject implements Transportable {
         this.dynamicPriority = 0;
         if (mission != null && getUnit().isOnCarrier()) {
             if (!requeueOnCurrentCarrier()) {
-                logger.warning("Requeue on mission changed failed: " + mission);
+                logger.warning("Requeue on mission change failed: " + mission);
             }
         }            
     }
@@ -315,11 +315,15 @@ public class AIUnit extends AIObject implements Transportable {
         final AIUnit aiCarrier = getAIMain().getAIUnit(carrier);
         if (aiCarrier == null) return false;
         Mission m = aiCarrier.getMission();
-        if (!(m instanceof TransportMission)
-            || !((TransportMission)m).queueTransportable(this, false))
-            return false;
-        setTransport(aiCarrier, "requeued");
-        return true;
+        if (m instanceof TransportMission) {
+            if (((TransportMission)m).retargetTransportable(this)) {
+                setTransport(aiCarrier, "requeued");
+                return true;
+            }
+        } else {
+            logger.warning("Carrier mission not TransportMission: " + carrier);
+        }
+        return false;
     }
         
     /**
