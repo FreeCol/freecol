@@ -253,7 +253,12 @@ public class AIUnit extends AIObject implements Transportable {
         setMission(mission);
         this.dynamicPriority = 0;
         if (mission != null && getUnit().isOnCarrier()) {
-            if (!requeueOnCurrentCarrier()) {
+            // Check if arrived, otherwise requeue
+            if (mission.getTarget() != null
+                && Map.isSameLocation(mission.getTarget(),
+                                      getUnit().getLocation())) {
+                leaveTransport(null);
+            } else if (!requeueOnCurrentCarrier()) {
                 logger.warning("Requeue on mission change failed: " + mission);
             }
         }            
@@ -539,7 +544,7 @@ public class AIUnit extends AIObject implements Transportable {
      */
     public void setTransport(AIUnit transport, String reason) {
         if (this.transport != transport) {
-            logger.finest("setTransport " + this + " on " + transport
+            logger.finest("setTransport " + this + " -> " + transport
                 + ": " + reason);
         }
         this.transport = transport;
