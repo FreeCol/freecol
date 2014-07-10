@@ -215,6 +215,15 @@ public class ColonyTile extends WorkLocation {
                 .addName("%location%", name);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public String toShortString() {
+        return getColony().getName()
+            + "-" + getWorkTile().getType().getSuffix()
+            + "-" + getTile().getDirection(getWorkTile()).toString();
+    }
+
 
     // Interface UnitLocation
     // Inherits:

@@ -2410,6 +2410,13 @@ public class Map extends FreeColGameObject implements Location {
         return null; // Obviously irrelevant for a Map.
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public String toShortString() {
+        return "Map";
+    }
+
 
     // Override FreeColGameObject
 

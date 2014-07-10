@@ -151,4 +151,11 @@ public interface Location extends ObjectWithId {
      *     any, or null if none found.
      */
     public IndianSettlement getIndianSettlement();
+
+    /**
+     * Get a short description of this location.
+     *
+     * @return A short description.
+     */
+    public String toShortString();
 }

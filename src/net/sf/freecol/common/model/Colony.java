@@ -2608,6 +2608,13 @@ public class Colony extends Settlement implements Nameable {
         return units;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public String toShortString() {
+        return getName();
+    }
+
 
     // Interface UnitLocation
     // Inherits

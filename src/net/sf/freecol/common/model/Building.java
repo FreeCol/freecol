@@ -383,6 +383,13 @@ public class Building extends WorkLocation
             .add("%location%", getNameKey());
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public String toShortString() {
+        return getColony().getName() + "-" + getType().getSuffix();
+    }
+
 
     // Interface UnitLocation
     // Inherits:

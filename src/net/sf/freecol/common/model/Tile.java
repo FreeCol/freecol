@@ -1977,6 +1977,16 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public String toShortString() {
+        StringBuilder sb = new StringBuilder(16);
+        sb.append(getX()).append(",").append(getY())
+            .append("-").append(getType().getSuffix());
+        return sb.toString();
+    }
+
 
     // Interface Named
 

@@ -120,6 +120,14 @@ public class HighSeas extends UnitLocation {
         return StringTemplate.key("model.tile.highSeas.name");
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public String toShortString() {
+        return "HighSeas";
+    }
+
+
     // UnitLocation
     // Inherits
     //   UnitLocation.getSpaceTaken

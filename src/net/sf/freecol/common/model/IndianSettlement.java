@@ -1079,7 +1079,14 @@ public class IndianSettlement extends Settlement {
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public String toShortString() {
+        return getName();
+    }
 
+    
     // UnitLocation
     // Inherits
     //   UnitLocation.getSpaceTaken

@@ -1620,20 +1620,12 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
      * @return The text description.
      */
     private String locationDescription(Location loc) {
-        if (loc instanceof Building) {
-            Building building = (Building)loc;
-            return building.getType().getSuffix();
-        } else if (loc instanceof ColonyTile) {
-            ColonyTile colonyTile = (ColonyTile)loc;
-            // Have to use positions to get the direction as
-            // Map.getDirection() will not see copied tiles.
-            Tile cTile = colonyTile.getColony().getTile();
-            Tile wTile = colonyTile.getWorkTile();
-            return colonyTile.getWorkTile().getType().getSuffix() + "/"
-                + cTile.getDirection(wTile).toString();
-        } else {
-            return loc.getId();
+        String name = colony.getName() + "-";
+        String desc = loc.toShortString();
+        if (desc.startsWith(name)) {
+            desc = desc.substring(name.length(), desc.length());
         }
+        return desc;
     }
 
     /**

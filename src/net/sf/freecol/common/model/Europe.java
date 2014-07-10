@@ -291,6 +291,13 @@ public class Europe extends UnitLocation implements Ownable, Named {
         return super.canAdd(locatable);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public String toShortString() {
+        return "Europe";
+    }
+
 
     // Interface UnitLocation
     // Inheriting

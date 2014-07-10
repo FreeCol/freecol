@@ -3436,6 +3436,13 @@ public class Unit extends GoodsLocation
         return (location != null) ? location.getSettlement() : null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public String toShortString() {
+        return getId() + "-" + getType().getSuffix();
+    }
+
 
     // UnitLocation
     // Inherits
