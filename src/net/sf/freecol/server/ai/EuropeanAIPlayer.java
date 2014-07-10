@@ -1564,6 +1564,8 @@ public class EuropeanAIPlayer extends AIPlayer {
 
         // Give remaining units the fallback mission.
         aiUnits.addAll(navalUnits);
+        List<Colony> ports = null;
+        int nPorts = player.getNumberOfPorts();
         for (AIUnit aiUnit : aiUnits) {
             final Unit unit = aiUnit.getUnit();
             Mission m = aiUnit.getMission();
@@ -1572,7 +1574,16 @@ public class EuropeanAIPlayer extends AIPlayer {
                 continue;
             }
 
-            if (aiUnit.getMission() instanceof IdleAtSettlementMission) {
+            if (unit.isInEurope() && unit.isPerson() && nPorts > 0) {
+                // Choose a port to add to
+                if (ports == null) ports = player.getPorts();
+                Colony c = ports.remove(0);
+                m = new WorkInsideColonyMission(aiMain, aiUnit,
+                                                aiMain.getAIColony(c));
+                aiUnit.changeMission(m, "Work");
+                ports.add(c);
+                    
+            } else if (aiUnit.getMission() instanceof IdleAtSettlementMission) {
                 ; // already idle
             } else {
                 m = new IdleAtSettlementMission(aiMain, aiUnit);

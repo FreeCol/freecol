@@ -2442,6 +2442,20 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Get the port settlements.
+     *
+     * @return A list of port <code>Colony</code>s.
+     */
+    public List<Colony> getPorts() {
+        if (!isEuropean()) return Collections.<Colony>emptyList();
+        List<Colony> result = new ArrayList<Colony>();
+        for (Colony colony : getColonies()) {
+            if (colony.isConnectedPort()) result.add(colony);
+        }
+        return result;
+    }
+
+    /**
      * Does this player own a given settlement.
      *
      * @param settlement The <code>Settlement</code> to check.
