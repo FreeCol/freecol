@@ -234,8 +234,8 @@ public class WorkerWish extends Wish {
         StringBuilder sb = new StringBuilder(64);
         sb.append("[").append(getId())
             .append(" for ").append(destination)
-            .append(" ").append((unitType == null) ? "null" : unitType.getNameKey())
-            .append(" (").append(getValue())
+            .append(" ").append((unitType == null) ? "null" : unitType.getSuffix())
+            .append("(").append(getValue())
             .append((expertNeeded) ? ", expert" : "")
             .append(")]");
         return sb.toString();

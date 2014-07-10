@@ -249,8 +249,8 @@ public class GoodsWish extends Wish {
             .append(" for ").append(destination)
             .append(" on ").append(transportable)
             .append(" ").append(amountRequested)
-            .append(" ").append(goodsType)
-            .append(" (").append(getValue())
+            .append(" ").append(goodsType.getSuffix())
+            .append("(").append(getValue())
             .append(")]");
         return sb.toString();
     }

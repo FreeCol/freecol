@@ -36,6 +36,7 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.server.ai.mission.Mission;
 import net.sf.freecol.server.ai.mission.TransportMission;
 
 import org.w3c.dom.Element;
@@ -272,7 +273,7 @@ public class AIGoods extends AIObject implements Transportable {
      * @param reason A reason for changing the transport.
      */
     public void setTransport(AIUnit transport, String reason) {
-        logger.finest("setTransport " + this + " on " + transport
+        logger.finest("setTransport " + this + " -> " + transport
             + ": " + reason);
         this.transport = transport;
     }

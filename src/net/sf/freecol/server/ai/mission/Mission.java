@@ -823,7 +823,7 @@ public abstract class Mission extends AIObject {
         Location newTarget = findTarget();
         setTarget(newTarget);
         logger.finest(tag + " retargetting(" + reason + ") -> " + newTarget
-            + "(transport " + claim + "): " + this);
+            + " (transport " + claim + "): " + this);
         return newTarget != null;
     }
 
