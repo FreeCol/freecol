@@ -110,7 +110,7 @@ public class TensionTest extends FreeColTestCase {
         assertEquals(Stance.PEACE, stance);
 
         // ask the AI to secure the settlement
-        indianAI.secureIndianSettlement(settlement);
+        indianAI.secureIndianSettlement(settlement, null);
 
         // the tension and stance have not changed
         tension = indian.getTension(european);

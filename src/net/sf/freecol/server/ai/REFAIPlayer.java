@@ -447,10 +447,10 @@ public class REFAIPlayer extends EuropeanAIPlayer {
 
 
     /**
-     * Gives a mission to non-naval units.
+     * {@inheritDoc}
      */
     @Override
-    public void giveNormalMissions() {
+    public void giveNormalMissions(StringBuffer sb) {
         // Give military missions to all REF units.
         for (AIUnit aiu : getAIUnits()) {
             Unit u = aiu.getUnit();
@@ -470,7 +470,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         }
 
         // Fall back to the normal EuropeanAI behaviour for non-army.
-        super.giveNormalMissions();
+        super.giveNormalMissions(sb);
     }
 
 

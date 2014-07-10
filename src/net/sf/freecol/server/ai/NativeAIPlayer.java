@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -141,28 +142,15 @@ public class NativeAIPlayer extends AIPlayer {
 
 
     /**
-     * Determines the stances towards each player.
-     * That is: should we declare war?
-     */
-    private void determineStances() {
-        final Player player = getPlayer();
-
-        for (Player p : getGame().getLivePlayers(player)) {
-            Stance newStance = determineStance(p);
-            if (newStance != player.getStance(p)) {
-                getAIMain().getFreeColServer().getInGameController()
-                    .changeStance(player, newStance, p, true);
-            }
-        }
-    }
-
-    /**
      * Simple initialization of AI missions given that we know the starting
      * conditions.
+     *
+     * @param sb An optional <code>StringBuffer</code>  to log to.
      */
-    private void initializeMissions() {
-        AIMain aiMain = getAIMain();
-        Player player = getPlayer();
+    private void initializeMissions(StringBuffer sb) {
+        final AIMain aiMain = getAIMain();
+        final Player player = getPlayer();
+        if (sb != null) sb.append("\n  Initialize");
 
         // Give defensive missions up to the minimum expected defence,
         // leave the rest with the default wander-hostile mission.
@@ -177,12 +165,45 @@ public class NativeAIPlayer extends AIPlayer {
                 AIUnit aiu = getAIUnit(u);
                 aiu.changeMission(new UnitWanderHostileMission(aiMain, aiu),
                                   "Wander-0");
+                if (sb != null) sb.append(u.toShortString())
+                                    .append(" wander, ");
             }
             for (Unit u : units) {
                 AIUnit aiu = getAIUnit(u);
                 aiu.changeMission(new DefendSettlementMission(aiMain, aiu, is),
                                   "Defend-" + is.getName());
+                if (sb != null) sb.append(u.toShortString())
+                                    .append(" defend-").append(is.getName())
+                                    .append(", ");
             }
+        }
+        if (sb != null) sb.setLength(sb.length() - 2);
+    }
+
+    /**
+     * Determines the stances towards each player.
+     * That is: should we declare war?
+     *
+     * @param sb An optional <code>StringBuffer</code> to log to.
+     */
+    private void determineStances(StringBuffer sb) {
+        final Player player = getPlayer();
+        int point = (sb == null) ? -1 : sb.length();
+
+        for (Player p : getGame().getLivePlayers(player)) {
+            Stance newStance = determineStance(p);
+            if (newStance != player.getStance(p)) {
+                getAIMain().getFreeColServer().getInGameController()
+                    .changeStance(player, newStance, p, true);
+                if (sb != null) {
+                    sb.append(" ").append(p.getNation().getSuffix())
+                        .append("->").append(newStance).append(", ");
+                }
+            }
+        }
+        if (sb != null && sb.length() > point) {
+            sb.insert(point, "\n  Stance changes:");
+            sb.setLength(sb.length() - 2);
         }
     }
 
@@ -190,23 +211,31 @@ public class NativeAIPlayer extends AIPlayer {
      * Takes the necessary actions to secure the settlements.
      * This is done by making new military units or to give existing
      * units new missions.
+     *
+     * @param randoms An array of random settlement indexes.
+     * @param sb An optional <code>StringBuffer</code> to log to.
      */
-    private void secureSettlements() {
+    private void secureSettlements(int[] randoms, StringBuffer sb) {
+        int randomIdx = 0;
         List<IndianSettlement> settlements
             = getPlayer().getIndianSettlements();
         for (IndianSettlement is : settlements) {
             // Spread arms and horses between camps
             // TODO: maybe make this dependent on difficulty level?
-            int n = Utils.randomInt(logger, "Secure",
-                                    getAIRandom(), settlements.size());
+            int n = randoms[randomIdx++];
             IndianSettlement settlement = settlements.get(n);
             if (settlement != is) {
                 is.tradeGoodsWithSettlement(settlement);
             }
         }
         for (IndianSettlement is : settlements) {
-            equipBraves(is);
-            secureIndianSettlement(is);
+            int point = (sb == null) ? -1 : sb.length();
+            equipBraves(is, sb);
+            secureIndianSettlement(is, sb);
+            if (sb != null && sb.length() > point) {
+                sb.insert(point, "\n  At " + is.getName());
+                sb.setLength(sb.length() - 2);
+            }
         }
     }
 
@@ -215,8 +244,9 @@ public class NativeAIPlayer extends AIPlayer {
      * Public for the test suite.
      *
      * @param is The <code>IndianSettlement</code> where the equipping occurs.
+     * @param sb An optional <code>StringBuffer</code> to log to.
      */
-    public void equipBraves(IndianSettlement is) {
+    public void equipBraves(IndianSettlement is, StringBuffer sb) {
         final Specification spec = getSpecification();
         final Role nativeDragoon = spec.getRole("model.role.nativeDragoon");
         final Role armedBrave = spec.getRole("model.role.armedBrave");
@@ -232,15 +262,20 @@ public class NativeAIPlayer extends AIPlayer {
 
         boolean moreHorses = true, moreMuskets = true;
         for (Unit u : units) {
-            if (!u.isArmed()) {
+            Role old = u.getRole();
+            if (!u.isArmed() && moreMuskets) {
                 Role r = (u.isMounted()) ? nativeDragoon : armedBrave;
                 moreMuskets = is.priceGoods(u.getGoodsDifference(r, 1)) == 0
                     && getAIUnit(u).equipForRole(r.getId(), false);
             }
-            if (!u.isMounted()) {
+            if (!u.isMounted() && moreHorses) {
                 Role r = (u.isArmed()) ? nativeDragoon : mountedBrave;
                 moreHorses = is.priceGoods(u.getGoodsDifference(r, 1)) == 0
                     && getAIUnit(u).equipForRole(r.getId(), false);
+            }
+            if (sb != null && u.getRole() != old) {
+                sb.append(u.toShortString()).append(" upgraded from ")
+                    .append(old.getSuffix()).append(", ");
             }
             if (!moreHorses && !moreMuskets) break;
         }
@@ -251,8 +286,10 @@ public class NativeAIPlayer extends AIPlayer {
      * Public for the test suite.
      *
      * @param is The <code>IndianSettlement</code> to secure.
+     * @param sb An optional <code>StringBuffer</code> to log to.
      */
-    public void secureIndianSettlement(final IndianSettlement is) {
+    public void secureIndianSettlement(final IndianSettlement is,
+                                       StringBuffer sb) {
         final AIMain aiMain = getAIMain();
         final Player player = getPlayer();
         final CombatModel cm = getGame().getCombatModel();
@@ -268,9 +305,6 @@ public class NativeAIPlayer extends AIPlayer {
         }
 
         // Collect the current defenders
-        StringBuffer sb = new StringBuffer(64);
-        sb.append("Defending settlement ")
-            .append(is.getName()).append(" with:");
         for (Unit u : new ArrayList<Unit>(units)) {
             AIUnit aiu = aiMain.getAIUnit(u);
             if (aiu == null) {
@@ -278,7 +312,6 @@ public class NativeAIPlayer extends AIPlayer {
             } else if (aiu.getMission() instanceof DefendSettlementMission
                 && (((DefendSettlementMission)aiu.getMission())
                     .getTarget() == is)) {
-                sb.append(" ").append(u.getId());
                 defenders.add(u);
                 units.remove(u);
             } else if (Mission.invalidNewMissionReason(aiu) != null) {
@@ -303,7 +336,6 @@ public class NativeAIPlayer extends AIPlayer {
                     } else if (aiu.getMission() instanceof DefendSettlementMission
                         && ((DefendSettlementMission)aiu.getMission())
                         .getTarget() == is) {
-                        sb.append(" ").append(u.getId());
                         defenders.add(u);
                     } else if (Mission.invalidNewMissionReason(aiu) == null) {
                         units.add(u);
@@ -330,9 +362,6 @@ public class NativeAIPlayer extends AIPlayer {
                 if (value > 0.0f) threats.put(t, new Float(value));
             }
         }
-        sb.append("\n  defenders=").append(defenders.size())
-            .append(" minimum=").append(minimumDefence)
-            .append(" threats=").append(threats.size());
 
         // Sort the available units by proximity to the settlement.
         // Simulates favouring the first warriors found by outgoing messengers.
@@ -361,7 +390,6 @@ public class NativeAIPlayer extends AIPlayer {
                 AIUnit aiu = aiMain.getAIUnit(u);
                 aiu.changeMission(new DefendSettlementMission(aiMain, aiu, is),
                                   "Defend-" + is.getName());
-                sb.append(" [+").append(u.getId()).append("+]");
                 defenders.add(u);
                 if (defenders.size() >= needed) break;
             }
@@ -382,6 +410,14 @@ public class NativeAIPlayer extends AIPlayer {
                 }
             });
 
+        if (sb != null && !defenders.isEmpty()) {
+            sb.append(" defend with:");
+            for (Unit u : defenders) sb.append(" ").append(u.toShortString());
+            sb.append(" minimum=").append(minimumDefence)
+                .append(" threats=").append(threats.size())
+                .append(", ");
+        }
+
         // Assign units to attack the threats, greedily chosing closest unit.
         while (!threatTiles.isEmpty() && !units.isEmpty()) {
             Tile tile = threatTiles.remove(0);
@@ -401,29 +437,32 @@ public class NativeAIPlayer extends AIPlayer {
             units.remove(unit);
             AIUnit aiUnit = aiMain.getAIUnit(unit);
             Unit target = tile.getDefendingUnit(unit);
-            sb.append("\n  Sends ").append(aiUnit.toString())
-                .append(" to attack ").append(target.toString())
-                .append(" at ").append(tile.toString());
             Mission m = new UnitSeekAndDestroyMission(aiMain, aiUnit, target);
             aiUnit.changeMission(m, "Raid-" + target.getId());
+            if (sb != null) {
+                sb.append("send ").append(aiUnit.getUnit().toShortString())
+                    .append(" to attack ").append(target.toShortString())
+                    .append(" at ").append(tile.toShortString())
+                    .append(", ");
+            }
         }
-        logger.finest(sb.toString());
     }
 
     /**
      * Gives a mission to all units.
+     *
+     * @param sb An optional <code>StringBuffer</code> to log to.
      */
-    private void giveNormalMissions() {
+    private void giveNormalMissions(StringBuffer sb) {
         final AIMain aiMain = getAIMain();
         final Player player = getPlayer();
         final Specification spec = aiMain.getGame().getSpecification();
         final int turnNumber = getGame().getTurn().getNumber();
-        List<AIUnit> aiUnits = getAIUnits();
-        final int allUnits = aiUnits.size();
         final List<AbstractGoods> scoutEq = spec.getRole("model.role.mountedBrave")
             .getRequiredGoods();
         final List<AbstractGoods> soldierEq = spec.getRole("model.role.armedBrave")
             .getRequiredGoods();
+        List<AIUnit> aiUnits = getAIUnits();
 
         List<AIUnit> done = new ArrayList<AIUnit>();
         reasons.clear();
@@ -445,17 +484,6 @@ public class NativeAIPlayer extends AIPlayer {
         }
         aiUnits.removeAll(done);
         done.clear();
-
-        StringBuffer sb = null;
-        if (logger.isLoggable(Level.FINE)) {
-            sb = new StringBuffer(256);
-            sb.append(player.getNation().getSuffix())
-                .append(".giveNormalMissions(turn=").append(turnNumber)
-                .append(" settlements=").append(player.getNumberOfSettlements())
-                .append(" free-land-units=");
-            for (AIUnit aiu : aiUnits) sb.append(" ").append(aiu);
-            sb.append(")");
-        }
 
         for (AIUnit aiUnit : aiUnits) {
             final Unit unit = aiUnit.getUnit();
@@ -493,34 +521,39 @@ public class NativeAIPlayer extends AIPlayer {
         aiUnits.removeAll(done);
         done.clear();
 
+        // Log
         if (sb != null) {
-            for (AIUnit aiu : getAIUnits()) {
-                Unit u = aiu.getUnit();
-                String reason = reasons.get(u);
-                if (reason == null) reason = "OMITTED";
-                Mission m = aiu.getMission();
-                sb.append("\n  ").append(u.getLocation())
-                    .append(" ").append(reason)
-                    .append("-").append((m == null) ? "NONE" : m.toString());
+            if (!aiUnits.isEmpty()) {
+                sb.append("\n  Free Land Units:");
+                for (AIUnit aiu : aiUnits) {
+                    sb.append(" ").append(aiu.getUnit().toShortString());
+                }
             }
-            logger.fine(sb.toString());
+            sb.append("\n  Missions(")
+                .append(" settlements=").append(player.getNumberOfSettlements())
+                .append(" )");
+            logMissions(reasons, sb);
         }
     }
 
     /**
      * Brings gifts to nice players with nearby colonies.
+     *
+     * @param randoms An array of random percentages.
+     * @param sb An optional <code>StringBuffer</code> to log to.
      */
-    private void bringGifts() {
+    private void bringGifts(int[] randoms, StringBuffer sb) {
         final Player player = getPlayer();
         final Map map = getGame().getMap();
         final CostDecider cd = CostDeciders.numberOfLegalTiles();
         final int giftProbability = getGame().getSpecification()
             .getInteger(GameOptions.GIFT_PROBABILITY);
+        int point = (sb == null) ? -1 : sb.length();
+        int randomIdx = 0;
 
         for (IndianSettlement is : player.getIndianSettlements()) {
             // Do not bring gifts all the time.
-            if (Utils.randomInt(logger, is.getName() + " bring gifts",
-                    getAIRandom(), 100) >= giftProbability) continue;
+            if (randoms[randomIdx++] >= giftProbability) continue;
 
             // Check if the settlement has anything to give.
             Goods gift = is.getRandomGift(getAIRandom());
@@ -541,11 +574,15 @@ public class NativeAIPlayer extends AIPlayer {
                 }
             }
             if (alreadyAssignedUnits > MAX_NUMBER_OF_GIFTS_BEING_DELIVERED) {
-                logger.finest(is.getName() + " has " + alreadyAssignedUnits
-                    + " already.");
+                if (sb != null) {
+                    sb.append(is.getName()).append(" has ")
+                        .append(alreadyAssignedUnits).append(" already, ");
+                }
                 continue;
             } else if (availableUnits.isEmpty()) {
-                logger.finest(is.getName() + " has no gift units.");
+                if (sb != null) {
+                    sb.append(is.getName()).append(" has no gift units, ");
+                }
                 continue;
             }
             // Pick a random available capable unit.
@@ -564,7 +601,9 @@ public class NativeAIPlayer extends AIPlayer {
                 }
             }
             if (unit == null) {
-                logger.finest(is.getName() + " has no suitable gift units.");
+                if (sb != null) {
+                    sb.append(is.getName()).append(" found no gift unit, ");
+                }
                 continue;
             }
 
@@ -589,7 +628,9 @@ public class NativeAIPlayer extends AIPlayer {
             // If there are any suitable colonies, pick a random one
             // to send a gift to.
             if (nearbyColonies.isEmpty()) {
-                logger.finest(is.getName() + " has no nearby gift colonies.");
+                if (sb != null) {
+                    sb.append(is.getName()).append(" found no gift colonies, ");
+                }
                 continue;
             }
             Colony target = RandomChoice.getWeightedRandom(logger,
@@ -600,25 +641,39 @@ public class NativeAIPlayer extends AIPlayer {
 
             // Send the unit.
             Mission m = new IndianBringGiftMission(getAIMain(), aiUnit, target);
-            aiUnit.changeMission(m, "Gift-" + gift + "-" + is.getName()
-                + "->" + target.getName());
+            aiUnit.changeMission(m, "Gift-" + is.getName());
+            if (sb != null) {
+                sb.append(is.getName())
+                    .append(" sends ").append(aiUnit.getUnit().toShortString())
+                    .append(" with ").append(gift)
+                    .append("->").append(target.getName())
+                    .append(", ");
+            }
+        }
+        if (sb != null && sb.length() > point) {
+            sb.insert(point, "\n  Gifts: ");
+            sb.setLength(sb.length() - 2);
         }
     }
 
     /**
      * Demands tribute from nasty players with nearby colonies.
+     *
+     * @param randoms An array of random percentages.
+     * @param sb An optional <code>StringBuffer</code> to log to.
      */
-    private void demandTribute() {
+    private void demandTribute(int[] randoms, StringBuffer sb) {
         final Map map = getGame().getMap();
         final Player player = getPlayer();
         final CostDecider cd = CostDeciders.numberOfLegalTiles();
         final int demandProbability = getGame().getSpecification()
             .getInteger(GameOptions.DEMAND_PROBABILITY);
+        int point = (sb == null) ? -1 : sb.length();
+        int randomIdx = 0;
 
         for (IndianSettlement is : player.getIndianSettlements()) {
             // Do not demand tribute all of the time.
-            if (Utils.randomInt(logger, is.getName() + " demand tribute",
-                    getAIRandom(), 100) >= demandProbability) continue;
+            if (randoms[randomIdx++] >= demandProbability) continue;
 
             // Check if there are available units, and if there are already
             // enough missions in operation.
@@ -635,11 +690,15 @@ public class NativeAIPlayer extends AIPlayer {
                 }
             }
             if (alreadyAssignedUnits > MAX_NUMBER_OF_DEMANDS) {
-                logger.finest(is.getName() + " has " + alreadyAssignedUnits
-                    + " already.");
+                if (sb != null) {
+                    sb.append(is.getName()).append(" has ")
+                        .append(alreadyAssignedUnits).append(" already, ");
+                }
                 continue;
             } else if (availableUnits.isEmpty()) {
-                logger.finest(is.getName() + " has no demand units.");
+                if (sb != null) {
+                    sb.append(is.getName()).append(" has no demand units, ");
+                }
                 continue;
             }
             // Pick a random available capable unit.
@@ -658,7 +717,9 @@ public class NativeAIPlayer extends AIPlayer {
                 }
             }
             if (unit == null) {
-                logger.finest(is.getName() + " has no suitable demand units.");
+                if (sb != null) {
+                    sb.append(is.getName()).append(" found no demand unit, ");
+                }
                 continue;
             }
 
@@ -685,26 +746,30 @@ public class NativeAIPlayer extends AIPlayer {
             // Sometimes a random one, sometimes the weakest, sometimes the
             // most annoying.
             if (nearbyColonies.isEmpty()) {
-                logger.finest(is.getName() + " has no nearby demand colonies.");
+                if (sb != null) {
+                    sb.append(is.getName()).append(" found no demand colonies, ");
+                }
                 continue;
             }
             Colony target = RandomChoice.getWeightedRandom(logger,
                 "Choose demand colony", nearbyColonies, getAIRandom());
             if (target == null) {
-                StringBuffer sb = new StringBuffer(64);
-                sb.append("No demand target for ").append(is.getName());
-                for (RandomChoice<Colony> rc : nearbyColonies) {
-                    sb.append("\n  ").append(rc.getObject().getName())
-                        .append(" p=").append(rc.getProbability());
-                }
-                logger.warning(sb.toString());
+                sb.append(is.getName()).append(" found no demand target, ");
                 continue;
             }
 
             // Send the unit.
             Mission m = new IndianDemandMission(getAIMain(), aiUnit, target);
-            aiUnit.changeMission(m, "Demand-" + is.getName()
-                + "->" + target.getName());
+            aiUnit.changeMission(m, "Demand-" + is.getName());
+            if (sb != null) {
+                sb.append(is.getName()).append(" sends ")
+                    .append(aiUnit.getUnit().toShortString())
+                    .append("->").append(target.getName()).append(", ");
+            }
+        }
+        if (sb != null && sb.length() > point) {
+            sb.insert(point, "\n  Tribute: ");
+            sb.setLength(sb.length() - 2);
         }
     }
 
@@ -739,27 +804,46 @@ public class NativeAIPlayer extends AIPlayer {
      * {@inheritDoc}
      */
     public void startWorking() {
-        Turn turn = getGame().getTurn();
-        logger.finest(getClass().getName() + " in " + turn
-            + ": " + getPlayer().getNationId());
+        final Player player = getPlayer();
+        final Turn turn = getGame().getTurn();
+        final int nSettlements = player.getNumberOfSettlements();
+        final Random air = getAIRandom();
+
+        StringBuffer sb = null;
+        if (logger.isLoggable(Level.FINEST)) {
+            sb = new StringBuffer(256);
+            sb.append(player.getNation().getSuffix())
+                .append(" in ").append(turn)
+                .append("/").append(turn.getNumber());
+        }
+
         sessionRegister.clear();
         clearAIUnits();
-        determineStances();
+        determineStances(sb);
         if (turn.isFirstTurn()) {
-            initializeMissions();
+            initializeMissions(sb);
         } else {
+            int[] randoms;
             abortInvalidMissions();
-            secureSettlements();
-            bringGifts();
-            demandTribute();
-            giveNormalMissions();
-            doMissions();
+            randoms = Utils.randomInts(logger, "Trades", air,
+                                       nSettlements, nSettlements);
+            secureSettlements(randoms, sb);
+            randoms = Utils.randomInts(logger, "Gifts", air,
+                                       100, nSettlements);
+            bringGifts(randoms, sb);
+            randoms = Utils.randomInts(logger, "Tribute", air,
+                                       100, nSettlements);
+            demandTribute(randoms, sb);
+            giveNormalMissions(sb);
+            doMissions(sb);
             abortInvalidMissions();
-            giveNormalMissions();
+            giveNormalMissions(sb);
         }
-        doMissions();
+        doMissions(null);
         abortInvalidMissions();
         clearAIUnits();
+
+        if (sb != null) logger.finest(sb.toString());
     }
 
     /**

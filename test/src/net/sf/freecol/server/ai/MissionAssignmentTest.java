@@ -235,7 +235,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
         assertEquals("Wrong Indian player tension towards dutch",
                      Tension.Level.HATEFUL.getLimit(),
                      inca.getTension(dutch).getValue());
-        aiInca.secureIndianSettlement(camp);
+        aiInca.secureIndianSettlement(camp, null);
 
         // Verify if a unit was assigned a UnitSeekAndDestroyMission
         boolean isSeekAndDestroyMission = false;
@@ -303,7 +303,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
                      inca.getTension(dutch).getValue());
 
         aiInca.abortInvalidMissions();
-        aiInca.secureIndianSettlement(camp);
+        aiInca.secureIndianSettlement(camp, null);
         boolean seeking = false;
         for (Unit brave : inca.getUnits()) {
             AIUnit aiUnit = aiMain.getAIUnit(brave);

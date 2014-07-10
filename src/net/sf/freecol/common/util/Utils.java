@@ -80,6 +80,17 @@ public class Utils {
     }
 
     /**
+     * Truncate a string to a maximum length.
+     *
+     * @param str The string to chop.
+     * @param maxLength The maximum length.
+     * @return A string not exceeding maxLength.
+     */
+    public static String chop(String str, int maxLength) {
+        return (str.size() > maxLength) ? str.substring(0, maxLength) : str;
+    }
+
+    /**
      * Will check if both objects are equal but also checks for null.
      *
      * @param one First object to compare

@@ -20,6 +20,8 @@
 package net.sf.freecol.server.ai;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -34,9 +36,11 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
 import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
@@ -63,6 +67,26 @@ import net.sf.freecol.server.networking.DummyConnection;
 public abstract class AIPlayer extends AIObject {
 
     private static final Logger logger = Logger.getLogger(AIPlayer.class.getName());
+
+    /** A comparator to sort AI units by location. */
+    private static final Comparator<AIUnit> aiUnitLocationComparator
+        = new Comparator<AIUnit>() {
+            public int compare(AIUnit a1, AIUnit a2) {
+                Location l1 = (a1 == null) ? null
+                    : (a1.getUnit() == null) ? null
+                    : a1.getUnit().getLocation();
+                Location l2 = (a2 == null) ? null
+                    : (a2.getUnit() == null) ? null
+                    : a2.getUnit().getLocation();
+                FreeColObject f1 = (l1 instanceof WorkLocation)
+                    ? ((WorkLocation)l1).getColony()
+                    : (FreeColObject)l1;
+                FreeColObject f2 = (l2 instanceof WorkLocation)
+                    ? ((WorkLocation)l2).getColony()
+                    : (FreeColObject)l2;
+                return FreeColObject.compareIds(f1, f2);
+            }
+        };
 
     /** The FreeColGameObject this AIObject contains AI-information for. */
     private ServerPlayer player;
@@ -369,6 +393,41 @@ public abstract class AIPlayer extends AIObject {
     }
 
     /**
+     * Log the missions of this player.
+     *
+     * @param reasons A map of reasons for the current mission by unit.
+     * @param sb A <code>StringBuffer</code> to log to.
+     */
+    protected void logMissions(java.util.Map<Unit, String> reasons,
+                               StringBuffer sb) {
+        List<AIUnit> units = getAIUnits();
+        Collections.sort(units, aiUnitLocationComparator);
+        for (AIUnit aiu : units) {
+            Unit u = aiu.getUnit();
+            String reason = reasons.get(u);
+            if (reason == null) reason = "OMITTED";
+            String ms = "NONE";
+            Location target = null;
+            if (aiu.hasMission()) {
+                Mission m = aiu.getMission();
+                ms = Utils.lastPart(m.getClass().toString(), ".");
+                ms = ms.substring(0, ms.length() - "Mission".length());
+                target = m.getTarget();
+            }
+
+            
+            sb.append("\n  @")
+                .append(String.format("%-30s%-10s%-30s%-16s",
+                        Utils.chop(u.getLocation().toShortString(), 30),
+                        Utils.chop(reason, 10),
+                        Utils.chop(u.toShortString(), 30),
+                        Utils.chop(ms, 16)));
+            if (target != null) sb.append("->")
+                                    .append(target.toShortString());
+        }
+    }
+
+    /**
      * Checks the integrity of this AIPlayer.
      *
      * @param fix Fix problems if possible.
@@ -385,22 +444,6 @@ public abstract class AIPlayer extends AIObject {
     }
 
 
-    /**
-     * Makes every unit perform their mission.
-     *
-     * Overridden by European AI.
-     */
-    protected void doMissions() {
-        for (AIUnit au : getAIUnits()) {
-            try {
-                au.doMission();
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "doMissions failed for: " + au, e);
-            }
-        }
-    }
-
-
     // AI behaviour interface to be implemented by subclasses
 
     /**
@@ -409,6 +452,25 @@ public abstract class AIPlayer extends AIObject {
      * returns.
      */
     public abstract void startWorking();
+
+    /**
+     * Makes every unit perform their mission.
+     *
+     * @param sb An optional <code>StringBuffer</code> to log to.
+     */
+    protected void doMissions(StringBuffer sb) {
+        if (sb != null) sb.append("\n  Do Missions:");
+        for (AIUnit aiu : getAIUnits()) {
+            if (sb != null) {
+                sb.append(" ").append(aiu.getUnit().toShortString());
+            }
+            try {
+                aiu.doMission();
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "doMissions failed for: " + aiu, e);
+            }
+        }
+    }
 
     /**
      * Adjusts the score of this proposed mission for this player type.
