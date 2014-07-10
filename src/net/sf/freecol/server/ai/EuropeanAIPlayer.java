@@ -930,7 +930,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         Player player = getPlayer();
         if (!player.canBuildColonies()) return 0;
 
-        int nColonies = 0, nPorts = 0, nWorkers = 0;
+        int nColonies = 0, nPorts = 0, nWorkers = 0, nEuropean = 0;
         for (Settlement settlement : player.getSettlements()) {
             nColonies++;
             if (settlement.isConnectedPort()) nPorts++;
@@ -938,7 +938,13 @@ public class EuropeanAIPlayer extends AIPlayer {
                 if (u.isPerson()) nWorkers++;
             }
         }
-
+        Europe europe = player.getEurope();
+        if (europe != null) {
+            for (Unit u : europe.getUnitList()) {
+                if (u.isPerson()) nEuropean++;
+            }
+        }
+            
         // If would be good to have at least two colonies, and at least
         // one port.  After that, determine the ratio of workers to colonies
         // (which should be the average colony size), and if that is above
@@ -947,11 +953,10 @@ public class EuropeanAIPlayer extends AIPlayer {
         // low IMHO as it makes a lot of brittle colonies, 3 is too
         // high at least initially as it slows expansion.  For now,
         // arbitrarily choose e.
-        int result = (nColonies == 0 || nPorts == 0) ? 2
-            : ((nPorts == 1) && nWorkers >= 3) ? 1
-            : ((double)nWorkers / nColonies > Math.E) ? 1
+        return (nColonies == 0 || nPorts == 0) ? 2
+            : ((nPorts <= 1) && (nWorkers + nEuropean) >= 3) ? 1
+            : ((double)(nWorkers + nEuropean) / nColonies > Math.E) ? 1
             : 0;
-        return result;
     }
 
     /**
