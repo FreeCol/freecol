@@ -1002,9 +1002,9 @@ public abstract class Mission extends AIObject {
         StringBuilder sb = new StringBuilder(24);
         sb.append(Utils.lastPart(getClass().getName(), "."))
             .append("@").append(hashCode())
-            .append("-").append(aiUnit);
+            .append("-").append(aiUnit.getUnit().toShortString());
         Location target = getTarget();
-        if (target != null) sb.append("->").append(target);
+        if (target != null) sb.append("->").append(target.toShortString());
         return sb.toString();
     }
 }

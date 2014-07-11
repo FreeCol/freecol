@@ -3440,7 +3440,14 @@ public class Unit extends GoodsLocation
      * {@inheritDoc}
      */
     public String toShortString() {
-        return getId() + "-" + getType().getSuffix();
+        StringBuffer sb = new StringBuffer(32);
+        sb.append(getId()).append("-").append(getType().getSuffix());
+        if (!hasDefaultRole()) {
+            sb.append("-").append(getRoleSuffix());
+            int count = getRoleCount();
+            if (count > 1) sb.append(".").append(count);
+        }
+        return sb.toString();
     }
 
 

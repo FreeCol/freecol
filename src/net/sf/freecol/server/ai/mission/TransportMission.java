@@ -335,8 +335,9 @@ public class TransportMission extends Mission {
                     // Can the carrier deliver the unit to the target?
                     if ((path = unit.findPath(carrier.getLocation(), dst,
                                               carrier, null)) == null) {
-                        return "no-deliver " + unit + "/" + carrier
-                            + " -> " + dst;
+                        return "no-deliver " + unit.toShortString()
+                            + "/" + carrier.toShortString()
+                            + " -> " + dst.toShortString();
                     }
                     // Drop node must exist, the unit is aboard
                     drop = path.getTransportDropNode();
@@ -359,19 +360,20 @@ public class TransportMission extends Mission {
                     // does the unit need the carrier at all?
                     if ((path = unit.findPath(unit.getLocation(), dst,
                                               carrier, null)) == null) {
-                        return "no-collect+deliver " + unit + "/" + carrier
-                            + " -> " + dst;
+                        return "no-collect+deliver " + unit.toShortString()
+                            + "/" + carrier.toShortString()
+                            + " -> " + dst.toShortString();
                     }
                     if ((drop = path.getCarrierMove()) == null) {
-                        return "no-carrier-move for " + carrier
-                            + " to collect " + unit;
+                        return "no-carrier-move for " + carrier.toShortString()
+                            + " to collect " + unit.toShortString();
                     }
                     // TODO: proper rendezvous paths, unit needs
                     // to modify its target too!
                     if ((path = carrier.findPath(drop.getLocation())) == null) {
-                        return "no-collect of " + unit
-                            + " with " + carrier
-                            + " -> " + ((FreeColGameObject)drop.getLocation());
+                        return "no-collect of " + unit.toShortString()
+                            + " with " + carrier.toShortString()
+                            + " -> " + drop.getLocation().toShortString();
                     }
                     if (upLoc(drop.getLocation()) instanceof Tile) {
                         this.mode = CargoMode.PICKUP;
@@ -409,7 +411,8 @@ public class TransportMission extends Mission {
                         }
                     }
                     if (path == null) {
-                        return "no-deliver for " + carrier + " -> " + dst;
+                        return "no-deliver for " + carrier.toShortString()
+                            + " -> " + dst.toShortString();
                     } else {
                         this.mode = CargoMode.UNLOAD;
                         this.turns = path.getLastNode().getTotalTurns();
@@ -433,7 +436,8 @@ public class TransportMission extends Mission {
                     }
                     path = carrier.findPath(goods.getLocation());
                     if (path == null) {
-                        return "no-collect for " + carrier + " -> " + dst;
+                        return "no-collect for " + carrier.toShortString()
+                            + " -> " + dst.toShortString();
                     } else {
                         this.mode = CargoMode.LOAD;
                         this.turns = path.getLastNode().getTotalTurns();
@@ -497,7 +501,8 @@ public class TransportMission extends Mission {
             StringBuilder sb = new StringBuilder(64);
             sb.append("[").append(transportable.toString())
                 .append(" mode=").append(mode)
-                .append((mode.isCollection()) ? " from " : " to ").append(target)
+                .append((mode.isCollection()) ? " from " : " to ")
+                .append(target.toShortString())
                 .append(" ").append(turns).append("/").append(tries)
                 .append(" space=").append(spaceLeft)
                 .append((wrapped == null) ? "" : " wrap")
@@ -782,11 +787,12 @@ public class TransportMission extends Mission {
         if (cargo != null) {
             setTarget(cargo.getTarget());
             logger.finest(tag + " retargeted for cargo: "
-                + upLoc(cargo.getTarget()));
+                + upLoc(cargo.getTarget()).toShortString());
         } else if ((path = getTrivialPath()) != null) {
             Location loc = upLoc(path.getLastNode().getLocation());
             setTarget(loc);
-            logger.finest(tag + " retargeted safe port: " + loc);
+            logger.finest(tag + " retargeted safe port: "
+                + loc.toShortString());
         } else {
             setTarget(null);
             logger.finest(tag + " unable to retarget safe port: " + this);
@@ -922,7 +928,7 @@ public class TransportMission extends Mission {
         if (t.getTransportDestination() == null) {
             reason = "null transport destination";
         } else if (!isCarrying(t) && !t.carriableBy(carrier)) {
-            reason = "carrier " + carrier + " can not carry";
+            reason = "carrier " + carrier.toShortString() + " can not carry";
         } else {
             cargo = new Cargo(t, carrier);
             reason = cargo.setTarget();
@@ -1084,7 +1090,7 @@ public class TransportMission extends Mission {
             break;
         case 3:
             logger.finest(tag + " retarget succeeded for " + cargo
-                + " to " + dst + ": " + toFullString());
+                + " to " + dst.toShortString() + ": " + toFullString());
             break;
         }
         return result == 3;
@@ -1171,14 +1177,16 @@ public class TransportMission extends Mission {
                 AIUnit aiu = getAIMain().getAIUnit(u);
                 if (aiu == null) throw new IllegalStateException("Bogus:" + u);
                 retry.add(aiu);
-                if (sb != null) sb.append(" ").append(aiu);
+                if (sb != null) {
+                    sb.append(" ").append(aiu.getUnit().toShortString());
+                }
             }
         }
         if (!goodsPresent.isEmpty()) {
             if (sb != null) sb.append(", found unexpected goods:");
             for (Goods g : goodsPresent) {
                 AIGoods aig = new AIGoods(getAIMain(), carrier, g.getType(),
-                    g.getAmount(), null);
+                                          g.getAmount(), null);
                 retry.add(aig);
                 if (sb != null) sb.append(" ").append(aig);
             }
@@ -1215,7 +1223,8 @@ public class TransportMission extends Mission {
             boolean dropReady = path == null || carrier.isAtLocation(end);
             if (dropReady) {
                 if (sb != null) {
-                    sb.append(", drop at ").append(upLoc(here)).append(":");
+                    sb.append(", drop at ").append(upLoc(here).toShortString())
+                        .append(":");
                 }
                 while (!drop.isEmpty()) {
                     Transportable t = drop.remove(0);
@@ -1227,7 +1236,7 @@ public class TransportMission extends Mission {
                 }
             } else {
                 if (sb != null) {
-                    sb.append(", will drop at ").append(upLoc(end));
+                    sb.append(", will drop at ").append(upLoc(end).toShortString());
                 }
                 while (!drop.isEmpty()) {
                     Transportable t = drop.remove(0);
@@ -1277,17 +1286,17 @@ public class TransportMission extends Mission {
 
             if (!t.joinTransport(carrier, null)) {
                 logger.warning(tag + " failed to load " + t
-                    + " at " + here + ": " + this);
+                    + " at " + here.toShortString() + ": " + this);
                 return CargoResult.TFAIL;
             }
             logger.finest(tag + " loaded " + t
-                + " at " + here + ": " + this);
+                + " at " + here.toShortString() + ": " + this);
 
             if ((reason = cargo.setTarget()) == null) {
                 return CargoResult.TNEXT;
             }
             logger.finest(tag + " next fail(" + reason + ") " + t
-                + " at " + here + ": " + this);
+                + " at " + here.toShortString() + ": " + this);
             return CargoResult.TFAIL;
 
         case UNLOAD:
@@ -1296,10 +1305,10 @@ public class TransportMission extends Mission {
             }
             if (t.leaveTransport(null)) {
                 logger.finest(tag + " completed (unload) of " + t
-                    + " at " + here + ": " + this);
+                    + " at " + here.toShortString() + ": " + this);
             } else {
                 logger.warning(tag + " failed to unload " + t
-                    + " at " + here + ": " + this);
+                    + " at " + here.toShortString() + ": " + this);
                 return CargoResult.TFAIL;
             }
             return CargoResult.TDONE;
@@ -1310,12 +1319,12 @@ public class TransportMission extends Mission {
             }
             if (isCarrying(t)) {
                 logger.finest(tag + " picked up " + t
-                    + " at " + here + ": " + this);
+                    + " at " + here.toShortString() + ": " + this);
                 if ((reason = cargo.setTarget()) == null) {
                     return CargoResult.TNEXT;
                 }
                 logger.finest(tag + " next fail(" + reason + ") " + t
-                    + " at " + here + ": " + this);
+                    + " at " + here.toShortString() + ": " + this);
                 return CargoResult.TFAIL;
             }
             aiu = (AIUnit)t;
@@ -1332,7 +1341,8 @@ public class TransportMission extends Mission {
             }
             if (!isCarrying(t)) {
                 logger.finest(tag + " completed (dropoff) " + t
-                    + " at " + carrier.getLocation() + ": " + this);
+                    + " at " + carrier.getLocation().toShortString()
+                    + ": " + this);
                 return CargoResult.TDONE;
             }
             aiu = (AIUnit)t;
@@ -1427,7 +1437,7 @@ public class TransportMission extends Mission {
             tSet(unwrapCargoes(ts), false);
         }
         retarget();
-        if (sb != null) sb.append(" -> ").append(getTarget());
+        if (sb != null) sb.append(" -> ").append(getTarget().toShortString());
     }
 
     // End of cargoes handling.
@@ -1522,15 +1532,16 @@ public class TransportMission extends Mission {
             }
             if (canLeave && aiu.leaveTransport(direction)) {
                 logger.finest(tag + " dumped " + aiu
-                    + " at " + here + ": " + toFullString());
+                    + " at " + here.toShortString() + ": " + toFullString());
             } else {
                 if (!force) {
                     logger.warning(tag + " failed to dump " + aiu
-                        + " at " + here + ": " + toFullString());
+                        + " at " + here.toShortString()
+                        + ": " + toFullString());
                     return false;
                 }
                 logger.warning(tag + " forcing dump(disband) " + aiu
-                    + " at " + here + ": " + toFullString());
+                    + " at " + here.toShortString() + ": " + toFullString());
                 return AIMessage.askDisband(aiu);
             }
                 
@@ -1538,15 +1549,16 @@ public class TransportMission extends Mission {
             AIGoods aig = (AIGoods)t;
             if (canLeave && aig.leaveTransport(null)) {
                 logger.finest(tag + " dumped " + aig
-                    + " at " + here + ": " + toFullString());
+                    + " at " + here.toShortString() + ": " + toFullString());
             } else {
                 if (!force) {
                     logger.warning(tag + " failed to dump " + aig
-                        + " at " + here + ": " + toFullString());
+                        + " at " + here.toShortString()
+                        + ": " + toFullString());
                     return false;
                 }
                 logger.warning(tag + " forcing dump(goods) " + aig
-                    + " at " + here + ": " + toFullString());
+                    + " at " + here.toShortString() + ": " + toFullString());
                 return AIMessage.askUnloadCargo(aiCarrier, aig.getGoods());
             }
 
@@ -1741,7 +1753,8 @@ public class TransportMission extends Mission {
                     return;
                 }
             }
-            if (sb != null) sb.append(", recovered to ").append(getTarget());
+            if (sb != null) sb.append(", recovered to ")
+                                .append(getTarget().toShortString());
         }
 
         final AIUnit aiCarrier = getAIUnit();
@@ -1752,8 +1765,10 @@ public class TransportMission extends Mission {
         CostDecider costDecider = CostDeciders.defaultCostDeciderFor(carrier);
         outer: for (;;) {
             Unit.MoveType mt = travelToTarget(tag, target, costDecider);
-            if (sb != null) sb.append(", travel(").append(target)
-                                .append("->").append(mt).append(")");
+            if (sb != null) {
+                sb.append(", travel(").append(target.toShortString())
+                    .append("->").append(mt).append(")");
+            }
             switch (mt) {
             case MOVE_HIGH_SEAS: case MOVE_NO_MOVES: case MOVE_NO_REPAIR:
                 break outer;
@@ -1765,7 +1780,8 @@ public class TransportMission extends Mission {
                 Location blocker = resolveBlockage(aiCarrier, target);
                 if (blocker instanceof Unit && shouldAttack((Unit)blocker)) {
                     if (sb != null) {
-                        sb.append(", attacking(").append(blocker).append(")");
+                        sb.append(", attacking(")
+                            .append(blocker.toShortString()).append(")");
                     }
                     AIMessage.askAttack(aiCarrier,
                         carrier.getTile().getDirection(blocker.getTile()));
@@ -1781,8 +1797,11 @@ public class TransportMission extends Mission {
                     carrier.setMovesLeft(0);
                     break outer;
                 }
-                if (sb != null) sb.append(" retry-blockage(")
-                                    .append(carrier.getLocation()).append(")");
+                if (sb != null) {
+                    sb.append(" retry-blockage(")
+                        .append(carrier.getLocation().toShortString())
+                        .append(")");
+                }
                 costDecider = fallBackDecider; // Retry
                 break;
             case MOVE:
@@ -1895,8 +1914,10 @@ public class TransportMission extends Mission {
                                         .append(")");
                     break outer;
                 } else if (carrier.isAtLocation(target)) {
-                    if (sb != null) sb.append(", waiting(").append(target)
-                                        .append(")");
+                    if (sb != null) {
+                        sb.append(", waiting(").append(target.toShortString())
+                            .append(")");
+                    }
                     break outer;
                 }
                 break;
