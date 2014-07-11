@@ -87,7 +87,7 @@ public class Utils {
      * @return A string not exceeding maxLength.
      */
     public static String chop(String str, int maxLength) {
-        return (str.size() > maxLength) ? str.substring(0, maxLength) : str;
+        return (str.length() > maxLength) ? str.substring(0, maxLength) : str;
     }
 
     /**
