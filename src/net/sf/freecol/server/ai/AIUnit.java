@@ -317,6 +317,10 @@ public class AIUnit extends AIObject implements Transportable {
         final AIUnit aiCarrier = getAIMain().getAIUnit(carrier);
         if (aiCarrier == null) return false;
         Mission m = aiCarrier.getMission();
+        if (m == null) {
+            m = new TransportMission(getAIMain(), aiCarrier);
+            aiCarrier.changeMission(m, "restart");
+        }
         if (m instanceof TransportMission) {
             if (((TransportMission)m).retargetTransportable(this)) {
                 setTransport(aiCarrier, "requeued");
