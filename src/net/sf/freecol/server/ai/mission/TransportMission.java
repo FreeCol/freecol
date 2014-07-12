@@ -723,11 +723,11 @@ public class TransportMission extends Mission {
      *
      * @param cargo The <code>Cargo</code> to add.
      * @param index The position to add it.
-     * @return True if the addition succeeded.
+     * @return True if the addition succeeded or the cargo was already present.
      */
     private boolean tAdd(Cargo cargo, int index) {
-        if (!cargo.isValid()
-            || tFind(cargo.getTransportable()) != null) return false;
+        if (!cargo.isValid()) return false;
+        if (tFind(cargo.getTransportable()) != null) return true;
         synchronized (cargoes) {
             if (index >= 0) {
                 cargoes.add(index, cargo); 
