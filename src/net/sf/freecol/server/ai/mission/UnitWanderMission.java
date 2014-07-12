@@ -118,15 +118,18 @@ public class UnitWanderMission extends Mission {
     /**
      * {@inheritDoc}
      */
-    public void doMission() {
+    public Mission doMission(StringBuffer sb) {
+        logSB(sb, tag);
         String reason = invalidReason();
         if (reason != null) {
-            logger.finest(tag + " broken(" + reason + "): " + this);
-            return;
+            logSBbroken(sb, reason);
+            return null;
         }
 
         // Just move in random directions.
         moveRandomlyTurn(tag);
+        logSBat(sb, getUnit());
+        return this;
     }
 
 

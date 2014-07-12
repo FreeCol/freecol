@@ -364,37 +364,49 @@ public class CashInTreasureTrainMission extends Mission {
     /**
      * {@inheritDoc}
      */
-    public void doMission() {
-        final Unit unit = getUnit();
+    public Mission doMission(StringBuffer sb) {
+        logSB(sb, tag);
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            if (!retargetMission(tag, reason)) return;
+            if (!retargetMission(reason, sb)) return null;
         } else if (reason != null) {
-            logger.finest(tag + " broken(" + reason + "): " + this);
-            return;
+            logSBbroken(sb, reason);
+            return null;
         }
 
-        // Go to the target.
-        Unit.MoveType mt = travelToTarget(tag, getTarget(),
-            CostDeciders.avoidSettlementsAndBlockingUnits());
-        logger.finest(tag + " travel=" + mt + ": " + this);
-        if (mt != Unit.MoveType.MOVE) return;
+        for (;;) {
+            // Go to the target.
+            final Unit unit = getUnit();
+            Unit.MoveType mt = travelToTarget(getTarget(),
+                CostDeciders.avoidSettlementsAndBlockingUnits(), sb);
+            switch (mt) {
+            case MOVE:
+                break;
+            case MOVE_ILLEGAL:
+            case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
+                return this;
+            default:
+                logSBmove(sb, unit, mt);
+                return this;
+            }
 
-        // Cash in now if:
-        // - already in Europe
-        // - or can never get there
-        // - or there is no potential carrier to get the treasure to there
-        // - or if the transport fee is not in effect.
-        // Otherwise, it is better to send to Europe.
-        final AIUnit aiUnit = getAIUnit();
-        final Player player = unit.getOwner();
-        final Europe europe = player.getEurope();
-        if (unit.canCashInTreasureTrain()) {
-            AIUnit aiCarrier = aiUnit.getTransport();
-            if (europe != null && aiCarrier != null) {
-                logger.finest(tag + " queued for Europe with carrier: "
-                    + aiCarrier); // Let the carrier do its job
-            } else {
+            // Cash in now if:
+            // - already in Europe
+            // - or can never get there
+            // - or there is no potential carrier to get the treasure to there
+            // - or if the transport fee is not in effect.
+            // Otherwise, it is better to send to Europe.
+            final AIUnit aiUnit = getAIUnit();
+            final Player player = unit.getOwner();
+            final Europe europe = player.getEurope();
+            if (unit.canCashInTreasureTrain()) {
+                AIUnit aiCarrier = aiUnit.getTransport();
+                if (europe != null && aiCarrier != null) {
+                    // Let the carrier do its job
+                    logSB(sb, " queued for Europe on ",
+                        aiCarrier.getUnit(), ".");
+                    return this;
+                }
                 List<Unit> carriers = player.getCarriersForUnit(unit);
                 boolean cashin = unit.isInEurope()
                     || europe == null
@@ -413,34 +425,25 @@ public class CashInTreasureTrainMission extends Mission {
                         }
                     }
                     final AIMain aiMain = getAIMain();
-                    if (closest == null // No suitable carrier
-                        || (aiCarrier = aiMain.getAIUnit(closest)) == null) {
-                        cashin = true;
-                    } else {
-                        Mission m = aiCarrier.getMission();
-                        if (!(m instanceof TransportMission)) {
-                            m = new TransportMission(aiMain, aiCarrier);
-                            aiCarrier.changeMission(m, "TreasureTrain");
-                        }
-                        ((TransportMission)m).queueTransportable(aiUnit, false);
-                        logger.finest(tag + " at " + upLoc(unit.getLocation())
-                            + " retargeting Europe with " + aiCarrier
-                            + ": " + this);
+                    if (closest != null
+                        && (aiCarrier = aiMain.getAIUnit(closest)) != null
+                        && aiCarrier.getMission() instanceof TransportMission) {
+                        TransportMission tm = (TransportMission)aiCarrier.getMission();
+                        tm.queueTransportable(aiUnit, false);
+                        logSB(sb, ", retarget Europe on ", aiCarrier.getUnit(),
+                            " at ", unit.getLocation(), ".");
+                        return this;
                     }
                 }
-                if (cashin) {
-                    if (AIMessage.askCashInTreasureTrain(aiUnit)) {
-                        logger.finest(tag + " completed cash in at "
-                            + getTarget() + ": " + this);
-                    } else {
-                        logger.warning(tag + " failed to cash in at "
-                            + upLoc(unit.getLocation()) + ": " + this);
-                    }
+                if (AIMessage.askCashInTreasureTrain(aiUnit)) {
+                    logSBdone(sb, " cash in at ", unit.getLocation());
+                } else {
+                    logSBfail(sb, " cash in at", unit.getLocation());
                 }
+                return null;
             }
-        } else {
-            retargetMission(tag, "arrived at "
-                + unit.getLocation().getColony().getName());
+            if (!retargetMission(", arrived at " + unit.getColony().getName(),
+                                 sb)) return null;
         }
     }
 

@@ -464,77 +464,74 @@ public class UnitSeekAndDestroyMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    public void doMission() {
+    public Mission doMission(StringBuffer sb) {
+        logSB(sb, tag);
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            if (!retargetMission(tag, reason)) return;
+            if (!retargetMission(reason, sb)) return null;
         } else if (reason != null) {
-            logger.finest(tag + " broken(" + reason + "): " + this);
-            return;
+            logSBbroken(sb, reason);
+            return null;
         }
 
+        final Unit unit = getUnit();
         int disembark = checkDisembark(tag);
         if (disembark > 0) { // Arrived
-            logger.finest(tag + " arrived at transport target "
-                + transportTarget + ": " + this);
-            return;
-        } else if (disembark < 0) return; // Failed!?!
+            logSBat(sb, unit);
+            return this;
+        } else if (disembark < 0) { // Failed!?!
+            logSBfail(sb, "disembark at ", unit.getLocation());
+            return this;
+        }
 
         // Is there a target-of-opportunity?
         final AIUnit aiUnit = getAIUnit();
-        final Unit unit = getUnit();
         Location nearbyTarget = (unit.isOnCarrier()) ? null
             : findTarget(aiUnit, 1, false);
         if (nearbyTarget != null) {
             if (getTarget() == null) {
-                logger.finest(tag + " retargeted " + nearbyTarget
-                    + ": " + this);
+                logSB(sb, ", retargeted ", nearbyTarget);
                 setTarget(nearbyTarget);
                 nearbyTarget = null;
             } else if (nearbyTarget == getTarget()) {
                 nearbyTarget = null;
             } else {
-                logger.finest(tag + " found target-of-opportunity "
-                    + nearbyTarget + ": " + this);
+                logSB(sb, ", found target of opportunity ", nearbyTarget);
             }
-        } else if (reason != null) {
-            logger.finest(tag + " " + reason + ": " + this);
-            return;
         }
 
         // Go to the target.
         Location currentTarget = (nearbyTarget != null) ? nearbyTarget
             : getTarget();
         // Note avoiding other targets by choice of cost decider.
-        Unit.MoveType mt = travelToTarget(tag, currentTarget,
-            CostDeciders.avoidSettlementsAndBlockingUnits());
+        Unit.MoveType mt = travelToTarget(currentTarget,
+            CostDeciders.avoidSettlementsAndBlockingUnits(), sb);
         switch (mt) {
-        case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
         case MOVE_ILLEGAL:
-            break;
+        case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
+            return this;
+
         case ATTACK_UNIT: case ATTACK_SETTLEMENT:
             Tile unitTile = unit.getTile();
             Settlement settlement = unitTile.getSettlement();
             if (settlement != null && settlement.getUnitCount() < 2) {
                 // Do not risk attacking out of a settlement that
                 // might collapse.  Defend instead.
-                Mission m = new DefendSettlementMission(getAIMain(), aiUnit, settlement);
-                aiUnit.changeMission(m, "Desperate-defence-" + settlement.getName());
-                return;
+                logSB(sb, ", desperate defence of ", settlement, ".");
+                return new DefendSettlementMission(getAIMain(), aiUnit,
+                                                   settlement);
             }
-            Direction dirn = unitTile.getDirection(currentTarget.getTile());
-            if (dirn == null) {
-                throw new IllegalStateException("No direction " + unitTile
-                    + " to " + currentTarget.getTile());
-            }
-            logger.finest(tag + " attacking " + currentTarget
-                + ": " + this);
-            AIMessage.askAttack(aiUnit, dirn);
-            break;
+            Direction d = unitTile.getDirection(currentTarget.getTile());
+            assert d != null;
+            AIMessage.askAttack(aiUnit, d);
+            logSBattack(sb, currentTarget);
+            return (unit.isDisposed()) ? null : this;
+
         default:
-            logger.finest(tag + " unexpected move type: " + mt + ": " + this);
+            logSBmove(sb, unit, mt);
             break;
         }
+        return this;
     }
 
 

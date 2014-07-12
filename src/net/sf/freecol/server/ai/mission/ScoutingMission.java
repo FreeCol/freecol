@@ -399,83 +399,90 @@ public class ScoutingMission extends Mission {
     /**
      * {@inheritDoc}
      */
-    public void doMission() {
+    public Mission doMission(StringBuffer sb) {
+        logSB(sb, tag);
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            if (!retargetMission(tag, reason)) return;
+            if (!retargetMission(reason, sb)) return null;
         } else if (reason != null) {
-            logger.finest(tag + " broken(" + reason + "): " + this);
-            return;
+            logSBbroken(sb, reason);
+            return null;
         }
 
         // Go to the target.
         final AIUnit aiUnit = getAIUnit();
         final Unit unit = getUnit();
         Direction d;
-        Unit.MoveType mt = travelToTarget(tag, getTarget(),
-            CostDeciders.avoidSettlementsAndBlockingUnits());
+        Unit.MoveType mt = travelToTarget(getTarget(),
+            CostDeciders.avoidSettlementsAndBlockingUnits(), sb);
         switch (mt) {
         case MOVE_ILLEGAL:
         case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
-            return;
+            return this;
+
+        case MOVE: // Arrived at a colony
+            break;
+
         case ATTACK_UNIT:
             // Could be adjacent to the destination but it is
             // temporarily blocked by another unit.  Make a random
             // (directed if possible) move and try again.
             moveRandomly(tag, unit.getTile()
                 .getDirection(getTarget().getTile()));
-            return;
-        case MOVE:
-            break;
+            logSBdodge(sb, unit);
+            return this;
+
         case ENTER_INDIAN_SETTLEMENT_WITH_SCOUT:
-            if ((d = unit.getTile()
-                    .getDirection(getTarget().getTile())) == null) {
-                throw new IllegalStateException("Unit not next to target "
-                    + getTarget() + ": " + unit + "/" + unit.getLocation());
-            }
-            if (!AIMessage.askScoutSpeakToChief(aiUnit, d)) {
-                logger.warning(tag + " unexpected failure at " + getTarget()
-                    + ": " + this);
+            d = unit.getTile().getDirection(getTarget().getTile());
+            assert d != null;
+            if (AIMessage.askScoutSpeakToChief(aiUnit, d)) {
+                logSBdone(sb, "speak-with-chief at ", getTarget());
+            } else {
+                logSBfail(sb, " unexpected failure to speak at ", getTarget());
             }
             break;
+
         case EXPLORE_LOST_CITY_RUMOUR:
-            if ((d = unit.getTile()
-                    .getDirection(getTarget().getTile())) == null) {
-                throw new IllegalStateException("Unit not next to target "
-                    + getTarget() + ": " + unit + "/" + unit.getLocation());
-            }
-            if (!AIMessage.askMove(aiUnit, d)) {
-                logger.warning(tag + " unexpected failure at " + getTarget()
-                    + ": " + this);
+            d = unit.getTile().getDirection(getTarget().getTile());
+            assert d != null;
+            if (AIMessage.askMove(aiUnit, d)) {
+                logSBdone(sb, tag, "explore at ", getTarget());
+            } else {
+                logSBfail(sb, tag, "unexpected failure at ", getTarget());
             }
             break;
+
         default:
-            logger.warning(tag + " unexpected move type " + mt + ": " + this);
-            return;
+            logSBmove(sb, unit, mt);
+            return this;
         }
         if (unit.isDisposed()) {
-            logger.finest(tag + " died at target " + getTarget() + ": " + this);
-            return;
+            logSB(sb, ", died at target ", getTarget(), ".");
+            return null;
         }
 
         // Retarget on failure or complete, but do not retarget from
         // one colony to another, just drop equipment and invalidate
         // the mission.
         Location completed = getTarget();
-        setTarget(findTarget(aiUnit, 20, false));
-        if (completed instanceof Colony) {
-            if (getTarget() == null || getTarget() == completed) {
-                if (canScoutNatives(aiUnit)) {
-                    aiUnit.equipForRole(Specification.DEFAULT_ROLE_ID, false);
-                }
-                setTarget(null);
+        Location newTarget = findTarget(aiUnit, 20, false);
+        if (completed instanceof Colony
+            && (newTarget == null || newTarget == completed)) {
+            if (canScoutNatives(aiUnit)) {
+                aiUnit.equipForRole(Specification.DEFAULT_ROLE_ID, false);
             }
-            logger.finest(tag + " arrived at " + ((Colony)completed).getName()
-                + ", retargeting " + getTarget() + ": " + this);
-        } else {
-            logger.finest(tag + " completed target " + completed
-                + ", retargeting " + getTarget() + ": " + this);
+            logSBfail(sb, " arrived at ", completed,
+                " but found no targets");
+            return null;
         }
+        if (newTarget == null) {
+            logSB(sb, " at ", completed, " but found no targets");
+            return null;
+        }
+
+        setTarget(newTarget);
+        logSB(sb, " retargeting ", newTarget);
+        return this;
     }
 
 

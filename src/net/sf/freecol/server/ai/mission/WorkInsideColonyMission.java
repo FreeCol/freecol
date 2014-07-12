@@ -27,6 +27,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIUnit;
@@ -149,15 +150,34 @@ public class WorkInsideColonyMission extends Mission {
     /**
      * {@inheritDoc}
      */
-    public void doMission() {
+    public Mission doMission(StringBuffer sb) {
+        logSB(sb, tag);
         String reason = invalidReason();
         if (reason != null) {
-            logger.finest(tag + " broken(" + reason + "): " + this);
-            return;
+            logSBbroken(sb, reason);
+            return null;
         }
 
-        travelToTarget(tag, getTarget(),
-                       CostDeciders.avoidSettlementsAndBlockingUnits());
+        final Unit unit = getUnit();
+        Unit.MoveType mt = travelToTarget(getTarget(),
+            CostDeciders.avoidSettlementsAndBlockingUnits(), sb);
+        switch (mt) {
+        case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
+            break;
+
+        case MOVE: // Arrived
+            if (unit.isInColony()) {
+                logSB(sb, ", working ", unit.getLocation(), ".");
+            } else {
+                logSB(sb, ", arrived at ", getTarget(), ".");
+            }
+            break;
+
+        default:
+            logSBmove(sb, unit, mt);
+            break;
+        }
+        return this;
     }
 
 

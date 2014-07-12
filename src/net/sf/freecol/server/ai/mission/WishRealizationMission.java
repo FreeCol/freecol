@@ -157,43 +157,50 @@ public class WishRealizationMission extends Mission {
     /**
      * {@inheritDoc}
      */
-    public void doMission() {
-        final Unit unit = getUnit();
+    public Mission doMission(StringBuffer sb) {
+        logSB(sb, tag);
         String reason = invalidReason();
         if (reason != null) {
-            logger.finest(tag + " broken(" + reason + "): " + this);
-            return;
+            logSBbroken(sb, reason);
+            return null;
         }
 
         // Move towards the target.
+        final Unit unit = getUnit();
         Location target = getTarget();
-        if (travelToTarget(tag, target,
-                           CostDeciders.avoidSettlementsAndBlockingUnits())
-            != Unit.MoveType.MOVE) return;
+        Unit.MoveType mt = travelToTarget(target,
+            CostDeciders.avoidSettlementsAndBlockingUnits(), sb);
+        switch (mt) {
+        case MOVE:
+            break;
+        case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
+            return this;
+        default:
+            logSBmove(sb, unit, mt);
+            return this;
+        }
 
         if (target instanceof Colony) {
+            final AIMain aiMain = getAIMain();
             final Colony colony = (Colony)target;
             final AIUnit aiUnit = getAIUnit();
-            final AIColony aiColony = getAIMain().getAIColony(colony);
+            final AIColony aiColony = aiMain.getAIColony(colony);
             aiColony.completeWish(wish, "mission(" + unit + ")");
-            logger.finest(tag + " completed at " + colony + ": " + this);
             // Replace the mission, with a defensive one if this is a
-            // military unit or a simple working one if not.  Beware
-            // that changeMission() will dispose of this mission which is
-            // why this is done last.
+            // military unit or a simple working one if not.
             if (unit.getType().isOffensive()) {
-                Mission m = new DefendSettlementMission(getAIMain(), aiUnit, colony);
-                aiUnit.changeMission(m, "Defend-" + colony.getName());
+                logSBdone(sb, " ready to defend ", colony);
+                return new DefendSettlementMission(aiMain, aiUnit, colony);
             } else {                
                 aiColony.requestRearrange();
-                Mission m = new WorkInsideColonyMission(getAIMain(), aiUnit, aiColony);
-                aiUnit.changeMission(m, "Work-" + colony.getName());
+                logSBdone(sb, " ready to work at ", colony);
+                return new WorkInsideColonyMission(aiMain, aiUnit, aiColony);
             }
         } else {
-            logger.warning(tag + " unknown destination type " + wish
-                + ": " + this);
+            logSBfail(sb, " broken wish: ", wish);
             wish.dispose();
             wish = null;
+            return null;
         }
     }
 

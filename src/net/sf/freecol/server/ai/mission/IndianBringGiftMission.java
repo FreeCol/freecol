@@ -239,75 +239,82 @@ public class IndianBringGiftMission extends Mission {
     /**
      * {@inheritDoc}
      */
-    public void doMission() {
+    public Mission doMission(StringBuffer sb) {
+        logSB(sb, tag);
         String reason = invalidReason();
         if (reason != null) {
-            logger.finest(tag + " broken(" + reason + "): " + this);
-            return;
+            logSBbroken(sb, reason);
+            return null;
         }
 
         final AIUnit aiUnit = getAIUnit();
         final Unit unit = getUnit();
         final IndianSettlement is = unit.getHomeIndianSettlement();
         if (!hasGift()) {
-            Unit.MoveType mt = travelToTarget(tag, is, null);
+            Unit.MoveType mt = travelToTarget(is, null, sb);
             switch (mt) {
             case MOVE: // Arrived!
                 break;
             case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
-                return;
+                return this;
             case ATTACK_SETTLEMENT: case ATTACK_UNIT: // A blockage!
                 Location blocker = resolveBlockage(aiUnit, is);
-                if (blocker == null) {
-                    logger.warning(tag + " could not resolve blockage"
-                        + ": " + this);
-                    moveRandomly(tag, null);
-                    unit.setMovesLeft(0);
-                } else {
-                    logger.finest(tag + " blocked by " + blocker
-                        + ", attacking: " + this);
+                if (blocker != null) {
                     AIMessage.askAttack(aiUnit, unit.getTile()
                         .getDirection(blocker.getTile()));
+                    logSBattack(sb, blocker);
+                    return this;
                 }
-                break;
-            default:
-                logger.warning(tag + " unexpected collection move type: " + mt
-                    + ": " + this);
                 moveRandomly(tag, null);
-                return;
+                unit.setMovesLeft(0);
+                logSBdodge(sb, unit);
+                return this;
+            default:
+                logSBmove(sb, unit, mt);
+                return this;
             }
             // Load the goods.
             Goods gift = is.getRandomGift(getAIRandom());
             if (gift == null) {
-                logger.finest(tag + " found no gift to collect"
-                    + " at " + is.getName() + ": " + this);
-            } else {
-                if (!AIMessage.askLoadCargo(aiUnit, gift)) {
-                    logger.finest(tag + " failed to collect gift "
-                        + " at " + is.getName() + ": " + this);
-                }
-            }
-            if (!hasGift()) {
                 completed = true;
-                return;
+                logSBfail(sb, "found no gift at ", is);
+                return null;
+            } else if (!AIMessage.askLoadCargo(aiUnit, gift) || !hasGift()) {
+                completed = true;
+                logSBfail(sb, "failed to collect gift at ", is);
+                return null;
+            } else {
+                logSB(sb, ", collected gift at ", is, ".");
+                return this;
             }
+
         } else {
             // Move to the target's colony and deliver, avoiding trouble
             // by choice of cost decider.
-            Unit.MoveType mt = travelToTarget(tag, getTarget(),
-                CostDeciders.avoidSettlementsAndBlockingUnits());
+            Unit.MoveType mt = travelToTarget(getTarget(),
+                CostDeciders.avoidSettlementsAndBlockingUnits(), sb);
             switch (mt) {
-            case MOVE: // Arrived!
+            case MOVE: case ATTACK_SETTLEMENT: // Arrived (do not attack!)
                 break;
             case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
-                return;
-            case ATTACK_SETTLEMENT: // Arrived (do not really attack)
-                break;
-            default:
-                logger.finest(tag + " unexpected delivery move type: " + mt
-                    + ": " + this);
+                return this;
+
+            case ATTACK_UNIT:
+                Location blocker = resolveBlockage(aiUnit, is);
+                if (blocker != null) {
+                    AIMessage.askAttack(aiUnit, unit.getTile()
+                        .getDirection(blocker.getTile()));
+                    logSBattack(sb, blocker);
+                    return this;
+                }
                 moveRandomly(tag, null);
-                return;
+                unit.setMovesLeft(0);
+                logSBdodge(sb, unit);
+                return this;
+
+            default:
+                logSBmove(sb, unit, mt);
+                return this;
             }
 
             if (!unit.getTile().isAdjacent(getTarget().getTile())) {
@@ -315,17 +322,19 @@ public class IndianBringGiftMission extends Mission {
                     + getTarget());
             }
             Settlement settlement = (Settlement)getTarget();
-            if (AIMessage.askGetTransaction(aiUnit, settlement)
-                && AIMessage.askDeliverGift(aiUnit, settlement,
-                    unit.getGoodsList().get(0))) {
+            boolean result = false;
+            if (AIMessage.askGetTransaction(aiUnit, settlement)) {
+                result = AIMessage.askDeliverGift(aiUnit, settlement,
+                    unit.getGoodsList().get(0));
                 AIMessage.askCloseTransaction(aiUnit, settlement);
-                logger.finest(tag + " completed at " + settlement.getName()
-                    + ": " + this);
-            } else {
-                logger.warning(tag + " failed at " + settlement.getName()
-                    + ": " + this);
             }
             completed = true;
+            if (result) {
+                logSBdone(sb, "delivered at ", settlement);
+            } else {
+                logSBfail(sb, "to deliver ", settlement);
+            }
+            return null;
         }
     }
 

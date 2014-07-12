@@ -19,6 +19,7 @@
 
 package net.sf.freecol.server.ai.mission;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -39,6 +40,7 @@ import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.util.Utils;
+import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIUnit;
@@ -335,7 +337,8 @@ public class BuildColonyMission extends Mission {
     /**
      * {@inheritDoc}
      */
-    public void doMission() {
+    public Mission doMission(StringBuffer sb) {
+        logSB(sb, tag);
         final AIMain aiMain = getAIMain();
         final AIUnit aiUnit = getAIUnit();
         final Unit unit = getUnit();
@@ -345,18 +348,27 @@ public class BuildColonyMission extends Mission {
         if (isTargetReason(reason)) {
             ; // retarget below
         } else if (reason != null) {
-            logger.finest(tag + " broken(" + reason + "): " + this);
-            return;
+            logSBbroken(sb, reason);
+            return null;
         } else if (target instanceof Tile
             && (player.getColonyValue((Tile)target)) < colonyValue) {
             reason = "target tile " + target + " value fell";
         }
-        if (reason != null && !retargetMission(tag, reason)) return;
+        if (reason != null && !retargetMission(reason, sb)) return null;
 
         // Go there.
-        if (travelToTarget(tag, getTarget(),
-                CostDeciders.avoidSettlementsAndBlockingUnits())
-            != Unit.MoveType.MOVE) return;
+        Unit.MoveType mt = travelToTarget(getTarget(),
+            CostDeciders.avoidSettlementsAndBlockingUnits(), sb);
+        switch (mt) {
+        case MOVE:
+            break;
+        case MOVE_ILLEGAL:
+        case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
+            return this;
+        default:
+            logSBmove(sb, unit, mt);
+            return this;
+        }
 
         if (getTarget() instanceof Colony) {
             // If arrived at the target colony it is time to retarget
@@ -364,18 +376,13 @@ public class BuildColonyMission extends Mission {
             // just work in the colony for the present.
             String name = ((Colony)getTarget()).getName();
             Location newTarget = findTarget(aiUnit, 5, false);
-            if (newTarget != null) {
-                setTarget(newTarget);
-                logger.finest(tag + " arrived at " + name
-                    + ", retargeting " + newTarget + ": " + this);
-            } else {
-                logger.finest(tag + " gives up and joins " + name
-                    + ": " + this);
-                Mission m = new WorkInsideColonyMission(aiMain, aiUnit,
+            if (newTarget == null) {
+                logSB(sb, ", give up and join ", name, ".");
+                return new WorkInsideColonyMission(aiMain, aiUnit,
                     aiMain.getAIColony((Colony)getTarget()));
-                aiUnit.changeMission(m, "Join-" + ((Colony)getTarget()).getName());
             }
-            return;
+            setTarget(newTarget);
+            logSB(sb, ", arrived at ", name, ", retargeting ", newTarget);
 
         } else if (getTarget() instanceof Tile) {
             Tile tile = (Tile)getTarget();
@@ -411,47 +418,46 @@ public class BuildColonyMission extends Mission {
                         || !player.owns(tile);
                 }
                 if (fail) {
-                    logger.finest(tag + " failed to claim land at " + tile
-                        + ": " + this);
                     setTarget(null);
-                    return;
+                    logSBfail(sb, "tile claim at ", tile, ".");
+                    return null;
                 }
             }
 
             // Check that the unit has moves left, which are required
             // for building.
             if (unit.getMovesLeft() <= 0) {
-                logger.finest(tag + " waiting to build at " + tile
-                    + ": " + this);
-                return;
+                logSB(sb, ", waiting to build at ", tile, ".");
+                return this;
             }
 
             // Log the colony values so we can improve things
-            StringBuffer sb = new StringBuffer();
-            sb.append(tag).append(" score-at-foundation:");
-            for (Double d : player.getAllColonyValues(tile)) {
-                sb.append(" ").append(d);
+            if (logger.isLoggable(Level.FINE)) {
+                StringBuffer s2 = new StringBuffer(32);
+                logSB(s2, tag, " score-at-foundation ", tile, ":");
+                for (Double d : player.getAllColonyValues(tile)) {
+                    logSB(s2, " ", d);
+                }
+                logger.fine(s2.toString());
             }
-            logger.finest(sb.toString());
             
             // Clear to build the colony.
             if (AIMessage.askBuildColony(aiUnit, Player.ASSIGN_SETTLEMENT_NAME)
                 && tile.getColony() != null) {
                 Colony colony = tile.getColony();
-                logger.finest(tag + " completed " + colony.getName()
-                    + ": " + this);
-                Mission m = new WorkInsideColonyMission(aiMain, aiUnit,
-                    aiMain.getAIColony(colony));
-                aiUnit.changeMission(m, "Built-" + colony.getName());
+                AIColony aiColony = aiMain.getAIColony(colony);
+                aiColony.requestRearrange();
+                logSBdone(sb, colony);
+                return new WorkInsideColonyMission(aiMain, aiUnit, aiColony);
             } else {
-                logger.warning(tag + " unexpected failure at " + tile
-                    + ": " + this);
-                setTarget(null);
+                logSBfail(sb, "build at ", tile);
+                return null;
             }
 
         } else {
-            throw new IllegalStateException("Bogus target: " + getTarget());
+            throw new IllegalStateException("Bogus target " + getTarget());
         }
+        return this;
     }
 
 

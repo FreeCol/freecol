@@ -305,75 +305,89 @@ public class DefendSettlementMission extends Mission {
     /**
      * {@inheritDoc}
      */
-    public void doMission() {
+    public Mission doMission(StringBuffer sb) {
+        logSB(sb, tag);
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            if (!retargetMission(tag, reason)) return;
+            if (!retargetMission(reason, sb)) return null;
         } else if (reason != null) {
-            logger.finest(tag + " broken(" + reason + "): " + this);
-            return;
+            logSBbroken(sb, reason);
+            return null;
         }
 
         // Go to the target!
-        if (travelToTarget(tag, getTarget(),
-                CostDeciders.avoidSettlementsAndBlockingUnits())
-            != Unit.MoveType.MOVE) return;
+        final Unit unit = getUnit();
+        Unit.MoveType mt = travelToTarget(getTarget(),
+            CostDeciders.avoidSettlementsAndBlockingUnits(), sb);
+        switch (mt) {
+        case MOVE:
+            break;
+        case MOVE_ILLEGAL:
+        case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
+            return this;
+        default:
+            logSBmove(sb, unit, mt);
+            return this;
+        }
 
         // Check if the mission should change?
         // Change to supporting the settlement if the size is marginal.
         final AIMain aiMain = getAIMain();
         final AIUnit aiUnit = getAIUnit();
-        final Unit unit = getUnit();
         Mission m = null;
         if (getTarget() instanceof Colony) {
             Colony colony = (Colony)getTarget();
             if (unit.isInColony()
                 || (unit.isPerson() && colony.getUnitCount() <= 1)) {
-                m = new WorkInsideColonyMission(aiMain, aiUnit,
+                logSB(sb, " bolster ", colony, ".");
+                return new WorkInsideColonyMission(aiMain, aiUnit,
                     aiMain.getAIColony(colony));
-                aiUnit.changeMission(m, "Bolster-Colony");
-                m.doMission();
-                return; // No log, setMission logs this mission going away.
             }
         }
 
         // Anything more to do?
         if (unit.getState() == UnitState.FORTIFIED
             || unit.getState() == UnitState.FORTIFYING) {
-            return; // No log, these happen indefinitely.
+            logSB(sb, ", fortified.");
+            return this;
         }
 
         // Check if the settlement is badly defended.  If so, try to fortify.
         Settlement settlement = (Settlement)getTarget();
-        int defenderCount = 0, fortifiedCount = 0;
+        int defenderCount = 0, fortifyCount = 0;
         List<Unit> units = settlement.getUnitList();
         units.addAll(settlement.getTile().getUnitList());
         for (Unit u : units) {
             AIUnit aiu = getAIMain().getAIUnit(u);
             if (invalidMissionReason(aiu) == null) {
                 defenderCount++;
-                if (u.getState() == UnitState.FORTIFIED) fortifiedCount++;
+                switch (u.getState()) {
+                case FORTIFIED: case FORTIFYING: fortifyCount++; break;
+                }
             }
         }
-        if (defenderCount <= 2 || fortifiedCount <= 1) {
+        if (defenderCount <= 2 || fortifyCount <= 1) {
             String logMe;
             if (!unit.checkSetState(UnitState.FORTIFYING)) {
-                logMe = " waiting to fortify at ";
+                logMe = ", waiting to fortify at ";
             } else if (AIMessage.askChangeState(aiUnit, UnitState.FORTIFYING)
                 && unit.getState() == UnitState.FORTIFYING) {
-                logMe = " completed (fortifying) at ";
+                logMe = ", fortified at ";
             } else {
-                logMe = " fortify failed at ";
+                logMe = ", fortify failed at ";
             }
-            logger.finest(tag + logMe + settlement.getName() + ": " + this);
-            return;
+            logSB(sb, logMe, settlement, ".");
+            return this;
         }
 
         // The target is well enough defended.  See if the unit
         // should attack a nearby hostile unit.  Remember to prevent a
         // sole unit attacking because if it loses, the settlement
-        // will collapse (and the combat model does not understand that).
-        if (!unit.isOffensiveUnit()) return;
+        // will collapse (and the combat model does not handle that).
+        if (!unit.isOffensiveUnit()) {
+            logSBbroken(sb, "not-offensive-unit");
+            return null;
+        }
         final CombatModel cm = unit.getGame().getCombatModel();
         Unit bestTarget = null;
         float bestDifference = Float.MIN_VALUE;
@@ -405,11 +419,13 @@ public class DefendSettlementMission extends Mission {
 
         // Attack if a target is available.
         if (bestTarget != null) {
-            logger.finest(tag + " attacking " + bestTarget
-                + " from " + ((Settlement)getTarget()).getName()
-                + ": " + this);
             AIMessage.askAttack(getAIUnit(), bestDirection);
+            logSBattack(sb, bestTarget);
+            return (unit.isDisposed()) ? null : this;
         }
+
+        logSB(sb, " alert at ", getTarget(), ".");
+        return this;
     }
     
 

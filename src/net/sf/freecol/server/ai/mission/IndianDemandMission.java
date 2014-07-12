@@ -348,11 +348,12 @@ public class IndianDemandMission extends Mission {
     /**
      * {@inheritDoc}
      */
-    public void doMission() {
+    public Mission doMission(StringBuffer sb) {
+        logSB(sb, tag);
         String reason = invalidReason();
         if (reason != null) {
-            logger.finest(tag + " broken(" + reason + "): " + this);
-            return;
+            logSBbroken(sb, reason);
+            return null;
         }
 
         final AIUnit aiUnit = getAIUnit();
@@ -360,18 +361,16 @@ public class IndianDemandMission extends Mission {
         final IndianSettlement is = unit.getHomeIndianSettlement();
         while (!completed) {
             if (hasTribute()) {
-                Unit.MoveType mt = travelToTarget(tag, is,
-                    CostDeciders.avoidSettlementsAndBlockingUnits());
+                Unit.MoveType mt = travelToTarget(is,
+                    CostDeciders.avoidSettlementsAndBlockingUnits(), sb);
                 switch (mt) {
                 case MOVE: // Arrived!
                     break;
                 case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
-                    return;                
+                    return this;
                 default:
-                    logger.warning(tag + " unexpected delivery move type: " + mt
-                        + ": " + this);
-                    moveRandomly(tag, null);
-                    return;
+                    logSBmove(sb, unit, mt);
+                    return this;
                 }
                 // Unload the goods
                 GoodsContainer container = unit.getGoodsContainer();
@@ -379,20 +378,20 @@ public class IndianDemandMission extends Mission {
                     Goods tribute = container.removeGoods(goods.getType());
                     is.addGoods(tribute);
                 }
-                logger.finest(tag + " completed unloading tribute at "
-                    + is.getName() + ": " + this);
                 completed = true;
-                return;
+                logSBdone(sb, "unloaded tribute at ", is);
+                return null;
             }
 
             // Move to the target's colony and demand
-            Unit.MoveType mt = travelToTarget(tag, target, null);
+            Unit.MoveType mt = travelToTarget(target, null, sb);
             Direction d;
             switch (mt) {
             case MOVE: // Arrived!
                 break;
             case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
-                return;                
+                return this;
+
             case ATTACK_SETTLEMENT:
                 d = unit.getTile().getDirection(target.getTile());
                 if (d != null) break; // Arrived at target, handled below.
@@ -400,22 +399,19 @@ public class IndianDemandMission extends Mission {
             case ATTACK_UNIT: // Something is blocking our path
                 Location blocker = resolveBlockage(aiUnit, target);
                 if (blocker == null) {
-                    logger.warning(tag + " could not resolve blockage"
-                        + ": " + this);
                     moveRandomly(tag, null);
                     unit.setMovesLeft(0);
+                    logSBdodge(sb, unit);
                 } else {
-                    logger.finest(tag + " blocked by " + blocker
-                        + ", attacking: " + this);
                     d = unit.getTile().getDirection(blocker.getTile());
                     AIMessage.askAttack(aiUnit, d);
-                }                
-                return;
+                    logSBattack(sb, blocker);
+                }
+                return this;
             default:
-                logger.warning(tag + " unexpected demand move type: " + mt
-                    + ": " + this);
                 moveRandomly(tag, null);
-                return;
+                logSBmove(sb, unit, mt);
+                return this;
             }
 
             Colony colony = (Colony)getTarget();
@@ -428,9 +424,8 @@ public class IndianDemandMission extends Mission {
             if (goods == null) {
                 if (!enemy.checkGold(1)) {
                     completed = true;
-                    logger.finest(tag + " completed empty handed"
-                        + " at " + colony.getName() + ": " + this);
-                    return;
+                    logSBdone(sb, "empty handed at ", colony);
+                    return null;
                 }
                 amount = enemy.getGold() / 20;
                 if (amount == 0) amount = enemy.getGold();
@@ -441,12 +436,11 @@ public class IndianDemandMission extends Mission {
                 = AIMessage.askIndianDemand(aiUnit, colony, type, amount);
             if (accepted && (goods == null || hasTribute())) {
                 if (goods != null) {
-                    logger.finest(tag + " accepted at " + colony.getName()
-                        + " tribute: " + goods.toString() + ": " + this);
+                    logSB(sb, " accepted at ", colony, " tribute: ", goods);
                     continue; // Head for home
                 } else {
-                    logger.finest(tag + " completed at " + colony.getName()
-                        + " tribute: " + amount + " gold: " + this);
+                    logSB(sb, " accepted at ", colony, " tribute: ", amount,
+                        " gold");
                 }
             } else { // Consider attacking if not content.
                 int unitTension = (is == null) ? 0
@@ -456,18 +450,14 @@ public class IndianDemandMission extends Mission {
                 d = unit.getTile().getDirection(colony.getTile());
                 boolean attack = tension >= Tension.Level.CONTENT.getLimit()
                     && d != null;
-                logger.finest(tag + " completed with refusal"
-                    + " at " + colony.getName()
-                    + ((attack) ? "(attacking)" : "") + ": " + this);
-                if (attack) {
-                    AIMessage.askAttack(aiUnit, d);
-                    return;
-                }
+                if (attack) AIMessage.askAttack(aiUnit, d);
+                completed = true;
+                logSBdone(sb, "refused at ", colony, 
+                    (((attack) ? " (attacking)" : "")));
+                return null;
             }
-            // Consume any remaining moves.
-            completed = true;
-            moveRandomlyTurn(tag);
         }
+        return this;
     }
 
 

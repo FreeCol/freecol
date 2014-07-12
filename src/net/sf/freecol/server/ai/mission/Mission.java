@@ -498,14 +498,14 @@ public abstract class Mission extends AIObject {
      * Logging at `fine' on failures, `finest' on valid return values
      * other than normal path completion.
      *
-     * @param logMe A prefix string for the log messages.
      * @param target The destination <code>Location</code>.
      * @param costDecider The <code>CostDecider</code> to use in any path
      *     finding.
+     * @param sb An optional <code>StringBuffer</code> to log to.
      * @return The type of move the unit stopped at.
      */
-    protected MoveType travelToTarget(String logMe, Location target,
-                                      CostDecider costDecider) {
+    protected MoveType travelToTarget(Location target, CostDecider costDecider,
+                                      StringBuffer sb) {
         final Tile targetTile = target.getTile();
         if (!(target instanceof Europe) && targetTile == null) {
             throw new IllegalStateException("Target neither Europe nor Tile");
@@ -523,8 +523,8 @@ public abstract class Mission extends AIObject {
         if (unit.isAtLocation(target)) {
             if (unit.isOnCarrier()) {
                 if (!aiUnit.leaveTransport(null)) {
-                    logger.warning(logMe + " at " + target
-                        + " failed to disembark from " + carrier + ": " + this);
+                    logSB(sb, ", at ", target,
+                        " failed to disembark from ", carrier, ".");
                     return MoveType.MOVE_ILLEGAL;
                 }
             }
@@ -533,7 +533,7 @@ public abstract class Mission extends AIObject {
 
         // Sanitize the unit location and drop out the trivial cases.
         if (unit.isAtSea()) {
-            logger.finest(logMe + " at sea: " + this);
+            logSB(sb, ", at sea.");
             return MoveType.MOVE_NO_MOVES;
         } else if (unit.isInEurope()) {
             if (!unit.getOwner().canMoveToEurope()) {
@@ -542,12 +542,10 @@ public abstract class Mission extends AIObject {
             if (unit.getType().canMoveToHighSeas()) {
                 unit.setDestination(target);
                 if (AIMessage.askMoveTo(aiUnit, map)) {
-                    logger.finest(logMe + " sailed for " + target
-                        + ": " + this);
+                    logSB(sb, ", sailed for ", target, ".");
                     return MoveType.MOVE_HIGH_SEAS;
                 } else {
-                    logger.fine(logMe + " failed to sail for " + target
-                        + ": "+ this);
+                    logSB(sb, ", failed to sail for ", target, ".");
                     return MoveType.MOVE_ILLEGAL;
                 }
             }
@@ -555,18 +553,16 @@ public abstract class Mission extends AIObject {
             throw new IllegalStateException("Unit not on the map: " + unit);
         } else if (target instanceof Europe) {
             if (!unit.getOwner().canMoveToEurope()) {
-                logger.fine(logMe + " impossible move to Europe: " + this);
+                logSBfail(sb, "impossible move to Europe for ", unit);
                 return MoveType.MOVE_ILLEGAL;
             }
             if (unit.getType().canMoveToHighSeas()
                 && unit.getTile().isDirectlyHighSeasConnected()) {
                 if (AIMessage.askMoveTo(aiUnit, target)) {
-                    logger.finest(logMe + " sailed for " + target
-                        + ": " + this);
+                    logSB(sb, ", sailed for ", target, ".");
                     return MoveType.MOVE_HIGH_SEAS;
                 } else {
-                    logger.fine(logMe + " failed to sail for " + target
-                        + ": " + this);
+                    logSB(sb, ", failed to sail for ", target, ".");
                     return MoveType.MOVE_ILLEGAL;
                 }
             }
@@ -576,23 +572,23 @@ public abstract class Mission extends AIObject {
         if (path == null) {
             if (unit.getType().canMoveToHighSeas() || unit.isOnCarrier()
                 || unit.getOwner().isIndian()) {
-                logger.fine(logMe + " no path from " + unit.getLocation()
-                    + " to " + target + ": " + this);
+                logSB(sb, ", no path from ", unit.getLocation(),
+                    " to ", target, ".");
                 return MoveType.MOVE_NO_TILE;
             }
             AIUnit newAICarrier = aiUnit.getTransport();
             if (newAICarrier == null) {
-                logger.finest(logMe + " at " + unit.getLocation()
-                    + " needs transport to " + target + ": " + this);
+                logSB(sb, ", at ", unit.getLocation(),
+                    " needs transport to ", target, ".");
                 return MoveType.MOVE_ILLEGAL;
             }
             Unit newCarrier = newAICarrier.getUnit();
             path = unit.findPath(unit.getLocation(), target,
                                  newCarrier, costDecider);
             if (path == null) {
-                logger.fine(logMe + " no path from " + unit.getLocation()
-                    + " to " + target + " with assigned carrier " + newCarrier
-                    + ": " + this);
+                logSB(sb, ", at ", unit.getLocation(),
+                    " no path to ", target,
+                    " with assigned carrier ", newCarrier, ".");
                 return MoveType.MOVE_ILLEGAL;
             }
         }
@@ -602,7 +598,7 @@ public abstract class Mission extends AIObject {
                 + " from " + unit.getLocation() + " to target " + target
                 + " result=" +  unit.isAtLocation(target));
         }            
-        return followPath(logMe, path.next);
+        return followPath(path.next, sb);
     }
 
     /**
@@ -611,11 +607,11 @@ public abstract class Mission extends AIObject {
      * Logging is fine on failures, finest on valid return values other
      * than normal path completion.
      *
-     * @param logMe A prefix string for the log messages.
      * @param path The <code>PathNode</code> to follow.
+     * @param sb An optional <code>StringBuffer</code> to log to.
      * @return The type of move the unit stopped at.
      */
-    protected MoveType followPath(String logMe, PathNode path) {
+    protected MoveType followPath(PathNode path, StringBuffer sb) {
         final Unit unit = getUnit();
         final AIUnit aiUnit = getAIUnit();
         final Unit carrier = unit.getCarrier();
@@ -628,17 +624,16 @@ public abstract class Mission extends AIObject {
             int useEurope = 0;
             // Sanitize the unit state.
             if (unit.isDisposed()) {
-                logger.fine(logMe + " died going to " + path.getLocation()
-                    + ": " + this);
+                logSB(sb, ", died going to ", path.getLocation(), ".");
                 return MoveType.MOVE_NO_REPAIR;
             } else if (unit.getMovesLeft() <= 0 || unit.isAtSea()) {
-                logger.finest(logMe + " at " + unit.getLocation()
-                    + " en route to " + target + ": " + this);
+                logSB(sb, ", at ", unit.getLocation(),
+                    " en route to ", target, ".");
                 return MoveType.MOVE_NO_MOVES;
             } else if (unit.isInEurope()) {
                 useEurope++;
             } else if (!unit.hasTile()) {
-                logger.fine(logMe + " unit not on the map: " + this);
+                logSB(sb, ", not on the map.");
                 return MoveType.MOVE_ILLEGAL;
             }
 
@@ -646,15 +641,14 @@ public abstract class Mission extends AIObject {
             if (path.getLocation() instanceof Europe) {
                 useEurope++;
             } else if (path.getTile() == null) {
-                logger.fine(logMe + " null path tile " + path.toString()
-                    + ": " + this);
+                logSB(sb, ", null path tile.");
                 return MoveType.MOVE_ILLEGAL;
             }
 
             // Handle embark/disembark.
             if (unit.isOnCarrier() && path.isOnCarrier()) {
-                logger.finest(logMe + " at " + unit.getLocation()
-                    + " in transit to " + target + ": " + this);
+                logSB(sb, ", on ", unit.getLocation(),
+                    " in transit to ", target, ".");
                 return MoveType.MOVE_NO_MOVES;
 
             } else if (unit.isOnCarrier() && !path.isOnCarrier()) {
@@ -664,43 +658,38 @@ public abstract class Mission extends AIObject {
                 } else if (unit.hasTile()
                     && unit.getTile().isAdjacent(path.getTile())) {
                     if (unit.getMovesLeft() <= 0) {
-                        logger.finest(logMe + " at " + unit.getLocation()
-                            + " waiting to disembark: " + this);
+                        logSB(sb, ", on ", unit.getLocation(),
+                            " waiting to disembark.");
                         return MoveType.MOVE_NO_MOVES;
                     }
                     d = unit.getTile().getDirection(path.getTile());
                 } else {
-                    logger.warning(logMe + " at " + unit.getLocation()
-                        + " should be in range of " + path.getLocation()
-                        + " to disembark: " + this);
+                    logSB(sb, ", on ", unit.getLocation(),
+                        " should be in range of ", path.getLocation(),
+                        " to disembark.");
                     return MoveType.MOVE_ILLEGAL;
                 }
+
                 MoveType mt = unit.getMoveType(d);
-                if (!mt.isProgress()) { // Special handling required.
-                    logger.finest(logMe + " at " + unit.getLocation()
-                        + " has special disembark " + mt
-                        + " to " + path.getTile() + ": " + this);
-                    return mt;
-                }
+                if (!mt.isProgress()) return mt; // Special handling required.
+
                 if (aiUnit.leaveTransport(d)) continue;
-                logger.warning(logMe + " at " + unit.getLocation()
-                    + " unexpected failure to disembark: " + this
-                    + "\n" + path.fullPathToString());
+                logSB(sb, ", on ", unit.getLocation(), 
+                    " failed to disembark to ", path.getTile(), ".");
                 return MoveType.MOVE_ILLEGAL;
 
             } else if (!unit.isOnCarrier() && path.isOnCarrier()) {
                 final AIUnit newAICarrier = aiUnit.getTransport();
                 if (newAICarrier == null) {
-                    logger.finest(logMe + " at " + unit.getLocation()
-                        + " requires transport to " + target + ": " + this);
+                    logSB(sb, " at " + unit.getLocation()
+                        + " requires transport to " + target, ".");
                     return MoveType.MOVE_ILLEGAL;
                 }
                 final Unit newCarrier = newAICarrier.getUnit();
                 if (!newCarrier.isAtLocation(path.getLocation())) {
-                    logger.finest(logMe + " at " + unit.getLocation()
-                        + " waiting for carrier " + newCarrier
-                        + " to arrive and transport it to " + target
-                        + ": " + this);
+                    logSB(sb, ", at ", unit.getLocation(),
+                        " waiting for carrier ", newCarrier,
+                        " to arrive and transport it to ", target, ".");
                     return MoveType.MOVE_ILLEGAL;
                 }
                 UnitLocation.NoAddReason reason
@@ -709,11 +698,12 @@ public abstract class Mission extends AIObject {
                 case NONE:
                     break;
                 case CAPACITY_EXCEEDED:
-                    logger.finest(logMe + " at " + unit.getLocation()
-                        + " waiting for space to be cleared on " + newCarrier
-                        + ": " + this);
+                    logSB(sb, ", at ", unit.getLocation(),
+                        " waiting for space on ", newCarrier, ".");
                     return MoveType.MOVE_NO_MOVES;
                 default:
+                    logSB(sb, ", at ", unit.getLocation(),
+                        " unexpected boarding problem ", reason, ".");
                     return MoveType.MOVE_ILLEGAL;
                 }
                 Direction d;
@@ -721,23 +711,22 @@ public abstract class Mission extends AIObject {
                     d = null;
                 } else if (unit.hasTile()
                     && unit.getTile().isAdjacent(newCarrier.getTile())) {
-                    if (unit.getMovesLeft() <= 0) {
-                        logger.finest(logMe + " at " + unit.getLocation()
-                            + " waiting to embark on " + newCarrier
-                            + ": " + this);
-                        return MoveType.MOVE_NO_MOVES;
-                    }
                     d = unit.getTile().getDirection(newCarrier.getTile());
                 } else {
-                    logger.warning(logMe + " at " + unit.getLocation()
-                        + " should be in range of " + path.getLocation()
-                        + " to embark to " + newCarrier + ": " + this);
+                    logSB(sb, ", at ", unit.getLocation(),
+                        " should be in range of ", path.getLocation(),
+                        " to embark to ", newCarrier, ".");
                     return MoveType.MOVE_ILLEGAL;
                 }
+                if (unit.getMovesLeft() <= 0) {
+                    logSB(sb, ", waiting at ", unit.getLocation(),
+                        " to embark on ", newCarrier, ".");
+                    return MoveType.MOVE_NO_MOVES;
+                }
                 if (aiUnit.joinTransport(newCarrier, d)) continue;
-                logger.finest(logMe + " at " + unit.getLocation()
-                        + " unexpected failure to embark to " + newCarrier
-                    + " at " + newCarrier.getLocation() + ": " + this);
+                logSB(sb, ", at ", unit.getLocation(),
+                    " failed to embark on ", newCarrier,
+                    " at " + newCarrier.getLocation(), ".");
                 return MoveType.MOVE_ILLEGAL;
             }
 
@@ -751,14 +740,10 @@ public abstract class Mission extends AIObject {
                 MoveType mt = unit.getMoveType(path.getDirection());
                 if (mt == MoveType.MOVE_NO_MOVES) {
                     unit.setMovesLeft(0);
+                    logSB(sb, ", reached ", unit.getLocation(), ".");
                     return MoveType.MOVE_NO_MOVES;
                 }
-                if (!mt.isProgress()) { // Special handling required.
-                    logger.finest(logMe + " at " + unit.getTile()
-                        + " has special move " + mt + " to " + path.getTile()
-                        + ": " + this);
-                    return mt;
-                }
+                if (!mt.isProgress()) return mt; // Special handling required.
                 if (aiUnit.move(path.getDirection())) continue;
                 break;
 
@@ -766,7 +751,7 @@ public abstract class Mission extends AIObject {
                 Location dst = (unit.isInEurope()) ? unit.getGame().getMap()
                     : path.getLocation();
                 if (AIMessage.askMoveTo(aiUnit, dst)) {
-                    logger.finest(logMe + " now on high seas: " + this);
+                    logSB(sb, ", on the high seas.");
                     return MoveType.MOVE_HIGH_SEAS;
                 }
                 break;
@@ -777,9 +762,8 @@ public abstract class Mission extends AIObject {
             default:
                 throw new IllegalStateException("Can not happen");
             }
-            logger.finest(logMe + " at " + unit.getLocation()
-                + " failed to move to " + path.getLocation()
-                + ": " + this);
+            logSB(sb, ", at ", unit.getLocation(),
+                " failed to move to ", path.getLocation(), ".");
             return MoveType.MOVE_ILLEGAL;
         }
         return MoveType.MOVE; // Must have completed path normally, no log.
@@ -802,17 +786,17 @@ public abstract class Mission extends AIObject {
         Mission m = aiCarrier.getMission();
         if (!(m instanceof TransportMission)) return false;
 
-        return ((TransportMission)m).retargetTransportable(aiUnit);
+        return ((TransportMission)m).requeueTransportable(aiUnit);
     }
 
     /**
      * Retarget a mission because of some problem.
      *
-     * @param tag The mission tag.
      * @param reason The reason for the retarget.
+     * @param sb An optional <code>StringBuffer</code> to log to.
      * @return True if a non-null target was found.
      */
-    public boolean retargetMission(String tag, String reason) {
+    public boolean retargetMission(String reason, StringBuffer sb) {
         final AIUnit aiu = getAIUnit();
         final Location loc = aiu.getTransportSource();
         String claim = (loc == null) ? "no-loc"
@@ -821,10 +805,15 @@ public abstract class Mission extends AIObject {
             ? "cancelled"
             : "cancel-failed";
         Location newTarget = findTarget();
+        if (newTarget == null) {
+            setTarget(null);
+            logSB(sb, ", retarget(", reason, ") failed.");
+            return false;
+        }
         setTarget(newTarget);
-        logger.finest(tag + " retargetting(" + reason + ") -> " + newTarget
-            + " (transport " + claim + "): " + this);
-        return newTarget != null;
+        logSB(sb, ", retargeted(", reason, ") to ", newTarget,
+            " (transport ", claim, ")");
+        return true;
     }
 
     // Fake partial implementation of Transportable interface.
@@ -957,8 +946,13 @@ public abstract class Mission extends AIObject {
 
     /**
      * Performs the mission.
+     *
+     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @return The <code>Mission</code> to continue with, or null
+     *     if the current mission has completed.
+     * @return 
      */
-    public abstract void doMission();
+    public abstract Mission doMission(StringBuffer sb);
 
 
     // Serialization

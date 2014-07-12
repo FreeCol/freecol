@@ -82,7 +82,7 @@ public class PioneeringMissionTest extends FreeColTestCase {
         aiUnit.setMission(null);
 
         // Check there are improvements to be made.
-        aiColony.createTileImprovementPlans();
+        aiColony.updateTileImprovementPlans(null);
         List<TileImprovementPlan> improvements
             = aiColony.getTileImprovementPlans();
         assertTrue("There should be valid improvements",
@@ -134,7 +134,7 @@ public class PioneeringMissionTest extends FreeColTestCase {
         Tile target = tip.getTarget();
         assertNotNull("Plan should have a target",
                       target);
-        aiUnit.changeMission(mission, "test");
+        aiUnit.changeMission(mission, null);
         assertEquals("Mission should stick", mission,
                      aiUnit.getMission());
     }

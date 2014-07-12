@@ -150,7 +150,7 @@ public class NativeAIPlayer extends AIPlayer {
     private void initializeMissions(StringBuffer sb) {
         final AIMain aiMain = getAIMain();
         final Player player = getPlayer();
-        if (sb != null) sb.append("\n  Initialize");
+        logSB(sb, "\n  Initialize ");
 
         // Give defensive missions up to the minimum expected defence,
         // leave the rest with the default wander-hostile mission.
@@ -163,18 +163,15 @@ public class NativeAIPlayer extends AIPlayer {
             while (units.size() > defence) {
                 Unit u = units.remove(0);
                 AIUnit aiu = getAIUnit(u);
-                aiu.changeMission(new UnitWanderHostileMission(aiMain, aiu),
-                                  "Wander-0");
-                if (sb != null) sb.append(u.toShortString())
-                                    .append(" wander, ");
+                Mission m = new UnitWanderHostileMission(aiMain, aiu);
+                aiu.setMission(m);
+                logSB(sb, u, " wander, ");
             }
             for (Unit u : units) {
                 AIUnit aiu = getAIUnit(u);
-                aiu.changeMission(new DefendSettlementMission(aiMain, aiu, is),
-                                  "Defend-" + is.getName());
-                if (sb != null) sb.append(u.toShortString())
-                                    .append(" defend-").append(is.getName())
-                                    .append(", ");
+                Mission m = new DefendSettlementMission(aiMain, aiu, is);
+                aiu.setMission(m);
+                logSB(sb, u, "defend-", is, ", ");
             }
         }
         if (sb != null) sb.setLength(sb.length() - 2);
@@ -195,10 +192,8 @@ public class NativeAIPlayer extends AIPlayer {
             if (newStance != player.getStance(p)) {
                 getAIMain().getFreeColServer().getInGameController()
                     .changeStance(player, newStance, p, true);
-                if (sb != null) {
-                    sb.append(" ").append(p.getNation().getSuffix())
-                        .append("->").append(newStance).append(", ");
-                }
+                logSB(sb, " ", p.getNation().getSuffix(),
+                      "->", newStance, ", ");
             }
         }
         if (sb != null && sb.length() > point) {
@@ -274,8 +269,7 @@ public class NativeAIPlayer extends AIPlayer {
                     && getAIUnit(u).equipForRole(r.getId(), false);
             }
             if (sb != null && u.getRole() != old) {
-                sb.append(u.toShortString()).append(" upgraded from ")
-                    .append(old.getSuffix()).append(", ");
+                logSB(sb, u, " upgraded from ", old.getSuffix(), ", ");
             }
             if (!moreHorses && !moreMuskets) break;
         }
@@ -389,7 +383,7 @@ public class NativeAIPlayer extends AIPlayer {
                 Unit u = units.remove(0);
                 AIUnit aiu = aiMain.getAIUnit(u);
                 aiu.changeMission(new DefendSettlementMission(aiMain, aiu, is),
-                                  "Defend-" + is.getName());
+                                  sb);logSB(sb, ", ");
                 defenders.add(u);
                 if (defenders.size() >= needed) break;
             }
@@ -438,13 +432,9 @@ public class NativeAIPlayer extends AIPlayer {
             AIUnit aiUnit = aiMain.getAIUnit(unit);
             Unit target = tile.getDefendingUnit(unit);
             Mission m = new UnitSeekAndDestroyMission(aiMain, aiUnit, target);
-            aiUnit.changeMission(m, "Raid-" + target.getId());
-            if (sb != null) {
-                sb.append("send ").append(aiUnit.getUnit().toShortString())
-                    .append(" to attack ").append(target.toShortString())
-                    .append(" at ").append(tile.toShortString())
-                    .append(", ");
-            }
+            aiUnit.changeMission(m, sb);logSB(sb, ", ");
+            logSB(sb, "send ", aiUnit.getUnit(), " to attack ", target,
+                " at ", tile, ", ");
         }
     }
 
@@ -464,6 +454,7 @@ public class NativeAIPlayer extends AIPlayer {
             .getRequiredGoods();
         List<AIUnit> aiUnits = getAIUnits();
 
+        int point = (sb == null) ? -1 : sb.length();
         List<AIUnit> done = new ArrayList<AIUnit>();
         reasons.clear();
         for (AIUnit aiUnit : aiUnits) {
@@ -493,7 +484,6 @@ public class NativeAIPlayer extends AIPlayer {
                 ? aiUnit.getMission().getClass() : null;
 
             Mission m = null;
-            String reason = null;
             if (settlement != null && settlement.getUnitCount()
                 + settlement.getTile().getUnitCount() <= 1) {
                 // First see to local settlement defence
@@ -515,7 +505,9 @@ public class NativeAIPlayer extends AIPlayer {
                 reasons.put(unit, "Patrol");
             }
 
-            if (m != null) aiUnit.changeMission(m, reason);
+            if (m != null) {
+                aiUnit.changeMission(m, sb);logSB(sb, ", ");
+            }
             done.add(aiUnit);
         }
         aiUnits.removeAll(done);
@@ -523,15 +515,16 @@ public class NativeAIPlayer extends AIPlayer {
 
         // Log
         if (sb != null) {
-            if (!aiUnits.isEmpty()) {
-                sb.append("\n  Free Land Units:");
-                for (AIUnit aiu : aiUnits) {
-                    sb.append(" ").append(aiu.getUnit().toShortString());
-                }
+            if (point < sb.length()) {
+                sb.insert(point, "\n  Mission changes: ");
+                sb.setLength(sb.length() - 2);
             }
-            sb.append("\n  Missions(")
-                .append(" settlements=").append(player.getNumberOfSettlements())
-                .append(" )");
+            if (!aiUnits.isEmpty()) {
+                logSB(sb, "\n  Free Land Units:");
+                for (AIUnit aiu : aiUnits) logSB(sb, " ", aiu.getUnit());
+            }
+            logSB(sb, "\n  Missions(settlements=",
+                  player.getNumberOfSettlements(), " )");
             logMissions(reasons, sb);
         }
     }
@@ -574,15 +567,11 @@ public class NativeAIPlayer extends AIPlayer {
                 }
             }
             if (alreadyAssignedUnits > MAX_NUMBER_OF_GIFTS_BEING_DELIVERED) {
-                if (sb != null) {
-                    sb.append(is.getName()).append(" has ")
-                        .append(alreadyAssignedUnits).append(" already, ");
-                }
+                logSB(sb, is.getName(), " has ", alreadyAssignedUnits, 
+                      " already, ");
                 continue;
             } else if (availableUnits.isEmpty()) {
-                if (sb != null) {
-                    sb.append(is.getName()).append(" has no gift units, ");
-                }
+                logSB(sb, is.getName(), " has no gift units, ");
                 continue;
             }
             // Pick a random available capable unit.
@@ -601,9 +590,7 @@ public class NativeAIPlayer extends AIPlayer {
                 }
             }
             if (unit == null) {
-                if (sb != null) {
-                    sb.append(is.getName()).append(" found no gift unit, ");
-                }
+                logSB(sb, is.getName(), " found no gift unit, ");
                 continue;
             }
 
@@ -628,9 +615,7 @@ public class NativeAIPlayer extends AIPlayer {
             // If there are any suitable colonies, pick a random one
             // to send a gift to.
             if (nearbyColonies.isEmpty()) {
-                if (sb != null) {
-                    sb.append(is.getName()).append(" found no gift colonies, ");
-                }
+                logSB(sb, is.getName(), " found no gift colonies, ");
                 continue;
             }
             Colony target = RandomChoice.getWeightedRandom(logger,
@@ -640,15 +625,10 @@ public class NativeAIPlayer extends AIPlayer {
             }
 
             // Send the unit.
+            logSB(sb, "At ", is.getName(), " ");
             Mission m = new IndianBringGiftMission(getAIMain(), aiUnit, target);
-            aiUnit.changeMission(m, "Gift-" + is.getName());
-            if (sb != null) {
-                sb.append(is.getName())
-                    .append(" sends ").append(aiUnit.getUnit().toShortString())
-                    .append(" with ").append(gift)
-                    .append("->").append(target.getName())
-                    .append(", ");
-            }
+            aiUnit.changeMission(m, sb);
+            logSB(sb, " and takes ", gift, " to ", target.getName(), ", ");
         }
         if (sb != null && sb.length() > point) {
             sb.insert(point, "\n  Gifts: ");
@@ -690,15 +670,11 @@ public class NativeAIPlayer extends AIPlayer {
                 }
             }
             if (alreadyAssignedUnits > MAX_NUMBER_OF_DEMANDS) {
-                if (sb != null) {
-                    sb.append(is.getName()).append(" has ")
-                        .append(alreadyAssignedUnits).append(" already, ");
-                }
+                logSB(sb, is.getName(), " has ", alreadyAssignedUnits,
+                    " already, ");
                 continue;
             } else if (availableUnits.isEmpty()) {
-                if (sb != null) {
-                    sb.append(is.getName()).append(" has no demand units, ");
-                }
+                logSB(sb, is.getName(), " has no demand units, ");
                 continue;
             }
             // Pick a random available capable unit.
@@ -717,9 +693,7 @@ public class NativeAIPlayer extends AIPlayer {
                 }
             }
             if (unit == null) {
-                if (sb != null) {
-                    sb.append(is.getName()).append(" found no demand unit, ");
-                }
+                logSB(sb, is.getName(), " found no demand unit, ");
                 continue;
             }
 
@@ -746,26 +720,21 @@ public class NativeAIPlayer extends AIPlayer {
             // Sometimes a random one, sometimes the weakest, sometimes the
             // most annoying.
             if (nearbyColonies.isEmpty()) {
-                if (sb != null) {
-                    sb.append(is.getName()).append(" found no demand colonies, ");
-                }
+                logSB(sb, is.getName(), " found no demand colonies, ");
                 continue;
             }
             Colony target = RandomChoice.getWeightedRandom(logger,
                 "Choose demand colony", nearbyColonies, getAIRandom());
             if (target == null) {
-                sb.append(is.getName()).append(" found no demand target, ");
+                logSB(sb, is.getName(), " found no demand target, ");
                 continue;
             }
 
             // Send the unit.
+            logSB(sb, "At ", is.getName(), " ");
             Mission m = new IndianDemandMission(getAIMain(), aiUnit, target);
-            aiUnit.changeMission(m, "Demand-" + is.getName());
-            if (sb != null) {
-                sb.append(is.getName()).append(" sends ")
-                    .append(aiUnit.getUnit().toShortString())
-                    .append("->").append(target.getName()).append(", ");
-            }
+            aiUnit.changeMission(m, sb);
+            logSB(sb, " and will demand of ", target, ", ");
         }
         if (sb != null && sb.length() > point) {
             sb.insert(point, "\n  Tribute: ");
@@ -812,16 +781,18 @@ public class NativeAIPlayer extends AIPlayer {
         StringBuffer sb = null;
         if (logger.isLoggable(Level.FINEST)) {
             sb = new StringBuffer(256);
-            sb.append(player.getNation().getSuffix())
-                .append(" in ").append(turn)
-                .append("/").append(turn.getNumber());
+            logSB(sb, player.getNation().getSuffix(),
+                " in ", turn, "/", turn.getNumber());
         }
 
         sessionRegister.clear();
         clearAIUnits();
+
         determineStances(sb);
+        List<AIUnit> more;
         if (turn.isFirstTurn()) {
             initializeMissions(sb);
+            more = getAIUnits();
         } else {
             int[] randoms;
             abortInvalidMissions();
@@ -835,12 +806,14 @@ public class NativeAIPlayer extends AIPlayer {
                                        100, nSettlements);
             demandTribute(randoms, sb);
             giveNormalMissions(sb);
-            doMissions(sb);
+            more = doMissions(getAIUnits(), sb);
+        }
+
+        if (!more.isEmpty()) {
             abortInvalidMissions();
             giveNormalMissions(sb);
+            doMissions(more, sb);
         }
-        doMissions(null);
-        abortInvalidMissions();
         clearAIUnits();
 
         if (sb != null) logger.finest(sb.toString());

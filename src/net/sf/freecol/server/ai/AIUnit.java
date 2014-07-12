@@ -232,42 +232,37 @@ public class AIUnit extends AIObject implements Transportable {
      * The dynamic priority is reset.
      *
      * @param mission The new <code>Mission</code>.
-     * @param why A reason to change the mission.
+     * @param sb An optional <code>StringBuffer</code> to log to.
      */
-    public void changeMission(Mission mission, String why) {
+    public void changeMission(Mission mission, StringBuffer sb) {
         if (this.mission == mission) return;
+        Location oldTarget;
+
         if (this.mission == null) {
-            if (!mission.isOneTime()) {
-                logger.fine("Mission replaced (" + why + ") null"
-                    + " -> " + mission);
-            }
+            logSB(sb, unit, " replaced null with ", mission);
+            oldTarget = null;
         } else {
-            if (!this.mission.isOneTime()
-                || (mission != null && !mission.isOneTime())) {
-                logger.fine("Mission replaced (" + why + ") " + this.mission
-                    + " -> " + mission);
-            }
+            logSB(sb, unit, " replaced ", this.mission, " with ", mission);
+            oldTarget = this.mission.getTarget();
             this.mission.dispose();
         }
        
-        removeTransport(why);
         setMission(mission);
         this.dynamicPriority = 0;
 
-        if (mission != null && unit.isOnCarrier()) {
-            if (!leaveTransport()) {
-                requeueOnCurrentCarrier();
+        boolean cancel = true;
+        if (unit.isOnCarrier()) {
+            if (mission == null) {
+                if (leaveTransport()) logSB(sb, " Disembarked.");
+            } else if (oldTarget == mission.getTarget()) {
+                cancel = false;
+            } else if (requeueOnCurrentCarrier()) {
+                cancel = false;
+            } else {
+                if (leaveTransport()) logSB(sb, " Disembarked.");
             }
-        }            
-    }
-
-    /**
-     * Aborts a mission.
-     *
-     * @param why A reason to abort the mission.
-     */
-    public void abortMission(String why) {
-        changeMission(null, why);
+        }
+        if (cancel) removeTransport("mission-changed");
     }
 
     /**
@@ -317,12 +312,8 @@ public class AIUnit extends AIObject implements Transportable {
         final AIUnit aiCarrier = getAIMain().getAIUnit(carrier);
         if (aiCarrier == null) return false;
         Mission m = aiCarrier.getMission();
-        if (m == null) {
-            m = new TransportMission(getAIMain(), aiCarrier);
-            aiCarrier.changeMission(m, "restart");
-        }
         if (m instanceof TransportMission) {
-            if (((TransportMission)m).retargetTransportable(this)) {
+            if (((TransportMission)m).requeueTransportable(this)) {
                 setTransport(aiCarrier, "requeued");
                 return true;
             }
@@ -356,18 +347,19 @@ public class AIUnit extends AIObject implements Transportable {
         if (transport != null) {
             Mission m = transport.getMission();
             if (m instanceof TransportMission) {
-                ((TransportMission)m).retargetTransportable(this);
+                ((TransportMission)m).requeueTransportable(this);
             }
         }
     }
 
     /**
      * Performs the mission this unit has been assigned.
+     *
+     * @param sb An optional <code>StringBuffer</code> to log to.
      */
-    public void doMission() {
-        if (mission != null && mission.isValid()) {
-            mission.doMission();
-        }
+    public Mission doMission(StringBuffer sb) {
+        return (mission != null && mission.isValid()) ? mission.doMission(sb)
+            : null;
     }
 
     /**

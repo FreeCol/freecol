@@ -253,9 +253,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * Rearranges the workers within this colony using the {@link ColonyPlan}.
      * TODO: Detect military threats and boost defence.
      *
+     * @param sb An optional <code>StringBuffer</code> to log to.
      * @return True if the workers were rearranged.
      */
-    public boolean rearrangeWorkers() {
+    public boolean rearrangeWorkers(StringBuffer sb) {
         final AIMain aiMain = getAIMain();
         if (colonyPlan == null) colonyPlan = new ColonyPlan(aiMain, colony);
 
@@ -277,6 +278,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         final Tile tile = colony.getTile();
         final Player player = colony.getOwner();
         final Specification spec = getSpecification();
+        logSB(sb, "\n  ", colony.getName());
 
         // For now, cap the rearrangement horizon, because confidence
         // that we are triggering on all relevant changes is low.
@@ -288,10 +290,11 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // This needs to be done early so that new tiles can be
         // included in any new colony plan.
         exploreLCRs();
-        stealTiles();
+        stealTiles(sb);
         for (Tile t : tile.getSurroundingTiles(1)) {
             if (!player.owns(t) && player.canClaimForSettlement(t)) {
                 AIMessage.askClaimLand(t, this, 0);
+                if (player.owns(t)) logSB(sb, ", claimed tile ", t);
             }
         }
 
@@ -348,6 +351,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         Colony scratch = colonyPlan.assignWorkers(new ArrayList<Unit>(workers),
                                                   preferScouts);
         if (scratch == null) {
+            logSB(sb, ", failed to assign workers.");
             rearrangeTurn = new Turn(turn + 1);
             return false;
         }
@@ -357,6 +361,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         // Emergency recovery if something broke and the colony is empty.
         if (colony.getUnitCount() <= 0) {
+            logSB(sb, ", autodestruct detected");
             String destruct = "Autodestruct at " + colony.getName()
                 + " in " + turn + ":";
             for (UnitWas uw : was) destruct += "\n" + uw.toString();
@@ -372,11 +377,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // rearrange next turn until we get out of this state.
         if (build != null && !colony.canBuild(build)) {
             BuildableType newBuild = colonyPlan.getBestBuildableType();
-            logger.finest(colony.getName()
-                + " reneged building " + build.getSuffix()
-                + " (" + colony.getNoBuildReason(build, null)
-                + ") reassigned to "
-                + ((newBuild == null) ? "nothing" : newBuild.getSuffix()));
+            logSB(sb, ", reneged building ", build.getSuffix(),
+                " (", colony.getNoBuildReason(build, null), ")");
             List<BuildableType> queue = new ArrayList<BuildableType>();
             if (newBuild != null) queue.add(newBuild);
             AIMessage.askSetBuildQueue(this, queue);
@@ -403,56 +405,59 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             nextRearrange = Math.max(1, Math.min(nextRearrange, when));
         }
 
-        // Log the changes.
-        build = colony.getCurrentlyBuilding();
-        String buildStr = (build != null) ? build.toString()
-            : ((build = colonyPlan.getBestBuildableType()) != null)
-            ? "unexpected-null(" + build.toString() + ")"
-            : "expected-null";
-        String report = "Rearrange " + colony.getName()
-            + " (" + colony.getUnitCount() + ")"
-            + " build=" + buildStr
-            + " " + getGame().getTurn()
-            + " + " + nextRearrange;
-        for (UnitWas uw : was) report += "\n" + uw.toString();
-        logger.finest(report);
-
-        // Give suitable missions to all units.
+        // Make sure all units have suitable missions.
         for (Unit u : colony.getUnitList()) {
-            AIUnit aiU = getAIUnit(u);
-            if (aiU.getMission() instanceof WorkInsideColonyMission
-                && ((WorkInsideColonyMission)aiU.getMission()).getAIColony()
+            AIUnit aiu = getAIUnit(u);
+            Mission m = null;
+            if (aiu.getMission() instanceof WorkInsideColonyMission
+                && ((WorkInsideColonyMission)aiu.getMission()).getAIColony()
                 == this) {
                 ;// Do nothing
             } else {
-                Mission m = new WorkInsideColonyMission(aiMain, aiU, this);
-                aiU.changeMission(m, "Work-in-" + colony.getName());
+                m = new WorkInsideColonyMission(aiMain, aiu, this);
+            }
+            if (m != null) {
+                logSB(sb, ", ");
+                aiu.changeMission(m, sb);
             }
         }
         EuropeanAIPlayer aip = (EuropeanAIPlayer)aiMain.getAIPlayer(player);
         boolean pioneersWanted = aip.pioneersNeeded() > 0;
         Tile pioneerTile;
         for (Unit u : tile.getUnitList()) {
-            AIUnit aiU = getAIUnit(u);
-            if (aiU == null || aiU.getMission() != null) continue;
+            AIUnit aiu = getAIUnit(u);
+            if (aiu == null || aiu.hasMission()) continue;
             Mission m = null;
             if (u.isArmed()) {
-                m = new DefendSettlementMission(aiMain, aiU, colony);
+                m = new DefendSettlementMission(aiMain, aiu, colony);
             } else if (u.hasAbility(Ability.SPEAK_WITH_CHIEF)) {
-                if (preferScouts) m = aip.getScoutingMission(aiU);
+                if (preferScouts) m = aip.getScoutingMission(aiu);
             } else if (u.hasAbility(Ability.IMPROVE_TERRAIN)) {
-                if (pioneersWanted) m = aip.getPioneeringMission(aiU);
+                if (pioneersWanted) m = aip.getPioneeringMission(aiu);
             } else if (u.hasAbility(Ability.ESTABLISH_MISSION)) {
-                m = aip.getMissionaryMission(aiU);
+                m = aip.getMissionaryMission(aiu);
             }
-            if (m != null) aiU.changeMission(m, "Out-of-" + colony.getName());
+            if (m != null) {
+                logSB(sb, ", ");
+                aiu.changeMission(m, sb);
+            }
         }
+
+        // Log the changes.
+        build = colony.getCurrentlyBuilding();
+        String buildStr = (build != null) ? build.toString()
+            : ((build = colonyPlan.getBestBuildableType()) != null)
+            ? "unexpected-null(" + build.toString() + ")"
+            : "expected-null";
+        logSB(sb, ", building ", buildStr, ", units=", colony.getUnitCount(),
+              ", next=", nextRearrange);
+        for (UnitWas uw : was) logSB(sb, "\n  ", uw);
 
         // Change the export settings when required.
         resetExports();
 
-        createTileImprovementPlans();
-        updateWishes();
+        updateTileImprovementPlans(sb);
+        updateWishes(sb);
 
         // Set the next rearrangement turn.
         rearrangeTurn = new Turn(turn + nextRearrange);
@@ -559,8 +564,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * defence.  Grab everything if at war with the owner, otherwise
      * just take the tile that best helps with the currently required
      * raw building materials, with a lesser interest in food.
+     *
+     * @param sb An optional <code>StringBuffer</code> to log to.
      */
-    private void stealTiles() {
+    private void stealTiles(StringBuffer sb) {
         final Specification spec = getSpecification();
         final Tile tile = colony.getTile();
         final Player player = colony.getOwner();
@@ -594,8 +601,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             if (owner.atWarWith(player)) {
                 if (AIMessage.askClaimLand(t, this, NetworkConstants.STEAL_LAND)
                     && player.owns(t)) {
-                    logger.info(player.getName() + " stole tile " + t
-                        + " from hostile " + owner.getName());
+                    logSB(sb, ", stole tile ", t,
+                          " from hostile ", owner.getName());
                 }
             } else {
                 // Pick the best tile to steal, considering mainly the
@@ -618,9 +625,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             Player owner = steal.getOwner();
             if (AIMessage.askClaimLand(steal, this, NetworkConstants.STEAL_LAND)
                 && player.owns(steal)) {
-                logger.info(player.getName() + " stole tile " + steal
-                    + " (score = " + score
-                    + ") from " + owner.getName());
+                logSB(sb, ", stole tile ", steal, " (score = ", score,
+                      ") from ", owner.getName());
             }
         }
     }
@@ -723,29 +729,31 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      *
      * @param ag The <code>AIGoods</code> to log.
      * @param action The state of the goods.
+     * @param sb An optional <code>StringBuffer</code> to log to.
      */
-    private void goodsLog(AIGoods ag, String action) {
-        if (logger.isLoggable(Level.FINEST)) {
-            Goods goods = (ag == null) ? null : ag.getGoods();
-            int amount = (goods == null) ? -1 : goods.getAmount();
-            String type = (goods == null) ? "(null)"
-                : ag.getGoods().getType().getSuffix();
-            logger.finest(String.format("%-20s %-10s %s %s %s",
-                    colony.getName(), action,
-                    ((ag == null) ? "(null)" : ag.getId()),
-                    ((amount >= GoodsContainer.CARGO_SIZE) ? "full"
-                        : Integer.toString(amount)), type));
-        }
+    private void goodsLog(AIGoods ag, String action, StringBuffer sb) {
+        if (sb == null) return;
+        Goods goods = (ag == null) ? null : ag.getGoods();
+        int amount = (goods == null) ? -1 : goods.getAmount();
+        String type = (goods == null) ? "(null)"
+            : ag.getGoods().getType().getSuffix();
+        logSB(sb, String.format("%-20s %-10s %s %s %s",
+                colony.getName(), action,
+                ((ag == null) ? "(null)" : ag.getId()),
+                ((amount >= GoodsContainer.CARGO_SIZE) ? "full"
+                    : Integer.toString(amount)), type));
     }
 
     /**
      * Creates a list of the goods which should be shipped out of this colony.
+     *
+     * @param sb An optional <code>StringBuffer</code> to log to.
      */
-    public void updateAIGoods() {
+    public void updateAIGoods(StringBuffer sb) {
         if (colony.hasAbility(Ability.EXPORT)) {
             while (!aiGoods.isEmpty()) {
                 AIGoods ag = aiGoods.remove(0);
-                goodsLog(ag, "customizes");
+                goodsLog(ag, "customizes", sb);
                 dropGoods(ag);
             }
             return;
@@ -757,16 +765,16 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             if (ag == null) {
                 aiGoods.remove(i);
             } else if (ag.checkIntegrity(false) < 0) {
-                goodsLog(ag, "reaps");
+                goodsLog(ag, "reaps", sb);
                 dropGoods(ag);
             } else if (ag.getGoods().getLocation() != colony) {
                 // On its way, no longer of interest here, but do not dispose
                 // as that will happen when delivered.
-                goodsLog(ag, "sends");
+                goodsLog(ag, "sends", sb);
                 aiGoods.remove(i);
             } else if (colony.getAdjustedNetProductionOf(ag.getGoods()
                     .getType()) < 0) {
-                goodsLog(ag, "needs");
+                goodsLog(ag, "needs", sb);
                 dropGoods(ag);
             } else {
                 i++;
@@ -809,12 +817,12 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                         goods.setAmount(amount);
                         ag.setTransportPriority(priority);
                     }
-                    goodsLog(ag, "exports");
+                    goodsLog(ag, "exports", sb);
                 } else if (exportAmount >= EXPORT_MINIMUM) {
                     goods.setAmount(exportAmount);
-                    goodsLog(ag, "clamps");
+                    goodsLog(ag, "clamps", sb);
                 } else {
-                    goodsLog(ag, "unexports");
+                    goodsLog(ag, "unexports", sb);
                     dropGoods(ag);
                     continue;
                 }
@@ -831,7 +839,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                                                amount, destination);
                 newGoods.setTransportPriority(priority);
                 newAIGoods.add(newGoods);
-                goodsLog(newGoods, "makes");
+                goodsLog(newGoods, "makes", sb);
                 exportAmount -= amount;
             }
         }
@@ -958,8 +966,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * @param type The <code>GoodsType</code> to wish for.
      * @param amount The amount of goods wished for.
      * @param value The urgency of the wish.
+     * @param sb An optional <code>StringBuffer</code> to log to.
      */
-    public void requireGoodsWish(GoodsType type, int amount, int value) {
+    public void requireGoodsWish(GoodsType type, int amount, int value,
+                                 StringBuffer sb) {
         GoodsWish gw = null;
         for (Wish w : wishes) {
             if (w instanceof GoodsWish
@@ -974,7 +984,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         } else {
             gw = new GoodsWish(getAIMain(), colony, value, amount, type);
             wishes.add(gw);
-            logger.finest(colony.getName() + " makes new goods wish: " + gw);
+            logSB(sb, " ", gw);
         }
     }
 
@@ -986,9 +996,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * @param type The <code>UnitType</code> to wish for.
      * @param expertNeeded Is an expert unit required?
      * @param value The urgency of the wish.
+     * @param sb An optional <code>StringBuffer</code> to log to.
      */
     public void requireWorkerWish(UnitType type, boolean expertNeeded,
-                                  int value) {
+                                  int value, StringBuffer sb) {
         WorkerWish ww = null;
         for (Wish w : wishes) {
             if (w instanceof WorkerWish
@@ -1002,24 +1013,31 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         } else {
             ww = new WorkerWish(getAIMain(), colony, value, type, expertNeeded);
             wishes.add(ww);
-            logger.finest(colony.getName() + " makes new worker wish: "
-                + ww);
+            logSB(sb, " ", ww);
         }
     }
 
     /**
      * Updates the wishes for the <code>Colony</code>.
+     *
+     * @param sb An optional <code>StringBuffer</code> to log to.
      */
-    private void updateWishes() {
-        updateWorkerWishes();
-        updateGoodsWishes();
+    private void updateWishes(StringBuffer sb) {
+        int point = (sb == null) ? -1 : sb.length();
+        updateWorkerWishes(sb);
+        updateGoodsWishes(sb);
         Collections.sort(wishes);
+        if (sb != null && point < sb.length()) {
+            sb.insert(point, "\n  New Wishes:");
+        }
     }
 
     /**
      * Updates the worker wishes.
+     *
+     * @param sb An optional <code>StringBuffer</code> to log to.
      */
-    private void updateWorkerWishes() {
+    private void updateWorkerWishes(StringBuffer sb) {
         final Specification spec = getSpecification();
         final int baseValue = 25;
         final int priorityMax = 50;
@@ -1067,7 +1085,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                     - priorityDecay * producing.indexOf(goods))
                 + (Math.min(multipleMax, experts.getCount(expert) - 1)
                     * multipleBonus);
-            requireWorkerWish(expert, true, value);
+            requireWorkerWish(expert, true, value, sb);
         }
 
         // Request population increase if no worker wishes and the bonus
@@ -1086,7 +1104,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 expert = spec.getExpertForProducing(plan.getGoodsType());
                 break;
             }
-            requireWorkerWish(expert, false, 50);
+            requireWorkerWish(expert, false, 50, sb);
         }
 
         // TODO: check for students
@@ -1096,15 +1114,17 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         if (isBadlyDefended()) {
             UnitType bestDefender = colony.getBestDefenderType();
             if (bestDefender != null) {
-                requireWorkerWish(bestDefender, true, 100);
+                requireWorkerWish(bestDefender, true, 100, sb);
             }
         }
     }
 
     /**
      * Updates the goods wishes.
+     *
+     * @param sb An optional <code>StringBuffer</code> to log to.
      */
-    private void updateGoodsWishes() {
+    private void updateGoodsWishes(StringBuffer sb) {
         final Specification spec = getSpecification();
         int goodsWishValue = 50;
 
@@ -1201,7 +1221,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             if (amount > 0) {
                 int value = goodsWishValue;
                 if (colony.canProduce(requiredType)) value /= 10;
-                requireGoodsWish(requiredType, amount, value);
+                requireGoodsWish(requiredType, amount, value, sb);
             }
         }
 
@@ -1246,8 +1266,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * increase the production by this <code>Colony</code>.
      *
      * @see TileImprovementPlan
+     * @param sb An optional <code>StringBuffer</code> to log to.
      */
-    public void createTileImprovementPlans() {
+    public void updateTileImprovementPlans(StringBuffer sb) {
         List<TileImprovementPlan> newPlans
             = new ArrayList<TileImprovementPlan>();
         for (WorkLocation wl : colony.getAvailableWorkLocations()) {
@@ -1300,13 +1321,17 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                     if (forest <= FOREST_MINIMUM) continue;
                 }
                 newPlans.add(plan);
-                logger.info(colony.getName()
-                    + " new tile improvement plan: " + plan);
             }
         }
         tileImprovementPlans.clear();
         tileImprovementPlans.addAll(newPlans);
         Collections.sort(tileImprovementPlans);
+        if (sb != null) {
+            logSB(sb, "\n  TIPs:");
+            for (TileImprovementPlan tip : tileImprovementPlans) {
+                logSB(sb, " ", tip);
+            }
+        }
     }
 
     /**

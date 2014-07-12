@@ -499,8 +499,8 @@ public class PioneeringMission extends Mission {
     public String invalidReason() {
         // Prevent invalidation for improvements that are just completing.
         if (tileImprovementPlan != null) {
-            if (tileImprovementPlan.isComplete()) return null;
             if (tileImprovementPlan.isDisposed()) return "plan-disposed";
+            if (tileImprovementPlan.isComplete()) return null;
         }
         return invalidReason(getAIUnit(), getTarget());
     }
@@ -510,34 +510,43 @@ public class PioneeringMission extends Mission {
     /**
      * {@inheritDoc}
      */
-    public void doMission() {
+    public Mission doMission(StringBuffer sb) {
+        logSB(sb, tag);
         // Check for completion and tileImprovement failure up front.
         final AIUnit aiUnit = getAIUnit();
         Location newTarget;
-        if (tileImprovementPlan != null) {
-            String logMe = null;
+        boolean retarget = tileImprovementPlan == null;
+        if (!retarget) {
             if (tileImprovementPlan.isComplete()) {
-                logMe = tag + " completed improvement " + getTarget()
-                    + "/" + tileImprovementPlan;
+                logSBdone(sb, tileImprovementPlan.getType(),
+                    " at ", getTarget());
+                retarget = true;
             } else if (!tileImprovementPlan.validate()) {
-                logMe = tag + " abandoned invalid plan " + getTarget()
-                    + "/" + tileImprovementPlan;
+                logSBfail(sb, " abandoned invalid plan at ",
+                    getTarget(), "/", tileImprovementPlan);
+                retarget = true;
+            } else {
+                retarget = false;
             }
-            if (logMe != null) {
-                setTarget(newTarget = findTarget(aiUnit, 10, false));
-                logMe += ", retargeting " + newTarget
-                    + "/" + tileImprovementPlan + ": " + this;
-                logger.finest(logMe);
-                if (newTarget == null) return;
+        }
+        if (retarget) {
+            newTarget = findTarget(aiUnit, 10, false);
+            if (newTarget == null) {
+                setTarget(null);
+                logSBfail(sb, tag, " found no target");
+                return null;
             }
+            setTarget(newTarget);
+            logSB(sb, tag, ", retargeting ", newTarget,
+                "/", tileImprovementPlan);
         }
 
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            if (!retargetMission(tag, reason)) return;
+            if (!retargetMission(reason, sb)) return null;
         } else if (reason != null) {
-            logger.finest(tag + " broken(" + reason + "): " + this);
-            return;
+            logSBbroken(sb, reason);
+            return null;
         }
 
         final Unit unit = getUnit();
@@ -550,44 +559,61 @@ public class PioneeringMission extends Mission {
         String where;
         while (!hasTools()) { // Get tools first.
             // Go there and clear target on arrival.
-            if (travelToTarget(tag, getTarget(), costDecider)
-                != Unit.MoveType.MOVE) return;
-            where = ((Colony)getTarget()).getName();
+            Unit.MoveType mt = travelToTarget(getTarget(), costDecider, sb);
+            switch (mt) {
+            case MOVE:
+                break;
+            case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
+                return this;
+            default:
+                logSBmove(sb, unit, mt);
+                return this;
+            }
 
             // Try to equip
-            String logMe = tag + " reached " + where;
+            where = ((Colony)getTarget()).getName();
+            String logMe = ", at " + where;
             logMe += (aiUnit.equipForRole("model.role.pioneer", false)
                 && hasTools())
-                ? " and equips"
+                ? " equips"
                 : " but fails to equip";
             newTarget = findTarget(aiUnit, 10, false);
-            if (!hasTools() && Map.isSameLocation(newTarget, getTarget())) {
-                newTarget = null;
-                logMe += ", cancelling: " + this;
-            } else {
-                logMe += ", retargeting " + newTarget
-                    + "/" + tileImprovementPlan + ": " + this;
+            if (newTarget == null
+                || (!hasTools() && Map.isSameLocation(newTarget, getTarget()))) {
+                setTarget(null);
+                logSB(sb, logMe, ", cancelling");
+                return null;
             }
             setTarget(newTarget);
-            logger.finest(logMe);
-            if (newTarget == null) return;
+            logSB(sb, logMe, ", retargeting ", newTarget,
+                "/", tileImprovementPlan);
         }
 
         // Going to an intermediate colony?
         if (getTarget() instanceof Colony
             && invalidTargetReason(getTarget(), player) == null) {
-            if (travelToTarget(tag, getTarget(), costDecider)
-                != Unit.MoveType.MOVE) return;
+            Unit.MoveType mt = travelToTarget(getTarget(), costDecider, sb);
+            switch (mt) {
+            case MOVE:
+                break;
+            case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
+                return this;
+            default:
+                logSBmove(sb, unit, mt);
+                return this;
+            }
             where = ((Colony)getTarget()).getName();
             setTarget(newTarget = findTarget(aiUnit, 10, false));
-            logger.finest(tag + " reached intermediate colony " + where
-                + ", retargeting " + newTarget
-                + "/" + tileImprovementPlan + ": " + this);
-            if (newTarget == null) return;
+            if (newTarget == null) {
+                setTarget(null);
+                logSBfail(sb, ", reached ", where, " but found no target");
+                return null;
+            }
+            logSB(sb, ", at ", where, ", retargeting ", newTarget,
+                "/", tileImprovementPlan);
         }
 
         // Check for threats.
-
         // The code below is very conservative.  When enabled it
         // reduces the number of completed improvements by a factor of
         // 4 -- 5, which is unacceptable.  Therefore, disabled for
@@ -612,25 +638,25 @@ public class PioneeringMission extends Mission {
         */
 
         // Going to a tile to perform an improvement.
-        Unit.MoveType mt = travelToTarget(tag, getTarget(), costDecider);
+        Unit.MoveType mt = travelToTarget(getTarget(), costDecider, sb);
         switch (mt) {
         case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
-            return;
-        case MOVE_ILLEGAL:
-            if (unit.isInEurope()) return;
-            // Fall through
+            return this;
+
+        case MOVE: // Arrived
+            break;
+
         case MOVE_NO_ATTACK_CIVILIAN:
             // Might be a temporary blockage due to an occupying unit
             // at the target.  Move randomly and retry if adjacent.
             Direction d = unit.getTile().getDirection(getTarget().getTile());
             if (d != null) moveRandomly(tag, d);
-            return;
-        case MOVE:
-            break;
+            logSBdodge(sb, unit);
+            return this;
+
         default:
-            logger.warning(tag + " unexpected move type (" + mt
-                + ") at " + unit.getLocation() + ": " + this);
-            return;
+            logSBmove(sb, unit, mt);
+            return this;
         }
 
         // Take control of the land before proceeding to improve.
@@ -654,35 +680,30 @@ public class PioneeringMission extends Mission {
             if (fail) {
                 aiPlayer.removeTileImprovementPlan(tileImprovementPlan);
                 tileImprovementPlan.dispose();
-                setTarget(null);
-                logger.finest(tag + " can not claim land at " + tile
-                    + ": " + this);
-                return;
+                logSBfail(sb, "land claim at ", tile);
+                return null;
             }
         }
 
         // Work on the improvement
         if (unit.getState() == UnitState.IMPROVING) {
             unit.setMovesLeft(0);
-            logger.finest(tag + " improving "
-                + tileImprovementPlan.getType() + ": " + this);
+            logSB(sb, ", improving ", tileImprovementPlan.getType(), ".");
         } else if (unit.checkSetState(UnitState.IMPROVING)) {
             if (AIMessage.askChangeWorkImprovementType(aiUnit,
                     tileImprovementPlan.getType())) {
-                logger.finest(tag + " began improvement "
-                    + tileImprovementPlan.getType()
-                    + " at target " + tile + ": " + this);
+                logSB(sb, " began improvement ", tileImprovementPlan.getType(),
+                    " at ", tile, ".");
             } else {
                 aiPlayer.removeTileImprovementPlan(tileImprovementPlan);
                 tileImprovementPlan.dispose();
-                setTarget(null);
-                logger.warning(tag + " failed to improve " + tile
-                    + ": " + this);
+                logSBfail(sb, "to change work type at ", tile);
+                return null;
             }
         } else { // Probably just out of moves.
-            logger.finest(tag + " waiting to improve at " + tile
-                + ": " + this);
+            logSB(sb, ", waiting to improve at ", tile, ".");
         }
+        return this;
     }
 
 

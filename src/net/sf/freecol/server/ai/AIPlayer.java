@@ -466,20 +466,26 @@ public abstract class AIPlayer extends AIObject {
     /**
      * Makes every unit perform their mission.
      *
+     * @param aiUnits A list of <code>AIUnit</code>s to perform missions.
      * @param sb An optional <code>StringBuffer</code> to log to.
+     * @return A list of <code>AIUnit</code>s that have moves left.
      */
-    protected void doMissions(StringBuffer sb) {
-        if (sb != null) sb.append("\n  Do Missions:");
-        for (AIUnit aiu : getAIUnits()) {
-            if (sb != null) {
-                sb.append(" ").append(aiu.getUnit().toShortString());
-            }
+    protected List<AIUnit> doMissions(List<AIUnit> aiUnits, StringBuffer sb) {
+        logSB(sb, "\n  Do Missions:");
+        List<AIUnit> result = new ArrayList<AIUnit>();
+        for (AIUnit aiu : aiUnits) {
+            final Unit unit = aiu.getUnit();
+            logSB(sb, "\n  ", unit, " ");
             try {
-                aiu.doMission();
+                Mission old = aiu.getMission();
+                Mission mission = aiu.doMission(sb);
+                if (mission != old) aiu.changeMission(mission, sb);
             } catch (Exception e) {
                 logger.log(Level.WARNING, "doMissions failed for: " + aiu, e);
             }
+            if (!unit.isDisposed() && unit.getMovesLeft() > 0) result.add(aiu);
         }
+        return result;
     }
 
     /**

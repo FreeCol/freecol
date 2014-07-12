@@ -382,25 +382,23 @@ public class PrivateerMission extends Mission {
     /**
      * {@inheritDoc}
      */
-    public void doMission() {
+    public Mission doMission(StringBuffer sb) {
+        logSB(sb, tag);
         final AIMain aiMain = getAIMain();
         final AIUnit aiUnit = getAIUnit();
         if (aiUnit.hasCargo()) { // Deliver the goods
-            aiUnit.changeMission(new TransportMission(aiMain, aiUnit),
-                                 "TransportOverride");
-            aiUnit.getMission().doMission();
-            return;
+            logSB(sb, ", should transport.");
+            return new TransportMission(aiMain, aiUnit);
         }
 
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            if (!retargetMission(tag, reason)) return;
+            if (!retargetMission(reason, sb)) return null;
         } else if (reason != null) {
-            logger.finest(tag + " broken(" + reason + "): " + this);
-            return;
+            logSBbroken(sb, reason);
+            return null;
         }
         final Unit unit = getUnit();
-        if (unit.isAtSea()) return;
 
         if (unit.isInEurope()) {
             Settlement settlement = getBestSettlement(unit.getOwner());
@@ -408,52 +406,61 @@ public class PrivateerMission extends Mission {
                 : unit.getFullEntryLocation();
             unit.setDestination(tile);
             aiUnit.moveToAmerica();
-            return;
+        }
+        if (unit.isAtSea()) {
+            logSBat(sb, unit);
+            return this;
         }
 
         Location newTarget = findTarget(aiUnit, 1, true);
         if (newTarget == null) {
             moveRandomlyTurn(tag);
-            return;
+            logSBat(sb, unit);
+            return this;
         }
 
         setTarget(newTarget);
-        Unit.MoveType mt = travelToTarget(tag, getTarget(), null);
+        Unit.MoveType mt = travelToTarget(newTarget, null, sb);
         switch (mt) {
-        case MOVE: case MOVE_HIGH_SEAS: case MOVE_NO_MOVES:
-        case MOVE_NO_REPAIR:
-            return;
+        case MOVE_HIGH_SEAS: case MOVE_NO_MOVES: case MOVE_NO_REPAIR:
+            return this;
+
+        case MOVE:
+            break;
+
         case MOVE_NO_TILE: // Can happen when another unit blocks a river
-            logger.finest(tag + " hit unexpected blockage: " + this);
             moveRandomly(tag, null);
             unit.setMovesLeft(0);
-            return;
+            logSBdodge(sb, unit);
+            return this;
+
         case ATTACK_UNIT:
             Direction direction = unit.getTile()
                 .getDirection(getTarget().getTile());
             if (direction != null) {
-                logger.finest(tag + " completed hunt for target " + getTarget()
-                    + ", attacking: " + this);
                 AIMessage.askAttack(aiUnit, direction);
+                logSB(sb, "attacking ", getTarget());
             } else { // Found something else in the way!
                 Location blocker = resolveBlockage(aiUnit, getTarget());
                 if (blocker instanceof Unit
                     && scoreUnit(aiUnit, (Unit)blocker) > 0) {
-                    logger.finest(tag + " bumped into " + blocker
-                        + ", attacking: " + this);
                     AIMessage.askAttack(aiUnit,
                         unit.getTile().getDirection(blocker.getTile()));
+                    logSBattack(sb, blocker);
                 } else { // Might be dangerous, try to confuse them:-)
-                    logger.finest(tag + " bumped into " + blocker
-                        + ", avoiding: " + this);
                     moveRandomlyTurn(tag);
+                    logSB(sb, " avoiding ", blocker, ".");
                 }
             }
-            break;
+            return this;
+
         default:
-            logger.warning(tag + " unexpected hunt move " + mt + ": " + this);
-            break;
+            logSBmove(sb, unit, mt);
+            return this;
         }
+
+        logSBat(sb, unit);
+        return this;
     }
 
 

@@ -144,7 +144,7 @@ public class AIColonyTest extends FreeColTestCase {
         colony.addGoods(foodType, GoodsContainer.CARGO_SIZE);
 
         aiColony.propertyChange(null); // force rearranging workers
-        aiColony.rearrangeWorkers();
+        aiColony.rearrangeWorkers(null);
 
         assertEquals("Colony should be building lumber mill",
             lumberMillType, colony.getCurrentlyBuilding());
@@ -160,7 +160,7 @@ public class AIColonyTest extends FreeColTestCase {
         colony.addGoods(hammersType,
             lumberMillType.getRequiredAmountOf(hammersType));
         aiColony.propertyChange(null); // force rearranging workers
-        aiColony.rearrangeWorkers();
+        aiColony.rearrangeWorkers(null);
 
         assertEquals("Colony should be building lumber mill",
             lumberMillType, colony.getCurrentlyBuilding());
@@ -174,7 +174,7 @@ public class AIColonyTest extends FreeColTestCase {
         // Fill the warehouse with sugar, re-arrange and re-check.
         colony.addGoods(sugarType, GoodsContainer.CARGO_SIZE);
         aiColony.propertyChange(null); // force rearranging workers
-        aiColony.rearrangeWorkers();
+        aiColony.rearrangeWorkers(null);
 
         assertEquals("Colony does not need a carpenter", 0,
             carpenterHouse.getUnitCount());
@@ -190,7 +190,7 @@ public class AIColonyTest extends FreeColTestCase {
             BuildableType toolsBuild = getToolsBuilder(aiColony);
             assertNotNull(toolsBuild);
             aiColony.propertyChange(null); // force rearranging workers
-            aiColony.rearrangeWorkers();
+            aiColony.rearrangeWorkers(null);
             if (colony.getCurrentlyBuilding() == toolsBuild) break;
         }
 
@@ -238,7 +238,7 @@ public class AIColonyTest extends FreeColTestCase {
             colony.getGoodsCount(oreType));
 
         aiColony.propertyChange(null); // force rearranging workers
-        aiColony.rearrangeWorkers();
+        aiColony.rearrangeWorkers(null);
 
         assertFalse("Colony can not have a lumberjack, no lumber",
             colony.getNetProductionOf(lumberType) > 0);
@@ -254,7 +254,7 @@ public class AIColonyTest extends FreeColTestCase {
         // Add lumber to stock, re-arrange and re-check
         colony.addGoods(lumberType, GoodsContainer.CARGO_SIZE);
         aiColony.propertyChange(null); // force rearranging workers
-        aiColony.rearrangeWorkers();
+        aiColony.rearrangeWorkers(null);
 
         assertEquals("Colony should be building lumber mill",
             lumberMillType, colony.getCurrentlyBuilding());
@@ -272,7 +272,7 @@ public class AIColonyTest extends FreeColTestCase {
         colony.addGoods(hammersType,
             lumberMillType.getRequiredAmountOf(hammersType));
         aiColony.propertyChange(null); // force rearranging workers
-        aiColony.rearrangeWorkers();
+        aiColony.rearrangeWorkers(null);
 
         assertFalse("Colony can not have a lumberjack, no lumber",
             colony.getNetProductionOf(lumberType) > 0);
@@ -286,7 +286,7 @@ public class AIColonyTest extends FreeColTestCase {
         // Change to building something that needs tools.
         BuildableType toolsBuild = getToolsBuilder(aiColony);
         aiColony.propertyChange(null); // force rearranging workers
-        aiColony.rearrangeWorkers();
+        aiColony.rearrangeWorkers(null);
 
         assertFalse("Colony can not have a lumberjack, no lumber",
             colony.getNetProductionOf(lumberType) > 0);
@@ -302,7 +302,7 @@ public class AIColonyTest extends FreeColTestCase {
         // Add ore to stock, re-arrange and re-check
         colony.addGoods(oreType, GoodsContainer.CARGO_SIZE);
         aiColony.propertyChange(null); // force rearranging workers
-        aiColony.rearrangeWorkers();
+        aiColony.rearrangeWorkers(null);
 
         assertFalse("Colony can not have a lumberjack, no lumber",
             colony.getNetProductionOf(lumberType) > 0);
@@ -334,7 +334,7 @@ public class AIColonyTest extends FreeColTestCase {
         Unit lumberjack = colony.getUnitList().get(0);
 
         aiColony.propertyChange(null); // force rearranging workers
-        aiColony.rearrangeWorkers();
+        aiColony.rearrangeWorkers(null);
 
         assertEquals("Lumberjack should have been assigned to collect lumber",
             lumberType, lumberjack.getWorkType());
@@ -342,7 +342,7 @@ public class AIColonyTest extends FreeColTestCase {
         // Add lumber to stock, re-arrange and re-check
         colony.addGoods(lumberType, GoodsContainer.CARGO_SIZE);
         aiColony.propertyChange(null); // force rearranging workers
-        aiColony.rearrangeWorkers();
+        aiColony.rearrangeWorkers(null);
 
         assertTrue("Lumberjack should not collect lumber, in stock",
             lumberType != lumberjack.getWorkType());

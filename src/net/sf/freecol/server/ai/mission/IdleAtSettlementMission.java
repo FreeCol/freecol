@@ -27,6 +27,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.PathNode;
+import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.ai.AIMain;
@@ -123,26 +124,47 @@ public class IdleAtSettlementMission extends Mission {
     /**
      * {@inheritDoc}
      */
-    public void doMission() {
-        final Unit unit = getUnit();
+    public Mission doMission(StringBuffer sb) {
+        logSB(sb, tag);
         String reason = invalidReason();
         if (reason != null) {
-            logger.warning(tag + " broken(" + reason + "): " + this);
-            return;
+            logSBbroken(sb, reason);
+            return null;
         }
 
-        // Wait if in Europe.
-        if (!unit.hasTile()) return;
+        // Wait if not on the map.
+        final Unit unit = getUnit();
+        if (!unit.hasTile()) {
+            logSBat(sb, unit);
+            return this;
+        }
 
         // If our tile contains a settlement, idle.  No log, this is normal.
-        if (unit.getTile().hasSettlement()) return;
+        Settlement settlement = unit.getTile().getSettlement();
+        if (settlement != null) {
+            logSB(sb, ", idling at ", settlement, ".");
+            return this;
+        }
 
         Location target = findTarget();
         if (target != null) {
-            travelToTarget(tag, target, null);
+            Unit.MoveType mt = travelToTarget(target, null, sb);
+            switch (mt) {
+            case MOVE:
+                break;
+            case MOVE_ILLEGAL:
+            case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
+                return this;
+            default:
+                logSBmove(sb, unit, mt);
+                return this;
+            }
+
         } else { // Just make a random moves if no target can be found.
             moveRandomlyTurn(tag);
+            logSBat(sb, unit);
         }
+        return this;
     }
 
 

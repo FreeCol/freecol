@@ -160,11 +160,12 @@ public class UnitWanderHostileMission extends Mission {
     /**
      * {@inheritDoc}
      */
-    public void doMission() {
+    public Mission doMission(StringBuffer sb) {
+        logSB(sb, tag);
         String reason = invalidReason();
         if (reason != null) {
-            logger.finest(tag + " broken(" + reason + "): " + this);
-            return;
+            logSBbroken(sb, reason);
+            return null;
         }
 
         // Make random moves in a reasonably consistent direction,
@@ -172,10 +173,10 @@ public class UnitWanderHostileMission extends Mission {
         final Unit unit = getUnit();
         final AIMain aiMain = getAIMain();
         final AIUnit aiUnit = getAIUnit();
+        final Location oldLoc = unit.getLocation();
         int check = 0, checkTurns = Utils.randomInt(logger, "Hostile",
                                                     getAIRandom(), 4);
         Direction d = Direction.getRandomDirection(tag, getAIRandom());
-        boolean moved = false;
         Mission m;
         while (unit.getMovesLeft() > 0) {
             // Every checkTurns, look for a target of opportunity.
@@ -183,21 +184,16 @@ public class UnitWanderHostileMission extends Mission {
                 Location loc = UnitSeekAndDestroyMission.findTarget(aiUnit, 1,
                                                                     false);
                 if (loc != null) {
-                    m = new UnitSeekAndDestroyMission(aiMain, aiUnit, loc);
-                    aiUnit.changeMission(m, "Target-" + upLoc(loc).getId());
-                    m.doMission();
-                    return;
+                    logSB(sb, ", acquired target ", loc, ".");
+                    return new UnitSeekAndDestroyMission(aiMain, aiUnit, loc);
                 }
                 check = checkTurns;
             } else check--;
 
             if ((d = moveRandomly(tag, d)) == null) break;
-            moved = true;
         }
-        if (moved) {
-            logger.finest(tag + " moved to " + unit.getLocation()
-                + ": " + this);
-        }
+        logSBat(sb, unit);
+        return this;
     }
 
 

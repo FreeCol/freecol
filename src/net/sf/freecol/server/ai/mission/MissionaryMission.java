@@ -368,57 +368,61 @@ public class MissionaryMission extends Mission {
     /**
      * {@inheritDoc}
      */
-    public void doMission() {
+    public Mission doMission(StringBuffer sb) {
+        logSB(sb, tag);
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            if (!retargetMission(tag, reason)) return;
+            if (!retargetMission(reason, sb)) return null;
         } else if (reason != null) {
-            logger.finest(tag + " broken(" + reason + "): " + this);
-            return;
+            logSBbroken(sb, reason);
+            return null;
         }
 
         // Go to the target.
         final AIUnit aiUnit = getAIUnit();
         final Unit unit = getUnit();
-        Unit.MoveType mt = travelToTarget(tag, getTarget(),
-            CostDeciders.avoidSettlementsAndBlockingUnits());
-        switch (mt) {
-        case MOVE_ILLEGAL:
-        case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
-            break;
-        case MOVE:
-            // Reached an intermediate colony.  Retarget, but do not
-            // accept fallback targets.
-            Location completed = getTarget();
-            setTarget(findTarget(aiUnit, 20, false));
-            logger.finest(tag + " reached colony target " + completed
-                + ", retargeting " + getTarget() + ": " + this);
-            break;
-        case ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY:
-            Direction d = unit.getTile().getDirection(getTarget().getTile());
-            if (d == null) {
-                throw new IllegalStateException("Unit not next to target "
-                    + getTarget() + ": " + unit + "/" + unit.getLocation());
-            }
-            IndianSettlement is = (IndianSettlement)getTarget();
-            AIMessage.askEstablishMission(aiUnit, d, is.hasMissionary());
-            if (unit.isDisposed()) {
-                logger.finest(tag + " died at target " + getTarget() 
-                    + ": " + this);
-            } else if (is.hasMissionary(unit.getOwner())
-                && unit.isInMission()) {
-                logger.finest(tag + " completed at " + getTarget()
-                    + ": " + this);
+        for (;;) {
+            Unit.MoveType mt = travelToTarget(getTarget(),
+                CostDeciders.avoidSettlementsAndBlockingUnits(), sb);
+            switch (mt) {
+            case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
+                return this;
+
+            case MOVE:
+                // Reached an intermediate colony.  Retarget, but do not
+                // accept fallback targets.
+                Location completed = getTarget();
+                Location newTarget = findTarget(aiUnit, 20, false);
+                if (newTarget == null || newTarget == completed) {
+                    setTarget(null);
+                    logSB(sb, ", reached ", completed, ", retarget failed.");
+                    return null;
+                }
+                setTarget(newTarget);
+                logSB(sb, tag, " reached ", completed,
+                    ", retargeted " + newTarget);
+                break;
+
+            case ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY:
+                Direction d = unit.getTile().getDirection(getTarget().getTile());
+                assert d != null;
+                IndianSettlement is = (IndianSettlement)getTarget();
+                AIMessage.askEstablishMission(aiUnit, d, is.hasMissionary());
                 setTarget(null);
-            } else {
-                logger.warning(tag + " unexpected failure at " + getTarget()
-                    + ": " + this);
+                if (unit.isDisposed()) {
+                    logSBfail(sb, "died at ", is);
+                } else if (is.hasMissionary(unit.getOwner())
+                    && unit.isInMission()) {
+                    logSBdone(sb, "at ", is);
+                } else {
+                    logSBfail(sb, "unexpected failure at ", is);
+                }
+                return null;
+
+            default:
+                logSBmove(sb, unit, mt);
+                return this;
             }
-            break;
-        default:
-            logger.warning(tag + " unexpected move type (" + mt
-                + ") at " + unit.getLocation() + ": " + this);
-            break;
         }
     }
 

@@ -252,8 +252,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         double ratio = getStrengthRatio(rebel);
         int n = targets.size();
         StringBuffer sb = new StringBuffer(256);
-        sb.append("REF attacking ").append(rebel.getName())
-            .append(" ratio=").append(ratio);
+        logSB(sb, "REF attacking ", rebel.getName(), " ratio=", ratio);
 
         // For each target search from the target position to find a
         // Tile to disembark to.  If teleporting in, the navy will
@@ -336,10 +335,8 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         for (int i = 0; i < n; i++) {
             if (!auIterator.hasNext()) break;
             final TargetTuple t = targets.get(i);
-            sb.append("\n  Attack ").append(t.colony.getName())
-                .append(" from ").append(t.entry)
-                .append(" via ").append(t.disembarkTile)
-                .append(" with ");
+            logSB(sb, "\n  Attack ", t.colony.getName(), " from ", t.entry,
+                " via ", t.disembarkTile, " with ");
             while (auIterator.hasNext()) {
                 AIUnit aiu = auIterator.next();
                 if (!aiu.getUnit().isNaval()) continue;
@@ -353,19 +350,19 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                 } else {
                     ship.setEntryLocation(t.entry);
                 }
-                sb.append("[").append(ship);
+                logSB(sb, "[", ship);
                 used = 0;
                 for (Unit u : aiu.getUnit().getUnitList()) {
                     AIUnit laiu = aiMain.getAIUnit(u);
                     Mission m = new UnitSeekAndDestroyMission(aiMain, laiu,
                                                               t.colony);
-                    laiu.changeMission(m, "Assault-0");
+                    laiu.setMission(m);
                     used++;
-                    sb.append(" ").append(u);
+                    logSB(sb, " ", u);
                 }
-                sb.append(" ]");
+                logSB(sb, " ]");
                 TransportMission tm = new TransportMission(aiMain, aiu);
-                aiu.changeMission(tm, "Invade-0");
+                aiu.setMission(tm);
                 if (i < n-1 && used >= (int)Math.floor(land * 0.66)) {
                     land -= used;
                     break;
@@ -411,22 +408,19 @@ public class REFAIPlayer extends EuropeanAIPlayer {
             Tile start;
             if (enemy == null) {
                 Mission m = new UnitWanderHostileMission(aiMain, aiu);
-                aiu.changeMission(m, "Harass");
+                aiu.setMission(m);
                 start = Utils.getRandomMember(logger, "REF patrol entry",
                                               entries, aiRandom);
                 u.setEntryLocation(start);
-                sb.append("\n  Patrol ")
-                    .append(" from ").append(start)
-                    .append(" with ").append(u);
+                logSB(sb, "\n  Patrol from ", start, " with ", u);
             } else {
                 Mission m = new UnitSeekAndDestroyMission(aiMain, aiu, enemy);
-                aiu.changeMission(m, "Suppress-" + enemy.getId());
+                aiu.setMission(m);
                 start = u.getBestEntryTile(enemy.getTile());
                 u.setEntryLocation(start);
                 entries.add(start);
-                sb.append("\n  Suppress ").append(enemy)
-                    .append(" from ").append(start)
-                    .append(" with ").append(u);
+                logSB(sb, "\n  Suppress ", enemy, " from ", start,
+                      " with ", u);
             }
         }
         logger.fine(sb.toString());
@@ -452,6 +446,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
     @Override
     public void giveNormalMissions(StringBuffer sb) {
         // Give military missions to all REF units.
+        logSB(sb, "Military mission changes: ");
         for (AIUnit aiu : getAIUnits()) {
             Unit u = aiu.getUnit();
             if (u.isNaval() || aiu.hasMission()) continue;
@@ -460,11 +455,11 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                     seekAndDestroyRange, false);
                 if (target == null) {
                     Mission m = new UnitWanderHostileMission(getAIMain(), aiu);
-                    aiu.changeMission(m, "Harass");
+                    aiu.changeMission(m, sb);
                 } else {                    
                     Mission m = new UnitSeekAndDestroyMission(getAIMain(), aiu,
                                                               target);
-                    aiu.changeMission(m, "Suppress-" + target.getId());
+                    aiu.changeMission(m, sb);
                 }
             }
         }
