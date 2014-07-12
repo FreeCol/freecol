@@ -1518,56 +1518,34 @@ public class TransportMission extends Mission {
      * @return True if the transportable was dumped.
      */
     private boolean dumpTransportable(Transportable t, boolean force) {
-        final Unit carrier = getUnit();
-        final AIUnit aiCarrier = getAIUnit();
-        final Location here = carrier.getLocation();
-        Locatable l = t.getTransportLocatable();
-        boolean canLeave = carrier.isInEurope()
-            || carrier.getLocation().getSettlement() != null;
-
         if (t instanceof AIUnit) {
             AIUnit aiu = (AIUnit)t;
-            Direction direction = null;
-            if (!canLeave) {
-                for (Tile tile : carrier.getTile().getSurroundingTiles(1)) {
-                    if (tile.isLand()
-                        && aiu.getUnit().getMoveType(tile).isProgress()) {
-                        direction = carrier.getTile().getDirection(tile);
-                        canLeave = true;
-                        break;
-                    }
-                }
-            }
-            if (canLeave && aiu.leaveTransport(direction)) {
-                logger.finest(tag + " dumped " + aiu
-                    + " at " + here.toShortString() + ": " + toFullString());
-            } else {
-                if (!force) {
-                    logger.warning(tag + " failed to dump " + aiu
-                        + " at " + here.toShortString()
-                        + ": " + toFullString());
-                    return false;
-                }
-                logger.warning(tag + " forcing dump(disband) " + aiu
-                    + " at " + here.toShortString() + ": " + toFullString());
-                return AIMessage.askDisband(aiu);
-            }
+            return aiu.leaveTransport();
                 
         } else if (t instanceof AIGoods) {
+            final Unit carrier = getUnit();
+            final AIUnit aiCarrier = getAIUnit();
+            final Location here = carrier.getLocation();
+            final Settlement settlement = carrier.getSettlement();
+
             AIGoods aig = (AIGoods)t;
-            if (canLeave && aig.leaveTransport(null)) {
-                logger.finest(tag + " dumped " + aig
-                    + " at " + here.toShortString() + ": " + toFullString());
-            } else {
-                if (!force) {
-                    logger.warning(tag + " failed to dump " + aig
-                        + " at " + here.toShortString()
-                        + ": " + toFullString());
-                    return false;
+            if (settlement != null) {
+                if (aig.leaveTransport(null)) {
+                    logger.finest(tag + " dumped " + aig
+                        + " at " + settlement.getName() + ": " + this);
+                } else {
+                    logger.finest(tag + " dump " + aig
+                        + " at " + settlement.getName() + " failed: " + this);
                 }
+            } else if (force) {
                 logger.warning(tag + " forcing dump(goods) " + aig
                     + " at " + here.toShortString() + ": " + toFullString());
                 return AIMessage.askUnloadCargo(aiCarrier, aig.getGoods());
+            } else {
+                logger.warning(tag + " dump ignored " + aig
+                    + " at " + here.toShortString()
+                    + ": " + toFullString());
+                return false;
             }
 
         } else throw new RuntimeException("Bogus transportable: " + t);

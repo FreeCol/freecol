@@ -19,6 +19,7 @@
 
 package net.sf.freecol.server.ai;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
@@ -252,23 +253,9 @@ public class AIUnit extends AIObject implements Transportable {
         removeTransport(why);
         setMission(mission);
         this.dynamicPriority = 0;
-        final Unit unit = getUnit();
+
         if (mission != null && unit.isOnCarrier()) {
-            Location here = unit.getLocation();
-            Location target = mission.getTarget();
-            Direction direction;
-            if (target == null) {
-                if (unit.isInEurope()
-                    || (here.getTile() != null && here.getTile().isLand())) {
-                    leaveTransport(null);
-                } // else let transport decide where to drop this unit
-            } else if (Map.isSameLocation(target, here)) {
-                leaveTransport(null);
-            } else if (here.getTile() != null && target.getTile() != null
-                && (direction = here.getTile().getDirection(target.getTile()))
-                != null) {
-                leaveTransport(direction);
-            } else {
+            if (!leaveTransport()) {
                 requeueOnCurrentCarrier();
             }
         }            
@@ -576,6 +563,83 @@ public class AIUnit extends AIObject implements Transportable {
         }
     }
 
+    /**
+     * Try to leave a transport, in any safe way possible.
+     *
+     * @return True if the unit disembarked.
+     */
+    public boolean leaveTransport() {
+        final Unit unit = getUnit();
+        if (!unit.isOnCarrier()) return true; // Harmless error
+
+        // Just leave at once if in Europe
+        if (unit.isInEurope()) return leaveTransport(null);
+
+        // Otherwise if not on the map, do nothing.
+        final Tile tile = unit.getTile();
+        if (tile == null) return false;
+
+        // Try to go to the target location.
+        final Mission mission = getMission();
+        final Location target = (mission == null) ? null : mission.getTarget();
+        Direction direction;
+        if (target != null) {
+            if (Map.isSameLocation(target, tile)) return leaveTransport(null);
+            if (target.getTile() != null
+                && (direction = tile.getDirection(target.getTile())) != null) {
+                return leaveTransport(direction);
+            }
+            PathNode path = unit.findPath(target); // Not using carrier!
+            if (path != null
+                && (direction = tile.getDirection(path.next.getTile())) != null) {
+                return leaveTransport(direction);
+            }
+        }
+
+        // Just get off here if possible.
+        if (tile.isLand()) return leaveTransport(null);
+
+        // Collect neighbouring land tiles, get off if one has our settlement
+        List<Tile> tiles = new ArrayList<Tile>();
+        for (Tile t : tile.getSurroundingTiles(1)) {
+            if (!t.isBlocked(unit)) {
+                if (t.getSettlement() != null) {
+                    return leaveTransport(tile.getDirection(t));
+                }
+                tiles.add(t);
+            }
+        }
+
+        // No adjacent unblocked tile, fail.
+        if (tiles.isEmpty()) return false;
+
+        // Pick the available tile with the shortest path to one of our
+        // settlements, or the tile with the highest defence value.
+        final Player player = unit.getOwner();
+        final Map map = getGame().getMap();
+        Tile safe = tiles.get(0);
+        Tile best = null;
+        int bestTurns = Integer.MAX_VALUE;
+        Settlement settlement = null;
+        for (Tile t : tiles) {
+            if (settlement == null
+                || !map.isSameContiguity(t, settlement.getTile())) {
+                settlement = t.getNearestSettlement(player, 10, true);
+            }
+            if (settlement != null) {
+                int turns = unit.getTurnsToReach(t, settlement);
+                if (bestTurns > turns) {
+                    bestTurns = turns;
+                    best = t;
+                }
+            }
+            if (safe.getDefenceValue() < t.getDefenceValue()) {
+                safe = t;
+            }
+        }
+        return leaveTransport(tile.getDirection((best != null) ? best : safe));
+    }               
+        
     /**
      * An AI unit leaves a ship.
      * Fulfills a wish if possible.
