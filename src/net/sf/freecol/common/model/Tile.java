@@ -1115,6 +1115,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
         for (int r = 1; true; r++) {
             List<Tile> tiles = getSurroundingTiles(r, r);
+            if (tiles.isEmpty()) return null;
             if (random != null) {
                 Utils.randomShuffle(logger, "Safe tile", tiles, random);
             }
