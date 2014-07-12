@@ -551,6 +551,32 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
+     * Quick test whether this tile is trivially blocked to moves from
+     * a unit.  This is a simplification, use getMoveType().isProgress()
+     * for the full details.
+     *
+     * @param unit The <code>Unit</code> to test.
+     * @return True if the unit can not move to this tile.
+     */
+    public boolean isBlocked(Unit unit) {
+        Player owner = unit.getOwner();
+
+        Unit u = getFirstUnit();
+        if (u != null && !owner.owns(u)) return true; // Blocked by unit
+
+        if (isLand()) {
+            Settlement s = getSettlement();
+            if (unit.isNaval()) {
+                return s == null || !owner.owns(s); // Land, not our settlement
+            } else {
+                return s != null && !owner.owns(s); // Not our settlement
+            }
+        } else {
+            return !unit.isNaval(); // Can not swim
+        }
+    }
+       
+    /**
      * Gets the <code>IndianSettlementInternals</code> for the given player.
      *
      * @param player The <code>Player</code> to query.
