@@ -1218,8 +1218,8 @@ public class EuropeanAIPlayer extends AIPlayer {
             if (gw != null) {
                 wishList.remove(gw);
                 aig.setTransportDestination(gw.getDestination());
-                logger.finest("RetargetCargo succeeded with new destination: "
-                              + aig);
+                logger.finest("RetargetCargo succeeded with new destination "
+                    + gw.getDestination().toShortString() + ": " + aig);
                 return true;
             }
             // Look for a suitable colony to unload the goods.
@@ -1243,8 +1243,9 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
             if (best != null) {
                 aig.setTransportDestination(best);
-                logger.finest("RetargetCargo reluctantly unloading: " + aig);
-                return false;
+                logger.finest("RetargetCargo unloading to "
+                    + best.toShortString() + ": " + aig);
+                return true;
             }
         }
 
