@@ -1062,6 +1062,14 @@ public class TransportMission extends Mission {
         if (tRemove(cargo)) {
             result++;
             Cargo next = makeCargo(t);
+            if (next == null) {
+                dst = this.target;
+                if (dst == null) {
+                    PathNode path = getTrivialPath();
+                    dst = path.getLastNode().getLocation();
+                }
+                if (dst != null) next = new Cargo(t, getUnit(), dst);
+            }
             if (next != null) {
                 cargo = next;
                 result++;
@@ -1072,8 +1080,8 @@ public class TransportMission extends Mission {
                     dropTransportable(t, "retarget/queuing failed");
                 }
             }
+            retarget();
         }
-        retarget();
 
         switch (result) {
         case 0:
@@ -1477,7 +1485,7 @@ public class TransportMission extends Mission {
     }
 
     /**
-     * Retargets a transportable that should already be on being transported.
+     * Retargets a transportable that should already be on board the carrier.
      *
      * @param t The <code>Transportable</code> to retarget.
      * @return True if the retargeting succeeded.

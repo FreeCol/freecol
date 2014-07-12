@@ -252,14 +252,24 @@ public class AIUnit extends AIObject implements Transportable {
         removeTransport(why);
         setMission(mission);
         this.dynamicPriority = 0;
-        if (mission != null && getUnit().isOnCarrier()) {
-            // Check if arrived, otherwise requeue
-            if (mission.getTarget() != null
-                && Map.isSameLocation(mission.getTarget(),
-                                      getUnit().getLocation())) {
+        final Unit unit = getUnit();
+        if (mission != null && unit.isOnCarrier()) {
+            Location here = unit.getLocation();
+            Location target = mission.getTarget();
+            Direction direction;
+            if (target == null) {
+                if (unit.isInEurope()
+                    || (here.getTile() != null && here.getTile().isLand())) {
+                    leaveTransport(null);
+                } // else let transport decide where to drop this unit
+            } else if (Map.isSameLocation(target, here)) {
                 leaveTransport(null);
-            } else if (!requeueOnCurrentCarrier()) {
-                logger.warning("Requeue on mission change failed: " + mission);
+            } else if (here.getTile() != null && target.getTile() != null
+                && (direction = here.getTile().getDirection(target.getTile()))
+                != null) {
+                leaveTransport(direction);
+            } else {
+                requeueOnCurrentCarrier();
             }
         }            
     }
@@ -316,7 +326,7 @@ public class AIUnit extends AIObject implements Transportable {
      */
     private boolean requeueOnCurrentCarrier() {
         final Unit carrier = getUnit().getCarrier();
-        if (carrier == null) return false;
+        if (carrier == null || carrier.isDisposed()) return false;
         final AIUnit aiCarrier = getAIMain().getAIUnit(carrier);
         if (aiCarrier == null) return false;
         Mission m = aiCarrier.getMission();
