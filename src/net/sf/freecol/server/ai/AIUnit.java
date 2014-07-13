@@ -581,7 +581,8 @@ public class AIUnit extends AIObject implements Transportable {
 
         // Try to go to the target location.
         final Mission mission = getMission();
-        final Location target = (mission == null) ? null : mission.getTarget();
+        final Location target = (mission == null || !mission.isValid()) ? null
+            : mission.getTarget();
         Direction direction;
         if (target != null) {
             if (Map.isSameLocation(target, tile)) return leaveTransport(null);
