@@ -164,7 +164,7 @@ public class HighScore extends FreeColObject {
             independenceTurn = -1;
         }
         // TODO: how difficult is a custom difficulty?
-        difficulty = game.getSpecification().getDifficultyLevel().getId();
+        difficulty = game.getSpecification().getDifficultyLevel();
         newLandName = player.getNewLandName();
     }
 

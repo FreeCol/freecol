@@ -608,8 +608,10 @@ public final class TileType extends FreeColGameObjectType {
                 productionTypes.add(new ProductionType(goods, true,
                                                        tileProduction));
             } else if (SECONDARY_PRODUCTION_TAG.equals(tag)) {
-                for (ProductionType productionType
-                         : getAvailableProductionTypes(true)) {
+                String level = spec.getDifficultyLevel();
+                List<ProductionType> unattendedTypes
+                    = getAvailableProductionTypes(true, level);
+                for (ProductionType productionType : unattendedTypes) {
                     if (tileProduction == null
                         || tileProduction.equals(productionType.getProductionLevel())) {
                         productionType.getOutputs().add(goods);

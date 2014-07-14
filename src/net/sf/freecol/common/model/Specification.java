@@ -1476,21 +1476,31 @@ public final class Specification {
     }
 
     /**
-     * Gets the current difficulty level.
+     * Get the current difficulty level.
      *
-     * @return The current difficulty level.
+     * @return The difficulty level.
      */
-    public OptionGroup getDifficultyLevel() {
+    public String getDifficultyLevel() {
+        return difficultyLevel;
+    }
+
+    /**
+     * Gets the current difficulty level options.
+     *
+     * @return The current difficulty level <code>OptionGroup</code>.
+     */
+    public OptionGroup getDifficultyOptionGroup() {
         return allOptionGroups.get(difficultyLevel);
     }
 
     /**
-     * Gets a difficulty level by id.
+     * Gets difficulty level options by id.
      *
      * @param id The id to look for.
-     * @return The corresponding difficulty level, if any.
+     * @return The corresponding difficulty level
+     *     <code>OptionGroup</code>, if any.
      */
-    public OptionGroup getDifficultyLevel(String id) {
+    public OptionGroup getDifficultyOptionGroup(String id) {
         return allOptionGroups.get(id);
     }
 
