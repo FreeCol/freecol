@@ -328,6 +328,14 @@ public class SimpleCombatModel extends CombatModel {
             }
 
         } else if (combatIsSettlementAttack(attacker, defender)) {
+            Settlement settlement = (Settlement)defender;
+            // Tile defence bonus
+            Tile tile = settlement.getTile();
+            result.addAll(tile.getType().getDefenceModifiers());
+
+            // Settlement defence bonus
+            result.addAll(settlement.getModifiers(Modifier.DEFENCE));
+
             // Not allowed to see inside the settlement.  This only applies 
             // to the pre-combat dialog--- the actual attack is on the
             // unit chosen to defend.
@@ -394,10 +402,6 @@ public class SimpleCombatModel extends CombatModel {
             } else { // In settlement
                 // Settlement defence bonus
                 result.addAll(settlement.getModifiers(Modifier.DEFENCE));
-
-                // Owner settlement-specific bonus
-                result.addAll(settlement.getOwner()
-                    .getModifiers(Modifier.DEFENCE, settlement.getType()));
 
                 // Artillery defence bonus against an Indian raid
                 if (defenderUnit.hasAbility(Ability.BOMBARD)
