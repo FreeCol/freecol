@@ -79,7 +79,7 @@ public class PioneeringMissionTest extends FreeColTestCase {
                                              colonistType);
         final AIUnit aiUnit = aiMain.getAIUnit(colonist);
         assertNotNull(aiUnit);
-        aiUnit.abortMission("Test");
+        aiUnit.setMission(null);
 
         // Check there are improvements to be made.
         aiColony.createTileImprovementPlans();

@@ -718,7 +718,7 @@ public class AIUnit extends AIObject implements Transportable {
             // changes owner.  TODO: cleanup.
             logger.warning("Disposing of " + getId() + " but owner is null!");
         }
-        abortMission("AIUnit-disposed");
+        setMission(null);
         super.dispose();
     }
 
@@ -776,13 +776,8 @@ public class AIUnit extends AIObject implements Transportable {
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        if (mission != null && !mission.isOneTime()) {
-            String reason = mission.invalidReason();
-            if (reason != null) {
-                abortMission(reason);
-            } else {
-                mission.toXML(xw);
-            }
+        if (mission != null && !mission.isOneTime() && mission.isValid()) {
+            mission.toXML(xw);
         }
     }
 

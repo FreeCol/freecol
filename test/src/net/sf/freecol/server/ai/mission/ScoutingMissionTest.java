@@ -75,7 +75,7 @@ public class ScoutingMissionTest extends FreeColTestCase {
         assertEquals(scoutRole, scout.getRole());
 
         AIUnit aiUnit = aiMain.getAIUnit(scout);
-        aiUnit.abortMission("test");
+        aiUnit.setMission(null);
         assertNotNull("The scout should be an AI unit", aiUnit);
         assertEquals("Scout should have the scout role", scoutRole,
             scout.getRole());

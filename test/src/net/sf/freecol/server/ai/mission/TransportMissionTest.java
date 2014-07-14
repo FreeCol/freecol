@@ -295,7 +295,7 @@ public class TransportMissionTest extends FreeColTestCase {
         AIUnit wagon = aiMain.getAIUnit(wagonTrain);
         assertNotNull(wagon);
 
-        wagon.abortMission("test");
+        wagon.setMission(null);
         assertNull("Transport mission should be valid.",
                    TransportMission.invalidReason(wagon));
         TransportMission mission = new TransportMission(aiMain, wagon);

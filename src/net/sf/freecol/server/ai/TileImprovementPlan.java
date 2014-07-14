@@ -276,11 +276,7 @@ public class TileImprovementPlan extends ValuedAIObject {
      */
     @Override
     public void dispose() {
-        if (pioneer != null
-            && pioneer.getMission() instanceof PioneeringMission) {
-            pioneer.abortMission("disposing plan");
-        }
-        pioneer = null;
+        this.pioneer = null;
         super.dispose();
     }
 

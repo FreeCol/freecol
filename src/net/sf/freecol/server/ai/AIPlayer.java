@@ -327,7 +327,7 @@ public abstract class AIPlayer extends AIObject {
         for (AIUnit au : getAIUnits()) {
             Mission mission = au.getMission();
             String reason = (mission == null) ? null : mission.invalidReason();
-            if (reason != null) au.abortMission(reason);
+            if (reason != null) au.setMission(null);
         }
     }
 
