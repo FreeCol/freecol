@@ -127,15 +127,15 @@ public class CombatTest extends FreeColTestCase {
         Set<Modifier> offenceModifiers
             = combatModel.getOffensiveModifiers(soldier, colonist);
         assertEquals(5, offenceModifiers.size());
-        assertTrue(offenceModifiers.contains(bigMovementPenalty));
-        offenceModifiers.remove(bigMovementPenalty);
-        assertTrue(offenceModifiers.contains(attackModifier));
-        offenceModifiers.remove(attackModifier);
-        assertTrue(offenceModifiers.contains(veteranModifier));
-        offenceModifiers.remove(veteranModifier);
-        // this was also added by the combat model
-        assertEquals(Specification.BASE_OFFENCE_SOURCE,
-            offenceModifiers.iterator().next().getSource());
+        int n = 0;
+        for (Modifier m : offenceModifiers) {
+            if (m.getSource() == Specification.BASE_OFFENCE_SOURCE) n += 1;
+            if (m == bigMovementPenalty) n += 2;
+            if (m == attackModifier) n += 4;
+            if (m == veteranModifier) n += 8;
+            if (m.getSource() == dragoonRole) n += 16;
+        }
+        assertEquals(31, n);
 
         final Modifier fortifiedModifier
             = spec().getModifiers(Modifier.FORTIFIED).get(0);
@@ -204,48 +204,50 @@ public class CombatTest extends FreeColTestCase {
         Goods goods1 = new Goods(game, null, lumberType, 50);
         privateer.add(goods1);
         offenceModifiers = combatModel.getOffensiveModifiers(privateer, galleon);
-        Iterator<Modifier> privIt = offenceModifiers.iterator();
         assertEquals(3, offenceModifiers.size());
-        assertEquals(Specification.BASE_OFFENCE_SOURCE, privIt.next().getSource());
-        assertEquals(Specification.ATTACK_BONUS_SOURCE, privIt.next().getSource());
-        Modifier goodsPenalty1 = privIt.next();
-        assertEquals(Specification.CARGO_PENALTY_SOURCE, goodsPenalty1.getSource());
-        assertEquals(-12.5f, goodsPenalty1.getValue());
+        n = 0;
+        for (Modifier m : offenceModifiers) {
+            if (m.getSource() == Specification.BASE_OFFENCE_SOURCE) n += 1;
+            if (m.getSource() == Specification.ATTACK_BONUS_SOURCE) n += 2;
+            if (m.getSource() == Specification.CARGO_PENALTY_SOURCE) n += 4;
+        }
+        assertEquals(7, n);
 
         Goods goods2 = new Goods(game, null, lumberType, 150);
         galleon.add(goods2);
         assertEquals(2, galleon.getVisibleGoodsCount());
         defenceModifiers = combatModel.getDefensiveModifiers(privateer, galleon);
-        Iterator<Modifier> gallIt = defenceModifiers.iterator();
+        n = 0;
         assertEquals(2, defenceModifiers.size());
-        assertEquals(Specification.BASE_DEFENCE_SOURCE, gallIt.next().getSource());
-        Modifier goodsPenalty2 = gallIt.next();
-        assertEquals(Specification.CARGO_PENALTY_SOURCE, goodsPenalty2.getSource());
-        assertEquals(-25f, goodsPenalty2.getValue());
+        for (Modifier m : defenceModifiers) {
+            if (m.getSource() == Specification.BASE_DEFENCE_SOURCE) n += 1;
+            if (m.getSource() == Specification.CARGO_PENALTY_SOURCE) {
+                n += 2;
+                assertEquals(-25f, m.getValue());
+            }
+        }
+        assertEquals(3, n);
 
-        /**
-         * Francis Drake
-         */
+        // Francis Drake
         FoundingFather drake = spec().getFoundingFather("model.foundingFather.francisDrake");
         Set<Modifier> drakeModifiers = drake.getModifiers(Modifier.OFFENCE, privateerType);
         assertEquals(1, drakeModifiers.size());
-        Modifier drakeModifier = drakeModifiers.iterator().next();
-
         french.addFather(drake);
         drakeModifiers = french.getModifiers(Modifier.OFFENCE, privateerType);
         assertEquals(1, drakeModifiers.size());
-        assertEquals(drakeModifier, drakeModifiers.iterator().next());
-
         offenceModifiers = combatModel.getOffensiveModifiers(privateer, galleon);
-        privIt = offenceModifiers.iterator();
         assertEquals(4, offenceModifiers.size());
-        assertEquals(Specification.BASE_OFFENCE_SOURCE, privIt.next().getSource());
-        Modifier newDrakeModifier = privIt.next();
-        assertEquals(drakeModifier, newDrakeModifier);
-        assertEquals(Specification.ATTACK_BONUS_SOURCE, privIt.next().getSource());
-        goodsPenalty1 = privIt.next();
-        assertEquals(Specification.CARGO_PENALTY_SOURCE, goodsPenalty1.getSource());
-        assertEquals(-12.5f, goodsPenalty1.getValue());
+        n = 0;
+        for (Modifier m : offenceModifiers) {
+            if (m.getSource() == Specification.BASE_OFFENCE_SOURCE) n += 1;
+            if (m.getSource() == drake) n += 2;
+            if (m.getSource() == Specification.ATTACK_BONUS_SOURCE) n += 4;
+            if (m.getSource() == Specification.CARGO_PENALTY_SOURCE) {
+                n += 8;
+                assertEquals(-12.5f, m.getValue());
+            }
+        }
+        assertEquals(15, n);
 
         // Verify that the move is correctly interpreted
         assertEquals("Wrong move type", MoveType.ATTACK_UNIT,

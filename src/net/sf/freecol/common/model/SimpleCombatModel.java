@@ -20,7 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -93,7 +93,7 @@ public class SimpleCombatModel extends CombatModel {
         } else if (combatIsAttackMeasurement(attacker, defender)
             || combatIsAttack(attacker, defender)
             || combatIsSettlementAttack(attacker, defender)) {
-            result = FreeColObject.applyModifiers(0,
+            result = FreeColObject.applyModifiers(0.0f,
                 attacker.getGame().getTurn(),
                 getOffensiveModifiers(attacker, defender));
 
@@ -128,7 +128,7 @@ public class SimpleCombatModel extends CombatModel {
             || combatIsAttack(attacker, defender)
             || combatIsSettlementAttack(attacker, defender)
             || combatIsBombard(attacker, defender)) {
-            result = FeatureContainer.applyModifiers(0f,
+            result = FeatureContainer.applyModifiers(0.0f,
                 defender.getGame().getTurn(),
                 getDefensiveModifiers(attacker, defender));
 
@@ -147,7 +147,7 @@ public class SimpleCombatModel extends CombatModel {
      */
     public Set<Modifier> getOffensiveModifiers(FreeColGameObject attacker,
                                                FreeColGameObject defender) {
-        Set<Modifier> result = new LinkedHashSet<Modifier>();
+        Set<Modifier> result = new HashSet<Modifier>();
         if (attacker == null) {
             throw new IllegalStateException("Null attacker");
         } else if (combatIsAttackMeasurement(attacker, defender)
@@ -284,10 +284,11 @@ public class SimpleCombatModel extends CombatModel {
             }
 
             // Artillery in the open penalty, attacker must be on a
-            // tile and not in a settlement.
+            // tile and neither unit can be in a settlement.
             if (attackerUnit.hasAbility(Ability.BOMBARD)
                 && attackerUnit.getLocation() instanceof Tile
-                && attackerUnit.getSettlement() == null) {
+                && attackerUnit.getSettlement() == null
+                && defenderUnit.getSettlement() == null) {
                 result.addAll(spec.getModifiers(Modifier.ARTILLERY_IN_THE_OPEN));
             }
         } else {
@@ -304,7 +305,7 @@ public class SimpleCombatModel extends CombatModel {
      */
     public Set<Modifier> getDefensiveModifiers(FreeColGameObject attacker,
                                                FreeColGameObject defender) {
-        Set<Modifier> result = new LinkedHashSet<Modifier>();
+        Set<Modifier> result = new HashSet<Modifier>();
         if (combatIsDefenceMeasurement(attacker, defender)
             || combatIsAttack(attacker, defender)
             || combatIsBombard(attacker, defender)) {
