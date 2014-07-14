@@ -272,7 +272,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
             }
         }
         if (selected == null) {
-            selected = spec.getDifficultyLevel("model.difficulty.medium");
+            selected = spec.getDifficultyOptionGroup("model.difficulty.medium");
         }
         if (selected == null) {
             int index = difficultyBox.getItemCount() / 2;

@@ -1511,7 +1511,7 @@ public final class Specification {
      * @param difficultyLevel The id of a difficulty level to apply
      */
     public void applyDifficultyLevel(String difficultyLevel) {
-        applyDifficultyLevel(getDifficultyLevel(difficultyLevel));
+        applyDifficultyLevel(getDifficultyOptionGroup(difficultyLevel));
     }
 
     /**

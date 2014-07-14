@@ -178,8 +178,8 @@ public class Game extends FreeColGameObject {
      *
      * @return An <code>OptionGroup</code> containing the difficulty settings.
      */
-    public final OptionGroup getDifficultyLevel() {
-        return specification.getDifficultyLevel();
+    public final OptionGroup getDifficultyOptionGroup() {
+        return specification.getDifficultyOptionGroup();
     }
 
     /**

@@ -179,7 +179,7 @@ public final class MapEditorController {
         game.setMapGeneratorOptions(mgo);
 
         try {
-            if (spec.getDifficultyLevel() == null) {
+            if (spec.getDifficultyOptionGroup() == null) {
                 spec.applyDifficultyLevel(FreeCol.getDifficulty());
             }
             mapGenerator.createMap(game);

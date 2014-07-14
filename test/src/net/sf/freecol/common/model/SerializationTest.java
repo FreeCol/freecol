@@ -196,8 +196,8 @@ public class SerializationTest extends FreeColTestCase {
         assertNotNull(spec1);
         assertNotNull(spec2);
 
-        OptionGroup level1 = spec1.getDifficultyLevel();
-        OptionGroup level2 = spec2.getDifficultyLevel();
+        OptionGroup level1 = spec1.getDifficultyOptionGroup();
+        OptionGroup level2 = spec2.getDifficultyOptionGroup();
         assertNotNull(level1);
         assertNotNull(level2);
         assertEquals(level1.getId(), level2.getId());
