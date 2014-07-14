@@ -190,6 +190,67 @@ public abstract class AIObject extends FreeColObject {
             : loc;
     }
 
+
+    // AI logging support
+
+    private String o2s(Object o) {
+        return (o == null) ? "null"
+            : (o instanceof String) ? (String)o
+            : (o instanceof Location) ? ((Location)o).toShortString()
+            : o.toString();
+    }
+
+    private void lSB(StringBuffer sb, Object[] objects) {
+        if (sb != null) {
+            for (Object o : objects) sb.append(o2s(o));
+        }
+    }
+
+    /**
+     * Logging helper.
+     *
+     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param objects Objects to log.
+     */
+    protected void logSB(StringBuffer sb, Object... objects) {
+        if (sb != null) lSB(sb, objects);
+    }
+
+    protected void logSBat(StringBuffer sb, Unit unit) {
+        logSB(sb, ", reached ", unit.getLocation(), ".");
+    }
+
+    protected void logSBdodge(StringBuffer sb, Unit unit) {
+        logSB(sb, ", dodging at ", unit.getLocation(), ".");
+    }
+
+    protected void logSBmove(StringBuffer sb, Unit unit, Unit.MoveType mt) {
+        logSB(sb, ", bad move type at ", unit.getLocation(), ": ", mt, ".");
+    }
+
+    protected void logSBattack(StringBuffer sb, Location what) {
+        logSB(sb, ", attacking ", what, ".");
+    }
+
+    protected void logSBbroken(StringBuffer sb, String reason) {
+        logSB(sb, ", broken: ", reason, ".");
+    }
+
+    protected void logSBfail(StringBuffer sb, Object... reasons) {
+        if (sb != null) {
+            sb.append(", FAILED: ");
+            lSB(sb, reasons);
+        }
+    }
+
+    protected void logSBdone(StringBuffer sb, Object... reasons) {
+        if (sb != null) {
+            sb.append(", COMPLETED: ");
+            lSB(sb, reasons);
+        }
+    }
+
+
     /**
      * Checks the integrity of this AI object.
      * Subclasses should extend.
