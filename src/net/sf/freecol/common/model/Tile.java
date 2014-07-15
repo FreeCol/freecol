@@ -1803,58 +1803,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     //
 
     /**
-     * Gets a unit that can become active.  This is preferably a unit
-     * not currently performing any work.
-     *
-     * @return A <code>Unit</code> with moves left, or null if none found.
-     */
-    public Unit getMovableUnit() {
-        if (getFirstUnit() != null) {
-            Iterator<Unit> unitIterator = getUnitIterator();
-            while (unitIterator.hasNext()) {
-                Unit u = unitIterator.next();
-
-                Iterator<Unit> childUnitIterator = u.getUnitIterator();
-                while (childUnitIterator.hasNext()) {
-                    Unit childUnit = childUnitIterator.next();
-
-                    if (childUnit.getMovesLeft() > 0
-                        && childUnit.getState() == Unit.UnitState.ACTIVE) {
-                        return childUnit;
-                    }
-                }
-
-                if (u.getMovesLeft() > 0
-                    && u.getState() == Unit.UnitState.ACTIVE) {
-                    return u;
-                }
-            }
-        } else {
-            return null;
-        }
-
-        Iterator<Unit> unitIterator = getUnitIterator();
-        while (unitIterator.hasNext()) {
-            Unit u = unitIterator.next();
-
-            Iterator<Unit> childUnitIterator = u.getUnitIterator();
-            while (childUnitIterator.hasNext()) {
-                Unit childUnit = childUnitIterator.next();
-
-                if ((childUnit.getMovesLeft() > 0)) {
-                    return childUnit;
-                }
-            }
-
-            if (u.getMovesLeft() > 0) {
-                return u;
-            }
-        }
-
-        return null;
-    }
-
-    /**
      * Gets the unit that is currently defending this tile.
      * <p>If this tile has a settlement, the units inside the
      * settlement are also considered as potential defenders.

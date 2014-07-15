@@ -2876,44 +2876,72 @@ public final class MapViewer {
      * Gets the unit that should be displayed on the given tile.
      *
      * @param unitTile The <code>Tile</code>.
-     * @return The <code>Unit</code> or <i>null</i> if no unit applies.
+     * @return The <code>Unit</code> to display or null if none found.
      */
     private Unit getUnitInFront(Tile unitTile) {
-        if (unitTile == null || unitTile.getUnitCount() <= 0) {
-            return null;
-        }
+        Unit result;
 
-        if (activeUnit != null && activeUnit.getTile() == unitTile) {
-            return activeUnit;
+        if (unitTile == null || unitTile.isEmpty()) {
+            result = null;
+
+        } else if (activeUnit != null && activeUnit.getTile() == unitTile) {
+            result = activeUnit;
+
+        } else if (unitTile.hasSettlement()) {
+            result = null;
+
+        } else if (activeUnit != null && activeUnit.isOffensiveUnit()) {
+            result = unitTile.getDefendingUnit(activeUnit);
+
         } else {
-            if (!unitTile.hasSettlement()) {
-                Unit bestDefendingUnit = null;
-                if (activeUnit != null) {
-                    bestDefendingUnit = unitTile.getDefendingUnit(activeUnit);
-                    if (bestDefendingUnit != null) {
-                        return bestDefendingUnit;
-                    }
-                }
-
-                Unit movableUnit = unitTile.getMovableUnit();
-                if (movableUnit != null && movableUnit.getLocation() == movableUnit.getTile()) {
-                    return movableUnit;
-                } else {
-                    Unit bestPick = null;
-                    Iterator<Unit> unitIterator = unitTile.getUnitIterator();
-                    while (unitIterator.hasNext()) {
-                        Unit u = unitIterator.next();
-                        if (bestPick == null || bestPick.getMovesLeft() < u.getMovesLeft()) {
-                            bestPick = u;
+            // Find the unit with the most moves left, preferring
+            // active units.
+            List<Unit> units = unitTile.getUnitList();
+            result = units.remove(0);
+            int best = result.getMovesLeft();
+            boolean carrier,
+                active = result.getState() == Unit.UnitState.ACTIVE;
+            for (Unit u : units) {
+                carrier = false;
+                if (active) {
+                    if (u.getState() == Unit.UnitState.ACTIVE) {
+                        if (best < u.getMovesLeft()) {
+                            best = u.getMovesLeft();
+                            result = u;
                         }
+                    } else {
+                        carrier = !u.isEmpty();
                     }
-
-                    return bestPick;
+                } else if (u.getState() == Unit.UnitState.ACTIVE) {
+                    active = true;
+                    best = u.getMovesLeft();
+                    result = u;
+                } else {
+                    if (best < u.getMovesLeft()) {
+                        best = u.getMovesLeft();
+                        result = u;
+                    }
+                    carrier = !u.isEmpty();
                 }
-            } else {
-                return null;
+                if (carrier) {
+                    // Check for active units on carriers.  Usually the
+                    // carrier takes precedence.
+                    for (Unit c : u.getUnitList()) {
+                        if (active) {
+                            if (best < c.getMovesLeft()) {
+                                best = c.getMovesLeft();
+                                result = c;
+                            }
+                        } else if (c.getState() == Unit.UnitState.ACTIVE) {
+                            active = true;
+                            best = c.getMovesLeft();
+                            result = c;
+                        }
+                    }                            
+                }
             }
         }
+        return result;
     }
 
     /**
