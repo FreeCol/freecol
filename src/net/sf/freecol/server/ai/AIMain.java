@@ -22,6 +22,7 @@ package net.sf.freecol.server.ai;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -196,7 +197,56 @@ public class AIMain extends FreeColObject
      * @return The <code>AIObject</code>.
      */
     public AIObject getAIObject(String id) {
-        return aiObjects.get(id);
+        synchronized (aiObjects) {
+            return aiObjects.get(id);
+        }
+    }
+
+    /**
+     * Adds a reference to the given <code>AIObject</code>.
+     *
+     * @param id The object identifier.
+     * @param aiObject The <code>AIObject</code> to store a reference
+     *        for.
+     */
+    public void addAIObject(String id, AIObject aiObject) {
+        if (aiObject == null) {
+            throw new NullPointerException("aiObject == null");
+        }
+        boolean present;
+        synchronized (aiObjects) {
+            present = aiObjects.containsKey(id);
+            if (!present) aiObjects.put(id, aiObject);
+        }
+        if (present) {
+            throw new RuntimeException("AIObject already created: " + id);
+        }
+    }
+
+    /**
+     * Removes a reference to the given <code>AIObject</code>.
+     *
+     * @param id The object identifier.
+     * @return True if an object for the identifier is removed.
+     */
+    public boolean removeAIObject(String id) {
+        boolean result;
+        synchronized (aiObjects) {
+            result = aiObjects.remove(id) != null;
+        }
+        if (result) logger.finest("Removed AI object: " + id);
+        return result;
+    }
+
+    /**
+     * Get a copy of the list of all AI objects.
+     *
+     * @return A list of <code>AIObject</code>s.
+     */
+    private List<AIObject> getAIObjects() {
+        synchronized (aiObjects) {
+            return new ArrayList<AIObject>(aiObjects.values());
+        }
     }
 
     /**
@@ -247,44 +297,14 @@ public class AIMain extends FreeColObject
     }
 
     /**
-     * Adds a reference to the given <code>AIObject</code>.
-     *
-     * @param id The object identifier.
-     * @param aiObject The <code>AIObject</code> to store a reference
-     *        for.
-     * @exception IllegalStateException if an <code>AIObject</code> with
-     *       the same object identifier has already been created.
-     */
-    public void addAIObject(String id, AIObject aiObject) {
-        if (aiObjects.containsKey(id)) {
-            throw new IllegalStateException("AIObject already created: " + id);
-        }
-        if (aiObject == null) {
-            throw new NullPointerException("aiObject == null");
-        }
-        aiObjects.put(id, aiObject);
-    }
-
-    /**
-     * Removes a reference to the given <code>AIObject</code>.
-     *
-     * @param id The object identifier.
-     */
-    public void removeAIObject(String id) {
-        aiObjects.remove(id);
-    }
-
-    /**
      * Computes how many objects of each class have been created, to
      * track memory leaks over time
      */
     public HashMap<String, String> getAIStatistics() {
         HashMap<String, String> stats = new HashMap<String, String>();
         HashMap<String, Long> objStats = new HashMap<String, Long>();
-        Iterator<AIObject> iter = aiObjects.values().iterator();
-        while (iter.hasNext()) {
-            AIObject obj = iter.next();
-            String className = obj.getClass().getSimpleName();
+        for (AIObject aio : getAIObjects()) {
+            String className = aio.getClass().getSimpleName();
             if (objStats.containsKey(className)) {
                 Long count = objStats.get(className);
                 count++;
@@ -311,13 +331,14 @@ public class AIMain extends FreeColObject
      */
     public int checkIntegrity(boolean fix) {
         int result = 1;
-        for (AIObject ao : new ArrayList<AIObject>(aiObjects.values())) {
-            int integ = ao.checkIntegrity(fix);
+        for (AIObject aio : getAIObjects()) {
+            int integ = aio.checkIntegrity(fix);
             if (integ < 0 && fix) {
-                logger.warning("Invalid AIObject: " + ao.getId()
-                    + " (" + Utils.lastPart(ao.getClass().getName(), ".")
+                logger.warning("Invalid AIObject: " + aio.getId()
+                    + " (" + Utils.lastPart(aio.getClass().getName(), ".")
                     + "), dropping.");
-                ao.dispose();
+                removeAIObject(aio.getId());
+                aio.dispose();
                 integ = 0;
             }
             result = Math.min(result, integ);
@@ -327,7 +348,7 @@ public class AIMain extends FreeColObject
             = getGame().getFreeColGameObjectIterator();
         while (fit.hasNext()) {
             FreeColGameObject f = fit.next();
-            if (shouldHaveAIObject(f) && !aiObjects.containsKey(f.getId())) {
+            if (shouldHaveAIObject(f) && getAIObject(f.getId()) == null) {
                 if (fix) {
                     logger.warning("Added missing AIObject for: " + f.getId());
                     setFreeColGameObject(f.getId(), f);
@@ -356,7 +377,7 @@ public class AIMain extends FreeColObject
      * @see FreeColGameObject#getId
      */
     public void setFreeColGameObject(String id, FreeColGameObject fcgo) {
-        if (aiObjects.containsKey(id) || !shouldHaveAIObject(fcgo)) return;
+        if (getAIObject(id) != null || !shouldHaveAIObject(fcgo)) return;
         if (!id.equals(fcgo.getId())) {
             throw new IllegalArgumentException("!id.equals(fcgo.getId())");
         }
@@ -518,8 +539,9 @@ public class AIMain extends FreeColObject
             // lookup.  AIObjects that can be forward referenced must
             // ensure they complete initialization somewhere in their
             // serialization read* routines.
-            if (oid != null && aiObjects.containsKey(oid)) {
-                getAIObject(oid).readFromXML(xr);
+            AIObject aio;
+            if (oid != null && (aio = getAIObject(oid)) != null) {
+                aio.readFromXML(xr);
 
             // @compat 0.10.1
             } else if (COLONIAL_AI_PLAYER_TAG.equals(tag)) {

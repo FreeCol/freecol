@@ -2332,6 +2332,12 @@ public class EuropeanAIPlayer extends AIPlayer {
         final Player player = getPlayer();
         final Turn turn = getGame().getTurn();
 
+        // This is happening, very rarely.  Hopefully now fixed by
+        // synchronizing access to AIMain.aiObjects.
+        if (getAIMain().getAIPlayer(player) != this) {
+            throw new RuntimeException("EuropeanAIPlayer integrity fail");
+        }
+
         StringBuffer sb = null;
         if (logger.isLoggable(Level.FINEST)) {
             sb = new StringBuffer(256);
