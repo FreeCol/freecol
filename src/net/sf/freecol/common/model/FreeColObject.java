@@ -55,6 +55,7 @@ import net.sf.freecol.common.ObjectWithId;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.io.FreeColXMLWriter.WriteScope;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.util.Introspector;
 import net.sf.freecol.common.util.Utils;
 
@@ -674,6 +675,43 @@ public abstract class FreeColObject
     public void removeFeatures(FreeColObject fco, String logMe) {
         FeatureContainer fc = getFeatureContainer();
         if (fc != null) fc.removeFeatures(fco, logMe);
+    }
+
+
+    // Logging support
+
+    /**
+     * Convert an object to a (shorter) string.
+     *
+     * @param o The <code>Object</code> to convert.
+     * @return The string.
+     */
+    private static String o2s(Object o) {
+        return (o == null) ? "null"
+            : (o instanceof String) ? (String)o
+            : (o instanceof Location) ? ((Location)o).toShortString()
+            : o.toString();
+    }
+
+    /**
+     * Internal logging helper.  Do not use except inside other logSB
+     * routines.
+     *
+     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param objects <code>Object</code>s to log.
+     */
+    protected static void logSB2(StringBuffer sb, Object[] objects) {
+        for (Object o : objects) sb.append(o2s(o));
+    }
+
+    /**
+     * Logging helper.
+     *
+     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param objects <code>Object</code>s to log.
+     */
+    public static void logSB(StringBuffer sb, Object... objects) {
+        if (sb != null) logSB2(sb, objects);
     }
 
 

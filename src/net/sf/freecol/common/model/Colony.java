@@ -37,6 +37,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.util.RandomChoice;
@@ -518,10 +519,8 @@ public class Colony extends Settlement implements Nameable {
 
         // Can the unit work at this wl?
         boolean present = unit.getLocation() == wl;
-        if (sb != null) {
-            sb.append("\n    ").append(wl);
-            if (!present && !wl.canAdd(unit)) sb.append(" no-add");
-        }
+        logSB(sb, "\n    ", wl,
+            ((!present && !wl.canAdd(unit)) ? " no-add" : ""));
         if (!present && !wl.canAdd(unit)) return bestAmount;
 
         // Can the unit determine the production type at this WL?
@@ -530,7 +529,7 @@ public class Colony extends Settlement implements Nameable {
         boolean alone = wl.getProductionType() == null
             || wl.isEmpty()
             || (present && wl.getUnitCount() == 1);
-        if (sb != null) sb.append(" alone=").append(alone);
+        logSB(sb, " alone=", alone);
 
         // Try the available production types for the best production.
         List<ProductionType> productionTypes = new ArrayList<ProductionType>();
@@ -540,18 +539,15 @@ public class Colony extends Settlement implements Nameable {
             productionTypes.add(wl.getProductionType());
         }
         for (ProductionType pt : productionTypes) {
-            if (sb != null) sb.append("\n      try=").append(pt);
+            logSB(sb, "\n      try=", pt);
             for (GoodsType gt : workTypes) {
                 if (pt.getOutput(gt) == null) continue;
                 int amount = getMinimumGoodsCount(pt.getInputs());
                 amount = Math.min(amount, wl.getPotentialProduction(gt, type));
-                if (sb != null) {
-                    sb.append(" ").append(gt.getSuffix())
-                        .append("=").append(amount)
-                        .append("/").append(getMinimumGoodsCount(pt.getInputs()))
-                        .append("/").append(wl.getPotentialProduction(gt, type));
-                    if (bestAmount < amount) sb.append("!");
-                }
+                logSB(sb, " ", gt.getSuffix(), "=", amount,
+                    "/", getMinimumGoodsCount(pt.getInputs()),
+                    "/", wl.getPotentialProduction(gt, type),
+                    ((bestAmount < amount) ? "!" : ""));
                 if (bestAmount < amount) {
                     bestAmount = amount;
                     best.workLocation = wl;
@@ -609,13 +605,13 @@ public class Colony extends Settlement implements Nameable {
         for (Collection<GoodsType> types
                  : getWorkTypeChoices(unit, userMode)) {
             if (sb != null) {
-                sb.append("\n  ");
+                logSB(sb, "\n  ");
                 logWorkTypes(sb, types);
             }
             Occupation occupation = getOccupationFor(unit, types, sb);
             if (occupation != null) return occupation;
         }
-        if (sb != null) sb.append("\n  => FAILED");
+        logSB(sb, "\n  => FAILED");
         return null;
     }
 
@@ -635,10 +631,9 @@ public class Colony extends Settlement implements Nameable {
         StringBuffer sb = null;
         if (getOccupationTrace()) {
             sb = new StringBuffer(128);
-            sb.append(getName()).append(".getOccupationFor(").append(unit)
-                .append(", ");
+            logSB(sb, getName(), ".getOccupationFor(", unit, ", ");
             logWorkTypes(sb, workTypes);
-            sb.append(")");
+            logSB(sb, ")");
         }
 
         Occupation occupation = getOccupationFor(unit, workTypes, sb);
@@ -694,18 +689,18 @@ public class Colony extends Settlement implements Nameable {
         for (Collection<GoodsType> types
                  : getWorkTypeChoices(unit, userMode)) {
             if (sb != null) {
-                sb.append("\n  ");
+                logSB(sb, "\n  ");
                 logWorkTypes(sb, types);
             }
             bestAmount = getOccupationAt(unit, wl, best, bestAmount,
                                          types, sb);
             if (best.workType != null) {
-                if (sb != null) sb.append("\n  => ").append(best);
+                logSB(sb, "\n  => ", best);
                 break;
             }
         }
         if (sb != null) {
-            if (best.workType == null) sb.append("\n  FAILED");
+            if (best.workType == null) logSB(sb, "\n  FAILED");
             logger.warning(sb.toString());
         }      
         return (best.workType == null) ? null : best;

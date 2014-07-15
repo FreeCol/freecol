@@ -190,31 +190,7 @@ public abstract class AIObject extends FreeColObject {
             : loc;
     }
 
-
-    // AI logging support
-
-    private String o2s(Object o) {
-        return (o == null) ? "null"
-            : (o instanceof String) ? (String)o
-            : (o instanceof Location) ? ((Location)o).toShortString()
-            : o.toString();
-    }
-
-    private void lSB(StringBuffer sb, Object[] objects) {
-        if (sb != null) {
-            for (Object o : objects) sb.append(o2s(o));
-        }
-    }
-
-    /**
-     * Logging helper.
-     *
-     * @param sb An optional <code>StringBuffer</code> to log to.
-     * @param objects Objects to log.
-     */
-    protected void logSB(StringBuffer sb, Object... objects) {
-        if (sb != null) lSB(sb, objects);
-    }
+    // Mission logging support
 
     protected void logSBat(StringBuffer sb, Unit unit) {
         logSB(sb, ", reached ", unit.getLocation(), ".");
@@ -239,14 +215,14 @@ public abstract class AIObject extends FreeColObject {
     protected void logSBfail(StringBuffer sb, Object... reasons) {
         if (sb != null) {
             sb.append(", FAILED: ");
-            lSB(sb, reasons);
+            logSB2(sb, reasons);
         }
     }
 
     protected void logSBdone(StringBuffer sb, Object... reasons) {
         if (sb != null) {
             sb.append(", COMPLETED: ");
-            lSB(sb, reasons);
+            logSB2(sb, reasons);
         }
     }
 

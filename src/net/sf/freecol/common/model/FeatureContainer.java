@@ -409,8 +409,8 @@ public final class FeatureContainer {
     public void removeFeatures(FreeColObject fco, String logMe) {
         FeatureContainer c = fco.getFeatureContainer();
         if (c == null) return;
-        StringBuilder sb = (!logger.isLoggable(Level.FINE)) ? null
-            : new StringBuilder(64);
+        StringBuffer sb = (!logger.isLoggable(Level.FINE)) ? null
+            : new StringBuffer(64);
 
         Set<Entry<String, Set<Ability>>> ca = c.getAbilityEntries();
         if (ca != null && abilitiesPresent()) {
@@ -421,7 +421,7 @@ public final class FeatureContainer {
                     for (Ability a : new HashSet<Ability>(abilitySet)) {
                         if (a.getSource() == fco) {
                             abilitySet.remove(a);
-                            if (sb != null) sb.append(" ").append(a.getId());
+                            FreeColObject.logSB(sb, " ", a.getId());
                         }
                     }
                 }
@@ -437,14 +437,16 @@ public final class FeatureContainer {
                     for (Modifier m : new HashSet<Modifier>(modifierSet)) {
                         if (m.getSource() == fco) {
                             modifierSet.remove(m);
-                            if (sb != null) sb.append(" ").append(m.getId());
+                            FreeColObject.logSB(sb, " ", m.getId());
                         }
                     }
                 }
             }
         }
         if (sb != null && sb.length() > 0) {
-            logger.fine(logMe + ", removed features:" + sb.toString());
+            sb.insert(0, ", removed features:");
+            sb.insert(0, logMe);
+            logger.fine(sb.toString());
         }
     }
 

@@ -61,6 +61,7 @@ import net.sf.freecol.common.model.EuropeWas;
 import net.sf.freecol.common.model.Event;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.GoldTradeItem;
@@ -540,11 +541,8 @@ public final class InGameController implements NetworkConstants {
             stop = unit.getStop();
             // Complain and return if the stop is no longer valid.
             if (!TradeRoute.isStopValid(unit, stop)) {
-                if (sb != null) {
-                    sb.append(" ")
-                        .append(stopMessage("tradeRoute.invalidStop",
-                                stop, player));
-                }
+                FreeColObject.logSB(sb, " ",
+                    stopMessage("tradeRoute.invalidStop", stop, player));
                 clearOrders(unit);
                 result = true;
                 break;
@@ -630,11 +628,8 @@ public final class InGameController implements NetworkConstants {
             Location destination = stop.getLocation();
             PathNode path = unit.findPath(destination);
             if (path == null) {
-                if (sb != null) {
-                    sb.append(" ")
-                        .append(stopMessage("tradeRoute.pathStop",
-                                            stop, player));
-                }
+                FreeColObject.logSB(sb, " ",
+                    stopMessage("tradeRoute.pathStop", stop, player));
                 unit.setState(UnitState.SKIPPED);
                 break;
             }
@@ -720,19 +715,14 @@ public final class InGameController implements NetworkConstants {
                 int amount = Math.min(demand, export);
                 Goods cargo = new Goods(game, loc, type, amount);
                 if (loadGoods(cargo, unit)) {
-                    if (sb != null) {
-                        sb.append(" ")
-                            .append(getLoadGoodsMessage(unit, type, amount,
-                                    present, export, demand));
-                    }
+                    FreeColObject.logSB(sb, " ",
+                        getLoadGoodsMessage(unit, type, amount,
+                                            present, export, demand));
                     ret = true;
                 }
             } else if (present > 0) {
-                if (sb != null) {
-                    sb.append(" ")
-                        .append(getLoadGoodsMessage(unit, type, 0,
-                                present, 0, demand));
-                }
+                FreeColObject.logSB(sb, " ",
+                    getLoadGoodsMessage(unit, type, 0, present, 0, demand));
             }
         }
         return ret;
@@ -834,11 +824,9 @@ public final class InGameController implements NetworkConstants {
             Goods cargo = new Goods(game, unit, type, amount);
             ret = (cargo.getAmount() == 0) ? false
                 : unloadGoods(cargo, unit, colony);
-            if (sb != null) {
-                sb.append(" ")
-                    .append(getUnloadGoodsMessage(unit, type,
-                            amount, present, atStop, toUnload));
-            }
+            FreeColObject.logSB(sb, " ",
+                getUnloadGoodsMessage(unit, type, amount,
+                                      present, atStop, toUnload));
         }
 
         return ret;
