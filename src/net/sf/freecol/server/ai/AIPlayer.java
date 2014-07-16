@@ -180,6 +180,15 @@ public abstract class AIPlayer extends AIObject {
     }
 
     /**
+     * Add an AI unit owned by this player.
+     *
+     * @param aiUnit The <code>AIUnit</code> to add.
+     */
+    public void addAIUnit(AIUnit aiUnit) {
+        aiUnits.add(aiUnit);
+    }
+
+    /**
      * Removes an AI unit owned by this player.
      *
      * @param aiUnit The <code>AIUnit</code> to remove.

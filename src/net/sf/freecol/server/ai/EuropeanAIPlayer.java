@@ -1566,6 +1566,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         if (AIMessage.askEmigrate(this, slot)
             && europe.getUnitCount() == n+1) {
             aiUnit = getAIUnit(europe.getUnitList().get(n));
+            if (aiUnit != null) addAIUnit(aiUnit);
         }
         return aiUnit;
     }
@@ -1592,6 +1593,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         if (AIMessage.askTrainUnitInEurope(this, unitType)
             && europe.getUnitCount() == n+1) {
             aiUnit = getAIUnit(europe.getUnitList().get(n));
+            if (aiUnit != null) addAIUnit(aiUnit);
         }
         return aiUnit;
     }
