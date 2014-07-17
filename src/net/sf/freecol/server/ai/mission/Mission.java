@@ -352,8 +352,7 @@ public abstract class Mission extends AIObject {
      */
     protected Direction moveRandomly(String logMe, Direction direction) {
         final Unit unit = getUnit();
-        if (unit.getMovesLeft() <= 0
-            || !(unit.getLocation() instanceof Tile)) return null;
+        if (unit.getMovesLeft() <= 0 || !unit.hasTile()) return null;
         if (logMe == null) logMe = "moveRandomly";
 
         Random aiRandom = getAIRandom();
