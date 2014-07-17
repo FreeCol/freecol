@@ -1750,7 +1750,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         // First try to satisfy the demand for missions with a defined quota.
         // Builders first to keep weak players in the game, scouts next
         // as they are profitable.
-        if (nBuilders > 0) {
+        if (nBuilders > 0 || player.getNumberOfSettlements() <= 0) {
             Collections.sort(aiUnits, builderComparator);
             for (AIUnit aiUnit : aiUnits) {
                 final Unit unit = aiUnit.getUnit();
