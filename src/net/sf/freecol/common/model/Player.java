@@ -4280,9 +4280,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(32);
-        sb.append(getName()).append(" (").append(nationId).append(")");
-        return sb.toString();
+        return nationId;
     }
 
     /**
