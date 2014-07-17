@@ -509,12 +509,16 @@ public class EuropeanAIPlayer extends AIPlayer {
                 AIUnit aiu;
                 if (bestWish == null) {
                     aiu = recruitAIUnitInEurope(-1);
-                    // let giveNormalMissions look after the mission
-                    logSB(sb, "recruit ", aiu.getUnit(), ", ");
+                    if (aiu != null) {
+                        // let giveNormalMissions look after the mission
+                        logSB(sb, "recruit ", aiu.getUnit(), ", ");
+                    }
                 } else {
                     aiu = trainAIUnitInEurope(bestWish.getUnitType());
-                    aiu.setMission(consumeWorkerWish(aiu, bestWish));
-                    logSB(sb, "train ", aiu.getUnit(), ", ");
+                    if (aiu != null) {
+                        aiu.setMission(consumeWorkerWish(aiu, bestWish));
+                        logSB(sb, "train ", aiu.getUnit(), ", ");
+                    }
                 }
             }
         }
