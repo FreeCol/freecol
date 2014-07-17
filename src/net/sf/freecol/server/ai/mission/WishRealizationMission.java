@@ -173,6 +173,7 @@ public class WishRealizationMission extends Mission {
         switch (mt) {
         case MOVE:
             break;
+        case MOVE_ILLEGAL:
         case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
             return this;
         default:
