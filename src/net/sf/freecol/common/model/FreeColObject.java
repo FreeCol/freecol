@@ -697,21 +697,60 @@ public abstract class FreeColObject
      * Internal logging helper.  Do not use except inside other logSB
      * routines.
      *
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      * @param objects <code>Object</code>s to log.
      */
-    protected static void logSB2(StringBuffer sb, Object[] objects) {
+    protected static void logSB2(StringBuilder sb, Object[] objects) {
         for (Object o : objects) sb.append(o2s(o));
     }
 
     /**
      * Logging helper.
      *
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      * @param objects <code>Object</code>s to log.
      */
-    public static void logSB(StringBuffer sb, Object... objects) {
+    public static void logSB(StringBuilder sb, Object... objects) {
         if (sb != null) logSB2(sb, objects);
+    }
+
+    /**
+     * Shorten a string buffer by a trailing delimiter.
+     *
+     * (Cheats, does not really check that the delimiter is there)
+     *
+     * @param sb The <code>StringBuilder</code> to shorten.
+     * @param delim The delimiter to remove.
+     */
+    public static void sbShrink(StringBuilder sb, String delim) {
+        if (sb != null && delim != null) {
+            sb.setLength(sb.length() - delim.length());
+        }
+    }
+
+    /**
+     * Remember a position in a string buffer.
+     *
+     * @param sb The <code>StringBuilder</code> to mark.
+     * @return The current buffer position if non-null.
+     */
+    public static int sbMark(StringBuilder sb) {
+        return (sb == null) ? -1 : sb.length();
+    }
+
+    /**
+     * Check if a string buffer has grown since marked, and optionally
+     * insert text at that point.
+     *
+     * @param sb The <code>StringBuilder</code> to check.
+     * @param point A previous mark (from #sbMark).
+     * @param add Optional text to add.
+     * @return True if the buffer grew.
+     */
+    public static boolean sbGrew(StringBuilder sb, int point, String add) {
+        if (sb == null || sb.length() <= point) return false;
+        if (add != null) sb.insert(point, add);
+        return true;
     }
 
 

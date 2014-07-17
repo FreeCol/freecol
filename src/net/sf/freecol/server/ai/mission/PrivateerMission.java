@@ -382,7 +382,7 @@ public class PrivateerMission extends Mission {
     /**
      * {@inheritDoc}
      */
-    public Mission doMission(StringBuffer sb) {
+    public Mission doMission(StringBuilder sb) {
         logSB(sb, tag);
         final AIMain aiMain = getAIMain();
         final AIUnit aiUnit = getAIUnit();

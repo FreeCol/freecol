@@ -164,7 +164,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
                                  List<GoodsType> goodsTypes) {
             final String sep = ", ";
             final Player owner = unit.getOwner();
-            StringBuffer sb = new StringBuffer(32);
+            StringBuilder sb = new StringBuilder(32);
             boolean dropSep = false;
 
             // Always show our missions, it may influence our choice of
@@ -242,7 +242,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
                 }
             } // else do nothing
 
-            if (dropSep) sb.setLength(sb.length() - sep.length());
+            if (dropSep) FreeColObject.sbShrink(sb, sep);
             return sb.toString();
         }
 

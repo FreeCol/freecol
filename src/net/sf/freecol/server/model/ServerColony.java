@@ -322,6 +322,7 @@ public class ServerColony extends Colony implements ServerModelObject {
         if (hasAbility(Ability.EXPORT)) {
             StringBuilder sb = new StringBuilder(64);
             sb.append(" ");
+            int point = sbMark(sb);
             for (Goods goods : getCompactGoods()) {
                 GoodsType type = goods.getType();
                 ExportData data = getExportData(type);
@@ -340,8 +341,8 @@ public class ServerColony extends Colony implements ServerModelObject {
                     .addAmount("%gold%", (owner.getGold() - oldGold));
                 sb.append(Messages.message(st) + ", ");
             }
-            if (sb.length() > 1) {
-                sb.setLength(sb.length() - 2);
+            if (sbGrew(sb, point, null)) {
+                sbShrink(sb, ", ");
                 cs.addMessage(See.only(owner),
                     new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT,
                                      "customs.sale", this)

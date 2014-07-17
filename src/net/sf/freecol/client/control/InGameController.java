@@ -535,7 +535,8 @@ public final class InGameController implements NetworkConstants {
 
         // If required accumulate a summary of all the activity of
         // this unit on its trade route into this string buffer.
-        StringBuffer sb = (tr.isSilent()) ? null : new StringBuffer(128);
+        StringBuilder sb = (tr.isSilent()) ? null : new StringBuilder(128);
+        int topPoint = FreeColObject.sbMark(sb);
 
         for (;;) {
             stop = unit.getStop();
@@ -559,7 +560,7 @@ public final class InGameController implements NetworkConstants {
                     + (FreeColGameObject)stop.getLocation());
             }
             if (atStop) {
-                int len = (sb == null) ? -1 : sb.length();
+                int point = FreeColObject.sbMark(sb);
                 // Anything to unload?
                 unloadUnitAtStop(unit, (sb != null && detailed) ? sb : null);
 
@@ -567,10 +568,9 @@ public final class InGameController implements NetworkConstants {
                 loadUnitAtStop(unit, (sb != null && detailed) ? sb : null);
 
                 // Wrap load/unload messages.
-                if (sb != null && detailed && sb.length() > len) {
-                    sb.insert(len, stopMessage("tradeRoute.atStop",
-                                               stop, player));
-                    sb.insert(len, " ");
+                if (detailed) {
+                    FreeColObject.sbGrew(sb, point,
+                        " " + stopMessage("tradeRoute.atStop", stop, player));
                 }
 
                 // If the un/load consumed the moves, break now before
@@ -642,7 +642,7 @@ public final class InGameController implements NetworkConstants {
             }
         }
 
-        if (sb != null && sb.length() > 0) {
+        if (FreeColObject.sbGrew(sb, topPoint, null)) {
             ModelMessage m = new ModelMessage(MessageType.GOODS_MOVEMENT,
                                               "tradeRoute.prefix", unit)
                 .addName("%route%", tr.getName())
@@ -661,10 +661,10 @@ public final class InGameController implements NetworkConstants {
      * Work out what goods to load onto a unit at a stop, and load them.
      *
      * @param unit The <code>Unit</code> to load.
-     * @param sb An optional <code>StringBuffer</code> to update.
+     * @param sb An optional <code>StringBuilder</code> to update.
      * @return True if goods were loaded.
      */
-    private boolean loadUnitAtStop(Unit unit, StringBuffer sb) {
+    private boolean loadUnitAtStop(Unit unit, StringBuilder sb) {
         final Game game = freeColClient.getGame();
         final Colony colony = unit.getColony();
         final Location loc = (unit.isInEurope())
@@ -769,10 +769,10 @@ public final class InGameController implements NetworkConstants {
      * Work out what goods to unload from a unit at a stop, and unload them.
      *
      * @param unit The <code>Unit</code> to unload.
-     * @param sb An optional <code>StringBuffer</code> to update.
+     * @param sb An optional <code>StringBuilder</code> to update.
      * @return True if something was unloaded.
      */
-    private boolean unloadUnitAtStop(Unit unit, StringBuffer sb) {
+    private boolean unloadUnitAtStop(Unit unit, StringBuilder sb) {
         Colony colony = unit.getColony();
         TradeRouteStop stop = unit.getStop();
         final List<GoodsType> goodsTypesToLoad = stop.getCargo();
@@ -1675,6 +1675,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         StringBuilder sb = new StringBuilder(256);
+        int point = FreeColObject.sbMark(sb);
         if (landLocked) {
             sb.append(Messages.message("buildColony.landLocked")).append("\n");
         }
@@ -1702,7 +1703,7 @@ public final class InGameController implements NetworkConstants {
             sb.append(Messages.message("buildColony.IndianLand")).append("\n");
         }
 
-        return (sb.length() == 0) ? true
+        return (!FreeColObject.sbGrew(sb, point, null)) ? true
             : gui.showConfirmDialog(true, unit.getTile(),
                                     StringTemplate.label(sb.toString()), unit,
                                     "buildColony.yes", "buildColony.no");

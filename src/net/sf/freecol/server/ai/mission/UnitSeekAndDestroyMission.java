@@ -464,7 +464,7 @@ public class UnitSeekAndDestroyMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    public Mission doMission(StringBuffer sb) {
+    public Mission doMission(StringBuilder sb) {
         logSB(sb, tag);
         String reason = invalidReason();
         if (isTargetReason(reason)) {

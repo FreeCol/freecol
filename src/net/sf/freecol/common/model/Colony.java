@@ -121,7 +121,7 @@ public class Colony extends Settlement implements Nameable {
         }
 
         public String toString() {
-            StringBuffer sb = new StringBuffer(32);
+            StringBuilder sb = new StringBuilder(32);
             sb.append("[Occupation ").append(workLocation)
                 //.append(" ").append(productionType)
                 .append(" ").append(workType.getSuffix())
@@ -423,12 +423,12 @@ public class Colony extends Settlement implements Nameable {
         return result;
     }
 
-    private void logWorkTypes(StringBuffer sb, Collection<GoodsType> workTypes) {
+    private void logWorkTypes(StringBuilder sb, Collection<GoodsType> workTypes) {
         sb.append("[");
         for (GoodsType gt : workTypes) {
             sb.append(gt.getSuffix()).append(" ");
         }
-        sb.setLength(sb.length()-1);
+        sbShrink(sb, " ");
         sb.append("]");
     }
         
@@ -508,13 +508,13 @@ public class Colony extends Settlement implements Nameable {
      * @param bestAmount The amount of goods produced.
      * @param workTypes A collection of <code>GoodsType</code> to
      *     consider producing.
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      * @return The updated best amount of production found.
      */
     private int getOccupationAt(Unit unit, WorkLocation wl,
                                 Occupation best, int bestAmount,
                                 Collection<GoodsType> workTypes,
-                                StringBuffer sb) {
+                                StringBuilder sb) {
         final UnitType type = unit.getType();
 
         // Can the unit work at this wl?
@@ -567,13 +567,13 @@ public class Colony extends Settlement implements Nameable {
      *     <code>Occupation</code> for.
      * @param workTypes A collection of <code>GoodsType</code> to
      *     consider producing.
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      * @return An <code>Occupation</code> for the given unit, or null
      *     if none found.
      */
     private Occupation getOccupationFor(Unit unit,
                                         Collection<GoodsType> workTypes,
-                                        StringBuffer sb) {
+                                        StringBuilder sb) {
         if (workTypes.isEmpty()) return null;
 
         Occupation best = new Occupation(null, null, null);
@@ -596,12 +596,12 @@ public class Colony extends Settlement implements Nameable {
      *     <code>Occupation</code> for.
      * @param userMode If a user requested this, favour the current
      *     work type, if not favour goods that the unit requires.
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      * @return An <code>Occupation</code> for the given unit, or
      *     null if none found.
      */
     private Occupation getOccupationFor(Unit unit, boolean userMode,
-                                        StringBuffer sb) {
+                                        StringBuilder sb) {
         for (Collection<GoodsType> types
                  : getWorkTypeChoices(unit, userMode)) {
             if (sb != null) {
@@ -628,9 +628,9 @@ public class Colony extends Settlement implements Nameable {
      */
     private Occupation getOccupationFor(Unit unit,
                                         Collection<GoodsType> workTypes) {
-        StringBuffer sb = null;
+        StringBuilder sb = null;
         if (getOccupationTrace()) {
-            sb = new StringBuffer(128);
+            sb = new StringBuilder(128);
             logSB(sb, getName(), ".getOccupationFor(", unit, ", ");
             logWorkTypes(sb, workTypes);
             logSB(sb, ")");
@@ -652,9 +652,9 @@ public class Colony extends Settlement implements Nameable {
      *     null if none found.
      */
     private Occupation getOccupationFor(Unit unit, boolean userMode) {
-        StringBuffer sb = null;
+        StringBuilder sb = null;
         if (getOccupationTrace()) {
-            sb = new StringBuffer(128);
+            sb = new StringBuilder(128);
             sb.append(getName()).append(".getOccupationFor(").append(unit)
                 .append(")");
         }
@@ -677,9 +677,9 @@ public class Colony extends Settlement implements Nameable {
      */
     private Occupation getOccupationAt(Unit unit, WorkLocation wl,
                                        boolean userMode) {
-        StringBuffer sb = null;
+        StringBuilder sb = null;
         if (getOccupationTrace()) {
-            sb = new StringBuffer(128);
+            sb = new StringBuilder(128);
             sb.append(getName()).append(".getOccupationAt(").append(unit)
                 .append(", ").append(wl).append(")");
         }
@@ -1471,7 +1471,7 @@ public class Colony extends Settlement implements Nameable {
         Occupation occupation = getOccupationFor(unit, false);
         if (occupation == null) {
             if (!traceOccupation) {
-                StringBuffer sb = new StringBuffer(64);
+                StringBuilder sb = new StringBuilder(64);
                 getOccupationFor(unit, false, sb);
                 logger.warning(sb.toString());
             }

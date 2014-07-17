@@ -301,7 +301,7 @@ public class ServerGame extends Game implements ServerModelObject {
             || strongestAIPlayer == null
             || weakestAIPlayer == strongestAIPlayer) return;
 
-        StringBuffer sb = new StringBuffer(512);
+        StringBuilder sb = new StringBuilder(512);
         sb.append("Spanish succession in ").append(getTurn())
             .append(" scores[");
         for (Player player : scores.keySet()) {

@@ -126,7 +126,7 @@ public class InciteTradeItem extends TradeItem {
      */
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer(16);
+        StringBuilder sb = new StringBuilder(16);
         sb.append("[").append(getId())
             .append(" ").append(victim.getId()).append("]");
         return sb.toString();

@@ -1483,9 +1483,9 @@ public class Map extends FreeColGameObject implements Location {
                     && unit != null
                     && unit.getLocation() == carrier) ? carrier : unit)
             : offMapUnit;
-        StringBuffer sb = null;
+        StringBuilder sb = null;
         if (traceSearch) {
-            sb = new StringBuffer(256);
+            sb = new StringBuilder(256);
             logSB(sb, "Search trace(",
                 ((maxTurns==INFINITY) ? "" : Integer.toString(maxTurns)),
                 ") for ", unit,

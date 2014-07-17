@@ -305,7 +305,7 @@ public class DefendSettlementMission extends Mission {
     /**
      * {@inheritDoc}
      */
-    public Mission doMission(StringBuffer sb) {
+    public Mission doMission(StringBuilder sb) {
         logSB(sb, tag);
         String reason = invalidReason();
         if (isTargetReason(reason)) {

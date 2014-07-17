@@ -253,10 +253,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * Rearranges the workers within this colony using the {@link ColonyPlan}.
      * TODO: Detect military threats and boost defence.
      *
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      * @return True if the workers were rearranged.
      */
-    public boolean rearrangeWorkers(StringBuffer sb) {
+    public boolean rearrangeWorkers(StringBuilder sb) {
         final AIMain aiMain = getAIMain();
         if (colonyPlan == null) colonyPlan = new ColonyPlan(aiMain, colony);
 
@@ -565,9 +565,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * just take the tile that best helps with the currently required
      * raw building materials, with a lesser interest in food.
      *
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      */
-    private void stealTiles(StringBuffer sb) {
+    private void stealTiles(StringBuilder sb) {
         final Specification spec = getSpecification();
         final Tile tile = colony.getTile();
         final Player player = colony.getOwner();
@@ -729,9 +729,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      *
      * @param ag The <code>AIGoods</code> to log.
      * @param action The state of the goods.
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      */
-    private void goodsLog(AIGoods ag, String action, StringBuffer sb) {
+    private void goodsLog(AIGoods ag, String action, StringBuilder sb) {
         if (sb == null) return;
         Goods goods = (ag == null) ? null : ag.getGoods();
         int amount = (goods == null) ? -1 : goods.getAmount();
@@ -747,9 +747,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     /**
      * Creates a list of the goods which should be shipped out of this colony.
      *
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      */
-    public void updateAIGoods(StringBuffer sb) {
+    public void updateAIGoods(StringBuilder sb) {
         if (colony.hasAbility(Ability.EXPORT)) {
             while (!aiGoods.isEmpty()) {
                 AIGoods ag = aiGoods.remove(0);
@@ -966,10 +966,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * @param type The <code>GoodsType</code> to wish for.
      * @param amount The amount of goods wished for.
      * @param value The urgency of the wish.
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      */
     public void requireGoodsWish(GoodsType type, int amount, int value,
-                                 StringBuffer sb) {
+                                 StringBuilder sb) {
         GoodsWish gw = null;
         for (Wish w : wishes) {
             if (w instanceof GoodsWish
@@ -996,10 +996,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * @param type The <code>UnitType</code> to wish for.
      * @param expertNeeded Is an expert unit required?
      * @param value The urgency of the wish.
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      */
     public void requireWorkerWish(UnitType type, boolean expertNeeded,
-                                  int value, StringBuffer sb) {
+                                  int value, StringBuilder sb) {
         WorkerWish ww = null;
         for (Wish w : wishes) {
             if (w instanceof WorkerWish
@@ -1020,24 +1020,22 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     /**
      * Updates the wishes for the <code>Colony</code>.
      *
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      */
-    private void updateWishes(StringBuffer sb) {
-        int point = (sb == null) ? -1 : sb.length();
+    private void updateWishes(StringBuilder sb) {
+        int point = sbMark(sb);
         updateWorkerWishes(sb);
         updateGoodsWishes(sb);
         Collections.sort(wishes);
-        if (sb != null && point < sb.length()) {
-            sb.insert(point, "\n  New Wishes:");
-        }
+        sbGrew(sb, point, "\n  New Wishes:");
     }
 
     /**
      * Updates the worker wishes.
      *
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      */
-    private void updateWorkerWishes(StringBuffer sb) {
+    private void updateWorkerWishes(StringBuilder sb) {
         final Specification spec = getSpecification();
         final int baseValue = 25;
         final int priorityMax = 50;
@@ -1122,9 +1120,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     /**
      * Updates the goods wishes.
      *
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      */
-    private void updateGoodsWishes(StringBuffer sb) {
+    private void updateGoodsWishes(StringBuilder sb) {
         final Specification spec = getSpecification();
         int goodsWishValue = 50;
 
@@ -1266,9 +1264,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * increase the production by this <code>Colony</code>.
      *
      * @see TileImprovementPlan
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      */
-    public void updateTileImprovementPlans(StringBuffer sb) {
+    public void updateTileImprovementPlans(StringBuilder sb) {
         List<TileImprovementPlan> newPlans
             = new ArrayList<TileImprovementPlan>();
         for (WorkLocation wl : colony.getAvailableWorkLocations()) {

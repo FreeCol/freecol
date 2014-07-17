@@ -169,7 +169,7 @@ public final class ReportTradePanel extends ReportPanel {
 
                 JLabel productionLabel = createNumberLabel(production, true);
 
-                StringBuffer toolTip = new StringBuffer();
+                StringBuilder toolTip = new StringBuilder();
                 for (StringTemplate warning : colony.getWarnings(goodsType, amount, production)) {
                     if (toolTip.length() > 0) {
                         toolTip.append(" - ");

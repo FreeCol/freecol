@@ -1117,11 +1117,11 @@ public class TransportMission extends Mission {
      * carrier yet without a meaningful transport destination.
      *
      * @param t The <code>Transportable</code> to retarget.
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      * @return True if the transportable should now have a valid
      *     transport destination.
      */
-    private boolean retargetTransportable(Transportable t, StringBuffer sb) {
+    private boolean retargetTransportable(Transportable t, StringBuilder sb) {
         final EuropeanAIPlayer euaip = getEuropeanAIPlayer();
         final AIUnit aiCarrier = getAIUnit();
         final Unit carrier = aiCarrier.getUnit();
@@ -1222,9 +1222,9 @@ public class TransportMission extends Mission {
      * cargo on board should be on the cargoes list but the list is
      * not necessarily going to be in a sensible order.
      *
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      */
-    private void checkCargoes(StringBuffer sb) {
+    private void checkCargoes(StringBuilder sb) {
         final Unit carrier = getUnit();
         if (carrier.isAtSea()) return; // Let it emerge.
 
@@ -1305,14 +1305,11 @@ public class TransportMission extends Mission {
 
         // Ask the parent player to retarget transportables on the retry list
         if (!retry.isEmpty()) {
-            int point = (sb == null) ? -1 : sb.length();
+            int point = sbMark(sb);
             for (Transportable t : retry) {
                 if (!retargetTransportable(t, sb)) drop.add(t);
             }
-            if (sb != null && sb.length() > point) {
-                sb.insert(point, ", retarget: ");
-                sb.setLength(sb.length() - 2);
-            }                
+            if (sbGrew(sb, point, ", retarget: ")) sbShrink(sb, ", ");
         }
 
         // Drop transportables on the drop list, or queue them to be dropped
@@ -1492,9 +1489,9 @@ public class TransportMission extends Mission {
      * Leaves the cargoes in the order they are expected to
      * execute, with valid spaceLeft values.
      *
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      */
-    private void optimizeCargoes(StringBuffer sb) {
+    private void optimizeCargoes(StringBuilder sb) {
         logSB(sb, ", optimize");
 
         // We wrap/unwrap the list to minimize the number of nodes
@@ -1824,7 +1821,7 @@ public class TransportMission extends Mission {
     /**
      * {@inheritDoc}
      */
-    public Mission doMission(StringBuffer sb) {
+    public Mission doMission(StringBuilder sb) {
         logSB(sb, tag);
         checkCargoes(sb);
 

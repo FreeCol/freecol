@@ -510,7 +510,7 @@ public class PioneeringMission extends Mission {
     /**
      * {@inheritDoc}
      */
-    public Mission doMission(StringBuffer sb) {
+    public Mission doMission(StringBuilder sb) {
         logSB(sb, tag);
         // Check for completion and tileImprovement failure up front.
         final AIUnit aiUnit = getAIUnit();

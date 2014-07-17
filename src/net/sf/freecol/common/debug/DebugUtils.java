@@ -677,7 +677,7 @@ public class DebugUtils {
         }
 
         if (problemDetected) {
-            sb.setLength(sb.length()-1);
+            FreeColObject.sbShrink(sb, "\n");
             String err = sb.toString();
             freeColClient.getGUI().showInformationMessage(err);
             logger.severe(err);

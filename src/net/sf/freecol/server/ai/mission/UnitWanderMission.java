@@ -118,7 +118,7 @@ public class UnitWanderMission extends Mission {
     /**
      * {@inheritDoc}
      */
-    public Mission doMission(StringBuffer sb) {
+    public Mission doMission(StringBuilder sb) {
         logSB(sb, tag);
         String reason = invalidReason();
         if (reason != null) {

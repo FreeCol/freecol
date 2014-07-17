@@ -339,7 +339,7 @@ public class Utils {
             throw new IllegalStateException("IO exception in memory!?", e);
         }
         byte[] bytes = bos.toByteArray();
-        StringBuffer sb = new StringBuffer(bytes.length * 2);
+        StringBuilder sb = new StringBuilder(bytes.length * 2);
         for (byte b : bytes) {
             sb.append(HEX_DIGITS.charAt((b >> 4) & 0x0F));
             sb.append(HEX_DIGITS.charAt(b & 0x0F));

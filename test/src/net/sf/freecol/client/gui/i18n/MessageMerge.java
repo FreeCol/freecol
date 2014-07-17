@@ -128,8 +128,8 @@ public final class MessageMerge {
     {
         try {
             List<String> lineList = new ArrayList<String>();
-            FileInputStream  in = new FileInputStream( pathToFile );
-            StringBuffer  line = new StringBuffer();
+            FileInputStream in = new FileInputStream( pathToFile );
+            StringBuilder line = new StringBuilder();
             while ( true )
             {
                 int  data = in.read();

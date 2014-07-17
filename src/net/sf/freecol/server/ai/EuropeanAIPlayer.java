@@ -352,9 +352,9 @@ public class EuropeanAIPlayer extends AIPlayer {
      * Simple initialization of AI missions given that we know the starting
      * conditions.
      *
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      */
-    private void initializeMissions(StringBuffer sb) {
+    private void initializeMissions(StringBuilder sb) {
         final AIMain aiMain = getAIMain();
         List<AIUnit> aiUnits = getAIUnits();
         logSB(sb, "\n  Initialize");
@@ -405,15 +405,15 @@ public class EuropeanAIPlayer extends AIPlayer {
      *
      * TODO: Remove when the AI is good enough.
      *
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      */
-    private void cheat(StringBuffer sb) {
+    private void cheat(StringBuilder sb) {
         final AIMain aiMain = getAIMain();
         if (!aiMain.getFreeColServer().isSinglePlayer()) return;
 
         final Player player = getPlayer();
         if (player.getPlayerType() != PlayerType.COLONIAL) return;
-        int point = (sb == null) ? -1 : sb.length();
+        int point = sbMark(sb);
 
         final Specification spec = getSpecification();
         final Game game = getGame();
@@ -648,10 +648,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
         }
 
-        if (sb != null && sb.length() > point) {
-            sb.insert(point, "\n  Cheats: ");
-            sb.setLength(sb.length()-2);
-        }
+        if (sbGrew(sb, point, "\n  Cheats: ")) sbShrink(sb, ", ");
     }
 
     /**
@@ -689,10 +686,10 @@ public class EuropeanAIPlayer extends AIPlayer {
      *
      * @param missions A list of <code>TransportMission</code>s to potentially
      *     assign more transportables to.
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      */
     private void allocateTransportables(List<TransportMission> missions,
-                                        StringBuffer sb) {
+                                        StringBuilder sb) {
         if (missions.isEmpty()) return;
         List<Transportable> urgent = getUrgentTransportables();
         if (urgent.isEmpty()) return;
@@ -760,9 +757,9 @@ public class EuropeanAIPlayer extends AIPlayer {
      * this might be folded into a trade mission, since
      * European gifts are just a special case of trading.
      *
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      */
-    private void bringGifts(StringBuffer sb) {
+    private void bringGifts(StringBuilder sb) {
         //if (sb != null) sb.append("\n  Bring Gifts: NYI");
         return;
     }
@@ -772,9 +769,9 @@ public class EuropeanAIPlayer extends AIPlayer {
      *
      * TODO: European players can also demand tribute!
      *
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      */
-    private void demandTribute(StringBuffer sb) {
+    private void demandTribute(StringBuilder sb) {
         //if (sb != null) sb.append("\n  Demand Tribute: NYI");
         return;
     }
@@ -788,9 +785,9 @@ public class EuropeanAIPlayer extends AIPlayer {
      * Called by startWorking at the start of every turn.
      * Public for the test suite.
      *
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      */
-    public void buildTipMap(StringBuffer sb) {
+    public void buildTipMap(StringBuilder sb) {
         tipMap.clear();
         for (AIColony aic : getAIColonies()) {
             for (TileImprovementPlan tip : aic.getTileImprovementPlans()) {
@@ -946,9 +943,9 @@ public class EuropeanAIPlayer extends AIPlayer {
      * Rebuild the transport maps.
      * Count the number of transports requiring naval/land carriers.
      *
-     * @param sb A <code>StringBuffer</code> to log to.
+     * @param sb A <code>StringBuilder</code> to log to.
      */
-    private void buildTransportMaps(StringBuffer sb) {
+    private void buildTransportMaps(StringBuilder sb) {
         transportDemand.clear();
         transportSupply.clear();
         wagonsNeeded.clear();
@@ -1201,9 +1198,9 @@ public class EuropeanAIPlayer extends AIPlayer {
     /**
      * Rebuilds the goods and worker wishes maps.
      *
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      */
-    private void buildWishMaps(StringBuffer sb) {
+    private void buildWishMaps(StringBuilder sb) {
         for (UnitType unitType : getSpecification().getUnitTypeList()) {
             List<WorkerWish> wl = workerWishes.get(unitType);
             if (wl == null) {
@@ -1237,7 +1234,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         }
 
         if (sb != null && !workerWishes.isEmpty()) {
-            int point = sb.length();
+            int point = sbMark(sb);
             for (UnitType ut : workerWishes.keySet()) {
                 List<WorkerWish> wl = workerWishes.get(ut);
                 if (!wl.isEmpty()) {
@@ -1249,10 +1246,10 @@ public class EuropeanAIPlayer extends AIPlayer {
                     sb.append("]");
                 }
             }
-            if (sb.length() > point) sb.insert(point, "\n  Wishes (workers):");
+            sbGrew(sb, point, "\n  Wishes (workers):");
         }
         if (sb != null && !goodsWishes.isEmpty()) {
-            int point = sb.length();
+            int point = sbMark(sb);
             for (GoodsType gt : goodsWishes.keySet()) {
                 List<GoodsWish> gl = goodsWishes.get(gt);
                 if (!gl.isEmpty()) {
@@ -1264,7 +1261,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                     sb.append("]");
                 }
             }
-            if (sb.length() > point) sb.insert(point, "\n  Wishes (goods):");
+            sbGrew(sb, point, "\n  Wishes (goods):");
         }
     }
 
@@ -1464,11 +1461,11 @@ public class EuropeanAIPlayer extends AIPlayer {
     /**
      * Determines the stances towards each player.
      *
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      */
-    private void determineStances(StringBuffer sb) {
+    private void determineStances(StringBuilder sb) {
         final Player player = getPlayer();
-        int point = (sb == null) ? -1 : sb.length();
+        int point = sbMark(sb);
 
         for (Player p : getGame().getLivePlayers(player)) {
             Stance newStance = determineStance(p);
@@ -1483,10 +1480,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 }
             }
         }
-        if (sb != null && sb.length() > point) {
-            sb.insert(point, "\n  Stance changes:");
-            sb.setLength(sb.length() - 2);
-        }
+        if (sbGrew(sb, point, "\n  Stance changes:")) sbShrink(sb, ", ");
     }
 
     /**
@@ -1669,9 +1663,9 @@ public class EuropeanAIPlayer extends AIPlayer {
     /**
      * Ensures all units have a mission.
      *
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      */
-    protected void giveNormalMissions(StringBuffer sb) {
+    protected void giveNormalMissions(StringBuilder sb) {
         final AIMain aiMain = getAIMain();
         final Player player = getPlayer();
         final int turnNumber = getGame().getTurn().getNumber();
@@ -1692,7 +1686,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         // aiUnits list (reporting why not).  Adjust the
         // Build/Pioneer/Scout counts according to the existing valid
         // missions.  Accumulate potentially usable transport missions.
-        int point = (sb == null) ? -1 : sb.length();
+        int point = sbMark(sb);
         for (AIUnit aiUnit : aiUnits) {
             final Unit unit = aiUnit.getUnit();
             Mission m = aiUnit.getMission();
@@ -1891,10 +1885,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 reasons.put(unit, "Idle");
             }
         }
-        if (sb != null && point < sb.length()) {
-            sb.insert(point, "\n  Mission changes: ");
-            sb.setLength(sb.length() - 2);
-        }
+        if (sbGrew(sb, point, "\n  Mission changes: ")) sbShrink(sb, ", ");
 
         // Now see if transport can be found
         allocateTransportables(transportMissions, sb);
@@ -2187,9 +2178,9 @@ public class EuropeanAIPlayer extends AIPlayer {
             throw new RuntimeException("EuropeanAIPlayer integrity fail");
         }
 
-        StringBuffer sb = null;
+        StringBuilder sb = null;
         if (logger.isLoggable(Level.FINEST)) {
-            sb = new StringBuffer(256);
+            sb = new StringBuilder(256);
             logSB(sb, player.getNation().getSuffix(),
                 " in ", turn, "/", turn.getNumber(),
                 " declare=", (player.checkDeclareIndependence() == null),
@@ -2202,13 +2193,11 @@ public class EuropeanAIPlayer extends AIPlayer {
         determineStances(sb);
         buildTipMap(sb);
 
-        int point = (sb == null) ? -1 : sb.length();
+        int point = sbMark(sb);
         for (AIColony aic : getAIColonies()) {
             if (aic.isBadlyDefended()) logSB(sb, " ", aic.getColony());
         }
-        if (sb != null && sb.length() > point) {
-            sb.insert(point, "\n  Badly defended colonies:");
-        }
+        sbGrew(sb, point, "\n  Badly defended colonies:");
 
         for (AIColony aic : getAIColonies()) {
             aic.rearrangeWorkers(sb);
@@ -2247,8 +2236,8 @@ public class EuropeanAIPlayer extends AIPlayer {
      * {@inheritDoc}
      */
     @Override
-    protected List<AIUnit> doMissions(List<AIUnit> aiUnits, StringBuffer sb) {
-        int point = (sb == null) ? -1 : sb.length();
+    protected List<AIUnit> doMissions(List<AIUnit> aiUnits, StringBuilder sb) {
+        int point = sbMark(sb);
         List<AIUnit> result = new ArrayList<AIUnit>();
         for (AIUnit aiu : aiUnits) {
             final Unit unit = aiu.getUnit();
@@ -2263,10 +2252,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
             if (unit.getMovesLeft() > 0) result.add(aiu);
         }
-        if (sb != null && sb.length() > point) {
-            sb.insert(point, "\n  Do normal missions:");
-            point = sb.length();
-        }
+        if (sbGrew(sb, point, "\n  Do normal missions:")) point = sbMark(sb);
         for (AIUnit aiu : aiUnits) {
             final Unit unit = aiu.getUnit();
             final Mission old = aiu.getMission();
@@ -2280,9 +2266,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
             if (!unit.isDisposed() && unit.getMovesLeft() > 0) result.add(aiu);
         }
-        if (sb != null && sb.length() > point) {
-            sb.insert(point, "\n  Do transport missions:");
-        }
+        sbGrew(sb, point, "\n  Do transport missions:");
         return result;
     }
 
@@ -2338,7 +2322,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             = new HashMap<TradeItem, Integer>();
         TradeItem peace = null;
         TradeItem cash = null;
-        StringBuffer sb = new StringBuffer(64);
+        StringBuilder sb = new StringBuilder(64);
         sb.append("Evaluate trade offer from ").append(other.getName())
             .append(":");
         TradeStatus result = null;

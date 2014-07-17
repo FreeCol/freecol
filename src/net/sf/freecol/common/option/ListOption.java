@@ -294,7 +294,7 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
      */
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer(64);
+        StringBuilder sb = new StringBuilder(64);
         sb.append("[").append(getId());
         if (value != null) {
             sb.append(" [");

@@ -337,7 +337,7 @@ public class BuildColonyMission extends Mission {
     /**
      * {@inheritDoc}
      */
-    public Mission doMission(StringBuffer sb) {
+    public Mission doMission(StringBuilder sb) {
         logSB(sb, tag);
         final AIMain aiMain = getAIMain();
         final AIUnit aiUnit = getAIUnit();
@@ -433,7 +433,7 @@ public class BuildColonyMission extends Mission {
 
             // Log the colony values so we can improve things
             if (logger.isLoggable(Level.FINE)) {
-                StringBuffer s2 = new StringBuffer(32);
+                StringBuilder s2 = new StringBuilder(32);
                 logSB(s2, tag, " score-at-foundation ", tile, ":");
                 for (Double d : player.getAllColonyValues(tile)) {
                     logSB(s2, " ", d);

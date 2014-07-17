@@ -1027,7 +1027,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         Market market = getMarket();
         if (market == null) return false;
         boolean ret = false;
-        StringBuffer sb = new StringBuffer(32);
+        StringBuilder sb = new StringBuilder(32);
         sb.append("Flush market for ").append(getId()).append(":");
         for (GoodsType type : getSpecification().getGoodsTypeList()) {
             if (csFlushMarket(type, cs)) {
@@ -1442,7 +1442,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     public List<ModelMessage> csApplyDisaster(Random random, Colony colony,
                                               Disaster disaster, ChangeSet cs) {
-        StringBuffer sb = new StringBuffer(64);
+        StringBuilder sb = new StringBuilder(64);
         sb.append("Applying ").append(disaster.getNumberOfEffects())
             .append(" effect/s of disaster ")
             .append(Messages.getName(disaster));

@@ -2206,14 +2206,10 @@ public class Unit extends GoodsLocation
         StringBuilder sb = new StringBuilder(16);
         int quotient = getMovesLeft() / 3;
         int remainder = getMovesLeft() % 3;
-        if (remainder == 0 || quotient > 0) {
-            sb.append(quotient);
-        }
+        if (quotient > 0 || remainder == 0) sb.append(quotient);
         if (remainder > 0) {
-            if (sb.length() > 0) sb.append(" ");
             sb.append("(").append(remainder).append("/3) ");
         }
-
         sb.append("/").append(getInitialMovesLeft() / 3);
         return sb.toString();
     }
@@ -3440,7 +3436,7 @@ public class Unit extends GoodsLocation
      * {@inheritDoc}
      */
     public String toShortString() {
-        StringBuffer sb = new StringBuffer(32);
+        StringBuilder sb = new StringBuilder(32);
         sb.append(getId()).append("-").append(getType().getSuffix());
         if (!hasDefaultRole()) {
             sb.append("-").append(getRoleSuffix());

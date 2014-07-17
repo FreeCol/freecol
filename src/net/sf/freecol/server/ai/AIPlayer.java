@@ -406,10 +406,10 @@ public abstract class AIPlayer extends AIObject {
      * Log the missions of this player.
      *
      * @param reasons A map of reasons for the current mission by unit.
-     * @param sb A <code>StringBuffer</code> to log to.
+     * @param sb A <code>StringBuilder</code> to log to.
      */
     protected void logMissions(java.util.Map<Unit, String> reasons,
-                               StringBuffer sb) {
+                               StringBuilder sb) {
         List<AIUnit> units = getAIUnits();
         Collections.sort(units, aiUnitLocationComparator);
         for (AIUnit aiu : units) {
@@ -467,10 +467,10 @@ public abstract class AIPlayer extends AIObject {
      * Makes every unit perform their mission.
      *
      * @param aiUnits A list of <code>AIUnit</code>s to perform missions.
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      * @return A list of <code>AIUnit</code>s that have moves left.
      */
-    protected List<AIUnit> doMissions(List<AIUnit> aiUnits, StringBuffer sb) {
+    protected List<AIUnit> doMissions(List<AIUnit> aiUnits, StringBuilder sb) {
         logSB(sb, "\n  Do Missions:");
         List<AIUnit> result = new ArrayList<AIUnit>();
         for (AIUnit aiu : aiUnits) {

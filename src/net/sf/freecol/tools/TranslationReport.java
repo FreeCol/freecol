@@ -220,7 +220,7 @@ public class TranslationReport {
             System.out.println("*** Summary of translation efforts (" + master.size() + " keys in master file) ***");
             System.out.println(stars);
             for (LanguageStatsRecord stats : statistics){
-                StringBuffer output = new StringBuffer();
+                StringBuilder output = new StringBuilder();
                 output.append(shortenName(stats.localFile));
                 output.append(": ");
                 output.append(prettyPrint(stats.missingKeys));
@@ -243,8 +243,8 @@ public class TranslationReport {
         }
     }
 
-    private static StringBuffer shortenName(String localFile) {
-        StringBuffer out = new StringBuffer(5);
+    private static StringBuilder shortenName(String localFile) {
+        StringBuilder out = new StringBuilder(5);
         String temp = localFile.substring(16, localFile.indexOf("."));
         if (temp.length() < 5)
             out.append("   ");
@@ -252,8 +252,8 @@ public class TranslationReport {
         return out;
     }
 
-    private static StringBuffer prettyPrint(int number) {
-        StringBuffer output = new StringBuffer(4);
+    private static StringBuilder prettyPrint(int number) {
+        StringBuilder output = new StringBuilder(4);
         if (number < 10)
             output.append(" ");
         if (number < 100)

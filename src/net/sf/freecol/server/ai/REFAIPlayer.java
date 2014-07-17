@@ -180,7 +180,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         }
         Collections.sort(targets);
 
-        StringBuffer sb = new StringBuffer(32);
+        StringBuilder sb = new StringBuilder(32);
         sb.append("REF found colony targets:");
         for (TargetTuple t : targets) {
             sb.append(" ").append(t.colony.getName())
@@ -251,7 +251,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         final Player rebel = targets.get(0).colony.getOwner();
         double ratio = getStrengthRatio(rebel);
         int n = targets.size();
-        StringBuffer sb = new StringBuffer(256);
+        StringBuilder sb = new StringBuilder(256);
         logSB(sb, "REF attacking ", rebel.getName(), " ratio=", ratio);
 
         // For each target search from the target position to find a
@@ -444,7 +444,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
      * {@inheritDoc}
      */
     @Override
-    public void giveNormalMissions(StringBuffer sb) {
+    public void giveNormalMissions(StringBuilder sb) {
         // Give military missions to all REF units.
         logSB(sb, "Military mission changes: ");
         for (AIUnit aiu : getAIUnits()) {

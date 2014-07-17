@@ -122,7 +122,7 @@ public class UnitTradeItem extends TradeItem {
      */
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer(16);
+        StringBuilder sb = new StringBuilder(16);
         sb.append("[").append(getId())
             .append(" ").append(unit.getId()).append("]");
         return sb.toString();

@@ -30,8 +30,9 @@ import java.util.logging.Logger;
 import java.util.logging.LogRecord;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.server.FreeColServer;
 
 
 /**
@@ -391,7 +392,7 @@ public class FreeColDebugger {
         for (StackTraceElement s : Thread.currentThread().getStackTrace()) {
             sb.append(s.toString()).append("\n");
         }
-        sb.deleteCharAt(sb.length()-1);
+        FreeColObject.sbShrink(sb, "\n");
         return sb.toString();
     }
 }

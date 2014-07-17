@@ -148,7 +148,7 @@ public class GoodsTradeItem extends TradeItem {
      */
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer(16);
+        StringBuilder sb = new StringBuilder(16);
         sb.append("[").append(getId())
             .append(" ").append(goods.getAmount()).append(" ")
             .append(Messages.message(goods.getNameKey())).append("]");

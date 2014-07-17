@@ -232,9 +232,9 @@ public class AIUnit extends AIObject implements Transportable {
      * The dynamic priority is reset.
      *
      * @param mission The new <code>Mission</code>.
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      */
-    public void changeMission(Mission mission, StringBuffer sb) {
+    public void changeMission(Mission mission, StringBuilder sb) {
         if (this.mission == mission) return;
         Location oldTarget;
 
@@ -355,9 +355,9 @@ public class AIUnit extends AIObject implements Transportable {
     /**
      * Performs the mission this unit has been assigned.
      *
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      */
-    public Mission doMission(StringBuffer sb) {
+    public Mission doMission(StringBuilder sb) {
         return (mission != null && mission.isValid()) ? mission.doMission(sb)
             : null;
     }

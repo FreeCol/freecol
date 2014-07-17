@@ -145,9 +145,9 @@ public class NativeAIPlayer extends AIPlayer {
      * Simple initialization of AI missions given that we know the starting
      * conditions.
      *
-     * @param sb An optional <code>StringBuffer</code>  to log to.
+     * @param sb An optional <code>StringBuilder</code>  to log to.
      */
-    private void initializeMissions(StringBuffer sb) {
+    private void initializeMissions(StringBuilder sb) {
         final AIMain aiMain = getAIMain();
         final Player player = getPlayer();
         logSB(sb, "\n  Initialize ");
@@ -174,18 +174,18 @@ public class NativeAIPlayer extends AIPlayer {
                 logSB(sb, u, "defend-", is, ", ");
             }
         }
-        if (sb != null) sb.setLength(sb.length() - 2);
+        sbShrink(sb, ", ");
     }
 
     /**
      * Determines the stances towards each player.
      * That is: should we declare war?
      *
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      */
-    private void determineStances(StringBuffer sb) {
+    private void determineStances(StringBuilder sb) {
         final Player player = getPlayer();
-        int point = (sb == null) ? -1 : sb.length();
+        int point = sbMark(sb);
 
         for (Player p : getGame().getLivePlayers(player)) {
             Stance newStance = determineStance(p);
@@ -196,10 +196,7 @@ public class NativeAIPlayer extends AIPlayer {
                       "->", newStance, ", ");
             }
         }
-        if (sb != null && sb.length() > point) {
-            sb.insert(point, "\n  Stance changes:");
-            sb.setLength(sb.length() - 2);
-        }
+        if (sbGrew(sb, point, "\n  Stance changes:")) sbShrink(sb, ", ");
     }
 
     /**
@@ -208,9 +205,9 @@ public class NativeAIPlayer extends AIPlayer {
      * units new missions.
      *
      * @param randoms An array of random settlement indexes.
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      */
-    private void secureSettlements(int[] randoms, StringBuffer sb) {
+    private void secureSettlements(int[] randoms, StringBuilder sb) {
         int randomIdx = 0;
         List<IndianSettlement> settlements
             = getPlayer().getIndianSettlements();
@@ -224,13 +221,11 @@ public class NativeAIPlayer extends AIPlayer {
             }
         }
         for (IndianSettlement is : settlements) {
-            int point = (sb == null) ? -1 : sb.length();
+            int point = sbMark(sb);
             equipBraves(is, sb);
             secureIndianSettlement(is, sb);
-            if (sb != null && sb.length() > point) {
-                sb.insert(point, "\n  At " + is.getName());
-                sb.setLength(sb.length() - 2);
-            }
+            if (sbGrew(sb, point,
+                         "\n  At " + is.getName())) sbShrink(sb, ", ");
         }
     }
 
@@ -239,9 +234,9 @@ public class NativeAIPlayer extends AIPlayer {
      * Public for the test suite.
      *
      * @param is The <code>IndianSettlement</code> where the equipping occurs.
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      */
-    public void equipBraves(IndianSettlement is, StringBuffer sb) {
+    public void equipBraves(IndianSettlement is, StringBuilder sb) {
         final Specification spec = getSpecification();
         final Role nativeDragoon = spec.getRole("model.role.nativeDragoon");
         final Role armedBrave = spec.getRole("model.role.armedBrave");
@@ -280,10 +275,10 @@ public class NativeAIPlayer extends AIPlayer {
      * Public for the test suite.
      *
      * @param is The <code>IndianSettlement</code> to secure.
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      */
     public void secureIndianSettlement(final IndianSettlement is,
-                                       StringBuffer sb) {
+                                       StringBuilder sb) {
         final AIMain aiMain = getAIMain();
         final Player player = getPlayer();
         final CombatModel cm = getGame().getCombatModel();
@@ -441,9 +436,9 @@ public class NativeAIPlayer extends AIPlayer {
     /**
      * Gives a mission to all units.
      *
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      */
-    private void giveNormalMissions(StringBuffer sb) {
+    private void giveNormalMissions(StringBuilder sb) {
         final AIMain aiMain = getAIMain();
         final Player player = getPlayer();
         final Specification spec = aiMain.getGame().getSpecification();
@@ -454,7 +449,7 @@ public class NativeAIPlayer extends AIPlayer {
             .getRequiredGoods();
         List<AIUnit> aiUnits = getAIUnits();
 
-        int point = (sb == null) ? -1 : sb.length();
+        int point = sbMark(sb);
         List<AIUnit> done = new ArrayList<AIUnit>();
         reasons.clear();
         for (AIUnit aiUnit : aiUnits) {
@@ -514,11 +509,8 @@ public class NativeAIPlayer extends AIPlayer {
         done.clear();
 
         // Log
-        if (sb != null) {
-            if (point < sb.length()) {
-                sb.insert(point, "\n  Mission changes: ");
-                sb.setLength(sb.length() - 2);
-            }
+        if (sbGrew(sb, point, "\n  Mission changes: ")) {
+            sbShrink(sb, ", ");
             if (!aiUnits.isEmpty()) {
                 logSB(sb, "\n  Free Land Units:");
                 for (AIUnit aiu : aiUnits) logSB(sb, " ", aiu.getUnit());
@@ -533,15 +525,15 @@ public class NativeAIPlayer extends AIPlayer {
      * Brings gifts to nice players with nearby colonies.
      *
      * @param randoms An array of random percentages.
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      */
-    private void bringGifts(int[] randoms, StringBuffer sb) {
+    private void bringGifts(int[] randoms, StringBuilder sb) {
         final Player player = getPlayer();
         final Map map = getGame().getMap();
         final CostDecider cd = CostDeciders.numberOfLegalTiles();
         final int giftProbability = getGame().getSpecification()
             .getInteger(GameOptions.GIFT_PROBABILITY);
-        int point = (sb == null) ? -1 : sb.length();
+        int point = sbMark(sb);
         int randomIdx = 0;
 
         for (IndianSettlement is : player.getIndianSettlements()) {
@@ -630,25 +622,22 @@ public class NativeAIPlayer extends AIPlayer {
             aiUnit.changeMission(m, sb);
             logSB(sb, " and takes ", gift, " to ", target.getName(), ", ");
         }
-        if (sb != null && sb.length() > point) {
-            sb.insert(point, "\n  Gifts: ");
-            sb.setLength(sb.length() - 2);
-        }
+        if (sbGrew(sb, point, "\n  Gifts: ")) sbShrink(sb, ", ");
     }
 
     /**
      * Demands tribute from nasty players with nearby colonies.
      *
      * @param randoms An array of random percentages.
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      */
-    private void demandTribute(int[] randoms, StringBuffer sb) {
+    private void demandTribute(int[] randoms, StringBuilder sb) {
         final Map map = getGame().getMap();
         final Player player = getPlayer();
         final CostDecider cd = CostDeciders.numberOfLegalTiles();
         final int demandProbability = getGame().getSpecification()
             .getInteger(GameOptions.DEMAND_PROBABILITY);
-        int point = (sb == null) ? -1 : sb.length();
+        int point = sbMark(sb);
         int randomIdx = 0;
 
         for (IndianSettlement is : player.getIndianSettlements()) {
@@ -736,10 +725,7 @@ public class NativeAIPlayer extends AIPlayer {
             aiUnit.changeMission(m, sb);
             logSB(sb, " and will demand of ", target, ", ");
         }
-        if (sb != null && sb.length() > point) {
-            sb.insert(point, "\n  Tribute: ");
-            sb.setLength(sb.length() - 2);
-        }
+        if (sbGrew(sb, point, "\n  Tribute: ")) sbShrink(sb, ", ");
     }
 
     /**
@@ -778,9 +764,9 @@ public class NativeAIPlayer extends AIPlayer {
         final int nSettlements = player.getNumberOfSettlements();
         final Random air = getAIRandom();
 
-        StringBuffer sb = null;
+        StringBuilder sb = null;
         if (logger.isLoggable(Level.FINEST)) {
-            sb = new StringBuffer(256);
+            sb = new StringBuilder(256);
             logSB(sb, player.getNation().getSuffix(),
                 " in ", turn, "/", turn.getNumber());
         }

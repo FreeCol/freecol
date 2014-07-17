@@ -511,16 +511,16 @@ public class UnitTest extends FreeColTestCase {
         String initial = "/" + Integer.toString(unit.getInitialMovesLeft()/3);
 
         String[] expected = new String[] {
-            "0", "(1/3) ", "(2/3) ", "1", "1 (1/3) ", "1 (2/3) ",
-            "2", "2 (1/3) ", "2 (2/3) ", "3", "3 (1/3) ", "3 (2/3) "
+            "0", "(1/3) ", "(2/3) ", "1", "1(1/3) ", "1(2/3) ",
+            "2", "2(1/3) ", "2(2/3) ", "3", "3(1/3) ", "3(2/3) "
         };
 
         for (int index = 0; index < expected.length; index++) {
             unit.setMovesLeft(index);
             String expectedString = expected[index] + initial;
             String actualString = unit.getMovesAsString();
-            assertEquals(expectedString + " != " + actualString,
-                expectedString, actualString);
+            assertTrue(expectedString + "!=" + actualString,
+                       expectedString.equals(actualString));
         }
     }
 

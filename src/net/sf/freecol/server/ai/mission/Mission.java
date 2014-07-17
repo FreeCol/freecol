@@ -501,11 +501,11 @@ public abstract class Mission extends AIObject {
      * @param target The destination <code>Location</code>.
      * @param costDecider The <code>CostDecider</code> to use in any path
      *     finding.
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      * @return The type of move the unit stopped at.
      */
     protected MoveType travelToTarget(Location target, CostDecider costDecider,
-                                      StringBuffer sb) {
+                                      StringBuilder sb) {
         final Tile targetTile = target.getTile();
         if (!(target instanceof Europe) && targetTile == null) {
             throw new IllegalStateException("Target neither Europe nor Tile");
@@ -608,10 +608,10 @@ public abstract class Mission extends AIObject {
      * than normal path completion.
      *
      * @param path The <code>PathNode</code> to follow.
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      * @return The type of move the unit stopped at.
      */
-    protected MoveType followPath(PathNode path, StringBuffer sb) {
+    protected MoveType followPath(PathNode path, StringBuilder sb) {
         final Unit unit = getUnit();
         final AIUnit aiUnit = getAIUnit();
         final Unit carrier = unit.getCarrier();
@@ -793,10 +793,10 @@ public abstract class Mission extends AIObject {
      * Retarget a mission because of some problem.
      *
      * @param reason The reason for the retarget.
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      * @return True if a non-null target was found.
      */
-    public boolean retargetMission(String reason, StringBuffer sb) {
+    public boolean retargetMission(String reason, StringBuilder sb) {
         final AIUnit aiu = getAIUnit();
         final Location loc = aiu.getTransportSource();
         String claim = (loc == null) ? "no-loc"
@@ -947,12 +947,12 @@ public abstract class Mission extends AIObject {
     /**
      * Performs the mission.
      *
-     * @param sb An optional <code>StringBuffer</code> to log to.
+     * @param sb An optional <code>StringBuilder</code> to log to.
      * @return The <code>Mission</code> to continue with, or null
      *     if the current mission has completed.
      * @return 
      */
-    public abstract Mission doMission(StringBuffer sb);
+    public abstract Mission doMission(StringBuilder sb);
 
 
     // Serialization

@@ -409,8 +409,9 @@ public final class FeatureContainer {
     public void removeFeatures(FreeColObject fco, String logMe) {
         FeatureContainer c = fco.getFeatureContainer();
         if (c == null) return;
-        StringBuffer sb = (!logger.isLoggable(Level.FINE)) ? null
-            : new StringBuffer(64);
+        StringBuilder sb = (!logger.isLoggable(Level.FINE)) ? null
+            : new StringBuilder(64);
+        int point = FreeColObject.sbMark(sb);
 
         Set<Entry<String, Set<Ability>>> ca = c.getAbilityEntries();
         if (ca != null && abilitiesPresent()) {
@@ -443,9 +444,7 @@ public final class FeatureContainer {
                 }
             }
         }
-        if (sb != null && sb.length() > 0) {
-            sb.insert(0, ", removed features:");
-            sb.insert(0, logMe);
+        if (FreeColObject.sbGrew(sb, point, logMe + ", removed features:")) {
             logger.fine(sb.toString());
         }
     }
