@@ -1732,13 +1732,30 @@ public class EuropeanAIPlayer extends AIPlayer {
         aiUnits.removeAll(done);
         done.clear();
 
-        // First try to satisfy the demand for missions with a defined quota.
-        // Builders first to keep weak players in the game, scouts next
-        // as they are profitable.
-        if (nBuilders > 0 || player.getNumberOfSettlements() <= 0) {
+        // First try to satisfy the demand for missions with a defined
+        // quota.  Builders first to keep weak players in the game,
+        // scouts next as they are profitable.  Pile onto any
+        // exisiting building mission if there are no colonies.
+        if (player.getNumberOfSettlements() <= 0 && bcm != null) {
             Collections.sort(aiUnits, builderComparator);
             for (AIUnit aiUnit : aiUnits) {
-                final Unit unit = aiUnit.getUnit();
+                Mission m = new BuildColonyMission(aiMain, aiUnit,
+                                                   bcm.getTarget());
+                if (m == null) continue;
+                done.add(aiUnit);
+                aiUnit.changeMission(m, lb);lb.add(", ");
+                if (requestsTransport(aiUnit)) {
+                    Utils.appendToMapList(transportSupply,
+                        upLoc(aiUnit.getTransportSource()), aiUnit);
+                }
+                reasons.put(aiUnit.getUnit(), "0Builder");
+            }
+            aiUnits.removeAll(done);
+            done.clear();
+        }
+        if (nBuilders > 0) {
+            Collections.sort(aiUnits, builderComparator);
+            for (AIUnit aiUnit : aiUnits) {
                 Mission m = getBuildColonyMission(aiUnit);
                 if (m == null) continue;
                 done.add(aiUnit);
@@ -1747,7 +1764,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                     Utils.appendToMapList(transportSupply,
                         upLoc(aiUnit.getTransportSource()), aiUnit);
                 }
-                reasons.put(unit, "Builder" + nBuilders);
+                reasons.put(aiUnit.getUnit(), "Builder" + nBuilders);
                 if (--nBuilders <= 0) break;
             }
             aiUnits.removeAll(done);
