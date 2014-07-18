@@ -30,6 +30,7 @@ import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.util.LogBuilder;
 
 import org.w3c.dom.Element;
 
@@ -122,6 +123,20 @@ public class GoodsWish extends Wish {
 
 
     /**
+     * Updates this <code>GoodsWish</code> with the given attributes.
+     *
+     * @param goodsType The <code>GoodsType</code> to wish for.
+     * @param amount The amount of goods.
+     * @param value The urgency of the wish.
+     */
+    public void update(GoodsType goodsType, int amount, int value) {
+        this.goodsType = goodsType;
+        this.amountRequested = amount;
+        setValue(value);
+        if (transportable != null) transportable.increaseTransportPriority();
+    }
+
+    /**
      * Checks if this <code>Wish</code> needs to be stored in a savegame.
      *
      * @return True.  We always store goods wishes.
@@ -141,18 +156,6 @@ public class GoodsWish extends Wish {
     }
 
     /**
-     * Does some specified goods satisfy this wish?
-     *
-     * @param goods The <code>Goods</code> to test.
-     * @return True if the goods type matches and amount is not less than
-     *     that requested.
-     */
-    public boolean satisfiedBy(Goods goods) {
-        return goods.getType() == goodsType
-            && goods.getAmount() >= amountRequested;
-    }
-
-    /**
      * Gets the amount of goods wished for.
      *
      * @return The amount of goods wished for.
@@ -167,9 +170,21 @@ public class GoodsWish extends Wish {
      * amount.
      *
      * @param amount The new amount of goods wished for.
-     */
     public void setGoodsAmount(int amount) {
         amountRequested = amount;
+    }
+     */
+
+    /**
+     * Does some specified goods satisfy this wish?
+     *
+     * @param goods The <code>Goods</code> to test.
+     * @return True if the goods type matches and amount is not less than
+     *     that requested.
+     */
+    public boolean satisfiedBy(Goods goods) {
+        return goods.getType() == goodsType
+            && goods.getAmount() >= amountRequested;
     }
 
     /**
@@ -244,15 +259,13 @@ public class GoodsWish extends Wish {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(32);
-        sb.append("[").append(getId())
-            .append(" for ").append(destination)
-            .append(" on ").append(transportable)
-            .append(" ").append(amountRequested)
-            .append(" ").append(goodsType.getSuffix())
-            .append("(").append(getValue())
-            .append(")]");
-        return sb.toString();
+        LogBuilder lb = new LogBuilder(32);
+        lb.add("[", getId(), " -> ", destination,
+            " ", amountRequested,
+            " ", ((goodsType == null) ? "null" : goodsType.getSuffix()),
+            "(", getValue(), ") ",
+            ((transportable == null) ? "" : transportable), "]");
+        return lb.toString();
     }
 
     /**

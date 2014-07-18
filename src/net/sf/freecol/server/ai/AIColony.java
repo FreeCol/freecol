@@ -981,8 +981,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             }
         }
         if (gw != null) {
-            gw.setGoodsAmount(amount);
-            gw.setValue(value);
+            gw.update(type, amount, value);
         } else {
             gw = new GoodsWish(getAIMain(), colony, value, amount, type);
             wishes.add(gw);

@@ -29,6 +29,7 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.util.LogBuilder;
 
 import org.w3c.dom.Element;
 
@@ -125,14 +126,15 @@ public class WorkerWish extends Wish {
     /**
      * Updates this <code>WorkerWish</code> with the given attributes.
      *
-     * @param value The urgency of the wish.
      * @param unitType The <code>UnitType</code> to wish for.
      * @param expertNeeded Is an expert unit required?
+     * @param value The urgency of the wish.
      */
     public void update(UnitType unitType, boolean expertNeeded, int value) {
         setValue(value);
         this.unitType = unitType;
         this.expertNeeded = expertNeeded;
+        if (transportable != null) transportable.increaseTransportPriority();
     }
 
     /**
@@ -231,14 +233,12 @@ public class WorkerWish extends Wish {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(64);
-        sb.append("[").append(getId())
-            .append(" for ").append(destination)
-            .append(" ").append((unitType == null) ? "null" : unitType.getSuffix())
-            .append("(").append(getValue())
-            .append((expertNeeded) ? ", expert" : "")
-            .append(")]");
-        return sb.toString();
+        LogBuilder lb = new LogBuilder(64);
+        lb.add("[", getId(), " -> ", destination,
+            " ", ((unitType == null) ? "null" : unitType.getSuffix()),
+            "(", getValue(), ((expertNeeded) ? "/expert" : ""), ") ",
+            ((transportable == null) ? "" : transportable), "]");
+        return lb.toString();
     }
 
     /**

@@ -1171,7 +1171,7 @@ public class TransportMission extends Mission {
                     if (a >= gw.getGoodsAmount()) {
                         euaip.consumeGoodsWish(aig, gw);
                     } else {
-                        gw.setGoodsAmount(gw.getGoodsAmount() - a);
+                        gw.update(type, gw.getGoodsAmount() - a, gw.getValue());
                     }
                     lb.add(aig, " to ", loc, ", ");
                     return true;
