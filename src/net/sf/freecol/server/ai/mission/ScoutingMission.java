@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIUnit;
@@ -399,13 +400,13 @@ public class ScoutingMission extends Mission {
     /**
      * {@inheritDoc}
      */
-    public Mission doMission(StringBuilder sb) {
-        logSB(sb, tag);
+    public Mission doMission(LogBuilder lb) {
+        lb.add(tag);
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            if (!retargetMission(reason, sb)) return null;
+            if (!retargetMission(reason, lb)) return null;
         } else if (reason != null) {
-            logSBbroken(sb, reason);
+            lbBroken(lb, reason);
             return null;
         }
 
@@ -414,7 +415,7 @@ public class ScoutingMission extends Mission {
         final Unit unit = getUnit();
         Direction d;
         Unit.MoveType mt = travelToTarget(getTarget(),
-            CostDeciders.avoidSettlementsAndBlockingUnits(), sb);
+            CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
         switch (mt) {
         case MOVE_ILLEGAL:
         case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
@@ -429,16 +430,16 @@ public class ScoutingMission extends Mission {
             // (directed if possible) move and try again.
             moveRandomly(tag, unit.getTile()
                 .getDirection(getTarget().getTile()));
-            logSBdodge(sb, unit);
+            lbDodge(lb, unit);
             return this;
 
         case ENTER_INDIAN_SETTLEMENT_WITH_SCOUT:
             d = unit.getTile().getDirection(getTarget().getTile());
             assert d != null;
             if (AIMessage.askScoutSpeakToChief(aiUnit, d)) {
-                logSBdone(sb, "speak-with-chief at ", getTarget());
+                lbDone(lb, "speak-with-chief at ", getTarget());
             } else {
-                logSBfail(sb, " unexpected failure to speak at ", getTarget());
+                lbFail(lb, " unexpected failure to speak at ", getTarget());
             }
             break;
 
@@ -446,18 +447,18 @@ public class ScoutingMission extends Mission {
             d = unit.getTile().getDirection(getTarget().getTile());
             assert d != null;
             if (AIMessage.askMove(aiUnit, d)) {
-                logSBdone(sb, tag, "explore at ", getTarget());
+                lbDone(lb, tag, "explore at ", getTarget());
             } else {
-                logSBfail(sb, tag, "unexpected failure at ", getTarget());
+                lbFail(lb, tag, "unexpected failure at ", getTarget());
             }
             break;
 
         default:
-            logSBmove(sb, unit, mt);
+            lbMove(lb, unit, mt);
             return this;
         }
         if (unit.isDisposed()) {
-            logSB(sb, ", died at target ", getTarget(), ".");
+            lb.add(", died at target ", getTarget(), ".");
             return null;
         }
 
@@ -471,17 +472,16 @@ public class ScoutingMission extends Mission {
             if (canScoutNatives(aiUnit)) {
                 aiUnit.equipForRole(Specification.DEFAULT_ROLE_ID, false);
             }
-            logSBfail(sb, " arrived at ", completed,
-                " but found no targets");
+            lbFail(lb, " arrived at ", completed, " but found no targets");
             return null;
         }
         if (newTarget == null) {
-            logSB(sb, " at ", completed, " but found no targets");
+            lb.add(" at ", completed, " but found no targets");
             return null;
         }
 
         setTarget(newTarget);
-        logSB(sb, " retargeting ", newTarget);
+        lb.add(" retargeting ", newTarget);
         return this;
     }
 

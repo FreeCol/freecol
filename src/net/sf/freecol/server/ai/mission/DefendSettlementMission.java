@@ -39,6 +39,7 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIUnit;
@@ -305,20 +306,20 @@ public class DefendSettlementMission extends Mission {
     /**
      * {@inheritDoc}
      */
-    public Mission doMission(StringBuilder sb) {
-        logSB(sb, tag);
+    public Mission doMission(LogBuilder lb) {
+        lb.add(tag);
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            if (!retargetMission(reason, sb)) return null;
+            if (!retargetMission(reason, lb)) return null;
         } else if (reason != null) {
-            logSBbroken(sb, reason);
+            lbBroken(lb, reason);
             return null;
         }
 
         // Go to the target!
         final Unit unit = getUnit();
         Unit.MoveType mt = travelToTarget(getTarget(),
-            CostDeciders.avoidSettlementsAndBlockingUnits(), sb);
+            CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
         switch (mt) {
         case MOVE:
             break;
@@ -326,7 +327,7 @@ public class DefendSettlementMission extends Mission {
         case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
             return this;
         default:
-            logSBmove(sb, unit, mt);
+            lbMove(lb, unit, mt);
             return this;
         }
 
@@ -339,7 +340,7 @@ public class DefendSettlementMission extends Mission {
             Colony colony = (Colony)getTarget();
             if (unit.isInColony()
                 || (unit.isPerson() && colony.getUnitCount() <= 1)) {
-                logSB(sb, " bolster ", colony, ".");
+                lb.add(" bolster ", colony, ".");
                 return new WorkInsideColonyMission(aiMain, aiUnit,
                     aiMain.getAIColony(colony));
             }
@@ -348,7 +349,7 @@ public class DefendSettlementMission extends Mission {
         // Anything more to do?
         if (unit.getState() == UnitState.FORTIFIED
             || unit.getState() == UnitState.FORTIFYING) {
-            logSB(sb, ", fortified.");
+            lb.add(", fortified.");
             return this;
         }
 
@@ -376,7 +377,7 @@ public class DefendSettlementMission extends Mission {
             } else {
                 logMe = ", fortify failed at ";
             }
-            logSB(sb, logMe, settlement, ".");
+            lb.add(logMe, settlement, ".");
             return this;
         }
 
@@ -385,7 +386,7 @@ public class DefendSettlementMission extends Mission {
         // sole unit attacking because if it loses, the settlement
         // will collapse (and the combat model does not handle that).
         if (!unit.isOffensiveUnit()) {
-            logSBbroken(sb, "not-offensive-unit");
+            lbBroken(lb, "not-offensive-unit");
             return null;
         }
         final CombatModel cm = unit.getGame().getCombatModel();
@@ -420,11 +421,11 @@ public class DefendSettlementMission extends Mission {
         // Attack if a target is available.
         if (bestTarget != null) {
             AIMessage.askAttack(getAIUnit(), bestDirection);
-            logSBattack(sb, bestTarget);
+            lbAttack(lb, bestTarget);
             return (unit.isDisposed()) ? null : this;
         }
 
-        logSB(sb, " alert at ", getTarget(), ".");
+        lb.add(" alert at ", getTarget(), ".");
         return this;
     }
     

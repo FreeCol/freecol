@@ -29,6 +29,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.control.InGameController;
@@ -110,7 +111,7 @@ public class TensionTest extends FreeColTestCase {
         assertEquals(Stance.PEACE, stance);
 
         // ask the AI to secure the settlement
-        indianAI.secureIndianSettlement(settlement, null);
+        indianAI.secureIndianSettlement(settlement, new LogBuilder(0));
 
         // the tension and stance have not changed
         tension = indian.getTension(european);

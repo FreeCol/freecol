@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -46,6 +47,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
 import net.sf.freecol.server.ai.mission.Mission;
@@ -180,13 +182,10 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         }
         Collections.sort(targets);
 
-        StringBuilder sb = new StringBuilder(32);
-        sb.append("REF found colony targets:");
-        for (TargetTuple t : targets) {
-            sb.append(" ").append(t.colony.getName())
-                .append("(").append(t.score).append(")");
-        }
-        logger.fine(sb.toString());
+        LogBuilder lb = new LogBuilder(logger, Level.FINE);
+        lb.add("REF found colony targets:");
+        for (TargetTuple t : targets) lb.add(" ", t.colony, "(", t.score, ")");
+        lb.flush();
         return targets;
     }
 
@@ -251,8 +250,8 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         final Player rebel = targets.get(0).colony.getOwner();
         double ratio = getStrengthRatio(rebel);
         int n = targets.size();
-        StringBuilder sb = new StringBuilder(256);
-        logSB(sb, "REF attacking ", rebel.getName(), " ratio=", ratio);
+        LogBuilder lb = new LogBuilder(logger, Level.FINE);
+        lb.add("REF attacking ", rebel.getName(), " ratio=", ratio);
 
         // For each target search from the target position to find a
         // Tile to disembark to.  If teleporting in, the navy will
@@ -276,19 +275,19 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         }
         if (fail > 0) {
             if (fail < n) { // Drop targets without a decent disembark tile
-                sb.append(" (");
+                lb.add(" (");
                 int i = 0;
                 while (i < targets.size()) {
                     final TargetTuple t = targets.get(i);
                     if (t.disembarkTile == null) {
-                        sb.append(" ").append(t.colony.getName());
+                        lb.add(" ", t.colony);
                         targets.remove(i);
                         n--;
                     } else {
                         i++;
                     }
                 }
-                sb.append(")");
+                lb.add(")");
             } else { // They were all bad, just use the existing simple path
                 for (int i = 0; i < n; i++) {
                     final TargetTuple t = targets.get(i);
@@ -301,7 +300,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         n = (ratio < 1.0) ? 1 // Just go for one place
             : (ratio < 2.0) ? Math.min(2, targets.size())
             : Math.min(3, targets.size());
-        sb.append(" => #targets=").append(n);
+        lb.add(" => #targets=", n);
 
         if (!teleport) {
             // Try to arrive on the map without being seen, while retaining
@@ -335,8 +334,8 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         for (int i = 0; i < n; i++) {
             if (!auIterator.hasNext()) break;
             final TargetTuple t = targets.get(i);
-            logSB(sb, "\n  Attack ", t.colony.getName(), " from ", t.entry,
-                " via ", t.disembarkTile, " with ");
+            lb.add("\n  Attack ", t.colony, " from ", t.entry,
+                   " via ", t.disembarkTile, " with ");
             while (auIterator.hasNext()) {
                 AIUnit aiu = auIterator.next();
                 if (!aiu.getUnit().isNaval()) continue;
@@ -350,7 +349,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                 } else {
                     ship.setEntryLocation(t.entry);
                 }
-                logSB(sb, "[", ship);
+                lb.add("[", ship);
                 used = 0;
                 for (Unit u : aiu.getUnit().getUnitList()) {
                     AIUnit laiu = aiMain.getAIUnit(u);
@@ -358,9 +357,9 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                                                               t.colony);
                     laiu.setMission(m);
                     used++;
-                    logSB(sb, " ", u);
+                    lb.add(" ", u);
                 }
-                logSB(sb, " ]");
+                lb.add(" ]");
                 TransportMission tm = new TransportMission(aiMain, aiu);
                 aiu.setMission(tm);
                 if (i < n-1 && used >= (int)Math.floor(land * 0.66)) {
@@ -412,18 +411,17 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                 start = Utils.getRandomMember(logger, "REF patrol entry",
                                               entries, aiRandom);
                 u.setEntryLocation(start);
-                logSB(sb, "\n  Patrol from ", start, " with ", u);
+                lb.add("\n  Patrol from ", start, " with ", u);
             } else {
                 Mission m = new UnitSeekAndDestroyMission(aiMain, aiu, enemy);
                 aiu.setMission(m);
                 start = u.getBestEntryTile(enemy.getTile());
                 u.setEntryLocation(start);
                 entries.add(start);
-                logSB(sb, "\n  Suppress ", enemy, " from ", start,
-                      " with ", u);
+                lb.add("\n  Suppress ", enemy, " from ", start, " with ", u);
             }
         }
-        logger.fine(sb.toString());
+        lb.flush();
         return true;
     }
 
@@ -444,9 +442,9 @@ public class REFAIPlayer extends EuropeanAIPlayer {
      * {@inheritDoc}
      */
     @Override
-    public void giveNormalMissions(StringBuilder sb) {
+    public void giveNormalMissions(LogBuilder lb) {
         // Give military missions to all REF units.
-        logSB(sb, "Military mission changes: ");
+        lb.add("Military mission changes: ");
         for (AIUnit aiu : getAIUnits()) {
             Unit u = aiu.getUnit();
             if (u.isNaval() || aiu.hasMission()) continue;
@@ -455,17 +453,17 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                     seekAndDestroyRange, false);
                 if (target == null) {
                     Mission m = new UnitWanderHostileMission(getAIMain(), aiu);
-                    aiu.changeMission(m, sb);
-                } else {                    
+                    aiu.changeMission(m, lb);
+                } else {
                     Mission m = new UnitSeekAndDestroyMission(getAIMain(), aiu,
                                                               target);
-                    aiu.changeMission(m, sb);
+                    aiu.changeMission(m, lb);
                 }
             }
         }
 
         // Fall back to the normal EuropeanAI behaviour for non-army.
-        super.giveNormalMissions(sb);
+        super.giveNormalMissions(lb);
     }
 
 

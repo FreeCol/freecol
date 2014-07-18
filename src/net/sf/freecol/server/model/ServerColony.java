@@ -52,6 +52,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.See;
@@ -320,9 +321,9 @@ public class ServerColony extends Colony implements ServerModelObject {
         // Do not flush price changes yet, as any price change may change
         // yet again in csYearlyGoodsAdjust.
         if (hasAbility(Ability.EXPORT)) {
-            StringBuilder sb = new StringBuilder(64);
-            sb.append(" ");
-            int point = sbMark(sb);
+            LogBuilder lb = new LogBuilder(64);
+            lb.add(" ");
+            lb.mark();
             for (Goods goods : getCompactGoods()) {
                 GoodsType type = goods.getType();
                 ExportData data = getExportData(type);
@@ -339,15 +340,15 @@ public class ServerColony extends Colony implements ServerModelObject {
                     .addAmount("%amount%", amount)
                     .add("%goods%", type.getNameKey())
                     .addAmount("%gold%", (owner.getGold() - oldGold));
-                sb.append(Messages.message(st) + ", ");
+                lb.add(Messages.message(st), ", ");
             }
-            if (sbGrew(sb, point, null)) {
-                sbShrink(sb, ", ");
+            if (lb.grew()) {
+                lb.shrink(", ");
                 cs.addMessage(See.only(owner),
                     new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT,
                                      "customs.sale", this)
                         .addName("%colony%", getName())
-                        .addName("%data%", sb.toString()));
+                        .addName("%data%", lb.toString()));
                 cs.addPartial(See.only(owner), owner, "gold");
             }
         }

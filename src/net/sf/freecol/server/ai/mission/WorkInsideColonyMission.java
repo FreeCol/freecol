@@ -28,6 +28,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIUnit;
@@ -150,31 +151,31 @@ public class WorkInsideColonyMission extends Mission {
     /**
      * {@inheritDoc}
      */
-    public Mission doMission(StringBuilder sb) {
-        logSB(sb, tag);
+    public Mission doMission(LogBuilder lb) {
+        lb.add(tag);
         String reason = invalidReason();
         if (reason != null) {
-            logSBbroken(sb, reason);
+            lbBroken(lb, reason);
             return null;
         }
 
         final Unit unit = getUnit();
         Unit.MoveType mt = travelToTarget(getTarget(),
-            CostDeciders.avoidSettlementsAndBlockingUnits(), sb);
+            CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
         switch (mt) {
         case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
             break;
 
         case MOVE: // Arrived
             if (unit.isInColony()) {
-                logSB(sb, ", working ", unit.getLocation(), ".");
+                lb.add(", working ", unit.getLocation(), ".");
             } else {
-                logSB(sb, ", arrived at ", getTarget(), ".");
+                lb.add(", arrived at ", getTarget(), ".");
             }
             break;
 
         default:
-            logSBmove(sb, unit, mt);
+            lbMove(lb, unit, mt);
             break;
         }
         return this;

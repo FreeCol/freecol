@@ -30,6 +30,7 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIUnit;
@@ -157,11 +158,11 @@ public class WishRealizationMission extends Mission {
     /**
      * {@inheritDoc}
      */
-    public Mission doMission(StringBuilder sb) {
-        logSB(sb, tag);
+    public Mission doMission(LogBuilder lb) {
+        lb.add(tag);
         String reason = invalidReason();
         if (reason != null) {
-            logSBbroken(sb, reason);
+            lbBroken(lb, reason);
             return null;
         }
 
@@ -169,7 +170,7 @@ public class WishRealizationMission extends Mission {
         final Unit unit = getUnit();
         Location target = getTarget();
         Unit.MoveType mt = travelToTarget(target,
-            CostDeciders.avoidSettlementsAndBlockingUnits(), sb);
+            CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
         switch (mt) {
         case MOVE:
             break;
@@ -177,7 +178,7 @@ public class WishRealizationMission extends Mission {
         case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
             return this;
         default:
-            logSBmove(sb, unit, mt);
+            lbMove(lb, unit, mt);
             return this;
         }
 
@@ -190,20 +191,21 @@ public class WishRealizationMission extends Mission {
             // Replace the mission, with a defensive one if this is a
             // military unit or a simple working one if not.
             if (unit.getType().isOffensive()) {
-                logSBdone(sb, " ready to defend ", colony);
+                lbDone(lb, " ready to defend ", colony);
                 return new DefendSettlementMission(aiMain, aiUnit, colony);
             } else {                
                 aiColony.requestRearrange();
-                logSBdone(sb, " ready to work at ", colony);
+                lbDone(lb, " ready to work at ", colony);
                 return new WorkInsideColonyMission(aiMain, aiUnit, aiColony);
             }
         } else {
-            logSBfail(sb, " broken wish: ", wish);
+            lbFail(lb, " broken wish: ", wish);
             wish.dispose();
             wish = null;
             return null;
         }
     }
+
 
     // Serialization
 

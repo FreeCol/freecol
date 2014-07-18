@@ -30,6 +30,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.util.LogBuilder;
+
 
 /**
  * A container to hold abilities and modifiers for some FreeColObject-subclass.
@@ -409,9 +411,8 @@ public final class FeatureContainer {
     public void removeFeatures(FreeColObject fco, String logMe) {
         FeatureContainer c = fco.getFeatureContainer();
         if (c == null) return;
-        StringBuilder sb = (!logger.isLoggable(Level.FINE)) ? null
-            : new StringBuilder(64);
-        int point = FreeColObject.sbMark(sb);
+        LogBuilder lb = new LogBuilder(logger, Level.FINE);
+        lb.mark();
 
         Set<Entry<String, Set<Ability>>> ca = c.getAbilityEntries();
         if (ca != null && abilitiesPresent()) {
@@ -422,7 +423,7 @@ public final class FeatureContainer {
                     for (Ability a : new HashSet<Ability>(abilitySet)) {
                         if (a.getSource() == fco) {
                             abilitySet.remove(a);
-                            FreeColObject.logSB(sb, " ", a.getId());
+                            lb.add(" ", a.getId());
                         }
                     }
                 }
@@ -438,15 +439,13 @@ public final class FeatureContainer {
                     for (Modifier m : new HashSet<Modifier>(modifierSet)) {
                         if (m.getSource() == fco) {
                             modifierSet.remove(m);
-                            FreeColObject.logSB(sb, " ", m.getId());
+                            lb.add(" ", m.getId());
                         }
                     }
                 }
             }
         }
-        if (FreeColObject.sbGrew(sb, point, logMe + ", removed features:")) {
-            logger.fine(sb.toString());
-        }
+        if (lb.grew(logMe, ", removed features:")) lb.flush();
     }
 
     /**

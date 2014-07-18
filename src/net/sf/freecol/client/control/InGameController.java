@@ -108,6 +108,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.UnitWas;
 import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.ServerAPI;
 import net.sf.freecol.common.option.BooleanOption;
@@ -535,15 +536,14 @@ public final class InGameController implements NetworkConstants {
 
         // If required accumulate a summary of all the activity of
         // this unit on its trade route into this string buffer.
-        StringBuilder sb = (tr.isSilent()) ? null : new StringBuilder(128);
-        int topPoint = FreeColObject.sbMark(sb);
+        LogBuilder lb = new LogBuilder((tr.isSilent()) ? -1 : 256);
+        lb.mark();
 
         for (;;) {
             stop = unit.getStop();
             // Complain and return if the stop is no longer valid.
             if (!TradeRoute.isStopValid(unit, stop)) {
-                FreeColObject.logSB(sb, " ",
-                    stopMessage("tradeRoute.invalidStop", stop, player));
+                lb.add(" ", stopMessage("tradeRoute.invalidStop", stop, player));
                 clearOrders(unit);
                 result = true;
                 break;
@@ -560,18 +560,16 @@ public final class InGameController implements NetworkConstants {
                     + (FreeColGameObject)stop.getLocation());
             }
             if (atStop) {
-                int point = FreeColObject.sbMark(sb);
+                if (detailed) lb.mark();
+
                 // Anything to unload?
-                unloadUnitAtStop(unit, (sb != null && detailed) ? sb : null);
+                unloadUnitAtStop(unit, (detailed) ? lb : null);
 
                 // Anything to load?
-                loadUnitAtStop(unit, (sb != null && detailed) ? sb : null);
+                loadUnitAtStop(unit, (detailed) ? lb : null);
 
                 // Wrap load/unload messages.
-                if (detailed) {
-                    FreeColObject.sbGrew(sb, point,
-                        " " + stopMessage("tradeRoute.atStop", stop, player));
-                }
+                if (detailed) lb.grew(" ", stopMessage("tradeRoute.atStop", stop, player));
 
                 // If the un/load consumed the moves, break now before
                 // updating the stop.  This allows next move to arrive
@@ -590,9 +588,8 @@ public final class InGameController implements NetworkConstants {
                 // messages notifying that a stop has been skipped.
                 int next = unit.validateCurrentStop();
                 if (next == index) {
-                    if (sb != null && detailed) {
-                        sb.append(" ")
-                            .append(Messages.message("tradeRoute.wait"));
+                    if (detailed) {
+                        lb.add(" ", Messages.message("tradeRoute.wait"));
                     }
                     // Prevent reselection
                     askServer().changeState(unit, UnitState.SKIPPED);
@@ -601,10 +598,9 @@ public final class InGameController implements NetworkConstants {
                 for (;;) {
                     if (++index >= stops.size()) index = 0;
                     if (index == next) break;
-                    if (sb != null && detailed) {
-                        sb.append(" ")
-                            .append(stopMessage("tradeRoute.skipStop",
-                                    stops.get(index), player));
+                    if (detailed) {
+                        lb.add(" ", stopMessage("tradeRoute.skipStop",
+                                                stops.get(index), player));
                     }
                 }
 
@@ -616,10 +612,8 @@ public final class InGameController implements NetworkConstants {
             if (unit.getMovesLeft() <= 0
                 || unit.getState() == UnitState.SKIPPED
                 || !more) {
-                if (sb != null && detailed) {
-                    sb.append(" ")
-                        .append(stopMessage("tradeRoute.toStop",
-                                            stop, player));
+                if (detailed) {
+                    lb.add(" ", stopMessage("tradeRoute.toStop", stop, player));
                 }
                 break;
             }
@@ -628,8 +622,7 @@ public final class InGameController implements NetworkConstants {
             Location destination = stop.getLocation();
             PathNode path = unit.findPath(destination);
             if (path == null) {
-                FreeColObject.logSB(sb, " ",
-                    stopMessage("tradeRoute.pathStop", stop, player));
+                lb.add(" ", stopMessage("tradeRoute.pathStop", stop, player));
                 unit.setState(UnitState.SKIPPED);
                 break;
             }
@@ -642,12 +635,12 @@ public final class InGameController implements NetworkConstants {
             }
         }
 
-        if (FreeColObject.sbGrew(sb, topPoint, null)) {
+        if (lb.grew()) {
             ModelMessage m = new ModelMessage(MessageType.GOODS_MOVEMENT,
                                               "tradeRoute.prefix", unit)
                 .addName("%route%", tr.getName())
                 .addStringTemplate("%unit%", unit.getFullLabel())
-                .addName("%data%", sb.toString());
+                .addName("%data%", lb.toString());
             if (messages != null) {
                 messages.add(m);
             } else {
@@ -661,10 +654,10 @@ public final class InGameController implements NetworkConstants {
      * Work out what goods to load onto a unit at a stop, and load them.
      *
      * @param unit The <code>Unit</code> to load.
-     * @param sb An optional <code>StringBuilder</code> to update.
+     * @param lb A <code>LogBuilder</code> to update.
      * @return True if goods were loaded.
      */
-    private boolean loadUnitAtStop(Unit unit, StringBuilder sb) {
+    private boolean loadUnitAtStop(Unit unit, LogBuilder lb) {
         final Game game = freeColClient.getGame();
         final Colony colony = unit.getColony();
         final Location loc = (unit.isInEurope())
@@ -715,13 +708,13 @@ public final class InGameController implements NetworkConstants {
                 int amount = Math.min(demand, export);
                 Goods cargo = new Goods(game, loc, type, amount);
                 if (loadGoods(cargo, unit)) {
-                    FreeColObject.logSB(sb, " ",
+                    if (lb != null) lb.add(" ",
                         getLoadGoodsMessage(unit, type, amount,
                                             present, export, demand));
                     ret = true;
                 }
             } else if (present > 0) {
-                FreeColObject.logSB(sb, " ",
+                if (lb != null) lb.add(" ",
                     getLoadGoodsMessage(unit, type, 0, present, 0, demand));
             }
         }
@@ -769,10 +762,10 @@ public final class InGameController implements NetworkConstants {
      * Work out what goods to unload from a unit at a stop, and unload them.
      *
      * @param unit The <code>Unit</code> to unload.
-     * @param sb An optional <code>StringBuilder</code> to update.
+     * @param lb A <code>LogBuilder</code> to update.
      * @return True if something was unloaded.
      */
-    private boolean unloadUnitAtStop(Unit unit, StringBuilder sb) {
+    private boolean unloadUnitAtStop(Unit unit, LogBuilder lb) {
         Colony colony = unit.getColony();
         TradeRouteStop stop = unit.getStop();
         final List<GoodsType> goodsTypesToLoad = stop.getCargo();
@@ -824,7 +817,7 @@ public final class InGameController implements NetworkConstants {
             Goods cargo = new Goods(game, unit, type, amount);
             ret = (cargo.getAmount() == 0) ? false
                 : unloadGoods(cargo, unit, colony);
-            FreeColObject.logSB(sb, " ",
+            if (lb != null) lb.add(" ",
                 getUnloadGoodsMessage(unit, type, amount,
                                       present, atStop, toUnload));
         }
@@ -1674,38 +1667,37 @@ public final class InGameController implements NetworkConstants {
             }
         }
 
-        StringBuilder sb = new StringBuilder(256);
-        int point = FreeColObject.sbMark(sb);
+        LogBuilder lb = new LogBuilder(256);
+        lb.mark();
         if (landLocked) {
-            sb.append(Messages.message("buildColony.landLocked")).append("\n");
+            lb.add(Messages.message("buildColony.landLocked"), "\n");
         }
         if (food < 8) {
-            sb.append(Messages.message("buildColony.noFood")).append("\n");
+            lb.add(Messages.message("buildColony.noFood"), "\n");
         }
         for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
             if (!entry.getKey().isFoodType()
                 && entry.getValue().intValue() < 4) {
-                sb.append(Messages.message(StringTemplate
+                lb.add(Messages.message(StringTemplate
                         .template("buildColony.noBuildingMaterials")
-                        .add("%goods%", entry.getKey().getNameKey())))
-                    .append("\n");
+                        .add("%goods%", entry.getKey().getNameKey())),
+                    "\n");
             }
         }
 
         if (ownedBySelf) {
-            sb.append(Messages.message("buildColony.ownLand")).append("\n");
+            lb.add(Messages.message("buildColony.ownLand"), "\n");
         }
         if (ownedByEuropeans) {
-            sb.append(Messages.message("buildColony.EuropeanLand"))
-                .append("\n");
+            lb.add(Messages.message("buildColony.EuropeanLand"), "\n");
         }
         if (ownedByIndians) {
-            sb.append(Messages.message("buildColony.IndianLand")).append("\n");
+            lb.add(Messages.message("buildColony.IndianLand"), "\n");
         }
 
-        return (!FreeColObject.sbGrew(sb, point, null)) ? true
+        return (!lb.grew()) ? true
             : gui.showConfirmDialog(true, unit.getTile(),
-                                    StringTemplate.label(sb.toString()), unit,
+                                    StringTemplate.label(lb.toString()), unit,
                                     "buildColony.yes", "buildColony.no");
     }
 

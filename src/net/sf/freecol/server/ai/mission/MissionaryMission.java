@@ -41,6 +41,7 @@ import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIUnit;
@@ -368,13 +369,13 @@ public class MissionaryMission extends Mission {
     /**
      * {@inheritDoc}
      */
-    public Mission doMission(StringBuilder sb) {
-        logSB(sb, tag);
+    public Mission doMission(LogBuilder lb) {
+        lb.add(tag);
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            if (!retargetMission(reason, sb)) return null;
+            if (!retargetMission(reason, lb)) return null;
         } else if (reason != null) {
-            logSBbroken(sb, reason);
+            lbBroken(lb, reason);
             return null;
         }
 
@@ -383,7 +384,7 @@ public class MissionaryMission extends Mission {
         final Unit unit = getUnit();
         for (;;) {
             Unit.MoveType mt = travelToTarget(getTarget(),
-                CostDeciders.avoidSettlementsAndBlockingUnits(), sb);
+                CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
             switch (mt) {
             case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
                 return this;
@@ -395,11 +396,11 @@ public class MissionaryMission extends Mission {
                 Location newTarget = findTarget(aiUnit, 20, false);
                 if (newTarget == null || newTarget == completed) {
                     setTarget(null);
-                    logSB(sb, ", reached ", completed, ", retarget failed.");
+                    lb.add(", reached ", completed, ", retarget failed.");
                     return null;
                 }
                 setTarget(newTarget);
-                logSB(sb, tag, " reached ", completed,
+                lb.add(tag, " reached ", completed,
                     ", retargeted " + newTarget);
                 break;
 
@@ -410,17 +411,17 @@ public class MissionaryMission extends Mission {
                 AIMessage.askEstablishMission(aiUnit, d, is.hasMissionary());
                 setTarget(null);
                 if (unit.isDisposed()) {
-                    logSBfail(sb, "died at ", is);
+                    lbFail(lb, "died at ", is);
                 } else if (is.hasMissionary(unit.getOwner())
                     && unit.isInMission()) {
-                    logSBdone(sb, "at ", is);
+                    lbDone(lb, "at ", is);
                 } else {
-                    logSBfail(sb, "unexpected failure at ", is);
+                    lbFail(lb, "unexpected failure at ", is);
                 }
                 return null;
 
             default:
-                logSBmove(sb, unit, mt);
+                lbMove(lb, unit, mt);
                 return this;
             }
         }

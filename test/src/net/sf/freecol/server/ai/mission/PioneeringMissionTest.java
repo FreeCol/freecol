@@ -33,6 +33,7 @@ import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
@@ -55,6 +56,7 @@ public class PioneeringMissionTest extends FreeColTestCase {
     private static final UnitType colonistType
         = spec().getUnitType("model.unit.freeColonist");
 
+    private LogBuilder lb = new LogBuilder(0);
 
 
     @Override
@@ -82,12 +84,12 @@ public class PioneeringMissionTest extends FreeColTestCase {
         aiUnit.setMission(null);
 
         // Check there are improvements to be made.
-        aiColony.updateTileImprovementPlans(null);
+        aiColony.updateTileImprovementPlans(lb);
         List<TileImprovementPlan> improvements
             = aiColony.getTileImprovementPlans();
         assertTrue("There should be valid improvements",
                    !improvements.isEmpty());
-        aiPlayer.buildTipMap(null);
+        aiPlayer.buildTipMap(lb);
         assertTrue("The player should need pioneers",
                    aiPlayer.pioneersNeeded() > 0);
 
@@ -134,7 +136,7 @@ public class PioneeringMissionTest extends FreeColTestCase {
         Tile target = tip.getTarget();
         assertNotNull("Plan should have a target",
                       target);
-        aiUnit.changeMission(mission, null);
+        aiUnit.changeMission(mission, lb);
         assertEquals("Mission should stick", mission,
                      aiUnit.getMission());
     }

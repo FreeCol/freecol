@@ -82,6 +82,7 @@ import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
@@ -352,12 +353,12 @@ public class EuropeanAIPlayer extends AIPlayer {
      * Simple initialization of AI missions given that we know the starting
      * conditions.
      *
-     * @param sb An optional <code>StringBuilder</code> to log to.
+     * @param lb A <code>LogBuilder</code> to log to.
      */
-    private void initializeMissions(StringBuilder sb) {
+    private void initializeMissions(LogBuilder lb) {
         final AIMain aiMain = getAIMain();
         List<AIUnit> aiUnits = getAIUnits();
-        logSB(sb, "\n  Initialize");
+        lb.add("\n  Initialize");
 
         // Find all the carriers with potential colony builders on board,
         // give them missions.
@@ -380,11 +381,11 @@ public class EuropeanAIPlayer extends AIPlayer {
                     if (target != null) break;
                 }
                 if (target == null) throw new RuntimeException("Initial colony fail!");
-                logSB(sb, " ");
+                lb.add(" ");
                 aiu.changeMission(new BuildColonyMission(aiMain, aiu, target),
-                                  sb);
+                                  lb);
             }
-            logSB(sb, " ", aiCarrier.getMission());
+            lb.add(" ", aiCarrier.getMission());
         }
 
         // Put in some backup missions.
@@ -393,9 +394,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             Mission m = getSimpleMission(aiu);
             if (m != null) {
                 aiu.setMission(m);
-                logSB(sb, ", backup ",
-                    Utils.lastPart(m.getClass().toString(), "."),
-                    " ", aiu.getUnit());
+                lb.add(", backup ", m.getClass(), " ", aiu.getUnit());
             }
         }
     }
@@ -405,15 +404,15 @@ public class EuropeanAIPlayer extends AIPlayer {
      *
      * TODO: Remove when the AI is good enough.
      *
-     * @param sb An optional <code>StringBuilder</code> to log to.
+     * @param lb A <code>LogBuilder</code> to log to.
      */
-    private void cheat(StringBuilder sb) {
+    private void cheat(LogBuilder lb) {
         final AIMain aiMain = getAIMain();
         if (!aiMain.getFreeColServer().isSinglePlayer()) return;
 
         final Player player = getPlayer();
         if (player.getPlayerType() != PlayerType.COLONIAL) return;
-        int point = sbMark(sb);
+        lb.mark();
 
         final Specification spec = getSpecification();
         final Game game = getGame();
@@ -455,7 +454,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                     for (Modifier m : c.getModifiers()) {
                         if (Modifier.COLONY_GOODS_PARTY.equals(m.getSource())) {
                             c.removeModifier(m);
-                            logSB(sb, "lift-boycott at ", c, ", ");
+                            lb.add("lift-boycott at ", c, ", ");
                             break findOne;
                         }
                     }
@@ -470,7 +469,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 if (u.hasDefaultRole()
                     && u.hasAbility(Ability.CAN_BE_EQUIPPED)
                     && getAIUnit(u).equipForRole("model.role.scout", true)) {
-                    logSB(sb, "equipped scout ", u, ", ");
+                    lb.add("equipped scout ", u, ", ");
                     break;
                 }
             }
@@ -511,13 +510,13 @@ public class EuropeanAIPlayer extends AIPlayer {
                     aiu = recruitAIUnitInEurope(-1);
                     if (aiu != null) {
                         // let giveNormalMissions look after the mission
-                        logSB(sb, "recruit ", aiu.getUnit(), ", ");
+                        lb.add("recruit ", aiu.getUnit(), ", ");
                     }
                 } else {
                     aiu = trainAIUnitInEurope(bestWish.getUnitType());
                     if (aiu != null) {
                         aiu.setMission(consumeWorkerWish(aiu, bestWish));
-                        logSB(sb, "train ", aiu.getUnit(), ", ");
+                        lb.add("train ", aiu.getUnit(), ", ");
                     }
                 }
             }
@@ -591,8 +590,8 @@ public class EuropeanAIPlayer extends AIPlayer {
                     aiu.setMission(new UnitSeekAndDestroyMission(aiMain, aiu,
                                                                  target));
                 }
-                logSB(sb, "offensive land (", mercs.size(),
-                    ") attack ", target, ", ");
+                lb.add("offensive land (", mercs.size(), ") attack ",
+                       target, ", ");
             }
         }
             
@@ -621,9 +620,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 }
             }
             AIUnit c = cheatUnit(rc);
-            if (sb != null && c != null) {
-                logSB(sb, "offensive-naval ", c.getUnit(), ", ");
-            }
+            if (c != null) lb.add("offensive-naval ", c.getUnit(), ", ");
         }
         // Only cheat carriers if they have work to do.
         int nCarrier = (nNavalCarrier > 0) ? transportNavalUnitCheatPercent
@@ -643,12 +640,10 @@ public class EuropeanAIPlayer extends AIPlayer {
                 }
             }
             AIUnit c = cheatUnit(rc);
-            if (sb != null && c != null) {
-                logSB(sb, "transport-naval ", c.getUnit(), ", ");
-            }
+            if (c != null) lb.add("transport-naval ", c.getUnit(), ", ");
         }
 
-        if (sbGrew(sb, point, "\n  Cheats: ")) sbShrink(sb, ", ");
+        if (lb.grew("\n  Cheats: ")) lb.shrink(", ");
     }
 
     /**
@@ -686,21 +681,18 @@ public class EuropeanAIPlayer extends AIPlayer {
      *
      * @param missions A list of <code>TransportMission</code>s to potentially
      *     assign more transportables to.
-     * @param sb An optional <code>StringBuilder</code> to log to.
+     * @param lb A <code>LogBuilder</code> to log to.
      */
     private void allocateTransportables(List<TransportMission> missions,
-                                        StringBuilder sb) {
+                                        LogBuilder lb) {
         if (missions.isEmpty()) return;
         List<Transportable> urgent = getUrgentTransportables();
         if (urgent.isEmpty()) return;
 
-        int point = -1;
-        if (sb != null) {
-            logSB(sb, "\n  Allocate Transport:");
-            for (Transportable t : urgent) logSB(sb, " ", t);
-            logSB(sb, "\n  ->");
-            for (Mission m : missions) logSB(sb, " ", m);
-        }
+        lb.add("\n  Allocate Transport:");
+        for (Transportable t : urgent) lb.add(" ", t);
+        lb.add("\n  ->");
+        for (Mission m : missions) lb.add(" ", m);
 
         int i = 0;
         outer: while (i < urgent.size()) {
@@ -736,13 +728,13 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
             if (best != null) {
                 if (best.queueTransportable(t, false)) {
-                    logSB(sb, "\n  Queued ", t, " to ", best);
+                    lb.add("\n  Queued ", t, " to ", best);
                     claimTransportable(t);
                     if (best.destinationCapacity() <= 0) {
                         missions.remove(best);
                     }
                 } else {
-                    logSB(sb, "\n  Failed to queue ", t, " to ", best);
+                    lb.add("\n  Failed to queue ", t, " to ", best);
                     missions.remove(best);
                 }
             }
@@ -757,10 +749,9 @@ public class EuropeanAIPlayer extends AIPlayer {
      * this might be folded into a trade mission, since
      * European gifts are just a special case of trading.
      *
-     * @param sb An optional <code>StringBuilder</code> to log to.
+     * @param lb A <code>LogBuilder</code> to log to.
      */
-    private void bringGifts(StringBuilder sb) {
-        //if (sb != null) sb.append("\n  Bring Gifts: NYI");
+    private void bringGifts(LogBuilder lb) {
         return;
     }
 
@@ -769,10 +760,9 @@ public class EuropeanAIPlayer extends AIPlayer {
      *
      * TODO: European players can also demand tribute!
      *
-     * @param sb An optional <code>StringBuilder</code> to log to.
+     * @param lb A <code>LogBuilder</code> to log to.
      */
-    private void demandTribute(StringBuilder sb) {
-        //if (sb != null) sb.append("\n  Demand Tribute: NYI");
+    private void demandTribute(LogBuilder lb) {
         return;
     }
 
@@ -785,9 +775,9 @@ public class EuropeanAIPlayer extends AIPlayer {
      * Called by startWorking at the start of every turn.
      * Public for the test suite.
      *
-     * @param sb An optional <code>StringBuilder</code> to log to.
+     * @param lb A <code>LogBuilder</code> to log to.
      */
-    public void buildTipMap(StringBuilder sb) {
+    public void buildTipMap(LogBuilder lb) {
         tipMap.clear();
         for (AIColony aic : getAIColonies()) {
             for (TileImprovementPlan tip : aic.getTileImprovementPlans()) {
@@ -808,16 +798,13 @@ public class EuropeanAIPlayer extends AIPlayer {
                 }
             }
         }
-        if (sb != null && !tipMap.isEmpty()) {
-            sb.append("\n  Improvements:");
+        if (!tipMap.isEmpty()) {
+            lb.add("\n  Improvements:");
             for (Tile t : tipMap.keySet()) {
                 TileImprovementPlan tip = tipMap.get(t);
                 AIUnit pioneer = tip.getPioneer();
-                sb.append(" ").append(t.toShortString())
-                    .append("=").append(tip.getType().getSuffix());
-                if (pioneer != null) {
-                    sb.append("/").append(pioneer.getUnit().toShortString());
-                }
+                lb.add(" ", t, "=", tip.getType().getSuffix());
+                if (pioneer != null) lb.add("/", pioneer.getUnit());
             }
         }                
     }
@@ -943,9 +930,9 @@ public class EuropeanAIPlayer extends AIPlayer {
      * Rebuild the transport maps.
      * Count the number of transports requiring naval/land carriers.
      *
-     * @param sb A <code>StringBuilder</code> to log to.
+     * @param lb A <code>LogBuilder</code> to log to.
      */
-    private void buildTransportMaps(StringBuilder sb) {
+    private void buildTransportMaps(LogBuilder lb) {
         transportDemand.clear();
         transportSupply.clear();
         wagonsNeeded.clear();
@@ -1006,24 +993,20 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
         }
 
-        if (sb != null && !transportSupply.isEmpty()) {
-            sb.append("\n  Transport Supply:");
+        if (!transportSupply.isEmpty()) {
+            lb.add("\n  Transport Supply:");
             for (Location ls : transportSupply.keySet()) {
-                sb.append(" ").append(ls.toShortString()).append("[");
-                for (Transportable t : transportSupply.get(ls)) {
-                    sb.append(" ").append(t.toString());
-                }
-                sb.append(" ]");
+                lb.add(" ", ls, "[");
+                for (Transportable t : transportSupply.get(ls)) lb.add(" ", t);
+                lb.add(" ]");
             }
         }
-        if (sb != null && !transportDemand.isEmpty()) {
-            sb.append("\n  Transport Demand:");
+        if (!transportDemand.isEmpty()) {
+            lb.add("\n  Transport Demand:");
             for (Location ld : transportDemand.keySet()) {
-                sb.append(" ").append(ld.toShortString()).append("[");
-                for (Wish w : transportDemand.get(ld)) {
-                    sb.append(" ").append(w.toString());
-                }
-                sb.append(" ]");
+                lb.add(" ", ld, "[");
+                for (Wish w : transportDemand.get(ld)) lb.add(" ", w);
+                lb.add(" ]");
             }
         }
     }
@@ -1198,9 +1181,9 @@ public class EuropeanAIPlayer extends AIPlayer {
     /**
      * Rebuilds the goods and worker wishes maps.
      *
-     * @param sb An optional <code>StringBuilder</code> to log to.
+     * @param lb A <code>LogBuilder</code> to log to.
      */
-    private void buildWishMaps(StringBuilder sb) {
+    private void buildWishMaps(LogBuilder lb) {
         for (UnitType unitType : getSpecification().getUnitTypeList()) {
             List<WorkerWish> wl = workerWishes.get(unitType);
             if (wl == null) {
@@ -1233,35 +1216,35 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
         }
 
-        if (sb != null && !workerWishes.isEmpty()) {
-            int point = sbMark(sb);
+        if (!workerWishes.isEmpty()) {
+            lb.mark();
             for (UnitType ut : workerWishes.keySet()) {
                 List<WorkerWish> wl = workerWishes.get(ut);
                 if (!wl.isEmpty()) {
-                    sb.append(" [").append(ut.getSuffix());
+                    lb.add(" [", ut.getSuffix());
                     for (WorkerWish ww : wl) {
-                        sb.append(" ").append(ww.getDestination().toShortString())
-                            .append("(").append(ww.getValue()).append(")");
+                        lb.add(" ", ww.getDestination(),
+                               "(", ww.getValue(), ")");
                     }
-                    sb.append("]");
+                    lb.add("]");
                 }
             }
-            sbGrew(sb, point, "\n  Wishes (workers):");
+            lb.grew("\n  Wishes (workers):");
         }
-        if (sb != null && !goodsWishes.isEmpty()) {
-            int point = sbMark(sb);
+        if (!goodsWishes.isEmpty()) {
+            lb.mark();
             for (GoodsType gt : goodsWishes.keySet()) {
                 List<GoodsWish> gl = goodsWishes.get(gt);
                 if (!gl.isEmpty()) {
-                    sb.append(" [").append(gt.getSuffix());
+                    lb.add(" [", gt.getSuffix());
                     for (GoodsWish gw : gl) {
-                        sb.append(" ").append(gw.getDestination().toShortString())
-                            .append("(").append(gw.getValue()).append(")");
+                        lb.add(" ", gw.getDestination(),
+                               "(", gw.getValue(), ")");
                     }
-                    sb.append("]");
+                    lb.add("]");
                 }
             }
-            sbGrew(sb, point, "\n  Wishes (goods):");
+            lb.grew("\n  Wishes (goods):");
         }
     }
 
@@ -1461,11 +1444,11 @@ public class EuropeanAIPlayer extends AIPlayer {
     /**
      * Determines the stances towards each player.
      *
-     * @param sb An optional <code>StringBuilder</code> to log to.
+     * @param lb A <code>LogBuilder</code> to log to.
      */
-    private void determineStances(StringBuilder sb) {
+    private void determineStances(LogBuilder lb) {
         final Player player = getPlayer();
-        int point = sbMark(sb);
+        lb.mark();
 
         for (Player p : getGame().getLivePlayers(player)) {
             Stance newStance = determineStance(p);
@@ -1475,12 +1458,12 @@ public class EuropeanAIPlayer extends AIPlayer {
                 } else {
                     getAIMain().getFreeColServer().getInGameController()
                         .changeStance(player, newStance, p, true);
-                    logSB(sb, " ", p.getNation().getSuffix(),
-                          "->", newStance, ", ");
+                    lb.add(" ", p.getNation().getSuffix(),
+                           "->", newStance, ", ");
                 }
             }
         }
-        if (sbGrew(sb, point, "\n  Stance changes:")) sbShrink(sb, ", ");
+        if (lb.grew("\n  Stance changes:")) lb.shrink(", ");
     }
 
     /**
@@ -1644,7 +1627,7 @@ public class EuropeanAIPlayer extends AIPlayer {
      * Reject a trade agreement, except if a Franklin-derived stance
      * is supplied.
      *
-     * @param stance An optional stance <code>TradeItem</code>.
+     * @param stance A stance <code>TradeItem</code>.
      * @param agreement The <code>DiplomaticTrade</code> to reset.
      * @return The <code>TradeStatus</code> for the agreement.
      */
@@ -1663,13 +1646,14 @@ public class EuropeanAIPlayer extends AIPlayer {
     /**
      * Ensures all units have a mission.
      *
-     * @param sb An optional <code>StringBuilder</code> to log to.
+     * @param lb A <code>LogBuilder</code> to log to.
      */
-    protected void giveNormalMissions(StringBuilder sb) {
+    protected void giveNormalMissions(LogBuilder lb) {
         final AIMain aiMain = getAIMain();
         final Player player = getPlayer();
         final int turnNumber = getGame().getTurn().getNumber();
         java.util.Map<Unit, String> reasons = new HashMap<Unit, String>();
+        BuildColonyMission bcm = null;
 
         nBuilders = buildersNeeded();
         nPioneers = pioneersNeeded();
@@ -1686,7 +1670,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         // aiUnits list (reporting why not).  Adjust the
         // Build/Pioneer/Scout counts according to the existing valid
         // missions.  Accumulate potentially usable transport missions.
-        int point = sbMark(sb);
+        lb.mark();
         for (AIUnit aiUnit : aiUnits) {
             final Unit unit = aiUnit.getUnit();
             Mission m = aiUnit.getMission();
@@ -1697,7 +1681,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             } else if (unit.isDamaged()) { // Damaged units must wait
                 if (!(aiUnit.getMission() instanceof IdleAtSettlementMission)) {
                     m = new IdleAtSettlementMission(aiMain, aiUnit);
-                    aiUnit.changeMission(m, sb);logSB(sb, ", ");
+                    aiUnit.changeMission(m, lb);lb.add(", ");
                 }
                 reasons.put(unit, "Damaged");
                     
@@ -1710,7 +1694,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                         + colony.getName());
                     m = new WorkInsideColonyMission(aiMain, aiUnit,
                                                     aiMain.getAIColony(colony));
-                    aiUnit.changeMission(m, sb);logSB(sb, ", ");
+                    aiUnit.changeMission(m, lb);lb.add(", ");
                 }
                 reasons.put(unit, "Vital");
 
@@ -1719,6 +1703,7 @@ public class EuropeanAIPlayer extends AIPlayer {
 
             } else if (m != null && m.isValid() && !m.isOneTime()) {
                 if (m instanceof BuildColonyMission) {
+                    bcm = (BuildColonyMission)m;
                     nBuilders--;
                 } else if (m instanceof PioneeringMission) {
                     nPioneers--;
@@ -1757,7 +1742,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 Mission m = getBuildColonyMission(aiUnit);
                 if (m == null) continue;
                 done.add(aiUnit);
-                aiUnit.changeMission(m, sb);logSB(sb, ", ");
+                aiUnit.changeMission(m, lb);lb.add(", ");
                 if (requestsTransport(aiUnit)) {
                     Utils.appendToMapList(transportSupply,
                         upLoc(aiUnit.getTransportSource()), aiUnit);
@@ -1775,7 +1760,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 Mission m = getScoutingMission(aiUnit);
                 if (m == null) continue;
                 done.add(aiUnit);
-                aiUnit.changeMission(m, sb);logSB(sb, ", ");
+                aiUnit.changeMission(m, lb);lb.add(", ");
                 if (requestsTransport(aiUnit)) {
                     Utils.appendToMapList(transportSupply,
                         upLoc(aiUnit.getTransportSource()), aiUnit);
@@ -1793,7 +1778,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 Mission m = getPioneeringMission(aiUnit);
                 if (m == null) continue;
                 done.add(aiUnit);
-                aiUnit.changeMission(m, sb);logSB(sb, ", ");
+                aiUnit.changeMission(m, lb);lb.add(", ");
                 if (requestsTransport(aiUnit)) {
                     Utils.appendToMapList(transportSupply,
                         upLoc(aiUnit.getTransportSource()), aiUnit);
@@ -1811,7 +1796,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             Mission m = getSimpleMission(aiUnit);
 
             if (m != null) {
-                aiUnit.changeMission(m, sb);logSB(sb, ", ");
+                aiUnit.changeMission(m, lb);lb.add(", ");
                 reasons.put(unit, "New-Land");
                 done.add(aiUnit);
                 if (requestsTransport(aiUnit)) {
@@ -1830,7 +1815,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             Mission m = getSimpleMission(aiUnit);
 
             if (m != null) {
-                aiUnit.changeMission(m, sb);logSB(sb, ", ");
+                aiUnit.changeMission(m, lb);lb.add(", ");
                 reasons.put(unit, "New-Naval");
                 done.add(aiUnit);
                 if (m instanceof TransportMission) {
@@ -1873,7 +1858,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 Colony c = ports.remove(0);
                 m = new WorkInsideColonyMission(aiMain, aiUnit,
                                                 aiMain.getAIColony(c));
-                aiUnit.changeMission(m, sb);logSB(sb, ", ");
+                aiUnit.changeMission(m, lb);lb.add(", ");
                 reasons.put(unit, "To-work");
                 ports.add(c);
 
@@ -1881,44 +1866,42 @@ public class EuropeanAIPlayer extends AIPlayer {
                 reasons.put(unit, "Idle"); // already idle
             } else {
                 m = new IdleAtSettlementMission(aiMain, aiUnit);
-                aiUnit.changeMission(m, sb);logSB(sb, ", ");
+                aiUnit.changeMission(m, lb);lb.add(", ");
                 reasons.put(unit, "Idle");
             }
         }
-        if (sbGrew(sb, point, "\n  Mission changes: ")) sbShrink(sb, ", ");
+        if (lb.grew("\n  Mission changes: ")) lb.shrink(", ");
 
         // Now see if transport can be found
-        allocateTransportables(transportMissions, sb);
+        allocateTransportables(transportMissions, lb);
 
         // Log
-        if (sb != null) {
-            if (!transportMissions.isEmpty()) {
-                logSB(sb, "\n  Transports:");
-                for (TransportMission tm : transportMissions) {
-                    logSB(sb, " ", tm.getUnit());
-                }
+        if (!transportMissions.isEmpty()) {
+            lb.add("\n  Transports:");
+            for (TransportMission tm : transportMissions) {
+                lb.add(" ", tm.getUnit());
             }
-            if (!aiUnits.isEmpty()) {
-                logSB(sb, "\n  Free Land Units:");
-                for (AIUnit aiu : aiUnits) {
-                    logSB(sb, " ", aiu.getUnit());
-                }
-            }
-            if (!navalUnits.isEmpty()) {
-                logSB(sb, "\n  Free Naval Units:");
-                for (AIUnit aiu : navalUnits) {
-                    logSB(sb, " ", aiu.getUnit());
-                }
-            }
-            logSB(sb, "\n  Missions(",
-                  " colonies=", player.getNumberOfSettlements(),
-                  " builders=", nBuilders,
-                  " pioneers=", nPioneers,
-                  " scouts=", nScouts,
-                  " naval-carriers=", nNavalCarrier,
-                  " )");
-            logMissions(reasons, sb);
         }
+        if (!aiUnits.isEmpty()) {
+            lb.add("\n  Free Land Units:");
+            for (AIUnit aiu : aiUnits) {
+                lb.add(" ", aiu.getUnit());
+            }
+        }
+        if (!navalUnits.isEmpty()) {
+            lb.add("\n  Free Naval Units:");
+            for (AIUnit aiu : navalUnits) {
+                lb.add(" ", aiu.getUnit());
+            }
+        }
+        lb.add("\n  Missions(",
+            " colonies=", player.getNumberOfSettlements(),
+            " builders=", nBuilders,
+            " pioneers=", nPioneers,
+            " scouts=", nScouts,
+            " naval-carriers=", nNavalCarrier,
+            " )");
+        logMissions(reasons, lb);
     }
 
     /**
@@ -2178,50 +2161,47 @@ public class EuropeanAIPlayer extends AIPlayer {
             throw new RuntimeException("EuropeanAIPlayer integrity fail");
         }
 
-        StringBuilder sb = null;
-        if (logger.isLoggable(Level.FINEST)) {
-            sb = new StringBuilder(256);
-            logSB(sb, player.getNation().getSuffix(),
-                " in ", turn, "/", turn.getNumber(),
-                " declare=", (player.checkDeclareIndependence() == null),
-                " strength=", player.getRebelStrengthRatio());
-        }
+        LogBuilder lb = new LogBuilder(logger, Level.FINEST);
+        lb.add(player.getNation().getSuffix(),
+               " in ", turn, "/", turn.getNumber(),
+               " declare=", (player.checkDeclareIndependence() == null),
+               " strength=", player.getRebelStrengthRatio());
         sessionRegister.clear();
         clearAIUnits();
 
-        if (turn.isFirstTurn()) initializeMissions(sb);
-        determineStances(sb);
-        buildTipMap(sb);
+        if (turn.isFirstTurn()) initializeMissions(lb);
+        determineStances(lb);
+        buildTipMap(lb);
 
-        int point = sbMark(sb);
+        lb.mark();
         for (AIColony aic : getAIColonies()) {
-            if (aic.isBadlyDefended()) logSB(sb, " ", aic.getColony());
+            if (aic.isBadlyDefended()) lb.add(" ", aic.getColony());
         }
-        sbGrew(sb, point, "\n  Badly defended colonies:");
+        lb.grew("\n  Badly defended colonies:");
 
         for (AIColony aic : getAIColonies()) {
-            aic.rearrangeWorkers(sb);
-            aic.updateAIGoods(sb);
+            aic.rearrangeWorkers(lb);
+            aic.updateAIGoods(lb);
         }
         
-        buildTransportMaps(sb);
-        buildWishMaps(sb);
-        cheat(sb);
-        giveNormalMissions(sb);
+        buildTransportMaps(lb);
+        buildWishMaps(lb);
+        cheat(lb);
+        giveNormalMissions(lb);
 
-        bringGifts(sb);
-        demandTribute(sb);
-        List<AIUnit> more = doMissions(getAIUnits(), sb);
-        for (AIColony aic : getAIColonies()) aic.rearrangeWorkers(sb);
+        bringGifts(lb);
+        demandTribute(lb);
+        List<AIUnit> more = doMissions(getAIUnits(), lb);
+        for (AIColony aic : getAIColonies()) aic.rearrangeWorkers(lb);
 
         if (!more.isEmpty()) {
-            buildTransportMaps(sb);
-            buildWishMaps(sb);
-            giveNormalMissions(sb);
-            doMissions(more, sb);
-            for (AIColony aic : getAIColonies()) aic.rearrangeWorkers(sb);
+            buildTransportMaps(lb);
+            buildWishMaps(lb);
+            giveNormalMissions(lb);
+            doMissions(more, lb);
+            for (AIColony aic : getAIColonies()) aic.rearrangeWorkers(lb);
         }
-        if (sb != null) logger.finest(sb.toString());
+        lb.flush();
 
         clearAIUnits();
         tipMap.clear();
@@ -2236,37 +2216,37 @@ public class EuropeanAIPlayer extends AIPlayer {
      * {@inheritDoc}
      */
     @Override
-    protected List<AIUnit> doMissions(List<AIUnit> aiUnits, StringBuilder sb) {
-        int point = sbMark(sb);
+    protected List<AIUnit> doMissions(List<AIUnit> aiUnits, LogBuilder lb) {
+        lb.mark();
         List<AIUnit> result = new ArrayList<AIUnit>();
         for (AIUnit aiu : aiUnits) {
             final Unit unit = aiu.getUnit();
             final Mission old = aiu.getMission();
             if (old instanceof TransportMission) continue;
-            logSB(sb, "\n  ", unit, " ");
+            lb.add("\n  ", unit, " ");
             try {
-                Mission mission = aiu.doMission(sb);
-                if (mission != old) aiu.changeMission(mission, sb);
+                Mission mission = aiu.doMission(lb);
+                if (mission != old) aiu.changeMission(mission, lb);
             } catch (Exception e) {
                 logger.log(Level.WARNING, "doMissions failed for: " + aiu, e);
             }
             if (unit.getMovesLeft() > 0) result.add(aiu);
         }
-        if (sbGrew(sb, point, "\n  Do normal missions:")) point = sbMark(sb);
+        if (lb.grew("\n  Do normal missions:")) lb.mark();
         for (AIUnit aiu : aiUnits) {
             final Unit unit = aiu.getUnit();
             final Mission old = aiu.getMission();
             if (!(old instanceof TransportMission)) continue;
-            logSB(sb, "\n  ", unit, " ");
+            lb.add("\n  ", unit, " ");
             try {
-                Mission mission = aiu.doMission(sb);
-                if (mission != old) aiu.changeMission(mission, sb);
+                Mission mission = aiu.doMission(lb);
+                if (mission != old) aiu.changeMission(mission, lb);
             } catch (Exception e) {
                 logger.log(Level.WARNING, "doMissions failed for: " + aiu, e);
             }
             if (!unit.isDisposed() && unit.getMovesLeft() > 0) result.add(aiu);
         }
-        sbGrew(sb, point, "\n  Do transport missions:");
+        lb.grew("\n  Do transport missions:");
         return result;
     }
 
@@ -2322,9 +2302,8 @@ public class EuropeanAIPlayer extends AIPlayer {
             = new HashMap<TradeItem, Integer>();
         TradeItem peace = null;
         TradeItem cash = null;
-        StringBuilder sb = new StringBuilder(64);
-        sb.append("Evaluate trade offer from ").append(other.getName())
-            .append(":");
+        LogBuilder lb = new LogBuilder(logger, Level.INFO);
+        lb.add("Evaluate trade offer from ", other.getName(), ":");
         TradeStatus result = null;
 
         int unacceptable = 0;
@@ -2438,8 +2417,7 @@ public class EuropeanAIPlayer extends AIPlayer {
 
             if (value == Integer.MIN_VALUE) unacceptable++;
             scores.put(item, new Integer(value));
-            sb.append(" ").append(Messages.message(item.getDescription()))
-                .append(" = ").append(value);
+            lb.add(" ", Messages.message(item.getDescription()), " = ", value);
         }
 
         // If too many items are unacceptable, reject
@@ -2447,8 +2425,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             / (unacceptable + agreement.getTradeItems().size());
         if (ratio > 0.5 - 0.5 * agreement.getVersion()) {
             result = rejectAgreement(peace, agreement);
-            sb.append(", Too many (").append(unacceptable)
-                .append(") unacceptable");
+            lb.add(", Too many (", unacceptable, ") unacceptable");
         }
 
         int value = 0;
@@ -2469,7 +2446,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                     : (unacceptable == 0) ? TradeStatus.ACCEPT_TRADE
                     : (agreement.isEmpty()) ? TradeStatus.REJECT_TRADE
                     : TradeStatus.PROPOSE_TRADE;
-                sb.append(", Value = ").append(value);
+                lb.add(", Value = ", value);
             }
         }
 
@@ -2478,8 +2455,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             if (Utils.randomInt(logger, "Enough diplomacy?", getAIRandom(),
                                 1 + agreement.getVersion()) > 5) {
                 result = rejectAgreement(peace, agreement);
-                sb.append(", Ran out of patience at ")
-                    .append(agreement.getVersion());
+                lb.add(", Ran out of patience at ", agreement.getVersion());
             }
         }
 
@@ -2502,15 +2478,15 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
             if (value > 0 && !items.isEmpty()) {
                 result = TradeStatus.PROPOSE_TRADE;
-                sb.append(", Pruned until acceptable at ").append(value);
+                lb.add(", Pruned until acceptable at ", value);
             } else {
                 result = rejectAgreement(peace, agreement);
-                sb.append(", Agreement unsalvageable");
+                lb.add(", Agreement unsalvageable");
             }
         }
 
-        sb.append(" => ").append(result);
-        logger.info(sb.toString());
+        lb.add(" => ", result);
+        lb.flush();
         return result;
     }
 
@@ -2602,9 +2578,8 @@ public class EuropeanAIPlayer extends AIPlayer {
     @Override
     public boolean acceptTax(int tax) {
         boolean ret = true;
-        StringBuilder sb = new StringBuilder(32);
-        sb.append("Tax demand to ").append(getPlayer().getId())
-            .append(" of ").append(tax).append("%: ");
+        LogBuilder lb = new LogBuilder(logger, Level.INFO);
+        lb.add("Tax demand to ", getPlayer().getId(), " of ", tax, "%: ");
         Goods toBeDestroyed = getPlayer().getMostValuableGoods();
         GoodsType goodsType = (toBeDestroyed == null) ? null
             : toBeDestroyed.getType();
@@ -2612,10 +2587,10 @@ public class EuropeanAIPlayer extends AIPlayer {
         // Is this cheat to look at what the crown will destroy?
         if (toBeDestroyed == null) {
             ret = false;
-            sb.append("refused: no-goods-under-threat");
+            lb.add("refused: no-goods-under-threat");
         } else if (goodsType.isFoodType()) {
             ret = false;
-            sb.append("refused: food-type");
+            lb.add("refused: food-type");
         } else if (goodsType.isBreedable()) {
             // Refuse if we already have this type under production in
             // multiple places.
@@ -2625,12 +2600,11 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
             ret = n < 2;
             if (ret) {
-                sb.append("accepted: breedable-type-")
-                    .append(goodsType.getSuffix()).append("-missing");
+                lb.add("accepted: breedable-type-", goodsType.getSuffix(), 
+                       "-missing");
             } else {
-                sb.append("refused: breedable-type-")
-                    .append(goodsType.getSuffix())
-                    .append("-present-in-").append(n).append("-settlements");
+                lb.add("refused: breedable-type-", goodsType.getSuffix(),
+                       "-present-in-", n, "-settlements");
             }
         } else if (goodsType.isMilitaryGoods()
             || goodsType.isTradeGoods()
@@ -2639,8 +2613,8 @@ public class EuropeanAIPlayer extends AIPlayer {
             // TODO: check whether we have an armory, at least
             int age = getGame().getTurn().getAge();
             ret = age < 3;
-            sb.append((ret) ? "accepted" : "rejected")
-                .append(": special-goods-in-age-").append(age);
+            lb.add(((ret) ? "accepted" : "rejected"),
+                   ": special-goods-in-age-", age);
         } else {
             int averageIncome = 0;
             int numberOfGoods = 0;
@@ -2657,12 +2631,11 @@ public class EuropeanAIPlayer extends AIPlayer {
             averageIncome /= numberOfGoods;
             int income = getPlayer().getIncomeAfterTaxes(toBeDestroyed.getType());
             ret = income < averageIncome;
-            sb.append((ret) ? "accepted" : "rejected")
-                .append(": standard-goods-with-income-").append(income)
-                .append((ret) ? "-less-than-" : "-greater-than-")
-                .append(averageIncome);
+            lb.add(((ret) ? "accepted" : "rejected"),
+                   ": standard-goods-with-income-", income,
+                    ((ret) ? "-less-than-" : "-greater-than-"), averageIncome);
         }
-        logger.finest(sb.toString());
+        lb.flush();
         return ret;
     }
 

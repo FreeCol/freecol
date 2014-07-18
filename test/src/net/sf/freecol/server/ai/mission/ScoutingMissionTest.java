@@ -29,6 +29,7 @@ import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIUnit;
@@ -79,7 +80,6 @@ public class ScoutingMissionTest extends FreeColTestCase {
         assertNotNull("The scout should be an AI unit", aiUnit);
         assertEquals("Scout should have the scout role", scoutRole,
             scout.getRole());
-        
         assertTrue(scout.hasAbility(Ability.SPEAK_WITH_CHIEF));
         assertEquals("The Inca settlement should be a scouting target", null,
             ScoutingMission.invalidReason(aiUnit, is));
@@ -89,7 +89,9 @@ public class ScoutingMissionTest extends FreeColTestCase {
             ScoutingMission.invalidReason(aiUnit));
         assertEquals("Scout should find the Inca settlement", is,
             ScoutingMission.findTarget(aiUnit, 10, false));
-        aiUnit.changeMission(new ScoutingMission(aiMain, aiUnit, is), null);
+
+        aiUnit.changeMission(new ScoutingMission(aiMain, aiUnit, is),
+                             new LogBuilder(0));
         assertTrue("Scout should have been assigned a Scouting mission",
             aiUnit.getMission() instanceof ScoutingMission);
         assertTrue("Scouting mission should be valid",

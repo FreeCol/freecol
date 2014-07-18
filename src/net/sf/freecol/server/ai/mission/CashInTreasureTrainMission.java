@@ -37,6 +37,7 @@ import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIUnit;
@@ -364,13 +365,13 @@ public class CashInTreasureTrainMission extends Mission {
     /**
      * {@inheritDoc}
      */
-    public Mission doMission(StringBuilder sb) {
-        logSB(sb, tag);
+    public Mission doMission(LogBuilder lb) {
+        lb.add(tag);
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            if (!retargetMission(reason, sb)) return null;
+            if (!retargetMission(reason, lb)) return null;
         } else if (reason != null) {
-            logSBbroken(sb, reason);
+            lbBroken(lb, reason);
             return null;
         }
 
@@ -378,7 +379,7 @@ public class CashInTreasureTrainMission extends Mission {
             // Go to the target.
             final Unit unit = getUnit();
             Unit.MoveType mt = travelToTarget(getTarget(),
-                CostDeciders.avoidSettlementsAndBlockingUnits(), sb);
+                CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
             switch (mt) {
             case MOVE:
                 break;
@@ -386,7 +387,7 @@ public class CashInTreasureTrainMission extends Mission {
             case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
                 return this;
             default:
-                logSBmove(sb, unit, mt);
+                lbMove(lb, unit, mt);
                 return this;
             }
 
@@ -403,8 +404,7 @@ public class CashInTreasureTrainMission extends Mission {
                 AIUnit aiCarrier = aiUnit.getTransport();
                 if (europe != null && aiCarrier != null) {
                     // Let the carrier do its job
-                    logSB(sb, " queued for Europe on ",
-                        aiCarrier.getUnit(), ".");
+                    lb.add(" queued for Europe on ", aiCarrier.getUnit(), ".");
                     return this;
                 }
                 List<Unit> carriers = player.getCarriersForUnit(unit);
@@ -430,20 +430,20 @@ public class CashInTreasureTrainMission extends Mission {
                         && aiCarrier.getMission() instanceof TransportMission) {
                         TransportMission tm = (TransportMission)aiCarrier.getMission();
                         tm.queueTransportable(aiUnit, false);
-                        logSB(sb, ", retarget Europe on ", aiCarrier.getUnit(),
-                            " at ", unit.getLocation(), ".");
+                        lb.add(", retarget Europe on ", aiCarrier.getUnit(),
+                               " at ", unit.getLocation(), ".");
                         return this;
                     }
                 }
                 if (AIMessage.askCashInTreasureTrain(aiUnit)) {
-                    logSBdone(sb, " cash in at ", unit.getLocation());
+                    lbDone(lb, " cash in at ", unit.getLocation());
                 } else {
-                    logSBfail(sb, " cash in at", unit.getLocation());
+                    lbFail(lb, " cash in at", unit.getLocation());
                 }
                 return null;
             }
             if (!retargetMission(", arrived at " + unit.getColony().getName(),
-                                 sb)) return null;
+                                 lb)) return null;
         }
     }
 

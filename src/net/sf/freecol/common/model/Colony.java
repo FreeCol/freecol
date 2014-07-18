@@ -29,6 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -40,6 +41,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
 
 
@@ -423,13 +425,13 @@ public class Colony extends Settlement implements Nameable {
         return result;
     }
 
-    private void logWorkTypes(StringBuilder sb, Collection<GoodsType> workTypes) {
-        sb.append("[");
+    private void logWorkTypes(Collection<GoodsType> workTypes, LogBuilder lb) {
+        lb.add("[");
         for (GoodsType gt : workTypes) {
-            sb.append(gt.getSuffix()).append(" ");
+            lb.add(gt.getSuffix(), " ");
         }
-        sbShrink(sb, " ");
-        sb.append("]");
+        lb.shrink(" ");
+        lb.add("]");
     }
         
     private void accumulateChoices(Collection<GoodsType> workTypes,
@@ -508,18 +510,18 @@ public class Colony extends Settlement implements Nameable {
      * @param bestAmount The amount of goods produced.
      * @param workTypes A collection of <code>GoodsType</code> to
      *     consider producing.
-     * @param sb An optional <code>StringBuilder</code> to log to.
+     * @param lb A <code>LogBuilder</code> to log to.
      * @return The updated best amount of production found.
      */
     private int getOccupationAt(Unit unit, WorkLocation wl,
                                 Occupation best, int bestAmount,
                                 Collection<GoodsType> workTypes,
-                                StringBuilder sb) {
+                                LogBuilder lb) {
         final UnitType type = unit.getType();
 
         // Can the unit work at this wl?
         boolean present = unit.getLocation() == wl;
-        logSB(sb, "\n    ", wl,
+        lb.add("\n    ", wl,
             ((!present && !wl.canAdd(unit)) ? " no-add" : ""));
         if (!present && !wl.canAdd(unit)) return bestAmount;
 
@@ -529,7 +531,7 @@ public class Colony extends Settlement implements Nameable {
         boolean alone = wl.getProductionType() == null
             || wl.isEmpty()
             || (present && wl.getUnitCount() == 1);
-        logSB(sb, " alone=", alone);
+        lb.add(" alone=", alone);
 
         // Try the available production types for the best production.
         List<ProductionType> productionTypes = new ArrayList<ProductionType>();
@@ -539,12 +541,12 @@ public class Colony extends Settlement implements Nameable {
             productionTypes.add(wl.getProductionType());
         }
         for (ProductionType pt : productionTypes) {
-            logSB(sb, "\n      try=", pt);
+            lb.add("\n      try=", pt);
             for (GoodsType gt : workTypes) {
                 if (pt.getOutput(gt) == null) continue;
                 int amount = getMinimumGoodsCount(pt.getInputs());
                 amount = Math.min(amount, wl.getPotentialProduction(gt, type));
-                logSB(sb, " ", gt.getSuffix(), "=", amount,
+                lb.add(" ", gt.getSuffix(), "=", amount,
                     "/", getMinimumGoodsCount(pt.getInputs()),
                     "/", wl.getPotentialProduction(gt, type),
                     ((bestAmount < amount) ? "!" : ""));
@@ -567,24 +569,24 @@ public class Colony extends Settlement implements Nameable {
      *     <code>Occupation</code> for.
      * @param workTypes A collection of <code>GoodsType</code> to
      *     consider producing.
-     * @param sb An optional <code>StringBuilder</code> to log to.
+     * @param lb A <code>LogBuilder</code> to log to.
      * @return An <code>Occupation</code> for the given unit, or null
      *     if none found.
      */
     private Occupation getOccupationFor(Unit unit,
                                         Collection<GoodsType> workTypes,
-                                        StringBuilder sb) {
+                                        LogBuilder lb) {
         if (workTypes.isEmpty()) return null;
 
         Occupation best = new Occupation(null, null, null);
         int bestAmount = 0;
         for (WorkLocation wl : getCurrentWorkLocations()) {
             bestAmount = getOccupationAt(unit, wl, best, bestAmount,
-                                         workTypes, sb);
+                                         workTypes, lb);
         }
 
-        if (sb != null && best.workLocation != null) {
-            sb.append("\n  => ").append(best).append(" = ").append(bestAmount);
+        if (best.workLocation != null) {
+            lb.add("\n  => ", best, " = ", bestAmount);
         }
         return (best.workLocation == null) ? null : best;
     }
@@ -596,22 +598,20 @@ public class Colony extends Settlement implements Nameable {
      *     <code>Occupation</code> for.
      * @param userMode If a user requested this, favour the current
      *     work type, if not favour goods that the unit requires.
-     * @param sb An optional <code>StringBuilder</code> to log to.
+     * @param lb A <code>LogBuilder</code> to log to.
      * @return An <code>Occupation</code> for the given unit, or
      *     null if none found.
      */
     private Occupation getOccupationFor(Unit unit, boolean userMode,
-                                        StringBuilder sb) {
+                                        LogBuilder lb) {
         for (Collection<GoodsType> types
                  : getWorkTypeChoices(unit, userMode)) {
-            if (sb != null) {
-                logSB(sb, "\n  ");
-                logWorkTypes(sb, types);
-            }
-            Occupation occupation = getOccupationFor(unit, types, sb);
+            lb.add("\n  ");
+            logWorkTypes(types, lb);
+            Occupation occupation = getOccupationFor(unit, types, lb);
             if (occupation != null) return occupation;
         }
-        logSB(sb, "\n  => FAILED");
+        lb.add("\n  => FAILED");
         return null;
     }
 
@@ -628,16 +628,14 @@ public class Colony extends Settlement implements Nameable {
      */
     private Occupation getOccupationFor(Unit unit,
                                         Collection<GoodsType> workTypes) {
-        StringBuilder sb = null;
-        if (getOccupationTrace()) {
-            sb = new StringBuilder(128);
-            logSB(sb, getName(), ".getOccupationFor(", unit, ", ");
-            logWorkTypes(sb, workTypes);
-            logSB(sb, ")");
-        }
+        LogBuilder lb = new LogBuilder((getOccupationTrace()) ? logger : null,
+                                       Level.WARNING);
+        lb.add(getName(), ".getOccupationFor(", unit, ", ");
+        logWorkTypes(workTypes, lb);
+        lb.add(")");
 
-        Occupation occupation = getOccupationFor(unit, workTypes, sb);
-        if (sb != null) logger.warning(sb.toString());
+        Occupation occupation = getOccupationFor(unit, workTypes, lb);
+        lb.flush();
         return occupation;
     }
 
@@ -652,15 +650,12 @@ public class Colony extends Settlement implements Nameable {
      *     null if none found.
      */
     private Occupation getOccupationFor(Unit unit, boolean userMode) {
-        StringBuilder sb = null;
-        if (getOccupationTrace()) {
-            sb = new StringBuilder(128);
-            sb.append(getName()).append(".getOccupationFor(").append(unit)
-                .append(")");
-        }
+        LogBuilder lb = new LogBuilder((getOccupationTrace()) ? logger : null,
+                                       Level.WARNING);
+        lb.add(getName(), ".getOccupationFor(", unit, ")");
 
-        Occupation occupation = getOccupationFor(unit, userMode, sb);
-        if (sb != null) logger.warning(sb.toString());
+        Occupation occupation = getOccupationFor(unit, userMode, lb);
+        lb.flush();
         return occupation;
     }
 
@@ -677,32 +672,25 @@ public class Colony extends Settlement implements Nameable {
      */
     private Occupation getOccupationAt(Unit unit, WorkLocation wl,
                                        boolean userMode) {
-        StringBuilder sb = null;
-        if (getOccupationTrace()) {
-            sb = new StringBuilder(128);
-            sb.append(getName()).append(".getOccupationAt(").append(unit)
-                .append(", ").append(wl).append(")");
-        }
+        LogBuilder lb = new LogBuilder((getOccupationTrace()) ? logger : null,
+                                       Level.WARNING);
+        lb.add(getName(), ".getOccupationAt(", unit, ", ", wl, ")");
 
         Occupation best = new Occupation(null, null, null);
         int bestAmount = 0;
         for (Collection<GoodsType> types
                  : getWorkTypeChoices(unit, userMode)) {
-            if (sb != null) {
-                logSB(sb, "\n  ");
-                logWorkTypes(sb, types);
-            }
+            lb.add("\n  ");
+            logWorkTypes(types, lb);
             bestAmount = getOccupationAt(unit, wl, best, bestAmount,
-                                         types, sb);
+                                         types, lb);
             if (best.workType != null) {
-                logSB(sb, "\n  => ", best);
+                lb.add("\n  => ", best);
                 break;
             }
         }
-        if (sb != null) {
-            if (best.workType == null) logSB(sb, "\n  FAILED");
-            logger.warning(sb.toString());
-        }      
+        if (best.workType == null) lb.add("\n  FAILED");
+        lb.flush();
         return (best.workType == null) ? null : best;
     }
 
@@ -1471,9 +1459,9 @@ public class Colony extends Settlement implements Nameable {
         Occupation occupation = getOccupationFor(unit, false);
         if (occupation == null) {
             if (!traceOccupation) {
-                StringBuilder sb = new StringBuilder(64);
-                getOccupationFor(unit, false, sb);
-                logger.warning(sb.toString());
+                LogBuilder lb = new LogBuilder(logger, Level.WARNING);
+                getOccupationFor(unit, false, lb);
+                lb.flush();
             }
             return false;
         }

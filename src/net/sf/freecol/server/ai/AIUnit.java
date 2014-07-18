@@ -46,6 +46,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitLocation;
 import net.sf.freecol.common.model.Role;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.goal.Goal;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
@@ -232,17 +233,17 @@ public class AIUnit extends AIObject implements Transportable {
      * The dynamic priority is reset.
      *
      * @param mission The new <code>Mission</code>.
-     * @param sb An optional <code>StringBuilder</code> to log to.
+     * @param lb A <code>LogBuilder</code> to log to.
      */
-    public void changeMission(Mission mission, StringBuilder sb) {
+    public void changeMission(Mission mission, LogBuilder lb) {
         if (this.mission == mission) return;
         Location oldTarget;
 
         if (this.mission == null) {
-            logSB(sb, unit, " replaced null with ", mission);
+            lb.add(unit, " replaced null with ", mission);
             oldTarget = null;
         } else {
-            logSB(sb, unit, " replaced ", this.mission, " with ", mission);
+            lb.add(unit, " replaced ", this.mission, " with ", mission);
             oldTarget = this.mission.getTarget();
             this.mission.dispose();
         }
@@ -253,13 +254,13 @@ public class AIUnit extends AIObject implements Transportable {
         boolean cancel = true;
         if (unit.isOnCarrier()) {
             if (mission == null) {
-                if (leaveTransport()) logSB(sb, " Disembarked.");
+                if (leaveTransport()) lb.add(" Disembarked.");
             } else if (oldTarget == mission.getTarget()) {
                 cancel = false;
             } else if (requeueOnCurrentCarrier()) {
                 cancel = false;
             } else {
-                if (leaveTransport()) logSB(sb, " Disembarked.");
+                if (leaveTransport()) lb.add(" Disembarked.");
             }
         }
         if (cancel) removeTransport("mission-changed");
@@ -355,9 +356,9 @@ public class AIUnit extends AIObject implements Transportable {
     /**
      * Performs the mission this unit has been assigned.
      *
-     * @param sb An optional <code>StringBuilder</code> to log to.
+     * @param lb A <code>LogBuilder</code> to log to.
      */
-    public Mission doMission(StringBuilder sb) {
+    public Mission doMission(LogBuilder sb) {
         return (mission != null && mission.isValid()) ? mission.doMission(sb)
             : null;
     }

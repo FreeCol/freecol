@@ -51,6 +51,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
 import net.sf.freecol.server.ai.mission.Mission;
@@ -406,10 +407,10 @@ public abstract class AIPlayer extends AIObject {
      * Log the missions of this player.
      *
      * @param reasons A map of reasons for the current mission by unit.
-     * @param sb A <code>StringBuilder</code> to log to.
+     * @param lb A <code>LogBuilder</code> to log to.
      */
     protected void logMissions(java.util.Map<Unit, String> reasons,
-                               StringBuilder sb) {
+                               LogBuilder lb) {
         List<AIUnit> units = getAIUnits();
         Collections.sort(units, aiUnitLocationComparator);
         for (AIUnit aiu : units) {
@@ -426,14 +427,13 @@ public abstract class AIPlayer extends AIObject {
             }
 
             
-            sb.append("\n  @")
-                .append(String.format("%-30s%-10s%-30s%-16s",
-                        Utils.chop(u.getLocation().toShortString(), 30),
-                        Utils.chop(reason, 10),
-                        Utils.chop(u.toShortString(), 30),
-                        Utils.chop(ms, 16)));
-            if (target != null) sb.append("->")
-                                    .append(target.toShortString());
+            lb.add("\n  @",
+                String.format("%-30s%-10s%-30s%-16s",
+                    Utils.chop(u.getLocation().toShortString(), 30),
+                    Utils.chop(reason, 10),
+                    Utils.chop(u.toShortString(), 30),
+                    Utils.chop(ms, 16)));
+            if (target != null) lb.add("->", target);
         }
     }
 
@@ -467,19 +467,19 @@ public abstract class AIPlayer extends AIObject {
      * Makes every unit perform their mission.
      *
      * @param aiUnits A list of <code>AIUnit</code>s to perform missions.
-     * @param sb An optional <code>StringBuilder</code> to log to.
+     * @param lb A <code>LogBuilder</code> to log to.
      * @return A list of <code>AIUnit</code>s that have moves left.
      */
-    protected List<AIUnit> doMissions(List<AIUnit> aiUnits, StringBuilder sb) {
-        logSB(sb, "\n  Do Missions:");
+    protected List<AIUnit> doMissions(List<AIUnit> aiUnits, LogBuilder lb) {
+        lb.add("\n  Do Missions:");
         List<AIUnit> result = new ArrayList<AIUnit>();
         for (AIUnit aiu : aiUnits) {
             final Unit unit = aiu.getUnit();
-            logSB(sb, "\n  ", unit, " ");
+            lb.add("\n  ", unit, " ");
             try {
                 Mission old = aiu.getMission();
-                Mission mission = aiu.doMission(sb);
-                if (mission != old) aiu.changeMission(mission, sb);
+                Mission mission = aiu.doMission(lb);
+                if (mission != old) aiu.changeMission(mission, lb);
             } catch (Exception e) {
                 logger.log(Level.WARNING, "doMissions failed for: " + aiu, e);
             }

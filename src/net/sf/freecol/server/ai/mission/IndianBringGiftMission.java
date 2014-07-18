@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIUnit;
@@ -239,11 +240,11 @@ public class IndianBringGiftMission extends Mission {
     /**
      * {@inheritDoc}
      */
-    public Mission doMission(StringBuilder sb) {
-        logSB(sb, tag);
+    public Mission doMission(LogBuilder lb) {
+        lb.add(tag);
         String reason = invalidReason();
         if (reason != null) {
-            logSBbroken(sb, reason);
+            lbBroken(lb, reason);
             return null;
         }
 
@@ -251,7 +252,7 @@ public class IndianBringGiftMission extends Mission {
         final Unit unit = getUnit();
         final IndianSettlement is = unit.getHomeIndianSettlement();
         if (!hasGift()) {
-            Unit.MoveType mt = travelToTarget(is, null, sb);
+            Unit.MoveType mt = travelToTarget(is, null, lb);
             switch (mt) {
             case MOVE: // Arrived!
                 break;
@@ -262,29 +263,29 @@ public class IndianBringGiftMission extends Mission {
                 if (blocker != null) {
                     AIMessage.askAttack(aiUnit, unit.getTile()
                         .getDirection(blocker.getTile()));
-                    logSBattack(sb, blocker);
+                    lbAttack(lb, blocker);
                     return this;
                 }
                 moveRandomly(tag, null);
                 unit.setMovesLeft(0);
-                logSBdodge(sb, unit);
+                lbDodge(lb, unit);
                 return this;
             default:
-                logSBmove(sb, unit, mt);
+                lbMove(lb, unit, mt);
                 return this;
             }
             // Load the goods.
             Goods gift = is.getRandomGift(getAIRandom());
             if (gift == null) {
                 completed = true;
-                logSBfail(sb, "found no gift at ", is);
+                lbFail(lb, "found no gift at ", is);
                 return null;
             } else if (!AIMessage.askLoadCargo(aiUnit, gift) || !hasGift()) {
                 completed = true;
-                logSBfail(sb, "failed to collect gift at ", is);
+                lbFail(lb, "failed to collect gift at ", is);
                 return null;
             } else {
-                logSB(sb, ", collected gift at ", is, ".");
+                lb.add(", collected gift at ", is, ".");
                 return this;
             }
 
@@ -292,7 +293,7 @@ public class IndianBringGiftMission extends Mission {
             // Move to the target's colony and deliver, avoiding trouble
             // by choice of cost decider.
             Unit.MoveType mt = travelToTarget(getTarget(),
-                CostDeciders.avoidSettlementsAndBlockingUnits(), sb);
+                CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
             switch (mt) {
             case MOVE: case ATTACK_SETTLEMENT: // Arrived (do not attack!)
                 break;
@@ -304,16 +305,16 @@ public class IndianBringGiftMission extends Mission {
                 if (blocker != null) {
                     AIMessage.askAttack(aiUnit, unit.getTile()
                         .getDirection(blocker.getTile()));
-                    logSBattack(sb, blocker);
+                    lbAttack(lb, blocker);
                     return this;
                 }
                 moveRandomly(tag, null);
                 unit.setMovesLeft(0);
-                logSBdodge(sb, unit);
+                lbDodge(lb, unit);
                 return this;
 
             default:
-                logSBmove(sb, unit, mt);
+                lbMove(lb, unit, mt);
                 return this;
             }
 
@@ -330,9 +331,9 @@ public class IndianBringGiftMission extends Mission {
             }
             completed = true;
             if (result) {
-                logSBdone(sb, "delivered at ", settlement);
+                lbDone(lb, "delivered at ", settlement);
             } else {
-                logSBfail(sb, "to deliver ", settlement);
+                lbFail(lb, "to deliver ", settlement);
             }
             return null;
         }

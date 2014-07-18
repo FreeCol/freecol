@@ -26,6 +26,7 @@ import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIUnit;
@@ -38,6 +39,8 @@ public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
 
     private static final UnitType veteranType
         = spec().getUnitType("model.unit.veteranSoldier");
+
+    private LogBuilder lb = new LogBuilder(0);
 
 
     @Override
@@ -73,7 +76,7 @@ public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
 
         UnitSeekAndDestroyMission mission
             = new UnitSeekAndDestroyMission(aiMain,aiUnit,defender);
-        aiUnit.changeMission(mission, null);
+        aiUnit.changeMission(mission, lb);
         assertTrue("Attacker should have a UnitSeekAndDestroyMission",
                    aiUnit.getMission() instanceof UnitSeekAndDestroyMission);
 
@@ -110,7 +113,7 @@ public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
         player2.setStance(player1, Stance.WAR);
 
         UnitSeekAndDestroyMission mission = new UnitSeekAndDestroyMission(aiMain,aiUnit,defender);
-        aiUnit.changeMission(mission, null);
+        aiUnit.changeMission(mission, lb);
         boolean isSeekAndDestroyMission = aiUnit.getMission() instanceof UnitSeekAndDestroyMission;
         assertTrue("Attacker should have a UnitSeekAndDestroyMission", isSeekAndDestroyMission);
         assertTrue("UnitSeekAndDestroyMission should be valid", aiUnit.getMission().isValid());

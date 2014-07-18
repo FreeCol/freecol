@@ -39,6 +39,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIUnit;
@@ -382,20 +383,20 @@ public class PrivateerMission extends Mission {
     /**
      * {@inheritDoc}
      */
-    public Mission doMission(StringBuilder sb) {
-        logSB(sb, tag);
+    public Mission doMission(LogBuilder lb) {
+        lb.add(tag);
         final AIMain aiMain = getAIMain();
         final AIUnit aiUnit = getAIUnit();
         if (aiUnit.hasCargo()) { // Deliver the goods
-            logSB(sb, ", should transport.");
+            lb.add(", should transport.");
             return new TransportMission(aiMain, aiUnit);
         }
 
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            if (!retargetMission(reason, sb)) return null;
+            if (!retargetMission(reason, lb)) return null;
         } else if (reason != null) {
-            logSBbroken(sb, reason);
+            lbBroken(lb, reason);
             return null;
         }
         final Unit unit = getUnit();
@@ -408,19 +409,19 @@ public class PrivateerMission extends Mission {
             aiUnit.moveToAmerica();
         }
         if (unit.isAtSea()) {
-            logSBat(sb, unit);
+            lbAt(lb, unit);
             return this;
         }
 
         Location newTarget = findTarget(aiUnit, 1, true);
         if (newTarget == null) {
             moveRandomlyTurn(tag);
-            logSBat(sb, unit);
+            lbAt(lb, unit);
             return this;
         }
 
         setTarget(newTarget);
-        Unit.MoveType mt = travelToTarget(newTarget, null, sb);
+        Unit.MoveType mt = travelToTarget(newTarget, null, lb);
         switch (mt) {
         case MOVE_HIGH_SEAS: case MOVE_NO_MOVES: case MOVE_NO_REPAIR:
             return this;
@@ -431,7 +432,7 @@ public class PrivateerMission extends Mission {
         case MOVE_NO_TILE: // Can happen when another unit blocks a river
             moveRandomly(tag, null);
             unit.setMovesLeft(0);
-            logSBdodge(sb, unit);
+            lbDodge(lb, unit);
             return this;
 
         case ATTACK_UNIT:
@@ -439,27 +440,27 @@ public class PrivateerMission extends Mission {
                 .getDirection(getTarget().getTile());
             if (direction != null) {
                 AIMessage.askAttack(aiUnit, direction);
-                logSB(sb, "attacking ", getTarget());
+                lb.add("attacking ", getTarget());
             } else { // Found something else in the way!
                 Location blocker = resolveBlockage(aiUnit, getTarget());
                 if (blocker instanceof Unit
                     && scoreUnit(aiUnit, (Unit)blocker) > 0) {
                     AIMessage.askAttack(aiUnit,
                         unit.getTile().getDirection(blocker.getTile()));
-                    logSBattack(sb, blocker);
+                    lbAttack(lb, blocker);
                 } else { // Might be dangerous, try to confuse them:-)
                     moveRandomlyTurn(tag);
-                    logSB(sb, " avoiding ", blocker, ".");
+                    lb.add(" avoiding ", blocker, ".");
                 }
             }
             return this;
 
         default:
-            logSBmove(sb, unit, mt);
+            lbMove(lb, unit, mt);
             return this;
         }
 
-        logSBat(sb, unit);
+        lbAt(lb, unit);
         return this;
     }
 

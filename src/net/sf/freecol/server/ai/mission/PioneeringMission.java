@@ -42,6 +42,7 @@ import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.networking.NetworkConstants;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
@@ -510,20 +511,20 @@ public class PioneeringMission extends Mission {
     /**
      * {@inheritDoc}
      */
-    public Mission doMission(StringBuilder sb) {
-        logSB(sb, tag);
+    public Mission doMission(LogBuilder lb) {
+        lb.add(tag);
         // Check for completion and tileImprovement failure up front.
         final AIUnit aiUnit = getAIUnit();
         Location newTarget;
         boolean retarget = tileImprovementPlan == null;
         if (!retarget) {
             if (tileImprovementPlan.isComplete()) {
-                logSBdone(sb, tileImprovementPlan.getType(),
-                    " at ", getTarget());
+                lbDone(lb, tileImprovementPlan.getType(),
+                       " at ", getTarget());
                 retarget = true;
             } else if (!tileImprovementPlan.validate()) {
-                logSBfail(sb, " abandoned invalid plan at ",
-                    getTarget(), "/", tileImprovementPlan);
+                lbFail(lb, " abandoned invalid plan at ",
+                       getTarget(), "/", tileImprovementPlan);
                 retarget = true;
             } else {
                 retarget = false;
@@ -533,19 +534,18 @@ public class PioneeringMission extends Mission {
             newTarget = findTarget(aiUnit, 10, false);
             if (newTarget == null) {
                 setTarget(null);
-                logSBfail(sb, tag, " found no target");
+                lbFail(lb, tag, " found no target");
                 return null;
             }
             setTarget(newTarget);
-            logSB(sb, tag, ", retargeting ", newTarget,
-                "/", tileImprovementPlan);
+            lb.add(tag, ", retargeting ", newTarget, "/", tileImprovementPlan);
         }
 
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            if (!retargetMission(reason, sb)) return null;
+            if (!retargetMission(reason, lb)) return null;
         } else if (reason != null) {
-            logSBbroken(sb, reason);
+            lbBroken(lb, reason);
             return null;
         }
 
@@ -559,14 +559,14 @@ public class PioneeringMission extends Mission {
         String where;
         while (!hasTools()) { // Get tools first.
             // Go there and clear target on arrival.
-            Unit.MoveType mt = travelToTarget(getTarget(), costDecider, sb);
+            Unit.MoveType mt = travelToTarget(getTarget(), costDecider, lb);
             switch (mt) {
             case MOVE:
                 break;
             case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
                 return this;
             default:
-                logSBmove(sb, unit, mt);
+                lbMove(lb, unit, mt);
                 return this;
             }
 
@@ -581,36 +581,35 @@ public class PioneeringMission extends Mission {
             if (newTarget == null
                 || (!hasTools() && Map.isSameLocation(newTarget, getTarget()))) {
                 setTarget(null);
-                logSB(sb, logMe, ", cancelling");
+                lb.add(logMe, ", cancelling");
                 return null;
             }
             setTarget(newTarget);
-            logSB(sb, logMe, ", retargeting ", newTarget,
-                "/", tileImprovementPlan);
+            lb.add(logMe, ", retargeting ", newTarget, "/", tileImprovementPlan);
         }
 
         // Going to an intermediate colony?
         if (getTarget() instanceof Colony
             && invalidTargetReason(getTarget(), player) == null) {
-            Unit.MoveType mt = travelToTarget(getTarget(), costDecider, sb);
+            Unit.MoveType mt = travelToTarget(getTarget(), costDecider, lb);
             switch (mt) {
             case MOVE:
                 break;
             case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
                 return this;
             default:
-                logSBmove(sb, unit, mt);
+                lbMove(lb, unit, mt);
                 return this;
             }
             where = ((Colony)getTarget()).getName();
             setTarget(newTarget = findTarget(aiUnit, 10, false));
             if (newTarget == null) {
                 setTarget(null);
-                logSBfail(sb, ", reached ", where, " but found no target");
+                lbFail(lb, ", reached ", where, " but found no target");
                 return null;
             }
-            logSB(sb, ", at ", where, ", retargeting ", newTarget,
-                "/", tileImprovementPlan);
+            lb.add(", at ", where, ", retargeting ", newTarget,
+                   "/", tileImprovementPlan);
         }
 
         // Check for threats.
@@ -638,7 +637,7 @@ public class PioneeringMission extends Mission {
         */
 
         // Going to a tile to perform an improvement.
-        Unit.MoveType mt = travelToTarget(getTarget(), costDecider, sb);
+        Unit.MoveType mt = travelToTarget(getTarget(), costDecider, lb);
         switch (mt) {
         case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
             return this;
@@ -651,11 +650,11 @@ public class PioneeringMission extends Mission {
             // at the target.  Move randomly and retry if adjacent.
             Direction d = unit.getTile().getDirection(getTarget().getTile());
             if (d != null) moveRandomly(tag, d);
-            logSBdodge(sb, unit);
+            lbDodge(lb, unit);
             return this;
 
         default:
-            logSBmove(sb, unit, mt);
+            lbMove(lb, unit, mt);
             return this;
         }
 
@@ -680,7 +679,7 @@ public class PioneeringMission extends Mission {
             if (fail) {
                 aiPlayer.removeTileImprovementPlan(tileImprovementPlan);
                 tileImprovementPlan.dispose();
-                logSBfail(sb, "land claim at ", tile);
+                lbFail(lb, "land claim at ", tile);
                 return null;
             }
         }
@@ -688,20 +687,20 @@ public class PioneeringMission extends Mission {
         // Work on the improvement
         if (unit.getState() == UnitState.IMPROVING) {
             unit.setMovesLeft(0);
-            logSB(sb, ", improving ", tileImprovementPlan.getType(), ".");
+            lb.add(", improving ", tileImprovementPlan.getType(), ".");
         } else if (unit.checkSetState(UnitState.IMPROVING)) {
             if (AIMessage.askChangeWorkImprovementType(aiUnit,
                     tileImprovementPlan.getType())) {
-                logSB(sb, " began improvement ", tileImprovementPlan.getType(),
-                    " at ", tile, ".");
+                lb.add(" began improvement ", tileImprovementPlan.getType(),
+                       " at ", tile, ".");
             } else {
                 aiPlayer.removeTileImprovementPlan(tileImprovementPlan);
                 tileImprovementPlan.dispose();
-                logSBfail(sb, "to change work type at ", tile);
+                lbFail(lb, "to change work type at ", tile);
                 return null;
             }
         } else { // Probably just out of moves.
-            logSB(sb, ", waiting to improve at ", tile, ".");
+            lb.add(", waiting to improve at ", tile, ".");
         }
         return this;
     }

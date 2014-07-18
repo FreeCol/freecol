@@ -40,6 +40,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIUnit;
@@ -464,23 +465,23 @@ public class UnitSeekAndDestroyMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    public Mission doMission(StringBuilder sb) {
-        logSB(sb, tag);
+    public Mission doMission(LogBuilder lb) {
+        lb.add(tag);
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            if (!retargetMission(reason, sb)) return null;
+            if (!retargetMission(reason, lb)) return null;
         } else if (reason != null) {
-            logSBbroken(sb, reason);
+            lbBroken(lb, reason);
             return null;
         }
 
         final Unit unit = getUnit();
         int disembark = checkDisembark(tag);
         if (disembark > 0) { // Arrived
-            logSBat(sb, unit);
+            lbAt(lb, unit);
             return this;
         } else if (disembark < 0) { // Failed!?!
-            logSBfail(sb, "disembark at ", unit.getLocation());
+            lbFail(lb, "disembark at ", unit.getLocation());
             return this;
         }
 
@@ -490,13 +491,13 @@ public class UnitSeekAndDestroyMission extends Mission {
             : findTarget(aiUnit, 1, false);
         if (nearbyTarget != null) {
             if (getTarget() == null) {
-                logSB(sb, ", retargeted ", nearbyTarget);
+                lb.add(", retargeted ", nearbyTarget);
                 setTarget(nearbyTarget);
                 nearbyTarget = null;
             } else if (nearbyTarget == getTarget()) {
                 nearbyTarget = null;
             } else {
-                logSB(sb, ", found target of opportunity ", nearbyTarget);
+                lb.add(", found target of opportunity ", nearbyTarget);
             }
         }
 
@@ -505,7 +506,7 @@ public class UnitSeekAndDestroyMission extends Mission {
             : getTarget();
         // Note avoiding other targets by choice of cost decider.
         Unit.MoveType mt = travelToTarget(currentTarget,
-            CostDeciders.avoidSettlementsAndBlockingUnits(), sb);
+            CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
         switch (mt) {
         case MOVE_ILLEGAL:
         case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
@@ -517,18 +518,18 @@ public class UnitSeekAndDestroyMission extends Mission {
             if (settlement != null && settlement.getUnitCount() < 2) {
                 // Do not risk attacking out of a settlement that
                 // might collapse.  Defend instead.
-                logSB(sb, ", desperate defence of ", settlement, ".");
+                lb.add(", desperate defence of ", settlement, ".");
                 return new DefendSettlementMission(getAIMain(), aiUnit,
                                                    settlement);
             }
             Direction d = unitTile.getDirection(currentTarget.getTile());
             assert d != null;
             AIMessage.askAttack(aiUnit, d);
-            logSBattack(sb, currentTarget);
+            lbAttack(lb, currentTarget);
             return (unit.isDisposed()) ? null : this;
 
         default:
-            logSBmove(sb, unit, mt);
+            lbMove(lb, unit, mt);
             break;
         }
         return this;

@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.ai.AIGoods;
 import net.sf.freecol.server.ai.AIMain;
@@ -64,6 +65,8 @@ public class TransportMissionTest extends FreeColTestCase {
         = spec().getUnitType("model.unit.privateer");
     private static final UnitType wagonType
         = spec().getUnitType("model.unit.wagonTrain");
+
+    private LogBuilder lb = new LogBuilder(0);
 
 
     @Override
@@ -101,7 +104,7 @@ public class TransportMissionTest extends FreeColTestCase {
         Unit privateer = new ServerUnit(game, tile2, french, privateerType);
 
         // assign transport mission to the ship
-        aiUnit.changeMission(new TransportMission(aiMain, aiUnit), null);
+        aiUnit.changeMission(new TransportMission(aiMain, aiUnit), lb);
 
         // Simulate the combat
         igc.combat(dutch, privateer, galleon,
@@ -139,7 +142,7 @@ public class TransportMissionTest extends FreeColTestCase {
 
         // assign transport mission to the ship
         TransportMission mission = new TransportMission(aiMain, aiUnit);
-        aiUnit.changeMission(mission, null);
+        aiUnit.changeMission(mission, lb);
         Transportable goods = new AIGoods(aiMain,galleon, horsesType,50, colonyTile);
         mission.queueTransportable(goods, false);
 
@@ -174,12 +177,12 @@ public class TransportMissionTest extends FreeColTestCase {
 
         // assign transport mission to the ship
         TransportMission mission = new TransportMission(aiMain, aiUnit);
-        aiUnit.changeMission(mission, null);
+        aiUnit.changeMission(mission, lb);
         Transportable goods = new AIGoods(aiMain, galleon, horsesType, 50,
                                           europe);
         assertTrue("Goods should queue",
                    mission.queueTransportable(goods, false));
-        mission.doMission(null);
+        mission.doMission(lb);
 
         // Exercise
         Location dest = mission.getTarget();
@@ -215,11 +218,11 @@ public class TransportMissionTest extends FreeColTestCase {
 
         // assign transport mission to the ship
         TransportMission mission = new TransportMission(aiMain, aiUnit);
-        aiUnit.changeMission(mission, null);
+        aiUnit.changeMission(mission, lb);
         Transportable goods = new AIGoods(aiMain, galleon, horsesType, 50,
                                           colonyTile);
         mission.queueTransportable(goods, false);
-        mission.doMission(null);
+        mission.doMission(lb);
 
         // Exercise
         Location dest = mission.getTarget();
@@ -251,7 +254,7 @@ public class TransportMissionTest extends FreeColTestCase {
 
         // assign transport mission to the ship
         TransportMission mission = new TransportMission(aiMain, aiUnit);
-        aiUnit.changeMission(mission, null);
+        aiUnit.changeMission(mission, lb);
 
         assertTrue("Setup error, player should not have colonies", dutch.getColonies().isEmpty());
 
@@ -268,7 +271,7 @@ public class TransportMissionTest extends FreeColTestCase {
         builder.colonyTile(colonyTile).initialColonists(1).player(dutch).build();
         assertFalse("Player should now have a colony", dutch.getColonies().isEmpty());
         mission = new TransportMission(aiMain, aiUnit);
-        aiUnit.changeMission(mission, null);
+        aiUnit.changeMission(mission, lb);
 
         // Exercise
         dest = mission.getTarget();
@@ -312,7 +315,7 @@ public class TransportMissionTest extends FreeColTestCase {
         AIGoods aiGoods = new AIGoods(aiMain, two, 
                                       goods.getType(), goods.getAmount(), one);
         mission.queueTransportable(aiGoods, false);
-        mission.doMission(null);
+        mission.doMission(lb);
 
         dest = mission.getTarget();
         assertEquals("Destination should now be colony two", two.getId(), dest.getId());

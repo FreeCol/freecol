@@ -35,6 +35,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
 import net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission;
@@ -66,6 +67,8 @@ public class MissionAssignmentTest extends FreeColTestCase {
         = spec().getUnitType("model.unit.galleon");
 
     final int MISSION_IMPOSSIBLE = Integer.MIN_VALUE;
+
+    private LogBuilder lb = new LogBuilder(0); // dummy
 
 
     @Override
@@ -219,7 +222,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
             AIUnit aiUnit = aiMain.getAIUnit(brave);
             assertNotNull("Couldnt get the ai object for the brave", aiUnit);
             aiUnit.changeMission(new UnitWanderHostileMission(aiMain, aiUnit),
-                                 null);
+                                 lb);
             assertTrue("Should be UnitWanderHostileMission", 
                 aiUnit.getMission() instanceof UnitWanderHostileMission);
             assertEquals("Unit should be candidate for seek+destroy", null,
@@ -236,7 +239,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
         assertEquals("Wrong Indian player tension towards dutch",
                      Tension.Level.HATEFUL.getLimit(),
                      inca.getTension(dutch).getValue());
-        aiInca.secureIndianSettlement(camp, null);
+        aiInca.secureIndianSettlement(camp, lb);
 
         // Verify if a unit was assigned a UnitSeekAndDestroyMission
         boolean isSeekAndDestroyMission = false;
@@ -290,7 +293,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
             AIUnit aiUnit = aiMain.getAIUnit(brave);
             assertNotNull(aiUnit);
             aiUnit.changeMission(new UnitWanderHostileMission(aiMain, aiUnit),
-                                 null);
+                                 lb);
             assertEquals("No enemy units present",
                 UnitWanderHostileMission.class,
                 aiUnit.getMission().getClass());
@@ -305,7 +308,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
                      inca.getTension(dutch).getValue());
 
         aiInca.abortInvalidMissions();
-        aiInca.secureIndianSettlement(camp, null);
+        aiInca.secureIndianSettlement(camp, lb);
         boolean seeking = false;
         for (Unit brave : inca.getUnits()) {
             AIUnit aiUnit = aiMain.getAIUnit(brave);

@@ -52,6 +52,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIGoods;
@@ -506,16 +507,12 @@ public class TransportMission extends Mission {
          */
         @Override
         public String toString() {
-            StringBuilder sb = new StringBuilder(64);
-            sb.append("[").append(transportable.toString())
-                .append(" mode=").append(mode)
-                .append((mode.isCollection()) ? " from " : " to ")
-                .append(target.toShortString())
-                .append(" ").append(turns).append("/").append(tries)
-                .append(" space=").append(spaceLeft)
-                .append((wrapped == null) ? "" : " wrap")
-                .append("]");
-            return sb.toString();
+            LogBuilder lb = new LogBuilder(64);
+            lb.add("[", transportable, " mode=", mode,
+                ((mode.isCollection()) ? " from " : " to "), target,
+                " ", turns, "/", tries, " space=", spaceLeft,
+                ((wrapped == null) ? "" : " wrap"), "]");
+            return lb.toString();
         }            
     };
 
@@ -536,9 +533,12 @@ public class TransportMission extends Mission {
     public TransportMission(AIMain aiMain, AIUnit aiUnit) {
         super(aiMain, aiUnit);
 
-        checkCargoes(null);
+        LogBuilder lb = new LogBuilder(logger, Level.FINEST);
+        lb.add(tag);
+        checkCargoes(lb);
         retarget();
-        logger.finest(tag + " begins: " + toFullString());
+        lb.add(" begins: ", toFullString());
+        lb.flush();
         uninitialized = false;
     }
 
@@ -1117,11 +1117,11 @@ public class TransportMission extends Mission {
      * carrier yet without a meaningful transport destination.
      *
      * @param t The <code>Transportable</code> to retarget.
-     * @param sb An optional <code>StringBuilder</code> to log to.
+     * @param lb A <code>LogBuilder</code> to log to.
      * @return True if the transportable should now have a valid
      *     transport destination.
      */
-    private boolean retargetTransportable(Transportable t, StringBuilder sb) {
+    private boolean retargetTransportable(Transportable t, LogBuilder lb) {
         final EuropeanAIPlayer euaip = getEuropeanAIPlayer();
         final AIUnit aiCarrier = getAIUnit();
         final Unit carrier = aiCarrier.getUnit();
@@ -1142,7 +1142,7 @@ public class TransportMission extends Mission {
             for (Location loc : locations) {
                 for (WorkerWish ww : euaip.getWorkerWishesAt(loc, type)) {
                     if ((m = euaip.consumeWorkerWish(aiu, ww)) != null) {
-                        aiu.changeMission(m, sb);logSB(sb, ", ");
+                        aiu.changeMission(m, lb);lb.add(", ");
                         return true;
                     }
                 }
@@ -1151,7 +1151,7 @@ public class TransportMission extends Mission {
             // Try giving the unit a new mission (may well call
             // getBestWorkerWish at some point).
             if ((m = euaip.getSimpleMission(aiu)) != null) {
-                aiu.changeMission(m, sb);logSB(sb, ", ");
+                aiu.changeMission(m, lb);lb.add(", ");
                 return true;
             }
 
@@ -1173,7 +1173,7 @@ public class TransportMission extends Mission {
                     } else {
                         gw.setGoodsAmount(gw.getGoodsAmount() - a);
                     }
-                    logSB(sb, aig, " to ", loc, ", ");
+                    lb.add(aig, " to ", loc, ", ");
                     return true;
                 }
             }
@@ -1183,7 +1183,7 @@ public class TransportMission extends Mission {
             if (gw != null) {
                 aig.setTransportDestination(gw.getDestination());
                 euaip.consumeGoodsWish(aig, gw);
-                logSB(sb, aig, " to ", gw.getDestination(), ", ");
+                lb.add(aig, " to ", gw.getDestination(), ", ");
                 return true;
             }
 
@@ -1208,7 +1208,7 @@ public class TransportMission extends Mission {
             }
             if (best != null) {
                 aig.setTransportDestination(best);
-                logSB(sb, aig, " to unload at ", best, ", ");
+                lb.add(aig, " to unload at ", best, ", ");
                 return true;
             }
         }
@@ -1222,9 +1222,9 @@ public class TransportMission extends Mission {
      * cargo on board should be on the cargoes list but the list is
      * not necessarily going to be in a sensible order.
      *
-     * @param sb An optional <code>StringBuilder</code> to log to.
+     * @param lb A <code>LogBuilder</code> to log to.
      */
-    private void checkCargoes(StringBuilder sb) {
+    private void checkCargoes(LogBuilder lb) {
         final Unit carrier = getUnit();
         if (carrier.isAtSea()) return; // Let it emerge.
 
@@ -1238,29 +1238,29 @@ public class TransportMission extends Mission {
         List<Transportable> retry = new ArrayList<Transportable>();
         String reason;
         PathNode path;
-        logSB(sb, " [check:");
+        lb.add(" [check:");
         for (Cargo cargo : tCopy()) {
             Transportable t = cargo.getTransportable();
             if ((reason = cargo.check(aiCarrier)) != null) {
                 // Just remove, it is invalid
                 boolean result = removeCargo(cargo, reason);
-                logSB(sb, " invalid(", reason,")", cargo, "=", result);
+                lb.add(" invalid(", reason, ")", cargo, "=", result);
             } else if (cargo.isCollectable()) {
-                logSB(sb, " collect", cargo);
+                lb.add(" collect", cargo);
             } else if (cargo.isDeliverable()) {
-                logSB(sb, " deliver", cargo);
+                lb.add(" deliver", cargo);
             } else if ((path = carrier.findPath(cargo.getTarget())) == null
                 && !cargo.retry()) {
                 boolean result = removeCargo(cargo, "no path");
-                logSB(sb, " drop(no-path)", cargo, "=", result);
+                lb.add(" drop(no-path)", cargo, "=", result);
                 drop.add(t);
             } else if (carrier.hasTile()
                 && (reason = cargo.setTarget()) != null) {
                 boolean result = removeCargo(cargo, "fail(" + reason + ")");
                 if (reason.startsWith("invalid") || !cargo.retry()) {
-                    logSB(sb, " failed(", reason, ")", cargo, "=", result);
+                    lb.add(" failed(", reason, ")", cargo, "=", result);
                 } else {
-                    logSB(sb, " retry(", reason, ")", cargo, "=", result);
+                    lb.add(" retry(", reason, ")", cargo, "=", result);
                     retry.add(t);
                 }
             } else {
@@ -1285,31 +1285,31 @@ public class TransportMission extends Mission {
 
         // Retry anything found that was not on the cargoes list
         if (!unitsPresent.isEmpty()) {
-            logSB(sb, ", found unexpected units:");
+            lb.add(", found unexpected units:");
             for (Unit u : unitsPresent) {
                 AIUnit aiu = getAIMain().getAIUnit(u);
                 if (aiu == null) throw new IllegalStateException("Bogus:" + u);
                 retry.add(aiu);
-                logSB(sb, " ", aiu.getUnit());
+                lb.add(" ", aiu.getUnit());
             }
         }
         if (!goodsPresent.isEmpty()) {
-            logSB(sb, ", found unexpected goods:");
+            lb.add(", found unexpected goods:");
             for (Goods g : goodsPresent) {
                 AIGoods aig = new AIGoods(getAIMain(), carrier, g.getType(),
                                           g.getAmount(), null);
                 retry.add(aig);
-                logSB(sb, " ", aig);
+                lb.add(" ", aig);
             }
         }
 
         // Ask the parent player to retarget transportables on the retry list
         if (!retry.isEmpty()) {
-            int point = sbMark(sb);
+            lb.mark();
             for (Transportable t : retry) {
-                if (!retargetTransportable(t, sb)) drop.add(t);
+                if (!retargetTransportable(t, lb)) drop.add(t);
             }
-            if (sbGrew(sb, point, ", retarget: ")) sbShrink(sb, ", ");
+            if (lb.grew(", retarget: ")) lb.shrink(", ");
         }
 
         // Drop transportables on the drop list, or queue them to be dropped
@@ -1320,24 +1320,24 @@ public class TransportMission extends Mission {
                 : path.getLastNode().getLocation();
             boolean dropReady = path == null || carrier.isAtLocation(end);
             if (dropReady) {
-                logSB(sb, ", drop at ", upLoc(here), ":");
+                lb.add(", drop at ", upLoc(here), ":");
                 while (!drop.isEmpty()) {
                     Transportable t = drop.remove(0);
                     boolean result = dumpTransportable(t, true);
-                    logSB(sb, " ", t, ((result) ? "" : "(failed)"));
+                    lb.add(" ", t, ((result) ? "" : "(failed)"));
                 }
             } else {
-                logSB(sb, ", will drop at ", upLoc(end));
+                lb.add(", will drop at ", upLoc(end));
                 while (!drop.isEmpty()) {
                     Transportable t = drop.remove(0);
                     Cargo cargo = new Cargo(t, carrier, end);
                     boolean result = queueCargo(cargo, false);
-                    logSB(sb, " ", t, ((result) ? "" : "(failed)"));
+                    lb.add(" ", t, ((result) ? "" : "(failed)"));
                 }
             }
         }
 
-        logSB(sb, "]");
+        lb.add("]");
     }
 
     /**
@@ -1489,10 +1489,10 @@ public class TransportMission extends Mission {
      * Leaves the cargoes in the order they are expected to
      * execute, with valid spaceLeft values.
      *
-     * @param sb An optional <code>StringBuilder</code> to log to.
+     * @param lb A <code>LogBuilder</code> to log to.
      */
-    private void optimizeCargoes(StringBuilder sb) {
-        logSB(sb, ", optimize");
+    private void optimizeCargoes(LogBuilder lb) {
+        lb.add(", optimize");
 
         // We wrap/unwrap the list to minimize the number of nodes
         // that need consideration.
@@ -1524,7 +1524,7 @@ public class TransportMission extends Mission {
             tSet(unwrapCargoes(ts), false);
         }
         retarget();
-        logSB(sb, " -> ", getTarget());
+        lb.add(" -> ", getTarget());
     }
 
     /**
@@ -1821,23 +1821,23 @@ public class TransportMission extends Mission {
     /**
      * {@inheritDoc}
      */
-    public Mission doMission(StringBuilder sb) {
-        logSB(sb, tag);
-        checkCargoes(sb);
+    public Mission doMission(LogBuilder lb) {
+        lb.add(tag);
+        checkCargoes(lb);
 
         String reason = invalidReason();
         if (reason != null) {
-            logSBbroken(sb, reason);
+            lbBroken(lb, reason);
             retarget(); // Try to recover
             if ((reason = invalidReason()) != null) {
-                checkCargoes(sb);
-                optimizeCargoes(sb);
+                checkCargoes(lb);
+                optimizeCargoes(lb);
                 if ((reason = invalidReason()) != null) {
-                    logSBbroken(sb, reason);
+                    lbBroken(lb, reason);
                     return null;
                 }
             }
-            logSB(sb, ", recovered to ", getTarget());
+            lb.add(", recovered to ", getTarget());
         }
 
         final EuropeanAIPlayer euaip = getEuropeanAIPlayer();
@@ -1847,7 +1847,7 @@ public class TransportMission extends Mission {
             = CostDeciders.avoidSettlementsAndBlockingUnits();
         CostDecider costDecider = CostDeciders.defaultCostDeciderFor(unit);
         for (;;) {
-            Unit.MoveType mt = travelToTarget(target, costDecider, sb);
+            Unit.MoveType mt = travelToTarget(target, costDecider, lb);
             switch (mt) {
             case MOVE_HIGH_SEAS: case MOVE_NO_MOVES: case MOVE_NO_REPAIR:
                 return this;
@@ -1862,7 +1862,7 @@ public class TransportMission extends Mission {
                 if (blocker instanceof Unit && shouldAttack((Unit)blocker)) {
                     AIMessage.askAttack(aiCarrier,
                         unit.getTile().getDirection(blocker.getTile()));
-                    logSBattack(sb, blocker);
+                    lbAttack(lb, blocker);
                     return this;
                 }
                 // Fall through
@@ -1873,11 +1873,11 @@ public class TransportMission extends Mission {
                     || costDecider == fallBackDecider) {
                     moveRandomly(tag, null);
                     unit.setMovesLeft(0);
-                    logSBdodge(sb, unit);
+                    lbDodge(lb, unit);
                     return this;
                 }
                 costDecider = fallBackDecider; // Retry
-                logSB(sb, ", retry blockage at ", unit.getLocation());
+                lb.add(", retry blockage at ", unit.getLocation());
                 break;
 
             case MOVE:
@@ -1886,14 +1886,14 @@ public class TransportMission extends Mission {
                     // delivered.  Check other deliveries, we might be
                     // in port so this is a good time to decide to
                     // fail to deliver something.
-                    logSB(sb, ", delivering:");
+                    lb.add(", delivering:");
                     List<Cargo> cont = new ArrayList<Cargo>();
                     List<Cargo> curr = tClear();
                     for (Cargo cargo : curr) {
                         CargoResult result = (cargo.getMode().isCollection())
                             ? CargoResult.TCONTINUE
                             : tryCargo(cargo);
-                        logSB(sb, " ", cargo, "=", result);
+                        lb.add(" ", cargo, "=", result);
                         switch (result) {
                         case TCONTINUE:
                         case TRETRY: // will check again below
@@ -1912,12 +1912,12 @@ public class TransportMission extends Mission {
                     // Rebuild the cargo list with the original members,
                     // less the transportables that were dropped.
                     tSet(cont, true);
-                    checkCargoes(sb);
-                    optimizeCargoes(sb); // This will retarget failures
+                    checkCargoes(lb);
+                    optimizeCargoes(lb); // This will retarget failures
 
                     // Now try again, this time collecting as well as
                     // delivering.
-                    logSB(sb, ", collecting:");
+                    lb.add(", collecting:");
                     cont.clear();
                     List<Cargo> next = new ArrayList<Cargo>();
                     curr = tClear();
@@ -1925,7 +1925,7 @@ public class TransportMission extends Mission {
                         CargoResult result = (cargo.getMode().isCollection())
                             ? tryCargo(cargo)
                             : CargoResult.TCONTINUE;
-                        logSB(sb, " ", cargo, "=", result);
+                        lb.add(" ", cargo, "=", result);
                         switch (result) {
                         case TCONTINUE:
                             cont.add(cargo);
@@ -1984,16 +1984,16 @@ public class TransportMission extends Mission {
 
                 retarget();
                 if ((reason = invalidReason()) != null) {
-                    logSBbroken(sb, reason);
+                    lbBroken(lb, reason);
                     return null;
                 } else if (unit.isAtLocation(target)) {
-                    logSB(sb, ", waiting at ", target, ".");
+                    lb.add(", waiting at ", target, ".");
                     return this;
                 }
                 break;
 
             default:
-                logSBmove(sb, unit, mt);
+                lbMove(lb, unit, mt);
                 return this;
             }
         }
@@ -2147,12 +2147,10 @@ public class TransportMission extends Mission {
      * @return A summary of this mission including its transportables.
      */
     public String toFullString() {
-        StringBuilder sb = new StringBuilder(this.toString());
-        for (Cargo cargo : tCopy()) {
-            sb.append("\n  ->");
-            sb.append(cargo.toString());
-        }
-        return sb.toString();
+        LogBuilder lb = new LogBuilder(64);
+        lb.add(this);
+        for (Cargo cargo : tCopy()) lb.add("\n  ->", cargo);
+        return lb.toString();
     }
 
     /**

@@ -30,6 +30,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.util.LogBuilder;
 
 import org.w3c.dom.Element;
 
@@ -192,40 +193,36 @@ public abstract class AIObject extends FreeColObject {
 
     // Mission logging support
 
-    protected void logSBat(StringBuilder sb, Unit unit) {
-        logSB(sb, ", reached ", unit.getLocation(), ".");
+    protected void lbAt(LogBuilder lb, Unit unit) {
+        lb.add(", reached ", unit.getLocation(), ".");
     }
 
-    protected void logSBdodge(StringBuilder sb, Unit unit) {
-        logSB(sb, ", dodging at ", unit.getLocation(), ".");
+    protected void lbDodge(LogBuilder lb, Unit unit) {
+        lb.add(", dodging at ", unit.getLocation(), ".");
     }
 
-    protected void logSBmove(StringBuilder sb, Unit unit, Unit.MoveType mt) {
-        logSB(sb, ", bad move type at ", unit.getLocation(), ": ", mt, ".");
+    protected void lbMove(LogBuilder lb, Unit unit, Unit.MoveType mt) {
+        lb.add(", bad move type at ", unit.getLocation(), ": ", mt, ".");
+    }
+    
+    protected void lbAttack(LogBuilder lb, Location what) {
+        lb.add(", attacking ", what, ".");
     }
 
-    protected void logSBattack(StringBuilder sb, Location what) {
-        logSB(sb, ", attacking ", what, ".");
+    protected void lbBroken(LogBuilder lb, String reason) {
+        lb.add(", broken: ", reason, ".");
     }
 
-    protected void logSBbroken(StringBuilder sb, String reason) {
-        logSB(sb, ", broken: ", reason, ".");
+    protected void lbFail(LogBuilder lb, Object... reasons) {
+        lb.add(", FAILED: ", reasons, ".");
     }
 
-    protected void logSBfail(StringBuilder sb, Object... reasons) {
-        if (sb != null) {
-            sb.append(", FAILED: ");
-            logSB2(sb, reasons);
-        }
+    protected void lbDone(LogBuilder lb, Object... reasons) {
+        lb.add(", COMPLETED: ", reasons, ".");
     }
 
-    protected void logSBdone(StringBuilder sb, Object... reasons) {
-        if (sb != null) {
-            sb.append(", COMPLETED: ");
-            logSB2(sb, reasons);
-        }
-    }
 
+    // Other low level
 
     /**
      * Checks the integrity of this AI object.

@@ -30,6 +30,7 @@ import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIUnit;
 
@@ -124,31 +125,31 @@ public class IdleAtSettlementMission extends Mission {
     /**
      * {@inheritDoc}
      */
-    public Mission doMission(StringBuilder sb) {
-        logSB(sb, tag);
+    public Mission doMission(LogBuilder lb) {
+        lb.add(tag);
         String reason = invalidReason();
         if (reason != null) {
-            logSBbroken(sb, reason);
+            lbBroken(lb, reason);
             return null;
         }
 
         // Wait if not on the map.
         final Unit unit = getUnit();
         if (!unit.hasTile()) {
-            logSBat(sb, unit);
+            lbAt(lb, unit);
             return this;
         }
 
         // If our tile contains a settlement, idle.  No log, this is normal.
         Settlement settlement = unit.getTile().getSettlement();
         if (settlement != null) {
-            logSB(sb, ", idling at ", settlement, ".");
+            lb.add(", idling at ", settlement, ".");
             return this;
         }
 
         Location target = findTarget();
         if (target != null) {
-            Unit.MoveType mt = travelToTarget(target, null, sb);
+            Unit.MoveType mt = travelToTarget(target, null, lb);
             switch (mt) {
             case MOVE:
                 break;
@@ -156,13 +157,13 @@ public class IdleAtSettlementMission extends Mission {
             case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
                 return this;
             default:
-                logSBmove(sb, unit, mt);
+                lbMove(lb, unit, mt);
                 return this;
             }
 
         } else { // Just make a random moves if no target can be found.
             moveRandomlyTurn(tag);
-            logSBat(sb, unit);
+            lbAt(lb, unit);
         }
         return this;
     }

@@ -32,6 +32,7 @@ import java.util.logging.LogRecord;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.FreeColServer;
 
 
@@ -388,11 +389,11 @@ public class FreeColDebugger {
      * @return A stack trace as a string.
      */
     public static String stackTraceToString() {
-        StringBuilder sb = new StringBuilder(512);
+        LogBuilder lb = new LogBuilder(512);
         for (StackTraceElement s : Thread.currentThread().getStackTrace()) {
-            sb.append(s.toString()).append("\n");
+            lb.add(s, "\n");
         }
-        FreeColObject.sbShrink(sb, "\n");
-        return sb.toString();
+        lb.shrink("\n");
+        return lb.toString();
     }
 }

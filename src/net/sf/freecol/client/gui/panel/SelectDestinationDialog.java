@@ -78,6 +78,7 @@ import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders.MultipleAdjacentDecider;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.Utils;
 
 import net.miginfocom.swing.MigLayout;
@@ -164,22 +165,21 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
                                  List<GoodsType> goodsTypes) {
             final String sep = ", ";
             final Player owner = unit.getOwner();
-            StringBuilder sb = new StringBuilder(32);
+            LogBuilder lb = new LogBuilder(32);
             boolean dropSep = false;
 
             // Always show our missions, it may influence our choice of
             // units to bring, and/or goods.
             if (loc instanceof IndianSettlement
                 && ((IndianSettlement)loc).hasMissionary(owner)) {
-                sb.append(ImageLibrary.CROSS);
+                lb.add(ImageLibrary.CROSS);
             }
 
             if (loc instanceof Europe && !goodsTypes.isEmpty()) {
                 Market market = owner.getMarket();
                 for (GoodsType goodsType : goodsTypes) {
-                    sb.append(Messages.getName(goodsType)).append(" ")
-                        .append(market.getSalePrice(goodsType, 1))
-                        .append(sep);
+                    lb.add(Messages.getName(goodsType), " ",
+                           market.getSalePrice(goodsType, 1), sep);
                     dropSep = true;
                 }
 
@@ -189,8 +189,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
 
             } else if (loc instanceof Settlement
                 && ((Settlement)loc).getOwner().atWarWith(owner)) {
-                sb.append("[").append(Messages.message("model.stance.war"))
-                    .append("]");
+                lb.add("[", Messages.message("model.stance.war"), "]");
 
             } else if (loc instanceof Settlement) {
                 if (loc instanceof IndianSettlement) {
@@ -210,8 +209,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
                             }
                         }
                         if (up != null) {
-                            sb.append("[").append(Messages.getName(sk))
-                                .append("]");
+                            lb.add("[", Messages.getName(sk), "]");
                         }
                     }
                 }
@@ -232,18 +230,18 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
                             }
                         }
                         if (sale != null && more != null) {
-                            sb.append(Messages.getName(g));
-                            if (sale != null) sb.append(" ").append(sale);
-                            if (more != null) sb.append(more);
-                            sb.append(sep);
+                            lb.add(Messages.getName(g));
+                            if (sale != null) lb.add(" ", sale);
+                            if (more != null) lb.add(more);
+                            lb.add(sep);
                             dropSep = true;
                         }
                     }
                 }
             } // else do nothing
 
-            if (dropSep) FreeColObject.sbShrink(sb, sep);
-            return sb.toString();
+            if (dropSep) lb.shrink(sep);
+            return lb.toString();
         }
 
         private int calculateScore() {

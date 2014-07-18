@@ -54,6 +54,7 @@ import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.ai.EuropeanAIPlayer;
 
@@ -271,10 +272,10 @@ public class ColonyPlan {
      * @return A build plan report.
      */
     public String getBuildableReport() {
-        StringBuilder sb = new StringBuilder(64);
-        sb.append("Buildables:\n");
-        for (BuildPlan b : buildPlans) sb.append(b.toString()).append("\n");
-        return sb.toString();
+        LogBuilder lb = new LogBuilder(64);
+        lb.add("Buildables:\n");
+        for (BuildPlan b : buildPlans) lb.add(b, "\n");
+        return lb.toString();
     }
 
     /**
@@ -1218,9 +1219,11 @@ public class ColonyPlan {
      *
      * @param workers A list of <code>Unit</code>s to assign.
      * @param preferScout Prefer to make scouts rather than soldiers.
+     * @param lb A <code>LogBuilder</code> to log to.
      * @return A scratch colony with the workers in place.
      */
-    public Colony assignWorkers(List<Unit> workers, boolean preferScout) {
+    public Colony assignWorkers(List<Unit> workers, boolean preferScout,
+                                LogBuilder lb) {
         final GoodsType foodType = spec().getPrimaryFoodType();
         final int maxUnitFood = colony.getOwner().getMaximumFoodConsumption();
         final String name = colony.getName();
@@ -1235,11 +1238,7 @@ public class ColonyPlan {
         // Make a scratch colony to work on.
         Colony col = colony.copyColony();
         Tile tile = col.getTile();
-        StringBuilder report = new StringBuilder(256);
-        report.append("Worker assignment at ").append(name)
-            .append(" of ").append(workers.size()).append(" workers")
-            .append(" in ").append(turn).append("/").append(turn.getNumber())
-            .append("\n");
+        lb.add("Worker assignment at ", name, " of ", workers.size());
 
         // Replace the given workers with those in the scratch colony.
         List<Unit> otherWorkers = new ArrayList<Unit>(workers);
@@ -1277,9 +1276,8 @@ public class ColonyPlan {
                 if (u.getType() == role.getExpertUnit()
                     && fullEquipUnit(spec(), u, role, col)) {
                     workers.remove(u);
-                    report.append(u.getId()).append("(")
-                        .append(u.getType().getSuffix())
-                        .append(") -> ").append(role.getSuffix()).append("\n");
+                    lb.add(u.getId(), "(", u.getType().getSuffix(), ") -> ",
+                           role.getSuffix(), "\n");
                 }
             }
         }
@@ -1315,9 +1313,8 @@ public class ColonyPlan {
             Role role = u.getAvailableRoles(spec().getMilitaryRoles()).get(0);
             if (fullEquipUnit(spec(), u, role, col)) {
                 workers.remove(u);
-                report.append(u.getId()).append("(")
-                    .append(u.getType().getSuffix())
-                    .append(") -> ").append(u.getRoleSuffix()).append("\n");
+                lb.add(u.getId(), "(", u.getType().getSuffix(), ") -> ",
+                       u.getRoleSuffix(), "\n");
             }
         }
 
@@ -1352,7 +1349,7 @@ public class ColonyPlan {
             for (;;) {
                 if (wlp == null) { // Time to use a food plan.
                     if (foodPlans.isEmpty()) {
-                        report.append("Food plans exhausted\n");
+                        lb.add("Food plans exhausted\n");
                         done = true;
                         break;
                     }
@@ -1364,9 +1361,10 @@ public class ColonyPlan {
                 goodsType = wlp.getGoodsType();
                 wl = col.getCorresponding(wlp.getWorkLocation());
                 best = null;
-                report.append(String.format("%-2d: %15s@%-25s => ",
-                        col.getUnitCount(), goodsType.getSuffix(),
-                        locationDescription(wl)));
+                lb.add(lb.wide(2, col.getUnitCount()),
+                       ": ", lb.wide(-15, goodsType.getSuffix()),
+                       "@", lb.wide(25, locationDescription(wl)),
+                       " => ");
 
                 if (!wl.canBeWorked()) {
                     err = "can not be worked";
@@ -1378,7 +1376,7 @@ public class ColonyPlan {
                 }
                 if (err != null) {
                     wlps.remove(wlp); // The plan can not be worked, dump it.
-                    report.append(err).append("\n");
+                    lb.add(err, "\n");
                     break;
                 }
 
@@ -1389,7 +1387,7 @@ public class ColonyPlan {
                 if (col.getProductionBonus() < 0) {
                     best.setLocation(tile);
                     done = true;
-                    report.append("broke production bonus\n");
+                    lb.add("broke production bonus\n");
                     break;
                 }
 
@@ -1404,13 +1402,11 @@ public class ColonyPlan {
                         best.setLocation(tile);
                         wlp = null;
                         if (goodsType.isFoodType()) {
-                            report.append("starvation (").append(count)
-                                .append("/").append(net).append(")\n");
+                            lb.add("starvation (", count, "/", net, ")\n");
                             done = true;
                             break;
                         }
-                        report.append("would starve (").append(count)
-                            .append("/").append(net).append(")\n");
+                        lb.add("would starve (", count, "/", net, ")\n");
                         continue;
                     }
                     // Otherwise tolerate the food stock running down.
@@ -1440,8 +1436,7 @@ public class ColonyPlan {
                     // on its list.
                     best.changeWorkType(goodsType);
                     workers.remove(best);
-                    report.append(best.getId()).append("(")
-                        .append(best.getType().getSuffix()).append(")\n");
+                    lb.add(best.getId(), "(", best.getType().getSuffix(),")\n");
                     if (!goodsType.isFoodType() && produce.remove(goodsType)) {
                         produce.add(goodsType);
                     }
@@ -1459,8 +1454,7 @@ public class ColonyPlan {
                     // loop trying to satisfy the alternate plan.
                     if (produce.remove(raw)) produce.add(0, raw);
                     wlp = rawWlp;
-                    report.append("retry with ")
-                        .append(raw.getSuffix()).append("\n");
+                    lb.add("retry with ", raw.getSuffix(), "\n");
                     continue;
                 }
 
@@ -1470,8 +1464,7 @@ public class ColonyPlan {
                 // we will succeed next time.
                 wlps.remove(wlp);
                 produce.remove(goodsType);
-                report.append("needs more ")
-                    .append(raw.getSuffix()).append("\n");
+                lb.add("needs more ",raw.getSuffix(), "\n");
                 break;
             }
         }
@@ -1513,8 +1506,7 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
                         u.setLocation(wl);
                         u.changeWorkType(goodsType);
                         if (col.getAdjustedNetProductionOf(foodType) >= 0) {
-                            report.append("Subsist with ").append(u)
-                                .append("\n");
+                            lb.add("Subsist with ", u, "\n");
                             workers.remove(u);
                             break plans;
                         }
@@ -1546,14 +1538,12 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
             Unit u1 = experts.get(expert);
             Unit other;
             if ((other = trySwapExpert(u1, experts, col)) != null) {
-                report.append("Swapped ").append(u1.getId()).append("(")
-                    .append(u1.getType().getSuffix())
-                    .append(") for ").append(other).append("\n");
+                lb.add("Swapped ", u1.getId(), "(", u1.getType().getSuffix(),
+                       ") for ", other, "\n");
                 experts.remove(u1);
             } else if ((other = trySwapExpert(u1, nonExperts, col)) != null) {
-                report.append("Swapped ").append(u1.getId()).append("(")
-                    .append(u1.getType().getSuffix())
-                    .append(") for ").append(other).append("\n");
+                lb.add("Swapped ", u1.getId(), "(", u1.getType().getSuffix(),
+                       ") for ", other, "\n");
                 experts.remove(u1);
             } else {
                 expert++;
@@ -1564,9 +1554,8 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
             if (work != null) {
                 Unit other = trySwapExpert(u, col.getUnitList(), col);
                 if (other != null) {
-                    report.append("Swapped ").append(u.getId()).append("(")
-                        .append(u.getType().getSuffix())
-                        .append(") for ").append(other).append("\n");
+                    lb.add("Swapped ", u.getId(), "(", u.getType().getSuffix(),
+                           ") for ", other, "\n");
                     workers.remove(u);
                     workers.add(other);
                 }
@@ -1578,9 +1567,8 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
         for (Unit u : new ArrayList<Unit>(workers)) {
             Role role = u.getAvailableRoles(spec().getMilitaryRoles()).get(0);
             if (fullEquipUnit(spec(), u, role, col)) {
-                report.append(u.getId()).append("(")
-                    .append(u.getType().getSuffix())
-                    .append(") -> ").append(u.getRoleSuffix()).append("\n");
+                lb.add(u.getId(), "(", u.getType().getSuffix(), ") -> ",
+                       u.getRoleSuffix(), "\n");
                 workers.remove(u);
             } else break;
         }
@@ -1589,13 +1577,11 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
         // Otherwise abandon this rearrangement, disposing of the
         // scratch colony and returning null.
         for (Unit u : workers) {
-            report.append(u.getId()).append("(")
-                .append(u.getType().getSuffix()).append(") -> UNUSED\n");
+            lb.add(u.getId(), "(", u.getType().getSuffix(), ") -> UNUSED\n");
         }
-        report.append("Final population = ").append(col.getUnitCount());
+        lb.add("Final population = ", col.getUnitCount());
         if (col.getUnitCount() <= 0) {
-            report.append("\nassignWorkers at ").append(name)
-                .append(" failed.");
+            lb.add("\nassignWorkers at ", name, " failed.");
             col = null;
         }
         for (Unit u : col.getUnitList()) {
@@ -1605,7 +1591,6 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
             }
         }
 
-        logger.finest(report.toString());
         return col;
     }
 
@@ -1631,35 +1616,27 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
     @Override
     public String toString() {
         final Tile tile = colony.getTile();
-        final StringBuilder sb = new StringBuilder(256);
-        sb.append("ColonyPlan: ").append(colony.getName())
-            .append(" ").append(colony.getTile())
-            .append("\nProfile: ").append(profileType.toString())
-            .append("\nPreferred production:\n");
+        LogBuilder lb = new LogBuilder(256);
+        lb.add("ColonyPlan: ", colony,
+            " ", colony.getTile(),
+            "\nProfile: ", profileType, "\nPreferred production:\n");
         for (GoodsType goodsType : getPreferredProduction()) {
-            sb.append(goodsType.getSuffix()).append("\n");
+            lb.add(goodsType.getSuffix(), "\n");
         }
-        sb.append(getBuildableReport());
-        sb.append("Food Plans:\n");
+        lb.add(getBuildableReport(), "Food Plans:\n");
         for (WorkLocationPlan wlp : getFoodPlans()) {
             WorkLocation wl = wlp.getWorkLocation();
-            sb.append(locationDescription(wl))
-                .append(": ")
-                .append(wl.getGenericPotential(wlp.getGoodsType()))
-                .append(" ")
-                .append(wlp.getGoodsType().getSuffix())
-                .append("\n");
+            lb.add(locationDescription(wl),
+                ": ", wl.getGenericPotential(wlp.getGoodsType()), 
+                " ", wlp.getGoodsType().getSuffix(), "\n");
         }
-        sb.append("Work Plans:\n");
+        lb.add("Work Plans:\n");
         for (WorkLocationPlan wlp : getWorkPlans()) {
             WorkLocation wl = wlp.getWorkLocation();
-            sb.append(locationDescription(wl))
-                .append(": ")
-                .append(wl.getGenericPotential(wlp.getGoodsType()))
-                .append(" ")
-                .append(wlp.getGoodsType().getSuffix())
-                .append("\n");
+            lb.add(locationDescription(wl),
+                ": ", wl.getGenericPotential(wlp.getGoodsType()),
+                " ", wlp.getGoodsType().getSuffix(), "\n");
         }
-        return sb.toString();
+        return lb.toString();
     }
 }

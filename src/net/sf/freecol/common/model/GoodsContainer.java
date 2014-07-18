@@ -595,7 +595,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
                     .append(", ");
             }
         }
-        FreeColObject.sbShrink(sb, ", ");
+        sb.setLength(sb.length() - ", ".length());
         sb.append("][");
         synchronized (oldStoredGoods) {
             for (Map.Entry<GoodsType, Integer> entry : oldStoredGoods.entrySet()) {
@@ -603,7 +603,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
                     .append(", ");
             }
         }
-        FreeColObject.sbShrink(sb, ", ");
+        sb.setLength(sb.length() - ", ".length());
         sb.append("]]");
         return sb.toString();
     }

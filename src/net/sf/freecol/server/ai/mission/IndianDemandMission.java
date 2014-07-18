@@ -39,6 +39,7 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIUnit;
@@ -348,11 +349,11 @@ public class IndianDemandMission extends Mission {
     /**
      * {@inheritDoc}
      */
-    public Mission doMission(StringBuilder sb) {
-        logSB(sb, tag);
+    public Mission doMission(LogBuilder lb) {
+        lb.add(tag);
         String reason = invalidReason();
         if (reason != null) {
-            logSBbroken(sb, reason);
+            lbBroken(lb, reason);
             return null;
         }
 
@@ -362,14 +363,14 @@ public class IndianDemandMission extends Mission {
         while (!completed) {
             if (hasTribute()) {
                 Unit.MoveType mt = travelToTarget(is,
-                    CostDeciders.avoidSettlementsAndBlockingUnits(), sb);
+                    CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
                 switch (mt) {
                 case MOVE: // Arrived!
                     break;
                 case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
                     return this;
                 default:
-                    logSBmove(sb, unit, mt);
+                    lbMove(lb, unit, mt);
                     return this;
                 }
                 // Unload the goods
@@ -379,12 +380,12 @@ public class IndianDemandMission extends Mission {
                     is.addGoods(tribute);
                 }
                 completed = true;
-                logSBdone(sb, "unloaded tribute at ", is);
+                lbDone(lb, "unloaded tribute at ", is);
                 return null;
             }
 
             // Move to the target's colony and demand
-            Unit.MoveType mt = travelToTarget(target, null, sb);
+            Unit.MoveType mt = travelToTarget(target, null, lb);
             Direction d;
             switch (mt) {
             case MOVE: // Arrived!
@@ -401,16 +402,16 @@ public class IndianDemandMission extends Mission {
                 if (blocker == null) {
                     moveRandomly(tag, null);
                     unit.setMovesLeft(0);
-                    logSBdodge(sb, unit);
+                    lbDodge(lb, unit);
                 } else {
                     d = unit.getTile().getDirection(blocker.getTile());
                     AIMessage.askAttack(aiUnit, d);
-                    logSBattack(sb, blocker);
+                    lbAttack(lb, blocker);
                 }
                 return this;
             default:
                 moveRandomly(tag, null);
-                logSBmove(sb, unit, mt);
+                lbMove(lb, unit, mt);
                 return this;
             }
 
@@ -424,7 +425,7 @@ public class IndianDemandMission extends Mission {
             if (goods == null) {
                 if (!enemy.checkGold(1)) {
                     completed = true;
-                    logSBdone(sb, "empty handed at ", colony);
+                    lbDone(lb, "empty handed at ", colony);
                     return null;
                 }
                 amount = enemy.getGold() / 20;
@@ -436,10 +437,10 @@ public class IndianDemandMission extends Mission {
                 = AIMessage.askIndianDemand(aiUnit, colony, type, amount);
             if (accepted && (goods == null || hasTribute())) {
                 if (goods != null) {
-                    logSB(sb, " accepted at ", colony, " tribute: ", goods);
+                    lb.add(" accepted at ", colony, " tribute: ", goods);
                     continue; // Head for home
                 } else {
-                    logSB(sb, " accepted at ", colony, " tribute: ", amount,
+                    lb.add(" accepted at ", colony, " tribute: ", amount,
                         " gold");
                 }
             } else { // Consider attacking if not content.
@@ -452,8 +453,8 @@ public class IndianDemandMission extends Mission {
                     && d != null;
                 if (attack) AIMessage.askAttack(aiUnit, d);
                 completed = true;
-                logSBdone(sb, "refused at ", colony, 
-                    (((attack) ? " (attacking)" : "")));
+                lbDone(lb, "refused at ", colony, 
+                       (((attack) ? " (attacking)" : "")));
                 return null;
             }
         }

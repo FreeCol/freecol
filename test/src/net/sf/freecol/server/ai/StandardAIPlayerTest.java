@@ -25,6 +25,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.util.test.FreeColTestCase;
 
@@ -40,6 +41,8 @@ public class StandardAIPlayerTest extends FreeColTestCase {
         = spec().getRole("model.role.nativeDragoon");
 
     private int horsesReqPerUnit = 0, musketsReqPerUnit = 0;
+
+    private LogBuilder lb = new LogBuilder(0); // dummy
 
 
     @Override
@@ -99,7 +102,7 @@ public class StandardAIPlayerTest extends FreeColTestCase {
         assertEquals("Wrong initial number of muskets in Indian camp",
             totalMusketsAvail, camp.getGoodsCount(musketsType));
 
-        player.equipBraves(camp, null);
+        player.equipBraves(camp, lb);
 
         // Verify results
         int mounted = 0;
@@ -156,7 +159,7 @@ public class StandardAIPlayerTest extends FreeColTestCase {
         assertEquals("Wrong initial number of muskets in Indian camp",
             totalMusketsAvail, camp.getGoodsCount(musketsType));
 
-        player.equipBraves(camp, null);
+        player.equipBraves(camp, lb);
 
         // Verify results
         int mounted = 0;

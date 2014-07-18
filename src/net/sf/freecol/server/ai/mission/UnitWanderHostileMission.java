@@ -28,6 +28,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIUnit;
@@ -160,11 +161,11 @@ public class UnitWanderHostileMission extends Mission {
     /**
      * {@inheritDoc}
      */
-    public Mission doMission(StringBuilder sb) {
-        logSB(sb, tag);
+    public Mission doMission(LogBuilder lb) {
+        lb.add(tag);
         String reason = invalidReason();
         if (reason != null) {
-            logSBbroken(sb, reason);
+            lbBroken(lb, reason);
             return null;
         }
 
@@ -184,7 +185,7 @@ public class UnitWanderHostileMission extends Mission {
                 Location loc = UnitSeekAndDestroyMission.findTarget(aiUnit, 1,
                                                                     false);
                 if (loc != null) {
-                    logSB(sb, ", acquired target ", loc, ".");
+                    lb.add(", acquired target ", loc, ".");
                     return new UnitSeekAndDestroyMission(aiMain, aiUnit, loc);
                 }
                 check = checkTurns;
@@ -192,7 +193,7 @@ public class UnitWanderHostileMission extends Mission {
 
             if ((d = moveRandomly(tag, d)) == null) break;
         }
-        logSBat(sb, unit);
+        lbAt(lb, unit);
         return this;
     }
 

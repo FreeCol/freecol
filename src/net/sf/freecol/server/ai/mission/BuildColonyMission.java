@@ -39,6 +39,7 @@ import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.networking.NetworkConstants;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
@@ -337,8 +338,8 @@ public class BuildColonyMission extends Mission {
     /**
      * {@inheritDoc}
      */
-    public Mission doMission(StringBuilder sb) {
-        logSB(sb, tag);
+    public Mission doMission(LogBuilder lb) {
+        lb.add(tag);
         final AIMain aiMain = getAIMain();
         final AIUnit aiUnit = getAIUnit();
         final Unit unit = getUnit();
@@ -348,17 +349,17 @@ public class BuildColonyMission extends Mission {
         if (isTargetReason(reason)) {
             ; // retarget below
         } else if (reason != null) {
-            logSBbroken(sb, reason);
+            lbBroken(lb, reason);
             return null;
         } else if (target instanceof Tile
             && (player.getColonyValue((Tile)target)) < colonyValue) {
             reason = "target tile " + target + " value fell";
         }
-        if (reason != null && !retargetMission(reason, sb)) return null;
+        if (reason != null && !retargetMission(reason, lb)) return null;
 
         // Go there.
         Unit.MoveType mt = travelToTarget(getTarget(),
-            CostDeciders.avoidSettlementsAndBlockingUnits(), sb);
+            CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
         switch (mt) {
         case MOVE:
             break;
@@ -366,7 +367,7 @@ public class BuildColonyMission extends Mission {
         case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
             return this;
         default:
-            logSBmove(sb, unit, mt);
+            lbMove(lb, unit, mt);
             return this;
         }
 
@@ -377,12 +378,12 @@ public class BuildColonyMission extends Mission {
             String name = ((Colony)getTarget()).getName();
             Location newTarget = findTarget(aiUnit, 5, false);
             if (newTarget == null) {
-                logSB(sb, ", give up and join ", name, ".");
+                lb.add(", give up and join ", name, ".");
                 return new WorkInsideColonyMission(aiMain, aiUnit,
                     aiMain.getAIColony((Colony)getTarget()));
             }
             setTarget(newTarget);
-            logSB(sb, ", arrived at ", name, ", retargeting ", newTarget);
+            lb.add(", arrived at ", name, ", retargeting ", newTarget);
 
         } else if (getTarget() instanceof Tile) {
             Tile tile = (Tile)getTarget();
@@ -419,7 +420,7 @@ public class BuildColonyMission extends Mission {
                 }
                 if (fail) {
                     setTarget(null);
-                    logSBfail(sb, "tile claim at ", tile, ".");
+                    lbFail(lb, "tile claim at ", tile, ".");
                     return null;
                 }
             }
@@ -427,18 +428,18 @@ public class BuildColonyMission extends Mission {
             // Check that the unit has moves left, which are required
             // for building.
             if (unit.getMovesLeft() <= 0) {
-                logSB(sb, ", waiting to build at ", tile, ".");
+                lb.add(", waiting to build at ", tile, ".");
                 return this;
             }
 
             // Log the colony values so we can improve things
             if (logger.isLoggable(Level.FINE)) {
-                StringBuilder s2 = new StringBuilder(32);
-                logSB(s2, tag, " score-at-foundation ", tile, ":");
+                LogBuilder l2 = new LogBuilder(logger, Level.FINE);
+                l2.add(tag, " score-at-foundation ", tile, ":");
                 for (Double d : player.getAllColonyValues(tile)) {
-                    logSB(s2, " ", d);
+                    l2.add(" ", d);
                 }
-                logger.fine(s2.toString());
+                l2.flush();
             }
             
             // Clear to build the colony.
@@ -447,10 +448,10 @@ public class BuildColonyMission extends Mission {
                 Colony colony = tile.getColony();
                 AIColony aiColony = aiMain.getAIColony(colony);
                 aiColony.requestRearrange();
-                logSBdone(sb, colony);
+                lbDone(lb, colony);
                 return new WorkInsideColonyMission(aiMain, aiUnit, aiColony);
             } else {
-                logSBfail(sb, "build at ", tile);
+                lbFail(lb, "build at ", tile);
                 return null;
             }
 

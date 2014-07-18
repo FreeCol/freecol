@@ -77,6 +77,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.BooleanOption;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.FreeColServer;
@@ -596,23 +597,22 @@ public class DebugUtils {
         final GUI gui = freeColClient.getGUI();
 
         boolean problemDetected = false;
-        StringBuilder sb = new StringBuilder("Desynchronization detected\n");
+        LogBuilder lb = new LogBuilder(256);
+        lb.add("Desynchronization detected\n");
         for (Tile t : sMap.getAllTiles()) {
             if (!sPlayer.canSee(t)) continue;
             for (Unit u : t.getUnitList()) {
                 if (!sPlayer.owns(u)
                     && (t.hasSettlement() || u.isOnCarrier())) continue;
                 if (game.getFreeColGameObject(u.getId(), Unit.class) == null) {
-                    sb.append("Unit missing on client-side.\n")
-                        .append("  Server: ")
-                        .append(Messages.message(u.getFullLabel()))
-                        .append("(").append(u.getId()).append(") from: ")
-                        .append(u.getLocation().getId()).append(".\n");
+                    lb.add("Unit missing on client-side.\n", "  Server: ",
+                           Messages.message(u.getFullLabel()),
+                           "(", u.getId(), ") from: ", 
+                           u.getLocation().getId(), ".\n");
                     try {
-                        sb.append("  Client: ")
-                            .append(map.getTile(u.getTile().getX(),
-                                    u.getTile().getY()).getFirstUnit().getId())
-                            .append("\n");
+                        lb.add("  Client: ", map.getTile(u.getTile().getX(),
+                               u.getTile().getY()).getFirstUnit().getId(),
+                               "\n");
                     } catch (NullPointerException npe) {}
                     problemDetected = true;
                 } else {
@@ -620,15 +620,13 @@ public class DebugUtils {
                                                            Unit.class);
                     if (cUnit.hasTile()
                         && !cUnit.getTile().getId().equals(u.getTile().getId())) {
-                        sb.append("Unit located on different tiles.\n")
-                            .append("  Server: ")
-                            .append(Messages.message(u.getFullLabel()))
-                            .append("(").append(u.getId()).append(") from: ")
-                            .append(u.getLocation().getId()).append("\n")
-                            .append("  Client: ")
-                            .append(Messages.message(cUnit.getFullLabel()))
-                            .append("(").append(cUnit.getId()).append(") at: ")
-                            .append(cUnit.getLocation().getId()).append("\n");
+                        lb.add("Unit located on different tiles.\n",
+                            "  Server: ", Messages.message(u.getFullLabel()),
+                            "(", u.getId(), ") from: ",
+                            u.getLocation().getId(), "\n",
+                            "  Client: ", Messages.message(cUnit.getFullLabel()),
+                            "(", cUnit.getId(), ") at: ",
+                            cUnit.getLocation().getId(), "\n");
                         problemDetected = true;
                     }
                 }
@@ -639,21 +637,17 @@ public class DebugUtils {
             if (sSettlement == null && cSettlement == null) {
                 ;// OK
             } else if (sSettlement != null && cSettlement == null) {
-                sb.append("Settlement not present in client: ")
-                    .append(sSettlement.toString());
+                lb.add("Settlement not present in client: ", sSettlement);
                 problemDetected = true;
             } else if (sSettlement == null && cSettlement != null) { 
-                sb.append("Settlement still present in client: ")
-                    .append(cSettlement.toString());
+                lb.add("Settlement still present in client: ", cSettlement);
                 problemDetected = true;
             } else if (sSettlement.getId().equals(cSettlement.getId())) {
                 ;// OK
             } else {
-                sb.append("Settlements differ.\n")
-                    .append("  Server: ")
-                    .append(sSettlement.toString()).append("\n")
-                    .append("  Client: ")
-                    .append(cSettlement.toString()).append("\n");
+                lb.add("Settlements differ.\n  Server: ",
+                    sSettlement.toString(), "\n  Client: ", 
+                    cSettlement.toString(), "\n");
             }
         }
 
@@ -663,22 +657,19 @@ public class DebugUtils {
             GoodsType cg = game.getSpecification().getGoodsType(sg.getId());
             int cPrice = player.getMarket().getBidPrice(cg, 1);
             if (sPrice != cPrice) {
-                sb.append("Goods prices for ").append(sg.toString())
-                    .append(" differ.\n");
+                lb.add("Goods prices for ", sg, " differ.\n");
                 goodsProblemDetected = true;
             }
         }
         if (goodsProblemDetected) {
-            sb.append("  Server:\n").append(sPlayer.getMarket().toString())
-                .append("\n")
-                .append("  Client:\n").append(player.getMarket().toString())
-                .append("\n");
+            lb.add("  Server:\n", sPlayer.getMarket(), "\n",
+                "  Client:\n", player.getMarket(), "\n");
             problemDetected = true;
         }
 
         if (problemDetected) {
-            FreeColObject.sbShrink(sb, "\n");
-            String err = sb.toString();
+            lb.shrink("\n");
+            String err = lb.toString();
             freeColClient.getGUI().showInformationMessage(err);
             logger.severe(err);
         }
@@ -737,7 +728,7 @@ public class DebugUtils {
         final Game sGame = server.getGame();
         final AIMain aiMain = server.getAIMain();
 
-        StringBuilder sb = new StringBuilder();
+        LogBuilder lb = new LogBuilder(256);
         for (Player tp : sGame.getLiveEuropeanPlayers(null)) {
             Player p = sGame.getFreeColGameObject(tp.getId(), Player.class);
             if (p.getEurope() == null) continue;
@@ -749,10 +740,7 @@ public class DebugUtils {
             units.put("To Europe", toEurope);
             units.put("In Europe", inEurope);
             units.put("To America", toAmerica);
-
-            sb.append("\n==");
-            sb.append(Messages.message(p.getNationName()));
-            sb.append("==\n");
+            lb.add("\n==", Messages.message(p.getNationName()), "==\n");
 
             for (Unit u : p.getEurope().getUnitList()) {
                 if (u.getDestination() instanceof Map) {
@@ -769,35 +757,33 @@ public class DebugUtils {
             for (String label : units.keySet()) {
                 List<Unit> list = units.get(label);
                 if (list.size() > 0){
-                    sb.append("\n->" + label + "\n");
+                    lb.add("\n->", label, "\n");
                     for (Unit u : list) {
-                        sb.append('\n');
-                        sb.append(Messages.message(u.getFullLabel()));
+                        lb.add("\n", Messages.message(u.getFullLabel()));
                         if (u.isDamaged()) {
-                            sb.append(" (Repairing)");
+                            lb.add(" (Repairing)");
                         } else {
-                            sb.append("    ");
+                            lb.add("    ");
                             AIUnit aiu = aiMain.getAIUnit(u);
                             if (aiu.getMission() == null) {
-                                sb.append(" (None)");
+                                lb.add(" (None)");
                             } else {
-                                sb.append(aiu.getMission().toString()
+                                lb.add(aiu.getMission().toString()
                                     .replaceAll("\n", "    \n"));
                             }
                         }
                     }
-                    sb.append('\n');
+                    lb.add("\n");
                 }
             }
-            sb.append("\n->Recruitable units\n\n");
+            lb.add("\n->Recruitable units\n\n");
             for (UnitType unitType : p.getEurope().getRecruitables()) {
-                sb.append(Messages.getName(unitType));
-                sb.append('\n');
+                lb.add(Messages.getName(unitType), "\n");
             }
-            sb.append('\n');
+            lb.add("\n");
 
         }
-        freeColClient.getGUI().showInformationMessage(sb.toString());
+        freeColClient.getGUI().showInformationMessage(lb.toString());
     }
 
     /**
@@ -830,41 +816,37 @@ public class DebugUtils {
     public static void displayUnits(final FreeColClient freeColClient) {
         final Player player = freeColClient.getMyPlayer();
         List<Unit> all = player.getUnits();
-        StringBuilder sb = new StringBuilder("\nActive units:\n");
+        LogBuilder lb = new LogBuilder(256);
+        lb.add("\nActive units:\n");
 
         Unit u, first = player.getNextActiveUnit();
         if (first != null) {
-            sb.append(first.toString() + "\nat "
-                + ((FreeColGameObject)first.getLocation()) + "\n");
+            lb.add(first.toString(), "\nat ", first.getLocation(), "\n");
             all.remove(first);
             while (player.hasNextActiveUnit()
                 && (u = player.getNextActiveUnit()) != first) {
-                sb.append(u.toString() + "\nat "
-                    + ((FreeColGameObject)u.getLocation()) + "\n");
+                lb.add(u, "\nat ", u.getLocation(), "\n");
                 all.remove(u);
             }
         }
-        sb.append("Going-to units:\n");
+        lb.add("Going-to units:\n");
         first = player.getNextGoingToUnit();
         if (first != null) {
             all.remove(first);
-            sb.append(first.toString() + "\nat "
-                + ((FreeColGameObject)first.getLocation()) + "\n");
+            lb.add(first, "\nat ", first.getLocation(), "\n");
             while (player.hasNextGoingToUnit()
                 && (u = player.getNextGoingToUnit()) != first) {
-                sb.append(u.toString() + "\nat "
-                    + ((FreeColGameObject)u.getLocation()) + "\n");
+                lb.add(u, "\nat ", u.getLocation(), "\n");
                 all.remove(u);
             }
         }
-        sb.append("Remaining units:\n");
+        lb.add("Remaining units:\n");
         while (!all.isEmpty()) {
             u = all.remove(0);
-            sb.append(u.toString() + "\nat "
-                + ((FreeColGameObject)u.getLocation()) + "\n");
+            lb.add(u, "\nat ", u.getLocation(), "\n");
         }
 
-        freeColClient.getGUI().showInformationMessage(sb.toString());
+        freeColClient.getGUI().showInformationMessage(lb.toString());
     }
 
     /**
@@ -1120,35 +1102,33 @@ public class DebugUtils {
         final IndianSettlement sis = sGame.getFreeColGameObject(is.getId(),
             IndianSettlement.class);
 
-        StringBuilder sb = new StringBuilder(sis.getName());
-        sb.append("\n\nAlarm\n");
+        LogBuilder lb = new LogBuilder(256);
+        lb.add(sis.getName(), "\n\nAlarm\n");
         Player mostHated = sis.getMostHated();
         for (Player p : sGame.getLiveEuropeanPlayers(null)) {
             Tension tension = sis.getAlarm(p);
-            sb.append(Messages.message(p.getNationName())
-                + " " + ((tension == null) ? "(none)"
-                    : Integer.toString(tension.getValue()))
-                + ((mostHated == p) ? " (most hated)" : "")
-                + " " + Messages.message(sis.getShortAlarmLevelMessageId(p))
-                + " " + sis.getContactLevel(p)
-                + "\n");
+            lb.add(Messages.message(p.getNationName()),
+                   " ", ((tension == null) ? "(none)"
+                       : Integer.toString(tension.getValue())),
+                   ((mostHated == p) ? " (most hated)" : ""),
+                   " ", Messages.message(sis.getShortAlarmLevelMessageId(p)),
+                   " ", sis.getContactLevel(p), "\n");
         }
 
-        sb.append("\nGoods Present\n");
+        lb.add("\nGoods Present\n");
         for (Goods goods : sis.getCompactGoods()) {
-            sb.append(Messages.message(goods.getLabel(true)) + "\n");
+            lb.add(Messages.message(goods.getLabel(true)), "\n");
         }
 
-        sb.append("\nGoods Production\n");
+        lb.add("\nGoods Production\n");
         for (GoodsType type : sSpec.getGoodsTypeList()) {
             int prod = sis.getTotalProductionOf(type);
             if (prod > 0) {
-                sb.append(Messages.message(type.getNameKey())
-                          + " " + prod + "\n");
+                lb.add(Messages.message(type.getNameKey()), " ", prod, "\n");
             }
         }
 
-        sb.append("\nPrices (buy 1/100 / sell 1/100)\n");
+        lb.add("\nPrices (buy 1/100 / sell 1/100)\n");
         GoodsType[] wanted = sis.getWantedGoods();
         for (GoodsType type : sSpec.getGoodsTypeList()) {
             if (!type.isStorable()) continue;
@@ -1156,43 +1136,41 @@ public class DebugUtils {
             for (i = wanted.length - 1; i >= 0; i--) {
                 if (type == wanted[i]) break;
             }
-            sb.append(Messages.message(type.getNameKey())
-                + ": " + sis.getPriceToBuy(type, 1)
-                + "/" + sis.getPriceToBuy(type, 100)
-                + " / " + sis.getPriceToSell(type, 1)
-                + "/" + sis.getPriceToSell(type, 100)
-                + ((i < 0) ? "" : " wanted[" + Integer.toString(i) + "]")
-                + "\n");
+            lb.add(Messages.message(type.getNameKey()),
+                   ": ", sis.getPriceToBuy(type, 1),
+                   "/", sis.getPriceToBuy(type, 100),
+                   " / ", sis.getPriceToSell(type, 1),
+                   "/", sis.getPriceToSell(type, 100),
+                   ((i < 0) ? "" : " wanted[" + Integer.toString(i) + "]"),
+                   "\n");
         }
 
-        sb.append("\nUnits present\n");
+        lb.add("\nUnits present\n");
         for (Unit u : sis.getUnitList()) {
             Mission m = aiMain.getAIUnit(u).getMission();
-            sb.append(u + " at " + ((FreeColGameObject)u.getLocation()));
+            lb.add(u, " at ", u.getLocation());
             if (m != null) {
-                sb.append(" " + Utils.lastPart(m.getClass().getName(), "."));
+                lb.add(" ", m.getClass(), ".");
             }
-            sb.append("\n");
+            lb.add("\n");
         }
-        sb.append("\nUnits owned\n");
+        lb.add("\nUnits owned\n");
         for (Unit u : sis.getOwnedUnits()) {
             Mission m = aiMain.getAIUnit(u).getMission();
-            sb.append(u + " at " + ((FreeColGameObject)u.getLocation()));
+            lb.add(u, " at ", u.getLocation());
             if (m != null) {
-                sb.append(" " + Utils.lastPart(m.getClass().getName(), "."));
+                lb.add(" ", m.getClass(), ".");
             }
-            sb.append("\n");
+            lb.add("\n");
         }
 
-        sb.append("\nTiles\n");
-        for (Tile t : sis.getOwnedTiles()) {
-            sb.append(t + "\n");
-        }
+        lb.add("\nTiles\n");
+        for (Tile t : sis.getOwnedTiles()) lb.add(t, "\n");
 
-        sb.append("\nConvert Progress = " + sis.getConvertProgress());
-        sb.append("\nLast Tribute = " + sis.getLastTribute());
+        lb.add("\nConvert Progress = ", sis.getConvertProgress());
+        lb.add("\nLast Tribute = ", sis.getLastTribute());
 
-        freeColClient.getGUI().showInformationMessage(sb.toString());
+        freeColClient.getGUI().showInformationMessage(lb.toString());
     }
 
     /**

@@ -31,6 +31,7 @@ import java.util.NoSuchElementException;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -43,6 +44,7 @@ import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -1483,16 +1485,14 @@ public class Map extends FreeColGameObject implements Location {
                     && unit != null
                     && unit.getLocation() == carrier) ? carrier : unit)
             : offMapUnit;
-        StringBuilder sb = null;
-        if (traceSearch) {
-            sb = new StringBuilder(256);
-            logSB(sb, "Search trace(",
-                ((maxTurns==INFINITY) ? "" : Integer.toString(maxTurns)),
-                ") for ", unit,
-                "/", ((carrier==null) ? "-" : carrier.toString()),
-                " from ", start, " with ", currentUnit.getId(),
-                " costDecider=", costDecider, " goalDecider=", goalDecider);
-        }
+        LogBuilder lb = new LogBuilder((traceSearch) ? logger : null,
+                                       Level.INFO);
+        lb.add("Search trace(",
+            ((maxTurns==INFINITY) ? "" : Integer.toString(maxTurns)),
+            ") for ", unit,
+            "/", ((carrier==null) ? "-" : carrier.toString()),
+            " from ", start, " with ", currentUnit.getId(),
+            " costDecider=", costDecider, " goalDecider=", goalDecider);
 
         // Create the start node and put it on the open list.
         final PathNode firstNode = new PathNode(start,
@@ -1511,14 +1511,14 @@ public class Map extends FreeColGameObject implements Location {
             final PathNode currentNode = openListQueue.poll();
             final Location currentLocation = currentNode.getLocation();
             openList.remove(currentLocation.getId());
-            logSB(sb, "\n  ", currentNode);
+            lb.add("\n  ", currentNode);
 
             // Reset current unit to that of this node.
             currentUnit = (currentNode.isOnCarrier()) ? carrier : unit;
 
             // Check for success.
             if (goalDecider.check(currentUnit, currentNode)) {
-                logSB(sb, " ***goal(", currentNode.getCost(), ")***");
+                lb.add(" ***goal(", currentNode.getCost(), ")***");
                 best = goalDecider.getGoal();
                 bestScore = best.getCost();
                 if (!goalDecider.hasSubGoals()) break;
@@ -1528,20 +1528,20 @@ public class Map extends FreeColGameObject implements Location {
             // Skip nodes that can not beat the current best path.
             if (bestScore < currentNode.getCost()) {
                 closedList.put(currentLocation.getId(), currentNode);
-                logSB(sb, " ...goal cost wins(", bestScore,
+                lb.add(" ...goal cost wins(", bestScore,
                       " < ", currentNode.getCost(), ")...");
                 continue;
             }
 
             // Ignore nodes over the turn limit.
             if (currentNode.getTurns() > maxTurns) {
-                logSB(sb, "...out-of-range");
+                lb.add("...out-of-range");
                 continue;
             }
 
             // Valid candidate for the closed list.
             closedList.put(currentLocation.getId(), currentNode);
-            logSB(sb, "...close");
+            lb.add("...close");
 
             // Collect the parameters for the current node.
             final int currentMovesLeft = currentNode.getMovesLeft();
@@ -1553,7 +1553,7 @@ public class Map extends FreeColGameObject implements Location {
                 // TODO: Do not consider tiles `adjacent' to Europe, yet.
                 // There may indeed be cases where going to Europe and
                 // coming back on the other side of the map is faster.
-                logSB(sb, "...skip Europe");
+                lb.add("...skip Europe");
                 continue;
             }
 
@@ -1561,17 +1561,17 @@ public class Map extends FreeColGameObject implements Location {
             PathNode closed;
             for (Tile moveTile : currentTile.getSurroundingTiles(1)) {
                 // If the new tile is the tile we just visited, skip it.
-                logSB(sb, "\n    ", moveTile);
+                lb.add("\n    ", moveTile);
                 if (currentNode.previous != null
                     && currentNode.previous.getTile() == moveTile) {
-                    logSB(sb, " previous");
+                    lb.add(" previous");
                     continue;
                 }
 
                 // Skip neighbouring tiles already too expensive.
                 if ((closed = closedList.get(moveTile.getId())) != null
                     && closed.getCost() <= currentNode.getCost()) {
-                    logSB(sb, " closed-won");
+                    lb.add(" closed-won");
                     continue;
                 }
 
@@ -1581,7 +1581,7 @@ public class Map extends FreeColGameObject implements Location {
                 boolean isGoal = goalDecider.check(unit,
                     new PathNode(moveTile, 0, INFINITY-1, false,
                         currentNode, null));
-                if (isGoal && sb != null) sb.append(" *goal*");
+                if (isGoal) lb.add(" *goal*");
 
                 // Is this move possible for the base unit?
                 // Allow some seemingly impossible moves if it is to
@@ -1620,14 +1620,12 @@ public class Map extends FreeColGameObject implements Location {
                         // This search can never succeed if the unit
                         // can not reach the goal, except if there is
                         // a carrier involved that might still succeed.
-                        if (sb != null) {
-                            logSB(sb, " utter-fail(", umt, ")");
-                            logger.info(sb.toString());
-                        }
+                        lb.add(" utter-fail(", umt, ")");
+                        lb.flush();
                         return null;
                     }
                 }
-                logSB(sb, " unitMove=", umt, "/", unitMove);
+                lb.add(" unitMove=", umt, "/", unitMove);
 
                 // Check for a carrier change at the new tile,
                 // creating a MoveCandidate for each case.
@@ -1712,7 +1710,7 @@ public class Map extends FreeColGameObject implements Location {
                     move = null;
                     break;
                 }
-                logSB(sb, " ", step);
+                lb.add(" ", step);
 
                 if (move != null) {
                     PathNode movePath = move.resetPath();
@@ -1726,19 +1724,19 @@ public class Map extends FreeColGameObject implements Location {
                             closedList.remove(moveTile.getId());
                             move.improve(openList, openListQueue, f,
                                          searchHeuristic);
-                            logSB(sb, " closed-added");
+                            lb.add(" closed-added");
                         } else {
-                            logSB(sb, " closed-won");
+                            lb.add(" closed-won");
                         }
                     } else if (move.canImprove(openList.get(moveTile.getId()))){
                         move.improve(openList, openListQueue, f,
                                      searchHeuristic);
-                        logSB(sb, " added");
+                        lb.add(" added");
                     } else {
-                        logSB(sb, " loses");
+                        lb.add(" loses");
                     }
                 } else {
-                    logSB(sb, " invalid");
+                    lb.add(" invalid");
                 }
             }
 
@@ -1778,11 +1776,8 @@ public class Map extends FreeColGameObject implements Location {
         }
 
         // Output the trace result and return.
-        if (sb != null) {
-            logSB(sb, "\nResult\n");
-            if (best != null) logSB(sb, best.fullPathToString());
-            logger.info(sb.toString());
-        }
+        lb.add("\nResult\n", ((best != null) ? best.fullPathToString() : ""));
+        lb.flush();
         return best;
     }
 
