@@ -1906,6 +1906,7 @@ public class Unit extends GoodsLocation
                     || (from != null && getMoveCost(from, target, ml) > ml)) {
                     move = MoveType.MOVE_NO_MOVES;
                 }
+                break;
             }
         }
         return move;

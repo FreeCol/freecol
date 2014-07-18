@@ -411,7 +411,8 @@ public class AIUnit extends AIObject implements Transportable {
      */
     public boolean move(Direction direction) {
         Tile start = unit.getTile();
-        return AIMessage.askMove(this, direction)
+        return unit.getMoveType(direction).isProgress()
+            && AIMessage.askMove(this, direction)
             && unit.getTile() != start;
     }
 
@@ -648,10 +649,10 @@ public class AIUnit extends AIObject implements Transportable {
     public boolean leaveTransport(Direction direction) {
         if (!unit.isOnCarrier()) return false;
         final Unit carrier = unit.getCarrier();
-        boolean result = (direction != null) ? move(direction)
-            : AIMessage.askDisembark(this)
-            && unit.getLocation() == carrier.getLocation();
-
+        boolean result = (direction == null)
+            ? (AIMessage.askDisembark(this)
+                && unit.getLocation() == carrier.getLocation())
+            : move(direction);
         if (result) {
             Colony colony = unit.getColony();
             if (colony != null) {
