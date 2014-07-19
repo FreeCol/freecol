@@ -358,8 +358,8 @@ public class AIUnit extends AIObject implements Transportable {
      *
      * @param lb A <code>LogBuilder</code> to log to.
      */
-    public Mission doMission(LogBuilder sb) {
-        return (mission != null && mission.isValid()) ? mission.doMission(sb)
+    public Mission doMission(LogBuilder lb) {
+        return (mission != null && mission.isValid()) ? mission.doMission(lb)
             : null;
     }
 

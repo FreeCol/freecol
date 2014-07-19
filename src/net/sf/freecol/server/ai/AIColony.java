@@ -348,13 +348,16 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // ATM we just accept this assignment unless it failed, in
         // which case restore original state.
         AIPlayer aiPlayer = getAIOwner();
+        LogBuilder aw = new LogBuilder(256);
         boolean preferScouts = ((EuropeanAIPlayer)aiPlayer).scoutsNeeded() > 0;
         Colony scratch = colonyPlan.assignWorkers(new ArrayList<Unit>(workers),
-                                                  preferScouts, lb);
+                                                  preferScouts, aw);
         if (scratch == null) {
             lb.add(", failed to assign workers.");
             rearrangeTurn = new Turn(turn + 1);
             return false;
+        } else {
+            lb.add(", assigned ", workers.size(), " workers");
         }
 
         // Apply the arrangement, and give suitable missions to all units.
@@ -448,9 +451,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             : ((build = colonyPlan.getBestBuildableType()) != null)
             ? "unexpected-null(" + build.toString() + ")"
             : "expected-null";
-        lb.add(", building ", buildStr, ", units=", colony.getUnitCount(),
-               ", next=", nextRearrange);
-        for (UnitWas uw : was) lb.add("\n  ", uw);
+        lb.add(", building ", buildStr, ", population ", colony.getUnitCount(),
+            ", rearrange ", nextRearrange, ".\n");
+        lb.add(aw.toString());
+        for (UnitWas uw : was) lb.add("  ", uw, "\n");
 
         // Change the export settings when required.
         resetExports();
@@ -1120,7 +1124,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      *
      * @param lb A <code>LogBuilder</code> to log to.
      */
-    private void updateGoodsWishes(LogBuilder sb) {
+    private void updateGoodsWishes(LogBuilder lb) {
         final Specification spec = getSpecification();
         int goodsWishValue = 50;
 
@@ -1217,7 +1221,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             if (amount > 0) {
                 int value = goodsWishValue;
                 if (colony.canProduce(requiredType)) value /= 10;
-                requireGoodsWish(requiredType, amount, value, sb);
+                requireGoodsWish(requiredType, amount, value, lb);
             }
         }
 
@@ -1323,7 +1327,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         tileImprovementPlans.addAll(newPlans);
         Collections.sort(tileImprovementPlans);
         if (!tileImprovementPlans.isEmpty()) {
-            lb.add("\n  TIPs:");
+            lb.add("  TIPs:");
             for (TileImprovementPlan tip : tileImprovementPlans) {
                 lb.add(" ", tip);
             }

@@ -1238,7 +1238,6 @@ public class ColonyPlan {
         // Make a scratch colony to work on.
         Colony col = colony.copyColony();
         Tile tile = col.getTile();
-        lb.add("Worker assignment at ", name, " of ", workers.size());
 
         // Replace the given workers with those in the scratch colony.
         List<Unit> otherWorkers = new ArrayList<Unit>(workers);
@@ -1276,8 +1275,8 @@ public class ColonyPlan {
                 if (u.getType() == role.getExpertUnit()
                     && fullEquipUnit(spec(), u, role, col)) {
                     workers.remove(u);
-                    lb.add(u.getId(), "(", u.getType().getSuffix(), ") -> ",
-                           role.getSuffix(), "\n");
+                    lb.add(u.getId(), "(", u.getType().getSuffix(),
+                        ") -> ", role.getSuffix(), "\n");
                 }
             }
         }
@@ -1572,18 +1571,6 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
                 workers.remove(u);
             } else break;
         }
-
-        // Log and return the scratch colony on success.
-        // Otherwise abandon this rearrangement, disposing of the
-        // scratch colony and returning null.
-        for (Unit u : workers) {
-            lb.add(u.getId(), "(", u.getType().getSuffix(), ") -> UNUSED\n");
-        }
-        lb.add("Final population = ", col.getUnitCount());
-        if (col.getUnitCount() <= 0) {
-            lb.add("\nassignWorkers at ", name, " failed.");
-            col = null;
-        }
         for (Unit u : col.getUnitList()) {
             if (!u.hasDefaultRole()) {
                 logger.warning("assignWorkers bogus role for " + u);
@@ -1591,6 +1578,13 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
             }
         }
 
+        // Log and return the scratch colony on success.
+        // Otherwise abandon this rearrangement, disposing of the
+        // scratch colony and returning null.
+        for (Unit u : workers) {
+            lb.add(u.getId(), "(", u.getType().getSuffix(), ") -> UNUSED\n");
+        }
+        if (col.getUnitCount() <= 0) col = null;
         return col;
     }
 

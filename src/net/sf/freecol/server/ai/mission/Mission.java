@@ -952,7 +952,7 @@ public abstract class Mission extends AIObject {
      *     if the current mission has completed.
      * @return 
      */
-    public abstract Mission doMission(LogBuilder sb);
+    public abstract Mission doMission(LogBuilder lb);
 
 
     // Serialization
