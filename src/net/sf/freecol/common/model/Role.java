@@ -403,19 +403,12 @@ public class Role extends BuildableType {
         }
         return result;
     }
-       
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isAvailableTo(Player player) {
-        // Do *not* use isAvailableTo(Player) for roles, the unit
-        // context must be considered as there are unit specific
-        // abilities required.  Use isAvailable(Player, UnitType) or
-        // isAvailable(Unit).
-        throw new RuntimeException("isAvailableTo(Player) inappropriate for Role: "
-            + this);
-    }
 
+    /**
+     * Longer format debug helper.
+     *
+     * @return A more detailed description of this role.
+     */
     public String toFullString() {
         StringBuilder sb = new StringBuilder(32);
         sb.append("[Role ").append(getSuffix());

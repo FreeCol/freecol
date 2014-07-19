@@ -1413,7 +1413,7 @@ public final class Specification {
     /**
      * Get a role with an ability.
      *
-     * @param a The ability identifier to look for.
+     * @param id The ability identifier to look for.
      * @param roles An optional list of <code>Role</code>s to look in,
      *     if null all roles are used.
      * @return The first <code>Role</code> found with the required

@@ -79,11 +79,11 @@ public class LogBuilder {
     /**
      * Convert a simple object to a string suitable for a log buffer.
      *
-     * @param o The <code>Object</codE> to convert.
+     * @param o The <code>Object</code> to convert.
      */
     private static String o2s(Object o) {
         return (o == null) ? "null"
-            : (o instanceof Class) ? Utils.lastPart(((Class)o).getClass().getName(), ".")
+            : (o instanceof Class) ? ((Class)o).getName()
             : (o instanceof String) ? (String)o
             : (o instanceof Location) ? ((Location)o).toShortString()
             : o.toString();
@@ -127,8 +127,6 @@ public class LogBuilder {
 
     /**
      * Remember a position in a buffer.
-     *
-     * @return The current buffer position if non-null.
      */
     public void mark() {
         this.point = (sb == null) ? -1 : sb.length();
@@ -146,7 +144,7 @@ public class LogBuilder {
         if (sb == null || sb.length() <= this.point) return false;
         StringBuilder sb2 = new StringBuilder(64);
         add(sb2, objects);
-        add(this.sb, sb2.toString());
+        this.sb.insert(this.point, sb2.toString());
         return true;
     }
 

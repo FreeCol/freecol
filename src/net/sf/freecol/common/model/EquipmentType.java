@@ -32,7 +32,8 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 
 
 /**
- * @compat 0.10.x
+ * This whole class is now @compat 0.10.x.  We no longer use equipment types.
+ *
  * EquipmentTypes are now subsumed by roles.
  * Delete this whole file in due course.
  *

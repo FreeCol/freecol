@@ -73,8 +73,8 @@ import org.w3c.dom.Element;
 /**
  * Objects of this class contains AI-information for a single {@link Unit}.
  *
- * The method {@link #doMission()} is called once each turn, by
- * {@link AIPlayer#startWorking()}, to perform the assigned
+ * The method {@link #doMission(LogBuilder)} is called once each turn,
+ * by {@link AIPlayer#startWorking()}, to perform the assigned
  * <code>Mission</code>.  Most of the methods in this class just
  * delegates the call to that mission.
  *

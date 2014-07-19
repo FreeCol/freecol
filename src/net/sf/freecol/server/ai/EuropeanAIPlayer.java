@@ -1155,8 +1155,8 @@ public class EuropeanAIPlayer extends AIPlayer {
      * Gets the best goods wish for a carrier unit.
      *
      * @param aiUnit The carrier <code>AIUnit</code>.
-     * @param wishes A list of <code>GoodsWish</code>es to choose from.
-     * @return The best goods wish for the unit.
+     * @param goodsType The <code>GoodsType</code> to wish for.
+     * @return The best <code>GoodsWish</code> for the unit.
      */
     public GoodsWish getBestGoodsWish(AIUnit aiUnit, GoodsType goodsType) {
         List<GoodsWish> wishes = goodsWishes.get(goodsType);
@@ -1613,7 +1613,7 @@ public class EuropeanAIPlayer extends AIPlayer {
     /**
      * Evaluate goods for trade purposes.
      *
-     * @param goods The <code>Goods</code> to evaluate.
+     * @param ag The <code>AbstractGoods</code> to evaluate.
      * @return The score.
      */
     private int evaluateGoods(AbstractGoods ag) {

@@ -391,7 +391,7 @@ public class FreeColDebugger {
     public static String stackTraceToString() {
         LogBuilder lb = new LogBuilder(512);
         for (StackTraceElement s : Thread.currentThread().getStackTrace()) {
-            lb.add(s, "\n");
+            lb.add(s.toString(), "\n");
         }
         lb.shrink("\n");
         return lb.toString();

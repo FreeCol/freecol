@@ -950,7 +950,6 @@ public abstract class Mission extends AIObject {
      * @param lb A <code>LogBuilder</code> to log to.
      * @return The <code>Mission</code> to continue with, or null
      *     if the current mission has completed.
-     * @return 
      */
     public abstract Mission doMission(LogBuilder lb);
 

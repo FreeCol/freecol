@@ -696,7 +696,7 @@ public class Colony extends Settlement implements Nameable {
 
     /**
      * Install a unit at the best occupation for it at a given work
-     * location.  Public for {@link #WorkLocation.add}.
+     * location.  Public for {@link WorkLocation#add}.
      *
      * @param unit The <code>Unit</code> to install.
      * @param wl The <code>WorkLocation</code> to install the unit.
@@ -2376,7 +2376,7 @@ public class Colony extends Settlement implements Nameable {
     /**
      * adds a message about insufficient production for a building
      *
-     * @param A list of warnings to add to.
+     * @param warnings A list of warnings to add to.
      * @param info The <code>ProductionInfo</code> for the work location.
      */
     private void addInsufficientProductionMessage(List<StringTemplate> warnings,

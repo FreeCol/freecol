@@ -395,7 +395,7 @@ public final class TileType extends FreeColGameObjectType {
      *
      * Used by static tile type displays that just list unattended
      * production values.  Planning and production routines should use
-     * {@link getPotentialProduction(GoodsType, UnitType)}
+     * {@link #getPotentialProduction(GoodsType, UnitType)}
      *
      * @return A list of produced <code>AbstractGoods</code>.
      */
