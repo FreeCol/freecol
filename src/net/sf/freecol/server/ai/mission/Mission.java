@@ -993,9 +993,8 @@ public abstract class Mission extends AIObject {
     @Override
     public String toString() {
         LogBuilder lb = new LogBuilder(64);
-        lb.add(getClass(), "@", hashCode(), "-", aiUnit.getUnit());
-        Location target = getTarget();
-        if (target != null) lb.add("->", target);
+        lb.add(Utils.lastPart(getClass().getName(), "."), "@", hashCode(),
+            "-", aiUnit.getUnit(), "->", getTarget());
         return lb.toString();
     }
 }

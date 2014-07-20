@@ -445,6 +445,12 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             }
         }
 
+        // Change the export settings when required.
+        resetExports();
+
+        updateTileImprovementPlans(lb);
+        updateWishes(lb);
+
         // Log the changes.
         build = colony.getCurrentlyBuilding();
         String buildStr = (build != null) ? build.toString()
@@ -455,12 +461,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             ", rearrange ", nextRearrange, ".\n");
         lb.add(aw.toString());
         for (UnitWas uw : was) lb.add("  ", uw, "\n");
-
-        // Change the export settings when required.
-        resetExports();
-
-        updateTileImprovementPlans(lb);
-        updateWishes(lb);
 
         // Set the next rearrangement turn.
         rearrangeTurn = new Turn(turn + nextRearrange);
@@ -739,11 +739,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         int amount = (goods == null) ? -1 : goods.getAmount();
         String type = (goods == null) ? "(null)"
             : ag.getGoods().getType().getSuffix();
-        lb.add(String.format("%-20s %-10s %s %s %s",
-                colony.getName(), action,
-                ((ag == null) ? "(null)" : ag.getId()),
-                ((amount >= GoodsContainer.CARGO_SIZE) ? "full"
-                    : Integer.toString(amount)), type));
+        lb.add(", ", action, ((ag == null) ? "(null)" : ag.getId()),
+            " ", ((amount >= GoodsContainer.CARGO_SIZE) ? "full "
+                : Integer.toString(amount) + " "), type);
     }
 
     /**
@@ -1326,9 +1324,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         tileImprovementPlans.addAll(newPlans);
         Collections.sort(tileImprovementPlans);
         if (!tileImprovementPlans.isEmpty()) {
-            lb.add("  TIPs:");
             for (TileImprovementPlan tip : tileImprovementPlans) {
-                lb.add(" ", tip);
+                lb.add(", ", tip);
             }
         }
     }

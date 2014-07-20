@@ -36,6 +36,7 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ai.mission.Mission;
 import net.sf.freecol.server.ai.mission.TransportMission;
 
@@ -552,15 +553,13 @@ public class AIGoods extends AIObject implements Transportable {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(64);
-        sb.append("[").append(getId())
-            .append(" ").append(goods);
-        if (goods != null) sb.append(" at ").append(goods.getLocation());
-        sb.append(" -> ").append(destination);
-        if (transport != null) sb.append(" using ").append(transport);
-        sb.append(" /").append(transportPriority)
-            .append("]");
-        return sb.toString();
+        LogBuilder lb = new LogBuilder(64);
+        lb.add("[", getId(), " ", goods);
+        if (goods != null) lb.add(" at ", goods.getLocation());
+        lb.add(" -> ", destination);
+        if (transport != null) lb.add(" using ", transport.getUnit());
+        lb.add(" /", transportPriority, "]");
+        return lb.toString();
     }
 
     /**
