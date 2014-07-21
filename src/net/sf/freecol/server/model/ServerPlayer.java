@@ -2773,7 +2773,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         // Remove goods party modifiers as they apply to a different monarch.
         for (Modifier m : colony.getModifiers()) {
-            if (Modifier.COLONY_GOODS_PARTY.equals(m.getSource())) {
+            if (Specification.COLONY_GOODS_PARTY_SOURCE == m.getSource()) {
                 colony.removeModifier(m);
             }
         }
