@@ -419,6 +419,8 @@ public class BuildColonyMission extends Mission {
                         || !player.owns(tile);
                 }
                 if (fail) {
+                    if (retargetMission("tile-claim-at-" + tile,
+                                        lb)) return this;
                     setTarget(null);
                     lbFail(lb, "tile claim at ", tile, ".");
                     return null;
