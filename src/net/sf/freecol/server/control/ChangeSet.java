@@ -313,12 +313,8 @@ public class ChangeSet {
          * @param element The <code>Element</code> to attach to.
          */
         public void attachToElement(Element element) {
+            ; // Deliberately do nothing
         }
-
-        /**
-         * {@inheritDoc}
-         */
-        public abstract String toString();
     }
 
     /**

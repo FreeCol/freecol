@@ -794,12 +794,12 @@ public class TransportMission extends Mission {
         PathNode path;
         if (cargo != null) {
             setTarget(cargo.getTarget());
-            logger.finest(tag + " retargeted for cargo: "
+            logger.finest(tag + " retargeted " + getUnit() + " for cargo: "
                 + upLoc(cargo.getTarget()).toShortString());
         } else if ((path = getTrivialPath()) != null) {
             Location loc = upLoc(path.getLastNode().getLocation());
             setTarget(loc);
-            logger.finest(tag + " retargeted safe port: "
+            logger.finest(tag + " retargeted " + getUnit() + " to safe port: "
                 + loc.toShortString());
         } else {
             setTarget(null);
@@ -1763,7 +1763,7 @@ public class TransportMission extends Mission {
             // invalidate a transport mission as we still have to unload!
             if (!Map.isSameLocation(cargo.getTarget(),
                                     carrier.getLocation())) {
-                return "transportable-destination-failure";
+                return "transportable-destination-failure:" + t;
             }
         } else if (((FreeColGameObject)dst).isDisposed()) {
             return "transportable-destination-disposed";
@@ -1984,6 +1984,8 @@ public class TransportMission extends Mission {
 
                 retarget();
                 if ((reason = invalidReason()) != null) {
+                    logger.warning(tag + " post-stop failure(" + reason
+                        + "): " + this.toFullString());
                     lbBroken(lb, reason);
                     return null;
                 } else if (unit.isAtLocation(target)) {

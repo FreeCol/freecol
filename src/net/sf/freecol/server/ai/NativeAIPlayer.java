@@ -172,7 +172,7 @@ public class NativeAIPlayer extends AIPlayer {
                 AIUnit aiu = getAIUnit(u);
                 Mission m = new DefendSettlementMission(aiMain, aiu, is);
                 aiu.setMission(m);
-                lb.add(u, "defend-", is, ", ");
+                lb.add(u, " defend-", is, ", ");
             }
         }
         lb.shrink(", ");
