@@ -267,6 +267,26 @@ public class AIUnit extends AIObject implements Transportable {
     }
 
     /**
+     * Requeue this unit on its current carrier, if any.
+     *
+     * @return True if the requeue succeeds.
+     */
+    private boolean requeueOnCurrentCarrier() {
+        final Unit carrier = getUnit().getCarrier();
+        if (carrier == null || carrier.isDisposed()) return false;
+        final AIUnit aiCarrier = getAIMain().getAIUnit(carrier);
+        if (aiCarrier == null) return false;
+        Mission m = aiCarrier.getMission();
+        if (m instanceof TransportMission) {
+            if (((TransportMission)m).requeueTransportable(this)) {
+                setTransport(aiCarrier, "requeued");
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Gets the goal of this AI unit.
      *
      * @return The goal of this AI unit.
@@ -302,28 +322,6 @@ public class AIUnit extends AIObject implements Transportable {
         return AIMessage.askMoveTo(this, unit.getOwner().getEurope());
     }
 
-    /**
-     * Requeue this unit on its current carrier, if any.
-     *
-     * @return True if the requeue succeeds.
-     */
-    private boolean requeueOnCurrentCarrier() {
-        final Unit carrier = getUnit().getCarrier();
-        if (carrier == null || carrier.isDisposed()) return false;
-        final AIUnit aiCarrier = getAIMain().getAIUnit(carrier);
-        if (aiCarrier == null) return false;
-        Mission m = aiCarrier.getMission();
-        if (m instanceof TransportMission) {
-            if (((TransportMission)m).requeueTransportable(this)) {
-                setTransport(aiCarrier, "requeued");
-                return true;
-            }
-        } else {
-            logger.warning("Carrier mission not TransportMission: " + carrier);
-        }
-        return false;
-    }
-        
     /**
      * If this unit is scheduled for transport, deschedule.
      *
