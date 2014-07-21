@@ -252,38 +252,24 @@ public class AIUnit extends AIObject implements Transportable {
         this.dynamicPriority = 0;
 
         boolean cancel = true;
-        if (unit.isOnCarrier()) {
+        Unit carrier = unit.getCarrier();
+        AIUnit aiCarrier;
+        Mission m;
+        if (carrier != null && !carrier.isDisposed()) {
             if (mission == null) {
-                if (leaveTransport()) lb.add(" Disembarked.");
+                if (leaveTransport()) lb.add(" (disembarked)");
             } else if (oldTarget == mission.getTarget()) {
                 cancel = false;
-            } else if (requeueOnCurrentCarrier()) {
+            } else if ((aiCarrier = getAIMain().getAIUnit(carrier)) != null
+                && ((m = aiCarrier.getMission()) instanceof TransportMission)
+                && ((TransportMission)m).requeueTransportable(this)) {
+                setTransport(aiCarrier, "requeued");
                 cancel = false;
             } else {
-                if (leaveTransport()) lb.add(" Disembarked.");
+                if (leaveTransport()) lb.add(" (disembarked)");
             }
         }
         if (cancel) removeTransport("mission-changed");
-    }
-
-    /**
-     * Requeue this unit on its current carrier, if any.
-     *
-     * @return True if the requeue succeeds.
-     */
-    private boolean requeueOnCurrentCarrier() {
-        final Unit carrier = getUnit().getCarrier();
-        if (carrier == null || carrier.isDisposed()) return false;
-        final AIUnit aiCarrier = getAIMain().getAIUnit(carrier);
-        if (aiCarrier == null) return false;
-        Mission m = aiCarrier.getMission();
-        if (m instanceof TransportMission) {
-            if (((TransportMission)m).requeueTransportable(this)) {
-                setTransport(aiCarrier, "requeued");
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
