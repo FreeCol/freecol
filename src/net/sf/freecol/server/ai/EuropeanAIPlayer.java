@@ -504,6 +504,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             if (cost != INFINITY) {
                 if (cost > 0 && !player.checkGold(cost)) {
                     player.modifyGold(cost);
+                    lb.add("added ", cost, " gold to ");
                 }
                 AIUnit aiu;
                 if (bestWish == null) {
@@ -619,8 +620,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                     rc.add(new RandomChoice<UnitType>(unitType, weight));
                 }
             }
-            AIUnit c = cheatUnit(rc);
-            if (c != null) lb.add("offensive-naval ", c.getUnit(), ", ");
+            cheatUnit(rc, "offensive-naval", lb);
         }
         // Only cheat carriers if they have work to do.
         int nCarrier = (nNavalCarrier > 0) ? transportNavalUnitCheatPercent
@@ -639,8 +639,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                     rc.add(new RandomChoice<UnitType>(unitType, weight));
                 }
             }
-            AIUnit c = cheatUnit(rc);
-            if (c != null) lb.add("transport-naval ", c.getUnit(), ", ");
+            cheatUnit(rc, "transport-naval", lb);
         }
 
         if (lb.grew("\n  Cheats: ")) lb.shrink(", ");
@@ -650,27 +649,38 @@ public class EuropeanAIPlayer extends AIPlayer {
      * Cheat-build a unit in Europe.
      *
      * @param rc A list of random choices to choose from.
+     * @param what A description of the unit.
+     * @param lb A <code>LogBuilder</code> to log to.
      * @return The <code>AIUnit</code> built.
      */
-    private AIUnit cheatUnit(List<RandomChoice<UnitType>> rc) {
+    private AIUnit cheatUnit(List<RandomChoice<UnitType>> rc, String what,
+                             LogBuilder lb) {
         UnitType unitToPurchase
             = RandomChoice.getWeightedRandom(logger, "Cheat which unit",
                                              rc, getAIRandom());
-        return cheatUnit(unitToPurchase);
+        return cheatUnit(unitToPurchase, what, lb);
     }
 
     /**
      * Cheat-build a unit in Europe.
      *
      * @param unitType The <code>UnitType</code> to build.
+     * @param what A description of the unit.
+     * @param lb A <code>LogBuilder</code> to log to.
      * @return The <code>AIUnit</code> built.
      */
-    private AIUnit cheatUnit(UnitType unitType) {
+    private AIUnit cheatUnit(UnitType unitType, String what, LogBuilder lb) {
         final Player player = getPlayer();
         final Europe europe = player.getEurope();
         int cost = europe.getUnitPrice(unitType);
-        if (cost > 0 && !player.checkGold(cost)) player.modifyGold(cost);
-        return trainAIUnitInEurope(unitType);
+        if (cost > 0 && !player.checkGold(cost)) {
+            player.modifyGold(cost);
+            lb.add("added ", cost, " gold to build ");
+        }
+        AIUnit result = trainAIUnitInEurope(unitType);
+        lb.add(what, " ", unitType.getSuffix(),
+            ((result != null) ? "" : "(failed)"));
+        return result;
     }
 
     /**
