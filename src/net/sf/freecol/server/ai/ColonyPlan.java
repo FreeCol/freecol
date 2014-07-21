@@ -555,8 +555,8 @@ public class ColonyPlan {
                 if (rawLuxuryGoodsTypes.contains(secondaryRawMaterial)) {
                     rawLuxuryGoodsTypes.remove(secondaryRawMaterial);
                     luxuryGoodsTypes.remove(secondaryRawMaterial.getOutputType());
-                } else if (rawMaterials.contains(otherRawGoodsTypes)) {
-                    rawMaterials.remove(otherRawGoodsTypes);
+                } else if (otherRawGoodsTypes.contains(secondaryRawMaterial)) {
+                    otherRawGoodsTypes.remove(secondaryRawMaterial);
                 }
             }
             if (value > primaryValue) {
