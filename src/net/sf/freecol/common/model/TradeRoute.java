@@ -38,7 +38,7 @@ import org.w3c.dom.Element;
  * A TradeRoute holds all information for a unit to follow along a trade route.
  */
 public class TradeRoute extends FreeColGameObject
-    implements Cloneable, Nameable, Ownable {
+    implements Nameable, Ownable {
 
     private static final Logger logger = Logger.getLogger(TradeRoute.class.getName());
 

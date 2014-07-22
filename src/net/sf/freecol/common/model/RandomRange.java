@@ -177,16 +177,6 @@ public class RandomRange {
     }
 
 
-    // Interface Object
-
-    /**
-     * {@inheritDoc}
-     */
-    public RandomRange clone() {
-        return new RandomRange(probability, maximum, minimum, factor);
-    }
-
-
     // Serialization
 
     private static final String FACTOR_TAG = "factor";

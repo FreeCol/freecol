@@ -84,15 +84,6 @@ public class AbstractUnit extends FreeColObject {
 
 
     /**
-     * Create a copy of this abstract unit.
-     *
-     * @return The copy.
-     */
-    public AbstractUnit clone() {
-        return new AbstractUnit(getId(), getRoleId(), getNumber());
-    }
-
-    /**
      * Get the role identifier.
      *
      * @return The role identifier.

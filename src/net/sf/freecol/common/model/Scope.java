@@ -25,13 +25,14 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
  * The <code>Scope</code> class determines whether a given
  * <code>FreeColGameObjectType</code> fulfills certain requirements.
  */
-public class Scope extends FreeColObject implements Cloneable {
+public class Scope extends FreeColObject {
 
     /** 
      * The identifier of a <code>FreeColGameObjectType</code>, or

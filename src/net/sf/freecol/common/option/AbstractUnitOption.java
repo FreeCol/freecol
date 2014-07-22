@@ -110,13 +110,18 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
      * {@inheritDoc}
      */
     public AbstractUnitOption clone() {
+        Specification spec = getSpecification();
         AbstractUnitOption result
             = new AbstractUnitOption(getId(), getSpecification());
         result.setValues(this);
-        if (value != null) result.setValue(value.clone());
-        if (unitType != null) result.unitType = unitType.clone();
-        if (role != null) result.role = role.clone();
-        if (number != null) result.number = number.clone();
+        if (value != null) {
+            AbstractUnit au = new AbstractUnit(value.getType(spec),
+                value.getRoleId(), value.getNumber());
+            result.setValue(au);
+        }
+        if (unitType != null) result.unitType = unitType;
+        if (role != null) result.role = role;
+        if (number != null) result.number = number;
         return result;
     }
 
