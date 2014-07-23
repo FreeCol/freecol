@@ -49,6 +49,10 @@ public final class FeatureContainer {
 
     private static final Logger logger = Logger.getLogger(FeatureContainer.class.getName());
 
+    /** Lock variables. */
+    private Object abilitiesLock = new Object();
+    private Object modifiersLock = new Object();
+
     /** The abilities in the container. */
     private Map<String, Set<Ability>> abilities = null;
 
@@ -61,27 +65,20 @@ public final class FeatureContainer {
      *
      * @return True if the abilities are present.
      */
-    private synchronized boolean abilitiesPresent() {
-        return abilities != null;
+    private boolean abilitiesPresent() {
+        synchronized (abilitiesLock) {
+            return abilities != null;
+        }
     }
 
     /**
      * On demand creation of the abilities map.
      */
-    private synchronized void requireAbilities() {
-        if (abilities == null) abilities = new HashMap<String, Set<Ability>>();
-    }
-
-    /**
-     * Get a copy of the ability entry set.
-     *
-     * @return A copy of the ability entry set.
-     */
-    private Set<Entry<String, Set<Ability>>> getAbilityEntries() {
-        if (!abilitiesPresent()) return null;
-        synchronized (abilities) {
-            return new HashSet<Entry<String,
-                                     Set<Ability>>>(abilities.entrySet());
+    private void requireAbilities() {
+        synchronized (abilitiesLock) {
+            if (abilities == null) {
+                abilities = new HashMap<String, Set<Ability>>();
+            }
         }
     }
 
@@ -90,27 +87,20 @@ public final class FeatureContainer {
      *
      * @return True if the modifiers are present.
      */
-    private synchronized boolean modifiersPresent() {
-        return modifiers != null;
+    private boolean modifiersPresent() {
+        synchronized (modifiersLock) {
+            return modifiers != null;
+        }
     }
 
     /**
      * On demand creation of the modifiers map.
      */
     private synchronized void requireModifiers() {
-        if (modifiers == null) modifiers = new HashMap<String, Set<Modifier>>();
-    }
-
-    /**
-     * Get a copy of the modifier entry set.
-     *
-     * @return A copy of the modifier entry set.
-     */
-    private Set<Entry<String, Set<Modifier>>> getModifierEntries() {
-        if (!modifiersPresent()) return null;
-        synchronized (modifiers) {
-            return new HashSet<Entry<String,
-                                     Set<Modifier>>>(modifiers.entrySet());
+        synchronized (modifiersLock) {
+            if (modifiers == null) {
+                modifiers = new HashMap<String, Set<Modifier>>();
+            }
         }
     }
 
@@ -169,7 +159,7 @@ public final class FeatureContainer {
         Set<Ability> result = new HashSet<Ability>();
         if (!abilitiesPresent()) return result;
 
-        synchronized (abilities) {
+        synchronized (abilitiesLock) {
             Set<Ability> abilitySet;
             if (id == null) {
                 abilitySet = new HashSet<Ability>();
@@ -197,7 +187,7 @@ public final class FeatureContainer {
         if (ability == null) return false;
 
         requireAbilities();
-        synchronized (abilities) {
+        synchronized (abilitiesLock) {
             Set<Ability> abilitySet = abilities.get(ability.getId());
             if (abilitySet == null) {
                 abilitySet = new HashSet<Ability>();
@@ -216,7 +206,7 @@ public final class FeatureContainer {
     public Ability removeAbility(Ability ability) {
         if (ability == null || !abilitiesPresent()) return null;
 
-        synchronized (abilities) {
+        synchronized (abilitiesLock) {
             Set<Ability> abilitySet = abilities.get(ability.getId());
             return (abilitySet == null
                 || !abilitySet.remove(ability)) ? null
@@ -232,7 +222,7 @@ public final class FeatureContainer {
     public void removeAbilities(String id) {
         if (!abilitiesPresent()) return;
 
-        synchronized (abilities) {
+        synchronized (abilitiesLock) {
             abilities.remove(id);
         }
     }
@@ -253,7 +243,7 @@ public final class FeatureContainer {
         Set<Modifier> result = new HashSet<Modifier>();
         if (!modifiersPresent()) return result;
 
-        synchronized (modifiers) {
+        synchronized (modifiersLock) {
             Set<Modifier> modifierSet;
             if (id == null) {
                 modifierSet = new HashSet<Modifier>();
@@ -319,7 +309,7 @@ public final class FeatureContainer {
         if (modifier == null) return false;
 
         requireModifiers();
-        synchronized (modifiers) {
+        synchronized (modifiersLock) {
             Set<Modifier> modifierSet = modifiers.get(modifier.getId());
             if (modifierSet == null) {
                 modifierSet = new HashSet<Modifier>();
@@ -338,7 +328,7 @@ public final class FeatureContainer {
     public Modifier removeModifier(Modifier modifier) {
         if (modifier == null || !modifiersPresent()) return null;
 
-        synchronized (modifiers) {
+        synchronized (modifiersLock) {
             Set<Modifier> modifierSet = modifiers.get(modifier.getId());
             return (modifierSet == null
                 || !modifierSet.remove(modifier)) ? null
@@ -354,7 +344,7 @@ public final class FeatureContainer {
     public void removeModifiers(String id) {
         if (!modifiersPresent()) return;
 
-        synchronized (modifiers) {
+        synchronized (modifiersLock) {
             modifiers.remove(id);
         }
     }
@@ -368,34 +358,38 @@ public final class FeatureContainer {
         FeatureContainer c = fco.getFeatureContainer();
         if (c == null) return;
 
-        Set<Entry<String, Set<Ability>>> ca = c.getAbilityEntries();
-        if (ca != null) {
+        if (c.abilitiesPresent()) {
             requireAbilities();
-            synchronized (abilities) {
-                for (Entry<String, Set<Ability>> entry : ca) {
-                    Set<Ability> abilitySet = abilities.get(entry.getKey());
+            HashMap<String, Set<Ability>> ca;
+            synchronized (c.abilitiesLock) {
+                ca = new HashMap<String, Set<Ability>>(c.abilities);
+            }
+            synchronized (abilitiesLock) {
+                for (Entry<String, Set<Ability>> e : ca.entrySet()) {
+                    Set<Ability> abilitySet = abilities.get(e.getKey());
                     if (abilitySet == null) {
-                        abilities.put(entry.getKey(),
-                            new HashSet<Ability>(entry.getValue()));
-                    } else {
-                        abilitySet.addAll(entry.getValue());
+                        abilitySet = new HashSet<Ability>();
+                        abilities.put(e.getKey(), abilitySet);
                     }
+                    abilitySet.addAll(e.getValue());
                 }
             }
         }
 
-        Set<Entry<String, Set<Modifier>>> cm = c.getModifierEntries();
-        if (cm != null) {
+        if (c.modifiersPresent()) {
             requireModifiers();
-            synchronized (modifiers) {
-                for (Entry<String, Set<Modifier>> entry : cm) {
-                    Set<Modifier> modifierSet = modifiers.get(entry.getKey());
+            HashMap<String, Set<Modifier>> cm;
+            synchronized (c.modifiersLock) {
+                cm = new HashMap<String, Set<Modifier>>(c.modifiers);
+            }
+            synchronized (modifiersLock) {
+                for (Entry<String, Set<Modifier>> e : cm.entrySet()) {
+                    Set<Modifier> modifierSet = modifiers.get(e.getKey());
                     if (modifierSet == null) {
-                        modifiers.put(entry.getKey(),
-                            new HashSet<Modifier>(entry.getValue()));
-                    } else {
-                        modifierSet.addAll(entry.getValue());
+                        modifierSet = new HashSet<Modifier>();
+                        modifiers.put(e.getKey(), modifierSet);
                     }
+                    modifierSet.addAll(e.getValue());
                 }
             }
         }
@@ -414,11 +408,14 @@ public final class FeatureContainer {
         LogBuilder lb = new LogBuilder(64);
         lb.mark();
 
-        Set<Entry<String, Set<Ability>>> ca = c.getAbilityEntries();
-        if (ca != null && abilitiesPresent()) {
-            synchronized (abilities) {
-                for (Entry<String, Set<Ability>> entry : ca) {
-                    Set<Ability> abilitySet = abilities.get(entry.getKey());
+        if (abilitiesPresent() && c.abilitiesPresent()) {
+            Set<String> ca = new HashSet<String>();
+            synchronized (c.abilitiesLock) {
+                ca.addAll(c.abilities.keySet());
+            }
+            synchronized (abilitiesLock) {
+                for (String key : ca) {
+                    Set<Ability> abilitySet = abilities.get(key);
                     if (abilitySet == null) continue;
                     for (Ability a : new HashSet<Ability>(abilitySet)) {
                         if (a.getSource() == fco) {
@@ -430,11 +427,14 @@ public final class FeatureContainer {
             }
         }
 
-        Set<Entry<String, Set<Modifier>>> cm = c.getModifierEntries();
-        if (cm != null && modifiersPresent()) {
-            synchronized (modifiers) {
-                for (Entry<String, Set<Modifier>> entry : cm) {
-                    Set<Modifier> modifierSet = modifiers.get(entry.getKey());
+        if (modifiersPresent() && c.modifiersPresent()) {
+            Set<String> cm = new HashSet<String>();
+            synchronized (c.modifiersLock) {
+                cm.addAll(c.modifiers.keySet());
+            }
+            synchronized (modifiersLock) {
+                for (String key : cm) {
+                    Set<Modifier> modifierSet = modifiers.get(key);
                     if (modifierSet == null) continue;
                     for (Modifier m : new HashSet<Modifier>(modifierSet)) {
                         if (m.getSource() == fco) {
@@ -453,12 +453,12 @@ public final class FeatureContainer {
      */
     public void clear() {
         if (abilitiesPresent()) {
-            synchronized (abilities) {
+            synchronized (abilitiesLock) {
                 abilities.clear();
             }
         }
         if (modifiersPresent()) {
-            synchronized (modifiers) {
+            synchronized (modifiersLock) {
                 modifiers.clear();
             }
         }
