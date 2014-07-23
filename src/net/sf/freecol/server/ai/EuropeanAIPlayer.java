@@ -2249,7 +2249,8 @@ public class EuropeanAIPlayer extends AIPlayer {
         for (AIUnit aiu : aiUnits) {
             final Unit unit = aiu.getUnit();
             final Mission old = aiu.getMission();
-            if (old instanceof TransportMission) continue;
+            if (unit == null || unit.isDisposed()
+                || old instanceof TransportMission) continue;
             lb.add("\n  ", unit, " ");
             try {
                 Mission mission = aiu.doMission(lb);
@@ -2263,7 +2264,8 @@ public class EuropeanAIPlayer extends AIPlayer {
         for (AIUnit aiu : aiUnits) {
             final Unit unit = aiu.getUnit();
             final Mission old = aiu.getMission();
-            if (!(old instanceof TransportMission)) continue;
+            if (unit == null || unit.isDisposed()
+                || !(old instanceof TransportMission)) continue;
             lb.add("\n  ", unit, " ");
             try {
                 Mission mission = aiu.doMission(lb);

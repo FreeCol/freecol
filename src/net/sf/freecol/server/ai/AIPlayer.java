@@ -475,6 +475,7 @@ public abstract class AIPlayer extends AIObject {
         List<AIUnit> result = new ArrayList<AIUnit>();
         for (AIUnit aiu : aiUnits) {
             final Unit unit = aiu.getUnit();
+            if (unit == null || unit.isDisposed()) continue;
             lb.add("\n  ", unit, " ");
             try {
                 Mission old = aiu.getMission();
