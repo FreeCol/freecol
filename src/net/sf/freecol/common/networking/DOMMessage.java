@@ -104,10 +104,6 @@ public class DOMMessage {
         Document tempDocument = null;
         boolean dumpMsgOnError = true;
         if (dumpMsgOnError) {
-            /*
-             * inputSource.setByteStream( new
-             * ReplayableInputStream(inputSource.getByteStream()) );
-             */
             inputSource.setByteStream(new BufferedInputStream(inputSource.getByteStream()));
 
             inputSource.getByteStream().mark(1000000);
