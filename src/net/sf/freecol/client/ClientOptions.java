@@ -50,6 +50,7 @@ import net.sf.freecol.common.option.ModListOption;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.SelectOption;
 import net.sf.freecol.common.option.TextOption;
+import net.sf.freecol.common.util.Utils;
 
 import javax.xml.stream.events.XMLEvent;
 
@@ -584,7 +585,7 @@ public class ClientOptions extends OptionGroup {
         public int compare(ModelMessage message1, ModelMessage message2) {
             String sourceId1 = message1.getSourceId();
             String sourceId2 = message2.getSourceId();
-            if (sourceId1 == sourceId2) {
+            if (Utils.equals(sourceId1, sourceId2)) {
                 return messageTypeComparator.compare(message1, message2);
             }
             FreeColGameObject source1 = game.getMessageSource(message1);

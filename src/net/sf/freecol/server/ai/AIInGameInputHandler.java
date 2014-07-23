@@ -443,7 +443,7 @@ public final class AIInGameInputHandler implements MessageHandler {
         final Player currentPlayer = game.getFreeColGameObject(str, Player.class);
 
         if (currentPlayer != null
-            && serverPlayer.getId() == currentPlayer.getId()) {
+            && serverPlayer.getId().equals(currentPlayer.getId())) {
             logger.finest("Starting new Thread for " + serverPlayer.getName());
             Thread t = new Thread(FreeCol.SERVER_THREAD+"AIPlayer (" + serverPlayer.getName() + ")") {
                 public void run() {

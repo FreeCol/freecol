@@ -23,6 +23,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
 
@@ -191,7 +192,7 @@ public class ModelMessage extends StringTemplate {
      * @param newSource A new source.
      */
     public void divert(FreeColGameObject newSource) {
-        if (displayId == sourceId) displayId = newSource.getId();
+        if (Utils.equals(displayId, sourceId)) displayId = newSource.getId();
         sourceId = newSource.getId();
     }
 

@@ -281,7 +281,7 @@ public class Scope extends FreeColObject {
                 return false;
             }
             if (abilityId == null) {
-                if (otherScope.getAbilityId() != abilityId) {
+                if (!Utils.equals(otherScope.getAbilityId(), abilityId)) {
                     return false;
                 }
             } else if (!abilityId.equals(otherScope.getAbilityId())) {
@@ -291,14 +291,14 @@ public class Scope extends FreeColObject {
                 return false;
             }
             if (methodName == null) {
-                if (otherScope.getMethodName() != methodName) {
+                if (!Utils.equals(otherScope.getMethodName(), methodName)) {
                     return false;
                 }
             } else if (!methodName.equals(otherScope.getMethodName())) {
                 return false;
             }
             if (methodValue == null) {
-                if (otherScope.getMethodValue() != methodValue) {
+                if (!Utils.equals(otherScope.getMethodValue(), methodValue)) {
                     return false;
                 }
             } else if (!methodValue.equals(otherScope.getMethodValue())) {

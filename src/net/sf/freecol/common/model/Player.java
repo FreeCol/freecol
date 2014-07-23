@@ -2707,7 +2707,7 @@ public class Player extends FreeColGameObject implements Nameable {
             Iterator<ModelMessage> messageIterator = modelMessages.iterator();
             while (messageIterator.hasNext()) {
                 ModelMessage message = messageIterator.next();
-                if (message.getSourceId() == source.getId()) {
+                if (Utils.equals(message.getSourceId(), source.getId())) {
                     if (newSource == null) {
                         messageIterator.remove();
                     } else {
@@ -3043,7 +3043,7 @@ public class Player extends FreeColGameObject implements Nameable {
             return true;
         }
         Stance oldStance = stance.get(player.getId());
-        if (newStance.equals(oldStance)) return true;
+        if (newStance == oldStance) return true;
 
         boolean valid = true;;
         if ((newStance == Stance.CEASE_FIRE && oldStance != Stance.WAR)

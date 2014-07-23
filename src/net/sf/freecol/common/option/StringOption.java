@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.common.model.Specification;
 
 
@@ -113,7 +114,7 @@ public class StringOption extends AbstractOption<String> {
         final String oldValue = this.value;
         this.value = value;
 
-        if (isDefined && value != oldValue) {
+        if (isDefined && !Utils.equals(value, oldValue)) {
             firePropertyChange(VALUE_TAG, oldValue, value);
         }
         isDefined = true;

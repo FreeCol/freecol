@@ -657,7 +657,7 @@ public class AIMessage {
         RearrangeColonyMessage message = new RearrangeColonyMessage(colony);
         for (Unit u : workers) {
             Unit su = scratch.getCorresponding(u);
-            if (u.getLocation().getId() == su.getLocation().getId()
+            if (u.getLocation().getId().equals(su.getLocation().getId())
                 && u.getWorkType() == su.getWorkType()
                 && u.getRole() == su.getRole()
                 && u.getRoleCount() == su.getRoleCount()) continue;

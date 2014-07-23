@@ -1689,7 +1689,7 @@ public class ChangeSet {
      * @return True if they can be collapsed.
      */
     private static boolean collapseOK(Element e1, Element e2) {
-        if (e1.getTagName() != e2.getTagName()) return false;
+        if (!e1.getTagName().equals(e2.getTagName())) return false;
         NamedNodeMap nnm1 = e1.getAttributes();
         NamedNodeMap nnm2 = e2.getAttributes();
         if (nnm1.getLength() != nnm2.getLength()) return false;
@@ -1697,10 +1697,10 @@ public class ChangeSet {
             if (nnm1.item(i).getNodeType() != nnm2.item(i).getNodeType()) {
                 return false;
             }
-            if (nnm1.item(i).getNodeName() != nnm2.item(i).getNodeName()) {
+            if (!nnm1.item(i).getNodeName().equals(nnm2.item(i).getNodeName())) {
                 return false;
             }
-            if (nnm1.item(i).getNodeValue() != nnm2.item(i).getNodeValue()) {
+            if (!nnm1.item(i).getNodeValue().equals(nnm2.item(i).getNodeValue())) {
                 return false;
             }
         }
