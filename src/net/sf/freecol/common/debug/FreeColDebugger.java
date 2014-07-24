@@ -376,10 +376,16 @@ public class FreeColDebugger {
      * @param msg The message to log.
      */
     public static void debugLog(String msg) {
+        FileOutputStream fos = null;
+        PrintStream prs = null;
         try {
-            new PrintStream(new FileOutputStream("/tmp/freecol.debug", true), 
-                            true).println(msg);
-        } catch (Exception e) {}
+            fos = new FileOutputStream("/tmp/freecol.debug", true);
+            prs = new PrintStream(fos, true, "UTF-8");
+            prs.println(msg);
+        } catch (Exception e) {} finally {
+            if (fos != null) try { fos.close(); } catch (IOException ioe) {}
+            if (prs != null) prs.close();
+        }
     }
 
     /**

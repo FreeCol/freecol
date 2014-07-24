@@ -1845,12 +1845,16 @@ public final class Specification {
             zero10X = true;
         }
         if (!zero10X) return;
+        FileInputStream fis = null;
         try {
             File base = FreeColDirectories.getBaseDirectory();
-            load(new FileInputStream(new File(base, ROLES_COMPAT_FILE_NAME)));
+            fis = new FileInputStream(new File(base, ROLES_COMPAT_FILE_NAME)); 
+            load(fis);
         } catch (Exception e) {
             logger.log(Level.WARNING, "Failed to load remedial roles.", e);
             return;
+        } finally {
+            if (fis != null) try { fis.close(); } catch (IOException ioe) {}
         }
         List<String> roles = new ArrayList<String>();
         for (Role r : getRoles()) roles.add(r.getId());

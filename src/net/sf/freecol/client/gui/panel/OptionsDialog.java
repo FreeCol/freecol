@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -227,14 +228,18 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
      * @return True if the save succeeded.
      */
     protected boolean save(File file) {
+        FileOutputStream fos = null;
         try {
-            return group.save(new FileOutputStream(file),
-                              FreeColXMLWriter.WriteScope.toSave(), false);
+            fos = new FileOutputStream(file);
+            return group.save(fos, FreeColXMLWriter.WriteScope.toSave(),
+                              false);
         } catch (FileNotFoundException e) {
             logger.log(Level.WARNING, "Save failed", e);
             StringTemplate t = StringTemplate.template("failedToSave")
                 .addName("%name%", file.getPath());
             getGUI().showInformationMessage(t);
+        } finally {
+            if (fos != null) try { fos.close(); } catch (IOException ioe) {}
         }
         return false;
     }

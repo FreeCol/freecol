@@ -114,7 +114,7 @@ public class NumberRules {
             readFromXML(xr);
         } catch (Exception e) {
             logger.log(Level.WARNING, "Load parse", e);
-            throw new RuntimeException("Error parsing number rules.");
+            throw new RuntimeException("Error parsing number rules.", e);
         } finally {
             if (xr != null) xr.close();
         }

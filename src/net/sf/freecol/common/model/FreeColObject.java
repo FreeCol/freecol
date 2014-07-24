@@ -925,7 +925,13 @@ public abstract class FreeColObject
      * @exception FileNotFoundException
      */
     public boolean save(File file) throws FileNotFoundException {
-        return save(new FileOutputStream(file), WriteScope.toSave(), false);
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(file);
+            return save(fos, WriteScope.toSave(), false);
+        } finally {
+            if (fos != null) try { fos.close(); } catch (IOException ioe) {}
+        }
     }
 
     /**
@@ -937,7 +943,13 @@ public abstract class FreeColObject
      * @exception FileNotFoundException
      */
     public boolean save(File file, WriteScope scope) throws FileNotFoundException {
-        return save(new FileOutputStream(file), scope, false);
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(file);
+            return save(fos, scope, false);
+        } finally {
+            if (fos != null) try { fos.close(); } catch (IOException ioe) {}
+        }
     }
 
     /**

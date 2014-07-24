@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -74,12 +75,12 @@ public class GenerateDocumentation {
     }
 
     private static void readResources() {
-
         System.out.println("Processing source file: resources.properties");
+        BufferedReader bufferedReader = null;
         try {
             File sourceFile = new File(RULE_DIRECTORY, "resources.properties");
             FileReader fileReader = new FileReader(sourceFile);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            bufferedReader = new BufferedReader(fileReader);
             String line = bufferedReader.readLine();
             while (line != null) {
                 int index = line.indexOf('=');
@@ -90,8 +91,10 @@ public class GenerateDocumentation {
                 }
                 line = bufferedReader.readLine();
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            if (bufferedReader != null) try { bufferedReader.close(); } catch (IOException ioe) {}
         }
     }
 
@@ -117,9 +120,10 @@ public class GenerateDocumentation {
 
             File sourceFile = new File(STRING_DIRECTORY, name);
 
+            BufferedReader bufferedReader = null;
             try {
                 FileReader fileReader = new FileReader(sourceFile);
-                BufferedReader bufferedReader = new BufferedReader(fileReader);
+                bufferedReader = new BufferedReader(fileReader);
                 String line = bufferedReader.readLine();
                 while (line != null) {
                     int index = line.indexOf('=');
@@ -138,11 +142,14 @@ public class GenerateDocumentation {
                 }
             } catch(Exception e) {
                 // forget it
+            } finally {
+                if (bufferedReader != null) try { bufferedReader.close(); } catch (IOException ioe) {}
             }
         }
+        FileWriter out = null;
         try {
             File destinationFile = new File(DESTINATION_DIRECTORY, "freecol.tmx");
-            FileWriter out = new FileWriter(destinationFile);
+            out = new FileWriter(destinationFile);
 
             out.write("<?xml version =\"1.0\" encoding=\"UTF-8\"?>\n");
             out.write("<tmx version=\"1.4b\">\n");
@@ -159,9 +166,10 @@ public class GenerateDocumentation {
             out.write("</body>\n");
             out.write("</tmx>\n");
             out.flush();
-            out.close();
         } catch(Exception e) {
             e.printStackTrace();
+        } finally {
+            if (out != null) try { out.close(); } catch (IOException ioe) {}
         }
     }
 

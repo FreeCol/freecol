@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -110,9 +111,10 @@ public class MergeTranslations {
 
     private static Map<String, String> readFile(File file) {
         Map<String, String> result = new HashMap<String, String>();
+        BufferedReader bufferedReader = null;
         try {
             FileReader fileReader = new FileReader(file);
-            BufferedReader bufferedReader = new BufferedReader(fileReader); 
+            bufferedReader = new BufferedReader(fileReader); 
             String line = bufferedReader.readLine();
             while (line != null) {
                 int index = line.indexOf('=');
@@ -123,6 +125,8 @@ public class MergeTranslations {
             }
         } catch(Exception e) {
             // forget it
+        } finally {
+            if (bufferedReader != null) try { bufferedReader.close(); } catch (IOException ioe) {}
         }
         return result;
     }
