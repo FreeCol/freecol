@@ -499,7 +499,7 @@ public class TransportMission extends Mission {
         public int compareTo(Cargo other) {
             // Cargoes that reduce the carried amount should sort
             // before those that do not.
-            return getNewSpace() - other.getNewSpace();
+            return other.getNewSpace() - getNewSpace();
         }
 
         /**
