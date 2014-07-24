@@ -327,6 +327,27 @@ public class FreeColXMLReader extends StreamReaderDelegate {
     }
 
     /**
+     * Gets a long from an attribute in a stream.
+     *
+     * @param attributeName The attribute name.
+     * @param defaultValue The default value.
+     * @return The long attribute value, or the default value if none found.
+     */
+    public long getAttribute(String attributeName, long defaultValue) {
+        final String attrib = getParent().getAttributeValue(null,
+                                                            attributeName);
+        long result = defaultValue;
+        if (attrib != null) {
+            try {
+                result = Long.decode(attrib);
+            } catch (NumberFormatException e) {
+                logger.warning(attributeName + " is not a long: " + attrib);
+            }
+        }
+        return result;
+    }
+
+    /**
      * Gets a string from an attribute in a stream.
      *
      * @param attributeName The attribute name.

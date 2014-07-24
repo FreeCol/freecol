@@ -500,7 +500,7 @@ public class HighScore extends FreeColObject {
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         // HighScores do not have ids, no super.writeAttributes().
 
-        xw.writeAttribute(DATE_TAG, dateFormat.format(date));
+        xw.writeAttribute(DATE_TAG, date.getTime());
 
         xw.writeAttribute(RETIREMENT_TURN_TAG, retirementTurn);
 
@@ -538,13 +538,20 @@ public class HighScore extends FreeColObject {
     public void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         // HighScores do not have ids, no super.readAttributes().
 
-        String str = xr.getAttribute(DATE_TAG, "2008-01-01 00:00:00+0000");
-        try {
-            date = dateFormat.parse(str);
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Bad date: " + str, e);
-            date = new Date();
+        long l = xr.getAttribute(DATE_TAG, -1L);
+        date = (l >= 0L) ? new Date(l) : new Date();
+        // @compat 0.10.x
+        // Serializing the long as of 0.11.x
+        if (l < 0L) {
+            String str = xr.getAttribute(DATE_TAG, "2014-07-01 00:00:00+0000");
+            try {
+                date = dateFormat.parse(str);
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Bad date: " + str, e);
+                date = new Date();
+            }
         }
+        // end @compat
 
         retirementTurn = xr.getAttribute(RETIREMENT_TURN_TAG, 0);
 
