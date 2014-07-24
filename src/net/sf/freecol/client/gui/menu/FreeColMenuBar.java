@@ -132,7 +132,7 @@ public abstract class FreeColMenuBar extends JMenuBar {
             rtn.setAction(action);
             rtn.setOpaque(false);
 
-            if (!FreeColAction.NO_MNEMONIC.equals(action.getMnemonic())) {
+            if (action.getMnemonic() != null) {
                 rtn.addMenuKeyListener(action.getMenuKeyListener());
             }
         } else {

@@ -59,7 +59,6 @@ public abstract class FreeColAction extends AbstractAction
     public static final String BUTTON_ROLLOVER_IMAGE = "BUTTON_ROLLOVER_IMAGE";
     public static final String BUTTON_PRESSED_IMAGE = "BUTTON_PRESSED_IMAGE";
     public static final String BUTTON_DISABLED_IMAGE = "BUTTON_DISABLED_IMAGE";
-    public static final Integer NO_MNEMONIC = null;
 
     protected final FreeColClient freeColClient;
 
