@@ -1264,7 +1264,7 @@ public class TransportMission extends Mission {
                     retry.add(t);
                 }
             } else {
-                ; // Good
+                lb.add(" ok ", cargo); // Good
             }
             if (t instanceof AIUnit) {
                 unitsPresent.remove(((AIUnit)t).getUnit());

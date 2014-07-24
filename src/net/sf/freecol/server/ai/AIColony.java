@@ -1026,7 +1026,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         updateWorkerWishes(lb);
         updateGoodsWishes(lb);
         Collections.sort(wishes);
-        lb.grew("\n  New Wishes:");
     }
 
     /**

@@ -213,7 +213,7 @@ public class PathNode {
      * Gets the node where the unit using this path should leave its
      * transport.
      *
-     * @return The node where the unit leaves it's carrier.
+     * @return The node where the unit leaves the carrier.
      */
     public PathNode getTransportDropNode() {
         PathNode temp = this;

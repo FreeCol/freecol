@@ -353,7 +353,7 @@ public class BuildColonyMission extends Mission {
             return null;
         } else if (target instanceof Tile
             && (player.getColonyValue((Tile)target)) < colonyValue) {
-            reason = "target tile " + target + " value fell";
+            reason = "target tile " + target.toShortString() + " value fell";
         }
         if (reason != null && !retargetMission(reason, lb)) return null;
 

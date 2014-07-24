@@ -679,7 +679,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         }
         AIUnit result = trainAIUnitInEurope(unitType);
         lb.add(what, " ", unitType.getSuffix(),
-            ((result != null) ? "" : "(failed)"));
+            ((result != null) ? ", " : "(failed), "));
         return result;
     }
 
@@ -1907,6 +1907,11 @@ public class EuropeanAIPlayer extends AIPlayer {
             lb.add("\n  Transports:");
             for (TransportMission tm : transportMissions) {
                 lb.add(" ", tm.getUnit());
+            }
+            // TODO: Drop this when we are happy
+            lb.add("\n");
+            for (TransportMission tm : transportMissions) {
+                lb.add(tm.toFullString(), "\n");
             }
         }
         if (!aiUnits.isEmpty()) {

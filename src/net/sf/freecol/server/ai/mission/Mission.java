@@ -773,6 +773,8 @@ public abstract class Mission extends AIObject {
      * If the unit in this mission is currently being transported, retarget
      * its transport mission as needed.
      *
+     * Should be called by various *Mission.setTarget().
+     *
      * @return True if the transport is retargeted.
      */
     public boolean retargetTransportable() {
@@ -784,9 +786,9 @@ public abstract class Mission extends AIObject {
             : aiUnit.getTransport();
         if (aiCarrier == null) return false;
         Mission m = aiCarrier.getMission();
-        if (!(m instanceof TransportMission)) return false;
-
-        return ((TransportMission)m).requeueTransportable(aiUnit);
+        return (m instanceof TransportMission)
+            ? ((TransportMission)m).requeueTransportable(aiUnit)
+            : false;
     }
 
     /**
