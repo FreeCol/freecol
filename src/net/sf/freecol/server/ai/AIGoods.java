@@ -329,13 +329,6 @@ public class AIGoods extends AIObject implements Transportable {
                 result = false;
             }
         }   
-        if (result && colony != null) {
-            final AIColony aiColony = getAIMain().getAIColony(colony);
-            if (aiColony != null) {
-                aiColony.completeWish(newGoods);
-                aiColony.requestRearrange();
-            }
-        }
         return result;
     }
 

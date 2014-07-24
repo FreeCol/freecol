@@ -22,6 +22,7 @@ package net.sf.freecol.server.ai.mission;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.Iterator;
 import java.util.logging.Level;
@@ -490,6 +491,22 @@ public class TransportMission extends Mission {
             return null;
         }
 
+        /**
+         * Abbreviated string representation for this cargo.
+         *
+         * @return A short descriptive string.
+         */
+        public String toShortString() {
+            LogBuilder lb = new LogBuilder(32);
+            lb.add(mode.toString().toLowerCase(Locale.US), " ");
+            if (transportable instanceof AIUnit) {
+                lb.add(((AIUnit)transportable).getUnit());
+            } else if (transportable instanceof AIGoods) {
+                lb.add(((AIGoods)transportable).getGoods());
+            }
+            lb.add(" @ ", target);
+            return lb.toString();
+        }
 
         // Implement Comparable<Cargo>
 
@@ -501,6 +518,8 @@ public class TransportMission extends Mission {
             // before those that do not.
             return other.getNewSpace() - getNewSpace();
         }
+
+        // Override Object
 
         /**
          * {@inheritDoc}
@@ -1345,13 +1364,14 @@ public class TransportMission extends Mission {
      * whether action is needed at the current location.
      *
      * @param cargo The <code>Cargo</code> to check.
+     * @param lb A <code>LogBuilder</code> to log to.
      * @return TCONTINUE if the <code>Cargo</code> should continue,
      *     TDONE if it has completed,
      *     TFAIL if it has failed,
      *     TNEXT if it has progressed to the next stage,
      *     TRETRY if a blockage has occurred and it should be retried,
      */
-    private CargoResult tryCargo(Cargo cargo) {
+    private CargoResult tryCargo(Cargo cargo, LogBuilder lb) {
         final Unit carrier = getUnit();
         final Location here = carrier.getLocation();
         final Transportable t = cargo.getTransportable();
@@ -1363,88 +1383,99 @@ public class TransportMission extends Mission {
         switch (cargo.getMode()) {
         case LOAD:
             if (!Map.isSameLocation(here, l.getLocation())) {
+                lb.add(", ", cargo.toShortString(), " wait");
                 return CargoResult.TCONTINUE;
             }
             switch (carrier.getNoAddReason(l)) {
             case NONE: break;
-            case CAPACITY_EXCEEDED: return CargoResult.TCONTINUE;
-            default: return CargoResult.TRETRY;
+            case CAPACITY_EXCEEDED:
+                lb.add(", ", cargo.toShortString(), " NO-ROOM on ", carrier);
+                return CargoResult.TCONTINUE;
+            default:
+                lb.add(", ", cargo.toShortString(), " retry");
+                return CargoResult.TRETRY;
             }
 
             if (!t.joinTransport(carrier, null)) {
-                logger.warning(tag + " failed to load " + t
-                    + " at " + here.toShortString() + ": " + this);
+                lb.add(", ", cargo.toShortString(), " NO-JOIN");
                 return CargoResult.TFAIL;
             }
-            logger.finest(tag + " loaded " + t
-                + " at " + here.toShortString() + ": " + this);
 
             if ((reason = cargo.setTarget()) == null) {
+                lb.add(", ", cargo.toShortString(), " NEXT");
                 return CargoResult.TNEXT;
             }
-            logger.finest(tag + " next fail(" + reason + ") " + t
-                + " at " + here.toShortString() + ": " + this);
+            lb.add(", NO-NEXT(", reason, ")");
             return CargoResult.TFAIL;
 
         case UNLOAD:
             if (!Map.isSameLocation(here, cargo.getTarget())) {
+                lb.add(", ", cargo.toShortString(), " wait");
                 return CargoResult.TCONTINUE;
             }
-            if (t.leaveTransport(null)) {
-                logger.finest(tag + " completed (unload) of " + t
-                    + " at " + here.toShortString() + ": " + this);
-            } else {
-                logger.warning(tag + " failed to unload " + t
-                    + " at " + here.toShortString() + ": " + this);
+            if (!t.leaveTransport(null)) {
+                lb.add(", ", cargo.toShortString(), " NO-LEAVE");
                 return CargoResult.TFAIL;
             }
-            return CargoResult.TDONE;
+            lb.add(", ", cargo.toShortString(), " COMPLETED");
+            break;
 
         case PICKUP:
             if (!Map.isSameLocation(here, cargo.getTarget())) {
+                lb.add(", ", cargo.toShortString(), " wait");
                 return CargoResult.TCONTINUE;
             }
             if (isCarrying(t)) {
-                logger.finest(tag + " picked up " + t
-                    + " at " + here.toShortString() + ": " + this);
                 if ((reason = cargo.setTarget()) == null) {
+                    lb.add(", ", cargo.toShortString(), " NEXT");
                     return CargoResult.TNEXT;
                 }
-                logger.finest(tag + " next fail(" + reason + ") " + t
-                    + " at " + here.toShortString() + ": " + this);
+                lb.add(", ", cargo.toShortString(), " NO-NEXT(", reason, ")");
                 return CargoResult.TFAIL;
             }
             aiu = (AIUnit)t;
             if ((reason = aiu.getMission().invalidReason()) != null) {
-                logger.warning(tag + " unit mission failed(" + reason
-                    + ") for " + t + ": " + this);
+                lb.add(", ", cargo.toShortString(), " NO-MISSION(", reason, ")");
                 return CargoResult.TFAIL;
             }
+            lb.add(", ", cargo.toShortString(), " to-embark");
             return CargoResult.TCONTINUE;
 
         case DROPOFF:
             if (!Map.isSameLocation(here, cargo.getTarget())) {
+                lb.add(", ", cargo.toShortString(), " wait");
                 return CargoResult.TCONTINUE;
             }
             if (!isCarrying(t)) {
-                logger.finest(tag + " completed (dropoff) " + t
-                    + " at " + carrier.getLocation().toShortString()
-                    + ": " + this);
+                lb.add(", ", cargo.toShortString(), " COMPLETED");
                 return CargoResult.TDONE;
             }
             aiu = (AIUnit)t;
             if ((reason = aiu.getMission().invalidReason()) != null) {
-                logger.warning(tag + " unit mission failed(" + reason
-                    + ") for " + t + ": " + this);
+                lb.add(", ", cargo.toShortString(), " NO-MISSION(", reason, ")");
                 return CargoResult.TFAIL;
             }
+            lb.add(", ", cargo.toShortString(), " to-disembark");
             return CargoResult.TCONTINUE;
 
         case DUMP:
-            return (dumpTransportable(t, false)) ? CargoResult.TDONE
-                : CargoResult.TCONTINUE;
+            if (!dumpTransportable(t, false)) {
+                lb.add(", ", cargo.toShortString(), " STUCK");
+                return CargoResult.TCONTINUE;
+            }
+            lb.add(", ", cargo.toShortString(), " COMPLETED");
+            break;
         }
-        throw new IllegalStateException("Can not happen");
+
+        // Check for goods completing a wish
+        final Colony colony = here.getColony();
+        AIColony aiColony;
+        if (l instanceof Goods && colony != null
+            && (aiColony = getAIMain().getAIColony(colony)) != null
+            && aiColony.completeWish((Goods)l, lb)) {
+            aiColony.requestRearrange();
+        }
+        return CargoResult.TDONE;
     }
 
     /**
@@ -1886,14 +1917,13 @@ public class TransportMission extends Mission {
                     // delivered.  Check other deliveries, we might be
                     // in port so this is a good time to decide to
                     // fail to deliver something.
-                    lb.add(", delivering:");
+                    lb.add(", at ", unit.getLocation(), ", delivering");
                     List<Cargo> cont = new ArrayList<Cargo>();
                     List<Cargo> curr = tClear();
                     for (Cargo cargo : curr) {
                         CargoResult result = (cargo.getMode().isCollection())
                             ? CargoResult.TCONTINUE
-                            : tryCargo(cargo);
-                        lb.add(" ", cargo, "=", result);
+                            : tryCargo(cargo, lb);
                         switch (result) {
                         case TCONTINUE:
                         case TRETRY: // will check again below
@@ -1917,15 +1947,14 @@ public class TransportMission extends Mission {
 
                     // Now try again, this time collecting as well as
                     // delivering.
-                    lb.add(", collecting:");
+                    lb.add(", collecting");
                     cont.clear();
                     List<Cargo> next = new ArrayList<Cargo>();
                     curr = tClear();
                     for (Cargo cargo : curr) {
                         CargoResult result = (cargo.getMode().isCollection())
-                            ? tryCargo(cargo)
+                            ? tryCargo(cargo, lb)
                             : CargoResult.TCONTINUE;
-                        lb.add(" ", cargo, "=", result);
                         switch (result) {
                         case TCONTINUE:
                             cont.add(cargo);

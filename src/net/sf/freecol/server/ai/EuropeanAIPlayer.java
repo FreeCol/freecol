@@ -1140,7 +1140,8 @@ public class EuropeanAIPlayer extends AIPlayer {
             try {
                 turns = carrier.getTurnsToReach(w.getDestination());
             } catch (Exception e) {
-                logger.log(Level.WARNING, "Bogus wish destination: "
+                logger.log(Level.WARNING, "Bogus wish destination for "
+                    + aiUnit + ": "
                     + w.getDestination() + " for wish: " + w.toString(), e);
                 continue;
             }
@@ -1231,30 +1232,30 @@ public class EuropeanAIPlayer extends AIPlayer {
             for (UnitType ut : workerWishes.keySet()) {
                 List<WorkerWish> wl = workerWishes.get(ut);
                 if (!wl.isEmpty()) {
-                    lb.add(" [", ut.getSuffix());
+                    lb.add(ut.getSuffix(), ":");
                     for (WorkerWish ww : wl) {
                         lb.add(" ", ww.getDestination(),
                                "(", ww.getValue(), ")");
                     }
-                    lb.add("]");
+                    lb.add(", ");
                 }
             }
-            lb.grew("\n  Wishes (workers):");
+            if (lb.grew("\n  Wishes (workers):")) lb.shrink(", ");
         }
         if (!goodsWishes.isEmpty()) {
             lb.mark();
             for (GoodsType gt : goodsWishes.keySet()) {
                 List<GoodsWish> gl = goodsWishes.get(gt);
                 if (!gl.isEmpty()) {
-                    lb.add(" [", gt.getSuffix());
+                    lb.add(gt.getSuffix(), ":");
                     for (GoodsWish gw : gl) {
                         lb.add(" ", gw.getDestination(),
                                "(", gw.getValue(), ")");
                     }
-                    lb.add("]");
+                    lb.add(", ");
                 }
             }
-            lb.grew("\n  Wishes (goods):");
+            if (lb.grew("\n  Wishes (goods):")) lb.shrink(", ");
         }
     }
 
@@ -1913,6 +1914,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             for (TransportMission tm : transportMissions) {
                 lb.add(tm.toFullString(), "\n");
             }
+            lb.shrink("\n");
         }
         if (!aiUnits.isEmpty()) {
             lb.add("\n  Free Land Units:");
@@ -2212,8 +2214,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         lb.grew("\n  Badly defended colonies:");
 
         for (AIColony aic : getAIColonies()) {
-            aic.rearrangeWorkers(lb);
-            aic.updateAIGoods(lb);
+            aic.rearrangeWorkers(true, lb);
         }
         
         buildTransportMaps(lb);
@@ -2224,14 +2225,14 @@ public class EuropeanAIPlayer extends AIPlayer {
         bringGifts(lb);
         demandTribute(lb);
         List<AIUnit> more = doMissions(getAIUnits(), lb);
-        for (AIColony aic : getAIColonies()) aic.rearrangeWorkers(lb);
+        for (AIColony aic : getAIColonies()) aic.rearrangeWorkers(false, lb);
 
         if (!more.isEmpty()) {
             buildTransportMaps(lb);
             buildWishMaps(lb);
             giveNormalMissions(lb);
             doMissions(more, lb);
-            for (AIColony aic : getAIColonies()) aic.rearrangeWorkers(lb);
+            for (AIColony aic : getAIColonies()) aic.rearrangeWorkers(false, lb);
         }
         lb.log(logger, Level.FINEST);
 

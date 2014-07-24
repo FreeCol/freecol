@@ -234,9 +234,10 @@ public class WorkerWish extends Wish {
     @Override
     public String toString() {
         LogBuilder lb = new LogBuilder(64);
-        lb.add("[", getId(), " -> ", destination,
+        lb.add("[", getId(),
             " ", ((unitType == null) ? "null" : unitType.getSuffix()),
-            "(", getValue(), ((expertNeeded) ? "/expert" : ""), ") ",
+            ((expertNeeded) ? "/expert" : ""),
+            " -> ", destination, " (", getValue(), ")",
             ((transportable == null) ? "" : transportable), "]");
         return lb.toString();
     }

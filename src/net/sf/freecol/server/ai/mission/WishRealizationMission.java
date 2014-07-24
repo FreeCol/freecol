@@ -187,7 +187,7 @@ public class WishRealizationMission extends Mission {
             final Colony colony = (Colony)target;
             final AIUnit aiUnit = getAIUnit();
             final AIColony aiColony = aiMain.getAIColony(colony);
-            aiColony.completeWish(wish, "mission(" + unit + ")");
+            aiColony.completeWish(wish, unit.toShortString(), lb);
             // Replace the mission, with a defensive one if this is a
             // military unit or a simple working one if not.
             if (unit.getType().isOffensive()) {

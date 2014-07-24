@@ -254,10 +254,11 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * Rearranges the workers within this colony using the {@link ColonyPlan}.
      * TODO: Detect military threats and boost defence.
      *
+     * @param update If true, update the AI goods.
      * @param lb A <code>LogBuilder</code> to log to.
      * @return True if the workers were rearranged.
      */
-    public boolean rearrangeWorkers(LogBuilder lb) {
+    public boolean rearrangeWorkers(boolean update, LogBuilder lb) {
         final AIMain aiMain = getAIMain();
         if (colonyPlan == null) colonyPlan = new ColonyPlan(aiMain, colony);
 
@@ -280,6 +281,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         final Player player = colony.getOwner();
         final Specification spec = getSpecification();
         lb.add("\n  ", colony.getName());
+        if (update) updateAIGoods(lb);
 
         // For now, cap the rearrangement horizon, because confidence
         // that we are triggering on all relevant changes is low.
@@ -739,7 +741,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         int amount = (goods == null) ? -1 : goods.getAmount();
         String type = (goods == null) ? "(null)"
             : ag.getGoods().getType().getSuffix();
-        lb.add(", ", action, ((ag == null) ? "(null)" : ag.getId()),
+        lb.add(", ", action, " ", ((ag == null) ? "(null)" : ag.getId()),
             " ", ((amount >= GoodsContainer.CARGO_SIZE) ? "full "
                 : Integer.toString(amount) + " "), type);
     }
@@ -749,7 +751,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      *
      * @param lb A <code>LogBuilder</code> to log to.
      */
-    public void updateAIGoods(LogBuilder lb) {
+    private void updateAIGoods(LogBuilder lb) {
         if (colony.hasAbility(Ability.EXPORT)) {
             while (!aiGoods.isEmpty()) {
                 AIGoods ag = aiGoods.remove(0);
@@ -861,13 +863,17 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * Tries to complete a supplied wish.
      *
      * @param wish The <code>Wish</code> to complete.
+     * @param reason A reason for wish completion.
+     * @param lb A <code>LogBuilder</code> to log to.
      * @return True if this wish was successfully completed.
      */
-    public boolean completeWish(Wish wish, String reason) {
-        if (!wishes.remove(wish)) return false;
+    public boolean completeWish(Wish wish, String reason, LogBuilder lb) {
+        if (!wishes.remove(wish)) {
+            lb.add(", ", reason, " not wished for at ", colony.getName());
+            return false;
+        }
         ((EuropeanAIPlayer)getAIOwner()).completeWish(wish);
-        logger.finest(colony.getName() + " completes " + reason
-            + " wish: " + wish);
+        lb.add(", ", reason, " fulfills at ", colony.getName());
         wish.dispose();
         return true;
     }
@@ -876,16 +882,17 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * Tries to complete any wishes for some goods that have just arrived.
      *
      * @param goods Some <code>Goods</code> that are arriving in this colony.
+     * @param lb A <code>LogBuilder</code> to log to.
      * @return True if a wish was successfully completed.
      */
-    public boolean completeWish(Goods goods) {
+    public boolean completeWish(Goods goods, LogBuilder lb) {
         boolean ret = false;
         int i = 0;
         while (i < wishes.size()) {
             if (wishes.get(i) instanceof GoodsWish) {
                 GoodsWish gw = (GoodsWish)wishes.get(i);
                 if (gw.satisfiedBy(goods)
-                    && completeWish(gw, "satisfied(" + goods + ")")) {
+                    && completeWish(gw, goods.toString(), lb)) {
                     ret = true;
                     continue;
                 }
@@ -899,16 +906,17 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * Tries to complete any wishes for a unit that has just arrived.
      *
      * @param unit A <code>Unit</code> that is arriving in this colony.
+     * @param lb A <code>LogBuilder</code> to log to.
      * @return True if a wish was successfully completed.
      */
-    public boolean completeWish(Unit unit) {
+    public boolean completeWish(Unit unit, LogBuilder lb) {
         boolean ret = false;
         int i = 0;
         while (i < wishes.size()) {
             if (wishes.get(i) instanceof WorkerWish) {
                 WorkerWish ww = (WorkerWish)wishes.get(i);
                 if (ww.satisfiedBy(unit)
-                    && completeWish(ww, "satisfied (" + unit.getId() + ")")) {
+                    && completeWish(ww, unit.toShortString(), lb)) {
                     ret = true;
                     continue;
                 }
@@ -980,10 +988,11 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
         if (gw != null) {
             gw.update(type, amount, value);
+            lb.add(", update ", gw);
         } else {
             gw = new GoodsWish(getAIMain(), colony, value, amount, type);
             wishes.add(gw);
-            lb.add(" ", gw);
+            lb.add(", add ", gw);
         }
     }
 
@@ -1009,10 +1018,11 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
         if (ww != null) {
             ww.update(type, expertNeeded, value);
+            lb.add(", update ", ww);
         } else {
             ww = new WorkerWish(getAIMain(), colony, value, type, expertNeeded);
             wishes.add(ww);
-            lb.add(" ", ww);
+            lb.add(", add ", ww);
         }
     }
 
@@ -1196,7 +1206,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 GoodsWish g = (GoodsWish)wishes.get(i);
                 GoodsType t = g.getGoodsType();
                 if (required.getCount(t) < colony.getGoodsCount(t)) {
-                    completeWish(g, "redundant");
+                    completeWish(g, "redundant", lb);
                     continue;
                 }
             }
@@ -1323,8 +1333,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         tileImprovementPlans.addAll(newPlans);
         Collections.sort(tileImprovementPlans);
         if (!tileImprovementPlans.isEmpty()) {
+            lb.add(", improve:");
             for (TileImprovementPlan tip : tileImprovementPlans) {
-                lb.add(", ", tip);
+                lb.add(" ", tip.getTarget(), "-", tip.getType());
             }
         }
     }

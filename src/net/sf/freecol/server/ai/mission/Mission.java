@@ -648,7 +648,7 @@ public abstract class Mission extends AIObject {
             // Handle embark/disembark.
             if (unit.isOnCarrier() && path.isOnCarrier()) {
                 lb.add(", on ", unit.getLocation(),
-                       " in transit to ", target, ".");
+                       " in transit to ", upLoc(target), ".");
                 return MoveType.MOVE_NO_MOVES;
 
             } else if (unit.isOnCarrier() && !path.isOnCarrier()) {

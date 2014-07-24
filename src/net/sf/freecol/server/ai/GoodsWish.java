@@ -260,10 +260,10 @@ public class GoodsWish extends Wish {
     @Override
     public String toString() {
         LogBuilder lb = new LogBuilder(32);
-        lb.add("[", getId(), " -> ", destination,
+        lb.add("[", getId(),
             " ", amountRequested,
             " ", ((goodsType == null) ? "null" : goodsType.getSuffix()),
-            "(", getValue(), ") ",
+            " -> ", destination, " (", getValue(), ") ",
             ((transportable == null) ? "" : transportable), "]");
         return lb.toString();
     }
