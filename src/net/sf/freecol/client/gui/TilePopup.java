@@ -125,7 +125,7 @@ public final class TilePopup extends JPopupMenu {
                             // if unit did not move, we should show
                             // the goto path
                             if (activeUnit.getTile() == currTile) {
-                                gui.getMapViewer().updateGotoPathForActiveUnit();
+                                gui.getMapViewer().updateCurrentPathForActiveUnit();
                             }
                         }
                     });

@@ -153,6 +153,7 @@ public final class MapViewer {
     /** A path to be displayed on the map. */
     private PathNode currentPath;
 
+    /** A path for a current goto order. */
     private PathNode gotoPath = null;
     private boolean gotoStarted = false;
     private Point gotoDragPoint;
@@ -301,6 +302,37 @@ public final class MapViewer {
             setActiveUnit(null);
             break;
         }
+    }
+
+
+    /**
+     * Get the current active unit path.
+     *
+     * @return The current <code>PathNode</code>.
+     */
+    public PathNode getCurrentPath() {
+        return this.currentPath;
+    }
+
+    /**
+     * Set the current active unit path.
+     *
+     * @param path The current <code>PathNode</code>.
+     */
+    public void setCurrentPath(PathNode path) {
+        this.currentPath = path;
+    }
+
+    /**
+     * Sets the path of the active unit to display it.
+     */
+    public void updateCurrentPathForActiveUnit() {
+        setCurrentPath((activeUnit == null
+                || activeUnit.getDestination() == null
+                || Map.isSameLocation(activeUnit.getLocation(),
+                                      activeUnit.getDestination()))
+            ? null
+            : activeUnit.findPath(activeUnit.getDestination()));
     }
 
 
@@ -1230,7 +1262,7 @@ public final class MapViewer {
         if (activeUnit == null || tile == null) {
             freeColClient.updateActions();
         } else {
-            updateGotoPathForActiveUnit();
+            updateCurrentPathForActiveUnit();
             if (!setSelectedTile(tile, false)
                 || freeColClient.getClientOptions()
                 .getBoolean(ClientOptions.JUMP_TO_ACTIVE_UNIT)) {
@@ -1381,7 +1413,7 @@ public final class MapViewer {
                 Unit unitInFront = getUnitInFront(newTile);
                 if (unitInFront != null) {
                     ret = setActiveUnit(unitInFront);
-                    updateGotoPathForActiveUnit();
+                    updateCurrentPathForActiveUnit();
                 } else {
                     setFocus(newTile);
                     ret = true;
@@ -1390,7 +1422,7 @@ public final class MapViewer {
                 // Clear goto order when unit is already active
                 if (clearGoToOrders) {
                     freeColClient.getInGameController().clearGotoOrders(activeUnit);
-                    updateGotoPathForActiveUnit();
+                    updateCurrentPathForActiveUnit();
                 }
             }
         }
@@ -1470,20 +1502,8 @@ public final class MapViewer {
     public void stopGoto() {
         gui.getCanvas().setCursor(null);
         setGotoPath(null);
-        updateGotoPathForActiveUnit();
+        updateCurrentPathForActiveUnit();
         gotoStarted = false;
-    }
-
-    /**
-     * Sets the path of the active unit to display it.
-     */
-    public void updateGotoPathForActiveUnit() {
-        currentPath = (activeUnit == null
-                       || activeUnit.getDestination() == null
-                       || Map.isSameLocation(activeUnit.getLocation(),
-                                             activeUnit.getDestination()))
-            ? null
-            : activeUnit.findPath(activeUnit.getDestination());
     }
 
     /**
@@ -1809,56 +1829,54 @@ public final class MapViewer {
         }
     }
 
+
     /**
-     * Describe <code>displayGotoPath</code> method here.
+     * Display a path.
      *
-     * @param g a <code>Graphics2D</code> value
-     * @param gotoPath a <code>PathNode</code> value
+     * @param g The <code>Graphics2D</code> to display on.
+     * @param path The <code>PathNode</code> to display.
      */
-    private void displayGotoPath(Graphics2D g, PathNode gotoPath) {
+    private void displayPath(Graphics2D g, PathNode path) {
         final Font font = ResourceManager.getFont("NormalFont", 12f);
         final boolean debug = FreeColDebugger
             .isInDebugMode(FreeColDebugger.DebugMode.PATHS);
 
-        for (PathNode p = gotoPath; p != null; p = p.next) {
+        for (PathNode p = path; p != null; p = p.next) {
             Tile tile = p.getTile();
             if (tile == null) continue;
+            Point point = getTilePosition(tile);
+            if (point == null) continue;
 
-            Unit show = (activeUnit != null && activeUnit.isNaval()
-                && tile.isExplored() && tile.isLand()
-                && (tile.getColony() == null
-                    || !tile.getColony().getOwner().owns(activeUnit)))
-                ? activeUnit.getFirstUnit()
-                : activeUnit;
-            Image image = null, turns = null;
-            if (p.getTurns() == 0) {
-                g.setColor(Color.GREEN);
-                if (show != null) image = lib.getPathImage(show);
-            } else {
-                g.setColor(Color.RED);
-                image = lib.getPathNextTurnImage(show);
-                turns = lib.getStringImage(g, Integer.toString(p.getTurns()),
-                                           Color.WHITE, font);
-            }
-            if (debug) {
-                if (show != null) image = lib.getPathNextTurnImage(show);
+            Image image = (p.isOnCarrier())
+                ? lib.getPathImage(ImageLibrary.PathType.NAVAL)
+                : (activeUnit != null) 
+                ? lib.getPathImage(activeUnit)
+                : null;
+
+            Image turns = (p.getTurns() <= 0) ? null
+                : lib.getStringImage(g, Integer.toString(p.getTurns()),
+                                      Color.WHITE, font);
+            g.setColor((turns == null) ? Color.GREEN : Color.RED);
+
+            if (debug) { // More detailed display
+                if (activeUnit != null) {
+                    image = lib.getPathNextTurnImage(activeUnit);
+                }
                 turns = lib.getStringImage(g, Integer.toString(p.getTurns())
                     + "/" + Integer.toString(p.getMovesLeft()),
                     Color.WHITE, font);
             }
-            Point point = getTilePosition(tile);
-            if (point != null) {
-                g.translate(point.x, point.y);
-                if (image == null) {
-                    g.fillOval(halfWidth, halfHeight, 10, 10);
-                    g.setColor(Color.BLACK);
-                    g.drawOval(halfWidth, halfHeight, 10, 10);
-                } else {
-                    centerImage(g, image);
-                    if (turns != null) centerImage(g, turns);
-                }
-                g.translate(-point.x, -point.y);
+
+            g.translate(point.x, point.y);
+            if (image == null) {
+                g.fillOval(halfWidth, halfHeight, 10, 10);
+                g.setColor(Color.BLACK);
+                g.drawOval(halfWidth, halfHeight, 10, 10);
+            } else {
+                centerImage(g, image);
+                if (turns != null) centerImage(g, turns);
             }
+            g.translate(-point.x, -point.y);
         }
     }
 
@@ -2175,9 +2193,9 @@ public final class MapViewer {
         Display goto path
         */
         if (currentPath != null)
-            displayGotoPath(g, currentPath);
+            displayPath(g, currentPath);
         if (gotoPath != null)
-            displayGotoPath(g, gotoPath);
+            displayPath(g, gotoPath);
 
         /*
         PART 5

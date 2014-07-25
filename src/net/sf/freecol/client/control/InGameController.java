@@ -1935,7 +1935,7 @@ public final class InGameController implements NetworkConstants {
         if (unit != null && unit.getDestination() != null) {
             setDestination(unit, null);
             if (unit == gui.getActiveUnit()) {
-                gui.getMapViewer().updateGotoPathForActiveUnit();
+                gui.getMapViewer().updateCurrentPathForActiveUnit();
             }
         }
     }

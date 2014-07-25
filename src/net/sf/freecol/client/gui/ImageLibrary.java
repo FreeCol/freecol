@@ -32,14 +32,16 @@ import java.awt.Transparency;
 import java.awt.font.TextLayout;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
+
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.FreeColException;
@@ -88,6 +90,37 @@ public final class ImageLibrary {
                                TILE_OWNED_BY_INDIANS = "nativeLand.image",
                                LOST_CITY_RUMOUR = "lostCityRumour.image",
                                DARKNESS = "halo.dark.image";
+
+    public static enum PathType {
+        NAVAL,
+        WAGON,
+        HORSE,
+        FOOT;
+
+        public String getImageKey() {
+            return "path." + this.toString().toLowerCase(Locale.US) + ".image";
+        }
+
+        public String getNextTurnImageKey() {
+            return "path." + this.toString().toLowerCase(Locale.US)
+                + ".nextTurn.image";
+        }
+
+        /**
+         * Get the broad class of image to show along unit paths.
+         *
+         * @param u A <code>Unit</code> to classify.
+         * @return A suitable <code>PathType</code>.
+         */
+        public static PathType getPathType(Unit u) {
+            return (u == null) ? PathType.FOOT
+                : (u.isNaval()) ? PathType.NAVAL
+                : (u.isCarrier()) ? PathType.WAGON
+                : (u.isMounted()) ? PathType.HORSE
+                : PathType.FOOT;
+        }
+    };
+
 
     /**
      * The scaling factor used when creating this
@@ -815,16 +848,15 @@ public final class ImageLibrary {
         return imageCounts.get(prefix);
     }
 
-    private String getPathType(Unit unit) {
-        if (unit.isNaval()) {
-            return "naval";
-        } else if (unit.isMounted()) {
-            return "horse";
-        } else if (unit.getType().hasSkill() || unit.isUndead()) {
-            return "foot";
-        } else {
-            return "wagon";
-        }
+    /**
+     * Gets an image to represent the path of given path type.
+     *
+     * @param pt The <code>PathType</code>
+     * @return The <code>Image</code>.
+     */
+    public Image getPathImage(PathType pt) {
+        return (pt == null) ? null
+            : ResourceManager.getImage(pt.getImageKey());
     }
 
     /**
@@ -835,7 +867,18 @@ public final class ImageLibrary {
      */
     public Image getPathImage(Unit u) {
         return (u == null) ? null
-            : ResourceManager.getImage("path." + getPathType(u) + ".image");
+            : getPathImage(PathType.getPathType(u));
+    }
+
+    /**
+     * Gets an image to represent the path of the given <code>Unit</code>.
+     *
+     * @param pt The <code>PathType</code>
+     * @return The <code>Image</code>.
+     */
+    public Image getPathNextTurnImage(PathType pt) {
+        return (pt == null) ? null
+            : ResourceManager.getImage(pt.getNextTurnImageKey());
     }
 
     /**
@@ -846,7 +889,7 @@ public final class ImageLibrary {
      */
     public Image getPathNextTurnImage(Unit u) {
         return (u == null) ? null
-            : ResourceManager.getImage("path." + getPathType(u) + ".nextTurn.image");
+            : getPathNextTurnImage(PathType.getPathType(u));
     }
 
     /**
