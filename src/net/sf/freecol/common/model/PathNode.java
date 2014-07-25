@@ -315,6 +315,20 @@ public class PathNode {
     }
 
     /**
+     * Does this path include a non-carrier move within a given turn?
+     *
+     * @param turns Paths with fewer turns than this are previous turns.
+     * @return True if there was a non-carrier move in the last turn.
+     */
+    public boolean embarkedThisTurn(int turns) {
+        for (PathNode p = this; p != null; p = p.previous) {
+            if (p.getTurns() < turns) return false;
+            if (!p.isOnCarrier()) return true;
+        }
+        return false;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

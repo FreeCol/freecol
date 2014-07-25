@@ -1100,6 +1100,10 @@ public class Map extends FreeColGameObject implements Location {
             throw new IllegalArgumentException("Path fail: " + unit
                 + " from " + start + " to " + end + " with " + carrier, iae);
         }
+        // Do not allow finding a path into unexplored territory, as we
+        // do not have the terrain type and thus can not calculate costs.
+        if (realEnd instanceof Tile
+            && !((Tile)realEnd).isExplored()) return null;
         // Get the unit that will be used for off-map travel.
         final Unit offMapUnit = (carrier != null) ? carrier : unit;
 
@@ -1133,7 +1137,7 @@ public class Map extends FreeColGameObject implements Location {
             // "expected" failures when rivers block due to foreign
             // ship movement.  There are also other failures which we
             // would like to log.  Try to filter out the first case.
-            } else if ((p = findMapPath(unit,
+            } else if ((path = findMapPath(unit,
                         (tile = p.getLastNode().getTile()), (Tile)realEnd,
                         carrier, costDecider, lb)) == null) {
                 if (!((Tile)realEnd).isOnRiver()) {
@@ -1151,7 +1155,6 @@ public class Map extends FreeColGameObject implements Location {
             // location in Europe, correcting for the turns to sail to
             // the entry location.
             } else {
-                path = p;
                 path.addTurns(offMapUnit.getSailTurns());
                 path.previous = new PathNode(realStart, unit.getMovesLeft(),
                                              0, carrier != null, null, path);
@@ -1367,31 +1370,45 @@ public class Map extends FreeColGameObject implements Location {
 
         /**
          * Resets the path.  Required after the parameters change.
+         *
+         * @param goal True if this is a goal node.
          */
-        public PathNode resetPath() {
-            return this.path = new PathNode(dst, movesLeft, turns, onCarrier,
-                                            current, null);
-        }
+        public void resetPath(boolean goal) {
+            path = new PathNode(dst, movesLeft, turns, onCarrier,
+                                current, null);
+            if (goal) {
+                // Do not let the CostDecider (which may be
+                // conservative) block a final destination.  This
+                // allows planning routines to compute paths to tiles
+                // temporarily occupied by an enemy unit, or for an
+                // empty ship to find a compound path to a native
+                // settlement where the first step is to collect the
+                // cargo it needs to make the final move legal.
+                if (cost == CostDecider.ILLEGAL_MOVE
+                    && unit != null
+                    && current.getTile() != null
+                    && dst.getTile() != null) {
+                    // Pretend it finishes the move.
+                    movesLeft = unit.getInitialMovesLeft();
+                    turns++;
+                    path = new PathNode(dst, movesLeft, turns, onCarrier,
+                                        current, null);
+                }
 
-        /**
-         * Do not let the CostDecider (which may be conservative)
-         * block a final destination.  This allows planning routines
-         * to compute paths to tiles temporarily occupied by an enemy
-         * unit, or for an empty ship to find a compound path to a
-         * native settlement where the first step is to collect the
-         * cargo it needs to make the final move legal.
-         */
-        public void recoverGoal() {
-            Unit.MoveType mt;
-            if (cost == CostDecider.ILLEGAL_MOVE
-                && unit != null
-                && current.getTile() != null
-                && dst.getTile() != null) {
-                // Pretend it finishes the move.
-                movesLeft = unit.getInitialMovesLeft();
-                turns++;
+                // Add an extra step to disembark from a carrier at a
+                // settlement.  If this is omitted, then a path that
+                // disembarks a unit from its carrier on an adjacent
+                // tile looks unfairly expensive.
+                Settlement s;
+                if (unit != null && path.isOnCarrier()
+                    && (s = path.getLocation().getSettlement()) != null
+                    && unit.getOwner().owns(s)) {
+                    movesLeft = 0;
+                    if (path.embarkedThisTurn(turns)) turns++;
+                    path = new PathNode(s.getTile(), 0, turns, false,
+                                        path, null);
+                }
                 cost = PathNode.getCost(turns, movesLeft);
-                resetPath();
             }
         }
 
@@ -1450,21 +1467,6 @@ public class Map extends FreeColGameObject implements Location {
             return sb.toString();
         }
     };
-
-    /**
-     * Does this path include a non-carrier move within the last turn?
-     *
-     * @param p The <code>PathNode</code> to check.
-     * @param turns Paths with fewer turns than this are previous turns.
-     * @return True if there was a non-carrier move in the last turn.
-     */
-    private static boolean embarkedThisTurn(PathNode p, int turns) {
-        for (; p != null; p = p.previous) {
-            if (p.getTurns() < turns) return false;
-            if (!p.isOnCarrier()) return true;
-        }
-        return false;
-    }
 
     /**
      * Searches for a path to a goal determined by the given
@@ -1616,11 +1618,11 @@ public class Map extends FreeColGameObject implements Location {
                     continue;
                 }
 
-                // Is this move to the goal?  Use fake high costs so
+                // Is this move to the goal?  Use fake high cost so
                 // this does not become cached inside the goal decider
                 // as the preferred path.
                 boolean isGoal = goalDecider.check(unit,
-                    new PathNode(moveTile, 0, INFINITY-1, false,
+                    new PathNode(moveTile, 0, INFINITY/2, false,
                         currentNode, null));
                 if (isGoal && lb != null) lb.add(" *goal*");
 
@@ -1632,39 +1634,50 @@ public class Map extends FreeColGameObject implements Location {
                 boolean carrierMove = carrier != null
                     && carrier.isTileAccessible(moveTile);
                 boolean unitMove = umt.isProgress();
-                if (isGoal && !unitMove) {
-                    switch (umt) {
-                    case ATTACK_UNIT:
-                    case ATTACK_SETTLEMENT:
-                    case ENTER_FOREIGN_COLONY_WITH_SCOUT:
-                    case ENTER_INDIAN_SETTLEMENT_WITH_SCOUT:
-                    case ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST:
-                    case ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY:
-                    case ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
-                        // Can not move to the tile, but there is a
-                        // valid interaction with the unit or
-                        // settlement that is there.
-                        unitMove = true;
-                        break;
-                    case MOVE_NO_ATTACK_MARINE:
-                    case MOVE_NO_ATTACK_CIVILIAN:
-                        if (moveTile.hasSettlement()) break;
-                        // There is a unit in the way.  Assume this
-                        // condition is transient unless the unit is
-                        // in a constrained position such as a small
-                        // island or river.  Exception: beached units
-                        // are considered to be a permanent blockage.
-                        unitMove = moveTile.getAvailableAdjacentCount() >= 3;
-                        break;
-                    default:
-                        break;
+                if (isGoal) {
+                    if (!unitMove) {
+                        switch (umt) {
+                        case ATTACK_UNIT:
+                        case ATTACK_SETTLEMENT:
+                        case ENTER_FOREIGN_COLONY_WITH_SCOUT:
+                        case ENTER_INDIAN_SETTLEMENT_WITH_SCOUT:
+                        case ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST:
+                        case ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY:
+                        case ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
+                            // Can not move to the tile, but there is
+                            // a valid interaction with the unit or
+                            // settlement that is there.
+                            unitMove = true;
+                            break;
+                        case MOVE_NO_ATTACK_MARINE:
+                        case MOVE_NO_ATTACK_CIVILIAN:
+                            if (moveTile.hasSettlement()) break;
+                            // There is a unit in the way.  Unless this
+                            // unit can arrive there this turn, assume the
+                            // condition is transient as long as the tile
+                            // is not in a constrained position such as a
+                            // small island or river.
+                            unitMove = currentNode.getTurns() > 0
+                                && moveTile.getAvailableAdjacentCount() >= 3;
+                            break;
+                        default:
+                            break;
+                        }
+                        if (!unitMove && unit == currentUnit) {
+                            // This search can never succeed if the unit
+                            // can not reach the goal, except if there is
+                            // a carrier involved that might still succeed.
+                            if (lb != null) lb.add(" fail-at-GOAL(", umt, ")");
+                            return null;
+                        }
                     }
-                    if (!unitMove && unit == currentUnit) {
-                        // This search can never succeed if the unit
-                        // can not reach the goal, except if there is
-                        // a carrier involved that might still succeed.
-                        if (lb != null) lb.add(" utter-fail(", umt, ")");
-                        return null;
+                    // Special case where the carrier is adjacent to
+                    // an accessible goal settlement but out of moves,
+                    // in which case we let the unit finish the job
+                    // if it can move.
+                    if (unitMove && carrierMove && currentOnCarrier) {
+                        carrierMove = currentNode.getMovesLeft() > 0
+                            || currentNode.embarkedThisTurn(currentTurns);
                     }
                 }
                 if (lb != null) lb.add(" ", umt, "/",
@@ -1685,31 +1698,9 @@ public class Map extends FreeColGameObject implements Location {
                 // useful to dock the carrier so it can collect new
                 // cargo.  OTOH if the carrier is just passing through
                 // the right thing is to keep the passenger on board.
-                // The exception is the disembarkToGoal tests, which
-                // handle the case where the carrier ends its turn one
-                // short of a goal settlement, where we should
-                // consider an immediate move into the settlement by
-                // the passenger.
-                boolean embarked = embarkedThisTurn(currentNode, currentTurns);
-                boolean disembarkToGoal = false;
-                if (unitMove && carrierMove && currentOnCarrier
-                    && !embarked && isGoal) {
-                    // The unit has moves left, and is on a carrier
-                    // next to the goal, which both can move to.
-                    // Usually we will prefer to let the carrier
-                    // finish the job, unless it can not do it this turn.
-                    CostDecider cd = (costDecider != null) ? costDecider
-                        : CostDeciders.defaultCostDeciderFor(carrier);
-                    int cost = cd.getCost(carrier, currentNode.getLocation(),
-                                          moveTile, currentMovesLeft);
-                    if (cost == CostDecider.ILLEGAL_MOVE) {
-                        carrierMove = false;
-                    } else {
-                        disembarkToGoal = cd.getNewTurns() > 0;
-                    }
-                }
+                // However, see the goal settlement exception above.
                 MoveStep step = (currentOnCarrier)
-                    ? ((carrierMove && !disembarkToGoal) ? MoveStep.BYWATER
+                    ? ((carrierMove) ? MoveStep.BYWATER
                         : (unitMove) ? MoveStep.DISEMBARK
                         : MoveStep.FAIL)
                     : ((carrierMove && !usedCarrier(currentNode))
@@ -1740,10 +1731,8 @@ public class Map extends FreeColGameObject implements Location {
                     move.embarkUnit(carrier);
                     break;
                 case DISEMBARK:
-                    // If already embarked this turn the disembarking
-                    // unit will have to wait another turn.
                     move = new MoveCandidate(unit, currentNode, moveTile,
-                        0, ((embarked) ? currentTurns+1 : currentTurns), false,
+                        0, currentTurns, false,
                         ((costDecider != null) ? costDecider
                             : CostDeciders.defaultCostDeciderFor(unit)));
                     break;
@@ -1756,11 +1745,7 @@ public class Map extends FreeColGameObject implements Location {
                 if (move == null) {
                     stepLog = "!";
                 } else {
-                    PathNode movePath = move.resetPath();
-
-                    // Special case when on the map.
-                    if (isGoal) move.recoverGoal();
-
+                    move.resetPath(isGoal);
                     // Tighten the bounds on a previously seen case if possible
                     if (closed != null) {
                         if (move.canImprove(closed)) {
@@ -1780,31 +1765,6 @@ public class Map extends FreeColGameObject implements Location {
                     }
                 }
                 if (lb != null) lb.add(" ", step, stepLog);
-            }
-
-            // Also try moving to Europe if it exists and the move is ok.
-            if (europe != null
-                && (currentNode.previous != null
-                    && currentNode.previous.getLocation() != europe)
-                && currentUnit != null
-                && currentUnit.getType().canMoveToHighSeas()
-                && currentTile.isDirectlyHighSeasConnected()
-                && ((closed = closedList.get(europe.getId())) == null
-                    || closed.getCost() > currentNode.getCost())) {
-                MoveCandidate move = new MoveCandidate(currentUnit,
-                    currentNode, europe, currentMovesLeft, currentTurns,
-                    currentOnCarrier,
-                    ((costDecider != null) ? costDecider
-                        : CostDeciders.defaultCostDeciderFor(currentUnit)));
-                PathNode movePath = move.resetPath();
-                if (closed != null) {
-                    if (move.canImprove(closed)) {
-                        closedList.remove(europe.getId());
-                        move.improve(openList, openListQueue, f, null);
-                    }
-                } else if (move.canImprove(openList.get(europe.getId()))) {
-                    move.improve(openList, openListQueue, f, null);
-                }
             }
         }
 
