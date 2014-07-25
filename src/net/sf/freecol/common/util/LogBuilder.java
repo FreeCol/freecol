@@ -180,6 +180,16 @@ public class LogBuilder {
     }
 
     /**
+     * Output to a logger.
+     *
+     * @param logger The <code>Logger</code> to write to.
+     * @param level The logging <code>Level</code>.
+     */
+    public void log(Logger logger, Level level) {
+        logger.log(level, toString());
+    }
+
+    /**
      * Add a group of objects to the buffer at a particular width
      *
      * @param size The width to set.

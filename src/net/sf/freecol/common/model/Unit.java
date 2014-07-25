@@ -2350,7 +2350,7 @@ public class Unit extends GoodsLocation
     }
 
 
-    // Map searching support routines
+    // Map support routines
 
     /**
      * Gets a suitable tile to start path searches from for a unit.
@@ -2431,7 +2431,7 @@ public class Unit extends GoodsLocation
     public PathNode findPath(Location start, Location end, Unit carrier,
                              CostDecider costDecider) {
         return getGame().getMap().findPath(this, start, end,
-                                           carrier, costDecider);
+                                           carrier, costDecider, null);
     }
 
     /**
@@ -2613,7 +2613,7 @@ public class Unit extends GoodsLocation
     public PathNode search(Location start, GoalDecider gd,
                            CostDecider cd, int maxTurns, Unit carrier) {
         return getGame().getMap().search(this, start, gd, cd, maxTurns,
-                                         carrier);
+                                         carrier, null);
     }
 
     /**

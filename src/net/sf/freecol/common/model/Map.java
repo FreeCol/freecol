@@ -972,7 +972,7 @@ public class Map extends FreeColGameObject implements Location {
         return searchMap(unit, tile, GoalDeciders.getHighSeasGoalDecider(),
             ((costDecider != null) ? costDecider
                 : CostDeciders.avoidSettlementsAndBlockingUnits()),
-            INFINITY, carrier, null);
+            INFINITY, carrier, null, null);
     }
 
     /**
@@ -1003,11 +1003,12 @@ public class Map extends FreeColGameObject implements Location {
      * @param costDecider An optional <code>CostDecider</code> for
      *     determining the movement costs (uses default cost deciders
      *     for the unit/s if not provided).
+     * @param lb An optional <code>LogBuilder</code> to log to.
      * @return A path starting at the start tile and ending at the end
      *     tile, or null if none found.
      */
     private PathNode findMapPath(Unit unit, Tile start, Tile end, Unit carrier,
-                                 CostDecider costDecider) {
+                                 CostDecider costDecider, LogBuilder lb) {
         final Unit offMapUnit = (carrier != null) ? carrier : unit;
         final GoalDecider gd = GoalDeciders.getLocationGoalDecider(end);
         final SearchHeuristic sh = getManhattenHeuristic(end);
@@ -1020,10 +1021,10 @@ public class Map extends FreeColGameObject implements Location {
             // faster, but not always, e.g. mounted units on a good
             // road system.
             path = searchMap(unit, start, gd, costDecider,
-                             INFINITY, null, sh);
+                             INFINITY, null, sh, lb);
             PathNode carrierPath = (carrier == null) ? null
                 : searchMap(unit, start, gd, costDecider,
-                            INFINITY, carrier, sh);
+                            INFINITY, carrier, sh, lb);
             if (carrierPath != null
                 && (path == null
                     || (path.getLastNode().getCost()
@@ -1036,13 +1037,37 @@ public class Map extends FreeColGameObject implements Location {
             // capture with the contiguity test, so just allow the
             // search to proceed.
             path = searchMap(unit, start, gd, costDecider,
-                             INFINITY, carrier, sh);
+                             INFINITY, carrier, sh, lb);
         } else { // Otherwise, there is a connectivity failure.
             path = null;
         }
         return path;
     }
 
+    /**
+     * Finish processing a path.
+     *
+     * @param path The <code>PathNode</code> to finish.
+     * @param unit The <code>Unit</code> that is travelling along the path.
+     * @param lb An optional <code>LogBuilder</code> to log to.
+     * @return The finished path.
+     */
+    private PathNode finishPath(PathNode path, Unit unit, LogBuilder lb) {
+        if (path != null) {
+            // Add the turns remaining on the high seas.
+            final int initialTurns = (!unit.isAtSea()) ? 0
+                : ((unit.isOnCarrier()) ? unit.getCarrier() : unit)
+                .getWorkLeft();
+            if (initialTurns != 0) path.addTurns(initialTurns);
+
+            if (lb != null) {
+                lb.add("\nSuccess\n", path.fullPathToString());
+            }
+        }
+        if (lb != null) lb.log(logger, Level.INFO);
+        return path;
+    }
+        
     /**
      * Find the quickest path for a unit (with optional carrier) from
      * a start location to an end location.
@@ -1054,6 +1079,7 @@ public class Map extends FreeColGameObject implements Location {
      * @param costDecider An optional <code>CostDecider</code> for
      *     determining the movement costs (uses default cost deciders
      *     for the unit/s if not provided).
+     * @param lb An optional <code>LogBuilder</code> to log to.
      * @return A path starting at the start location and ending at the
      *     end location, or null if none found.
      * @throws IllegalArgumentException For many reasons, see
@@ -1061,7 +1087,10 @@ public class Map extends FreeColGameObject implements Location {
      */
     public PathNode findPath(final Unit unit,
                              final Location start, final Location end,
-                             final Unit carrier, CostDecider costDecider) {
+                             final Unit carrier, CostDecider costDecider,
+                             LogBuilder lb) {
+        if (traceSearch) lb = new LogBuilder(1024);
+
         // Validate the arguments, reducing to either Europe or a Tile.
         final Location realStart = findRealStart(unit, start, carrier);
         final Location realEnd;
@@ -1071,18 +1100,19 @@ public class Map extends FreeColGameObject implements Location {
             throw new IllegalArgumentException("Path fail: " + unit
                 + " from " + start + " to " + end + " with " + carrier, iae);
         }
-        // Do not allow finding a path into unexplored territory, as we
-        // do not have the terrain type and thus can not calculate costs.
-        if (realEnd instanceof Tile
-            && !((Tile)realEnd).isExplored()) return null;
         // Get the unit that will be used for off-map travel.
         final Unit offMapUnit = (carrier != null) ? carrier : unit;
 
-        PathNode path = null;
-        // There are four cases...
-        if (realStart instanceof Europe && realEnd instanceof Europe) {
-            // 0: Europe->Europe
-            // Create a trivial path.
+        PathNode p, path;
+        Tile tile;
+        if (realEnd instanceof Tile && !((Tile)realEnd).isExplored()) {
+            // Do not allow finding a path into unexplored territory,
+            // as we do not have the terrain type and thus can not
+            // calculate costs.
+            path = null;
+
+        } else if (realStart instanceof Europe && realEnd instanceof Europe) {
+            // 0: Europe->Europe: Create a trivial path.
             path = new PathNode(realStart, unit.getMovesLeft(), 0,
                                 false, null, null);
 
@@ -1090,83 +1120,81 @@ public class Map extends FreeColGameObject implements Location {
             // 1: Europe->Tile
             // Fail fast without an off map unit.
             if (offMapUnit == null
-                || !offMapUnit.getType().canMoveToHighSeas()) return null;
+                || !offMapUnit.getType().canMoveToHighSeas()) {
+                path = null;
 
-            // Find the best place to enter the map from Europe.
-            PathNode p = getBestEntryPath(unit, (Tile)realEnd, carrier,
-                                          costDecider);
-            if (p == null) return null;
-            Tile tile = p.getLastNode().getTile();
+            // Find the best place to enter the map from Europe
+            } else if ((p = getBestEntryPath(unit, (Tile)realEnd, carrier,
+                                             costDecider)) == null) {
+                path = null;
 
             // Now search forward from there to get a path in the
-            // right order (path costs are not symmetric).
-            path = findMapPath(unit, tile, (Tile)realEnd,
-                               carrier, costDecider);
-            if (path == null) {
-                // There are "expected" failures when rivers block
-                // due to foreign ship movement.  There are also other
-                // failures which we would like to log.  Try to filter
-                // out the first case.
+            // right order (path costs are not symmetric).  There are
+            // "expected" failures when rivers block due to foreign
+            // ship movement.  There are also other failures which we
+            // would like to log.  Try to filter out the first case.
+            } else if ((p = findMapPath(unit,
+                        (tile = p.getLastNode().getTile()), (Tile)realEnd,
+                        carrier, costDecider, lb)) == null) {
                 if (!((Tile)realEnd).isOnRiver()) {
-                    boolean old = traceSearch;
-                    setSearchTrace(true);
+                    LogBuilder l2 = new LogBuilder(logger, Level.WARNING);
+                    l2.add("Fail in findPath(", unit, ", ", tile,
+                        ", ", ((Tile)realEnd), ", ", carrier, ")\n",
+                        p.fullPathToString());
                     path = findMapPath(unit, tile, (Tile)realEnd,
-                                       carrier, costDecider);
-                    setSearchTrace(old);
-                    logger.warning("Fail in findPath(" + unit + ", " + tile
-                        + ", " + ((Tile)realEnd) + ", " + carrier + ")\n"
-                        + p.fullPathToString());
+                                       carrier, costDecider, l2);
+                    l2.flush();
                 }
-                return null;
-            }
+                path = null;
 
             // At the front of the path insert a node for the starting
             // location in Europe, correcting for the turns to sail to
             // the entry location.
-            path.addTurns(offMapUnit.getSailTurns());
-            path.previous = new PathNode(realStart, unit.getMovesLeft(),
-                                         0, carrier != null, null, path);
-            path = path.previous;
-            if (carrier != null && unit.getLocation() != carrier) {
+            } else {
+                path = p;
+                path.addTurns(offMapUnit.getSailTurns());
                 path.previous = new PathNode(realStart, unit.getMovesLeft(),
-                                             0, false, null, path);
+                                             0, carrier != null, null, path);
                 path = path.previous;
+                if (carrier != null && unit.getLocation() != carrier) {
+                    path.previous = new PathNode(realStart, unit.getMovesLeft(),
+                                                 0, false, null, path);
+                    path = path.previous;
+                }
             }
 
         } else if (realStart instanceof Tile && realEnd instanceof Europe) {
             // 2: Tile->Europe
             // Fail fast if Europe is unattainable.
             if (offMapUnit == null
-                || !offMapUnit.getType().canMoveToHighSeas()) return null;
+                || !offMapUnit.getType().canMoveToHighSeas()) {
+                path = null;
                 
             // Search forwards to the high seas.
-            path = searchMap(unit, (Tile)realStart,
-                             GoalDeciders.getHighSeasGoalDecider(),
-                             costDecider, INFINITY, carrier, null);
-            if (path != null) {
-                PathNode last = path.getLastNode();
+            } else if ((p = searchMap(unit, (Tile)realStart,
+                        GoalDeciders.getHighSeasGoalDecider(),
+                        costDecider, INFINITY, carrier, null, lb)) == null) {
+                path = null;
+
+            } else {
+                PathNode last = p.getLastNode();
                 last.next = new PathNode(realEnd, unit.getInitialMovesLeft(),
                     last.getTurns() + offMapUnit.getSailTurns(),
                     last.isOnCarrier(), last, null);
+                path = p;
             }
 
         } else if (realStart instanceof Tile && realEnd instanceof Tile) {
             // 3: Tile->Tile
             path = findMapPath(unit, (Tile)realStart, (Tile)realEnd, carrier,
-                               costDecider);
+                               costDecider, lb);
 
         } else {
             throw new IllegalStateException("Can not happen: " + realStart
                                             + ", " + realEnd);
         }
 
-        if (path != null) { // Add the turns remaining on the high seas.
-            final int initialTurns = (!unit.isAtSea()) ? 0
-                : ((unit.isOnCarrier()) ? unit.getCarrier() : unit)
-                .getWorkLeft();
-            if (initialTurns != 0) path.addTurns(initialTurns);
-        }
-        return path;
+        return finishPath(path, unit, lb);
     }
 
     /**
@@ -1185,6 +1213,7 @@ public class Map extends FreeColGameObject implements Location {
      *     <code>Unit</code> is allowed to move.  This is the
      *     maximum search range for a goal.
      * @param carrier An optional naval carrier <code>Unit</code> to use.
+     * @param lb An optional <code>LogBuilder</code> to log to.
      * @return The path to a goal, or null if none can be found.
      * @throws IllegalArgumentException If the unit is null, or the
      *     start location does not make sense, or the carrier/unit
@@ -1193,39 +1222,42 @@ public class Map extends FreeColGameObject implements Location {
     public PathNode search(final Unit unit, Location start,
                            final GoalDecider goalDecider,
                            final CostDecider costDecider,
-                           final int maxTurns, final Unit carrier) {
+                           final int maxTurns, final Unit carrier,
+                           LogBuilder lb) {
+        if (traceSearch) lb = new LogBuilder(1024);
+
         final Location realStart = findRealStart(unit, start, carrier);
+        final Unit offMapUnit = (carrier != null) ? carrier : unit;
         
-        PathNode path;
+        PathNode p, path;
         if (realStart instanceof Europe) {
             // Fail fast if Europe is unattainable.
-            Unit offMapUnit = (carrier != null) ? carrier : unit;
             if (offMapUnit == null
-                || !offMapUnit.getType().canMoveToHighSeas()) return null;
+                || !offMapUnit.getType().canMoveToHighSeas()) {
+                path = null;
 
             // This is suboptimal.  We do not know where to enter from
-            // Europe, so start with the standard entry location, then
-            // if we find a path, try to optimize it.  This will lose
-            // if the initial search fails due to a turn limit.
+            // Europe, so start with the standard entry location...
+            } else if ((p = searchMap(unit,
+                        (Tile)offMapUnit.getEntryLocation(),
+                        goalDecider, costDecider, maxTurns, carrier,
+                        null, lb)) == null) {
+                path = null;
+
+            // ...then if we find a path, try to optimize it.  This
+            // will lose if the initial search fails due to a turn limit.
             // TODO: something better.
-            path = searchMap(unit, (Tile)offMapUnit.getEntryLocation(),
-                             goalDecider, costDecider, maxTurns, carrier, null);
-            if (path != null) {
-                path = findPath(unit, realStart, path.getLastNode().getTile(),
-                                carrier, costDecider);
+            } else {
+                path = findPath(unit, realStart, p.getLastNode().getTile(),
+                                carrier, costDecider, lb);
             }
+
         } else {
             path = searchMap(unit, realStart.getTile(), goalDecider,
-                             costDecider, maxTurns, carrier, null);
+                             costDecider, maxTurns, carrier, null, lb);
         }
 
-        if (path != null) { // Add the turns remaining on the high seas.
-            final int initialTurns = (!unit.isAtSea()) ? 0
-                : ((unit.isOnCarrier()) ? unit.getCarrier() : unit)
-                .getWorkLeft();
-            if (initialTurns != 0) path.addTurns(initialTurns);
-        }
-        return path;
+        return finishPath(path, unit, lb);
     }
 
     /**
@@ -1313,6 +1345,15 @@ public class Map extends FreeColGameObject implements Location {
                 this.cost = PathNode.getCost(this.turns, this.movesLeft);
             }
             this.path = null;
+        }
+
+        /**
+         * Get the cost.
+         *
+         * @return The current move cost.
+         */
+        public int getCost() {
+            return this.cost;
         }
 
         /**
@@ -1455,6 +1496,7 @@ public class Map extends FreeColGameObject implements Location {
      *     maximum search range for a goal.
      * @param carrier An optional naval carrier <code>Unit</code> to use.
      * @param searchHeuristic An optional <code>SearchHeuristic</code>.
+     * @param lb An optional <code>LogBuilder</code> to log to.
      * @return A path to a goal determined by the given
      *     <code>GoalDecider</code>.
      */
@@ -1462,7 +1504,8 @@ public class Map extends FreeColGameObject implements Location {
                                final GoalDecider goalDecider,
                                final CostDecider costDecider,
                                final int maxTurns, final Unit carrier,
-                               final SearchHeuristic searchHeuristic) {
+                               final SearchHeuristic searchHeuristic,
+                               final LogBuilder lb) {
         final HashMap<String, PathNode> openList
             = new HashMap<String, PathNode>();
         final HashMap<String, PathNode> closedList
@@ -1478,21 +1521,17 @@ public class Map extends FreeColGameObject implements Location {
                     }
                 });
         final Europe europe = unit.getOwner().getEurope();
-        Unit offMapUnit = (carrier != null) ? carrier : unit;
+        final Unit offMapUnit = (carrier != null) ? carrier : unit;
         Unit currentUnit = (start.isLand())
             ? ((start.hasSettlement()
                     && start.getSettlement().isConnectedPort()
                     && unit != null
                     && unit.getLocation() == carrier) ? carrier : unit)
             : offMapUnit;
-        LogBuilder lb = new LogBuilder((traceSearch) ? logger : null,
-                                       Level.INFO);
-        lb.add("Search trace(",
-            ((maxTurns==INFINITY) ? "" : Integer.toString(maxTurns)),
-            ") for ", unit,
-            "/", ((carrier==null) ? "-" : carrier.toString()),
-            " from ", start, " with ", currentUnit.getId(),
-            " costDecider=", costDecider, " goalDecider=", goalDecider);
+        if (lb != null) lb.add("Search trace(unit=", unit,
+            ", from=", start,
+            ", max=", ((maxTurns == INFINITY)?"-":Integer.toString(maxTurns)),
+            ", carrier=", carrier, ")");
 
         // Create the start node and put it on the open list.
         final PathNode firstNode = new PathNode(start,
@@ -1511,14 +1550,15 @@ public class Map extends FreeColGameObject implements Location {
             final PathNode currentNode = openListQueue.poll();
             final Location currentLocation = currentNode.getLocation();
             openList.remove(currentLocation.getId());
-            lb.add("\n  ", currentNode);
+            if (lb != null) lb.add("\n  ", currentNode);
 
             // Reset current unit to that of this node.
             currentUnit = (currentNode.isOnCarrier()) ? carrier : unit;
 
             // Check for success.
             if (goalDecider.check(currentUnit, currentNode)) {
-                lb.add(" ***goal(", currentNode.getCost(), ")***");
+                if (lb != null) lb.add(" ***goal(",
+                    currentNode.getCost(), ")***");
                 best = goalDecider.getGoal();
                 bestScore = best.getCost();
                 if (!goalDecider.hasSubGoals()) break;
@@ -1528,20 +1568,20 @@ public class Map extends FreeColGameObject implements Location {
             // Skip nodes that can not beat the current best path.
             if (bestScore < currentNode.getCost()) {
                 closedList.put(currentLocation.getId(), currentNode);
-                lb.add(" ...goal cost wins(", bestScore,
-                      " < ", currentNode.getCost(), ")...");
+                if (lb != null) lb.add(" ...goal cost wins(",
+                    bestScore, " < ", currentNode.getCost(), ")...");
                 continue;
             }
 
             // Ignore nodes over the turn limit.
             if (currentNode.getTurns() > maxTurns) {
-                lb.add("...out-of-range");
+                if (lb != null) lb.add("...out-of-range");
                 continue;
             }
 
             // Valid candidate for the closed list.
             closedList.put(currentLocation.getId(), currentNode);
-            lb.add("...close");
+            if (lb != null) lb.add("...close");
 
             // Collect the parameters for the current node.
             final int currentMovesLeft = currentNode.getMovesLeft();
@@ -1553,7 +1593,7 @@ public class Map extends FreeColGameObject implements Location {
                 // TODO: Do not consider tiles `adjacent' to Europe, yet.
                 // There may indeed be cases where going to Europe and
                 // coming back on the other side of the map is faster.
-                lb.add("...skip Europe");
+                if (lb != null) lb.add("...skip Europe");
                 continue;
             }
 
@@ -1561,17 +1601,18 @@ public class Map extends FreeColGameObject implements Location {
             PathNode closed;
             for (Tile moveTile : currentTile.getSurroundingTiles(1)) {
                 // If the new tile is the tile we just visited, skip it.
-                lb.add("\n    ", moveTile);
+                if (lb != null) lb.add("\n    ", moveTile);
                 if (currentNode.previous != null
                     && currentNode.previous.getTile() == moveTile) {
-                    lb.add(" previous");
+                    if (lb != null) lb.add(" prev");
                     continue;
                 }
 
                 // Skip neighbouring tiles already too expensive.
+                int cc;
                 if ((closed = closedList.get(moveTile.getId())) != null
-                    && closed.getCost() <= currentNode.getCost()) {
-                    lb.add(" closed-won");
+                    && (cc = closed.getCost()) <= currentNode.getCost()) {
+                    if (lb != null) lb.add(" ", cc);
                     continue;
                 }
 
@@ -1581,13 +1622,15 @@ public class Map extends FreeColGameObject implements Location {
                 boolean isGoal = goalDecider.check(unit,
                     new PathNode(moveTile, 0, INFINITY-1, false,
                         currentNode, null));
-                if (isGoal) lb.add(" *goal*");
+                if (isGoal && lb != null) lb.add(" *goal*");
 
                 // Is this move possible for the base unit?
                 // Allow some seemingly impossible moves if it is to
                 // the goal (see the comment to recoverMove).
                 Unit.MoveType umt = unit.getSimpleMoveType(currentTile,
                                                            moveTile);
+                boolean carrierMove = carrier != null
+                    && carrier.isTileAccessible(moveTile);
                 boolean unitMove = umt.isProgress();
                 if (isGoal && !unitMove) {
                     switch (umt) {
@@ -1620,12 +1663,12 @@ public class Map extends FreeColGameObject implements Location {
                         // This search can never succeed if the unit
                         // can not reach the goal, except if there is
                         // a carrier involved that might still succeed.
-                        lb.add(" utter-fail(", umt, ")");
-                        lb.flush();
+                        if (lb != null) lb.add(" utter-fail(", umt, ")");
                         return null;
                     }
                 }
-                lb.add(" unitMove=", umt, "/", unitMove);
+                if (lb != null) lb.add(" ", umt, "/",
+                    ((unitMove) ? "U" : ""), ((carrierMove) ? "C" : ""));
 
                 // Check for a carrier change at the new tile,
                 // creating a MoveCandidate for each case.
@@ -1647,8 +1690,6 @@ public class Map extends FreeColGameObject implements Location {
                 // short of a goal settlement, where we should
                 // consider an immediate move into the settlement by
                 // the passenger.
-                boolean carrierMove = carrier != null
-                    && carrier.isTileAccessible(moveTile);
                 boolean embarked = embarkedThisTurn(currentNode, currentTurns);
                 boolean disembarkToGoal = false;
                 if (unitMove && carrierMove && currentOnCarrier
@@ -1710,9 +1751,11 @@ public class Map extends FreeColGameObject implements Location {
                     move = null;
                     break;
                 }
-                lb.add(" ", step);
 
-                if (move != null) {
+                String stepLog;
+                if (move == null) {
+                    stepLog = "!";
+                } else {
                     PathNode movePath = move.resetPath();
 
                     // Special case when on the map.
@@ -1724,20 +1767,19 @@ public class Map extends FreeColGameObject implements Location {
                             closedList.remove(moveTile.getId());
                             move.improve(openList, openListQueue, f,
                                          searchHeuristic);
-                            lb.add(" closed-added");
+                            stepLog = "^" + Integer.toString(move.getCost());
                         } else {
-                            lb.add(" closed-won");
+                            stepLog = ".";
                         }
                     } else if (move.canImprove(openList.get(moveTile.getId()))){
                         move.improve(openList, openListQueue, f,
                                      searchHeuristic);
-                        lb.add(" added");
+                        stepLog = "+" + Integer.toString(move.getCost());
                     } else {
-                        lb.add(" loses");
+                        stepLog = "-";
                     }
-                } else {
-                    lb.add(" invalid");
                 }
+                if (lb != null) lb.add(" ", step, stepLog);
             }
 
             // Also try moving to Europe if it exists and the move is ok.
@@ -1774,10 +1816,6 @@ public class Map extends FreeColGameObject implements Location {
                 best = best.previous;
             }
         }
-
-        // Output the trace result and return.
-        lb.add("\nResult\n", ((best != null) ? best.fullPathToString() : ""));
-        lb.flush();
         return best;
     }
 

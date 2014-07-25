@@ -45,12 +45,16 @@ import net.sf.freecol.common.model.CombatModel.CombatOdds;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.util.LogBuilder;
+
 
 
 /**
@@ -337,6 +341,28 @@ public final class TilePopup extends JPopupMenu {
                     }
                 });
             add(adda);
+        }
+
+        final Unit activeUnit = gui.getActiveUnit();
+        Tile unitTile;
+        if (activeUnit != null && (unitTile = activeUnit.getTile()) != null) {
+            JMenuItem menuItem = new JMenuItem("Show search");
+            menuItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent event) {
+                        if (!freeColClient.currentPlayerIsMyPlayer()) return;
+                        Tile currTile = activeUnit.getTile();
+                        if (currTile == tile) return;
+                        final Map map = activeUnit.getGame().getMap();
+                        LogBuilder lb = new LogBuilder(512);
+                        PathNode path = map.findPath(activeUnit,
+                            activeUnit.getTile(), tile, activeUnit.getCarrier(),
+                            null, lb);
+                        gui.showInformationMessage(lb.toString());
+                        gui.getMapViewer().setCurrentPath(path);
+                        gui.refresh();                        
+                    }
+                });
+            add(menuItem);
         }
 
         for (Unit u : tile.getUnitList()) {
