@@ -2009,8 +2009,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public String toShortString() {
         StringBuilder sb = new StringBuilder(16);
+        TileType type = getType();
         sb.append(getX()).append(",").append(getY())
-            .append("-").append(getType().getSuffix());
+            .append("-").append((type == null) ? "?" : type.getSuffix());
         return sb.toString();
     }
 
