@@ -533,12 +533,12 @@ public class TransportMission extends Mission {
     public TransportMission(AIMain aiMain, AIUnit aiUnit) {
         super(aiMain, aiUnit);
 
-        LogBuilder lb = new LogBuilder(logger, Level.FINEST);
+        LogBuilder lb = new LogBuilder(256);
         lb.add(tag);
         checkCargoes(lb);
         retarget();
         lb.add(" begins: ", toFullString());
-        lb.flush();
+        lb.log(logger, Level.FINEST);
         uninitialized = false;
     }
 

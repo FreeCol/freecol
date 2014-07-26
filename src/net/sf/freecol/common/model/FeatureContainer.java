@@ -411,7 +411,7 @@ public final class FeatureContainer {
     public void removeFeatures(FreeColObject fco, String logMe) {
         FeatureContainer c = fco.getFeatureContainer();
         if (c == null) return;
-        LogBuilder lb = new LogBuilder(logger, Level.FINE);
+        LogBuilder lb = new LogBuilder(64);
         lb.mark();
 
         Set<Entry<String, Set<Ability>>> ca = c.getAbilityEntries();
@@ -445,7 +445,7 @@ public final class FeatureContainer {
                 }
             }
         }
-        if (lb.grew(logMe, ", removed features:")) lb.flush();
+        if (lb.grew(logMe, "Removed features:")) lb.log(logger, Level.FINE);
     }
 
     /**

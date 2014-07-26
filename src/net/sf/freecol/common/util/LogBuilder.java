@@ -34,12 +34,6 @@ import net.sf.freecol.common.model.Location;
  */
 public class LogBuilder {
 
-    /** The logger. */
-    private Logger logger;
-
-    /** The logging level. */
-    private Level level;
-
     /** The string builder to use. */
     private StringBuilder sb;
 
@@ -49,29 +43,11 @@ public class LogBuilder {
 
     /**
      * Create a new LogBuilder that can only be used as a buffer.
-     * That is, flush is inoperative.
      *
      * @param size An initial size for the buffer.
      */
     public LogBuilder(int size) {
-        this.logger = null;
-        this.level = Level.INFO;
         this.sb = (size <= 0) ? null : new StringBuilder(size);
-        this.point = -1;
-    }
-
-    /**
-     * Create a new LogBuilder for a given logger and level.
-     *
-     * @param logger The <code>Logger</code> to write to.
-     * @param level The logging <code>Level</code>.
-     */
-    public LogBuilder(Logger logger, Level level) {
-        this.logger = logger;
-        this.level = level;
-        this.sb = (logger != null && logger.isLoggable(level))
-            ? new StringBuilder(256)
-            : null;
         this.point = -1;
     }
 
@@ -162,15 +138,6 @@ public class LogBuilder {
     }
 
     /**
-     * Flush the saved data to the logger.
-     */
-    public void flush() {
-        if (sb != null) {
-            this.logger.log(this.level, sb.toString());
-        }
-    }
-
-    /**
      * Get the buffer contents as a string.
      *
      * @return The buffer contents.
@@ -186,7 +153,10 @@ public class LogBuilder {
      * @param level The logging <code>Level</code>.
      */
     public void log(Logger logger, Level level) {
-        logger.log(level, toString());
+        if (sb != null && logger != null && level != null
+            && logger.isLoggable(level)) {
+            logger.log(level, toString());
+        }
     }
 
     /**

@@ -182,10 +182,10 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         }
         Collections.sort(targets);
 
-        LogBuilder lb = new LogBuilder(logger, Level.FINE);
+        LogBuilder lb = new LogBuilder(64);
         lb.add("REF found colony targets:");
         for (TargetTuple t : targets) lb.add(" ", t.colony, "(", t.score, ")");
-        lb.flush();
+        lb.log(logger, Level.FINE);
         return targets;
     }
 
@@ -250,7 +250,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         final Player rebel = targets.get(0).colony.getOwner();
         double ratio = getStrengthRatio(rebel);
         int n = targets.size();
-        LogBuilder lb = new LogBuilder(logger, Level.FINE);
+        LogBuilder lb = new LogBuilder(64);
         lb.add("REF attacking ", rebel.getName(), " ratio=", ratio);
 
         // For each target search from the target position to find a
@@ -421,7 +421,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                 lb.add("\n  Suppress ", enemy, " from ", start, " with ", u);
             }
         }
-        lb.flush();
+        lb.log(logger, Level.FINE);
         return true;
     }
 

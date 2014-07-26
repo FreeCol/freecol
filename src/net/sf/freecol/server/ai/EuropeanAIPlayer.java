@@ -2193,7 +2193,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             throw new RuntimeException("EuropeanAIPlayer integrity fail");
         }
 
-        LogBuilder lb = new LogBuilder(logger, Level.FINEST);
+        LogBuilder lb = new LogBuilder(1024);
         lb.add(player.getNation().getSuffix(),
                " in ", turn, "/", turn.getNumber(),
                " declare=", (player.checkDeclareIndependence() == null),
@@ -2233,7 +2233,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             doMissions(more, lb);
             for (AIColony aic : getAIColonies()) aic.rearrangeWorkers(lb);
         }
-        lb.flush();
+        lb.log(logger, Level.FINEST);
 
         clearAIUnits();
         tipMap.clear();
@@ -2336,7 +2336,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             = new HashMap<TradeItem, Integer>();
         TradeItem peace = null;
         TradeItem cash = null;
-        LogBuilder lb = new LogBuilder(logger, Level.INFO);
+        LogBuilder lb = new LogBuilder(64);
         lb.add("Evaluate trade offer from ", other.getName(), ":");
         TradeStatus result = null;
 
@@ -2520,7 +2520,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         }
 
         lb.add(" => ", result);
-        lb.flush();
+        lb.log(logger, Level.INFO);
         return result;
     }
 
@@ -2612,7 +2612,7 @@ public class EuropeanAIPlayer extends AIPlayer {
     @Override
     public boolean acceptTax(int tax) {
         boolean ret = true;
-        LogBuilder lb = new LogBuilder(logger, Level.INFO);
+        LogBuilder lb = new LogBuilder(64);
         lb.add("Tax demand to ", getPlayer().getId(), " of ", tax, "%: ");
         Goods toBeDestroyed = getPlayer().getMostValuableGoods();
         GoodsType goodsType = (toBeDestroyed == null) ? null
@@ -2669,7 +2669,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                    ": standard-goods-with-income-", income,
                     ((ret) ? "-less-than-" : "-greater-than-"), averageIncome);
         }
-        lb.flush();
+        lb.log(logger, Level.INFO);
         return ret;
     }
 

@@ -628,14 +628,13 @@ public class Colony extends Settlement implements Nameable {
      */
     private Occupation getOccupationFor(Unit unit,
                                         Collection<GoodsType> workTypes) {
-        LogBuilder lb = new LogBuilder((getOccupationTrace()) ? logger : null,
-                                       Level.WARNING);
+        LogBuilder lb = new LogBuilder((getOccupationTrace()) ? 64 : 0);
         lb.add(getName(), ".getOccupationFor(", unit, ", ");
         logWorkTypes(workTypes, lb);
         lb.add(")");
 
         Occupation occupation = getOccupationFor(unit, workTypes, lb);
-        lb.flush();
+        lb.log(logger, Level.WARNING);
         return occupation;
     }
 
@@ -650,12 +649,11 @@ public class Colony extends Settlement implements Nameable {
      *     null if none found.
      */
     private Occupation getOccupationFor(Unit unit, boolean userMode) {
-        LogBuilder lb = new LogBuilder((getOccupationTrace()) ? logger : null,
-                                       Level.WARNING);
+        LogBuilder lb = new LogBuilder((getOccupationTrace()) ? 64 : 0);
         lb.add(getName(), ".getOccupationFor(", unit, ")");
 
         Occupation occupation = getOccupationFor(unit, userMode, lb);
-        lb.flush();
+        lb.log(logger, Level.WARNING);
         return occupation;
     }
 
@@ -672,8 +670,7 @@ public class Colony extends Settlement implements Nameable {
      */
     private Occupation getOccupationAt(Unit unit, WorkLocation wl,
                                        boolean userMode) {
-        LogBuilder lb = new LogBuilder((getOccupationTrace()) ? logger : null,
-                                       Level.WARNING);
+        LogBuilder lb = new LogBuilder((getOccupationTrace()) ? 64 : 0);
         lb.add(getName(), ".getOccupationAt(", unit, ", ", wl, ")");
 
         Occupation best = new Occupation(null, null, null);
@@ -690,7 +687,7 @@ public class Colony extends Settlement implements Nameable {
             }
         }
         if (best.workType == null) lb.add("\n  FAILED");
-        lb.flush();
+        lb.log(logger, Level.WARNING);
         return (best.workType == null) ? null : best;
     }
 
@@ -1459,9 +1456,9 @@ public class Colony extends Settlement implements Nameable {
         Occupation occupation = getOccupationFor(unit, false);
         if (occupation == null) {
             if (!traceOccupation) {
-                LogBuilder lb = new LogBuilder(logger, Level.WARNING);
+                LogBuilder lb = new LogBuilder(64);
                 getOccupationFor(unit, false, lb);
-                lb.flush();
+                lb.log(logger, Level.WARNING);
             }
             return false;
         }

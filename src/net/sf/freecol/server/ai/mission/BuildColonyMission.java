@@ -436,12 +436,12 @@ public class BuildColonyMission extends Mission {
 
             // Log the colony values so we can improve things
             if (logger.isLoggable(Level.FINE)) {
-                LogBuilder l2 = new LogBuilder(logger, Level.FINE);
+                LogBuilder l2 = new LogBuilder(64);
                 l2.add(tag, " score-at-foundation ", tile, ":");
                 for (Double d : player.getAllColonyValues(tile)) {
                     l2.add(" ", d);
                 }
-                l2.flush();
+                l2.log(logger, Level.FINE);
             }
             
             // Clear to build the colony.

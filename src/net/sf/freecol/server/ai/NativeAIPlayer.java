@@ -763,7 +763,7 @@ public class NativeAIPlayer extends AIPlayer {
         final int nSettlements = player.getNumberOfSettlements();
         final Random air = getAIRandom();
 
-        LogBuilder lb = new LogBuilder(logger, Level.FINEST);
+        LogBuilder lb = new LogBuilder(1024);
         lb.add(player.getNation().getSuffix(), " in ", turn,
                "/", turn.getNumber());
 
@@ -797,7 +797,7 @@ public class NativeAIPlayer extends AIPlayer {
             doMissions(more, lb);
         }
         clearAIUnits();
-        lb.flush();
+        lb.log(logger, Level.FINEST);
     }
 
     /**
