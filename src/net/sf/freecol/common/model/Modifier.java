@@ -611,7 +611,7 @@ public class Modifier extends Feature {
         List<Scope> scopes = getScopes();
         if (!scopes.isEmpty()) {
             sb.append(" [");
-            for (Scope s : scopes) sb.append(" ").append(s.toString());
+            for (Scope s : scopes) sb.append(" ").append(s);
             sb.append(" ]");
         }
         sb.append("]");

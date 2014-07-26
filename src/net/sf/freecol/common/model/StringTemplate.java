@@ -239,7 +239,7 @@ public class StringTemplate extends FreeColObject {
             addReplacement(new StringTemplate(value, TemplateType.KEY));
         } else {
             throw new IllegalArgumentException("Cannot add key-value pair to StringTemplate type "
-                                               + templateType.toString());
+                                               + templateType);
         }
         return this;
     }
@@ -256,7 +256,7 @@ public class StringTemplate extends FreeColObject {
             addReplacement(new StringTemplate(value, TemplateType.KEY));
         } else {
             throw new IllegalArgumentException("Cannot add a single string to StringTemplate type "
-                                               + templateType.toString());
+                                               + templateType);
         }
         return this;
     }
@@ -276,7 +276,7 @@ public class StringTemplate extends FreeColObject {
             addReplacement(new StringTemplate(value, TemplateType.NAME));
         } else {
             throw new IllegalArgumentException("Cannot add key-value pair to StringTemplate type "
-                                               + templateType.toString());
+                                               + templateType);
         }
         return this;
     }
@@ -297,7 +297,7 @@ public class StringTemplate extends FreeColObject {
                                               TemplateType.KEY));
         } else {
             throw new IllegalArgumentException("Cannot add key-value pair to StringTemplate type "
-                                               + templateType.toString());
+                                               + templateType);
         }
         return this;
     }
@@ -315,7 +315,7 @@ public class StringTemplate extends FreeColObject {
             addReplacement(new StringTemplate(value, TemplateType.NAME));
         } else {
             throw new IllegalArgumentException("Cannot add a single string to StringTemplate type "
-                                               + templateType.toString());
+                                               + templateType);
         }
         return this;
     }
@@ -346,7 +346,7 @@ public class StringTemplate extends FreeColObject {
             addReplacement(template);
         } else {
             throw new IllegalArgumentException("Cannot add a key-template pair to a StringTemplate type "
-                                               + templateType.toString());
+                                               + templateType);
         }
         return this;
     }
@@ -362,7 +362,7 @@ public class StringTemplate extends FreeColObject {
             addReplacement(template);
         } else {
             throw new IllegalArgumentException("Cannot add a StringTemplate to StringTemplate type "
-                                               + templateType.toString());
+                                               + templateType);
         }
         return this;
     }
@@ -540,7 +540,7 @@ public class StringTemplate extends FreeColObject {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
-        sb.append(templateType.toString()).append(": ");
+        sb.append(templateType).append(": ");
         switch (templateType) {
         case LABEL:
             if (replacements == null) {
@@ -559,7 +559,7 @@ public class StringTemplate extends FreeColObject {
             sb.append(" [");
             for (int index = 0; index < keys.size(); index++) {
                 sb.append("[").append(keys.get(index)).append(": ")
-                    .append(replacements.get(index).toString()).append("]");
+                    .append(replacements.get(index)).append("]");
             }
             sb.append("]");
             break;

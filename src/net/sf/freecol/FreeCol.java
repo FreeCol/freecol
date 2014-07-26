@@ -330,8 +330,7 @@ public final class FreeCol {
      * @return A value of the package version attribute.
      */
     private static String readVersion(Class c) throws IOException {
-        String resourceName = "/" + c.getName().toString().replace('.', '/')
-            + ".class";
+        String resourceName = "/" + c.getName().replace('.', '/') + ".class";
         URL url = c.getResource(resourceName);
         Manifest mf = ((JarURLConnection)url.openConnection()).getManifest();
         return mf.getMainAttributes().getValue("Package-Version");

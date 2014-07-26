@@ -400,7 +400,7 @@ public abstract class WorkLocation extends UnitLocation
         NoAddReason reason = getNoAddReason(locatable);
         if (reason != NoAddReason.NONE) {
             throw new IllegalStateException("Can not add " + locatable
-                + " to " + toString() + " because " + reason);
+                + " to " + this + " because " + reason);
         }
         Unit unit = (Unit)locatable;
         if (contains(unit)) return true;

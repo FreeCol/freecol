@@ -521,9 +521,7 @@ public class DiplomaticTrade extends FreeColObject {
             .append(" to=").append(recipient.getId())
             .append(" version=").append(getVersion())
             .append(" [");
-        for (TradeItem item : getTradeItems()) {
-            sb.append(" ").append(item.toString());
-        }
+        for (TradeItem item : getTradeItems()) sb.append(" ").append(item);
         sb.append(" ]]");
         return sb.toString();
     }

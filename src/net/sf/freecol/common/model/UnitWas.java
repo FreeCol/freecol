@@ -115,7 +115,7 @@ public class UnitWas implements Comparable<UnitWas> {
                 String pc = ColonyChangeEvent.UNIT_TYPE_CHANGE.toString();
                 colony.firePropertyChange(pc, type, newType);
             } else if (role != newRole && newRole != null) {
-                String pc = Tile.UNIT_CHANGE.toString();
+                String pc = Tile.UNIT_CHANGE;
                 colony.firePropertyChange(pc, role.toString(),
                                           newRole.toString());
             }

@@ -90,24 +90,25 @@ public final class Monarch extends FreeColGameObject implements Named {
                     }
                 } else {
                     logger.warning("Found unit lacking required ability \""
-                        + ability + "\": " + unit.toString());
+                        + ability + "\": " + unit);
                 }
             }
             updateSpaceAndCapacity();
         }
 
-        public int getSpaceRequired() {
+
+        public final int getSpaceRequired() {
             return spaceRequired;
         }
 
-        public int getCapacity() {
+        public final int getCapacity() {
             return capacity;
         }
 
         /**
          * Update the space and capacity variables.
          */
-        public void updateSpaceAndCapacity() {
+        public final void updateSpaceAndCapacity() {
             final Specification spec = getSpecification();
             capacity = 0;
             for (AbstractUnit nu : navalUnits) {

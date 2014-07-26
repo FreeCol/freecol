@@ -126,7 +126,7 @@ public class SimpleMapGenerator implements MapGenerator {
          */
         @Override
         public String toString() {
-            return player + " territory at " + region.toString();
+            return player + " territory at " + region;
         }
     }
 
@@ -859,7 +859,7 @@ public class SimpleMapGenerator implements MapGenerator {
                     + " for player " + player
                     + " from (" + x + "," + y + ")"
                     + " avoiding:";
-                for (Tile t : startingTiles) err += " " + t.toString();
+                for (Tile t : startingTiles) err += " " + t;
                 err += " with map: ";
                 for (int xx = 0; xx < map.getWidth(); xx++) {
                     err += map.getTile(xx, y);

@@ -77,7 +77,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
         }
         if (location != null && location.getGoodsContainer() == null) {
             throw new IllegalArgumentException("Can not store goods at: "
-                + location.toString());
+                + location);
         }
 
         this.game = game;

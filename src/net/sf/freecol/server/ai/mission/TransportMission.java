@@ -478,7 +478,7 @@ public class TransportMission extends Mission {
 
             Locatable l = transportable.getTransportLocatable();
             if (l == null) {
-                return "null locatable: " + transportable.toString();
+                return "null locatable: " + transportable;
             } else if (l instanceof FreeColGameObject
                 && ((FreeColGameObject)l).isDisposed()) {
                 return "locatable disposed";
@@ -889,7 +889,7 @@ public class TransportMission extends Mission {
     private List<Cargo> wrapCargoes() {
         List<Cargo> ts = tCopy();
         String logMe = ":";
-        for (Cargo t : ts) logMe += "\n" + t.toString();
+        for (Cargo t : ts) logMe += "\n" + t;
         try {
             for (int i = 0; i < ts.size(); i++) {
                 Cargo head = ts.get(i);
@@ -980,11 +980,11 @@ public class TransportMission extends Mission {
         }
 
         if (result) {
-            logger.finest(tag + " added " + cargo.toString()
+            logger.finest(tag + " added " + cargo
                 + " (at " + ((index < 0) ? "end" : Integer.toString(index))
                 + "): " + toFullString());
         } else {
-            logger.warning(tag + " add " + cargo.toString()
+            logger.warning(tag + " add " + cargo
                 + " (at " + ((index < 0) ? "end" : Integer.toString(index))
                 + ") failed: " + toFullString());
         }

@@ -220,7 +220,7 @@ public class ModelMessage extends StringTemplate {
      * @return A message key.
      */
     public String getMessageTypeName() {
-        return "model.message." + messageType.toString();
+        return "model.message." + messageType;
     }
 
     /**

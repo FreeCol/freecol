@@ -1027,7 +1027,7 @@ public final class InGameController extends Controller {
         final Specification spec = getGame().getSpecification();
         boolean valid = monarch.actionIsValid(action);
         if (!valid) return;
-        String messageId = "model.monarch.action." + action.toString();
+        String messageId = "model.monarch.action." + action;
         StringTemplate template;
         MonarchActionMessage message;
         String monarchKey = serverPlayer.getMonarchKey();
@@ -1042,8 +1042,7 @@ public final class InGameController extends Controller {
                 logger.finest("Ignoring tax raise, no goods to boycott.");
                 break;
             }
-            template = StringTemplate.template("model.monarch.action."
-                + action.toString())
+            template = StringTemplate.template("model.monarch.action." + action)
                 .addStringTemplate("%goods%", goods.getType().getLabel())
                 .addAmount("%amount%", taxRaise);
             if (action == MonarchAction.RAISE_TAX_WAR) {
@@ -1892,7 +1891,7 @@ public final class InGameController extends Controller {
         UnitLocation.NoAddReason reason = carrier.getNoAddReason(unit);
         if (reason != UnitLocation.NoAddReason.NONE) {
             return DOMMessage.clientError("Carrier: " + carrier.getId()
-                + " can not carry " + unit.getId() + ": " + reason.toString());
+                + " can not carry " + unit.getId() + ": " + reason);
         }
 
         ChangeSet cs = new ChangeSet();
@@ -2006,7 +2005,7 @@ public final class InGameController extends Controller {
                 + settlement.getName());
         }
         if (!unit.getType().canBeUpgraded(skill, ChangeType.NATIVES)) {
-            return DOMMessage.clientError("Unit " + unit.toString()
+            return DOMMessage.clientError("Unit " + unit
                 + " can not learn skill " + skill
                 + " at " + settlement.getName());
         }
@@ -3036,8 +3035,7 @@ public final class InGameController extends Controller {
         for (TradeItem tradeItem : agreement.getTradeItems()) {
             // Check trade carefully before committing.
             if (!tradeItem.isValid()) {
-                logger.warning("Trade with invalid tradeItem: "
-                               + tradeItem.toString());
+                logger.warning("Trade with invalid tradeItem: " + tradeItem);
                 continue;
             }
             ServerPlayer source = (ServerPlayer)tradeItem.getSource();

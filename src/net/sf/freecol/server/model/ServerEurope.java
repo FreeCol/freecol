@@ -177,7 +177,7 @@ public class ServerEurope extends Europe implements ServerModelObject {
      * @param cs A <code>ChangeSet</code> to update.
      */
     public void csNewTurn(Random random, ChangeSet cs) {
-        logger.finest("ServerEurope.csNewTurn, for " + toString());
+        logger.finest("ServerEurope.csNewTurn, for " + this);
 
         for (Unit unit : getUnitList()) {
             if (unit.isNaval() && unit.isDamaged()) {

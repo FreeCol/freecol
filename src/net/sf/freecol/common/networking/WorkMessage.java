@@ -111,8 +111,8 @@ public class WorkMessage extends DOMMessage {
             return DOMMessage.clientError("Work location is not in the colony"
                 + " where the unit is: " + workLocationId);
         } else if (!workLocation.canAdd(unit)) {
-            return DOMMessage.clientError("Can not add " + unit.toString()
-                + " to " + workLocation.toString()
+            return DOMMessage.clientError("Can not add " + unit
+                + " to " + workLocation
                 + ": " + workLocation.getNoAddReason(unit));
         }
 

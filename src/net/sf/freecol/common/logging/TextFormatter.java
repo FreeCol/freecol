@@ -46,11 +46,13 @@ final class TextFormatter extends Formatter {
     @Override
     public String format(LogRecord record) {
         StringBuilder result = new StringBuilder();
-        result.append(record.getSourceClassName()).append(' ').append(record.getSourceMethodName());
-        result.append("\n\t").append(record.getLevel().getName()).append(": ").append(
-                record.getMessage().replaceAll("\n", "\n\t"));
-        result.append("\n\t").append(new Date(record.getMillis()).toString());
-        result.append("\n\tThread: ").append(record.getThreadID()).append('\n');
+        result.append(record.getSourceClassName())
+            .append(' ').append(record.getSourceMethodName())
+            .append("\n\t").append(record.getLevel().getName())
+            .append(": ").append(record.getMessage().replaceAll("\n", "\n\t"))
+            .append("\n\t").append(new Date(record.getMillis()))
+            .append("\n\tThread: ").append(record.getThreadID())
+            .append('\n');
         if (record.getThrown() != null) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
@@ -58,7 +60,7 @@ final class TextFormatter extends Formatter {
             record.getThrown().printStackTrace(pw);
             pw.println("----------------------------");
             pw.flush();
-            result.append(sw.toString());
+            result.append(sw);
         }
 
         return result.toString();

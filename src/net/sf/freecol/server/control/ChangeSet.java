@@ -422,7 +422,7 @@ public class ChangeSet {
         public String toString() {
             StringBuilder sb = new StringBuilder(64);
             sb.append("[").append(getClass().getName())
-                .append(" ").append(see.toString())
+                .append(" ").append(see)
                 .append(" #").append(getPriority())
                 .append(" ").append(attacker.getId())
                 .append("@").append(attackerTile.getId())
@@ -502,7 +502,7 @@ public class ChangeSet {
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
             sb.append("[").append(getClass().getName())
-                .append(" ").append(see.toString())
+                .append(" ").append(see)
                 .append(" #").append(getPriority())
                 .append(" ").append(key)
                 .append("=").append(value)
@@ -560,7 +560,7 @@ public class ChangeSet {
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
             sb.append("[").append(getClass().getName())
-                .append(" ").append(see.toString())
+                .append(" ").append(see)
                 .append(" #").append(getPriority())
                 .append(" ").append(message)
                 .append("]");
@@ -678,7 +678,7 @@ public class ChangeSet {
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
             sb.append("[").append(getClass().getName())
-                .append(" ").append(see.toString())
+                .append(" ").append(see)
                 .append(" #").append(getPriority())
                 .append(" ").append(unit.getId())
                 .append(" ").append(oldLocation.getId())
@@ -777,7 +777,7 @@ public class ChangeSet {
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
             sb.append("[").append(getClass().getName())
-                .append(" ").append(see.toString())
+                .append(" ").append(see)
                 .append(" #").append(getPriority())
                 .append(" ").append(fcgo.getId())
                 .append("]");
@@ -845,7 +845,7 @@ public class ChangeSet {
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
             sb.append("[").append(getClass().getName())
-                .append(" ").append(see.toString())
+                .append(" ").append(see)
                 .append(" #").append(getPriority())
                 .append(" ").append(fcgo.getId());
             for (String f : fields) sb.append(" ").append(f);
@@ -935,7 +935,7 @@ public class ChangeSet {
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
             sb.append("[").append(getClass().getName())
-                .append(" ").append(see.toString())
+                .append(" ").append(see)
                 .append(" #").append(getPriority())
                 .append(" ").append(((tile == null) ? "<null>" : tile.getId()));
             for (FreeColGameObject f : contents) {
@@ -995,7 +995,7 @@ public class ChangeSet {
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
             sb.append("[").append(getClass().getName())
-                .append(" ").append(see.toString())
+                .append(" ").append(see)
                 .append(" #").append(getPriority())
                 .append(" ").append(fco.getId())
                 .append("]");
@@ -1060,7 +1060,7 @@ public class ChangeSet {
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
             sb.append("[").append(getClass().getName())
-                .append(" ").append(see.toString())
+                .append(" ").append(see)
                 .append(" #").append(getPriority())
                 .append(" ").append((add) ? "add" : "remove")
                 .append(" ").append(feature)
@@ -1122,7 +1122,7 @@ public class ChangeSet {
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
             sb.append("[").append(getClass().getName())
-                .append(" ").append(see.toString())
+                .append(" ").append(see)
                 .append(" #").append(getPriority())
                 .append(" ").append(tile.getId())
                 .append("]");
@@ -1186,7 +1186,7 @@ public class ChangeSet {
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
             sb.append("[").append(getClass().getName())
-                .append(" ").append(see.toString())
+                .append(" ").append(see)
                 .append(" #").append(getPriority())
                 .append(" ").append(first.getId())
                 .append(" ").append(stance)
@@ -1251,7 +1251,7 @@ public class ChangeSet {
          * Debug helper.
          */
         public String toString() {
-            String ret = "[" + getClass().getName() + " " + see.toString()
+            String ret = "[" + getClass().getName() + " " + see
                 + " #" + getPriority()
                 + " " + name;
             for (String a : attributes) ret += " " + a;
@@ -1795,9 +1795,7 @@ public class ChangeSet {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         Collections.sort(changes, changeComparator);
-        for (Change c : changes) {
-            sb.append(c.toString()).append("\n");
-        }
+        for (Change c : changes) sb.append(c).append("\n");
         return sb.toString();
     }
 }

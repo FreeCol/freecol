@@ -147,8 +147,7 @@ public class AIMessage {
             try {
                 request = conn.handle(reply);
             } catch (FreeColException fce) {
-                logger.log(Level.WARNING, "AI handler failed: "
-                    + reply.toString(), fce);
+                logger.log(Level.WARNING, "AI handler failed: " + reply, fce);
                 return false;
             }
         }
@@ -185,8 +184,7 @@ public class AIMessage {
                     Element e = conn.handle((Element)nodes.item(i));
                     if (e != null) replies.add(e);
                 } catch (FreeColException fce) {
-                    logger.log(Level.WARNING, "AI handler failed: "
-                        + reply.toString(), fce);
+                    logger.log(Level.WARNING, "AI handler failed: " + reply, fce);
                 }
             }
             if (!askHandling(conn, DOMMessage.collapseElements(replies))

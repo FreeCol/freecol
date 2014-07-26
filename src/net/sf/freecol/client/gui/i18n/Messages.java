@@ -532,7 +532,7 @@ public class Messages {
                 if (result.length() > template.getId().length()) {
                     return result.substring(template.getId().length());
                 } else {
-                    logger.warning("incorrect use of template " + template.toString());
+                    logger.warning("incorrect use of template " + template);
                     return result;
                 }
             }

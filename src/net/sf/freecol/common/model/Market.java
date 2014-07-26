@@ -546,7 +546,7 @@ public final class Market extends FreeColGameObject implements Ownable {
         sb.append("[").append(getId())
             .append(" owner=").append(owner.getId());
         for (MarketData md : getSortedCopy(marketData.values())) {
-            sb.append(" ").append(md.toString());
+            sb.append(" ").append(md);
         }
         sb.append("]");
         return sb.toString();

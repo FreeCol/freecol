@@ -380,7 +380,7 @@ public final class ReportTurnPanel extends ReportPanel {
             }
 
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Insert fail: " + message.toString(), e);
+            logger.log(Level.WARNING, "Insert fail: " + message, e);
         }
     }
 

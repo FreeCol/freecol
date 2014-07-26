@@ -1915,7 +1915,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                     }
                     Direction d = Direction.angleToDirection(theta);
                     StringTemplate l = StringTemplate.template("nearLocation")
-                        .add("%direction%", "direction." + d.toString())
+                        .add("%direction%", "direction." + d)
                         .addName("%location%", name);
                     return StringTemplate.template("nameLocation")
                         .add("%name%", type.getNameKey())

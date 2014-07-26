@@ -290,7 +290,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         clearOfferedFathers();
         if (ff != null) {
             logger.finest(getId() + " is recruiting " + ff.getId()
-                + " in " + getGame().getTurn().toString());
+                + " in " + getGame().getTurn());
         }
     }
 
@@ -345,8 +345,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     market.setInitialPrice(type, min + add);
                     market.update(type);
                     market.flushPriceChange(type);
-                    sb.append(", " + type.getId()
-                        + " -> " + Integer.toString(min + add));
+                    sb.append(", ").append(type.getId())
+                        .append(" -> ").append(min + add);
                     changed = true;
                 }
             }
@@ -1150,8 +1150,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     HistoryEvent.getEventTypeFromStance(stance), otherPlayer)
                 .addStringTemplate("%nation%", otherPlayer.getNationName()));
             logger.info("Stance modification " + getName()
-                + " " + old.toString() + " -> " + stance.toString()
-                + " wrt " + otherPlayer.getName());
+                + " " + old + " -> " + stance + " wrt " + otherPlayer.getName());
             this.addStanceChange(other);
             if (old != Stance.UNCONTACTED) {
                 cs.addMessage(See.only(other),
@@ -1173,7 +1172,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     HistoryEvent.getEventTypeFromStance(stance), this)
                 .addStringTemplate("%nation%", this.getNationName()));
             logger.info("Stance modification " + otherPlayer.getName()
-                + " " + old.toString() + " -> " + stance.toString()
+                + " " + old + " -> " + stance
                 + " wrt " + getName() + " (symmetric)");
             other.addStanceChange(this);
             if (old != Stance.UNCONTACTED) {
@@ -2892,7 +2891,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 if (settlement != null) {
                     for (AbstractGoods ag : newGoods) {
                         settlement.addGoods(ag);
-                        winnerPlayer.logCheat("teleported " + ag.toString()
+                        winnerPlayer.logCheat("teleported " + ag
                             + " back to " + settlement.getName());
                     }
                     cs.add(See.only(winnerPlayer), settlement);

@@ -233,12 +233,12 @@ public final class AIInGameInputHandler implements MessageHandler {
         final DiplomaticTrade agreement = message.getAgreement();
 
         StringBuilder sb = new StringBuilder(256);
-        sb.append("AI Diplomacy: ").append(agreement.toString());
+        sb.append("AI Diplomacy: ").append(agreement);
 
         TradeStatus status = getAIPlayer().acceptDiplomaticTrade(agreement);
         agreement.setStatus(status);
 
-        sb.append(" -> ").append(agreement.toString());
+        sb.append(" -> ").append(agreement);
         logger.fine(sb.toString());
 
         return new DiplomacyMessage(message.getOurFCGO(game),

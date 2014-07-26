@@ -370,7 +370,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             lb.add(", autodestruct detected");
             String destruct = "Autodestruct at " + colony.getName()
                 + " in " + turn + ":";
-            for (UnitWas uw : was) destruct += "\n" + uw.toString();
+            for (UnitWas uw : was) destruct += "\n" + uw;
             logger.warning(destruct);
             avertAutoDestruction();
         }
@@ -457,7 +457,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         build = colony.getCurrentlyBuilding();
         String buildStr = (build != null) ? build.toString()
             : ((build = colonyPlan.getBestBuildableType()) != null)
-            ? "unexpected-null(" + build.toString() + ")"
+            ? "unexpected-null(" + build + ")"
             : "expected-null";
         lb.add(", building ", buildStr, ", population ", colony.getUnitCount(),
             ", rearrange ", nextRearrange, ".\n");
@@ -648,9 +648,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         String msg = "Colony " + colony.getName()
             + " rearrangement leaves no units, "
             + colony.getTile().getUnitCount() + " available";
-        for (Unit u : colony.getTile().getUnitList()) {
-            msg += ", " + u.toString();
-        }
+        for (Unit u : colony.getTile().getUnitList()) msg += ", " + u;
 
         List<GoodsType> libertyGoods = getSpecification()
             .getLibertyGoodsTypeList();

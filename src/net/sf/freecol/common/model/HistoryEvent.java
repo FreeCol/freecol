@@ -80,7 +80,7 @@ public class HistoryEvent extends StringTemplate {
      *     this event.
      */
     public HistoryEvent(Turn turn, EventType eventType, Player player) {
-        super("model.history." + eventType.toString(), TemplateType.TEMPLATE);
+        super("model.history." + eventType, TemplateType.TEMPLATE);
         this.turn = turn;
         this.eventType = eventType;
         this.playerId = (player == null) ? null : player.getId();
@@ -264,7 +264,7 @@ public class HistoryEvent extends StringTemplate {
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
         sb.append("[").append(getId())
-            .append(" ").append(eventType.toString())
+            .append(" ").append(eventType)
             .append(" (").append(turn.getYear()).append(")");
         if (playerId != null) {
             sb.append(" playerId=").append(playerId)

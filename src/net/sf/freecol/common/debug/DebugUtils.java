@@ -154,7 +154,7 @@ public class DebugUtils {
         for (Colony sColony : sPlayer.getColonies()) {
             Colony.NoBuildReason reason
                 = sColony.getNoBuildReason(sBuildingType, null);
-            results.add(sColony.getName() + ": " + reason.toString());
+            results.add(sColony.getName() + ": " + reason);
             if (reason == Colony.NoBuildReason.NONE) {
                 if (sBuildingType.isDefenceType()) {
                     sColony.getTile().cacheUnseen();//+til

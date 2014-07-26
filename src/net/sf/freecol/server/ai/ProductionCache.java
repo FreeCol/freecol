@@ -410,7 +410,7 @@ public class ProductionCache {
          */
         @Override
         public String toString() {
-            String result = "Cache entry: " + unit.toString();
+            String result = "Cache entry: " + unit;
             if (workLocation instanceof ColonyTile) {
                 return result
                     + ((ColonyTile) workLocation).getTile().getNameKey()

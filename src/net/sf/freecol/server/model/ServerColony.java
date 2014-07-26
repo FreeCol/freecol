@@ -133,7 +133,7 @@ public class ServerColony extends Colony implements ServerModelObject {
      * @param cs A <code>ChangeSet</code> to update.
      */
     public void csNewTurn(Random random, ChangeSet cs) {
-        logger.finest("ServerColony.csNewTurn, for " + toString());
+        logger.finest("ServerColony.csNewTurn, for " + this);
         final Specification spec = getSpecification();
         final ServerPlayer owner = (ServerPlayer) getOwner();
         BuildQueue<?>[] queues = new BuildQueue<?>[] { buildQueue,

@@ -218,7 +218,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
      * @param cs A <code>ChangeSet</code> to update.
      */
     public void csNewTurn(Random random, ChangeSet cs) {
-        logger.finest("ServerUnit.csNewTurn, for " + toString());
+        logger.finest("ServerUnit.csNewTurn, for " + this);
         ServerPlayer owner = (ServerPlayer) getOwner();
         Specification spec = getSpecification();
         Location loc = getLocation();

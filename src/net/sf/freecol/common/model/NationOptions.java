@@ -47,7 +47,7 @@ public class NationOptions extends FreeColObject {
         SELECTABLE;
 
         public String getId() {
-            return "playerOptions." + this.toString();
+            return "playerOptions." + this;
         }
     };
 
@@ -252,11 +252,11 @@ public class NationOptions extends FreeColObject {
     public String toString() {
         StringBuilder sb = new StringBuilder(128);
         sb.append(NATIONAL_ADVANTAGES_TAG).append(": ")
-            .append(nationalAdvantages.toString()).append("\n")
+            .append(nationalAdvantages).append("\n")
             .append(NATIONS_TAG).append(":\n");
         for (Map.Entry<Nation, NationState> entry : nations.entrySet()) {
             sb.append("   ").append(entry.getKey().getId())
-                .append(" ").append(entry.getValue().toString())
+                .append(" ").append(entry.getValue())
                 .append("\n");
         }
         return sb.toString();

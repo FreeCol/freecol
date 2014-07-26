@@ -446,7 +446,7 @@ public class AIGoods extends AIObject implements Transportable {
             }
         }
         if (why != null) {
-            logger.finest("checkIntegrity(" + this.toString() + ") = " + why);
+            logger.finest("checkIntegrity(" + this + ") = " + why);
             result = -1;
         }
         return result;

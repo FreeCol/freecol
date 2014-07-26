@@ -999,13 +999,11 @@ public final class FreeColServer {
                         // do not set the UnitState, as this clears
                         // workLeft.
                         if (u.getState() == Unit.UnitState.TO_EUROPE) {
-                            logger.info("Found unit on way to europe: "
-                                + u.toString());
+                            logger.info("Found unit on way to europe: " + u);
                             u.setLocation(p.getHighSeas());//-vis: safe!map
                             u.setDestination(p.getEurope());
                         } else if (u.getState() == Unit.UnitState.TO_AMERICA) {
-                            logger.info("Found unit on way to new world: "
-                                + u.toString());
+                            logger.info("Found unit on way to new world: " + u);
                             u.setLocation(p.getHighSeas());//-vis: safe!map
                             u.setDestination(game.getMap());
                         }

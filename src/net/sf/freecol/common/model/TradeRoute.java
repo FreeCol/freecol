@@ -350,9 +350,7 @@ public class TradeRoute extends FreeColGameObject
             .append(" \"").append(getName()).append("\"")
             .append(" owner=").append(owner.getId())
             .append(" silent=").append(Boolean.toString(silent));
-        for (TradeRouteStop stop : getStops()) {
-            sb.append(" ").append(stop.toString());
-        }
+        for (TradeRouteStop stop : getStops()) sb.append(" ").append(stop);
         sb.append("]");
         return sb.toString();
     }

@@ -2566,7 +2566,7 @@ public final class MapViewer {
                 }
             }
         } catch (Exception e) {
-            logger.log(Level.WARNING, "displayUnit " + unit.toString(), e);
+            logger.log(Level.WARNING, "displayUnit " + unit, e);
         }
 
         // FOR DEBUGGING

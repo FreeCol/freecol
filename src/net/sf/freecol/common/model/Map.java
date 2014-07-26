@@ -179,7 +179,7 @@ public class Map extends FreeColGameObject implements Location {
         }
 
         public String getNameKey() {
-            return "direction." + this.toString();
+            return "direction." + this;
         }
 
         /**

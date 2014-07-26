@@ -163,7 +163,7 @@ public class ClaimLandMessage extends DOMMessage {
                 break;
             default: // Fail
                 return DOMMessage.clientError("Can not claim tile "
-                    + tile.getId() + ": " + why.toString());
+                    + tile.getId() + ": " + why);
             }
         }
 

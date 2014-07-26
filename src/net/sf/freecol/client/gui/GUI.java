@@ -685,9 +685,9 @@ public class GUI {
         if (pmoffscreenValue == null) {
             System.setProperty(pmoffscreen, usePixmaps.getValue().toString());
             logger.info(pmoffscreen + " using client option: "
-                + usePixmaps.getValue().toString());
+                + usePixmaps.getValue());
         } else {
-            usePixmaps.setValue(new Boolean(pmoffscreenValue));
+            usePixmaps.setValue(Boolean.valueOf(pmoffscreenValue));
             logger.info(pmoffscreen + " overrides client option: "
                 + pmoffscreenValue);
         }

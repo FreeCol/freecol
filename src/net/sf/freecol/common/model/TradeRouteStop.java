@@ -288,7 +288,7 @@ public class TradeRouteStop extends FreeColObject {
         sb.append("[").append(getXMLTagName())
             .append(" ").append(getLocation().getId());
         for (GoodsType goodsType : getCargo()) {
-            sb.append(" ").append(goodsType.toString());
+            sb.append(" ").append(goodsType);
         }
         sb.append("]");
         return sb.toString();            

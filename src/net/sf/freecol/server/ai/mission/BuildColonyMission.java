@@ -296,7 +296,7 @@ public class BuildColonyMission extends Mission {
         default:
             break;
         }
-        return "target-" + reason.toString();
+        return "target-" + reason;
     }
 
     /**

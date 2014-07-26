@@ -3238,11 +3238,11 @@ public final class InGameController implements NetworkConstants {
                 if (sentry.getState() == UnitState.SENTRY) {
                     if (unit.canAdd(sentry)) {
                         boarded |= boardShip(sentry, unit);
-                        logger.finest("Unit " + unit.toString()
-                            + " loaded sentry " + sentry.toString());
+                        logger.finest("Unit " + unit
+                            + " loaded sentry " + sentry);
                     } else {
-                        logger.finest("Unit " + sentry.toString()
-                            + " is too big to board " + unit.toString());
+                        logger.finest("Unit " + sentry
+                            + " is too big to board " + unit);
                     }
                 }
             }
@@ -4124,7 +4124,7 @@ public final class InGameController implements NetworkConstants {
             if (name == null) return; // User cancelled, 0-length clears name.
         } else {
             logger.warning("Tried to rename an unsupported Nameable: "
-                + object.toString());
+                + object);
             return;
         }
 
@@ -4380,8 +4380,7 @@ public final class InGameController implements NetworkConstants {
             logger.log(Level.WARNING, "Illegal stance transition", e);
             return;
         }
-        logger.info("Stance transition: " + old.toString()
-            + " -> " + stance.toString());
+        logger.info("Stance transition: " + old + " -> " + stance);
         if (player == first && old == Stance.UNCONTACTED) {
             gui.playSound("sound.event.meet." + second.getNationId());
         }

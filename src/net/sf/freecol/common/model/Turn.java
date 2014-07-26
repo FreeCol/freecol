@@ -278,8 +278,7 @@ public class Turn {
      *     Examples: "SPRING 1602", "YEAR 1503"...
      */
     public static String toString(int turn) {
-        return getSeason(turn).toString()
-            + " " + Integer.toString(getYear(turn));
+        return getSeason(turn) + " " + Integer.toString(getYear(turn));
     }
 
 

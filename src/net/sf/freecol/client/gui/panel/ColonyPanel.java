@@ -2088,11 +2088,11 @@ public final class ColonyPanel extends PortPanel
                         if (getController().claimLand(tile, colony, 0)
                             && tile.getOwningSettlement() == colony) {
                             logger.info("Colony " + colony.getName()
-                                + " claims tile " + tile.toString()
+                                + " claims tile " + tile
                                 + " with unit " + unit.getId());
                         } else {
                             logger.warning("Colony " + colony.getName()
-                                + " did not claim " + tile.toString()
+                                + " did not claim " + tile
                                 + " with unit " + unit.getId());
                             return false;
                         }

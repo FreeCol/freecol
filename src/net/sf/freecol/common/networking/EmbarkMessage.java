@@ -136,8 +136,7 @@ public class EmbarkMessage extends DOMMessage {
             }
             if (carrier.getTile() != destinationTile) {
                 return DOMMessage.clientError("Carrier: " + carrierId
-                    + " is not at destination tile: "
-                    + destinationTile.toString());
+                    + " is not at destination tile: " + destinationTile);
             }
         }
 

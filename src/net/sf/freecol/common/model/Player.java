@@ -334,8 +334,8 @@ public class Player extends FreeColGameObject implements Nameable {
         }
         private void badTransition(Stance newStance)
             throws IllegalStateException {
-            throw new IllegalStateException("Bad transition: " + toString()
-                                            + " -> " + newStance.toString());
+            throw new IllegalStateException("Bad transition: " + this
+                                            + " -> " + newStance);
         }
 
         /**
@@ -950,7 +950,7 @@ public class Player extends FreeColGameObject implements Nameable {
             }
             if (startingShip != null) shipNames.add(0, startingShip);
             logger.info("Installed " + shipNames.size()
-                + " ship names for player " + this.toString());
+                + " ship names for player " + this);
         }
     }
 

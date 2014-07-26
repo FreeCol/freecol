@@ -206,7 +206,7 @@ public class Connection {
             sendDumping(DOMMessage.createMessage(DISCONNECT_TAG));
             reallyClose();
         } catch (IOException e) {
-            logger.log(Level.WARNING, "Error closing " + this.toString(), e);
+            logger.log(Level.WARNING, "Error closing " + this, e);
         }
     }
 
@@ -446,7 +446,7 @@ public class Connection {
                         if (reply != null) conn.sendDumping(reply);
                     } catch (Exception e) {
                         logger.log(Level.WARNING, "Handler failed: "
-                            + element.toString(), e);
+                            + element, e);
                     }
                 }
             };

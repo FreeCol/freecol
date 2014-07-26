@@ -206,7 +206,7 @@ public final class Server extends Thread {
                     clientSocket = serverSocket.accept();
 
                     logger.info("Got client connection from "
-                                + clientSocket.getInetAddress().toString());
+                                + clientSocket.getInetAddress());
                     //Connection connection =
                     new Connection(clientSocket,
                                    freeColServer.getUserConnectionHandler(),

@@ -81,7 +81,7 @@ public abstract class TransactionSession {
      */
     protected static String makeSessionKey(Class type,
                                            String o1, String o2) {
-        return type.toString() + "-" + o1 + "-" + o2;
+        return type + "-" + o1 + "-" + o2;
     }
 
     /**

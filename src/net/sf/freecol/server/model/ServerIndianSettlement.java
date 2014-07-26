@@ -239,7 +239,7 @@ public class ServerIndianSettlement extends IndianSettlement
      * @param cs A <code>ChangeSet</code> to update.
      */
     public void csNewTurn(Random random, ChangeSet cs) {
-        logger.finest("ServerIndianSettlement.csNewTurn, for " + toString());
+        logger.finest("ServerIndianSettlement.csNewTurn, for " + this);
         ServerPlayer owner = (ServerPlayer) getOwner();
         Specification spec = getSpecification();
 
