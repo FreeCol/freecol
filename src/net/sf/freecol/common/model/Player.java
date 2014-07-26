@@ -81,9 +81,13 @@ public class Player extends FreeColGameObject implements Nameable {
         A_FOOD,     // penalize food shortage
         A_LEVEL,    // reward high production potential
         A_NEARBY,   // penalize nearby units and settlements
-        A_GOODS,    // check sufficient critical goods available (e.g. lumber)
+        A_GOODS;    // check sufficient critical goods available (e.g. lumber)
         // A_GOODS must be last, the spec is entitled to require checks on
         // as many goods types as it likes
+
+        public String toString() {
+            return super.toString().substring(2);
+        }
     }
 
     /** Special return values for showstopper getColonyValue fail. */

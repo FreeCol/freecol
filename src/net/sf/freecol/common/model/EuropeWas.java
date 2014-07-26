@@ -73,8 +73,8 @@ public class EuropeWas {
         int newUnitCount = europe.getUnitCount();
 
         if (newUnitCount != unitCount) {
-            String pc = Europe.UNIT_CHANGE.toString();
-            europe.firePropertyChange(pc, unitCount, newUnitCount);
+            europe.firePropertyChange(Europe.UNIT_CHANGE,
+                                      unitCount, newUnitCount);
         }
     }
 }

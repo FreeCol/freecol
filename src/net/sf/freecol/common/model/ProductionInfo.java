@@ -185,7 +185,7 @@ public class ProductionInfo {
 
         result.append(key).append(": ");
         for (AbstractGoods goods : list) {
-            result.append(goods.toString());
+            result.append(goods);
             if (goods.getType().getStoredAs() != goods.getType()) {
                 result.append(" [")
                     .append(goods.getType().getStoredAs().getId())

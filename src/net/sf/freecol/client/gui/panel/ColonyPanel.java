@@ -610,36 +610,39 @@ public final class ColonyPanel extends PortPanel
             GoodsType goodsType = unit.getWorkType();
             Unit student = unit.getStudent();
 
-            String menuTitle;
             unitIcon = getLibrary().getUnitImageIcon(unit, 0.5);
+            StringBuilder sb = new StringBuilder(64);
             if (student != null) {
-                menuTitle = new String(Messages.message(unit.getLabel())
-                    + " " + Messages.message("producing.name")
-                    + " " + Messages.message(unit.getType().getSkillTaught()
-                                                           .getNameKey())
-                    + " " + Integer.toString(unit.getTurnsOfTraining())
-                    + "/" + Integer.toString(unit.getNeededTurnsOfTraining()));
+                sb.append(Messages.message(unit.getLabel()))
+                    .append(" ").append(Messages.message("producing.name"))
+                    .append(" ").append(Messages.message(unit.getType()
+                            .getSkillTaught().getNameKey()))
+                    .append(" ").append(unit.getTurnsOfTraining())
+                    .append("/").append(unit.getNeededTurnsOfTraining());
             } else if (workingOnLand != null && goodsType != null) {
                 int producing = workingOnLand.getProductionOf(unit, goodsType);
                 String nominative = Messages.message(StringTemplate.template(
                     goodsType.getNameKey()).addAmount("%amount%", producing));
-                menuTitle = new String(Messages.message(unit.getLabel())
-                    + " " + Messages.message("producing.name")
-                    + " " + producing + " " + nominative);
+                sb.append(Messages.message(unit.getLabel()))
+                    .append(" ").append(Messages.message("producing.name"))
+                    .append(" ").append(producing)
+                    .append(" ").append(nominative);
             } else if (workingInBuilding != null && goodsType != null) {
                 int producing = workingInBuilding.getProductionOf(unit,
                                                                   goodsType);
                 String nominative = Messages.message(
                     StringTemplate.template(goodsType.getNameKey())
                         .addAmount("%amount%", producing));
-                menuTitle = new String(Messages.message(unit.getLabel())
-                    + " " + Messages.message("producing.name")
-                    + " " + producing + " " + nominative);
+                sb.append(Messages.message(unit.getLabel()))
+                    .append(" ").append(Messages.message("producing.name"))
+                    .append(" ").append(producing)
+                    .append(" ").append(nominative);
             } else {
-                menuTitle = new String(Messages.message(unit.getLabel())
-                    + " " + Messages.message("producing.name")
-                    + " " + Messages.message("nothing"));
+                sb.append(Messages.message(unit.getLabel()))
+                    .append(" ").append(Messages.message("producing.name"))
+                    .append(" ").append(Messages.message("nothing"));
             }
+            String menuTitle = sb.toString();
             subMenu = new JMenuItem(menuTitle, unitIcon);
             subMenu.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
@@ -655,8 +658,8 @@ public final class ColonyPanel extends PortPanel
         for (final Unit unit : colonyTile.getUnitList()) {
             if(unit.isCarrier()){
                 unitIcon = getLibrary().getUnitImageIcon(unit, 0.5);
-                String menuTitle = new String(Messages.message(unit.getLabel()) +
-                    " " + Messages.message("inPort.name"));
+                String menuTitle = Messages.message(unit.getLabel())
+                    + " " + Messages.message("inPort.name");
                 subMenu = new JMenuItem(menuTitle, unitIcon);
                 subMenu.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {

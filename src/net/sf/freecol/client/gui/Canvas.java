@@ -2444,7 +2444,7 @@ public final class Canvas extends JDesktopPane {
                 t.add("%goods" + Integer.toString(i+1) + "%",
                     wantedGoods[i].getNameKey());
             }
-            sb.append(Messages.message(t) + "\n\n");
+            sb.append(Messages.message(t)).append("\n\n");
         }
         JTextArea text = GUI.getDefaultTextArea(sb.toString());
 

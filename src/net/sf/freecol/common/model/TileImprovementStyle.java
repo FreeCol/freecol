@@ -72,13 +72,13 @@ public class TileImprovementStyle {
     private TileImprovementStyle(String style) {
         this.style = style;
 
-        String s = new String();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < style.length(); i++) {
             char c = style.charAt(i);
             if (Character.digit(c, Character.MAX_RADIX) < 0) break;
-            s = s.concat((c == '0') ? "0" : "1");
+            sb.append((c == '0') ? "0" : "1");
         }
-        this.mask = s;
+        this.mask = sb.toString();
     }
 
 
@@ -113,24 +113,23 @@ public class TileImprovementStyle {
     public static String decodeOldStyle(String input, int pad) {
         if (pad <= 0) return null;
         boolean isZero = true;
-        String style = new String();
+        StringBuilder sb = new StringBuilder();
         try {
             int value = Integer.parseInt(input);
             for (int index = 0; index < 4; index++) {
                 int magnitude = value % 3;
                 isZero &= magnitude == 0;
-                style = style.concat(Integer.toString(magnitude,
-                                                      Character.MAX_RADIX));
+                sb.append(Integer.toString(magnitude, Character.MAX_RADIX));
                 value /= 3;
             }
         } catch (NumberFormatException nfe) {
             return null;
         }
         if (isZero) return null;
-        while (style.length() < pad) {
-            style = style.concat("0");
+        while (sb.length() < pad) {
+            sb.append("0");
         }
-        return style;
+        return sb.toString();
     }
     // end @compat
 

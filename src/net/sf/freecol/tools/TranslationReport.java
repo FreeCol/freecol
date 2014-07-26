@@ -236,7 +236,7 @@ public class TranslationReport {
                 
                 float percentageDone =  (100 * (master.size() - (stats.missingKeys + stats.copiedKeys))) / (float) master.size();
                 percentageDone = Math.round(percentageDone*100)/100f;
-                output.append(percentageDone + "% finished.");
+                output.append(percentageDone).append("% finished.");
                 
                 System.out.println(output.toString());
             }

@@ -315,10 +315,8 @@ public class Introspector {
             constructor = messageClass.getDeclaredConstructor(types);
         } catch (Exception e) {
             String p = "Unable to find constructor " + tag + "(";
-            for (int i = 0; i < types.length; i++) {
-                p += " " + types[i].toString();
-            }
-            p += " ): ";
+            for (int i = 0; i < types.length; i++) p += " " + types[i];
+            p += " )";
             throw new IllegalArgumentException(p, e);
         }
         Object instance;

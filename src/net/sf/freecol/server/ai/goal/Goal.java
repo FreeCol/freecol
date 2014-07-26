@@ -34,6 +34,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.util.Utils;
 
 import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.AIPlayer;
@@ -349,7 +350,7 @@ public abstract class Goal extends AIObject implements GoalConstants {
      *
      * @param u The {@link AIUnit} being added to this goal
      */
-    public void addUnit(AIUnit u) {
+    public final void addUnit(AIUnit u) {
         logger.finest("Entering method addUnit() for "+getDebugDescription()+" with unit: "+u.getId());
         getGame().getTurn().getNumber();
         availableUnitsList.add(u);
@@ -526,9 +527,8 @@ public abstract class Goal extends AIObject implements GoalConstants {
      * @return a string describing this goal
      */
     public String getGoalDescription() {
-        String goalName = getClass().toString();
-        goalName = goalName.substring(goalName.lastIndexOf('.') + 1,goalName.length()-4);
-        return goalName;
+        String goalName = Utils.lastPart(getClass().getName(), ".");
+        return goalName.substring(0, goalName.length() - "goal".length());
     }
 
     /**

@@ -134,7 +134,7 @@ public class FreeColDebugger {
     public static String getDebugModes() {
         String ret = "";
         for (DebugMode mode : DebugMode.values()) {
-            if (isInDebugMode(mode)) ret += "," + mode.toString();
+            if (isInDebugMode(mode)) ret += "," + mode;
         }
         return (ret.length() > 0) ? ret.substring(1, ret.length())
             : ret;

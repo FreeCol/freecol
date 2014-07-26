@@ -84,27 +84,21 @@ public class Relation {
 
     @Override
     public String toString() {
-        String result = new String("n ");
+        StringBuilder sb = new StringBuilder(32);
+        sb.append("n ");
         if (mod != 1) {
-            result += "mod " + Integer.toString(mod) + " ";
+            sb.append("mod ").append(mod).append(" ");
         }
         if (low == high) {
-            result += "is ";
-            if (negated) {
-                result += "not ";
-            }
-            result += Integer.toString(low);
+            sb.append("is ");
+            if (negated) sb.append("not ");
+            sb.append(low);
         } else {
-            if (negated) {
-                result += "not ";
-            }
-            if (!integer) {
-                result += "with";
-            }
-            result += "in " + Integer.toString(low)
-                + ".." + Integer.toString(high);
+            if (negated) sb.append("not ");
+            if (!integer) sb.append("with");
+            sb.append("in ").append(low).append("..").append(high);
         }
-        return result;
+        return sb.toString();
     }
 
 

@@ -361,9 +361,9 @@ public final class Limit extends FreeColGameObjectType {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(leftHandSide.toString());
-        sb.append(" ").append(operator.toString())
-            .append(" ").append(rightHandSide.toString());
+        StringBuilder sb = new StringBuilder(64);
+        sb.append(leftHandSide).append(" ").append(operator)
+            .append(" ").append(rightHandSide);
         return sb.toString();
     }
 

@@ -24,6 +24,7 @@ import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.util.LogBuilder;
 
 
 /**
@@ -333,14 +334,11 @@ public class PathNode {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("PathNode loc=");
-        sb.append(((FreeColGameObject)location).toString())
-            .append(" movesLeft=").append(movesLeft)
-            .append(" turns=").append(turns)
-            .append(" onCarrier=").append(onCarrier)
-            .append(" direction=").append(getDirection())
-            .append(" cost=").append(getCost());
-        return sb.toString();
+        LogBuilder lb = new LogBuilder(256);
+        lb.add("PathNode loc=", location, " movesLeft=", movesLeft,
+            " turns=", turns, " onCarrier=", onCarrier,
+            " direction=", getDirection(), " cost=", getCost());
+        return lb.toString();
     }
 
     /**
@@ -349,11 +347,9 @@ public class PathNode {
      * @return A string describing the whole path.
      */
     public String fullPathToString() {
-        StringBuilder sb = new StringBuilder(500);
+        LogBuilder lb = new LogBuilder(500);
         PathNode p;
-        for (p = this; p != null; p = p.next) {
-            sb.append(p.toString()).append("\n");
-        }
-        return sb.toString();
+        for (p = this; p != null; p = p.next) lb.add(p, "\n");
+        return lb.toString();
     }
 }

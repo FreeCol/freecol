@@ -294,26 +294,29 @@ public final class FreeCol {
         File autosave = FreeColDirectories.getAutosaveDirectory();
         File clientOptionsFile = FreeColDirectories.getClientOptionsFile();
         File userMods = FreeColDirectories.getUserModsDirectory();
-        logger.info("Initialization:"
-            + "\n  java:       " + version
-            + "\n  memory:     " + memory
-            + "\n  locale:     " + locale.toString()
-            + "\n  data:       " + FreeColDirectories.getDataDirectory()
-                                                     .getPath()
-            + "\n  userConfig: " + FreeColDirectories.getUserConfigDirectory()
-                                                     .getPath()
-            + "\n  userData:   " + FreeColDirectories.getUserDataDirectory()
-                                                     .getPath()
-            + "\n  autosave:   " + ((autosave == null) ? "NONE"
-                                     : autosave.getPath())
-            + "\n  logFile:    " + FreeColDirectories.getLogFilePath()
-            + "\n  options:    " + ((clientOptionsFile == null) ? "NONE"
-                                     : clientOptionsFile.getPath())
-            + "\n  save:       " + FreeColDirectories.getSaveDirectory()
-                                                     .getPath()
-            + "\n  userMods:   " + ((userMods == null) ? "NONE"
-                                   : userMods.getPath())
-            );
+        StringBuilder sb = new StringBuilder(256);
+        sb.append("Initialization:")
+            .append("\n  java:       ").append(version)
+            .append("\n  memory:     ").append(memory)
+            .append("\n  locale:     ").append(locale)
+            .append("\n  data:       ")
+            .append(FreeColDirectories.getDataDirectory().getPath())
+            .append("\n  userConfig: ")
+            .append(FreeColDirectories.getUserConfigDirectory().getPath())
+            .append("\n  userData:   ")
+            .append(FreeColDirectories.getUserDataDirectory().getPath())
+            .append("\n  autosave:   ")
+            .append((autosave == null) ? "NONE" : autosave.getPath())
+            .append("\n  logFile:    ")
+            .append(FreeColDirectories.getLogFilePath())
+            .append("\n  options:    ")
+            .append((clientOptionsFile == null) ? "NONE"
+                : clientOptionsFile.getPath())
+            .append("\n  save:       ")
+            .append(FreeColDirectories.getSaveDirectory().getPath())
+            .append("\n  userMods:   ")
+            .append((userMods == null) ? "NONE" : userMods.getPath());
+        logger.info(sb.toString());
 
         // Ready to specialize into client or server.
         if (standAloneServer) {
