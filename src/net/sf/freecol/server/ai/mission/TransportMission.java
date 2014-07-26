@@ -1262,27 +1262,30 @@ public class TransportMission extends Mission {
             if ((reason = cargo.check(aiCarrier)) != null) {
                 // Just remove, it is invalid
                 boolean result = removeCargo(cargo, reason);
-                lb.add(" invalid(", reason, ")", cargo, "=", result);
+                lb.add(" invalid(", reason, ")", cargo.toShortString(),
+                       "=", result);
             } else if (cargo.isCollectable()) {
-                lb.add(" collect", cargo);
+                lb.add(" collect", cargo.toShortString());
             } else if (cargo.isDeliverable()) {
-                lb.add(" deliver", cargo);
+                lb.add(" deliver", cargo.toShortString());
             } else if ((path = carrier.findPath(cargo.getTarget())) == null
                 && !cargo.retry()) {
                 boolean result = removeCargo(cargo, "no path");
-                lb.add(" drop(no-path)", cargo, "=", result);
+                lb.add(" drop(no-path)", cargo.toShortString(), "=", result);
                 drop.add(t);
             } else if (carrier.hasTile()
                 && (reason = cargo.setTarget()) != null) {
                 boolean result = removeCargo(cargo, "fail(" + reason + ")");
                 if (reason.startsWith("invalid") || !cargo.retry()) {
-                    lb.add(" failed(", reason, ")", cargo, "=", result);
+                    lb.add(" failed(", reason, ")", cargo.toShortString(),
+                           "=", result);
                 } else {
-                    lb.add(" retry(", reason, ")", cargo, "=", result);
+                    lb.add(" retry(", reason, ")", cargo.toShortString(),
+                           "=", result);
                     retry.add(t);
                 }
             } else {
-                lb.add(" ok ", cargo); // Good
+                lb.add(" ok ", cargo.toShortString()); // Good
             }
             if (t instanceof AIUnit) {
                 unitsPresent.remove(((AIUnit)t).getUnit());
@@ -1304,21 +1307,31 @@ public class TransportMission extends Mission {
         // Retry anything found that was not on the cargoes list
         if (!unitsPresent.isEmpty()) {
             lb.add(", found unexpected units:");
+            lb.mark();
             for (Unit u : unitsPresent) {
                 AIUnit aiu = getAIMain().getAIUnit(u);
                 if (aiu == null) throw new IllegalStateException("Bogus:" + u);
-                retry.add(aiu);
-                lb.add(" ", aiu.getUnit());
+                if (requeueTransportable(aiu)) {
+                    lb.add(" queued ", aiu.getUnit(), ", ");
+                } else {
+                    retry.add(aiu);
+                }
             }
+            if (lb.grew()) lb.shrink(", ");
         }
         if (!goodsPresent.isEmpty()) {
             lb.add(", found unexpected goods:");
+            lb.mark();
             for (Goods g : goodsPresent) {
                 AIGoods aig = new AIGoods(getAIMain(), carrier, g.getType(),
                                           g.getAmount(), null);
-                retry.add(aig);
-                lb.add(" ", aig);
+                if (requeueTransportable(aig)) {
+                    lb.add(" queued ", aig.getGoods(), ", ");
+                } else {
+                    retry.add(aig);
+                }
             }
+            if (lb.grew()) lb.shrink(", ");
         }
 
         // Ask the parent player to retarget transportables on the retry list

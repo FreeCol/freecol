@@ -800,21 +800,14 @@ public abstract class Mission extends AIObject {
      */
     public boolean retargetMission(String reason, LogBuilder lb) {
         final AIUnit aiu = getAIUnit();
-        final Location loc = aiu.getTransportSource();
-        String claim = (loc == null) ? "no-loc"
-            : (!getPlayer().isEuropean()) ? "native"
-            : (((EuropeanAIPlayer)getAIPlayer()).claimTransportable(aiu, loc))
-            ? "cancelled"
-            : "cancel-failed";
         Location newTarget = findTarget();
-        if (newTarget == null) {
-            setTarget(null);
-            lb.add(", retarget(", reason, ") failed.");
-            return false;
-        }
+        boolean ret = newTarget != null;
         setTarget(newTarget);
-        lb.add(", retargeted(", reason, ") to ", newTarget,
-               " (transport ", claim, ")");
+        if (ret) {
+            lb.add(", retargeted(", reason, ") to ", newTarget);
+        } else {
+            lb.add(", retarget(", reason, ") failed.");
+        }
         return true;
     }
 

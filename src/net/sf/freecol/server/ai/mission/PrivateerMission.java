@@ -270,7 +270,6 @@ public class PrivateerMission extends Mission {
             || target instanceof Unit) {
             boolean retarget = this.target != null && this.target != target;
             this.target = target;
-            if (retarget) retargetTransportable();
         }
     }
 

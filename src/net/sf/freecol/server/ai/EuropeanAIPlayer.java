@@ -2205,18 +2205,17 @@ public class EuropeanAIPlayer extends AIPlayer {
 
         if (turn.isFirstTurn()) initializeMissions(lb);
         determineStances(lb);
-        buildTipMap(lb);
 
         lb.mark();
         for (AIColony aic : getAIColonies()) {
             if (aic.isBadlyDefended()) lb.add(" ", aic.getColony());
         }
         lb.grew("\n  Badly defended colonies:");
-
         for (AIColony aic : getAIColonies()) {
             aic.rearrangeWorkers(true, lb);
         }
         
+        buildTipMap(lb);
         buildTransportMaps(lb);
         buildWishMaps(lb);
         cheat(lb);
