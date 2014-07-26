@@ -44,7 +44,7 @@ import org.w3c.dom.Element;
 public class RearrangeColonyMessage extends DOMMessage {
 
     /** Container for the unit change information. */
-    public class UnitChange {
+    public static class UnitChange {
 
         public Unit unit;
         public Location loc;

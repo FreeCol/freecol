@@ -50,7 +50,13 @@ public class OggVorbisDecoderFactory {
     /**
      * Core JOgg/JOrbis magic handled here.
      */
-    private class OggStream extends InputStream {
+    private static class OggStream extends InputStream {
+
+        // End of stream marker.
+        private static final String EOS = "End-of-stream";
+
+        // Internal buffer size.
+        private static final int BUFSIZ = 4096;
 
         private Packet oggPacket = new Packet();
         private Page oggPage = new Page();
@@ -63,12 +69,6 @@ public class OggVorbisDecoderFactory {
 
         private AudioFormat audioFormat;
 
-        // End of stream marker.
-        private final String EOS = "End-of-stream";
-
-        // Internal buffer size.
-        private final int BUFSIZ = 4096;
-        
         // The buffer to convert into.
         private byte[] convBuf = new byte[BUFSIZ];
         // The amount of data waiting in the buffer.
@@ -359,7 +359,7 @@ public class OggVorbisDecoderFactory {
      * The AudioInputStream extension to handle decoding Ogg/Vorbis Audio
      * input.
      */
-    private class OggVorbisAudioInputStream extends AudioInputStream {
+    private static class OggVorbisAudioInputStream extends AudioInputStream {
 
         // Core JOgg and JOrbis magic.
         private OggStream os = null;

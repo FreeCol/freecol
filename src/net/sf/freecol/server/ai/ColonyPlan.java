@@ -122,7 +122,8 @@ public class ColonyPlan {
     private Colony colony;
 
     /** The things to build, and their priority. */
-    private class BuildPlan {
+    private static class BuildPlan {
+
         public BuildableType type;
         public double weight;
         public double support;

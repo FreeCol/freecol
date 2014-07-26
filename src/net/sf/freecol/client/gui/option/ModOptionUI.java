@@ -83,7 +83,7 @@ public final class ModOptionUI extends OptionUI<ModOption>  {
         return box;
     }
 
-    private class ChoiceRenderer extends FreeColComboBoxRenderer {
+    private static class ChoiceRenderer extends FreeColComboBoxRenderer {
 
         @Override
         public void setLabelValues(JLabel label, Object value) {
@@ -108,5 +108,4 @@ public final class ModOptionUI extends OptionUI<ModOption>  {
     public ListCellRenderer getListCellRenderer() {
         return new ChoiceRenderer();
     }
-
 }

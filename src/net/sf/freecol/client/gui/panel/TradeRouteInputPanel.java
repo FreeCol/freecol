@@ -258,7 +258,7 @@ public final class TradeRouteInputPanel extends FreeColPanel {
         }
     }
 
-    public class StopTransferable implements Transferable {
+    public static class StopTransferable implements Transferable {
 
         private List<TradeRouteStop> stops;
 
@@ -419,7 +419,7 @@ public final class TradeRouteInputPanel extends FreeColPanel {
         }
     }
 
-    private class DestinationCellRenderer extends JLabel
+    private static class DestinationCellRenderer extends JLabel
         implements ListCellRenderer {
 
         public DestinationCellRenderer() {

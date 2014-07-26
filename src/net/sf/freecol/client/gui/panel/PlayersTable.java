@@ -186,7 +186,7 @@ public final class PlayersTable extends JTable {
         ((PlayersTableModel)getModel()).update();
     }
 
-    private class HeaderRenderer implements TableCellRenderer {
+    private static class HeaderRenderer implements TableCellRenderer {
 
         private static final int NO_COLUMN = -1;
         private int pressedColumn = NO_COLUMN;
@@ -215,7 +215,7 @@ public final class PlayersTable extends JTable {
         }
     }
 
-    private class HeaderListener extends MouseAdapter {
+    private static class HeaderListener extends MouseAdapter {
 
         private JTableHeader header;
 
@@ -324,24 +324,22 @@ public final class PlayersTable extends JTable {
             int row, int column) {
             Nation nation = (Nation) value;
             setText(Messages.message(nation.getNameKey()));
-            ImageIcon icon = new ImageIcon(library.getCoatOfArmsImage(nation, 0.5));
-            if (icon != null) setIcon(icon);
+            setIcon(new ImageIcon(library.getCoatOfArmsImage(nation, 0.5)));
             return this;
         }
     }
 
-    private class NationStateRenderer extends JLabel
+    private static class NationStateRenderer extends JLabel
         implements ListCellRenderer {
 
         public Component getListCellRendererComponent(JList list, Object value,
             int index, boolean isSelected, boolean cellHasFocus) {
-            setText(Messages.message("nationState."
-                    + ((NationState)value).toString()));
+            setText(Messages.message("nationState." + (NationState)value));
             return this;
         }
     }
 
-    private class PlayerCellRenderer implements TableCellRenderer {
+    private static class PlayerCellRenderer implements TableCellRenderer {
 
         JLabel label = new JLabel();
         JButton button = new JButton(Messages.message("select"));
@@ -407,14 +405,14 @@ public final class PlayersTable extends JTable {
         }
 
         public Object getCellEditorValue() {
-            return true;
+            return Boolean.TRUE;
         }
     }
 
     /**
      * The TableModel for the players table.
      */
-    private class PlayersTableModel extends AbstractTableModel {
+    private static class PlayersTableModel extends AbstractTableModel {
 
         private final PreGameController preGameController;
 

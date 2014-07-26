@@ -82,7 +82,7 @@ public class Colony extends Settlement implements Nameable {
      * Simple container to define where and what a unit is working
      * on.
      */
-    private class Occupation {
+    private static class Occupation {
 
         public WorkLocation workLocation;
         public ProductionType productionType;

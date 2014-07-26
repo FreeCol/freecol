@@ -30,7 +30,7 @@ import java.util.Map;
  */
 public class ProductionMap {
 
-    public class ProductionTree {
+    public static class ProductionTree {
 
         /**
          * The abstract goods all other types of goods in this tree are

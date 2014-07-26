@@ -446,7 +446,7 @@ public final class InGameController extends Controller {
         public DOMMessage handle(DOMMessage message);
     };
 
-    private class DOMMessageCallable implements Callable<DOMMessage> {
+    private static class DOMMessageCallable implements Callable<DOMMessage> {
 
         private Connection connection;
         private Game game;

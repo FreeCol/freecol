@@ -33,6 +33,39 @@ import net.sf.freecol.FreeCol;
 public class FileList extends JList {
 
     /**
+     * A single entry in the <code>FileList</code>.
+     */
+    public static class FileListEntry {
+
+        private File file;
+        
+
+        public FileListEntry(File file) {
+            this.file = file;
+        }
+        
+        
+        /**
+         * Gets the file.
+         *
+         * @return The <code>File</code>
+         */
+        public File getFile() {
+            return file;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            String name = file.getName();
+            return name.substring(0, name.length()-4);
+        }
+    }
+
+
+    /**
      * Creates a <code>FileList</code> displaying the contents
      * of the given directory.
      *
@@ -80,35 +113,5 @@ public class FileList extends JList {
         }
         
         return fileListEntries;
-    }
-
-    
-    /**
-     * A single entry in the <code>FileList</code>.
-     */
-    public class FileListEntry {
-        private File file;
-        
-        public FileListEntry(File file) {
-            this.file = file;
-        }
-        
-        
-        /**
-         * Gets a string representation of the file.
-         */        
-        public String toString() {
-            String name = file.getName();
-            return name.substring(0, name.length()-4);
-        }
-        
-        
-        /**
-         * Gets the file.
-         * @return The <code>File</code>
-         */
-        public File getFile() {
-            return file;
-        }
     }
 }

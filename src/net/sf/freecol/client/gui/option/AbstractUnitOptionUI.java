@@ -152,7 +152,7 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
     }
 
 
-    private class RoleRenderer extends FreeColComboBoxRenderer {
+    private static class RoleRenderer extends FreeColComboBoxRenderer {
 
         @Override
         public void setLabelValues(JLabel label, Object value) {

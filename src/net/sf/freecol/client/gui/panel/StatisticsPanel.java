@@ -52,7 +52,7 @@ public final class StatisticsPanel extends FreeColPanel {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(StatisticsPanel.class.getName());
 
-    class StatisticsModel extends AbstractTableModel {
+    private static class StatisticsModel extends AbstractTableModel {
 
         private static final int NAME_COLUMN = 0, VALUE_COLUMN = 1;
         private final String[] columnNames = { "Name", "Value" };

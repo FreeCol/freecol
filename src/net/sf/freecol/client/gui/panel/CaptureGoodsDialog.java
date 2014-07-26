@@ -50,7 +50,7 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
 
     private static final Logger logger = Logger.getLogger(CaptureGoodsDialog.class.getName());
 
-    private class CheckBoxRenderer extends JCheckBox
+    private static class CheckBoxRenderer extends JCheckBox
         implements ListCellRenderer {
 
         public CheckBoxRenderer() {
@@ -69,7 +69,7 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
         }
     }
 
-    private class GoodsItem extends JCheckBox {
+    private static class GoodsItem extends JCheckBox {
         private Goods good;
 
         public GoodsItem(Goods good) {

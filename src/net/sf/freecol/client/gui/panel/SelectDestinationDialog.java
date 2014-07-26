@@ -319,7 +319,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
         }
     }
 
-    private class LocationRenderer extends FreeColComboBoxRenderer {
+    private static class LocationRenderer extends FreeColComboBoxRenderer {
 
         @Override
         public void setLabelValues(JLabel label, Object value) {

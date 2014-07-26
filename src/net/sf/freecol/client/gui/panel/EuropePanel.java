@@ -75,6 +75,25 @@ public final class EuropePanel extends PortPanel {
 
     private static Logger logger = Logger.getLogger(EuropePanel.class.getName());
 
+    private static final class EuropeButton extends JButton {
+
+        public EuropeButton(String text, int keyEvent, String command,
+                            ActionListener listener) {
+            setOpaque(true);
+            setText(text);
+            setActionCommand(command);
+            addActionListener(listener);
+            InputMap closeInputMap = new ComponentInputMap(this);
+            closeInputMap.put(KeyStroke.getKeyStroke(keyEvent, 0, false),
+                              "pressed");
+            closeInputMap.put(KeyStroke.getKeyStroke(keyEvent, 0, true),
+                              "released");
+            SwingUtilities.replaceUIInputMap(this,
+                                             JComponent.WHEN_IN_FOCUSED_WINDOW,
+                                             closeInputMap);
+        }
+    }
+
     public static enum EuropeAction {
         EXIT,
         RECRUIT,
@@ -837,25 +856,6 @@ public final class EuropePanel extends PortPanel {
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Transaction log update failure", e);
             }
-        }
-    }
-
-    public final class EuropeButton extends JButton {
-
-        public EuropeButton(String text, int keyEvent, String command,
-                            ActionListener listener) {
-            setOpaque(true);
-            setText(text);
-            setActionCommand(command);
-            addActionListener(listener);
-            InputMap closeInputMap = new ComponentInputMap(this);
-            closeInputMap.put(KeyStroke.getKeyStroke(keyEvent, 0, false),
-                              "pressed");
-            closeInputMap.put(KeyStroke.getKeyStroke(keyEvent, 0, true),
-                              "released");
-            SwingUtilities.replaceUIInputMap(this,
-                                             JComponent.WHEN_IN_FOCUSED_WINDOW,
-                                             closeInputMap);
         }
     }
 }

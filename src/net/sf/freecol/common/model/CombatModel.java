@@ -65,7 +65,7 @@ public abstract class CombatModel {
     /**
      * Odds a particular outcome will occur in combat.
      */
-    public class CombatOdds {
+    public static class CombatOdds {
         public static final float UNKNOWN_ODDS = -1.0f;
 
         public float win;

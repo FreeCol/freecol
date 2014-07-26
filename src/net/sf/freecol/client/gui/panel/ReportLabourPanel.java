@@ -165,17 +165,16 @@ public final class ReportLabourPanel extends ReportPanel {
         getGUI().showReportLabourDetailPanel(unitType, data, unitCount, colonies);
     }
 
-    private class UnitRenderer implements ListCellRenderer {
+    private static class UnitRenderer implements ListCellRenderer {
 
-        public Component getListCellRendererComponent(JList list, Object value, int index,
-                                                      boolean isSelected, boolean cellHasFocus) {
+        public Component getListCellRendererComponent(JList list,
+            Object value, int index,
+            boolean isSelected, boolean cellHasFocus) {
             LabourUnitPanel panel = (LabourUnitPanel) value;
             panel.selected = isSelected;
             return panel;
         }
-
     }
-
 
     private class LabourUnitPanel extends JPanel {
 

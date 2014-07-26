@@ -149,7 +149,7 @@ public class FreeColComboBoxRenderer implements ListCellRenderer, UIResource {
         }
     }
 
-    private class SelectedComponent extends JLabel {
+    private static class SelectedComponent extends JLabel {
 
         public SelectedComponent() {
             setOpaque(false);
@@ -170,7 +170,7 @@ public class FreeColComboBoxRenderer implements ListCellRenderer, UIResource {
     }
 
 
-    private class NormalComponent extends JLabel {
+    private static class NormalComponent extends JLabel {
 
         public NormalComponent() {
             setOpaque(false);

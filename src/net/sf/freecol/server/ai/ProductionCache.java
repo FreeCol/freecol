@@ -295,7 +295,7 @@ public class ProductionCache {
      * goods, or can be upgraded to one.
      *
      */
-    public class Entry {
+    public static class Entry {
         private final GoodsType goodsType;
         private final WorkLocation workLocation;
         private final Unit unit;

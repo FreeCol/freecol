@@ -115,7 +115,7 @@ public class TransportMission extends Mission {
      * An class describing the action needed to make progress in a
      * transportation action for a specific transportable.
      */
-    public class Cargo implements Comparable<Cargo> {
+    public static class Cargo {
 
         private Transportable transportable;
         private Unit carrier;

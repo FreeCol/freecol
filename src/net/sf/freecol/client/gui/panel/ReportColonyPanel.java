@@ -288,14 +288,25 @@ public final class ReportColonyPanel extends ReportPanel
         if (cGood == null) cGood = Color.BLUE;
     }
 
-    // Work done by (optional) oldType would be better done by newType
-    // because it could produce amount more goodsType.
-    private class Suggestion {
+    private static class Suggestion {
+
         public UnitType oldType;
         public UnitType newType;
         public GoodsType goodsType;
         public int amount;
 
+        /**
+         * Suggest that work done by (optional) oldType would be
+         * better done by newType because it could produce amount more
+         * goodsType.
+         *
+         * @param oldType The optional <code>UnitType</code> currently
+         *     doing the work.
+         * @param newType A new <code>UnitType</code> to do the work.
+         * @param goodsType The <code>GoodsType</code> to produce.
+         * @param amount The extra goods that would be produced if the
+         *     suggestion is taken.
+         */
         public Suggestion(UnitType oldType, UnitType newType,
                           GoodsType goodsType, int amount) {
             this.oldType = oldType;

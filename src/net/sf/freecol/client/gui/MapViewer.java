@@ -105,18 +105,22 @@ public final class MapViewer {
     public static enum BorderType { COUNTRY, REGION }
 
 
-    class TextSpecification {
+    private static class TextSpecification {
+
         public String text;
         public Font font;
+
         public TextSpecification(String newText, Font newFont) {
             text = newText;
             font = newFont;
         }
     }
 
-    class SortableImage implements Comparable<SortableImage> {
+    private static class SortableImage implements Comparable<SortableImage> {
+
         public Image image;
         public int index;
+
         public SortableImage(Image image, int index) {
             this.image = image;
             this.index = index;

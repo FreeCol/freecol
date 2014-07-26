@@ -43,7 +43,7 @@ import net.sf.freecol.common.util.Utils;
 public class Role extends BuildableType {
 
     /** Container for valid role changes. */
-    public class RoleChange {
+    public static class RoleChange {
 
         public String from;
         public String capture;

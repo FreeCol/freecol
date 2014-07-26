@@ -80,13 +80,13 @@ public class FreeColDebugger {
     private static boolean displayCoordinates = false;
 
     /** Display tile values as a colony site for this player? */
-    public static Player displayColonyValuePlayer = null;
+    private static Player displayColonyValuePlayer = null;
 
     /** Show the mission for an AI unit? */
-    public static boolean showMission = false;
+    private static boolean showMission = false;
 
     /** Show full mission information? */
-    public static boolean showMissionInfo = false;
+    private static boolean showMissionInfo = false;
 
 
     /**

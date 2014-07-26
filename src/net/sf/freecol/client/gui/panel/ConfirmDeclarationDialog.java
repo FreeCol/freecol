@@ -87,7 +87,7 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
 
     }
 
-    private class EnumRenderer extends FreeColComboBoxRenderer {
+    private static class EnumRenderer extends FreeColComboBoxRenderer {
 
         private final String prefix;
 

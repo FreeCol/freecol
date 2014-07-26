@@ -82,7 +82,7 @@ public final class UnitTypeOptionUI extends OptionUI<UnitTypeOption>  {
         box.setSelectedItem(getOption().getValue());
     }
 
-    private class ChoiceRenderer extends FreeColComboBoxRenderer {
+    private static class ChoiceRenderer extends FreeColComboBoxRenderer {
 
         @Override
         public void setLabelValues(JLabel label, Object value) {

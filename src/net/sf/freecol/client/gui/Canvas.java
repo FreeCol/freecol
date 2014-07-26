@@ -255,7 +255,7 @@ public final class Canvas extends JDesktopPane {
     private static final int MAXTRY = 3;
 
     /** A class for frames being used as tool boxes. */
-    class ToolBoxFrame extends JInternalFrame {}
+    private static class ToolBoxFrame extends JInternalFrame {}
 
     /** The game client. */
     private final FreeColClient freeColClient;
