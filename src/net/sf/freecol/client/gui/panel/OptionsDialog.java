@@ -164,7 +164,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
         c.add(new ChoiceItem<OptionGroup>(Messages.message("cancel"),
                 (OptionGroup)null,
                 isEditable()).cancelOption().defaultOption());
-        initialize(DialogType.PLAIN, true, this.panel, null, c);
+        initializeDialog(DialogType.PLAIN, true, this.panel, null, c);
     }
 
     /**

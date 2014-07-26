@@ -69,6 +69,6 @@ public final class RiverStyleDialog extends FreeColChoiceDialog<String> {
                 .setIcon(new ImageIcon(ResourceManager.getImage(key, 0.5))));
         }
        
-        initialize(true, panel, null, "cancel", c);
+        initializeChoiceDialog(true, panel, null, "cancel", c);
     }
 }

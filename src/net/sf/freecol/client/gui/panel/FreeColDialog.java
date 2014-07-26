@@ -134,7 +134,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
                          List<ChoiceItem<T>> options) {
         this(freeColClient);
 
-        initialize(type, modal, obj, icon, options);
+        initializeDialog(type, modal, obj, icon, options);
     }
 
 
@@ -167,8 +167,9 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
      * @param icon An optional icon to display.
      * @param options A list of options to choose from.
      */
-    protected void initialize(DialogType type, boolean modal, Object obj, 
-                              ImageIcon icon, List<ChoiceItem<T>> options) {
+    protected final void initializeDialog(DialogType type, boolean modal,
+                                          Object obj, ImageIcon icon,
+                                          List<ChoiceItem<T>> options) {
         this.modal = modal;
         this.options = options;
         int paneType = JOptionPane.QUESTION_MESSAGE;

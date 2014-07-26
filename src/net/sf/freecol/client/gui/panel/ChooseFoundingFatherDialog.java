@@ -98,7 +98,7 @@ public final class ChooseFoundingFatherDialog
         List<ChoiceItem<FoundingFather>> c = choices();
         c.add(new ChoiceItem<FoundingFather>(Messages.message("ok"),
                 (FoundingFather)null).okOption().defaultOption());
-        initialize(DialogType.QUESTION, false, panel, null, c);
+        initializeDialog(DialogType.QUESTION, false, panel, null, c);
     }
 
 

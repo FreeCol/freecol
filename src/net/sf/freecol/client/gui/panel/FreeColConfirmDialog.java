@@ -60,7 +60,7 @@ public class FreeColConfirmDialog extends FreeColDialog<Boolean> {
                                 String okKey, String cancelKey) {
         this(freeColClient);
 
-        initialize(modal, obj, icon, okKey, cancelKey);
+        initializeConfirmDialog(modal, obj, icon, okKey, cancelKey);
     }
 
 
@@ -73,13 +73,14 @@ public class FreeColConfirmDialog extends FreeColDialog<Boolean> {
      * @param okKey The text displayed on the "ok"-button.
      * @param cancelKey The text displayed on the "cancel"-button.
      */
-    protected void initialize(boolean modal, Object obj, ImageIcon icon,
-                              String okKey, String cancelKey) {
+    protected final void initializeConfirmDialog(boolean modal, Object obj,
+                                                 ImageIcon icon, String okKey,
+                                                 String cancelKey) {
         List<ChoiceItem<Boolean>> c = choices();
         c.add(new ChoiceItem<Boolean>(Messages.message(okKey),
                 Boolean.TRUE).okOption());
         c.add(new ChoiceItem<Boolean>(Messages.message(cancelKey),
                 Boolean.FALSE).cancelOption().defaultOption());
-        initialize(DialogType.QUESTION, modal, obj, icon, c);
+        initializeDialog(DialogType.QUESTION, modal, obj, icon, c);
     }
 }

@@ -144,7 +144,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
                 fake));
         c.add(new ChoiceItem<IndianSettlement>(Messages.message("cancel"),
                 fake).cancelOption().defaultOption());
-        initialize(DialogType.QUESTION, true, panel,
+        initializeDialog(DialogType.QUESTION, true, panel,
             getGUI().getImageLibrary().getImageIcon(settlement, true), c);
     }
 

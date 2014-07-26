@@ -65,7 +65,7 @@ public abstract class FreeColInputDialog<T> extends FreeColDialog<T> {
                               String okKey, String cancelKey) {
         this(freeColClient);
 
-        initialize(modal, obj, icon, okKey, cancelKey);
+        initializeInputDialog(modal, obj, icon, okKey, cancelKey);
     }
 
 
@@ -79,8 +79,9 @@ public abstract class FreeColInputDialog<T> extends FreeColDialog<T> {
      * @param okKey The key displayed on the "ok"-button.
      * @param cancelKey The key displayed on the optional "cancel"-button.
      */
-    protected void initialize(boolean modal, Object obj, ImageIcon icon,
-                              String okKey, String cancelKey) {
+    protected final void initializeInputDialog(boolean modal, Object obj,
+                                               ImageIcon icon, String okKey,
+                                               String cancelKey) {
         List<ChoiceItem<T>> c = choices();
         c.add(new ChoiceItem<T>(Messages.message(okKey),
                 (T)null).okOption());
@@ -88,7 +89,7 @@ public abstract class FreeColInputDialog<T> extends FreeColDialog<T> {
             c.add(new ChoiceItem<T>(Messages.message(cancelKey),
                     (T)null).cancelOption().defaultOption());
         }
-        initialize(DialogType.QUESTION, modal, obj, icon, c);
+        initializeDialog(DialogType.QUESTION, modal, obj, icon, c);
     }
 
     /**

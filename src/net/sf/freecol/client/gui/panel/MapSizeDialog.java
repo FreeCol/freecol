@@ -74,7 +74,7 @@ public final class MapSizeDialog extends FreeColInputDialog<Dimension> {
         panel.add(heightLabel);
         panel.add(inputHeight);
 
-        initialize(true, panel, null, "ok", "cancel");
+        initializeInputDialog(true, panel, null, "ok", "cancel");
     }
 
     /**

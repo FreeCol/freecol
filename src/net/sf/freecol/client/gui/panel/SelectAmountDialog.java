@@ -105,7 +105,7 @@ public final class SelectAmountDialog extends FreeColInputDialog<Integer> {
         panel.add(this.comboBox, "wrap 20, growx");
         panel.setSize(panel.getPreferredSize());
 
-        initialize(true, panel, null, "ok", "cancel");
+        initializeInputDialog(true, panel, null, "ok", "cancel");
     }
 
     /**

@@ -920,7 +920,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         ImageIcon icon = getImageLibrary()
             .getImageIcon((otherColony != null) ? otherColony : otherUnit,
                           false);
-        initialize(DialogType.QUESTION, true, panel, icon, c);
+        initializeDialog(DialogType.QUESTION, true, panel, icon, c);
 
         updateDialog();
     }

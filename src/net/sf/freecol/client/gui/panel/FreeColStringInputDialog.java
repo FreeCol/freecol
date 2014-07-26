@@ -65,7 +65,7 @@ public final class FreeColStringInputDialog extends FreeColInputDialog<String> {
         panel.add(GUI.getDefaultTextArea(text));
         panel.add(textField, BorderLayout.SOUTH);
 
-        initialize(modal, panel, null, okKey, cancelKey);
+        initializeInputDialog(modal, panel, null, okKey, cancelKey);
     }
 
     /**

@@ -59,7 +59,7 @@ public class FreeColChoiceDialog<T> extends FreeColDialog<T> {
                                String cancelKey, List<ChoiceItem<T>> choices) {
         this(freeColClient);
 
-        initialize(modal, obj, icon, cancelKey, choices);
+        initializeChoiceDialog(modal, obj, icon, cancelKey, choices);
     }
 
 
@@ -70,12 +70,13 @@ public class FreeColChoiceDialog<T> extends FreeColDialog<T> {
      * @param cancelKey Key for the text of the optional cancel button.
      * @param choices A list of <code>ChoiceItem</code>s to create buttons for.
      */
-    protected void initialize(boolean modal, Object obj, ImageIcon icon,
-                              String cancelKey, List<ChoiceItem<T>> choices) {
+    protected final void initializeChoiceDialog(boolean modal, Object obj,
+                                                ImageIcon icon, String cancelKey,
+                                                List<ChoiceItem<T>> choices) {
         if (cancelKey != null) {
             choices.add(new ChoiceItem<T>(Messages.message(cancelKey),
                     (T)null).cancelOption().defaultOption());
         }
-        initialize(DialogType.PLAIN, modal, obj, icon, choices);
+        initializeDialog(DialogType.PLAIN, modal, obj, icon, choices);
     }
 }

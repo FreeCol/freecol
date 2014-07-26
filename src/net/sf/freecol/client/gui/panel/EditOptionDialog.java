@@ -55,7 +55,7 @@ public class EditOptionDialog extends FreeColConfirmDialog {
         if (ui.getLabel() == null) panel.add(ui.getLabel(), "split 2");
         panel.add(ui.getComponent());
 
-        initialize(true, panel, null, "ok", "cancel");
+        initializeConfirmDialog(true, panel, null, "ok", "cancel");
     }
 
 

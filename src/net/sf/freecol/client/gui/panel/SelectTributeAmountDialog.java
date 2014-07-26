@@ -74,7 +74,7 @@ public final class SelectTributeAmountDialog extends FreeColInputDialog<Integer>
         
         panel.setSize(panel.getPreferredSize());
 
-        initialize(true, panel, null, "ok", "cancel");
+        initializeInputDialog(true, panel, null, "ok", "cancel");
     }
 
     /**

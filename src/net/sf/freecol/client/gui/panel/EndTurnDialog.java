@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -190,8 +191,8 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
         panel.add(listScroller, "newline 10");
         panel.setSize(panel.getPreferredSize());
 
-        initialize(false, panel, getImageLibrary().getImageIcon(player, false),
-                   "ok", "cancel");
+        ImageIcon icon = getImageLibrary().getImageIcon(player, false);
+        initializeConfirmDialog(false, panel, icon, "ok", "cancel");
     }
 
     /**

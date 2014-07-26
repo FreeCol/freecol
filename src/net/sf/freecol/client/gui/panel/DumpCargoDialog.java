@@ -89,8 +89,8 @@ public final class DumpCargoDialog extends FreeColDialog<List<Goods>> {
             .okOption().defaultOption());
         c.add(new ChoiceItem<List<Goods>>(Messages.message("cancel"), fake)
             .cancelOption());
-        initialize(DialogType.QUESTION, false, panel,
-            lib.getImageIcon(unit, false), c);
+        initializeDialog(DialogType.QUESTION, false, panel,
+                         lib.getImageIcon(unit, false), c);
     }
 
 

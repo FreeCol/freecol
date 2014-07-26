@@ -160,7 +160,7 @@ public class PreCombatDialog extends FreeColConfirmDialog {
         panel.add(finalDefenceResult);
         panel.setSize(panel.getPreferredSize());
 
-        initialize(true, panel, null, "ok", "cancel");
+        initializeConfirmDialog(true, panel, null, "ok", "cancel");
     }
 
     private int addLabels(JPanel panel, JLabel[] labels, boolean newline,

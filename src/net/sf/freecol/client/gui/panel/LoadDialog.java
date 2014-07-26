@@ -84,7 +84,7 @@ public final class LoadDialog extends FreeColDialog<File> {
             });
 
         List<ChoiceItem<File>> c = choices();
-        initialize(DialogType.QUESTION, true, fileChooser, null, c);
+        initializeDialog(DialogType.QUESTION, true, fileChooser, null, c);
     }
 
 

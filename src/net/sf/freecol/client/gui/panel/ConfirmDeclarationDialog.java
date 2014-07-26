@@ -318,7 +318,7 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
                 fake).okOption());
         c.add(new ChoiceItem<List<String>>(Messages.message("declareIndependence.areYouSure.no"),
                 fake).cancelOption().defaultOption());
-        initialize(DialogType.QUESTION, true, panel, icon, c);
+        initializeDialog(DialogType.QUESTION, true, panel, icon, c);
     }
 
     @SuppressWarnings("unchecked") // FIXME in Java7

@@ -53,6 +53,7 @@ public final class VictoryDialog extends FreeColConfirmDialog {
         panel.add(new JLabel(new ImageIcon(image)),
                   "align center");
 
-        initialize(false, panel, null, "victory.yes", "victory.continue");
+        initializeConfirmDialog(false, panel, null,
+                                "victory.yes", "victory.continue");
     }
 }
