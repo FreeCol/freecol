@@ -72,7 +72,7 @@ import org.xml.sax.SAXException;
 public abstract class FreeColObject
     implements Comparable<FreeColObject>, ObjectWithId {
 
-    protected static Logger logger = Logger.getLogger(FreeColObject.class.getName());
+    protected static final Logger logger = Logger.getLogger(FreeColObject.class.getName());
 
     public static final int INFINITY = Integer.MAX_VALUE;
     public static final int UNDEFINED = Integer.MIN_VALUE;
@@ -784,22 +784,14 @@ public abstract class FreeColObject
                 return (Element)document.importNode(tempDocument.getDocumentElement(), true);
             } catch (ParserConfigurationException pce) {
                 // Parser with specified options can't be built
-                logger.log(Level.WARNING, "ParserConfigurationException", pce);
-                throw new IllegalStateException("ParserConfigurationException: "
-                    + pce.getMessage());
+                throw new IllegalStateException("Parser failure", pce);
             } catch (SAXException se) {
-                logger.log(Level.WARNING, "SAXException", se);
-                throw new IllegalStateException("SAXException: "
-                    + se.getMessage());
+                throw new IllegalStateException("SAX failure", se);
             } catch (IOException ie) {
-                logger.log(Level.WARNING, "IOException", ie);
-                throw new IllegalStateException("IOException: "
-                    + ie.getMessage());
+                throw new IllegalStateException("IO failure", ie);
             }
         } catch (XMLStreamException e) {
-            logger.log(Level.WARNING, "Error writing stream.", e);
-            throw new IllegalStateException("XMLStreamException: "
-                + e.getMessage());
+            throw new IllegalStateException("Error writing stream", e);
         }
     }
 
@@ -840,14 +832,11 @@ public abstract class FreeColObject
             readFromXML(xr);
 
         } catch (IOException ioe) {
-            logger.log(Level.WARNING, "IOException", ioe);
-            throw new IllegalStateException("IOException");
+            throw new IllegalStateException("IO failure", ioe);
         } catch (TransformerException te) {
-            logger.log(Level.WARNING, "TransformerException", te);
-            throw new IllegalStateException("TransformerException");
+            throw new IllegalStateException("Transformer failure", te);
         } catch (XMLStreamException xe) {
-            logger.log(Level.WARNING, "XMLStreamException", xe);
-            throw new IllegalStateException("XMLStreamException");
+            throw new IllegalStateException("XML failure", xe);
         } finally {
             if (xr != null) xr.close();
         }

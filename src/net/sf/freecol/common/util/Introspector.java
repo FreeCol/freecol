@@ -71,8 +71,7 @@ public class Introspector {
             return theClass.getMethod(methodName);
         } catch (Exception e) {
             throw new IllegalArgumentException(theClass.getName()
-                                               + "." + methodName
-                                               + ": " + e.toString());
+                                               + "." + methodName, e);
         }
     }
 
@@ -93,8 +92,7 @@ public class Introspector {
             return theClass.getMethod(methodName, argType);
         } catch (Exception e) {
             throw new IllegalArgumentException(theClass.getName()
-                                               + "." + methodName
-                                               + ": " + e.toString());
+                                               + "." + methodName, e);
         }
     }
 
@@ -114,8 +112,7 @@ public class Introspector {
         } catch (Exception e) {
             throw new IllegalArgumentException(theClass.getName()
                                                + "." + method.getName()
-                                               + " return type: "
-                                               + e.toString());
+                                               + " return type.", e);
         }
         return ret;
     }
@@ -137,16 +134,14 @@ public class Introspector {
                 method = argType.getMethod("name");
             } catch (Exception e) {
                 throw new IllegalArgumentException(argType.getName()
-                                                   + ".getMethod(name()): "
-                                                   + e.toString());
+                                                   + ".getMethod(name())", e);
             }
         } else {
             try {
                 method = String.class.getMethod("valueOf", argType);
             } catch (Exception e) {
                 throw new IllegalArgumentException("String.getMethod(valueOf("
-                                                   + argType.getName()
-                                                   + ")): " + e.toString());
+                                                   + argType.getName() + "))", e);
             }
         }
         return method;
@@ -170,8 +165,7 @@ public class Introspector {
             try {
                 method = Enum.class.getMethod("valueOf", Class.class, String.class);
             } catch (Exception e) {
-                throw new IllegalArgumentException("Enum.getMethod(valueOf(Class, String)): "
-                                                   + e.toString());
+                throw new IllegalArgumentException("Enum.getMethod(valueOf(Class, String))", e);
             }
         } else {
             if (argType.isPrimitive()) {
@@ -193,8 +187,7 @@ public class Introspector {
                 method = argType.getMethod("valueOf", String.class);
             } catch (Exception e) {
                 throw new IllegalArgumentException(argType.getName()
-                                                   + ".getMethod(valueOf(String)): "
-                                                   + e.toString());
+                                                   + ".getMethod(valueOf(String))", e);
             }
         }
         return method;
@@ -219,8 +212,7 @@ public class Introspector {
                 return (String) getMethod.invoke(obj);
             } catch (Exception e) {
                 throw new IllegalArgumentException(getMethod.getName()
-                                                   + "(obj)): "
-                                                   + e.toString());
+                                                   + "(obj)", e);
             }
         } else {
             Object result = null;
@@ -228,8 +220,7 @@ public class Introspector {
                 result = getMethod.invoke(obj);
             } catch (Exception e) {
                 throw new IllegalArgumentException(getMethod.getName()
-                                                   + "(obj): "
-                                                   + e.toString());
+                                                   + "(obj)", e);
             }
             Method convertMethod = getToStringConverter(fieldType);
             if (Modifier.isStatic(convertMethod.getModifiers())) {
@@ -237,16 +228,14 @@ public class Introspector {
                     return (String) convertMethod.invoke(null, result);
                 } catch (Exception e) {
                     throw new IllegalArgumentException(convertMethod.getName()
-                                                       + "(null, result): "
-                                                       + e.toString());
+                                                       + "(null, result)", e);
                 }
             } else {
                 try {
                     return (String) convertMethod.invoke(result);
                 } catch (Exception e) {
                     throw new IllegalArgumentException(convertMethod.getName()
-                                                       + "(result): "
-                                                       + e.toString());
+                                                       + "(result)", e);
                 }
             }
         }
@@ -271,8 +260,7 @@ public class Introspector {
                 setMethod.invoke(obj, value);
             } catch (Exception e) {
                 throw new IllegalArgumentException(setMethod.getName()
-                                                   + "(obj, " + value + ")): "
-                                                   + e.toString());
+                                                   + "(obj, " + value + ")", e);
             }
         } else {
             Method convertMethod = getFromStringConverter(fieldType);
@@ -284,24 +272,21 @@ public class Introspector {
                 } catch (Exception e) {
                     throw new IllegalArgumentException(convertMethod.getName()
                                                        + "(null, " + fieldType.getName()
-                                                       + ", " + value + "):"
-                                                       + e.toString());
+                                                       + ", " + value + ")", e);
                 }
             } else {
                 try {
                     result = convertMethod.invoke(null, value);
                 } catch (Exception e) {
                     throw new IllegalArgumentException(convertMethod.getName()
-                                                       + "(null, " + value + "):"
-                                                       + e.toString());
+                                                       + "(null, " + value + ")", e);
                 }
             }
             try {
                 setMethod.invoke(obj, result);
             } catch (Exception e) {
                 throw new IllegalArgumentException(setMethod.getName()
-                                                   + "(result): "
-                                                   + e.toString());
+                                                   + "(result)", e);
             }
         }
     }
@@ -323,8 +308,7 @@ public class Introspector {
         try {
             messageClass = Class.forName(tag);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Unable to find class " + tag
-                + ": " + e.toString());
+            throw new IllegalArgumentException("Unable to find class " + tag, e);
         }
         Constructor<?> constructor;
         try {
@@ -335,14 +319,13 @@ public class Introspector {
                 p += " " + types[i].toString();
             }
             p += " ): ";
-            throw new IllegalArgumentException(p + e.toString());
+            throw new IllegalArgumentException(p, e);
         }
         Object instance;
         try {
             instance = constructor.newInstance(params);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Failed to construct " + tag
-                + ": " + e.toString());
+            throw new IllegalArgumentException("Failed to construct " + tag, e);
         }
         return instance;
     }

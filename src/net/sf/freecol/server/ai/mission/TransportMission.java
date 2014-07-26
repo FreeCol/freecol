@@ -898,8 +898,7 @@ public class TransportMission extends Mission {
                 }
             }
         } catch (Exception e) {
-            logMe = e.getMessage() + logMe;
-            throw new IllegalStateException(logMe);
+            throw new IllegalStateException(logMe, e);
         }
         return ts;
     }

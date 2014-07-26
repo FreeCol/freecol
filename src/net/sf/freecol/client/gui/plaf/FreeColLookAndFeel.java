@@ -188,7 +188,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
             UIManager.setLookAndFeel(fclaf);
             UIManager.put("Button.defaultButtonFollowsFocus", Boolean.TRUE);
         } catch (UnsupportedLookAndFeelException e) {
-            throw new FreeColException(e.getMessage());
+            throw new FreeColException("Look and feel install failure", e);
         }
 
         // Set the default font in all UI elements.

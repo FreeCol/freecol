@@ -347,9 +347,7 @@ public final class Specification {
         try {
             readFromXML(xr);
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Load exception", e);
-            throw new RuntimeException("Error parsing specification: "
-                + e.getMessage());
+            throw new RuntimeException("Error parsing specification", e);
         }
     }
 
@@ -380,9 +378,7 @@ public final class Specification {
             xr.nextTag();
             load(xr);
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Load stream exception", e);
-            throw new RuntimeException("Error parsing specification: "
-                                       + e.getMessage());
+            throw new RuntimeException("Load specification stream error", e);
         } finally {
             if (xr != null) xr.close();
         }
@@ -999,7 +995,7 @@ public final class Specification {
         try {
             return getBooleanOption(id).getValue();
         } catch (ClassCastException e) {
-            throw new IllegalArgumentException("Not a boolean option: " + id);
+            throw new IllegalArgumentException("Not a boolean option: " + id, e);
         }
     }
 
@@ -1017,7 +1013,7 @@ public final class Specification {
         try {
             return getIntegerOption(id).getValue();
         } catch (ClassCastException e) {
-            throw new IllegalArgumentException("Not an integer option: " + id);
+            throw new IllegalArgumentException("Not an integer option: " + id, e);
         }
     }
 
@@ -1035,7 +1031,7 @@ public final class Specification {
         try {
             return getStringOption(id).getValue();
         } catch (ClassCastException e) {
-            throw new IllegalArgumentException("Not a string option: " + id);
+            throw new IllegalArgumentException("Not a string option: " + id, e);
         }
     }
 
@@ -1809,7 +1805,7 @@ public final class Specification {
                 load(parent.getSpecificationInputStream());
                 initialized = false;
             } catch (IOException e) {
-                throw new XMLStreamException("Failed to open parent specification: " + e);
+                throw new XMLStreamException("Failed to open parent specification: ", e);
             }
         }
 

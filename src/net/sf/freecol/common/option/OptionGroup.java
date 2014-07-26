@@ -244,7 +244,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
             return ((OptionGroup)getOption(id)).getValue();
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("No option group"
-                + " value associated with the specified option: " + id);
+                + " value associated with the specified option: " + id, e);
         }
     }
 
@@ -263,7 +263,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
             return ((IntegerOption)getOption(id)).getValue();
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("No integer"
-                + " value associated with the specified option: " + id);
+                + " value associated with the specified option: " + id, e);
         }
     }
 
@@ -282,7 +282,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
             ((IntegerOption)getOption(id)).setValue(value);
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("No integer"
-                + " value associated with the specified option: " + id);
+                + " value associated with the specified option: " + id, e);
         }
     }
 
@@ -301,7 +301,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
             return ((BooleanOption)getOption(id)).getValue();
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("No boolean"
-                + " value associated with the specified option: " + id);
+                + " value associated with the specified option: " + id, e);
         }
     }
 
@@ -320,7 +320,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
             ((BooleanOption)getOption(id)).setValue(value);
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("No boolean"
-                + " value associated with the specified option: " + id);
+                + " value associated with the specified option: " + id, e);
         }
     }
 
@@ -339,7 +339,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
             return ((StringOption)getOption(id)).getValue();
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("No String"
-                + " value associated with the specified option: " + id);
+                + " value associated with the specified option: " + id, e);
         }
     }
 
@@ -358,7 +358,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
             ((StringOption)getOption(id)).setValue(value);
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("No String"
-                + " value associated with the specified option: " + id);
+                + " value associated with the specified option: " + id, e);
         }
     }
 
@@ -377,7 +377,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
             return ((TextOption)getOption(id)).getValue();
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("No String"
-                + " value associated with the specified option: " + id);
+                + " value associated with the specified option: " + id, e);
         }
     }
 
@@ -396,7 +396,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
             ((TextOption)getOption(id)).setValue(value);
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("No String"
-                + " value associated with the specified option: " + id);
+                + " value associated with the specified option: " + id, e);
         }
     }
 

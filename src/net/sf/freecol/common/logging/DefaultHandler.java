@@ -47,8 +47,8 @@ public final class DefaultHandler extends Handler {
      * The constructor to use.
      * 
      * @param consoleLogging The flag to log to the console as well.
-     * @throws FreeColException In case the log file could not be
-     *             created/written to.
+     * @exception FreeColException In case the log file could not be
+     *     created/written to.
      */
     public DefaultHandler(boolean consoleLogging, String fileName)
         throws FreeColException {
@@ -68,7 +68,7 @@ public final class DefaultHandler extends Handler {
             file.createNewFile();
         } catch (IOException e) {
             throw new FreeColException("Log file \"" + fileName
-                + "\" could not be created: " + e.getMessage());
+                + "\" could not be created.", e);
         }
 
         if (!file.canWrite()) {
@@ -80,7 +80,7 @@ public final class DefaultHandler extends Handler {
             fileWriter = new FileWriter(file);
         } catch (IOException e) {
             throw new FreeColException("Can not write in log file \""
-                + fileName + "\".");
+                + fileName + "\".", e);
         }
 
         // We should use XMLFormatter here in the future

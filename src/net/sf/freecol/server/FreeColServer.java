@@ -366,7 +366,7 @@ public final class FreeColServer {
      *
      * @param firstPort The port to start trying to connect at.
      * @return A started <code>Server</code>.
-     * @throws IOException on failure to open the port.
+     * @exception IOException on failure to open the port.
      */
     private Server serverStart(int firstPort) throws IOException {
         int port, tries;
@@ -387,16 +387,10 @@ public final class FreeColServer {
                 break;
             } catch (BindException be) {
                 if (i == 1) {
-                    logger.log(Level.WARNING, "Bind exception starting server.",
-                        be);
-                    throw new IOException(be.getMessage());
+                    throw new IOException("Bind exception starting server", be);
                 }
             } catch (IOException ie) {
-                if (i == 1) {
-                    logger.log(Level.WARNING, "IO exception starting server.",
-                        ie);
-                    throw ie;
-                }
+                if (i == 1) throw ie;
             }
             port++;
         }
@@ -844,11 +838,9 @@ public final class FreeColServer {
             fos.closeEntry();
 
         } catch (XMLStreamException e) {
-            logger.log(Level.WARNING, "Failed to save", e);
-            throw new IOException("XMLStreamException: " + e.getMessage());
+            throw new IOException("Failed to save (XML)", e);
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Failed to save", e);
-            throw new IOException(e);
+            throw new IOException("Failed to save", e);
         } finally {
             if (xw != null) xw.close();
             if (fos != null) fos.close();
