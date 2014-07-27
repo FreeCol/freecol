@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.Location;
 
 
@@ -90,6 +91,13 @@ public class LogBuilder {
      */
     public void add(Object... objects) {
         if (sb != null) add(sb, objects);
+    }
+
+    /**
+     * Add a stack trace to the buffer.
+     */
+    public void addStackTrace() {
+        if (sb != null) FreeColDebugger.addStackTrace(this);
     }
 
     /**

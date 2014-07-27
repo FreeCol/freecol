@@ -396,10 +396,19 @@ public class FreeColDebugger {
      */
     public static String stackTraceToString() {
         LogBuilder lb = new LogBuilder(512);
+        addStackTrace(lb);
+        return lb.toString();
+    }
+
+    /**
+     * Helper that adds a stack trace to a log builder.
+     *
+     * @param lb The <code>LogBuilder</code> to add to.
+     */
+    public static void addStackTrace(LogBuilder lb) {
         for (StackTraceElement s : Thread.currentThread().getStackTrace()) {
             lb.add(s.toString(), "\n");
         }
         lb.shrink("\n");
-        return lb.toString();
     }
 }

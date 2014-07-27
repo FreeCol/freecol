@@ -1143,8 +1143,9 @@ public class Map extends FreeColGameObject implements Location {
                 if (!((Tile)realEnd).isOnRiver()) {
                     LogBuilder l2 = new LogBuilder(512);
                     l2.add("Fail in findPath(", unit, ", ", tile,
-                        ", ", ((Tile)realEnd), ", ", carrier, ")\n",
-                        p.fullPathToString());
+                        ", ", ((Tile)realEnd), ", ", carrier, ")\n");
+                    l2.addStackTrace();
+                    l2.add(p.fullPathToString());
                     path = findMapPath(unit, tile, (Tile)realEnd,
                                        carrier, costDecider, l2);
                     l2.log(logger, Level.WARNING);
