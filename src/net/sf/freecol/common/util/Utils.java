@@ -27,10 +27,12 @@ import java.io.ObjectOutputStream;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -370,5 +372,29 @@ public class Utils {
             logger.log(Level.WARNING, "Unable to restore random state.", e);
         }
         return null;
+    }
+
+    /**
+     * Make an unmodifiable set with specified members.
+     *
+     * @param members The set members.
+     * @return An unmodifiable set containing the members.
+     */     
+    public static <T> Set<T> makeUnmodifiableSet(T... members) {
+        Set<T> tmp = new HashSet<T>();
+        for (T t : members) tmp.add(t);
+        return Collections.<T>unmodifiableSet(tmp);
+    }
+
+    /**
+     * Make an unmodifiable list with specified members.
+     *
+     * @param members The list members.
+     * @return An unmodifiable list containing the members.
+     */     
+    public static <T> List<T> makeUnmodifiableList(T... members) {
+        List<T> tmp = new ArrayList<T>();
+        for (T t : members) tmp.add(t);
+        return Collections.<T>unmodifiableList(tmp);
     }
 }
