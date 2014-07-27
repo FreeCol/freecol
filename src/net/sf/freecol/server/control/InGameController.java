@@ -3737,7 +3737,9 @@ public final class InGameController extends Controller {
         if (price <= 0) {
             return DOMMessage.clientError("Bogus price: " + price);
         } else if (!serverPlayer.checkGold(price)) {
-            return DOMMessage.clientError("Not enough gold to train " + type);
+            return DOMMessage.clientError("Not enough gold ("
+                + serverPlayer.getGold() + " < " + price
+                + ") to train " + type);
         }
 
         Unit unit = new ServerUnit(getGame(), europe, serverPlayer,

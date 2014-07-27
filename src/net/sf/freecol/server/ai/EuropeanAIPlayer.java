@@ -514,6 +514,8 @@ public class EuropeanAIPlayer extends AIPlayer {
                         lb.add("recruit ", aiu.getUnit(), ", ");
                     }
                 } else {
+                    logger.info("About to train " + bestWish.getUnitType()
+                        + " gold=" + player.getGold());
                     aiu = trainAIUnitInEurope(bestWish.getUnitType());
                     if (aiu != null) {
                         aiu.setMission(consumeWorkerWish(aiu, bestWish));
