@@ -277,25 +277,41 @@ public class AIUnit extends AIObject implements Transportable {
         setMission(mission);
         this.dynamicPriority = 0;
 
-        boolean cancel = true;
-        Unit carrier = unit.getCarrier();
-        AIUnit aiCarrier;
-        TransportMission tm;
-        if (carrier != null && !carrier.isDisposed()) {
-            if (mission == null) {
-                if (leaveTransport()) lb.add(" (disembarked)");
-            } else if (oldTarget == mission.getTarget()) {
-                cancel = false;
-            } else if ((aiCarrier = getAIMain().getAIUnit(carrier)) != null
-                && (tm = aiCarrier.getMission(TransportMission.class)) != null
-                && tm.requeueTransportable(this)) {
-                setTransport(aiCarrier, "requeued");
-                cancel = false;
+        final AIUnit transport = getTransport();
+        final TransportMission tm = (transport == null) ? null
+            : transport.getMission(TransportMission.class);
+        boolean clear;
+        if (transport == null) {
+            clear = true;
+        } else {
+            if (tm == null) {
+                clear = true;
             } else {
-                if (leaveTransport()) lb.add(" (disembarked)");
+                if (mission == null) {
+                    clear = true;
+                } else if (oldTarget == mission.getTarget()) {
+                    clear = false;
+                    lb.add(" (transport preserved)");
+                } else if (tm.requeueTransportable(this)) {
+                    clear = false;
+                    lb.add(" (transport requeued)");
+                } else {
+                    clear = true;
+                }
+                if (clear) {
+                    tm.removeTransportable(this);
+                    lb.add(" (transport dequeued)");
+                }
+            }
+            if (clear) setTransport(null, "(mission-change)");
+        }
+        if (clear && unit.isOnCarrier()) {
+            if (leaveTransport()) {
+                lb.add("(disembarked)");
+            } else {
+                lb.add("(stuck on", unit.getLocation(), ")");
             }
         }
-        if (cancel) removeTransport("mission-changed");
     }
 
     /**
@@ -332,22 +348,6 @@ public class AIUnit extends AIObject implements Transportable {
      */
     public boolean moveToEurope() {
         return AIMessage.askMoveTo(this, unit.getOwner().getEurope());
-    }
-
-    /**
-     * If this unit is scheduled for transport, deschedule.
-     *
-     * @param reason A reason why the unit is to be removed.
-     */
-    private void removeTransport(String reason) {
-        AIUnit transport = getTransport();
-        if (transport != null) {
-            Mission m = transport.getMission();
-            if (m instanceof TransportMission) {
-                ((TransportMission)m).removeTransportable(this);
-            }
-        }
-        setTransport(null, reason);
     }
 
     /**
@@ -669,7 +669,6 @@ public class AIUnit extends AIObject implements Transportable {
                 colony.firePropertyChange(Colony.REARRANGE_WORKERS,
                                           true, false);
             }
-            removeTransport("disembarked");
         }
         return result;
     }
