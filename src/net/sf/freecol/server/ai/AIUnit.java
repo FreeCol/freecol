@@ -706,6 +706,16 @@ public class AIUnit extends AIObject implements Transportable {
         return carrier.couldCarry(unit);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public String invalidReason() {
+        String reason = Mission.invalidTransportableReason(this);
+        return (reason != null) ? reason
+            : (hasMission()) ? getMission().invalidReason()
+            : null;
+    }
+
 
     // Override AIObject
 

@@ -1770,50 +1770,15 @@ public class TransportMission extends Mission {
      *   - step is disposed
      *   - step is a captured settlement
      *
-     * @param aiUnit The <code>AIUnit</code> to test.
      * @param cargo The <code>Cargo</code> to test.
      * @return A reason why the mission would be invalid,
      *     or null if none found.
      */
-    private static String invalidCargoReason(AIUnit aiUnit, Cargo cargo) {
-        final Unit carrier = aiUnit.getUnit();
-        final Player owner = carrier.getOwner();
+    private static String invalidCargoReason(Cargo cargo) {
         final Transportable t = cargo.getTransportable();
-        final Locatable l = t.getTransportLocatable();
-        if (l == null) {
-            return "null-transportable";
-        } else if (l.getLocation() == carrier) {
-            ; // OK so far
-        } else if (l.getLocation() instanceof Unit) {
-            return "transportable-on-other-carrier";
-        } else {
-            Location src = t.getTransportSource();
-            if (src == null) {
-                return "transportable-source-missing";
-            } else if (((FreeColGameObject)src).isDisposed()) {
-                return "transportable-source-disposed";
-            } else if ((src instanceof Settlement)
-                && ((Settlement)src).getOwner() != null
-                && !owner.owns((Settlement)src)) {
-                return "transportable-source-captured";
-            }
-        }
-        Location dst = t.getTransportDestination();
-        if (dst == null) {
-            // Destination is null if we have arrived, but that should not
-            // invalidate a transport mission as we still have to unload!
-            if (!Map.isSameLocation(cargo.getTarget(),
-                                    carrier.getLocation())) {
-                return "transportable-destination-failure:" + t;
-            }
-        } else if (((FreeColGameObject)dst).isDisposed()) {
-            return "transportable-destination-disposed";
-        } else if (((dst instanceof Settlement)
-                && ((Settlement)dst).getOwner() != null
-                && !owner.owns((Settlement)dst))) {
-            return "transportable-destination-captured";
-        }
-        return (t instanceof AIUnit) ? invalidAIUnitReason((AIUnit)t)
+        String reason;
+        return (t == null) ? "null-transportable"
+            : ((reason = t.invalidReason()) != null) ? reason
             : null;
     }
             
@@ -1828,10 +1793,10 @@ public class TransportMission extends Mission {
         String reason;
         return ((reason = invalidMissionReason(aiUnit)) != null)
             ? reason
-            : (loc instanceof Europe || loc instanceof Colony)
-            ? invalidTargetReason(loc, aiUnit.getUnit().getOwner())
             : (loc instanceof Tile)
             ? null
+            : (loc instanceof Europe || loc instanceof Colony)
+            ? invalidTargetReason(loc, aiUnit.getUnit().getOwner())
             : Mission.TARGETINVALID;
     }
 
@@ -1854,7 +1819,7 @@ public class TransportMission extends Mission {
         Cargo cargo;
         return (reason != null) ? reason
             : ((cargo = tFirst()) == null) ? null
-            : invalidCargoReason(aiUnit, cargo);
+            : invalidCargoReason(cargo);
     }
 
     // Not a one-time mission, omit isOneTime().

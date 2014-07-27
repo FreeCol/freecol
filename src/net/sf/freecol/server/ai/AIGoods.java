@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Locatable;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.util.LogBuilder;
@@ -394,6 +395,21 @@ public class AIGoods extends AIObject implements Transportable {
         return carrier.couldCarry(getGoods());
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public String invalidReason() {
+        String reason = Mission.invalidTransportableReason(this);
+        Settlement s;
+        return (reason != null)
+            ? reason
+            : (goods.getLocation() instanceof Unit
+                && destination instanceof Settlement
+                && !((Unit)goods.getLocation()).getOwner().owns(s = (Settlement)destination))
+            ? "transportableDestination-" + s.getName() + "-captured-by-"
+                + s.getOwner().getNation().getSuffix()
+            : null;
+    }
 
     // Override AIObject
 

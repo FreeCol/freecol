@@ -31,6 +31,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
+import net.sf.freecol.common.model.Locatable;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
@@ -265,11 +266,57 @@ public abstract class Mission extends AIObject {
         String reason = invalidTargetReason(target);
         return (reason != null)
             ? reason
-            : (target instanceof Ownable
-                && owner != ((Ownable)target).getOwner())
+            : (target instanceof Europe && !owner.owns((Europe)target))
+            ? Mission.TARGETOWNERSHIP
+            : (target instanceof Settlement && !owner.owns((Settlement)target))
             ? Mission.TARGETOWNERSHIP
             : null;
     }
+
+    /**
+     * Is there a reason to invalidate mission to move a transportable?
+     *
+     * @param t The <code>Transportable</code> to check.
+     * @return A reason for the transport to be invalid, or null if
+     *     none found.
+     */
+    public static String invalidTransportableReason(Transportable t) {
+        if (t == null) return "null-transportable";
+        final Locatable l = t.getTransportLocatable();
+        if (l == null) return "null-locatable";
+
+        final Unit carrier = (l.getLocation() instanceof Unit)
+            ? (Unit)(l.getLocation()) : null;
+        final AIUnit transport = t.getTransport();
+        Player owner;
+        Location loc;
+        boolean checkSrc = transport == null;
+
+        if (carrier != null && transport != null
+            && carrier != transport.getUnit()) {
+            return "transportable-on-other-carrier";
+        }
+
+        if (checkSrc) {
+            Settlement s;
+            if ((loc = t.getTransportSource()) == null) {
+                return "transportable-source-missing-" + t;
+            } else if (((FreeColGameObject)loc).isDisposed()) {
+                return "transportable-source-disposed";
+            } else if (loc instanceof Settlement && l instanceof Ownable
+                && !((Ownable)l).getOwner().owns(s = (Settlement)loc)) {
+                return "transportable-source-" + s.getName()
+                    + "-captured-by-" + s.getOwner().getNation().getSuffix();
+            }
+        } else {
+            loc = t.getTransportDestination();
+            if (loc != null && ((FreeColGameObject)loc).isDisposed()) {
+                return "transportable-destination-disposed";
+            }
+        }
+        return null;
+    }
+
 
     /**
      * Is another player a valid attack target?

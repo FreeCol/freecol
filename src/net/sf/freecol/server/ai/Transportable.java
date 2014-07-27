@@ -218,4 +218,11 @@ public interface Transportable {
      * @return True if this transportable is disposed.
      */
     public boolean isDisposed();
+
+    /**
+     * Is there a reason to invalidate transporting this transportable?
+     *
+     * @return A reason to abort transport, or null if none found.
+     */
+    public String invalidReason();
 }
