@@ -785,9 +785,8 @@ public abstract class Mission extends AIObject {
             ? getAIMain().getAIUnit(u.getCarrier())
             : aiUnit.getTransport();
         if (aiCarrier == null) return false;
-        Mission m = aiCarrier.getMission();
-        return (m instanceof TransportMission)
-            ? ((TransportMission)m).requeueTransportable(aiUnit)
+        TransportMission tm = aiCarrier.getMission(TransportMission.class);
+        return (tm != null) ? tm.requeueTransportable(aiUnit)
             : false;
     }
 

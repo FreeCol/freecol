@@ -975,7 +975,7 @@ public class TransportMission extends Mission {
         boolean result = tAdd(cargo, index);
         if (result) {
             takeTransportable(cargo.getTransportable(), "added");
-            retarget();
+            if (tFirst() == cargo) retarget();
         }
 
         if (result) {
@@ -1613,10 +1613,8 @@ public class TransportMission extends Mission {
         if (tFind(t) != null) return false;
 
         AIUnit oldCarrier = t.getTransport();
-        if (oldCarrier.getMission() instanceof TransportMission) {
-            ((TransportMission)oldCarrier.getMission())
-                .removeTransportable(t);
-        }
+        TransportMission tm = oldCarrier.getMission(TransportMission.class);
+        if (tm != null) tm.removeTransportable(t);
 
         Cargo cargo = makeCargo(t);
         return (cargo == null) ? false : addCargo(cargo, index);

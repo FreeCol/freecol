@@ -884,17 +884,15 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     private boolean checkTransport(Transportable t) {
         AIUnit aiCarrier = t.getTransport();
-        if (aiCarrier != null) {
-            Mission m = aiCarrier.getMission();
-            if (m instanceof TransportMission) {
-                if (((TransportMission)m).isTransporting(t)) return true;
-                t.setTransport(null, "mission dropped");
-                return false;
-            }
-            t.setTransport(null, "no carrier transport mission");
+        if (aiCarrier == null) return false;
+        TransportMission tm = aiCarrier.getMission(TransportMission.class);
+        if (tm != null) {
+            if (tm.isTransporting(t)) return true;
+            t.setTransport(null, "mission dropped");
             return false;
         }
-        return true;
+        t.setTransport(null, "no carrier transport mission");
+        return false;
     }
 
     /**
@@ -1690,7 +1688,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 reasons.put(unit, "Invalid");
 
             } else if (unit.isDamaged()) { // Damaged units must wait
-                if (!(aiUnit.getMission() instanceof IdleAtSettlementMission)) {
+                if (!(m instanceof IdleAtSettlementMission)) {
                     m = new IdleAtSettlementMission(aiMain, aiUnit);
                     aiUnit.changeMission(m, lb);lb.add(", ");
                 }
@@ -1700,7 +1698,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 && unit.getColony().getUnitCount() <= 1) {
                 // The unit has its hand full keeping the colony alive.
                 Colony colony = unit.getColony();
-                if (!(aiUnit.getMission() instanceof WorkInsideColonyMission)) {
+                if (!(m instanceof WorkInsideColonyMission)) {
                     logger.warning(aiUnit + " should WorkInsideColony at "
                         + colony.getName());
                     m = new WorkInsideColonyMission(aiMain, aiUnit,
@@ -1890,7 +1888,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 reasons.put(unit, "To-work");
                 ports.add(c);
 
-            } else if (aiUnit.getMission() instanceof IdleAtSettlementMission) {
+            } else if (m instanceof IdleAtSettlementMission) {
                 reasons.put(unit, "Idle"); // already idle
             } else {
                 m = new IdleAtSettlementMission(aiMain, aiUnit);

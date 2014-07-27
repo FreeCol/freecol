@@ -513,12 +513,10 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                     }
                     // Do not chase the same unit!
                     for (AIUnit au : getAIUnits()) {
-                        Mission m = au.getMission();
+                        Mission m = au.getMission(UnitSeekAndDestroyMission.class);
                         Location loc;
                         if (m != null
-                            && m instanceof UnitSeekAndDestroyMission
-                            && (loc = ((UnitSeekAndDestroyMission)m)
-                                .getTarget()) != null
+                            && (loc = m.getTarget()) != null
                             && loc instanceof Unit
                             && loc == target) return Integer.MIN_VALUE;
                     }

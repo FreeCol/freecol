@@ -119,7 +119,7 @@ public class TransportMissionTest extends FreeColTestCase {
         // This will call AIPlayer.abortInvalidMissions() and change
         // the carrier mission.
         aiPlayer.startWorking();
-        assertFalse(aiUnit.getMission() instanceof TransportMission);
+        assertFalse(aiUnit.hasMission(TransportMission.class));
     }
 
     public void testGetNextStopAlreadyAtDestination() {

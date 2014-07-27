@@ -93,7 +93,7 @@ public class ScoutingMissionTest extends FreeColTestCase {
         aiUnit.changeMission(new ScoutingMission(aiMain, aiUnit, is),
                              new LogBuilder(0));
         assertTrue("Scout should have been assigned a Scouting mission",
-            aiUnit.getMission() instanceof ScoutingMission);
+            aiUnit.hasMission(ScoutingMission.class));
         assertTrue("Scouting mission should be valid",
             aiUnit.getMission().isValid());
         assertEquals("Scouting mission target should be the Inca settlement",

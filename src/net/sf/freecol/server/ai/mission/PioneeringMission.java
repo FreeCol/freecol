@@ -438,14 +438,12 @@ public class PioneeringMission extends Mission {
      * @return The associated <code>TileImprovementPlan</code>.
      */
     private static TileImprovementPlan getPlan(AIUnit aiUnit, Tile tile) {
-        if (aiUnit.getMission() instanceof PioneeringMission) {
-            PioneeringMission pm = (PioneeringMission)aiUnit.getMission();
-            if (pm.getTileImprovementPlan() != null
-                && pm.getTileImprovementPlan().getTarget() == tile) {
-                return pm.getTileImprovementPlan();
-            }
-        }
-        return null;
+        PioneeringMission pm = aiUnit.getMission(PioneeringMission.class);
+        return (pm != null
+            && pm.getTileImprovementPlan() != null
+            && pm.getTileImprovementPlan().getTarget() == tile)
+            ? pm.getTileImprovementPlan()
+            : null;
     }
 
     /**

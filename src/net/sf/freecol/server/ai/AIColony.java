@@ -414,16 +414,12 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // Make sure all units have suitable missions.
         for (Unit u : colony.getUnitList()) {
             AIUnit aiu = getAIUnit(u);
-            Mission m = null;
-            if (aiu.getMission() instanceof WorkInsideColonyMission
-                && ((WorkInsideColonyMission)aiu.getMission()).getAIColony()
-                == this) {
-                ;// Do nothing
+            WorkInsideColonyMission wic = aiu.getMission(WorkInsideColonyMission.class);
+            if (wic != null && wic.getAIColony() == this) {
+                ; // Do nothing
             } else {
-                m = new WorkInsideColonyMission(aiMain, aiu, this);
-            }
-            if (m != null) {
-                lb.add(", ");aiu.changeMission(m, lb);
+                wic = new WorkInsideColonyMission(aiMain, aiu, this);
+                lb.add(", ");aiu.changeMission(wic, lb);
             }
         }
         EuropeanAIPlayer aip = (EuropeanAIPlayer)aiMain.getAIPlayer(player);
@@ -579,7 +575,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         boolean hasDefender = false;
         for (Unit u : tile.getUnitList()) {
             if (u.isDefensiveUnit()
-                && getAIUnit(u).getMission() instanceof DefendSettlementMission) {
+                && getAIUnit(u).getMission(DefendSettlementMission.class) != null) {
                 // TODO: be smarter
                 hasDefender = true;
                 break;
@@ -718,10 +714,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * @param ag The <code>AIGoods</code> to drop.
      */
     private void dropGoods(AIGoods ag) {
+        TransportMission tm;
         if (ag.getTransport() != null
-            && ag.getTransport().getMission() instanceof TransportMission) {
-            ((TransportMission)ag.getTransport().getMission())
-                .removeTransportable((Transportable)ag);
+            && (tm = ag.getTransport().getMission(TransportMission.class)) != null) {
+            tm.removeTransportable((Transportable)ag);
         }
         removeAIGoods(ag);
         ag.dispose();

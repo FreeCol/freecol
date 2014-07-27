@@ -78,7 +78,7 @@ public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
             = new UnitSeekAndDestroyMission(aiMain,aiUnit,defender);
         aiUnit.changeMission(mission, lb);
         assertTrue("Attacker should have a UnitSeekAndDestroyMission",
-                   aiUnit.getMission() instanceof UnitSeekAndDestroyMission);
+            aiUnit.hasMission(UnitSeekAndDestroyMission.class));
 
         // simulate capture
         attacker.changeOwner(player2);
@@ -114,7 +114,7 @@ public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
 
         UnitSeekAndDestroyMission mission = new UnitSeekAndDestroyMission(aiMain,aiUnit,defender);
         aiUnit.changeMission(mission, lb);
-        boolean isSeekAndDestroyMission = aiUnit.getMission() instanceof UnitSeekAndDestroyMission;
+        boolean isSeekAndDestroyMission = aiUnit.hasMission(UnitSeekAndDestroyMission.class);
         assertTrue("Attacker should have a UnitSeekAndDestroyMission", isSeekAndDestroyMission);
         assertTrue("UnitSeekAndDestroyMission should be valid", aiUnit.getMission().isValid());
 

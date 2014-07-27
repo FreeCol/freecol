@@ -765,7 +765,7 @@ public class DebugUtils {
                         } else {
                             lb.add("    ");
                             AIUnit aiu = aiMain.getAIUnit(u);
-                            if (aiu.getMission() == null) {
+                            if (!aiu.hasMission()) {
                                 lb.add(" (None)");
                             } else {
                                 lb.add(aiu.getMission().toString()
@@ -799,9 +799,8 @@ public class DebugUtils {
         final FreeColServer server = freeColClient.getFreeColServer();
         final AIMain aiMain = server.getAIMain();
         final AIUnit aiUnit = aiMain.getAIUnit(unit);
-
-        String msg = (aiUnit.getMission() instanceof TransportMission)
-            ? ((TransportMission)aiUnit.getMission()).toFullString()
+        TransportMission tm = aiUnit.getMission(TransportMission.class);
+        String msg = (tm != null) ? tm.toFullString()
             : "Unit has no transport mission.";
         freeColClient.getGUI().showInformationMessage(msg);
     }
@@ -1147,8 +1146,8 @@ public class DebugUtils {
 
         lb.add("\nUnits present\n");
         for (Unit u : sis.getUnitList()) {
-            Mission m = aiMain.getAIUnit(u).getMission();
             lb.add(u, " at ", u.getLocation());
+            Mission m = aiMain.getAIUnit(u).getMission();
             if (m != null) {
                 lb.add(" ", m.getClass(), ".");
             }
@@ -1156,8 +1155,8 @@ public class DebugUtils {
         }
         lb.add("\nUnits owned\n");
         for (Unit u : sis.getOwnedUnits()) {
-            Mission m = aiMain.getAIUnit(u).getMission();
             lb.add(u, " at ", u.getLocation());
+            Mission m = aiMain.getAIUnit(u).getMission();
             if (m != null) {
                 lb.add(" ", m.getClass(), ".");
             }

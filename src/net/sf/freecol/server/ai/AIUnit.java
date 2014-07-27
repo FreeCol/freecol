@@ -229,6 +229,32 @@ public class AIUnit extends AIObject implements Transportable {
     }
 
     /**
+     * Does this unit have a particular class of mission?
+     *
+     * @param returnClass The <code>Class</code> of mission to check.
+     * @return True if the mission is of the given class.
+     */
+    public <T extends Mission> boolean hasMission(Class<T> returnClass) {
+        return getMission(returnClass) != null;
+    }
+
+    /**
+     * Get the unit mission if it is of a given class.
+     *
+     * @param returnClass The <code>Class</code> of the mission.
+     * @return The <code>Mission</code>, or null if it is not of the
+     *     given class.
+     */
+    public <T extends Mission> T getMission(Class<T> returnClass) {
+        Mission m = getMission();
+        try {
+            return returnClass.cast(m);
+        } catch (ClassCastException cce) {
+            return null;
+        }
+    }
+
+    /**
      * Change the mission of a unit.
      * The dynamic priority is reset.
      *
@@ -254,15 +280,15 @@ public class AIUnit extends AIObject implements Transportable {
         boolean cancel = true;
         Unit carrier = unit.getCarrier();
         AIUnit aiCarrier;
-        Mission m;
+        TransportMission tm;
         if (carrier != null && !carrier.isDisposed()) {
             if (mission == null) {
                 if (leaveTransport()) lb.add(" (disembarked)");
             } else if (oldTarget == mission.getTarget()) {
                 cancel = false;
             } else if ((aiCarrier = getAIMain().getAIUnit(carrier)) != null
-                && ((m = aiCarrier.getMission()) instanceof TransportMission)
-                && ((TransportMission)m).requeueTransportable(this)) {
+                && (tm = aiCarrier.getMission(TransportMission.class)) != null
+                && tm.requeueTransportable(this)) {
                 setTransport(aiCarrier, "requeued");
                 cancel = false;
             } else {

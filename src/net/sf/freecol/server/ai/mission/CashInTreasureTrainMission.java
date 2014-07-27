@@ -425,10 +425,10 @@ public class CashInTreasureTrainMission extends Mission {
                         }
                     }
                     final AIMain aiMain = getAIMain();
+                    TransportMission tm;
                     if (closest != null
                         && (aiCarrier = aiMain.getAIUnit(closest)) != null
-                        && aiCarrier.getMission() instanceof TransportMission) {
-                        TransportMission tm = (TransportMission)aiCarrier.getMission();
+                        && (tm = aiCarrier.getMission(TransportMission.class)) != null) {
                         tm.queueTransportable(aiUnit, false);
                         lb.add(", retarget Europe on ", aiCarrier.getUnit(),
                                " at ", unit.getLocation(), ".");

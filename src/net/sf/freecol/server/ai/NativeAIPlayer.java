@@ -283,6 +283,7 @@ public class NativeAIPlayer extends AIPlayer {
         final Player player = getPlayer();
         final CombatModel cm = getGame().getCombatModel();
         final int minimumDefence = is.getType().getMinimumSize() - 1;
+        DefendSettlementMission dm;
 
         // Collect native units and defenders
         List<Unit> units = new ArrayList<Unit>();
@@ -298,9 +299,8 @@ public class NativeAIPlayer extends AIPlayer {
             AIUnit aiu = aiMain.getAIUnit(u);
             if (aiu == null) {
                 units.remove(u);
-            } else if (aiu.getMission() instanceof DefendSettlementMission
-                && (((DefendSettlementMission)aiu.getMission())
-                    .getTarget() == is)) {
+            } else if ((dm = aiu.getMission(DefendSettlementMission.class)) != null
+                && dm.getTarget() == is) {
                 defenders.add(u);
                 units.remove(u);
             } else if (Mission.invalidNewMissionReason(aiu) != null) {
@@ -322,9 +322,8 @@ public class NativeAIPlayer extends AIPlayer {
                     if (defenders.contains(u) || units.contains(u)
                         || (aiu = aiMain.getAIUnit(u)) == null) {
                         ; // Do nothing
-                    } else if (aiu.getMission() instanceof DefendSettlementMission
-                        && ((DefendSettlementMission)aiu.getMission())
-                        .getTarget() == is) {
+                    } else if ((dm = aiu.getMission(DefendSettlementMission.class)) != null
+                        && dm.getTarget() == is) {
                         defenders.add(u);
                     } else if (Mission.invalidNewMissionReason(aiu) == null) {
                         units.add(u);
@@ -551,7 +550,7 @@ public class NativeAIPlayer extends AIPlayer {
                 AIUnit aiu = getAIUnit(ou);
                 if (aiu == null) {
                     continue;
-                } else if (aiu.getMission() instanceof IndianBringGiftMission) {
+                } else if (aiu.hasMission(IndianBringGiftMission.class)) {
                     alreadyAssignedUnits++;
                 } else if (Mission.invalidNewMissionReason(aiu) == null) {
                     availableUnits.add(ou);
@@ -650,7 +649,7 @@ public class NativeAIPlayer extends AIPlayer {
             for (Unit ou : is.getOwnedUnits()) {
                 AIUnit aiu = getAIUnit(ou);
                 if (Mission.invalidNewMissionReason(aiu) == null) {
-                    if (aiu.getMission() instanceof IndianDemandMission) {
+                    if (aiu.hasMission(IndianDemandMission.class)) {
                         alreadyAssignedUnits++;
                     } else {
                         availableUnits.add(ou);

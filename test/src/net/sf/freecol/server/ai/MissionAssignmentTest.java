@@ -224,7 +224,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
             aiUnit.changeMission(new UnitWanderHostileMission(aiMain, aiUnit),
                                  lb);
             assertTrue("Should be UnitWanderHostileMission", 
-                aiUnit.getMission() instanceof UnitWanderHostileMission);
+                aiUnit.hasMission(UnitWanderHostileMission.class));
             assertEquals("Unit should be candidate for seek+destroy", null,
                 UnitSeekAndDestroyMission.invalidReason(aiUnit));
             assertEquals("Unit should be candidate for defend", null,
@@ -247,8 +247,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
             AIUnit aiUnit = aiMain.getAIUnit(brave);
             assertNotNull("Couldnt get aiUnit for players brave", aiUnit);
             assertNotNull("Unit missing mission", aiUnit.getMission());
-            isSeekAndDestroyMission = aiUnit.getMission()
-                instanceof UnitSeekAndDestroyMission;
+            isSeekAndDestroyMission = aiUnit.hasMission(UnitSeekAndDestroyMission.class);
             if (isSeekAndDestroyMission) break;
         }
         assertTrue("A brave should have a UnitSeekAndDestroyMission",
@@ -294,9 +293,8 @@ public class MissionAssignmentTest extends FreeColTestCase {
             assertNotNull(aiUnit);
             aiUnit.changeMission(new UnitWanderHostileMission(aiMain, aiUnit),
                                  lb);
-            assertEquals("No enemy units present",
-                UnitWanderHostileMission.class,
-                aiUnit.getMission().getClass());
+            assertTrue("No enemy units present",
+                aiUnit.hasMission(UnitWanderHostileMission.class));
         }
 
         inca.setStance(dutch, Stance.WAR);
@@ -313,7 +311,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
         for (Unit brave : inca.getUnits()) {
             AIUnit aiUnit = aiMain.getAIUnit(brave);
             assertNotNull(aiUnit);
-            if (aiUnit.getMission() instanceof UnitSeekAndDestroyMission) {
+            if (aiUnit.hasMission(UnitSeekAndDestroyMission.class)) {
                 seeking = true;
                 break;
             }
