@@ -2269,6 +2269,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 Mission mission = aiu.doMission(lb);
                 if (mission != old) aiu.changeMission(mission, lb);
             } catch (Exception e) {
+                lb.add(", EXCEPTION: ", e.getMessage());
                 logger.log(Level.WARNING, "doMissions failed for: " + aiu, e);
             }
             if (unit.getMovesLeft() > 0) result.add(aiu);
@@ -2284,6 +2285,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 Mission mission = aiu.doMission(lb);
                 if (mission != old) aiu.changeMission(mission, lb);
             } catch (Exception e) {
+                lb.add(", EXCEPTION: ", e.getMessage());
                 logger.log(Level.WARNING, "doMissions failed for: " + aiu, e);
             }
             if (!unit.isDisposed() && unit.getMovesLeft() > 0) result.add(aiu);
