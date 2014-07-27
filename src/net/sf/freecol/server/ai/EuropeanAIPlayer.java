@@ -1946,54 +1946,62 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     public Mission getSimpleMission(AIUnit aiUnit) {
         final Unit unit = aiUnit.getUnit();
-        Mission m;
+        Mission m, ret;
+        final Mission old = ((m = aiUnit.getMission()) != null && m.isValid())
+            ? m : null;
 
         if (unit.isNaval()) {
-            if ((m = getPrivateerMission(aiUnit)) != null
-                || (m = getTransportMission(aiUnit)) != null
-                || (m = getSeekAndDestroyMission(aiUnit, 8)) != null
-                || (m = getWanderHostileMission(aiUnit)) != null
-                ) return m;
+            ret = //(old instanceof PrivateerMission) ? old
+                 ((m = getPrivateerMission(aiUnit)) != null) ? m
+                // (old instanceof TransportMission) ? old
+                : ((m = getTransportMission(aiUnit)) != null) ? m
+                // (old instanceof UnitSeekAndDestroyMission) ? old
+                : ((m = getSeekAndDestroyMission(aiUnit, 8)) != null) ? m
+                // (old instanceof UnitWanderHostileMission) ? old
+                : getWanderHostileMission(aiUnit);
 
         } else if (unit.isCarrier()) {
-            return getTransportMission(aiUnit);
+            ret = getTransportMission(aiUnit);
 
         } else {
             // CashIn missions are obvious
-            if ((m = getCashInTreasureTrainMission(aiUnit)) != null
+            ret = ((m = getCashInTreasureTrainMission(aiUnit)) != null) ? m
 
                 // Try to maintain defence
-                || (unit.isDefensiveUnit()
-                    && (m = getDefendSettlementMission(aiUnit, false)) != null)
+                : (unit.isDefensiveUnit()
+                    && (m = getDefendSettlementMission(aiUnit, false))
+                    != null) ? m
 
                 // Favour wish realization for expert units
-                || (unit.isColonist() && unit.getSkillLevel() > 0
-                    && (m = getWishRealizationMission(aiUnit)) != null)
+                : (unit.isColonist() && unit.getSkillLevel() > 0
+                    && (m = getWishRealizationMission(aiUnit)) != null) ? m
 
                 // Try nearby offence
-                || (unit.isOffensiveUnit()
-                    && (m = getSeekAndDestroyMission(aiUnit, 8)) != null)
+                : (unit.isOffensiveUnit()
+                    && (m = getSeekAndDestroyMission(aiUnit, 8)) != null) ? m
 
                 // Missionary missions are only available to some units
-                || (m = getMissionaryMission(aiUnit)) != null
+                : ((m = getMissionaryMission(aiUnit)) != null) ? m
 
                 // Try to satisfy any remaining wishes, such as population
-                || ((m = getWishRealizationMission(aiUnit)) != null)
+                : ((m = getWishRealizationMission(aiUnit)) != null) ? m
 
                 // Another try to defend, with relaxed cost decider
-                || (unit.isDefensiveUnit()
-                    && (m = getDefendSettlementMission(aiUnit, true)) != null)
+                : (unit.isDefensiveUnit()
+                    && (m = getDefendSettlementMission(aiUnit, true))
+                    != null) ? m
 
                 // Another try to attack, at longer range
-                || (unit.isOffensiveUnit()
-                    && (m = getSeekAndDestroyMission(aiUnit, 16)) != null)
+                : (unit.isOffensiveUnit()
+                    && (m = getSeekAndDestroyMission(aiUnit, 16)) != null) ? m
 
                 // Leftover offensive units should go out looking for trouble
-                || (unit.isOffensiveUnit()
-                    && (m = getWanderHostileMission(aiUnit)) != null)
-                ) return m;
+                : (unit.isOffensiveUnit()
+                    && (m = getWanderHostileMission(aiUnit)) != null) ? m
+
+                : null;
         }
-        return null;
+        return ret;
     }
 
     /**
