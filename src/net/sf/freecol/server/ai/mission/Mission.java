@@ -807,7 +807,7 @@ public abstract class Mission extends AIObject {
         } else {
             lb.add(", retarget(", reason, ") failed.");
         }
-        return true;
+        return ret;
     }
 
     // Fake partial implementation of Transportable interface.
