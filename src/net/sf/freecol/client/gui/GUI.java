@@ -1573,7 +1573,7 @@ public class GUI {
         return canvas.showParametersDialog();
     }
 
-    public boolean showPreCombatDialog(FreeColGameObject attacker,
+    public boolean showPreCombatDialog(Unit attacker,
                                        FreeColGameObject defender, Tile tile) {
         if (canvas == null) return false;
         return canvas.showPreCombatDialog(attacker, defender, tile);

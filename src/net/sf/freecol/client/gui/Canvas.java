@@ -2260,12 +2260,12 @@ public final class Canvas extends JDesktopPane {
     /**
      * Display a dialog to confirm a combat.
      *
-     * @param attacker The attacker.
+     * @param attacker The attacker <code>Unit</code>.
      * @param defender The defender.
      * @param tile A <code>Tile</code> to make visible.
      * @return True if the combat is to proceed.
      */
-    public boolean showPreCombatDialog(FreeColGameObject attacker,
+    public boolean showPreCombatDialog(Unit attacker,
                                        FreeColGameObject defender,
                                        Tile tile) {
         return showFreeColDialog(new PreCombatDialog(freeColClient,

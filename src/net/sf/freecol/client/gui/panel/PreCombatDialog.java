@@ -58,12 +58,11 @@ public class PreCombatDialog extends FreeColConfirmDialog {
      * Create a new pre-combat dialog.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param attacker The attacker (a <code>Unit</code>).
+     * @param attacker The attacker <code>Unit</code>.
      * @param defender The defender (either a <code>Unit</code> or
      *     a <code>Settlement</code>).
      */
-    public PreCombatDialog(FreeColClient freeColClient,
-                           FreeColGameObject attacker,
+    public PreCombatDialog(FreeColClient freeColClient, Unit attacker,
                            FreeColGameObject defender) {
         super(freeColClient);
         
@@ -84,9 +83,8 @@ public class PreCombatDialog extends FreeColConfirmDialog {
                 + "[sg label]20[sg value, right]1px[sg percent]", ""));
         // left hand side: attacker
         // right hand side: defender
-        Unit attackerUnit = (Unit)attacker;
-        String attackerName = Messages.getLabel(attackerUnit);
-        JLabel attackerLabel = new UnitLabel(freeColClient, attackerUnit,
+        String attackerName = Messages.getLabel(attacker);
+        JLabel attackerLabel = new UnitLabel(freeColClient, attacker,
                                              false, true);
         String defenderName = null;
         JLabel defenderLabel = null;

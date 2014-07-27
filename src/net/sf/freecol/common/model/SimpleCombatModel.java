@@ -179,7 +179,7 @@ public class SimpleCombatModel extends CombatModel {
             if (attackerUnit.isNaval()) {
                 addNavalOffensiveModifiers(attackerUnit, result);
             } else {
-                addLandOffensiveModifiers(attacker, defender, result);
+                addLandOffensiveModifiers(attackerUnit, defender, result);
             }
 
         } else if (combatIsBombard(attacker, defender)) {
@@ -217,21 +217,20 @@ public class SimpleCombatModel extends CombatModel {
     /**
      * Add all the offensive modifiers that apply to a land attack.
      *
-     * @param attacker The attacker.
+     * @param attacker The attacker <code>Unit</code>.
      * @param defender The defender.
      * @param result The set of modifiers to add to.
      */
-    private void addLandOffensiveModifiers(FreeColGameObject attacker,
+    private void addLandOffensiveModifiers(Unit attacker,
                                            FreeColGameObject defender,
                                            Set<Modifier> result) {
-        final Unit attackerUnit = (Unit)attacker;
-        final Specification spec = attackerUnit.getSpecification();
+        final Specification spec = attacker.getSpecification();
 
         // Attack bonus
         result.addAll(spec.getModifiers(Modifier.ATTACK_BONUS));
 
         // Movement penalty
-        switch (attackerUnit.getMovesLeft()) {
+        switch (attacker.getMovesLeft()) {
         case 1:
             result.addAll(spec.getModifiers(Modifier.BIG_MOVEMENT_PENALTY));
             break;
@@ -250,13 +249,13 @@ public class SimpleCombatModel extends CombatModel {
 
         } else if (combatIsSettlementAttack(attacker, defender)) {
             // Settlement present, apply bombardment bonus
-            result.addAll(attackerUnit.getModifiers(Modifier.BOMBARD_BONUS));
+            result.addAll(attacker.getModifiers(Modifier.BOMBARD_BONUS));
 
             // Popular support bonus
             if (combatIsWarOfIndependence(attacker, defender)) {
                 Colony colony = (Colony)defender;
                 int bonus = Math.max(100, colony.getSoL());
-                if (attackerUnit.getOwner().isREF()) bonus = 100 - bonus;
+                if (attacker.getOwner().isREF()) bonus = 100 - bonus;
                 result.add(new Modifier(Modifier.POPULAR_SUPPORT, bonus,
                                         ModifierType.PERCENTAGE, colony));
             }
@@ -267,7 +266,7 @@ public class SimpleCombatModel extends CombatModel {
             if (tile != null) {
                 if (tile.hasSettlement()) {
                     // Bombard bonus applies to settlement defence
-                    result.addAll(attackerUnit
+                    result.addAll(attacker
                                   .getModifiers(Modifier.BOMBARD_BONUS));
                 } else {
                     // Ambush bonus in the open = defender's defence
@@ -285,9 +284,9 @@ public class SimpleCombatModel extends CombatModel {
 
             // Artillery in the open penalty, attacker must be on a
             // tile and neither unit can be in a settlement.
-            if (attackerUnit.hasAbility(Ability.BOMBARD)
-                && attackerUnit.getLocation() instanceof Tile
-                && attackerUnit.getSettlement() == null
+            if (attacker.hasAbility(Ability.BOMBARD)
+                && attacker.getLocation() instanceof Tile
+                && attacker.getSettlement() == null
                 && defenderUnit.getSettlement() == null) {
                 result.addAll(spec.getModifiers(Modifier.ARTILLERY_IN_THE_OPEN));
             }
@@ -322,9 +321,9 @@ public class SimpleCombatModel extends CombatModel {
 
             // Land/naval split
             if (defenderUnit.isNaval()) {
-                addNavalDefensiveModifiers(defender, result);
+                addNavalDefensiveModifiers(defenderUnit, result);
             } else {
-                addLandDefensiveModifiers(attacker, defender, result);
+                addLandDefensiveModifiers(attacker, defenderUnit, result);
             }
 
         } else if (combatIsSettlementAttack(attacker, defender)) {
@@ -350,15 +349,13 @@ public class SimpleCombatModel extends CombatModel {
     /**
      * Add all the defensive modifiers that apply to a naval attack.
      *
-     * @param defender The defender.
+     * @param defender The defender <code>Unit</code>.
      * @param result The set of modifiers to add to.
      */
-    private void addNavalDefensiveModifiers(FreeColGameObject defender,
+    private void addNavalDefensiveModifiers(Unit defender,
                                             Set<Modifier> result) {
-        final Unit defenderUnit = (Unit)defender;
-
         // Cargo penalty always applies
-        int goodsCount = defenderUnit.getVisibleGoodsCount();
+        int goodsCount = defender.getVisibleGoodsCount();
         if (goodsCount > 0) {
             // TODO: should this be -cargo/capacity?
             result.add(new Modifier(Modifier.DEFENCE, -12.5f * goodsCount,
@@ -371,20 +368,19 @@ public class SimpleCombatModel extends CombatModel {
      * Add all the defensive modifiers that apply to a land attack.
      *
      * @param attacker The attacker.
-     * @param defender The defender.
+     * @param defender The defender <code>Unit</code>.
      * @param result The set of modifiers to add to.
      */
     private void addLandDefensiveModifiers(FreeColGameObject attacker,
-                                           FreeColGameObject defender,
+                                           Unit defender,
                                            Set<Modifier> result) {
         final Specification spec = defender.getSpecification();
-        final Unit defenderUnit = (Unit)defender;
-        final Tile tile = defenderUnit.getTile();
+        final Tile tile = defender.getTile();
         final Settlement settlement = (tile == null) ? null
             : tile.getSettlement();
 
         // Fortify bonus
-        if (defenderUnit.getState() == Unit.UnitState.FORTIFIED) {
+        if (defender.getState() == Unit.UnitState.FORTIFIED) {
             result.addAll(spec.getModifiers(Modifier.FORTIFIED));
         }
 
@@ -394,8 +390,8 @@ public class SimpleCombatModel extends CombatModel {
 
             if (settlement == null) {
                 // Artillery in the Open penalty
-                if (defenderUnit.hasAbility(Ability.BOMBARD)
-                    && defenderUnit.getState() != Unit.UnitState.FORTIFIED) {
+                if (defender.hasAbility(Ability.BOMBARD)
+                    && defender.getState() != Unit.UnitState.FORTIFIED) {
                     result.addAll(spec.getModifiers(Modifier.ARTILLERY_IN_THE_OPEN));
                 }
 
@@ -404,14 +400,14 @@ public class SimpleCombatModel extends CombatModel {
                 result.addAll(settlement.getModifiers(Modifier.DEFENCE));
 
                 // Artillery defence bonus against an Indian raid
-                if (defenderUnit.hasAbility(Ability.BOMBARD)
+                if (defender.hasAbility(Ability.BOMBARD)
                     && attacker != null
                     && ((Unit)attacker).getOwner().isIndian()) {
                     result.addAll(spec.getModifiers(Modifier.ARTILLERY_AGAINST_RAID));
                 }
 
                 // Automatic defensive role (e.g. Revere)
-                Role autoRole = defenderUnit.getAutomaticRole();
+                Role autoRole = defender.getAutomaticRole();
                 if (autoRole != null) {
                     result.addAll(autoRole.getModifiers(Modifier.DEFENCE));
                 }
@@ -520,8 +516,8 @@ public class SimpleCombatModel extends CombatModel {
         // `I just lost N combats' complaints.
         List<String> results = new ArrayList<String>();
         for (CombatResult cr : crs) results.add(cr.toString());
-        logger.info(attacker.toString() + " " + action
-                    + " " + defender.toString() + ": victory=" + odds.win
+        logger.info(attacker + " " + action
+                    + " " + defender + ": victory=" + odds.win
                     + " random(1.0)=" + r + " great=" + great
                     + " => " + Utils.join(" ", results));
         return crs;
