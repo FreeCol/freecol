@@ -146,10 +146,9 @@ public class River {
         this.random = random;
         this.riverType = map.getSpecification()
             .getTileImprovementType("model.improvement.river");
-        int index = Utils.randomInt(logger, "River", random,
-                                    Direction.longSides.length);
-        direction = Direction.longSides[index];
-        logger.fine("Starting new river flowing " + direction.toString());
+        this.direction = Utils.getRandomMember(logger, "River",
+                                               Direction.longSides, random);
+        logger.fine("Starting new river flowing " + direction);
     }
 
     public List<RiverSection> getSections() {

@@ -98,13 +98,20 @@ public class Map extends FreeColGameObject implements Location {
 
         public final static int NUMBER_OF_DIRECTIONS = values().length;
 
-        public final static Direction[] longSides = new Direction[] {
-            Direction.NE, Direction.SE, Direction.SW, Direction.NW
-        };
+        public static final List<Direction> allDirections
+            = Utils.makeUnmodifiableList(Direction.N, Direction.NE,
+                                         Direction.E, Direction.SE,
+                                         Direction.S, Direction.SW,
+                                         Direction.W, Direction.NW);
 
-        public static final Direction[] corners = new Direction[] {
-            Direction.N, Direction.E, Direction.S, Direction.W
-        };
+        public static final List<Direction> longSides
+            = Utils.makeUnmodifiableList(Direction.NE, Direction.SE,
+                                         Direction.SW, Direction.NW);
+
+        public static final List<Direction> corners
+            = Utils.makeUnmodifiableList(Direction.N, Direction.E,
+                                         Direction.S, Direction.W);
+        
 
         private int oddDX, oddDY, evenDX, evenDY;
 

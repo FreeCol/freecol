@@ -3007,8 +3007,8 @@ public final class MapViewer {
             }
             g.setColor(newColor);
             GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
-            path.moveTo(borderPoints.get(Direction.longSides[0]).x,
-                        borderPoints.get(Direction.longSides[0]).y);
+            path.moveTo(borderPoints.get(Direction.longSides.get(0)).x,
+                        borderPoints.get(Direction.longSides.get(0)).y);
             for (Direction d : Direction.longSides) {
                 Tile otherTile = tile.getNeighbourOrNull(d);
                 Direction next = d.getNextDirection();

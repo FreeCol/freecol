@@ -167,8 +167,8 @@ public class TileImprovement extends TileItem implements Named {
      *
      * @return An array of relevant directions, or null if none.
      */
-    public Direction[] getConnectionDirections() {
-        return (isRoad()) ? Direction.values()
+    public List<Direction> getConnectionDirections() {
+        return (isRoad()) ? Direction.allDirections
             : (isRiver()) ? Direction.longSides
             : null;
     }
@@ -290,14 +290,13 @@ public class TileImprovement extends TileItem implements Named {
      * @return A style string (may be null).
      */
     private String encodeConnections() {
-        Direction[] dirns = getConnectionDirections();
+        List<Direction> dirns = getConnectionDirections();
         if (dirns == null) return null;
-        String s = new String();
+        StringBuilder sb = new StringBuilder();
         for (Direction d : dirns) {
-            s = s.concat((isConnectedTo(d)) ? Integer.toString(magnitude)
-                : "0");
+            sb.append((isConnectedTo(d)) ? Integer.toString(magnitude) : "0");
         }
-        return s;
+        return sb.toString();
     }
 
     /**
@@ -306,7 +305,7 @@ public class TileImprovement extends TileItem implements Named {
      * @return A map of the connections.
      */
     public Map<Direction, Integer> getConnections() {
-        Direction[] dirns = getConnectionDirections();
+        List<Direction> dirns = getConnectionDirections();
         if (dirns == null) return Collections.emptyMap();
         Map<Direction, Integer> result
             = new EnumMap<Direction, Integer>(Direction.class);
@@ -370,15 +369,15 @@ public class TileImprovement extends TileItem implements Named {
      *
      * @return The connections implied by the current style.
      */
-    public long getConnectionsFromStyle() {
+    public final long getConnectionsFromStyle() {
         long conn = 0L;
         if (style != null) {
-            Direction[] directions = getConnectionDirections();
+            List<Direction> directions = getConnectionDirections();
             if (directions != null) {
                 String mask = style.getMask();
-                for (int i = 0; i < directions.length; i++) {
+                for (int i = 0; i < directions.size(); i++) {
                     if (mask.charAt(i) != '0') {
-                        conn |= 1L << directions[i].ordinal();
+                        conn |= 1L << directions.get(i).ordinal();
                     }
                 }
             }
@@ -619,12 +618,12 @@ public class TileImprovement extends TileItem implements Named {
         virtual = xr.getAttribute(VIRTUAL_TAG, false);
 
         String str = xr.getAttribute(STYLE_TAG, (String)null);
-        Direction dirns[] = getConnectionDirections();
+        List<Direction> dirns = getConnectionDirections();
         if (dirns == null || str == null || "".equals(str)) {
             style = null;
         // @compat 0.10.5
         } else if (str.length() < 4) {
-            String old = TileImprovementStyle.decodeOldStyle(str, dirns.length);
+            String old = TileImprovementStyle.decodeOldStyle(str, dirns.size());
             style = (old == null) ? null
                 : TileImprovementStyle.getInstance(old);
         // end @compat
@@ -635,7 +634,7 @@ public class TileImprovement extends TileItem implements Named {
                     + " ignored bogus TileImprovementStyle: " + str);
             }
         }
-        if (style != null && style.toString().length() != dirns.length) {
+        if (style != null && style.toString().length() != dirns.size()) {
             // @compat 0.10.5
             if ("0000".equals(style.getString())) {
                 // Old virtual roads and fish bonuses have this style!?!

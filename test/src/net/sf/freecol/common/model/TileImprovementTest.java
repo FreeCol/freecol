@@ -51,7 +51,7 @@ public class TileImprovementTest extends FreeColTestCase {
 
 
     public void testOldStyle() {
-        final int pad = Direction.longSides.length;
+        final int pad = Direction.longSides.size();
         TileImprovementStyle style;
 
         style = TileImprovementStyle.getInstance(TileImprovementStyle.decodeOldStyle("0", pad));
@@ -73,7 +73,7 @@ public class TileImprovementTest extends FreeColTestCase {
     }
 
     public void testEquality() {
-        final int pad = Direction.longSides.length;
+        final int pad = Direction.longSides.size();
         TileImprovementStyle style1, style2;
 
         style1 = TileImprovementStyle.getInstance(TileImprovementStyle.decodeOldStyle("0", pad));
