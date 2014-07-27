@@ -575,7 +575,7 @@ public class FreeColDirectories {
      *     possibly describing any directory migration, or null if
      *     nothing to say.
      */
-    public static String setUserDirectories() {
+    public static synchronized String setUserDirectories() {
         if (userConfigDirectory != null
             && !isGoodDirectory(userConfigDirectory))
             userConfigDirectory = null;
