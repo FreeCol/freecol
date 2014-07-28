@@ -868,7 +868,7 @@ public final class MapViewer {
             displayMap(g);
         } else {
             if (freeColClient.isMapEditor()) {
-                g.setColor(Color.black);
+                g.setColor(Color.BLACK);
                 g.fillRect(0, 0, size.width, size.height);
             } else {
                 Image bgImage = ResourceManager.getImage("CanvasBackgroundImage", size);
@@ -893,7 +893,7 @@ public final class MapViewer {
                     g.setColor(oldColor);
 
                 } else {
-                    g.setColor(Color.black);
+                    g.setColor(Color.BLACK);
                     g.fillRect(0, 0, size.width, size.height);
                 }
             }

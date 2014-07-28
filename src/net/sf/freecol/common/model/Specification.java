@@ -2144,7 +2144,7 @@ public final class Specification {
         // 0.10.x had no unknown enemy nation, just an unknown enemy player
         if (getNation("model.nation.unknownEnemy") == null) {
             Nation ue = new Nation("model.nation.unknownEnemy", this);
-            ue.setColor(Color.BLACK);
+            ue.setColor(Nation.UNKNOWN_NATION_COLOR);
         }
 
         // Ambush terrain ability not present in older specs.

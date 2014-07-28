@@ -37,15 +37,16 @@ import net.sf.freecol.common.resources.ResourceManager;
 public class Nation extends FreeColGameObjectType {
 
     /** The unknown enemy id. */
-    public static String UNKNOWN_NATION_ID = "model.nation.unknownEnemy";
+    public static final String UNKNOWN_NATION_ID = "model.nation.unknownEnemy";
 
-    public static Color UNKNOWN_NATION_COLOR = Color.BLACK;
+    /** The last resort unknown nation color. */
+    public static final Color UNKNOWN_NATION_COLOR = Color.BLACK;
 
     // @compat 0.10.x
     // Colours moved back into the spec at 0.11.  We have to tolerate
     // old specs that lack them while 0.10.x is supported.
     /** A map of default nation colours. */
-    private final static Map<String, Color> defaultColors
+    private static final Map<String, Color> defaultColors
         = new HashMap<String, Color>();
     static {
         defaultColors.put("model.nation.dutch",         new Color(0xff9d3c));
@@ -72,7 +73,7 @@ public class Nation extends FreeColGameObjectType {
         defaultColors.put("model.nation.swedishREF",    new Color(0x367588));
         defaultColors.put("model.nation.danishREF",     new Color(0x91006d));
         defaultColors.put("model.nation.russianREF",    new Color(0xbebebe));
-        defaultColors.put("model.nation.unknownEnemy",  Color.BLACK);
+        defaultColors.put("model.nation.unknownEnemy",  UNKNOWN_NATION_COLOR);
     }
     // end @compat 0.10.x
 
