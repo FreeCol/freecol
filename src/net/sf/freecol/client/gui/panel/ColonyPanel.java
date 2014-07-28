@@ -670,10 +670,12 @@ public final class ColonyPanel extends PortPanel
                 });
                 unitNumber++;
                 colonyUnitsMenu.add(subMenu);
-                if(unit.getUnitList() != null){
-                    for(final Unit innerUnit : unit.getUnitList()){
+                if (unit.getUnitList() != null) {
+                    for (final Unit innerUnit : unit.getUnitList()) {
                         unitIcon = getLibrary().getUnitImageIcon(innerUnit, 0.5);
-                        menuTitle = new String(Messages.message(innerUnit.getLabel()) + " Cargo On " + Messages.message(unit.getLabel()));
+                        menuTitle = Messages.message(innerUnit.getLabel())
+                            + " " + Messages.message("cargoOnCarrier")
+                            + " " + Messages.message(unit.getLabel());
                         subMenu = new JMenuItem(menuTitle, unitIcon);
                         subMenu.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent e) {
