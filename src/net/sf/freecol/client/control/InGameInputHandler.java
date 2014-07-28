@@ -1081,7 +1081,7 @@ public final class InGameInputHandler extends InputHandler {
         final Game game = getGame();
         Player p = game.getFreeColGameObject(element.getAttribute("player"),
                                              Player.class);
-        p.setAI(Boolean.valueOf(element.getAttribute("ai")).booleanValue());
+        p.setAI(Boolean.parseBoolean(element.getAttribute("ai")));
 
         return null;
     }

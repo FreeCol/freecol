@@ -1462,12 +1462,12 @@ public class TerrainGenerator {
         for (Direction d : Direction.longSides) {
             Tile t = tile.getNeighbourOrNull(d);
             if (t != null && t.isLand()) {
-                connections.put(d, true);
+                connections.put(d, Boolean.TRUE);
                 // ignore adjacent corners
-                connections.put(d.getNextDirection(), false);
-                connections.put(d.getPreviousDirection(), false);
+                connections.put(d.getNextDirection(), Boolean.FALSE);
+                connections.put(d.getPreviousDirection(), Boolean.FALSE);
             } else {
-                connections.put(d, false);
+                connections.put(d, Boolean.FALSE);
             }
         }
         int result = 0;

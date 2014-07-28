@@ -131,8 +131,7 @@ public class IntegerOption extends AbstractOption<Integer> {
         this.value = value;
 
         if (value != oldValue && isDefined) {
-            firePropertyChange(VALUE_TAG, Integer.valueOf(oldValue),
-                Integer.valueOf(value));
+            firePropertyChange(VALUE_TAG, (int)oldValue, (int)value);
         }
         isDefined = true;
     }

@@ -135,7 +135,7 @@ public class ModOption extends AbstractOption<FreeColModFile> {
         if (this == o) return true;
         if (o instanceof ModOption) {
             ModOption mod = (ModOption)o;
-            return Utils.equals(this.value, mod.value)
+            return this.value == mod.value
                 && super.equals(o);
         }
         return false;

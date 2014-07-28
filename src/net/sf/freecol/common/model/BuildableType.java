@@ -96,9 +96,9 @@ public abstract class BuildableType extends FreeColGameObjectType {
     }
 
     public boolean requiresAbility(String key) {
-        return (requiredAbilities == null)
-            ? false
-            : (requiredAbilities.get(key) == Boolean.TRUE);
+        return (requiredAbilities == null) ? false
+            : (!requiredAbilities.containsKey(key)) ? false
+            : requiredAbilities.get(key).booleanValue();
     }
 
     /**

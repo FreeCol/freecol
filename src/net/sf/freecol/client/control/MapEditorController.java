@@ -268,7 +268,7 @@ public final class MapEditorController {
         for (Nation n : spec.getIndianNations()) {
             Player p = game.getPlayer(n.getId());
             if (p == null) {
-                p = new ServerPlayer(game,Messages.getName(n.getRulerNameKey()),
+                p = new ServerPlayer(game, Messages.getName(n.getRulerNameKey()),
                                      false, n, null, null);
                 game.addPlayer(p);
             }

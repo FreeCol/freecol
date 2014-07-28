@@ -1406,7 +1406,7 @@ public final class FreeColServer {
             .getBooleanOption(GameOptions.FOG_OF_WAR);
         if (reveal) {
             FreeColDebugger.setNormalGameFogOfWar(fogOfWarSetting.getValue());
-            fogOfWarSetting.setValue(false); 
+            fogOfWarSetting.setValue(Boolean.FALSE); 
         } else {
             fogOfWarSetting.setValue(FreeColDebugger.getNormalGameFogOfWar());
         }

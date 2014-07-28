@@ -262,7 +262,7 @@ public abstract class FreeColGameObject extends FreeColObject {
             // FreeColGameObjects are equal if the two fcgos are in
             // the same game and have the same identifier.
             FreeColGameObject fco = (FreeColGameObject)o;
-            return Utils.equals(this.getGame(), fco.getGame())
+            return this.getGame() == fco.getGame()
                 && super.equals(o);
         }
         return false;
