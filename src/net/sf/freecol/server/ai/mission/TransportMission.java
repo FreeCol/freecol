@@ -1408,7 +1408,7 @@ public class TransportMission extends Mission {
                 return CargoResult.TRETRY;
             }
 
-            if (!t.joinTransport(carrier, null)) {
+            if (!isCarrying(t) && !t.joinTransport(carrier, null)) {
                 lb.add(", ", cargo.toShortString(), " NO-JOIN");
                 return CargoResult.TFAIL;
             }
@@ -1425,7 +1425,7 @@ public class TransportMission extends Mission {
                 lb.add(", ", cargo.toShortString(), " wait");
                 return CargoResult.TCONTINUE;
             }
-            if (!t.leaveTransport(null)) {
+            if (isCarrying(t) && !t.leaveTransport(null)) {
                 lb.add(", ", cargo.toShortString(), " NO-LEAVE");
                 return CargoResult.TFAIL;
             }
