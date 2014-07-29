@@ -86,7 +86,7 @@ public final class ErrorPanel extends FreeColPanel {
         try {
             logFileStream = new BufferedInputStream(new FileInputStream(logFile));
             logFileStream.read(buffer);
-            message = new String(buffer);
+            message = new String(buffer, "UTF-8");
         } catch (Exception e) {
             // ignore
         } finally {

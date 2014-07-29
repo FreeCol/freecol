@@ -133,7 +133,7 @@ public class DOMMessage {
                     }
                     baos.write(i);
                 }
-                logger.severe(baos.toString());
+                logger.severe(baos.toString("UTF-8"));
             }
             throw e;
         }

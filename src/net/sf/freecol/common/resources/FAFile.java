@@ -127,7 +127,7 @@ public class FAFile {
     private void load(InputStream is) throws IOException {
         letters.clear();
 
-        BufferedReader in = new BufferedReader(new InputStreamReader(is));
+        BufferedReader in = new BufferedReader(new InputStreamReader(is, "UTF-8"));
         if (!in.readLine().startsWith("FontAnimationFile")) {
             throw new IllegalStateException("Not a FAF");
         }

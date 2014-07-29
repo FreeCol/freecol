@@ -123,7 +123,7 @@ public class FSGConverter {
             byte[] buf = new byte[5];
             in.read(buf, 0, 5);
             in.reset();
-            if (!(new String(buf)).equals("<?xml")) {                
+            if (!(new String(buf, "UTF-8")).equals("<?xml")) {                
                 in =  new BufferedInputStream(new GZIPInputStream(in));
             }
 
