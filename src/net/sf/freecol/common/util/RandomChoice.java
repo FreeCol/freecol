@@ -31,7 +31,7 @@ import net.sf.freecol.common.util.Utils;
 /**
  * A class to provide flat and weighted random selection from a collection.
  */
-public class RandomChoice<T> implements Comparable<RandomChoice<T>> {
+public class RandomChoice<T> {//implements Comparable<RandomChoice<T>> {
 
     private final int probability;
     private final T object;
@@ -47,12 +47,6 @@ public class RandomChoice<T> implements Comparable<RandomChoice<T>> {
 
     public T getObject() {
         return object;
-    }
-
-    // Interface Comparable<RandomChoice<T>>
-
-    public int compareTo(RandomChoice<T> other) {
-        return other.getProbability() - getProbability();
     }
 
 
@@ -92,5 +86,4 @@ public class RandomChoice<T> implements Comparable<RandomChoice<T>> {
             return input.iterator().next().getObject();
         }
     }
-
 }

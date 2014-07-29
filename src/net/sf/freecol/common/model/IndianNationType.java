@@ -270,8 +270,6 @@ public class IndianNationType extends NationType {
         }
 
         super.readChildren(xr);
-
-        if (skills != null) Collections.sort(skills);
     }
 
     /**
