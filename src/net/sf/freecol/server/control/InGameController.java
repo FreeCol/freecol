@@ -982,11 +982,11 @@ public final class InGameController extends Controller {
     }
 
     private String getNonPlayerNation() {
-        int nations = Nation.EUROPEAN_NATIONS.length;
+        int nations = Nation.EUROPEAN_NATIONS.size();
         int start = Utils.randomInt(logger, "Random nation", random, nations);
         for (int index = 0; index < nations; index++) {
             String nationId = "model.nation."
-                + Nation.EUROPEAN_NATIONS[(start + index) % nations];
+                + Nation.EUROPEAN_NATIONS.get((start + index) % nations);
             if (getGame().getPlayer(nationId) == null) {
                 return nationId + ".name";
             }

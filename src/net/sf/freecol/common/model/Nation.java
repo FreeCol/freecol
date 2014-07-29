@@ -21,6 +21,8 @@ package net.sf.freecol.common.model;
 
 import java.awt.Color;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,6 +31,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.resources.ResourceManager;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -77,14 +80,18 @@ public class Nation extends FreeColGameObjectType {
     }
     // end @compat 0.10.x
 
-    public static final String[] EUROPEAN_NATIONS = new String[] {
-        // the original game's nations
-        "english", "french", "spanish", "dutch",
-        // FreeCol's additions
-        "portuguese", "danish", "swedish", "russian",
-        // other Europeans, used to generate Monarch messages
-        "german", "austrian", "prussian", "turkish"
-    };
+    /**
+     * A list of European nation names, where model.nation.X.name exists.
+     * Used by getNonPlayerNation().
+     */
+    public static final List<String> EUROPEAN_NATIONS
+        = Utils.makeUnmodifiableList(
+            // Original Col1 nations
+            "dutch", "english", "french", "spanish",
+            // FreeCol's additions
+            "danish", "portuguese", "swedish", "russian",
+            // other European non-player nations
+            "austrian", "prussian", "turkish");
 
     /** The nation type, European, native, etc. */
     private NationType type;
