@@ -95,7 +95,7 @@ public class NewUnitPanel extends FreeColPanel {
      * Updates this panel's labels so that the information it displays
      * is up to date.
      */
-    public void update() {
+    public final void update() {
         removeAll();
 
         final Player player = getMyPlayer();

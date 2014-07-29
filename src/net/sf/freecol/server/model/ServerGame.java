@@ -127,6 +127,7 @@ public class ServerGame extends Game implements ServerModelObject {
                 logger.log(Level.WARNING, "Build " + type + " failed", e);
             }
         }
+        logger.info("Read " + serverObjects.size() + " server objects.");
 
         readFromXML(xr);
     }

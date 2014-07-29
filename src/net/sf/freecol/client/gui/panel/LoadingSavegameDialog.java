@@ -49,9 +49,6 @@ public final class LoadingSavegameDialog extends FreeColConfirmDialog {
 
     private static final Logger logger = Logger.getLogger(LoadingSavegameDialog.class.getName());
 
-
-    private JLabel header;
-
     private JRadioButton singlePlayer;
 
     private JRadioButton privateMultiplayer;
@@ -76,8 +73,8 @@ public final class LoadingSavegameDialog extends FreeColConfirmDialog {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setOpaque(false);
 
-        header = new JLabel(Messages.message("LoadingSavegame.title"),
-                            JLabel.CENTER);
+        JLabel header = new JLabel(Messages.message("LoadingSavegame.title"),
+                                   JLabel.CENTER);
         header.setFont(GUI.MEDIUM_HEADER_FONT);
         header.setBorder(new EmptyBorder(20, 0, 0, 0));
 

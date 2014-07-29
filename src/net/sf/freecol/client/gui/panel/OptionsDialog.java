@@ -58,7 +58,6 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
 
     private boolean editable;
     private OptionGroup group;
-    private String header;
     private OptionGroupUI ui;
     private String defaultFileName;
     private String optionGroupId;
@@ -80,11 +79,10 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
 
         this.editable = editable;
         this.group = group;
-        this.header = header;
         this.ui = new OptionGroupUI(getGUI(), this.group, this.editable);
         this.defaultFileName = defaultFileName;
         this.optionGroupId = optionGroupId;
-        preparePanel(this.header, this.ui);
+        preparePanel(header, this.ui);
     }
 
 

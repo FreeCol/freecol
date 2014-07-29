@@ -39,9 +39,9 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
  */
 public final class GoodsType extends FreeColGameObjectType {
 
-    private final float DEFAULT_PRODUCTION_WEIGHT = 1.0f;
-    private final float DEFAULT_LOW_PRODUCTION_THRESHOLD = 0.0f;
-    private final float DEFAULT_ZERO_PRODUCTION_FACTOR = 1.0f;
+    private static final float DEFAULT_PRODUCTION_WEIGHT = 1.0f;
+    private static final float DEFAULT_LOW_PRODUCTION_THRESHOLD = 0.0f;
+    private static final float DEFAULT_ZERO_PRODUCTION_FACTOR = 1.0f;
 
     /** Is this a farmed goods type. */
     private boolean isFarmed;

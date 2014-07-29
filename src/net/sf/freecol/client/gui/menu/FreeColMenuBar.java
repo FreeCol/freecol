@@ -124,7 +124,6 @@ public abstract class FreeColMenuBar extends JMenuBar {
      */
     protected JMenuItem getMenuItem(String actionId) {
         JMenuItem rtn = null;
-
         FreeColAction action = am.getFreeColAction(actionId);
 
         if (action != null) {

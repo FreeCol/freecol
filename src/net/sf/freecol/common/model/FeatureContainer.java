@@ -503,7 +503,7 @@ public final class FeatureContainer {
         if (!abilities.isEmpty()) {
             sb.append(" [abilities");
             for (Ability ability : getAbilities(null, null, null)) {
-                sb.append(" ").append(ability.toString());
+                sb.append(" ").append(ability);
             }
             sb.append("]");
         }
@@ -511,7 +511,7 @@ public final class FeatureContainer {
         if (!modifiers.isEmpty()) {
             sb.append(" [modifiers");
             for (Modifier modifier : getModifiers(null, null, null)) {
-                sb.append(" ").append(modifier.toString());
+                sb.append(" ").append(modifier);
             }
             sb.append("]");
         }

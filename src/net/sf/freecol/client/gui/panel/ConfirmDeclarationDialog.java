@@ -66,11 +66,11 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
             setColor(color);
         }
 
-        public Color getColor() {
+        public final Color getColor() {
             return color;
         }
 
-        public void setColor(Color color) {
+        public final void setColor(Color color) {
             this.color = color;
             setBackground(color);
             setText(color == null ? "X" : null);
@@ -370,7 +370,7 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
         }
     }
 
-    public String[] getNumbers(int count) {
+    public final String[] getNumbers(int count) {
         String[] result = new String[count];
         for (int index = 0; index < count; index++) {
             result[index] = Integer.toString(index + 1);

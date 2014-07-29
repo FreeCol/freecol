@@ -75,7 +75,7 @@ public abstract class SelectableAction extends MapboardAction {
      *
      * @return <code>true</code> if the map controls is selected.
      */
-    public boolean isSelected() {
+    public final boolean isSelected() {
         return selected;
     }
 
@@ -84,7 +84,7 @@ public abstract class SelectableAction extends MapboardAction {
      *
      * @param b a <code>boolean</code> value
      */
-    public void setSelected(boolean b) {
+    public final void setSelected(boolean b) {
         this.selected = b;
     }
 

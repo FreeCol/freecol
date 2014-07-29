@@ -57,7 +57,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * Information that is internal to the native settlements, and only
      * updated on close contact.
      */
-    private class IndianSettlementInternals {
+    private static class IndianSettlementInternals {
 
         /** The skill taught at the settlement. */
         public UnitType skill = null;
@@ -2367,7 +2367,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                                           Region.class, (Region)null, true);
 
         moveToEurope = (xr.hasAttribute(MOVE_TO_EUROPE_TAG))
-            ? new Boolean(xr.getAttribute(MOVE_TO_EUROPE_TAG, false))
+            ? Boolean.valueOf(xr.getAttribute(MOVE_TO_EUROPE_TAG, false))
             : null;
 
         contiguity = xr.getAttribute(CONTIGUITY_TAG, -1);

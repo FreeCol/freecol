@@ -189,15 +189,14 @@ public final class DeclarationPanel extends FreeColPanel {
                 partNames = newPartNames;
             }
 
-            if (!isTooLarge(Utils.join(" ", partNames))) {
-                return Utils.join(" ", partNames);
-            } else if (!isTooLarge(partNames[0].charAt(0) + ". " + partNames[1])) {
-                return partNames[0].charAt(0) + ". " + partNames[1];
-            } else if (!isTooLarge(partNames[0] + " " + partNames[1].charAt(0) + ".")) {
-                return partNames[0] + " " + partNames[1].charAt(0) + ".";
-            } else {
-                return partNames[0].charAt(0) + ". " + partNames[1].charAt(0) + ".";
-            }
+            String first = partNames[0], second = partNames[1];
+            String s = Utils.join(" ", partNames);
+            if (!isTooLarge(s)) return s;
+            s = first.charAt(0) + ". " + second;
+            if (!isTooLarge(s)) return s;
+            s = first + " " + second.charAt(0) + ".";
+            if (!isTooLarge(s)) return s;
+            return first.charAt(0) + ". " + second.charAt(0) + ".";
         }
 
         /**

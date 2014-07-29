@@ -57,13 +57,11 @@ public class LandGenerator {
 
     private int width;
     private int height;
-    private int landMass;
 
     private int preferredDistanceToEdge;
     private int numberOfLandTiles;
     private int minimumNumberOfTiles;
 
-    private int genType;
 
     /**
      * Creates a new <code>LandGenerator</code>.
@@ -106,8 +104,6 @@ public class LandGenerator {
         return bmap;
     }
 
-
-
     /**
      * Creates a new land map.
      *
@@ -119,9 +115,9 @@ public class LandGenerator {
         width = mapGeneratorOptions.getInteger(MapGeneratorOptions.MAP_WIDTH);
         height = mapGeneratorOptions.getInteger(MapGeneratorOptions.MAP_HEIGHT);
         preferredDistanceToEdge = mapGeneratorOptions.getInteger(MapGeneratorOptions.PREFERRED_DISTANCE_TO_EDGE);
-        landMass = mapGeneratorOptions.getInteger(MapGeneratorOptions.LAND_MASS);
+        int landMass = mapGeneratorOptions.getInteger(MapGeneratorOptions.LAND_MASS);
         minimumNumberOfTiles = width * height * landMass / 100;
-        genType = mapGeneratorOptions.getInteger(MapGeneratorOptions.LAND_GENERATOR_TYPE);
+        int genType = mapGeneratorOptions.getInteger(MapGeneratorOptions.LAND_GENERATOR_TYPE);
 
         //set other internal values
         map = new boolean[width][height];
@@ -131,43 +127,42 @@ public class LandGenerator {
         //based on setting in mapGeneratorOptions
         //"Classic" is the original FreeCol land generator
         switch (genType) {
-            case MapGeneratorOptions.LAND_GENERATOR_CLASSIC:
-                createClassicLandMap();
-                break;
-            case MapGeneratorOptions.LAND_GENERATOR_CONTINENT:
-                addPolarRegions();
-                //create one landmass of 75%, start it somewhere near the center
-                int contsize = (minimumNumberOfTiles*75)/100;
-                addLandmass(contsize,contsize, width/2, 
-                    Utils.randomInt(logger, "Landmass", random, height/2)+height/4);
-                //then create small islands to fill up
-                while (numberOfLandTiles < minimumNumberOfTiles) {
-                    addLandmass(15,25);
-                }
-                cleanMap();
-                break;
-            case MapGeneratorOptions.LAND_GENERATOR_ARCHIPELAGO:
-                addPolarRegions();
-                //create 5 islands of 10% each
-                int archsize = (minimumNumberOfTiles*10)/100;
-                for (int i=0;i<5;i++) {
-                    addLandmass(archsize-10,archsize);
-                }
-                //then, fall into next case to generate small islands
-            case MapGeneratorOptions.LAND_GENERATOR_ISLANDS:
-                addPolarRegions();
-                //creates only islands of 25..75 tiles
-                while (numberOfLandTiles < minimumNumberOfTiles) {
-                    int s = Utils.randomInt(logger, "Island", random, 50) + 25;
-                    addLandmass(20,s);
-                }
-                cleanMap();
-                break;
+        case MapGeneratorOptions.LAND_GENERATOR_CLASSIC:
+            createClassicLandMap();
+            break;
+        case MapGeneratorOptions.LAND_GENERATOR_CONTINENT:
+            addPolarRegions();
+            //create one landmass of 75%, start it somewhere near the center
+            int contsize = (minimumNumberOfTiles*75)/100;
+            addLandmass(contsize,contsize, width/2, 
+                Utils.randomInt(logger, "Landmass", random, height/2)+height/4);
+            //then create small islands to fill up
+            while (numberOfLandTiles < minimumNumberOfTiles) {
+                addLandmass(15,25);
+            }
+            cleanMap();
+            break;
+        case MapGeneratorOptions.LAND_GENERATOR_ARCHIPELAGO:
+            addPolarRegions();
+            //create 5 islands of 10% each
+            int archsize = (minimumNumberOfTiles*10)/100;
+            for (int i=0;i<5;i++) {
+                addLandmass(archsize-10,archsize);
+            }
+            //then, fall into next case to generate small islands
+        case MapGeneratorOptions.LAND_GENERATOR_ISLANDS:
+            addPolarRegions();
+            //creates only islands of 25..75 tiles
+            while (numberOfLandTiles < minimumNumberOfTiles) {
+                int s = Utils.randomInt(logger, "Island", random, 50) + 25;
+                addLandmass(20,s);
+            }
+            cleanMap();
+            break;
         }
 
         return map;
     }
-
 
     private void createClassicLandMap() {
         int x;

@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model.pathfinding;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -220,7 +221,7 @@ public final class GoalDeciders {
      * @param enemies The list of enemy <code>Player</code>s.
      * @return A suitable <code>GoalDecider</code>.
      **/
-    public static GoalDecider getEnemySettlementGoalDecider(final List<Player> enemies) {
+    public static GoalDecider getEnemySettlementGoalDecider(final Collection<Player> enemies) {
         return new GoalDecider() {
             private PathNode best = null;
                         

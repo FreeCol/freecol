@@ -3509,13 +3509,11 @@ public final class InGameController extends Controller {
         } else {
             for (Goods g : loot) {
                 if (!available.contains(g)) {
-                    return DOMMessage.clientError("Invalid loot: "
-                        + g.toString());
+                    return DOMMessage.clientError("Invalid loot: " + g);
                 }
                 available.remove(g);
                 if (!winner.canAdd(g)) {
-                    return DOMMessage.clientError("Loot failed: "
-                        + g.toString());
+                    return DOMMessage.clientError("Loot failed: " + g);
                 }
                 winner.add(g);
             }

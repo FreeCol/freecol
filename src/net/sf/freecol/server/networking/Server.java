@@ -226,7 +226,7 @@ public final class Server extends Thread {
      */
     public void shutdown() {
         running = false;
-
+ 
         try {
             serverSocket.close();
             logger.fine("Closed server socket.");

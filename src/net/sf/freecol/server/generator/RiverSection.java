@@ -95,7 +95,7 @@ public class RiverSection {
      *
      * @return The <code>Tile</code>.
      */
-    public Tile getTile() {
+    public final Tile getTile() {
         return tile;
     }
 
@@ -103,14 +103,14 @@ public class RiverSection {
      * Returns the size
      * @return size
      */
-    public int getSize() {
+    public final int getSize() {
         return size;
     }
 
     /**
      * Sets the size of a branch
      */
-    public void setBranch(Direction direction, int size) {
+    public final void setBranch(Direction direction, int size) {
         if (size != TileImprovement.SMALL_RIVER) {
             size = TileImprovement.LARGE_RIVER;
         }
@@ -120,7 +120,7 @@ public class RiverSection {
     /**
      * Gets the size of a branch
      */
-    public int getBranch(Direction direction) {
+    public final int getBranch(Direction direction) {
         if (branches.containsKey(direction)) {
             return branches.get(direction);
         } else {
@@ -131,14 +131,14 @@ public class RiverSection {
     /**
      * Removes a branch
      */
-    public void removeBranch(Direction direction) {
+    public final void removeBranch(Direction direction) {
         branches.remove(direction);
     }
 
     /**
      * Increases the size a branch
      */
-    public void growBranch(Direction direction, int increment) {
+    public final void growBranch(Direction direction, int increment) {
         int newSize = Math.min(TileImprovement.LARGE_RIVER,
                                Math.max(TileImprovement.NO_RIVER,
                                         getBranch(direction) + increment));
@@ -155,10 +155,10 @@ public class RiverSection {
 
 
     public String encodeStyle() {
-        String result = new String();
+        StringBuilder sb = new StringBuilder();
         for (Direction direction : Direction.longSides) {
-            result = result.concat(Integer.toString(getBranch(direction), Character.MAX_RADIX));
+            sb.append(Integer.toString(getBranch(direction), Character.MAX_RADIX));
         }
-        return result;
+        return sb.toString();
     }
 }

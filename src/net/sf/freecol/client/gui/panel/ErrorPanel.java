@@ -48,9 +48,6 @@ public final class ErrorPanel extends FreeColPanel {
 
     private static final String SHOW = "show";
 
-    private JButton showButton = null;
-
-    private JScrollPane scrollPane = null;
 
 
     /**
@@ -62,7 +59,8 @@ public final class ErrorPanel extends FreeColPanel {
     public ErrorPanel(FreeColClient freeColClient, String message) {
         super(freeColClient, new MigLayout());
 
-        showButton = new JButton(Messages.message("errorMessage.showLogFile"));
+        JButton showButton
+            = new JButton(Messages.message("errorMessage.showLogFile"));
         showButton.setActionCommand(SHOW);
         showButton.addActionListener(this);
 
@@ -103,7 +101,7 @@ public final class ErrorPanel extends FreeColPanel {
         textArea.setFocusable(true);
         textArea.setEditable(false);
         
-        scrollPane = new JScrollPane(textArea,
+        JScrollPane scrollPane = new JScrollPane(textArea,
             JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
             JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.getViewport().setOpaque(false);
@@ -125,20 +123,5 @@ public final class ErrorPanel extends FreeColPanel {
         } else {
             super.actionPerformed(event);
         }
-    }
-
-
-    // Override Component
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void removeNotify() {
-        super.removeNotify();
-
-        removeAll();
-        scrollPane = null;
-        showButton = null;
     }
 }

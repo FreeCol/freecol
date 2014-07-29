@@ -85,7 +85,7 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
      * @param name The name.
      * @param handler The handler.
      */
-    protected void register(String name, NetworkRequestHandler handler) {
+    protected final void register(String name, NetworkRequestHandler handler) {
         _handlerMap.put(name, handler);
     }
 
@@ -96,7 +96,7 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
      * @param handler The handler.
      * @return True if the supplied handler was actually removed.
      */
-    protected boolean unregister(String name, NetworkRequestHandler handler) {
+    protected final boolean unregister(String name, NetworkRequestHandler handler) {
         // _handlerMap.remove(name, handler) would be better?
         return _handlerMap.remove(name) == handler;
     }

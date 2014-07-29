@@ -133,7 +133,7 @@ public class RebelToolTip extends JToolTip {
     }
 
 
-    public Dimension getPreferredSize() {
+    public final Dimension getPreferredSize() {
         return new Dimension(350, 250);
     }
 

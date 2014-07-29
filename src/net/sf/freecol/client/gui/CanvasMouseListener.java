@@ -45,24 +45,29 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
 
     private static final Logger logger = Logger.getLogger(CanvasMouseListener.class.getName());
 
+    private static final int doubleClickDelay = 200; // Milliseconds
+
+    private FreeColClient freeColClient;
+
     private final Canvas canvas;
 
     private final MapViewer mapViewer;
 
-    private final int doubleClickDelay = 200; // Milliseconds
     private Timer doubleClickTimer = new Timer(doubleClickDelay,this);
 
     private int centerX, centerY;
 
-    private FreeColClient freeColClient;
 
     /**
-     * The constructor to use.
+     * Create a new canvas mouse listener.
      *
+     * @param freeColClient The enclosing <code>FreeColClient</code>.
      * @param canvas The component this object gets created for.
-     * @param mapViewer The GUI that holds information such as screen resolution.
+     * @param mapViewer The GUI that holds information such as screen
+     *     resolution.
      */
-    public CanvasMouseListener(FreeColClient freeColClient, Canvas canvas, MapViewer mapViewer) {
+    public CanvasMouseListener(FreeColClient freeColClient, Canvas canvas,
+                               MapViewer mapViewer) {
         this.freeColClient = freeColClient;
         this.canvas = canvas;
         this.mapViewer = mapViewer;

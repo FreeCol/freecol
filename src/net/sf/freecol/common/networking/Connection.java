@@ -78,7 +78,7 @@ public class Connection {
 
     private String name;
 
-    protected static boolean dump
+    protected static final boolean dump
         = FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS);
 
 

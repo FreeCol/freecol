@@ -50,9 +50,6 @@ public class EuropeanNationType extends NationType {
     private Map<String, Map<String, AbstractUnit>> startingUnitMap
         = new HashMap<String, Map<String, AbstractUnit>>();
 
-    /** Always using expert starting units. */
-    private final boolean expert = true;
-
 
     /**
      * Create a new European nation type.

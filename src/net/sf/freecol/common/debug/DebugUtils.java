@@ -29,6 +29,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -634,20 +635,24 @@ public class DebugUtils {
             Tile ct = game.getFreeColGameObject(t.getId(), Tile.class);
             Settlement sSettlement = t.getSettlement();
             Settlement cSettlement = ct.getSettlement();
-            if (sSettlement == null && cSettlement == null) {
-                ;// OK
-            } else if (sSettlement != null && cSettlement == null) {
-                lb.add("Settlement not present in client: ", sSettlement);
-                problemDetected = true;
-            } else if (sSettlement == null && cSettlement != null) { 
-                lb.add("Settlement still present in client: ", cSettlement);
-                problemDetected = true;
-            } else if (sSettlement.getId().equals(cSettlement.getId())) {
-                ;// OK
+            if (sSettlement == null) {
+                if (cSettlement == null) {
+                    ;// OK
+                } else {
+                    lb.add("Settlement still present in client: ", cSettlement);
+                    problemDetected = true;
+                }
             } else {
-                lb.add("Settlements differ.\n  Server: ",
-                    sSettlement.toString(), "\n  Client: ", 
-                    cSettlement.toString(), "\n");
+                if (cSettlement == null) {
+                    lb.add("Settlement not present in client: ", sSettlement);
+                    problemDetected = true;
+                } else if (sSettlement.getId().equals(cSettlement.getId())) {
+                    ;// OK
+                } else {
+                    lb.add("Settlements differ.\n  Server: ",
+                        sSettlement.toString(), "\n  Client: ", 
+                        cSettlement.toString(), "\n");
+                }
             }
         }
 
@@ -754,27 +759,27 @@ public class DebugUtils {
                 inEurope.add(u);
             }
 
-            for (String label : units.keySet()) {
-                List<Unit> list = units.get(label);
-                if (list.size() > 0){
-                    lb.add("\n->", label, "\n");
-                    for (Unit u : list) {
-                        lb.add("\n", Messages.message(u.getFullLabel()));
-                        if (u.isDamaged()) {
-                            lb.add(" (Repairing)");
+            for (Entry<String, List<Unit>> entry : units.entrySet()) {
+                final String label = entry.getKey();
+                final List<Unit> list = entry.getValue();
+                if (list.isEmpty()) continue;
+                lb.add("\n->", label, "\n");
+                for (Unit u : list) {
+                    lb.add("\n", Messages.message(u.getFullLabel()));
+                    if (u.isDamaged()) {
+                        lb.add(" (Repairing)");
+                    } else {
+                        lb.add("    ");
+                        AIUnit aiu = aiMain.getAIUnit(u);
+                        if (!aiu.hasMission()) {
+                            lb.add(" (None)");
                         } else {
-                            lb.add("    ");
-                            AIUnit aiu = aiMain.getAIUnit(u);
-                            if (!aiu.hasMission()) {
-                                lb.add(" (None)");
-                            } else {
-                                lb.add(aiu.getMission().toString()
-                                    .replaceAll("\n", "    \n"));
-                            }
+                            lb.add(aiu.getMission().toString()
+                                .replaceAll("\n", "    \n"));
                         }
                     }
-                    lb.add("\n");
                 }
+                lb.add("\n");
             }
             lb.add("\n->Recruitable units\n\n");
             for (UnitType unitType : p.getEurope().getRecruitables()) {
@@ -1146,8 +1151,8 @@ public class DebugUtils {
 
         lb.add("\nUnits present\n");
         for (Unit u : sis.getUnitList()) {
-            lb.add(u, " at ", u.getLocation());
             Mission m = aiMain.getAIUnit(u).getMission();
+            lb.add(u, " at ", u.getLocation());
             if (m != null) {
                 lb.add(" ", m.getClass(), ".");
             }
@@ -1155,8 +1160,8 @@ public class DebugUtils {
         }
         lb.add("\nUnits owned\n");
         for (Unit u : sis.getOwnedUnits()) {
-            lb.add(u, " at ", u.getLocation());
             Mission m = aiMain.getAIUnit(u).getMission();
+            lb.add(u, " at ", u.getLocation());
             if (m != null) {
                 lb.add(" ", m.getClass(), ".");
             }

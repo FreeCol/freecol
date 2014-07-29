@@ -109,7 +109,7 @@ public class Tension {
      *
      * @return The value of this <code>Tension</code>.
      */
-    public int getValue() {
+    public final int getValue() {
         return this.value;
     }
 
@@ -118,7 +118,7 @@ public class Tension {
      *
      * @param newValue The new value of the tension.
      */
-    public void setValue(int newValue) {
+    public final void setValue(int newValue) {
         if (newValue < TENSION_MIN) {
             value = TENSION_MIN;
         } else if (newValue > TENSION_MAX) {
@@ -128,12 +128,12 @@ public class Tension {
         }
     }
 
-    /** 
+    /**
      * Get the current tension level.
      *
      * @return The current level.
      */
-    public Level getLevel() {
+    public final Level getLevel() {
         for (Level level : Level.values()) {
             if (value <= level.getLimit()) return level;
         }
@@ -145,7 +145,7 @@ public class Tension {
      *
      * @param newTension The amount to modify tension by.
      */
-    public void modify(int newTension) {
+    public final void modify(int newTension) {
         setValue(value + newTension);
     }
 

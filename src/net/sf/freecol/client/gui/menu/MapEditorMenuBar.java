@@ -89,7 +89,7 @@ public class MapEditorMenuBar extends FreeColMenuBar {
     /**
      * Resets this menu bar.
      */
-    public void reset() {
+    public final void reset() {
         removeAll();
 
         buildGameMenu();

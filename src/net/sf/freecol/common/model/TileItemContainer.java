@@ -140,7 +140,7 @@ public class TileItemContainer extends FreeColGameObject {
      *
      * @return The owning <code>Tile</code>.
      */
-    public Tile getTile() {
+    public final Tile getTile() {
         return tile;
     }
 
@@ -193,7 +193,7 @@ public class TileItemContainer extends FreeColGameObject {
      *
      * @return A <code>Resource</code> item, or null is none found.
      */
-    public Resource getResource() {
+    public final Resource getResource() {
         for (TileItem item : tileItems) {
             if (item instanceof Resource) return (Resource)item;
         }
@@ -329,7 +329,7 @@ public class TileItemContainer extends FreeColGameObject {
      * @return The added <code>TileItem</code> or the existing
      *     <code>TileItem</code> if of higher magnitude, or null on error.
      */
-    public TileItem addTileItem(TileItem item) {
+    public final TileItem addTileItem(TileItem item) {
         if (item == null) return null;
         for (int index = 0; index < tileItems.size(); index++) {
             TileItem oldItem = tileItems.get(index);
@@ -363,7 +363,7 @@ public class TileItemContainer extends FreeColGameObject {
      * @return The <code>TileItem</code> that has been removed from
      *     this container (if any).
      */
-    public <T extends TileItem> T removeTileItem(T item) {
+    public final <T extends TileItem> T removeTileItem(T item) {
         boolean removed = tileItems.remove(item);
         if (removed) {
             item.setLocation(null);
@@ -378,7 +378,7 @@ public class TileItemContainer extends FreeColGameObject {
      *
      * @param c The <code>Class</code> to remove.
      */
-    public <T extends TileItem> void removeAll(Class<T> c) {
+    public final <T extends TileItem> void removeAll(Class<T> c) {
         Iterator<TileItem> iterator = tileItems.iterator();
         while (iterator.hasNext()) {
             if (c.isInstance(iterator.next())) iterator.remove();

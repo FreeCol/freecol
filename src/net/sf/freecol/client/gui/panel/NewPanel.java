@@ -76,9 +76,9 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
         SHOW_DIFFICULTY
     };
 
-    private final JLabel ipLabel = localizedLabel("host");
     private final JLabel port1Label = localizedLabel("port");
     private final JLabel port2Label = localizedLabel("startServerOnPort");
+    private final JLabel ipLabel = localizedLabel("host");
     private final JLabel advantageLabel = localizedLabel("playerOptions.nationalAdvantages");
     private final JLabel rulesLabel = localizedLabel("rules");
     private final JLabel difficultyLabel = localizedLabel("difficulty");
@@ -88,11 +88,6 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
     private final JTextField server = new JTextField("127.0.0.1");
     private final JTextField port1 = new JTextField(Integer.toString(FreeCol.getServerPort()));
     private final JTextField port2 = new JTextField(Integer.toString(FreeCol.getServerPort()));
-    private final JRadioButton single = new JRadioButton(Messages.message("singlePlayerGame"), true);
-    private final JRadioButton join = new JRadioButton(Messages.message("joinMultiPlayerGame"), false);
-    private final JRadioButton start = new JRadioButton(Messages.message("startMultiplayerGame"), false);
-    private final JRadioButton meta = new JRadioButton( Messages.message("getServerList")
-                                                        + " (" + FreeCol.META_SERVER_ADDRESS + ")", false);
     private final JButton showDifficulty = new JButton(Messages.message("showDifficulty"));
     private final Advantages[] advChoices = new Advantages[] {
         Advantages.SELECTABLE,
@@ -181,6 +176,16 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
         JLabel nameLabel = localizedLabel("name");
 
         setCancelComponent(cancel);
+
+        JRadioButton
+            single = new JRadioButton(Messages.message("singlePlayerGame"),
+                                      true),
+            join = new JRadioButton(Messages.message("joinMultiPlayerGame"),
+                                    false),
+            start = new JRadioButton(Messages.message("startMultiplayerGame"),
+                                     false),
+            meta = new JRadioButton( Messages.message("getServerList")
+                + " (" + FreeCol.META_SERVER_ADDRESS + ")", false);
 
         group.add(single);
         group.add(join);

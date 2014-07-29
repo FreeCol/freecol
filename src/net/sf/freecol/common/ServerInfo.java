@@ -61,8 +61,11 @@ public class ServerInfo {
      * @param version The version of the server.
      * @param gameState The current state of the game.
      */
-    public ServerInfo(String name, String address, int port, int slotsAvailable, int currentlyPlaying, boolean isGameStarted, String version, int gameState) {
-        update(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted, version, gameState);
+    public ServerInfo(String name, String address, int port,
+                      int slotsAvailable, int currentlyPlaying,
+                      boolean isGameStarted, String version, int gameState) {
+        update(name, address, port, slotsAvailable, currentlyPlaying,
+               isGameStarted, version, gameState);
     }
 
     
@@ -89,8 +92,9 @@ public class ServerInfo {
      * @param version The version of the server.
      * @param gameState The current state of the game.
      */
-    public void update(String name, String address, int port, int slotsAvailable, 
-                       int currentlyPlaying, boolean isGameStarted, String version, int gameState) {
+    public void update(String name, String address, int port,
+                       int slotsAvailable, int currentlyPlaying,
+                       boolean isGameStarted, String version, int gameState) {
         this.name = name;
         this.address = address;
         this.port = port;
@@ -101,6 +105,20 @@ public class ServerInfo {
         this.gameState = gameState;
     }
 
+    /**
+     * Update the server info from an element.
+     *
+     * @param element The <code>Element</code> to update from.
+     */
+    public final void update(Element element) {
+        update(element.getAttribute("name"), element.getAttribute("address"),
+               Integer.parseInt(element.getAttribute("port")),
+               Integer.parseInt(element.getAttribute("slotsAvailable")),
+               Integer.parseInt(element.getAttribute("currentlyPlaying")),
+               Boolean.valueOf(element.getAttribute("slotsAvailable")).booleanValue(),
+               element.getAttribute("version"),
+               Integer.parseInt(element.getAttribute("gameState")));
+    }
     
     /**
      * Returns the name of the server that is beeing represented 
@@ -197,13 +215,7 @@ public class ServerInfo {
      *        should be read by this object.
      */
     public void readFromXMLElement(Element element) {
-        update(element.getAttribute("name"), element.getAttribute("address"),
-                Integer.parseInt(element.getAttribute("port")),
-                Integer.parseInt(element.getAttribute("slotsAvailable")),
-                Integer.parseInt(element.getAttribute("currentlyPlaying")),
-                Boolean.valueOf(element.getAttribute("slotsAvailable")).booleanValue(),
-                element.getAttribute("version"),
-                Integer.parseInt(element.getAttribute("gameState")));
+        update(element);
     }
 
 

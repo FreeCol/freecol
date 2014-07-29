@@ -44,10 +44,8 @@ public class Introspector {
      *
      * @param theClass The <code>Class</code> of interest.
      * @param field The field name within the class of interest.
-     * @throws IllegalArgumentException
      */
-    public Introspector(Class<?> theClass, String field)
-        throws IllegalArgumentException {
+    public Introspector(Class<?> theClass, String field) {
         if (field == null || field.length() == 0) {
             throw new IllegalArgumentException("Field may not be empty");
         }
@@ -60,10 +58,8 @@ public class Introspector {
      * Get a get-method for this Introspector.
      *
      * @return A <code>Method</code> representing getField().
-     * @throws IllegalArgumentException
      */
-    private Method getGetMethod()
-        throws IllegalArgumentException {
+    private Method getGetMethod() {
         String methodName = "get" + field.substring(0, 1).toUpperCase()
             + field.substring(1);
 
@@ -81,10 +77,8 @@ public class Introspector {
      * @param argType A <code>Class</code> that is the argument to
      *        the set-method
      * @return A <code>Method</code> representing setField().
-     * @throws IllegalArgumentException
      */
-    private Method getSetMethod(Class<?> argType)
-        throws IllegalArgumentException {
+    private Method getSetMethod(Class<?> argType) {
         String methodName = "set" + field.substring(0, 1).toUpperCase()
             + field.substring(1);
 
@@ -101,10 +95,8 @@ public class Introspector {
      *
      * @param method The <code>Method</code> to examine.
      * @return The method return type, or null on error.
-     * @throws IllegalArgumentException
      */
-    private Class<?> getMethodReturnType(Method method)
-        throws IllegalArgumentException {
+    private Class<?> getMethodReturnType(Method method) {
         Class<?> ret;
 
         try {
@@ -123,10 +115,8 @@ public class Introspector {
      *
      * @param argType A <code>Class</code> to find a converter for.
      * @return A conversion function, or null on error.
-     * @throws IllegalArgumentException
      */
-    private Method getToStringConverter(Class<?> argType)
-        throws IllegalArgumentException {
+    private Method getToStringConverter(Class<?> argType) {
         Method method;
 
         if (argType.isEnum()) {
@@ -155,10 +145,8 @@ public class Introspector {
      *
      * @param argType A <code>Class</code> to find a converter for.
      * @return A conversion function, or null on error.
-     * @throws IllegalArgumentExcpetion
      */
-    private Method getFromStringConverter(Class<?> argType)
-        throws IllegalArgumentException {
+    private Method getFromStringConverter(Class<?> argType) {
         Method method;
 
         if (argType.isEnum()) {
@@ -200,7 +188,6 @@ public class Introspector {
      *        whose get-method is to be invoked.
      * @return A <code>String</code> containing the result of invoking
      *         the get-method.
-     * @throws IllegalArgumentException
      */
     public String getter(Object obj)
         throws IllegalArgumentException {
@@ -247,10 +234,8 @@ public class Introspector {
      * @param obj An <code>Object</code> (really of type theClass)
      *        whose set-method is to be invoked.
      * @param value A <code>String</code> containing the value to be set.
-     * @throws IllegalArgumentException
      */
-    public void setter(Object obj, String value)
-        throws IllegalArgumentException {
+    public void setter(Object obj, String value) {
         Method getMethod = getGetMethod();
         Class<?> fieldType = getMethodReturnType(getMethod);
         Method setMethod = getSetMethod(fieldType);

@@ -26,8 +26,8 @@ import java.util.logging.Logger;
 
 
 /**
- * Represents a message that can be displayed in the GUI. It has message data
- * and a Color.
+ * Represents a message that can be displayed in the GUI.  It has
+ * message data and a Color.
  */
 public final class GUIMessage {
     
@@ -38,11 +38,14 @@ public final class GUIMessage {
     private final Color     color;
     private final Date      creationTime;
     
+
     /**
-    * The constructor to use.
-    * @param message The actual message.
-    * @param color The color in which to display this message.
-    */
+     * The constructor to use.
+     *
+     * @param message The actual message.
+     * @param color The <code>Color</code> in which to display this
+     *     message.
+     */
     public GUIMessage(String message, Color color) {
         this.message = message;
         this.color = color;
@@ -50,26 +53,29 @@ public final class GUIMessage {
     }
     
     /**
-    * Returns the actual message data.
-    * @return The actual message data.
-    */
+     * Get the message data.
+     *
+     * @return The message data.
+     */
     public String getMessage() {
         return message;
     }
     
     /**
-    * Returns the message's Color.
-    * @return The message's Color.
-    */
+     * Gets the message's Color.
+     *
+     * @return The message <code>Color</code>.
+     */
     public Color getColor() {
         return color;
     }
     
     /**
-    * Returns the time at which this message was created.
-    * @return The time at which this message was created.
-    */
-    public Date getCreationTime() {
-        return creationTime;
+     * Get the time at which this message was created.
+     *
+     * @return The time at which this message was created.
+     */
+    public long getCreationTime() {
+        return creationTime.getTime();
     }
 }

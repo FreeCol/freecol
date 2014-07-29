@@ -53,10 +53,6 @@ import net.sf.freecol.common.resources.ResourceManager;
  */
 public class InformationPanel extends FreeColPanel {
 
-    private JPanel textPanel = null;
-    private JScrollPane scrollPane = null;
-
-
     /**
      * Creates an information panel that shows the given texts and
      * images, and an "OK" button.
@@ -86,7 +82,7 @@ public class InformationPanel extends FreeColPanel {
                 "[510]", "[242]20[20]"));
 
         final GUI gui = getGUI();
-        textPanel = new MigPanel();
+        JPanel textPanel = new MigPanel();
         textPanel.setOpaque(false);
         textPanel.setLayout(new MigLayout("wrap 2", "", ""));
         for (int i = 0; i < texts.length; i++) {
@@ -110,7 +106,7 @@ public class InformationPanel extends FreeColPanel {
             }
         }
 
-        scrollPane = new JScrollPane(textPanel,
+        JScrollPane scrollPane = new JScrollPane(textPanel,
             JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
             JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         // correct way to make scroll pane opaque
@@ -184,19 +180,5 @@ public class InformationPanel extends FreeColPanel {
     public void paintComponent(Graphics g) {
         g.drawImage(ResourceManager.getImage("InformationPanel.backgroundImage"),
             0, 0, this);
-    }
-
-
-    // Override Component
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void removeNotify() {
-        super.removeNotify();
-        
-        removeAll();
-        scrollPane = null;
     }
 }

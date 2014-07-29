@@ -38,12 +38,13 @@ import net.miginfocom.swing.MigLayout;
 /**
  * The panel that allows a choice of tribute amount.
  */
-public final class SelectTributeAmountDialog extends FreeColInputDialog<Integer> {
+public final class SelectTributeAmountDialog
+    extends FreeColInputDialog<Integer> {
 
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(SelectTributeAmountDialog.class.getName());
 
-    private final int COLUMNS = 5;
+    private static final int COLUMNS = 5;
 
     /** The field to contain the input. */
     private JTextField input;

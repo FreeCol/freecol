@@ -117,7 +117,7 @@ public abstract class AIObject extends FreeColObject {
      *
      * @return The <code>AIMain</code>.
      */
-    public AIMain getAIMain() {
+    public final AIMain getAIMain() {
         return aiMain;
     }
 
@@ -126,7 +126,7 @@ public abstract class AIObject extends FreeColObject {
      *
      * @return The <code>Game</code>.
      */
-    public Game getGame() {
+    public final Game getGame() {
         return aiMain.getGame();
     }
 
@@ -135,7 +135,7 @@ public abstract class AIObject extends FreeColObject {
      *
      * @return The <code>Specification</code>.
      */
-    public Specification getSpecification() {
+    public final Specification getSpecification() {
         return getGame().getSpecification();
     }
 
@@ -147,7 +147,7 @@ public abstract class AIObject extends FreeColObject {
      *
      * @return <code>true</code> if this object is not initialized.
      */
-    public boolean isUninitialized() {
+    public final boolean isUninitialized() {
         return uninitialized;
     }
 
@@ -164,14 +164,14 @@ public abstract class AIObject extends FreeColObject {
      *
      * @return True if this AIObject was disposed.
      */
-    public boolean isDisposed() {
+    public final boolean isDisposed() {
         return getAIMain().getAIObject(getId()) == null;
     }
 
     /**
      * Adds this object to the AI main if it has a non-null identifier.
      */
-    protected void addAIObjectWithId() {
+    protected final void addAIObjectWithId() {
         if (getId() != null) aiMain.addAIObject(getId(), this);
     }
 

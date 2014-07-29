@@ -95,11 +95,14 @@ public class SimpleMapGenerator implements MapGenerator {
 
     private static final Logger logger = Logger.getLogger(SimpleMapGenerator.class.getName());
 
-    // To avoid starting positions to be too close to the poles
-    // percentage indicating how much of the half map close to the pole cannot be spawned on
+    /**
+     * To avoid starting positions too close to the poles, this
+     * percentage indicating how much of the half map close to the
+     * pole cannot be spawned on.
+     */
     private static final float MIN_DISTANCE_FROM_POLE = 0.30f;
 
-    private class Territory {
+    private static class Territory {
         public ServerRegion region;
         public Tile tile;
         public Player player;
@@ -262,7 +265,8 @@ public class SimpleMapGenerator implements MapGenerator {
                         + player.getNationId() + " not found in spec.");
                     continue;
                 }
-                indian = new ServerPlayer(game, null, false, nation, 
+                String name = Messages.message(nation.getRulerNameKey());
+                indian = new ServerPlayer(game, name, false, nation, 
                                           null, null);
                 logger.info("Imported new native nation "
                     + player.getNationId() + ": " + indian.getId());
@@ -332,7 +336,6 @@ public class SimpleMapGenerator implements MapGenerator {
         logger.info("Imported " + nSettlements + " native settlements.");
         return nSettlements > 0;
     }
-
 
     /**
      * Make the native settlements, at least a capital for every

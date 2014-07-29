@@ -63,13 +63,15 @@ public class RearrangeColonyMessage extends DOMMessage {
             this.roleCount = roleCount;
         }
 
-        public UnitChange(Game game, String unitId, String locId, String workId,
+        public UnitChange(Game game, String unitId,
+                          String locId, String workId,
                           String roleId, String roleCount) {
             init(game, unitId, locId, workId, roleId, roleCount);
         }
 
-        public void init(Game game, String unitId, String locId, String workId,
-                         String roleId, String roleCount) {
+        public final void init(Game game, String unitId, 
+                               String locId, String workId, 
+                               String roleId, String roleCount) {
             this.unit = game.getFreeColGameObject(unitId, Unit.class);
             this.loc = game.findFreeColLocation(locId);
             this.work = (workId == null || "".equals(workId)) ? null

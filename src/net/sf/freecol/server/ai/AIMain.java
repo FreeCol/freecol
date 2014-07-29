@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -64,7 +66,7 @@ public class AIMain extends FreeColObject
      * Contains mappings between <code>FreeColGameObject</code>s
      * and <code>AIObject</code>s.
      */
-    private final HashMap<String, AIObject> aiObjects
+    private final Map<String, AIObject> aiObjects
         = new HashMap<String, AIObject>();
 
 
@@ -300,9 +302,9 @@ public class AIMain extends FreeColObject
      * Computes how many objects of each class have been created, to
      * track memory leaks over time
      */
-    public HashMap<String, String> getAIStatistics() {
-        HashMap<String, String> stats = new HashMap<String, String>();
-        HashMap<String, Long> objStats = new HashMap<String, Long>();
+    public Map<String, String> getAIStatistics() {
+        Map<String, String> stats = new HashMap<String, String>();
+        Map<String, Long> objStats = new HashMap<String, Long>();
         for (AIObject aio : getAIObjects()) {
             String className = aio.getClass().getSimpleName();
             if (objStats.containsKey(className)) {

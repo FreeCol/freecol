@@ -173,7 +173,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         final Specification spec = getSpecification();
 
-        this.name = (name.startsWith("model.nation.")) ? Messages.message(name)
+        this.name = (name == null) ? null
+            : (name.startsWith("model.nation.")) ? Messages.message(name)
             : name;
         this.admin = admin;
         this.immigration = 0;
@@ -2199,6 +2200,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         } else {
             throw new IllegalStateException("Bogus combat");
         }
+        assert defenderTile != null;
 
         // If the combat results were not specified (usually the case),
         // query the combat model.

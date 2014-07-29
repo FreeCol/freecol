@@ -136,7 +136,7 @@ public class TileImprovementPlan extends ValuedAIObject {
      *     <code>null</code> if nobody has been assigned this
      *     mission.
      */
-    public AIUnit getPioneer() {
+    public final AIUnit getPioneer() {
         return pioneer;
     }
 
@@ -149,7 +149,7 @@ public class TileImprovementPlan extends ValuedAIObject {
      *     <code>null</code> if nobody has been assigned this
      *     mission.
      */
-    public void setPioneer(AIUnit pioneer) {
+    public final void setPioneer(AIUnit pioneer) {
         this.pioneer = pioneer;
     }
 
@@ -158,7 +158,7 @@ public class TileImprovementPlan extends ValuedAIObject {
      *
      * @return The type of the improvement.
      */
-    public TileImprovementType getType() {
+    public final TileImprovementType getType() {
         return type;
     }
 
@@ -168,7 +168,7 @@ public class TileImprovementPlan extends ValuedAIObject {
      * @param type The <code>TileImprovementType</code>.
      * @see #getType
      */
-    public void setType(TileImprovementType type) {
+    public final void setType(TileImprovementType type) {
         this.type = type;
     }
 
@@ -179,7 +179,7 @@ public class TileImprovementPlan extends ValuedAIObject {
      *     {@link #getPioneer pioneer} should make the
      *     given {@link #getType improvement}.
      */
-    public Tile getTarget() {
+    public final Tile getTarget() {
         return target;
     }
 

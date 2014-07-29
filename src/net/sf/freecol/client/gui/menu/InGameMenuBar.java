@@ -92,7 +92,7 @@ public class InGameMenuBar extends FreeColMenuBar {
     /**
      * Resets this menu bar.
      */
-    public void reset() {
+    public final void reset() {
         removeAll();
 
         buildGameMenu();

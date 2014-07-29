@@ -46,8 +46,8 @@ import net.sf.freecol.client.gui.action.FreeColAction;
  * User interface for displaying/changing a keyboard accelerator for a
  * <code>FreeColAction</code>.
  */
-public final class FreeColActionUI extends OptionUI<FreeColAction> implements ActionListener {
-
+public final class FreeColActionUI extends OptionUI<FreeColAction>
+    implements ActionListener {
 
     private OptionGroupUI optionGroupUI;
     private KeyStroke keyStroke;

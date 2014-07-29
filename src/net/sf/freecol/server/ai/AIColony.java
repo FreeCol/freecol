@@ -217,7 +217,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      *
      * @return The <code>Colony</code>.
      */
-    public Colony getColony() {
+    public final Colony getColony() {
         return colony;
     }
 

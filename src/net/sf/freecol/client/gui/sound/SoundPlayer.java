@@ -167,7 +167,7 @@ public class SoundPlayer {
      */
     private class SoundPlayerThread extends Thread {
 
-        private final int BUFSIZ = 8192;
+        private static final int BUFSIZ = 8192;
 
         private final byte[] data = new byte[BUFSIZ];
 
@@ -183,11 +183,11 @@ public class SoundPlayer {
         }
 
         private synchronized void awaken() {
-            this.notify();
+            notify();
         }
 
         private synchronized void goToSleep() throws InterruptedException {
-            this.wait();
+            wait();
         }
 
         public synchronized boolean keepPlaying() {

@@ -209,7 +209,7 @@ final class ReceivingThread extends Thread {
      * @param in The stream to read from.
      */
     ReceivingThread(Connection connection, InputStream in, String threadName) {
-        super(threadName + "ReceivingThread - " + connection.toString());
+        super(threadName + "ReceivingThread - " + connection);
 
         this.in = new FreeColNetworkInputStream(in);
         this.connection = connection;
@@ -255,9 +255,8 @@ final class ReceivingThread extends Thread {
     public synchronized void askToStop() {
         if (shouldRun) {
             shouldRun = false;
-            for (NetworkReplyObject o : waitingThreads.values()) {
-                o.interrupt();
-            }
+            Collection<NetworkReplyObject> waiting = waitingThreads.values();
+            for (NetworkReplyObject o : waiting) o.interrupt();
         }
     }
 

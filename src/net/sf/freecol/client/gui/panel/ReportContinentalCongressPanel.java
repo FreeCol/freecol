@@ -49,14 +49,11 @@ import net.sf.freecol.common.resources.ResourceManager;
  */
 public final class ReportContinentalCongressPanel extends ReportPanel {
 
-    static final String title = Messages.message("reportCongressAction.name");
+    private static final String title
+        = Messages.message("reportCongressAction.name");
 
-    static final String none = Messages.message("report.continentalCongress.none");
-
-    private Map<FoundingFatherType, JPanel> panels
-        = new EnumMap<FoundingFatherType, JPanel>(FoundingFatherType.class);
-
-    private JPanel recruitingPanel = null;
+    private static final String none
+        = Messages.message("report.continentalCongress.none");
 
 
     /**
@@ -72,7 +69,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
 
         Player player = getMyPlayer();
 
-        recruitingPanel = new MigPanel();
+        JPanel recruitingPanel = new MigPanel();
         recruitingPanel.setLayout(new MigLayout("center, wrap 1", "center"));
         if (player.getCurrentFather() == null) {
             recruitingPanel.add(new JLabel(none), "wrap 20");
@@ -99,6 +96,8 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
         tabs.addTab(Messages.message("report.continentalCongress.recruiting"), null,
                     recruitingPanel, null);
 
+        Map<FoundingFatherType, JPanel> panels
+            = new EnumMap<FoundingFatherType, JPanel>(FoundingFatherType.class);
         for (FoundingFatherType type : FoundingFatherType.values()) {
             JPanel panel = new MigPanel();
             panel.setLayout(new MigLayout("flowy", "[center]"));

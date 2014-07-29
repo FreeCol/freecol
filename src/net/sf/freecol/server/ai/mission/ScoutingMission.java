@@ -113,15 +113,6 @@ public class ScoutingMission extends Mission {
     }
 
     /**
-     * Does this scout have horses?
-     *
-     * @return True if the scout has horses.
-     */
-    private boolean canScoutNatives() {
-        return canScoutNatives(getAIUnit());
-    }
-
-    /**
      * Extract a valid target for this mission from a path.
      *
      * @param aiUnit A <code>AIUnit</code> to perform the mission.

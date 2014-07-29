@@ -72,11 +72,9 @@ public class Mods {
             for (File f : directory.listFiles(MOD_FILTER)) {
                 try {
                     FreeColModFile fcmf = new FreeColModFile(f);
-                    if (fcmf != null) {
-                        allMods.put(fcmf.getId(), fcmf);
-                        logger.info("Found mod " + fcmf.getId()
-                            + " in " + f.getPath());
-                    }
+                    allMods.put(fcmf.getId(), fcmf);
+                    logger.info("Found mod " + fcmf.getId()
+                        + " in " + f.getPath());
                 } catch (IOException e) {
                     logger.log(Level.WARNING, "Bad mod in " + f.getPath(), e);
                 }

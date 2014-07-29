@@ -207,7 +207,6 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
 
         private final Player source;
         private JSpinner spinner;
-        private JButton clearButton, addButton;
 
 
         /**
@@ -219,14 +218,14 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         public GoldTradeItemPanel(Player source, int gold) {
             this.source = source;
             this.spinner = new JSpinner(new SpinnerNumberModel(0, 0, gold, 1));
-            this.clearButton
+            JButton clearButton
                 = new JButton(Messages.message("negotiationDialog.clear"));
-            this.clearButton.addActionListener(this);
-            this.clearButton.setActionCommand("clear");
-            this.addButton
+            clearButton.addActionListener(this);
+            clearButton.setActionCommand("clear");
+            JButton addButton
                 = new JButton(Messages.message("negotiationDialog.add"));
-            this.addButton.addActionListener(this);
-            this.addButton.setActionCommand("add");
+            addButton.addActionListener(this);
+            addButton.setActionCommand("add");
             // adjust entry size
             ((JSpinner.DefaultEditor)this.spinner.getEditor())
                 .getTextField().setColumns(5);
@@ -238,8 +237,8 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
 
             add(new JLabel(Messages.message("tradeItem.gold")));
             add(this.spinner);
-            add(this.clearButton, "split 2");
-            add(this.addButton);
+            add(clearButton, "split 2");
+            add(addButton);
 
             setSize(getPreferredSize());
         }

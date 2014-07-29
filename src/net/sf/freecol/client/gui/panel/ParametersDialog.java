@@ -42,11 +42,11 @@ import net.sf.freecol.client.gui.i18n.Messages;
  */
 public class ParametersDialog extends FreeColDialog<Parameters> {
     
-    private final int COLUMNS = 5;
+    private static final int COLUMNS = 5;
 
-    private final int DEFAULT_distToLandFromHighSeas = 4;
+    private static final int DEFAULT_distToLandFromHighSeas = 4;
 
-    private final int DEFAULT_maxDistanceToEdge = 12;
+    private static final int DEFAULT_maxDistanceToEdge = 12;
 
     private final JTextField inputD;
 

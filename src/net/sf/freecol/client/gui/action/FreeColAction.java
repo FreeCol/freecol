@@ -169,7 +169,7 @@ public abstract class FreeColAction extends AbstractAction
      * @return The mnemonic of the action
      */
     public Integer getMnemonic() {
-        return (Integer) getValue(MNEMONIC_KEY);
+        return (Integer)getValue(MNEMONIC_KEY);
     }
 
     /**
@@ -245,7 +245,7 @@ public abstract class FreeColAction extends AbstractAction
      * @param accelerator The <code>KeyStroke</code>. Using <code>null</code>
      *            is the same as disabling the keyboard accelerator.
      */
-    public void setAccelerator(KeyStroke accelerator) {
+    public final void setAccelerator(KeyStroke accelerator) {
         putValue(ACCELERATOR_KEY, accelerator);
     }
 
@@ -255,7 +255,7 @@ public abstract class FreeColAction extends AbstractAction
      * @return The <code>KeyStroke</code> or <code>null</code> if the
      *         keyboard accelerator is disabled.
      */
-    public KeyStroke getAccelerator() {
+    public final KeyStroke getAccelerator() {
         return (KeyStroke) getValue(ACCELERATOR_KEY);
     }
 
@@ -265,7 +265,7 @@ public abstract class FreeColAction extends AbstractAction
      *
      * @return A short description of this action.
      */
-    public String getShortDescription() {
+    public final String getShortDescription() {
         return (String) getValue(SHORT_DESCRIPTION);
     }
 
@@ -274,7 +274,7 @@ public abstract class FreeColAction extends AbstractAction
      *
      * @return An unique identifier for this action.
      */
-    public String getId() {
+    public final String getId() {
         return (String) getValue(ACTION_ID);
     }
 

@@ -283,7 +283,7 @@ public class Modifier extends Feature {
      *
      * @return The <code>ModifierType</code>.
      */
-    public ModifierType getType() {
+    public final ModifierType getType() {
         return modifierType;
     }
 
@@ -292,7 +292,7 @@ public class Modifier extends Feature {
      *
      * @param modifierType The new <code>ModifierType</code> value.
      */
-    public void setType(final ModifierType modifierType) {
+    public final void setType(final ModifierType modifierType) {
         this.modifierType = modifierType;
     }
 
@@ -301,7 +301,7 @@ public class Modifier extends Feature {
      *
      * @return The modifier value.
      */
-    public float getValue() {
+    public final float getValue() {
         return value;
     }
 
@@ -311,7 +311,7 @@ public class Modifier extends Feature {
      * @param turn The <code>Turn</code> to check.
      * @return The turn-dependent modifier value.
      */
-    public float getValue(Turn turn) {
+    public final float getValue(Turn turn) {
         if (appliesTo(turn)) {
             if (hasIncrement()) {
                 float f = (turn.getNumber() - getFirstTurn().getNumber())
@@ -330,7 +330,7 @@ public class Modifier extends Feature {
      *
      * @param value The new value.
      */
-    public void setValue(final float value) {
+    public final void setValue(final float value) {
         this.value = value;
     }
 
@@ -339,7 +339,7 @@ public class Modifier extends Feature {
      *
      * @return True if this modifier has an increment.
      */
-    public boolean hasIncrement() {
+    public final boolean hasIncrement() {
         return incrementType != null;
     }
 
@@ -348,7 +348,7 @@ public class Modifier extends Feature {
      *
      * @return The increment <code>ModifierType</code>.
      */
-    public ModifierType getIncrementType() {
+    public final ModifierType getIncrementType() {
         return incrementType;
     }
 
@@ -357,7 +357,7 @@ public class Modifier extends Feature {
      *
      * @param incrementType The new increment <code>ModifierType</code>.
      */
-    public void setIncrementType(final ModifierType incrementType) {
+    public final void setIncrementType(final ModifierType incrementType) {
         this.incrementType = incrementType;
     }
 
@@ -366,7 +366,7 @@ public class Modifier extends Feature {
      *
      * @return The increment value.
      */
-    public float getIncrement() {
+    public final float getIncrement() {
         return increment;
     }
 
@@ -375,7 +375,7 @@ public class Modifier extends Feature {
      *
      * @param increment The new value.
      */
-    public void setIncrement(final float increment) {
+    public final void setIncrement(final float increment) {
         this.increment = increment;
     }
 
@@ -389,9 +389,9 @@ public class Modifier extends Feature {
      * @param lastTurn The last <code>Turn</code> the increment is
      *     active.
      */
-    public void setIncrement(final ModifierType incrementType,
-                             final float increment,
-                             Turn firstTurn, Turn lastTurn) {
+    public final void setIncrement(final ModifierType incrementType,
+                                   final float increment,
+                                   Turn firstTurn, Turn lastTurn) {
         if (firstTurn == null) {
             throw new IllegalArgumentException("Null firstTurn");
         }
@@ -406,7 +406,7 @@ public class Modifier extends Feature {
      *
      * @return The modifier index.
      */
-    public int getModifierIndex() {
+    public final int getModifierIndex() {
         return modifierIndex;
     }
 
@@ -415,7 +415,7 @@ public class Modifier extends Feature {
      *
      * @param modifierIndex The new modifier index value.
      */
-    public void setModifierIndex(final int modifierIndex) {
+    public final void setModifierIndex(final int modifierIndex) {
         this.modifierIndex = modifierIndex;
     }
 

@@ -1982,9 +1982,8 @@ public final class Specification {
             if (!(o instanceof OptionGroup)) continue;
             Option monarch = ((OptionGroup)o)
                 .getOption("model.difficulty.monarch");
-            Option refSize = ((OptionGroup)((monarch != null
-                        && (monarch instanceof OptionGroup)) ? monarch : o))
-                .getOption("model.option.refSize");
+            Option refSize = ((OptionGroup)((monarch instanceof OptionGroup)
+                    ? monarch : o)).getOption("model.option.refSize");
             if (refSize == null
                 || !(refSize instanceof UnitListOption)) continue;
             for (AbstractUnit au

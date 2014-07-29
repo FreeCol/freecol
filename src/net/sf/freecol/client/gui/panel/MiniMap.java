@@ -77,7 +77,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
      * The top left tile on the mini map represents the tile.
      * (firstColumn, firstRow) in the world map
      */
-    private int firstColumn, firstRow, lastColumn, lastRow;
+    private int firstColumn, firstRow;
 
     /**
      * Used for adjusting the position of the mapboard image.
@@ -269,9 +269,8 @@ public final class MiniMap extends JPanel implements MouseInputListener {
             adjustY = 0;
         }
 
-        lastRow = Math.min(firstRow + ySize, map.getHeight() - 1);
-        lastColumn = Math.min(firstColumn + xSize, map.getWidth() - 1);
-
+        int lastRow = Math.min(firstRow + ySize, map.getHeight() - 1);
+        int lastColumn = Math.min(firstColumn + xSize, map.getWidth() - 1);
         int tileWidth = tileSize;
         int tileHeight = tileSize/2;
         int halfWidth = tileSize/2;

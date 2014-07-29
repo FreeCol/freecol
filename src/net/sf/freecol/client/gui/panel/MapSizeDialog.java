@@ -41,9 +41,9 @@ import net.miginfocom.swing.MigLayout;
  */
 public final class MapSizeDialog extends FreeColInputDialog<Dimension> {
 
-    private final int COLUMNS = 5;
-    private final int DEFAULT_HEIGHT = 100;
-    private final int DEFAULT_WIDTH = 40;
+    private static final int COLUMNS = 5;
+    private static final int DEFAULT_HEIGHT = 100;
+    private static final int DEFAULT_WIDTH = 40;
 
     private JTextField inputWidth
         = new JTextField(Integer.toString(DEFAULT_WIDTH), COLUMNS);

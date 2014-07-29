@@ -38,7 +38,8 @@ public class FreeColModFile extends FreeColDataFile implements ObjectWithId {
 
     public static final String SPECIFICATION_FILE = "specification.xml";
     public static final String MOD_DESCRIPTOR_FILE = "mod.xml";
-    public static final String[] FILE_ENDINGS = new String[] {".fmd", ".zip"};
+    protected static final String[] FILE_ENDINGS
+        = new String[] {".fmd", ".zip"};
 
     private String id;
     private String parent;

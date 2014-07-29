@@ -63,8 +63,6 @@ public final class TilePanel extends FreeColPanel {
 
     private static final String COLOPEDIA = "COLOPEDIA";
 
-    private TileType tileType;
-
 
     /**
      * Creates a panel describing a tile.
@@ -76,9 +74,7 @@ public final class TilePanel extends FreeColPanel {
         super(freeColClient, new MigLayout("wrap 2, insets 20 30 10 30",
                                            "[right, sg][left, sg]"));
 
-        tileType = tile.getType();
-
-
+        TileType tileType = tile.getType();
         JButton colopediaButton = new JButton(Messages.message("menuBar.colopedia"));
         colopediaButton.setActionCommand(tile.getType().getId());
         colopediaButton.addActionListener(this);
@@ -191,8 +187,8 @@ public final class TilePanel extends FreeColPanel {
             } else {
                 for (Player.ColonyValueCategory c
                          : Player.ColonyValueCategory.values()) {
-                    add(new JLabel(c.toString().substring(2) + " "
-                            + values.get(c.ordinal())),
+                    String cat = c.toString();
+                    add(new JLabel(cat + values.get(c.ordinal())),
                         "newline 5, span, align center");
                 }
                 for (int a = Player.ColonyValueCategory.A_GOODS.ordinal();

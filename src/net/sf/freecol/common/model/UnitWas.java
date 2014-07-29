@@ -154,7 +154,8 @@ public class UnitWas implements Comparable<UnitWas> {
 
     // TODO: fix this non-OO nastiness
     private int getAmount(Location location, GoodsType goodsType) {
-        if (goodsType != null && location instanceof WorkLocation) {
+        if (goodsType == null) return 0;
+        if (location instanceof WorkLocation) {
             ProductionInfo info = ((WorkLocation)location).getProductionInfo();
             return AbstractGoods.getCount(goodsType, info.getProduction());
         }

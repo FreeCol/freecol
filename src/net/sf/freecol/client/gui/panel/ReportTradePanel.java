@@ -53,14 +53,7 @@ import net.sf.freecol.common.model.Unit;
  */
 public final class ReportTradePanel extends ReportPanel {
 
-    /**
-     * Storable goods types.
-     */
-    private List<GoodsType> storableGoods = new ArrayList<GoodsType>();
-
     private List<Colony> colonies;
-
-    private final JPanel goodsHeader = new MigPanel("ReportPanelUI");
 
 
     /**
@@ -75,9 +68,11 @@ public final class ReportTradePanel extends ReportPanel {
         Player player = getMyPlayer();
         colonies = freeColClient.getMySortedColonies();
 
+        JPanel goodsHeader = new MigPanel("ReportPanelUI");
         goodsHeader.setBorder(new EmptyBorder(20, 20, 0, 20));
         scrollPane.setColumnHeaderView(goodsHeader);
 
+        List<GoodsType> storableGoods = new ArrayList<GoodsType>();
         for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
             if (goodsType.isStorable()) {
                 storableGoods.add(goodsType);

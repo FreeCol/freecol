@@ -85,13 +85,15 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
 
     // Public interface
 
-    public FoundingFather getFather(Game game) {
+    /**
+     * Get the chosen father.
+     *
+     * @param game The <code>Game</code> to lookup the father in.
+     * @return The chosen <code>FoundingFather</code>, or null if none set.
+     */
+    public final FoundingFather getFather(Game game) {
         return (foundingFatherId == null) ? null
             : game.getSpecification().getFoundingFather(this.foundingFatherId);
-    }
-
-    public List<FoundingFather> getFathers() {
-        return fathers;
     }
 
     /**
@@ -99,9 +101,18 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
      *
      * @param ff The <code>FoundingFather</code> to choose.
      */
-    public ChooseFoundingFatherMessage setFather(FoundingFather ff) {
+    public final ChooseFoundingFatherMessage setFather(FoundingFather ff) {
         this.foundingFatherId = (ff == null) ? null : ff.getId();
         return this;
+    }
+
+    /**
+     * Get the list of offered fathers.
+     *
+     * @return The offered <code>FoundingFather</code>s.
+     */
+    public final List<FoundingFather> getFathers() {
+        return fathers;
     }
 
 

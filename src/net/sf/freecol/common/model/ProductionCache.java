@@ -161,8 +161,6 @@ public class ProductionCache {
                 productionAndConsumption.put(consumer, info);
             }
         }
-        this.productionAndConsumption = productionAndConsumption;
-        this.netProduction = netProduction;
         upToDate = true;
     }
 

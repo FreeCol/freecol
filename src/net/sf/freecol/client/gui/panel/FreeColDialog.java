@@ -99,9 +99,6 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
     /** The JOptionPane to embed in this dialog. */
     private JOptionPane pane;
 
-    /** An optional ScrollPane if there are many options. */
-    private JScrollPane scrollPane;
-
 
     /**
      * Protected constructor for the subclass panels.
@@ -186,19 +183,18 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
         this.pane.setValue(JOptionPane.UNINITIALIZED_VALUE);
         this.pane.addPropertyChangeListener(this);
         setComponentOrientation(this.pane.getComponentOrientation());
-        if (options.size() <= 20) {
-            this.scrollPane = null;
-        } else {
-            this.scrollPane = new JScrollPane(this.pane,
+
+        JScrollPane scrollPane = null;
+        if (options.size() > 20) {
+            scrollPane = new JScrollPane(this.pane,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-            this.scrollPane.setOpaque(false);
-            this.scrollPane.setBorder(null);
-            this.scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+            scrollPane.setOpaque(false);
+            scrollPane.setBorder(null);
+            scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         }
         Container contentPane = getContentPane();
-        contentPane.add((this.scrollPane != null) ? this.scrollPane
-            : this.pane);
+        contentPane.add((scrollPane != null) ? scrollPane : this.pane);
         setResizable(false);
         setUndecorated(true);
         setModal(modal);
@@ -442,7 +438,6 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
             this.pane.removePropertyChangeListener(this);
             this.pane = null;
         }
-        this.scrollPane = null;
 
         for (MouseListener listener : getMouseListeners()) {
             removeMouseListener(listener);

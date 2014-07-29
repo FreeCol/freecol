@@ -89,7 +89,8 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
             new DefaultMutableTreeNode(new ColopediaTreeItem(this, getId(), getName(), null));
 
         Image buildingImage = ResourceManager.getImage("Colopedia.buildingSection.image");
-        ImageIcon buildingIcon = new ImageIcon((buildingImage != null) ? buildingImage : null);
+        ImageIcon buildingIcon = (buildingImage == null) ? null
+            : new ImageIcon(buildingImage);
 
         List<BuildingType> buildingTypes = new ArrayList<BuildingType>();
         Map<BuildingType, DefaultMutableTreeNode> buildingHash =

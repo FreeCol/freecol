@@ -67,10 +67,6 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
     private JButton upButton = new JButton(Messages.message("list.up"));
     private JButton downButton = new JButton(Messages.message("list.down"));
 
-    private JButton[] buttons = new JButton[] {
-        editButton, addButton, removeButton, upButton, downButton
-    };
-
 
     /**
      * Creates a new <code>ListOptionUI</code> for the given
@@ -113,7 +109,8 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
         JScrollPane pane = new JScrollPane(list);
         panel.add(pane, "grow, spany 5");
 
-        for (JButton button : buttons) {
+        for (JButton button : new JButton[] {
+                editButton, addButton, removeButton, upButton, downButton}) {
             button.setEnabled(editable);
             panel.add(button);
         }

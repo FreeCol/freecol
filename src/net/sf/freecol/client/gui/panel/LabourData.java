@@ -559,7 +559,7 @@ public class LabourData {
      * @param unitType goods unitType
      * @return profession data
      */
-    public UnitData getUnitData(UnitType unitType) {
+    public final UnitData getUnitData(UnitType unitType) {
         UnitData data = unitDataMap.get(unitType.getId());
         if (data == null) {
             data = new UnitData(unitType);

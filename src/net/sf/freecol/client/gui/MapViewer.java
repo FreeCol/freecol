@@ -3228,7 +3228,7 @@ public final class MapViewer {
 
         int i = 0;
         while (i < getMessageCount()) {
-            long creationTime = getMessage(i).getCreationTime().getTime();
+            long creationTime = getMessage(i).getCreationTime();
             if ((currentTime - creationTime) >= MESSAGE_AGE) {
                 result = true;
                 messages.remove(i);

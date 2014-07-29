@@ -269,7 +269,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
      *
      * @param cancelButton an <code>AbstractButton</code> value
      */
-    public void setCancelComponent(AbstractButton cancelButton) {
+    public final void setCancelComponent(AbstractButton cancelButton) {
         if (cancelButton == null) throw new NullPointerException();
 
         InputMap inputMap

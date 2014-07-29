@@ -32,7 +32,8 @@ import net.sf.freecol.common.model.Unit;
 /**
  * An action for changing the view. This action will:
  *
- *  - Open a colony panel if the active unit is located on a tile with a colony.
+ *  - Open a colony panel if the active unit is located on a tile with
+      a colony.
  *  - If onboard a carrier then the carrier will be the active unit.
  *  - In other cases: switch to another unit on the same tile.
  */
@@ -58,7 +59,7 @@ public class ChangeAction extends UnitAction {
      * {@link #shouldBeEnabled} and updates the name of the action.
      */
     @Override
-    public void update() {
+    public final void update() {
         super.update();
 
         Unit unit = getGUI().getActiveUnit();

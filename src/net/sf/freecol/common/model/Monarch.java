@@ -127,7 +127,7 @@ public final class Monarch extends FreeColGameObject implements Named {
          *
          * @return A list of all units.
          */
-        public List<AbstractUnit> getUnits() {
+        public final List<AbstractUnit> getUnits() {
             List<AbstractUnit> result = new ArrayList<AbstractUnit>(landUnits);
             result.addAll(navalUnits);
             return result;
@@ -138,7 +138,7 @@ public final class Monarch extends FreeColGameObject implements Named {
          *
          * @return A list of the naval units.
          */
-        public List<AbstractUnit> getNavalUnits() {
+        public final List<AbstractUnit> getNavalUnits() {
             return navalUnits;
         }
 
@@ -147,7 +147,7 @@ public final class Monarch extends FreeColGameObject implements Named {
          *
          * @return A list of the  land units.
          */
-        public List<AbstractUnit> getLandUnits() {
+        public final List<AbstractUnit> getLandUnits() {
             return landUnits;
         }
 
@@ -156,7 +156,7 @@ public final class Monarch extends FreeColGameObject implements Named {
          *
          * @return True if there are no land or naval units.
          */
-        public boolean isEmpty() {
+        public final boolean isEmpty() {
             return landUnits.isEmpty() && navalUnits.isEmpty();
         }
 

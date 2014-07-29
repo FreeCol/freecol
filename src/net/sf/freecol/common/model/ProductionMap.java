@@ -174,7 +174,7 @@ public class ProductionMap {
                     ((ProductionTree) value).add(goods);
                 } else {
                     // add new root entry
-                    Integer amount = (value == null) ? 0 : (Integer) value;
+                    int amount = (value == null) ? 0 : (Integer)value;
                     value = new ProductionTree(new AbstractGoods(rootType, amount), goods);
                     cache.put(rootType, value);
                 }

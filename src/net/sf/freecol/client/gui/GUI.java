@@ -233,7 +233,7 @@ public class GUI {
     public static final Insets EMPTY_MARGIN = new Insets(0, 0, 0, 0);
 
     /** A style context to use for panels and dialogs. */
-    public static StyleContext STYLE_CONTEXT = new StyleContext();
+    public static final StyleContext STYLE_CONTEXT = new StyleContext();
     static {
         Style defaultStyle = StyleContext.getDefaultStyleContext()
             .getStyle(StyleContext.DEFAULT_STYLE);

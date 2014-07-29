@@ -56,17 +56,18 @@ public class ReportPanel extends FreeColPanel {
 
     protected static final Logger logger = Logger.getLogger(ReportPanel.class.getName());
 
-    private static final Comparator<Unit> unitTypeComparator = new Comparator<Unit>() {
-        public int compare(Unit unit1, Unit unit2) {
-            int deltaType = unit2.getType().compareTo(unit1.getType());
-            if (deltaType == 0) {
-                return (unit2.getRole() == null) ? -1
-                    : unit2.getRole().getId().compareTo(unit1.getRole().getId());
-            } else {
-                return deltaType;
+    private static final Comparator<Unit> unitTypeComparator
+        = new Comparator<Unit>() {
+            public int compare(Unit unit1, Unit unit2) {
+                int deltaType = unit2.getType().compareTo(unit1.getType());
+                if (deltaType == 0) {
+                    return (unit2.getRole() == null) ? -1
+                        : unit2.getRole().getId().compareTo(unit1.getRole().getId());
+                } else {
+                    return deltaType;
+                }
             }
-        }
-    };
+        };
 
     protected JPanel reportPanel;
 

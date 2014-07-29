@@ -56,7 +56,6 @@ import net.sf.freecol.client.gui.panel.Flag.UnionShape;
 public class FlagTest extends JFrame implements ActionListener, ItemListener {
 
 
-
     private final Flag[] FLAGS = new Flag[] {
         ConfirmDeclarationDialog.ENGLISH_FLAG, ConfirmDeclarationDialog.SPANISH_FLAG,
         ConfirmDeclarationDialog.FRENCH_FLAG, ConfirmDeclarationDialog.DUTCH_FLAG,
@@ -65,7 +64,7 @@ public class FlagTest extends JFrame implements ActionListener, ItemListener {
         null // custom
     };
 
-    private final String[] FLAG_NAMES = new String[] {
+    private static final String[] FLAG_NAMES = new String[] {
         "England", "Spain", "France", "Netherlands",
         "Portugal", "Sweden", "Denmark", "Russia", "Custom"
     };
@@ -103,11 +102,8 @@ public class FlagTest extends JFrame implements ActionListener, ItemListener {
         backgroundColors[4], backgroundColors[5]
     };
 
-    private JComboBox[] typeBoxes = new JComboBox[] {
-        decoration, union
-    };
-
     final JLabel label = new JLabel();
+
 
     @SuppressWarnings("unchecked")
     public FlagTest() {
@@ -246,7 +242,7 @@ public class FlagTest extends JFrame implements ActionListener, ItemListener {
         }
     }
 
-    public String[] getNumbers(int count) {
+    public final String[] getNumbers(int count) {
         String[] result = new String[count];
         for (int index = 0; index < count; index++) {
             result[index] = Integer.toString(index + 1);

@@ -25,7 +25,6 @@ import java.util.logging.Logger;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.control.InGameController;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.client.gui.action.DisplayTileTextAction.DisplayText;
 import net.sf.freecol.common.model.Map.Direction;
@@ -45,8 +44,6 @@ public class ActionManager extends OptionGroup {
 
     private final FreeColClient freeColClient;
 
-    private final GUI gui;
-
 
     /**
      * Creates a new <code>ActionManager</code>.
@@ -57,7 +54,6 @@ public class ActionManager extends OptionGroup {
         super("actionManager");
 
         this.freeColClient = freeColClient;
-        this.gui = freeColClient.getGUI();
     }
 
 
@@ -66,16 +62,19 @@ public class ActionManager extends OptionGroup {
      * implement a new <code>FreeColAction</code>, then you need to
      * add it in this method.  Localization and a possible accelerator
      * need to be added to the strings file.
+     *
+     * @param inGameController The client <code>InGameController</code>.
+     * @param connectController The client <code>ConnectController</code>.
      */
-    public void initializeActions(InGameController inGameController, ConnectController connectController) {
-        // keep this list alphabetized.
-
+    public void initializeActions(InGameController inGameController,
+                                  ConnectController connectController) {
         /**
          * Possible TODO: should we put some of these, especially the
          * move and tile improvement actions, into OptionGroups of
          * their own? This would simplify the MapControls slightly.
          */
 
+        // keep this list alphabetized.
         add(new AboutAction(freeColClient));
         add(new AssignTradeRouteAction(freeColClient));
         add(new BuildColonyAction(freeColClient));
@@ -164,14 +163,14 @@ public class ActionManager extends OptionGroup {
 
     /**
      * Adds the <code>FreeColActions</code> that are provided by the
-     * <code>Specification</code>. At the moment, this includes only
+     * <code>Specification</code>.  At the moment, this includes only
      * <code>TileImprovements</code>.
      *
-     * @param specification The <code>Specification</code> to refer to.
+     * @param spec The <code>Specification</code> to refer to.
      */
-    public void addSpecificationActions(Specification specification) {
+    public void addSpecificationActions(Specification spec) {
         // Initialize ImprovementActions
-        for (TileImprovementType type : specification.getTileImprovementTypeList()) {
+        for (TileImprovementType type : spec.getTileImprovementTypeList()) {
             if (!type.isNatural()) {
                 add(new ImprovementAction(freeColClient, type));
             }
@@ -197,7 +196,7 @@ public class ActionManager extends OptionGroup {
     public void update() {
         Iterator<Option> it = iterator();
         while (it.hasNext()) {
-            ((FreeColAction) it.next()).update();
+            ((FreeColAction)it.next()).update();
         }
     }
 }

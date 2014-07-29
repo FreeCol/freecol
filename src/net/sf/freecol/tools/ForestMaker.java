@@ -72,8 +72,10 @@ public class ForestMaker {
 
 
     private static class ImageLocation implements Comparable<ImageLocation> {
+
         BufferedImage image;
         int x, y;
+
 
         public ImageLocation(BufferedImage image, int x, int y) {
             this.image = image;

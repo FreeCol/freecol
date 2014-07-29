@@ -529,9 +529,7 @@ public class AIMessage {
         Element reply = askExpecting(owner.getConnection(),
             new GetNationSummaryMessage(player).toXMLElement(),
             GetNationSummaryMessage.getXMLElementTagName());
-        GetNationSummaryMessage message
-            = new GetNationSummaryMessage(reply);
-        return (message == null) ? null : message.getNationSummary();
+        return new GetNationSummaryMessage(reply).getNationSummary();
     }
 
 
@@ -566,9 +564,7 @@ public class AIMessage {
             new IndianDemandMessage(aiUnit.getUnit(), colony,
                                     type, amount).toXMLElement(),
             IndianDemandMessage.getXMLElementTagName());
-        IndianDemandMessage message
-            = new IndianDemandMessage(colony.getGame(), reply);
-        return (message == null) ? false : message.getResult();
+        return new IndianDemandMessage(colony.getGame(), reply).getResult();
     }
 
 
