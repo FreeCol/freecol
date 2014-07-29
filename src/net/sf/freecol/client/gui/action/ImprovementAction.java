@@ -65,7 +65,7 @@ public class ImprovementAction extends UnitAction {
             Unit selectedUnit = getGUI().getActiveUnit();
             Tile tile = selectedUnit.getTile();
             return selectedUnit.checkSetState(Unit.UnitState.IMPROVING)
-                && improvement.isTileAllowed(tile)
+                && tile.isImprovementTypeAllowed(improvement)
                 && improvement.isWorkerAllowed(selectedUnit);
         }
         return false;

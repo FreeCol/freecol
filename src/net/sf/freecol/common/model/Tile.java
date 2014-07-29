@@ -884,9 +884,36 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public int getWorkAmount(TileImprovementType workType) {
         return (workType == null) ? -1
-            : (!workType.isTileAllowed(this)) ? -1
+            : (getTileImprovement(workType) != null) ? -1
             // Return the basic work turns + additional work turns
             : getType().getBasicWorkTurns() + workType.getAddWorkTurns();
+    }
+
+    /**
+     * Check if a given improvement type is valid for this tile.
+     *
+     * @param type The <code>TileImprovementType</code> to check.
+     * @return True if this tile can be improved with the improvement type.
+     */
+    public boolean isImprovementTypeAllowed(TileImprovementType type) {
+        return type != null
+            && type.isTileTypeAllowed(getType())
+            && getTileImprovement(type) == null;
+    }
+        
+    /**
+     * Check if a given improvement is valid for this tile.
+     *
+     * @param tip The <code>TileImprovement</code> to check.
+     * @return True if this tile can be improved with the improvement.
+     */
+    public boolean isImprovementAllowed(TileImprovement tip) {
+        final TileImprovementType type = tip.getType();
+        if (!isImprovementTypeAllowed(type)) return false;
+        TileImprovementType req = type.getRequiredImprovementType();
+        if (req != null && getTileImprovement(req) == null) return false;
+        TileImprovement ti = getTileImprovement(type);
+        return ti == null || !ti.isComplete();
     }
 
     /**

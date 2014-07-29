@@ -280,7 +280,7 @@ public final class TileImprovementType extends FreeColGameObjectType {
      * actual tile.
      *
      * If you want to find out if an improvement is allowed for a tile, call
-     * {@link #isTileAllowed(Tile)}.
+     * {@link Tile#isImprovementAllowed(TileImprovement)}.
      *
      * @param tileType The <code>TileType</code> to check.
      * @return True if improvement is possible.
@@ -290,22 +290,6 @@ public final class TileImprovementType extends FreeColGameObjectType {
             if (!scope.appliesTo(tileType)) return false;
         }
         return true;
-    }
-
-    /**
-     * Check if a given tile is valid for this tile improvement.
-     *
-     * @param tile The <code>Tile</code> to check.
-     * @return True if the tile can be improved with this improvement.
-     */
-    public boolean isTileAllowed(Tile tile) {
-        if (!isTileTypeAllowed(tile.getType())) return false;
-        if (requiredImprovementType != null
-            && tile.getTileImprovement(requiredImprovementType) == null) {
-            return false;
-        }
-        TileImprovement ti = tile.getTileImprovement(this);
-        return ti == null || !ti.isComplete();
     }
 
     public int getBonus(GoodsType goodsType) {
