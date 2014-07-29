@@ -131,6 +131,30 @@ public final class MapViewer {
         public int compareTo(SortableImage other) {
             return other.index - this.index;
         }
+
+        // Override Object
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean equals(Object other) {
+            if (other instanceof SortableImage) {
+                return this.compareTo((SortableImage)other) == 0;
+            }
+            return super.equals(other);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int hashCode() {
+            int hash = super.hashCode();
+            hash = 37 * hash + Utils.hashCode(image);
+            hash = 37 * hash + index;
+            return hash;
+        }
     }
 
     private final FreeColClient freeColClient;

@@ -66,7 +66,69 @@ public class REFAIPlayer extends EuropeanAIPlayer {
 
     private static final Logger logger = Logger.getLogger(REFAIPlayer.class.getName());
 
-    private static int seekAndDestroyRange = 12;
+    /** Container class for REF target colony information. */
+    private static class TargetTuple implements Comparable<TargetTuple> {
+
+        public Colony colony;
+        public PathNode path;
+        public double score;
+        public Tile disembarkTile;
+        public Tile entry;
+
+
+        public TargetTuple(Colony colony, PathNode path, double score) {
+            this.colony = colony;
+            this.path = path;
+            this.score = score;
+            this.disembarkTile = null;
+            this.entry = null;
+            if (path != null) {
+                for (PathNode p = path; p != null; p = p.next) {
+                    Tile t = p.getTile();
+                    if (t != null) {
+                        this.entry = t;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Implement Comparable<TargetTuple>
+
+        public int compareTo(TargetTuple other) {
+            double cmp = other.score - score;
+            return (cmp < 0.0) ? -1 : (cmp > 0.0) ? 1 : 0;
+        }
+
+        // Override Object
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean equals(Object other) {
+            if (other instanceof TargetTuple) {
+                return this.compareTo((TargetTuple)other) == 0;
+            }
+            return super.equals(other);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int hashCode() {
+            int hash = super.hashCode();
+            hash = 37 * hash + Utils.hashCode(colony);
+            hash = 37 * hash + Utils.hashCode(path);
+            hash = 37 * hash + Utils.hashCode(score);
+            hash = 37 * hash + Utils.hashCode(disembarkTile);
+            hash = 37 * hash + Utils.hashCode(entry);
+            return hash;
+        }
+    }
+
+    private static final int seekAndDestroyRange = 12;
 
 
     /**
@@ -96,39 +158,6 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         uninitialized = getPlayer() == null;
     }
 
-
-    /** Container class for REF target colony information. */
-    private class TargetTuple implements Comparable<TargetTuple> {
-        public Colony colony;
-        public PathNode path;
-        public double score;
-        public Tile disembarkTile;
-        public Tile entry;
-
-        public TargetTuple(Colony colony, PathNode path, double score) {
-            this.colony = colony;
-            this.path = path;
-            this.score = score;
-            this.disembarkTile = null;
-            this.entry = null;
-            if (path != null) {
-                for (PathNode p = path; p != null; p = p.next) {
-                    Tile t = p.getTile();
-                    if (t != null) {
-                        this.entry = t;
-                        break;
-                    }
-                }
-            }
-        }
-
-        // Implement Comparable<TargetTuple>
-
-        public int compareTo(TargetTuple other) {
-            double cmp = other.score - score;
-            return (cmp < 0.0) ? -1 : (cmp > 0.0) ? 1 : 0;
-        }
-    }
 
     /**
      * Find suitable colony targets.

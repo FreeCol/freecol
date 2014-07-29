@@ -24,6 +24,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -114,6 +115,31 @@ public class TileTypeChange implements Comparable<TileTypeChange> {
             : (other.to == null) ? 1
             : FreeColObject.compareIds(to, other.to);
         return cmp;
+    }
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof TileTypeChange) {
+            return this.compareTo((TileTypeChange)other) == 0;
+        }
+        return super.equals(other);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 37 * hash + Utils.hashCode(from);
+        hash = 37 * hash + Utils.hashCode(to);
+        hash = 37 * hash + Utils.hashCode(production);
+        return hash;
     }
 
 

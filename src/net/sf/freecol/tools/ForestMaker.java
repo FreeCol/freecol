@@ -85,13 +85,33 @@ public class ForestMaker {
 
         public int compareTo(ImageLocation other) {
             int dy = other.y - this.y;
-            if (dy == 0) {
-                return other.x - this.x;
-            } else {
-                return dy;
-            }
+            return (dy == 0) ? other.x - this.x : dy;
         }
 
+        // Override Object
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean equals(Object other) {
+            if (other instanceof ImageLocation) {
+                return this.compareTo((ImageLocation)other) == 0;
+            }
+            return super.equals(other);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int hashCode() {
+            int hash = super.hashCode();
+            hash = 37 * hash + x;
+            hash = 37 * hash + y;
+            hash = 37 * hash + image.hashCode();
+            return hash;
+        }
     }
 
 
