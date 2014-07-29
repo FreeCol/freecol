@@ -428,7 +428,7 @@ public abstract class AIPlayer extends AIObject {
 
             
             lb.add("\n  @",
-                String.format("%-30s%-10s%-30s%-16s",
+                String.format("%-30s%-10s%-40s%-16s",
                     Utils.chop(u.getLocation().toShortString(), 30),
                     Utils.chop(reason, 10),
                     Utils.chop(u.toShortString(), 30),

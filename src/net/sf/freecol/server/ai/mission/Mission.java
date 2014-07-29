@@ -464,11 +464,11 @@ public abstract class Mission extends AIObject {
      * chose to use the transport destination tile, but it may have been
      * chosen carefully.
      *
-     * @param tag A logging tag.
+     * @param lb A <code>LogBuilder</code> to log to.
      * @return Positive if the unit disembarked, zero if no change occurs,
      *     negative if the disembark failed.
      */
-    protected int checkDisembark(String tag) {
+    protected int checkDisembark(LogBuilder lb) {
         final AIUnit aiUnit = getAIUnit();
         final Unit unit = getUnit();
         Location transportTarget;
@@ -479,35 +479,39 @@ public abstract class Mission extends AIObject {
             && (transportTarget = getTransportDestination()) != null
             && (tile = transportTarget.getTile()) != null) {
             if (unit.getTile() == tile) {
-                if (!aiUnit.leaveTransport(null)) {
-                    logger.warning(tag + " at " + unit.getLocation()
-                        + " failed simple disembark to " + transportTarget
-                        + ": " + this);
+                if (aiUnit.leaveTransport(null)) {
+                    lb.add(", disembarked to ", tile);
+                    return 1;
+                } else {
+                    lb.add(", failed to disembark from ", unit.getLocation());
                     return -1;
                 }
-                return 1;
             }
+
             Direction d = unit.getTile().getDirection(tile);
             if (d != null) {
-                switch (unit.getMoveType(d)) {
+                Unit.MoveType mt = unit.getMoveType(d);
+                switch (mt) {
                 case MOVE:
-                    if (!aiUnit.leaveTransport(d)) {
-                        logger.warning(tag + " at " + unit.getLocation()
-                            + " failed disembark " + d
-                            + " to " + transportTarget + ": " + this);
+                    if (aiUnit.leaveTransport(d)) {
+                        lb.add(", disembarked ", d, " to ", tile);
+                        return 1;
+                    } else {
+                        lbFail(lb, ", failed to disembark ", d, " to ", tile);
                         return -1;
                     }
-                    return 1;
                 case ATTACK_UNIT:
                     Unit other = tile.getFirstUnit();
                     if (unit.getOwner().atWarWith(other.getOwner())) {
+                        lbAttack(lb, other);
                         AIMessage.askAttack(aiUnit, d);
+                        return -1;
+                    } else {
+                        lb.add(", blocked by ", other, " at ", tile);
+                        return 0;
                     }
-                    // Return failure as even if the attack succeeds the
-                    // disembark has failed and the unit has consumed its
-                    // moves so no further progress is possible.
-                    return -1;
                 default:
+                    lbMove(lb, unit, mt);
                     break;
                 }
             }
@@ -569,7 +573,9 @@ public abstract class Mission extends AIObject {
         // Are we there yet?
         if (unit.isAtLocation(target)) {
             if (unit.isOnCarrier()) {
-                if (!aiUnit.leaveTransport(null)) {
+                if (aiUnit.leaveTransport(null)) {
+                    lb.add(", disembarked from ", carrier);
+                } else {
                     lb.add(", at ", target, " failed to disembark from ",
                            carrier, ".");
                     return MoveType.MOVE_ILLEGAL;
@@ -720,7 +726,10 @@ public abstract class Mission extends AIObject {
                 MoveType mt = unit.getMoveType(d);
                 if (!mt.isProgress()) return mt; // Special handling required.
 
-                if (aiUnit.leaveTransport(d)) continue;
+                if (aiUnit.leaveTransport(d)) {
+                    lb.add(", disembarked from ", carrier);
+                    continue;
+                }
                 lb.add(", on ", unit.getLocation(), 
                        " failed to disembark to ", path.getTile(), ".");
                 return MoveType.MOVE_ILLEGAL;
@@ -770,7 +779,10 @@ public abstract class Mission extends AIObject {
                            " to embark on ", newCarrier, ".");
                     return MoveType.MOVE_NO_MOVES;
                 }
-                if (aiUnit.joinTransport(newCarrier, d)) continue;
+                if (aiUnit.joinTransport(newCarrier, d)) {
+                    lb.add(", joined ", newCarrier);
+                    continue;
+                }
                 lb.add(", at ", unit.getLocation(),
                        " failed to embark on ", newCarrier,
                        " at ", newCarrier.getLocation(), ".");

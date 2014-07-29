@@ -476,14 +476,7 @@ public class UnitSeekAndDestroyMission extends Mission {
         }
 
         final Unit unit = getUnit();
-        int disembark = checkDisembark(tag);
-        if (disembark > 0) { // Arrived
-            lbAt(lb, unit);
-            return this;
-        } else if (disembark < 0) { // Failed!?!
-            lbFail(lb, "disembark at ", unit.getLocation());
-            return this;
-        }
+        if (checkDisembark(lb) < 0) return (unit.isDisposed()) ? null : this;
 
         // Is there a target-of-opportunity?
         final AIUnit aiUnit = getAIUnit();
