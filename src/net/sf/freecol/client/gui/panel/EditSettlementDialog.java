@@ -23,8 +23,6 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.List;
-import java.util.logging.Logger;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
@@ -37,7 +35,10 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
-import net.miginfocom.swing.MigLayout;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Logger;
+
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -57,6 +58,8 @@ import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
+
+import net.miginfocom.swing.MigLayout;
 
 
 /**
@@ -205,7 +208,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         final Specification spec = freeColClient.getGame().getSpecification();
         final GUI gui = freeColClient.getGUI();
         IndianSettlement ret = null;
-        List<Tile> tiles = settlement.getOwnedTiles();
+        Set<Tile> tiles = settlement.getOwnedTiles();
         Object value = getValue();
         if (options.get(0).equals(value)) { // OK
             settlement.setName(name.getText());

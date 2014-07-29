@@ -2929,7 +2929,7 @@ public final class InGameController extends Controller {
                               Colony colony) {
         final Specification spec = getGame().getSpecification();
         ChangeSet cs = new ChangeSet();
-        List<Tile> ownedTiles = colony.getOwnedTiles();
+        Set<Tile> ownedTiles = colony.getOwnedTiles();
         Tile tile = colony.getTile();
 
         // Join.

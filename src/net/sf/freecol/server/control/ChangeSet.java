@@ -20,6 +20,7 @@
 package net.sf.freecol.server.control;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -1313,7 +1314,7 @@ public class ChangeSet {
      * @param objects The <code>FreeColGameObject</code>s that changed.
      * @return The updated <code>ChangeSet</code>.
      */
-    public ChangeSet add(See see, List<? extends FreeColGameObject> objects) {
+    public ChangeSet add(See see, Collection<? extends FreeColGameObject> objects) {
         for (FreeColGameObject o : objects) {
             changes.add(new ObjectChange(see, o));
         }

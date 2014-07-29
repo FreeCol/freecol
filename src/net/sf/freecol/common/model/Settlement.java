@@ -20,9 +20,11 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -57,7 +59,7 @@ public abstract class Settlement extends GoodsLocation
     private SettlementType type = null;
 
     /** The tiles this settlement owns. */
-    private final List<Tile> ownedTiles = new ArrayList<Tile>();
+    private final Set<Tile> ownedTiles = new HashSet<Tile>();
 
     /** Contains the abilities and modifiers of this Settlement. */
     private final FeatureContainer featureContainer = new FeatureContainer();
@@ -159,8 +161,8 @@ public abstract class Settlement extends GoodsLocation
      *
      * @return A list of tiles.
      */
-    public List<Tile> getOwnedTiles() {
-        return new ArrayList<Tile>(ownedTiles);
+    public Set<Tile> getOwnedTiles() {
+        return new HashSet<Tile>(ownedTiles);
     }
 
     /**
@@ -259,8 +261,7 @@ public abstract class Settlement extends GoodsLocation
      */
     public void exciseSettlement() {
         Tile settlementTile = getTile();
-        List<Tile> lostTiles = getOwnedTiles();
-        for (Tile tile : lostTiles) {
+        for (Tile tile : getOwnedTiles()) {
             tile.changeOwnership(null, null);//-til
         }
         settlementTile.setSettlement(null);//-vis(owner),-til

@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -2782,7 +2783,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // not include the colony tile, which is updated in
         // csCombat().
         List<Tile> explored = attackerPlayer.exploreForSettlement(colony);
-        List<Tile> tiles = colony.getOwnedTiles();
+        Set<Tile> tiles = colony.getOwnedTiles();
         for (Tile t : tiles) {
             t.cacheUnseen(attackerPlayer);//+til
             if (!explored.contains(t)) explored.add(t);
@@ -3251,7 +3252,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     public void csDisposeSettlement(Settlement settlement, ChangeSet cs) {
         logger.finest("Disposing of " + settlement.getName());
         ServerPlayer owner = (ServerPlayer)settlement.getOwner();
-        List<Tile> owned = settlement.getOwnedTiles();
+        Set<Tile> owned = settlement.getOwnedTiles();
         for (Tile t : owned) t.cacheUnseen();//+til
         Tile centerTile = settlement.getTile();
 
