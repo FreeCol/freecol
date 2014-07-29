@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui.menu;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -139,7 +140,7 @@ public class FreeColMenuTest implements ActionListener, ItemListener {
         frame.setContentPane(demo.createContentPane());
 
         //Display the window.
-        frame.setSize(450, 260);
+        frame.setPreferredSize(new Dimension(450, 260));
         frame.setVisible(true);
     }
 
