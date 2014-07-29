@@ -380,13 +380,10 @@ public class AIUnit extends AIObject implements Transportable {
      * (possibly requiring a purchase, which may fail due to lack of gold
      * or boycotts in effect).
      *
-     * TODO: remove cheat.
-     *
      * @param roleId The role identifier.
-     * @param cheat Cheat goods purchase in Europe (but *not* boycotts).
      * @return True if the role change was successful.
      */
-    public boolean equipForRole(String roleId, boolean cheat) {
+    public boolean equipForRole(String roleId) {
         final Specification spec = getSpecification();
         Role r = spec.getRole(roleId);
         final Player player = unit.getOwner();
@@ -399,13 +396,6 @@ public class AIUnit extends AIObject implements Transportable {
                 int price = ((UnitLocation)loc).priceGoods(req);
                 if (price < 0) continue;
                 if (player.checkGold(price)) break;
-                if (cheat) {
-                    player.logCheat("minted " + price
-                        + " gold to equip " + unit
-                        + " for " + r + "." + count);
-                    player.modifyGold(price);
-                    break;
-                }
             }
             if (count <= 0) return false;
         }

@@ -183,8 +183,8 @@ public class EuropeanAIPlayer extends AIPlayer {
                 } else if (unit.hasAbility(Ability.EXPERT_SCOUT)) {
                     return 600;
                 }
-                List<AbstractGoods> roleEquipment = unit.getSpecification()
-                .getRole("model.role.scout").getRequiredGoods();
+                List<AbstractGoods> roleEquipment
+                    = scoutRole.getRequiredGoods();
                 int base = (unit.isInEurope()) ? 500
                     : (unit.getLocation().getColony() != null
                         && unit.getLocation().getColony()
@@ -226,8 +226,8 @@ public class EuropeanAIPlayer extends AIPlayer {
                 } else if (unit.hasAbility(Ability.EXPERT_PIONEER)) {
                     return 600;
                 }
-                List<AbstractGoods> roleEquipment = unit.getSpecification()
-                .getRole("model.role.pioneer").getRequiredGoods();
+                List<AbstractGoods> roleEquipment
+                    = pioneerRole.getRequiredGoods();
                 int base = (unit.isInEurope()) ? 500
                     : (unit.getLocation().getColony() != null
                         && unit.getLocation().getColony()
@@ -250,6 +250,18 @@ public class EuropeanAIPlayer extends AIPlayer {
 
 
     // Caches/internals.  Do not serialize.
+
+    /** Cheat chances. */
+    private static int liftBoycottCheatPercent;
+    private static int equipScoutCheatPercent;
+    private static int landUnitCheatPercent;
+    private static int offensiveLandUnitCheatPercent;
+    private static int offensiveNavalUnitCheatPercent;
+    private static int transportNavalUnitCheatPercent;
+    /** The pioneer role. */
+    private static Role pioneerRole = null;
+    /** The scouting role. */
+    private static Role scoutRole = null;
 
     /**
      * Stores temporary information for sessions (trading with another
@@ -350,6 +362,28 @@ public class EuropeanAIPlayer extends AIPlayer {
 
 
     /**
+     * Initialize the static fields that need the spec.
+     */
+    private synchronized void initializeSpecificationConstants() {
+        if (pioneerRole != null) return;
+        final Specification spec = getSpecification();
+        pioneerRole = spec.getRole("model.role.pioneer");
+        scoutRole = spec.getRole("model.role.scout");
+        liftBoycottCheatPercent
+            = spec.getInteger(GameOptions.LIFT_BOYCOTT_CHEAT);
+        equipScoutCheatPercent
+            = spec.getInteger(GameOptions.EQUIP_SCOUT_CHEAT);
+        landUnitCheatPercent
+            = spec.getInteger(GameOptions.LAND_UNIT_CHEAT);
+        offensiveLandUnitCheatPercent
+            = spec.getInteger(GameOptions.OFFENSIVE_LAND_UNIT_CHEAT);
+        offensiveNavalUnitCheatPercent
+            = spec.getInteger(GameOptions.OFFENSIVE_NAVAL_UNIT_CHEAT);
+        transportNavalUnitCheatPercent
+            = spec.getInteger(GameOptions.TRANSPORT_NAVAL_UNIT_CHEAT);
+    }
+
+    /**
      * Simple initialization of AI missions given that we know the starting
      * conditions.
      *
@@ -425,18 +459,6 @@ public class EuropeanAIPlayer extends AIPlayer {
                 if (market.getArrears(gt) > 0) arrears.add(gt);
             }
         }
-        final int liftBoycottCheatPercent
-            = spec.getInteger(GameOptions.LIFT_BOYCOTT_CHEAT);
-        final int equipScoutCheatPercent
-            = spec.getInteger(GameOptions.EQUIP_SCOUT_CHEAT);
-        final int landUnitCheatPercent
-            = spec.getInteger(GameOptions.LAND_UNIT_CHEAT);
-        final int offensiveLandUnitCheatPercent
-            = spec.getInteger(GameOptions.OFFENSIVE_LAND_UNIT_CHEAT);
-        final int offensiveNavalUnitCheatPercent
-            = spec.getInteger(GameOptions.OFFENSIVE_NAVAL_UNIT_CHEAT);
-        final int transportNavalUnitCheatPercent
-            = spec.getInteger(GameOptions.TRANSPORT_NAVAL_UNIT_CHEAT);
         final int nCheats = arrears.size() + 5;
         int[] randoms = Utils.randomInts(logger, "cheats", air, 100, nCheats);
         int cheatIndex = 0;
@@ -467,9 +489,15 @@ public class EuropeanAIPlayer extends AIPlayer {
             && randoms[cheatIndex++] < equipScoutCheatPercent) {
             for (Unit u : europe.getUnitList()) {
                 if (u.hasDefaultRole()
-                    && u.hasAbility(Ability.CAN_BE_EQUIPPED)
-                    && getAIUnit(u).equipForRole("model.role.scout", true)) {
-                    lb.add("equipped scout ", u, ", ");
+                    && u.hasAbility(Ability.CAN_BE_EQUIPPED)) {
+                    int price = europe.priceGoods(u.getGoodsDifference(scoutRole, 1));
+                    if (!u.getOwner().checkGold(price)) {
+                        player.modifyGold(price);
+                        lb.add("added ", price, " gold to ");
+                    }
+                    if (getAIUnit(u).equipForRole("model.role.scout")) {
+                        lb.add("equip scout ", u, ", ");
+                    }
                     break;
                 }
             }
@@ -2211,7 +2239,10 @@ public class EuropeanAIPlayer extends AIPlayer {
         sessionRegister.clear();
         clearAIUnits();
 
-        if (turn.isFirstTurn()) initializeMissions(lb);
+        if (turn.isFirstTurn()) {
+            initializeSpecificationConstants();
+            initializeMissions(lb);
+        }
         determineStances(lb);
 
         lb.mark();
