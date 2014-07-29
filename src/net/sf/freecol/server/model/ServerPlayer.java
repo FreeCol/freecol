@@ -3311,11 +3311,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
             claimant = null;
             if (!votes.isEmpty()) {
                 int bestValue = 0;
-                for (Settlement key : votes.keySet()) {
-                    int value = votes.get(key).intValue();
+                for (Entry<Settlement, Integer> entry : votes.entrySet()) {
+                    int value = entry.getValue();
                     if (bestValue < value) {
                         bestValue = value;
-                        claimant = key;
+                        claimant = entry.getKey();
                     }
                 }
             }

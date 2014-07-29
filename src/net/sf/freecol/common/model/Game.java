@@ -1011,8 +1011,8 @@ public class Game extends FreeColGameObject {
             if (obj.isDisposed()) disposed++;
         }
         stats.put("disposed", Long.toString(disposed));
-        for (String k : objStats.keySet()) {
-            stats.put(k, Long.toString(objStats.get(k)));
+        for (Entry<String, Long> entry : objStats.entrySet()) {
+            stats.put(entry.getKey(), Long.toString(entry.getValue()));
         }
 
         return stats;

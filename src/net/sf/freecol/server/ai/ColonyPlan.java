@@ -884,13 +884,15 @@ public class ColonyPlan {
      */
     private void updatePlans(Map<GoodsType, Map<WorkLocation, Integer>> production) {
         workPlans.clear();
-        for (GoodsType g : production.keySet()) {
+        for (Entry<GoodsType, Map<WorkLocation, Integer>> entry
+                 : production.entrySet()) {
+            GoodsType g = entry.getKey();
             // Do not make plans to produce into a full warehouse.
             if (g.isStorable()
                 && colony.getGoodsCount(g) >= colony.getWarehouseCapacity()
                 && !g.limitIgnored()) continue;
 
-            for (WorkLocation wl : production.get(g).keySet()) {
+            for (WorkLocation wl : entry.getValue().keySet()) {
                 if (wl.canBeWorked() || wl.canAutoProduce()) {
                     workPlans.add(new WorkLocationPlan(getAIMain(), wl, g));
                 }

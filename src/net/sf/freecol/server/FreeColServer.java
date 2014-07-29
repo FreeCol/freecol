@@ -1319,10 +1319,8 @@ public final class FreeColServer {
 
         if (allNations) {
             game.setFreeColGameObjectListener(aiMain);
-            Set<Entry<Nation, NationState>> entries
-                = new HashSet<Entry<Nation, NationState>>(game.getNationOptions()
-                    .getNations().entrySet());
-            for (Entry<Nation, NationState> entry : entries) {
+            for (Entry<Nation, NationState> entry
+                     : game.getNationOptions().getNations().entrySet()) {
                 if (entry.getKey().isUnknownEnemy()) continue;
                 if (entry.getValue() != NationState.NOT_AVAILABLE
                     && game.getPlayer(entry.getKey().getId()) == null) {

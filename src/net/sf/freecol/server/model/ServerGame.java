@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -285,16 +286,19 @@ public class ServerGame extends Game implements ServerModelObject {
         }
         if (!ready) return; // No player meets the support limit.
 
+        int bestScore = Integer.MIN_VALUE;
+        int worstScore = Integer.MAX_VALUE;
         Player weakestAIPlayer = null;
         Player strongestAIPlayer = null;
-        for (Player player : scores.keySet()) {
-            if ((weakestAIPlayer == null
-                    || scores.get(weakestAIPlayer) > scores.get(player))
-                && weakLimit.evaluate(player)) {
+        for (Entry<Player, Integer> entry : scores.entrySet()) {
+            Player player = entry.getKey();
+            int score = entry.getValue();
+            if (worstScore > score && weakLimit.evaluate(player)) {
+                worstScore = score;
                 weakestAIPlayer = player;
             }
-            if (strongestAIPlayer == null
-                || scores.get(strongestAIPlayer) < scores.get(player)) {
+            if (bestScore < score) {
+                bestScore = score;
                 strongestAIPlayer = player;
             }
         }

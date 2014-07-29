@@ -316,8 +316,8 @@ public class AIMain extends FreeColObject
                 objStats.put(className, count);
             }
         }
-        for (String k : objStats.keySet()) {
-            stats.put(k, Long.toString(objStats.get(k)));
+        for (Entry<String, Long> entry : objStats.entrySet()) {
+            stats.put(entry.getKey(), Long.toString(entry.getValue()));
         }
 
         return stats;

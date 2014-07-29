@@ -25,6 +25,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -188,8 +189,9 @@ public class IndianNationType extends NationType {
         }
 
         for (Tile t: tile.getSurroundingTiles(1)) {
-            for (GoodsType goodsType : scale.keySet()) {
-                scale.put(goodsType, scale.get(goodsType).intValue()
+            for (Entry<GoodsType, Integer> entry : scale.entrySet()) {
+                GoodsType goodsType = entry.getKey();
+                scale.put(goodsType, entry.getValue().intValue()
                           + t.getPotentialProduction(goodsType, null));
             }
         }
