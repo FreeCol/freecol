@@ -204,6 +204,8 @@ public final class TilePanel extends FreeColPanel {
         add(colopediaButton, "tag help");
 
         setSize(getPreferredSize());
+
+        g.dispose();
     }
 
 

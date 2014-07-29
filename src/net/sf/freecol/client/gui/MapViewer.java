@@ -2933,6 +2933,8 @@ public final class MapViewer {
 
         final JLabel label = new JLabel(new ImageIcon(img));
         label.setSize(width, height);
+
+        g.dispose();
         return label;
     }
 

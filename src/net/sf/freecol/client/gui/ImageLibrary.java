@@ -239,8 +239,10 @@ public final class ImageLibrary {
         float[] offsets = { offset, offset, offset, 0.0f };
         RescaleOp rop = new RescaleOp(scales, offsets, null);
 
-        Graphics2D g2d = (Graphics2D) g;
+        Graphics2D g2d = (Graphics2D)g;
         g2d.drawImage(bi, rop, 0, 0);
+
+        g.dispose();
         return bi;
     }
 
