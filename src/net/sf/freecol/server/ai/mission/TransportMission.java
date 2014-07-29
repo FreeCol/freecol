@@ -1262,25 +1262,25 @@ public class TransportMission extends Mission {
             if ((reason = cargo.check(aiCarrier)) != null) {
                 // Just remove, it is invalid
                 boolean result = removeCargo(cargo, reason);
-                lb.add(" invalid(", reason, ")", cargo.toShortString(),
+                lb.add(" invalid(", reason, ") ", cargo.toShortString(),
                        "=", result);
             } else if (cargo.isCollectable()) {
-                lb.add(" collect", cargo.toShortString());
+                lb.add(" collect ", cargo.toShortString());
             } else if (cargo.isDeliverable()) {
-                lb.add(" deliver", cargo.toShortString());
+                lb.add(" deliver ", cargo.toShortString());
             } else if ((path = carrier.findPath(cargo.getTarget())) == null
                 && !cargo.retry()) {
                 boolean result = removeCargo(cargo, "no path");
-                lb.add(" drop(no-path)", cargo.toShortString(), "=", result);
+                lb.add(" drop(no-path) ", cargo.toShortString(), "=", result);
                 drop.add(t);
             } else if (carrier.hasTile()
                 && (reason = cargo.setTarget()) != null) {
                 boolean result = removeCargo(cargo, "fail(" + reason + ")");
                 if (reason.startsWith("invalid") || !cargo.retry()) {
-                    lb.add(" failed(", reason, ")", cargo.toShortString(),
+                    lb.add(" failed(", reason, ") ", cargo.toShortString(),
                            "=", result);
                 } else {
-                    lb.add(" retry(", reason, ")", cargo.toShortString(),
+                    lb.add(" retry(", reason, ") ", cargo.toShortString(),
                            "=", result);
                     retry.add(t);
                 }
@@ -1399,18 +1399,21 @@ public class TransportMission extends Mission {
                 return CargoResult.TCONTINUE;
             }
             switch (carrier.getNoAddReason(l)) {
-            case NONE: break;
+            case NONE:
+                if (!t.joinTransport(carrier, null)) {
+                    lb.add(", ", cargo.toShortString(), " NO-JOIN");
+                    return CargoResult.TFAIL;
+                }
+                break;
+            case ALREADY_PRESENT:
+                break;
             case CAPACITY_EXCEEDED:
                 lb.add(", ", cargo.toShortString(), " NO-ROOM on ", carrier);
                 return CargoResult.TCONTINUE;
             default:
-                lb.add(", ", cargo.toShortString(), " retry");
+                lb.add(", ", cargo.toShortString(), " retry-",
+                       carrier.getNoAddReason(l));
                 return CargoResult.TRETRY;
-            }
-
-            if (!isCarrying(t) && !t.joinTransport(carrier, null)) {
-                lb.add(", ", cargo.toShortString(), " NO-JOIN");
-                return CargoResult.TFAIL;
             }
 
             if ((reason = cargo.setTarget()) == null) {
