@@ -1388,6 +1388,10 @@ public class TransportMission extends Mission {
         final Location here = carrier.getLocation();
         final Transportable t = cargo.getTransportable();
         final Locatable l = t.getTransportLocatable();
+        if (l == null) {
+            logger.warning("Null-locatable: " + cargo);
+            return CargoResult.TDONE;
+        }
         AIUnit aiu;
         AIGoods aig;
         String reason;
