@@ -802,6 +802,17 @@ public class Messages {
             : player.getNewLandName();
     }
 
+    /**
+     * Initialize the otherRivers collection.
+     */
+    public static synchronized void requireOtherRivers() {
+        if (otherRivers == null) {
+            otherRivers = new ArrayList<String>();
+            collectNames("model.other.region.river.", otherRivers);
+            // Does not need to use player or system PRNG
+            Collections.shuffle(otherRivers);
+        }
+    }
 
     /**
      * Creates a unique region name by fetching a new default name
@@ -831,12 +842,7 @@ public class Messages {
         // There are a bunch of extra rivers not attached to a specific
         // nation at model.other.region.river.*.
         if (name == null && regionType == RegionType.RIVER) {
-            if (otherRivers == null) {
-                otherRivers = new ArrayList<String>();
-                collectNames("model.other.region.river.", otherRivers);
-                // Does not need to use player or system PRNG
-                Collections.shuffle(otherRivers);
-            }
+            requireOtherRivers();
             while (!otherRivers.isEmpty()) {
                 name = otherRivers.remove(0);
                 if (map.getRegionByName(name) == null) return name;
@@ -860,15 +866,22 @@ public class Messages {
     }
 
     /**
+     * Initialize the mercenary leaders collection.
+     */
+    private static synchronized void requireMercenaryLeaders() {
+        if (mercenaryLeaders == null) {
+            mercenaryLeaders = new ArrayList<String>();
+            collectNames("model.mercenaries.", mercenaryLeaders);
+        }
+    }
+
+    /**
      * Get the number of mercenary leaders.
      *
      * @return The number of mercenary leaders.
      */
     public static int getMercenaryLeaderCount() {
-        if (mercenaryLeaders == null) {
-            mercenaryLeaders = new ArrayList<String>();
-            collectNames("model.mercenaries.", mercenaryLeaders);
-        }
+        requireMercenaryLeaders();
         return mercenaryLeaders.size();
     }
 
@@ -879,6 +892,7 @@ public class Messages {
      * @return The mercenary leader name.
      */
     public static String getMercenaryLeaderName(int n) {
+        requireMercenaryLeaders();
         return mercenaryLeaders.get(n);
     }
 
