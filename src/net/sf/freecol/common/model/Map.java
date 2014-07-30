@@ -747,8 +747,7 @@ public class Map extends FreeColGameObject implements Location {
     public static final boolean isSameLocation(Location l1, Location l2) {
         return (l1 == null || l2 == null) ? false
             : (l1 == l2) ? true
-            : (l1 instanceof Unit) ? isSameLocation(((Unit)l1).getLocation(), l2)
-            : (l2 instanceof Unit) ? isSameLocation(l1, ((Unit)l2).getLocation())
+            : (l1.getTile() == null) ? false
             : l1.getTile() == l2.getTile();
     }
 
