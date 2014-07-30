@@ -378,116 +378,129 @@ public class BuildColonyMission extends Mission {
         } else if (reason != null) {
             lbBroken(lb, reason);
             return null;
-        } else if (target instanceof Tile
-            && (getColonyValue((Tile)target)) < colonyValue) {
-            reason = "target tile " + target.toShortString() + " value fell";
+        } else if (target instanceof Tile) {
+            Colony c = ((Tile)target).getColony();
+            if (player.owns(c)) { // Another builder has succeeded
+                setTarget(c);
+            } else {
+                int newValue = getColonyValue((Tile)target);
+                if (newValue < colonyValue) {
+                    reason = "target tile " + target.toShortString()
+                        + " value " + colonyValue + " -> " + newValue;
+                }
+            }
         }
         if (reason != null && !retargetMission(reason, lb)) return null;
 
-        // Go there.
-        Unit.MoveType mt = travelToTarget(getTarget(),
-            CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
-        switch (mt) {
-        case MOVE:
-            break;
-        case MOVE_ILLEGAL:
-        case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
-            return this;
-        default:
-            lbMove(lb, unit, mt);
-            return this;
-        }
-
-        if (getTarget() instanceof Colony) {
-            // If arrived at the target colony it is time to retarget
-            // and insist on finding a building site.  On failure,
-            // just work in the colony for the present.
-            String name = ((Colony)getTarget()).getName();
-            Location newTarget = findTarget(aiUnit, 5, false);
-            if (newTarget == null) {
-                lb.add(", give up and join ", name, ".");
-                return new WorkInsideColonyMission(aiMain, aiUnit,
-                    aiMain.getAIColony((Colony)getTarget()));
-            }
-            setTarget(newTarget);
-            lb.add(", arrived at ", name, ", retargeting ", newTarget);
-
-        } else if (getTarget() instanceof Tile) {
-            Tile tile = (Tile)getTarget();
-            if (tile.getOwner() == null) {
-                ; // All is well
-            } else if (player.owns(tile)) { // Already ours, clear users
-                Colony colony = (Colony)tile.getOwningSettlement();
-                ColonyTile ct;
-                if (colony != null
-                    && (ct = colony.getColonyTile(tile)) != null) {
-                    // Weird, building next to one of own colonies.
-                    // This should not happen, but handle it.
-                    aiMain.getAIColony(colony).stopUsing(ct);
-                }
-            } else {
-                // Not our tile, so claim it first.  Fail if someone
-                // has claimed the tile and will not sell.  Otherwise
-                // try to buy it or steal it.
-                int price = player.getLandPrice(tile);
-                boolean fail = price < 0;
-                if (price > 0 && !player.checkGold(price)) {
-                    if (Utils.randomInt(logger, "Land gold?",
-                            getAIRandom(), 4) == 0) {
-                        player.modifyGold(price);
-                        player.logCheat("minted " + price
-                            + " gold to buy " + tile);
-                    }
-                }
-                if (price >= 0) {
-                    fail = !AIMessage.askClaimLand(tile, aiUnit,
-                        ((price == 0) ? 0 : (player.checkGold(price)) ? price
-                            : NetworkConstants.STEAL_LAND))
-                        || !player.owns(tile);
-                }
-                if (fail) {
-                    if (retargetMission("tile-claim-at-" + tile,
-                                        lb)) return this;
-                    setTarget(null);
-                    lbFail(lb, "tile claim at ", tile, ".");
-                    return null;
-                }
-            }
-
-            // Check that the unit has moves left, which are required
-            // for building.
-            if (unit.getMovesLeft() <= 0) {
-                lb.add(", waiting to build at ", tile, ".");
+        for (;;) {
+            // Go there.
+            Unit.MoveType mt = travelToTarget(getTarget(),
+                CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
+            switch (mt) {
+            case MOVE:
+                break;
+            case MOVE_ILLEGAL:
+            case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
+                return this;
+            default:
+                lbMove(lb, unit, mt);
                 return this;
             }
 
-            // Log the colony values so we can improve things
-            if (logger.isLoggable(Level.FINE)) {
-                LogBuilder l2 = new LogBuilder(64);
-                l2.add(tag, " score-at-foundation ", tile, ":");
-                for (Double d : player.getAllColonyValues(tile)) {
-                    l2.add(" ", d);
+            if (getTarget() instanceof Colony) {
+                // If arrived at the target colony it is time to retarget
+                // another building site, unless the existing one is small
+                // or nothing is found.
+                Colony colony = (Colony)getTarget();
+                String name = colony.getName();
+                Location newTarget;
+                if (colony.getUnitCount() <= 1
+                    || (newTarget = findTarget(aiUnit, 5, false)) == null) {
+                    lb.add(", join ", name, ". ");
+                    break;
                 }
-                l2.log(logger, Level.FINE);
-            }
-            
-            // Clear to build the colony.
-            if (AIMessage.askBuildColony(aiUnit, Player.ASSIGN_SETTLEMENT_NAME)
-                && tile.getColony() != null) {
-                Colony colony = tile.getColony();
-                AIColony aiColony = aiMain.getAIColony(colony);
-                aiColony.requestRearrange();
-                lbDone(lb, colony);
-                return new WorkInsideColonyMission(aiMain, aiUnit, aiColony);
-            } else {
-                lbFail(lb, "build at ", tile);
-                return null;
-            }
+                setTarget(newTarget);
+                lb.add(", arrived at ", name, ", retargeting ", newTarget);
+                
+            } else if (getTarget() instanceof Tile) {
+                Tile tile = (Tile)getTarget();
+                if (tile.getOwner() == null) {
+                    ; // All is well
+                } else if (player.owns(tile)) { // Already ours, clear users
+                    Colony colony = (Colony)tile.getOwningSettlement();
+                    ColonyTile ct;
+                    if (colony != null
+                        && (ct = colony.getColonyTile(tile)) != null) {
+                        // Weird, building next to one of own colonies.
+                        // This should not happen, but handle it.
+                        aiMain.getAIColony(colony).stopUsing(ct);
+                    }
+                } else {
+                    // Not our tile, so claim it first.  Fail if someone
+                    // has claimed the tile and will not sell.  Otherwise
+                    // try to buy it or steal it.
+                    int price = player.getLandPrice(tile);
+                    boolean fail = price < 0;
+                    if (price > 0 && !player.checkGold(price)) {
+                        if (Utils.randomInt(logger, "Land gold?",
+                                getAIRandom(), 4) == 0) {
+                            player.modifyGold(price);
+                            player.logCheat("minted " + price
+                                + " gold to buy " + tile);
+                        }
+                    }
+                    if (price >= 0) {
+                        fail = !AIMessage.askClaimLand(tile, aiUnit,
+                            ((price == 0) ? 0 : (player.checkGold(price)) ? price
+                                : NetworkConstants.STEAL_LAND))
+                            || !player.owns(tile);
+                    }
+                    if (fail) {
+                        if (retargetMission("tile-claim-at-" + tile,
+                                            lb)) return this;
+                        setTarget(null);
+                        lbFail(lb, "tile claim at ", tile, ".");
+                        break;
+                    }
+                }
 
-        } else {
-            throw new IllegalStateException("Bogus target " + getTarget());
+                // Check that the unit has moves left, which are required
+                // for building.
+                if (unit.getMovesLeft() <= 0) {
+                    lb.add(", waiting to build at ", tile, ".");
+                    return this;
+                }
+
+                // Log the colony values so we can improve things
+                if (logger.isLoggable(Level.FINE)) {
+                    LogBuilder l2 = new LogBuilder(64);
+                    l2.add(tag, " score-at-foundation ", tile, ":");
+                    for (Double d : player.getAllColonyValues(tile)) {
+                        l2.add(" ", d);
+                    }
+                    l2.log(logger, Level.FINE);
+                }
+            
+                // Clear to build the colony.
+                if (AIMessage.askBuildColony(aiUnit,
+                        Player.ASSIGN_SETTLEMENT_NAME)
+                    && tile.getColony() != null) {
+                    Colony colony = tile.getColony();
+                    AIColony aiColony = aiMain.getAIColony(colony);
+                    aiColony.requestRearrange();
+                    lbDone(lb, colony);
+                    return new WorkInsideColonyMission(aiMain, aiUnit, aiColony);
+                } else {
+                    lbFail(lb, "build at ", tile);
+                    break;
+                }
+
+            } else {
+                lbFail(lb, "bogus target ", getTarget());
+                break;
+            }
         }
-        return this;
+        return null;
     }
 
 
