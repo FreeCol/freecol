@@ -56,7 +56,7 @@ public abstract class ValuedAIObject extends AIObject {
     public ValuedAIObject(AIMain aiMain, String id) {
         super(aiMain, id);
 
-        value = 0;
+        this.value = 0;
     }
 
     /**
@@ -65,7 +65,7 @@ public abstract class ValuedAIObject extends AIObject {
      *
      * @param aiMain The main AI-object.
      * @param element The root element for the XML-representation 
-     *       of a <code>Wish</code>.
+     *     of the object.
      */
     public ValuedAIObject(AIMain aiMain, Element element) {
         super(aiMain, element);

@@ -527,7 +527,8 @@ public class TransportMission extends Mission {
         @Override
         public String toString() {
             LogBuilder lb = new LogBuilder(64);
-            lb.add("[", transportable, " mode=", mode,
+            lb.add("[", transportable,
+                " ", mode.toString().toLowerCase(Locale.US),
                 ((mode.isCollection()) ? " from " : " to "), target,
                 " ", turns, "/", tries, " space=", spaceLeft,
                 ((wrapped == null) ? "" : " wrap"), "]");

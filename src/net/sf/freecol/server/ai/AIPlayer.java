@@ -426,12 +426,11 @@ public abstract class AIPlayer extends AIObject {
                 target = m.getTarget();
             }
 
-            
             lb.add("\n  @",
                 String.format("%-30s%-10s%-40s%-16s",
                     Utils.chop(u.getLocation().toShortString(), 30),
                     Utils.chop(reason, 10),
-                    Utils.chop(u.toShortString(), 30),
+                    Utils.chop(u.toShortString(), 40),
                     Utils.chop(ms, 16)));
             if (target != null) lb.add("->", target);
         }
