@@ -55,7 +55,7 @@ import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.ai.EuropeanAIPlayer;
-import net.sf.freecol.server.ai.Transportable;
+import net.sf.freecol.server.ai.TransportableAIObject;
 
 
 /**
@@ -276,11 +276,11 @@ public abstract class Mission extends AIObject {
     /**
      * Is there a reason to invalidate mission to move a transportable?
      *
-     * @param t The <code>Transportable</code> to check.
+     * @param t The <code>TransportableAIObject</code> to check.
      * @return A reason for the transport to be invalid, or null if
      *     none found.
      */
-    public static String invalidTransportableReason(Transportable t) {
+    public static String invalidTransportableReason(TransportableAIObject t) {
         if (t == null) return "null-transportable";
         final Locatable l = t.getTransportLocatable();
         if (l == null) return "null-locatable";
@@ -869,10 +869,8 @@ public abstract class Mission extends AIObject {
         return ret;
     }
 
-    // Fake partial implementation of Transportable interface.
-    // Missions are not actually Transportables but the units that are
-    // performing a mission often determine their destination and priority
-    // from the mission undertaken.
+
+    // Mission interface to be implemented/overridden by descendants.
 
     /**
      * Gets the destination of a required transport.
@@ -904,9 +902,6 @@ public abstract class Mission extends AIObject {
             ? NORMAL_TRANSPORT_PRIORITY
             : 0;
     }
-
-
-    // Mission interface to be implemented/overridden by descendants.
 
     /**
      * Gets the target of this mission, if any.

@@ -40,7 +40,7 @@ import net.sf.freecol.server.ai.AIGoods;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
-import net.sf.freecol.server.ai.Transportable;
+import net.sf.freecol.server.ai.TransportableAIObject;
 import net.sf.freecol.server.ai.mission.TransportMission;
 import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -143,7 +143,8 @@ public class TransportMissionTest extends FreeColTestCase {
         // assign transport mission to the ship
         TransportMission mission = new TransportMission(aiMain, aiUnit);
         aiUnit.changeMission(mission, lb);
-        Transportable goods = new AIGoods(aiMain,galleon, horsesType,50, colonyTile);
+        TransportableAIObject goods = new AIGoods(aiMain, galleon, 
+                                                  horsesType, 50, colonyTile);
         mission.queueTransportable(goods, false);
 
         // Exercise
@@ -178,8 +179,8 @@ public class TransportMissionTest extends FreeColTestCase {
         // assign transport mission to the ship
         TransportMission mission = new TransportMission(aiMain, aiUnit);
         aiUnit.changeMission(mission, lb);
-        Transportable goods = new AIGoods(aiMain, galleon, horsesType, 50,
-                                          europe);
+        TransportableAIObject goods = new AIGoods(aiMain, galleon,
+                                                  horsesType, 50, europe);
         assertTrue("Goods should queue",
                    mission.queueTransportable(goods, false));
         mission.doMission(lb);
@@ -219,8 +220,8 @@ public class TransportMissionTest extends FreeColTestCase {
         // assign transport mission to the ship
         TransportMission mission = new TransportMission(aiMain, aiUnit);
         aiUnit.changeMission(mission, lb);
-        Transportable goods = new AIGoods(aiMain, galleon, horsesType, 50,
-                                          colonyTile);
+        TransportableAIObject goods = new AIGoods(aiMain, galleon,
+                                                  horsesType, 50, colonyTile);
         mission.queueTransportable(goods, false);
         mission.doMission(lb);
 

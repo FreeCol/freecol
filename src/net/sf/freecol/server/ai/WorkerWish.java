@@ -134,7 +134,7 @@ public class WorkerWish extends Wish {
         setValue(value);
         this.unitType = unitType;
         this.expertNeeded = expertNeeded;
-        if (transportable != null) transportable.increaseTransportPriority();
+        if (transportable != null) transportable.incrementTransportPriority();
     }
 
     /**

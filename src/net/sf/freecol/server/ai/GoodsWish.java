@@ -133,7 +133,7 @@ public class GoodsWish extends Wish {
         this.goodsType = goodsType;
         this.amountRequested = amount;
         setValue(value);
-        if (transportable != null) transportable.increaseTransportPriority();
+        if (transportable != null) transportable.incrementTransportPriority();
     }
 
     /**

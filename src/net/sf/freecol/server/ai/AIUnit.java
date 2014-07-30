@@ -80,7 +80,7 @@ import org.w3c.dom.Element;
  *
  * @see Mission
  */
-public class AIUnit extends AIObject implements Transportable {
+public class AIUnit extends TransportableAIObject {
 
     private static final Logger logger = Logger.getLogger(AIUnit.class.getName());
 
@@ -96,12 +96,6 @@ public class AIUnit extends AIObject implements Transportable {
     /** The dynamic part of the transport priority. */
     private int dynamicPriority;
 
-    /**
-     * The <code>AIUnit</code> which has this <code>Transportable</code> in
-     * its transport list.
-     */
-    private AIUnit transport;
-
 
     /**
      * Creates a new uninitialized <code>AIUnit</code>.
@@ -116,7 +110,6 @@ public class AIUnit extends AIObject implements Transportable {
         this.mission = null;
         this.goal = null;
         this.dynamicPriority = 0;
-        this.transport = null;
     }
 
     /**
@@ -169,9 +162,73 @@ public class AIUnit extends AIObject implements Transportable {
      *
      * @return The <code>Unit</code>.
      */
-    public Unit getUnit() {
+    public final Unit getUnit() {
         return unit;
     }
+
+    /**
+     * Checks if this unit has been assigned a mission.
+     *
+     * @return True if this unit has a mission.
+     */
+    public final boolean hasMission() {
+        return mission != null;
+    }
+
+    /**
+     * Gets the mission this unit has been assigned.
+     *
+     * @return The <code>Mission</code>.
+     */
+    public final Mission getMission() {
+        return mission;
+    }
+
+    /**
+     * Assigns a mission to unit. 
+     *
+     * @param mission The new <code>Mission</code>.
+     */
+    public final void setMission(Mission mission) {
+        this.mission = mission;
+    }
+
+    /**
+     * Gets the goal of this AI unit.
+     *
+     * @return The goal of this AI unit.
+     */
+    public final Goal getGoal() {
+        return goal;
+    }
+
+    /**
+     * Sets the goal of this AI unit.
+     *
+     * @param goal The new <code>Goal</code>.
+     */
+    public final void setGoal(Goal goal) {
+        this.goal = goal;
+    }
+
+
+    // Internal
+
+    /**
+     * If this unit has a transport, retarget.
+     */
+    private void retargetTransport() {
+        AIUnit transport = getTransport();
+        if (transport != null) {
+            Mission m = transport.getMission();
+            if (m instanceof TransportMission) {
+                ((TransportMission)m).requeueTransportable(this);
+            }
+        }
+    }
+
+
+    // Public interface
 
     /**
      * Is this AI unit carrying any cargo (units or goods).
@@ -199,33 +256,6 @@ public class AIUnit extends AIObject implements Transportable {
     public AIPlayer getAIOwner() {
         return (unit == null) ? null
             : getAIMain().getAIPlayer(unit.getOwner());
-    }
-
-    /**
-     * Checks if this unit has been assigned a mission.
-     *
-     * @return True if this unit has a mission.
-     */
-    public boolean hasMission() {
-        return mission != null;
-    }
-
-    /**
-     * Gets the mission this unit has been assigned.
-     *
-     * @return The <code>Mission</code>.
-     */
-    public Mission getMission() {
-        return mission;
-    }
-
-    /**
-     * Assigns a mission to unit. 
-     *
-     * @param mission The new <code>Mission</code>.
-     */
-    public void setMission(Mission mission) {
-        this.mission = mission;
     }
 
     /**
@@ -315,21 +345,12 @@ public class AIUnit extends AIObject implements Transportable {
     }
 
     /**
-     * Gets the goal of this AI unit.
+     * Performs the mission this unit has been assigned.
      *
-     * @return The goal of this AI unit.
+     * @param lb A <code>LogBuilder</code> to log to.
      */
-    public Goal getGoal() {
-        return goal;
-    }
-
-    /**
-     * Sets the goal of this AI unit.
-     *
-     * @param goal The new <code>Goal</code>.
-     */
-    public void setGoal(Goal goal) {
-        this.goal = goal;
+    public Mission doMission(LogBuilder lb) {
+        return (mission != null) ? mission.doMission(lb) : null;
     }
 
     /**
@@ -351,26 +372,16 @@ public class AIUnit extends AIObject implements Transportable {
     }
 
     /**
-     * If this unit has a transport, retarget.
-     */
-    private void retargetTransport() {
-        AIUnit transport = getTransport();
-        if (transport != null) {
-            Mission m = transport.getMission();
-            if (m instanceof TransportMission) {
-                ((TransportMission)m).requeueTransportable(this);
-            }
-        }
-    }
-
-    /**
-     * Performs the mission this unit has been assigned.
+     * Moves this AI unit.
      *
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param direction The <code>Direction</code> to move.
+     * @return True if the move succeeded.
      */
-    public Mission doMission(LogBuilder lb) {
-        return (mission != null && mission.isValid()) ? mission.doMission(lb)
-            : null;
+    public boolean move(Direction direction) {
+        Tile start = unit.getTile();
+        return unit.getMoveType(direction).isProgress()
+            && AIMessage.askMove(this, direction)
+            && unit.getTile() != start;
     }
 
     /**
@@ -403,48 +414,18 @@ public class AIUnit extends AIObject implements Transportable {
             && unit.getRole() == r && unit.getRoleCount() == count;
     }
 
+
+    // Implement TransportableAIObject
+
     /**
-     * Moves this AI unit.
-     *
-     * @param direction The <code>Direction</code> to move.
-     * @return True if the move succeeded.
+     * {@inheritDoc}
      */
-    public boolean move(Direction direction) {
-        Tile start = unit.getTile();
-        return unit.getMoveType(direction).isProgress()
-            && AIMessage.askMove(this, direction)
-            && unit.getTile() != start;
+    public Locatable getTransportLocatable() {
+        return unit;
     }
 
     /**
-     * Takes this unit one step along a path.
-     *
-     * @param path The path to follow.
-     * @return True if the step succeeds.
-     */
-    public boolean stepPath(PathNode path) {
-        return (unit.isOnCarrier() && !path.isOnCarrier())
-            ? leaveTransport(path.getDirection())
-            : move(path.getDirection());
-    }
-
-
-    // Interface Transportable
-
-    /**
-     * Gets the number of cargo slots taken by this AI unit.
-     *
-     * @return The number of cargo slots taken.
-     */
-    public int getSpaceTaken() {
-        return (getUnit() == null) ? 0 : getUnit().getSpaceTaken();
-    }
-
-    /**
-     * Returns the source for this <code>Transportable</code>. This is
-     * normally the location of the {@link #getTransportLocatable locatable}.
-     *
-     * @return The source for this <code>Transportable</code>.
+     * {@inheritDoc}
      */
     public Location getTransportSource() {
         return (getUnit() == null || getUnit().isDisposed()) ? null
@@ -452,14 +433,7 @@ public class AIUnit extends AIObject implements Transportable {
     }
 
     /**
-     * Returns the destination for this <code>Transportable</code>.
-     * This can either be the target
-     * {@link net.sf.freecol.common.model.Tile} of the transport or
-     * the target for the entire <code>Transportable</code>'s
-     * mission.  The target for the transport is determined by
-     * {@link TransportMission} in the latter case.
-     *
-     * @return The destination for this <code>Transportable</code>.
+     * {@inheritDoc}
      */
     public Location getTransportDestination() {
         return (getUnit() == null || getUnit().isDisposed() || !hasMission())
@@ -468,103 +442,21 @@ public class AIUnit extends AIObject implements Transportable {
     }
 
     /**
-     * Gets the priority of transporting this <code>Transportable</code> to
-     * it's destination.
-     *
-     * @return The priority of the transport.
+     * {@inheritDoc}
      */
-    public int getTransportPriority() {
-        if (hasMission()) {
-            return mission.getTransportPriority() + dynamicPriority;
-        } else {
-            return 0;
-        }
+    public void setTransportDestination(Location location) {
+        throw new RuntimeException("Can not set transport destination for AIUnit");
     }
 
     /**
-     * Sets the priority of getting the goods to the
-     * {@link #getTransportDestination}.
-     *
-     * @param transportPriority The priority.
+     * {@inheritDoc}
      */
-    public void setTransportPriority(int transportPriority) {
-        if (hasMission()) {
-            dynamicPriority = transportPriority;
-        }
+    public boolean carriableBy(Unit carrier) {
+        return carrier.couldCarry(unit);
     }
 
     /**
-     * Increases the transport priority of this <code>Transportable</code>.
-     * This method gets called every turn the <code>Transportable</code> have
-     * not been put on a carrier's transport list.
-     */
-    public void increaseTransportPriority() {
-        if (hasMission()) {
-            ++dynamicPriority;
-        }
-    }
-
-    /**
-     * Gets the <code>Locatable</code> which should be transported.
-     *
-     * @return The <code>Locatable</code>.
-     */
-    public Locatable getTransportLocatable() {
-        return unit;
-    }
-
-    /**
-     * Gets the carrier responsible for transporting this
-     * <code>Transportable</code>.
-     *
-     * @return The <code>AIUnit</code> which has this
-     *         <code>Transportable</code> in it's transport list. This
-     *         <code>Transportable</code> has not been scheduled for transport
-     *         if this value is <code>null</code>.
-     *
-     */
-    public AIUnit getTransport() {
-        return transport;
-    }
-
-    /**
-     * Sets the carrier responsible for transporting this
-     * <code>Transportable</code>.
-     *
-     * @param transport The <code>AIUnit</code> which has this
-     *            <code>Transportable</code> in it's transport list. This
-     *            <code>Transportable</code> has not been scheduled for
-     *            transport if this value is <code>null</code>.
-     * @param reason A reason for changing the transport.
-     */
-    public void setTransport(AIUnit transport, String reason) {
-        if (this.transport != transport) {
-            logger.finest("setTransport " + this + " -> " + transport
-                + ": " + reason);
-        }
-        this.transport = transport;
-    }
-
-    /**
-     * Aborts the given <code>Wish</code>.
-     *
-     * @param w The <code>Wish</code> to be aborted.
-     */
-    public void abortWish(Wish w) {
-        if (mission instanceof WishRealizationMission) {
-            // TODO: should we use setMission and dispose the mission as well?
-            mission = null;
-            dynamicPriority = 0;
-        }
-        if (w.getTransportable() == this) {
-            w.dispose();
-        }
-    }
-
-    /**
-     * Try to leave a transport, in any safe way possible.
-     *
-     * @return True if the unit disembarked.
+     * {@inheritDoc}
      */
     public boolean leaveTransport() {
         final Unit unit = getUnit();
@@ -640,11 +532,7 @@ public class AIUnit extends AIObject implements Transportable {
     }               
         
     /**
-     * An AI unit leaves a ship.
-     * Fulfills a wish if possible.
-     *
-     * @param direction The <code>Direction</code> to move, if any.
-     * @return True if the unit is unloaded.
+     * {@inheritDoc}
      */
     public boolean leaveTransport(Direction direction) {
         if (!unit.isOnCarrier()) return false;
@@ -664,11 +552,7 @@ public class AIUnit extends AIObject implements Transportable {
     }
 
     /**
-     * An AI unit joins a ship.
-     *
-     * @param carrier The carrier <code>Unit</code> to join.
-     * @param direction The <code>Direction</code> to move, if any.
-     * @return True if the unit is loaded.
+     * {@inheritDoc}
      */
     public boolean joinTransport(Unit carrier, Direction direction) {
         AIUnit aiCarrier = getAIMain().getAIUnit(carrier);
@@ -686,13 +570,6 @@ public class AIUnit extends AIObject implements Transportable {
             retargetTransport();
         }
         return result;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean carriableBy(Unit carrier) {
-        return carrier.couldCarry(unit);
     }
 
     /**
@@ -744,7 +621,6 @@ public class AIUnit extends AIObject implements Transportable {
 
     // Serialization
 
-    private static final String TRANSPORT_TAG = "transport";
     // @compat 0.10.3
     private static final String TILE_IMPROVEMENT_PLAN_MISSION_TAG = "tileImprovementPlanMission";
     // end @compat
@@ -752,25 +628,6 @@ public class AIUnit extends AIObject implements Transportable {
     private static final String IDLE_AT_COLONY_MISSION_TAG = "idleAtColonyMission";
     // end @compat
 
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
-        super.writeAttributes(xw);
-
-        if (transport != null) {
-            Unit u = transport.getUnit();
-            if (u == null) {
-                logger.warning("transport.getUnit() == null");
-            } else if (transport.isDisposed()) {
-                logger.warning("broken reference to transport");
-            } else {
-                xw.writeAttribute(TRANSPORT_TAG, u);
-            }
-        }
-    }
 
     /**
      * {@inheritDoc}
@@ -795,11 +652,6 @@ public class AIUnit extends AIObject implements Transportable {
 
         unit = xr.findFreeColGameObject(aiMain.getGame(), ID_ATTRIBUTE_TAG,
                                         Unit.class, (Unit)null, true);
-        
-        transport = (xr.hasAttribute(TRANSPORT_TAG))
-            ? xr.makeAIObject(aiMain, TRANSPORT_TAG,
-                              AIUnit.class, (AIUnit)null, true)
-            : null;
     }
 
     /**

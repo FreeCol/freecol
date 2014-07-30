@@ -234,7 +234,8 @@ public class PrivateerMission extends Mission {
             : null;
     }        
 
-    // Fake Transportable interface, noop as naval units are never transported.
+
+    // Implement Mission
 
     /**
      * {@inheritDoc}
@@ -251,8 +252,6 @@ public class PrivateerMission extends Mission {
     public int getTransportPriority() {
         return 0;
     }
-
-    // Mission interface
 
     /**
      * {@inheritDoc}

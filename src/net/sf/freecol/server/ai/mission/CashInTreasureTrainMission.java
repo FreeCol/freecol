@@ -226,8 +226,7 @@ public class CashInTreasureTrainMission extends Mission {
     }
 
 
-    // Fake Transportable interface
-    // Inherit: Mission.getTransportDestination
+    // Implement Mission
 
     /**
      * {@inheritDoc}
@@ -237,9 +236,6 @@ public class CashInTreasureTrainMission extends Mission {
         return (getTransportDestination() == null) ? 0
             : getUnit().getTreasureAmount();
     }
-
-
-    // Mission interface
 
     /**
      * {@inheritDoc}

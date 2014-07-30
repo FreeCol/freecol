@@ -195,8 +195,7 @@ public class DefendSettlementMission extends Mission {
     }
 
 
-    // Fake Transportable interface
-    // Inherit: Mission.getTransportDestination
+    // Implement Mission
 
     /**
      * {@inheritDoc}
@@ -206,9 +205,6 @@ public class DefendSettlementMission extends Mission {
         return (getTransportDestination() == null) ? 0
             : NORMAL_TRANSPORT_PRIORITY + 5;
     }
-
-
-    // Mission interface
 
     /**
      * {@inheritDoc}

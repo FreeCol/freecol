@@ -43,11 +43,11 @@ public abstract class Wish extends ValuedAIObject {
     protected Location destination;
 
     /**
-     * The <code>Transportable</code> which will realize the wish,
-     * or <code>null</code> if no <code>Transportable</code> has
+     * The <code>TransportableAIObject</code> which will realize the wish,
+     * or <code>null</code> if no <code>TransportableAIObject</code> has
      * been chosen.
      */
-    protected Transportable transportable;
+    protected TransportableAIObject transportable;
 
 
     /**
@@ -99,26 +99,28 @@ public abstract class Wish extends ValuedAIObject {
     }
 
     /**
-     * Gets the <code>Transportable</code> assigned to this <code>Wish</code>.
+     * Gets the <code>TransportableAIObject</code> assigned to this
+     * <code>Wish</code>.
      *
-     * @return The <code>Transportable</code> which will realize this wish,
-     *         or <code>null</code> if none has been assigned.
-     * @see #setTransportable
+     * @return The <code>TransportableAIObject</code> which will
+     *     realize this wish, or null if none has been assigned.
+     * @see #setTransportableAIObject
      * @see net.sf.freecol.server.ai.mission.WishRealizationMission
      */
-    public Transportable getTransportable() {
+    public TransportableAIObject getTransportable() {
         return transportable;
     }
 
     /**
-     * Assigns a <code>Transportable</code> to this <code>Wish</code>.
+     * Assigns a <code>TransportableAIObject</code> to this
+     * <code>Wish</code>.
      *
-     * @param transportable The <code>Transportable</code> which should
-     *        realize this wish.
-     * @see #getTransportable
+     * @param transportable The <code>TransportableAIObject</code>
+     *     which should realize this wish.
+     * @see #getTransportableAIObject
      * @see net.sf.freecol.server.ai.mission.WishRealizationMission
      */
-    public void setTransportable(Transportable transportable) {
+    public void setTransportable(TransportableAIObject transportable) {
         this.transportable = transportable;
     }
 

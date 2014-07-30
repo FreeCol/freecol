@@ -304,7 +304,7 @@ public class UnitSeekAndDestroyMission extends Mission {
     }
 
 
-    // Fake Transportable interface
+    // Implement Mission
 
     /**
      * {@inheritDoc}
@@ -315,9 +315,6 @@ public class UnitSeekAndDestroyMission extends Mission {
         Location loc = (transportTarget != null) ? transportTarget : target;
         return (getUnit().shouldTakeTransportTo(loc)) ? loc : null;
     }
-
-    
-    // Mission interface
 
     /**
      * {@inheritDoc}

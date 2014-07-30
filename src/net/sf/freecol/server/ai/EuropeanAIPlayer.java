@@ -284,10 +284,10 @@ public class EuropeanAIPlayer extends AIPlayer {
         = new HashMap<Location, List<Wish>>();
 
     /**
-     * A cached map of source Location to Transportables awaiting transport.
+     * A cached map of source Location to Transportable awaiting transport.
      */
-    private final java.util.Map<Location, List<Transportable>> transportSupply
-        = new HashMap<Location, List<Transportable>>();
+    private final java.util.Map<Location, List<TransportableAIObject>> transportSupply
+        = new HashMap<Location, List<TransportableAIObject>>();
 
     /**
      * A mapping of goods type to the goods wishes where a colony has
@@ -726,18 +726,18 @@ public class EuropeanAIPlayer extends AIPlayer {
     private void allocateTransportables(List<TransportMission> missions,
                                         LogBuilder lb) {
         if (missions.isEmpty()) return;
-        List<Transportable> urgent = getUrgentTransportables();
+        List<TransportableAIObject> urgent = getUrgentTransportables();
         if (urgent.isEmpty()) return;
 
         lb.add("\n  Allocate Transport:");
-        for (Transportable t : urgent) lb.add(" ", t);
+        for (TransportableAIObject t : urgent) lb.add(" ", t);
         lb.add("\n  ->");
         for (Mission m : missions) lb.add(" ", m);
 
         int i = 0;
         outer: while (i < urgent.size()) {
             if (missions.isEmpty()) break;
-            Transportable t = urgent.get(i);
+            TransportableAIObject t = urgent.get(i);
             TransportMission best = null;
             float bestValue = 0.0f;
             boolean present = false;
@@ -893,12 +893,12 @@ public class EuropeanAIPlayer extends AIPlayer {
     /**
      * Checks if a transportable needs transport.
      *
-     * @param t The <code>Transportable</code> to check.
+     * @param t The <code>TransportableAIObject</code> to check.
      * @return True if no transport is already present or the
      *     transportable is already aboard a carrier, and there is a
      *     well defined source and destination location.
      */
-    private boolean requestsTransport(Transportable t) {
+    private boolean requestsTransport(TransportableAIObject t) {
         return t.getTransport() == null
             && t.getTransportDestination() != null
             && t.getTransportSource() != null
@@ -909,10 +909,10 @@ public class EuropeanAIPlayer extends AIPlayer {
      * Checks that the carrier assigned to a transportable is has a
      * transport mission and the transport is queued thereon.
      *
-     * @param t The <code>Transportable</code> to check.
+     * @param t The <code>TransportableAIObject</code> to check.
      * @return True if all is well.
      */
-    private boolean checkTransport(Transportable t) {
+    private boolean checkTransport(TransportableAIObject t) {
         AIUnit aiCarrier = t.getTransport();
         if (aiCarrier == null) return false;
         TransportMission tm = aiCarrier.getMission(TransportMission.class);
@@ -996,7 +996,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 if (requestsTransport(aiu)) {
                     Utils.appendToMapList(transportSupply,
                         upLoc(aiu.getTransportSource()), aiu);
-                    aiu.increaseTransportPriority();
+                    aiu.incrementTransportPriority();
                     nNavalCarrier++;
                 }
             }
@@ -1008,7 +1008,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 if (requestsTransport(aig)) {
                     Utils.appendToMapList(transportSupply,
                         upLoc(aig.getTransportSource()), aig);
-                    aig.increaseTransportPriority();
+                    aig.incrementTransportPriority();
                     Location src = aig.getTransportSource();
                     Location dst = aig.getTransportDestination();
                     if (!Map.isSameContiguity(src, dst)) {
@@ -1023,7 +1023,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         }
 
         for (Wish w : getWishes()) {
-            Transportable t = w.getTransportable();
+            TransportableAIObject t = w.getTransportable();
             if (t != null && t.getTransport() == null
                 && t.getTransportDestination() != null) {
                 Location loc = upLoc(t.getTransportDestination());
@@ -1035,7 +1035,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             lb.add("\n  Transport Supply:");
             for (Location ls : transportSupply.keySet()) {
                 lb.add(" ", ls, "[");
-                for (Transportable t : transportSupply.get(ls)) lb.add(" ", t);
+                for (TransportableAIObject t : transportSupply.get(ls)) lb.add(" ", t);
                 lb.add(" ]");
             }
         }
@@ -1054,13 +1054,13 @@ public class EuropeanAIPlayer extends AIPlayer {
      *
      * @return The most urgent 10% of the available transportables.
      */
-    public List<Transportable> getUrgentTransportables() {
-        List<Transportable> urgent = new ArrayList<Transportable>();
+    public List<TransportableAIObject> getUrgentTransportables() {
+        List<TransportableAIObject> urgent = new ArrayList<TransportableAIObject>();
         for (Location l : transportSupply.keySet()) {
             urgent.addAll(transportSupply.get(l));
         }
         // Do not let the list exceed 10% of all transports
-        Collections.sort(urgent, Transportable.transportableComparator);
+        Collections.sort(urgent);
         int urge = urgent.size();
         urge = Math.max(2, (urge + 5) / 10);
         while (urgent.size() > urge) urgent.remove(urge);
@@ -1075,33 +1075,33 @@ public class EuropeanAIPlayer extends AIPlayer {
      * @param loc The <code>Location</code> to transport from.
      * @return A list of transportables.
      */
-    public List<Transportable> getTransportablesAt(Location loc) {
-        List<Transportable> supply = transportSupply.get(upLoc(loc));
-        return (supply == null) ? Collections.<Transportable>emptyList()
-            : new ArrayList<Transportable>(supply);
+    public List<TransportableAIObject> getTransportablesAt(Location loc) {
+        List<TransportableAIObject> supply = transportSupply.get(upLoc(loc));
+        return (supply == null) ? Collections.<TransportableAIObject>emptyList()
+            : new ArrayList<TransportableAIObject>(supply);
     }
 
     /**
      * Allows a TransportMission to signal that it has taken responsibility
-     * for a Transportable.
+     * for a TransportableAIObject.
      *
-     * @param t The <code>Transportable</code> being claimed.
+     * @param t The <code>TransportableAIObject</code> being claimed.
      * @return True if the transportable was claimed from the supply map.
      */
-    public boolean claimTransportable(Transportable t) {
+    public boolean claimTransportable(TransportableAIObject t) {
         return claimTransportable(t, upLoc(t.getTransportSource()));
     }
 
     /**
      * Allows a TransportMission to signal that it has taken responsibility
-     * for a Transportable.
+     * for a TransportableAIObject.
      *
-     * @param t The <code>Transportable</code> being claimed.
+     * @param t The <code>TransportableAIObject</code> being claimed.
      * @param loc The <code>Location</code> to claim from.
      * @return True if the transportable was claimed from the supply map.
      */
-    public boolean claimTransportable(Transportable t, Location loc) {
-        List<Transportable> tl = transportSupply.get(upLoc(loc));
+    public boolean claimTransportable(TransportableAIObject t, Location loc) {
+        List<TransportableAIObject> tl = transportSupply.get(upLoc(loc));
         return tl != null && tl.remove(t);
     }
 

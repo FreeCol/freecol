@@ -47,7 +47,7 @@ import org.w3c.dom.Element;
 /**
  * Objects of this class contains AI-information for a single {@link Goods}.
  */
-public class AIGoods extends AIObject implements Transportable {
+public class AIGoods extends TransportableAIObject {
 
     private static final Logger logger = Logger.getLogger(AIGoods.class.getName());
 
@@ -56,12 +56,6 @@ public class AIGoods extends AIObject implements Transportable {
 
     /** The destination location for the goods. */
     private Location destination;
-
-    /** The transport priority. */
-    private int transportPriority;
-
-    /** The AI unit assigned to provide the transport. */
-    private AIUnit transport = null;
 
 
     /**
@@ -75,8 +69,6 @@ public class AIGoods extends AIObject implements Transportable {
 
         this.goods = null;
         this.destination = null;
-        this.transportPriority = -1;
-        this.transport = null;
     }
 
     /**
@@ -135,7 +127,7 @@ public class AIGoods extends AIObject implements Transportable {
      *
      * @return The <code>Goods</code>.
      */
-    public Goods getGoods() {
+    public final Goods getGoods() {
         return goods;
     }
 
@@ -144,7 +136,7 @@ public class AIGoods extends AIObject implements Transportable {
      *
      * @param goods The new <code>Goods</code>.
      */
-    public void setGoods(Goods goods) {
+    public final void setGoods(Goods goods) {
         this.goods = goods;
     }
 
@@ -153,7 +145,7 @@ public class AIGoods extends AIObject implements Transportable {
      *
      * @return The <code>GoodsType</code>.
      */
-    public GoodsType getGoodsType() {
+    public final GoodsType getGoodsType() {
         return goods.getType();
     }
 
@@ -162,133 +154,12 @@ public class AIGoods extends AIObject implements Transportable {
      *
      * @return The amount of goods.
      */
-    public int getGoodsAmount() {
+    public final int getGoodsAmount() {
         return goods.getAmount();
     }
 
 
-    // Interface Transportable
-
-    /**
-     * Gets the number of cargo slots taken by these AI goods.
-     *
-     * @return The number of cargo slots.
-     */
-    public int getSpaceTaken() {
-        return (goods == null) ? 0 : goods.getSpaceTaken();
-    }
-
-    /**
-     * Returns the source for this <code>Transportable</code>.
-     * This is normally the location of the
-     * {@link #getTransportLocatable locatable}.
-     *
-     * @return The source for this <code>Transportable</code>.
-     */
-    public Location getTransportSource() {
-        return (goods == null) ? null : goods.getLocation();
-    }
-
-    /**
-     * Returns the destination for this <code>Transportable</code>.
-     * This can either be the target {@link Tile} of the transport
-     * or the target for the entire <code>Transportable</code>'s
-     * mission. The target for the tansport is determined by
-     * {@link TransportMission} in the latter case.
-     *
-     * @return The destination for this <code>Transportable</code>.
-     */
-    public Location getTransportDestination() {
-        return destination;
-    }
-
-    /**
-     * Sets the destination for this <code>Transportable</code>.
-     * This should only be called when a goods transportable destination
-     * becomes invalid and we need to retarget.
-     *
-     * @param destination The new destination <code>Location</code>.
-     */
-    public void setTransportDestination(Location destination) {
-        this.destination = destination;
-    }
-
-    /**
-     * Gets the priority of transporting this <code>Transportable</code>
-     * to it's destination.
-     *
-     * @return The priority of the transport.
-     */
-    public int getTransportPriority() {
-        return transportPriority;
-    }
-
-    /**
-     * Sets the priority of getting the goods to the {@link
-     * #getTransportDestination}.
-     *
-     * @param transportPriority The priority.
-     */
-    public void setTransportPriority(int transportPriority) {
-        this.transportPriority = transportPriority;
-    }
-
-    /**
-     * Increases the transport priority of this <code>Transportable</code>.
-     * This method gets called every turn the <code>Transportable</code>
-     * have not been put on a carrier's transport list.
-     */
-    public void increaseTransportPriority() {
-        transportPriority++;
-    }
-
-    /**
-     * Gets the <code>Locatable</code> which should be transported.
-     * @return The <code>Locatable</code>.
-     */
-    public Locatable getTransportLocatable() {
-        return getGoods();
-    }
-
-    /**
-     * Gets the carrier responsible for transporting this
-     * <code>Transportable</code>.
-     *
-     * @return The <code>AIUnit</code> which has this
-     *         <code>Transportable</code> in it's transport list. This
-     *         <code>Transportable</code> has not been scheduled for
-     *         transport if this value is <code>null</code>.
-     *
-     */
-    public AIUnit getTransport() {
-        return transport;
-    }
-
-    /**
-     * Sets the carrier responsible for transporting this
-     * <code>Transportable</code>.
-     *
-     * @param transport The <code>AIUnit</code> which has this
-     *            <code>Transportable</code> in it's transport list. This
-     *            <code>Transportable</code> has not been scheduled for
-     *            transport if this value is <code>null</code>.
-     * @param reason A reason for changing the transport.
-     */
-    public void setTransport(AIUnit transport, String reason) {
-        logger.finest("setTransport " + this + " -> " + transport
-            + ": " + reason);
-        this.transport = transport;
-    }
-
-    /**
-     * Aborts the given <code>Wish</code>.
-     *
-     * @param w The <code>Wish</code> to be aborted.
-     */
-    public void abortWish(Wish w) {
-        if (destination == w.getDestination()) destination = null;
-        if (w.getTransportable() == this) w.dispose();
-    }
+    // Internal
 
     /**
      * Goods leaves a ship.
@@ -296,7 +167,7 @@ public class AIGoods extends AIObject implements Transportable {
      * @param amount The amount of goods to unload.
      * @return True if the unload succeeds.
      */
-    public boolean leaveTransport(int amount) {
+    private boolean leaveTransport(int amount) {
         if (!(goods.getLocation() instanceof Unit)) return false;
         final Unit carrier = (Unit)goods.getLocation();
         final GoodsType type = goods.getType();
@@ -333,12 +204,53 @@ public class AIGoods extends AIObject implements Transportable {
         return result;
     }
 
+
+    // Implement TransportableAIObject
+
     /**
-     * Goods leaves a ship.
-     * Completes a wish if possible.
-     *
-     * @param direction The <code>Direction</code> to unload (not applicable).
-     * @return True if the unload succeeds.
+     * {@inheritDoc}
+     */
+    public Locatable getTransportLocatable() {
+        return getGoods();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location getTransportSource() {
+        return (goods == null) ? null : goods.getLocation();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location getTransportDestination() {
+        return destination;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setTransportDestination(Location destination) {
+        this.destination = destination;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean carriableBy(Unit carrier) {
+        return carrier.couldCarry(getGoods());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean leaveTransport() {
+        return leaveTransport(null);
+    }
+
+    /**
+     * {@inheritDoc}
      */
     public boolean leaveTransport(Direction direction) {
         if (direction != null) return false;
@@ -346,11 +258,7 @@ public class AIGoods extends AIObject implements Transportable {
     }
 
     /**
-     * Goods joins a ship.
-     *
-     * @param carrier The carrier <code>Unit</code> to join.
-     * @param direction The <code>Direction</code> to unload (not applicable).
-     * @return True if the load succeeds.
+     * {@inheritDoc}
      */
     public boolean joinTransport(Unit carrier, Direction direction) {
         if (direction != null) return false;
@@ -391,13 +299,6 @@ public class AIGoods extends AIObject implements Transportable {
     /**
      * {@inheritDoc}
      */
-    public boolean carriableBy(Unit carrier) {
-        return carrier.couldCarry(getGoods());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public String invalidReason() {
         String reason = Mission.invalidTransportableReason(this);
         Settlement s;
@@ -410,6 +311,7 @@ public class AIGoods extends AIObject implements Transportable {
                 + s.getOwner().getNation().getSuffix()
             : null;
     }
+
 
     // Override AIObject
 
@@ -472,8 +374,6 @@ public class AIGoods extends AIObject implements Transportable {
     // Serialization
 
     private static final String DESTINATION_TAG = "destination";
-    private static final String TRANSPORT_TAG = "transport";
-    private static final String TRANSPORT_PRIORITY_TAG = "transportPriority";
 
 
     /**
@@ -485,16 +385,6 @@ public class AIGoods extends AIObject implements Transportable {
 
         if (destination != null) {
             xw.writeAttribute(DESTINATION_TAG, destination.getId());
-
-            xw.writeAttribute(TRANSPORT_PRIORITY_TAG, transportPriority);
-
-            if (transport != null) {
-                if (transport.isDisposed()) {
-                    logger.warning("broken reference to transport");
-                } else {
-                    xw.writeAttribute(TRANSPORT_TAG, transport);
-                }
-            }
         }
     }
 
@@ -519,13 +409,6 @@ public class AIGoods extends AIObject implements Transportable {
 
         destination = xr.getLocationAttribute(aiMain.getGame(),
                                               DESTINATION_TAG, false);
-
-        transportPriority = xr.getAttribute(TRANSPORT_PRIORITY_TAG, -1);
-
-        transport = (xr.hasAttribute(TRANSPORT_TAG))
-            ? xr.makeAIObject(aiMain, TRANSPORT_TAG,
-                              AIUnit.class, (AIUnit)null, true)
-            : null;
     }
 
     /**

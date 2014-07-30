@@ -92,7 +92,7 @@ public class WishRealizationMission extends Mission {
 
 
     /**
-     * Disposes this <code>Mission</code>.
+     * Disposes of this <code>Mission</code>.
      */
     public void dispose() {
         if (wish != null) {
@@ -103,9 +103,7 @@ public class WishRealizationMission extends Mission {
     }
 
 
-    // Fake Transportable interface wholly inherited from Mission.
-
-    // Mission interface
+    // Implement Mission
 
     /**
      * {@inheritDoc}

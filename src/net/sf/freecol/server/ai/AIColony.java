@@ -717,7 +717,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         TransportMission tm;
         if (ag.getTransport() != null
             && (tm = ag.getTransport().getMission(TransportMission.class)) != null) {
-            tm.removeTransportable((Transportable)ag);
+            tm.removeTransportable(ag);
         }
         removeAIGoods(ag);
         ag.dispose();
@@ -789,9 +789,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 ? count - colony.getExportData(g).getExportLevel()
                 : -1;
             int priority = (exportAmount >= capacity)
-                ? Transportable.IMPORTANT_DELIVERY
+                ? TransportableAIObject.IMPORTANT_DELIVERY
                 : (exportAmount >= GoodsContainer.CARGO_SIZE)
-                ? Transportable.FULL_DELIVERY
+                ? TransportableAIObject.FULL_DELIVERY
                 : 0;
 
             // Find all existing AI goods of type g
@@ -840,7 +840,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             }
         }
         aiGoods.addAll(newAIGoods);
-        Collections.sort(aiGoods, Transportable.transportableComparator);
+        Collections.sort(aiGoods);
     }
 
 

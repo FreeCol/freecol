@@ -75,9 +75,7 @@ public class UnitWanderMission extends Mission {
     }
 
 
-    // Fake Transportable interface wholly inherited from Mission.
-
-    // Mission interface
+    // Implement Mission
 
     /**
      * {@inheritDoc}
