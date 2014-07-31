@@ -409,7 +409,6 @@ public class EuropeanAIPlayer extends AIPlayer {
             if (aiCarrier.hasMission()) continue;
             Unit carrier = aiCarrier.getUnit();
             if (!carrier.isNaval()) continue;
-            aiCarrier.setMission(new TransportMission(aiMain, aiCarrier));
             target = null;
             Mission tm = null;
             for (Unit u : carrier.getUnitList()) {
@@ -420,10 +419,13 @@ public class EuropeanAIPlayer extends AIPlayer {
                     if (target != null) break;
                 }
                 if (target == null) throw new RuntimeException("Initial colony fail!");
-                lb.add(" ");
-                aiu.changeMission(new BuildColonyMission(aiMain, aiu, target),
-                                  lb);
+                aiu.setMission(new BuildColonyMission(aiMain, aiu, target));
+                lb.add(" ", aiu.getMission());
             }
+            // Initialize the carrier mission after the cargo units
+            // have a valid mission so that the transport list and
+            // mission target do not break.
+            aiCarrier.setMission(new TransportMission(aiMain, aiCarrier));
             lb.add(" ", aiCarrier.getMission());
         }
 
