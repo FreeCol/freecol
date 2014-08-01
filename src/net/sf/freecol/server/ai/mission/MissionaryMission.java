@@ -398,8 +398,7 @@ public class MissionaryMission extends Mission {
                     return null;
                 }
                 setTarget(newTarget);
-                lb.add(tag, " reached ", completed,
-                    ", retargeted " + newTarget);
+                lb.add(tag, " reached ", completed, ", retargeted ", newTarget);
                 break;
 
             case ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY:

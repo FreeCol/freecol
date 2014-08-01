@@ -1939,18 +1939,6 @@ public class EuropeanAIPlayer extends AIPlayer {
         allocateTransportables(transportMissions, lb);
 
         // Log
-        if (!transportMissions.isEmpty()) {
-            lb.add("\n  Transports:");
-            for (TransportMission tm : transportMissions) {
-                lb.add(" ", tm.getUnit());
-            }
-            // TODO: Drop this when we are happy
-            lb.add("\n");
-            for (TransportMission tm : transportMissions) {
-                lb.add(tm.toFullString(), "\n");
-            }
-            lb.shrink("\n");
-        }
         if (!aiUnits.isEmpty()) {
             lb.add("\n  Free Land Units:");
             for (AIUnit aiu : aiUnits) {

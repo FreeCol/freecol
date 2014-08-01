@@ -194,7 +194,7 @@ public abstract class AIObject extends FreeColObject {
     // Mission logging support
 
     protected void lbAt(LogBuilder lb, Unit unit) {
-        lb.add(", reached ", unit.getLocation(), ".");
+        lb.add(", at ", unit.getLocation(), ".");
     }
 
     protected void lbDodge(LogBuilder lb, Unit unit) {

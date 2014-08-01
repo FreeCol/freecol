@@ -799,7 +799,7 @@ public abstract class Mission extends AIObject {
                 MoveType mt = unit.getMoveType(path.getDirection());
                 if (mt == MoveType.MOVE_NO_MOVES) {
                     unit.setMovesLeft(0);
-                    lb.add(", reached ", unit.getLocation(), ".");
+                    lbAt(lb, unit);
                     return MoveType.MOVE_NO_MOVES;
                 }
                 if (!mt.isProgress()) return mt; // Special handling required.
