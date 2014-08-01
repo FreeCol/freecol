@@ -59,6 +59,7 @@ import net.sf.freecol.common.option.StringOption;
 import net.sf.freecol.common.option.UnitListOption;
 import net.sf.freecol.common.util.Utils;
 
+
 /**
  * This class encapsulates any parts of the "specification" for
  * FreeCol that are expressed best using XML.  The XML is loaded
@@ -574,7 +575,7 @@ public final class Specification {
                 change.put(capture, role);
             }
         }
-                    
+
         logger.info("Specification clean following " + why + " complete"
             + ", starting year=" + Turn.getStartingYear()
             + ", season year=" + Turn.getSeasonYear()

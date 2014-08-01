@@ -174,29 +174,15 @@ public class EuropeanAIPlayer extends AIPlayer {
         = new Comparator<AIUnit>() {
             private int score(AIUnit a) {
                 Unit unit;
-                if (a == null || (unit = a.getUnit()) == null
+                return (a == null || (unit = a.getUnit()) == null
                     || unit.getLocation() == null
-                    || !unit.isColonist()) {
-                    return -1000;
-                } else if (unit.hasAbility(Ability.SPEAK_WITH_CHIEF)) {
-                    return 900 + ((unit.hasTile()) ? 100 : 0);
-                } else if (unit.hasAbility(Ability.EXPERT_SCOUT)) {
-                    return 600;
-                }
-                List<AbstractGoods> roleEquipment
-                    = scoutRole.getRequiredGoods();
-                int base = (unit.isInEurope()) ? 500
-                    : (unit.getLocation().getColony() != null
-                        && unit.getLocation().getColony()
-                        .canProvideGoods(roleEquipment)) ? 400
-                    : -1000;
-                if (!unit.hasDefaultRole()) {
-                    base -= 400;
-                } else if (unit.getSkillLevel() > 0) {
-                    base -= 200;
-                }
-                // Do not penalize criminals or servants.
-                return base;
+                    || !unit.isColonist()) ? -1000
+                : (unit.hasAbility(Ability.SPEAK_WITH_CHIEF))
+                ? 900 + ((unit.hasTile()) ? 100 : 0)
+                : (unit.hasAbility(Ability.EXPERT_SCOUT)) ? 600
+                : (!unit.hasDefaultRole()) ? 100
+                : (unit.getSkillLevel() <= 0) ? 200
+                : 0;
             }
 
             public int compare(AIUnit a1, AIUnit a2) {
@@ -217,30 +203,15 @@ public class EuropeanAIPlayer extends AIPlayer {
         = new Comparator<AIUnit>() {
             private int score(AIUnit a) {
                 Unit unit;
-                if (a == null || (unit = a.getUnit()) == null
+                return (a == null || (unit = a.getUnit()) == null
                     || unit.getLocation() == null
-                    || !unit.isColonist()) {
-                    return -1000;
-                } else if (unit.hasAbility(Ability.IMPROVE_TERRAIN)) {
-                    return 900 + ((unit.hasTile()) ? 100 : 0);
-                } else if (unit.hasAbility(Ability.EXPERT_PIONEER)) {
-                    return 600;
-                }
-                List<AbstractGoods> roleEquipment
-                    = pioneerRole.getRequiredGoods();
-                int base = (unit.isInEurope()) ? 500
-                    : (unit.getLocation().getColony() != null
-                        && unit.getLocation().getColony()
-                        .canProvideGoods(roleEquipment)) ? 400
-                    : -1000;
-                if (!unit.hasDefaultRole()) {
-                    base -= 400;
-                } else if (unit.getSkillLevel() > 0) {
-                    base -= 200;
-                } else {
-                    base += unit.getSkillLevel() * 150;
-                }
-                return base;
+                    || !unit.isColonist()) ? -1000
+                : (unit.hasAbility(Ability.IMPROVE_TERRAIN))
+                ? 900 + ((unit.hasTile()) ? 100 : 0)
+                : (unit.hasAbility(Ability.EXPERT_PIONEER)) ? 600
+                : (!unit.hasDefaultRole()) ? 100
+                : (unit.getSkillLevel() > 0) ? 200
+                : 200 + unit.getSkillLevel() * 50;
             }
 
             public int compare(AIUnit a1, AIUnit a2) {
@@ -345,7 +316,6 @@ public class EuropeanAIPlayer extends AIPlayer {
         super(aiMain, player);
 
         uninitialized = getPlayer() == null;
-        initializeFromSpecification(getSpecification());
     }
 
     /**
@@ -360,7 +330,6 @@ public class EuropeanAIPlayer extends AIPlayer {
         super(aiMain, xr);
 
         uninitialized = getPlayer() == null;
-        initializeFromSpecification(getSpecification());
     }
 
 
@@ -370,10 +339,10 @@ public class EuropeanAIPlayer extends AIPlayer {
      *
      * @param spec The <code>Specification</code> to initialize from.
      */
-    private synchronized void initializeFromSpecification(Specification spec) {
+    public static synchronized void initializeFromSpecification(Specification spec) {
         if (pioneerRole != null) return;
-        pioneerRole = spec.getRole("model.role.pioneer");
-        scoutRole = spec.getRole("model.role.scout");
+        pioneerRole = spec.getRoleWithAbility(Ability.IMPROVE_TERRAIN, null);
+        scoutRole = spec.getRoleWithAbility(Ability.SPEAK_WITH_CHIEF, null);
         liftBoycottCheatPercent
             = spec.getInteger(GameOptions.LIFT_BOYCOTT_CHEAT);
         equipScoutCheatPercent
@@ -2219,6 +2188,8 @@ public class EuropeanAIPlayer extends AIPlayer {
     public void startWorking() {
         final Player player = getPlayer();
         final Turn turn = getGame().getTurn();
+        final Specification spec = getSpecification();
+        initializeFromSpecification(spec);
 
         // This is happening, very rarely.  Hopefully now fixed by
         // synchronizing access to AIMain.aiObjects.
