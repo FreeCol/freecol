@@ -248,8 +248,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
         };
 
-
-    // Caches/internals.  Do not serialize.
+    // These should be final, but need the spec.
 
     /** Cheat chances. */
     private static int liftBoycottCheatPercent;
@@ -262,6 +261,8 @@ public class EuropeanAIPlayer extends AIPlayer {
     private static Role pioneerRole = null;
     /** The scouting role. */
     private static Role scoutRole = null;
+
+    // Caches/internals.  Do not serialize.
 
     /**
      * Stores temporary information for sessions (trading with another
@@ -344,6 +345,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         super(aiMain, player);
 
         uninitialized = getPlayer() == null;
+        initializeFromSpecification(getSpecification());
     }
 
     /**
@@ -358,15 +360,18 @@ public class EuropeanAIPlayer extends AIPlayer {
         super(aiMain, xr);
 
         uninitialized = getPlayer() == null;
+        initializeFromSpecification(getSpecification());
     }
 
 
     /**
-     * Initialize the static fields that need the spec.
+     * Initialize the static fields that would be final but for
+     * needing the specification.
+     *
+     * @param spec The <code>Specification</code> to initialize from.
      */
-    private synchronized void initializeSpecificationConstants() {
+    private synchronized void initializeFromSpecification(Specification spec) {
         if (pioneerRole != null) return;
-        final Specification spec = getSpecification();
         pioneerRole = spec.getRole("model.role.pioneer");
         scoutRole = spec.getRole("model.role.scout");
         liftBoycottCheatPercent
@@ -2239,10 +2244,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         sessionRegister.clear();
         clearAIUnits();
 
-        if (turn.isFirstTurn()) {
-            initializeSpecificationConstants();
-            initializeMissions(lb);
-        }
+        if (turn.isFirstTurn()) initializeMissions(lb);
         determineStances(lb);
 
         lb.mark();
