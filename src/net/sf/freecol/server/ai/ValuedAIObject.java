@@ -21,6 +21,8 @@ package net.sf.freecol.server.ai;
 
 import javax.xml.stream.XMLStreamException;
 
+import java.util.Comparator;
+
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.FreeColObject;
@@ -33,6 +35,14 @@ import org.w3c.dom.Element;
  * integer value.
  */
 public abstract class ValuedAIObject extends AIObject {
+
+    /** A comparator for the AI object value. */
+    public static final Comparator<ValuedAIObject> valuedComparator
+        = new Comparator<ValuedAIObject>() {
+            public int compare(ValuedAIObject v1, ValuedAIObject v2) {
+                return v2.getValue() - v1.getValue();
+            }
+        };
 
     /** The value of this AIObject. */
     private int value;
