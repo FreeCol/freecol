@@ -28,6 +28,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
@@ -225,7 +226,7 @@ public class AIGoods extends TransportableAIObject {
      * {@inheritDoc}
      */
     public Location getTransportDestination() {
-        return destination;
+        return this.destination;
     }
 
     /**
@@ -306,7 +307,8 @@ public class AIGoods extends TransportableAIObject {
             ? reason
             : (goods.getLocation() instanceof Unit
                 && destination instanceof Settlement
-                && !((Unit)goods.getLocation()).getOwner().owns(s = (Settlement)destination))
+                && !((Unit)goods.getLocation())
+                    .getOwner().owns(s = (Settlement)destination))
             ? "transportableDestination-" + s.getName() + "-captured-by-"
                 + s.getOwner().getNation().getSuffix()
             : null;
@@ -395,7 +397,7 @@ public class AIGoods extends TransportableAIObject {
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        goods.toXML(xw);
+        if (goods != null) goods.toXML(xw);
     }
 
     /**
@@ -405,10 +407,9 @@ public class AIGoods extends TransportableAIObject {
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        final AIMain aiMain = getAIMain();
+        final Game game = getAIMain().getGame();
 
-        destination = xr.getLocationAttribute(aiMain.getGame(),
-                                              DESTINATION_TAG, false);
+        destination = xr.getLocationAttribute(game, DESTINATION_TAG, false);
     }
 
     /**
