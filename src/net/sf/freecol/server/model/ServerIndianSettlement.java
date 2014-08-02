@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.See;
@@ -236,10 +237,11 @@ public class ServerIndianSettlement extends IndianSettlement
      * New turn for this native settlement.
      *
      * @param random A <code>Random</code> number source.
+     * @param lb A <code>LogBuilder</code> to log to.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    public void csNewTurn(Random random, ChangeSet cs) {
-        logger.finest("ServerIndianSettlement.csNewTurn, for " + this);
+    public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
+        lb.add(this);
         ServerPlayer owner = (ServerPlayer) getOwner();
         Specification spec = getSpecification();
 
@@ -260,11 +262,11 @@ public class ServerIndianSettlement extends IndianSettlement
             Unit victim = Utils.getRandomMember(logger, "Choose starver",
                                                 getUnitList(), random);
             cs.addDispose(See.only(owner), this, victim);//-vis(owner)
-            logger.finest("Famine in " + getName());
+            lb.add(" FAMINE");
         }
         if (getUnitCount() <= 0) {
             if (tile.isEmpty()) {
-                logger.info(getName() + " collapsed.");
+                lb.add(" COLLAPSED, ");
                 owner.csDisposeSettlement(this, cs);//+vis(owner)
                 return;
             }
@@ -293,8 +295,7 @@ public class ServerIndianSettlement extends IndianSettlement
                 // New units quickly go out of their city and start annoying.
                 addOwnedUnit(unit);
                 unit.setHomeIndianSettlement(this);
-                logger.info("New native created in " + getName()
-                    + ": " + unit.getId());
+                lb.add(" new ", unit);
             }
             // Consume the food anyway
             consumeGoods(foodType, FOOD_PER_COLONIST);
@@ -310,12 +311,13 @@ public class ServerIndianSettlement extends IndianSettlement
             && foodProdAvail > 0) {
             int nHorses = Math.min(MAX_HORSES_PER_TURN, foodProdAvail);
             addGoods(horsesType, nHorses);
-            logger.finest("Settlement " + getName() + " bred " + nHorses);
+            lb.add(" bred ", nHorses, " horses");
         }
 
         getGoodsContainer().removeAbove(getWarehouseCapacity());
         updateWantedGoods();
         cs.add(See.only(owner), this);
+        lb.add(", ");
     }
 
     /**

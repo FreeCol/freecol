@@ -33,6 +33,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.networking.NoRouteToServerException;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.Controller;
 import net.sf.freecol.server.control.InGameController;
@@ -161,7 +162,7 @@ public final class ServerTestHelper {
 
     public static void newTurn() {
         ServerGame game = (ServerGame) server.getGame();
-        game.csNewTurn(random, new ChangeSet());
+        game.csNewTurn(random, new LogBuilder(0), new ChangeSet());
     }
 
     /**

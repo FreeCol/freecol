@@ -130,10 +130,11 @@ public class ServerColony extends Colony implements ServerModelObject {
      * TODO: use the warehouse to store things?
      *
      * @param random A <code>Random</code> number source.
+     * @param lb A <code>LogBuilder</code> to log to.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    public void csNewTurn(Random random, ChangeSet cs) {
-        logger.finest("ServerColony.csNewTurn, for " + this);
+    public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
+        lb.add("COLONY ", this);
         final Specification spec = getSpecification();
         final ServerPlayer owner = (ServerPlayer) getOwner();
         BuildQueue<?>[] queues = new BuildQueue<?>[] { buildQueue,
@@ -144,7 +145,7 @@ public class ServerColony extends Colony implements ServerModelObject {
         // Clean up such cases, to avoid other players seeing the
         // nonsensical 0-unit colony.
         if (getUnitCount() <= 0) {
-            logger.warning("Cleaning up 0-unit colony: " + getName());
+            lb.add(" 0-unit DISPOSING, ");
             owner.csDisposeSettlement(this, cs);
             return;
         }
@@ -156,7 +157,7 @@ public class ServerColony extends Colony implements ServerModelObject {
 
         // Check for learning by experience
         for (WorkLocation workLocation : getCurrentWorkLocations()) {
-            ((ServerModelObject) workLocation).csNewTurn(random, cs);
+            ((ServerModelObject)workLocation).csNewTurn(random, lb, cs);
             ProductionInfo productionInfo = getProductionInfo(workLocation);
             if (productionInfo == null) continue;
             if (!workLocation.isEmpty()) {
@@ -281,10 +282,8 @@ public class ServerColony extends Colony implements ServerModelObject {
                                              this)
                                 .addName("%colony%", getName())
                                 .addAmount("%number%", turns));
-                        logger.finest("Famine feared in " + getName()
-                                      + " food=" + stored
-                                      + " production=" + net
-                                      + " turns=" + turns);
+                        lb.add(" famine in ", turns,
+                               " food=", stored, " production=", net);
                     }
                 }
             }
@@ -321,9 +320,9 @@ public class ServerColony extends Colony implements ServerModelObject {
         // Do not flush price changes yet, as any price change may change
         // yet again in csYearlyGoodsAdjust.
         if (hasAbility(Ability.EXPORT)) {
-            LogBuilder lb = new LogBuilder(64);
-            lb.add(" ");
-            lb.mark();
+            LogBuilder lb2 = new LogBuilder(64);
+            lb2.add(" ");
+            lb2.mark();
             for (Goods goods : getCompactGoods()) {
                 GoodsType type = goods.getType();
                 ExportData data = getExportData(type);
@@ -340,16 +339,17 @@ public class ServerColony extends Colony implements ServerModelObject {
                     .addAmount("%amount%", amount)
                     .add("%goods%", type.getNameKey())
                     .addAmount("%gold%", (owner.getGold() - oldGold));
-                lb.add(Messages.message(st), ", ");
+                lb2.add(Messages.message(st), ", ");
             }
-            if (lb.grew()) {
-                lb.shrink(", ");
+            if (lb2.grew()) {
+                lb2.shrink(", ");
                 cs.addMessage(See.only(owner),
                     new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT,
                                      "customs.sale", this)
                         .addName("%colony%", getName())
-                        .addName("%data%", lb.toString()));
+                        .addName("%data%", lb2.toString()));
                 cs.addPartial(See.only(owner), owner, "gold");
+                lb.add(lb2.toString());
             }
         }
 
@@ -496,6 +496,7 @@ public class ServerColony extends Colony implements ServerModelObject {
         } else {
             cs.add(See.only(owner), this);
         }
+        lb.add(", ");
     }
 
     /**

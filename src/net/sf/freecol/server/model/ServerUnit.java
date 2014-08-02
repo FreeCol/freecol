@@ -70,6 +70,7 @@ import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.control.ChangeSet;
@@ -215,10 +216,11 @@ public class ServerUnit extends Unit implements ServerModelObject {
      * New turn for this unit.
      *
      * @param random A <code>Random</code> number source.
+     * @param lb A <code>LogBuilder</code> to log to.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    public void csNewTurn(Random random, ChangeSet cs) {
-        logger.finest("ServerUnit.csNewTurn, for " + this);
+    public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
+        lb.add(this);
         ServerPlayer owner = (ServerPlayer) getOwner();
         Specification spec = getSpecification();
         Location loc = getLocation();
@@ -240,6 +242,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 cs.addDispose(See.perhaps().always(owner), loc,
                               this);//-vis(owner)
                 owner.invalidateCanSeeTiles();//+vis(owner)
+                lb.add(", ");
                 return;
             }
         } else {
@@ -269,8 +272,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     .addStringTemplate("%oldName%", oldName)
                     .addStringTemplate("%unit%", getLabel())
                     .addName("%colony%", getColony().getName()));
-                logger.finest("Experience upgrade for unit " + getId()
-                    + " to " + getType());
+                lb.add(" experience upgrade to ", getType());
                 unitDirty = true;
             }
         }
@@ -336,7 +338,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 Location dst = getDestination();
                 Location result = resolveDestination();
                 if (result == europe) {
-                    logger.info(this + " arrives in Europe");
+                    lb.add(" arrives in Europe");
                     if (getTradeRoute() == null) {
                         setDestination(null);
                         cs.addMessage(See.only(owner),
@@ -351,14 +353,13 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     locDirty = true;
                 } else if (result instanceof Tile) {
                     Tile tile = ((Tile)result).getSafeTile(owner, random);
-                    logger.info(this + " arrives in America at " + tile
-                        + ((dst == null) ? "" : ", sailing for " + dst));
+                    lb.add(" arrives in America at ", tile);
+                    if (dst != null) lb.add(" sailing for ", dst);
                     if (dst instanceof Map) setDestination(null);
                     csMove(tile, random, cs);
                     locDirty = unitDirty = false; // loc update present
                 } else {
-                    logger.warning(this + " has unsupported destination "
-                        + getDestination());
+                    lb.add(" has unsupported destination ", getDestination());
                 }
             } else {
                 switch (getState()) {
@@ -371,8 +372,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     locDirty = true;
                     break;
                 default:
-                    logger.warning("Unknown work completed, state="
-                        + getState());
+                    lb.add(" unknown work completed, state=", getState());
                     setState(UnitState.ACTIVE);
                     break;
                 }
@@ -386,6 +386,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         } else {
             cs.addPartial(See.only(owner), this, "movesLeft");
         }
+        lb.add(", ");
     }
 
     /**

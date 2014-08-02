@@ -31,6 +31,7 @@ import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.See;
 
@@ -66,17 +67,17 @@ public class ServerBuilding extends Building implements ServerModelObject {
      * New turn for this building.
      *
      * @param random A <code>Random</code> number source.
+     * @param lb A <code>LogBuilder</code> to log to.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    public void csNewTurn(Random random, ChangeSet cs) {
+    public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
         BuildingType type = getType();
 
         if (canTeach()) csTeach(cs);
 
         if (type.hasAbility(Ability.REPAIR_UNITS)) {
-            repairUnits(cs);
+            csRepairUnits(cs);
         }
-
     }
 
     /**
@@ -210,7 +211,7 @@ public class ServerBuilding extends Building implements ServerModelObject {
      *
      * @param cs A <code>ChangeSet</code> to update.
      */
-    private void repairUnits(ChangeSet cs) {
+    private void csRepairUnits(ChangeSet cs) {
         for (Unit unit : getTile().getUnitList()) {
             if (unit.isDamaged()
                 && getType().hasAbility(Ability.REPAIR_UNITS,

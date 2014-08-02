@@ -54,6 +54,7 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.ChangePriority;
@@ -243,18 +244,23 @@ public class ServerGame extends Game implements ServerModelObject {
      * Build the updates for a new turn for all the players in this game.
      *
      * @param random A <code>Random</code> number source.
+     * @param lb A <code>LogBuilder</code> to log to.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    public void csNewTurn(Random random, ChangeSet cs) {
+    public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
+        lb.add("GAME ", getId(), ", ");
         for (Player player : getLivePlayers(null)) {
-            ((ServerPlayer)player).csNewTurn(random, cs);
+            ((ServerPlayer)player).csNewTurn(random, lb, cs);
         }
 
         final Specification spec = getSpecification();
         Event succession = spec.getEvent("model.event.spanishSuccession");
         if (succession != null && !getSpanishSuccession()) {
-            Limit yearLimit = succession.getLimit("model.limit.spanishSuccession.year");
-            if (yearLimit.evaluate(this)) csSpanishSuccession(cs, succession);
+            Limit yearLimit
+                = succession.getLimit("model.limit.spanishSuccession.year");
+            if (yearLimit.evaluate(this)) {
+                csSpanishSuccession(cs, lb, succession);
+            }
         }
     }
 
@@ -265,9 +271,10 @@ public class ServerGame extends Game implements ServerModelObject {
      * Visibility changes for the winner, loser is killed/irrelevant.
      *
      * @param cs A <code>ChangeSet</code> to update.
+     * @param lb A <code>LogBuilder</code> to log to.
      * @param event The Spanish Succession <code>Event</code>.
      */
-    private void csSpanishSuccession(ChangeSet cs, Event event) {
+    private void csSpanishSuccession(ChangeSet cs, LogBuilder lb, Event event) {
         Limit weakLimit
             = event.getLimit("model.limit.spanishSuccession.weakestPlayer");
         Limit strongLimit
@@ -306,23 +313,19 @@ public class ServerGame extends Game implements ServerModelObject {
             || strongestAIPlayer == null
             || weakestAIPlayer == strongestAIPlayer) return;
 
-        StringBuilder sb = new StringBuilder(512);
-        sb.append("Spanish succession in ").append(getTurn())
-            .append(" scores[");
+        lb.add("Spanish succession in ", getTurn(), " scores[");
         for (Player player : scores.keySet()) {
-            sb.append(" ").append(player.getName())
-                .append("=").append(scores.get(player));
+            lb.add(" ", player.getName(), "=", scores.get(player));
         }
-        sb.append(" ]\n=> ").append(weakestAIPlayer.getName())
-            .append(" cedes to ").append(strongestAIPlayer.getName())
-            .append(":");
+        lb.add(" ]\n=> ", weakestAIPlayer.getName(),
+               " cedes to ", strongestAIPlayer.getName(), ":");
         List<Tile> tiles = new ArrayList<Tile>();
         ServerPlayer strongest = (ServerPlayer)strongestAIPlayer;
         ServerPlayer weakest = (ServerPlayer)weakestAIPlayer;
         for (Player player : getLiveNativePlayers(null)) {
             for (IndianSettlement is : player.getIndianSettlements()) {
                 if (!is.hasMissionary(weakest)) continue;
-                sb.append(" ").append(is.getName()).append("(mission)");
+                lb.add(" ", is.getName(), "(mission)");
                 is.getTile().cacheUnseen(strongest);//+til
                 tiles.add(is.getTile());
                 is.setContacted(strongest);//-til
@@ -343,14 +346,14 @@ public class ServerGame extends Game implements ServerModelObject {
                                                  cs);//-vis(both),-til
             cs.add(See.only(strongest),
                 strongest.exploreForSettlement(colony));
-            sb.append(" ").append(colony.getName());
+            lb.add(" ", colony.getName());
         }
         for (Unit unit : weakest.getUnits()) {
             if (weakest.csChangeOwner(unit, strongest, 
                     ChangeType.CAPTURE, null, cs)) { //-vis(both)
                 unit.setMovesLeft(0);
                 unit.setState(Unit.UnitState.ACTIVE);
-                sb.append(" ").append(unit.getId());
+                lb.add(" ", unit.getId());
                 if (unit.getLocation() instanceof Europe) {
                     unit.setLocation(strongestAIPlayer.getEurope());//-vis
                     cs.add(See.only(strongest), unit);
@@ -383,7 +386,6 @@ public class ServerGame extends Game implements ServerModelObject {
         
         weakest.csKill(cs);//+vis(weakest)
         strongest.invalidateCanSeeTiles();//+vis(strongest)
-        logger.info(sb.toString());
     }
 
     /**

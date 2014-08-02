@@ -21,6 +21,7 @@ package net.sf.freecol.server.model;
 
 import java.util.Random;
 
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.control.ChangeSet;
 
 
@@ -58,8 +59,8 @@ public interface ServerModelObject {
      * Executes new-turn actions for this server object.
      *
      * @param random A pseudo-random number source.
+     * @param lb A <code>LogBuilder</code> to log to.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    public void csNewTurn(Random random, ChangeSet cs);
-
+    public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs);
 } 

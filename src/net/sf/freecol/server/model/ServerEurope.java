@@ -37,6 +37,7 @@ import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.UnitListOption;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.server.control.ChangeSet;
 
@@ -174,14 +175,15 @@ public class ServerEurope extends Europe implements ServerModelObject {
      * TODO: give Europe a shipyard and remove this
      *
      * @param random A <code>Random</code> number source.
+     * @param lb A <code>LogBuilder</code> to log to.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    public void csNewTurn(Random random, ChangeSet cs) {
+    public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
         logger.finest("ServerEurope.csNewTurn, for " + this);
 
         for (Unit unit : getUnitList()) {
             if (unit.isNaval() && unit.isDamaged()) {
-                ((ServerUnit) unit).csRepairUnit(cs);
+                ((ServerUnit)unit).csRepairUnit(cs);
             }
         }
     }

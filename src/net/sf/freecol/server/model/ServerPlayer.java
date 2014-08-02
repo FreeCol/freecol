@@ -86,6 +86,7 @@ import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.FirstContactMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.control.ChangeSet;
@@ -1238,17 +1239,18 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * New turn for this player.
      *
      * @param random A <code>Random</code> number source.
+     * @param lb A <code>LogBuilder</code> to log to.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    public void csNewTurn(Random random, ChangeSet cs) {
-        logger.finest("ServerPlayer.csNewTurn, for " + getName());
+    public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
+        lb.add("PLAYER ", getName(), ": ");
 
         // Settlements
         List<Settlement> settlements
             = new ArrayList<Settlement>(getSettlements());
         int newSoL = 0, newImmigration = getImmigration();
         for (Settlement settlement : settlements) {
-            ((ServerModelObject)settlement).csNewTurn(random, cs);
+            ((ServerModelObject)settlement).csNewTurn(random, lb, cs);
             newSoL += settlement.getSoL();
         }
         newImmigration = getImmigration() - newImmigration;
@@ -1270,13 +1272,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         // Europe.
         if (europe != null) {
-            ((ServerModelObject) europe).csNewTurn(random, cs);
+            ((ServerModelObject) europe).csNewTurn(random, lb, cs);
             modifyImmigration(europe.getImmigration(newImmigration));
         }
         // Units.
         for (Unit unit : new ArrayList<Unit>(getUnits())) {
             try {
-                ((ServerModelObject) unit).csNewTurn(random, cs);
+                ((ServerModelObject) unit).csNewTurn(random, lb, cs);
             } catch (ClassCastException e) {
                 logger.log(Level.SEVERE, "Not a ServerUnit: " + unit.getId(), e);
             }

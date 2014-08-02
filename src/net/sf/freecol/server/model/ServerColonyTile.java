@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.See;
 
@@ -68,11 +69,12 @@ public class ServerColonyTile extends ColonyTile implements ServerModelObject {
      * New turn for this colony tile.
      *
      * @param random A <code>Random</code> number source.
+     * @param lb A <code>LogBuilder</code> to log to.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    public void csNewTurn(Random random, ChangeSet cs) {
+    public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
         Colony colony = getColony();
-        ServerPlayer owner = (ServerPlayer) colony.getOwner();
+        ServerPlayer owner = (ServerPlayer)colony.getOwner();
 
         Tile workTile = getWorkTile();
         if (!isColonyCenterTile() && !isEmpty() && canBeWorked()) {
@@ -80,6 +82,8 @@ public class ServerColonyTile extends ColonyTile implements ServerModelObject {
                 Resource resource = expendResource(workTile, unit.getWorkType(),
                                                    unit.getType());
                 if (resource != null) {
+                    lb.add(" ", getId(), " exhausted resource ",
+                           resource.getType().getSuffix());
                     cs.addMessage(See.only(owner),
                         new ModelMessage(ModelMessage.MessageType.WARNING,
                             "model.tile.resourceExhausted", colony)

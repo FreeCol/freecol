@@ -114,6 +114,7 @@ import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.NetworkRequestHandler;
 import net.sf.freecol.common.networking.RearrangeColonyMessage;
 import net.sf.freecol.common.networking.RearrangeColonyMessage.UnitChange;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.FreeColServer;
@@ -709,7 +710,11 @@ public final class InGameController extends Controller {
                 game.csNextTurn(next);
                 sendToAll(next);
 
-                game.csNewTurn(random, cs);
+                LogBuilder lb = new LogBuilder(512);
+                lb.add("New turn ", game.getTurn(), " for ");
+                game.csNewTurn(random, lb, cs);
+                lb.shrink(", ");
+                lb.log(logger, Level.FINEST);
                 if (debugOnlyAITurns > 0) {
                     if (--debugOnlyAITurns <= 0) {
                         // If this was a debug run, complete it.  This will
