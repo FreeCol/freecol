@@ -90,11 +90,8 @@ public class AIUnit extends TransportableAIObject {
     /** The mission to which this AI unit has been assigned. */
     private Mission mission;
 
-    /** The goal this AIUnit belongs to, if one has been assigned. */
+    /** The goal.  Currently unused. */
     private Goal goal = null;
-
-    /** The dynamic part of the transport priority. */
-    private int dynamicPriority;
 
 
     /**
@@ -109,7 +106,6 @@ public class AIUnit extends TransportableAIObject {
         this.unit = null;
         this.mission = null;
         this.goal = null;
-        this.dynamicPriority = 0;
     }
 
     /**
@@ -122,6 +118,8 @@ public class AIUnit extends TransportableAIObject {
         this(aiMain, unit.getId());
 
         this.unit = unit;
+        this.mission = null;
+        this.goal = null;
 
         uninitialized = unit == null;
     }
@@ -215,38 +213,59 @@ public class AIUnit extends TransportableAIObject {
     // Internal
 
     /**
-     * If this unit has a transport, retarget.
+     * Request a rearrangement of any colony at the current location.
      */
-    private void retargetTransport() {
-        AIUnit transport = getTransport();
-        if (transport != null) {
-            Mission m = transport.getMission();
-            if (m instanceof TransportMission) {
-                ((TransportMission)m).requeueTransportable(this);
-            }
+    private void requestLocalRearrange() {
+        Location loc;
+        Colony colony;
+        AIColony aiColony;
+        if (unit != null
+            && (loc = unit.getLocation()) != null
+            && (colony = loc.getColony()) != null
+            && (aiColony = getAIMain().getAIColony(colony)) != null) {
+            aiColony.requestRearrange();
         }
     }
 
-
-    // Public interface
-
     /**
-     * Is this AI unit carrying any cargo (units or goods).
+     * Drop the current transport, keeping the transport mission consistent.
      *
-     * @return True if the unit has cargo aboard.
+     * @return True if the unit has no allocated transport.
      */
-    public boolean hasCargo() {
-        return (unit == null) ? false : unit.hasCargo();
+    private boolean dropTransport() {
+        AIUnit transport = getTransport();
+        if (transport != null && getUnit().getLocation() != transport) {
+            TransportMission tm = transport.getMission(TransportMission.class);
+            if (tm != null) tm.removeTransportable(this);
+            setTransport(null);
+        }
+        return getTransport() == null;
     }
 
     /**
-     * Gets the PRNG to use with this unit.
-     *
-     * @return A <code>Random</code> instance.
+     * Take the current carrier as transport, keeping the transport mission/s
+     * consistent.
      */
-    public Random getAIRandom() {
-        return getAIMain().getAIPlayer(unit.getOwner()).getAIRandom();
+    private void takeTransport() {
+        Unit carrier = getUnit().getCarrier();
+        AIUnit aiCarrier = (carrier == null) ? null
+            : getAIMain().getAIUnit(carrier);
+        TransportMission tm;
+        AIUnit transport = getTransport();
+        if (transport != null) {
+            if (transport != aiCarrier) {
+                logger.warning("Boarded different transport: " + aiCarrier);
+                tm = transport.getMission(TransportMission.class);
+                if (tm != null) tm.removeTransportable(this);
+            }    
+        }
+        tm = aiCarrier.getMission(TransportMission.class);
+        if (tm != null) tm.requeueTransportable(this);
+        if (transport != aiCarrier) setTransport(aiCarrier);
     }
+
+
+    // Public routines
 
     /**
      * Gets the AIPlayer that owns this AIUnit.
@@ -256,6 +275,24 @@ public class AIUnit extends TransportableAIObject {
     public AIPlayer getAIOwner() {
         return (unit == null) ? null
             : getAIMain().getAIPlayer(unit.getOwner());
+    }
+
+    /**
+     * Gets the PRNG to use with this unit.
+     *
+     * @return A <code>Random</code> instance.
+     */
+    public Random getAIRandom() {
+        return (unit == null) ? null : getAIOwner().getAIRandom();
+    }
+
+    /**
+     * Is this AI unit carrying any cargo (units or goods).
+     *
+     * @return True if the unit has cargo aboard.
+     */
+    public final boolean hasCargo() {
+        return (unit == null) ? false : unit.hasCargo();
     }
 
     /**
@@ -285,8 +322,19 @@ public class AIUnit extends TransportableAIObject {
     }
 
     /**
+     * Performs the mission this unit has been assigned.
+     *
+     * Do *not* check mission validity.  The mission itself does that,
+     * and has special case error handling.
+     *
+     * @param lb A <code>LogBuilder</code> to log to.
+     */
+    public Mission doMission(LogBuilder lb) {
+        return (mission != null) ? mission.doMission(lb) : null;
+    }
+
+    /**
      * Change the mission of a unit.
-     * The dynamic priority is reset.
      *
      * @param mission The new <code>Mission</code>.
      * @param lb A <code>LogBuilder</code> to log to.
@@ -296,16 +344,16 @@ public class AIUnit extends TransportableAIObject {
         Location oldTarget;
 
         if (this.mission == null) {
-            lb.add(unit, " replaced null with ", mission);
             oldTarget = null;
+            lb.add(" ", unit, " replaced null with ", mission);
         } else {
-            lb.add(unit, " replaced ", this.mission, " with ", mission);
             oldTarget = this.mission.getTarget();
+            lb.add(" ", unit, " replaced ", this.mission, " with ", mission);
             this.mission.dispose();
+            this.mission = null;
         }
        
         setMission(mission);
-        this.dynamicPriority = 0;
 
         final AIUnit transport = getTransport();
         final TransportMission tm = (transport == null) ? null
@@ -342,15 +390,6 @@ public class AIUnit extends TransportableAIObject {
                 lb.add("(stuck on", unit.getLocation(), ")");
             }
         }
-    }
-
-    /**
-     * Performs the mission this unit has been assigned.
-     *
-     * @param lb A <code>LogBuilder</code> to log to.
-     */
-    public Mission doMission(LogBuilder lb) {
-        return (mission != null) ? mission.doMission(lb) : null;
     }
 
     /**
@@ -420,6 +459,14 @@ public class AIUnit extends TransportableAIObject {
     /**
      * {@inheritDoc}
      */
+    @Override
+    public int getTransportPriority() {
+        return (hasMission()) ? getValue() : 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public Locatable getTransportLocatable() {
         return unit;
     }
@@ -444,15 +491,15 @@ public class AIUnit extends TransportableAIObject {
     /**
      * {@inheritDoc}
      */
-    public void setTransportDestination(Location location) {
-        throw new RuntimeException("Can not set transport destination for AIUnit");
+    public void setTransportDestination(Location destination) {
+        throw new RuntimeException("AI unit transport destination set by mission.");
     }
 
     /**
      * {@inheritDoc}
      */
     public boolean carriableBy(Unit carrier) {
-        return carrier.couldCarry(unit);
+        return carrier.couldCarry(getUnit());
     }
 
     /**
@@ -483,7 +530,12 @@ public class AIUnit extends TransportableAIObject {
             PathNode path = unit.findPath(target); // Not using carrier!
             if (path != null
                 && (direction = tile.getDirection(path.next.getTile())) != null) {
-                return leaveTransport(direction);
+                try {
+                    return leaveTransport(direction);
+                } catch (Exception e) {
+                    logger.log(Level.WARNING, "Leave transport crash for "
+                        + this + "/" + unit.getMovesLeft(), e);
+                }
             }
         }
 
@@ -530,7 +582,7 @@ public class AIUnit extends TransportableAIObject {
         }
         return leaveTransport(tile.getDirection((best != null) ? best : safe));
     }               
-        
+
     /**
      * {@inheritDoc}
      */
@@ -542,11 +594,8 @@ public class AIUnit extends TransportableAIObject {
                 && unit.getLocation() == carrier.getLocation())
             : move(direction);
         if (result) {
-            Colony colony = unit.getColony();
-            if (colony != null) {
-                colony.firePropertyChange(Colony.REARRANGE_WORKERS,
-                                          true, false);
-            }
+            requestLocalRearrange();
+            dropTransport();
         }
         return result;
     }
@@ -562,12 +611,8 @@ public class AIUnit extends TransportableAIObject {
             && unit.getLocation() == carrier;
 
         if (result) {
-            Colony colony = unit.getColony();
-            if (colony != null) {
-                colony.firePropertyChange(Colony.REARRANGE_WORKERS,
-                                          true, false);
-            }
-            retargetTransport();
+            requestLocalRearrange();
+            takeTransport();
         }
         return result;
     }
