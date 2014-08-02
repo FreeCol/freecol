@@ -598,7 +598,10 @@ public class AIUnit extends TransportableAIObject {
             // changes owner.  TODO: cleanup.
             logger.warning("Disposing of " + getId() + " but owner is null!");
         }
-        setMission(null);
+        if (mission != null) {
+            this.mission.dispose();
+            this.mission = null;
+        }
         super.dispose();
     }
 

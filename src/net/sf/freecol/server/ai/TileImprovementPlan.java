@@ -368,8 +368,9 @@ public class TileImprovementPlan extends ValuedAIObject {
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
         sb.append("[").append(getId())
-            .append(" ").append(type.getSuffix())
-            .append(" at ").append(target.toShortString())
+            .append(" ").append((type == null) ? "null" : type.getSuffix())
+            .append(" at ").append((target == null) ? "null"
+                : target.toShortString())
             .append("/").append(getValue())
             .append("]");
         return sb.toString();
