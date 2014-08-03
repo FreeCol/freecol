@@ -388,7 +388,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                     if (target != null) break;
                 }
                 if (target == null) throw new RuntimeException("Initial colony fail!");
-                aiu.setMission(new BuildColonyMission(aiMain, aiu, target));
+                aiu.setMission(getBuildColonyMission(aiu, target));
                 lb.add(" ", aiu.getMission());
             }
             // Initialize the carrier mission after the cargo units
@@ -1754,8 +1754,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         if (player.getNumberOfSettlements() <= 0 && bcm != null) {
             Collections.sort(aiUnits, builderComparator);
             for (AIUnit aiUnit : aiUnits) {
-                Mission m = new BuildColonyMission(aiMain, aiUnit,
-                                                   bcm.getTarget());
+                Mission m = getBuildColonyMission(aiUnit, bcm.getTarget());
                 if (m == null) continue;
                 done.add(aiUnit);
                 aiUnit.changeMission(m, lb);lb.add(", ");
@@ -1771,7 +1770,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         if (nBuilders > 0) {
             Collections.sort(aiUnits, builderComparator);
             for (AIUnit aiUnit : aiUnits) {
-                Mission m = getBuildColonyMission(aiUnit);
+                Mission m = getBuildColonyMission(aiUnit, null);
                 if (m == null) continue;
                 done.add(aiUnit);
                 aiUnit.changeMission(m, lb);lb.add(", ");
@@ -2000,16 +1999,19 @@ public class EuropeanAIPlayer extends AIPlayer {
      * Gets a new BuildColonyMission for a unit.
      *
      * @param aiUnit The <code>AIUnit</code> to check.
+     * @param target An optional target <code>Location</code>.
      * @return A new mission, or null if impossible.
      */
-    protected Mission getBuildColonyMission(AIUnit aiUnit) {
+    protected Mission getBuildColonyMission(AIUnit aiUnit, Location target) {
         String reason = BuildColonyMission.invalidReason(aiUnit);
         if (reason != null) return null;
         final Unit unit = aiUnit.getUnit();
-        Location loc = BuildColonyMission.findTarget(aiUnit, buildingRange,
-                                                     unit.isInEurope());
-        return (loc == null) ? null
-            : new BuildColonyMission(getAIMain(), aiUnit, loc);
+        if (target == null) {
+            target = BuildColonyMission.findTarget(aiUnit, buildingRange,
+                                                   unit.isInEurope());
+        }
+        return (target == null) ? null
+            : new BuildColonyMission(getAIMain(), aiUnit, target);
     }
 
     /**
@@ -2266,7 +2268,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 lb.add(", EXCEPTION: ", e.getMessage());
                 logger.log(Level.WARNING, "doMissions failed for: " + aiu, e);
             }
-            if (unit.getMovesLeft() > 0) result.add(aiu);
+            if (!unit.isDisposed() && unit.getMovesLeft() > 0) result.add(aiu);
         }
         if (lb.grew("\n  Do normal missions:")) lb.mark();
         for (AIUnit aiu : aiUnits) {

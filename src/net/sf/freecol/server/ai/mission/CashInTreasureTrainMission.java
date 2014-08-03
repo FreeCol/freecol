@@ -406,13 +406,14 @@ public class CashInTreasureTrainMission extends Mission {
                     || europe == null
                     || unit.getTransportFee() == 0
                     || (aiCarrier == null && carriers.isEmpty());
+                Location here = upLoc(unit.getLocation());
                 if (!cashin) {
                     setTarget(europe);
                     // Pick the closest carrier and forcibly add this unit.
                     int turns = INFINITY;
                     Unit closest = null;
                     for (Unit c : carriers) {
-                        int t = c.getTurnsToReach(unit.getLocation());
+                        int t = c.getTurnsToReach(here);
                         if (turns > t) {
                             turns = t;
                             closest = c;
@@ -424,15 +425,15 @@ public class CashInTreasureTrainMission extends Mission {
                         && (aiCarrier = aiMain.getAIUnit(closest)) != null
                         && (tm = aiCarrier.getMission(TransportMission.class)) != null) {
                         tm.queueTransportable(aiUnit, false);
-                        lb.add(", retarget Europe on ", aiCarrier.getUnit(),
-                               " at ", unit.getLocation(), ".");
+                        lb.add(", retarget Europe on ", aiCarrier.getUnit());
+                        lbAt(lb, unit);
                         return this;
                     }
                 }
                 if (AIMessage.askCashInTreasureTrain(aiUnit)) {
-                    lbDone(lb, " cash in at ", unit.getLocation());
+                    lbDone(lb, "cash in at ", here);
                 } else {
-                    lbFail(lb, " cash in at", unit.getLocation());
+                    lbFail(lb, "cash in failed at", here);
                 }
                 return null;
             }
