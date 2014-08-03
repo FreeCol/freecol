@@ -44,8 +44,7 @@ public abstract class Wish extends ValuedAIObject {
 
     /**
      * The <code>TransportableAIObject</code> which will realize the wish,
-     * or <code>null</code> if no <code>TransportableAIObject</code> has
-     * been chosen.
+     * or null if none has been assigned.
      */
     protected TransportableAIObject transportable;
 
@@ -99,8 +98,7 @@ public abstract class Wish extends ValuedAIObject {
     }
 
     /**
-     * Gets the <code>TransportableAIObject</code> assigned to this
-     * <code>Wish</code>.
+     * Gets the <code>TransportableAIObject</code> assigned to this wish.
      *
      * @return The <code>TransportableAIObject</code> which will
      *     realize this wish, or null if none has been assigned.
@@ -112,12 +110,11 @@ public abstract class Wish extends ValuedAIObject {
     }
 
     /**
-     * Assigns a <code>TransportableAIObject</code> to this
-     * <code>Wish</code>.
+     * Assigns a <code>TransportableAIObject</code> to this <code>Wish</code>.
      *
      * @param transportable The <code>TransportableAIObject</code>
      *     which should realize this wish.
-     * @see #getTransportableAIObject
+     * @see #getTransportable
      * @see net.sf.freecol.server.ai.mission.WishRealizationMission
      */
     public void setTransportable(TransportableAIObject transportable) {
@@ -128,8 +125,8 @@ public abstract class Wish extends ValuedAIObject {
      * Gets the destination of this <code>Wish</code>.
      *
      * @return The <code>Location</code> in which the
-     *       {@link #getTransportable transportable} assigned to
-     *       this <code>Wish</code> will have to reach.
+     *     {@link #getTransportable transportable} assigned to
+     *     this <code>Wish</code> will have to reach.
      */
     public Location getDestination() {
         return destination;
@@ -155,15 +152,15 @@ public abstract class Wish extends ValuedAIObject {
      */
     @Override
     public void dispose() {
-        destination = null;
-        transportable = null;
+        this.destination = null;
+        this.transportable = null;
         super.dispose();
     }
 
     /**
      * Checks the integrity of a <code>Wish</code>.
-     * The destination must be neither null nor disposed, the transportable
-     * may be null but must otherwise be intact.
+     * The destination must be neither null nor disposed, the
+     * transportable may be null but must otherwise be intact.
      *
      * @param fix Fix problems if possible.
      * @return Negative if there are problems remaining, zero if
