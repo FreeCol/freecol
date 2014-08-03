@@ -76,6 +76,7 @@ public class UnitWanderMission extends Mission {
 
 
     // Implement Mission
+    //   Inherit dispose, getBaseTransportPriority, getTransportDestination
 
     /**
      * {@inheritDoc}
@@ -96,22 +97,19 @@ public class UnitWanderMission extends Mission {
         return null;
     }
 
-    // Omitted invalidReason(aiUnit, Location), location irrelevant
-    // Omitted invalidReason(aiUnit), always true
-
-    /**
-     * {@inheritDoc}
-     */
-    public String invalidReason() {
-        return invalidAIUnitReason(getAIUnit());
-    }
-
     /**
      * {@inheritDoc}
      */
     @Override
     public boolean isOneTime() {
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String invalidReason() {
+        return invalidAIUnitReason(getAIUnit());
     }
 
     /**

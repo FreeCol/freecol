@@ -234,51 +234,6 @@ public class PrivateerMission extends Mission {
             : null;
     }        
 
-
-    // Implement Mission
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Location getTransportDestination() {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getTransportPriority() {
-        return 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Location getTarget() {
-        return target;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setTarget(Location target) {
-        if (target == null
-            || target instanceof Colony || target instanceof Europe
-            || target instanceof Unit) {
-            boolean retarget = this.target != null && this.target != target;
-            this.target = target;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Location findTarget() {
-        return findTarget(getAIUnit(), 8, true);
-    }
-    
     /**
      * Why would a PrivateeringMission be invalid with the given unit.
      *
@@ -369,14 +324,49 @@ public class PrivateerMission extends Mission {
             : Mission.TARGETINVALID;
     }
 
+
+    // Implement Mission
+    //   Inherit dispose, getBaseTransportPriority, isOneTime
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Location getTransportDestination() {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location getTarget() {
+        return target;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setTarget(Location target) {
+        if (target == null
+            || target instanceof Colony || target instanceof Europe
+            || target instanceof Unit) {
+            this.target = target;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location findTarget() {
+        return findTarget(getAIUnit(), 8, true);
+    }
+    
     /**
      * {@inheritDoc}
      */
     public String invalidReason() {
         return invalidReason(getAIUnit(), getTarget());
     }
-
-    // Not a one-time mission, omit isOneTime().
 
     /**
      * {@inheritDoc}

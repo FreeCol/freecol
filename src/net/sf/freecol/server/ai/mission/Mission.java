@@ -107,19 +107,11 @@ public abstract class Mission extends AIObject {
 
 
     /**
-     * Disposes this mission by removing any references to it.
-     * Subclasses should override as needed.
-     */
-    public void dispose() {
-        // Nothing to do yet.
-    }
-
-    /**
      * Gets the AI-unit this mission has been created for.
      *
      * @return The <code>AIUnit</code>.
      */
-    public AIUnit getAIUnit() {
+    public final AIUnit getAIUnit() {
         return aiUnit;
     }
 
@@ -127,17 +119,17 @@ public abstract class Mission extends AIObject {
      * Sets the AI-unit this mission has been created for.
      *
      * @param aiUnit The <code>AIUnit</code>.
-     */
     protected void setAIUnit(AIUnit aiUnit) {
         this.aiUnit = aiUnit;
     }
+     */
 
     /**
      * Gets the unit this mission has been created for.
      *
      * @return The <code>Unit</code>.
      */
-    public Unit getUnit() {
+    public final Unit getUnit() {
         return (aiUnit == null) ? null : aiUnit.getUnit();
     }
 
@@ -146,7 +138,7 @@ public abstract class Mission extends AIObject {
      *
      * @return The <code>Player</code> that owns the mission unit.
      */
-    protected Player getPlayer() {
+    protected final Player getPlayer() {
         return (getUnit() == null) ? null : getUnit().getOwner();
     }
 
@@ -155,7 +147,7 @@ public abstract class Mission extends AIObject {
      *
      * @return The <code>AIPlayer</code>.
      */
-    protected AIPlayer getAIPlayer() {
+    protected final AIPlayer getAIPlayer() {
         return getAIMain().getAIPlayer(getUnit().getOwner());
     }
 
@@ -164,7 +156,7 @@ public abstract class Mission extends AIObject {
      *
      * @return The <code>EuropeanAIPlayer</code>.
      */
-    protected EuropeanAIPlayer getEuropeanAIPlayer() {
+    protected final EuropeanAIPlayer getEuropeanAIPlayer() {
         Player player = getUnit().getOwner();
         if (!player.isEuropean()) {
             throw new IllegalArgumentException("Not a European player: "
@@ -178,7 +170,7 @@ public abstract class Mission extends AIObject {
      *
      * @return A <code>Random</code> to use.
      */
-    protected Random getAIRandom() {
+    protected final Random getAIRandom() {
         return aiUnit.getAIRandom();
     }
 
@@ -196,7 +188,7 @@ public abstract class Mission extends AIObject {
      *
      * @return True if the reason starts with "target-".
      */
-    public boolean isTargetReason(String reason) {
+    public static boolean isTargetReason(String reason) {
         return reason != null && reason.startsWith("target-");
     }
 
@@ -317,7 +309,6 @@ public abstract class Mission extends AIObject {
         return null;
     }
 
-
     /**
      * Is another player a valid attack target?
      *
@@ -341,6 +332,48 @@ public abstract class Mission extends AIObject {
             ? "target-european-war-absent"
             : null;
     }
+
+    /**
+     * Is an AI unit able to perform a different mission?
+     *
+     * AIPlayers will call FooMission.invalidReason(aiUnit) to
+     * determine whether it is valid to assign some unit to a
+     * FooMission, so `interesting' Mission subclasses with complex
+     * validity requirements must implement a routine with this
+     * signature.  Conversely, simple Missions that are always possible
+     * need not.
+     *
+     * Implementations should usually start by calling this routine
+     * (i.e. Mission.invalidReason(AIUnit)).
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @return A reason for mission invalidity, or null if none found.
+     */
+    public static String invalidReason(AIUnit aiUnit) {
+        return invalidAIUnitReason(aiUnit);
+    }
+
+    /**
+     * Is an AI unit able to perform a mission with a specified target?
+     *
+     * Specific Missions can be invalid for target-related reasons.
+     * Such Missions need to implement a routine with this signature,
+     * as it will be called by the GoalDeciders in map path find/searches
+     * to choose a Mission target.
+     *
+     * Implementations should usually start by calling either
+     * invalidAIUnitReason() or this routine if the target checking is
+     * trivial.
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param loc The target <code>Location</code> to check.
+     * @return A reason for mission invalidity, or null if none found.
+     */
+    public static String invalidReason(AIUnit aiUnit, Location loc) {
+        String reason = invalidAIUnitReason(aiUnit);
+        return (reason != null) ? reason : invalidTargetReason(loc);
+    }
+
 
     /**
      * Finds a target for a unit without considering its movement
@@ -871,7 +904,25 @@ public abstract class Mission extends AIObject {
 
 
     // Mission interface to be implemented/overridden by descendants.
+    // TransportableAIObject delegates some functionality here when
+    // a mission is available.
+ 
+    /**
+     * Disposes this mission by removing any references to it.
+     */
+    public void dispose() {
+        // Nothing to do yet.
+    }
 
+    /**
+     * Get the base transport priority for the unit performing this mission.
+     *
+     * @return A base transport priority.
+     */
+    public int getBaseTransportPriority() {
+        return 0;
+    }
+        
     /**
      * Gets the destination of a required transport.
      *
@@ -889,18 +940,6 @@ public abstract class Mission extends AIObject {
             : ((loc = getTarget()) == null) ? null
             : (!getUnit().shouldTakeTransportTo(loc)) ? null
             : loc;
-    }
-
-    /**
-     * Gets the priority of getting the unit to the transport
-     * destination.
-     *
-     * @return The priority.
-     */
-    public int getTransportPriority() {
-        return (getTransportDestination() != null)
-            ? NORMAL_TRANSPORT_PRIORITY
-            : 0;
     }
 
     /**
@@ -925,6 +964,19 @@ public abstract class Mission extends AIObject {
     public abstract Location findTarget();
 
     /**
+     * Should this mission be considered a mere fallback to be replaced
+     * at will?
+     *
+     * Missions are not one-time by default, true one-time missions
+     * must override this routine.
+     *
+     * @return False.
+     */
+    public boolean isOneTime() {
+        return false;
+    }
+
+    /**
      * Why is this mission invalid?
      *
      * Mission subclasses must implement this routine, which probably
@@ -938,59 +990,6 @@ public abstract class Mission extends AIObject {
      * @return A reason for mission invalidity, or null if none found.
      */
     public abstract String invalidReason();
-
-    /**
-     * Is an AI unit able to perform a different mission?
-     *
-     * AIPlayers will call FooMission.invalidReason(aiUnit) to
-     * determine whether it is valid to assign some unit to a
-     * FooMission, so `interesting' Mission subclasses with complex
-     * validity requirements must implement a routine with this
-     * signature.  Conversely, simple Missions that are always possible
-     * need not.
-     *
-     * Implementations should usually start by calling this routine
-     * (i.e. Mission.invalidReason(AIUnit)).
-     *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @return A reason for mission invalidity, or null if none found.
-     */
-    public static String invalidReason(AIUnit aiUnit) {
-        return invalidAIUnitReason(aiUnit);
-    }
-
-    /**
-     * Is an AI unit able to perform a mission with a specified target?
-     *
-     * Specific Missions can be invalid for target-related reasons.
-     * Such Missions need to implement a routine with this signature,
-     * as it will be called by the GoalDeciders in map path find/searches
-     * to choose a Mission target.
-     *
-     * Implementations should usually start by calling either
-     * invalidAIUnitReason() or this routine if the target checking is
-     * trivial.
-     *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param loc The target <code>Location</code> to check.
-     * @return A reason for mission invalidity, or null if none found.
-     */
-    public static String invalidReason(AIUnit aiUnit, Location loc) {
-        String reason = invalidAIUnitReason(aiUnit);
-        return (reason != null) ? reason : invalidTargetReason(loc);
-    }
-
-    /**
-     * Should this mission only be carried out once?
-     *
-     * Missions are not one-time by default, true one-time missions
-     * must override this routine.
-     *
-     * @return False.
-     */
-    public boolean isOneTime() {
-        return false;
-    }
 
     /**
      * Performs the mission.

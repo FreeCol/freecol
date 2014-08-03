@@ -79,27 +79,6 @@ public class UnitWanderHostileMission extends Mission {
     }
 
 
-    // Implement Mission
-
-    /**
-     * {@inheritDoc}
-     */
-    public Location getTarget() {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setTarget(Location target) {}
-
-    /**
-     * {@inheritDoc}
-     */
-    public Location findTarget() {
-        return null;
-    }
-
     /**
      * Why would this mission be invalid with the given unit.
      *
@@ -141,11 +120,27 @@ public class UnitWanderHostileMission extends Mission {
             : null;
     }
 
+
+    // Implement Mission
+    //   Inherit dispose, getBaseTransportPriority, getTransportDestination
+
     /**
      * {@inheritDoc}
      */
-    public String invalidReason() {
-        return invalidReason(getAIUnit(), null);
+    public Location getTarget() {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setTarget(Location target) {}
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location findTarget() {
+        return null;
     }
 
     /**
@@ -154,6 +149,13 @@ public class UnitWanderHostileMission extends Mission {
     @Override
     public boolean isOneTime() {
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String invalidReason() {
+        return invalidReason(getAIUnit(), null);
     }
 
     /**

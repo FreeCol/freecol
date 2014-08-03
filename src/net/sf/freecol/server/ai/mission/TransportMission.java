@@ -132,7 +132,8 @@ public class TransportMission extends Mission {
          *
          * Defaults to DUMP mode.  Call setTarget to do something useful.
          *
-         * @param transportable The <code>TransportableAIObject</code> to cargo.
+         * @param transportable The <code>TransportableAIObject</code>
+         *     to cargo.
          * @param carrier The carrier <code>Unit</code>.
          */
         public Cargo(TransportableAIObject transportable, Unit carrier) {
@@ -142,7 +143,8 @@ public class TransportMission extends Mission {
         /**
          * Creates the new dumping Cargo to a given location.
          *
-         * @param transportable The <code>TransportableAIObject</code> to transport.
+         * @param transportable The <code>TransportableAIObject</code>
+         *     to transport.
          * @param carrier The carrier <code>Unit</code>.
          * @param target The target <code>Location</code>.
          */
@@ -279,10 +281,11 @@ public class TransportMission extends Mission {
         }
 
         /**
-         * Transportables can be `wrapped' if they have the same target
-         * and advancing them reduces the space on the carrier.
+         * TransportableAIObjects can be `wrapped' if they have the
+         * same target and advancing them reduces the space on the carrier.
          *
-         * @param other The other <code>Cargo</code> to consider.
+         * @param other The other <code>TransportableAIObject</code>
+         *     to consider.
          * @return True if the transportables can be wrapped.
          */
         public boolean couldWrap(Cargo other) {
@@ -557,7 +560,11 @@ public class TransportMission extends Mission {
 
         LogBuilder lb = new LogBuilder(256);
         lb.add(tag);
-        checkCargoes(lb);
+        for (Unit u : getUnit().getUnitList()) {
+            AIUnit aiu = getAIMain().getAIUnit(u);
+            if (aiu == null) continue;
+            queueTransportable(aiu, false);
+        }
         retarget();
         lb.add(" begins: ", toFullString());
         lb.log(logger, Level.FINEST);
@@ -587,7 +594,8 @@ public class TransportMission extends Mission {
      * Disposes of this <code>Mission</code>.
      */
     public void dispose() {
-        logger.finest(tag + " disposing (" + clearCargoes() + "): " + this);
+        logger.finest(tag + " disposing (" + clearCargoes() + "): " + this
+            + "\n" + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
         super.dispose();
     }
 
@@ -712,8 +720,7 @@ public class TransportMission extends Mission {
     }
 
     /**
-     * Find a <code>Cargo</code> with the given
-     * <code>TransportableAIObject</code>.
+     * Find a <code>Cargo</code> with the given <code>TransportableAIObject</code>.
      *
      * @param t The <code>TransportableAIObject</code> to look for.
      * @return The <code>Cargo</code> found, or null if none found.
@@ -865,11 +872,10 @@ public class TransportMission extends Mission {
      * If this carrier is the current carrier of a transportable, drop it.
      *
      * @param t The <code>TransportableAIObject</code> to check.
-     * @param reason A reason for changing the carrier.
      */
-    private void dropTransportable(TransportableAIObject t, String reason) {
+    private void dropTransportable(TransportableAIObject t) {
         AIUnit carrier = getAIUnit();
-        if (t.getTransport() == carrier) t.setTransport(null, reason);
+        if (t.getTransport() == carrier) t.setTransport(null);
     }
 
     /**
@@ -877,11 +883,10 @@ public class TransportMission extends Mission {
      * transportable, make it so.
      *
      * @param t The <code>TransportableAIObject</code> to check.
-     * @param reason A reason for changing the carrier.
      */
-    private void takeTransportable(TransportableAIObject t, String reason) {
+    private void takeTransportable(TransportableAIObject t) {
         AIUnit carrier = getAIUnit();
-        if (t.getTransport() != carrier) t.setTransport(carrier, reason);
+        if (t.getTransport() != carrier) t.setTransport(carrier);
     }
 
     /**
@@ -933,7 +938,7 @@ public class TransportMission extends Mission {
     private String clearCargoes() {
         String log = "cargoes cleared: ";
         for (Cargo cargo : tClear()) {
-            dropTransportable(cargo.getTransportable(), "cleared");
+            dropTransportable(cargo.getTransportable());
             log += " " + cargo;
         }
         return log;
@@ -978,7 +983,7 @@ public class TransportMission extends Mission {
     private boolean addCargo(Cargo cargo, int index) {
         boolean result = tAdd(cargo, index);
         if (result) {
-            takeTransportable(cargo.getTransportable(), "added");
+            takeTransportable(cargo.getTransportable());
             if (tFirst() == cargo) retarget();
         }
 
@@ -1005,7 +1010,7 @@ public class TransportMission extends Mission {
     private boolean removeCargo(Cargo cargo, String reason) {
         boolean result = tRemove(cargo);
         if (result) {
-            dropTransportable(cargo.getTransportable(), reason);
+            dropTransportable(cargo.getTransportable());
             retarget();
         }
         return result;
@@ -1104,10 +1109,10 @@ public class TransportMission extends Mission {
                 cargo = next;
                 result++;
                 if (queueCargo(cargo, false)) {
-                    takeTransportable(t, "retarget/queued");
+                    takeTransportable(t);
                     result++;
                 } else {
-                    dropTransportable(t, "retarget/queuing failed");
+                    dropTransportable(t);
                 }
             }
             retarget();
@@ -1143,8 +1148,7 @@ public class TransportMission extends Mission {
      * @return True if the transportable should now have a valid
      *     transport destination.
      */
-    private boolean retargetTransportable(TransportableAIObject t,
-                                          LogBuilder lb) {
+    private boolean retargetTransportable(TransportableAIObject t, LogBuilder lb) {
         final EuropeanAIPlayer euaip = getEuropeanAIPlayer();
         final AIUnit aiCarrier = getAIUnit();
         final Unit carrier = aiCarrier.getUnit();
@@ -1165,7 +1169,7 @@ public class TransportMission extends Mission {
             for (Location loc : locations) {
                 for (WorkerWish ww : euaip.getWorkerWishesAt(loc, type)) {
                     if ((m = euaip.consumeWorkerWish(aiu, ww)) != null) {
-                        aiu.changeMission(m, lb);lb.add(", ");
+                        lb.add(", ");aiu.changeMission(m, lb);
                         return true;
                     }
                 }
@@ -1174,7 +1178,7 @@ public class TransportMission extends Mission {
             // Try giving the unit a new mission (may well call
             // getBestWorkerWish at some point).
             if ((m = euaip.getSimpleMission(aiu)) != null) {
-                aiu.changeMission(m, lb);lb.add(", ");
+                lb.add(", ");aiu.changeMission(m, lb);
                 return true;
             }
 
@@ -1196,7 +1200,7 @@ public class TransportMission extends Mission {
                     } else {
                         gw.update(type, gw.getGoodsAmount() - a, gw.getValue());
                     }
-                    lb.add(aig, " to ", loc, ", ");
+                    lb.add(", ", aig, " to ", loc);
                     return true;
                 }
             }
@@ -1206,7 +1210,7 @@ public class TransportMission extends Mission {
             if (gw != null) {
                 aig.setTransportDestination(gw.getDestination());
                 euaip.consumeGoodsWish(aig, gw);
-                lb.add(aig, " to ", gw.getDestination(), ", ");
+                lb.add(", ", aig, " to ", gw.getDestination());
                 return true;
             }
 
@@ -1231,7 +1235,7 @@ public class TransportMission extends Mission {
             }
             if (best != null) {
                 aig.setTransportDestination(best);
-                lb.add(aig, " to unload at ", best, ", ");
+                lb.add(", ", aig, " to unload at ", best);
                 return true;
             }
         }
@@ -1261,9 +1265,10 @@ public class TransportMission extends Mission {
             = new ArrayList<TransportableAIObject>();
         List<TransportableAIObject> retry
             = new ArrayList<TransportableAIObject>();
+
         String reason;
         PathNode path;
-        lb.add(" [check:");
+        lb.add(" [check");
         for (Cargo cargo : tCopy()) {
             TransportableAIObject t = cargo.getTransportable();
             if ((reason = cargo.check(aiCarrier)) != null) {
@@ -1313,41 +1318,35 @@ public class TransportMission extends Mission {
 
         // Retry anything found that was not on the cargoes list
         if (!unitsPresent.isEmpty()) {
-            lb.add(", found unexpected units:");
-            lb.mark();
+            lb.add(", found unexpected units");
             for (Unit u : unitsPresent) {
                 AIUnit aiu = getAIMain().getAIUnit(u);
                 if (aiu == null) throw new IllegalStateException("Bogus:" + u);
                 if (requeueTransportable(aiu)) {
-                    lb.add(" queued ", aiu.getUnit(), ", ");
+                    lb.add(", queued ", aiu.getUnit());
                 } else {
                     retry.add(aiu);
                 }
             }
-            if (lb.grew()) lb.shrink(", ");
         }
         if (!goodsPresent.isEmpty()) {
-            lb.add(", found unexpected goods:");
-            lb.mark();
+            lb.add(", found unexpected goods");
             for (Goods g : goodsPresent) {
                 AIGoods aig = new AIGoods(getAIMain(), carrier, g.getType(),
                                           g.getAmount(), null);
                 if (requeueTransportable(aig)) {
-                    lb.add(" queued ", aig.getGoods(), ", ");
+                    lb.add(", queued ", aig.getGoods());
                 } else {
                     retry.add(aig);
                 }
             }
-            if (lb.grew()) lb.shrink(", ");
         }
 
         // Ask the parent player to retarget transportables on the retry list
         if (!retry.isEmpty()) {
-            lb.mark();
             for (TransportableAIObject t : retry) {
                 if (!retargetTransportable(t, lb)) drop.add(t);
             }
-            if (lb.grew(", retarget: ")) lb.shrink(", ");
         }
 
         // Drop transportables on the drop list, or queue them to be dropped
@@ -1611,153 +1610,6 @@ public class TransportMission extends Mission {
         return best;
     }
 
-    // End of cargoes handling.
-
-    // Publically accessible routines to manipulate a Transportable.
-
-    /**
-     * Adds the given <code>TransportableAIObject</code> to the cargo
-     * list.
-     *
-     * @param t The <code>TransportableAIObject</code> to add.
-     * @param index The index of where to add the cargo.
-     * @return True if the <code>TransportableAIObject</code> was added.
-     */
-    public boolean addTransportable(TransportableAIObject t, int index) {
-        if (tFind(t) != null) return false;
-
-        AIUnit oldCarrier = t.getTransport();
-        TransportMission tm = oldCarrier.getMission(TransportMission.class);
-        if (tm != null) tm.removeTransportable(t);
-
-        Cargo cargo = makeCargo(t);
-        return (cargo == null) ? false : addCargo(cargo, index);
-    }
-
-    /**
-     * Removes the given <code>TransportableAIObject</code> from the cargo list.
-     *
-     * @param t The <code>TransportableAIObject</code> to remove.
-     * @return True if the removal succeeded.
-     */
-    public boolean removeTransportable(TransportableAIObject t) {
-        Cargo cargo = tFind(t);
-        return (cargo == null) ? false : tRemove(cargo);
-    }
-
-    /**
-     * Retargets a transportable that should already be on board the carrier.
-     *
-     * @param t The <code>TransportableAIObject</code> to retarget.
-     * @return True if the retargeting succeeded.
-     */
-    public boolean requeueTransportable(TransportableAIObject t) {
-        Cargo cargo = tFind(t);
-        return (cargo == null) ? queueTransportable(t, false)
-            : requeueCargo(cargo);
-    }
-
-    /**
-     * Wrapper for queueCargo.
-     * Public for the benefit of EuropeanAIPlayer.allocateTransportables
-     * and CashInTreasureTrain.doMission.
-     *
-     * @param t The <code>TransportableAIObject</code> to add.
-     * @param requireMatch Fail if an existing destination is not matched.
-     * @return True if the transportable was queued.
-     */
-    public boolean queueTransportable(TransportableAIObject t,
-                                      boolean requireMatch) {
-        Cargo cargo = makeCargo(t);
-        return (cargo == null) ? false : queueCargo(cargo, requireMatch);
-    }
-
-    /**
-     * Gets rid of a transportable, possibly dumping it.
-     *
-     * @param t The <code>TransportableAIObject</code> to dump.
-     * @param force If true, disband units or dump goods at sea.
-     * @return True if the transportable was dumped.
-     */
-    private boolean dumpTransportable(TransportableAIObject t, boolean force) {
-        if (t instanceof AIUnit) {
-            AIUnit aiu = (AIUnit)t;
-            return aiu.leaveTransport();
-                
-        } else if (t instanceof AIGoods) {
-            final Unit carrier = getUnit();
-            final AIUnit aiCarrier = getAIUnit();
-            final Location here = carrier.getLocation();
-            final Settlement settlement = carrier.getSettlement();
-
-            AIGoods aig = (AIGoods)t;
-            if (settlement != null) {
-                if (aig.leaveTransport(null)) {
-                    logger.finest(tag + " dumped " + aig
-                        + " at " + settlement.getName() + ": " + this);
-                } else {
-                    logger.finest(tag + " dump " + aig
-                        + " at " + settlement.getName() + " failed: " + this);
-                }
-            } else if (force) {
-                logger.warning(tag + " forcing dump(goods) " + aig
-                    + " at " + here.toShortString() + ": " + toFullString());
-                return AIMessage.askUnloadCargo(aiCarrier, aig.getGoods());
-            } else {
-                logger.warning(tag + " dump ignored " + aig
-                    + " at " + here.toShortString()
-                    + ": " + toFullString());
-                return false;
-            }
-
-        } else throw new RuntimeException("Bogus transportable: " + t);
-
-        return true;
-    }
-
-    // End of public TransportableAIObject manipulations
-
-
-    // Implement Mission
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Tile getTransportDestination() {
-        return null; // The carrier unit is never transported!
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getTransportPriority() {
-        return 0; // Override with no priority.
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Location getTarget() {
-        return target;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setTarget(Location target) {
-        this.target = target;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Location findTarget() {
-        // A noop.  The target is defined by the cargoes.
-        return null;
-    }
-
     /**
      * Why would an TransportMission be invalid with the given unit?
      *
@@ -1822,6 +1674,144 @@ public class TransportMission extends Mission {
         return invalidMissionReason(aiUnit);
     }
 
+    // End of cargoes handling.
+
+    // Publically accessible routines to manipulate a TransportableAIObject.
+
+    /**
+     * Adds the given <code>TransportableAIObject</code> to the cargo
+     * list.
+     *
+     * @param t The <code>TransportableAIObject</code> to add.
+     * @param index The index of where to add the cargo.
+     * @return True if the <code>TransportableAIObject</code> was added.
+     */
+    public boolean addTransportable(TransportableAIObject t, int index) {
+        if (tFind(t) != null) return false;
+
+        AIUnit oldCarrier = t.getTransport();
+        TransportMission tm = oldCarrier.getMission(TransportMission.class);
+        if (tm != null) tm.removeTransportable(t);
+
+        Cargo cargo = makeCargo(t);
+        return (cargo == null) ? false : addCargo(cargo, index);
+    }
+
+    /**
+     * Removes the given <code>TransportableAIObject</code> from the cargo list.
+     *
+     * @param t The <code>TransportableAIObject</code> to remove.
+     * @return True if the removal succeeded.
+     */
+    public boolean removeTransportable(TransportableAIObject t) {
+        Cargo cargo = tFind(t);
+        return (cargo == null) ? false : tRemove(cargo);
+    }
+
+    /**
+     * Retargets a transportable that should already be on board the carrier.
+     *
+     * @param t The <code>TransportableAIObject</code> to retarget.
+     * @return True if the retargeting succeeded.
+     */
+    public boolean requeueTransportable(TransportableAIObject t) {
+        Cargo cargo = tFind(t);
+        return (cargo == null) ? queueTransportable(t, false)
+            : requeueCargo(cargo);
+    }
+
+    /**
+     * Wrapper for queueCargo.
+     * Public for the benefit of EuropeanAIPlayer.allocateTransportables
+     * and CashInTreasureTrain.doMission.
+     *
+     * @param t The <code>TransportableAIObject</code> to add.
+     * @param requireMatch Fail if an existing destination is not matched.
+     * @return True if the transportable was queued.
+     */
+    public boolean queueTransportable(TransportableAIObject t, boolean requireMatch) {
+        Cargo cargo = makeCargo(t);
+        return (cargo == null) ? false : queueCargo(cargo, requireMatch);
+    }
+
+    /**
+     * Gets rid of a transportable, possibly dumping it.
+     *
+     * @param t The <code>TransportableAIObject</code> to dump.
+     * @param force If true, disband units or dump goods at sea.
+     * @return True if the transportable was dumped.
+     */
+    private boolean dumpTransportable(TransportableAIObject t, boolean force) {
+        if (t instanceof AIUnit) {
+            AIUnit aiu = (AIUnit)t;
+            return aiu.leaveTransport();
+                
+        } else if (t instanceof AIGoods) {
+            final Unit carrier = getUnit();
+            final AIUnit aiCarrier = getAIUnit();
+            final Location here = carrier.getLocation();
+            final Settlement settlement = carrier.getSettlement();
+
+            AIGoods aig = (AIGoods)t;
+            if (settlement != null) {
+                if (aig.leaveTransport(null)) {
+                    logger.finest(tag + " dumped " + aig
+                        + " at " + settlement.getName() + ": " + this);
+                } else {
+                    logger.finest(tag + " dump " + aig
+                        + " at " + settlement.getName() + " failed: " + this);
+                }
+            } else if (force) {
+                logger.warning(tag + " forcing dump(goods) " + aig
+                    + " at " + here.toShortString() + ": " + toFullString());
+                return AIMessage.askUnloadCargo(aiCarrier, aig.getGoods());
+            } else {
+                logger.warning(tag + " dump ignored " + aig
+                    + " at " + here.toShortString()
+                    + ": " + toFullString());
+                return false;
+            }
+
+        } else throw new RuntimeException("Bogus transportable: " + t);
+
+        return true;
+    }
+
+    // End of public TransportableAIObject manipulations
+
+    // Implement Mission
+    //   Inherit dispose, getBaseTransportPriority, isOneTime
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Tile getTransportDestination() {
+        return null; // Can not transport a carrier unit.
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location getTarget() {
+        return target;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setTarget(Location target) {
+        this.target = target;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location findTarget() {
+        // A noop.  The target is defined by the cargoes.
+        return null;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -1833,8 +1823,6 @@ public class TransportMission extends Mission {
             : ((cargo = tFirst()) == null) ? null
             : invalidCargoReason(cargo);
     }
-
-    // Not a one-time mission, omit isOneTime().
 
     /**
      * {@inheritDoc}
@@ -1981,8 +1969,7 @@ public class TransportMission extends Mission {
                 // location, then just add the best transportable for this
                 // carrier.
                 Location here = upLoc(unit.getLocation());
-                List<TransportableAIObject> tl
-                    = euaip.getTransportablesAt(here);
+                List<TransportableAIObject> tl = euaip.getTransportablesAt(here);
                 if (tl != null) {
                     for (TransportableAIObject t : tl) {
                         if (destinationCapacity() <= 0) break;
@@ -2002,7 +1989,7 @@ public class TransportMission extends Mission {
                 retarget();
                 if ((reason = invalidReason()) != null) {
                     logger.warning(tag + " post-stop failure(" + reason
-                        + "): " + this.toFullString());
+                        + ": " + this.toFullString());
                     lbBroken(lb, reason);
                     return null;
                 } else if (unit.isAtLocation(target)) {

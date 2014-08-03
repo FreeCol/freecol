@@ -140,7 +140,7 @@ public class DefendSettlementMission extends Mission {
      * @return A suitable <code>GoalDecider</code>.
      */
     private static GoalDecider getGoalDecider(final AIUnit aiUnit) {
-        GoalDecider gd = new GoalDecider() {
+        return new GoalDecider() {
                 private PathNode bestPath = null;
                 private int bestValue = Integer.MIN_VALUE;
                 
@@ -156,7 +156,6 @@ public class DefendSettlementMission extends Mission {
                     return false;
                 }
             };
-        return gd;
     }
 
     /**
@@ -175,8 +174,8 @@ public class DefendSettlementMission extends Mission {
         if (startTile == null) return null;
 
         return unit.search(startTile, getGoalDecider(aiUnit),
-            CostDeciders.avoidSettlementsAndBlockingUnits(),
-            range, unit.getCarrier());
+                           CostDeciders.avoidSettlementsAndBlockingUnits(),
+                           range, unit.getCarrier());
     }
 
     /**
@@ -190,45 +189,7 @@ public class DefendSettlementMission extends Mission {
     public static Location findTarget(AIUnit aiUnit, int range,
                                       boolean deferOK) {
         PathNode path = findTargetPath(aiUnit, range, deferOK);
-        return (path != null) ? extractTarget(aiUnit, path)
-            : null;
-    }
-
-
-    // Implement Mission
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getTransportPriority() {
-        return (getTransportDestination() == null) ? 0
-            : NORMAL_TRANSPORT_PRIORITY + 5;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Location getTarget() {
-        return target;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setTarget(Location target) {
-        if (target == null || target instanceof Settlement) {
-            boolean retarget = this.target != null && this.target != target;
-            this.target = target;
-            if (retarget) retargetTransportable();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Location findTarget() {
-        return findTarget(getAIUnit(), 4, true);
+        return (path != null) ? extractTarget(aiUnit, path) : null;
     }
 
     /**
@@ -242,8 +203,8 @@ public class DefendSettlementMission extends Mission {
         String reason = invalidAIUnitReason(aiUnit);
         if (reason != null) return reason;
         final Unit unit = aiUnit.getUnit();
-        return (unit.getGame().getCombatModel()
-            .getDefencePower(null, unit) <= 0.0f) ? "unit-not-defender"
+        final CombatModel cm = unit.getGame().getCombatModel();
+        return (cm.getDefencePower(null, unit) <= 0.0f) ? "unit-not-defender"
             : null;
     }
     
@@ -290,14 +251,50 @@ public class DefendSettlementMission extends Mission {
             : Mission.TARGETINVALID;
     }
 
+
+    // Implement Mission
+    //   Inherit dispose, getTransportDestination, isOneTime
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getBaseTransportPriority() {
+        return (getTransportDestination() == null) ? 0
+            : NORMAL_TRANSPORT_PRIORITY + 5;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location getTarget() {
+        return target;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setTarget(Location target) {
+        if (target == null || target instanceof Settlement) {
+            boolean retarget = this.target != null && this.target != target;
+            this.target = target;
+            if (retarget) retargetTransportable();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location findTarget() {
+        return findTarget(getAIUnit(), 4, true);
+    }
+
     /**
      * {@inheritDoc}
      */
     public String invalidReason() {
         return invalidReason(getAIUnit(), getTarget());
     }
-
-    // Not a one-time mission, omit isOneTime().
 
     /**
      * {@inheritDoc}

@@ -217,38 +217,6 @@ public class BuildColonyMission extends Mission {
                                      range*3, deferOK));
     }
 
-      
-    // Implement Mission
-
-    /**
-     * {@inheritDoc}
-     */
-    public Location getTarget() {
-        return target;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setTarget(Location target) {
-        if (target == null
-            || target instanceof Colony || target instanceof Tile) {
-            boolean retarget = this.target != null && this.target != target;
-            this.target = target;
-            this.colonyValue = (target instanceof Tile)
-                ? getAIUnit().getUnit().getOwner().getColonyValue((Tile)target)
-                : -1;
-            if (retarget) retargetTransportable();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Location findTarget() {
-        return findTarget(getAIUnit(), 5, true);
-    }
-
     /**
      * Why would this mission be invalid with the given unit?
      *
@@ -324,14 +292,52 @@ public class BuildColonyMission extends Mission {
         return invalidMissionReason(aiUnit);
     }
 
+      
+    // Implement Mission
+    //   Inherit dispose, getTransportDestination, isOneTime
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getBaseTransportPriority() {
+        return NORMAL_TRANSPORT_PRIORITY + 10;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location getTarget() {
+        return target;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setTarget(Location target) {
+        if (target == null
+            || target instanceof Colony || target instanceof Tile) {
+            boolean retarget = this.target != null && this.target != target;
+            this.target = target;
+            this.colonyValue = (target instanceof Tile)
+                ? getAIUnit().getUnit().getOwner().getColonyValue((Tile)target)
+                : -1;
+            if (retarget) retargetTransportable();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location findTarget() {
+        return findTarget(getAIUnit(), 5, true);
+    }
+
     /**
      * {@inheritDoc}
      */
     public String invalidReason() {
         return invalidReason(getAIUnit(), target);
     }
-
-    // Not a one-time mission, omit isOneTime().
 
     /**
      * {@inheritDoc}

@@ -368,38 +368,6 @@ public class PioneeringMission extends Mission {
             : "unit-missing-tools";
     }
 
-
-    // Implement Mission
-
-    /**
-     * {@inheritDoc}
-     */
-    public Location getTarget() {
-        return target;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setTarget(Location target) {
-        if (target == null
-            || target instanceof Colony || target instanceof Tile) {
-            boolean retarget = this.target != null && this.target != target;
-            this.target = target;
-            setTileImprovementPlan((target instanceof Tile)
-                ? getBestPlan((Tile)target)
-                : null);
-            if (retarget) retargetTransportable();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Location findTarget() {
-        return findTarget(getAIUnit(), 10, true);
-    }
-    
     /**
      * Why would a PioneeringMission be invalid with the given unit.
      *
@@ -495,6 +463,47 @@ public class PioneeringMission extends Mission {
             : Mission.TARGETINVALID;
     }
 
+
+    // Implement Mission
+    //   Inherit dispose, getTransportDestination, isOneTime
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getBaseTransportPriority() {
+        return NORMAL_TRANSPORT_PRIORITY;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location getTarget() {
+        return target;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setTarget(Location target) {
+        if (target == null
+            || target instanceof Colony || target instanceof Tile) {
+            boolean retarget = this.target != null && this.target != target;
+            this.target = target;
+            setTileImprovementPlan((target instanceof Tile)
+                ? getBestPlan((Tile)target)
+                : null);
+            if (retarget) retargetTransportable();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location findTarget() {
+        return findTarget(getAIUnit(), 10, true);
+    }
+    
     /**
      * {@inheritDoc}
      */
@@ -506,8 +515,6 @@ public class PioneeringMission extends Mission {
         }
         return invalidReason(getAIUnit(), getTarget());
     }
-
-    // Not a one-time mission, omit isOneTime().
 
     /**
      * {@inheritDoc}

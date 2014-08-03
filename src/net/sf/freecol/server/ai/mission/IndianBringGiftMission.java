@@ -115,46 +115,6 @@ public class IndianBringGiftMission extends Mission {
         return getUnit().hasGoodsCargo();
     }
 
-
-    // Implement Mission
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Location getTransportDestination() {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getTransportPriority() {
-        return 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Location getTarget() {
-        return target;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setTarget(Location target) {
-        throw new IllegalStateException("Target is fixed");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Location findTarget() {
-        throw new IllegalStateException("Target is fixed");
-    }
-
     /**
      * Why would this mission be invalid with the given unit?
      *
@@ -223,6 +183,39 @@ public class IndianBringGiftMission extends Mission {
             : Mission.TARGETINVALID;
     }
 
+
+    // Mission interface
+    //   Inherit dispose, getBaseTransportPriority, isOneTime
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Location getTransportDestination() {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location getTarget() {
+        return target;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setTarget(Location target) {
+        throw new IllegalStateException("Target is fixed");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location findTarget() {
+        throw new IllegalStateException("Target is fixed");
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -233,8 +226,6 @@ public class IndianBringGiftMission extends Mission {
             ? "completed"
             : null;
     }
-
-    // Not a one-time mission, omit isOneTime().
 
     /**
      * {@inheritDoc}

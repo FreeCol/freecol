@@ -80,6 +80,15 @@ public class IdleAtSettlementMission extends Mission {
 
 
     // Implement Mission
+    //   Inherit dispose, getTransportDestination
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getBaseTransportPriority() {
+        return MINIMUM_TRANSPORT_PRIORITY;
+    }
 
     /**
      * {@inheritDoc}
@@ -97,19 +106,11 @@ public class IdleAtSettlementMission extends Mission {
      * {@inheritDoc}
      */
     public Location findTarget() {
-        PathNode path = getAIUnit().getUnit().findOurNearestOtherSettlement();
+        final Unit unit = getAIUnit().getUnit();
+        if (unit.isInEurope()) return unit.getLocation();
+
+        PathNode path = unit.findOurNearestOtherSettlement();
         return (path == null) ? null : upLoc(path.getLastNode().getLocation());
-    }
-
-    // No static invalidReason(AIUnit [,Location]) forms, as this is
-    // a targetless fallback mission that is never invalid.
-    // TODO: revise this, it could be invalid if there are no settlements?!?
-
-    /**
-     * {@inheritDoc}
-     */
-    public String invalidReason() {
-        return invalidAIUnitReason(getAIUnit());
     }
 
     /**
@@ -118,6 +119,13 @@ public class IdleAtSettlementMission extends Mission {
     @Override
     public boolean isOneTime() {
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String invalidReason() {
+        return invalidAIUnitReason(getAIUnit());
     }
 
     /**

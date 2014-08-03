@@ -94,15 +94,40 @@ public class WorkInsideColonyMission extends Mission {
         return aiColony;
     }
 
+    /**
+     * Why would this mission be invalid with the given AI unit and location?
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param loc The <code>Location</code> to check.
+     * @return A reason for invalidity, or null if none found.
+     */
+    public static String invalidReason(AIUnit aiUnit, Location loc) {
+        String reason;
+        return ((reason = invalidAIUnitReason(aiUnit)) != null) ? reason
+            : (!aiUnit.getUnit().isPerson()) ? Mission.UNITNOTAPERSON
+            : ((reason = invalidTargetReason(loc, aiUnit.getUnit().getOwner()))
+                != null) ? reason
+            : null;
+    }
+
 
     // Implement Mission
+    //   Inherit dispose, getTransportDestination, isOneTime
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getBaseTransportPriority() {
+        return NORMAL_TRANSPORT_PRIORITY;
+    }
 
     /**
      * {@inheritDoc}
      */
     public Location getTarget() {
         return (aiColony == null || aiColony.getColony() == null) ? null
-            : aiColony.getColony().getTile();
+            : aiColony.getColony();
     }
 
     /**
@@ -120,31 +145,11 @@ public class WorkInsideColonyMission extends Mission {
     }
 
     /**
-     * Why would this mission be invalid with the given AI unit and location?
-     *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param loc The <code>Location</code> to check.
-     * @return A reason for invalidity, or null if none found.
-     */
-    public static String invalidReason(AIUnit aiUnit, Location loc) {
-        String reason;
-        return ((reason = invalidAIUnitReason(aiUnit)) != null) ? reason
-            : (!aiUnit.getUnit().isPerson()) ? Mission.UNITNOTAPERSON
-            : ((reason = invalidTargetReason(loc, aiUnit.getUnit().getOwner()))
-                != null) ? reason
-            : null;
-    }
-
-    // Omitted invalidReason(AIUnit), not needed.
-
-    /**
      * {@inheritDoc}
      */
     public String invalidReason() {
         return invalidReason(getAIUnit(), getTarget());
     }
-
-    // Not a one-time mission, omit isOneTime().
 
     /**
      * {@inheritDoc}

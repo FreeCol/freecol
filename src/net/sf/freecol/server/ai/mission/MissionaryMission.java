@@ -244,34 +244,6 @@ public class MissionaryMission extends Mission {
         return reason;
     }
 
-
-    // Implement Mission
-
-    /**
-     * {@inheritDoc}
-     */
-    public Location getTarget() {
-        return target;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setTarget(Location target) {
-        if (target == null || target instanceof Settlement) {
-            boolean retarget = this.target != null && this.target != target;
-            this.target = target;
-            if (retarget) retargetTransportable();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Location findTarget() {
-        return findTarget(getAIUnit(), 20, true);
-    }
-
     /**
      * Why would this mission be invalid with the given unit?
      *
@@ -355,14 +327,49 @@ public class MissionaryMission extends Mission {
             : Mission.TARGETINVALID;
     }
 
+
+    // Implement Mission
+    //   Inherit dispose, getTransportDestination, isOneTime
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getBaseTransportPriority() {
+        return NORMAL_TRANSPORT_PRIORITY;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location getTarget() {
+        return target;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setTarget(Location target) {
+        if (target == null || target instanceof Settlement) {
+            boolean retarget = this.target != null && this.target != target;
+            this.target = target;
+            if (retarget) retargetTransportable();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location findTarget() {
+        return findTarget(getAIUnit(), 20, true);
+    }
+
     /**
      * {@inheritDoc}
      */
     public String invalidReason() {
         return invalidReason(getAIUnit(), getTarget());
     }
-
-    // Not a one-time mission, omit isOneTime().
     
     /**
      * {@inheritDoc}

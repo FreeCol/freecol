@@ -225,44 +225,6 @@ public class CashInTreasureTrainMission extends Mission {
                                      range*3, deferOK));
     }
 
-
-    // Implement Mission
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getTransportPriority() {
-        return (getTransportDestination() == null) ? 0
-            : getUnit().getTreasureAmount();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Location getTarget() {
-        return target;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setTarget(Location target) {
-        if (target == null
-            || target instanceof Europe || target instanceof Colony) {
-            boolean retarget = this.target != null && this.target != target;
-            this.target = target;
-            if (retarget) retargetTransportable();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Location findTarget() {
-        return findTarget(getAIUnit(), 20, true);
-    }
-
     /**
      * Why would this mission be invalid with the given unit?
      *
@@ -349,6 +311,44 @@ public class CashInTreasureTrainMission extends Mission {
         return invalidMissionReason(aiUnit);
     }
 
+
+    // Implement Mission
+    //   Inherit dispose, getTransportDestination, isOneTime
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getBaseTransportPriority() {
+        return getUnit().getTreasureAmount();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location getTarget() {
+        return target;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setTarget(Location target) {
+        if (target == null
+            || target instanceof Europe || target instanceof Colony) {
+            boolean retarget = this.target != null && this.target != target;
+            this.target = target;
+            if (retarget) retargetTransportable();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location findTarget() {
+        return findTarget(getAIUnit(), 20, true);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -356,8 +356,6 @@ public class CashInTreasureTrainMission extends Mission {
         return invalidReason(getAIUnit(), target);
     }
 
-    // Not a one-time mission, omit isOneTime().
-    
     /**
      * {@inheritDoc}
      */

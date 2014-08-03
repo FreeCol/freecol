@@ -303,61 +303,6 @@ public class UnitSeekAndDestroyMission extends Mission {
             : null;
     }
 
-
-    // Implement Mission
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Location getTransportDestination() {
-        if (!isValid()) return null;
-        Location loc = (transportTarget != null) ? transportTarget : target;
-        return (getUnit().shouldTakeTransportTo(loc)) ? loc : null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Location getTarget() {
-        return target;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setTarget(Location target) {
-        if (target == null
-            || target instanceof Unit || target instanceof Settlement) {
-            boolean retarget = this.target != null && this.target != target;
-            this.target = target;
-            Unit unit = getUnit();
-            transportTarget = null;
-            if (unit.shouldTakeTransportTo(target)
-                && (target instanceof Settlement)) {
-                Settlement settlement = (Settlement)target;
-                if (settlement.isConnectedPort()) {
-                    transportTarget = settlement.getTile()
-                        .getBestDisembarkTile(unit.getOwner());
-                    logger.finest(tag + " chose dropoff " + transportTarget
-                        + " for attack on "
-                        + ((settlement.canBombardEnemyShip()) ? "hazardous"
-                            : "normal")
-                        + " settlement " + settlement.getName()
-                        + ": " + this);
-                }
-            }
-            if (retarget) retargetTransportable();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Location findTarget() {
-        return findTarget(getAIUnit(), 4, false);
-    }
-
     /**
      * Why would a UnitSeekAndDestroyMission be invalid with the given unit.
      *
@@ -449,14 +394,76 @@ public class UnitSeekAndDestroyMission extends Mission {
             : Mission.TARGETINVALID;
     }
 
+    
+    // Implement Mission
+    //   Inherit dispose, isOneTime
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getBaseTransportPriority() {
+        return NORMAL_TRANSPORT_PRIORITY - 5;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Location getTransportDestination() {
+        if (!isValid()) return null;
+        Location loc = (transportTarget != null) ? transportTarget : target;
+        return (getUnit().shouldTakeTransportTo(loc)) ? loc : null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location getTarget() {
+        return target;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setTarget(Location target) {
+        if (target == null
+            || target instanceof Unit || target instanceof Settlement) {
+            boolean retarget = this.target != null && this.target != target;
+            this.target = target;
+            Unit unit = getUnit();
+            transportTarget = null;
+            if (unit.shouldTakeTransportTo(target)
+                && (target instanceof Settlement)) {
+                Settlement settlement = (Settlement)target;
+                if (settlement.isConnectedPort()) {
+                    transportTarget = settlement.getTile()
+                        .getBestDisembarkTile(unit.getOwner());
+                    logger.finest(tag + " chose dropoff " + transportTarget
+                        + " for attack on "
+                        + ((settlement.canBombardEnemyShip()) ? "hazardous"
+                            : "normal")
+                        + " settlement " + settlement.getName()
+                        + ": " + this);
+                }
+            }
+            if (retarget) retargetTransportable();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location findTarget() {
+        return findTarget(getAIUnit(), 4, false);
+    }
+
     /**
      * {@inheritDoc}
      */
     public String invalidReason() {
         return invalidReason(getAIUnit(), getTarget());
     }
-
-    // Not a one-time mission, omit isOneTime().
 
     /**
      * {@inheritDoc}

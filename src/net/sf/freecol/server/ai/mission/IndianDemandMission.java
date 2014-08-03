@@ -222,46 +222,6 @@ public class IndianDemandMission extends Mission {
                         GoodsContainer.CARGO_SIZE); // One load of goods max
     }
 
-
-    // Implement Mission
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Location getTransportDestination() {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getTransportPriority() {
-        return 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Location getTarget() {
-        return target;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setTarget(Location target) {
-        throw new IllegalStateException("Target is fixed");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Location findTarget() {
-        throw new IllegalStateException("Target is fixed");
-    }
-
     /**
      * Why would this mission be invalid with the given unit?
      *
@@ -332,6 +292,39 @@ public class IndianDemandMission extends Mission {
             : Mission.TARGETINVALID;
     }
 
+
+    // Implement Mission
+    //   Inherit dispose, getBaseTransportPriority, isOneTime
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Location getTransportDestination() {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location getTarget() {
+        return target;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setTarget(Location target) {
+        throw new IllegalStateException("Target is fixed");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location findTarget() {
+        throw new IllegalStateException("Target is fixed");
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -342,8 +335,6 @@ public class IndianDemandMission extends Mission {
             ? "completed"
             : null;
     }
-
-    // Not a one-time mission, omit isOneTime().
 
     /**
      * {@inheritDoc}

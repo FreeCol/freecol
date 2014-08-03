@@ -92,8 +92,28 @@ public class WishRealizationMission extends Mission {
 
 
     /**
-     * Disposes of this <code>Mission</code>.
+     * Why would this mission be invalid with the given AI unit and location?
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param loc The <code>Location</code> to check.
+     * @return A reason for invalidity, or null if none found.
      */
+    public static String invalidReason(AIUnit aiUnit, Location loc) {
+        String reason;
+        return ((reason = invalidAIUnitReason(aiUnit)) != null) ? reason
+            : ((reason = invalidTargetReason(loc,
+                        aiUnit.getUnit().getOwner())) != null) ? reason
+            : null;
+    }
+
+
+    // Implement Mission
+    //   Inherit getTransportDestination, isOneTime
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void dispose() {
         if (wish != null) {
             wish.setTransportable(null);
@@ -102,8 +122,13 @@ public class WishRealizationMission extends Mission {
         super.dispose();
     }
 
-
-    // Implement Mission
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getBaseTransportPriority() {
+        return NORMAL_TRANSPORT_PRIORITY;
+    }
 
     /**
      * {@inheritDoc}
@@ -126,23 +151,6 @@ public class WishRealizationMission extends Mission {
         throw new IllegalStateException("Target is fixed.");
     }
 
-    // Omitted invalidReason(AIUnit), not needed
-
-    /**
-     * Why would this mission be invalid with the given AI unit and location?
-     *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param loc The <code>Location</code> to check.
-     * @return A reason for invalidity, or null if none found.
-     */
-    public static String invalidReason(AIUnit aiUnit, Location loc) {
-        String reason;
-        return ((reason = invalidAIUnitReason(aiUnit)) != null) ? reason
-            : ((reason = invalidTargetReason(loc,
-                        aiUnit.getUnit().getOwner())) != null) ? reason
-            : null;
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -150,8 +158,6 @@ public class WishRealizationMission extends Mission {
         return (wish == null) ? "wish-null"
             : invalidReason(getAIUnit(), getTarget());
     }
-
-    // Not a one-time mission, omit isOneTime().
 
     /**
      * {@inheritDoc}
