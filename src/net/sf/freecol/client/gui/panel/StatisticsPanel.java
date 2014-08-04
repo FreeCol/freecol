@@ -167,7 +167,8 @@ public final class StatisticsPanel extends FreeColPanel {
         // Title
         JPanel header = new JPanel();
         this.add(header, BorderLayout.NORTH);
-        header.add(new JLabel("Statistics"),JPanel.CENTER_ALIGNMENT);
+        header.add(new JLabel(Messages.message("statistics")),
+                   JPanel.CENTER_ALIGNMENT);
 
         // Actual stats panel
         JPanel statsPanel = new JPanel(new GridLayout(1,2));

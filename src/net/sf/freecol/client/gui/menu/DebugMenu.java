@@ -434,7 +434,7 @@ public class DebugMenu extends JMenu {
 
         // statistics
         final JMenuItem statistics
-            = new JMenuItem(Messages.message("menuBar.debug.statistics"));
+            = new JMenuItem(Messages.message("statistics"));
         statistics.setOpaque(false);
         //statistics.setMnemonic(KeyEvent.VK_I);
         this.add(statistics);
