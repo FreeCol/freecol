@@ -224,6 +224,7 @@ public class EuropeanAIPlayer extends AIPlayer {
     /** Cheat chances. */
     private static int liftBoycottCheatPercent;
     private static int equipScoutCheatPercent;
+    private static int equipPioneerCheatPercent;
     private static int landUnitCheatPercent;
     private static int offensiveLandUnitCheatPercent;
     private static int offensiveNavalUnitCheatPercent;
@@ -347,6 +348,8 @@ public class EuropeanAIPlayer extends AIPlayer {
             = spec.getInteger(GameOptions.LIFT_BOYCOTT_CHEAT);
         equipScoutCheatPercent
             = spec.getInteger(GameOptions.EQUIP_SCOUT_CHEAT);
+        equipPioneerCheatPercent
+            = spec.getInteger(GameOptions.EQUIP_PIONEER_CHEAT);
         landUnitCheatPercent
             = spec.getInteger(GameOptions.LAND_UNIT_CHEAT);
         offensiveLandUnitCheatPercent
@@ -434,7 +437,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 if (market.getArrears(gt) > 0) arrears.add(gt);
             }
         }
-        final int nCheats = arrears.size() + 5;
+        final int nCheats = arrears.size() + 6; // 6 cheats + arrears
         int[] randoms = Utils.randomInts(logger, "cheats", air, 100, nCheats);
         int cheatIndex = 0;
 
@@ -472,6 +475,25 @@ public class EuropeanAIPlayer extends AIPlayer {
                     }
                     if (getAIUnit(u).equipForRole("model.role.scout")) {
                         lb.add("equip scout ", u, ", ");
+                    }
+                    break;
+                }
+            }
+        }
+
+        if (!europe.isEmpty()
+            && pioneersNeeded() > 0
+            && randoms[cheatIndex++] < equipPioneerCheatPercent) {
+            for (Unit u : europe.getUnitList()) {
+                if (u.hasDefaultRole()
+                    && u.hasAbility(Ability.CAN_BE_EQUIPPED)) {
+                    int price = europe.priceGoods(u.getGoodsDifference(pioneerRole, 1));
+                    if (!u.getOwner().checkGold(price)) {
+                        player.modifyGold(price);
+                        lb.add("added ", price, " gold to ");
+                    }
+                    if (getAIUnit(u).equipForRole("model.role.pioneer")) {
+                        lb.add("equip pioneer ", u, ", ");
                     }
                     break;
                 }
@@ -1362,7 +1384,7 @@ public class EuropeanAIPlayer extends AIPlayer {
      * @return The desired number of pioneers for this player.
      */
     public int pioneersNeeded() {
-        return tipMap.size() / 2;
+        return (tipMap.size() + 1) / 2;
     }
 
     /**

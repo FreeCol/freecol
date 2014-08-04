@@ -394,6 +394,8 @@ public class GameOptions {
         = "model.option.liftBoycottCheat";
     public static final String EQUIP_SCOUT_CHEAT
         = "model.option.equipScoutCheat";
+    public static final String EQUIP_PIONEER_CHEAT
+        = "model.option.equipPioneerCheat";
     public static final String LAND_UNIT_CHEAT
         = "model.option.landUnitCheat";
     public static final String OFFENSIVE_LAND_UNIT_CHEAT

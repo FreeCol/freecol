@@ -1176,6 +1176,8 @@ public final class FreeColServer {
             "gameOptions.colony", true, false);
         addIntegerOption(GameOptions.OFFENSIVE_LAND_UNIT_CHEAT,
             "model.difficulty.cheat", 4, true);
+        addIntegerOption(GameOptions.EQUIP_PIONEER_CHEAT,
+            "model.difficulty.cheat", 10, true);
     }
 
     private void addOptionGroup(String id, boolean difficulty) {
