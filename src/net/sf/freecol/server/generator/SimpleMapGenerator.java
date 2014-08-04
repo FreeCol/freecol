@@ -23,8 +23,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
@@ -472,44 +474,27 @@ public class SimpleMapGenerator implements MapGenerator {
                 territory.numberOfSettlements = Math.round(2 * share);
                 break;
             }
-            int radius = territory.player.getNationType().getCapitalType().getClaimableRadius();
-            ArrayList<Tile> capitalTiles = new ArrayList<Tile>(settlementTiles);
-            while (!capitalTiles.isEmpty()) {
-                Tile tile = map.getClosestTile(territory.getCenterTile(map),
-                                               capitalTiles);
-                capitalTiles.remove(tile);
-                // Choose this tile if it is free and half the expected tile
-                // claim can succeed (preventing capitals on small islands).
-                if (territory.player.getClaimableTiles(tile, radius).size()
-                    >= (2 * radius + 1) * (2 * radius + 1) / 2) {
-                    String name = (territory.region == null) ? "default region"
-                        : territory.region.getNameKey();
-                    logger.fine("Placing the " + territory.player
-                                + " capital in region: " + name
-                                + " at tile: " + tile);
-                    IndianSettlement is
-                        = placeIndianSettlement(territory.player, true,
-                                                tile, map);
-                    settlements.add(is);
-                    territory.numberOfSettlements--;
-                    territory.tile = tile;
-                    settlementTiles.remove(tile);
-                    settlementsPlaced++;
-                    break;
-                }
+            int radius = territory.player.getNationType().getCapitalType()
+                .getClaimableRadius();
+            IndianSettlement is = placeCapital(map, territory, radius,
+                new ArrayList<Tile>(settlementTiles));
+            if (is != null) {
+                settlements.add(is);
+                settlementsPlaced++;
+                settlementTiles.remove(is.getTile());
             }
         }
 
         // Sort tiles from the edges of the map inward
         Collections.sort(settlementTiles, new Comparator<Tile>() {
-            public int compare(Tile tile1, Tile tile2) {
-                int distance1 = Math.min(Math.min(tile1.getX(), map.getWidth() - tile1.getX()),
-                                         Math.min(tile1.getY(), map.getHeight() - tile1.getY()));
-                int distance2 = Math.min(Math.min(tile2.getX(), map.getWidth() - tile2.getX()),
-                                         Math.min(tile2.getY(), map.getHeight() - tile2.getY()));
-                return (distance1 - distance2);
-            }
-        });
+                public int compare(Tile tile1, Tile tile2) {
+                    int distance1 = Math.min(Math.min(tile1.getX(), map.getWidth() - tile1.getX()),
+                        Math.min(tile1.getY(), map.getHeight() - tile1.getY()));
+                    int distance2 = Math.min(Math.min(tile2.getX(), map.getWidth() - tile2.getX()),
+                        Math.min(tile2.getY(), map.getHeight() - tile2.getY()));
+                    return distance1 - distance2;
+                }
+            });
 
         // Now place other settlements
         while (!settlementTiles.isEmpty() && !territories.isEmpty()) {
@@ -701,6 +686,42 @@ public class SimpleMapGenerator implements MapGenerator {
         return result;
     }
 
+    /**
+     * Place a native capital in a territory.
+     *
+     * @param map The <code>Map</code> to place the settlement in.
+     * @param territory The <code>Territory</code> within the map.
+     * @param radius The settlement radius.
+     * @param tiles A list of <code>Tile</code>s to select from.
+     * @return The <code>IndianSettlement</code> placed, or null if
+     *     none placed.
+     */
+    private IndianSettlement placeCapital(final Map map, Territory territory,
+                                          int radius, List<Tile> tiles) {
+        final Tile center = territory.getCenterTile(map);
+        Collections.sort(tiles, new Comparator<Tile>() {
+                public int compare(Tile t1, Tile t2) {
+                    return t1.getDistanceTo(center) - t2.getDistanceTo(center);
+                }
+            });
+        for (Tile t : tiles) {
+            // Choose this tile if it is free and half the expected tile
+            // claim can succeed (preventing capitals on small islands).
+            if (territory.player.getClaimableTiles(t, radius).size()
+                >= (2 * radius + 1) * (2 * radius + 1) / 2) {
+                String name = (territory.region == null) ? "default region"
+                    : territory.region.getNameKey();
+                logger.fine("Placing the " + territory.player
+                    + " capital in region: " + name + " at tile: " + t);
+                IndianSettlement is
+                    = placeIndianSettlement(territory.player, true, t, map);
+                territory.numberOfSettlements--;
+                territory.tile = t;
+                return is;
+            }
+        }
+        return null;
+    }
 
     /**
      * Builds a <code>IndianSettlement</code> at the given position.
@@ -733,22 +754,29 @@ public class SimpleMapGenerator implements MapGenerator {
     }
 
     /**
-     * Generates a skill that could be taught from a settlement on the given Tile.
+     * Generates a skill that could be taught from a settlement on the
+     * given tile.
      *
      * @param map The <code>Map</code>.
-     * @param tile The tile where the settlement will be located.
+     * @param tile The <code>Tile</code> where the settlement will be located.
+     * @param nationType The <code>NationType</code> to generate a skill for.
      * @return A skill that can be taught to Europeans.
      */
-    private UnitType generateSkillForLocation(Map map, Tile tile, NationType nationType) {
-        List<RandomChoice<UnitType>> skills = ((IndianNationType) nationType).getSkills();
-        java.util.Map<GoodsType, Integer> scale = new HashMap<GoodsType, Integer>();
+    private UnitType generateSkillForLocation(Map map, Tile tile,
+                                              NationType nationType) {
+        List<RandomChoice<UnitType>> skills
+            = ((IndianNationType)nationType).getSkills();
+        java.util.Map<GoodsType, Integer> scale
+            = new HashMap<GoodsType, Integer>();
         for (RandomChoice<UnitType> skill : skills) {
             scale.put(skill.getObject().getExpertProduction(), 1);
         }
 
         for (Tile t: tile.getSurroundingTiles(1)) {
-            for (GoodsType goodsType : scale.keySet()) {
-                scale.put(goodsType, scale.get(goodsType).intValue() + t.getPotentialProduction(goodsType, null));
+            for (Entry<GoodsType, Integer> entry : scale.entrySet()) {
+                GoodsType goodsType = entry.getKey();
+                scale.put(goodsType, entry.getValue().intValue()
+                          + t.getPotentialProduction(goodsType, null));
             }
         }
 
