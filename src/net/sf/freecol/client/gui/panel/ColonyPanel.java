@@ -156,14 +156,10 @@ public final class ColonyPanel extends PortPanel
     // inherit PortPanel.defaultTransferHandler
     // inherit PortPanel.selectedUnitLabel
 
-    private ActionListener nameActionListener = null;
-
     private MouseListener releaseListener = null;
 
-    private MouseAdapter buildQueueListener = null;
-
     // Subparts
-    private JComboBox nameBox = null;
+    private final JComboBox nameBox = new JComboBox();
 
     private JPanel netProductionPanel = null;
 
@@ -276,25 +272,11 @@ public final class ColonyPanel extends PortPanel
 
         defaultTransferHandler
             = new DefaultTransferHandler(freeColClient, this);
-        nameActionListener = new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    final Colony newColony = (Colony)nameBox.getSelectedItem();
-                    final GUI gui = getGUI();
-                    closeColonyPanel();
-                    gui.showColonyPanel(newColony, null);
-                }
-            };
         pressListener = new DragListener(freeColClient, this);
         releaseListener = new DropListener();
-        buildQueueListener = new MouseAdapter() {
-                public void mousePressed(MouseEvent e) {
-                    getGUI().showBuildQueuePanel(getColony());
-                }
-            };
         selectedUnitLabel = null;
 
         // Make the colony label
-        nameBox = new JComboBox();
         nameBox.setFont(GUI.SMALL_HEADER_FONT);
         if (editable) {
             for (Colony aColony : freeColClient.getMySortedColonies()) {
@@ -417,8 +399,16 @@ public final class ColonyPanel extends PortPanel
         if (setGoodsButton != null) {
             setGoodsButton.setEnabled(isEditable());
         }
+
+        final GUI gui = getGUI();
         nameBox.setEnabled(isEditable());
-        nameBox.addActionListener(nameActionListener);
+        nameBox.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    final Colony newColony = (Colony)nameBox.getSelectedItem();
+                    closeColonyPanel();
+                    gui.showColonyPanel(newColony, null);
+                }
+            });
         updateNetProductionPanel();
 
         buildingsPanel.initialize();
@@ -463,8 +453,6 @@ public final class ColonyPanel extends PortPanel
         buildQueueButton.removeActionListener(this);
         colonyUnitsButton.removeActionListener(this);
         if (setGoodsButton != null) setGoodsButton.removeActionListener(this);
-
-        nameBox.removeActionListener(nameActionListener);
 
         removePropertyChangeListeners();
         if (getSelectedUnit() != null) {
@@ -1065,14 +1053,12 @@ public final class ColonyPanel extends PortPanel
         super.removeNotify();
 
         // Alas, ColonyPanel is often leaky.
-        nameBox = null;
         unloadButton = null;
         fillButton = null;
         warehouseButton = null;
         buildQueueButton = null;
         colonyUnitsButton = null;
         setGoodsButton = null;
-        nameBox = null;
         netProductionPanel = null;
         buildingsPanel = null;
         buildingsScroll = null;
@@ -1087,9 +1073,7 @@ public final class ColonyPanel extends PortPanel
         warehousePanel = null;
         warehouseScroll = null;
 
-        nameActionListener = null;
         releaseListener = null;
-        buildQueueListener = null;
 
         // Inherited from PortPanel
         //cargoPanel = null;
@@ -1714,6 +1698,13 @@ public final class ColonyPanel extends PortPanel
          */
         public final class ASingleBuildingPanel extends BuildingPanel
             implements DropTarget  {
+
+            private MouseAdapter buildQueueListener = new MouseAdapter() {
+                    public void mousePressed(MouseEvent e) {
+                        getGUI().showBuildQueuePanel(getColony());
+                    }
+                };
+
 
             /**
              * Creates this ASingleBuildingPanel.

@@ -55,8 +55,6 @@ public class CargoPanel extends FreeColPanel
 
     private DefaultTransferHandler defaultTransferHandler = null;
 
-    private MouseListener pressListener = null;
-
     private final TitledBorder border;
 
 
@@ -76,8 +74,6 @@ public class CargoPanel extends FreeColPanel
 
         this.defaultTransferHandler
             = new DefaultTransferHandler(getFreeColClient(), this);
-
-        this.pressListener = new DragListener(getFreeColClient(), this);
     }
 
 
@@ -117,7 +113,7 @@ public class CargoPanel extends FreeColPanel
         removeAll();
 
         if (carrier != null) {
-
+            DragListener dl = new DragListener(getFreeColClient(), this);
             Iterator<Unit> unitIterator = carrier.getUnitIterator();
             while (unitIterator.hasNext()) {
                 Unit unit = unitIterator.next();
@@ -125,7 +121,7 @@ public class CargoPanel extends FreeColPanel
                 UnitLabel label = new UnitLabel(getFreeColClient(), unit);
                 if (isEditable()) {
                     label.setTransferHandler(defaultTransferHandler);
-                    label.addMouseListener(pressListener);
+                    label.addMouseListener(dl);
                 }
                 add(label);
             }
@@ -137,7 +133,7 @@ public class CargoPanel extends FreeColPanel
                 GoodsLabel label = new GoodsLabel(g, getGUI());
                 if (isEditable()) {
                     label.setTransferHandler(defaultTransferHandler);
-                    label.addMouseListener(pressListener);
+                    label.addMouseListener(dl);
                 }
                 add(label);
             }
@@ -322,6 +318,5 @@ public class CargoPanel extends FreeColPanel
         removePropertyChangeListeners();
 
         defaultTransferHandler = null;
-        pressListener = null;
     }
 }
