@@ -100,7 +100,7 @@ public class Utils {
      * @return True if the arguments are either both null or equal in the
      *     sense of their equals() method.
      */
-    public static boolean equals(Object one, Object two) {
+    public static <T> boolean equals(T one, T two) {
         return (one == null) ? (two == null) : one.equals(two);
     }
 
