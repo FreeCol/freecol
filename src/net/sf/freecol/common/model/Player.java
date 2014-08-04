@@ -125,17 +125,6 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public class ActivePredicate extends UnitPredicate {
 
-        private final Player player;
-
-        /**
-         * Creates a new active predicate.
-         *
-         * @param player The owning <code>Player</code>.
-         */
-        public ActivePredicate(Player player) {
-            this.player = player;
-        }
-
         /**
          * Is the unit active and going nowhere, and thus available to
          * be moved by the player?
@@ -192,28 +181,14 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * An <code>Iterator</code> of {@link Unit}s that can be made active.
      */
-    public class UnitIterator implements Iterator<Unit> {
+    public static class UnitIterator implements Iterator<Unit> {
 
         private Player owner;
 
         private UnitPredicate predicate;
 
-        private List<Unit> units = null;
+        private final List<Unit> units = new ArrayList<Unit>();
 
-        /**
-         * A comparator to compare units by position, top to bottom,
-         * left to right.
-         */
-        private final Comparator<Unit> xyComparator = new Comparator<Unit>() {
-            public int compare(Unit unit1, Unit unit2) {
-                Tile tile1 = unit1.getTile();
-                Tile tile2 = unit2.getTile();
-                int cmp = ((tile1 == null) ? 0 : tile1.getY())
-                    - ((tile2 == null) ? 0 : tile2.getY());
-                return (cmp != 0 || tile1 == null || tile2 == null) ? cmp
-                    : (tile1.getX() - tile2.getX());
-            }
-        };
 
         /**
          * Creates a new <code>UnitIterator</code>.
@@ -226,49 +201,20 @@ public class Player extends FreeColGameObject implements Nameable {
         public UnitIterator(Player owner, UnitPredicate predicate) {
             this.owner = owner;
             this.predicate = predicate;
-            reset();
+            update();
         }
 
+
         /**
-         * Reset the internal units list, initially only with units that
-         * satisfy the predicate.
+         * Update the internal units list with units that satisfy the
+         * predicate.
          */
-        public void reset() {
-            units = new ArrayList<Unit>();
+        private final void update() {
+            units.clear();
             for (Unit u : owner.getUnits()) {
                 if (predicate.obtains(u)) units.add(u);
             }
             Collections.sort(units, xyComparator);
-        }
-
-        /**
-         * Check if there is any more valid units.
-         * If there are, it will be at the head of the internal units list.
-         *
-         * @return True if there are any valid units left.
-         */
-        public boolean hasNext() {
-            // Try to find a unit that still satisfies the predicate.
-            while (!units.isEmpty()) {
-                if (predicate.obtains(units.get(0))) {
-                    return true; // Still valid
-                }
-                units.remove(0);
-            }
-            // Nothing left, so refill the units list.  If it is still
-            // empty then there is definitely nothing left.
-            reset();
-            return !units.isEmpty();
-        }
-
-        /**
-         * Get the next valid unit.
-         * Always call hasNext to enforce validity.
-         *
-         * @return The next valid unit, or null if none.
-         */
-        public Unit next() {
-            return (hasNext()) ? units.remove(0) : null;
         }
 
         /**
@@ -284,23 +230,13 @@ public class Player extends FreeColGameObject implements Nameable {
                     if (units.get(0) == unit) return true;
                     units.remove(0);
                 }
-                reset();
+                update();
                 while (!units.isEmpty() && units.get(0) != first) {
                     if (units.get(0) == unit) return true;
                     units.remove(0);
                 }
             }
             return false;
-        }
-
-        /**
-         * Removes from the underlying collection the last element returned by
-         * the iterator (optional operation).
-         *
-         * @exception UnsupportedOperationException no matter what.
-         */
-        public void remove() {
-            throw new UnsupportedOperationException();
         }
 
         /**
@@ -311,6 +247,47 @@ public class Player extends FreeColGameObject implements Nameable {
          */
         public boolean remove(Unit u) {
             return units.remove(u);
+        }
+
+        /**
+         * Reset the iterator.
+         */
+        public void reset() {
+            update();
+        }
+
+
+        // Implement Iterator
+
+        /**
+         * {@inheritDoc}
+         */
+        public boolean hasNext() {
+            // Try to find a unit that still satisfies the predicate.
+            while (!units.isEmpty()) {
+                if (predicate.obtains(units.get(0))) {
+                    return true; // Still valid
+                }
+                units.remove(0);
+            }
+            // Nothing left, so refill the units list.  If it is still
+            // empty then there is definitely nothing left.
+            update();
+            return !units.isEmpty();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public Unit next() {
+            return (hasNext()) ? units.remove(0) : null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void remove() {
+            next(); // Ignore value
         }
     }
 
@@ -453,6 +430,23 @@ public class Player extends FreeColGameObject implements Nameable {
     //
     // Constants
     //
+
+    /**
+     * A comparator to compare units by position, top to bottom,
+     * left to right.
+     */
+    private static final Comparator<Unit> xyComparator
+        = new Comparator<Unit>() {
+            public int compare(Unit unit1, Unit unit2) {
+                Tile tile1 = unit1.getTile();
+                Tile tile2 = unit2.getTile();
+                int cmp = ((tile1 == null) ? 0 : tile1.getY())
+                    - ((tile2 == null) ? 0 : tile2.getY());
+                return (cmp != 0 || tile1 == null || tile2 == null) ? cmp
+                    : (tile1.getX() - tile2.getX());
+            }
+        };
+
 
     /** A comparator for ordering players. */
     public static final Comparator<Player> playerComparator
@@ -643,7 +637,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /** An iterator for the player units that are still active this turn. */
     private final UnitIterator nextActiveUnitIterator
-        = new UnitIterator(this, new ActivePredicate(this));
+        = new UnitIterator(this, new ActivePredicate());
 
     /** An iterator for the player units that have a destination to go to. */
     private final UnitIterator nextGoingToUnitIterator
