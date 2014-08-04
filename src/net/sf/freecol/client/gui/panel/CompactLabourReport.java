@@ -189,7 +189,7 @@ public final class CompactLabourReport extends ReportPanel {
      */
     private void addHeader() {
 
-        JLabel empty = new JLabel("");
+        JLabel empty = new JLabel();
         empty.setBorder(TOPLEFTCELLBORDER);
         headerRow.add(empty, "cell " + COLONY_COLUMN + " 1");
 
@@ -579,7 +579,7 @@ public final class CompactLabourReport extends ReportPanel {
     }
 
     private JLabel createEmptyLabel() {
-        JLabel empty = new JLabel("");
+        JLabel empty = new JLabel();
         empty.setBorder(CELLBORDER);
         return empty;
     }

@@ -399,7 +399,7 @@ public final class ReportColonyPanel extends ReportPanel
                     .addAmount("%amount%", grow));
             reportPanel.add(b);
         } else {
-            reportPanel.add(new JLabel(""));
+            reportPanel.add(new JLabel());
         }
 
         // Field: The number of potential colony tiles that need
@@ -413,7 +413,7 @@ public final class ReportColonyPanel extends ReportPanel
                     .addAmount("%amount%", exploreTiles.size()));
             reportPanel.add(b);
         } else {
-            reportPanel.add(new JLabel(""));
+            reportPanel.add(new JLabel());
         }
 
         // Field: The number of existing colony tiles that would
@@ -431,7 +431,7 @@ public final class ReportColonyPanel extends ReportPanel
             }
             reportPanel.add(b);
         } else {
-            reportPanel.add(new JLabel(""));
+            reportPanel.add(new JLabel());
         }
 
         // Field: The number of existing colony tiles that would
@@ -445,7 +445,7 @@ public final class ReportColonyPanel extends ReportPanel
                     .addAmount("%amount%", roadTiles.size()));
             reportPanel.add(b);
         } else {
-            reportPanel.add(new JLabel(""));
+            reportPanel.add(new JLabel());
         }
 
         // Fields: The net production of each storable+non-trade-goods
@@ -522,7 +522,7 @@ public final class ReportColonyPanel extends ReportPanel
                     .add("%goods%", g.getNameKey())
                     .addAmount("%amount%", p);
             }
-            if (c == null) reportPanel.add(new JLabel(""));
+            if (c == null) reportPanel.add(new JLabel());
             else {
                 b = colourButton(cac, Integer.toString(p), null, c, tip);
                 reportPanel.add(b);
@@ -624,7 +624,7 @@ public final class ReportColonyPanel extends ReportPanel
                     .addAmount("%turns%", -newColonist));
             reportPanel.add(b);
         } else {
-            reportPanel.add(new JLabel(""));
+            reportPanel.add(new JLabel());
         }
 
         // Field: What is currently being built (clickable if on the
@@ -700,13 +700,13 @@ public final class ReportColonyPanel extends ReportPanel
             }
             reportPanel.add(b);
         }
-        if (fields <= 0) reportPanel.add(new JLabel(""));
+        if (fields <= 0) reportPanel.add(new JLabel());
 
         // Field: The units that could be upgraded.
         if (!improve.isEmpty()) {
             addUnits(improve, couldWork, colony);
         } else {
-            reportPanel.add(new JLabel(""));
+            reportPanel.add(new JLabel());
         }
 
         // Field: The units the colony could make good use of.
@@ -716,7 +716,7 @@ public final class ReportColonyPanel extends ReportPanel
                 / Settlement.FOOD_PER_COLONIST);
             addUnits(want, couldWork, colony);
         } else {
-            reportPanel.add(new JLabel(""));
+            reportPanel.add(new JLabel());
         }
     }
 
