@@ -281,7 +281,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         final Player player = colony.getOwner();
         final Specification spec = getSpecification();
         lb.add("\n  ", colony.getName());
-        if (update) updateAIGoods(lb);
+        if (update) {
+            resetExports();
+            updateAIGoods(lb);
+        }
 
         // For now, cap the rearrangement horizon, because confidence
         // that we are triggering on all relevant changes is low.
@@ -443,9 +446,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             }
         }
 
-        // Change the export settings when required.
-        resetExports();
-
         updateTileImprovementPlans(lb);
         updateWishes(lb);
 
@@ -475,33 +475,32 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         final Specification spec = getSpecification();
         final Player player = colony.getOwner();
 
-        if (fullExport.isEmpty()) {
-            // Initialize the exportable sets.
-            // Luxury goods, non-raw materials (silver), and raw
-            // materials we do not produce (might have been gifted)
-            // should always be fully exported.  Other raw and
-            // manufactured goods should be exported only to the
-            // extent of not filling the warehouse.
-            for (GoodsType g : spec.getGoodsTypeList()) {
-                if (g.isStorable()
-                    && !g.isFoodType()
-                    && !g.isBuildingMaterial()
-                    && !g.isMilitaryGoods()
-                    && !g.isTradeGoods()) {
-                    if (g.isRawMaterial()) {
-                        partExport.add(g);
-                    } else {
-                        fullExport.add(g);
-                    }
+        fullExport.clear();
+        partExport.clear();
+        // Initialize the exportable sets.
+        // Luxury goods, non-raw materials (silver), and raw materials
+        // we do not produce (might have been gifted) should always be
+        // fully exported.  Other raw and manufactured goods should be
+        // exported only to the extent of not filling the warehouse.
+        for (GoodsType g : spec.getGoodsTypeList()) {
+            if (g.isStorable()
+                && !g.isFoodType()
+                && !g.isBuildingMaterial()
+                && !g.isMilitaryGoods()
+                && !g.isTradeGoods()) {
+                if (g.isRawMaterial()) {
+                    partExport.add(g);
+                } else {
+                    fullExport.add(g);
                 }
             }
-            for (Role role : spec.getRoles()) {
-                if (role.isAvailableTo(player, spec.getDefaultUnitType())) {
-                    for (AbstractGoods ag : role.getRequiredGoods()) {
-                        if (fullExport.contains(ag.getType())) {
-                            fullExport.remove(ag.getType());
-                            partExport.add(ag.getType());
-                        }
+        }
+        for (Role role : spec.getRoles()) {
+            if (role.isAvailableTo(player, spec.getDefaultUnitType())) {
+                for (AbstractGoods ag : role.getRequiredGoods()) {
+                    if (fullExport.contains(ag.getType())) {
+                        fullExport.remove(ag.getType());
+                        partExport.add(ag.getType());
                     }
                 }
             }
