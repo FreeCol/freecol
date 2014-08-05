@@ -372,7 +372,6 @@ public class EuropeanAIPlayer extends AIPlayer {
         // give them missions.
         final Map map = getGame().getMap();
         final int maxRange = map.getWidth() + map.getHeight();
-        List<Unit> carriers = new ArrayList<Unit>();
         Location target;
         carrier: for (AIUnit aiCarrier : aiUnits) {
             if (aiCarrier.hasMission()) continue;
@@ -614,13 +613,11 @@ public class EuropeanAIPlayer extends AIPlayer {
             = new ArrayList<RandomChoice<UnitType>>();
         if (randoms[cheatIndex++] < nNaval) {
             rc.clear();
-            List<UnitType> navalUnits = new ArrayList<UnitType>();
             for (UnitType unitType : spec.getUnitTypeList()) {
                 if (unitType.hasAbility(Ability.NAVAL_UNIT)
                     && unitType.isAvailableTo(player)
                     && unitType.hasPrice()
                     && unitType.isOffensive()) {
-                    navalUnits.add(unitType);
                     int weight = unitType.getOffence()
                         * 100000 / europe.getUnitPrice(unitType);
                     rc.add(new RandomChoice<UnitType>(unitType, weight));
@@ -633,13 +630,11 @@ public class EuropeanAIPlayer extends AIPlayer {
             : -1;
         if (randoms[cheatIndex++] < nCarrier) {
             rc.clear();
-            List<UnitType> navalUnits = new ArrayList<UnitType>();
             for (UnitType unitType : spec.getUnitTypeList()) {
                 if (unitType.hasAbility(Ability.NAVAL_UNIT)
                     && unitType.isAvailableTo(player)
                     && unitType.hasPrice()
                     && unitType.getSpace() > 0) {
-                    navalUnits.add(unitType);
                     int weight = unitType.getSpace()
                         * 100000 / europe.getUnitPrice(unitType);
                     rc.add(new RandomChoice<UnitType>(unitType, weight));

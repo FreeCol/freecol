@@ -276,14 +276,13 @@ public class PrivateerMission extends Mission {
      */
     private static String invalidUnitReason(AIUnit aiUnit, Unit unit) {
         Player player = aiUnit.getUnit().getOwner();
-        Player other = unit.getOwner();
         return (unit == null)
             ? Mission.TARGETINVALID
             : (!unit.isNaval())
             ? "privateer-ignores-land-unit"
-            : (player == other)
+            : (player.owns(unit))
             ? Mission.TARGETOWNERSHIP
-            : (player.getStance(other) == Stance.ALLIANCE)
+            : (player.getStance(unit.getOwner()) == Stance.ALLIANCE)
             ? "privateer-avoids-ally"
             : (scoreUnit(aiUnit, unit) <= 0)
             ? "privateer-avoids-trouble"

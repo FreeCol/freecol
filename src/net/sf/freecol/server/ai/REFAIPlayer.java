@@ -476,7 +476,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         lb.add("Military mission changes: ");
         for (AIUnit aiu : getAIUnits()) {
             Unit u = aiu.getUnit();
-            if (u.isNaval() || aiu.hasMission()) continue;
+            if (u.isDisposed() || u.isNaval() || aiu.hasMission()) continue;
             if (u.isOffensiveUnit()) {
                 Location target = UnitSeekAndDestroyMission.findTarget(aiu, 
                     seekAndDestroyRange, false);
