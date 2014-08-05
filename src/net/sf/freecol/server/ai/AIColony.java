@@ -51,6 +51,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Role;
@@ -343,14 +344,16 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         for (Unit u : tile.getUnitList()) {
             if (!u.isPerson() || u.hasAbility(Ability.REF_UNIT)
                 || getAIUnit(u) == null) continue;
-            Mission mission = getAIUnit(u).getMission();
-            if (mission == null
-                || mission instanceof IdleAtSettlementMission
-                || mission instanceof WorkInsideColonyMission
-                || (mission instanceof BuildColonyMission
-                    && ((BuildColonyMission)mission).getTarget() == tile)
+            Mission m = getAIUnit(u).getMission();
+            if (m == null
+                || (m instanceof BuildColonyMission
+                    && (Map.isSameLocation(m.getTarget(), tile)
+                        || colony.getUnitCount() <= 1))
                 // TODO: drop this when the AI stops building excessive armies
-                || mission instanceof DefendSettlementMission) {
+                || m instanceof DefendSettlementMission
+                || m instanceof IdleAtSettlementMission
+                || m instanceof WorkInsideColonyMission
+                ) {
                 workers.add(u);
                 was.add(new UnitWas(u));
             }
