@@ -741,7 +741,6 @@ public final class InGameController extends Controller {
                 // "can not happen"
                 return DOMMessage.clientError("Can not get next player");
             }
-            player.csFlushMarket(cs);
 
             // Remove dead players and retry
             switch (player.checkForDeath()) {
