@@ -894,7 +894,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         return t.getTransport() == null
             && t.getTransportDestination() != null
             && t.getTransportSource() != null
-            && !(t.getTransportLocatable().getLocation() instanceof Unit);
+            && !(t.getLocation() instanceof Unit);
     }
 
     /**

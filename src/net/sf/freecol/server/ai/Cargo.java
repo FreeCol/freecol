@@ -208,7 +208,7 @@ public class Cargo {
      */
     public boolean isCollectable() {
         if (!mode.isCollection()) return false;
-        Location loc = transportable.getTransportLocatable().getLocation();
+        Location loc = transportable.getLocation();
         return Map.isSameLocation(loc, target)
             && loc != carrier
             && Map.isSameLocation(carrier.getLocation(), target);
@@ -222,7 +222,7 @@ public class Cargo {
      */
     public boolean isDeliverable() {
         if (mode.isCollection()) return false;
-        Location loc = transportable.getTransportLocatable().getLocation();
+        Location loc = transportable.getLocation();
         return loc == carrier
             && Map.isSameLocation(carrier.getLocation(), target);
     }

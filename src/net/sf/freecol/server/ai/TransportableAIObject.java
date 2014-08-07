@@ -192,6 +192,16 @@ public abstract class TransportableAIObject extends ValuedAIObject {
         setTransport(transport);
     }
 
+    /**
+     * Get the transportables location if any.
+     *
+     * @return The transportable <code>Location</code>.
+     */
+    public Location getLocation() {
+        Locatable l = getTransportLocatable();
+        return (l == null) ? null : l.getLocation();
+    }
+
 
     // TransportableAIObject abstract routines
 

@@ -176,9 +176,7 @@ public class TransportMission extends Mission {
      * @return True if the carrier is carrying the transportable.
      */
     private boolean isCarrying(TransportableAIObject t) {
-        return t != null
-            && t.getTransportLocatable() != null
-            && t.getTransportLocatable().getLocation() == getUnit();
+        return t != null && t.getLocation() == getUnit();
     }
 
     /**
