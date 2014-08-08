@@ -706,6 +706,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         }
 
         logger.info("Unit " + getId() + " is exploring rumour " + rumour);
+        boolean result = true;
         switch (rumour) {
         case BURIAL_GROUND:
             csNativeBurialGround(cs);
@@ -714,7 +715,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                     "lostCityRumour.expeditionVanishes", serverPlayer));
-            return false;
+            result = false;
+            break;
         case NOTHING:
             if (game.getTurn().getYear() % 100 == 12
                 && Utils.randomInt(logger, "Mayans?", random, 4) == 0) {
@@ -866,7 +868,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         }
         tile.cacheUnseen();//+til
         tile.removeLostCityRumour();//-til
-        return true;
+        return result;
     }
 
     /**
