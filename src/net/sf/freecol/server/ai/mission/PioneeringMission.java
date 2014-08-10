@@ -510,7 +510,9 @@ public class PioneeringMission extends Mission {
     public String invalidReason() {
         // Prevent invalidation for improvements that are just completing.
         if (tileImprovementPlan != null) {
-            if (tileImprovementPlan.isDisposed()) return "plan-disposed";
+            if (tileImprovementPlan.isDisposed()) {
+                return "target-plan-disposed";
+            }
             if (tileImprovementPlan.isComplete()) return null;
         }
         return invalidReason(getAIUnit(), getTarget());
@@ -521,33 +523,31 @@ public class PioneeringMission extends Mission {
      */
     public Mission doMission(LogBuilder lb) {
         lb.add(tag);
-        // Check for completion and tileImprovement failure up front.
         final AIUnit aiUnit = getAIUnit();
-        Location newTarget;
-        boolean retarget = tileImprovementPlan == null;
-        if (!retarget) {
+
+        // Check for completion and tileImprovement failure up front.
+        if (tileImprovementPlan != null) {
             if (tileImprovementPlan.isComplete()) {
                 lbDone(lb, tileImprovementPlan.getType(),
                        " at ", getTarget());
-                retarget = true;
+                setTarget(null);
             } else if (!tileImprovementPlan.validate()) {
                 lbFail(lb, " abandoned invalid plan at ",
                        getTarget(), "/", tileImprovementPlan);
-                retarget = true;
-            } else {
-                retarget = false;
+                setTarget(null);
             }
         }
-        if (retarget) {
-            newTarget = findTarget(aiUnit, 10, false);
+
+        /*if (retarget) {
+            newTarget = findTarget(aiUnit, 10, unit.isInEurope());
             if (newTarget == null) {
                 setTarget(null);
                 lbFail(lb, tag, " found no target");
                 return null;
             }
             setTarget(newTarget);
-            lb.add(tag, ", retargeting ", newTarget, "/", tileImprovementPlan);
-        }
+            lb.add(", retargeting ", newTarget, "/", tileImprovementPlan);
+        }*/
 
         String reason = invalidReason();
         if (isTargetReason(reason)) {
@@ -565,6 +565,7 @@ public class PioneeringMission extends Mission {
 
         Tile tile;
         String where;
+        Location newTarget;
         while (!hasTools()) { // Get tools first.
             // Go there and clear target on arrival.
             Unit.MoveType mt = travelToTarget(getTarget(), costDecider, lb);
