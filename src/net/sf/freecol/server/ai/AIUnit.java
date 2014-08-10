@@ -390,6 +390,9 @@ public class AIUnit extends TransportableAIObject {
                 lb.add("(stuck on", unit.getLocation(), ")");
             }
         }
+        if (mission != null) {
+            setTransportPriority(mission.getBaseTransportPriority());
+        }
     }
 
     /**

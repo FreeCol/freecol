@@ -398,11 +398,7 @@ public class TransportMission extends Mission {
         Location now = null;
         int ret = 0;
         for (Cargo cargo : tCopy()) {
-            if (now == null) {
-                now = cargo.getTarget();
-            } else if (Map.isSameLocation(now, cargo.getTarget())) {
-                ; // do nothing
-            } else {
+            if (!Map.isSameLocation(now, cargo.getTarget())) {
                 ret++;
                 now = cargo.getTarget();
             }

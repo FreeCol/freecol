@@ -721,22 +721,27 @@ public class EuropeanAIPlayer extends AIPlayer {
         List<TransportableAIObject> urgent = getUrgentTransportables();
         if (urgent.isEmpty()) return;
 
-        lb.add("\n  Allocate Transport:");
+        lb.add("\n  Allocate Transport, ", urgent.size(), " cargoes, ",
+            missions.size(), " carriers:");
         for (TransportableAIObject t : urgent) lb.add(" ", t);
-        lb.add("\n  ->");
+        lb.add(" ->");
         for (Mission m : missions) lb.add(" ", m);
 
+        TransportMission best;
+        float bestValue;
+        boolean present;
         int i = 0;
         outer: while (i < urgent.size()) {
             if (missions.isEmpty()) break;
             TransportableAIObject t = urgent.get(i);
-            TransportMission best = null;
-            float bestValue = 0.0f;
-            boolean present = false;
+            best = null;
+            bestValue = 0.0f;
+            present = false;
             for (TransportMission tm : missions) {
                 if (!tm.spaceAvailable(t)) continue;
                 Cargo cargo = tm.makeCargo(t);
                 if (cargo == null) { // Serious problem with this cargo
+                    lb.add("\n  FAIL ", t);
                     urgent.remove(i);
                     continue outer;
                 }
@@ -744,14 +749,11 @@ public class EuropeanAIPlayer extends AIPlayer {
                 float value;
                 if (turns == 0) {
                     value = tm.destinationCapacity();
-                    if (!present) {
-                        bestValue = 0.0f;
-                        present = true;
-                    }
-                } else if (present) {
-                    continue;
+                    if (!present) bestValue = 0.0f; // reset
+                    present = true;
                 } else {
-                    value = (float)t.getTransportPriority() / turns;
+                    value = (present) ? -1.0f
+                        : (float)t.getTransportPriority() / turns;
                 }
                 if (bestValue < value) {
                     bestValue = value;
