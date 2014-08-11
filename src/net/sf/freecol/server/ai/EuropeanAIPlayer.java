@@ -2308,7 +2308,8 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
             if (!unit.isDisposed() && unit.getMovesLeft() > 0) result.add(aiu);
         }
-        if (lb.grew("\n  Do normal missions:")) lb.mark();
+        lb.grew("\n  Do normal missions:");
+        lb.mark();
         for (AIUnit aiu : aiUnits) {
             final Unit unit = aiu.getUnit();
             final Mission old = aiu.getMission();

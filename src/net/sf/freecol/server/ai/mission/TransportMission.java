@@ -1008,8 +1008,11 @@ public class TransportMission extends Mission {
                 return CargoResult.TFAIL;
             }
             aiu = (AIUnit)t;
-            if ((reason = aiu.getMission().invalidReason()) != null) {
-                lb.add(", ", cargo.toShortString(), " NO-MISSION(", reason, ")");
+            if (!aiu.hasMission()) {
+                lb.add(", ", cargo.toShortString(), " NO-MISSION");
+                return CargoResult.TFAIL;
+            } else if ((reason = aiu.getMission().invalidReason()) != null) {
+                lb.add(", ", cargo.toShortString(), " BAD-MISSION(", reason, ")");
                 return CargoResult.TFAIL;
             }
             lb.add(", ", cargo.toShortString(), " to-embark");
@@ -1025,8 +1028,11 @@ public class TransportMission extends Mission {
                 return CargoResult.TDONE;
             }
             aiu = (AIUnit)t;
-            if ((reason = aiu.getMission().invalidReason()) != null) {
-                lb.add(", ", cargo.toShortString(), " NO-MISSION(", reason, ")");
+            if (!aiu.hasMission()) {
+                lb.add(", ", cargo.toShortString(), " NO-MISSION");
+                return CargoResult.TFAIL;
+            } else if ((reason = aiu.getMission().invalidReason()) != null) {
+                lb.add(", ", cargo.toShortString(), " BAD-MISSION(", reason, ")");
                 return CargoResult.TFAIL;
             }
             lb.add(", ", cargo.toShortString(), " to-disembark");
