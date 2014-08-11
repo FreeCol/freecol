@@ -1732,7 +1732,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 reasons.put(unit, "Vital");
 
             } else if (unit.isInMission()) {
-                reasons.put(unit, "In-Mission");
+                reasons.put(unit, "Mission");
 
             } else if (m != null && m.isValid() && !m.isOneTime()) {
                 if (m instanceof BuildColonyMission) {
@@ -1918,7 +1918,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 reasons.put(unit, "Idle");
             }
         }
-        if (lb.grew("\n  Mission changes: ")) lb.shrink(", ");
+        if (lb.grew("\n  Mission changes:")) lb.shrink(", ");
 
         // Now see if transport can be found
         allocateTransportables(transportMissions, lb);
@@ -1974,6 +1974,10 @@ public class EuropeanAIPlayer extends AIPlayer {
         } else {
             // CashIn missions are obvious
             ret = ((m = getCashInTreasureTrainMission(aiUnit)) != null) ? m
+
+                // Working in colony is obvious
+                : (unit.isInColony()
+                    && (m = getWorkInsideColonyMission(aiUnit)) != null) ? m
 
                 // Try to maintain defence
                 : (unit.isDefensiveUnit()
@@ -2196,6 +2200,19 @@ public class EuropeanAIPlayer extends AIPlayer {
         final Unit unit = aiUnit.getUnit();
         WorkerWish best = getBestWorkerWish(aiUnit, unit.getType());
         return (best == null) ? null : consumeWorkerWish(aiUnit, best);
+    }
+
+    /**
+     * Gets a WorkInsideColonyMission for a unit, which should already
+     * be inside a colony.
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @return A new mission, or null if impossible.
+     */
+    public Mission getWorkInsideColonyMission(AIUnit aiUnit) {
+        AIColony aiColony = getAIColony(aiUnit.getUnit().getColony());
+        return (aiColony == null) ? null
+            : new WorkInsideColonyMission(getAIMain(), aiUnit, aiColony);
     }
 
 
