@@ -20,13 +20,16 @@
 package net.sf.freecol.server.ai;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -1071,7 +1074,8 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     public List<TransportableAIObject> getTransportablesAt(Location loc) {
         List<TransportableAIObject> supply = transportSupply.get(upLoc(loc));
-        return (supply == null) ? Collections.<TransportableAIObject>emptyList()
+        return (supply == null)
+            ? Collections.<TransportableAIObject>emptyList()
             : new ArrayList<TransportableAIObject>(supply);
     }
 
@@ -1098,6 +1102,27 @@ public class EuropeanAIPlayer extends AIPlayer {
         List<TransportableAIObject> tl = transportSupply.get(upLoc(loc));
         return tl != null && tl.remove(t);
     }
+
+    /**
+     * Rearrange colonies, collecting workers that now need a
+     * WorkInsideColonyMission.
+     *
+     * @param lb A <code>LogBuilder</code> to log to.
+     */
+    private void rearrangeColonies(LogBuilder lb) {
+        Set<AIUnit> workers = new HashSet<AIUnit>();
+        for (AIColony aic : getAIColonies()) {
+            workers.addAll(aic.rearrangeWorkers(lb));
+        }
+        if (!workers.isEmpty()) {
+            lb.add("\n  New workers:");
+            for (AIUnit aiu : workers) {
+                lb.add(" ");
+                aiu.changeMission(getWorkInsideColonyMission(aiu), lb);
+            }
+        }
+    }
+
 
     // Wish handling
 
@@ -2252,28 +2277,22 @@ public class EuropeanAIPlayer extends AIPlayer {
         lb.mark();
         for (AIColony aic : getAIColonies()) aic.updateGoods(lb);
         lb.grew("\n  Update goods:");
-
-        for (AIColony aic : getAIColonies()) {
-            aic.rearrangeWorkers(lb);
-        }
-        
         buildTipMap(lb);
         buildTransportMaps(lb);
         buildWishMaps(lb);
         cheat(lb);
+        rearrangeColonies(lb);
         giveNormalMissions(lb);
-
         bringGifts(lb);
         demandTribute(lb);
-        List<AIUnit> more = doMissions(getAIUnits(), lb);
-        for (AIColony aic : getAIColonies()) aic.rearrangeWorkers(lb);
 
+        List<AIUnit> more = doMissions(getAIUnits(), lb);
         if (!more.isEmpty()) {
             buildTransportMaps(lb);
             buildWishMaps(lb);
+            rearrangeColonies(lb);
             giveNormalMissions(lb);
             doMissions(more, lb);
-            for (AIColony aic : getAIColonies()) aic.rearrangeWorkers(lb);
         }
         lb.log(logger, Level.FINEST);
 

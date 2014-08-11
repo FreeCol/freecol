@@ -22,6 +22,7 @@ package net.sf.freecol.server.ai;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -76,8 +77,6 @@ import net.sf.freecol.server.ai.mission.BuildColonyMission;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
 import net.sf.freecol.server.ai.mission.IdleAtSettlementMission;
 import net.sf.freecol.server.ai.mission.Mission;
-import net.sf.freecol.server.ai.mission.PioneeringMission;
-import net.sf.freecol.server.ai.mission.ScoutingMission;
 import net.sf.freecol.server.ai.mission.TransportMission;
 import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
 
@@ -264,25 +263,27 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * TODO: Detect military threats and boost defence.
      *
      * @param lb A <code>LogBuilder</code> to log to.
-     * @return True if the workers were rearranged.
+     * @return A collection of worker <code>AIUnit</code>s that now need
+     *     a <code>WorkInsideColonyMission</code>.
      */
-    public boolean rearrangeWorkers(LogBuilder lb) {
+    public Collection<AIUnit> rearrangeWorkers(LogBuilder lb) {
         final AIMain aiMain = getAIMain();
-        if (colonyPlan == null) colonyPlan = new ColonyPlan(aiMain, colony);
+        Set<AIUnit> result = new HashSet<AIUnit>();
 
-        // Skip this colony if it does not yet need rearranging, but
-        // first check if it is collapsing.
+        // First check if it is collapsing.
+        if (colony.getUnitCount() <= 0) avertAutoDestruction();
+
+        // Skip this colony if it does not yet need rearranging.
         final int turn = getGame().getTurn().getNumber();
-        if (colony.getUnitCount() <= 0) {
-            avertAutoDestruction();
-        } else if (rearrangeTurn.getNumber() > turn) {
+        if (rearrangeTurn.getNumber() > turn) {
             if (colony.getCurrentlyBuilding() == null
+                && colonyPlan != null
                 && colonyPlan.getBestBuildableType() != null) {
                 logger.warning(colony.getName() + " could be building but"
                     + " is asleep until turn: " + rearrangeTurn.getNumber()
                     + "( > " + turn + ")");
             }
-            return false;
+            return result;
         }
 
         final Tile tile = colony.getTile();
@@ -309,6 +310,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
 
         // Update the colony plan.
+        if (colonyPlan == null) colonyPlan = new ColonyPlan(aiMain, colony);
         colonyPlan.update();
 
         // Now that we know what raw materials are available in the
@@ -364,7 +366,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         if (scratch == null) {
             lb.add(", failed to assign workers.");
             rearrangeTurn = new Turn(turn + 1);
-            return false;
+            return result;
         } else {
             lb.add(", assigned ", workers.size(), " workers");
         }
@@ -418,36 +420,12 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             nextRearrange = Math.max(1, Math.min(nextRearrange, when));
         }
 
-        // Make sure all units have suitable missions.
+        // Return any units that need a mission change.
         for (Unit u : colony.getUnitList()) {
             AIUnit aiu = getAIUnit(u);
-            WorkInsideColonyMission wic = aiu.getMission(WorkInsideColonyMission.class);
-            if (wic != null && wic.getAIColony() == this) {
-                ; // Do nothing
-            } else {
-                wic = new WorkInsideColonyMission(aiMain, aiu, this);
-                lb.add(", ");aiu.changeMission(wic, lb);
-            }
-        }
-        EuropeanAIPlayer aip = (EuropeanAIPlayer)aiMain.getAIPlayer(player);
-        boolean pioneersWanted = aip.pioneersNeeded() > 0;
-        Tile pioneerTile;
-        for (Unit u : tile.getUnitList()) {
-            AIUnit aiu = getAIUnit(u);
-            if (aiu == null || aiu.hasMission()) continue;
-            Mission m = null;
-            if (u.isArmed()) {
-                m = new DefendSettlementMission(aiMain, aiu, colony);
-            } else if (u.hasAbility(Ability.SPEAK_WITH_CHIEF)) {
-                if (preferScouts) m = aip.getScoutingMission(aiu);
-            } else if (u.hasAbility(Ability.IMPROVE_TERRAIN)) {
-                if (pioneersWanted) m = aip.getPioneeringMission(aiu);
-            } else if (u.hasAbility(Ability.ESTABLISH_MISSION)) {
-                m = aip.getMissionaryMission(aiu);
-            }
-            if (m != null) {
-                lb.add(", ");aiu.changeMission(m, lb);
-            }
+            WorkInsideColonyMission wic
+                = aiu.getMission(WorkInsideColonyMission.class);
+            if (wic == null || wic.getAIColony() != this) result.add(aiu);
         }
 
         updateTileImprovementPlans(lb);
@@ -466,7 +444,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         // Set the next rearrangement turn.
         rearrangeTurn = new Turn(turn + nextRearrange);
-        return true;
+        return result;
     }
 
     /**
