@@ -2404,6 +2404,18 @@ public class Unit extends GoodsLocation
     }
 
     /**
+     * Gets the trivial path for this unit.  That is, the path to the
+     * nearest available safe settlement.
+     *
+     * @return A path to the trivial target, or null if none found.
+     */
+    public PathNode getTrivialPath() {
+        return (isDisposed()) ? null
+            : (isNaval()) ? findOurNearestPort()
+            : findOurNearestSettlement();
+    }
+
+    /**
      * Finds the fastest path from the current location to the
      * specified one.  No carrier is provided, and the default cost
      * decider for this unit is used.
