@@ -250,14 +250,23 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     }
 
     /**
+     * Update the export state and disposition of AIGoods in this colony.
+     *
+     * @param lb A <code>LogBuilder</code> to log to.
+     */
+    public void updateGoods(LogBuilder lb) {
+        resetExports();
+        updateAIGoods(lb);
+    }
+
+    /**
      * Rearranges the workers within this colony using the {@link ColonyPlan}.
      * TODO: Detect military threats and boost defence.
      *
-     * @param update If true, update the AI goods.
      * @param lb A <code>LogBuilder</code> to log to.
      * @return True if the workers were rearranged.
      */
-    public boolean rearrangeWorkers(boolean update, LogBuilder lb) {
+    public boolean rearrangeWorkers(LogBuilder lb) {
         final AIMain aiMain = getAIMain();
         if (colonyPlan == null) colonyPlan = new ColonyPlan(aiMain, colony);
 
@@ -280,10 +289,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         final Player player = colony.getOwner();
         final Specification spec = getSpecification();
         lb.add("\n  ", colony.getName());
-        if (update) {
-            resetExports();
-            updateAIGoods(lb);
-        }
 
         // For now, cap the rearrangement horizon, because confidence
         // that we are triggering on all relevant changes is low.

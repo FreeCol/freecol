@@ -2249,8 +2249,12 @@ public class EuropeanAIPlayer extends AIPlayer {
             if (aic.isBadlyDefended()) lb.add(" ", aic.getColony());
         }
         lb.grew("\n  Badly defended colonies:");
+        lb.mark();
+        for (AIColony aic : getAIColonies()) aic.updateGoods(lb);
+        lb.grew("\n  Update goods:");
+
         for (AIColony aic : getAIColonies()) {
-            aic.rearrangeWorkers(true, lb);
+            aic.rearrangeWorkers(lb);
         }
         
         buildTipMap(lb);
@@ -2262,14 +2266,14 @@ public class EuropeanAIPlayer extends AIPlayer {
         bringGifts(lb);
         demandTribute(lb);
         List<AIUnit> more = doMissions(getAIUnits(), lb);
-        for (AIColony aic : getAIColonies()) aic.rearrangeWorkers(false, lb);
+        for (AIColony aic : getAIColonies()) aic.rearrangeWorkers(lb);
 
         if (!more.isEmpty()) {
             buildTransportMaps(lb);
             buildWishMaps(lb);
             giveNormalMissions(lb);
             doMissions(more, lb);
-            for (AIColony aic : getAIColonies()) aic.rearrangeWorkers(false, lb);
+            for (AIColony aic : getAIColonies()) aic.rearrangeWorkers(lb);
         }
         lb.log(logger, Level.FINEST);
 

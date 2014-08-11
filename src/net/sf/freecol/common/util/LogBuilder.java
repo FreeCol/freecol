@@ -39,7 +39,7 @@ public class LogBuilder {
     private StringBuilder sb;
 
     /** The remembered buffer index. */
-    private int point;
+    private final List<Integer> points = new ArrayList<Integer>();
 
 
     /**
@@ -49,7 +49,6 @@ public class LogBuilder {
      */
     public LogBuilder(int size) {
         this.sb = (size <= 0) ? null : new StringBuilder(size);
-        this.point = -1;
     }
 
 
@@ -113,7 +112,7 @@ public class LogBuilder {
      * Remember a position in a buffer.
      */
     public void mark() {
-        this.point = (sb == null) ? -1 : sb.length();
+        if (sb != null) this.points.add(new Integer(sb.length()));
     }
 
     /**
@@ -125,10 +124,12 @@ public class LogBuilder {
      * @return True if the buffer grew (before inserting).
      */
     public boolean grew(Object... objects) {
-        if (sb == null || sb.length() <= this.point) return false;
+        if (sb == null) return false;
+        int p = this.points.remove(0);
+        if (sb.length() <= p) return false;
         StringBuilder sb2 = new StringBuilder(64);
         add(sb2, objects);
-        this.sb.insert(this.point, sb2.toString());
+        this.sb.insert(p, sb2.toString());
         return true;
     }
 
