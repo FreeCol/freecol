@@ -106,6 +106,29 @@ public class BuildColonyMission extends Mission {
 
 
     /**
+     * Get the colony value for a tile.
+     *
+     * @param tile The <code>Tile</code> to test.
+     * @return The colony value for this player.
+     */
+    private int getColonyValue(Tile tile) {
+        final Player owner = getAIUnit().getUnit().getOwner();
+        /*
+        // Track down errant colony tile valuation
+        LogBuilder lb = new LogBuilder(64);
+        lb.add(owner.getNation().getSuffix(), " checks ", tile, ":");
+        double result = 1.0;
+        for (Double v : owner.getAllColonyValues((Tile)target)) {
+            lb.add(" ", v);
+            result *= v;
+        }
+        lb.add(" = ", (int)Math.round(result));
+        logger.finest(lb.toString());
+        */
+        return owner.getColonyValue(tile);
+    }
+
+    /**
      * Extract a valid target for this mission from a path.
      *
      * @param aiUnit A <code>AIUnit</code> to perform the mission.
@@ -319,7 +342,7 @@ public class BuildColonyMission extends Mission {
             boolean retarget = this.target != null && this.target != target;
             this.target = target;
             this.colonyValue = (target instanceof Tile)
-                ? getAIUnit().getUnit().getOwner().getColonyValue((Tile)target)
+                ? getColonyValue((Tile)target)
                 : -1;
             if (retarget) retargetTransportable();
         }
@@ -356,7 +379,7 @@ public class BuildColonyMission extends Mission {
             lbBroken(lb, reason);
             return null;
         } else if (target instanceof Tile
-            && (player.getColonyValue((Tile)target)) < colonyValue) {
+            && (getColonyValue((Tile)target)) < colonyValue) {
             reason = "target tile " + target.toShortString() + " value fell";
         }
         if (reason != null && !retargetMission(reason, lb)) return null;
