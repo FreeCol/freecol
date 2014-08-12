@@ -119,7 +119,12 @@ public class TransportMission extends Mission {
             if (aiu == null) continue;
             queueTransportable(aiu, false);
         }
-        retarget();
+        if (target == null) {
+            PathNode path = getUnit().getTrivialPath();
+            if (path != null) {
+                setTarget(upLoc(path.getLastNode().getLocation()));
+            }
+        }
         lb.add(" begins: ", toFullString());
         lb.log(logger, Level.FINEST);
         uninitialized = false;
@@ -155,18 +160,6 @@ public class TransportMission extends Mission {
 
 
     // Simple internal utilities
-
-    /**
-     * Gets the trivial target for the carrier unit.
-     *
-     * @return A path to the trivial target, or null if none found.
-     */
-    private PathNode getTrivialPath() {
-        final Unit carrier = getUnit();
-        return (carrier.isDisposed()) ? null
-            : (carrier.isNaval()) ? carrier.findOurNearestPort()
-            : carrier.findOurNearestSettlement();
-    }
 
     /**
      * Checks if the carrier using this mission is carrying the given
@@ -237,6 +230,7 @@ public class TransportMission extends Mission {
             old.addAll(cargoes);
             cargoes.clear();
         }
+        tRetarget();
         return old;
     }
 
@@ -248,13 +242,15 @@ public class TransportMission extends Mission {
      * @return The old cargoes list.
      */
     private List<Cargo> tSet(List<Cargo> nxt, boolean setSpace) {
-        List<Cargo> old = tClear();
+        List<Cargo> old = tCopy();
         synchronized (cargoes) {
+            cargoes.clear();
             for (Cargo c : nxt) {
                 if (c.isValid()) cargoes.add(c);
             }
             if (setSpace) tSpace();
         }
+        tRetarget();
         return old;
     }
 
@@ -272,7 +268,8 @@ public class TransportMission extends Mission {
     }
 
     /**
-     * Find a <code>Cargo</code> with the given <code>TransportableAIObject</code>.
+     * Find a <code>Cargo</code> with the given
+     * <code>TransportableAIObject</code>.
      *
      * @param t The <code>TransportableAIObject</code> to look for.
      * @return The <code>Cargo</code> found, or null if none found.
@@ -318,7 +315,9 @@ public class TransportMission extends Mission {
     private boolean tAdd(Cargo cargo, int index) {
         if (!cargo.isValid()) return false;
         if (tFind(cargo.getTransportable()) != null) return true;
+        boolean change = false;
         synchronized (cargoes) {
+            change = cargoes.isEmpty() || index == 0;
             if (index >= 0) {
                 cargoes.add(index, cargo); 
             } else {
@@ -326,6 +325,7 @@ public class TransportMission extends Mission {
             }
             tSpace();
         }
+        if (change) tRetarget();
         return true;
     }
 
@@ -336,11 +336,15 @@ public class TransportMission extends Mission {
      * @return True if the remove succeeded.
      */
     private boolean tRemove(Cargo cargo) {
-        boolean result;
+        boolean result = false, change = false;
         synchronized (cargoes) {
-            result = cargoes.remove(cargo);
-            tSpace();
+            if (!cargoes.isEmpty()) {
+                change = cargo == cargoes.get(0);
+                result = cargoes.remove(cargo);
+                if (result) tSpace();
+            }
         }
+        if (change) tRetarget();
         return result;
     }
 
@@ -352,42 +356,31 @@ public class TransportMission extends Mission {
         final Unit carrier = getUnit();
         final int maxHolds = carrier.getCargoCapacity();
         int holds = carrier.getCargoSpaceTaken();
-        int i = 0;
-        while (i < cargoes.size()) {
-            Cargo cargo = cargoes.get(i);
-            if (cargo.isValid()) {
-                holds += cargo.getNewSpace();
-                cargo.setSpaceLeft(maxHolds - holds);
-                i++;
-            } else {
-                cargoes.remove(i);
+        for (Cargo cargo : cargoes) {
+            if (!cargo.isValid()) continue;
+            holds += cargo.getNewSpace();
+            cargo.setSpaceLeft(maxHolds - holds);
+        }
+    }
+
+    /**
+     * Reset the carrier target after a change to the first cargo.
+     */
+    private void tRetarget() {
+        Location next = null;
+        synchronized (cargoes) {
+            for (Cargo cargo : cargoes) {
+                if (cargo.isValid()) {
+                    next = cargo.getTarget();
+                    break;
+                }
             }
         }
+        setTarget(upLoc(next));
     }
 
     // Medium-level cargo and target manipulation, should be kept
     // private to TransportMission.
-
-    /**
-     * Retarget the mission using the cargoes list.
-     */
-    private void retarget() {
-        Cargo cargo = tFirst();
-        PathNode path;
-        if (cargo != null) {
-            setTarget(cargo.getTarget());
-            logger.finest(tag + " retargeted " + getUnit() + " for cargo: "
-                + upLoc(cargo.getTarget()).toShortString());
-        } else if ((path = getTrivialPath()) != null) {
-            Location loc = upLoc(path.getLastNode().getLocation());
-            setTarget(loc);
-            logger.finest(tag + " retargeted " + getUnit() + " to safe port: "
-                + loc.toShortString());
-        } else {
-            setTarget(null);
-            logger.finest(tag + " unable to retarget safe port: " + this);
-        }
-    }
 
     /**
      * Count distinct non-adjacent destinations in a list of cargoes.
@@ -532,7 +525,6 @@ public class TransportMission extends Mission {
         boolean result = tAdd(cargo, index);
         if (result) {
             takeTransportable(cargo.getTransportable());
-            if (tFirst() == cargo) retarget();
         }
 
         if (result) {
@@ -559,7 +551,6 @@ public class TransportMission extends Mission {
         boolean result = tRemove(cargo);
         if (result) {
             dropTransportable(cargo.getTransportable());
-            retarget();
         }
         return result;
     }
@@ -648,7 +639,7 @@ public class TransportMission extends Mission {
             if (next == null) {
                 dst = this.target;
                 if (dst == null) {
-                    PathNode path = getTrivialPath();
+                    PathNode path = getUnit().getTrivialPath();
                     dst = path.getLastNode().getLocation();
                 }
                 if (dst != null) next = new Cargo(t, getUnit(), dst);
@@ -663,7 +654,6 @@ public class TransportMission extends Mission {
                     dropTransportable(t);
                 }
             }
-            retarget();
         }
 
         switch (result) {
@@ -901,7 +891,7 @@ public class TransportMission extends Mission {
         // Drop transportables on the drop list, or queue them to be dropped
         // at the next port
         if (!drop.isEmpty()) {
-            path = getTrivialPath();
+            path = carrier.getTrivialPath();
             Location end = (path == null) ? null
                 : path.getLastNode().getLocation();
             boolean dropReady = path == null || carrier.isAtLocation(end);
@@ -1134,7 +1124,6 @@ public class TransportMission extends Mission {
         } else {
             tSet(unwrapCargoes(ts), false);
         }
-        retarget();
         lb.add(" -> ", getTarget());
     }
 
@@ -1389,16 +1378,7 @@ public class TransportMission extends Mission {
         String reason = invalidReason();
         if (reason != null) {
             lbBroken(lb, reason);
-            retarget(); // Try to recover
-            if ((reason = invalidReason()) != null) {
-                checkCargoes(lb);
-                optimizeCargoes(lb);
-                if ((reason = invalidReason()) != null) {
-                    lbBroken(lb, reason);
-                    return null;
-                }
-            }
-            lb.add(", recovered to ", getTarget());
+            return null;
         }
 
         final EuropeanAIPlayer euaip = getEuropeanAIPlayer();
@@ -1541,7 +1521,6 @@ public class TransportMission extends Mission {
                     }
                 }
 
-                retarget();
                 if ((reason = invalidReason()) != null) {
                     logger.warning(tag + " post-stop failure(" + reason
                         + ": " + this.toFullString());

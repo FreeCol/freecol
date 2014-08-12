@@ -222,6 +222,7 @@ public class TransportMissionTest extends FreeColTestCase {
         aiUnit.changeMission(mission, lb);
         TransportableAIObject goods = new AIGoods(aiMain, galleon,
                                                   horsesType, 50, colonyTile);
+        goods.setTransportDestination(europe);
         mission.queueTransportable(goods, false);
         mission.doMission(lb);
 
@@ -303,6 +304,7 @@ public class TransportMissionTest extends FreeColTestCase {
         assertNull("Transport mission should be valid.",
                    TransportMission.invalidReason(wagon));
         TransportMission mission = new TransportMission(aiMain, wagon);
+        wagon.changeMission(mission, new LogBuilder(0));
 
         Location dest = mission.getTarget();
         assertEquals("Destination should be colony one.", one, dest);
