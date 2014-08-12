@@ -28,6 +28,7 @@ import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Locatable;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.ai.mission.TransportMission;
 
@@ -270,6 +271,30 @@ public abstract class TransportableAIObject extends ValuedAIObject {
      * @param destination The destination <code>Location</code>.
      */
     public abstract void setTransportDestination(Location destination);
+
+    /**
+     * Get the path to deliver this transportable to its destination
+     * with a given carrier.
+     *
+     * @param carrier The carrier <code>Unit</code> to use.
+     * @param dst The destination <code>Location</code>, defaulting to the
+     *     transport destination if null.
+     * @return A path, or null if none found.
+     */
+    public abstract PathNode getDeliveryPath(Unit carrier, Location dst);
+
+    /**
+     * Get the path to make progress with this transport, for the
+     * carrier to either collect or deliver the transportable, albeit
+     * it need only improve the current situation rather than complete
+     * the delivery to the destination.
+     *
+     * @param carrier The carrier <code>Unit</code> to use.
+     * @param dst The destination <code>Location</code>, defaulting to the
+     *     transport destination if null.
+     * @return A path, or null if none found.
+     */
+    public abstract PathNode getIntermediatePath(Unit carrier, Location dst);
 
     /**
      * Can this transportable be carried by a given carrier unit?

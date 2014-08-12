@@ -35,6 +35,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Locatable;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -234,6 +235,26 @@ public class AIGoods extends TransportableAIObject {
      */
     public void setTransportDestination(Location destination) {
         this.destination = destination;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public PathNode getDeliveryPath(Unit carrier, Location dst) {
+        if (dst == null) dst = upLoc(getTransportDestination());
+
+        PathNode path = (goods.getLocation() == carrier) ? carrier.findPath(dst)
+            : (goods.getLocation() instanceof Unit) ? null
+            : carrier.findPath(goods.getLocation(), dst, null, null);
+        if (path != null) path.convertToGoodsDeliveryPath();
+        return path;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public PathNode getIntermediatePath(Unit carrier, Location dst) {
+        return null; // NYI
     }
 
     /**

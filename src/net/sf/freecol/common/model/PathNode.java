@@ -217,11 +217,9 @@ public class PathNode {
      * @return The node where the unit leaves the carrier.
      */
     public PathNode getTransportDropNode() {
-        PathNode temp = this;
-        while (temp.next != null && temp.isOnCarrier()) {
-            temp = temp.next;
-        }
-        return temp;
+        PathNode p = this;
+        while (p.next != null && p.isOnCarrier()) p = p.next;
+        return p;
     }
 
     /**
@@ -300,8 +298,8 @@ public class PathNode {
      *     if the path does not use a carrier.
      */
     public PathNode getCarrierMove() {
-        for (PathNode path = this; path != null; path = path.next) {
-            if (path.isOnCarrier()) return path;
+        for (PathNode p = this; p != null; p = p.next) {
+            if (p.isOnCarrier()) return p;
         }
         return null;
     }
@@ -327,6 +325,21 @@ public class PathNode {
             if (!p.isOnCarrier()) return true;
         }
         return false;
+    }
+
+    /**
+     * Convert this path to a delivery path for some goods, where
+     * every node is marked as on carrier, except for a duplicate of
+     * the last node.
+     */
+    public void convertToGoodsDeliveryPath() {
+        PathNode p;
+        for (p = this; p.next != null; p = p.next) {
+            p.onCarrier = true;
+        }
+        p.onCarrier = true;
+        p.next = new PathNode(p.location, p.movesLeft, p.turns, false,
+                              p, null);
     }
 
     /**

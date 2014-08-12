@@ -314,20 +314,20 @@ public class Cargo {
         Location dst = transportable.getTransportDestination();
         if (dst == null) return "invalid-null-destination";
         dst = AIObject.upLoc(dst);
-        PathNode path, drop;
+        PathNode deliveryPath = transportable.getDeliveryPath(carrier, dst);
+        PathNode drop;
 
         if (transportable instanceof AIUnit) {
             final Unit unit = ((AIUnit)transportable).getUnit();
             if (unit.getLocation() == carrier) {
                 // Can the carrier deliver the unit to the target?
-                if ((path = unit.findPath(carrier.getLocation(), dst,
-                            carrier, null)) == null) {
+                if (deliveryPath == null) {
                     return "no-deliver " + unit.toShortString()
                         + "/" + carrier.toShortString()
                         + " -> " + dst.toShortString();
                 }
                 // Drop node must exist, the unit is aboard
-                drop = path.getTransportDropNode();
+                drop = deliveryPath.getTransportDropNode();
                 if (drop.getLocation().getColony() == null) {
                     this.mode = CargoMode.DROPOFF;
                     if (drop.previous == null) {
@@ -345,19 +345,19 @@ public class Cargo {
             } else {
                 // Can the carrier get the unit to the target, and
                 // does the unit need the carrier at all?
-                if ((path = unit.findPath(unit.getLocation(), dst,
-                            carrier, null)) == null) {
+                if (deliveryPath == null) {
                     return "no-collect+deliver " + unit.toShortString()
                         + "/" + carrier.toShortString()
                         + " -> " + dst.toShortString();
                 }
-                if ((drop = path.getCarrierMove()) == null) {
+                if ((drop = deliveryPath.getCarrierMove()) == null) {
                     return "no-carrier-move for " + carrier.toShortString()
                         + " to collect " + unit.toShortString();
                 }
                 // TODO: proper rendezvous paths, unit needs
                 // to modify its target too!
-                if ((path = carrier.findPath(drop.getLocation())) == null) {
+                PathNode path = carrier.findPath(drop.getLocation());
+                if (path == null) {
                     return "no-collect of " + unit.toShortString()
                         + " with " + carrier.toShortString()
                         + " -> " + drop.getLocation().toShortString();
@@ -378,8 +378,7 @@ public class Cargo {
         } else if (transportable instanceof AIGoods) {
             final Goods goods = ((AIGoods)transportable).getGoods();
             if (goods.getLocation() == carrier) {
-                path = carrier.findPath(dst);
-                if (path == null) {
+                if (deliveryPath == null) {
                     Tile dstTile = dst.getTile();
                     Tile srcTile = carrier.getTile();
                     // OK, this is expected if the carrier is a
@@ -389,22 +388,22 @@ public class Cargo {
                     // find an intermediate port.
                     if (carrier.isNaval()) {
                         if (dstTile != null) {
-                            path = carrier.findIntermediatePort(dstTile);
+                            deliveryPath = carrier.findIntermediatePort(dstTile);
                         }
                     } else {
                         if (dstTile == null
                             || dstTile.getContiguity() != dstTile.getContiguity()) {
-                            path = carrier.findOurNearestPort();
+                            deliveryPath = carrier.findOurNearestPort();
                         }
                     }
                 }
-                if (path == null) {
+                if (deliveryPath == null) {
                     return "no-deliver for " + carrier.toShortString()
                         + " -> " + dst.toShortString();
                 } else {
                     this.mode = CargoMode.UNLOAD;
-                    this.turns = path.getLastNode().getTotalTurns();
-                    this.target = path.getLastNode().getLocation();
+                    this.turns = deliveryPath.getLastNode().getTotalTurns();
+                    this.target = deliveryPath.getLastNode().getLocation();
                 }
             } else if (goods.getLocation() instanceof Unit) {
                 return "goods-already-collected";
@@ -422,7 +421,7 @@ public class Cargo {
                                 present));
                     }
                 }
-                path = carrier.findPath(goods.getLocation());
+                PathNode path = carrier.findPath(goods.getLocation());
                 if (path == null) {
                     return "no-collect for " + carrier.toShortString()
                         + " -> " + dst.toShortString();

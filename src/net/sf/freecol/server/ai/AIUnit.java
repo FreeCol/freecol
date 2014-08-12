@@ -494,6 +494,34 @@ public class AIUnit extends TransportableAIObject {
     /**
      * {@inheritDoc}
      */
+    public PathNode getDeliveryPath(Unit carrier, Location dst) {
+        if (dst == null) {
+            dst = getTransportDestination();
+            if (dst == null) return null;
+        }
+        dst = upLoc(dst);
+
+        PathNode path;
+        if (unit.getLocation() == carrier) {
+            path = unit.findPath(carrier.getLocation(), dst, carrier, null);
+        } else if (unit.getLocation() instanceof Unit) {
+            path = null;
+        } else {
+            path = unit.findPath(unit.getLocation(), dst, carrier, null);
+        }
+        return path;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public PathNode getIntermediatePath(Unit carrier, Location dst) {
+        return null; // NYI
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public void setTransportDestination(Location destination) {
         throw new RuntimeException("AI unit transport destination set by mission.");
     }
