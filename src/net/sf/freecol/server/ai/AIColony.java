@@ -1012,7 +1012,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * @param lb A <code>LogBuilder</code> to log to.
      */
     private void updateWishes(LogBuilder lb) {
-        lb.mark();
         updateWorkerWishes(lb);
         updateGoodsWishes(lb);
         Collections.sort(wishes);
