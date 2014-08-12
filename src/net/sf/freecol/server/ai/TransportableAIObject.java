@@ -24,13 +24,14 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Locatable;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.server.ai.mission.TransportMission;
 
 import org.w3c.dom.Element;
-
 
 
 /**
@@ -186,10 +187,43 @@ public abstract class TransportableAIObject extends ValuedAIObject {
     }
 
     /**
-     * TODO: Better.
+     * Change the allocated transport for this transportable to a different
+     * carrier unit.
+     *
+     * TODO: partial attempt to maintain consistency of any carrier
+     * TransportMission lists, and disembark from the old carrier if
+     * possible.
+     *
+     * @param carrier The new carrier <code>AIUnit</code>.
+     * @return True if the transport was changed, false if the transportable
+     *     was unable to disembark from the old carrier or unable to be
+     *     added to the new carrier transport list.
      */
-    public void setTransport(AIUnit transport, String reason) {
-        setTransport(transport);
+    public boolean changeTransport(AIUnit aiCarrier) {
+        // Get off any current carrier unless it is the new one.
+        Location now;
+        Locatable l = getTransportLocatable();
+        if (l != null && (now = l.getLocation()) instanceof Unit
+            && !(aiCarrier != null && aiCarrier.getUnit() == now)) {
+            if (!leaveTransport()) return false;
+        }
+
+        AIUnit old = getTransport();
+        if (old != null) {
+            if (old == aiCarrier) return true;
+
+            TransportMission tm = old.getMission(TransportMission.class);
+            if (tm != null) tm.removeTransportable(this);
+        }
+        setTransport(null);
+        if (aiCarrier != null) {
+            //TransportMission tm = aiCarrier.getMission(TransportMission.class);
+            //if (tm != null) {
+            //    if (!tm.requeueTransportable(this)) return false;
+            //}
+            setTransport(aiCarrier);
+        }
+        return true;
     }
 
     /**

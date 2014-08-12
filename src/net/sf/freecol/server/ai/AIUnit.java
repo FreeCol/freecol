@@ -378,10 +378,10 @@ public class AIUnit extends TransportableAIObject {
                 }
                 if (clear) {
                     tm.removeTransportable(this);
-                    lb.add(" (transport dequeued)");
+                    lb.add(" (transport removed)");
                 }
             }
-            if (clear) setTransport(null, "(mission-change)");
+            if (clear) changeTransport(null);
         }
         if (clear && unit.isOnCarrier()) {
             if (leaveTransport()) {
@@ -464,7 +464,7 @@ public class AIUnit extends TransportableAIObject {
      */
     @Override
     public int getTransportPriority() {
-        return (hasMission()) ? getValue() : 0;
+        return (hasMission()) ? super.getTransportPriority() : 0;
     }
 
     /**

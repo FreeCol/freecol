@@ -913,12 +913,8 @@ public class EuropeanAIPlayer extends AIPlayer {
         AIUnit aiCarrier = t.getTransport();
         if (aiCarrier == null) return false;
         TransportMission tm = aiCarrier.getMission(TransportMission.class);
-        if (tm != null) {
-            if (tm.isTransporting(t)) return true;
-            t.setTransport(null, "mission dropped");
-            return false;
-        }
-        t.setTransport(null, "no carrier transport mission");
+        if (tm != null && tm.isTransporting(t)) return true;
+        t.changeTransport(null);
         return false;
     }
 
