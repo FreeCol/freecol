@@ -45,6 +45,7 @@ import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
+import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.model.TradeRouteStop;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.util.EmptyIterator;
@@ -2569,31 +2570,93 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Find a path to a port nearest to a destination.
-     * Used by ships to find where to deliver goods to inland colonies.
+     * Find a path to a settlement nearer to a destination.
      *
-     * The absolute best port is not necessarily found as that depends
-     * on the movement characteristics of the unit that makes the
-     * final delivery, which is as yet unknown.  We just pick the
-     * closest in basic tile count.
+     * Used to find where to deliver goods to/from inland colonies,
+     * or when blocked.
      *
-     * @param dst The destination <code>Tile</code>.
+     * @param dst The destination <code>Location</code>.
      * @return A path to the port, or null if none found.
      */
-    public PathNode findIntermediatePort(Tile dst) {
-        int dstCont = dst.getContiguity();
-        Settlement best = null;
-        int bestValue = INFINITY;
-        int value;
-        for (Settlement s : getOwner().getSettlements()) {
-            if (s.getTile().getContiguity() == dstCont
-                && s.isConnectedPort()
-                && bestValue > (value = dst.getDistanceTo(s.getTile()))) {
-                bestValue = value;
-                best = s;
+    public PathNode findIntermediatePort(Location dst) {
+        final Settlement ignoreSrc = getSettlement();
+        final Settlement ignoreDst = dst.getSettlement();
+        final Tile srcTile = getTile();
+        final Tile dstTile = dst.getTile();
+        final int dstCont = (dstTile == null) ? -1 : dstTile.getContiguity();
+        PathNode path, best = null;
+        int value, bestValue = INFINITY;
+        int type;
+
+        if (isNaval()) {
+            if (!srcTile.isHighSeasConnected()) {
+                // On a lake!  TODO: better
+                type = 0;
+            } else if (dstTile == null) {
+                // Carrier must be blocked from high seas
+                type = 1;
+            } else if (dstTile.isHighSeasConnected()) {
+                // Carrier is blocked or destination is blocked.
+                type = (getTile().isOnRiver()) ? 1 : 2;
+            } else {
+                // Destination must be blocked
+                type = 2;
+            }
+        } else {
+            if (dstTile == null || getTile().getContiguity() != dstCont) {
+                // Ocean travel will be required
+                // If already at port try to improve its connectivity,
+                // otherwise go to a port.
+                type = (srcTile.isHighSeasConnected()) ? 1 : 2;
+            } else {
+                // Pure land travel, just find a nearer settlement.
+                type = 3;
             }
         }
-        return (best == null) ? null : findPath(best.getTile());
+
+        switch (type) {
+        case 0:
+            // No progress possible.
+            break;
+        case 1:
+            // Starting on a river, probably blocked in there.
+            // Find the settlement that most reduces the high seas count.
+            best = search(getLocation(),
+                          GoalDeciders.getReduceHighSeasCountGoalDecider(this),
+                          null, INFINITY, null);
+            break;
+        case 2:
+            // Ocean travel required, destination blocked.
+            // Find the closest available connected port.
+            for (Settlement s : getOwner().getSettlements()) {
+                if (s != ignoreSrc && s != ignoreDst && s.isConnectedPort()
+                    && (path = findPath(s)) != null) {
+                    value = path.getTotalTurns()
+                        + dstTile.getDistanceTo(s.getTile());
+                    if (bestValue > value) {
+                        bestValue = value;
+                        best = path;
+                    }
+                }
+            }
+            break;
+        case 3:
+            // Land travel.  Find nearby settlement with correct contiguity.
+            for (Settlement s : getOwner().getSettlements()) {
+                if (s != ignoreSrc && s != ignoreDst
+                    && s.getTile().getContiguity() == dstCont
+                    && (path = findPath(s)) != null) {
+                    value = path.getTotalTurns()
+                        + dstTile.getDistanceTo(s.getTile());
+                    if (bestValue > value) {
+                        bestValue = value;
+                        best = path;
+                    }
+                }
+            }
+        }
+        return (best != null) ? best
+            : findOurNearestSettlement(false, INFINITY, false);
     }
 
     /**

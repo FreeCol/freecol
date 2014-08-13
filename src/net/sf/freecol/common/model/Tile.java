@@ -536,18 +536,21 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
-     * Is this tile on or adjacent to a navigable river.
+     * Is this tile on or adjacent to a navigable river but not the ocean.
      *
      * @return True if on a navigable river.
      */
     public boolean isOnRiver() {
         final TileType greatRiver
             = getSpecification().getTileType("model.tile.greatRiver");
-        if (getType() == greatRiver) return true;
+        final TileType ocean
+            = getSpecification().getTileType("model.tile.ocean");
+        boolean ret = getType() == greatRiver;
         for (Tile t : getSurroundingTiles(1)) {
-            if (t.getType() == greatRiver) return true;
+            if (t.getType() == ocean) return false;
+            ret |= t.getType() == greatRiver;
         }
-        return false;
+        return ret;
     }
 
     /**

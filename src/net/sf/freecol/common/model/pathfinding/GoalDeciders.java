@@ -328,7 +328,37 @@ public final class GoalDeciders {
             }
         };
     }
-        
+
+    /**
+     * Get a goal decider to find tiles with a settlement with a lower
+     * high seas count than a unit currently has.  Useful for tunnelling
+     * out of intermittantly blocked rivers.
+     *
+     * @param unit The <code>Unit</code> to get the goal decider for.
+     * @return A suitable <code>GoalDecider</code>.
+     */
+    public static GoalDecider getReduceHighSeasCountGoalDecider(final Unit unit) {
+        return new GoalDecider() {
+            private PathNode goal = null;
+            private int score = unit.getTile().getHighSeasCount();
+
+            public PathNode getGoal() { return goal; }
+            public boolean hasSubGoals() { return true; }
+            public boolean check(Unit u, PathNode pathNode) {
+                Tile tile = pathNode.getTile();
+                if (tile.getHighSeasCount() < score) {
+                    Settlement s = tile.getSettlement();
+                    if (unit.getOwner().owns(s)) {
+                        this.goal = pathNode;
+                        this.score = tile.getHighSeasCount();
+                        return true;
+                    }
+                }
+                return false;
+            }
+        };
+    }
+  
     /**
      * A class to wrap a goal decider that searches for paths to an
      * adjacent tile to a set of locations, and the results of such a

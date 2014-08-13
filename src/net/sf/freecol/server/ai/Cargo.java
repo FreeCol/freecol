@@ -315,6 +315,9 @@ public class Cargo {
         if (dst == null) return "invalid-null-destination";
         dst = AIObject.upLoc(dst);
         PathNode deliveryPath = transportable.getDeliveryPath(carrier, dst);
+        if (deliveryPath == null) {
+            deliveryPath = transportable.getIntermediatePath(carrier, dst);
+        }
         PathNode drop;
 
         if (transportable instanceof AIUnit) {
