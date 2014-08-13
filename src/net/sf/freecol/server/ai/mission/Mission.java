@@ -115,17 +115,14 @@ public abstract class Mission extends AIObject {
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
      * @param target The initial target <code>Location</code>.
-     * @param lb A <code>LogBuilder</code> to log to.
      */
-    protected Mission(AIMain aiMain, AIUnit aiUnit, Location target,
-                      LogBuilder lb) {
+    protected Mission(AIMain aiMain, AIUnit aiUnit, Location target) {
         this(aiMain, aiUnit);
 
-        this.aiUnit = aiUnit;
-        this.uninitialized = aiUnit == null;
         setTarget(target);
-        aiUnit.changeMission(this, lb);
-        if (target != null) lb.add(" with target ", target);
+        if (aiUnit != null && aiUnit.getMission() != this) {
+            aiUnit.changeMission(this);
+        }
     }
 
 

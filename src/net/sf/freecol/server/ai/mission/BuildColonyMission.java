@@ -76,13 +76,9 @@ public class BuildColonyMission extends Mission {
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
      * @param target The target <code>Location</code> for this mission.
-     * @param lb A <code>LogBuilder</code> to log to.
      */
-    public BuildColonyMission(AIMain aiMain, AIUnit aiUnit, Location target,
-                              LogBuilder lb) {
-        super(aiMain, aiUnit, target, lb);
-
-        lb.add(" and value ", colonyValue);
+    public BuildColonyMission(AIMain aiMain, AIUnit aiUnit, Location target) {
+        super(aiMain, aiUnit, target);
     }
 
     /**
@@ -490,9 +486,12 @@ public class BuildColonyMission extends Mission {
                     Colony colony = tile.getColony();
                     AIColony aiColony = aiMain.getAIColony(colony);
                     aiColony.requestRearrange();
-                    lbDone(lb, colony);
-                    return new WorkInsideColonyMission(aiMain, aiUnit,
-                                                       aiColony, lb);
+                    Mission m = getEuropeanAIPlayer()
+                        .getWorkInsideColonyMission(aiUnit, aiColony);
+                    if (m != null) {
+                        lbDone(lb, colony, ", switched to ", m);
+                        return m;
+                    }
                 } else {
                     lbFail(lb, "build at ", tile);
                     break;

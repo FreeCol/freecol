@@ -69,11 +69,10 @@ public class DefendSettlementMission extends Mission {
      * @param aiUnit The <code>AIUnit</code> this mission
      *        is created for.
      * @param settlement The <code>Settlement</code> to defend.
-     * @param lb A <code>LogBuilder</code> to log to.
      */
     public DefendSettlementMission(AIMain aiMain, AIUnit aiUnit,
-                                   Settlement settlement, LogBuilder lb) {
-        super(aiMain, aiUnit, settlement, lb);
+                                   Settlement settlement) {
+        super(aiMain, aiUnit, settlement);
     }
 
     /**
@@ -329,9 +328,12 @@ public class DefendSettlementMission extends Mission {
             Colony colony = (Colony)getTarget();
             if (unit.isInColony()
                 || (unit.isPerson() && colony.getUnitCount() <= 1)) {
-                lb.add(" bolster ", colony, ".");
-                return new WorkInsideColonyMission(aiMain, aiUnit,
-                    aiMain.getAIColony(colony), lb);
+                m = getEuropeanAIPlayer().getWorkInsideColonyMission(aiUnit,
+                    aiMain.getAIColony(colony));
+                if (m != null) {
+                    lbDone(lb, " bolster ", colony, ", switch to ", m);
+                    return m;
+                }
             }
         }
 

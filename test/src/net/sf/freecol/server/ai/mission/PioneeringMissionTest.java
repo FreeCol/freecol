@@ -128,7 +128,7 @@ public class PioneeringMissionTest extends FreeColTestCase {
         assertTrue("Pioneer should find a tile to improve",
                    loc instanceof Tile);
         PioneeringMission mission
-            = new PioneeringMission(aiMain, aiUnit, loc, lb);
+            = new PioneeringMission(aiMain, aiUnit, loc);
         assertTrue("Mission should be valid",
                    mission.isValid());
         TileImprovementPlan tip = mission.getTileImprovementPlan();

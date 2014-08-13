@@ -34,6 +34,7 @@ import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIUnit;
+import net.sf.freecol.server.ai.EuropeanAIPlayer;
 import net.sf.freecol.server.ai.GoodsWish;
 import net.sf.freecol.server.ai.Wish;
 import net.sf.freecol.server.ai.WorkerWish;
@@ -62,9 +63,8 @@ public class WishRealizationMission extends Mission {
      *     the unit and this mission.
      * @param lb A <code>LogBuilder</code> to log to.
      */
-    public WishRealizationMission(AIMain aiMain, AIUnit aiUnit, Wish wish,
-                                  LogBuilder lb) {
-        super(aiMain, aiUnit, wish.getDestination(), lb);
+    public WishRealizationMission(AIMain aiMain, AIUnit aiUnit, Wish wish) {
+        super(aiMain, aiUnit, wish.getDestination());
 
         this.wish = wish;
     }
@@ -188,23 +188,34 @@ public class WishRealizationMission extends Mission {
             final Colony colony = (Colony)target;
             final AIUnit aiUnit = getAIUnit();
             final AIColony aiColony = aiMain.getAIColony(colony);
+            final EuropeanAIPlayer owner = getEuropeanAIPlayer();
             aiColony.completeWish(wish, unit.toShortString(), lb);
             // Replace the mission, with a defensive one if this is a
             // military unit or a simple working one if not.
             if (unit.getType().isOffensive()) {
-                lbDone(lb, " ready to defend, ");
-                return new DefendSettlementMission(aiMain, aiUnit, colony, lb);
+                Mission m = owner.getDefendSettlementMission(aiUnit, colony);
+                if (m != null) {
+                    lbDone(lb, " ready to defend, ", colony,
+                           ", switched to ", m);
+                    return m;
+                }
+                lbFail(lb, " unable to defend");
             } else {                
                 aiColony.requestRearrange();
-                lbDone(lb, " ready to work, ");
-                return new WorkInsideColonyMission(aiMain, aiUnit, aiColony, lb);
+                Mission m = owner.getWorkInsideColonyMission(aiUnit, aiColony);
+                if (m != null) {
+                    lbDone(lb, " ready to work ", colony,
+                           ", switched to ", m);
+                    return m;
+                }
+                lbFail(lb, " unable to work");
             }
         } else {
             lbFail(lb, " broken wish: ", wish);
-            wish.dispose();
-            wish = null;
-            return null;
         }
+        wish.dispose();
+        wish = null;
+        return null;
     }
 
 

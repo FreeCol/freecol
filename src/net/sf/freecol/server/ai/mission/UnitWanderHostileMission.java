@@ -51,11 +51,9 @@ public class UnitWanderHostileMission extends Mission {
      *
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
-     * @param lb A <code>LogBuilder</code> to log to.
      */
-    public UnitWanderHostileMission(AIMain aiMain, AIUnit aiUnit,
-                                    LogBuilder lb) {
-        super(aiMain, aiUnit, null, lb);
+    public UnitWanderHostileMission(AIMain aiMain, AIUnit aiUnit) {
+        super(aiMain, aiUnit, null);
     }
 
     /**
@@ -179,10 +177,10 @@ public class UnitWanderHostileMission extends Mission {
         while (unit.getMovesLeft() > 0) {
             // Every checkTurns, look for a target of opportunity.
             if (check == 0) {
-                Location loc = UnitSeekAndDestroyMission.findTarget(aiUnit, 1,
-                                                                    false);
-                if (loc != null) {
-                    return new UnitSeekAndDestroyMission(aiMain, aiUnit, loc, lb);
+                Mission m = getAIPlayer().getSeekAndDestroyMission(aiUnit, 1);
+                if (m != null) {
+                    lbDone(lb, ", found target, switched to ", m);
+                    return m;
                 }
                 check = checkTurns;
             } else check--;

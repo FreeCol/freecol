@@ -70,11 +70,10 @@ public class UnitSeekAndDestroyMission extends Mission {
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
      * @param target The object we are trying to destroy.  This can be
      *     either a <code>Settlement</code> or a <code>Unit</code>.
-     * @param lb A <code>LogBuilder</code> to log to.
      */
     public UnitSeekAndDestroyMission(AIMain aiMain, AIUnit aiUnit,
-                                     Location target, LogBuilder lb) {
-        super(aiMain, aiUnit, target, lb);
+                                     Location target) {
+        super(aiMain, aiUnit, target);
     }
 
     /**
@@ -501,9 +500,13 @@ public class UnitSeekAndDestroyMission extends Mission {
             if (settlement != null && settlement.getUnitCount() < 2) {
                 // Do not risk attacking out of a settlement that
                 // might collapse.  Defend instead.
-                lb.add(", desperate defence ");
-                return new DefendSettlementMission(getAIMain(), aiUnit,
-                                                   settlement, lb);
+                Mission m = getAIPlayer()
+                    .getDefendSettlementMission(aiUnit, settlement);
+                if (m != null) {
+                    lbDone(lb, " desperate defence of ", settlement,
+                        ", switched to ", m);
+                    return m;
+                }
             }
             Direction d = unitTile.getDirection(currentTarget.getTile());
             assert d != null;

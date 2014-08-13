@@ -68,11 +68,9 @@ public class PrivateerMission extends Mission {
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
      * @param target The target <code>Location</code> for this mission.
-     * @param lb A <code>LogBuilder</code> to log to.
      */
-    public PrivateerMission(AIMain aiMain, AIUnit aiUnit, Location target,
-                            LogBuilder lb) {
-        super(aiMain, aiUnit, target, lb);
+    public PrivateerMission(AIMain aiMain, AIUnit aiUnit, Location target) {
+        super(aiMain, aiUnit, target);
     }
 
     /**
@@ -361,8 +359,11 @@ public class PrivateerMission extends Mission {
         final AIMain aiMain = getAIMain();
         final AIUnit aiUnit = getAIUnit();
         if (aiUnit.hasCargo()) { // Deliver the goods
-            lb.add(", should transport, ");
-            return new TransportMission(aiMain, aiUnit, lb);
+            Mission m = getEuropeanAIPlayer().getTransportMission(aiUnit);
+            if (m != null) {
+                lbDone(lb, " transporting, switched to ", m);
+                return m;
+            }
         }
 
         String reason = invalidReason();
@@ -413,7 +414,7 @@ public class PrivateerMission extends Mission {
                 .getDirection(getTarget().getTile());
             if (direction != null) {
                 AIMessage.askAttack(aiUnit, direction);
-                lb.add("attacking ", getTarget());
+                lbAttack(lb, getTarget());
             } else { // Found something else in the way!
                 Location blocker = resolveBlockage(aiUnit, getTarget());
                 if (blocker instanceof Unit

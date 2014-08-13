@@ -92,7 +92,7 @@ public class ScoutingMissionTest extends FreeColTestCase {
                      ScoutingMission.invalidReason(aiUnit));
 
         ScoutingMission mission
-            = new ScoutingMission(aiMain, aiUnit, is, lb);
+            = new ScoutingMission(aiMain, aiUnit, is);
         assertEquals("Scout should have been assigned the Scouting mission",
                      mission, aiUnit.getMission());
         assertEquals(null, mission.invalidReason());

@@ -360,6 +360,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         Iterator<AIUnit> auIterator = getAIUnits().iterator();
         int land = getPlayer().getNumberOfKingLandUnits();
         int used;
+        Mission m;
         for (int i = 0; i < n; i++) {
             if (!auIterator.hasNext()) break;
             final TargetTuple t = targets.get(i);
@@ -379,17 +380,17 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                     ship.setEntryLocation(t.entry);
                 }
                 lb.add("[", ship);
+                lb.mark();
                 used = 0;
                 for (Unit u : aiu.getUnit().getUnitList()) {
                     AIUnit laiu = aiMain.getAIUnit(u);
-                    Mission m = new UnitSeekAndDestroyMission(aiMain, laiu,
-                                                              t.colony, lb);
+                    m = getSeekAndDestroyMission(laiu, t.colony);
+                    if (m != null) lb.add(" ", m);
                     used++;
-                    lb.add(" ", u);
                 }
+                m = getTransportMission(aiu);
+                lb.grew(" ", m);
                 lb.add(" ]");
-                TransportMission tm = new TransportMission(aiMain, aiu, lb);
-                aiu.setMission(tm);
                 if (i < n-1 && used >= (int)Math.floor(land * 0.66)) {
                     land -= used;
                     break;
@@ -434,19 +435,20 @@ public class REFAIPlayer extends EuropeanAIPlayer {
             final Unit enemy = (ui.hasNext()) ? ui.next() : null;
             Tile start;
             if (enemy == null) {
-                Mission m = new UnitWanderHostileMission(aiMain, aiu, lb);
-                aiu.setMission(m);
-                start = Utils.getRandomMember(logger, "REF patrol entry",
-                                              entries, aiRandom);
-                u.setEntryLocation(start);
-                lb.add("\n  Patrol from ", start, " with ", u);
+                if ((m = getWanderHostileMission(aiu)) != null) {
+                    start = Utils.getRandomMember(logger, "REF patrol entry",
+                                                  entries, aiRandom);
+                    u.setEntryLocation(start);
+                    lb.add("\n  Patrol from ", start, " with ", m);
+                }
             } else {
-                Mission m = new UnitSeekAndDestroyMission(aiMain, aiu, enemy, lb );
-                aiu.setMission(m);
-                start = u.getBestEntryTile(enemy.getTile());
-                u.setEntryLocation(start);
-                entries.add(start);
-                lb.add("\n  Suppress ", enemy, " from ", start, " with ", u);
+                if ((m = getSeekAndDestroyMission(aiu, enemy)) != null) {
+                    start = u.getBestEntryTile(enemy.getTile());
+                    u.setEntryLocation(start);
+                    entries.add(start);
+                    lb.add("\n  Suppress ", enemy, " from ", start,
+                        " with ", m);
+                }
             }
         }
         lb.log(logger, Level.FINE);
@@ -472,18 +474,17 @@ public class REFAIPlayer extends EuropeanAIPlayer {
     @Override
     public void giveNormalMissions(LogBuilder lb) {
         // Give military missions to all REF units.
-        lb.add("Military mission changes: ");
+        lb.add("Military mission changes:");
         for (AIUnit aiu : getAIUnits()) {
             Unit u = aiu.getUnit();
             if (u.isDisposed() || u.isNaval() || aiu.hasMission()) continue;
             if (u.isOffensiveUnit()) {
                 Location target = UnitSeekAndDestroyMission.findTarget(aiu, 
                     seekAndDestroyRange, false);
-                if (target == null) {
-                    new UnitWanderHostileMission(getAIMain(), aiu, lb);
-                } else {
-                    new UnitSeekAndDestroyMission(getAIMain(), aiu, target, lb);
-                }
+                Mission m = (target == null)
+                    ? getWanderHostileMission(aiu)
+                    : getSeekAndDestroyMission(aiu, target);
+                lb.add(" ", m);
             }
         }
 

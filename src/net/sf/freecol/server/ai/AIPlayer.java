@@ -53,8 +53,11 @@ import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.Utils;
-import net.sf.freecol.server.ai.mission.DefendSettlementMission;
 import net.sf.freecol.server.ai.mission.Mission;
+import net.sf.freecol.server.ai.mission.DefendSettlementMission;
+import net.sf.freecol.server.ai.mission.IdleAtSettlementMission;
+import net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission;
+import net.sf.freecol.server.ai.mission.UnitWanderHostileMission;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.networking.DummyConnection;
 
@@ -392,6 +395,8 @@ public abstract class AIPlayer extends AIObject {
         return attacker.canAttack(defender);
     }
 
+    // Mission support
+
     /**
      * Log the missions of this player.
      *
@@ -423,6 +428,71 @@ public abstract class AIPlayer extends AIObject {
                     Utils.chop(ms, 16)));
             if (target != null) lb.add("->", target);
         }
+    }
+
+    /**
+     * Gets a new DefendSettlementMission for a unit.
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param target The <code>Settlement</code> to defend.
+     * @return A new mission, or null if impossible.
+     */
+    public Mission getDefendSettlementMission(AIUnit aiUnit,
+                                              Settlement target) {
+        return (DefendSettlementMission.invalidReason(aiUnit) != null) ? null
+            : new DefendSettlementMission(getAIMain(), aiUnit, target);
+    }
+
+    /**
+     * Gets a new IdleAtSettlementMission for a unit.
+     *
+     * @param aiUnit The <code>AIUnit</code> to use.
+     * @return A new mission, or null if impossible.
+     */
+    public Mission getIdleAtSettlementMission(AIUnit aiUnit) {
+        return (IdleAtSettlementMission.invalidReason(aiUnit) != null) ? null
+            : new IdleAtSettlementMission(getAIMain(), aiUnit);
+    }
+       
+    /**
+     * Gets a UnitSeekAndDestroyMission for a unit.
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param range A maximum range to search for a target within.
+     * @return A new mission, or null if impossible.
+     */
+    public Mission getSeekAndDestroyMission(AIUnit aiUnit, int range) {
+        Location loc = null;
+        if (UnitSeekAndDestroyMission.invalidReason(aiUnit) == null) {
+            loc = UnitSeekAndDestroyMission.findTarget(aiUnit, range, false);
+        }
+        return (loc == null) ? null
+            : getSeekAndDestroyMission(aiUnit, loc);
+    }
+
+    /**
+     * Gets a UnitSeekAndDestroyMission for a unit.
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param loc The target <code>Location</code>.
+     * @param lb A <code>LogBuilder</code> to log to.
+     * @return A new mission, or null if impossible.
+     */
+    public Mission getSeekAndDestroyMission(AIUnit aiUnit, Location loc) {
+        return (UnitSeekAndDestroyMission.invalidReason(aiUnit) != null
+            || loc == null) ? null
+            : new UnitSeekAndDestroyMission(getAIMain(), aiUnit, loc);
+    }
+
+    /**
+     * Gets a new UnitWanderHostileMission for a unit.
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @return A new mission, or null if impossible.
+     */
+    public Mission getWanderHostileMission(AIUnit aiUnit) {
+        return (UnitWanderHostileMission.invalidReason(aiUnit) != null) ? null
+            : new UnitWanderHostileMission(getAIMain(), aiUnit);
     }
 
     /**

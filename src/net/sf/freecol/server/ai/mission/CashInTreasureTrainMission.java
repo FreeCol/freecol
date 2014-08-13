@@ -68,11 +68,10 @@ public class CashInTreasureTrainMission extends Mission {
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
      * @param target The target <code>Location</code> for this mission.
-     * @param lb A <code>LogBuilder</code> to log to.
      */
     public CashInTreasureTrainMission(AIMain aiMain, AIUnit aiUnit,
-                                      Location target, LogBuilder lb) {
-        super(aiMain, aiUnit, target, lb);
+                                      Location target) {
+        super(aiMain, aiUnit, target);
     }
 
     /**

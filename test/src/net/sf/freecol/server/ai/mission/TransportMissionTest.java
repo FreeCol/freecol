@@ -104,7 +104,7 @@ public class TransportMissionTest extends FreeColTestCase {
         Unit privateer = new ServerUnit(game, tile2, french, privateerType);
 
         // assign transport mission to the ship
-        new TransportMission(aiMain, aiUnit, lb);
+        new TransportMission(aiMain, aiUnit);
 
         // Simulate the combat
         igc.combat(dutch, privateer, galleon,
@@ -141,7 +141,7 @@ public class TransportMissionTest extends FreeColTestCase {
         assertNotNull(aiUnit);
 
         // assign transport mission to the ship
-        TransportMission mission = new TransportMission(aiMain, aiUnit, lb);
+        TransportMission mission = new TransportMission(aiMain, aiUnit);
         TransportableAIObject goods = new AIGoods(aiMain, galleon, 
                                                   horsesType, 50, colonyTile);
         mission.queueTransportable(goods, false);
@@ -176,7 +176,7 @@ public class TransportMissionTest extends FreeColTestCase {
         assertNotNull(aiUnit);
 
         // assign transport mission to the ship
-        TransportMission mission = new TransportMission(aiMain, aiUnit, lb);
+        TransportMission mission = new TransportMission(aiMain, aiUnit);
         TransportableAIObject goods = new AIGoods(aiMain, galleon,
                                                   horsesType, 50, europe);
         assertTrue("Goods should queue",
@@ -216,7 +216,7 @@ public class TransportMissionTest extends FreeColTestCase {
         assertNotNull(aiUnit);
 
         // assign transport mission to the ship
-        TransportMission mission = new TransportMission(aiMain, aiUnit, lb);
+        TransportMission mission = new TransportMission(aiMain, aiUnit);
         TransportableAIObject goods = new AIGoods(aiMain, galleon,
                                                   horsesType, 50, colonyTile);
         goods.setTransportDestination(europe);
@@ -252,7 +252,7 @@ public class TransportMissionTest extends FreeColTestCase {
         assertNotNull(aiUnit);
 
         // assign transport mission to the ship
-        TransportMission mission = new TransportMission(aiMain, aiUnit, lb);
+        TransportMission mission = new TransportMission(aiMain, aiUnit);
 
         assertTrue("Setup error, player should not have colonies", dutch.getColonies().isEmpty());
 
@@ -268,7 +268,7 @@ public class TransportMissionTest extends FreeColTestCase {
         FreeColTestUtils.ColonyBuilder builder = FreeColTestUtils.getColonyBuilder();
         builder.colonyTile(colonyTile).initialColonists(1).player(dutch).build();
         assertFalse("Player should now have a colony", dutch.getColonies().isEmpty());
-        mission = new TransportMission(aiMain, aiUnit, lb);
+        mission = new TransportMission(aiMain, aiUnit);
 
         // Exercise
         dest = mission.getTarget();
@@ -298,7 +298,7 @@ public class TransportMissionTest extends FreeColTestCase {
         wagon.setMission(null);
         assertNull("Transport mission should be valid.",
                    TransportMission.invalidReason(wagon));
-        TransportMission mission = new TransportMission(aiMain, wagon, lb);
+        TransportMission mission = new TransportMission(aiMain, wagon);
 
         Location dest = mission.getTarget();
         assertEquals("Destination should be colony one.", one, dest);

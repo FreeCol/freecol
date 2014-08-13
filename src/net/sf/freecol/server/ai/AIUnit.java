@@ -161,7 +161,7 @@ public class AIUnit extends TransportableAIObject {
      * @return The <code>Unit</code>.
      */
     public final Unit getUnit() {
-        return unit;
+        return this.unit;
     }
 
     /**
@@ -170,7 +170,7 @@ public class AIUnit extends TransportableAIObject {
      * @return True if this unit has a mission.
      */
     public final boolean hasMission() {
-        return mission != null;
+        return this.mission != null;
     }
 
     /**
@@ -179,7 +179,7 @@ public class AIUnit extends TransportableAIObject {
      * @return The <code>Mission</code>.
      */
     public final Mission getMission() {
-        return mission;
+        return this.mission;
     }
 
     /**
@@ -197,7 +197,7 @@ public class AIUnit extends TransportableAIObject {
      * @return The goal of this AI unit.
      */
     public final Goal getGoal() {
-        return goal;
+        return this.goal;
     }
 
     /**
@@ -323,9 +323,8 @@ public class AIUnit extends TransportableAIObject {
      *     given class.
      */
     public <T extends Mission> T getMission(Class<T> returnClass) {
-        Mission m = getMission();
         try {
-            return returnClass.cast(m);
+            return returnClass.cast(this.mission);
         } catch (ClassCastException cce) {
             return null;
         }
@@ -340,25 +339,25 @@ public class AIUnit extends TransportableAIObject {
      * @param lb A <code>LogBuilder</code> to log to.
      */
     public Mission doMission(LogBuilder lb) {
-        return (mission != null) ? mission.doMission(lb) : null;
+        if (this.mission == null) return null;
+        Mission m = this.mission.doMission(lb);
+        if (m != this.mission) changeMission(m);
+        return m;
     }
 
     /**
      * Change the mission of a unit.
      *
      * @param mission The new <code>Mission</code>.
-     * @param lb A <code>LogBuilder</code> to log to.
      */
-    public void changeMission(Mission mission, LogBuilder lb) {
+    public void changeMission(Mission mission) {
         if (this.mission == mission) return;
         Location oldTarget;
 
         if (this.mission == null) {
             oldTarget = null;
-            lb.add(" ", unit, " replaced null with ", mission);
         } else {
             oldTarget = this.mission.getTarget();
-            lb.add(" ", unit, " replaced ", this.mission, " with ", mission);
             this.mission.dispose();
             this.mission = null;
         }
@@ -379,27 +378,18 @@ public class AIUnit extends TransportableAIObject {
                     clear = true;
                 } else if (oldTarget == mission.getTarget()) {
                     clear = false;
-                    lb.add(" (transport preserved)");
                 } else if (tm.requeueTransportable(this)) {
                     clear = false;
-                    lb.add(" (transport requeued)");
                 } else {
                     clear = true;
                 }
                 if (clear) {
                     tm.removeTransportable(this);
-                    lb.add(" (transport removed)");
                 }
             }
             if (clear) changeTransport(null);
         }
-        if (clear && unit.isOnCarrier()) {
-            if (leaveTransport()) {
-                lb.add("(disembarked)");
-            } else {
-                lb.add("(stuck on", unit.getLocation(), ")");
-            }
-        }
+        if (clear && unit.isOnCarrier()) leaveTransport();
         if (mission != null) {
             setTransportPriority(mission.getBaseTransportPriority());
         }

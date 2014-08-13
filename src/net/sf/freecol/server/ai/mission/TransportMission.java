@@ -108,10 +108,15 @@ public class TransportMission extends Mission {
      *
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
-     * @param lb A <code>LogBuilder</code> to log to.
      */
-    public TransportMission(AIMain aiMain, AIUnit aiUnit, LogBuilder lb) {
-        super(aiMain, aiUnit, aiUnit.getTrivialTarget(), lb);
+    public TransportMission(AIMain aiMain, AIUnit aiUnit) {
+        super(aiMain, aiUnit, aiUnit.getTrivialTarget());
+
+        for (Unit u : getUnit().getUnitList()) {
+            AIUnit aiu = getAIMain().getAIUnit(u);
+            if (aiu == null) continue;
+            queueTransportable(aiu, false);
+        }
     }
 
     /**
@@ -684,8 +689,9 @@ public class TransportMission extends Mission {
         if (t instanceof AIUnit) {
             // Try giving the unit a new mission (may well call
             // getBestWorkerWish at some point).
-            if (euaip.getSimpleMission((AIUnit)t, lb) != null) {
-                lb.add(", ");
+            Mission m = euaip.getSimpleMission((AIUnit)t);
+            if (m != null) {
+                lb.add(", ", m);
                 return true;
             }
 

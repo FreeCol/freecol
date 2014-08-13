@@ -71,11 +71,9 @@ public class IndianBringGiftMission extends Mission {
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
      * @param target The <code>Colony</code> receiving the gift.
-     * @param lb A <code>LogBuilder</code> to log to.
      */
-    public IndianBringGiftMission(AIMain aiMain, AIUnit aiUnit,
-                                  Colony target, LogBuilder lb) {
-        super(aiMain, aiUnit, target, lb);
+    public IndianBringGiftMission(AIMain aiMain, AIUnit aiUnit, Colony target) {
+        super(aiMain, aiUnit, target);
 
         this.completed = false;
     }

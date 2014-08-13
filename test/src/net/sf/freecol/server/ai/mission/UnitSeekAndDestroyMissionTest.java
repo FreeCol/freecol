@@ -75,7 +75,7 @@ public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
         player2.setStance(player1, Stance.WAR);
 
         UnitSeekAndDestroyMission mission
-            = new UnitSeekAndDestroyMission(aiMain, aiUnit, defender, lb);
+            = new UnitSeekAndDestroyMission(aiMain, aiUnit, defender);
         assertTrue("Attacker should have a UnitSeekAndDestroyMission",
             aiUnit.hasMission(UnitSeekAndDestroyMission.class));
 
@@ -112,7 +112,7 @@ public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
         player2.setStance(player1, Stance.WAR);
 
         UnitSeekAndDestroyMission mission
-            = new UnitSeekAndDestroyMission(aiMain, aiUnit, defender, lb);
+            = new UnitSeekAndDestroyMission(aiMain, aiUnit, defender);
         assertTrue("Attacker should have a UnitSeekAndDestroyMission",
                    aiUnit.hasMission(UnitSeekAndDestroyMission.class));
         assertTrue("UnitSeekAndDestroyMission should be valid",
