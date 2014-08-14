@@ -68,7 +68,6 @@ public class WishRealizationMission extends Mission {
         this.wish = wish;
         logger.finest(tag + " starting with destination "
             + wish.getDestination() + ": " + this);
-        uninitialized = false;
     }
 
     /**
@@ -87,7 +86,6 @@ public class WishRealizationMission extends Mission {
         super(aiMain, aiUnit);
 
         readFromXML(xr);
-        uninitialized = getAIUnit() == null;
     }
 
 

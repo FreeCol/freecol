@@ -76,7 +76,6 @@ public class CashInTreasureTrainMission extends Mission {
         setTarget(target);
         logger.finest(tag + " starts at " + aiUnit.getUnit().getLocation()
             + " with target " + target + ": " + this);
-        uninitialized = false;
     }
 
     /**

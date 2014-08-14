@@ -122,7 +122,6 @@ public class TransportMission extends Mission {
         if (target == null) target = aiUnit.getTrivialTarget();
         lb.add(" begins: ", toFullString());
         lb.log(logger, Level.FINEST);
-        uninitialized = false;
     }
 
     /**
@@ -140,7 +139,6 @@ public class TransportMission extends Mission {
         super(aiMain, aiUnit);
 
         readFromXML(xr);
-        uninitialized = getAIUnit() == null;
     }
 
 

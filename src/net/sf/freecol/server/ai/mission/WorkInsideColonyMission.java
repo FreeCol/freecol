@@ -62,7 +62,6 @@ public class WorkInsideColonyMission extends Mission {
         super(aiMain, aiUnit);
 
         this.aiColony = aiColony;
-        uninitialized = false;
     }
 
     /**
@@ -81,7 +80,6 @@ public class WorkInsideColonyMission extends Mission {
         super(aiMain, aiUnit);
 
         readFromXML(xr);
-        uninitialized = getAIUnit() == null;
     }
 
 

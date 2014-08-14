@@ -85,7 +85,6 @@ public class PrivateerMission extends Mission {
         setTarget(target);
         Unit unit = aiUnit.getUnit();
         logger.finest(tag + " begins at " + unit.getLocation() + ": " + this);
-        uninitialized = false;
     }
 
     /**
@@ -104,7 +103,6 @@ public class PrivateerMission extends Mission {
         super(aiMain, aiUnit);
 
         readFromXML(xr);
-        uninitialized = getAIUnit() == null;
     }
 
 

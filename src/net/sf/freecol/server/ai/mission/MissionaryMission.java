@@ -88,7 +88,6 @@ public class MissionaryMission extends Mission {
         setTarget(target);
         logger.finest(tag + " starts at " + aiUnit.getUnit().getLocation()
             + " with target " + getTarget() + ": " + this);
-        uninitialized = false;
     }
 
     /**
@@ -107,7 +106,6 @@ public class MissionaryMission extends Mission {
         super(aiMain, aiUnit);
 
         readFromXML(xr);
-        uninitialized = getAIUnit() == null;
     }
 
 

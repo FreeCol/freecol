@@ -83,7 +83,6 @@ public class BuildColonyMission extends Mission {
         setTarget(target);
         logger.finest(tag + " starts with target " + target
             + " and value " + colonyValue + ": " + this);
-        uninitialized = false;
     }
 
     /**
@@ -101,7 +100,6 @@ public class BuildColonyMission extends Mission {
         super(aiMain, aiUnit);
 
         readFromXML(xr);
-        uninitialized = getAIUnit() == null;
     }
 
 

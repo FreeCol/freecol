@@ -51,8 +51,6 @@ public class UnitWanderMission extends Mission {
      */
     public UnitWanderMission(AIMain aiMain, AIUnit aiUnit) {
         super(aiMain, aiUnit);
-
-        uninitialized = false;
     }
 
     /**
@@ -71,7 +69,6 @@ public class UnitWanderMission extends Mission {
         super(aiMain, aiUnit);
 
         readFromXML(xr);
-        uninitialized = getAIUnit() == null;
     }
 
 

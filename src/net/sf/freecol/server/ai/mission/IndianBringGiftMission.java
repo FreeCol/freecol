@@ -84,7 +84,6 @@ public class IndianBringGiftMission extends Mission {
         if (!unit.getOwner().isIndian() || !unit.canCarryGoods()) {
             throw new IllegalArgumentException("Unsuitable unit: " + unit);
         }
-        uninitialized = false;
     }
 
     /**
@@ -102,7 +101,6 @@ public class IndianBringGiftMission extends Mission {
         super(aiMain, aiUnit);
 
         readFromXML(xr);
-        uninitialized = getAIUnit() == null;
     }
 
 

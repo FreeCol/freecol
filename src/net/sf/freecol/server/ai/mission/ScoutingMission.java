@@ -80,7 +80,6 @@ public class ScoutingMission extends Mission {
         setTarget(loc);
         logger.finest(tag + " starts at " + aiUnit.getUnit().getLocation()
             + " with target " + target + ": " + this);
-        uninitialized = false;
     }
 
     /**
@@ -97,7 +96,6 @@ public class ScoutingMission extends Mission {
         super(aiMain, aiUnit);
 
         readFromXML(xr);
-        uninitialized = getAIUnit() == null;
     }
 
 

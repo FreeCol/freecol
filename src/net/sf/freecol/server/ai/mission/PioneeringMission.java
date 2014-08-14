@@ -95,7 +95,6 @@ public class PioneeringMission extends Mission {
 
         setTarget(loc);
         logger.finest(tag + " starts with target " + getTarget() + ": " + this);
-        uninitialized = false;
     }
 
     /**
@@ -114,7 +113,6 @@ public class PioneeringMission extends Mission {
         super(aiMain, aiUnit);
 
         readFromXML(xr);
-        uninitialized = getAIUnit() == null;
     }
 
 

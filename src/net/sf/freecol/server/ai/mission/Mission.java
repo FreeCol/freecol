@@ -103,6 +103,7 @@ public abstract class Mission extends AIObject {
         super(aiMain);
 
         this.aiUnit = aiUnit;
+        this.uninitialized = aiUnit == null;
     }
 
 
@@ -114,15 +115,6 @@ public abstract class Mission extends AIObject {
     public final AIUnit getAIUnit() {
         return aiUnit;
     }
-
-    /**
-     * Sets the AI-unit this mission has been created for.
-     *
-     * @param aiUnit The <code>AIUnit</code>.
-    protected void setAIUnit(AIUnit aiUnit) {
-        this.aiUnit = aiUnit;
-    }
-     */
 
     /**
      * Gets the unit this mission has been created for.

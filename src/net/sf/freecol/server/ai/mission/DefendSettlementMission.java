@@ -76,7 +76,6 @@ public class DefendSettlementMission extends Mission {
 
         setTarget(settlement);
         logger.finest(tag + " started with " + target + ": " + this);
-        uninitialized = false;
     }
 
     /**
@@ -95,7 +94,6 @@ public class DefendSettlementMission extends Mission {
         super(aiMain, aiUnit);
 
         readFromXML(xr);
-        uninitialized = getAIUnit() == null;
     }
 
 

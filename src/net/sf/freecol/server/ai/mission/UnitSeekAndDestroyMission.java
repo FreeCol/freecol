@@ -87,7 +87,6 @@ public class UnitSeekAndDestroyMission extends Mission {
 
         setTarget(target);
         logger.finest(tag + " begins with target " + target + ": " + this);
-        uninitialized = false;
     }
 
     /**
@@ -106,7 +105,6 @@ public class UnitSeekAndDestroyMission extends Mission {
         super(aiMain, aiUnit);
 
         readFromXML(xr);
-        uninitialized = getAIUnit() == null;
     }
 
 

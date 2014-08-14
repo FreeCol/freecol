@@ -55,8 +55,6 @@ public class IdleAtSettlementMission extends Mission {
      */
     public IdleAtSettlementMission(AIMain aiMain, AIUnit aiUnit) {
         super(aiMain, aiUnit);
-
-        uninitialized = false;
     }
 
     /**
