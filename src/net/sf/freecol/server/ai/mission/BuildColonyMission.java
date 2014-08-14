@@ -275,11 +275,15 @@ public class BuildColonyMission extends Mission {
      * @return A reason for mission invalidity, or null if none found.
      */
     private static String invalidTileReason(AIUnit aiUnit, Tile tile) {
-        Player.NoClaimReason reason = aiUnit.getUnit().getOwner()
-            .canClaimToFoundSettlementReason(tile);
+        Player owner = aiUnit.getUnit().getOwner();
+        Player.NoClaimReason reason
+            = owner.canClaimToFoundSettlementReason(tile);
         switch (reason) {
         case NONE: case NATIVES:
             return null;
+        case SETTLEMENT: // Continue to our settlements
+            if (owner.owns(tile.getSettlement())) return null;
+            break;
         default:
             break;
         }
