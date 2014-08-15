@@ -425,17 +425,6 @@ public abstract class Mission extends AIObject {
     }
 
     /**
-     * Get a trivial target, usually a safe nearby settlement or Europe.
-     *
-     * @return A trivial target, or null if none found.
-     */
-    public Location getTrivialTarget() {
-        final Unit unit = aiUnit.getUnit();
-        PathNode path = unit.getTrivialPath();
-        return (path == null) ? null : path.getLastNode().getLocation();
-    }
-
-    /**
      * Moves a unit one step randomly.
      *
      * @param logMe A string to log the random number generation with.

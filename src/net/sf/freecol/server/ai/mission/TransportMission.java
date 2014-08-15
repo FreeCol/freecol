@@ -119,12 +119,7 @@ public class TransportMission extends Mission {
             if (aiu == null) continue;
             queueTransportable(aiu, false);
         }
-        if (target == null) {
-            PathNode path = getUnit().getTrivialPath();
-            if (path != null) {
-                setTarget(upLoc(path.getLastNode().getLocation()));
-            }
-        }
+        if (target == null) target = aiUnit.getTrivialTarget();
         lb.add(" begins: ", toFullString());
         lb.log(logger, Level.FINEST);
         uninitialized = false;
@@ -375,6 +370,7 @@ public class TransportMission extends Mission {
                     break;
                 }
             }
+            if (next == null) next = getAIUnit().getTrivialTarget();
         }
         setTarget(upLoc(next));
     }

@@ -287,6 +287,16 @@ public class AIUnit extends TransportableAIObject {
     }
 
     /**
+     * Get a trivial target, usually a safe nearby settlement or Europe.
+     *
+     * @return A trivial target, or null if none found.
+     */
+    public Location getTrivialTarget() {
+        PathNode path = unit.getTrivialPath();
+        return (path == null) ? null : upLoc(path.getLastNode().getLocation());
+    }
+
+    /**
      * Is this AI unit carrying any cargo (units or goods).
      *
      * @return True if the unit has cargo aboard.
