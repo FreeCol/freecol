@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.Unit;
@@ -124,22 +125,23 @@ public class WorkInsideColonyMission extends Mission {
      * {@inheritDoc}
      */
     public Location getTarget() {
-        return (aiColony == null || aiColony.getColony() == null) ? null
-            : aiColony.getColony();
+        return aiColony.getColony();
     }
 
     /**
      * {@inheritDoc}
      */
     public void setTarget(Location target) {
-        throw new IllegalStateException("Target is fixed.");
+        if (target instanceof Colony) {
+            this.aiColony = getAIMain().getAIColony((Colony)target);
+        }
     }
 
     /**
      * {@inheritDoc}
      */
     public Location findTarget() {
-        throw new IllegalStateException("Target is fixed.");
+        return getTarget();
     }
 
     /**

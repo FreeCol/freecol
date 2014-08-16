@@ -139,14 +139,14 @@ public class WishRealizationMission extends Mission {
      * {@inheritDoc}
      */
     public void setTarget(Location target) {
-        throw new IllegalStateException("Target is fixed.");
+        // Ignored, target is set by wish
     }
 
     /**
      * {@inheritDoc}
      */
     public Location findTarget() {
-        throw new IllegalStateException("Target is fixed.");
+        return getTarget();
     }
 
     /**
