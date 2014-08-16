@@ -75,8 +75,7 @@ public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
         player2.setStance(player1, Stance.WAR);
 
         UnitSeekAndDestroyMission mission
-            = new UnitSeekAndDestroyMission(aiMain,aiUnit,defender);
-        aiUnit.changeMission(mission, lb);
+            = new UnitSeekAndDestroyMission(aiMain, aiUnit, defender, lb);
         assertTrue("Attacker should have a UnitSeekAndDestroyMission",
             aiUnit.hasMission(UnitSeekAndDestroyMission.class));
 
@@ -112,15 +111,16 @@ public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
         player1.setStance(player2, Stance.WAR);
         player2.setStance(player1, Stance.WAR);
 
-        UnitSeekAndDestroyMission mission = new UnitSeekAndDestroyMission(aiMain,aiUnit,defender);
-        aiUnit.changeMission(mission, lb);
-        boolean isSeekAndDestroyMission = aiUnit.hasMission(UnitSeekAndDestroyMission.class);
-        assertTrue("Attacker should have a UnitSeekAndDestroyMission", isSeekAndDestroyMission);
-        assertTrue("UnitSeekAndDestroyMission should be valid", aiUnit.getMission().isValid());
+        UnitSeekAndDestroyMission mission
+            = new UnitSeekAndDestroyMission(aiMain, aiUnit, defender, lb);
+        assertTrue("Attacker should have a UnitSeekAndDestroyMission",
+                   aiUnit.hasMission(UnitSeekAndDestroyMission.class));
+        assertTrue("UnitSeekAndDestroyMission should be valid",
+                   aiUnit.getMission().isValid());
 
         // add colony to the defender tile, to simulate the unit entering it
         getStandardColony(1, defenderTile.getX(),defenderTile.getY());
-        String errMsg = "UnitSeekAndDestroyMission should NOT be valid anymore, defender in colony";
-        assertFalse(errMsg, aiUnit.getMission().isValid());
+        assertFalse("UnitSeekAndDestroyMission should NOT be valid anymore, defender in colony",
+            aiUnit.getMission().isValid());
     }
 }

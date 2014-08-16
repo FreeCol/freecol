@@ -100,7 +100,7 @@ public class TransportMission extends Mission {
     private final List<Cargo> cargoes = new ArrayList<Cargo>();
 
     /** The current target location to travel to. */
-    private Location target = null;
+    private Location target;
 
 
     /**
@@ -108,20 +108,10 @@ public class TransportMission extends Mission {
      *
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
+     * @param lb A <code>LogBuilder</code> to log to.
      */
-    public TransportMission(AIMain aiMain, AIUnit aiUnit) {
-        super(aiMain, aiUnit);
-
-        LogBuilder lb = new LogBuilder(256);
-        lb.add(tag);
-        for (Unit u : getUnit().getUnitList()) {
-            AIUnit aiu = getAIMain().getAIUnit(u);
-            if (aiu == null) continue;
-            queueTransportable(aiu, false);
-        }
-        if (target == null) target = aiUnit.getTrivialTarget();
-        lb.add(" begins: ", toFullString());
-        lb.log(logger, Level.FINEST);
+    public TransportMission(AIMain aiMain, AIUnit aiUnit, LogBuilder lb) {
+        super(aiMain, aiUnit, aiUnit.getTrivialTarget(), lb);
     }
 
     /**
@@ -692,25 +682,10 @@ public class TransportMission extends Mission {
         }
             
         if (t instanceof AIUnit) {
-            final AIUnit aiu = (AIUnit)t;
-            final Unit u = aiu.getUnit();
-
-            // Look for a scheduled location that wants this unit
-            UnitType type = u.getType();
-            Mission m = null;
-            for (Location loc : locations) {
-                for (WorkerWish ww : euaip.getWorkerWishesAt(loc, type)) {
-                    if ((m = euaip.consumeWorkerWish(aiu, ww)) != null) {
-                        lb.add(", ");aiu.changeMission(m, lb);
-                        return true;
-                    }
-                }
-            }
-     
             // Try giving the unit a new mission (may well call
             // getBestWorkerWish at some point).
-            if ((m = euaip.getSimpleMission(aiu)) != null) {
-                lb.add(", ");aiu.changeMission(m, lb);
+            if (euaip.getSimpleMission((AIUnit)t, lb) != null) {
+                lb.add(", ");
                 return true;
             }
 

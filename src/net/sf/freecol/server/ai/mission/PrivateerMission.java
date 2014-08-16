@@ -59,18 +59,8 @@ public class PrivateerMission extends Mission {
      * The target for this mission.  Either a port location to drop off
      * plunder, or a unit to attack.
      */
-    private Location target = null;
+    private Location target;
 
-
-    /**
-     * Creates a mission for the given <code>AIUnit</code>.
-     *
-     * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission is created for.
-     */
-    public PrivateerMission(AIMain aiMain, AIUnit aiUnit) {
-        this(aiMain, aiUnit, findTarget(aiUnit, 8, true));
-    }
 
     /**
      * Creates a mission for the given <code>AIUnit</code>.
@@ -78,13 +68,11 @@ public class PrivateerMission extends Mission {
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
      * @param target The target <code>Location</code> for this mission.
+     * @param lb A <code>LogBuilder</code> to log to.
      */
-    public PrivateerMission(AIMain aiMain, AIUnit aiUnit, Location target) {
-        super(aiMain, aiUnit);
-
-        setTarget(target);
-        Unit unit = aiUnit.getUnit();
-        logger.finest(tag + " begins at " + unit.getLocation() + ": " + this);
+    public PrivateerMission(AIMain aiMain, AIUnit aiUnit, Location target,
+                            LogBuilder lb) {
+        super(aiMain, aiUnit, target, lb);
     }
 
     /**
@@ -373,8 +361,8 @@ public class PrivateerMission extends Mission {
         final AIMain aiMain = getAIMain();
         final AIUnit aiUnit = getAIUnit();
         if (aiUnit.hasCargo()) { // Deliver the goods
-            lb.add(", should transport.");
-            return new TransportMission(aiMain, aiUnit);
+            lb.add(", should transport, ");
+            return new TransportMission(aiMain, aiUnit, lb);
         }
 
         String reason = invalidReason();

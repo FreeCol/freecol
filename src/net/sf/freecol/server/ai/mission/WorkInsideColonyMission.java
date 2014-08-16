@@ -53,16 +53,13 @@ public class WorkInsideColonyMission extends Mission {
      * Creates a mission for the given <code>AIUnit</code>.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission
-     *        is created for.
+     * @param aiUnit The <code>AIUnit</code> this mission is created for.
      * @param aiColony The <code>AIColony</code> the unit should be
-     *        working in.
+     *     working in.
      */
     public WorkInsideColonyMission(AIMain aiMain, AIUnit aiUnit,
-                                   AIColony aiColony) {
-        super(aiMain, aiUnit);
-
-        this.aiColony = aiColony;
+                                   AIColony aiColony, LogBuilder lb) {
+        super(aiMain, aiUnit, aiColony.getColony(), lb);
     }
 
     /**

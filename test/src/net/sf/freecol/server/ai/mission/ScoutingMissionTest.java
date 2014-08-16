@@ -46,6 +46,8 @@ public class ScoutingMissionTest extends FreeColTestCase {
     private static final UnitType scoutType
         = spec().getUnitType("model.unit.seasonedScout");
 
+    private static final LogBuilder lb = new LogBuilder(0);
+
 
     @Override
     public void tearDown() throws Exception {
@@ -90,8 +92,7 @@ public class ScoutingMissionTest extends FreeColTestCase {
         assertEquals("Scout should find the Inca settlement", is,
             ScoutingMission.findTarget(aiUnit, 10, false));
 
-        aiUnit.changeMission(new ScoutingMission(aiMain, aiUnit, is),
-                             new LogBuilder(0));
+        new ScoutingMission(aiMain, aiUnit, is, lb);
         assertTrue("Scout should have been assigned a Scouting mission",
             aiUnit.hasMission(ScoutingMission.class));
         assertTrue("Scouting mission should be valid",

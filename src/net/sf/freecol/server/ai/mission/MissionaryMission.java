@@ -62,7 +62,7 @@ public class MissionaryMission extends Mission {
      * Either an IndianSettlement, or a backup Colony to head for before
      * retargeting.
      */
-    private Location target = null;
+    private Location target;
 
 
     /**
@@ -70,10 +70,10 @@ public class MissionaryMission extends Mission {
      *
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
-     */
     public MissionaryMission(AIMain aiMain, AIUnit aiUnit) {
         this(aiMain, aiUnit, findTarget(aiUnit, 20, true));
     }
+     */
 
     /**
      * Creates a missionary mission for the given <code>AIUnit</code>.
@@ -81,13 +81,11 @@ public class MissionaryMission extends Mission {
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
      * @param target The target <code>Location</code> for this mission.
+     * @param lb A <code>LogBuilder</code> to log to.
      */
-    public MissionaryMission(AIMain aiMain, AIUnit aiUnit, Location target) {
-        super(aiMain, aiUnit);
-
-        setTarget(target);
-        logger.finest(tag + " starts at " + aiUnit.getUnit().getLocation()
-            + " with target " + getTarget() + ": " + this);
+    public MissionaryMission(AIMain aiMain, AIUnit aiUnit, Location target,
+                             LogBuilder lb) {
+        super(aiMain, aiUnit, target, lb);
     }
 
     /**

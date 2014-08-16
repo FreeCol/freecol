@@ -50,11 +50,12 @@ public class UnitWanderHostileMission extends Mission {
      * Creates a mission for the given <code>AIUnit</code>.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission
-     *        is created for.
+     * @param aiUnit The <code>AIUnit</code> this mission is created for.
+     * @param lb A <code>LogBuilder</code> to log to.
      */
-    public UnitWanderHostileMission(AIMain aiMain, AIUnit aiUnit) {
-        super(aiMain, aiUnit);
+    public UnitWanderHostileMission(AIMain aiMain, AIUnit aiUnit,
+                                    LogBuilder lb) {
+        super(aiMain, aiUnit, null, lb);
     }
 
     /**
@@ -175,15 +176,13 @@ public class UnitWanderHostileMission extends Mission {
         int check = 0, checkTurns = Utils.randomInt(logger, "Hostile",
                                                     getAIRandom(), 4);
         Direction d = Direction.getRandomDirection(tag, getAIRandom());
-        Mission m;
         while (unit.getMovesLeft() > 0) {
             // Every checkTurns, look for a target of opportunity.
             if (check == 0) {
                 Location loc = UnitSeekAndDestroyMission.findTarget(aiUnit, 1,
                                                                     false);
                 if (loc != null) {
-                    lb.add(", acquired target ", loc, ".");
-                    return new UnitSeekAndDestroyMission(aiMain, aiUnit, loc);
+                    return new UnitSeekAndDestroyMission(aiMain, aiUnit, loc, lb);
                 }
                 check = checkTurns;
             } else check--;

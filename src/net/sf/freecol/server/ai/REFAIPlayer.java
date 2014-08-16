@@ -383,13 +383,12 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                 for (Unit u : aiu.getUnit().getUnitList()) {
                     AIUnit laiu = aiMain.getAIUnit(u);
                     Mission m = new UnitSeekAndDestroyMission(aiMain, laiu,
-                                                              t.colony);
-                    laiu.setMission(m);
+                                                              t.colony, lb);
                     used++;
                     lb.add(" ", u);
                 }
                 lb.add(" ]");
-                TransportMission tm = new TransportMission(aiMain, aiu);
+                TransportMission tm = new TransportMission(aiMain, aiu, lb);
                 aiu.setMission(tm);
                 if (i < n-1 && used >= (int)Math.floor(land * 0.66)) {
                     land -= used;
@@ -435,14 +434,14 @@ public class REFAIPlayer extends EuropeanAIPlayer {
             final Unit enemy = (ui.hasNext()) ? ui.next() : null;
             Tile start;
             if (enemy == null) {
-                Mission m = new UnitWanderHostileMission(aiMain, aiu);
+                Mission m = new UnitWanderHostileMission(aiMain, aiu, lb);
                 aiu.setMission(m);
                 start = Utils.getRandomMember(logger, "REF patrol entry",
                                               entries, aiRandom);
                 u.setEntryLocation(start);
                 lb.add("\n  Patrol from ", start, " with ", u);
             } else {
-                Mission m = new UnitSeekAndDestroyMission(aiMain, aiu, enemy);
+                Mission m = new UnitSeekAndDestroyMission(aiMain, aiu, enemy, lb );
                 aiu.setMission(m);
                 start = u.getBestEntryTile(enemy.getTile());
                 u.setEntryLocation(start);
@@ -481,12 +480,9 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                 Location target = UnitSeekAndDestroyMission.findTarget(aiu, 
                     seekAndDestroyRange, false);
                 if (target == null) {
-                    Mission m = new UnitWanderHostileMission(getAIMain(), aiu);
-                    aiu.changeMission(m, lb);
+                    new UnitWanderHostileMission(getAIMain(), aiu, lb);
                 } else {
-                    Mission m = new UnitSeekAndDestroyMission(getAIMain(), aiu,
-                                                              target);
-                    aiu.changeMission(m, lb);
+                    new UnitSeekAndDestroyMission(getAIMain(), aiu, target, lb);
                 }
             }
         }

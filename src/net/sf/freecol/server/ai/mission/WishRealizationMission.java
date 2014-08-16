@@ -57,17 +57,16 @@ public class WishRealizationMission extends Mission {
      * Creates a mission for the given <code>AIUnit</code>.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission
-     *        is created for.
+     * @param aiUnit The <code>AIUnit</code> this mission is created for.
      * @param wish The <code>Wish</code> which will be realized by
-     *        the unit and this mission.
+     *     the unit and this mission.
+     * @param lb A <code>LogBuilder</code> to log to.
      */
-    public WishRealizationMission(AIMain aiMain, AIUnit aiUnit, Wish wish) {
-        super(aiMain, aiUnit);
+    public WishRealizationMission(AIMain aiMain, AIUnit aiUnit, Wish wish,
+                                  LogBuilder lb) {
+        super(aiMain, aiUnit, wish.getDestination(), lb);
 
         this.wish = wish;
-        logger.finest(tag + " starting with destination "
-            + wish.getDestination() + ": " + this);
     }
 
     /**
@@ -193,12 +192,12 @@ public class WishRealizationMission extends Mission {
             // Replace the mission, with a defensive one if this is a
             // military unit or a simple working one if not.
             if (unit.getType().isOffensive()) {
-                lbDone(lb, " ready to defend ", colony);
-                return new DefendSettlementMission(aiMain, aiUnit, colony);
+                lbDone(lb, " ready to defend, ");
+                return new DefendSettlementMission(aiMain, aiUnit, colony, lb);
             } else {                
                 aiColony.requestRearrange();
-                lbDone(lb, " ready to work at ", colony);
-                return new WorkInsideColonyMission(aiMain, aiUnit, aiColony);
+                lbDone(lb, " ready to work, ");
+                return new WorkInsideColonyMission(aiMain, aiUnit, aiColony, lb);
             }
         } else {
             lbFail(lb, " broken wish: ", wish);

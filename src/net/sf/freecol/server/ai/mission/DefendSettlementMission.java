@@ -59,7 +59,7 @@ public class DefendSettlementMission extends Mission {
     private static int MAX_TURNS = 20;
 
     /** The settlement to be protected. */
-    private Location target = null;
+    private Location target;
 
 
     /**
@@ -69,13 +69,11 @@ public class DefendSettlementMission extends Mission {
      * @param aiUnit The <code>AIUnit</code> this mission
      *        is created for.
      * @param settlement The <code>Settlement</code> to defend.
+     * @param lb A <code>LogBuilder</code> to log to.
      */
     public DefendSettlementMission(AIMain aiMain, AIUnit aiUnit,
-                                   Settlement settlement) {
-        super(aiMain, aiUnit);
-
-        setTarget(settlement);
-        logger.finest(tag + " started with " + target + ": " + this);
+                                   Settlement settlement, LogBuilder lb) {
+        super(aiMain, aiUnit, settlement, lb);
     }
 
     /**
@@ -333,7 +331,7 @@ public class DefendSettlementMission extends Mission {
                 || (unit.isPerson() && colony.getUnitCount() <= 1)) {
                 lb.add(" bolster ", colony, ".");
                 return new WorkInsideColonyMission(aiMain, aiUnit,
-                    aiMain.getAIColony(colony));
+                    aiMain.getAIColony(colony), lb);
             }
         }
 

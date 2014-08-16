@@ -59,7 +59,7 @@ public class CashInTreasureTrainMission extends Mission {
      * The location to cash this treasure train in at, either a Colony
      * or Europe.
      */
-    private Location target = null;
+    private Location target;
 
 
     /**
@@ -68,14 +68,11 @@ public class CashInTreasureTrainMission extends Mission {
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
      * @param target The target <code>Location</code> for this mission.
+     * @param lb A <code>LogBuilder</code> to log to.
      */
     public CashInTreasureTrainMission(AIMain aiMain, AIUnit aiUnit,
-                                      Location target) {
-        super(aiMain, aiUnit);
-
-        setTarget(target);
-        logger.finest(tag + " starts at " + aiUnit.getUnit().getLocation()
-            + " with target " + target + ": " + this);
+                                      Location target, LogBuilder lb) {
+        super(aiMain, aiUnit, target, lb);
     }
 
     /**

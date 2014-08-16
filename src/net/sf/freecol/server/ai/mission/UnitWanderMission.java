@@ -46,11 +46,11 @@ public class UnitWanderMission extends Mission {
      * Creates a mission for the given <code>AIUnit</code>.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission
-     *        is created for.
+     * @param aiUnit The <code>AIUnit</code> this mission is created for.
+     * @param lb A <code>LogBuilder</code> to log to.
      */
-    public UnitWanderMission(AIMain aiMain, AIUnit aiUnit) {
-        super(aiMain, aiUnit);
+    public UnitWanderMission(AIMain aiMain, AIUnit aiUnit, LogBuilder lb) {
+        super(aiMain, aiUnit, null, lb);
     }
 
     /**

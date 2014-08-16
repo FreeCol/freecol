@@ -58,10 +58,8 @@ public class IndianBringGiftMission extends Mission {
     /** The tag for this mission. */
     private static final String tag = "AI native gifter";
 
-    /**
-     * The Colony to receive the gift.
-     */
-    private Location target = null;
+    /** The Colony to receive the gift. */
+    private Location target;
 
     /** Decides whether this mission has been completed or not. */
     private boolean completed;
@@ -73,17 +71,13 @@ public class IndianBringGiftMission extends Mission {
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
      * @param target The <code>Colony</code> receiving the gift.
+     * @param lb A <code>LogBuilder</code> to log to.
      */
-    public IndianBringGiftMission(AIMain aiMain, AIUnit aiUnit, Colony target) {
-        super(aiMain, aiUnit);
+    public IndianBringGiftMission(AIMain aiMain, AIUnit aiUnit,
+                                  Colony target, LogBuilder lb) {
+        super(aiMain, aiUnit, target, lb);
 
-        this.target = target; // Sole place target is to be set.
         this.completed = false;
-
-        Unit unit = getUnit();
-        if (!unit.getOwner().isIndian() || !unit.canCarryGoods()) {
-            throw new IllegalArgumentException("Unsuitable unit: " + unit);
-        }
     }
 
     /**
@@ -204,7 +198,9 @@ public class IndianBringGiftMission extends Mission {
      * {@inheritDoc}
      */
     public void setTarget(Location target) {
-        throw new IllegalStateException("Target is fixed");
+        if (target instanceof Colony) {
+            this.target = target;
+        }
     }
 
     /**

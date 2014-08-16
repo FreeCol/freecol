@@ -164,15 +164,11 @@ public class NativeAIPlayer extends AIPlayer {
             while (units.size() > defence) {
                 Unit u = units.remove(0);
                 AIUnit aiu = getAIUnit(u);
-                Mission m = new UnitWanderHostileMission(aiMain, aiu);
-                aiu.setMission(m);
-                lb.add(u, " wander, ");
+                new UnitWanderHostileMission(aiMain, aiu, lb);
             }
             for (Unit u : units) {
                 AIUnit aiu = getAIUnit(u);
-                Mission m = new DefendSettlementMission(aiMain, aiu, is);
-                aiu.setMission(m);
-                lb.add(u, " defend-", is, ", ");
+                new DefendSettlementMission(aiMain, aiu, is, lb);
             }
         }
         lb.shrink(", ");
@@ -376,8 +372,7 @@ public class NativeAIPlayer extends AIPlayer {
             while (!units.isEmpty()) {
                 Unit u = units.remove(0);
                 AIUnit aiu = aiMain.getAIUnit(u);
-                aiu.changeMission(new DefendSettlementMission(aiMain, aiu, is),
-                                  lb);lb.add(", ");
+                new DefendSettlementMission(aiMain, aiu, is, lb);lb.add(", ");
                 defenders.add(u);
                 if (defenders.size() >= needed) break;
             }
@@ -424,10 +419,8 @@ public class NativeAIPlayer extends AIPlayer {
             units.remove(unit);
             AIUnit aiUnit = aiMain.getAIUnit(unit);
             Unit target = tile.getDefendingUnit(unit);
-            Mission m = new UnitSeekAndDestroyMission(aiMain, aiUnit, target);
-            aiUnit.changeMission(m, lb);
-            lb.add(", send ", aiUnit.getUnit(), " to attack ", target,
-                   " at ", tile, ", ");
+            new UnitSeekAndDestroyMission(aiMain, aiUnit, target, lb);
+            lb.add(", ");
         }
     }
 
@@ -476,30 +469,25 @@ public class NativeAIPlayer extends AIPlayer {
             final Class now = (aiUnit.hasMission())
                 ? aiUnit.getMission().getClass() : null;
 
-            Mission m = null;
             if (settlement != null && settlement.getUnitCount()
                 + settlement.getTile().getUnitCount() <= 1) {
                 // First see to local settlement defence
-                m = new DefendSettlementMission(aiMain, aiUnit,
-                                                settlement);
+                new DefendSettlementMission(aiMain, aiUnit, settlement, lb);
                 reasons.put(unit, "Defend-" + settlement.getName());
 
             } else if (is != null
                 && ((!unit.isMounted() && is.canProvideGoods(scoutEq))
                     || (!unit.isArmed() && is.canProvideGoods(soldierEq)))) {
                 // Go home for new equipment if the home settlement has it
-                m = new DefendSettlementMission(aiMain, aiUnit, is);
+                new DefendSettlementMission(aiMain, aiUnit, is, lb);
                 reasons.put(unit, "Equip-" + is.getName());
 
             } else {
                 // Go out looking for trouble
-                m = (now == UnitWanderHostileMission.class) ? null
-                    : new UnitWanderHostileMission(aiMain, aiUnit);
+                if (now != UnitWanderHostileMission.class) {
+                    new UnitWanderHostileMission(aiMain, aiUnit, lb);
+                }
                 reasons.put(unit, "Patrol");
-            }
-
-            if (m != null) {
-                aiUnit.changeMission(m, lb);lb.add(", ");
             }
             done.add(aiUnit);
         }
@@ -616,8 +604,7 @@ public class NativeAIPlayer extends AIPlayer {
 
             // Send the unit.
             lb.add("At ", is.getName(), " ");
-            Mission m = new IndianBringGiftMission(getAIMain(), aiUnit, target);
-            aiUnit.changeMission(m, lb);
+            new IndianBringGiftMission(getAIMain(), aiUnit, target, lb);
             lb.add(" and takes ", gift, " to ", target.getName(), ", ");
         }
         if (lb.grew("\n  Gifts: ")) lb.shrink(", ");
@@ -719,8 +706,7 @@ public class NativeAIPlayer extends AIPlayer {
 
             // Send the unit.
             lb.add("At ", is.getName(), " ");
-            Mission m = new IndianDemandMission(getAIMain(), aiUnit, target);
-            aiUnit.changeMission(m, lb);
+            new IndianDemandMission(getAIMain(), aiUnit, target, lb);
             lb.add(" and will demand of ", target, ", ");
         }
         if (lb.grew("\n  Tribute: ")) lb.shrink(", ");

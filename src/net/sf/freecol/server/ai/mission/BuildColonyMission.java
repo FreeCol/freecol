@@ -64,10 +64,10 @@ public class BuildColonyMission extends Mission {
      * Colony should be built, or an existing connected Colony owned
      * by this player to go to before retargeting.
      */
-    private Location target = null;
+    private Location target;
 
     /** The value of a target <code>Tile</code>. */
-    private int colonyValue = -1;
+    private int colonyValue;
 
 
     /**
@@ -75,14 +75,12 @@ public class BuildColonyMission extends Mission {
      *
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
+     * @param lb A <code>LogBuilder</code> to log to.
      * @param target The target for this mission.
      */
-    public BuildColonyMission(AIMain aiMain, AIUnit aiUnit, Location target) {
-        super(aiMain, aiUnit);
-
-        setTarget(target);
-        logger.finest(tag + " starts with target " + target
-            + " and value " + colonyValue + ": " + this);
+    public BuildColonyMission(AIMain aiMain, AIUnit aiUnit, Location target,
+                              LogBuilder lb) {
+        super(aiMain, aiUnit, target, lb);
     }
 
     /**
@@ -487,7 +485,8 @@ public class BuildColonyMission extends Mission {
                     AIColony aiColony = aiMain.getAIColony(colony);
                     aiColony.requestRearrange();
                     lbDone(lb, colony);
-                    return new WorkInsideColonyMission(aiMain, aiUnit, aiColony);
+                    return new WorkInsideColonyMission(aiMain, aiUnit,
+                                                       aiColony, lb);
                 } else {
                     lbFail(lb, "build at ", tile);
                     break;

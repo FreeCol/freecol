@@ -477,9 +477,7 @@ public abstract class AIPlayer extends AIObject {
             if (unit == null || unit.isDisposed()) continue;
             lb.add("\n  ", unit, " ");
             try {
-                Mission old = aiu.getMission();
-                Mission mission = aiu.doMission(lb);
-                if (mission != old) aiu.changeMission(mission, lb);
+                aiu.doMission(lb);
             } catch (Exception e) {
                 logger.log(Level.WARNING, "doMissions failed for: " + aiu, e);
             }

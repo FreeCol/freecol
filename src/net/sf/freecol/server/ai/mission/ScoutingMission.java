@@ -64,7 +64,7 @@ public class ScoutingMission extends Mission {
      * native settlement to talk to the chief of, or a player colony
      * to retarget from.
      */
-    private Location target = null;
+    private Location target;
 
 
     /**
@@ -72,14 +72,12 @@ public class ScoutingMission extends Mission {
      *
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
-     * @param loc The target <code>Location</code>.
+     * @param target The target <code>Location</code>.
+     * @param lb A <code>LogBuilder</code> to log to.
      */
-    public ScoutingMission(AIMain aiMain, AIUnit aiUnit, Location loc) {
-        super(aiMain, aiUnit);
-
-        setTarget(loc);
-        logger.finest(tag + " starts at " + aiUnit.getUnit().getLocation()
-            + " with target " + target + ": " + this);
+    public ScoutingMission(AIMain aiMain, AIUnit aiUnit, Location target,
+                           LogBuilder lb) {
+        super(aiMain, aiUnit, target, lb);
     }
 
     /**

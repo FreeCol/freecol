@@ -127,7 +127,8 @@ public class PioneeringMissionTest extends FreeColTestCase {
         Location loc = PioneeringMission.findTarget(aiUnit, 10, false);
         assertTrue("Pioneer should find a tile to improve",
                    loc instanceof Tile);
-        PioneeringMission mission = new PioneeringMission(aiMain, aiUnit, loc);
+        PioneeringMission mission
+            = new PioneeringMission(aiMain, aiUnit, loc, lb);
         assertTrue("Mission should be valid",
                    mission.isValid());
         TileImprovementPlan tip = mission.getTileImprovementPlan();
@@ -136,7 +137,6 @@ public class PioneeringMissionTest extends FreeColTestCase {
         Tile target = tip.getTarget();
         assertNotNull("Plan should have a target",
                       target);
-        aiUnit.changeMission(mission, lb);
         assertEquals("Mission should stick", mission,
                      aiUnit.getMission());
     }

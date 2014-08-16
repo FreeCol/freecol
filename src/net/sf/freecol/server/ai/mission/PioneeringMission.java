@@ -69,7 +69,7 @@ public class PioneeringMission extends Mission {
     private static final int DEFAULT_THREAT_TURNS = 3;
 
     /** The improvement this pioneer is to work on. */
-    private TileImprovementPlan tileImprovementPlan = null;
+    private TileImprovementPlan tileImprovementPlan;
 
     /**
      * The target location to go to:
@@ -77,7 +77,7 @@ public class PioneeringMission extends Mission {
      *   - a colony to go to to equip
      *   - just an initial colony to retarget from
      */
-    private Location target = null;
+    private Location target;
 
 
     /**
@@ -88,13 +88,12 @@ public class PioneeringMission extends Mission {
      *
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
-     * @param loc The target <code>Location</code>.
+     * @param target The target <code>Location</code>.
+     * @param lb A <code>LogBuilder</code> to log to.
      */
-    public PioneeringMission(AIMain aiMain, AIUnit aiUnit, Location loc) {
-        super(aiMain, aiUnit);
-
-        setTarget(loc);
-        logger.finest(tag + " starts with target " + getTarget() + ": " + this);
+    public PioneeringMission(AIMain aiMain, AIUnit aiUnit, Location target,
+                             LogBuilder lb) {
+        super(aiMain, aiUnit, target, lb);
     }
 
     /**
