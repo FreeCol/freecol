@@ -122,7 +122,7 @@ public class WorkInsideColonyMission extends Mission {
      * {@inheritDoc}
      */
     public Location getTarget() {
-        return aiColony.getColony();
+        return (aiColony == null) ? null : aiColony.getColony();
     }
 
     /**
