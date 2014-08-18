@@ -68,16 +68,6 @@ public class UnitSeekAndDestroyMission extends Mission {
      *
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
-    public UnitSeekAndDestroyMission(AIMain aiMain, AIUnit aiUnit) {
-        this(aiMain, aiUnit, findTarget(aiUnit, 4, false));
-    }
-     */
-
-    /**
-     * Creates a mission for the given <code>AIUnit</code>.
-     *
-     * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission is created for.
      * @param target The object we are trying to destroy.  This can be
      *     either a <code>Settlement</code> or a <code>Unit</code>.
      * @param lb A <code>LogBuilder</code> to log to.

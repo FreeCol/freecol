@@ -331,17 +331,6 @@ public abstract class AIPlayer extends AIObject {
     }
 
     /**
-     * Aborts all the missions which are no longer valid.
-     */
-    protected void abortInvalidMissions() {
-        for (AIUnit au : getAIUnits()) {
-            Mission mission = au.getMission();
-            String reason = (mission == null) ? null : mission.invalidReason();
-            if (reason != null) au.setMission(null);
-        }
-    }
-
-    /**
      * Counts the number of defenders allocated to a settlement.
      *
      * @param settlement The <code>Settlement</code> to examine.

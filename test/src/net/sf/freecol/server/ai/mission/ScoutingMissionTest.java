@@ -81,33 +81,34 @@ public class ScoutingMissionTest extends FreeColTestCase {
         aiUnit.setMission(null);
         assertNotNull("The scout should be an AI unit", aiUnit);
         assertEquals("Scout should have the scout role", scoutRole,
-            scout.getRole());
-        assertTrue(scout.hasAbility(Ability.SPEAK_WITH_CHIEF));
+                     scout.getRole());
+        assertTrue("Scout should be able to speak to chief",
+                   scout.hasAbility(Ability.SPEAK_WITH_CHIEF));
         assertEquals("The Inca settlement should be a scouting target", null,
-            ScoutingMission.invalidReason(aiUnit, is));
+                     ScoutingMission.invalidReason(aiUnit, is));
         assertEquals("The Inca settlement should be found as scouting target",
-            is, ScoutingMission.findTarget(aiUnit, 10, false));
+                     is, ScoutingMission.findTarget(aiUnit, 10, false));
         assertEquals("Scouting mission should be assignable to scout", null,
-            ScoutingMission.invalidReason(aiUnit));
-        assertEquals("Scout should find the Inca settlement", is,
-            ScoutingMission.findTarget(aiUnit, 10, false));
+                     ScoutingMission.invalidReason(aiUnit));
 
-        new ScoutingMission(aiMain, aiUnit, is, lb);
-        assertTrue("Scout should have been assigned a Scouting mission",
-            aiUnit.hasMission(ScoutingMission.class));
+        ScoutingMission mission
+            = new ScoutingMission(aiMain, aiUnit, is, lb);
+        assertEquals("Scout should have been assigned the Scouting mission",
+                     mission, aiUnit.getMission());
+        assertEquals(null, mission.invalidReason());
         assertTrue("Scouting mission should be valid",
-            aiUnit.getMission().isValid());
+                   mission.isValid());
         assertEquals("Scouting mission target should be the Inca settlement",
-            is, aiUnit.getMission().getTarget());
+                     is, mission.getTarget());
 
         // Invalidate the mission by losing the horses.
         scout.changeRole(spec().getDefaultRole(), 0);
         assertFalse("Scout should not have the scout role",
-            scout.hasAbility(Ability.SPEAK_WITH_CHIEF));
+                    scout.hasAbility(Ability.SPEAK_WITH_CHIEF));
         assertNotNull("Scouting mission should be invalid",
-            aiUnit.getMission().invalidReason());
+                      aiUnit.getMission().invalidReason());
         assertNotNull("Scouting mission should be impossible for this unit",
-            ScoutingMission.invalidReason(aiUnit));
+                      ScoutingMission.invalidReason(aiUnit));
         
         // Restore the horses.
         scout.changeRole(scoutRole, 1);

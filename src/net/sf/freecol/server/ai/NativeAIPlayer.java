@@ -730,6 +730,19 @@ public class NativeAIPlayer extends AIPlayer {
         return result;
     }
 
+    /**
+     * Aborts all the missions which are no longer valid.
+     *
+     * Public for the test suite.
+     */
+    public void abortInvalidMissions() {
+        for (AIUnit au : getAIUnits()) {
+            Mission mission = au.getMission();
+            String reason = (mission == null) ? null : mission.invalidReason();
+            if (reason != null) au.setMission(null);
+        }
+    }
+
 
     // AIPlayer interface
     // Inherit:

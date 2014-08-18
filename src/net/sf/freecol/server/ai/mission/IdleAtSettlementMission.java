@@ -74,7 +74,6 @@ public class IdleAtSettlementMission extends Mission {
         super(aiMain, aiUnit);
 
         readFromXML(xr);
-        uninitialized = getAIUnit() == null;
     }
 
 

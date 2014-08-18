@@ -94,6 +94,8 @@ public class PioneeringMission extends Mission {
     public PioneeringMission(AIMain aiMain, AIUnit aiUnit, Location target,
                              LogBuilder lb) {
         super(aiMain, aiUnit, target, lb);
+
+        lb.add(" improvement ", tileImprovementPlan);
     }
 
     /**

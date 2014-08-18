@@ -360,7 +360,7 @@ public class ScoutingMission extends Mission {
      * {@inheritDoc}
      */
     public Location getTarget() {
-        return target;
+        return this.target;
     }
 
     /**

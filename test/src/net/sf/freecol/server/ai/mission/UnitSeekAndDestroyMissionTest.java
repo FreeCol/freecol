@@ -121,6 +121,6 @@ public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
         // add colony to the defender tile, to simulate the unit entering it
         getStandardColony(1, defenderTile.getX(),defenderTile.getY());
         assertFalse("UnitSeekAndDestroyMission should NOT be valid anymore, defender in colony",
-            aiUnit.getMission().isValid());
+                    aiUnit.getMission().isValid());
     }
 }

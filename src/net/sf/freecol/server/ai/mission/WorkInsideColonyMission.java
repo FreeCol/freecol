@@ -56,6 +56,7 @@ public class WorkInsideColonyMission extends Mission {
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
      * @param aiColony The <code>AIColony</code> the unit should be
      *     working in.
+     * @param lb A <code>LogBuilder</code> to log to.
      */
     public WorkInsideColonyMission(AIMain aiMain, AIUnit aiUnit,
                                    AIColony aiColony, LogBuilder lb) {
