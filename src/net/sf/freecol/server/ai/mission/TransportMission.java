@@ -1353,7 +1353,7 @@ public class TransportMission extends Mission {
         String reason = invalidReason();
         if (reason != null) {
             lbBroken(lb, reason);
-            return null;
+            return dropMission();
         }
 
         final EuropeanAIPlayer euaip = getEuropeanAIPlayer();
@@ -1500,8 +1500,9 @@ public class TransportMission extends Mission {
                     logger.warning(tag + " post-stop failure(" + reason
                         + ": " + this.toFullString());
                     lbBroken(lb, reason);
-                    return null;
-                } else if (unit.isAtLocation(target)) {
+                    return dropMission();
+                }
+                if (unit.isAtLocation(target)) {
                     lb.add(", waiting at ", target, ".");
                     return this;
                 }

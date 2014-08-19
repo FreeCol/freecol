@@ -368,10 +368,10 @@ public class PrivateerMission extends Mission {
 
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            if (!retargetMission(reason, lb)) return null;
+            if (!retargetMission(reason, lb)) return dropMission();
         } else if (reason != null) {
             lbBroken(lb, reason);
-            return null;
+            return dropMission();
         }
         final Unit unit = getUnit();
 

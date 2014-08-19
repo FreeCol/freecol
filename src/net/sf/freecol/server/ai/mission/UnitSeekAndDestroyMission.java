@@ -458,14 +458,17 @@ public class UnitSeekAndDestroyMission extends Mission {
         lb.add(tag);
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            if (!retargetMission(reason, lb)) return null;
+            if (!retargetMission(reason, lb)) return dropMission();
         } else if (reason != null) {
             lbBroken(lb, reason);
-            return null;
+            return dropMission();
         }
 
         final Unit unit = getUnit();
-        if (checkDisembark(lb) < 0) return (unit.isDisposed()) ? null : this;
+        if (checkDisembark(lb) < 0) {
+            if (unit.isDisposed()) return dropMission();
+            return this;
+        }
 
         // Is there a target-of-opportunity?
         final AIUnit aiUnit = getAIUnit();
@@ -512,7 +515,8 @@ public class UnitSeekAndDestroyMission extends Mission {
             assert d != null;
             AIMessage.askAttack(aiUnit, d);
             lbAttack(lb, currentTarget);
-            return (unit.isDisposed()) ? null : this;
+            if (unit.isDisposed()) return dropMission();
+            return this;
 
         default:
             lbMove(lb, unit, mt);

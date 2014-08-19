@@ -132,7 +132,7 @@ public class IdleAtSettlementMission extends Mission {
         String reason = invalidReason();
         if (reason != null) {
             lbBroken(lb, reason);
-            return null;
+            return dropMission();
         }
 
         // Wait if not on the map.

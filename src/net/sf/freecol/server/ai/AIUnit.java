@@ -338,20 +338,18 @@ public class AIUnit extends TransportableAIObject {
      *
      * @param lb A <code>LogBuilder</code> to log to.
      */
-    public Mission doMission(LogBuilder lb) {
-        if (this.mission == null) return null;
-        Mission m = this.mission.doMission(lb);
-        if (m != this.mission) changeMission(m);
-        return m;
+    public void doMission(LogBuilder lb) {
+        if (this.mission != null) this.mission.doMission(lb);
     }
 
     /**
      * Change the mission of a unit.
      *
      * @param mission The new <code>Mission</code>.
+     * @return The new current <code>Mission</code>.
      */
-    public void changeMission(Mission mission) {
-        if (this.mission == mission) return;
+    public Mission changeMission(Mission mission) {
+        if (this.mission == mission) return this.mission;
         Location oldTarget;
 
         if (this.mission == null) {
@@ -393,6 +391,7 @@ public class AIUnit extends TransportableAIObject {
         if (mission != null) {
             setTransportPriority(mission.getBaseTransportPriority());
         }
+        return this.mission;
     }
 
     /**

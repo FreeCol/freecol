@@ -358,10 +358,10 @@ public class CashInTreasureTrainMission extends Mission {
         lb.add(tag);
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            if (!retargetMission(reason, lb)) return null;
+            if (!retargetMission(reason, lb)) return dropMission();
         } else if (reason != null) {
             lbBroken(lb, reason);
-            return null;
+            return dropMission();
         }
 
         for (;;) {
@@ -430,10 +430,10 @@ public class CashInTreasureTrainMission extends Mission {
                 } else {
                     lbFail(lb, "cash in failed at", here);
                 }
-                return null;
+                return dropMission();
             }
             if (!retargetMission(", arrived at " + unit.getColony().getName(),
-                                 lb)) return null;
+                                 lb)) return dropMission();
         }
     }
 

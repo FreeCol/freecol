@@ -385,6 +385,14 @@ public abstract class Mission extends AIObject {
         return (reason != null) ? reason : invalidTargetReason(loc);
     }
 
+    /**
+     * Drop the current mission.
+     *
+     * @return The current <code>Mission</code>, which should now be null.
+     */
+    public Mission dropMission() {
+        return (aiUnit == null) ? null : aiUnit.changeMission(null);
+    }
 
     /**
      * Finds a target for a unit without considering its movement

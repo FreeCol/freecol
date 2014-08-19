@@ -298,10 +298,10 @@ public class DefendSettlementMission extends Mission {
         lb.add(tag);
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            if (!retargetMission(reason, lb)) return null;
+            if (!retargetMission(reason, lb)) return dropMission();
         } else if (reason != null) {
             lbBroken(lb, reason);
-            return null;
+            return dropMission();
         }
 
         // Go to the target!
@@ -378,7 +378,7 @@ public class DefendSettlementMission extends Mission {
         // will collapse (and the combat model does not handle that).
         if (!unit.isOffensiveUnit()) {
             lbBroken(lb, "not-offensive-unit");
-            return null;
+            return dropMission();
         }
         final CombatModel cm = unit.getGame().getCombatModel();
         Unit bestTarget = null;
@@ -413,7 +413,8 @@ public class DefendSettlementMission extends Mission {
         if (bestTarget != null) {
             AIMessage.askAttack(getAIUnit(), bestDirection);
             lbAttack(lb, bestTarget);
-            return (unit.isDisposed()) ? null : this;
+            if (unit.isDisposed()) return dropMission();
+            return this;
         }
 
         lb.add(" alert at ", getTarget(), ".");

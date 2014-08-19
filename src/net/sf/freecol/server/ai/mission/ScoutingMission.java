@@ -394,10 +394,10 @@ public class ScoutingMission extends Mission {
         lb.add(tag);
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            if (!retargetMission(reason, lb)) return null;
+            if (!retargetMission(reason, lb)) return dropMission();
         } else if (reason != null) {
             lbBroken(lb, reason);
-            return null;
+            return dropMission();
         }
 
         // Go to the target.
@@ -449,7 +449,7 @@ public class ScoutingMission extends Mission {
         }
         if (unit.isDisposed()) {
             lb.add(", died at target ", getTarget(), ".");
-            return null;
+            return dropMission();
         }
 
         // Retarget on failure or complete, but do not retarget from
@@ -463,11 +463,11 @@ public class ScoutingMission extends Mission {
                 aiUnit.equipForRole(Specification.DEFAULT_ROLE_ID);
             }
             lbFail(lb, " arrived at ", completed, " but found no targets");
-            return null;
+            return dropMission();
         }
         if (newTarget == null) {
             lb.add(" at ", completed, " but found no targets");
-            return null;
+            return dropMission();
         }
 
         setTarget(newTarget);

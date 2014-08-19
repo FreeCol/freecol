@@ -164,7 +164,7 @@ public class WishRealizationMission extends Mission {
         String reason = invalidReason();
         if (reason != null) {
             lbBroken(lb, reason);
-            return null;
+            return dropMission();
         }
 
         // Move towards the target.
@@ -215,7 +215,7 @@ public class WishRealizationMission extends Mission {
         }
         wish.dispose();
         wish = null;
-        return null;
+        return dropMission();
     }
 
 

@@ -363,10 +363,10 @@ public class MissionaryMission extends Mission {
         lb.add(tag);
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            if (!retargetMission(reason, lb)) return null;
+            if (!retargetMission(reason, lb)) return dropMission();
         } else if (reason != null) {
             lbBroken(lb, reason);
-            return null;
+            return dropMission();
         }
 
         // Go to the target.
@@ -387,7 +387,7 @@ public class MissionaryMission extends Mission {
                 if (newTarget == null || newTarget == completed) {
                     setTarget(null);
                     lb.add(", reached ", completed, ", retarget failed.");
-                    return null;
+                    return dropMission();
                 }
                 setTarget(newTarget);
                 lb.add(tag, " reached ", completed, ", retargeted ", newTarget);
@@ -407,7 +407,7 @@ public class MissionaryMission extends Mission {
                 } else {
                     lbFail(lb, "unexpected failure at ", is);
                 }
-                return null;
+                return dropMission();
 
             default:
                 lbMove(lb, unit, mt);

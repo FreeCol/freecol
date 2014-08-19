@@ -116,7 +116,7 @@ public class UnitWanderMission extends Mission {
         String reason = invalidReason();
         if (reason != null) {
             lbBroken(lb, reason);
-            return null;
+            return dropMission();
         }
 
         // Just move in random directions.

@@ -538,7 +538,7 @@ public class PioneeringMission extends Mission {
             if (newTarget == null) {
                 setTarget(null);
                 lbFail(lb, tag, " found no target");
-                return null;
+                return dropMission();
             }
             setTarget(newTarget);
             lb.add(", retargeting ", newTarget, "/", tileImprovementPlan);
@@ -546,10 +546,10 @@ public class PioneeringMission extends Mission {
 
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            if (!retargetMission(reason, lb)) return null;
+            if (!retargetMission(reason, lb)) return dropMission();
         } else if (reason != null) {
             lbBroken(lb, reason);
-            return null;
+            return dropMission();
         }
 
         final Unit unit = getUnit();
@@ -585,7 +585,7 @@ public class PioneeringMission extends Mission {
                 || (!hasTools() && Map.isSameLocation(newTarget, getTarget()))) {
                 setTarget(null);
                 lb.add(logMe, ", cancelling");
-                return null;
+                return dropMission();
             }
             setTarget(newTarget);
             lb.add(logMe, ", retargeting ", newTarget, "/", tileImprovementPlan);
@@ -609,7 +609,7 @@ public class PioneeringMission extends Mission {
             if (newTarget == null) {
                 setTarget(null);
                 lbFail(lb, ", reached ", where, " but found no target");
-                return null;
+                return dropMission();
             }
             lb.add(", at ", where, ", retargeting ", newTarget,
                    "/", tileImprovementPlan);
@@ -628,13 +628,13 @@ public class PioneeringMission extends Mission {
         if (unit.isInDanger(turnsNeeded, 0.25f)) {
             if (unit.getTile().getColony() != null) {
                 logger.finest(tag + " avoiding danger: " + this);
-                return;
+                return dropMission();
             }
             PathNode safe = unit.findOurNearestSettlement(false, 1, false);
             if (safe != null) {
                 travelToTarget(tag + " (evading)",
                                safe.getLastNode().getTile(), costDecider);
-                return;
+                return dropMission();
             }
         }
         */
@@ -683,7 +683,7 @@ public class PioneeringMission extends Mission {
                 aiPlayer.removeTileImprovementPlan(tileImprovementPlan);
                 tileImprovementPlan.dispose();
                 lbFail(lb, "land claim at ", tile);
-                return null;
+                return dropMission();
             }
         }
 
@@ -700,7 +700,7 @@ public class PioneeringMission extends Mission {
                 aiPlayer.removeTileImprovementPlan(tileImprovementPlan);
                 tileImprovementPlan.dispose();
                 lbFail(lb, "to change work type at ", tile);
-                return null;
+                return dropMission();
             }
         } else { // Probably just out of moves.
             lb.add(", waiting to improve at ", tile, ".");

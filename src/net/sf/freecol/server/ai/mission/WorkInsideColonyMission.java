@@ -156,7 +156,7 @@ public class WorkInsideColonyMission extends Mission {
         String reason = invalidReason();
         if (reason != null) {
             lbBroken(lb, reason);
-            return null;
+            return dropMission();
         }
 
         final Unit unit = getUnit();

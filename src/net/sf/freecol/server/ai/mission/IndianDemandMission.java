@@ -338,7 +338,7 @@ public class IndianDemandMission extends Mission {
         String reason = invalidReason();
         if (reason != null) {
             lbBroken(lb, reason);
-            return null;
+            return dropMission();
         }
 
         final AIUnit aiUnit = getAIUnit();
@@ -365,7 +365,7 @@ public class IndianDemandMission extends Mission {
                 }
                 completed = true;
                 lbDone(lb, "unloaded tribute at ", is);
-                return null;
+                return dropMission();
             }
 
             // Move to the target's colony and demand
@@ -410,7 +410,7 @@ public class IndianDemandMission extends Mission {
                 if (!enemy.checkGold(1)) {
                     completed = true;
                     lbDone(lb, "empty handed at ", colony);
-                    return null;
+                    return dropMission();
                 }
                 amount = enemy.getGold() / 20;
                 if (amount == 0) amount = enemy.getGold();
@@ -439,7 +439,7 @@ public class IndianDemandMission extends Mission {
                 completed = true;
                 lbDone(lb, "refused at ", colony, 
                        (((attack) ? " (attacking)" : "")));
-                return null;
+                return dropMission();
             }
         }
         return this;

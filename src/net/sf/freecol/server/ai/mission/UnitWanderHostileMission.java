@@ -162,7 +162,7 @@ public class UnitWanderHostileMission extends Mission {
         String reason = invalidReason();
         if (reason != null) {
             lbBroken(lb, reason);
-            return null;
+            return dropMission();
         }
 
         // Make random moves in a reasonably consistent direction,

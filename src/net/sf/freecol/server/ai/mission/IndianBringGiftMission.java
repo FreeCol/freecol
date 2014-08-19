@@ -227,7 +227,7 @@ public class IndianBringGiftMission extends Mission {
         String reason = invalidReason();
         if (reason != null) {
             lbBroken(lb, reason);
-            return null;
+            return dropMission();
         }
 
         final AIUnit aiUnit = getAIUnit();
@@ -261,11 +261,11 @@ public class IndianBringGiftMission extends Mission {
             if (gift == null) {
                 completed = true;
                 lbFail(lb, "found no gift at ", is);
-                return null;
+                return dropMission();
             } else if (!AIMessage.askLoadCargo(aiUnit, gift) || !hasGift()) {
                 completed = true;
                 lbFail(lb, "failed to collect gift at ", is);
-                return null;
+                return dropMission();
             } else {
                 lb.add(", collected gift at ", is, ".");
                 return this;
@@ -317,7 +317,7 @@ public class IndianBringGiftMission extends Mission {
             } else {
                 lbFail(lb, "to deliver ", settlement);
             }
-            return null;
+            return dropMission();
         }
     }
 

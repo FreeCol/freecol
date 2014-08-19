@@ -375,7 +375,7 @@ public class BuildColonyMission extends Mission {
             ; // retarget below
         } else if (reason != null) {
             lbBroken(lb, reason);
-            return null;
+            return dropMission();
         } else if (target instanceof Tile) {
             Colony c = ((Tile)target).getColony();
             if (player.owns(c)) { // Another builder has succeeded
@@ -388,7 +388,7 @@ public class BuildColonyMission extends Mission {
                 }
             }
         }
-        if (reason != null && !retargetMission(reason, lb)) return null;
+        if (reason != null && !retargetMission(reason, lb)) return dropMission();
 
         for (;;) {
             // Go there.
@@ -502,7 +502,7 @@ public class BuildColonyMission extends Mission {
                 break;
             }
         }
-        return null;
+        return dropMission();
     }
 
 
