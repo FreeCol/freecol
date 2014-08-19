@@ -115,7 +115,7 @@ public class ServerInfo {
                Integer.parseInt(element.getAttribute("port")),
                Integer.parseInt(element.getAttribute("slotsAvailable")),
                Integer.parseInt(element.getAttribute("currentlyPlaying")),
-               Boolean.valueOf(element.getAttribute("slotsAvailable")).booleanValue(),
+               Boolean.parseBoolean(element.getAttribute("slotsAvailable")),
                element.getAttribute("version"),
                Integer.parseInt(element.getAttribute("gameState")));
     }

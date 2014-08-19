@@ -71,8 +71,7 @@ public class ChatMessage extends DOMMessage {
 
         sender = element.getAttribute("sender");
         message = element.getAttribute("message");
-        privateChat = Boolean.valueOf(element.getAttribute("privateChat"))
-            .booleanValue();
+        privateChat = Boolean.parseBoolean(element.getAttribute("privateChat"));
     }
 
 

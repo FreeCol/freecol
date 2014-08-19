@@ -270,7 +270,7 @@ public final class StartGamePanel extends FreeColPanel {
         final FreeColClient fcc = getFreeColClient();
         final GUI gui = getGUI();
         try {
-            switch (Integer.valueOf(command).intValue()) {
+            switch (Integer.parseInt(command)) {
             case START:
                 int row = table.getSelectedRow();
                 int col = table.getSelectedColumn();

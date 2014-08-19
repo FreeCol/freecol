@@ -114,7 +114,7 @@ public class FirstContactMessage extends DOMMessage {
     }
             
     public boolean getResult() {
-        return Boolean.valueOf(result);
+        return Boolean.parseBoolean(result);
     }
 
     public FirstContactMessage setResult(boolean result) {

@@ -153,7 +153,7 @@ public class MonarchActionMessage extends DOMMessage {
      * @return The result.
      */
     public boolean getResult() {
-        return Boolean.valueOf(resultString);
+        return Boolean.parseBoolean(resultString);
     }
 
     /**

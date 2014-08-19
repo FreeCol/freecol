@@ -142,8 +142,7 @@ public final class PreGameInputHandler extends InputHandler {
     private Element ready(Connection connection, Element element) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         if (player != null) {
-            boolean ready = Boolean.valueOf(element.getAttribute("value"))
-                .booleanValue();
+            boolean ready = Boolean.parseBoolean(element.getAttribute("value"));
             player.setReady(ready);
             getFreeColServer().getServer()
                 .sendToAll(DOMMessage.createMessage("playerReady",

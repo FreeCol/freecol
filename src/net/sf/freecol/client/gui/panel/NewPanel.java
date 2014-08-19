@@ -445,7 +445,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
                 break;
             case JOIN:
                 try {
-                    port = Integer.valueOf(port1.getText()).intValue();
+                    port = Integer.parseInt(port1.getText());
                 } catch (NumberFormatException e) {
                     port1Label.setForeground(Color.red);
                     break;
@@ -456,7 +456,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
                 break;
             case START:
                 try {
-                    port = Integer.valueOf(port2.getText()).intValue();
+                    port = Integer.parseInt(port2.getText());
                 } catch (NumberFormatException e) {
                     port2Label.setForeground(Color.red);
                     break;

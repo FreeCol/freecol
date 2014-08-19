@@ -99,7 +99,7 @@ public class BooleanOption extends AbstractOption<Boolean> {
      */
     @Override
     protected void setValue(String valueString, String defaultValueString) {
-        setValue(Boolean.parseBoolean((valueString != null) ? valueString
+        setValue(Boolean.valueOf((valueString != null) ? valueString
                 : defaultValueString));
     }
 

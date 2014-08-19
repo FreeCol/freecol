@@ -77,8 +77,7 @@ public class MissionaryMessage extends DOMMessage {
 
         this.unitId = element.getAttribute("unitId");
         this.directionString = element.getAttribute("direction");
-        this.denounce = Boolean.valueOf(element.getAttribute("denounce"))
-            .booleanValue();
+        this.denounce = Boolean.parseBoolean(element.getAttribute("denounce"));
     }
 
 

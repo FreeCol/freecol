@@ -105,13 +105,13 @@ public class LoginMessage extends DOMMessage {
         this.userName = element.getAttribute("userName");
         this.version = element.getAttribute("version");
         str = element.getAttribute("admin");
-        this.admin = Boolean.valueOf(str).booleanValue();
+        this.admin = Boolean.parseBoolean(str);
         str = element.getAttribute("startGame");
-        this.startGame = Boolean.valueOf(str).booleanValue();
+        this.startGame = Boolean.parseBoolean(str);
         str = element.getAttribute("singlePlayer");
-        this.singlePlayer = Boolean.valueOf(str).booleanValue();
+        this.singlePlayer = Boolean.parseBoolean(str);
         str = element.getAttribute("currentPlayer");
-        this.currentPlayer = Boolean.valueOf(str).booleanValue();
+        this.currentPlayer = Boolean.parseBoolean(str);
         this.activeUnitId = element.getAttribute("activeUnit");
         NodeList children = element.getChildNodes();
         this.game = (children.getLength() != 1) ? null

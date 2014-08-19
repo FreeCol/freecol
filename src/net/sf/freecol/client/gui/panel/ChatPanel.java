@@ -100,7 +100,7 @@ public final class ChatPanel extends FreeColPanel {
     public void actionPerformed(ActionEvent event) {
         final String command = event.getActionCommand();
         try {
-            switch (Integer.valueOf(command).intValue()) {
+            switch (Integer.parseInt(command)) {
             case CHAT:
                 String message = getChatText();
                 getController().sendChat(message);

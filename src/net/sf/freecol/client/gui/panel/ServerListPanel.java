@@ -186,7 +186,7 @@ public final class ServerListPanel extends FreeColPanel {
         final String command = event.getActionCommand();
 
         try {
-            switch (Integer.valueOf(command).intValue()) {
+            switch (Integer.parseInt(command)) {
             case CONNECT:
                 ServerInfo si = tableModel.getItem(table.getSelectedRow());
                 connectController.joinMultiplayerGame(si.getAddress(), si.getPort());

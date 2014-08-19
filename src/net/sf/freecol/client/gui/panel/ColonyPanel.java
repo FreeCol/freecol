@@ -689,8 +689,8 @@ public final class ColonyPanel extends PortPanel
                 }
             }else if(!unit.isOnCarrier()){
                 unitIcon = getLibrary().getUnitImageIcon(unit, 0.5);
-                String menuTitle = new String(Messages.message(unit.getLabel()) +
-                        " " + Messages.message("outsideOfColony.name"));
+                String menuTitle = Messages.message(unit.getLabel())
+                    + " " + Messages.message("outsideOfColony.name");
                 subMenu = new JMenuItem(menuTitle, unitIcon);
                 subMenu.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
@@ -937,7 +937,7 @@ public final class ColonyPanel extends PortPanel
         } else {
             int cmd;
             try {
-                cmd = Integer.valueOf(command).intValue();
+                cmd = Integer.parseInt(command);
             } catch (NumberFormatException nfe) {
                 logger.warning("Invalid action number: " + command);
                 return;
