@@ -78,6 +78,9 @@ import net.sf.freecol.server.ai.mission.BuildColonyMission;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
 import net.sf.freecol.server.ai.mission.IdleAtSettlementMission;
 import net.sf.freecol.server.ai.mission.Mission;
+import net.sf.freecol.server.ai.mission.MissionaryMission;
+import net.sf.freecol.server.ai.mission.PioneeringMission;
+import net.sf.freecol.server.ai.mission.ScoutingMission;
 import net.sf.freecol.server.ai.mission.TransportMission;
 import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
 
@@ -361,9 +364,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // Assign the workers according to the colony plan.
         // ATM we just accept this assignment unless it failed, in
         // which case restore original state.
-        AIPlayer aiPlayer = getAIOwner();
+        EuropeanAIPlayer aiPlayer = (EuropeanAIPlayer)getAIOwner();
         LogBuilder aw = new LogBuilder(256);
-        boolean preferScouts = ((EuropeanAIPlayer)aiPlayer).scoutsNeeded() > 0;
+        boolean preferScouts = aiPlayer.scoutsNeeded() > 0;
         Colony scratch = colonyPlan.assignWorkers(new ArrayList<Unit>(workers),
                                                   preferScouts, aw);
         if (scratch == null) {
@@ -423,12 +426,41 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             nextRearrange = Math.max(1, Math.min(nextRearrange, when));
         }
 
-        // Return any units that need a mission change.
+        // Return any units with the wrong mission
         for (Unit u : colony.getUnitList()) {
-            AIUnit aiu = getAIUnit(u);
+            final AIUnit aiu = getAIUnit(u);
             WorkInsideColonyMission wic
                 = aiu.getMission(WorkInsideColonyMission.class);
-            if (wic == null || wic.getAIColony() != this) result.add(aiu);
+            if (wic == null) {
+                if (aiPlayer.getWorkInsideColonyMission(aiu, this) == null) {
+                    result.add(aiu); 
+                } else lb.add(", ", aiu.getMission());
+            }
+        }
+        for (Unit u : tile.getUnitList()) {
+            final AIUnit aiu = getAIUnit(u);
+            Mission m = aiu.getMission();
+            if (u.hasAbility(Ability.SPEAK_WITH_CHIEF)
+                && !(m instanceof ScoutingMission)) {
+                if (aiPlayer.getScoutingMission(aiu) == null) {
+                    result.add(aiu);
+                } else lb.add(", ", aiu.getMission());
+            } else if (u.hasAbility(Ability.IMPROVE_TERRAIN)
+                && !(m instanceof PioneeringMission)) {
+                if (aiPlayer.getPioneeringMission(aiu) == null) {
+                    result.add(aiu);
+                } else lb.add(", ", aiu.getMission());
+            } else if (u.hasAbility(Ability.ESTABLISH_MISSION)
+                && !(m instanceof MissionaryMission)) {
+                if (aiPlayer.getMissionaryMission(aiu) == null) {
+                    result.add(aiu);
+                } else lb.add(", ", aiu.getMission());
+            } else if (u.isDefensiveUnit()
+                && !(m instanceof DefendSettlementMission)) {
+                if (aiPlayer.getDefendSettlementMission(aiu, colony) == null) {
+                    result.add(aiu);
+                } else lb.add(", ", aiu.getMission());
+            }
         }
 
         updateTileImprovementPlans(lb);

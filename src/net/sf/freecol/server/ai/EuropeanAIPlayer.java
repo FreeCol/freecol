@@ -1108,19 +1108,14 @@ public class EuropeanAIPlayer extends AIPlayer {
      * WorkInsideColonyMission.
      *
      * @param lb A <code>LogBuilder</code> to log to.
+     * @return A collection of <code>AIUnit</code>s that need work.
      */
-    private void rearrangeColonies(LogBuilder lb) {
+    private Collection<AIUnit> rearrangeColonies(LogBuilder lb) {
         Set<AIUnit> workers = new HashSet<AIUnit>();
         for (AIColony aic : getAIColonies()) {
             workers.addAll(aic.rearrangeWorkers(lb));
         }
-        if (!workers.isEmpty()) {
-            lb.add("\n  New workers:");
-            for (AIUnit aiu : workers) {
-                Mission m = getWorkInsideColonyMission(aiu, null);
-                if (m != null) lb.add(" ", m);
-            }
-        }
+        return workers;
     }
 
 
@@ -1756,7 +1751,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                     lb.add(m, ", ");
                 }
                 reasons.put(unit, "Vital");
-                
+
             } else if (unit.isInMission()) {
                 reasons.put(unit, "Mission");
 
