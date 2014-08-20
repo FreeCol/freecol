@@ -2224,6 +2224,20 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Get the number of units a player has, either land or naval.
+     *
+     * @param naval If true, count naval units, else count land units.
+     * @return The number of units.
+     */
+    public int getUnitCount(boolean naval) {
+        int ret = 0;
+        for (Unit u : getUnits()) {
+            if (u.isNaval() == naval) ret++;
+        }
+        return ret;
+    }
+        
+    /**
      * Gets the number of King's land units.
      *
      * @return The number of units

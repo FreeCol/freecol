@@ -246,6 +246,12 @@ public class EuropeanAIPlayer extends AIPlayer {
         = new HashMap<String, Integer>();
 
     /**
+     * A cached map of the current nation summary for all live nations.
+     */
+    private final java.util.Map<Player, NationSummary> nationMap
+        = new HashMap<Player, NationSummary>();
+
+    /**
      * A cached map of Tile to best TileImprovementPlan.
      * Used to choose a tile improvement for a pioneer to work on.
      */
@@ -360,6 +366,17 @@ public class EuropeanAIPlayer extends AIPlayer {
             = spec.getInteger(GameOptions.OFFENSIVE_NAVAL_UNIT_CHEAT);
         transportNavalUnitCheatPercent
             = spec.getInteger(GameOptions.TRANSPORT_NAVAL_UNIT_CHEAT);
+    }
+
+    /**
+     * Update the nation map.
+     */
+    public void cacheNations() {
+        nationMap.clear();
+        for (Player p : getGame().getLiveEuropeanPlayers(null)) {
+            NationSummary ns = AIMessage.askGetNationSummary(this, p);
+            nationMap.put(p, ns);
+        }            
     }
 
     /**
@@ -639,7 +656,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         // otherwise if the navy is below average the chance to cheat
         // is proportional to how badly below average.
         double naval = getNavalStrengthRatio();
-        int nNaval = (naval == 0.0f) ? 100
+        int nNaval = (player.getUnitCount(true) == 0) ? 100
             : (0.0f < naval && naval < 0.5f)
             ? (int)(naval * offensiveNavalUnitCheatPercent)
             : -1;
@@ -652,8 +669,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                     && unitType.isAvailableTo(player)
                     && unitType.hasPrice()
                     && unitType.isOffensive()) {
-                    int weight = unitType.getOffence()
-                        * 100000 / europe.getUnitPrice(unitType);
+                    int weight = 100000 / europe.getUnitPrice(unitType);
                     rc.add(new RandomChoice<UnitType>(unitType, weight));
                 }
             }
@@ -669,8 +685,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                     && unitType.isAvailableTo(player)
                     && unitType.hasPrice()
                     && unitType.getSpace() > 0) {
-                    int weight = unitType.getSpace()
-                        * 100000 / europe.getUnitPrice(unitType);
+                    int weight = 100000 / europe.getUnitPrice(unitType);
                     rc.add(new RandomChoice<UnitType>(unitType, weight));
                 }
             }
@@ -1573,9 +1588,10 @@ public class EuropeanAIPlayer extends AIPlayer {
      * @return The strength ratio (strength/sum(strengths)).
      */
     protected double getStrengthRatio(Player other) {
-        NationSummary ns = AIMessage.askGetNationSummary(this, other);
+        NationSummary ns = nationMap.get(other);
         int strength = getPlayer().calculateStrength(false);
-        return (double)strength / (strength + ns.getMilitaryStrength());
+        return (ns == null) ? -1.0 : 
+            (double)strength / (strength + ns.getMilitaryStrength());
     }
 
     /**
@@ -1591,21 +1607,20 @@ public class EuropeanAIPlayer extends AIPlayer {
         double navalAverage = 0.0;
         double navalStrength = 0.0;
         int nPlayers = 0;
-        for (Player p : getGame().getLiveEuropeanPlayers(null)) {
+        for (Entry<Player, NationSummary> e : nationMap.entrySet()) {
+            Player p = e.getKey();
             if (p.isREF()) continue;
             if (p == player) {
-                navalStrength = AIMessage.askGetNationSummary(this, p)
-                    .getNavalStrength();
+                navalStrength = e.getValue().getNavalStrength();
             } else {
-                int ns = AIMessage.askGetNationSummary(this, p)
-                    .getNavalStrength();
+                int ns = e.getValue().getNavalStrength();
                 if (ns >= 0) navalAverage += ns;
                 nPlayers++;
             }
         }
         if (nPlayers <= 0 || navalStrength < 0) return -1.0;
         navalAverage /= nPlayers;
-        return navalStrength / navalAverage;
+        return (navalAverage == 0.0) ? -1.0 : navalStrength / navalAverage;
     }
 
     /**
@@ -2225,6 +2240,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         }
         sessionRegister.clear();
         clearAIUnits();
+        cacheNations();
 
         // Note call to getAIUnits().  This triggers
         // AIPlayer.createAIUnits which we want to do early, certainly
