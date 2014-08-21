@@ -277,9 +277,6 @@ public class BuildColonyMission extends Mission {
         switch (reason) {
         case NONE: case NATIVES:
             return null;
-        case SETTLEMENT: // Continue to our settlements
-            if (owner.owns(tile.getSettlement())) return null;
-            break;
         default:
             break;
         }
@@ -370,29 +367,33 @@ public class BuildColonyMission extends Mission {
         final Unit unit = getUnit();
         final Player player = unit.getOwner();
 
+        boolean retarget = false;
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            if (!retargetMission(reason, lb)) return dropMission();
+            // Allow target invalidation by another builder succeeding, and
+            // continue on to the target as an intermediate colony.
+            Colony c;
+            if (target instanceof Tile
+                && (c = ((Tile)target).getColony()) != null
+                && player.owns(c)) {
+                setTarget(c);
+            }
         } else if (reason != null) {
             lbBroken(lb, reason);
             return null;
-        }
-
-        for (;;) {
+        } else { // Target valid, but has it devalued?
             if (target instanceof Tile) {
-                Colony c = ((Tile)target).getColony();
-                if (player.owns(c)) { // Another builder has succeeded
-                    setTarget(c);
-                } else {
-                    int newValue = getColonyValue((Tile)target);
-                    if (newValue < colonyValue) {
-                        reason = "target tile " + target.toShortString()
-                            + " value " + colonyValue + " -> " + newValue;
-                        if (!retargetMission(reason, lb)) return dropMission();
-                    }
+                int newValue = getColonyValue((Tile)target);
+                if (newValue < colonyValue) {
+                    reason = "target tile " + target.toShortString()
+                        + " value " + colonyValue + " -> " + newValue;
+                    retarget = true;
                 }
             }
+        }
+        if (retarget && !retargetMission(reason, lb)) return dropMission();
 
+        for (;;) {
             // Go there.
             Unit.MoveType mt = travelToTarget(getTarget(),
                 CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
