@@ -162,7 +162,7 @@ public abstract class TransportableAIObject extends ValuedAIObject {
      * @return The <code>AIUnit</code> which will transport this object.
      */
     public final AIUnit getTransport() {
-        return transport;
+        return this.transport;
     }
 
     /**

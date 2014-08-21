@@ -338,10 +338,20 @@ public class PathNode {
             p.onCarrier = true;
         }
         p.onCarrier = true;
-        p.next = new PathNode(p.location, p.movesLeft, p.turns, false,
-                              p, null);
+        ensureDisembark();
     }
 
+    /**
+     * Ensure the last node of this path is no longer on the carrier.
+     */
+    public void ensureDisembark() {
+        PathNode p = this.getLastNode();
+        if (p.isOnCarrier()) {
+            p.next = new PathNode(p.location, p.movesLeft, p.turns, false,
+                                  p, null);
+        }
+    }
+           
     /**
      * {@inheritDoc}
      */

@@ -1107,10 +1107,6 @@ public class Map extends FreeColGameObject implements Location {
             throw new IllegalArgumentException("Path fail: " + unit
                 + " from " + start + " to " + end + " with " + carrier, iae);
         }
-        // Do not allow finding a path into unexplored territory, as we
-        // do not have the terrain type and thus can not calculate costs.
-        if (realEnd instanceof Tile
-            && !((Tile)realEnd).isExplored()) return null;
         // Get the unit that will be used for off-map travel.
         final Unit offMapUnit = (carrier != null) ? carrier : unit;
 

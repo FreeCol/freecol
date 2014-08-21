@@ -252,16 +252,15 @@ public class AIUnit extends TransportableAIObject {
             : getAIMain().getAIUnit(carrier);
         TransportMission tm;
         AIUnit transport = getTransport();
-        if (transport != null) {
-            if (transport != aiCarrier) {
-                logger.warning("Boarded different transport: " + aiCarrier);
-                tm = transport.getMission(TransportMission.class);
-                if (tm != null) tm.removeTransportable(this);
-            }    
+        if (transport != aiCarrier) {
+            if (transport != null) {
+                logger.warning("Taking different transport: " + aiCarrier);
+                dropTransport();
+            }
+            setTransport(aiCarrier);
+            tm = aiCarrier.getMission(TransportMission.class);
+            if (tm != null) tm.queueTransportable(this, false);
         }
-        tm = aiCarrier.getMission(TransportMission.class);
-        if (tm != null) tm.requeueTransportable(this);
-        if (transport != aiCarrier) setTransport(aiCarrier);
     }
 
 
@@ -508,6 +507,7 @@ public class AIUnit extends TransportableAIObject {
         } else {
             path = unit.findPath(unit.getLocation(), dst, carrier, null);
         }
+        if (path != null) path.ensureDisembark();
         return path;
     }
 
@@ -623,6 +623,7 @@ public class AIUnit extends TransportableAIObject {
             ? (AIMessage.askDisembark(this)
                 && unit.getLocation() == carrier.getLocation())
             : move(direction);
+
         if (result) {
             requestLocalRearrange();
             dropTransport();
