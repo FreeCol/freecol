@@ -938,7 +938,13 @@ public class TransportMission extends Mission {
         }
 
         switch (cargo.getMode()) {
-        case LOAD: case PICKUP:
+        case PICKUP:
+            if (!t.canMove()) {
+                lb.add(", ", cargo.toShortString(), " out of moves");
+                return CargoResult.TCONTINUE;
+            }
+            // Fall through
+        case LOAD:
             switch (carrier.getNoAddReason(l)) {
             case NONE:
                 if (!t.joinTransport(carrier, cargo.getJoinDirection())) {
@@ -962,9 +968,16 @@ public class TransportMission extends Mission {
                 lb.add(", ", cargo.toShortString(), " NO-UPDATE(", reason, ")");
                 return CargoResult.TFAIL;
             }
+            lb.add(", ", cargo.toShortString(), " collected");
             return CargoResult.TNEXT;
 
-        case UNLOAD: case DROPOFF:
+        case DROPOFF:
+            if (!t.canMove()) {
+                lb.add(", ", cargo.toShortString(), " about to disembark");
+                return CargoResult.TCONTINUE;
+            }
+            // Fall through
+        case UNLOAD:
             if (isCarrying(t) && !t.leaveTransport(cargo.getLeaveDirection())) {
                 lb.add(", ", cargo.toShortString(), " NO-LEAVE");
                 return CargoResult.TFAIL;
