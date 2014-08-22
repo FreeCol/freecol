@@ -466,13 +466,8 @@ public class UnitSeekAndDestroyMission extends Mission {
             return dropMission();
         }
 
-        final Unit unit = getUnit();
-        if (checkDisembark(lb) < 0) {
-            if (unit.isDisposed()) return dropMission();
-            return this;
-        }
-
         // Is there a target-of-opportunity?
+        final Unit unit = getUnit();
         final AIUnit aiUnit = getAIUnit();
         Location nearbyTarget = (unit.isOnCarrier()) ? null
             : findTarget(aiUnit, 1, false);

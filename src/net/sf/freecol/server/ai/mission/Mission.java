@@ -511,67 +511,6 @@ public abstract class Mission extends AIObject {
     }
 
     /**
-     * Check if a unit can disembark to its transport destination.
-     * This is useful because the normal path finding does not always
-     * chose to use the transport destination tile, but it may have been
-     * chosen carefully.
-     *
-     * @param lb A <code>LogBuilder</code> to log to.
-     * @return Positive if the unit disembarked, zero if no change occurs,
-     *     negative if the disembark failed.
-     */
-    protected int checkDisembark(LogBuilder lb) {
-        final AIUnit aiUnit = getAIUnit();
-        final Unit unit = getUnit();
-        Location transportTarget;
-        Tile tile;
-        if (unit != null
-            && unit.hasTile()
-            && unit.isOnCarrier()
-            && (transportTarget = getTransportDestination()) != null
-            && (tile = transportTarget.getTile()) != null) {
-            if (unit.getTile() == tile) {
-                if (aiUnit.leaveTransport(null)) {
-                    lb.add(", disembarked to ", tile);
-                    return 1;
-                } else {
-                    lb.add(", failed to disembark from ", unit.getLocation());
-                    return -1;
-                }
-            }
-
-            Direction d = unit.getTile().getDirection(tile);
-            if (d != null) {
-                Unit.MoveType mt = unit.getMoveType(d);
-                switch (mt) {
-                case MOVE:
-                    if (aiUnit.leaveTransport(d)) {
-                        lb.add(", disembarked ", d, " to ", tile);
-                        return 1;
-                    } else {
-                        lbFail(lb, ", failed to disembark ", d, " to ", tile);
-                        return -1;
-                    }
-                case ATTACK_UNIT:
-                    Unit other = tile.getFirstUnit();
-                    if (unit.getOwner().atWarWith(other.getOwner())) {
-                        lbAttack(lb, other);
-                        AIMessage.askAttack(aiUnit, d);
-                        return -1;
-                    } else {
-                        lb.add(", blocked by ", other, " at ", tile);
-                        return 0;
-                    }
-                default:
-                    lbMove(lb, unit, mt);
-                    break;
-                }
-            }
-        }
-        return 0;
-    }
-
-    /**
      * Tries to move this mission's unit to a target location.
      *
      * First check for units in transit, that is units on a carrier that
