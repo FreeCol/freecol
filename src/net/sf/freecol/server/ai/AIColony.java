@@ -275,7 +275,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         Set<AIUnit> result = new HashSet<AIUnit>();
 
         // First check if it is collapsing.
-        if (colony.getUnitCount() <= 0) avertAutoDestruction();
+        if (colony.getUnitCount() <= 0) {
+            if (!avertAutoDestruction()) return result;
+        }
 
         // Skip this colony if it does not yet need rearranging.
         final int turn = getGame().getTurn().getNumber();
@@ -387,7 +389,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 + " in " + turn + ":";
             for (UnitWas uw : was) destruct += "\n" + uw;
             logger.warning(destruct);
-            avertAutoDestruction();
+            if (!avertAutoDestruction()) return result;
         }
 
         // Argh.  We may have chosen to build something we can no
@@ -655,16 +657,17 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * Throwing an exception stalls the AI and wrecks the colony in a
      * weird way.  Try to recover by hopefully finding a unit outside
      * the colony and stuffing it into the town hall.
+     *
+     * @return True if autodestruction has been averted.
      */
-    private void avertAutoDestruction() {
-        String msg = "Colony " + colony.getName()
-            + " rearrangement leaves no units, "
-            + colony.getTile().getUnitCount() + " available";
-        for (Unit u : colony.getTile().getUnitList()) msg += ", " + u;
-
+    private boolean avertAutoDestruction() {
+        LogBuilder lb = new LogBuilder(64);
+        lb.add("Colony ", colony.getName(), " rearrangement leaves no units, ",
+            colony.getTile().getUnitCount(), " available:");
+        for (Unit u : colony.getTile().getUnitList()) lb.add(" ", u);
         List<GoodsType> libertyGoods = getSpecification()
             .getLibertyGoodsTypeList();
-        for (Unit u : colony.getTile().getUnitList()) {
+        out: for (Unit u : colony.getTile().getUnitList()) {
             if (!u.isPerson()) continue;
             for (WorkLocation wl : colony.getAvailableWorkLocations()) {
                 if (!wl.canAdd(u)) continue;
@@ -673,17 +676,14 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                         && AIMessage.askWork(getAIUnit(u), wl)
                         && u.getLocation() == wl) {
                         AIMessage.askChangeWorkType(getAIUnit(u), type);
-                        msg += ".  Autodestruct averted with " + u + ".";
-                        logger.warning(msg);
-                        break;
+                        lb.add(", averts destruction with ", u);
+                        break out;
                     }
                 }
             }
         }
-        // No good, no choice but to fail.
-        if (colony.getUnitCount() <= 0) {
-            throw new IllegalStateException(msg);
-        }
+        lb.log(logger, Level.WARNING);
+        return colony.getUnitCount() > 0;
     }
 
     /**
