@@ -379,7 +379,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         final int maxRange = map.getWidth() + map.getHeight();
         Location target;
         Mission m;
-        lb.mark();
+        TransportMission tm;
         for (AIUnit aiCarrier : aiUnits) {
             if (aiCarrier.hasMission()) continue;
             Unit carrier = aiCarrier.getUnit();
@@ -402,9 +402,15 @@ public class EuropeanAIPlayer extends AIPlayer {
             // Initialize the carrier mission after the cargo units
             // have a valid mission so that the transport list and
             // mission target do not break.
-            if ((m = getTransportMission(aiCarrier)) != null) lb.add(m, ", ");
+            if ((tm = (TransportMission)getTransportMission(aiCarrier)) != null) {
+                for (Unit u : carrier.getUnitList()) {
+                    AIUnit aiu = getAIMain().getAIUnit(u);
+                    if (aiu == null) continue;
+                    tm.queueTransportable(aiu, false);
+                }
+                lb.add(tm.toFullString());
+            }
         }
-        if (lb.grew()) lb.shrink(", ");
 
         // Put in some backup missions.
         lb.mark();
@@ -412,7 +418,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             if (aiu.hasMission()) continue;
             if ((m = getSimpleMission(aiu)) != null) lb.add(m, ", ");
         }
-        if (lb.grew(", backup: ")) lb.shrink(", ");
+        if (lb.grew("\n  Backup: ")) lb.shrink(", ");
     }
 
     /**
@@ -769,7 +775,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
             if (best != null) {
                 if (best.queueTransportable(t, false)) {
-                    lb.add("\n  Queued ", t, " to ", best);
+                    lb.add("\n  Queued ", t, " to ", best.toFullString());
                     claimTransportable(t);
                     if (best.destinationCapacity() <= 0) {
                         missions.remove(best);

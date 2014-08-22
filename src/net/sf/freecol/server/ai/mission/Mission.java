@@ -613,38 +613,34 @@ public abstract class Mission extends AIObject {
         if (!(target instanceof Europe) && targetTile == null) {
             throw new IllegalStateException("Target neither Europe nor Tile");
         }
-
         final Unit unit = getUnit();
         final AIUnit aiUnit = getAIUnit();
-        final Unit carrier = unit.getCarrier();
+        final AIUnit aiCarrier = aiUnit.getTransport();
         final Map map = unit.getGame().getMap();
         PathNode path = null;
         boolean inTransit = false;
         boolean needTransport = false;
 
-        // Are we there yet?
-        if (unit.isAtLocation(target)) {
-            if (unit.isOnCarrier()) {
-                if (aiUnit.leaveTransport(null)) {
-                    lb.add(", disembarked from ", carrier);
-                } else {
-                    lb.add(", at ", target, " failed to disembark from ",
-                           carrier, ".");
-                    return MoveType.MOVE_ILLEGAL;
-                }
-            }
-            return MoveType.MOVE;
-        }
-
-        // Sanitize the unit location and drop out the trivial cases.
         if (unit.isAtSea()) {
+            // Wait for carrier to arrive on the map.
             lb.add(", at sea.");
             return MoveType.MOVE_NO_MOVES;
+        } else if (unit.isOnCarrier()) {
+            // Transport mission will disembark the unit when it
+            // arrives at the drop point.
+            lb.add(", on carrier.");
+            return MoveType.MOVE_NO_MOVES;
+        } else if (unit.isAtLocation(target)) {
+            // Arrived!
+            return MoveType.MOVE;
         } else if (unit.isInEurope()) {
+            // Leave or wait for transport.
             if (!unit.getOwner().canMoveToEurope()) {
                 throw new IllegalStateException("Impossible move from Europe");
             }
-            if (unit.getType().canMoveToHighSeas()) {
+            if (!unit.getType().canMoveToHighSeas()) {
+                path = null;
+            } else {
                 unit.setDestination(target);
                 if (AIMessage.askMoveTo(aiUnit, map)) {
                     lb.add(", sailed for ", target, ".");
@@ -656,46 +652,33 @@ public abstract class Mission extends AIObject {
             }
         } else if (!unit.hasTile()) {
             throw new IllegalStateException("Unit not on the map: " + unit);
-        } else if (target instanceof Europe) {
-            if (!unit.getOwner().canMoveToEurope()) {
+        } else {
+            // On map
+            if (target instanceof Europe &&
+                !unit.getOwner().canMoveToEurope()) {
                 lbFail(lb, "impossible move to Europe for ", unit);
                 return MoveType.MOVE_ILLEGAL;
             }
-            if (unit.getType().canMoveToHighSeas()
-                && unit.getTile().isDirectlyHighSeasConnected()) {
-                if (AIMessage.askMoveTo(aiUnit, target)) {
-                    lb.add(", sailed for ", target, ".");
-                    return MoveType.MOVE_HIGH_SEAS;
-                } else {
-                    lb.add(", failed to sail for ", target, ".");
-                    return MoveType.MOVE_ILLEGAL;
-                }
-            }
+            path = (target instanceof Europe
+                && !unit.getType().canMoveToHighSeas()) ? null
+                : unit.findPath(unit.getLocation(), target, null, costDecider);
         }
-
-        path = unit.findPath(unit.getLocation(), target, carrier, costDecider);
         if (path == null) {
-            if (unit.getType().canMoveToHighSeas() || unit.isOnCarrier()
-                || unit.getOwner().isIndian()) {
+            // A carrier will be required.
+            if (unit.canCarryGoods()) {
+                // Carriers can not be carried, so this must fail.
                 lb.add(", no path from ", unit.getLocation(),
                        " to ", target, ".");
                 return MoveType.MOVE_NO_TILE;
             }
-            AIUnit newAICarrier = aiUnit.getTransport();
-            if (newAICarrier == null) {
+            if (aiCarrier == null) {
                 lb.add(", at ", unit.getLocation(),
-                       " needs transport to ", target, ".");
-                return MoveType.MOVE_ILLEGAL;
-            }
-            Unit newCarrier = newAICarrier.getUnit();
-            path = unit.findPath(unit.getLocation(), target,
-                                 newCarrier, costDecider);
-            if (path == null) {
+                    " needs transport to ", target, ".");
+            } else {
                 lb.add(", at ", unit.getLocation(),
-                       " no path to ", target,
-                       " with assigned carrier ", newCarrier, ".");
-                return MoveType.MOVE_ILLEGAL;
+                    " wait for ", aiCarrier.getUnit(), ".");
             }
+            return MoveType.MOVE_ILLEGAL;
         }
         if (path.next == null) {
             throw new IllegalStateException("Trivial path found "
