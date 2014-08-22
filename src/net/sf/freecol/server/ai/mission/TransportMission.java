@@ -1411,9 +1411,7 @@ public class TransportMission extends Mission {
                     // Add the new and blocked cargoes incrementally with
                     // the current arrangement, which is likely to put them
                     // at the end.
-                    while (!next.isEmpty()) {
-                        queueCargo(next.remove(0), false);
-                    }
+                    for (Cargo c : next) queueCargo(c, false);
                 }
 
                 // See if the transportables need replenishing.
