@@ -305,6 +305,14 @@ public abstract class TransportableAIObject extends ValuedAIObject {
     public abstract boolean carriableBy(Unit carrier);
 
     /**
+     * This transportable can move now.  Useful for units that may or
+     * may not have enough moves left to join or leave a carrier.
+     *
+     * @return True if the transportable can move.
+     */
+    public abstract boolean canMove();
+
+    /**
      * This object leaves its current carrier unit by the most
      * suitable means.
      *

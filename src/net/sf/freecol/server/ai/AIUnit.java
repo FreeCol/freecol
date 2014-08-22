@@ -535,6 +535,13 @@ public class AIUnit extends TransportableAIObject {
     /**
      * {@inheritDoc}
      */
+    public boolean canMove() {
+        return getUnit().getMovesLeft() > 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public boolean leaveTransport() {
         final Unit unit = getUnit();
         if (!unit.isOnCarrier()) return true; // Harmless error

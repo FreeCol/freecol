@@ -267,6 +267,13 @@ public class AIGoods extends TransportableAIObject {
     /**
      * {@inheritDoc}
      */
+    public boolean canMove() {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public boolean leaveTransport() {
         return leaveTransport(null);
     }
