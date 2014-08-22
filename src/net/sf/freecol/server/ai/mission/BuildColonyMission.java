@@ -30,6 +30,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
@@ -334,7 +335,8 @@ public class BuildColonyMission extends Mission {
     public void setTarget(Location target) {
         if (target == null
             || target instanceof Colony || target instanceof Tile) {
-            boolean retarget = this.target != null && this.target != target;
+            boolean retarget = this.target != null
+                && !Map.isSameLocation(this.target, target);
             this.target = target;
             this.colonyValue = (target instanceof Tile)
                 ? getColonyValue((Tile)target)
