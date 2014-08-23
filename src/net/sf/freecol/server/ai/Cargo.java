@@ -593,7 +593,7 @@ public class Cargo {
         LogBuilder lb = new LogBuilder(32);
         lb.add(getModeString(), " ", transportable);
         Location lt = getTransportTarget();
-        lb.add(" @ ", lt.toShortString());
+        lb.add(" @ ", ((lt == null) ? "null" : lt.toShortString()));
         Location ct = getCarrierTarget();
         if (ct != lt) lb.add("/", ct.toShortString());
         return lb.toString();
@@ -621,13 +621,16 @@ public class Cargo {
         lb.add("[", transportable,
             " ", getModeString(),
             " ", getTurns(), "/", tries, " space=", spaceLeft,
-            ((wrapped == null) ? "" : " wrap "), " ");
+            ((wrapped == null) ? "" : " wrap "));
         if (plan.twait != null && plan.cwait != null) {
-            lb.add(plan.twait.toShortString(),
-                "/", plan.cwait.toShortString(), ",");
+            lb.add(" ", plan.twait.toShortString(),
+                "/", plan.cwait.toShortString());
         }
-        lb.add(plan.cdst.toShortString(), "/", plan.tdst.toShortString(),
-            " ", plan.fallback, "]");
+        if (plan.cdst != null && plan.tdst != null) {
+            lb.add("->", plan.cdst.toShortString(),
+                "/", plan.tdst.toShortString());
+        }
+        lb.add(" ", plan.fallback, "]");
         return lb.toString();
     }            
 
