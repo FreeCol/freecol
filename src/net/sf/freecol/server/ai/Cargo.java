@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
@@ -198,13 +199,15 @@ public class Cargo {
             // terminal points.
             if (carrying) {
                 this.turns = deliver.getTotalTurns();
-                this.mode = (cdst.getColony() == null) ? CargoMode.DROPOFF
-                    : CargoMode.UNLOAD;
+                this.mode = (this.cdst instanceof Europe
+                    || this.cdst.getColony() != null) ? CargoMode.UNLOAD
+                    : CargoMode.DROPOFF;
             } else {
                 this.turns = Math.max(pick.getTurns(), collect.getTotalTurns())
                     + pick.getTotalTurns();
-                this.mode = (cwait.getColony() == null) ? CargoMode.PICKUP
-                    : CargoMode.LOAD;
+                this.mode = (this.cwait instanceof Europe
+                    || this.cwait.getColony() != null) ? CargoMode.LOAD
+                    : CargoMode.PICKUP;
             }
             return null;
         }
