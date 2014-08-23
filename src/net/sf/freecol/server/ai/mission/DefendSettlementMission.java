@@ -329,11 +329,11 @@ public class DefendSettlementMission extends Mission {
         if (getTarget() instanceof Colony) {
             Colony colony = (Colony)getTarget();
             if (unit.isInColony()
-                || (unit.isPerson() && colony.getUnitCount() <= 1)) {
+                || (unit.isPerson() && colony.getUnitCount() < 1)) {
                 m = getEuropeanAIPlayer().getWorkInsideColonyMission(aiUnit,
                     aiMain.getAIColony(colony));
                 if (m != null) {
-                    lbDone(lb, " bolster ", colony, ", switch to ", m);
+                    lbDone(lb, "bolster ", colony, ", switch to ", m);
                     return m;
                 }
             }
