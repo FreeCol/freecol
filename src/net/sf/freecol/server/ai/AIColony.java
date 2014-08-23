@@ -861,7 +861,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             exportGoods.addAll(newAIGoods);
             Collections.sort(exportGoods);
         }
-        lb.grew(" " + colony.getName());
+        lb.grew(" ", colony.getName());
     }
 
 

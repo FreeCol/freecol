@@ -1288,7 +1288,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                     lb.add(", ");
                 }
             }
-            if (lb.grew("\n  Wishes (workers):")) lb.shrink(", ");
+            if (lb.grew("\n  Wishes (workers): ")) lb.shrink(", ");
         }
         if (!goodsWishes.isEmpty()) {
             lb.mark();
@@ -1303,7 +1303,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                     lb.add(", ");
                 }
             }
-            if (lb.grew("\n  Wishes (goods):")) lb.shrink(", ");
+            if (lb.grew("\n  Wishes (goods): ")) lb.shrink(", ");
         }
     }
 
@@ -1954,13 +1954,12 @@ public class EuropeanAIPlayer extends AIPlayer {
                 lb.add(" ", aiu.getUnit());
             }
         }
-        lb.add("\n  Missions(",
-            " colonies=", player.getNumberOfSettlements(),
+        lb.add("\n  Missions(colonies=", player.getNumberOfSettlements(),
             " builders=", nBuilders,
             " pioneers=", nPioneers,
             " scouts=", nScouts,
             " naval-carriers=", nNavalCarrier,
-            " )");
+            ")");
         logMissions(reasons, lb);
     }
 
@@ -2222,28 +2221,38 @@ public class EuropeanAIPlayer extends AIPlayer {
             throw new RuntimeException("EuropeanAIPlayer integrity fail");
         }
 
-        LogBuilder lb = new LogBuilder(1024);
-        lb.add(player.getNation().getSuffix(),
-               " in ", turn, "/", turn.getNumber(),
-               " declare=", (player.checkDeclareIndependence() == null),
-               " strength=", player.getRebelStrengthRatio());
         sessionRegister.clear();
         clearAIUnits();
 
+        // Note call to getAIUnits().  This triggers
+        // AIPlayer.createAIUnits which we want to do early, certainly
+        // before cheat() or other operations that might make new ones
+        // happens.
+        LogBuilder lb = new LogBuilder(1024);
+        int colonyCount = getAIColonies().size();
+        lb.add(player.getNation().getSuffix(),
+               " in ", turn, "/", turn.getNumber(),
+               " units=", getAIUnits().size(),
+               " colonies=", colonyCount,
+               " declare=", (player.checkDeclareIndependence() == null),
+               " strength=", player.getRebelStrengthRatio());
         if (turn.isFirstTurn()) initializeMissions(lb);
         determineStances(lb);
 
-        lb.mark();
-        for (AIColony aic : getAIColonies()) {
-            if (aic.isBadlyDefended()) lb.add(" ", aic.getColony());
+        if (colonyCount > 0) {
+            lb.add("\n  Badly defended:");
+            for (AIColony aic : getAIColonies()) {
+                if (aic.isBadlyDefended()) lb.add(" ", aic.getColony());
+            }
+
+            lb.add("\n  Update goods:");
+            for (AIColony aic : getAIColonies()) aic.updateGoods(lb);
+
+            buildTipMap(lb);
+            buildWishMaps(lb);
         }
-        lb.grew("\n  Badly defended colonies:");
-        lb.mark();
-        for (AIColony aic : getAIColonies()) aic.updateGoods(lb);
-        lb.grew("\n  Update goods:");
-        buildTipMap(lb);
+
         buildTransportMaps(lb);
-        buildWishMaps(lb);
         cheat(lb);
         rearrangeColonies(lb);
         giveNormalMissions(lb);
