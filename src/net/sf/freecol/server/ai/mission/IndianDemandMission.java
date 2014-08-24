@@ -55,11 +55,8 @@ public class IndianDemandMission extends Mission {
     /** The tag for this mission. */
     private static final String tag = "AI native demander";
 
-    /** The mission target, which is the colony to demand from. */
-    private Location target;
-
-    /** Whether this mission has been completed or not. */
-    private boolean completed;
+    /** The colony to demand from. */
+    private Colony colony;
 
     /** Whether the demand has been made or not. */
     private boolean demanded;
@@ -75,7 +72,6 @@ public class IndianDemandMission extends Mission {
     public IndianDemandMission(AIMain aiMain, AIUnit aiUnit, Colony target) {
         super(aiMain, aiUnit, target);
 
-        this.completed = false;
         this.demanded = false;
     }
 
@@ -214,6 +210,10 @@ public class IndianDemandMission extends Mission {
                         GoodsContainer.CARGO_SIZE); // One load of goods max
     }
 
+    private static IndianSettlement getHome(AIUnit aiUnit) {
+        return aiUnit.getUnit().getHomeIndianSettlement();
+    }
+
     /**
      * Why would this mission be invalid with the given unit?
      *
@@ -223,9 +223,10 @@ public class IndianDemandMission extends Mission {
      */
     private static String invalidMissionReason(AIUnit aiUnit) {
         String reason = invalidAIUnitReason(aiUnit);
+        IndianSettlement home;
         return (reason != null)
             ? reason
-            : (aiUnit.getUnit().getHomeIndianSettlement() == null)
+            : ((home = getHome(aiUnit)) == null || home.isDisposed())
             ? "home-destroyed"
             : null;
     }
@@ -281,6 +282,8 @@ public class IndianDemandMission extends Mission {
             ? reason
             : (loc instanceof Colony)
             ? invalidColonyReason(aiUnit, (Colony)loc)
+            : (loc instanceof IndianSettlement)
+            ? invalidTargetReason(loc, aiUnit.getUnit().getOwner())
             : Mission.TARGETINVALID;
     }
 
@@ -300,7 +303,8 @@ public class IndianDemandMission extends Mission {
      * {@inheritDoc}
      */
     public Location getTarget() {
-        return target;
+        return (this.demanded) ? getUnit().getHomeIndianSettlement()
+            : this.colony;
     }
 
     /**
@@ -308,7 +312,7 @@ public class IndianDemandMission extends Mission {
      */
     public void setTarget(Location target) {
         if (target instanceof Colony) {
-            this.target = target;
+            this.colony = (Colony)target;
         }
     }
 
@@ -323,11 +327,7 @@ public class IndianDemandMission extends Mission {
      * {@inheritDoc}
      */
     public String invalidReason() {
-        String reason = invalidReason(getAIUnit(), target);
-        return (reason != null) ? reason
-            : (completed)
-            ? "completed"
-            : null;
+        return invalidReason(getAIUnit(), getTarget());
     }
 
     /**
@@ -341,38 +341,78 @@ public class IndianDemandMission extends Mission {
         final AIUnit aiUnit = getAIUnit();
         final Unit unit = getUnit();
         final IndianSettlement is = unit.getHomeIndianSettlement();
-        while (!completed) {
-            if (hasTribute()) {
-                Unit.MoveType mt = travelToTarget(is,
-                    CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
-                switch (mt) {
-                case MOVE_HIGH_SEAS: case MOVE_NO_REPAIR:
-                    return lbWait(lb);
+        Direction d;
 
-                case MOVE_NO_MOVES: case MOVE_NO_TILE: case MOVE_ILLEGAL:
-                    return this;
+        while (!this.demanded) {
+            Unit.MoveType mt = travelToTarget(getTarget(), null, lb);
+            switch (mt) {
+            case MOVE_HIGH_SEAS: case MOVE_NO_REPAIR:
+                return lbWait(lb);
 
-                case MOVE: // Arrived
-                    break;
+            case MOVE_NO_MOVES: case MOVE_NO_TILE: case MOVE_ILLEGAL:
+                return this;
 
-                default:
-                    return lbMove(lb, mt);
+            case ATTACK_SETTLEMENT: // Arrived?
+                d = unit.getTile().getDirection(getTarget().getTile());
+                if (d != null) break; // Yes, arrived at target
+                // Fall through
+            case ATTACK_UNIT: // Something is blocking our path
+                Location blocker = resolveBlockage(aiUnit, getTarget());
+                if (blocker == null) {
+                    moveRandomly(tag, null);
+                    continue;
                 }
-
-                // Unload the goods
-                lbAt(lb);
-                GoodsContainer container = unit.getGoodsContainer();
-                for (Goods goods : container.getCompactGoods()) {
-                    Goods tribute = container.removeGoods(goods.getType());
-                    is.addGoods(tribute);
+                d = unit.getTile().getDirection(blocker.getTile());
+                if (AIMessage.askAttack(aiUnit, d)) {
+                    return lbAttack(lb, blocker);
                 }
-                completed = true;
-                return lbDone(lb, false, "unloaded tribute");
+                continue;
+
+            default:
+                return lbMove(lb, mt);
             }
 
-            // Move to the target's colony and demand
-            Direction d;
-            Unit.MoveType mt = travelToTarget(target, null, lb);
+            // Load the goods.
+            lbAt(lb);
+            Colony colony = (Colony)getTarget();
+            Player enemy = colony.getOwner();
+            Goods goods = selectGoods(colony);
+            GoodsType type = (goods == null) ? null : goods.getType();
+            int amount = (goods == null) ? 0 : goods.getAmount();
+            int oldGoods = (goods == null) ? 0 : unit.getGoodsCount(type);
+            if (goods == null) {
+                if (!enemy.checkGold(1)) {
+                    return lbDone(lb, false, "empty handed");
+                }
+                amount = enemy.getGold() / 20;
+                if (amount == 0) amount = enemy.getGold();
+            }
+            this.demanded
+                = AIMessage.askIndianDemand(aiUnit, colony, type, amount);
+            if (this.demanded && (goods == null || hasTribute())) {
+                if (goods == null) {
+                    return lbDone(lb, false, "accepted tribute ",
+                                  amount, " gold");
+                }
+                lb.add(", accepted tribute ", goods);
+                return lbRetarget(lb);
+            }
+
+            // Consider attacking if not content.
+            int unitTension = (is == null) ? 0 : is.getAlarm(enemy).getValue();
+            int tension = Math.max(unitTension,
+                unit.getOwner().getTension(enemy).getValue());
+            d = unit.getTile().getDirection(colony.getTile());
+            if (tension >= Tension.Level.CONTENT.getLimit() && d != null) {
+                if (AIMessage.askAttack(aiUnit, d)) lbAttack(lb, colony);
+            }
+            return lbDone(lb, false, "refused at ", colony);
+        }
+
+        // Take the goods home
+        for (;;) {
+            Unit.MoveType mt = travelToTarget(getTarget(),
+                CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
             switch (mt) {
             case MOVE_HIGH_SEAS: case MOVE_NO_REPAIR:
                 return lbWait(lb);
@@ -382,78 +422,27 @@ public class IndianDemandMission extends Mission {
 
             case MOVE: // Arrived
                 break;
-
-            case ATTACK_SETTLEMENT:
-                d = unit.getTile().getDirection(target.getTile());
-                if (d != null) break; // Arrived at target, handled below.
-                // Fall through
-            case ATTACK_UNIT: // Something is blocking our path
-                Location blocker = resolveBlockage(aiUnit, target);
-                if (blocker == null) {
-                    moveRandomly(tag, null);
-                    return lbDodge(lb);
-                }
-                d = unit.getTile().getDirection(blocker.getTile());
-                AIMessage.askAttack(aiUnit, d);
-                return lbAttack(lb, blocker);
-
+                
             default:
-                moveRandomly(tag, null);
                 return lbMove(lb, mt);
             }
-
+        
+            // Unload the goods
             lbAt(lb);
-            Colony colony = (Colony)getTarget();
-            Player enemy = colony.getOwner();
-            Goods goods = selectGoods(colony);
-            GoodsType type = (goods == null) ? null : goods.getType();
-            int amount = (goods == null) ? 0 : goods.getAmount();
-            int oldGoods = (goods == null) ? 0
-                : unit.getGoodsCount(type);
-            if (goods == null) {
-                if (!enemy.checkGold(1)) {
-                    completed = true;
-                    return lbDone(lb, false, "empty handed");
-                }
-                amount = enemy.getGold() / 20;
-                if (amount == 0) amount = enemy.getGold();
+            GoodsContainer container = unit.getGoodsContainer();
+            for (Goods goods : container.getCompactGoods()) {
+                Goods tribute = container.removeGoods(goods.getType());
+                is.addGoods(tribute);
             }
-            demanded = true;
-
-            boolean accepted
-                = AIMessage.askIndianDemand(aiUnit, colony, type, amount);
-            if (accepted && (goods == null || hasTribute())) {
-                if (goods != null) {
-                    lb.add(" accepted tribute: ", goods);
-                    continue; // Head for home
-                } else {
-                    lb.add(" accepted tribute: ", amount, " gold");
-                }
-            } else { // Consider attacking if not content.
-                int unitTension = (is == null) ? 0
-                    : is.getAlarm(enemy).getValue();
-                int tension = Math.max(unitTension,
-                    unit.getOwner().getTension(enemy).getValue());
-                d = unit.getTile().getDirection(colony.getTile());
-                boolean attack = tension >= Tension.Level.CONTENT.getLimit()
-                    && d != null;
-                if (attack) {
-                    AIMessage.askAttack(aiUnit, d);
-                    lbAttack(lb, colony);
-                }
-                completed = true;
-                return lbDone(lb, false, "refused at ", colony);
-            }
+            return lbDone(lb, false, "unloaded tribute");
         }
-        return this;
     }
 
 
     // Serialization
 
-    private static final String COMPLETED_TAG = "completed";
+    private static final String COLONY_TAG = "colony";
     private static final String DEMANDED_TAG = "demanded";
-    private static final String TARGET_TAG = "target";
 
 
     /**
@@ -463,13 +452,11 @@ public class IndianDemandMission extends Mission {
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
-        if (target != null) {
-            xw.writeAttribute(TARGET_TAG, target.getId());
+        if (this.colony != null) {
+            xw.writeAttribute(COLONY_TAG, this.colony.getId());
         }
 
-        xw.writeAttribute(COMPLETED_TAG, completed);
-
-        xw.writeAttribute(DEMANDED_TAG, demanded);
+        xw.writeAttribute(DEMANDED_TAG, this.demanded);
     }
 
     /**
@@ -479,12 +466,10 @@ public class IndianDemandMission extends Mission {
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        target = xr.getAttribute(getGame(), TARGET_TAG,
-                                 Colony.class, (Colony)null);
+        this.colony = xr.getAttribute(getGame(), COLONY_TAG,
+                                      Colony.class, (Colony)null);
 
-        completed = xr.getAttribute(COMPLETED_TAG, false);
-
-        demanded = xr.getAttribute(DEMANDED_TAG, false);
+        this.demanded = xr.getAttribute(DEMANDED_TAG, false);
     }
 
     /**

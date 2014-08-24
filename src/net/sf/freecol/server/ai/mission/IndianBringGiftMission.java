@@ -59,10 +59,10 @@ public class IndianBringGiftMission extends Mission {
     private static final String tag = "AI native gifter";
 
     /** The Colony to receive the gift. */
-    private Location target;
+    private Colony colony;
 
-    /** Decides whether this mission has been completed or not. */
-    private boolean completed;
+    /** Has the gift been collected? */
+    private boolean collected;
 
 
     /**
@@ -75,7 +75,7 @@ public class IndianBringGiftMission extends Mission {
     public IndianBringGiftMission(AIMain aiMain, AIUnit aiUnit, Colony target) {
         super(aiMain, aiUnit, target);
 
-        this.completed = false;
+        this.collected = false;
     }
 
     /**
@@ -96,6 +96,8 @@ public class IndianBringGiftMission extends Mission {
     }
 
 
+    public Colony getColony() { return this.colony; }
+
     /**
      * Checks if the unit is carrying a gift (goods).
      *
@@ -114,9 +116,11 @@ public class IndianBringGiftMission extends Mission {
      */
     private static String invalidMissionReason(AIUnit aiUnit) {
         String reason = invalidAIUnitReason(aiUnit);
+        IndianSettlement home;
         return (reason != null)
             ? reason
-            : (aiUnit.getUnit().getHomeIndianSettlement() == null)
+            : ((home = aiUnit.getUnit().getHomeIndianSettlement()) == null
+                || home.isDisposed())
             ? "home-destroyed"
             : null;
     }
@@ -170,6 +174,8 @@ public class IndianBringGiftMission extends Mission {
         return (reason != null) ? reason
             : (loc instanceof Colony)
             ? invalidColonyReason(aiUnit, (Colony)loc)
+            : (loc instanceof IndianSettlement)
+            ? invalidTargetReason(loc, aiUnit.getUnit().getOwner())
             : Mission.TARGETINVALID;
     }
 
@@ -189,7 +195,8 @@ public class IndianBringGiftMission extends Mission {
      * {@inheritDoc}
      */
     public Location getTarget() {
-        return target;
+        return (this.collected) ? this.colony
+            : getUnit().getHomeIndianSettlement();
     }
 
     /**
@@ -197,7 +204,7 @@ public class IndianBringGiftMission extends Mission {
      */
     public void setTarget(Location target) {
         if (target instanceof Colony) {
-            this.target = target;
+            this.colony = (Colony)target;
         }
     }
 
@@ -205,18 +212,14 @@ public class IndianBringGiftMission extends Mission {
      * {@inheritDoc}
      */
     public Location findTarget() {
-        throw new IllegalStateException("Target is fixed");
+        return getTarget();
     }
 
     /**
      * {@inheritDoc}
      */
     public String invalidReason() {
-        String reason = invalidReason(getAIUnit(), target);
-        return (reason != null) ? reason
-            : (completed)
-            ? "completed"
-            : null;
+        return invalidReason(getAIUnit(), this.colony);
     }
 
     /**
@@ -231,8 +234,8 @@ public class IndianBringGiftMission extends Mission {
         final Unit unit = getUnit();
         final IndianSettlement is = unit.getHomeIndianSettlement();
 
-        if (!hasGift()) {
-            Unit.MoveType mt = travelToTarget(is, null, lb);
+        while (!this.collected) {
+            Unit.MoveType mt = travelToTarget(getTarget(), null, lb);
             switch (mt) {
             case MOVE_HIGH_SEAS: case MOVE_NO_REPAIR:
                 return lbWait(lb);
@@ -244,15 +247,14 @@ public class IndianBringGiftMission extends Mission {
                 break;
 
             case ATTACK_SETTLEMENT: case ATTACK_UNIT: // A blockage!
-                Location blocker = resolveBlockage(aiUnit, is);
-                if (blocker != null) {
-                    AIMessage.askAttack(aiUnit, unit.getTile()
-                        .getDirection(blocker.getTile()));
-                    lbAttack(lb, blocker);
-                    return this;
+                Location blocker = resolveBlockage(aiUnit, getTarget());
+                if (blocker != null
+                    && AIMessage.askAttack(aiUnit, unit.getTile()
+                        .getDirection(blocker.getTile()))) {
+                    return lbAttack(lb, blocker);
                 }
                 moveRandomly(tag, null);
-                return lbDodge(lb);
+                continue;
 
             default:
                 return lbMove(lb, mt);
@@ -261,69 +263,64 @@ public class IndianBringGiftMission extends Mission {
             // Load the goods.
             lbAt(lb);
             Goods gift = is.getRandomGift(getAIRandom());
-            if (gift == null) {
-                completed = true;
-                return lbFail(lb, false, "found no gift");
-            }
+            if (gift == null) return lbFail(lb, false, "found no gift");
             if (!AIMessage.askLoadCargo(aiUnit, gift) || !hasGift()) {
-                completed = true;
                 return lbFail(lb, false, "failed to collect gift");
             }
+            this.collected = true;
             lb.add(", collected gift");
-            return this;
+            return lbRetarget(lb);
         }
 
         // Move to the target's colony and deliver, avoiding trouble
         // by choice of cost decider.
-        Unit.MoveType mt = travelToTarget(getTarget(),
-            CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
-        switch (mt) {
-        case MOVE_HIGH_SEAS: case MOVE_NO_REPAIR:
-            return lbWait(lb);
+        for (;;) {
+            Unit.MoveType mt = travelToTarget(getTarget(),
+                CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
+            switch (mt) {
+            case MOVE_HIGH_SEAS: case MOVE_NO_REPAIR:
+                return lbWait(lb);
 
-        case MOVE_NO_MOVES: case MOVE_NO_TILE: case MOVE_ILLEGAL:
-            return this;
+            case MOVE_NO_MOVES: case MOVE_NO_TILE: case MOVE_ILLEGAL:
+                return this;
             
-        case MOVE: case ATTACK_SETTLEMENT: // Arrived (do not attack!)
-            break;
+            case MOVE: case ATTACK_SETTLEMENT: // Arrived (do not attack!)
+                break;
 
-        case ATTACK_UNIT:
-            Location blocker = resolveBlockage(aiUnit, is);
-            if (blocker != null) {
-                AIMessage.askAttack(aiUnit, unit.getTile()
-                    .getDirection(blocker.getTile()));
-                return lbAttack(lb, blocker);
+            case ATTACK_UNIT:
+                Location blocker = resolveBlockage(aiUnit, getTarget());
+                if (blocker != null
+                    && AIMessage.askAttack(aiUnit, unit.getTile()
+                        .getDirection(blocker.getTile()))) {
+                    return lbAttack(lb, blocker);
+                }
+                moveRandomly(tag, null);
+                continue;
+            
+            default:
+                return lbMove(lb, mt);
             }
-            moveRandomly(tag, null);
-            return lbDodge(lb);
-            
-        default:
-            return lbMove(lb, mt);
-        }
         
-        if (!unit.getTile().isAdjacent(getTarget().getTile())) {
-            throw new IllegalStateException("Not at target: "
-                + getTarget());
+            // Deliver the goods.
+            lbAt(lb);
+            Settlement settlement = (Settlement)getTarget();
+            boolean result = false;
+            if (AIMessage.askGetTransaction(aiUnit, settlement)) {
+                result = AIMessage.askDeliverGift(aiUnit, settlement,
+                    unit.getGoodsList().get(0));
+                AIMessage.askCloseTransaction(aiUnit, settlement);
+            }
+            return (result)
+                ? lbDone(lb, false, "delivered")
+                : lbFail(lb, false, "delivery");
         }
-        lbAt(lb);
-        Settlement settlement = (Settlement)getTarget();
-        boolean result = false;
-        if (AIMessage.askGetTransaction(aiUnit, settlement)) {
-            result = AIMessage.askDeliverGift(aiUnit, settlement,
-                unit.getGoodsList().get(0));
-            AIMessage.askCloseTransaction(aiUnit, settlement);
-        }
-        completed = true;
-        return (result)
-            ? lbDone(lb, false, "delivered")
-            : lbFail(lb, false, "delivery");
     }
 
 
     // Serialization
 
-    private static final String COMPLETED_TAG = "completed";
-    private static final String TARGET_TAG = "target";
+    private static final String COLLECTED_TAG = "collected";
+    private static final String COLONY_TAG = "colony";
 
 
     /**
@@ -333,11 +330,11 @@ public class IndianBringGiftMission extends Mission {
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
-        if (target != null) {
-            xw.writeAttribute(TARGET_TAG, target.getId());
-        }
+        xw.writeAttribute(COLLECTED_TAG, this.collected);
 
-        xw.writeAttribute(COMPLETED_TAG, completed);
+        if (this.colony != null) {
+            xw.writeAttribute(COLONY_TAG, this.colony.getId());
+        }
     }
 
     /**
@@ -347,10 +344,10 @@ public class IndianBringGiftMission extends Mission {
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        target = xr.getAttribute(getGame(), TARGET_TAG,
-                                 Colony.class, (Colony)null);
+        this.collected = xr.getAttribute(COLLECTED_TAG, false);
 
-        completed = xr.getAttribute(COMPLETED_TAG, false);
+        this.colony = xr.getAttribute(getGame(), COLONY_TAG,
+                                      Colony.class, (Colony)null);
     }
 
     /**

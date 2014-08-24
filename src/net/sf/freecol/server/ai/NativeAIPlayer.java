@@ -617,10 +617,8 @@ public class NativeAIPlayer extends AIPlayer {
 
             // Send the unit.
             Mission m = new IndianBringGiftMission(getAIMain(), aiUnit, target);
-            if (m != null) {
-                lb.add("at ", is.getName(), " ", m, " taking ", gift,
-                       " to ", target.getName(), ", ");
-            }
+            lb.add(m, " gift from ", is.getName(), " to ", target.getName(),
+                ", ");
         }
         if (lb.grew("\n  Gifts: ")) lb.shrink(", ");
     }
