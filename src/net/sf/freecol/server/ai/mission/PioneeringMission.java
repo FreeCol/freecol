@@ -483,13 +483,10 @@ public class PioneeringMission extends Mission {
     public void setTarget(Location target) {
         if (target == null
             || target instanceof Colony || target instanceof Tile) {
-            boolean retarget = this.target != null
-                && !Map.isSameLocation(this.target, target);
             this.target = target;
             setTileImprovementPlan((target instanceof Tile)
                 ? getBestPlan((Tile)target)
                 : null);
-            if (retarget) retargetTransportable();
         }
     }
 

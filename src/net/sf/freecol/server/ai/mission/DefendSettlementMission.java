@@ -30,7 +30,6 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Settlement;
@@ -272,10 +271,7 @@ public class DefendSettlementMission extends Mission {
      */
     public void setTarget(Location target) {
         if (target == null || target instanceof Settlement) {
-            boolean retarget = this.target != null
-                && !Map.isSameLocation(this.target, target);
             this.target = target;
-            if (retarget) retargetTransportable();
         }
     }
 

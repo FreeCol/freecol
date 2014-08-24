@@ -690,7 +690,8 @@ public class TransportMission extends Mission {
      * @return True if the transportable should now have a valid
      *     transport destination.
      */
-    private boolean retargetTransportable(TransportableAIObject t, LogBuilder lb) {
+    private boolean retargetTransportable(TransportableAIObject t,
+                                          LogBuilder lb) {
         final EuropeanAIPlayer euaip = getEuropeanAIPlayer();
         final AIUnit aiCarrier = getAIUnit();
         final Unit carrier = aiCarrier.getUnit();
@@ -1230,10 +1231,11 @@ public class TransportMission extends Mission {
      * @param lb A <code>LogBuilder</code> to log to.
      * @return True if the retargeting succeeded.
      */
-    public boolean requeueTransportable(TransportableAIObject t) {
+    public boolean requeueTransportable(TransportableAIObject t,
+                                        LogBuilder lb) {
         Cargo cargo = tFind(t);
         return (cargo == null) ? queueTransportable(t, false)
-            : requeueCargo(cargo, /*TODO: better*/new LogBuilder(0));
+            : requeueCargo(cargo, lb);
     }
 
     /**

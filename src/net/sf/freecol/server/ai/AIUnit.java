@@ -349,44 +349,13 @@ public class AIUnit extends TransportableAIObject {
      */
     public Mission changeMission(Mission mission) {
         if (this.mission == mission) return this.mission;
-        Location oldTarget;
 
-        if (this.mission == null) {
-            oldTarget = null;
-        } else {
-            oldTarget = this.mission.getTarget();
+        if (this.mission != null) {
             this.mission.dispose();
             this.mission = null;
         }
        
         setMission(mission);
-
-        final AIUnit transport = getTransport();
-        final TransportMission tm = (transport == null) ? null
-            : transport.getMission(TransportMission.class);
-        boolean clear;
-        if (transport == null) {
-            clear = true;
-        } else {
-            if (tm == null) {
-                clear = true;
-            } else {
-                if (mission == null) {
-                    clear = true;
-                } else if (oldTarget == mission.getTarget()) {
-                    clear = false;
-                } else if (tm.requeueTransportable(this)) {
-                    clear = false;
-                } else {
-                    clear = true;
-                }
-                if (clear) {
-                    tm.removeTransportable(this);
-                }
-            }
-            if (clear) changeTransport(null);
-        }
-        if (clear && unit.isOnCarrier()) leaveTransport();
         if (mission != null) {
             setTransportPriority(mission.getBaseTransportPriority());
         }

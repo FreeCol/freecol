@@ -31,7 +31,6 @@ import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
@@ -415,8 +414,6 @@ public class UnitSeekAndDestroyMission extends Mission {
     public void setTarget(Location target) {
         if (target == null
             || target instanceof Unit || target instanceof Settlement) {
-            boolean retarget = this.target != null
-                && !Map.isSameLocation(this.target, target);
             this.target = target;
             Unit unit = getUnit();
             transportTarget = null;
@@ -434,7 +431,6 @@ public class UnitSeekAndDestroyMission extends Mission {
                         + ": " + this);
                 }
             }
-            if (retarget) retargetTransportable();
         }
     }
 

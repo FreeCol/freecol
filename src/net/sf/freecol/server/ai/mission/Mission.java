@@ -803,27 +803,6 @@ public abstract class Mission extends AIObject {
     }
 
     /**
-     * If the unit in this mission is currently being transported, retarget
-     * its transport mission as needed.
-     *
-     * Should be called by various *Mission.setTarget().
-     *
-     * @return True if the transport is retargeted.
-     */
-    public boolean retargetTransportable() {
-        Unit u = getUnit();
-        AIUnit aiUnit = getAIUnit();
-        if (aiUnit == null) return false;
-        AIUnit aiCarrier = (u.isOnCarrier())
-            ? getAIMain().getAIUnit(u.getCarrier())
-            : aiUnit.getTransport();
-        if (aiCarrier == null) return false;
-        TransportMission tm = aiCarrier.getMission(TransportMission.class);
-        return (tm != null) ? tm.requeueTransportable(aiUnit)
-            : false;
-    }
-
-    /**
      * Retarget a mission because of some problem.
      *
      * @param reason The reason for the retarget.
@@ -835,10 +814,11 @@ public abstract class Mission extends AIObject {
         Location newTarget = findTarget();
         boolean ret = newTarget != null;
         setTarget(newTarget);
+        lb.add(", failing(", reason, ")");
         if (ret) {
-            lb.add(", retargeted(", reason, ") to ", newTarget);
+            lb.add(", retargeted to ", newTarget);
         } else {
-            lb.add(", retarget(", reason, ") failed.");
+            lb.add(", retarget failed");
         }
         return ret;
     }

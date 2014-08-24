@@ -2306,6 +2306,10 @@ public class EuropeanAIPlayer extends AIPlayer {
             final Mission old = aiu.getMission();
             if (unit == null || unit.isDisposed()
                 || !(old instanceof TransportMission)) continue;
+            final Location oldTarget = (old == null) ? null : old.getTarget();
+            final AIUnit aiCarrier = aiu.getTransport();
+            final TransportMission tm = (aiCarrier == null) ? null
+                : aiCarrier.getMission(TransportMission.class);
             lb.add("\n  ", unit, " ");
             try {
                 aiu.doMission(lb);
@@ -2313,7 +2317,34 @@ public class EuropeanAIPlayer extends AIPlayer {
                 lb.add(", EXCEPTION: ", e.getMessage());
                 logger.log(Level.WARNING, "doMissions failed for: " + aiu, e);
             }
-            if (!unit.isDisposed() && unit.getMovesLeft() > 0) result.add(aiu);
+            if (unit.isDisposed()) {
+                if (tm != null) {
+                    lb.add(", dropped transport ", aiCarrier.getUnit());
+                    tm.removeTransportable(aiu);
+                }
+                lb.add(", DIED.");
+                continue;
+            }
+            Mission m = aiu.getMission();
+            Location newTarget = null;
+            if (m != null && tm != null
+                && oldTarget != null
+                && (newTarget = m.getTarget()) != null
+                && !Map.isSameLocation(newTarget, oldTarget)) {
+                if (unit.isOnCarrier()
+                    || unit.shouldTakeTransportTo(newTarget)) {
+                    tm.requeueTransportable(aiu, lb);
+                } else {
+                    tm.removeTransportable(aiu);
+                    lb.add(", dropped transport ", aiCarrier.getUnit());
+                }
+            }
+            if (unit.getMovesLeft() > 0) {
+                lb.add("...");
+                result.add(aiu);
+            } else {
+                lb.add(".");
+            }
         }
         lb.grew("\n  Do transport missions:");
         return result;
