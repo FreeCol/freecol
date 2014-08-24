@@ -2220,14 +2220,13 @@ public class EuropeanAIPlayer extends AIPlayer {
         if (getAIMain().getAIPlayer(player) != this) {
             throw new RuntimeException("EuropeanAIPlayer integrity fail");
         }
-
         sessionRegister.clear();
         clearAIUnits();
 
         // Note call to getAIUnits().  This triggers
         // AIPlayer.createAIUnits which we want to do early, certainly
-        // before cheat() or other operations that might make new ones
-        // happens.
+        // before cheat() or other operations that might make new units
+        // happen.
         LogBuilder lb = new LogBuilder(1024);
         int colonyCount = getAIColonies().size();
         lb.add(player.getNation().getSuffix(),
@@ -2249,23 +2248,19 @@ public class EuropeanAIPlayer extends AIPlayer {
             for (AIColony aic : getAIColonies()) aic.updateGoods(lb);
 
             buildTipMap(lb);
-            buildWishMaps(lb);
         }
-
-        buildTransportMaps(lb);
         cheat(lb);
-        rearrangeColonies(lb);
-        giveNormalMissions(lb);
-        bringGifts(lb);
-        demandTribute(lb);
 
-        List<AIUnit> more = doMissions(getAIUnits(), lb);
-        if (!more.isEmpty()) {
+        List<AIUnit> aiUnits = getAIUnits();
+        for (int i = 0; i < 3; i++) {
+            if (aiUnits.isEmpty()) break;
             buildTransportMaps(lb);
             buildWishMaps(lb);
             rearrangeColonies(lb);
             giveNormalMissions(lb);
-            doMissions(more, lb);
+            bringGifts(lb);
+            demandTribute(lb);
+            aiUnits = doMissions(aiUnits, lb);
         }
         lb.log(logger, Level.FINEST);
 
@@ -2326,10 +2321,9 @@ public class EuropeanAIPlayer extends AIPlayer {
                 continue;
             }
             Mission m = aiu.getMission();
-            Location newTarget = null;
-            if (m != null && tm != null
+            Location newTarget = (m == null) ? null : m.getTarget();
+            if (tm != null
                 && oldTarget != null
-                && (newTarget = m.getTarget()) != null
                 && !Map.isSameLocation(newTarget, oldTarget)) {
                 if (unit.isOnCarrier()
                     || unit.shouldTakeTransportTo(newTarget)) {
