@@ -1324,10 +1324,10 @@ public class TransportMission extends Mission {
         for (;;) {
             Unit.MoveType mt = travelToTarget(target, costDecider, lb);
             switch (mt) {
-            case MOVE_HIGH_SEAS: case MOVE_NO_MOVES: case MOVE_NO_REPAIR:
-                return this;
+            case MOVE_HIGH_SEAS: case MOVE_NO_REPAIR:
+                return lbWait(lb);
 
-            case MOVE_NO_TILE: // Can happen when another unit blocks a river
+            case MOVE_NO_MOVES: case MOVE_NO_TILE: // Can happen when another unit blocks a river
                 moveRandomly(tag, null);
                 return lbDodge(lb);
 

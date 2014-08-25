@@ -346,8 +346,10 @@ public class IndianDemandMission extends Mission {
                 Unit.MoveType mt = travelToTarget(is,
                     CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
                 switch (mt) {
-                case MOVE_ILLEGAL:
-                case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
+                case MOVE_HIGH_SEAS: case MOVE_NO_REPAIR:
+                    return lbWait(lb);
+
+                case MOVE_NO_MOVES: case MOVE_NO_TILE: case MOVE_ILLEGAL:
                     return this;
 
                 case MOVE: // Arrived
@@ -369,11 +371,13 @@ public class IndianDemandMission extends Mission {
             }
 
             // Move to the target's colony and demand
-            Unit.MoveType mt = travelToTarget(target, null, lb);
             Direction d;
+            Unit.MoveType mt = travelToTarget(target, null, lb);
             switch (mt) {
-            case MOVE_ILLEGAL:
-            case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
+            case MOVE_HIGH_SEAS: case MOVE_NO_REPAIR:
+                return lbWait(lb);
+
+            case MOVE_NO_MOVES: case MOVE_NO_TILE: case MOVE_ILLEGAL:
                 return this;
 
             case MOVE: // Arrived

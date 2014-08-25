@@ -389,8 +389,10 @@ public class PrivateerMission extends Mission {
         setTarget(newTarget);
         Unit.MoveType mt = travelToTarget(newTarget, null, lb);
         switch (mt) {
-        case MOVE_ILLEGAL:
-        case MOVE_HIGH_SEAS: case MOVE_NO_MOVES: case MOVE_NO_REPAIR:
+        case MOVE_HIGH_SEAS: case MOVE_NO_REPAIR:
+            return lbWait(lb);
+
+        case MOVE_NO_MOVES: case MOVE_ILLEGAL:
             return this;
 
         case MOVE:

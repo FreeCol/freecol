@@ -175,7 +175,7 @@ public class UnitWanderHostileMission extends Mission {
             // Every checkTurns, look for a target of opportunity.
             if (check == 0) {
                 Mission m = getAIPlayer().getSeekAndDestroyMission(aiUnit, 1);
-                if (m != null) return lbDone(lb, false, ", found target");
+                if (m != null) return lbDone(lb, false, "found target");
                 check = checkTurns;
             } else check--;
 

@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Role;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
@@ -514,6 +515,17 @@ public class PioneeringMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
+    protected Mission lbFail(LogBuilder lb, boolean cont, Object... reasons) {
+        if (hasTools() && getUnit().getColony() != null) {
+            getAIUnit().equipForRole(Specification.DEFAULT_ROLE_ID);
+        }
+        return super.lbFail(lb, false, reasons);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public Mission doMission(LogBuilder lb) {
         lb.add(tag);
         final AIUnit aiUnit = getAIUnit();
@@ -553,16 +565,16 @@ public class PioneeringMission extends Mission {
         final EuropeanAIPlayer aiPlayer = getEuropeanAIPlayer();
         final CostDecider costDecider
             = CostDeciders.avoidSettlementsAndBlockingUnits();
-
-        Tile tile;
-        String where;
         Location newTarget;
-        while (!hasTools()) { // Get tools first.
+
+        if (!hasTools()) { // Get tools first.
             // Go there and clear target on arrival.
             Unit.MoveType mt = travelToTarget(getTarget(), costDecider, lb);
             switch (mt) {
-            case MOVE_ILLEGAL:
-            case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
+            case MOVE_HIGH_SEAS: case MOVE_NO_REPAIR:
+                return lbWait(lb);
+
+            case MOVE_NO_MOVES: case MOVE_NO_TILE: case MOVE_ILLEGAL:
                 return this;
 
             case MOVE:
@@ -576,13 +588,17 @@ public class PioneeringMission extends Mission {
             lbAt(lb);
             if (aiUnit.equipForRole("model.role.pioneer") && hasTools()) {
                 lb.add(", equips");
+                newTarget = findTarget(aiUnit, 10, false);
+                if (newTarget == null) {
+                    return lbFail(lb, false, "no pioneering target");
+                }
             } else {
                 lb.add(", fails to equip");
-            }
-            newTarget = findTarget(aiUnit, 10, false);
-            if (newTarget == null
-                || (!hasTools() && Map.isSameLocation(newTarget, getTarget()))) {
-                return lbFail(lb, false, ", found no target");
+                newTarget = findTarget(aiUnit, 10, false);
+                if (newTarget == null
+                    || Map.isSameLocation(newTarget, getTarget())) {
+                    return lbFail(lb, false, "no tools target");
+                }
             }
             setTarget(newTarget);
             return lbRetarget(lb);
@@ -593,8 +609,10 @@ public class PioneeringMission extends Mission {
             && invalidTargetReason(getTarget(), player) == null) {
             Unit.MoveType mt = travelToTarget(getTarget(), costDecider, lb);
             switch (mt) {
-            case MOVE_ILLEGAL:
-            case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
+            case MOVE_HIGH_SEAS: case MOVE_NO_REPAIR:
+                return lbWait(lb);
+
+            case MOVE_NO_MOVES: case MOVE_NO_TILE: case MOVE_ILLEGAL:
                 return this;
 
             case MOVE:
@@ -605,9 +623,12 @@ public class PioneeringMission extends Mission {
             }
 
             lbAt(lb);
-            setTarget(newTarget = findTarget(aiUnit, 10, false));
-            return (newTarget == null) ? lbFail(lb, false, "found no target")
-                : lbRetarget(lb);
+            newTarget = findTarget(aiUnit, 10, false);
+            if (newTarget == null) {
+                return lbFail(lb, false, "found no pioneering target");
+            }
+            setTarget(newTarget);
+            return lbRetarget(lb);
         }
 
         // Check for threats.
@@ -635,29 +656,35 @@ public class PioneeringMission extends Mission {
         */
 
         // Going to a tile to perform an improvement.
-        Unit.MoveType mt = travelToTarget(getTarget(), costDecider, lb);
-        switch (mt) {
-        case MOVE_ILLEGAL:
-        case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
-            return lbWait(lb);
+        Tile tile = getTarget().getTile();
+        for (;;) {
+            Unit.MoveType mt = travelToTarget(getTarget(), costDecider, lb);
+            switch (mt) {
+            case MOVE_HIGH_SEAS: case MOVE_NO_REPAIR:
+                return lbWait(lb);
+                
+            case MOVE_NO_MOVES: case MOVE_NO_TILE: case MOVE_ILLEGAL:
+                return this;
+                
+            case MOVE: // Arrived
+                break;
+                
+            case MOVE_NO_ATTACK_CIVILIAN:
+                // Might be a temporary blockage due to an occupying
+                // unit at the target.  Move randomly and retry if
+                // adjacent.
+                Direction d = unit.getTile().getDirection(tile);
+                if (d != null) moveRandomly(tag, d);
+                continue;
 
-        case MOVE: // Arrived
+            default:
+                return lbMove(lb, mt);
+            }
             break;
-
-        case MOVE_NO_ATTACK_CIVILIAN:
-            // Might be a temporary blockage due to an occupying unit
-            // at the target.  Move randomly and retry if adjacent.
-            Direction d = unit.getTile().getDirection(getTarget().getTile());
-            if (d != null) moveRandomly(tag, d);
-            return lbDodge(lb);
-
-        default:
-            return lbMove(lb, mt);
         }
 
         // Take control of the land before proceeding to improve.
         lbAt(lb);
-        tile = getTarget().getTile();
         if (!player.owns(tile)) {
             // TODO: Better choice whether to pay or steal.
             // Currently always pay if we can, steal if we can not.
@@ -669,15 +696,18 @@ public class PioneeringMission extends Mission {
                 if (price > 0 && !player.checkGold(price)) {
                     price = NetworkConstants.STEAL_LAND;
                 }
-                if (!AIMessage.askClaimLand(tile, aiUnit, price)
-                    || !player.owns(tile)) { // Failed to take ownership
-                    fail = true;
-                }
+                fail = !AIMessage.askClaimLand(tile, aiUnit, price)
+                    || !player.owns(tile); // Failed to claim ownership
             }
             if (fail) {
                 aiPlayer.removeTileImprovementPlan(tileImprovementPlan);
                 tileImprovementPlan.dispose();
-                return lbFail(lb, false, "land claim at ", tile);
+                lb.add(", land claim failed at ", tile);
+                if ((newTarget = findTarget(aiUnit, 10, false)) == null) {
+                    return lbFail(lb, false, "no alternate target");
+                }
+                setTarget(newTarget);
+                return lbRetarget(lb);
             }
         }
 

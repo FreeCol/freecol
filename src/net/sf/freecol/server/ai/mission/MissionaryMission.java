@@ -373,8 +373,10 @@ public class MissionaryMission extends Mission {
         Unit.MoveType mt = travelToTarget(getTarget(),
             CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
         switch (mt) {
-        case MOVE_ILLEGAL:
-        case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
+        case MOVE_HIGH_SEAS: case MOVE_NO_REPAIR:
+            return lbWait(lb);
+
+        case MOVE_NO_MOVES: case MOVE_NO_TILE: case MOVE_ILLEGAL:
             return this;
 
         case MOVE:
@@ -384,8 +386,7 @@ public class MissionaryMission extends Mission {
             Location completed = getTarget();
             Location newTarget = findTarget(aiUnit, 20, false);
             if (newTarget == null || newTarget == completed) {
-                lb.add(", retarget failed");
-                return lbDrop(lb);
+                return lbFail(lb, false, "retarget failed");
             }
             setTarget(newTarget);
             return lbRetarget(lb);
@@ -397,6 +398,7 @@ public class MissionaryMission extends Mission {
             return lbMove(lb, mt);
         }
 
+        // Establish the mission.
         lbAt(lb);
         Direction d = unit.getTile().getDirection(getTarget().getTile());
         assert d != null;

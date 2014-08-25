@@ -306,8 +306,10 @@ public class DefendSettlementMission extends Mission {
         Unit.MoveType mt = travelToTarget(getTarget(),
             CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
         switch (mt) {
-        case MOVE_ILLEGAL:
-        case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
+        case MOVE_HIGH_SEAS: case MOVE_NO_REPAIR:
+            return lbWait(lb);
+
+        case MOVE_NO_MOVES: case MOVE_NO_TILE: case MOVE_ILLEGAL:
             return this;
 
         case MOVE:

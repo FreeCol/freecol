@@ -136,16 +136,22 @@ public class IdleAtSettlementMission extends Mission {
         final Unit unit = getUnit();
         if (!unit.hasTile()) return lbWait(lb);            
 
-        // If our tile contains a settlement, idle.  No log, this is normal.
-        Settlement settlement = unit.getTile().getSettlement();
-        if (settlement != null) return lbAt(lb);
+        // Idle in Europe or settlements.
+        if (unit.isInEurope() || unit.getSettlement() != null) return lbAt(lb);
 
         Location target = findTarget();
-        if (target != null) {
+        if (target == null) {
+            // Just make a random moves if no target can be found.
+            moveRandomlyTurn(tag);
+
+        } else {
             Unit.MoveType mt = travelToTarget(target, null, lb);
             switch (mt) {
-            case MOVE_ILLEGAL:
-            case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
+            case MOVE_HIGH_SEAS: case MOVE_NO_REPAIR:
+                return lbWait(lb);
+
+            case MOVE_NO_MOVES: case MOVE_ILLEGAL:
+            case MOVE_NO_TILE:
                 return this;
 
             case MOVE:
@@ -154,9 +160,6 @@ public class IdleAtSettlementMission extends Mission {
             default:
                 return lbMove(lb, mt);
             }
-
-        } else { // Just make a random moves if no target can be found.
-            moveRandomlyTurn(tag);
         }
 
         return lbAt(lb);

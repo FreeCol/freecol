@@ -498,9 +498,8 @@ public abstract class Mission extends AIObject {
      * @return This <code>Mission</code>.
      */
     protected Mission lbWait(LogBuilder lb, Object... reasons) {
-        final Unit unit = getUnit();
         lb.add(reasons);
-        unit.setMovesLeft(0);
+        getUnit().setMovesLeft(0);
         return this;
     }
 
@@ -639,10 +638,10 @@ public abstract class Mission extends AIObject {
      * - MOVE if the unit has arrived at the target.  The unit may not
      *   have moved, or have exhausted its moves.
      * - MOVE_HIGH_SEAS if the unit has successfully set sail.
-     * - MOVE_ILLEGAL if the unit is unable to proceed for now
      * - MOVE_NO_MOVES is underway but short of the target
      * - MOVE_NO_REPAIR if the unit died for whatever reason
      * - MOVE_NO_TILE if there is no path (usually transitory on rivers)
+     * - MOVE_ILLEGAL if the unit is unable to proceed for now
      * - other legal results (e.g. ENTER_INDIAN_SETTLEMENT*) if that would
      *   occur if the unit proceeded.  Such moves require special handling
      *   and are not performed here, the calling mission code must
@@ -674,7 +673,7 @@ public abstract class Mission extends AIObject {
         if (unit.isAtSea()) {
             // Wait for carrier to arrive on the map.
             lb.add(", at sea");
-            return MoveType.MOVE_NO_MOVES;
+            return MoveType.MOVE_HIGH_SEAS;
         } else if (unit.isOnCarrier()) {
             // Transport mission will disembark the unit when it
             // arrives at the drop point.
