@@ -350,7 +350,7 @@ public class IndianDemandMission extends Mission {
                 case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
                     return this;
 
-                case MOVE: // Arrived!
+                case MOVE: // Arrived
                     break;
 
                 default:
@@ -358,13 +358,14 @@ public class IndianDemandMission extends Mission {
                 }
 
                 // Unload the goods
+                lbAt(lb);
                 GoodsContainer container = unit.getGoodsContainer();
                 for (Goods goods : container.getCompactGoods()) {
                     Goods tribute = container.removeGoods(goods.getType());
                     is.addGoods(tribute);
                 }
                 completed = true;
-                return lbDone(lb, false, "unloaded tribute at ", is);
+                return lbDone(lb, false, "unloaded tribute");
             }
 
             // Move to the target's colony and demand
@@ -375,7 +376,7 @@ public class IndianDemandMission extends Mission {
             case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
                 return this;
 
-            case MOVE: // Arrived!
+            case MOVE: // Arrived
                 break;
 
             case ATTACK_SETTLEMENT:
@@ -397,6 +398,7 @@ public class IndianDemandMission extends Mission {
                 return lbMove(lb, mt);
             }
 
+            lbAt(lb);
             Colony colony = (Colony)getTarget();
             Player enemy = colony.getOwner();
             Goods goods = selectGoods(colony);
@@ -407,7 +409,7 @@ public class IndianDemandMission extends Mission {
             if (goods == null) {
                 if (!enemy.checkGold(1)) {
                     completed = true;
-                    return lbDone(lb, false, "empty handed at ", colony);
+                    return lbDone(lb, false, "empty handed");
                 }
                 amount = enemy.getGold() / 20;
                 if (amount == 0) amount = enemy.getGold();
@@ -418,11 +420,10 @@ public class IndianDemandMission extends Mission {
                 = AIMessage.askIndianDemand(aiUnit, colony, type, amount);
             if (accepted && (goods == null || hasTribute())) {
                 if (goods != null) {
-                    lb.add(" accepted at ", colony, " tribute: ", goods);
+                    lb.add(" accepted tribute: ", goods);
                     continue; // Head for home
                 } else {
-                    lb.add(" accepted at ", colony, " tribute: ", amount,
-                        " gold");
+                    lb.add(" accepted tribute: ", amount, " gold");
                 }
             } else { // Consider attacking if not content.
                 int unitTension = (is == null) ? 0

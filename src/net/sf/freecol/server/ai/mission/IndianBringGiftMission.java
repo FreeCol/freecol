@@ -225,11 +225,12 @@ public class IndianBringGiftMission extends Mission {
     public Mission doMission(LogBuilder lb) {
         lb.add(tag);
         String reason = invalidReason();
-        if (reason != null) lbFail(lb, false, reason);
+        if (reason != null) return lbFail(lb, false, reason);
 
         final AIUnit aiUnit = getAIUnit();
         final Unit unit = getUnit();
         final IndianSettlement is = unit.getHomeIndianSettlement();
+
         if (!hasGift()) {
             Unit.MoveType mt = travelToTarget(is, null, lb);
             switch (mt) {
@@ -237,7 +238,7 @@ public class IndianBringGiftMission extends Mission {
             case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
                 return this;
 
-            case MOVE: // Arrived!
+            case MOVE: // Arrived
                 break;
 
             case ATTACK_SETTLEMENT: case ATTACK_UNIT: // A blockage!
@@ -254,17 +255,19 @@ public class IndianBringGiftMission extends Mission {
             default:
                 return lbMove(lb, mt);
             }
+
             // Load the goods.
+            lbAt(lb);
             Goods gift = is.getRandomGift(getAIRandom());
             if (gift == null) {
                 completed = true;
-                return lbFail(lb, false, "found no gift at ", is);
+                return lbFail(lb, false, "found no gift");
             }
             if (!AIMessage.askLoadCargo(aiUnit, gift) || !hasGift()) {
                 completed = true;
-                return lbFail(lb, false, "failed to collect gift at ", is);
+                return lbFail(lb, false, "failed to collect gift");
             }
-            lb.add(", collected gift at ", is);
+            lb.add(", collected gift");
             return this;
         }
 
@@ -285,8 +288,7 @@ public class IndianBringGiftMission extends Mission {
             if (blocker != null) {
                 AIMessage.askAttack(aiUnit, unit.getTile()
                     .getDirection(blocker.getTile()));
-                lbAttack(lb, blocker);
-                return this;
+                return lbAttack(lb, blocker);
             }
             moveRandomly(tag, null);
             return lbDodge(lb);
@@ -299,6 +301,7 @@ public class IndianBringGiftMission extends Mission {
             throw new IllegalStateException("Not at target: "
                 + getTarget());
         }
+        lbAt(lb);
         Settlement settlement = (Settlement)getTarget();
         boolean result = false;
         if (AIMessage.askGetTransaction(aiUnit, settlement)) {
@@ -308,8 +311,8 @@ public class IndianBringGiftMission extends Mission {
         }
         completed = true;
         return (result)
-            ? lbDone(lb, false, "delivered at ", settlement)
-            : lbFail(lb, false, "deliver at ", settlement);
+            ? lbDone(lb, false, "delivered")
+            : lbFail(lb, false, "delivery");
     }
 
 

@@ -333,10 +333,9 @@ public class DefendSettlementMission extends Mission {
         }
 
         // Anything more to do?
-        if (unit.getState() == UnitState.FORTIFIED
-            || unit.getState() == UnitState.FORTIFYING) {
-            lb.add(", fortified.");
-            return this;
+        switch (unit.getState()) {
+        case FORTIFIED:  return lbWait(lb, ", fortified");
+        case FORTIFYING: return lbWait(lb, ", fortifying");
         }
 
         // Check if the settlement is badly defended.  If so, try to fortify.
@@ -354,17 +353,12 @@ public class DefendSettlementMission extends Mission {
             }
         }
         if (defenderCount <= 2 || fortifyCount <= 1) {
-            String logMe;
-            if (!unit.checkSetState(UnitState.FORTIFYING)) {
-                logMe = ", waiting to fortify at ";
-            } else if (AIMessage.askChangeState(aiUnit, UnitState.FORTIFYING)
-                && unit.getState() == UnitState.FORTIFYING) {
-                logMe = ", fortified at ";
-            } else {
-                logMe = ", fortify failed at ";
-            }
-            lb.add(logMe, settlement, ".");
-            return this;
+            return (!unit.checkSetState(UnitState.FORTIFYING))
+                ? lbWait(lb, ", waiting to fortify at ", settlement)
+                : (AIMessage.askChangeState(aiUnit, UnitState.FORTIFYING)
+                    && unit.getState() == UnitState.FORTIFYING)
+                ? lbWait(lb, ", now fortifying at ", settlement)
+                : lbFail(lb, false, ", fortify failed at ", settlement);
         }
 
         // The target is well enough defended.  See if the unit
@@ -374,6 +368,7 @@ public class DefendSettlementMission extends Mission {
         if (!unit.isOffensiveUnit()) {
             return lbFail(lb, false, "not-offensive-unit");
         }
+
         final CombatModel cm = unit.getGame().getCombatModel();
         Unit bestTarget = null;
         float bestDifference = Float.MIN_VALUE;
@@ -409,8 +404,7 @@ public class DefendSettlementMission extends Mission {
             return lbAttack(lb, bestTarget);
         }
 
-        lb.add(", alert at ", getTarget());
-        return this;
+        return lbWait(lb, ", alert at ", getTarget());
     }
     
 

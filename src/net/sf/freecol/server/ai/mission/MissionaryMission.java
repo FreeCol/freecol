@@ -369,42 +369,42 @@ public class MissionaryMission extends Mission {
         // Go to the target.
         final AIUnit aiUnit = getAIUnit();
         final Unit unit = getUnit();
-        for (;;) {
-            Unit.MoveType mt = travelToTarget(getTarget(),
-                CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
-            switch (mt) {
-            case MOVE_ILLEGAL:
-            case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
-                return this;
 
-            case MOVE:
-                // Reached an intermediate colony.  Retarget, but do not
-                // accept fallback targets.
-                lbAt(lb);
-                Location completed = getTarget();
-                Location newTarget = findTarget(aiUnit, 20, false);
-                if (newTarget == null || newTarget == completed) {
-                    lb.add(", retarget failed");
-                    return lbDrop(lb);
-                }
-                setTarget(newTarget);
-                return lbRetarget(lb);
+        Unit.MoveType mt = travelToTarget(getTarget(),
+            CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
+        switch (mt) {
+        case MOVE_ILLEGAL:
+        case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
+            return this;
 
-            case ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY:
-                Direction d = unit.getTile().getDirection(getTarget().getTile());
-                assert d != null;
-                IndianSettlement is = (IndianSettlement)getTarget();
-                AIMessage.askEstablishMission(aiUnit, d, is.hasMissionary());
-                if (is.hasMissionary(unit.getOwner())
-                    && unit.isInMission()) {
-                    return lbDone(lb, false, "established at ", is);
-                }
-                return lbFail(lb, false, "unexpected failure at ", is);
-
-            default:
-                return lbMove(lb, mt);
+        case MOVE:
+            // Reached an intermediate colony.  Retarget, but do not
+            // accept fallback targets.
+            lbAt(lb);
+            Location completed = getTarget();
+            Location newTarget = findTarget(aiUnit, 20, false);
+            if (newTarget == null || newTarget == completed) {
+                lb.add(", retarget failed");
+                return lbDrop(lb);
             }
+            setTarget(newTarget);
+            return lbRetarget(lb);
+            
+        case ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY: // Arrived
+            break;
+
+        default:
+            return lbMove(lb, mt);
         }
+
+        lbAt(lb);
+        Direction d = unit.getTile().getDirection(getTarget().getTile());
+        assert d != null;
+        IndianSettlement is = (IndianSettlement)getTarget();
+        AIMessage.askEstablishMission(aiUnit, d, is.hasMissionary());
+        return (is.hasMissionary(unit.getOwner()) && unit.isInMission())
+            ? lbDone(lb, false, "established")
+            : lbFail(lb, false, "establish");
     }
 
 

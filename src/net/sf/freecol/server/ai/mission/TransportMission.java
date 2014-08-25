@@ -1312,7 +1312,6 @@ public class TransportMission extends Mission {
     public Mission doMission(LogBuilder lb) {
         lb.add(tag);
         checkCargoes(lb);
-
         String reason = invalidReason();
         if (reason != null) return lbFail(lb, false, reason);
 
@@ -1330,16 +1329,14 @@ public class TransportMission extends Mission {
 
             case MOVE_NO_TILE: // Can happen when another unit blocks a river
                 moveRandomly(tag, null);
-                unit.setMovesLeft(0);
-                return this;
+                return lbDodge(lb);
 
             case ATTACK_UNIT:
                 Location blocker = resolveBlockage(aiCarrier, target);
                 if (blocker instanceof Unit && shouldAttack((Unit)blocker)) {
                     AIMessage.askAttack(aiCarrier,
                         unit.getTile().getDirection(blocker.getTile()));
-                    lbAttack(lb, blocker);
-                    return this;
+                    return lbAttack(lb, blocker);
                 }
                 // Fall through
             case MOVE_NO_ATTACK_CIVILIAN:
@@ -1360,7 +1357,8 @@ public class TransportMission extends Mission {
                     // delivered.  Check other deliveries, we might be
                     // in port so this is a good time to decide to
                     // fail to deliver something.
-                    lb.add(", at ", unit.getLocation(), ", delivering");
+                    lbAt(lb);
+                    lb.add(", delivering");
                     List<Cargo> cont = new ArrayList<Cargo>();
                     List<Cargo> curr = tClear();
                     for (Cargo cargo : curr) {
@@ -1454,12 +1452,11 @@ public class TransportMission extends Mission {
 
                 if ((reason = invalidReason()) != null) {
                     logger.warning(tag + " post-stop failure(" + reason
-                        + ": " + this.toFullString());
+                        + "): " + this.toFullString());
                     return lbFail(lb, false, reason);
                 }
                 if (unit.isAtLocation(target)) {
-                    lb.add(", waiting at ", target, ".");
-                    return this;
+                    return lbWait(lb, ", waiting at ", target);
                 }
                 break;
 

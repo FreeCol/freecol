@@ -461,8 +461,7 @@ public class BuildColonyMission extends Mission {
             // Check that the unit has moves left, which are required
             // for building.
             if (unit.getMovesLeft() <= 0) {
-                lb.add(", waiting to build at ", tile);
-                return this;
+                return lbWait(lb, ", waiting to build at ", tile);
             }
 
             // Log the colony values so we can improve things

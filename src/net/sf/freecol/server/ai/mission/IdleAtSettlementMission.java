@@ -134,14 +134,11 @@ public class IdleAtSettlementMission extends Mission {
 
         // Wait if not on the map.
         final Unit unit = getUnit();
-        if (!unit.hasTile()) return lbAt(lb);
+        if (!unit.hasTile()) return lbWait(lb);            
 
         // If our tile contains a settlement, idle.  No log, this is normal.
         Settlement settlement = unit.getTile().getSettlement();
-        if (settlement != null) {
-            lb.add(", idling at ", settlement, ".");
-            return this;
-        }
+        if (settlement != null) return lbAt(lb);
 
         Location target = findTarget();
         if (target != null) {
@@ -160,9 +157,9 @@ public class IdleAtSettlementMission extends Mission {
 
         } else { // Just make a random moves if no target can be found.
             moveRandomlyTurn(tag);
-            return lbAt(lb);
         }
-        return this;
+
+        return lbAt(lb);
     }
 
 

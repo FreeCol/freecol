@@ -525,7 +525,7 @@ public class PioneeringMission extends Mission {
                        " at ", getTarget());
                 setTarget(null);
             } else if (!tileImprovementPlan.validate()) {
-                lbFail(lb, true, " abandoned invalid plan at ",
+                lbFail(lb, true, "abandoned invalid plan at ",
                        getTarget(), "/", tileImprovementPlan);
                 setTarget(null);
             }
@@ -535,8 +535,7 @@ public class PioneeringMission extends Mission {
             newTarget = findTarget(aiUnit, 10, unit.isInEurope());
             if (newTarget == null) {
                 setTarget(null);
-                lbFail(lb, tag, " found no target");
-                return dropMission();
+                return lbFail(lb, false, " found no target");
             }
             setTarget(newTarget);
             lb.add(", retargeting ", newTarget, "/", tileImprovementPlan);
@@ -578,12 +577,11 @@ public class PioneeringMission extends Mission {
             if (aiUnit.equipForRole("model.role.pioneer") && hasTools()) {
                 lb.add(", equips");
             } else {
-                lb.add(", but fails to equip");
+                lb.add(", fails to equip");
             }
             newTarget = findTarget(aiUnit, 10, false);
             if (newTarget == null
                 || (!hasTools() && Map.isSameLocation(newTarget, getTarget()))) {
-                setTarget(null);
                 return lbFail(lb, false, ", found no target");
             }
             setTarget(newTarget);
@@ -608,11 +606,8 @@ public class PioneeringMission extends Mission {
 
             lbAt(lb);
             setTarget(newTarget = findTarget(aiUnit, 10, false));
-            if (newTarget == null) {
-                setTarget(null);
-                return lbFail(lb, false, ", found no target");
-            }
-            return lbRetarget(lb);
+            return (newTarget == null) ? lbFail(lb, false, "found no target")
+                : lbRetarget(lb);
         }
 
         // Check for threats.
@@ -628,13 +623,13 @@ public class PioneeringMission extends Mission {
         if (unit.isInDanger(turnsNeeded, 0.25f)) {
             if (unit.getTile().getColony() != null) {
                 logger.finest(tag + " avoiding danger: " + this);
-                return dropMission();
+                return lbDrop(lb);
             }
             PathNode safe = unit.findOurNearestSettlement(false, 1, false);
             if (safe != null) {
                 travelToTarget(tag + " (evading)",
                                safe.getLastNode().getTile(), costDecider);
-                return dropMission();
+                return lbDrop(lb);
             }
         }
         */
@@ -644,7 +639,7 @@ public class PioneeringMission extends Mission {
         switch (mt) {
         case MOVE_ILLEGAL:
         case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
-            return this;
+            return lbWait(lb);
 
         case MOVE: // Arrived
             break;
@@ -661,6 +656,7 @@ public class PioneeringMission extends Mission {
         }
 
         // Take control of the land before proceeding to improve.
+        lbAt(lb);
         tile = getTarget().getTile();
         if (!player.owns(tile)) {
             // TODO: Better choice whether to pay or steal.
@@ -687,22 +683,19 @@ public class PioneeringMission extends Mission {
 
         // Work on the improvement
         if (unit.getState() == UnitState.IMPROVING) {
-            unit.setMovesLeft(0);
-            lb.add(", improving ", tileImprovementPlan.getType(), ".");
+            return lbWait(lb, ", improving ", tileImprovementPlan);
         } else if (unit.checkSetState(UnitState.IMPROVING)) {
             if (AIMessage.askChangeWorkImprovementType(aiUnit,
                     tileImprovementPlan.getType())) {
-                lb.add(" began improvement ", tileImprovementPlan.getType(),
-                       " at ", tile, ".");
+                return lbWait(lb, ", began ", tileImprovementPlan);
             } else {
                 aiPlayer.removeTileImprovementPlan(tileImprovementPlan);
                 tileImprovementPlan.dispose();
                 return lbFail(lb, false, "to change work type at ", tile);
             }
-        } else { // Probably just out of moves.
-            lb.add(", waiting to improve at ", tile);
         }
-        return this;
+        // Probably just out of moves.
+        return lbWait(lb, ", waiting to improve at ", tile);
     }
 
 

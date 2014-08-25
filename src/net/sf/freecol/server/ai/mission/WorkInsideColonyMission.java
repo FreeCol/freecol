@@ -165,14 +165,15 @@ public class WorkInsideColonyMission extends Mission {
             break;
 
         case MOVE: // Arrived
-            lbAt(lb);
-            if (unit.isInColony()) lb.add(", working");
             break;
 
         default:
             return lbMove(lb, mt);
         }
-        return this;
+
+        lbAt(lb);
+        if (unit.isInColony()) lb.add(", working");
+        return lbWait(lb);
     }
 
 
