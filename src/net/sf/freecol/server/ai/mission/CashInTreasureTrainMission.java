@@ -356,10 +356,9 @@ public class CashInTreasureTrainMission extends Mission {
         lb.add(tag);
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            if (!retargetMission(reason, lb)) return dropMission();
+            return retargetMission(reason, lb);
         } else if (reason != null) {
-            lbBroken(lb, reason);
-            return dropMission();
+            return lbFail(lb, false, reason);
         }
 
         for (;;) {
@@ -368,14 +367,15 @@ public class CashInTreasureTrainMission extends Mission {
             Unit.MoveType mt = travelToTarget(getTarget(),
                 CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
             switch (mt) {
-            case MOVE:
-                break;
             case MOVE_ILLEGAL:
             case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
                 return this;
+
+            case MOVE:
+                break;
+
             default:
-                lbMove(lb, unit, mt);
-                return this;
+                return lbMove(lb, mt);
             }
 
             // Cash in now if:
@@ -418,20 +418,15 @@ public class CashInTreasureTrainMission extends Mission {
                         && (aiCarrier = aiMain.getAIUnit(closest)) != null
                         && (tm = aiCarrier.getMission(TransportMission.class)) != null) {
                         tm.queueTransportable(aiUnit, false);
-                        lb.add(", retarget Europe on ", aiCarrier.getUnit());
-                        lbAt(lb, unit);
-                        return this;
+                        lb.add(", queued to carrier ", aiCarrier.getUnit());
                     }
+                    return lbRetarget(lb);
                 }
-                if (AIMessage.askCashInTreasureTrain(aiUnit)) {
-                    lbDone(lb, "cash in at ", here);
-                } else {
-                    lbFail(lb, "cash in failed at", here);
-                }
-                return dropMission();
+                return (AIMessage.askCashInTreasureTrain(aiUnit))
+                    ? lbDone(lb, false, "cash in at ", here)
+                    : lbFail(lb, false, "cash in failed at", here);
             }
-            if (!retargetMission(", arrived at " + unit.getColony().getName(),
-                                 lb)) return dropMission();
+            return retargetMission("arrived "+unit.getColony().getName(), lb);
         }
     }
 

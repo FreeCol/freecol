@@ -360,21 +360,17 @@ public class PrivateerMission extends Mission {
         final AIUnit aiUnit = getAIUnit();
         if (aiUnit.hasCargo()) { // Deliver the goods
             Mission m = getEuropeanAIPlayer().getTransportMission(aiUnit);
-            if (m != null) {
-                lbDone(lb, " transporting, switched to ", m);
-                return m;
-            }
+            return lbDone(lb, m != null, " transporting");
         }
 
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            if (!retargetMission(reason, lb)) return dropMission();
+            return retargetMission(reason, lb);
         } else if (reason != null) {
-            lbBroken(lb, reason);
-            return dropMission();
+            return lbFail(lb, false, reason);
         }
-        final Unit unit = getUnit();
 
+        final Unit unit = getUnit();
         if (unit.isInEurope()) {
             Settlement settlement = getBestSettlement(unit.getOwner());
             Tile tile = (settlement != null) ? settlement.getTile()
@@ -382,21 +378,18 @@ public class PrivateerMission extends Mission {
             unit.setDestination(tile);
             aiUnit.moveToAmerica();
         }
-        if (unit.isAtSea()) {
-            lbAt(lb, unit);
-            return this;
-        }
+        if (unit.isAtSea()) return lbAt(lb);
 
         Location newTarget = findTarget(aiUnit, 1, true);
         if (newTarget == null) {
             moveRandomlyTurn(tag);
-            lbAt(lb, unit);
-            return this;
+            return lbAt(lb);
         }
 
         setTarget(newTarget);
         Unit.MoveType mt = travelToTarget(newTarget, null, lb);
         switch (mt) {
+        case MOVE_ILLEGAL:
         case MOVE_HIGH_SEAS: case MOVE_NO_MOVES: case MOVE_NO_REPAIR:
             return this;
 
@@ -405,9 +398,7 @@ public class PrivateerMission extends Mission {
 
         case MOVE_NO_TILE: // Can happen when another unit blocks a river
             moveRandomly(tag, null);
-            unit.setMovesLeft(0);
-            lbDodge(lb, unit);
-            return this;
+            return lbDodge(lb);
 
         case ATTACK_UNIT:
             Direction direction = unit.getTile()
@@ -430,12 +421,10 @@ public class PrivateerMission extends Mission {
             return this;
 
         default:
-            lbMove(lb, unit, mt);
-            return this;
+            return lbMove(lb, mt);
         }
 
-        lbAt(lb, unit);
-        return this;
+        return lbAt(lb);
     }
 
 

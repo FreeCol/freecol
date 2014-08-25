@@ -114,15 +114,11 @@ public class UnitWanderMission extends Mission {
     public Mission doMission(LogBuilder lb) {
         lb.add(tag);
         String reason = invalidReason();
-        if (reason != null) {
-            lbBroken(lb, reason);
-            return dropMission();
-        }
+        if (reason != null) return lbFail(lb, false, reason);
 
         // Just move in random directions.
         moveRandomlyTurn(tag);
-        lbAt(lb, getUnit());
-        return this;
+        return lbAt(lb);
     }
 
 

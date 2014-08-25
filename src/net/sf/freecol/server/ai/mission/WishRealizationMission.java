@@ -112,9 +112,9 @@ public class WishRealizationMission extends Mission {
      */
     @Override
     public void dispose() {
-        if (wish != null) {
-            wish.setTransportable(null);
-            wish = null;
+        if (this.wish != null) {
+            this.wish.setTransportable(null);
+            this.wish = null;
         }
         super.dispose();
     }
@@ -131,7 +131,7 @@ public class WishRealizationMission extends Mission {
      * {@inheritDoc}
      */
     public Location getTarget() {
-        return (wish == null) ? null : wish.getDestination();
+        return (this.wish == null) ? null : this.wish.getDestination();
     }
 
     /**
@@ -152,7 +152,7 @@ public class WishRealizationMission extends Mission {
      * {@inheritDoc}
      */
     public String invalidReason() {
-        return (wish == null) ? "wish-null"
+        return (this.wish == null) ? "wish-null"
             : invalidReason(getAIUnit(), getTarget());
     }
 
@@ -162,10 +162,7 @@ public class WishRealizationMission extends Mission {
     public Mission doMission(LogBuilder lb) {
         lb.add(tag);
         String reason = invalidReason();
-        if (reason != null) {
-            lbBroken(lb, reason);
-            return dropMission();
-        }
+        if (reason != null) return lbFail(lb, false, reason);
 
         // Move towards the target.
         final Unit unit = getUnit();
@@ -173,16 +170,18 @@ public class WishRealizationMission extends Mission {
         Unit.MoveType mt = travelToTarget(target,
             CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
         switch (mt) {
-        case MOVE:
-            break;
         case MOVE_ILLEGAL:
         case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
             return this;
+
+        case MOVE:
+            break;
+
         default:
-            lbMove(lb, unit, mt);
-            return this;
+            return lbMove(lb, mt);
         }
 
+        lbAt(lb);
         if (target instanceof Colony) {
             final AIMain aiMain = getAIMain();
             final Colony colony = (Colony)target;
@@ -193,29 +192,25 @@ public class WishRealizationMission extends Mission {
             // Replace the mission, with a defensive one if this is a
             // military unit or a simple working one if not.
             if (unit.getType().isOffensive()) {
-                Mission m = owner.getDefendSettlementMission(aiUnit, colony);
-                if (m != null) {
-                    lbDone(lb, " ready to defend, ", colony,
-                           ", switched to ", m);
-                    return m;
+                if (owner.getDefendSettlementMission(aiUnit, colony) != null) {
+                    lbDone(lb, true, "ready to defend, ", colony);
+                } else {
+                    lbFail(lb, true, "unable to defend");
                 }
-                lbFail(lb, " unable to defend");
             } else {                
                 aiColony.requestRearrange();
-                Mission m = owner.getWorkInsideColonyMission(aiUnit, aiColony);
-                if (m != null) {
-                    lbDone(lb, " ready to work ", colony,
-                           ", switched to ", m);
-                    return m;
+                if (owner.getWorkInsideColonyMission(aiUnit, aiColony)!=null) {
+                    lbDone(lb, true, "ready to work ", colony);
+                } else {
+                    lbFail(lb, true, "unable to work");
                 }
-                lbFail(lb, " unable to work");
             }
         } else {
-            lbFail(lb, " broken wish: ", wish);
+            lbFail(lb, true, "broken wish ", wish);
         }
-        wish.dispose();
-        wish = null;
-        return dropMission();
+
+        this.wish = null;
+        return lbDrop(lb);
     }
 
 

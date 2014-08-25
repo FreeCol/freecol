@@ -385,14 +385,125 @@ public abstract class Mission extends AIObject {
         return (reason != null) ? reason : invalidTargetReason(loc);
     }
 
+
+    // Mission logging support
+
+    /**
+     * State where a unit is.
+     *
+     * @param lb A <code>LogBuilder</code> to log to.
+     * @return This <code>Mission</code>.
+     */
+    protected Mission lbAt(LogBuilder lb) {
+        final Unit unit = getUnit();
+        lb.add(", at ", upLoc(unit.getLocation()));
+        return this;
+    }
+
+    /**
+     * State that the unit has made an attack.
+     *
+     * @param lb A <code>LogBuilder</code> to log to.
+     * @param what What is being attacked (a <code>Unit</code> or
+     *     <code>Settlement</code>).
+     * @return This <code>Mission</code>.
+     */
+    protected Mission lbAttack(LogBuilder lb, Location what) {
+        lb.add(", attacking ", what);
+        return this;
+    }
+
+    /**
+     * State that the unit is dodging.
+     *
+     * @param lb A <code>LogBuilder</code> to log to.
+     * @return This <code>Mission</code>.
+     */
+    protected Mission lbDodge(LogBuilder lb) {
+        final Unit unit = getUnit();
+        lb.add(", dodging at ", unit.getLocation());
+        unit.setMovesLeft(0);        
+        return this;
+    }
+
+    /**
+     * State that this mission has completed successfully.
+     *
+     * @param lb A <code>LogBuilder</code> to log to.
+     * @param cont If true, the mission should continue, otherwise drop the
+     *     mission.
+     * @param reasons Reasons for the successful completion.
+     * @return The current <code>Mission</code> of the unit, which may
+     *     now be different from <code>this</code>.
+     */
+    protected Mission lbDone(LogBuilder lb, boolean cont, Object... reasons) {
+        lb.add(", COMPLETED: ", reasons);
+        return (cont) ? aiUnit.getMission() : lbDrop(lb);
+    }
+
     /**
      * Drop the current mission.
      *
-     * @return The current <code>Mission</code>, which should now be null.
+     * @param lb A <code>LogBuilder</code> to log to.
+     * @return Null, which is now the current <code>Mission</code> of
+     *     this unit.
      */
-    public Mission dropMission() {
+    protected Mission lbDrop(LogBuilder lb) {
+        lb.add(", DROPPED");
         return (aiUnit == null) ? null : aiUnit.changeMission(null);
     }
+
+    /**
+     * The current mission has failed.
+     *
+     * @param lb A <code>LogBuilder</code> to log to.
+     * @param cont If true, the mission should continue, otherwise drop the
+     *     mission.
+     * @param reasons Reasons for the successful completion.
+     * @return The current <code>Mission</code> of the unit, which may
+     *     not be different from <code>this</code>.
+     */
+    protected Mission lbFail(LogBuilder lb, boolean cont, Object... reasons) {
+        lb.add(", FAILED: ", reasons);
+        return (cont) ? aiUnit.getMission() : lbDrop(lb);
+    }
+
+    /**
+     * State that a bad move has occurred.
+     *
+     * @param lb A <code>LogBuilder</code> to log to.
+     * @param mt The bad <code>MoveType</code>.
+     * @return This <code>Mission</code>.
+     */     
+    protected Mission lbMove(LogBuilder lb, Unit.MoveType mt) {
+        lb.add(", bad move type at ", getUnit().getLocation(), ": ", mt);
+        return this;
+    }
+
+    /**
+     * State that the mission has been retargeted.
+     *
+     * @param lb A <code>LogBuilder</code> to log to.
+     * @return This <code>Mission</code>.
+     */
+    protected Mission lbRetarget(LogBuilder lb) {
+        lb.add(", retargeted ", getTarget());
+        return this;
+    }
+
+    /**
+     * State that the unit is waiting for something.
+     *
+     * @param lb A <code>LogBuilder</code> to log to.
+     * @return This <code>Mission</code>.
+     */
+    protected Mission lbWait(LogBuilder lb, Object... reasons) {
+        final Unit unit = getUnit();
+        lb.add(reasons);
+        unit.setMovesLeft(0);
+        return this;
+    }
+
 
     /**
      * Finds a target for a unit without considering its movement
@@ -575,7 +686,8 @@ public abstract class Mission extends AIObject {
         } else if (unit.isInEurope()) {
             // Leave or wait for transport.
             if (!unit.getOwner().canMoveToEurope()) {
-                throw new IllegalStateException("Impossible move from Europe");
+                lb.add(", impossible move from Europe");
+                return MoveType.MOVE_ILLEGAL;
             }
             if (!unit.getType().canMoveToHighSeas()) {
                 path = null;
@@ -593,9 +705,9 @@ public abstract class Mission extends AIObject {
             throw new IllegalStateException("Unit not on the map: " + unit);
         } else {
             // On map
-            if (target instanceof Europe &&
-                !unit.getOwner().canMoveToEurope()) {
-                lbFail(lb, "impossible move to Europe for ", unit);
+            if (target instanceof Europe
+                && !unit.getOwner().canMoveToEurope()) {
+                lb.add(", impossible move to Europe");
                 return MoveType.MOVE_ILLEGAL;
             }
             path = (target instanceof Europe
@@ -773,7 +885,7 @@ public abstract class Mission extends AIObject {
                 MoveType mt = unit.getMoveType(path.getDirection());
                 if (mt == MoveType.MOVE_NO_MOVES) {
                     unit.setMovesLeft(0);
-                    lbAt(lb, unit);
+                    lbAt(lb);
                     return MoveType.MOVE_NO_MOVES;
                 }
                 if (!mt.isProgress()) return mt; // Special handling required.
@@ -807,20 +919,20 @@ public abstract class Mission extends AIObject {
      *
      * @param reason The reason for the retarget.
      * @param lb A <code>LogBuilder</code> to log to.
-     * @return True if a non-null target was found.
+     * @return The current <code>Mission</code>, which has been set to
+     *     null on failure to retarget.
      */
-    public boolean retargetMission(String reason, LogBuilder lb) {
+    public Mission retargetMission(String reason, LogBuilder lb) {
         final AIUnit aiu = getAIUnit();
-        Location newTarget = findTarget();
-        boolean ret = newTarget != null;
-        setTarget(newTarget);
         lb.add(", failing(", reason, ")");
-        if (ret) {
-            lb.add(", retargeted to ", newTarget);
-        } else {
-            lb.add(", retarget failed");
+
+        Location newTarget = findTarget();
+        if (newTarget != null) {
+            setTarget(newTarget);
+            return lbRetarget(lb);
         }
-        return ret;
+        lb.add(", retarget failed");
+        return lbDrop(lb);
     }
 
 

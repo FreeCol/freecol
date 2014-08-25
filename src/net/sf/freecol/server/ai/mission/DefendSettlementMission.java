@@ -296,10 +296,9 @@ public class DefendSettlementMission extends Mission {
         lb.add(tag);
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            if (!retargetMission(reason, lb)) return dropMission();
+            return retargetMission(reason, lb);
         } else if (reason != null) {
-            lbBroken(lb, reason);
-            return dropMission();
+            return lbFail(lb, false, reason);
         }
 
         // Go to the target!
@@ -307,14 +306,15 @@ public class DefendSettlementMission extends Mission {
         Unit.MoveType mt = travelToTarget(getTarget(),
             CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
         switch (mt) {
-        case MOVE:
-            break;
         case MOVE_ILLEGAL:
         case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
             return this;
+
+        case MOVE:
+            break;
+
         default:
-            lbMove(lb, unit, mt);
-            return this;
+            return lbMove(lb, mt);
         }
 
         // Check if the mission should change?
@@ -328,10 +328,7 @@ public class DefendSettlementMission extends Mission {
                 || (unit.isPerson() && colony.getUnitCount() < 1)) {
                 m = getEuropeanAIPlayer().getWorkInsideColonyMission(aiUnit,
                     aiMain.getAIColony(colony));
-                if (m != null) {
-                    lbDone(lb, "bolster ", colony, ", switch to ", m);
-                    return m;
-                }
+                return lbDone(lb, m != null, "bolster ", colony);
             }
         }
 
@@ -375,8 +372,7 @@ public class DefendSettlementMission extends Mission {
         // sole unit attacking because if it loses, the settlement
         // will collapse (and the combat model does not handle that).
         if (!unit.isOffensiveUnit()) {
-            lbBroken(lb, "not-offensive-unit");
-            return dropMission();
+            return lbFail(lb, false, "not-offensive-unit");
         }
         final CombatModel cm = unit.getGame().getCombatModel();
         Unit bestTarget = null;
@@ -410,12 +406,10 @@ public class DefendSettlementMission extends Mission {
         // Attack if a target is available.
         if (bestTarget != null) {
             AIMessage.askAttack(getAIUnit(), bestDirection);
-            lbAttack(lb, bestTarget);
-            if (unit.isDisposed()) return dropMission();
-            return this;
+            return lbAttack(lb, bestTarget);
         }
 
-        lb.add(" alert at ", getTarget(), ".");
+        lb.add(", alert at ", getTarget());
         return this;
     }
     

@@ -521,11 +521,11 @@ public class PioneeringMission extends Mission {
         // Check for completion and tileImprovement failure up front.
         if (tileImprovementPlan != null) {
             if (tileImprovementPlan.isComplete()) {
-                lbDone(lb, tileImprovementPlan.getType(),
+                lbDone(lb, true, tileImprovementPlan.getType(),
                        " at ", getTarget());
                 setTarget(null);
             } else if (!tileImprovementPlan.validate()) {
-                lbFail(lb, " abandoned invalid plan at ",
+                lbFail(lb, true, " abandoned invalid plan at ",
                        getTarget(), "/", tileImprovementPlan);
                 setTarget(null);
             }
@@ -544,10 +544,9 @@ public class PioneeringMission extends Mission {
 
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            if (!retargetMission(reason, lb)) return dropMission();
+            return retargetMission(reason, lb);
         } else if (reason != null) {
-            lbBroken(lb, reason);
-            return dropMission();
+            return lbFail(lb, false, reason);
         }
 
         final Unit unit = getUnit();
@@ -563,30 +562,32 @@ public class PioneeringMission extends Mission {
             // Go there and clear target on arrival.
             Unit.MoveType mt = travelToTarget(getTarget(), costDecider, lb);
             switch (mt) {
-            case MOVE:
-                break;
+            case MOVE_ILLEGAL:
             case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
                 return this;
+
+            case MOVE:
+                break;
+
             default:
-                lbMove(lb, unit, mt);
-                return this;
+                return lbMove(lb, mt);
             }
 
             // Try to equip
-            where = ((Colony)getTarget()).getName();
-            String logMe = ", at " + where;
-            logMe += (aiUnit.equipForRole("model.role.pioneer") && hasTools())
-                ? " equips"
-                : " but fails to equip";
+            lbAt(lb);
+            if (aiUnit.equipForRole("model.role.pioneer") && hasTools()) {
+                lb.add(", equips");
+            } else {
+                lb.add(", but fails to equip");
+            }
             newTarget = findTarget(aiUnit, 10, false);
             if (newTarget == null
                 || (!hasTools() && Map.isSameLocation(newTarget, getTarget()))) {
                 setTarget(null);
-                lb.add(logMe, ", cancelling");
-                return dropMission();
+                return lbFail(lb, false, ", found no target");
             }
             setTarget(newTarget);
-            lb.add(logMe, ", retargeting ", newTarget, "/", tileImprovementPlan);
+            return lbRetarget(lb);
         }
 
         // Going to an intermediate colony?
@@ -594,23 +595,24 @@ public class PioneeringMission extends Mission {
             && invalidTargetReason(getTarget(), player) == null) {
             Unit.MoveType mt = travelToTarget(getTarget(), costDecider, lb);
             switch (mt) {
-            case MOVE:
-                break;
+            case MOVE_ILLEGAL:
             case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
                 return this;
+
+            case MOVE:
+                break;
+
             default:
-                lbMove(lb, unit, mt);
-                return this;
+                return lbMove(lb, mt);
             }
-            where = ((Colony)getTarget()).getName();
+
+            lbAt(lb);
             setTarget(newTarget = findTarget(aiUnit, 10, false));
             if (newTarget == null) {
                 setTarget(null);
-                lbFail(lb, ", reached ", where, " but found no target");
-                return dropMission();
+                return lbFail(lb, false, ", found no target");
             }
-            lb.add(", at ", where, ", retargeting ", newTarget,
-                   "/", tileImprovementPlan);
+            return lbRetarget(lb);
         }
 
         // Check for threats.
@@ -640,6 +642,7 @@ public class PioneeringMission extends Mission {
         // Going to a tile to perform an improvement.
         Unit.MoveType mt = travelToTarget(getTarget(), costDecider, lb);
         switch (mt) {
+        case MOVE_ILLEGAL:
         case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
             return this;
 
@@ -651,12 +654,10 @@ public class PioneeringMission extends Mission {
             // at the target.  Move randomly and retry if adjacent.
             Direction d = unit.getTile().getDirection(getTarget().getTile());
             if (d != null) moveRandomly(tag, d);
-            lbDodge(lb, unit);
-            return this;
+            return lbDodge(lb);
 
         default:
-            lbMove(lb, unit, mt);
-            return this;
+            return lbMove(lb, mt);
         }
 
         // Take control of the land before proceeding to improve.
@@ -680,8 +681,7 @@ public class PioneeringMission extends Mission {
             if (fail) {
                 aiPlayer.removeTileImprovementPlan(tileImprovementPlan);
                 tileImprovementPlan.dispose();
-                lbFail(lb, "land claim at ", tile);
-                return dropMission();
+                return lbFail(lb, false, "land claim at ", tile);
             }
         }
 
@@ -697,11 +697,10 @@ public class PioneeringMission extends Mission {
             } else {
                 aiPlayer.removeTileImprovementPlan(tileImprovementPlan);
                 tileImprovementPlan.dispose();
-                lbFail(lb, "to change work type at ", tile);
-                return dropMission();
+                return lbFail(lb, false, "to change work type at ", tile);
             }
         } else { // Probably just out of moves.
-            lb.add(", waiting to improve at ", tile, ".");
+            lb.add(", waiting to improve at ", tile);
         }
         return this;
     }

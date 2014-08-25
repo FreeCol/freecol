@@ -392,10 +392,9 @@ public class ScoutingMission extends Mission {
         lb.add(tag);
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            if (!retargetMission(reason, lb)) return dropMission();
+            return retargetMission(reason, lb);
         } else if (reason != null) {
-            lbBroken(lb, reason);
-            return dropMission();
+            return lbFail(lb, false, reason);
         }
 
         // Go to the target.
@@ -418,16 +417,15 @@ public class ScoutingMission extends Mission {
             // (directed if possible) move and try again.
             moveRandomly(tag, unit.getTile()
                 .getDirection(getTarget().getTile()));
-            lbDodge(lb, unit);
-            return this;
+            return lbDodge(lb);
 
         case ENTER_INDIAN_SETTLEMENT_WITH_SCOUT:
             d = unit.getTile().getDirection(getTarget().getTile());
             assert d != null;
             if (AIMessage.askScoutSpeakToChief(aiUnit, d)) {
-                lbDone(lb, "speak-with-chief at ", getTarget());
+                lbDone(lb, true, "speak-with-chief at ", getTarget());
             } else {
-                lbFail(lb, " unexpected failure to speak at ", getTarget());
+                lbFail(lb, true, "unexpected failure to speak at ", getTarget());
             }
             break;
 
@@ -435,42 +433,32 @@ public class ScoutingMission extends Mission {
             d = unit.getTile().getDirection(getTarget().getTile());
             assert d != null;
             if (AIMessage.askMove(aiUnit, d)) {
-                lbDone(lb, tag, "explore at ", getTarget());
+                lbDone(lb, true, "explore at ", getTarget());
             } else {
-                lbFail(lb, tag, "unexpected failure at ", getTarget());
+                lbFail(lb, true, "unexpected failure at ", getTarget());
             }
             break;
 
         default:
-            lbMove(lb, unit, mt);
-            return this;
+            return lbMove(lb, mt);
         }
-        if (unit.isDisposed()) {
-            lb.add(", died at target ", getTarget(), ".");
-            return dropMission();
-        }
+        if (unit.isDisposed()) return this;
 
         // Retarget on failure or complete, but do not retarget from
         // one colony to another, just drop equipment and invalidate
         // the mission.
+        lbAt(lb);
         Location completed = getTarget();
         Location newTarget = findTarget(aiUnit, 20, false);
-        if (completed instanceof Colony
-            && (newTarget == null || newTarget == completed)) {
-            if (canScoutNatives(aiUnit)) {
+        if (newTarget == null
+            || (completed instanceof Colony && newTarget == completed)) {
+            if (completed instanceof Colony && canScoutNatives(aiUnit)) {
                 aiUnit.equipForRole(Specification.DEFAULT_ROLE_ID);
             }
-            lbFail(lb, " arrived at ", completed, " but found no targets");
-            return dropMission();
+            return lbFail(lb, false, ", found no targets");
         }
-        if (newTarget == null) {
-            lb.add(" at ", completed, " but found no targets");
-            return dropMission();
-        }
-
         setTarget(newTarget);
-        lb.add(" retargeting ", newTarget);
-        return this;
+        return lbRetarget(lb);
     }
 
 

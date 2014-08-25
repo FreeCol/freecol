@@ -191,36 +191,6 @@ public abstract class AIObject extends FreeColObject {
             : loc;
     }
 
-    // Mission logging support
-
-    protected void lbAt(LogBuilder lb, Unit unit) {
-        lb.add(", at ", unit.getLocation(), ".");
-    }
-
-    protected void lbDodge(LogBuilder lb, Unit unit) {
-        lb.add(", dodging at ", unit.getLocation(), ".");
-    }
-
-    protected void lbMove(LogBuilder lb, Unit unit, Unit.MoveType mt) {
-        lb.add(", bad move type at ", unit.getLocation(), ": ", mt, ".");
-    }
-    
-    protected void lbAttack(LogBuilder lb, Location what) {
-        lb.add(", attacking ", what, ".");
-    }
-
-    protected void lbBroken(LogBuilder lb, String reason) {
-        lb.add(", broken: ", reason, ".");
-    }
-
-    protected void lbFail(LogBuilder lb, Object... reasons) {
-        lb.add(", FAILED: ", reasons, ".");
-    }
-
-    protected void lbDone(LogBuilder lb, Object... reasons) {
-        lb.add(", COMPLETED: ", reasons, ".");
-    }
-
 
     // Other low level
 

@@ -361,10 +361,9 @@ public class MissionaryMission extends Mission {
         lb.add(tag);
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            if (!retargetMission(reason, lb)) return dropMission();
+            return retargetMission(reason, lb);
         } else if (reason != null) {
-            lbBroken(lb, reason);
-            return dropMission();
+            return lbFail(lb, false, reason);
         }
 
         // Go to the target.
@@ -374,42 +373,36 @@ public class MissionaryMission extends Mission {
             Unit.MoveType mt = travelToTarget(getTarget(),
                 CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
             switch (mt) {
+            case MOVE_ILLEGAL:
             case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
                 return this;
 
             case MOVE:
                 // Reached an intermediate colony.  Retarget, but do not
                 // accept fallback targets.
+                lbAt(lb);
                 Location completed = getTarget();
                 Location newTarget = findTarget(aiUnit, 20, false);
                 if (newTarget == null || newTarget == completed) {
-                    setTarget(null);
-                    lb.add(", reached ", completed, ", retarget failed.");
-                    return dropMission();
+                    lb.add(", retarget failed");
+                    return lbDrop(lb);
                 }
                 setTarget(newTarget);
-                lb.add(tag, " reached ", completed, ", retargeted ", newTarget);
-                break;
+                return lbRetarget(lb);
 
             case ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY:
                 Direction d = unit.getTile().getDirection(getTarget().getTile());
                 assert d != null;
                 IndianSettlement is = (IndianSettlement)getTarget();
                 AIMessage.askEstablishMission(aiUnit, d, is.hasMissionary());
-                setTarget(null);
-                if (unit.isDisposed()) {
-                    lbFail(lb, "died at ", is);
-                } else if (is.hasMissionary(unit.getOwner())
+                if (is.hasMissionary(unit.getOwner())
                     && unit.isInMission()) {
-                    lbDone(lb, "at ", is);
-                } else {
-                    lbFail(lb, "unexpected failure at ", is);
+                    return lbDone(lb, false, "established at ", is);
                 }
-                return dropMission();
+                return lbFail(lb, false, "unexpected failure at ", is);
 
             default:
-                lbMove(lb, unit, mt);
-                return this;
+                return lbMove(lb, mt);
             }
         }
     }

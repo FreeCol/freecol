@@ -154,10 +154,7 @@ public class WorkInsideColonyMission extends Mission {
     public Mission doMission(LogBuilder lb) {
         lb.add(tag);
         String reason = invalidReason();
-        if (reason != null) {
-            lbBroken(lb, reason);
-            return dropMission();
-        }
+        if (reason != null) return lbFail(lb, false, reason);
 
         final Unit unit = getUnit();
         Unit.MoveType mt = travelToTarget(getTarget(),
@@ -168,16 +165,12 @@ public class WorkInsideColonyMission extends Mission {
             break;
 
         case MOVE: // Arrived
-            if (unit.isInColony()) {
-                lb.add(", working ", unit.getLocation(), ".");
-            } else {
-                lb.add(", arrived at ", getTarget(), ".");
-            }
+            lbAt(lb);
+            if (unit.isInColony()) lb.add(", working");
             break;
 
         default:
-            lbMove(lb, unit, mt);
-            break;
+            return lbMove(lb, mt);
         }
         return this;
     }

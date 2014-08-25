@@ -375,10 +375,10 @@ public class BuildColonyMission extends Mission {
                 && (c = ((Tile)target).getColony()) != null
                 && player.owns(c)) {
                 setTarget(c);
+                return lbRetarget(lb);
             }
         } else if (reason != null) {
-            lbBroken(lb, reason);
-            return null;
+            return lbFail(lb, false, reason);
         } else { // Target valid, but has it devalued?
             if (target instanceof Tile) {
                 int newValue = getColonyValue((Tile)target);
@@ -389,23 +389,25 @@ public class BuildColonyMission extends Mission {
                 }
             }
         }
-        if (retarget && !retargetMission(reason, lb)) return dropMission();
+        if (retarget) return retargetMission(reason, lb);
 
         for (;;) {
             // Go there.
             Unit.MoveType mt = travelToTarget(getTarget(),
                 CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
             switch (mt) {
-            case MOVE:
-                break;
             case MOVE_ILLEGAL:
             case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
                 return this;
+
+            case MOVE:
+                break;
+
             default:
-                lbMove(lb, unit, mt);
-                return this;
+                return lbMove(lb, mt);
             }
 
+            lbAt(lb);
             if (getTarget() instanceof Colony) {
                 // If arrived at the target colony it is time to retarget
                 // another building site, unless the existing one is small
@@ -415,17 +417,14 @@ public class BuildColonyMission extends Mission {
                 Location newTarget;
                 if (colony.getUnitCount() <= 1
                     || (newTarget = findTarget(aiUnit, 5, false)) == null) {
-                    lb.add(", join ", name, ". ");
-                    break;
+                    return lbDone(lb, false, "joining");
                 }
                 setTarget(newTarget);
-                lb.add(", arrived at ", name, ", retargeting ", newTarget);
-                continue;
+                return lbRetarget(lb);
             }
 
             if (!(getTarget() instanceof Tile)) {
-                lbFail(lb, "bogus target ", getTarget(), ".");
-                break;
+                return lbFail(lb, false, "bogus target ", getTarget());
             }
             Tile tile = (Tile)getTarget();
             if (tile.getOwner() == null) {
@@ -434,8 +433,7 @@ public class BuildColonyMission extends Mission {
                 Colony colony = (Colony)tile.getOwningSettlement();
                 if (colony != null) {
                     logger.warning("Building on colony tile: " + tile);
-                    lbFail(lb, "building on colony tile ", tile, ".");
-                    break;
+                    return lbFail(lb, false, "building on colony tile ", tile);
                 }
             } else {
                 // Not our tile, so claim it first.  Fail if someone
@@ -457,18 +455,13 @@ public class BuildColonyMission extends Mission {
                             : NetworkConstants.STEAL_LAND))
                         || !player.owns(tile);
                 }
-                if (fail) {
-                    if (retargetMission("tile-claim-at-" + tile, lb)) continue;
-                    setTarget(null);
-                    lbFail(lb, "tile claim at ", tile, ".");
-                    break;
-                }
+                if (fail) return retargetMission("tile-claim-at-" + tile, lb);
             }
 
             // Check that the unit has moves left, which are required
             // for building.
             if (unit.getMovesLeft() <= 0) {
-                lb.add(", waiting to build at ", tile, ".");
+                lb.add(", waiting to build at ", tile);
                 return this;
             }
 
@@ -490,13 +483,10 @@ public class BuildColonyMission extends Mission {
                 aiColony.requestRearrange();
                 Mission m = getEuropeanAIPlayer()
                     .getWorkInsideColonyMission(aiUnit, aiColony);
-                lbDone(lb, colony, ", switched to ", m);
-                return m;
+                return lbDone(lb, m != null, colony);
             }
-            lbFail(lb, "build at ", tile, ".");
-            break;
+            return lbFail(lb, false, "build at ", tile);
         }
-        return dropMission();
     }
 
 

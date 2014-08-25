@@ -160,10 +160,7 @@ public class UnitWanderHostileMission extends Mission {
     public Mission doMission(LogBuilder lb) {
         lb.add(tag);
         String reason = invalidReason();
-        if (reason != null) {
-            lbBroken(lb, reason);
-            return dropMission();
-        }
+        if (reason != null) return lbFail(lb, false, reason);
 
         // Make random moves in a reasonably consistent direction,
         // checking for a target along the way.
@@ -178,17 +175,13 @@ public class UnitWanderHostileMission extends Mission {
             // Every checkTurns, look for a target of opportunity.
             if (check == 0) {
                 Mission m = getAIPlayer().getSeekAndDestroyMission(aiUnit, 1);
-                if (m != null) {
-                    lbDone(lb, ", found target, switched to ", m);
-                    return m;
-                }
+                if (m != null) return lbDone(lb, false, ", found target");
                 check = checkTurns;
             } else check--;
 
             if ((d = moveRandomly(tag, d)) == null) break;
         }
-        lbAt(lb, unit);
-        return this;
+        return lbAt(lb);
     }
 
 

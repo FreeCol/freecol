@@ -1308,10 +1308,7 @@ public class TransportMission extends Mission {
         checkCargoes(lb);
 
         String reason = invalidReason();
-        if (reason != null) {
-            lbBroken(lb, reason);
-            return dropMission();
-        }
+        if (reason != null) return lbFail(lb, false, reason);
 
         final EuropeanAIPlayer euaip = getEuropeanAIPlayer();
         final AIUnit aiCarrier = getAIUnit();
@@ -1345,9 +1342,7 @@ public class TransportMission extends Mission {
                 if (unit.getTile().isAdjacent(target.getTile())
                     || costDecider == fallBackDecider) {
                     moveRandomly(tag, null);
-                    unit.setMovesLeft(0);
-                    lbDodge(lb, unit);
-                    return this;
+                    return lbDodge(lb);
                 }
                 costDecider = fallBackDecider; // Retry
                 lb.add(", retry blockage at ", unit.getLocation());
@@ -1454,8 +1449,7 @@ public class TransportMission extends Mission {
                 if ((reason = invalidReason()) != null) {
                     logger.warning(tag + " post-stop failure(" + reason
                         + ": " + this.toFullString());
-                    lbBroken(lb, reason);
-                    return dropMission();
+                    return lbFail(lb, false, reason);
                 }
                 if (unit.isAtLocation(target)) {
                     lb.add(", waiting at ", target, ".");
@@ -1464,8 +1458,7 @@ public class TransportMission extends Mission {
                 break;
 
             default:
-                lbMove(lb, unit, mt);
-                return this;
+                return lbMove(lb, mt);
             }
         }
     }

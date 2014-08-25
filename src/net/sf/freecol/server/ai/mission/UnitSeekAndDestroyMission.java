@@ -456,10 +456,9 @@ public class UnitSeekAndDestroyMission extends Mission {
         lb.add(tag);
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            if (!retargetMission(reason, lb)) return dropMission();
+            return retargetMission(reason, lb);
         } else if (reason != null) {
-            lbBroken(lb, reason);
-            return dropMission();
+            return lbFail(lb, false, reason);
         }
 
         // Is there a target-of-opportunity?
@@ -469,10 +468,10 @@ public class UnitSeekAndDestroyMission extends Mission {
             : findTarget(aiUnit, 1, false);
         if (nearbyTarget != null) {
             if (getTarget() == null) {
-                lb.add(", retargeted ", nearbyTarget);
                 setTarget(nearbyTarget);
-                nearbyTarget = null;
-            } else if (nearbyTarget == getTarget()) {
+                return lbRetarget(lb);
+            }
+            if (nearbyTarget == getTarget()) {
                 nearbyTarget = null;
             } else {
                 lb.add(", found target of opportunity ", nearbyTarget);
@@ -498,24 +497,17 @@ public class UnitSeekAndDestroyMission extends Mission {
                 // might collapse.  Defend instead.
                 Mission m = getAIPlayer()
                     .getDefendSettlementMission(aiUnit, settlement);
-                if (m != null) {
-                    lbDone(lb, " desperate defence of ", settlement,
-                        ", switched to ", m);
-                    return m;
-                }
+                return lbDone(lb, m != null, " desperate defence of ",
+                              settlement);
             }
             Direction d = unitTile.getDirection(currentTarget.getTile());
             assert d != null;
             AIMessage.askAttack(aiUnit, d);
-            lbAttack(lb, currentTarget);
-            if (unit.isDisposed()) return dropMission();
-            return this;
+            return lbAttack(lb, currentTarget);
 
         default:
-            lbMove(lb, unit, mt);
-            break;
+            return lbMove(lb, mt);
         }
-        return this;
     }
 
 

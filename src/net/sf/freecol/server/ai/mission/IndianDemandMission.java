@@ -336,10 +336,7 @@ public class IndianDemandMission extends Mission {
     public Mission doMission(LogBuilder lb) {
         lb.add(tag);
         String reason = invalidReason();
-        if (reason != null) {
-            lbBroken(lb, reason);
-            return dropMission();
-        }
+        if (reason != null) return lbFail(lb, false, reason);
 
         final AIUnit aiUnit = getAIUnit();
         final Unit unit = getUnit();
@@ -349,14 +346,17 @@ public class IndianDemandMission extends Mission {
                 Unit.MoveType mt = travelToTarget(is,
                     CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
                 switch (mt) {
-                case MOVE: // Arrived!
-                    break;
+                case MOVE_ILLEGAL:
                 case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
                     return this;
+
+                case MOVE: // Arrived!
+                    break;
+
                 default:
-                    lbMove(lb, unit, mt);
-                    return this;
+                    return lbMove(lb, mt);
                 }
+
                 // Unload the goods
                 GoodsContainer container = unit.getGoodsContainer();
                 for (Goods goods : container.getCompactGoods()) {
@@ -364,18 +364,19 @@ public class IndianDemandMission extends Mission {
                     is.addGoods(tribute);
                 }
                 completed = true;
-                lbDone(lb, "unloaded tribute at ", is);
-                return dropMission();
+                return lbDone(lb, false, "unloaded tribute at ", is);
             }
 
             // Move to the target's colony and demand
             Unit.MoveType mt = travelToTarget(target, null, lb);
             Direction d;
             switch (mt) {
-            case MOVE: // Arrived!
-                break;
+            case MOVE_ILLEGAL:
             case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
                 return this;
+
+            case MOVE: // Arrived!
+                break;
 
             case ATTACK_SETTLEMENT:
                 d = unit.getTile().getDirection(target.getTile());
@@ -385,18 +386,15 @@ public class IndianDemandMission extends Mission {
                 Location blocker = resolveBlockage(aiUnit, target);
                 if (blocker == null) {
                     moveRandomly(tag, null);
-                    unit.setMovesLeft(0);
-                    lbDodge(lb, unit);
-                } else {
-                    d = unit.getTile().getDirection(blocker.getTile());
-                    AIMessage.askAttack(aiUnit, d);
-                    lbAttack(lb, blocker);
+                    return lbDodge(lb);
                 }
-                return this;
+                d = unit.getTile().getDirection(blocker.getTile());
+                AIMessage.askAttack(aiUnit, d);
+                return lbAttack(lb, blocker);
+
             default:
                 moveRandomly(tag, null);
-                lbMove(lb, unit, mt);
-                return this;
+                return lbMove(lb, mt);
             }
 
             Colony colony = (Colony)getTarget();
@@ -409,8 +407,7 @@ public class IndianDemandMission extends Mission {
             if (goods == null) {
                 if (!enemy.checkGold(1)) {
                     completed = true;
-                    lbDone(lb, "empty handed at ", colony);
-                    return dropMission();
+                    return lbDone(lb, false, "empty handed at ", colony);
                 }
                 amount = enemy.getGold() / 20;
                 if (amount == 0) amount = enemy.getGold();
@@ -435,11 +432,12 @@ public class IndianDemandMission extends Mission {
                 d = unit.getTile().getDirection(colony.getTile());
                 boolean attack = tension >= Tension.Level.CONTENT.getLimit()
                     && d != null;
-                if (attack) AIMessage.askAttack(aiUnit, d);
+                if (attack) {
+                    AIMessage.askAttack(aiUnit, d);
+                    lbAttack(lb, colony);
+                }
                 completed = true;
-                lbDone(lb, "refused at ", colony, 
-                       (((attack) ? " (attacking)" : "")));
-                return dropMission();
+                return lbDone(lb, false, "refused at ", colony);
             }
         }
         return this;

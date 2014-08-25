@@ -225,10 +225,7 @@ public class IndianBringGiftMission extends Mission {
     public Mission doMission(LogBuilder lb) {
         lb.add(tag);
         String reason = invalidReason();
-        if (reason != null) {
-            lbBroken(lb, reason);
-            return dropMission();
-        }
+        if (reason != null) lbFail(lb, false, reason);
 
         final AIUnit aiUnit = getAIUnit();
         final Unit unit = getUnit();
@@ -236,10 +233,13 @@ public class IndianBringGiftMission extends Mission {
         if (!hasGift()) {
             Unit.MoveType mt = travelToTarget(is, null, lb);
             switch (mt) {
-            case MOVE: // Arrived!
-                break;
+            case MOVE_ILLEGAL:
             case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
                 return this;
+
+            case MOVE: // Arrived!
+                break;
+
             case ATTACK_SETTLEMENT: case ATTACK_UNIT: // A blockage!
                 Location blocker = resolveBlockage(aiUnit, is);
                 if (blocker != null) {
@@ -249,76 +249,67 @@ public class IndianBringGiftMission extends Mission {
                     return this;
                 }
                 moveRandomly(tag, null);
-                unit.setMovesLeft(0);
-                lbDodge(lb, unit);
-                return this;
+                return lbDodge(lb);
+
             default:
-                lbMove(lb, unit, mt);
-                return this;
+                return lbMove(lb, mt);
             }
             // Load the goods.
             Goods gift = is.getRandomGift(getAIRandom());
             if (gift == null) {
                 completed = true;
-                lbFail(lb, "found no gift at ", is);
-                return dropMission();
-            } else if (!AIMessage.askLoadCargo(aiUnit, gift) || !hasGift()) {
+                return lbFail(lb, false, "found no gift at ", is);
+            }
+            if (!AIMessage.askLoadCargo(aiUnit, gift) || !hasGift()) {
                 completed = true;
-                lbFail(lb, "failed to collect gift at ", is);
-                return dropMission();
-            } else {
-                lb.add(", collected gift at ", is, ".");
-                return this;
+                return lbFail(lb, false, "failed to collect gift at ", is);
             }
-
-        } else {
-            // Move to the target's colony and deliver, avoiding trouble
-            // by choice of cost decider.
-            Unit.MoveType mt = travelToTarget(getTarget(),
-                CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
-            switch (mt) {
-            case MOVE: case ATTACK_SETTLEMENT: // Arrived (do not attack!)
-                break;
-            case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
-                return this;
-
-            case ATTACK_UNIT:
-                Location blocker = resolveBlockage(aiUnit, is);
-                if (blocker != null) {
-                    AIMessage.askAttack(aiUnit, unit.getTile()
-                        .getDirection(blocker.getTile()));
-                    lbAttack(lb, blocker);
-                    return this;
-                }
-                moveRandomly(tag, null);
-                unit.setMovesLeft(0);
-                lbDodge(lb, unit);
-                return this;
-
-            default:
-                lbMove(lb, unit, mt);
-                return this;
-            }
-
-            if (!unit.getTile().isAdjacent(getTarget().getTile())) {
-                throw new IllegalStateException("Not at target: "
-                    + getTarget());
-            }
-            Settlement settlement = (Settlement)getTarget();
-            boolean result = false;
-            if (AIMessage.askGetTransaction(aiUnit, settlement)) {
-                result = AIMessage.askDeliverGift(aiUnit, settlement,
-                    unit.getGoodsList().get(0));
-                AIMessage.askCloseTransaction(aiUnit, settlement);
-            }
-            completed = true;
-            if (result) {
-                lbDone(lb, "delivered at ", settlement);
-            } else {
-                lbFail(lb, "to deliver ", settlement);
-            }
-            return dropMission();
+            lb.add(", collected gift at ", is);
+            return this;
         }
+
+        // Move to the target's colony and deliver, avoiding trouble
+        // by choice of cost decider.
+        Unit.MoveType mt = travelToTarget(getTarget(),
+            CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
+        switch (mt) {
+        case MOVE_ILLEGAL:
+        case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
+            return this;
+            
+        case MOVE: case ATTACK_SETTLEMENT: // Arrived (do not attack!)
+            break;
+
+        case ATTACK_UNIT:
+            Location blocker = resolveBlockage(aiUnit, is);
+            if (blocker != null) {
+                AIMessage.askAttack(aiUnit, unit.getTile()
+                    .getDirection(blocker.getTile()));
+                lbAttack(lb, blocker);
+                return this;
+            }
+            moveRandomly(tag, null);
+            return lbDodge(lb);
+            
+        default:
+            return lbMove(lb, mt);
+        }
+        
+        if (!unit.getTile().isAdjacent(getTarget().getTile())) {
+            throw new IllegalStateException("Not at target: "
+                + getTarget());
+        }
+        Settlement settlement = (Settlement)getTarget();
+        boolean result = false;
+        if (AIMessage.askGetTransaction(aiUnit, settlement)) {
+            result = AIMessage.askDeliverGift(aiUnit, settlement,
+                unit.getGoodsList().get(0));
+            AIMessage.askCloseTransaction(aiUnit, settlement);
+        }
+        completed = true;
+        return (result)
+            ? lbDone(lb, false, "delivered at ", settlement)
+            : lbFail(lb, false, "deliver at ", settlement);
     }
 
 

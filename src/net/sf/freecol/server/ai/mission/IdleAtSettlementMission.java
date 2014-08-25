@@ -130,17 +130,11 @@ public class IdleAtSettlementMission extends Mission {
     public Mission doMission(LogBuilder lb) {
         lb.add(tag);
         String reason = invalidReason();
-        if (reason != null) {
-            lbBroken(lb, reason);
-            return dropMission();
-        }
+        if (reason != null) return lbFail(lb, false, reason);
 
         // Wait if not on the map.
         final Unit unit = getUnit();
-        if (!unit.hasTile()) {
-            lbAt(lb, unit);
-            return this;
-        }
+        if (!unit.hasTile()) return lbAt(lb);
 
         // If our tile contains a settlement, idle.  No log, this is normal.
         Settlement settlement = unit.getTile().getSettlement();
@@ -153,19 +147,20 @@ public class IdleAtSettlementMission extends Mission {
         if (target != null) {
             Unit.MoveType mt = travelToTarget(target, null, lb);
             switch (mt) {
-            case MOVE:
-                break;
             case MOVE_ILLEGAL:
             case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_NO_TILE:
                 return this;
+
+            case MOVE:
+                break;
+
             default:
-                lbMove(lb, unit, mt);
-                return this;
+                return lbMove(lb, mt);
             }
 
         } else { // Just make a random moves if no target can be found.
             moveRandomlyTurn(tag);
-            lbAt(lb, unit);
+            return lbAt(lb);
         }
         return this;
     }
