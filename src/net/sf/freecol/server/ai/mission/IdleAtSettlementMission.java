@@ -75,6 +75,18 @@ public class IdleAtSettlementMission extends Mission {
     }
 
 
+    /**
+     * Is the unit in a safe location where it can idle, or should it move?
+     *
+     * @return True if the unit is safe.
+     */
+    private boolean isSafe() {
+        final Unit unit = getUnit();
+        return unit.isInEurope() || !unit.hasTile()
+            || unit.getTile().hasSettlement();
+    }
+
+
     // Implement Mission
     //   Inherit dispose, getTransportDestination
 
@@ -90,7 +102,7 @@ public class IdleAtSettlementMission extends Mission {
      * {@inheritDoc}
      */
     public Location getTarget() {
-        return null;
+        return (isSafe()) ? null : findTarget();
     }
 
     /**
@@ -102,9 +114,9 @@ public class IdleAtSettlementMission extends Mission {
      * {@inheritDoc}
      */
     public Location findTarget() {
-        final Unit unit = getAIUnit().getUnit();
-        if (unit.isInEurope()) return unit.getLocation();
+        if (isSafe()) return null;
 
+        final Unit unit = getAIUnit().getUnit();
         PathNode path = unit.findOurNearestOtherSettlement();
         return (path == null) ? null : upLoc(path.getLastNode().getLocation());
     }
@@ -132,34 +144,35 @@ public class IdleAtSettlementMission extends Mission {
         String reason = invalidReason();
         if (reason != null) return lbFail(lb, false, reason);
 
-        // Wait if not on the map.
+        // If safe, do nothing but do not use lbWait in case a useful
+        // mission is found.
+        if (isSafe()) {
+            lb.add(", idling");
+            return lbAt(lb);
+        }
+
         final Unit unit = getUnit();
-        if (!unit.hasTile()) return lbWait(lb);            
-
-        // Idle in Europe or settlements.
-        if (unit.isInEurope() || unit.getSettlement() != null) return lbAt(lb);
-
-        Location target = findTarget();
+        Location target = getTarget();
         if (target == null) {
             // Just make a random moves if no target can be found.
             moveRandomlyTurn(tag);
+            return lbWait(lb);
+        }
 
-        } else {
-            Unit.MoveType mt = travelToTarget(target, null, lb);
-            switch (mt) {
-            case MOVE_HIGH_SEAS: case MOVE_NO_REPAIR:
-                return lbWait(lb);
-
-            case MOVE_NO_MOVES: case MOVE_ILLEGAL:
-            case MOVE_NO_TILE:
-                return this;
-
-            case MOVE:
-                break;
-
-            default:
-                return lbMove(lb, mt);
-            }
+        Unit.MoveType mt = travelToTarget(getTarget(), null, lb);
+        switch (mt) {
+        case MOVE_HIGH_SEAS: case MOVE_NO_REPAIR:
+            return lbWait(lb);
+            
+        case MOVE_NO_MOVES: case MOVE_ILLEGAL:
+        case MOVE_NO_TILE:
+            return this;
+            
+        case MOVE: // Arrived
+            break;
+            
+        default:
+            return lbMove(lb, mt);
         }
 
         return lbAt(lb);

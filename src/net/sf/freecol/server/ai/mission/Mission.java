@@ -658,6 +658,7 @@ public abstract class Mission extends AIObject {
      */
     protected MoveType travelToTarget(Location target, CostDecider costDecider,
                                       LogBuilder lb) {
+        if (target == null) return MoveType.MOVE_ILLEGAL;
         final Tile targetTile = target.getTile();
         if (!(target instanceof Europe) && targetTile == null) {
             throw new IllegalStateException("Target neither Europe nor Tile");
