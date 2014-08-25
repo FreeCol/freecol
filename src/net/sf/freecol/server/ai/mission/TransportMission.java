@@ -946,6 +946,12 @@ public class TransportMission extends Mission {
             }
             // Fall through
         case LOAD:
+            if (!Map.isSameLocation(t.getLocation(),
+                                    cargo.getTransportTarget())) {
+                lb.add(", ", cargo.toShortString(), " at ", t.getLocation(),
+                    " not ", cargo.getTransportTarget());
+                return CargoResult.TCONTINUE;
+            }
             switch (carrier.getNoAddReason(l)) {
             case NONE:
                 if (!t.joinTransport(carrier, cargo.getJoinDirection())) {
