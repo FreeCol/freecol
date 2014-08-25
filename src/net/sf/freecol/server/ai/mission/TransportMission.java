@@ -987,7 +987,7 @@ public class TransportMission extends Mission {
         case UNLOAD:
             if (isCarrying(t) && !t.leaveTransport(cargo.getLeaveDirection())) {
                 lb.add(", ", cargo.toShortString(), " NO-LEAVE");
-                return CargoResult.TFAIL;
+                return CargoResult.TRETRY;
             }
             lb.add(", ", cargo.toShortString(), " COMPLETED");
             break;
@@ -1360,6 +1360,7 @@ public class TransportMission extends Mission {
                     lbAt(lb);
                     lb.add(", delivering");
                     List<Cargo> cont = new ArrayList<Cargo>();
+                    List<Cargo> next = new ArrayList<Cargo>();
                     List<Cargo> curr = tClear();
                     for (Cargo cargo : curr) {
                         CargoResult result = (cargo.getMode().isCollection())
@@ -1367,15 +1368,25 @@ public class TransportMission extends Mission {
                             : tryCargo(cargo, lb);
                         switch (result) {
                         case TCONTINUE:
-                        case TRETRY: // will check again below
                             cont.add(cargo);
                             break;
+                        case TRETRY: // will check again below
+                            if (cargo.retry()) {
+                                cont.add(cargo);
+                                break;
+                            }
+                            // Fall through
+                        case TFAIL:
+                            if (cargo.isCarried()) {
+                                cargo.dump();
+                                break;
+                            }
+                            // Fall through
                         case TDONE:
+                            dropTransportable(cargo.getTransportable());
                             cargo.clear();
                             break;
-                        case TFAIL: // failures will be retargeted below
-                            break;
-                        case TNEXT:
+                        case TNEXT: default:
                             throw new IllegalStateException("Can not happen");
                         }
                     }
@@ -1383,16 +1394,13 @@ public class TransportMission extends Mission {
                     // Rebuild the cargo list with the original members,
                     // less the transportables that were dropped.
                     tSet(cont, true);
-                    checkCargoes(lb);
                     optimizeCargoes(lb); // This will retarget failures
 
                     // Now try again, this time collecting as well as
                     // delivering.
                     lb.add(", collecting");
                     cont.clear();
-                    List<Cargo> next = new ArrayList<Cargo>();
-                    curr = tClear();
-                    for (Cargo cargo : curr) {
+                    for (Cargo cargo : tClear()) {
                         CargoResult result = (cargo.getMode().isCollection())
                             ? tryCargo(cargo, lb)
                             : CargoResult.TCONTINUE;
@@ -1400,11 +1408,8 @@ public class TransportMission extends Mission {
                         case TCONTINUE:
                             cont.add(cargo);
                             break;
-                        case TDONE:
-                            cargo.clear();
-                            break;
                         case TNEXT:
-                            next.add(cargo);
+                            cont.add(cargo);
                             break;
                         case TRETRY:
                             if (cargo.retry()) { // Can not reach the target.
@@ -1412,11 +1417,14 @@ public class TransportMission extends Mission {
                                 break;
                             }
                             // Fall through
-                        case TFAIL:
+                        case TFAIL: case TDONE:
+                            dropTransportable(cargo.getTransportable());
+                            cargo.clear();
                             break;
+                        default:
+                            throw new IllegalStateException("Can not happen");
                         }
                     }
-                    curr.clear();
 
                     // Rebuild the cargo list with the original members,
                     // less the transportables that were dropped.
@@ -1428,25 +1436,16 @@ public class TransportMission extends Mission {
                     for (Cargo c : next) queueCargo(c, false);
                 }
 
-                // See if the transportables need replenishing.
-                // First try to collect more transportables at the current
-                // location, then just add the best transportable for this
-                // carrier.
-                Location here = upLoc(unit.getLocation());
-                List<TransportableAIObject> tl = euaip.getTransportablesAt(here);
-                if (tl != null) {
-                    for (TransportableAIObject t : tl) {
-                        if (destinationCapacity() <= 0) break;
-                        if (queueTransportable(t, true)) {
-                            euaip.claimTransportable(t, here);
-                        }
-                    }
-                }
-                for (int n = destinationCapacity(); n > 0; n--) {
+                int capacity = destinationCapacity();
+                lb.add(", capacity=", capacity);
+                // Add the best transportable for this carrier up to
+                // available capacity.
+                for (int n = capacity; n > 0; n--) {
                     TransportableAIObject t = getBestTransportable(unit);
                     if (t == null) break;
                     if (queueTransportable(t, false)) {
                         euaip.claimTransportable(t);
+                        lb.add(", queued", t);
                     }
                 }
 
