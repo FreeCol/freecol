@@ -14,6 +14,10 @@ statit () {
 }
 
 countinlog () {
+    w0=`sed -n -e 's/^.*AI transport.*\(COMPLETED, at wish-target.*fulfills at\)[^]]*, collecting.*$/\1/p' "$1" | sed -e 's/fulfills/#/g' -e 's/[^#]//g' | tr -d '\010' | wc -c`
+    w1=`grep -c 'AI wisher.*, COMPLETED' "$1"`
+    t0=`sed -n -e 's/^.*AI transport.*, delivering,\(.*COMPLETED.*\), collecting.*$/\1/p' "$1" | sed -e 's/COMPLETED/#/g' -e 's/[^#]//g' | tr -d '\010' | wc -c`
+
     echo -n 'Count builds: '      ; grep -c 'AI colony builder.*, COMPLETED' "$1"
     echo -n 'Count cashins: '     ; grep -c 'AI treasureTrain.*, COMPLETED' "$1"
     echo -n 'Count defences: '    ; grep -c 'AI defender.*, attacking' "$1"
@@ -24,8 +28,8 @@ countinlog () {
     echo -n 'Count piracies: '    ; grep -c 'AI privateer.*, attacking' "$1"
     echo -n 'Count scoutings: '   ; grep -c 'AI scout.*, COMPLETED' "$1"
     echo -n 'Count seek+dests: '  ; grep -c 'AI seek+destroyer.*, attacking' "$1"
-    echo -n 'Count transports: '  ; sed -n -e 's/^.*AI transport.*, delivering,\(.*COMPLETED.*\), collecting.*$/\1/p' "$1" | sed -e 's/COMPLETED/#/g' -e 's/[^#]//g' | tr -d '\010' | wc -c
-    echo -n 'Count wishes: '      ; grep -c 'AI wisher.*, COMPLETED' "$1"
+    echo -n 'Count transports: '  ; echo $t0
+    echo -n 'Count wishes: '      ; expr $w0 + $w1
     echo -n 'Count Cibola: '      ; grep -c 'is exploring rumour CIBOLA' "$1"
     echo -n 'Count fountain: '    ; grep -c 'is exploring rumour FOUNTAIN' "$1"
     echo -n 'Count colony-fall: ' ; grep -c 'DESTROY_COLONY' "$1"
