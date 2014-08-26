@@ -438,6 +438,23 @@ public class EuropeanAIPlayer extends AIPlayer {
     }
 
     /**
+     * Cheat by adding gold to guarantee the player has a minimum amount.
+     *
+     * @param amount The minimum amount of gold required.
+     * @param lb A <code>LogBuilder</code> to log to.
+     */
+    public void cheatGold(int amount, LogBuilder lb) {
+        final Player player = getPlayer();
+        int gold = player.getGold();
+        if (gold < amount) {
+            amount -= gold;
+            player.modifyGold(amount);
+            lb.add("added ", amount, " gold");
+        }
+        player.logCheat(amount + " gold");
+    }
+
+    /**
      * Cheats for the AI.  Please try to centralize cheats here.
      *
      * TODO: Remove when the AI is good enough.
@@ -481,6 +498,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                         if (Specification.COLONY_GOODS_PARTY_SOURCE == m.getSource()) {
                             c.removeModifier(m);
                             lb.add("lift-boycott at ", c, ", ");
+                            player.logCheat("lift boycott at " + c.getName());
                             break findOne;
                         }
                     }
@@ -494,13 +512,10 @@ public class EuropeanAIPlayer extends AIPlayer {
             for (Unit u : europe.getUnitList()) {
                 if (u.hasDefaultRole()
                     && u.hasAbility(Ability.CAN_BE_EQUIPPED)) {
-                    int price = europe.priceGoods(u.getGoodsDifference(scoutRole, 1));
-                    if (!u.getOwner().checkGold(price)) {
-                        player.modifyGold(price);
-                        lb.add("added ", price, " gold to ");
-                    }
+                    cheatGold(europe.priceGoods(u.getGoodsDifference(scoutRole, 1)), lb);
                     if (getAIUnit(u).equipForRole("model.role.scout")) {
-                        lb.add("equip scout ", u, ", ");
+                        lb.add(" to equip scout ", u, ", ");
+                        player.logCheat("Equip scout " + u.toShortString());
                     }
                     break;
                 }
@@ -513,13 +528,10 @@ public class EuropeanAIPlayer extends AIPlayer {
             for (Unit u : europe.getUnitList()) {
                 if (u.hasDefaultRole()
                     && u.hasAbility(Ability.CAN_BE_EQUIPPED)) {
-                    int price = europe.priceGoods(u.getGoodsDifference(pioneerRole, 1));
-                    if (!u.getOwner().checkGold(price)) {
-                        player.modifyGold(price);
-                        lb.add("added ", price, " gold to ");
-                    }
+                    cheatGold(europe.priceGoods(u.getGoodsDifference(pioneerRole, 1)), lb);
                     if (getAIUnit(u).equipForRole("model.role.pioneer")) {
-                        lb.add("equip pioneer ", u, ", ");
+                        lb.add(" to equip pioneer ", u, ", ");
+                        player.logCheat("Equip pioneer " + u.toShortString());
                     }
                     break;
                 }
@@ -553,26 +565,24 @@ public class EuropeanAIPlayer extends AIPlayer {
                 cost = INFINITY;
             }
             if (cost != INFINITY) {
-                if (cost > 0 && !player.checkGold(cost)) {
-                    player.modifyGold(cost);
-                    lb.add("added ", cost, " gold to ");
-                }
+                cheatGold(cost, lb);
                 AIUnit aiu;
                 if (bestWish == null) {
                     if ((aiu = recruitAIUnitInEurope(-1)) != null) {
                         // let giveNormalMissions look after the mission
-                        lb.add("recruit ", aiu.getUnit(), ", ");
+                        lb.add(" to recruit ", aiu.getUnit(), ", ");
                     }
                 } else {
                     if ((aiu = trainAIUnitInEurope(bestWish.getUnitType())) != null) {
                         Mission m = getWishRealizationMission(aiu, bestWish);
                         if (m != null) {
-                            lb.add("train for ", m, ", ");
+                            lb.add(" to train for ", m, ", ");
                         } else {
-                            lb.add("train ", aiu.getUnit(), ", ");
+                            lb.add(" to train ", aiu.getUnit(), ", ");
                         }
                     }
                 }
+                player.logCheat("Make " + aiu.getUnit());
             }
         }
 
@@ -641,6 +651,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 for (Unit u : mercs) {
                     AIUnit aiu = getAIUnit(u);
                     if (aiu == null) continue; // Can not happen
+                    player.logCheat("Enlist " + aiu.getUnit());
                     Mission m = getSeekAndDestroyMission(aiu, target);
                     if (m != null) {
                         lb.add("enlisted ", m, ", ");
@@ -722,13 +733,11 @@ public class EuropeanAIPlayer extends AIPlayer {
         final Player player = getPlayer();
         final Europe europe = player.getEurope();
         int cost = europe.getUnitPrice(unitType);
-        if (cost > 0 && !player.checkGold(cost)) {
-            player.modifyGold(cost);
-            lb.add("added ", cost, " gold to build ");
-        }
+        cheatGold(cost, lb);
         AIUnit result = trainAIUnitInEurope(unitType);
-        lb.add(what, " ", unitType.getSuffix(),
+        lb.add(" to build ", what, " ", unitType.getSuffix(),
             ((result != null) ? "" : "(failed)"), ", ");
+        player.logCheat("Build " + result.getUnit());
         return result;
     }
 
