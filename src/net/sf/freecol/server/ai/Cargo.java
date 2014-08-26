@@ -182,7 +182,10 @@ public class Cargo {
             // or at its predecessor from the carrier point of view.
             PathNode drop = pick.getTransportDropNode();
             if (drop == null || drop.previous == null) {
-                throw new IllegalStateException("FAIL " + t + " " + deliver.fullPathToString() + " " + pick.fullPathToString() + " " + drop);
+                throw new IllegalStateException("Cargo failure " + t
+                    + " " + deliver.fullPathToString()
+                    + " " + pick.fullPathToString()
+                    + " " + drop);
             }
             this.cdst = AIObject.upLoc(drop.previous.getLocation());
 

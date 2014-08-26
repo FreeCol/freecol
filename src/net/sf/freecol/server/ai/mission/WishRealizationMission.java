@@ -90,6 +90,15 @@ public class WishRealizationMission extends Mission {
 
 
     /**
+     * Get the wish handled by this mission.
+     *
+     * @return The mission <code>Wish</code>.
+     */
+    public Wish getWish() {
+        return this.wish;
+    }
+
+    /**
      * Why would this mission be invalid with the given AI unit and location?
      *
      * @param aiUnit The <code>AIUnit</code> to check.

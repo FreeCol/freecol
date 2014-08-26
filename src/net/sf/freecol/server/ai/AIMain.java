@@ -432,8 +432,12 @@ public class AIMain extends FreeColObject
         logger.finest("Owner changed for " + source.getId()
             + " with AI object: " + ao);
         AIPlayer aiOwner = getAIPlayer(oldOwner);
-        if (aiOwner != null && ao instanceof AIUnit) {
-            aiOwner.removeAIUnit((AIUnit)ao);
+        if (aiOwner != null) {
+            if (ao instanceof AIColony) {
+                aiOwner.removeAIColony((AIColony)ao);
+            } else if (ao instanceof AIUnit) {
+                aiOwner.removeAIUnit((AIUnit)ao);
+            }
         }
         if (ao != null) {
             ao.dispose();

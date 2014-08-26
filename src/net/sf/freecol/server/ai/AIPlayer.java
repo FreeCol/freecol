@@ -293,6 +293,14 @@ public abstract class AIPlayer extends AIObject {
     }
 
     /**
+     * Remove an AI colony.
+     * Do nothing here, but European player classes will be more active.
+     *
+     * @param aic The <code>AIColony</code> to remove.
+     */
+    public void removeAIColony(AIColony aic) {}
+
+    /**
      * Gets the AI unit corresponding to a given unit, if any.
      *
      * @param unit The <code>Unit</code> to look up.
