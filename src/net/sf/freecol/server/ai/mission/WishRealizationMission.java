@@ -212,7 +212,7 @@ public class WishRealizationMission extends Mission {
             lbFail(lb, true, "broken wish ", wish);
         }
 
-        this.wish = null;
+        this.wish = null; // completeWish disposes
         return lbDrop(lb);
     }
 

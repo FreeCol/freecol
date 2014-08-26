@@ -934,80 +934,79 @@ public class TransportMission extends Mission {
             return CargoResult.TDONE;
         }
         if (!Map.isSameLocation(here, cargo.getCarrierTarget())) {
-            lb.add(", ", cargo.toShortString(), " wait");
+            lb.add(", ", t, " unready");
             return CargoResult.TCONTINUE;
         }
 
         switch (cargo.getMode()) {
         case PICKUP:
             if (!t.canMove()) {
-                lb.add(", ", cargo.toShortString(), " out of moves");
+                lb.add(", ", t, " out of moves");
                 return CargoResult.TCONTINUE;
             }
             // Fall through
         case LOAD:
             if (!Map.isSameLocation(t.getLocation(),
                                     cargo.getTransportTarget())) {
-                lb.add(", ", cargo.toShortString(), " at ", t.getLocation(),
+                lb.add(", ", t, " at ", t.getLocation(),
                     " not ", cargo.getTransportTarget());
                 return CargoResult.TCONTINUE;
             }
             switch (carrier.getNoAddReason(l)) {
             case NONE:
                 if (!t.joinTransport(carrier, cargo.getJoinDirection())) {
-                    lb.add(", ", cargo.toShortString(), " NO-JOIN");
+                    lb.add(", ", t, " NO-JOIN");
                     return CargoResult.TFAIL;
                 }
                 break;
             case ALREADY_PRESENT:
                 break;
             case CAPACITY_EXCEEDED:
-                lb.add(", ", cargo.toShortString(), " NO-ROOM on ", carrier);
+                lb.add(", ", t, " NO-ROOM on ", carrier);
                 return CargoResult.TFAIL;
             default:
-                lb.add(", ", cargo.toShortString(), " retry-",
-                       carrier.getNoAddReason(l));
+                lb.add(", ", t, " retry-", carrier.getNoAddReason(l));
                 return CargoResult.TRETRY;
             }
             
             String reason = cargo.update();
             if (reason != null) {
-                lb.add(", ", cargo.toShortString(), " NO-UPDATE(", reason, ")");
+                lb.add(", ", t, " NO-UPDATE(", reason, ")");
                 return CargoResult.TFAIL;
             }
-            lb.add(", ", cargo.toShortString(), " collected");
+            lb.add(", ", t, " collected");
             return CargoResult.TNEXT;
 
         case DROPOFF:
             if (!t.canMove()) {
-                lb.add(", ", cargo.toShortString(), " about to disembark");
+                lb.add(", ", t, " about to leave");
                 return CargoResult.TCONTINUE;
             }
             // Fall through
         case UNLOAD:
             if (isCarrying(t) && !t.leaveTransport(cargo.getLeaveDirection())) {
-                lb.add(", ", cargo.toShortString(), " NO-LEAVE");
+                lb.add(", ", t, " NO-LEAVE");
                 return CargoResult.TRETRY;
             }
-            lb.add(", ", cargo.toShortString(), " COMPLETED");
+            lb.add(", ", t, " COMPLETED");
             break;
 
         case DUMP:
             if (!t.leaveTransport()) {
-                lb.add(", ", cargo.toShortString(), " STUCK");
+                lb.add(", ", t, " STUCK");
                 return CargoResult.TCONTINUE;
             }
-            lb.add(", ", cargo.toShortString(), " DUMPED at ", t.getLocation());
+            lb.add(", ", t, " DUMPED at ", t.getLocation());
             break;
         }
 
         // Check for goods completing a wish
-        final Colony colony = (t.getLocation() == null) ? null
-            : t.getLocation().getColony();
+        Colony colony;
         AIColony aiColony;
-        if (l instanceof Goods && colony != null
+        if ((colony = (t.getLocation() == null) ? null
+                : t.getLocation().getColony()) != null
             && (aiColony = getAIMain().getAIColony(colony)) != null
-            && aiColony.completeWish((Goods)l, lb)) {
+            && aiColony.completeWish(t, lb)) {
             aiColony.requestRearrange();
         }
         return CargoResult.TDONE;
@@ -1089,7 +1088,6 @@ public class TransportMission extends Mission {
         } else {
             tSet(unwrapCargoes(ts), false);
         }
-        lb.add(" -> ", getTarget());
     }
 
     /**
@@ -1394,7 +1392,6 @@ public class TransportMission extends Mission {
                     // Rebuild the cargo list with the original members,
                     // less the transportables that were dropped.
                     tSet(cont, true);
-                    optimizeCargoes(lb); // This will retarget failures
 
                     // Now try again, this time collecting as well as
                     // delivering.
@@ -1436,17 +1433,16 @@ public class TransportMission extends Mission {
                     for (Cargo c : next) queueCargo(c, false);
                 }
 
-                int capacity = destinationCapacity();
-                lb.add(", capacity=", capacity);
-                // Add the best transportable for this carrier up to
-                // available capacity.
-                for (int n = capacity; n > 0; n--) {
+                optimizeCargoes(lb);
+                // Replenish cargoes up to available destination capacity
+                // and 50% above maximum cargoes (TODO: longer?)
+                while (destinationCapacity() > 0
+                    && tSize() < unit.getCargoCapacity() * 3 / 2) {
                     TransportableAIObject t = getBestTransportable(unit);
                     if (t == null) break;
-                    if (queueTransportable(t, false)) {
-                        euaip.claimTransportable(t);
-                        lb.add(", queued", t);
-                    }
+                    if (!queueTransportable(t, false)) break;
+                    euaip.claimTransportable(t);
+                    lb.add(", queued", t);
                 }
 
                 if ((reason = invalidReason()) != null) {

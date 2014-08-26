@@ -715,11 +715,11 @@ public class PioneeringMission extends Mission {
         if (unit.getState() == UnitState.IMPROVING) {
             return lbWait(lb, ", improving ", tileImprovementPlan);
         } else if (unit.checkSetState(UnitState.IMPROVING)) {
+            aiPlayer.removeTileImprovementPlan(tileImprovementPlan);
             if (AIMessage.askChangeWorkImprovementType(aiUnit,
                     tileImprovementPlan.getType())) {
                 return lbWait(lb, ", began ", tileImprovementPlan);
             } else {
-                aiPlayer.removeTileImprovementPlan(tileImprovementPlan);
                 tileImprovementPlan.dispose();
                 return lbFail(lb, false, "to change work type at ", tile);
             }

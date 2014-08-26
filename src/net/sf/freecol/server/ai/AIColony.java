@@ -83,6 +83,7 @@ import net.sf.freecol.server.ai.mission.PioneeringMission;
 import net.sf.freecol.server.ai.mission.ScoutingMission;
 import net.sf.freecol.server.ai.mission.TransportMission;
 import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
+import net.sf.freecol.server.ai.mission.WishRealizationMission;
 
 import org.w3c.dom.Element;
 
@@ -253,13 +254,19 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     }
 
     /**
-     * Update the export state and disposition of AIGoods in this colony.
+     * Update any relatively static properties of the colony:
+     *   - export state
+     *   - disposition of AIGoods in this colony
+     *   - tile improvements (might ignore freshly grabbed tiles)
+     *   - wishes
      *
      * @param lb A <code>LogBuilder</code> to log to.
      */
-    public void updateGoods(LogBuilder lb) {
+    public void update(LogBuilder lb) {
         resetExports();
         updateAIGoods(lb);
+        updateTileImprovementPlans(lb);
+        updateWishes(lb);
     }
 
     /**
@@ -464,9 +471,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 } else lb.add(", ", aiu.getMission());
             }
         }
-
-        updateTileImprovementPlans(lb);
-        updateWishes(lb);
 
         // Log the changes.
         build = colony.getCurrentlyBuilding();
@@ -890,6 +894,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         ((EuropeanAIPlayer)getAIOwner()).completeWish(wish);
         lb.add(", ", reason, " fulfills at ", colony.getName());
         wish.dispose();
+        requestRearrange();
         return true;
     }
 
@@ -941,6 +946,30 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         return ret;
     }
 
+    /**
+     * Tries to complete any wishes for a transportable that has just arrived.
+     *
+     * @param t The arriving <code>TransportableAIObject</code>.
+     * @param lb A <code>LogBuilder</code> to log to.
+     * @return True if a wish was successfully completed.
+     */
+    public boolean completeWish(TransportableAIObject t, LogBuilder lb) {
+        if (t instanceof AIGoods) {
+            return completeWish((Goods)t.getTransportLocatable(), lb);
+        } else if (t instanceof AIUnit) {
+            AIUnit aiUnit = (AIUnit)t;
+            WishRealizationMission wm
+                = aiUnit.getMission(WishRealizationMission.class);
+            if (wm != null && Map.isSameLocation(wm.getTarget(), colony)) {
+                lb.add(", at wish-target");
+                completeWish(aiUnit.getUnit(), lb);
+                aiUnit.changeMission(null);
+                return true;
+            }
+        }
+        return false;
+    }
+            
     /**
      * Gets the wishes this colony has.
      *
@@ -1110,7 +1139,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         // Request population increase if no worker wishes and the bonus
         // can take it.
-        if (experts.isEmpty()
+        if (colonyPlan != null
+            && experts.isEmpty()
             && colony.governmentChange(colony.getUnitCount() + 1) >= 0) {
             boolean needFood = colony.getFoodProduction()
                 <= colony.getFoodConsumption()

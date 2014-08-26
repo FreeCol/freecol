@@ -1392,8 +1392,8 @@ public class EuropeanAIPlayer extends AIPlayer {
         // a threshold, send out another colonist.
         // The threshold probably should be configurable.  2 is too
         // low IMHO as it makes a lot of brittle colonies, 3 is too
-        // high at least initially as it slows expansion.  For now,
-        // arbitrarily choose e.
+        // high at least initially as it makes it hard for the initial
+        // colonies to become substantial.  For now, arbitrarily choose e.
         return (nColonies == 0 || nPorts == 0) ? 2
             : ((nPorts <= 1) && (nWorkers + nEuropean) >= 3) ? 1
             : ((double)(nWorkers + nEuropean) / nColonies > Math.E) ? 1
@@ -2239,24 +2239,24 @@ public class EuropeanAIPlayer extends AIPlayer {
         determineStances(lb);
 
         if (colonyCount > 0) {
-            lb.add("\n  Badly defended:");
+            lb.add("\n  Badly defended:"); // TODO: prioritize defence
             for (AIColony aic : getAIColonies()) {
                 if (aic.isBadlyDefended()) lb.add(" ", aic.getColony());
             }
 
-            lb.add("\n  Update goods:");
-            for (AIColony aic : getAIColonies()) aic.updateGoods(lb);
+            lb.add("\n  Update colonies:");
+            for (AIColony aic : getAIColonies()) aic.update(lb);
 
             buildTipMap(lb);
+            buildWishMaps(lb);
         }
         cheat(lb);
+        buildTransportMaps(lb);
 
         List<AIUnit> aiUnits = getAIUnits();
         for (int i = 0; i < 3; i++) {
-            if (aiUnits.isEmpty()) break;
-            buildTransportMaps(lb);
-            buildWishMaps(lb);
             rearrangeColonies(lb);
+            if (aiUnits.isEmpty()) break;
             giveNormalMissions(lb);
             bringGifts(lb);
             demandTribute(lb);
