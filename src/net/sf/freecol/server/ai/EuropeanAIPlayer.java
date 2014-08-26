@@ -2278,29 +2278,12 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     @Override
     protected List<AIUnit> doMissions(List<AIUnit> aiUnits, LogBuilder lb) {
-        lb.mark();
+        lb.add("\n  Do missions:");
         List<AIUnit> result = new ArrayList<AIUnit>();
         for (AIUnit aiu : aiUnits) {
             final Unit unit = aiu.getUnit();
+            if (unit == null || unit.isDisposed()) continue;
             final Mission old = aiu.getMission();
-            if (unit == null || unit.isDisposed()
-                || old instanceof TransportMission) continue;
-            lb.add("\n  ", unit, " ");
-            try {
-                aiu.doMission(lb);
-            } catch (Exception e) {
-                lb.add(", EXCEPTION: ", e.getMessage());
-                logger.log(Level.WARNING, "doMissions failed for: " + aiu, e);
-            }
-            if (!unit.isDisposed() && unit.getMovesLeft() > 0) result.add(aiu);
-        }
-        lb.grew("\n  Do normal missions:");
-        lb.mark();
-        for (AIUnit aiu : aiUnits) {
-            final Unit unit = aiu.getUnit();
-            final Mission old = aiu.getMission();
-            if (unit == null || unit.isDisposed()
-                || !(old instanceof TransportMission)) continue;
             final Location oldTarget = (old == null) ? null : old.getTarget();
             final AIUnit aiCarrier = aiu.getTransport();
             final TransportMission tm = (aiCarrier == null) ? null
@@ -2314,7 +2297,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
             if (unit.isDisposed()) {
                 if (tm != null) {
-                    lb.add(", dropped transport ", aiCarrier.getUnit());
+                    lb.add(", drop transport ", aiCarrier.getUnit());
                     tm.removeTransportable(aiu);
                 }
                 lb.add(", DIED.");
@@ -2330,17 +2313,17 @@ public class EuropeanAIPlayer extends AIPlayer {
                     tm.requeueTransportable(aiu, lb);
                 } else {
                     tm.removeTransportable(aiu);
-                    lb.add(", dropped transport ", aiCarrier.getUnit());
+                    lb.add(", drop transport ", aiCarrier.getUnit());
                 }
             }
-            if (unit.getMovesLeft() > 0) {
-                lb.add("...");
+            if (unit.getMovesLeft() > 0 && (!unit.isOnCarrier()
+                    || unit.getCarrier().getMovesLeft() > 0)) {
+                lb.add("+");
                 result.add(aiu);
             } else {
                 lb.add(".");
             }
         }
-        lb.grew("\n  Do transport missions:");
         return result;
     }
 
