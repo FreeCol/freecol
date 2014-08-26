@@ -93,12 +93,13 @@ public class CashInTreasureTrainMission extends Mission {
     }
 
     /**
-     * Find a carrier for this treasure.
+     * Assign a carrier for this treasure.
      *
+     * @param lb A <code>LogBuilder</code> to log to.
      * @return A suitable carrier <code>AIUnit</code>, to which this unit
      *     has been queued for transport.
      */
-    private AIUnit findCarrier() {
+    private AIUnit assignCarrier(LogBuilder lb) {
         final AIUnit aiUnit = getAIUnit();
         final Unit unit = getUnit();
         final Player player = unit.getOwner();
@@ -129,6 +130,7 @@ public class CashInTreasureTrainMission extends Mission {
             // TODO: violently reorder the queue to deliver only, then
             // collect the treasure
             tm.queueTransportable(aiUnit, false);
+            lb.add(", queued to ", aiCarrier.getUnit());
             return aiCarrier;
         }
         return null;
@@ -435,12 +437,8 @@ public class CashInTreasureTrainMission extends Mission {
                 boolean cashin = unit.isInEurope()
                     || europe == null
                     || unit.getTransportFee() == 0;
-                if (!cashin && (aiCarrier = aiUnit.getTransport()) == null) {
-                    if ((aiCarrier = findCarrier()) == null) {
-                        cashin = true;
-                    } else {
-                        lb.add(", queued to ", aiCarrier.getUnit());
-                    }
+                if (!cashin && aiUnit.getTransport() == null) {
+                    cashin = assignCarrier(lb) == null;
                 }
                 if (cashin) return (AIMessage.askCashInTreasureTrain(aiUnit))
                                 ? lbDone(lb, false, "cashed in")
