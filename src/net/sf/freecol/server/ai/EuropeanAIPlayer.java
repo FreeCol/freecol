@@ -2287,6 +2287,11 @@ public class EuropeanAIPlayer extends AIPlayer {
             final Unit unit = aiu.getUnit();
             if (unit == null || unit.isDisposed()) continue;
             final Mission old = aiu.getMission();
+            if (old == null) {
+                // WishRealizationMission cancelled by transport delivery?
+                result.add(aiu);
+                continue;
+            }
             final Location oldTarget = (old == null) ? null : old.getTarget();
             final AIUnit aiCarrier = aiu.getTransport();
             final TransportMission tm = (aiCarrier == null) ? null
