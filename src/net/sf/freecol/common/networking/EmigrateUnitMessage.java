@@ -111,7 +111,9 @@ public class EmigrateUnitMessage extends DOMMessage {
             }
             type = MigrationType.RECRUIT;
         } else {
-            return DOMMessage.clientError("No migrants available.");
+            return DOMMessage.clientError("No migrants available at cost "
+                + europe.getRecruitPrice()
+                + " for player with " + player.getGold() + " gold.");
         }
 
         // Proceed to emigrate.
