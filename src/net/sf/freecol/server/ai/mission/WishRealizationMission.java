@@ -67,6 +67,7 @@ public class WishRealizationMission extends Mission {
         super(aiMain, aiUnit, wish.getDestination());
 
         this.wish = wish;
+        wish.setTransportable(aiUnit);
     }
 
     /**

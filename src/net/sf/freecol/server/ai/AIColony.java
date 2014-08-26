@@ -1002,7 +1002,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             }
         }
         if (gw != null) {
-            gw.update(type, amount, value);
+            gw.update(type, amount, gw.getValue() + 1);
             lb.add(", update ", gw);
         } else {
             gw = new GoodsWish(getAIMain(), colony, value, amount, type);
@@ -1032,7 +1032,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             }
         }
         if (ww != null) {
-            ww.update(type, expertNeeded, value);
+            ww.update(type, expertNeeded, ww.getValue() + 1);
             lb.add(", update ", ww);
         } else {
             ww = new WorkerWish(getAIMain(), colony, value, type, expertNeeded);
