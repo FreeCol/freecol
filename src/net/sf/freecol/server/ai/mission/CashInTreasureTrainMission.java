@@ -92,6 +92,47 @@ public class CashInTreasureTrainMission extends Mission {
         readFromXML(xr);
     }
 
+    /**
+     * Find a carrier for this treasure.
+     *
+     * @return A suitable carrier <code>AIUnit</code>, to which this unit
+     *     has been queued for transport.
+     */
+    private AIUnit findCarrier() {
+        final AIUnit aiUnit = getAIUnit();
+        final Unit unit = getUnit();
+        final Player player = unit.getOwner();
+        final Europe europe = player.getEurope();
+
+        List<Unit> carriers = player.getCarriersForUnit(unit);
+        if (carriers.isEmpty()) return null;
+
+        // Pick the closest carrier and queue this unit.
+        final Location here = unit.getLocation();
+        int turns = INFINITY;
+        Unit closest = null;
+        for (Unit c : carriers) {
+            int t = c.getTurnsToReach(here);
+            if (turns > t) {
+                turns = t;
+                closest = c;
+            }
+        }
+        final AIMain aiMain = getAIMain();
+        TransportMission tm;
+        AIUnit aiCarrier;
+        if (closest != null
+            && (aiCarrier = aiMain.getAIUnit(closest)) != null
+            && (tm = aiCarrier.getMission(TransportMission.class)) != null) {
+            setTarget(europe);
+            aiUnit.changeTransport(aiCarrier);
+            // TODO: violently reorder the queue to deliver only, then
+            // collect the treasure
+            tm.queueTransportable(aiUnit, false);
+            return aiCarrier;
+        }
+        return null;
+    }
 
     /**
      * Extract a valid target for this mission from a path.
@@ -383,50 +424,27 @@ public class CashInTreasureTrainMission extends Mission {
             // Cash in now if:
             // - already in Europe
             // - or can never get there
+            // - it is free to transport the treasure
             // - or there is no potential carrier to get the treasure to there
-            // - or if the transport fee is not in effect.
             // Otherwise, it is better to send to Europe.
+            lbAt(lb);
             final AIUnit aiUnit = getAIUnit();
-            final Player player = unit.getOwner();
-            final Europe europe = player.getEurope();
+            final Europe europe = getUnit().getOwner().getEurope();
             if (unit.canCashInTreasureTrain()) {
-                AIUnit aiCarrier = aiUnit.getTransport();
-                if (europe != null && aiCarrier != null) {
-                    // Let the carrier do its job
-                    lb.add(" queued for Europe on ", aiCarrier.getUnit(), ".");
-                    return this;
-                }
-                List<Unit> carriers = player.getCarriersForUnit(unit);
+                AIUnit aiCarrier = null;
                 boolean cashin = unit.isInEurope()
                     || europe == null
-                    || unit.getTransportFee() == 0
-                    || (aiCarrier == null && carriers.isEmpty());
-                Location here = upLoc(unit.getLocation());
-                if (!cashin) {
-                    setTarget(europe);
-                    // Pick the closest carrier and forcibly add this unit.
-                    int turns = INFINITY;
-                    Unit closest = null;
-                    for (Unit c : carriers) {
-                        int t = c.getTurnsToReach(here);
-                        if (turns > t) {
-                            turns = t;
-                            closest = c;
-                        }
+                    || unit.getTransportFee() == 0;
+                if (!cashin && (aiCarrier = aiUnit.getTransport()) == null) {
+                    if ((aiCarrier = findCarrier()) == null) {
+                        cashin = true;
+                    } else {
+                        lb.add(", queued to ", aiCarrier.getUnit());
                     }
-                    final AIMain aiMain = getAIMain();
-                    TransportMission tm;
-                    if (closest != null
-                        && (aiCarrier = aiMain.getAIUnit(closest)) != null
-                        && (tm = aiCarrier.getMission(TransportMission.class)) != null) {
-                        tm.queueTransportable(aiUnit, false);
-                        lb.add(", queued to carrier ", aiCarrier.getUnit());
-                    }
-                    return lbRetarget(lb);
                 }
-                return (AIMessage.askCashInTreasureTrain(aiUnit))
-                    ? lbDone(lb, false, "cash in at ", here)
-                    : lbFail(lb, false, "cash in failed at", here);
+                if (cashin) return (AIMessage.askCashInTreasureTrain(aiUnit))
+                                ? lbDone(lb, false, "cashed in")
+                                : lbFail(lb, false, "cashin");
             }
             return retargetMission("arrived "+unit.getColony().getName(), lb);
         }
