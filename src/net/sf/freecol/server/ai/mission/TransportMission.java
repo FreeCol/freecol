@@ -1455,7 +1455,7 @@ public class TransportMission extends Mission {
                 }
                 break;
 
-            default:
+            case MOVE_NO_ACCESS_EMBARK: default:
                 return lbMove(lb, mt);
             }
         }

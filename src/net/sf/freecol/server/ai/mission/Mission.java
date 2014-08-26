@@ -635,20 +635,19 @@ public abstract class Mission extends AIObject {
      *
      * If there is no impediment to the unit moving towards the target,
      * do so.  Return an indicative MoveType for the result of the travel.
-     * - MOVE if the unit has arrived at the target.  The unit may not
-     *   have moved, or have exhausted its moves.
-     * - MOVE_HIGH_SEAS if the unit has successfully set sail.
-     * - MOVE_NO_MOVES is underway but short of the target
+     * - MOVE if the unit has arrived at the target, although it may
+     *     have exhausted its moves
+     * - MOVE_HIGH_SEAS if the unit has set sail to/from Europe
+     * - MOVE_NO_MOVES is underway but ran out of moves
+     * - MOVE_NO_ACCESS_EMBARK if progress depends on a carrier, either
+     *     currently boarded or due to collect the unit
      * - MOVE_NO_REPAIR if the unit died for whatever reason
      * - MOVE_NO_TILE if there is no path (usually transitory on rivers)
-     * - MOVE_ILLEGAL if the unit is unable to proceed for now
+     * - MOVE_ILLEGAL if there is an error or permanent restriction
      * - other legal results (e.g. ENTER_INDIAN_SETTLEMENT*) if that would
      *   occur if the unit proceeded.  Such moves require special handling
      *   and are not performed here, the calling mission code must
      *   handle them.
-     *
-     * Logging at `fine' on failures, `finest' on valid return values
-     * other than normal path completion.
      *
      * @param target The destination <code>Location</code>.
      * @param costDecider The <code>CostDecider</code> to use in any path
@@ -668,8 +667,7 @@ public abstract class Mission extends AIObject {
         final AIUnit aiCarrier = aiUnit.getTransport();
         final Map map = unit.getGame().getMap();
         PathNode path = null;
-        boolean inTransit = false;
-        boolean needTransport = false;
+        boolean needsTransport = false;
 
         if (unit.isAtSea()) {
             // Wait for carrier to arrive on the map.
@@ -679,7 +677,7 @@ public abstract class Mission extends AIObject {
             // Transport mission will disembark the unit when it
             // arrives at the drop point.
             lb.add(", on carrier");
-            return MoveType.MOVE_NO_MOVES;
+            return MoveType.MOVE_NO_ACCESS_EMBARK;
         } else if (unit.isAtLocation(target)) {
             // Arrived!
             return MoveType.MOVE;
@@ -689,9 +687,7 @@ public abstract class Mission extends AIObject {
                 lb.add(", impossible move from Europe");
                 return MoveType.MOVE_ILLEGAL;
             }
-            if (!unit.getType().canMoveToHighSeas()) {
-                path = null;
-            } else {
+            if (unit.getType().canMoveToHighSeas()) {
                 unit.setDestination(target);
                 if (AIMessage.askMoveTo(aiUnit, map)) {
                     lb.add(", sailed for ", target);
@@ -701,213 +697,106 @@ public abstract class Mission extends AIObject {
                     return MoveType.MOVE_ILLEGAL;
                 }
             }
+            needsTransport = true;
         } else if (!unit.hasTile()) {
-            throw new IllegalStateException("Unit not on the map: " + unit);
+            return MoveType.MOVE_ILLEGAL;
         } else {
             // On map
-            if (target instanceof Europe
-                && !unit.getOwner().canMoveToEurope()) {
-                lb.add(", impossible move to Europe");
-                return MoveType.MOVE_ILLEGAL;
+            if (target instanceof Europe) {
+                if (!unit.getOwner().canMoveToEurope()) {
+                    lb.add(", impossible move to Europe");
+                    return MoveType.MOVE_ILLEGAL;
+                }
+                if (!unit.getType().canMoveToHighSeas()) {
+                    needsTransport = true;
+                } else {
+                    path = unit.findPath(unit.getLocation(), target,
+                                         null, costDecider);
+                }
+            } else {
+                if (!unit.getType().canMoveToHighSeas()
+                    && !Map.isSameContiguity(target, unit.getLocation())) {
+                    needsTransport = true;
+                } else {
+                    path = unit.findPath(unit.getLocation(), target,
+                                         null, costDecider);
+                }
             }
-            path = (target instanceof Europe
-                && !unit.getType().canMoveToHighSeas()) ? null
-                : unit.findPath(unit.getLocation(), target, null, costDecider);
         }
-        if (path == null) {
-            // A carrier will be required.
-            if (unit.canCarryGoods()) {
-                // Carriers can not be carried, so this must fail.
-                lb.add(", no path from ", unit.getLocation(), " to ", target);
-                return MoveType.MOVE_NO_TILE;
-            }
-            lbAt(lb);
+        if (needsTransport) {
             if (aiCarrier == null) {
                 lb.add(", needs transport to ", target);
-            } else {
-                lb.add(", wait for ", aiCarrier.getUnit());
+                return MoveType.MOVE_NO_ACCESS_EMBARK;
             }
-            return MoveType.MOVE_ILLEGAL;
+            lb.add(", wait for ", aiCarrier.getUnit());
+            return (aiCarrier.getUnit().getMovesLeft() > 0)
+                ? MoveType.MOVE_NO_ACCESS_EMBARK
+                : MoveType.MOVE_NO_MOVES;
+        }            
+        if (path == null) {
+            lbAt(lb);
+            lb.add(", no path to ", target);
+            return MoveType.MOVE_NO_TILE;
         }
         if (path.next == null) {
+            // This should not happen, the isAtLocation() test above
+            // should have succeeded.
             throw new IllegalStateException("Trivial path found "
                 + path.fullPathToString()
                 + " from " + unit.getLocation() + " to target " + target
                 + " result=" +  unit.isAtLocation(target));
         }            
-        return followPath(path.next, lb);
+        return followMapPath(path.next, lb);
     }
 
     /**
-     * Follow a path to a target.
-     *
-     * Logging is fine on failures, finest on valid return values other
-     * than normal path completion.
+     * Follow a path that is on the map (except perhaps the last node)
+     * and does not use a carrier.
      *
      * @param path The <code>PathNode</code> to follow.
      * @param lb A <code>LogBuilder</code> to log to.
      * @return The type of move the unit stopped at.
      */
-    protected MoveType followPath(PathNode path, LogBuilder lb) {
+    private MoveType followMapPath(PathNode path, LogBuilder lb) {
         final Unit unit = getUnit();
         final AIUnit aiUnit = getAIUnit();
         final Unit carrier = unit.getCarrier();
         final Location target = path.getLastNode().getLocation();
-        final int NO_EUROPE = 0;
-        final int USES_EUROPE = 1;
-        final int BOTH_EUROPE = 2;
 
         for (; path != null; path = path.next) {
-            int useEurope = 0;
-            // Sanitize the unit state.
+            // Check for immediate failure
             if (unit.isDisposed()) {
-                lb.add(", died going to ", path.getLocation());
+                lb.add(", died going to ", upLoc(path.getLocation()));
                 return MoveType.MOVE_NO_REPAIR;
-            } else if (unit.getMovesLeft() <= 0 || unit.isAtSea()) {
-                lb.add(", at ", unit.getLocation(),
-                       " en route to ", upLoc(target));
+            } else if (unit.getMovesLeft() <= 0) {
+                lbAt(lb);
+                lb.add(", en route to ", upLoc(target));
                 return MoveType.MOVE_NO_MOVES;
-            } else if (unit.isInEurope()) {
-                useEurope++;
-            } else if (!unit.hasTile()) {
-                lb.add(", not on the map");
-                return MoveType.MOVE_ILLEGAL;
             }
 
-            // Sanitize the path node.
             if (path.getLocation() instanceof Europe) {
-                useEurope++;
-            } else if (path.getTile() == null) {
-                lb.add(", null path tile");
-                return MoveType.MOVE_ILLEGAL;
-            }
-
-            // Handle embark/disembark.
-            if (unit.isOnCarrier() && path.isOnCarrier()) {
-                lb.add(", on ", unit.getLocation(),
-                       " in transit to ", upLoc(target));
-                return MoveType.MOVE_NO_MOVES;
-
-            } else if (unit.isOnCarrier() && !path.isOnCarrier()) {
-                Direction d;
-                if (unit.isAtLocation(path.getLocation())) {
-                    d = null;
-                } else if (unit.hasTile()
-                    && unit.getTile().isAdjacent(path.getTile())) {
-                    if (unit.getMovesLeft() <= 0) {
-                        lb.add(", on ", unit.getLocation(),
-                               " waiting to disembark");
-                        return MoveType.MOVE_NO_MOVES;
-                    }
-                    d = unit.getTile().getDirection(path.getTile());
-                } else {
-                    lb.add(", on ", unit.getLocation(),
-                           " should be in range of ", path.getLocation(),
-                           " to disembark");
-                    return MoveType.MOVE_ILLEGAL;
-                }
-
-                MoveType mt = unit.getMoveType(d);
-                if (!mt.isProgress()) return mt; // Special handling required.
-
-                if (aiUnit.leaveTransport(d)) {
-                    lb.add(", disembarked from ", carrier);
-                    continue;
-                }
-                lb.add(", on ", unit.getLocation(), 
-                       " failed to disembark to ", path.getTile());
-                return MoveType.MOVE_ILLEGAL;
-
-            } else if (!unit.isOnCarrier() && path.isOnCarrier()) {
-                final AIUnit newAICarrier = aiUnit.getTransport();
-                if (newAICarrier == null) {
-                    lb.add(" at ", unit.getLocation(),
-                           " requires transport to ", upLoc(target));
-                    return MoveType.MOVE_ILLEGAL;
-                }
-                final Unit newCarrier = newAICarrier.getUnit();
-                if (!newCarrier.isAtLocation(path.getLocation())) {
-                    lb.add(", at ", unit.getLocation(),
-                           " waiting for carrier ", newCarrier,
-                           " to arrive and transport it to ", upLoc(target));
-                    return MoveType.MOVE_ILLEGAL;
-                }
-                UnitLocation.NoAddReason reason
-                    = newCarrier.getNoAddReason(unit);
-                switch (reason) {
-                case NONE:
-                    break;
-                case CAPACITY_EXCEEDED:
-                    lb.add(", at ", unit.getLocation(),
-                           " waiting for space on ", newCarrier);
-                    return MoveType.MOVE_NO_MOVES;
-                default:
-                    lb.add(", at ", unit.getLocation(),
-                           " unexpected boarding problem ", reason);
-                    return MoveType.MOVE_ILLEGAL;
-                }
-                Direction d;
-                if (unit.isAtLocation(path.getLocation())) {
-                    d = null;
-                } else if (unit.hasTile()
-                    && unit.getTile().isAdjacent(newCarrier.getTile())) {
-                    d = unit.getTile().getDirection(newCarrier.getTile());
-                } else {
-                    lb.add(", at ", unit.getLocation(),
-                           " should be in range of ", path.getLocation(),
-                           " to embark to ", newCarrier);
-                    return MoveType.MOVE_ILLEGAL;
-                }
-                if (unit.getMovesLeft() <= 0) {
-                    lb.add(", waiting at ", unit.getLocation(),
-                           " to embark on ", newCarrier);
-                    return MoveType.MOVE_NO_MOVES;
-                }
-                if (aiUnit.joinTransport(newCarrier, d)) {
-                    lb.add(", joined ", newCarrier);
-                    continue;
-                }
-                lb.add(", at ", unit.getLocation(),
-                       " failed to embark on ", newCarrier,
-                       " at ", newCarrier.getLocation());
-                return MoveType.MOVE_ILLEGAL;
-            }
-
-            // Post-sanitization there are only two valid cases,
-            // not using Europe at all, and sailing to/from Europe.
-            // Ignore the trivial path within Europe.
-            // On success, continue or return.
-            // On failure, fall through to the error report.
-            switch (useEurope) {
-            case NO_EUROPE:
-                MoveType mt = unit.getMoveType(path.getDirection());
-                if (mt == MoveType.MOVE_NO_MOVES) {
-                    unit.setMovesLeft(0);
-                    lbAt(lb);
-                    return MoveType.MOVE_NO_MOVES;
-                }
-                if (!mt.isProgress()) return mt; // Special handling required.
-                if (aiUnit.move(path.getDirection())) continue;
-                break;
-
-            case USES_EUROPE:
-                Location dst = (unit.isInEurope()) ? unit.getGame().getMap()
-                    : path.getLocation();
-                if (AIMessage.askMoveTo(aiUnit, dst)) {
-                    lb.add(", on the high seas");
+                if (AIMessage.askMoveTo(aiUnit, path.getLocation())) {
+                    lb.add(", sailed to Europe");
                     return MoveType.MOVE_HIGH_SEAS;
+                } else {
+                    lb.add(", failed to sail for Europe");
+                    return MoveType.MOVE_ILLEGAL;
                 }
-                break;
-
-            case BOTH_EUROPE:
-                continue; // Do nothing, on to next node.
-
-            default:
-                throw new IllegalStateException("Can not happen");
             }
-            lb.add(", at ", unit.getLocation(),
-                   " failed to move to ", path.getLocation());
-            return MoveType.MOVE_ILLEGAL;
+            MoveType mt = unit.getMoveType(path.getDirection());
+            if (mt == MoveType.MOVE_NO_MOVES) {
+                unit.setMovesLeft(0);
+                lbAt(lb);
+                return MoveType.MOVE_NO_MOVES;
+            }
+            if (!mt.isProgress()) {
+                return mt; // Special handling required, no log.
+            }
+            if (!aiUnit.move(path.getDirection())) {
+                lbAt(lb);
+                lb.add(", failed to move to ", upLoc(path.getLocation()));
+                return MoveType.MOVE_ILLEGAL;
+            }
         }
         return MoveType.MOVE; // Must have completed path normally, no log.
     }

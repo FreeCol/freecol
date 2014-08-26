@@ -349,7 +349,7 @@ public class IndianDemandMission extends Mission {
             case MOVE_HIGH_SEAS: case MOVE_NO_REPAIR:
                 return lbWait(lb);
 
-            case MOVE_NO_MOVES: case MOVE_NO_TILE: case MOVE_ILLEGAL:
+            case MOVE_NO_ACCESS_EMBARK: case MOVE_NO_MOVES: case MOVE_NO_TILE: case MOVE_ILLEGAL:
                 return this;
 
             case ATTACK_SETTLEMENT: // Arrived?
@@ -417,7 +417,7 @@ public class IndianDemandMission extends Mission {
             case MOVE_HIGH_SEAS: case MOVE_NO_REPAIR:
                 return lbWait(lb);
 
-            case MOVE_NO_MOVES: case MOVE_NO_TILE: case MOVE_ILLEGAL:
+            case MOVE_NO_ACCESS_EMBARK: case MOVE_NO_MOVES: case MOVE_NO_TILE: case MOVE_ILLEGAL:
                 return this;
 
             case MOVE: // Arrived
