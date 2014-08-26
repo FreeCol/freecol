@@ -1426,6 +1426,33 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     public void propertyChange(PropertyChangeEvent event) {
         logger.finest("Property change REARRANGE_WORKERS fired.");
         requestRearrange();
+
+        // Check for goods party!
+        if (event != null 
+            && event.getOldValue() instanceof GoodsType) {
+            GoodsType goodsType = (GoodsType)event.getOldValue();
+            int i, left = colony.getGoodsCount(goodsType);
+            AIGoods export = null;
+            for (i = 0; i < exportGoods.size(); i++) {
+                export = exportGoods.get(i);
+                if (export.isDisposed()) {
+                    exportGoods.remove(i);
+                    break;
+                } else if (export.getGoods() == null) {
+                    exportGoods.remove(i);
+                    export.changeTransport(null);
+                    break;
+                } else if (export.getGoodsType() == goodsType) {
+                    if (left > 0) {
+                        export.getGoods().setAmount(left);
+                    } else {
+                        exportGoods.remove(i);
+                        export.changeTransport(null);
+                    }
+                    break;
+                }
+            }
+        }
     }
 
     /**
