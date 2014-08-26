@@ -1378,6 +1378,9 @@ public class EuropeanAIPlayer extends AIPlayer {
             for (Unit u : settlement.getUnitList()) {
                 if (u.isPerson()) nWorkers++;
             }
+            for (Unit u : settlement.getTile().getUnitList()) {
+                if (u.isPerson()) nWorkers++;
+            }
         }
         Europe europe = player.getEurope();
         if (europe != null) {
