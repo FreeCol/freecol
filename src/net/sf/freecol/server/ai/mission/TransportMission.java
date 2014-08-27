@@ -1015,6 +1015,113 @@ throw new RuntimeException("FAIL " + cargo + "\n" + net.sf.freecol.common.debug.
     }
 
     /**
+     * Perform the transport load/unload operations on arrival at the
+     * target for the top cargo.
+     *
+     * @param lb A <code>LogBuilder</code> to log to.
+     */
+    private void doTransport(LogBuilder lb) {
+        final Unit unit = getUnit();
+        if (tSize() > 0) {
+            // Arrived at a target.  Deliver what can be delivered.
+            // Check other deliveries, we might be in port so this is
+            // a good time to decide to fail to deliver something.
+            lbAt(lb);
+            lb.add(", delivering");
+            List<Cargo> cont = new ArrayList<Cargo>();
+            List<Cargo> next = new ArrayList<Cargo>();
+            List<Cargo> curr = tClear();
+            for (Cargo cargo : curr) {
+                CargoResult result = (cargo.getMode().isCollection())
+                    ? CargoResult.TCONTINUE
+                    : tryCargo(cargo, lb);
+                switch (result) {
+                case TCONTINUE:
+                    cont.add(cargo);
+                    break;
+                case TRETRY: // will check again below
+                    if (cargo.retry()) {
+                        cont.add(cargo);
+                        break;
+                    }
+                    // Fall through
+                case TFAIL:
+                    if (cargo.isCarried()) {
+                        cargo.dump();
+                        break;
+                    }
+                    // Fall through
+                case TDONE:
+                    dropTransportable(cargo.getTransportable());
+                    cargo.clear();
+                    break;
+                case TNEXT: default:
+                    throw new IllegalStateException("Can not happen");
+                }
+            }
+            curr.clear();
+            // Rebuild the cargo list with the original members,
+            // less the transportables that were dropped.
+            tSet(cont, true);
+
+            // Now try again, this time collecting as well as
+            // delivering.
+            lb.add(", collecting");
+            cont.clear();
+            for (Cargo cargo : tClear()) {
+                CargoResult result = (cargo.getMode().isCollection())
+                    ? tryCargo(cargo, lb)
+                    : CargoResult.TCONTINUE;
+                switch (result) {
+                case TCONTINUE:
+                    cont.add(cargo);
+                    break;
+                case TNEXT:
+                    cont.add(cargo);
+                    break;
+                case TRETRY:
+                    if (cargo.retry()) { // Can not reach the target.
+                        next.add(cargo); // Try again next turn.
+                        break;
+                    }
+                    // Fall through
+                case TFAIL: case TDONE:
+                    dropTransportable(cargo.getTransportable());
+                    cargo.clear();
+                    break;
+                default:
+                    throw new IllegalStateException("Can not happen");
+                }
+            }
+
+            // Rebuild the cargo list with the original members,
+            // less the transportables that were dropped.
+            tSet(cont, true);
+
+            // Add the new and blocked cargoes incrementally with
+            // the current arrangement, which is likely to put them
+            // at the end.
+            if (!next.isEmpty()) {
+                lb.add(", requeue");
+                for (Cargo c : next) queueCargo(c, false, lb);
+            }
+
+            optimizeCargoes(lb);
+        }
+
+        // Replenish cargoes up to available destination capacity
+        // and 50% above maximum cargoes (TODO: longer?)
+        final EuropeanAIPlayer euaip = getEuropeanAIPlayer();
+        while (destinationCapacity() > 0
+            && tSize() < unit.getCargoCapacity() * 3 / 2) {
+            TransportableAIObject t = getBestTransportable(unit);
+            if (t == null) break;
+            if (!queueTransportable(t, false, lb)) break;
+            euaip.claimTransportable(t);
+        }
+    }
+
+    /**
      * Calculates a score for a proposed list of
      * <code>Cargo</code>s using the current unit.  Disallows
      * routes that would overfill the carrier.
@@ -1299,7 +1406,6 @@ throw new RuntimeException("FAIL " + cargo + "\n" + net.sf.freecol.common.debug.
         String reason = invalidReason();
         if (reason != null) return lbFail(lb, false, reason);
 
-        final EuropeanAIPlayer euaip = getEuropeanAIPlayer();
         final AIUnit aiCarrier = getAIUnit();
         final Unit unit = getUnit();
         final CostDecider fallBackDecider
@@ -1308,10 +1414,23 @@ throw new RuntimeException("FAIL " + cargo + "\n" + net.sf.freecol.common.debug.
         for (;;) {
             Unit.MoveType mt = travelToTarget(target, costDecider, lb);
             switch (mt) {
-            case MOVE_HIGH_SEAS: case MOVE_NO_REPAIR:
+            case MOVE: // Arrived at transport target
+                doTransport(lb);
+                if ((reason = invalidReason()) != null) {
+                    logger.warning(tag + " post-stop failure(" + reason
+                        + "): " + this.toFullString());
+                    return lbFail(lb, false, reason);
+                }
+                if (unit.isAtLocation(target)) {
+                    return lbWait(lb, ", waiting at ", target);
+                }
+                break;
+
+            case MOVE_HIGH_SEAS: case MOVE_NO_MOVES:
+            case MOVE_NO_REPAIR: case MOVE_ILLEGAL:
                 return lbWait(lb);
 
-            case MOVE_NO_MOVES: case MOVE_NO_TILE: // Can happen when another unit blocks a river
+            case MOVE_NO_TILE: // Another unit is blocking a river?
                 moveRandomly(tag, null);
                 return lbDodge(lb);
 
@@ -1333,114 +1452,6 @@ throw new RuntimeException("FAIL " + cargo + "\n" + net.sf.freecol.common.debug.
                 }
                 costDecider = fallBackDecider; // Retry
                 lb.add(", retry blockage at ", unit.getLocation());
-                break;
-
-            case MOVE:
-                if (tSize() > 0) {
-                    // Arrived at a target.  Deliver what can be
-                    // delivered.  Check other deliveries, we might be
-                    // in port so this is a good time to decide to
-                    // fail to deliver something.
-                    lbAt(lb);
-                    lb.add(", delivering");
-                    List<Cargo> cont = new ArrayList<Cargo>();
-                    List<Cargo> next = new ArrayList<Cargo>();
-                    List<Cargo> curr = tClear();
-                    for (Cargo cargo : curr) {
-                        CargoResult result = (cargo.getMode().isCollection())
-                            ? CargoResult.TCONTINUE
-                            : tryCargo(cargo, lb);
-                        switch (result) {
-                        case TCONTINUE:
-                            cont.add(cargo);
-                            break;
-                        case TRETRY: // will check again below
-                            if (cargo.retry()) {
-                                cont.add(cargo);
-                                break;
-                            }
-                            // Fall through
-                        case TFAIL:
-                            if (cargo.isCarried()) {
-                                cargo.dump();
-                                break;
-                            }
-                            // Fall through
-                        case TDONE:
-                            dropTransportable(cargo.getTransportable());
-                            cargo.clear();
-                            break;
-                        case TNEXT: default:
-                            throw new IllegalStateException("Can not happen");
-                        }
-                    }
-                    curr.clear();
-                    // Rebuild the cargo list with the original members,
-                    // less the transportables that were dropped.
-                    tSet(cont, true);
-
-                    // Now try again, this time collecting as well as
-                    // delivering.
-                    lb.add(", collecting");
-                    cont.clear();
-                    for (Cargo cargo : tClear()) {
-                        CargoResult result = (cargo.getMode().isCollection())
-                            ? tryCargo(cargo, lb)
-                            : CargoResult.TCONTINUE;
-                        switch (result) {
-                        case TCONTINUE:
-                            cont.add(cargo);
-                            break;
-                        case TNEXT:
-                            cont.add(cargo);
-                            break;
-                        case TRETRY:
-                            if (cargo.retry()) { // Can not reach the target.
-                                next.add(cargo); // Try again next turn.
-                                break;
-                            }
-                            // Fall through
-                        case TFAIL: case TDONE:
-                            dropTransportable(cargo.getTransportable());
-                            cargo.clear();
-                            break;
-                        default:
-                            throw new IllegalStateException("Can not happen");
-                        }
-                    }
-
-                    // Rebuild the cargo list with the original members,
-                    // less the transportables that were dropped.
-                    tSet(cont, true);
-
-                    // Add the new and blocked cargoes incrementally with
-                    // the current arrangement, which is likely to put them
-                    // at the end.
-                    if (!next.isEmpty()) {
-                        lb.add(", requeue");
-                        for (Cargo c : next) queueCargo(c, false, lb);
-                    }
-                }
-
-                optimizeCargoes(lb);
-                // Replenish cargoes up to available destination capacity
-                // and 50% above maximum cargoes (TODO: longer?)
-                while (destinationCapacity() > 0
-                    && tSize() < unit.getCargoCapacity() * 3 / 2) {
-                    TransportableAIObject t = getBestTransportable(unit);
-                    if (t == null) break;
-                    if (!queueTransportable(t, false, lb)) break;
-                    euaip.claimTransportable(t);
-                }
-
-                if ((reason = invalidReason()) != null) {
-                    logger.warning(tag + " post-stop failure(" + reason
-                        + "): " + this.toFullString());
-                    return lbFail(lb, false, reason);
-                }
-                if (unit.isAtLocation(target)) {
-                    return lbWait(lb, ", waiting at ", target);
-                }
                 break;
 
             case MOVE_NO_ACCESS_EMBARK: default:
