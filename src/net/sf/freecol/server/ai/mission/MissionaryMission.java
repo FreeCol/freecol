@@ -373,12 +373,6 @@ public class MissionaryMission extends Mission {
         Unit.MoveType mt = travelToTarget(getTarget(),
             CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
         switch (mt) {
-        case MOVE_HIGH_SEAS: case MOVE_NO_REPAIR:
-            return lbWait(lb);
-
-        case MOVE_NO_ACCESS_EMBARK: case MOVE_NO_MOVES: case MOVE_NO_TILE: case MOVE_ILLEGAL:
-            return this;
-
         case MOVE:
             // Reached an intermediate colony.  Retarget, but do not
             // accept fallback targets.
@@ -390,7 +384,14 @@ public class MissionaryMission extends Mission {
             }
             setTarget(newTarget);
             return lbRetarget(lb);
+
+        case MOVE_HIGH_SEAS: case MOVE_NO_MOVES:
+        case MOVE_NO_REPAIR: case MOVE_ILLEGAL:
+            return lbWait(lb);
             
+        case MOVE_NO_ACCESS_EMBARK: case MOVE_NO_TILE:
+            return this;
+
         case ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY: // Arrived
             break;
 

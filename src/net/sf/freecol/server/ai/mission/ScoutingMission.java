@@ -404,14 +404,19 @@ public class ScoutingMission extends Mission {
         Unit.MoveType mt = travelToTarget(getTarget(),
             CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
         switch (mt) {
-        case MOVE_HIGH_SEAS: case MOVE_NO_REPAIR:
-            return lbWait(lb);
-
-        case MOVE_NO_ACCESS_EMBARK: case MOVE_NO_MOVES: case MOVE_NO_TILE: case MOVE_ILLEGAL:
-            return this;
-
         case MOVE: // Arrived at a colony
             break;
+
+        case MOVE_HIGH_SEAS: case MOVE_NO_MOVES:
+        case MOVE_NO_REPAIR: case MOVE_ILLEGAL:
+            return lbWait(lb);
+
+        case MOVE_NO_ACCESS_EMBARK:
+            return this;
+
+        case MOVE_NO_TILE:
+            moveRandomly(tag, null);
+            return lbDodge(lb);
 
         case ATTACK_UNIT:
             // Could be adjacent to the destination but it is

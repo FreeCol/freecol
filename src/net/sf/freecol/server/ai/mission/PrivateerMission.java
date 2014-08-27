@@ -389,20 +389,18 @@ public class PrivateerMission extends Mission {
         setTarget(newTarget);
         Unit.MoveType mt = travelToTarget(newTarget, null, lb);
         switch (mt) {
-        case MOVE_HIGH_SEAS: case MOVE_NO_REPAIR:
-            return lbWait(lb);
-
-        case MOVE_NO_ACCESS_EMBARK: case MOVE_NO_MOVES: case MOVE_ILLEGAL:
-            return this;
-
-        case MOVE:
+        case MOVE: // Arrived at intermediate safe location
             break;
 
+        case MOVE_HIGH_SEAS: case MOVE_NO_MOVES:
+        case MOVE_NO_REPAIR: case MOVE_ILLEGAL:
+            return lbWait(lb);
+            
         case MOVE_NO_TILE: // Can happen when another unit blocks a river
             moveRandomly(tag, null);
             return lbDodge(lb);
 
-        case ATTACK_UNIT:
+        case ATTACK_UNIT: // Arrived
             Direction direction = unit.getTile()
                 .getDirection(getTarget().getTile());
             if (direction != null) {
@@ -422,7 +420,7 @@ public class PrivateerMission extends Mission {
             }
             return this;
 
-        default:
+        case MOVE_NO_ACCESS_EMBARK: default:
             return lbMove(lb, mt);
         }
 

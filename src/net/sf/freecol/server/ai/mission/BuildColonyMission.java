@@ -396,14 +396,15 @@ public class BuildColonyMission extends Mission {
             Unit.MoveType mt = travelToTarget(getTarget(),
                 CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
             switch (mt) {
-            case MOVE_HIGH_SEAS: case MOVE_NO_REPAIR:
+            case MOVE: // Arrived
+                break;
+
+            case MOVE_HIGH_SEAS: case MOVE_NO_MOVES:
+            case MOVE_NO_REPAIR: case MOVE_ILLEGAL:
                 return lbWait(lb);
 
-            case MOVE_NO_ACCESS_EMBARK: case MOVE_NO_MOVES: case MOVE_NO_TILE: case MOVE_ILLEGAL:
+            case MOVE_NO_ACCESS_EMBARK: case MOVE_NO_TILE:
                 return this;
-
-            case MOVE:
-                break;
 
             default:
                 return lbMove(lb, mt);

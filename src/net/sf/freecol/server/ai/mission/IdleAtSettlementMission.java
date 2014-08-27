@@ -161,16 +161,16 @@ public class IdleAtSettlementMission extends Mission {
 
         Unit.MoveType mt = travelToTarget(getTarget(), null, lb);
         switch (mt) {
-        case MOVE_HIGH_SEAS: case MOVE_NO_REPAIR:
-            return lbWait(lb);
-            
-        case MOVE_NO_ACCESS_EMBARK: case MOVE_NO_MOVES: case MOVE_ILLEGAL:
-        case MOVE_NO_TILE:
-            return this;
-            
         case MOVE: // Arrived
             break;
-            
+
+        case MOVE_HIGH_SEAS: case MOVE_NO_MOVES:
+        case MOVE_NO_REPAIR: case MOVE_ILLEGAL:
+            return lbWait(lb);
+
+        case MOVE_NO_ACCESS_EMBARK: case MOVE_NO_TILE:
+            return this;
+
         default:
             return lbMove(lb, mt);
         }
