@@ -250,7 +250,6 @@ public class AIUnit extends TransportableAIObject {
         Unit carrier = getUnit().getCarrier();
         AIUnit aiCarrier = (carrier == null) ? null
             : getAIMain().getAIUnit(carrier);
-        TransportMission tm;
         AIUnit transport = getTransport();
         if (transport != aiCarrier) {
             if (transport != null) {
@@ -258,8 +257,6 @@ public class AIUnit extends TransportableAIObject {
                 dropTransport();
             }
             setTransport(aiCarrier);
-            tm = aiCarrier.getMission(TransportMission.class);
-            if (tm != null) tm.queueTransportable(this, false);
         }
     }
 
