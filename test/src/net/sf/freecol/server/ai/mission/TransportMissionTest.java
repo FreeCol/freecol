@@ -144,7 +144,7 @@ public class TransportMissionTest extends FreeColTestCase {
         TransportMission mission = new TransportMission(aiMain, aiUnit);
         TransportableAIObject goods = new AIGoods(aiMain, galleon, 
                                                   horsesType, 50, colonyTile);
-        mission.queueTransportable(goods, false);
+        mission.queueTransportable(goods, false, lb);
 
         // Exercise
         Location dest = mission.getTarget();
@@ -180,7 +180,7 @@ public class TransportMissionTest extends FreeColTestCase {
         TransportableAIObject goods = new AIGoods(aiMain, galleon,
                                                   horsesType, 50, europe);
         assertTrue("Goods should queue",
-                   mission.queueTransportable(goods, false));
+                   mission.queueTransportable(goods, false, lb));
         mission.doMission(lb);
 
         // Exercise
@@ -220,7 +220,7 @@ public class TransportMissionTest extends FreeColTestCase {
         TransportableAIObject goods = new AIGoods(aiMain, galleon,
                                                   horsesType, 50, colonyTile);
         goods.setTransportDestination(europe);
-        mission.queueTransportable(goods, false);
+        mission.queueTransportable(goods, false, lb);
         mission.doMission(lb);
 
         // Exercise
@@ -311,7 +311,7 @@ public class TransportMissionTest extends FreeColTestCase {
         two.addGoods(goods);
         AIGoods aiGoods = new AIGoods(aiMain, two, 
                                       goods.getType(), goods.getAmount(), one);
-        mission.queueTransportable(aiGoods, false);
+        mission.queueTransportable(aiGoods, false, lb);
         mission.doMission(lb);
 
         dest = mission.getTarget();

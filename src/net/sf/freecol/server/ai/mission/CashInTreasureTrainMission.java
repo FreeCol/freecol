@@ -129,8 +129,9 @@ public class CashInTreasureTrainMission extends Mission {
             aiUnit.changeTransport(aiCarrier);
             // TODO: violently reorder the queue to deliver only, then
             // collect the treasure
-            tm.queueTransportable(aiUnit, false);
-            lb.add(", queued to ", aiCarrier.getUnit());
+            if (tm.queueTransportable(aiUnit, false, lb)) {
+                lb.add(" to ", aiCarrier.getUnit());
+            }
             return aiCarrier;
         }
         return null;

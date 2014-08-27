@@ -263,6 +263,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * @param lb A <code>LogBuilder</code> to log to.
      */
     public void update(LogBuilder lb) {
+        lb.add("\n   ", colony.getName());
         resetExports();
         updateAIGoods(lb);
         updateTileImprovementPlans(lb);
@@ -481,7 +482,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         lb.add(", building ", buildStr, ", population ", colony.getUnitCount(),
             ", rearrange ", nextRearrange, ".\n");
         lb.add(aw.toString());
-        for (UnitWas uw : was) lb.add("  ", uw, "\n");
+        for (UnitWas uw : was) lb.add("  ", uw);
 
         // Set the next rearrangement turn.
         rearrangeTurn = new Turn(turn + nextRearrange);

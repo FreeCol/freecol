@@ -484,10 +484,11 @@ public class TransportMission extends Mission {
      * own inland paths, and thus we need to consider drop nodes.
      *
      * @param t The <code>TransportableAIObject</code> to consider.
+     * @param lb A <code>LogBuilder</code> to log to.
      * @return A new <code>Cargo</code> defining the action to take
      *     with the <code>TransportableAIObject</code>, or null if impossible.
      */
-    public Cargo makeCargo(TransportableAIObject t) {
+    public Cargo makeCargo(TransportableAIObject t, LogBuilder lb) {
         final Unit carrier = getUnit();
         String reason;
         Cargo cargo = null;
@@ -523,7 +524,7 @@ public class TransportMission extends Mission {
             }
         }
         if (reason == null) return cargo;
-        logger.finest("Failed to make cargo (" + reason + "): " + t);
+        lb.add(", failed to make cargo for ", t, " (", reason, ")");
         return null;
     }
 
@@ -532,20 +533,19 @@ public class TransportMission extends Mission {
      *
      * @param cargo The <code>Cargo</code> to add.
      * @param index The index of where to add the cargo.
+     * @param lb A <code>LogBuilder</code> to log to.
      * @return True if the cargo was added.
      */
-    private boolean addCargo(Cargo cargo, int index) {
+    private boolean addCargo(Cargo cargo, int index, LogBuilder lb) {
         boolean result = tAdd(cargo, index);
         if (result) takeTransportable(cargo.getTransportable());
 
         if (result) {
-            logger.finest(tag + " added " + cargo
-                + " (at " + ((index < 0) ? "end" : Integer.toString(index))
-                + "): " + toFullString());
+            lb.add(", added ", cargo.toShortString(),
+                   " at ", ((index < 0) ? "end" : Integer.toString(index)));
         } else {
-            logger.warning(tag + " add " + cargo
-                + " (at " + ((index < 0) ? "end" : Integer.toString(index))
-                + ") failed: " + toFullString());
+            lb.add(", failed to add ", cargo.toShortString());
+throw new RuntimeException("FAIL " + cargo + "\n" + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
         }
         return result;
     }
@@ -598,9 +598,11 @@ public class TransportMission extends Mission {
      *
      * @param cargo The new <code>Cargo</code> to add.
      * @param requireMatch Fail if an existing destination is not matched.
+     * @param lb A <code>LogBuilder</code> to log to.
      * @return True if the cargo was queued.
      */
-    private boolean queueCargo(Cargo cargo, boolean requireMatch) {
+    private boolean queueCargo(Cargo cargo, boolean requireMatch,
+                               LogBuilder lb) {
         final Unit carrier = getUnit();
         final int maxHolds = carrier.getCargoCapacity();
         final List<Cargo> ts = tCopy();
@@ -630,7 +632,7 @@ public class TransportMission extends Mission {
             if (requireMatch) return false;
             candidate = ts.size();
         }
-        return addCargo(cargo, candidate);
+        return addCargo(cargo, candidate, lb);
     }
 
     /**
@@ -669,7 +671,7 @@ public class TransportMission extends Mission {
             dumpCargo(cargo);
         } else if (!tRemove(cargo)) {
             lb.add(" requeue/remove fail ", cargo.toShortString());
-        } else if (!queueCargo(cargo, false)) {
+        } else if (!queueCargo(cargo, false, lb)) {
             lb.add(" requeue/queue fail ", cargo.toShortString());
             dropTransportable(t);
         } else {
@@ -881,7 +883,7 @@ public class TransportMission extends Mission {
         // Try to queue the surprise transportables.
         while (!todo.isEmpty()) {
             TransportableAIObject t = todo.remove(0);
-            if (!queueTransportable(t, false)) drop.add(t);
+            if (!queueTransportable(t, false, lb)) drop.add(t);
         }
 
         // Drop transportables on the drop list, or queue them to be
@@ -898,8 +900,8 @@ public class TransportMission extends Mission {
                 } else if (end != null) {
                     try {
                         Cargo cargo = Cargo.newCargo(t, carrier, end, false);
-                        boolean result = queueCargo(cargo, false);
-                        lb.add(" ", t, " drop at ", upLoc(end), "=", result);
+                        boolean result = queueCargo(cargo, false, lb);
+                        lb.add(" to drop at ", upLoc(end), "=", result);
                     } catch (FreeColException fce) {
                         lb.add(" ", t, " drop-fail(", fce.getMessage(), ")");
                     }
@@ -1199,26 +1201,8 @@ public class TransportMission extends Mission {
     // Publically accessible routines to manipulate a TransportableAIObject.
 
     /**
-     * Adds the given <code>TransportableAIObject</code> to the cargo
-     * list.
-     *
-     * @param t The <code>TransportableAIObject</code> to add.
-     * @param index The index of where to add the cargo.
-     * @return True if the <code>TransportableAIObject</code> was added.
-     */
-    public boolean addTransportable(TransportableAIObject t, int index) {
-        if (tFind(t) != null) return false;
-
-        AIUnit oldCarrier = t.getTransport();
-        TransportMission tm = oldCarrier.getMission(TransportMission.class);
-        if (tm != null) tm.removeTransportable(t);
-
-        Cargo cargo = makeCargo(t);
-        return (cargo == null) ? false : addCargo(cargo, index);
-    }
-
-    /**
-     * Removes the given <code>TransportableAIObject</code> from the cargo list.
+     * Removes the given <code>TransportableAIObject</code> from the
+     * cargo list.
      *
      * @param t The <code>TransportableAIObject</code> to remove.
      * @return True if the removal succeeded.
@@ -1238,7 +1222,7 @@ public class TransportMission extends Mission {
     public boolean requeueTransportable(TransportableAIObject t,
                                         LogBuilder lb) {
         Cargo cargo = tFind(t);
-        return (cargo == null) ? queueTransportable(t, false)
+        return (cargo == null) ? queueTransportable(t, false, lb)
             : requeueCargo(cargo, lb);
     }
 
@@ -1249,11 +1233,13 @@ public class TransportMission extends Mission {
      *
      * @param t The <code>TransportableAIObject</code> to add.
      * @param requireMatch Fail if an existing destination is not matched.
+     * @param lb A <code>LogBuilder</code> to log to.
      * @return True if the transportable was queued.
      */
-    public boolean queueTransportable(TransportableAIObject t, boolean requireMatch) {
-        Cargo cargo = makeCargo(t);
-        return (cargo == null) ? false : queueCargo(cargo, requireMatch);
+    public boolean queueTransportable(TransportableAIObject t,
+                                      boolean requireMatch, LogBuilder lb) {
+        Cargo cargo = makeCargo(t, lb);
+        return (cargo == null) ? false : queueCargo(cargo, requireMatch, lb);
     }
 
 
@@ -1430,7 +1416,10 @@ public class TransportMission extends Mission {
                     // Add the new and blocked cargoes incrementally with
                     // the current arrangement, which is likely to put them
                     // at the end.
-                    for (Cargo c : next) queueCargo(c, false);
+                    if (!next.isEmpty()) {
+                        lb.add(", requeue");
+                        for (Cargo c : next) queueCargo(c, false, lb);
+                    }
                 }
 
                 optimizeCargoes(lb);
@@ -1440,9 +1429,8 @@ public class TransportMission extends Mission {
                     && tSize() < unit.getCargoCapacity() * 3 / 2) {
                     TransportableAIObject t = getBestTransportable(unit);
                     if (t == null) break;
-                    if (!queueTransportable(t, false)) break;
+                    if (!queueTransportable(t, false, lb)) break;
                     euaip.claimTransportable(t);
-                    lb.add(", queued", t);
                 }
 
                 if ((reason = invalidReason()) != null) {

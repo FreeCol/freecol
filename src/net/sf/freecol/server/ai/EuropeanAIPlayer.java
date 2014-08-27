@@ -419,13 +419,14 @@ public class EuropeanAIPlayer extends AIPlayer {
             // Initialize the carrier mission after the cargo units
             // have a valid mission so that the transport list and
             // mission target do not break.
-            if ((tm = (TransportMission)getTransportMission(aiCarrier)) != null) {
+            tm = (TransportMission)getTransportMission(aiCarrier);
+            if (tm != null) {
+                lb.add(tm);
                 for (Unit u : carrier.getUnitList()) {
                     AIUnit aiu = getAIMain().getAIUnit(u);
                     if (aiu == null) continue;
-                    tm.queueTransportable(aiu, false);
+                    tm.queueTransportable(aiu, false, lb);
                 }
-                lb.add(tm.toFullString());
             }
         }
 
@@ -751,9 +752,9 @@ public class EuropeanAIPlayer extends AIPlayer {
 
         lb.add("\n  Allocate Transport cargo=", urgent.size(),
                " carriers=", missions.size());
-        for (TransportableAIObject t : urgent) lb.add(" ", t);
-        lb.add(" ->");
-        for (Mission m : missions) lb.add(" ", m);
+        //for (TransportableAIObject t : urgent) lb.add(" ", t);
+        //lb.add(" ->");
+        //for (Mission m : missions) lb.add(" ", m);
 
         TransportMission best;
         float bestValue;
@@ -767,9 +768,8 @@ public class EuropeanAIPlayer extends AIPlayer {
             present = false;
             for (TransportMission tm : missions) {
                 if (!tm.spaceAvailable(t)) continue;
-                Cargo cargo = tm.makeCargo(t);
+                Cargo cargo = tm.makeCargo(t, lb);
                 if (cargo == null) { // Serious problem with this cargo
-                    lb.add("\n  FAIL ", t);
                     urgent.remove(i);
                     continue outer;
                 }
@@ -789,14 +789,13 @@ public class EuropeanAIPlayer extends AIPlayer {
                 }
             }
             if (best != null) {
-                if (best.queueTransportable(t, false)) {
-                    lb.add("\n  Queued ", t, " to ", best.toFullString());
+                lb.add(best.getUnit(), " chosen");
+                if (best.queueTransportable(t, false, lb)) {
                     claimTransportable(t);
                     if (best.destinationCapacity() <= 0) {
                         missions.remove(best);
                     }
                 } else {
-                    lb.add("\n  Failed to queue ", t, " to ", best);
                     missions.remove(best);
                 }
             }
