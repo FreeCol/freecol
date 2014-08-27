@@ -62,36 +62,36 @@ public class ColonizationMapReader {
     public static final int HEIGHT = 2;
 
     private static final char[] tiletypes = new char[] {
-        't', // tundra
-        'd', // desert
-        'p', // plains
-        'r', // prairie
-        'g', // grassland
-        'v', // savannah
-        'm', // marsh
-        's', // swamp
+        't', // 0x00 tundra
+        'd', // 0x01 desert
+        'p', // 0x02 plains
+        'r', // 0x03 prairie
+        'g', // 0x04 grassland
+        'v', // 0x05 savannah
+        'm', // 0x06 marsh
+        's', // 0x07 swamp
 
-        'B', // boreal (tundra with forest)
-        'S', // scrub (desert with forest)
-        'M', // mixed (plains with forest)
-        'L', // broadleaf (prairie with forest)
-        'C', // conifer (grassland with forest)
-        'T', // tropical (savannah with forest)
-        'W', // wetland (marsh with forest)
-        'R', // rain (swamp with forest)
+        'B', // 0x08 boreal (tundra with forest)
+        'S', // 0x09 scrub (desert with forest)
+        'M', // 0x0a mixed (plains with forest)
+        'L', // 0x0b broadleaf (prairie with forest)
+        'C', // 0x0c conifer (grassland with forest)
+        'T', // 0x0d tropical (savannah with forest)
+        'W', // 0x0e wetland (marsh with forest)
+        'R', // 0x0f rain (swamp with forest)
 
-        'B', // boreal (tundra with forest)
-        'S', // scrub (desert with forest)
-        'M', // mixed (plains with forest)
-        'L', // broadleaf (prairie with forest)
-        'C', // conifer (grassland with forest)
-        'T', // tropical (savannah with forest)
-        'W', // wetland (marsh with forest)
-        'R', // rain (swamp with forest)
+        'B', // 0x10 boreal (tundra with forest)
+        'S', // 0x11 scrub (desert with forest)
+        'M', // 0x12 mixed (plains with forest)
+        'L', // 0x13 broadleaf (prairie with forest)
+        'C', // 0x14 conifer (grassland with forest)
+        'T', // 0x15 tropical (savannah with forest)
+        'W', // 0x16 wetland (marsh with forest)
+        'R', // 0x17 rain (swamp with forest)
 
-        '_', // ice
-        '.', // ocean
-        ':', // sea lane
+        '_', // 0x18 ice
+        '.', // 0x19 ocean
+        ':', // 0x1a sea lane
         '?', // undefined
         '?', // undefined
         '?', // undefined
