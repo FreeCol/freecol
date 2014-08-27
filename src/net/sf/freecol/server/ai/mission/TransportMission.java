@@ -1114,10 +1114,10 @@ throw new RuntimeException("FAIL " + cargo + "\n" + net.sf.freecol.common.debug.
         final EuropeanAIPlayer euaip = getEuropeanAIPlayer();
         while (destinationCapacity() > 0
             && tSize() < unit.getCargoCapacity() * 3 / 2) {
-            TransportableAIObject t = getBestTransportable(unit);
-            if (t == null) break;
-            if (!queueTransportable(t, false, lb)) break;
-            euaip.claimTransportable(t);
+            Cargo cargo = getBestCargo(unit);
+            if (cargo == null) break;
+            if (!queueCargo(cargo, false, lb)) break;
+            euaip.claimTransportable(cargo.getTransportable());
         }
     }
 
@@ -1203,13 +1203,14 @@ throw new RuntimeException("FAIL " + cargo + "\n" + net.sf.freecol.common.debug.
      * What is the best transportable for a carrier to collect?
      *
      * @param carrier The carrier <code>Unit</code> to consider.
-     * @return The best transportable, or null if none found.
+     * @return The best available new <code>Cargo</code>, or null if
+     *     none found.
      */
-    private TransportableAIObject getBestTransportable(Unit carrier) {
+    private Cargo getBestCargo(Unit carrier) {
         final EuropeanAIPlayer euaip = getEuropeanAIPlayer();
         final Location src = (carrier.isAtSea()) ? carrier.resolveDestination()
             : carrier.getLocation();
-        TransportableAIObject bestDirect = null, bestFallback = null;
+        Cargo bestDirect = null, bestFallback = null;
         float bestDirectValue = 0.0f, bestFallbackValue = 0.0f;
         for (TransportableAIObject t : euaip.getUrgentTransportables()) {
             if (t.isDisposed() || !t.carriableBy(carrier)) continue;
@@ -1225,12 +1226,12 @@ throw new RuntimeException("FAIL " + cargo + "\n" + net.sf.freecol.common.debug.
             if (cargo.isFallback()) {
                 if (bestFallbackValue < value) {
                     bestFallbackValue = value;
-                    bestFallback = t;
+                    bestFallback = cargo;
                 }
             } else {
                 if (bestDirectValue < value) {
                     bestDirectValue = value;
-                    bestDirect = t;
+                    bestDirect = cargo;
                 }
             }
         }

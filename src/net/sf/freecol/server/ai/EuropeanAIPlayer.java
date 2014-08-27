@@ -264,11 +264,9 @@ public class EuropeanAIPlayer extends AIPlayer {
     private final java.util.Map<Location, List<Wish>> transportDemand
         = new HashMap<Location, List<Wish>>();
 
-    /**
-     * A cached map of source Location to Transportable awaiting transport.
-     */
-    private final java.util.Map<Location, List<TransportableAIObject>> transportSupply
-        = new HashMap<Location, List<TransportableAIObject>>();
+    /** A cached list of transportables awaiting transport. */
+    private final List<TransportableAIObject> transportSupply
+        = new ArrayList<TransportableAIObject>();
 
     /**
      * A mapping of goods type to the goods wishes where a colony has
@@ -1011,8 +1009,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             } else {
                 checkTransport(aiu);
                 if (requestsTransport(aiu)) {
-                    Utils.appendToMapList(transportSupply,
-                        upLoc(aiu.getTransportSource()), aiu);
+                    transportSupply.add(aiu);
                     aiu.incrementTransportPriority();
                     nNavalCarrier++;
                 }
@@ -1023,8 +1020,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             for (AIGoods aig : aic.getAIGoods()) {
                 checkTransport(aig);
                 if (requestsTransport(aig)) {
-                    Utils.appendToMapList(transportSupply,
-                        upLoc(aig.getTransportSource()), aig);
+                    transportSupply.add(aig);
                     aig.incrementTransportPriority();
                     Location src = aig.getTransportSource();
                     Location dst = aig.getTransportDestination();
@@ -1050,11 +1046,7 @@ public class EuropeanAIPlayer extends AIPlayer {
 
         if (!transportSupply.isEmpty()) {
             lb.add("\n  Transport Supply:");
-            for (Location ls : transportSupply.keySet()) {
-                lb.add(" ", ls, "[");
-                for (TransportableAIObject t : transportSupply.get(ls)) lb.add(" ", t);
-                lb.add(" ]");
-            }
+            for (TransportableAIObject t : transportSupply) lb.add(" ", t);
         }
         if (!transportDemand.isEmpty()) {
             lb.add("\n  Transport Demand:");
@@ -1072,31 +1064,14 @@ public class EuropeanAIPlayer extends AIPlayer {
      * @return The most urgent 10% of the available transportables.
      */
     public List<TransportableAIObject> getUrgentTransportables() {
-        List<TransportableAIObject> urgent = new ArrayList<TransportableAIObject>();
-        for (Location l : transportSupply.keySet()) {
-            urgent.addAll(transportSupply.get(l));
-        }
+        List<TransportableAIObject> urgent
+            = new ArrayList<TransportableAIObject>(transportSupply);
         // Do not let the list exceed 10% of all transports
         Collections.sort(urgent);
         int urge = urgent.size();
         urge = Math.max(2, (urge + 5) / 10);
         while (urgent.size() > urge) urgent.remove(urge);
-
         return urgent;
-    }
-
-    /**
-     * Gets a list of the transportables that need transport from a
-     * given location.
-     *
-     * @param loc The <code>Location</code> to transport from.
-     * @return A list of transportables.
-     */
-    public List<TransportableAIObject> getTransportablesAt(Location loc) {
-        List<TransportableAIObject> supply = transportSupply.get(upLoc(loc));
-        return (supply == null)
-            ? Collections.<TransportableAIObject>emptyList()
-            : new ArrayList<TransportableAIObject>(supply);
     }
 
     /**
@@ -1107,20 +1082,7 @@ public class EuropeanAIPlayer extends AIPlayer {
      * @return True if the transportable was claimed from the supply map.
      */
     public boolean claimTransportable(TransportableAIObject t) {
-        return claimTransportable(t, upLoc(t.getTransportSource()));
-    }
-
-    /**
-     * Allows a TransportMission to signal that it has taken responsibility
-     * for a TransportableAIObject.
-     *
-     * @param t The <code>TransportableAIObject</code> being claimed.
-     * @param loc The <code>Location</code> to claim from.
-     * @return True if the transportable was claimed from the supply map.
-     */
-    public boolean claimTransportable(TransportableAIObject t, Location loc) {
-        List<TransportableAIObject> tl = transportSupply.get(upLoc(loc));
-        return tl != null && tl.remove(t);
+        return transportSupply.remove(t);
     }
 
     /**
@@ -1820,8 +1782,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 lb.add(m, ", ");
                 done.add(aiUnit);
                 if (requestsTransport(aiUnit)) {
-                    Utils.appendToMapList(transportSupply,
-                        upLoc(aiUnit.getTransportSource()), aiUnit);
+                    transportSupply.add(aiUnit);
                 }
                 reasons.put(aiUnit.getUnit(), "0Builder");
             }
@@ -1836,8 +1797,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 lb.add(m, ", ");
                 done.add(aiUnit);
                 if (requestsTransport(aiUnit)) {
-                    Utils.appendToMapList(transportSupply,
-                        upLoc(aiUnit.getTransportSource()), aiUnit);
+                    transportSupply.add(aiUnit);
                 }
                 reasons.put(aiUnit.getUnit(), "Builder" + nBuilders);
                 if (--nBuilders <= 0) break;
@@ -1853,8 +1813,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 lb.add(m, ", ");
                 done.add(aiUnit);
                 if (requestsTransport(aiUnit)) {
-                    Utils.appendToMapList(transportSupply,
-                        upLoc(aiUnit.getTransportSource()), aiUnit);
+                    transportSupply.add(aiUnit);
                 }
                 reasons.put(unit, "Scout" + nScouts);
                 if (--nScouts <= 0) break;
@@ -1870,8 +1829,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 lb.add(m, ", ");
                 done.add(aiUnit);
                 if (requestsTransport(aiUnit)) {
-                    Utils.appendToMapList(transportSupply,
-                        upLoc(aiUnit.getTransportSource()), aiUnit);
+                    transportSupply.add(aiUnit);
                 }
                 reasons.put(unit, "Pioneer" + nPioneers);
                 if (--nPioneers <= 0) break;
@@ -1888,8 +1846,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             reasons.put(unit, "New-Land");
             done.add(aiUnit);
             if (requestsTransport(aiUnit)) {
-                Utils.appendToMapList(transportSupply,
-                    upLoc(aiUnit.getTransportSource()), aiUnit);
+                transportSupply.add(aiUnit);
             }
         }
         aiUnits.removeAll(done);
