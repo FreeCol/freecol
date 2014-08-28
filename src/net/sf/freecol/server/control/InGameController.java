@@ -799,44 +799,10 @@ public final class InGameController extends Controller {
                     .getAIPlayer(player);
                 boolean teleport = getGame().getSpecification()
                     .getBoolean(GameOptions.TELEPORT_REF);
-                if (!refAIPlayer.initialize(teleport)) {
-                    logger.severe("REF failed to initialize.");
+                if (refAIPlayer.initialize(teleport)) {
+                    csLaunchREF(player, teleport, cs);
                 } else {
-                    // Set the REF player entry location from the
-                    // rebels.  Note that the REF units will have
-                    // their own unit-specific entry locations set by
-                    // their missions.  This just flags that the REF
-                    // is initialized.
-                    for (Player p : player.getRebels()) {
-                        player.setEntryLocation(p.getEntryLocation().getTile());
-                        break;
-                    }
-
-                    if (teleport) { // Teleport in the units.
-                        Set<Tile> seen = new HashSet<Tile>();
-                        for (Unit u : player.getUnits()) {
-                            if (!u.isNaval()) continue;
-                            Tile entry = u.getEntryLocation().getTile();
-                            u.setLocation(entry);//-vis(player)
-                            u.setWorkLeft(-1);
-                            u.setState(Unit.UnitState.ACTIVE);
-                            if (!seen.contains(entry)) {
-                                seen.add(entry);
-                                cs.add(See.only(player),
-                                    player.exploreForUnit(u));
-                                cs.add(See.perhaps().except(player), entry);
-                            }
-                        }
-                        player.invalidateCanSeeTiles();//+vis(player)
-                    } else {
-                        // Put navy on the high seas, with 1-turn sail time
-                        for (Unit u : player.getUnits()) {
-                            if (!u.isNaval()) continue;
-                            u.setWorkLeft(1);
-                            u.setDestination(u.getEntryLocation());
-                            u.setLocation(u.getOwner().getHighSeas());//-vis: safe!map
-                        }
-                    }
+                    logger.severe("REF failed to initialize.");
                 }
             }
             player.csStartTurn(random, cs);
@@ -886,6 +852,51 @@ public final class InGameController extends Controller {
             sendToList(getOtherPlayers(player, serverPlayer), cs);
             if (player != serverPlayer) sendElement(player, cs);
             return cs.build(serverPlayer);
+        }
+    }
+
+    /**
+     * Launch the REF.
+     *
+     * @param serverPlayer The REF <code>ServerPlayer</code>.
+     * @param teleport If true, teleport the REF in.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    private void csLaunchREF(ServerPlayer serverPlayer, boolean teleport,
+                             ChangeSet cs) {
+        // Set the REF player entry location from the rebels.  Note
+        // that the REF units will have their own unit-specific entry
+        // locations set by their missions.  This just flags that the
+        // REF is initialized.
+        for (Player p : serverPlayer.getRebels()) {
+            serverPlayer.setEntryLocation(p.getEntryLocation().getTile());
+            break;
+        }
+
+        if (teleport) { // Teleport in the units.
+            Set<Tile> seen = new HashSet<Tile>();
+            for (Unit u : serverPlayer.getUnits()) {
+                if (!u.isNaval()) continue;
+                Tile entry = u.getEntryLocation().getTile();
+                u.setLocation(entry);//-vis(serverPlayer)
+                u.setWorkLeft(-1);
+                u.setState(Unit.UnitState.ACTIVE);
+                if (!seen.contains(entry)) {
+                    seen.add(entry);
+                    cs.add(See.only(serverPlayer),
+                           serverPlayer.exploreForUnit(u));
+                    cs.add(See.perhaps().except(serverPlayer), entry);
+                }
+            }
+            serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
+        } else {
+            // Put navy on the high seas, with 1-turn sail time
+            for (Unit u : serverPlayer.getUnits()) {
+                if (!u.isNaval()) continue;
+                u.setWorkLeft(1);
+                u.setDestination(u.getEntryLocation());
+                u.setLocation(u.getOwner().getHighSeas());//-vis: safe!map
+            }
         }
     }
 
