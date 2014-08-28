@@ -254,24 +254,6 @@ public class Turn {
     }
 
     /**
-     * Get the ages boundary array.
-     *
-     * @return The ages boundaries.
-     */
-    public static final int[] getAges() {
-        return ages;
-    }
-
-    /**
-     * Sets the ages boundaries.
-     *
-     * @param newAges The new ages boundaries.
-     */
-    public static final void setAges(final int[] newAges) {
-        ages = newAges;
-    }
-
-    /**
      * Gets a non-localized string representation of the given turn.
      *
      * @return A string with the format: "<i>season year</i>".
