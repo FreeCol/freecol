@@ -198,6 +198,8 @@ public abstract class AIPlayer extends AIObject {
      * @param aiUnit The <code>AIUnit</code> to remove.
      */
     public void removeAIUnit(AIUnit aiUnit) {
+        aiUnit.dropTransport();
+        aiUnit.changeMission(null);
         aiUnits.remove(aiUnit);
     }
 

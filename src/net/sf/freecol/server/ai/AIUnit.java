@@ -230,9 +230,11 @@ public class AIUnit extends TransportableAIObject {
     /**
      * Drop the current transport, keeping the transport mission consistent.
      *
+     * Public so AIPlayer.removeAIUnit can drop its responsibilities.
+     *
      * @return True if the unit has no allocated transport.
      */
-    private boolean dropTransport() {
+    public boolean dropTransport() {
         AIUnit transport = getTransport();
         if (transport != null && getUnit().getLocation() != transport) {
             TransportMission tm = transport.getMission(TransportMission.class);
