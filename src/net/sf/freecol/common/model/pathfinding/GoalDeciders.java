@@ -358,7 +358,58 @@ public final class GoalDeciders {
             }
         };
     }
-  
+
+    /**
+     * Get a goal decider to find tiles on river corners, preferring ones
+     * closest to the high seas.  This is useful when a unit is stuck on
+     * a river.  By moving to a corner (i.e. where another unit can get
+     * past it) the chance that the blockage clears is enhanced.
+     *
+     * @param unit The <code>Unit</code> that is stuck on the river.
+     * @return A suitable goal decider.
+     */
+    public static GoalDecider getCornerGoalDecider(final Unit unit) {
+        return new GoalDecider() {
+            private PathNode goal = null;
+            private int score = Integer.MAX_VALUE;
+            private List<Tile> tiles = new ArrayList<Tile>();
+
+            public PathNode getGoal() { return goal; }
+            public boolean hasSubGoals() { return true; }
+            public boolean check(Unit u, PathNode pathNode) {
+                Tile tile = pathNode.getTile();
+                if (tile.getHighSeasCount() < score) {
+                    tiles.clear();
+                    for (Tile t : tile.getSurroundingTiles(1)) {
+                        if (t.isOnRiver()) tiles.add(t);
+                    }
+                    boolean ok = false;
+                    switch (tiles.size()) {
+                    case 0: case 1:
+                        break;
+                    case 2:
+                        ok = tiles.get(0).isAdjacent(tiles.get(1));
+                        break;
+                    case 3:
+                        ok = tiles.get(0).isAdjacent(tiles.get(1))
+                            || tiles.get(1).isAdjacent(tiles.get(2))
+                            || tiles.get(2).isAdjacent(tiles.get(0));
+                        break;
+                    default:
+                        ok = true;
+                        break;
+                    }
+                    if (ok) {
+                        score = tile.getHighSeasCount();
+                        goal = pathNode;
+                        return true;
+                    }
+                }
+                return false;
+            }
+        };
+    }
+
     /**
      * A class to wrap a goal decider that searches for paths to an
      * adjacent tile to a set of locations, and the results of such a

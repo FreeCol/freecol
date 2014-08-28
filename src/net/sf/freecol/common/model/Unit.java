@@ -2411,9 +2411,25 @@ public class Unit extends GoodsLocation
      * @return A path to the trivial target, or null if none found.
      */
     public PathNode getTrivialPath() {
-        return (isDisposed()) ? null
-            : (isNaval()) ? findOurNearestPort()
-            : findOurNearestSettlement();
+        if (isDisposed()) return null;
+        if (!isNaval()) return findOurNearestSettlement();
+        PathNode path = findOurNearestPort();
+        if (path == null) {
+            // This is unusual, but can happen when a ship is up a
+            // river and foreign ship creates a blockage downstream.
+            // If so, the rational thing to do is to go to a tile
+            // where other units can pass and which has the best
+            // connectivity to the high seas.
+            Tile tile = getTile();
+            if (tile != null && tile.isOnRiver()
+                && tile.isHighSeasConnected()) {
+                path = search(getLocation(), 
+                    GoalDeciders.getCornerGoalDecider(this),
+                    CostDeciders.avoidSettlementsAndBlockingUnits(),
+                    INFINITY, null);
+            }
+        }
+        return path;
     }
 
     /**
