@@ -163,7 +163,7 @@ public class AbstractUnit extends FreeColObject {
         int n = getNumber();
         Role role = getRole(spec);
         UnitType type = spec.getUnitType(getId());
-        return n * type.getOffence() * role.getOffence();
+        return n * (type.getOffence() + role.getOffence());
     }
 
 

@@ -158,7 +158,7 @@ public class SimpleCombatModel extends CombatModel {
 
             // Base offense
             result.add(new Modifier(Modifier.OFFENCE,
-                                    attackerUnit.getType().getOffence(),
+                                    attackerUnit.getType().getBaseOffence(),
                                     ModifierType.ADDITIVE,
                                     Specification.BASE_OFFENCE_SOURCE));
 
@@ -312,7 +312,7 @@ public class SimpleCombatModel extends CombatModel {
 
             // Base defence
             result.add(new Modifier(Modifier.DEFENCE,
-                                    defenderUnit.getType().getDefence(),
+                                    defenderUnit.getType().getBaseDefence(),
                                     ModifierType.ADDITIVE,
                                     Specification.BASE_DEFENCE_SOURCE));
 

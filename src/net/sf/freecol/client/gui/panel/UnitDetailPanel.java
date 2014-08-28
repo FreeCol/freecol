@@ -113,10 +113,10 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
         panel.add(name, "span, align center, wrap 40");
 
         panel.add(localizedLabel("colopedia.unit.offensivePower"));
-        panel.add(new JLabel(Integer.toString(type.getOffence())), "right");
+        panel.add(new JLabel(Integer.toString((int)type.getOffence())), "right");
 
         panel.add(localizedLabel("colopedia.unit.defensivePower"));
-        panel.add(new JLabel(Integer.toString(type.getDefence())), "right");
+        panel.add(new JLabel(Integer.toString((int)type.getDefence())), "right");
 
         panel.add(localizedLabel("colopedia.unit.movement"));
         panel.add(new JLabel(String.valueOf(type.getMovement()/3)), "right");

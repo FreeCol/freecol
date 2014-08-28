@@ -546,10 +546,10 @@ public class InGameControllerTest extends FreeColTestCase {
                                        spec().getDefaultRole());
         assertEquals("Must be Colonial Regular",
                      colonialType, colonial.getType());
-        assertEquals("Only has default offence",
-                     UnitType.DEFAULT_OFFENCE, colonial.getType().getOffence());
-        assertEquals("Only has default defence",
-                     UnitType.DEFAULT_DEFENCE, colonial.getType().getDefence());
+        assertEquals("Only has default base offence",
+                     UnitType.DEFAULT_OFFENCE, colonial.getType().getBaseOffence());
+        assertEquals("Only has default base defence",
+                     UnitType.DEFAULT_DEFENCE, colonial.getType().getBaseDefence());
         assertTrue("Has default role", colonial.hasDefaultRole());
 
         // Create Veteran Soldier with default role

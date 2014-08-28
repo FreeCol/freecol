@@ -2252,7 +2252,8 @@ public class EuropeanAIPlayer extends AIPlayer {
                " units=", getAIUnits().size(),
                " colonies=", colonyCount,
                " declare=", (player.checkDeclareIndependence() == null),
-               " strength=", player.getRebelStrengthRatio());
+               " v-land-REF=", player.getRebelStrengthRatio(false),
+               " v-naval-REF=", player.getRebelStrengthRatio(true));
         if (turn.isFirstTurn()) initializeMissions(lb);
         determineStances(lb);
 

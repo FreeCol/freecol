@@ -157,39 +157,57 @@ public final class UnitType extends BuildableType implements Consumer {
     }
 
     /**
-     * Get the offence value.
+     * Get the base offence value.
+     *
+     * @return The base offence value.
+     */
+    public int getBaseOffence() {
+        return offence;
+    }
+
+    /**
+     * Get the offence of this unit type.
      *
      * @return The offence value.
      */
-    public int getOffence() {
-        return offence;
+    public float getOffence() {
+        return applyModifiers(offence, null, Modifier.OFFENCE);
     }
 
     /**
      * Is this an offensive unit type?
      *
-     * @return True if offensive ability is greater than the default.
+     * @return True if base offensive ability is greater than the default.
      */
     public boolean isOffensive() {
-        return getOffence() > UnitType.DEFAULT_OFFENCE;
+        return getBaseOffence() > UnitType.DEFAULT_OFFENCE;
     }
 
     /**
-     * Get the defence value.
+     * Get the base defence value.
      *
      * @return The defence value.
      */
-    public int getDefence() {
+    public int getBaseDefence() {
         return defence;
+    }
+
+    /**
+     * Get the total defence of this unit type.
+     *
+     * @return The defence value.
+     */
+    public float getDefence() {
+        return applyModifiers(defence, null, Modifier.DEFENCE);
     }
 
     /**
      * Is this a defensive unit type?
      *
-     * @return True if defensive ability is greater than the default.
+     * @return True if base defensive ability is greater than the default.
      */
     public boolean isDefensive() {
-        return getDefence() > UnitType.DEFAULT_DEFENCE;
+        return getBaseDefence() > UnitType.DEFAULT_DEFENCE;
     }
 
     /**

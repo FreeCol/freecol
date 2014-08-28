@@ -1776,7 +1776,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                             if (alarm == null) continue;
                             for (Unit unit : tile.getUnitList()) {
                                 if (unit.isOffensiveUnit() && !unit.isNaval()) {
-                                    alarm += unit.getType().getOffence();
+                                    alarm += (int)unit.getType().getOffence();
                                 }
                             }
                             extra.put(enemy, alarm);

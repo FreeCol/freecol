@@ -1798,7 +1798,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Generic strength calculation.
      *
-     * @param naval If true consider naval units, otherwise, land units.
+     * @param naval If true consider naval units, otherwise land units.
      * @return A measure of naval or land offensive power.
      */
     public int calculateStrength(boolean naval) {
@@ -1815,14 +1815,15 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Get the strength ratio of this player with respect to its REF.
      *
+     * @param naval If true consider naval units, otherwise land units.
      * @return A measure of the military viability of this player.
      */
-    public float getRebelStrengthRatio() {
+    public float getRebelStrengthRatio(boolean naval) {
         if (getPlayerType() != PlayerType.COLONIAL) return 0f;
         float ref = getMonarch().getExpeditionaryForce()
-            .calculateStrength(false);
-        float pla = calculateStrength(false);
-        return ref / (ref + pla);
+            .calculateStrength(naval);
+        float pla = calculateStrength(naval);
+        return pla / (ref + pla);
     }
 
 
