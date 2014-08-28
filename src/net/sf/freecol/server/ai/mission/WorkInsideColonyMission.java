@@ -45,8 +45,8 @@ public class WorkInsideColonyMission extends Mission {
     /** The tag for this mission. */
     private static final String tag = "AI worker";
 
-    /** The AI colony to work inside. */
-    private AIColony aiColony;
+    /** The target colony to work inside. */
+    private Colony colony;
 
 
     /**
@@ -87,7 +87,7 @@ public class WorkInsideColonyMission extends Mission {
      * @return The <code>AIColony</code> to work in.
      */
     public AIColony getAIColony() {
-        return aiColony;
+        return getAIMain().getAIColony(colony);
     }
 
     /**
@@ -122,7 +122,7 @@ public class WorkInsideColonyMission extends Mission {
      * {@inheritDoc}
      */
     public Location getTarget() {
-        return (aiColony == null) ? null : aiColony.getColony();
+        return colony;
     }
 
     /**
@@ -130,7 +130,7 @@ public class WorkInsideColonyMission extends Mission {
      */
     public void setTarget(Location target) {
         if (target instanceof Colony) {
-            this.aiColony = getAIMain().getAIColony((Colony)target);
+            this.colony = (Colony)target;
         }
     }
 
@@ -192,7 +192,7 @@ public class WorkInsideColonyMission extends Mission {
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
-        xw.writeAttribute(COLONY_TAG, aiColony);
+        xw.writeAttribute(COLONY_TAG, colony);
     }
 
     /**
@@ -202,8 +202,8 @@ public class WorkInsideColonyMission extends Mission {
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        aiColony = xr.getAttribute(getAIMain(), COLONY_TAG,
-                                   AIColony.class, (AIColony)null);
+        colony = xr.getAttribute(getGame(), COLONY_TAG,
+                                 Colony.class, (Colony)null);
     }
 
     /**

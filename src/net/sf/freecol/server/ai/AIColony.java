@@ -483,7 +483,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             ", rearrange ", nextRearrange, ".\n");
         lb.add(aw.toString());
         lb.shrink("\n");
-        for (UnitWas uw : was) lb.add("\n    ", uw);
+        for (UnitWas uw : was) lb.add("\n  ", uw);
 
         // Set the next rearrangement turn.
         rearrangeTurn = new Turn(turn + nextRearrange);

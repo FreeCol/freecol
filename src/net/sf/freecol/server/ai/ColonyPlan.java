@@ -1363,7 +1363,7 @@ public class ColonyPlan {
                 goodsType = wlp.getGoodsType();
                 wl = col.getCorresponding(wlp.getWorkLocation());
                 best = null;
-                lb.add(lb.wide(2, col.getUnitCount()),
+                lb.add("    ", lb.wide(2, col.getUnitCount()),
                        ": ", lb.wide(-15, goodsType.getSuffix()),
                        "@", lb.wide(25, locationDescription(wl)),
                        " => ");
@@ -1389,7 +1389,7 @@ public class ColonyPlan {
                 if (col.getProductionBonus() < 0) {
                     best.setLocation(tile);
                     done = true;
-                    lb.add("broke production bonus\n");
+                    lb.add("    broke production bonus\n");
                     break;
                 }
 
@@ -1404,11 +1404,11 @@ public class ColonyPlan {
                         best.setLocation(tile);
                         wlp = null;
                         if (goodsType.isFoodType()) {
-                            lb.add("starvation (", count, "/", net, ")\n");
+                            lb.add("    starvation (", count, "/", net, ")\n");
                             done = true;
                             break;
                         }
-                        lb.add("would starve (", count, "/", net, ")\n");
+                        lb.add("    would starve (", count, "/", net, ")\n");
                         continue;
                     }
                     // Otherwise tolerate the food stock running down.
@@ -1438,7 +1438,8 @@ public class ColonyPlan {
                     // on its list.
                     best.changeWorkType(goodsType);
                     workers.remove(best);
-                    lb.add(best.getId(), "(", best.getType().getSuffix(),")\n");
+                    lb.add("    ", best.getId(), "(",
+                           best.getType().getSuffix(),")\n");
                     if (!goodsType.isFoodType() && produce.remove(goodsType)) {
                         produce.add(goodsType);
                     }
@@ -1456,7 +1457,7 @@ public class ColonyPlan {
                     // loop trying to satisfy the alternate plan.
                     if (produce.remove(raw)) produce.add(0, raw);
                     wlp = rawWlp;
-                    lb.add("retry with ", raw.getSuffix(), "\n");
+                    lb.add("    retry with ", raw.getSuffix(), "\n");
                     continue;
                 }
 
@@ -1466,7 +1467,7 @@ public class ColonyPlan {
                 // we will succeed next time.
                 wlps.remove(wlp);
                 produce.remove(goodsType);
-                lb.add("needs more ",raw.getSuffix(), "\n");
+                lb.add("    needs more ", raw.getSuffix(), "\n");
                 break;
             }
         }
@@ -1508,7 +1509,7 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
                         u.setLocation(wl);
                         u.changeWorkType(goodsType);
                         if (col.getAdjustedNetProductionOf(foodType) >= 0) {
-                            lb.add("Subsist with ", u, "\n");
+                            lb.add("    Subsist with ", u, "\n");
                             workers.remove(u);
                             break plans;
                         }
@@ -1540,12 +1541,12 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
             Unit u1 = experts.get(expert);
             Unit other;
             if ((other = trySwapExpert(u1, experts, col)) != null) {
-                lb.add("Swapped ", u1.getId(), "(", u1.getType().getSuffix(),
-                       ") for ", other, "\n");
+                lb.add("    Swapped ", u1.getId(), "(",
+                    u1.getType().getSuffix(), ") for ", other, "\n");
                 experts.remove(u1);
             } else if ((other = trySwapExpert(u1, nonExperts, col)) != null) {
-                lb.add("Swapped ", u1.getId(), "(", u1.getType().getSuffix(),
-                       ") for ", other, "\n");
+                lb.add("    Swapped ", u1.getId(), "(",
+                    u1.getType().getSuffix(), ") for ", other, "\n");
                 experts.remove(u1);
             } else {
                 expert++;
@@ -1556,8 +1557,8 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
             if (work != null) {
                 Unit other = trySwapExpert(u, col.getUnitList(), col);
                 if (other != null) {
-                    lb.add("Swapped ", u.getId(), "(", u.getType().getSuffix(),
-                           ") for ", other, "\n");
+                    lb.add("    Swapped ", u.getId(), "(",
+                        u.getType().getSuffix(), ") for ", other, "\n");
                     workers.remove(u);
                     workers.add(other);
                 }
@@ -1569,8 +1570,8 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
         for (Unit u : new ArrayList<Unit>(workers)) {
             Role role = u.getAvailableRoles(spec().getMilitaryRoles()).get(0);
             if (fullEquipUnit(spec(), u, role, col)) {
-                lb.add(u.getId(), "(", u.getType().getSuffix(), ") -> ",
-                       u.getRoleSuffix(), "\n");
+                lb.add("    ", u.getId(), "(", u.getType().getSuffix(),
+                       ") -> ", u.getRoleSuffix(), "\n");
                 workers.remove(u);
             } else break;
         }
@@ -1585,7 +1586,8 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
         // Otherwise abandon this rearrangement, disposing of the
         // scratch colony and returning null.
         for (Unit u : workers) {
-            lb.add(u.getId(), "(", u.getType().getSuffix(), ") -> UNUSED\n");
+            lb.add("    ", u.getId(), "(", u.getType().getSuffix(),
+                   ") -> UNUSED\n");
         }
         if (col.getUnitCount() <= 0) col = null;
         return col;

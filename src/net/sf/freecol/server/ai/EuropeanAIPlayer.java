@@ -1895,8 +1895,9 @@ public class EuropeanAIPlayer extends AIPlayer {
                 // Choose a port to add to
                 if (ports == null) ports = player.getPorts();
                 Colony c = ports.remove(0);
-                if ((m = getWorkInsideColonyMission(aiUnit,
-                            aiMain.getAIColony(c))) != null) lb.add(m, ", ");
+                AIColony aic = aiMain.getAIColony(c);
+                if ((m = getWorkInsideColonyMission(aiUnit, aic)) != null) 
+                    lb.add(m, ", ");
                 reasons.put(unit, "To-work");
                 ports.add(c);
 
