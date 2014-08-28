@@ -22,10 +22,13 @@ package net.sf.freecol.common.io;
 import java.io.File;
 import java.io.IOException;
 import java.io.BufferedInputStream;
+
+import java.util.Set;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.io.FreeColXMLReader;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -36,6 +39,9 @@ public class FreeColSavegameFile extends FreeColDataFile {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(FreeColSavegameFile.class.getName());
 
+    private static final Set<String> FILE_ENDINGS
+        = makeUnmodifiableSet(FreeCol.FREECOL_SAVE_EXTENSION, ".zip");
+
     /** The tag for the version string in the saved game. */
     public static final String VERSION_TAG = "version";
 
@@ -43,11 +49,11 @@ public class FreeColSavegameFile extends FreeColDataFile {
     public static final String SAVEGAME_FILE = "savegame.xml";
 
     /**
-     *  The name of a properties file that contains information about
-     *  the saved game, such as the size of the map, the date and time
-     *  it was started, and so on.  The map size is used in the
-     *  {@link net.sf.freecol.client.gui.panel.MapGeneratorOptionsDialog},
-     *  for example.
+     * The name of a properties file that contains information about
+     * the saved game, such as the size of the map, the date and time
+     * it was started, and so on.  The map size is used in the
+     * {@link net.sf.freecol.client.gui.panel.MapGeneratorOptionsDialog},
+     * for example.
      */
     public static final String SAVEGAME_PROPERTIES = "savegame.properties";
 
@@ -118,8 +124,7 @@ public class FreeColSavegameFile extends FreeColDataFile {
      * File endings that are supported for this type of data file.
      * @return An array of: ".fsg" and ".zip".
      */
-    @Override
-    protected String[] getFileEndings() {
-        return new String[] { FreeCol.FREECOL_SAVE_EXTENSION, ".zip"};
+    protected static Set<String> getFileEndings() {
+        return FILE_ENDINGS;
     }
 }

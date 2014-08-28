@@ -26,9 +26,12 @@ import java.io.InputStream;
 
 import javax.xml.stream.XMLStreamException;
 
+import java.util.Set;
+
 import net.sf.freecol.common.ObjectWithId;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.FreeColObject;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -36,10 +39,10 @@ import net.sf.freecol.common.model.FreeColObject;
  */
 public class FreeColModFile extends FreeColDataFile implements ObjectWithId {
 
+    private static final Set<String> FILE_ENDINGS
+        = makeUnmodifiableSet(".fmd", ".zip");
     public static final String SPECIFICATION_FILE = "specification.xml";
     public static final String MOD_DESCRIPTOR_FILE = "mod.xml";
-    protected static final String[] FILE_ENDINGS
-        = new String[] {".fmd", ".zip"};
 
     private String id;
     private String parent;
@@ -106,10 +109,9 @@ public class FreeColModFile extends FreeColDataFile implements ObjectWithId {
     /**
      * File endings that are supported for this type of data file.
      *
-     * @return An array of: ".fmd" and ".zip".
+     * @return A set of: ".fmd" and ".zip".
      */
-    @Override
-    protected String[] getFileEndings() {
+    protected static Set<String> getFileEndings() {
         return FILE_ENDINGS;
     }
 

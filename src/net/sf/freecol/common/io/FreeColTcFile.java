@@ -23,14 +23,21 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
 
+import java.util.Set;
+
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.resources.ResourceMapping;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
  * A Total Conversion (TC).  Rules are TCs.
  */
 public class FreeColTcFile extends FreeColModFile {
+
+    private static final Set<String> FILE_ENDINGS
+        = makeUnmodifiableSet(".ftc", ".zip");
+
 
     /**
      * Opens the given file for reading.
@@ -93,10 +100,10 @@ public class FreeColTcFile extends FreeColModFile {
 
     /**
      * File endings that are supported for this type of data file.
-     * @return An array of: ".ftc" and ".zip".
+     *
+     * @return A set: ".ftc" and ".zip".
      */
-    @Override
-    protected String[] getFileEndings() {
-        return new String[] {".ftc", ".zip"};
+    protected static Set<String> getFileEndings() {
+        return FILE_ENDINGS;
     }
 }

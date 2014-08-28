@@ -47,7 +47,7 @@ public class Mods {
                 } else if (f.isDirectory()) {
                     return true;
                 } else {
-                    for (String ending : FreeColModFile.FILE_ENDINGS) {
+                    for (String ending : FreeColModFile.getFileEndings()) {
                         if (name.endsWith(ending)) {
                             return true;
                         }

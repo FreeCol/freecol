@@ -28,11 +28,13 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLConnection;
+
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
@@ -41,6 +43,7 @@ import java.util.logging.Logger;
 import net.sf.freecol.common.resources.Resource;
 import net.sf.freecol.common.resources.ResourceFactory;
 import net.sf.freecol.common.resources.ResourceMapping;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -52,6 +55,8 @@ public class FreeColDataFile {
 
     private static final Logger logger = Logger.getLogger(FreeColDataFile.class.getName());
 
+    private static final Set<String> FILE_ENDINGS
+        = makeUnmodifiableSet(".zip");
     private static final String RESOURCE_FILE_PREFIX = "resources";
     private static final String RESOURCE_FILE_SUFFIX = ".properties";
 
@@ -316,7 +321,7 @@ public class FreeColDataFile {
      *
      * @return An array with a single element: ".zip".
      */
-    protected String[] getFileEndings() {
-        return new String[] {".zip"};
+    protected static Set<String> getFileEndings() {
+        return FILE_ENDINGS;
     }
 }
