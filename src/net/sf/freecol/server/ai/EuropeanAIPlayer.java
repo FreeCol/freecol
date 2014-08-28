@@ -2273,13 +2273,16 @@ public class EuropeanAIPlayer extends AIPlayer {
         cheat(lb);
         buildTransportMaps(lb);
 
+        // Note order of operations below.  We allow rearrange et al to run
+        // even when there are no movable units left because this expedites
+        // mission assignment.
         List<AIUnit> aiUnits = getAIUnits();
         for (int i = 0; i < 3; i++) {
             rearrangeColonies(lb);
-            if (aiUnits.isEmpty()) break;
             giveNormalMissions(lb);
             bringGifts(lb);
             demandTribute(lb);
+            if (aiUnits.isEmpty()) break;
             aiUnits = doMissions(aiUnits, lb);
         }
         lb.log(logger, Level.FINEST);
