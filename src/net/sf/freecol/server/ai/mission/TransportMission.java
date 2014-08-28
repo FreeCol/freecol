@@ -93,7 +93,7 @@ public class TransportMission extends Mission {
      * Insist transport lists remain simple by imposing an upper bound
      * on the distinct destination locations to visit.
      */
-    private static final int DESTINATION_UPPER_BOUND = 3;
+    private static final int DESTINATION_UPPER_BOUND = 4;
 
     private static final int MINIMUM_GOLD_TO_STAY_IN_EUROPE = 600;
 
@@ -428,17 +428,11 @@ public class TransportMission extends Mission {
      */
     private List<Cargo> wrapCargoes() {
         List<Cargo> ts = tCopy();
-        String logMe = ":";
-        for (Cargo t : ts) logMe += "\n" + t;
-        try {
-            for (int i = 0; i < ts.size(); i++) {
-                Cargo head = ts.get(i);
-                while (i+1 < ts.size() && head.couldWrap(ts.get(i+1))) {
-                    head.wrap(ts.remove(i+1));
-                }
+        for (int i = 0; i < ts.size()-1; i++) {
+            Cargo head = ts.get(i);
+            while (i+1 < ts.size() && head.couldWrap(ts.get(i+1))) {
+                head.wrap(ts.remove(i+1));
             }
-        } catch (Exception e) {
-            throw new IllegalStateException(logMe, e);
         }
         return ts;
     }
@@ -1167,6 +1161,7 @@ throw new RuntimeException("FAIL " + cargo + "\n" + net.sf.freecol.common.debug.
      */
     private void optimizeCargoes(LogBuilder lb) {
         lb.add(", optimize");
+        Location oldTarget = getTarget();
 
         // We wrap/unwrap the list to minimize the number of nodes
         // that need consideration.
@@ -1194,6 +1189,7 @@ throw new RuntimeException("FAIL " + cargo + "\n" + net.sf.freecol.common.debug.
         }
         if (best != null) {
             tSet(unwrapCargoes(best), true);
+            if (oldTarget != getTarget()) lb.add("->", getTarget());
         } else {
             tSet(unwrapCargoes(ts), false);
         }
