@@ -283,7 +283,7 @@ public final class TradeRouteInputPanel extends FreeColPanel {
     /**
      * TransferHandler for Stops.
      */
-    public class StopHandler extends TransferHandler {
+    public static class StopHandler extends TransferHandler {
 
         protected Transferable createTransferable(JComponent c) {
             JList list = (JList) c;

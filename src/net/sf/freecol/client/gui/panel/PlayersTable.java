@@ -238,7 +238,7 @@ public final class PlayersTable extends JTable {
         }
     }
 
-    private class AvailableCellRenderer implements TableCellRenderer {
+    private static class AvailableCellRenderer implements TableCellRenderer {
 
         @SuppressWarnings("unchecked") // FIXME in Java7
         private JComboBox box = new JComboBox(allStates);
