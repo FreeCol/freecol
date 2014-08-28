@@ -1046,12 +1046,14 @@ public class EuropeanAIPlayer extends AIPlayer {
 
         if (!transportSupply.isEmpty()) {
             lb.add("\n  Transport Supply:");
-            for (TransportableAIObject t : transportSupply) lb.add(" ", t);
+            for (TransportableAIObject t : transportSupply) {
+                lb.add(" ", t.getTransportPriority(), "+", t);
+            }
         }
         if (!transportDemand.isEmpty()) {
             lb.add("\n  Transport Demand:");
             for (Location ld : transportDemand.keySet()) {
-                lb.add(" ", ld, "[");
+                lb.add("\n    ", ld, "[");
                 for (Wish w : transportDemand.get(ld)) lb.add(" ", w);
                 lb.add(" ]");
             }
@@ -1252,34 +1254,30 @@ public class EuropeanAIPlayer extends AIPlayer {
         }
 
         if (!workerWishes.isEmpty()) {
-            lb.mark();
+            lb.add("\n  Wishes (workers):");
             for (UnitType ut : workerWishes.keySet()) {
                 List<WorkerWish> wl = workerWishes.get(ut);
                 if (!wl.isEmpty()) {
-                    lb.add(ut.getSuffix(), ":");
+                    lb.add("\n    ", ut.getSuffix(), ":");
                     for (WorkerWish ww : wl) {
                         lb.add(" ", ww.getDestination(),
                                "(", ww.getValue(), ")");
                     }
-                    lb.add(", ");
                 }
             }
-            if (lb.grew("\n  Wishes (workers): ")) lb.shrink(", ");
         }
         if (!goodsWishes.isEmpty()) {
-            lb.mark();
+            lb.add("\n  Wishes (goods):");
             for (GoodsType gt : goodsWishes.keySet()) {
                 List<GoodsWish> gl = goodsWishes.get(gt);
                 if (!gl.isEmpty()) {
-                    lb.add(gt.getSuffix(), ":");
+                    lb.add("\n    ", gt.getSuffix(), ":");
                     for (GoodsWish gw : gl) {
                         lb.add(" ", gw.getDestination(),
                                "(", gw.getValue(), ")");
                     }
-                    lb.add(", ");
                 }
             }
-            if (lb.grew("\n  Wishes (goods): ")) lb.shrink(", ");
         }
     }
 

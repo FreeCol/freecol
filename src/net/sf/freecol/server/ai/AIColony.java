@@ -768,7 +768,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * @param lb A <code>LogBuilder</code> to log to.
      */
     private void updateAIGoods(LogBuilder lb) {
-        lb.mark();
         if (colony.hasAbility(Ability.EXPORT)) {
             while (!exportGoods.isEmpty()) {
                 AIGoods ag = exportGoods.remove(0);
@@ -867,7 +866,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             exportGoods.addAll(newAIGoods);
             Collections.sort(exportGoods);
         }
-        lb.grew(" ", colony.getName());
     }
 
 

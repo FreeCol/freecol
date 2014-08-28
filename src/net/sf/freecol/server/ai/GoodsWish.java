@@ -264,9 +264,7 @@ public class GoodsWish extends Wish {
             " ", amountRequested,
             " ", ((goodsType == null) ? "null" : goodsType.getSuffix()),
             " -> ", destination,
-            " (", getValue(), ")");
-        if (transportable != null) lb.add(" ", transportable);
-        lb.add("]");
+            " (", getValue(), ")]");
         return lb.toString();
     }
 

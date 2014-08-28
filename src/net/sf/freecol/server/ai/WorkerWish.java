@@ -237,8 +237,7 @@ public class WorkerWish extends Wish {
         lb.add("[", getId(),
             " ", ((unitType == null) ? "null" : unitType.getSuffix()),
             ((expertNeeded) ? "/expert" : ""),
-            " -> ", destination, " (", getValue(), ")",
-            ((transportable == null) ? "" : transportable), "]");
+            " -> ", destination, " (", getValue(), ")]");
         return lb.toString();
     }
 
