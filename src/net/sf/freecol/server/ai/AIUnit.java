@@ -236,9 +236,13 @@ public class AIUnit extends TransportableAIObject {
      */
     public boolean dropTransport() {
         AIUnit transport = getTransport();
-        if (transport != null && getUnit().getLocation() != transport) {
-            TransportMission tm = transport.getMission(TransportMission.class);
-            if (tm != null) tm.removeTransportable(this);
+        if (transport != null) {
+            if (!transport.isDisposed()
+                && getUnit().getLocation() != transport) {
+                TransportMission tm
+                    = transport.getMission(TransportMission.class);
+                if (tm != null) tm.removeTransportable(this);
+            }
             setTransport(null);
         }
         return getTransport() == null;
