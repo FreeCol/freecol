@@ -296,8 +296,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 logger.warning(colony.getName() + " could be building but"
                     + " is asleep until turn: " + rearrangeTurn.getNumber()
                     + "( > " + turn + ")");
+            } else {
+                return result;
             }
-            return result;
         }
 
         final Tile tile = colony.getTile();
