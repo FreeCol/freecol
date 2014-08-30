@@ -341,7 +341,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             AIMessage.askSetBuildQueue(this, queue);
             build = colony.getCurrentlyBuilding();
         }
-        colonyPlan.refine(build);
+        colonyPlan.refine(build, lb);
 
         // Collect all potential workers from the colony and from the tile,
         // being careful not to disturb existing non-colony missions.

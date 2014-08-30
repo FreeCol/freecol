@@ -36,6 +36,7 @@ import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -154,6 +155,7 @@ public class ColonyPlanTest extends FreeColTestCase {
     private static final UnitType sugarPlanterType
         = spec().getUnitType("model.unit.masterSugarPlanter");
 
+    private static final LogBuilder lb = new LogBuilder(0);
 
     @Override
     public void tearDown() throws Exception {
@@ -222,7 +224,7 @@ public class ColonyPlanTest extends FreeColTestCase {
         colony.addGoods(hammersType,
             blacksmithShopType.getRequiredAmountOf(hammersType));
         colony.setCurrentlyBuilding(blacksmithShopType);
-        plan.refine(blacksmithShopType);
+        plan.refine(blacksmithShopType, lb);
 
         assertTrue("The colony should plan to produce ore",
             shouldProduce(plan, oreType));
@@ -247,7 +249,7 @@ public class ColonyPlanTest extends FreeColTestCase {
 
         ColonyPlan plan = new ColonyPlan(aiMain, colony);
         plan.update();
-        plan.refine(colony.getCurrentlyBuilding());
+        plan.refine(colony.getCurrentlyBuilding(), lb);
 
         assertFalse("The colony can not produce lumber, none available",
             shouldProduce(plan, lumberType));
@@ -260,7 +262,7 @@ public class ColonyPlanTest extends FreeColTestCase {
         colony.addGoods(hammersType,
             blacksmithShopType.getRequiredAmountOf(hammersType));
         colony.setCurrentlyBuilding(blacksmithShopType);
-        plan.refine(blacksmithShopType);
+        plan.refine(blacksmithShopType, lb);
 
         assertFalse("The colony should not produce hammers, has enough",
             shouldProduce(plan, hammersType));

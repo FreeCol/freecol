@@ -313,8 +313,9 @@ public class ColonyPlan {
      * Refines this plan given the colony choice of what to build.
      *
      * @param build The <code>BuildableType</code> to be built (may be null).
+     * @param lb A <code>LogBuilder</code> to log to.
      */
-    public void refine(BuildableType build) {
+    public void refine(BuildableType build, LogBuilder lb) {
         List<GoodsType> required = new ArrayList<GoodsType>();
         for (AbstractGoods ag : colony.getFullRequiredGoods(build)) {
             required.add(ag.getType());
@@ -360,8 +361,7 @@ public class ColonyPlan {
                 wls.add(0, wlp); // reverses list
                 suppressed.put(g, wls);
                 produce.remove(g);
-                logger.finest("At " + colony.getName()
-                    + " suppress production of " + g);
+                lb.add(", suppress production of ", g);
             } else if (g.isRefined()
                 && (rawBuildingGoodsTypes.contains(g.getInputType())
                     || buildingGoodsTypes.contains(g.getInputType()))) {
@@ -377,8 +377,7 @@ public class ColonyPlan {
                         workPlans.add(i - offset, wls.remove(0));
                     }
                     produce.add(idx, type);
-                    logger.finest("At " + colony.getName()
-                        + " restore production of " + type);
+                    lb.add(", restore production of ", type);
                 }
                 offset -= n;
             }
