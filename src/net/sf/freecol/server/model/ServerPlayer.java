@@ -1991,19 +1991,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             } else if (eventId.equals("model.event.freeBuilding")) {
                 BuildingType type = spec.getBuildingType(event.getValue());
                 for (Colony colony : getColonies()) {
-                    if (colony.canBuild(type)) {
-                        if (type.isDefenceType()) {
-                            colony.getTile().cacheUnseen();//+til
-                        }
-                        colony.addBuilding(new ServerBuilding(game, colony,
-                                                              type));//-til
-                        colony.getBuildQueue().remove(type);
-                        cs.add(See.only(this), colony);
-                        if (isAI()) {
-                            colony.firePropertyChange(Colony.REARRANGE_WORKERS,
-                                                      true, false);
-                        }
-                    }
+                    ((ServerColony)colony).csFreeBuilding(type, cs);
                 }
 
             } else if (eventId.equals("model.event.seeAllColonies")) {
@@ -2045,6 +2033,26 @@ public class ServerPlayer extends Player implements ServerModelObject {
         if (visibilityChange) invalidateCanSeeTiles(); //+vis(this)
     }
 
+    /**
+     * Get a list of free building types this player has access to
+     * through its choice of founding fathers.  Used to upgrade newly
+     * captured colonies.
+     *
+     * @return A list of free <code>BuildingType</code>s.
+     */
+    public List<BuildingType> getFreeBuildingTypes() {
+        final Specification spec = getGame().getSpecification();
+        List<BuildingType> result = new ArrayList<BuildingType>();
+        for (FoundingFather ff : getFathers()) {
+            for (Event event : ff.getEvents()) {
+                String eventId = event.getId();
+                if ("model.event.freeBuilding".equals(eventId)) {
+                    result.add(spec.getBuildingType(event.getValue()));
+                }
+            }
+        }
+        return result;
+    }
 
     /**
      * Claim land.

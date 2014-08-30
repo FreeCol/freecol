@@ -780,10 +780,37 @@ public class ServerColony extends Colony implements ServerModelObject {
         // Clear the build queue
         buildQueue.clear();
 
+        // Add free buildings from new owner
+        for (BuildingType bt : newOwner.getFreeBuildingTypes()) {
+            csFreeBuilding(bt, cs);
+        }
+
         // Changing the owner might alter bonuses applied by founding fathers:
         updateSoL();
         updateProductionBonus();
         newOwner.exploreForSettlement(this);
+    }
+
+    /**
+     * Add a free building to this colony.
+     *
+     * Triggered by election of laSalle and colony capture by a player
+     * with laSalle.
+     *
+     * @param type The <code>BuildingType</code> to add.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    public void csFreeBuilding(BuildingType type, ChangeSet cs) {
+        if (canBuild(type)) {
+            final ServerPlayer owner = (ServerPlayer)getOwner();
+            if (type.isDefenceType()) getTile().cacheUnseen();//+til
+            addBuilding(new ServerBuilding(getGame(), this, type));//-til
+            getBuildQueue().remove(type);
+            cs.add(See.only(owner), this);
+            if (owner.isAI()) {
+                firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
+            }
+        }
     }
 
 
