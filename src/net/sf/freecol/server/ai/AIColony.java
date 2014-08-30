@@ -116,10 +116,11 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     private final List<AIGoods> exportGoods = new ArrayList<AIGoods>();
 
     /** Useful things for the colony. */
-    private final List<Wish> wishes;
+    private final List<Wish> wishes = new ArrayList<Wish>();
 
     /** Plans to improve neighbouring tiles. */
-    private final List<TileImprovementPlan> tileImprovementPlans;
+    private final List<TileImprovementPlan> tileImprovementPlans
+        = new ArrayList<TileImprovementPlan>();
 
     /** When should the workers in this Colony be rearranged? */
     private Turn rearrangeTurn = new Turn(0);
@@ -160,8 +161,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         this.colony = null;
         this.colonyPlan = null;
-        this.wishes = new ArrayList<Wish>();
-        this.tileImprovementPlans = new ArrayList<TileImprovementPlan>();
     }
 
     /**
