@@ -475,9 +475,35 @@ public class AIUnit extends TransportableAIObject {
         if (unit.getLocation() == carrier) {
             path = unit.findPath(carrier.getLocation(), dst, carrier, null);
         } else if (unit.getLocation() instanceof Unit) {
-            path = null;
+            return null;
         } else {
             path = unit.findPath(unit.getLocation(), dst, carrier, null);
+        }
+        if (path == null) {
+            // Check for a temporary blockage
+            Tile tile = dst.getTile();
+            Player owner = unit.getOwner();
+            if (path == null && tile != null && unit.isTileAccessible(tile)
+                && tile.getFirstUnit() != null
+                && !owner.owns(tile.getFirstUnit())) {
+                // Try going to a neighbouring tile.
+                int maxDistance = INFINITY;
+                Tile best = null;
+                for (Tile t : tile.getSurroundingTiles(1)) {
+                    if (t.isLand() && (tile.getFirstUnit() == null
+                            || owner.owns(tile.getFirstUnit()))) {
+                        int dist = unit.getTile().getDistanceTo(t);
+                        if (maxDistance > dist) {
+                            maxDistance = dist;
+                            best = t;
+                        }
+                    }
+                }
+                if (best != null) {
+                    path = unit.findPath(carrier.getLocation(), best,
+                                         carrier, null);
+                }
+            }
         }
         if (path != null) path.ensureDisembark();
         return path;

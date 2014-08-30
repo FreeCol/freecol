@@ -841,6 +841,7 @@ public class TransportMission extends Mission {
             lb.add(", ", t, " unready");
             return CargoResult.TCONTINUE;
         }
+        Direction d = null;
 
         switch (cargo.getMode()) {
         case PICKUP:
@@ -848,6 +849,7 @@ public class TransportMission extends Mission {
                 lb.add(", ", t, " out of moves");
                 return CargoResult.TCONTINUE;
             }
+            d = cargo.getJoinDirection();
             // Fall through
         case LOAD:
             if (!Map.isSameLocation(t.getLocation(),
@@ -858,7 +860,7 @@ public class TransportMission extends Mission {
             }
             switch (carrier.getNoAddReason(l)) {
             case NONE:
-                if (!t.joinTransport(carrier, cargo.getJoinDirection())) {
+                if (!t.joinTransport(carrier, d)) {
                     lb.add(", ", t, " NO-JOIN");
                     return CargoResult.TFAIL;
                 }
@@ -886,9 +888,10 @@ public class TransportMission extends Mission {
                 lb.add(", ", t, " about to leave");
                 return CargoResult.TCONTINUE;
             }
+            d = cargo.getLeaveDirection();
             // Fall through
         case UNLOAD:
-            if (isCarrying(t) && !t.leaveTransport(cargo.getLeaveDirection())) {
+            if (isCarrying(t) && !t.leaveTransport(d)) {
                 lb.add(", ", t, " NO-LEAVE");
                 return CargoResult.TRETRY;
             }

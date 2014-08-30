@@ -670,6 +670,7 @@ public abstract class Mission extends AIObject {
         PathNode path = null;
         boolean needsTransport = false;
 
+        target = upLoc(target);
         if (unit.isAtSea()) {
             // Wait for carrier to arrive on the map.
             lb.add(", at sea");
@@ -729,7 +730,8 @@ public abstract class Mission extends AIObject {
                 lb.add(", needs transport to ", target);
                 return MoveType.MOVE_NO_ACCESS_EMBARK;
             }
-            lb.add(", wait for ", aiCarrier.getUnit());
+            lb.add(", wait at ", upLoc(unit.getLocation()),
+                   " for ", aiCarrier.getUnit());
             return (aiCarrier.getUnit().getMovesLeft() > 0)
                 ? MoveType.MOVE_NO_ACCESS_EMBARK
                 : MoveType.MOVE_NO_MOVES;
