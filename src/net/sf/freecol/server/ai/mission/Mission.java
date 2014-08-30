@@ -122,6 +122,7 @@ public abstract class Mission extends AIObject {
         setTarget(target);
         if (aiUnit != null && aiUnit.getMission() != this) {
             aiUnit.changeMission(this);
+            aiUnit.dropTransport(); // Does not clear if boarded
         }
     }
 

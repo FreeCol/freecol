@@ -1742,6 +1742,14 @@ public class EuropeanAIPlayer extends AIPlayer {
                         + colony.getName());
                     lb.add(m, ", ");
                 }
+                AIUnit transport = aiUnit.getTransport();
+                if (transport != null) {
+                    logger.warning("Vital unit " + unit
+                        + " still allocated transport " + transport
+                        + ".  Dropping.");
+                    aiUnit.dropTransport();
+                    lb.add(", dropped transport ", transport.getUnit());
+                }
                 reasons.put(unit, "Vital");
 
             } else if (unit.isInMission()) {
