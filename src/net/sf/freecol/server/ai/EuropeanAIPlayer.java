@@ -2330,9 +2330,6 @@ public class EuropeanAIPlayer extends AIPlayer {
                 continue;
             }
             final Location oldTarget = (old == null) ? null : old.getTarget();
-            final AIUnit aiCarrier = aiu.getTransport();
-            final TransportMission tm = (aiCarrier == null) ? null
-                : aiCarrier.getMission(TransportMission.class);
             lb.add("\n  ", unit, " ");
             try {
                 aiu.doMission(lb);
@@ -2341,24 +2338,26 @@ public class EuropeanAIPlayer extends AIPlayer {
                 logger.log(Level.WARNING, "doMissions failed for: " + aiu, e);
             }
             if (unit.isDisposed()) {
-                if (tm != null) {
-                    lb.add(", drop transport ", aiCarrier.getUnit());
-                    tm.removeTransportable(aiu);
-                }
+                aiu.dropTransport();
                 lb.add(", DIED.");
                 continue;
             }
+            // If changeMission has been called, non-boarded transport
+            // will have been dropped.
             Mission m = aiu.getMission();
             Location newTarget = (m == null) ? null : m.getTarget();
-            if (tm != null
-                && oldTarget != null
-                && !Map.isSameLocation(newTarget, oldTarget)) {
-                if (unit.isOnCarrier()
-                    || unit.shouldTakeTransportTo(newTarget)) {
-                    tm.requeueTransportable(aiu, lb);
-                } else {
-                    tm.removeTransportable(aiu);
-                    lb.add(", drop transport ", aiCarrier.getUnit());
+            AIUnit aiCarrier = aiu.getTransport();
+            if (aiCarrier != null
+                && unit.getLocation() == aiCarrier.getUnit()) {
+                TransportMission tm = (aiCarrier == null) ? null
+                    : aiCarrier.getMission(TransportMission.class);
+                if (tm != null) {
+                    if (newTarget == null) {
+                        tm.dumpTransportable(aiu, lb);
+                    } else if (!Map.isSameLocation(newTarget, oldTarget)
+                        || unit.shouldTakeTransportTo(newTarget)) {
+                        tm.requeueTransportable(aiu, lb);
+                    }
                 }
             }
             if (unit.getMovesLeft() > 0 && (!unit.isOnCarrier()

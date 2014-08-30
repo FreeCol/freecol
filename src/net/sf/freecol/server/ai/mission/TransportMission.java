@@ -539,7 +539,6 @@ public class TransportMission extends Mission {
                    " at ", ((index < 0) ? "end" : Integer.toString(index)));
         } else {
             lb.add(", failed to add ", cargo.toShortString());
-throw new RuntimeException("FAIL " + cargo + "\n" + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
         }
         return result;
     }
@@ -633,16 +632,22 @@ throw new RuntimeException("FAIL " + cargo + "\n" + net.sf.freecol.common.debug.
      * Dump a currently carried cargo.
      *
      * @param cargo The <code>Cargo</code> to dump.
+     * @param lb A <code>LogBuilder</code> to log to.
      * @return True if the cargo is no longer on board and not on the
-     *     transport list.
+     *     transport list, or is on board but is scheduled to be dumped.
      */
-    public boolean dumpCargo(Cargo cargo) {
+    public boolean dumpCargo(Cargo cargo, LogBuilder lb) {
         TransportableAIObject t = cargo.getTransportable();
         if (isCarrying(t)) t.leaveTransport();
         if (!isCarrying(t) && tFind(t) != null) removeCargo(cargo);
         if (tFind(t) != null) {
-            cargo.dump();
-            return false;
+            String reason = cargo.dump();
+            if (reason != null) {
+                lb.add(", dump failed(", reason, ")");
+                return false;
+            } else {
+                lb.add(", dumping");
+            }
         }
         return true;
     }
@@ -662,7 +667,7 @@ throw new RuntimeException("FAIL " + cargo + "\n" + net.sf.freecol.common.debug.
         if (reason != null) {
             lb.add(" requeue/update fail(", reason, ") ",
                    cargo.toShortString());
-            dumpCargo(cargo);
+            dumpCargo(cargo, lb);
         } else if (!tRemove(cargo)) {
             lb.add(" requeue/remove fail ", cargo.toShortString());
         } else if (!queueCargo(cargo, false, lb)) {
@@ -675,97 +680,6 @@ throw new RuntimeException("FAIL " + cargo + "\n" + net.sf.freecol.common.debug.
             ret = true;
         }
         return ret;
-    }
-
-    /**
-     * Find a good place to send a transportable currently on board a
-     * carrier yet without a meaningful transport destination.
-     *
-     * @param t The <code>TransportableAIObject</code> to retarget.
-     * @param lb A <code>LogBuilder</code> to log to.
-     * @return True if the transportable should now have a valid
-     *     transport destination.
-     */
-    private boolean retargetTransportable(TransportableAIObject t,
-                                          LogBuilder lb) {
-        final EuropeanAIPlayer euaip = getEuropeanAIPlayer();
-        final AIUnit aiCarrier = getAIUnit();
-        final Unit carrier = aiCarrier.getUnit();
-
-        List<Location> locations = new ArrayList<Location>();
-        for (Cargo c : tCopy()) {
-            if (locations.contains(c.getCarrierTarget())) continue;
-            locations.add(c.getCarrierTarget());
-        }
-            
-        if (t instanceof AIUnit) {
-            // Try giving the unit a new mission (may well call
-            // getBestWorkerWish at some point).
-            Mission m = euaip.getSimpleMission((AIUnit)t);
-            if (m != null) {
-                lb.add(", ", m);
-                return true;
-            }
-
-        } else if (t instanceof AIGoods) {
-            final AIGoods aig = (AIGoods)t;
-
-            Location dst = t.getTransportDestination();
-            if (dst != null
-                && carrier.getTurnsToReach(dst) != INFINITY) return true;
-
-            // Look for a scheduled location that wants these goods
-            GoodsType type = aig.getGoods().getType();
-            for (Location loc : locations) {
-                for (GoodsWish gw : euaip.getGoodsWishesAt(loc, type)) {
-                    aig.setTransportDestination(loc);
-                    int a = aig.getGoods().getAmount();
-                    if (a >= gw.getGoodsAmount()) {
-                        euaip.consumeGoodsWish(aig, gw);
-                    } else {
-                        gw.update(type, gw.getGoodsAmount() - a, gw.getValue());
-                    }
-                    lb.add(", ", aig, " to ", loc);
-                    return true;
-                }
-            }
-
-            // Try another existing goods wish.
-            GoodsWish gw = euaip.getBestGoodsWish(aiCarrier, type);
-            if (gw != null) {
-                aig.setTransportDestination(gw.getDestination());
-                euaip.consumeGoodsWish(aig, gw);
-                lb.add(", ", aig, " to ", gw.getDestination());
-                return true;
-            }
-
-            // Look for a suitable colony to unload the goods.
-            Location best = null;
-            int bestValue = INFINITY;
-            for (AIColony aic : euaip.getAIColonies()) {
-                Colony colony = aic.getColony();
-                if (colony.getImportAmount(aig.getGoodsType())
-                    >= aig.getGoodsAmount()) {
-                    int value = carrier.getTurnsToReach(colony);
-                    if (bestValue > value) {
-                        bestValue = value;
-                        best = colony;
-                    }
-                }
-            }
-            Europe europe = getPlayer().getEurope();
-            if (europe != null && getPlayer().canTrade(aig.getGoodsType())
-                && carrier.getTurnsToReach(europe) < bestValue) {
-                best = europe;
-            }
-            if (best != null) {
-                aig.setTransportDestination(best);
-                lb.add(", ", aig, " to unload at ", best);
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -827,13 +741,7 @@ throw new RuntimeException("FAIL " + cargo + "\n" + net.sf.freecol.common.debug.
 
             if (dump) {
                 if (cargo.isCarried()) {
-                    reason = cargo.dump();
-                    if (reason == null) {
-                        lb.add(", dump ", cargo.toShortString());
-                    } else {
-                        removeCargo(cargo);
-                        lb.add(", dump-fail(", reason, ") ", cargo.toShortString());
-                    }
+                    dumpCargo(cargo, lb); // FIXME: can fail
                 } else {
                     removeCargo(cargo);
                     lb.add(", dropped(", reason, ") ", cargo.toShortString());
@@ -1344,6 +1252,23 @@ throw new RuntimeException("FAIL " + cargo + "\n" + net.sf.freecol.common.debug.
                                       boolean requireMatch, LogBuilder lb) {
         Cargo cargo = makeCargo(t, lb);
         return (cargo == null) ? false : queueCargo(cargo, requireMatch, lb);
+    }
+
+    /**
+     * Dump a transportable.
+     *
+     * @param t The <code>TransportableAIObject</code> to dump.
+     * @param lb A <code>LogBuilder</code> to log to.
+     * @return True if the transportable was either dumped or queued to be.
+     */
+    public boolean dumpTransportable(TransportableAIObject t, LogBuilder lb) {
+        Cargo cargo = tFind(t);
+        if (t == null) return true;
+        if (!isCarrying(t)) {
+            removeTransportable(t);
+            return true;
+        }
+        return dumpCargo(cargo, lb);
     }
 
 

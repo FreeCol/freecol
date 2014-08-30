@@ -1379,7 +1379,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         if (!tileImprovementPlans.isEmpty()) {
             lb.add(", improve:");
             for (TileImprovementPlan tip : tileImprovementPlans) {
-                lb.add(" ", tip.getTarget(), "-", tip.getType());
+                lb.add(" ", tip.getTarget(), "-", tip.getType().getSuffix());
             }
         }
     }
