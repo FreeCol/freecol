@@ -32,7 +32,9 @@ import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
@@ -45,6 +47,7 @@ import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIUnit;
+import net.sf.freecol.server.ai.EuropeanAIPlayer;
 
 
 /**
@@ -360,10 +363,12 @@ public class BuildColonyMission extends Mission {
      */
     public Mission doMission(LogBuilder lb) {
         lb.add(tag);
+        final Specification spec = getSpecification();
         final AIMain aiMain = getAIMain();
         final AIUnit aiUnit = getAIUnit();
         final Unit unit = getUnit();
         final Player player = unit.getOwner();
+        final EuropeanAIPlayer euaip = getEuropeanAIPlayer();
 
         boolean retarget = false;
         String reason = invalidReason();
@@ -420,7 +425,14 @@ public class BuildColonyMission extends Mission {
                 Location newTarget;
                 if (colony.getUnitCount() <= 1
                     || (newTarget = findTarget(aiUnit, 5, false)) == null) {
-                    return lbDone(lb, false, "joining");
+                    // Favour improving colony center?
+                    Mission m
+                        = euaip.getPioneeringMission(aiUnit, colony.getTile());
+                    if (m == null) {
+                        return lbDone(lb, false, "joining");
+                    } else {
+                        return lbDone(lb, true, "improving");
+                    }
                 }
                 setTarget(newTarget);
                 return lbRetarget(lb);
@@ -448,7 +460,7 @@ public class BuildColonyMission extends Mission {
                     if (Utils.randomInt(logger, "Land gold?",
                                         getAIRandom(), 4) == 0) {
                         lb.add(", ");
-                        getEuropeanAIPlayer().cheatGold(price, lb);
+                        euaip.cheatGold(price, lb);
                         lb.add(" to buy ", tile);
                     }
                 }
@@ -483,8 +495,7 @@ public class BuildColonyMission extends Mission {
                 Colony colony = tile.getColony();
                 AIColony aiColony = aiMain.getAIColony(colony);
                 aiColony.requestRearrange();
-                Mission m = getEuropeanAIPlayer()
-                    .getWorkInsideColonyMission(aiUnit, aiColony);
+                Mission m = euaip.getWorkInsideColonyMission(aiUnit, aiColony);
                 return lbDone(lb, m != null, colony);
             }
             return lbFail(lb, false, "build at ", tile);

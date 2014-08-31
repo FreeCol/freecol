@@ -457,7 +457,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 } else lb.add(", ", aiu.getMission());
             } else if (u.hasAbility(Ability.IMPROVE_TERRAIN)
                 && !(m instanceof PioneeringMission)) {
-                if (aiPlayer.getPioneeringMission(aiu) == null) {
+                if (aiPlayer.getPioneeringMission(aiu, null) == null) {
                     result.add(aiu);
                 } else lb.add(", ", aiu.getMission());
             } else if (u.hasAbility(Ability.ESTABLISH_MISSION)

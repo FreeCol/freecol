@@ -878,6 +878,17 @@ public class EuropeanAIPlayer extends AIPlayer {
     }
 
     /**
+     * Update the tip map with tips from a new colony.
+     *
+     * @param aic The new <code>AIColony</code>.
+     */
+    private void updateTipMap(AIColony aic) {
+        for (TileImprovementPlan tip : aic.getTileImprovementPlans()) {
+            tipMap.put(tip.getTarget(), tip);
+        }
+    }
+
+    /**
      * Gets the best plan for a tile from the tipMap.
      *
      * @param tile The <code>Tile</code> to lookup.
@@ -1840,7 +1851,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             Collections.sort(aiUnits, pioneerComparator);
             for (AIUnit aiUnit : aiUnits) {
                 final Unit unit = aiUnit.getUnit();
-                if ((m = getPioneeringMission(aiUnit)) == null) continue;
+                if ((m = getPioneeringMission(aiUnit, null)) == null) continue;
                 lb.add(m, ", ");
                 done.add(aiUnit);
                 if (requestsTransport(aiUnit)) {
@@ -2108,14 +2119,17 @@ public class EuropeanAIPlayer extends AIPlayer {
      * TODO: pioneers to make roads between colonies
      *
      * @param aiUnit The <code>AIUnit</code> to check.
+     * @param target An optional target <code>Location</code>.
      * @return A new mission, or null if impossible.
      */
-    public Mission getPioneeringMission(AIUnit aiUnit) {
+    public Mission getPioneeringMission(AIUnit aiUnit, Location target) {
         if (PioneeringMission.prepare(aiUnit) != null) return null;
-        Location loc = PioneeringMission.findTarget(aiUnit, pioneeringRange,
-                                                    true);
-        return (loc == null) ? null
-            : new PioneeringMission(getAIMain(), aiUnit, loc);
+        if (target == null) {
+            target = PioneeringMission.findTarget(aiUnit, pioneeringRange,
+                                                  true);
+        }
+        return (target == null) ? null
+            : new PioneeringMission(getAIMain(), aiUnit, target);
     }
 
     /**
@@ -2329,7 +2343,10 @@ public class EuropeanAIPlayer extends AIPlayer {
                 result.add(aiu);
                 continue;
             }
+
+            // Do the mission.
             final Location oldTarget = (old == null) ? null : old.getTarget();
+            final Colony oldLocation = unit.getLocation().getColony();
             lb.add("\n  ", unit, " ");
             try {
                 aiu.doMission(lb);
@@ -2342,15 +2359,17 @@ public class EuropeanAIPlayer extends AIPlayer {
                 lb.add(", DIED.");
                 continue;
             }
-            // If changeMission has been called, non-boarded transport
-            // will have been dropped.
-            Mission m = aiu.getMission();
-            Location newTarget = (m == null) ? null : m.getTarget();
-            AIUnit aiCarrier = aiu.getTransport();
+
+            // If the mission has changed, non-boarded transport will have
+            // been dropped already.  Boarded transport needs to be checked
+            // for a target change.
+            final AIUnit aiCarrier = aiu.getTransport();
             if (aiCarrier != null
                 && unit.getLocation() == aiCarrier.getUnit()) {
-                TransportMission tm = (aiCarrier == null) ? null
-                    : aiCarrier.getMission(TransportMission.class);
+                Mission m = aiu.getMission();
+                Location newTarget = (m == null) ? null : m.getTarget();
+                TransportMission tm
+                    = aiCarrier.getMission(TransportMission.class);
                 if (tm != null) {
                     if (newTarget == null) {
                         tm.dumpTransportable(aiu, lb);
@@ -2360,12 +2379,26 @@ public class EuropeanAIPlayer extends AIPlayer {
                     }
                 }
             }
+            
+            // Units with moves left should be requeued.  If they are on a
+            // carrier the carrier needs to have moves left.
             if (unit.getMovesLeft() > 0 && (!unit.isOnCarrier()
                     || unit.getCarrier().getMovesLeft() > 0)) {
                 lb.add("+");
                 result.add(aiu);
             } else {
                 lb.add(".");
+            }
+
+            // Immediately update a newly built colony so that other
+            // units that are about to wake up can see its tile
+            // improvement plans.
+            Colony newColony = unit.getLocation().getColony();
+            if (newColony != null
+                && Map.isSameLocation(oldLocation, newColony)) {
+                AIColony aiColony = getAIColony(newColony);
+                aiColony.update(lb);
+                updateTipMap(aiColony);
             }
         }
         return result;
