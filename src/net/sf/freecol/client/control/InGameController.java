@@ -470,7 +470,10 @@ public final class InGameController implements NetworkConstants {
     private void doEndTurn() {
         // Check for desync as last thing!
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.DESYNC)
-            && DebugUtils.checkDesyncAction(freeColClient)) return;
+            && DebugUtils.checkDesyncAction(freeColClient)) {
+            freeColClient.getConnectController().reconnect();
+            return;
+        }
 
         // Clean up lingering menus.
         gui.closeMenus();
@@ -4252,8 +4255,10 @@ public final class InGameController implements NetworkConstants {
         final Game game = freeColClient.getGame();
         game.setCurrentPlayer(player);
         if (freeColClient.getMyPlayer().equals(player)) {
-            if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.DESYNC)) {
-                DebugUtils.checkDesyncAction(freeColClient);
+            if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.DESYNC)
+                && DebugUtils.checkDesyncAction(freeColClient)) {
+                freeColClient.getConnectController().reconnect();
+                return;
             }
 
             // Get turn report out quickly before more message display occurs.
