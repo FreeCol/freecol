@@ -2411,7 +2411,7 @@ public class Unit extends GoodsLocation
      * @return A path to the trivial target, or null if none found.
      */
     public PathNode getTrivialPath() {
-        if (isDisposed()) return null;
+        if (isDisposed() || getLocation() == null) return null;
         if (!isNaval()) return findOurNearestSettlement();
         PathNode path = findOurNearestPort();
         if (path == null) {
