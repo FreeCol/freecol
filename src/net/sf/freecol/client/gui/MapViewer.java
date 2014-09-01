@@ -401,20 +401,20 @@ public final class MapViewer {
         int leftOffset;
         if (focus.getX() < getLeftColumns()) {
             // we are at the left side of the map
-            if ((focus.getY() % 2) == 0) {
+            if ((focus.getY() & 1) == 0) {
                 leftOffset = tileWidth * focus.getX() + halfWidth;
             } else {
                 leftOffset = tileWidth * (focus.getX() + 1);
             }
         } else if (focus.getX() >= (game.getMap().getWidth() - getRightColumns())) {
             // we are at the right side of the map
-            if ((focus.getY() % 2) == 0) {
+            if ((focus.getY() & 1) == 0) {
                 leftOffset = size.width - (game.getMap().getWidth() - focus.getX()) * tileWidth;
             } else {
                 leftOffset = size.width - (game.getMap().getWidth() - focus.getX() - 1) * tileWidth - halfWidth;
             }
         } else {
-            if ((focus.getY() % 2) == 0) {
+            if ((focus.getY() & 1) == 0) {
                 leftOffset = (size.width / 2);
             } else {
                 leftOffset = (size.width / 2) + halfWidth;
@@ -449,7 +449,7 @@ public final class MapViewer {
             remainderUp = (topOffset - y) % (tileHeight / 4),
             remainderLeft = (leftOffset - x) % (tileWidth / 4);
 
-        if ((diffUp % 2) == 0) {
+        if ((diffUp & 1) == 0) {
             diffUp = diffUp / 2;
         } else {
             if (diffUp < 0) {
@@ -459,7 +459,7 @@ public final class MapViewer {
             }
         }
 
-        if ((diffLeft % 2) == 0) {
+        if ((diffLeft & 1) == 0) {
             diffLeft = diffLeft / 2;
         } else {
             if (diffLeft < 0) {
@@ -471,13 +471,13 @@ public final class MapViewer {
 
         boolean done = false;
         while (!done) {
-            if ((diffUp % 2) == 0) {
-                if ((diffLeft % 2) == 0) {
+            if ((diffUp & 1) == 0) {
+                if ((diffLeft & 1) == 0) {
                     diffLeft = diffLeft / 2;
                     done = true;
                 } else {
                     // Crosspoint
-                    if (((orDiffLeft % 2) == 0) && ((orDiffUp % 2) == 0)) {
+                    if (((orDiffLeft & 1) == 0) && ((orDiffUp & 1) == 0)) {
                         if ((orDiffLeft > 0) && (orDiffUp > 0)) {
                             // Upper-Left
                             if ((remainderUp * 2) > remainderLeft) {
@@ -539,7 +539,7 @@ public final class MapViewer {
                                 diffLeft--;
                             }
                         }
-                    } else if ((orDiffLeft % 2) == 0) {
+                    } else if ((orDiffLeft & 1) == 0) {
                         if ((orDiffLeft > 0) && (orDiffUp > 0)) {
                             // Lower-Left
                             if ((remainderUp * 2 + remainderLeft) > (tileWidth / 4)) {
@@ -569,7 +569,7 @@ public final class MapViewer {
                                 diffUp++;
                             }
                         }
-                    } else if ((orDiffUp % 2) == 0) {
+                    } else if ((orDiffUp & 1) == 0) {
                         if ((orDiffLeft > 0) && (orDiffUp > 0)) {
                             // Upper-Right
                             if ((remainderUp * 2 + remainderLeft) > (tileWidth / 4)) {
@@ -664,9 +664,9 @@ public final class MapViewer {
                     }
                 }
             } else {
-                if ((diffLeft % 2) == 0) {
+                if ((diffLeft & 1) == 0) {
                     // Crosspoint
-                    if (((orDiffLeft % 2) == 0) && ((orDiffUp % 2) == 0)) {
+                    if (((orDiffLeft & 1) == 0) && ((orDiffUp & 1) == 0)) {
                         if ((orDiffLeft > 0) && (orDiffUp > 0)) {
                             // Upper-Left
                             if ((remainderUp * 2) > remainderLeft) {
@@ -728,7 +728,7 @@ public final class MapViewer {
                                 diffLeft--;
                             }
                         }
-                    } else if ((orDiffLeft % 2) == 0) {
+                    } else if ((orDiffLeft & 1) == 0) {
                         if ((orDiffLeft > 0) && (orDiffUp > 0)) {
                             // Lower-Left
                             if ((remainderUp * 2 + remainderLeft) > (tileWidth / 4)) {
@@ -790,7 +790,7 @@ public final class MapViewer {
                                 diffUp++;
                             }
                         }
-                    } else if ((orDiffUp % 2) == 0) {
+                    } else if ((orDiffUp & 1) == 0) {
                         if ((orDiffLeft > 0) && (orDiffUp > 0)) {
                             // Upper-Right
                             if ((remainderUp * 2 + remainderLeft) > (tileWidth / 4)) {
@@ -852,7 +852,7 @@ public final class MapViewer {
                         }
                     }
                 } else {
-                    if ((focus.getY() % 2) == 0) {
+                    if ((focus.getY() & 1) == 0) {
                         if (diffLeft < 0) {
                             diffLeft = diffLeft / 2;
                         } else {
@@ -1117,7 +1117,7 @@ public final class MapViewer {
         if (isTileVisible(tile)) {
             result.x = ((tile.getX() - leftColumn) * tileWidth) + leftColumnX;
             result.y = ((tile.getY() - topRow) * halfHeight) + topRowY - tileHeight;
-            if ((tile.getY() % 2) != 0) {
+            if ((tile.getY() & 1) != 0) {
                 result.x += halfWidth;
             }
             result.width = tileWidth;
@@ -1150,7 +1150,7 @@ public final class MapViewer {
 
         int x = ((t.getX() - leftColumn) * tileWidth) + leftColumnX;
         int y = ((t.getY() - topRow) * halfHeight) + topRowY;
-        if ((t.getY() % 2) != 0) x += halfWidth;
+        if ((t.getY() & 1) != 0) x += halfWidth;
         return new Point(x, y);
     }
 
@@ -1993,7 +1993,7 @@ public final class MapViewer {
         // Row per row; start with the top modified row
         for (int row = firstRow; row <= lastRow; row++) {
             rowTransform = g.getTransform();
-            if (row % 2 == 1) {
+            if ((row & 1) == 1) {
                 g.translate(halfWidth, 0);
             }
 
@@ -2025,7 +2025,7 @@ public final class MapViewer {
         // Row per row; start with the top modified row
         for (int row = firstRow; row <= lastRow; row++) {
             rowTransform = g.getTransform();
-            if (row % 2 == 1) {
+            if ((row & 1) == 1) {
                 g.translate(halfWidth, 0);
             }
 
@@ -2779,7 +2779,7 @@ public final class MapViewer {
     private int getLeftColumns(int y) {
         int leftColumns = leftSpace / tileWidth + 1;
 
-        if ((y % 2) == 0) {
+        if ((y & 1) == 0) {
             if ((leftSpace % tileWidth) > 32) {
                 leftColumns++;
             }
@@ -2838,7 +2838,7 @@ public final class MapViewer {
     private int getRightColumns(int y) {
         int rightColumns = rightSpace / tileWidth + 1;
 
-        if ((y % 2) == 0) {
+        if ((y & 1) == 0) {
             if ((rightSpace % tileWidth) == 0) {
                 rightColumns--;
             }
@@ -3157,9 +3157,9 @@ public final class MapViewer {
           Calculate: leftColumn, rightColumn, leftColumnX
           This will tell us which columns need to be drawn on the screen (from
           leftColumn until and including rightColumn).
-          leftColumnX will tell us at which x-coordinate the left column needs
-          to be drawn (this is for the Tiles where y%2==0; the others should be
-          halfWidth more to the right).
+          leftColumnX will tell us at which x-coordinate the left
+          column needs to be drawn (this is for the Tiles where y&1 == 0;
+          the others should be halfWidth more to the right).
         */
 
         alignedLeft = false;
@@ -3327,7 +3327,8 @@ public final class MapViewer {
      * Describe <code>updateMapDisplayVariables</code> method here.
      */
     private void updateMapDisplayVariables() {
-        // Calculate the amount of rows that will be drawn above the central Tile
+        // Calculate the amount of rows that will be drawn above the
+        // central Tile
         topSpace = (size.height - tileHeight) / 2;
         if ((topSpace % (halfHeight)) != 0) {
             topRows = topSpace / (halfHeight) + 2;
