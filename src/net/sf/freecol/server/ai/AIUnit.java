@@ -238,7 +238,7 @@ public class AIUnit extends TransportableAIObject {
         AIUnit transport = getTransport();
         if (transport != null) {
             if (!transport.isDisposed()
-                && getUnit().getLocation() != transport) {
+                && getUnit().getLocation() != transport.getUnit()) {
                 TransportMission tm
                     = transport.getMission(TransportMission.class);
                 if (tm != null) tm.removeTransportable(this);
