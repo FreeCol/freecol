@@ -309,8 +309,8 @@ public class EquipmentType extends BuildableType {
         super.readChildren(xr);
 
         for (Modifier modifier : getModifiers()) {
-            if (modifier.getId().equals(Modifier.OFFENCE)
-                || modifier.getId().equals(Modifier.DEFENCE)) {
+            if (Modifier.OFFENCE.equals(modifier.getId())
+                || Modifier.DEFENCE.equals(modifier.getId())) {
                 militaryEquipment = true;
                 break;
             }

@@ -641,7 +641,7 @@ public final class FreeColServer {
                     "version", FreeCol.getVersion(),
                     "gameState", Integer.toString(getGameState().ordinal())));
             if (reply != null
-                && reply.getTagName().equals("noRouteToServer")) {
+                && "noRouteToServer".equals(reply.getTagName())) {
                 throw new NoRouteToServerException();
             }
         } catch (IOException e) {

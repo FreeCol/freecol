@@ -86,6 +86,10 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
 
     private static final int HUGE_DEMAND = 100000;
 
+    private static final String ADD = "add";
+    private static final String CLEAR = "clear";
+
+
     private class RemoveAction extends AbstractAction {
         private TradeItem item;
 
@@ -125,11 +129,11 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             this.clearButton
                 = new JButton(Messages.message("negotiationDialog.clear"));
             this.clearButton.addActionListener(this);
-            this.clearButton.setActionCommand("clear");
+            this.clearButton.setActionCommand(CLEAR);
             this.addButton
                 = new JButton(Messages.message("negotiationDialog.add"));
             this.addButton.addActionListener(this);
-            this.addButton.setActionCommand("add");
+            this.addButton.setActionCommand(ADD);
             this.label = new JLabel(Messages.message("tradeItem.colony"));
             this.allColonies = source.getColonies();
 
@@ -191,10 +195,10 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
          */
         public void actionPerformed(ActionEvent event) {
             final String command = event.getActionCommand();
-            if (command.equals("add")) {
+            if (ADD.equals(command)) {
                 DiplomaticTradeDialog.this.addColonyTradeItem(source,
                     (Colony)colonyBox.getSelectedItem());
-            } else if (command.equals("clear")) {
+            } else if (CLEAR.equals(command)) {
                 DiplomaticTradeDialog.this.removeTradeItems(ColonyTradeItem.class);
             } else {
                 logger.warning("Bad command: " + command);
@@ -221,11 +225,11 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             JButton clearButton
                 = new JButton(Messages.message("negotiationDialog.clear"));
             clearButton.addActionListener(this);
-            clearButton.setActionCommand("clear");
+            clearButton.setActionCommand(CLEAR);
             JButton addButton
                 = new JButton(Messages.message("negotiationDialog.add"));
             addButton.addActionListener(this);
-            addButton.setActionCommand("add");
+            addButton.setActionCommand(ADD);
             // adjust entry size
             ((JSpinner.DefaultEditor)this.spinner.getEditor())
                 .getTextField().setColumns(5);
@@ -261,10 +265,10 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
          */
         public void actionPerformed(ActionEvent event) {
             final String command = event.getActionCommand();
-            if (command.equals("add")) {
+            if (ADD.equals(command)) {
                 int amount = ((Integer)spinner.getValue()).intValue();
                 DiplomaticTradeDialog.this.addGoldTradeItem(source, amount);
-            } else if (command.equals("clear")) {
+            } else if (CLEAR.equals(command)) {
                 DiplomaticTradeDialog.this.removeTradeItems(GoldTradeItem.class);
             } else {
                 logger.warning("Bad command: " + command);
@@ -310,11 +314,11 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             this.clearButton
                 = new JButton(Messages.message("negotiationDialog.clear"));
             this.clearButton.addActionListener(this);
-            this.clearButton.setActionCommand("clear");
+            this.clearButton.setActionCommand(CLEAR);
             this.addButton
                 = new JButton(Messages.message("negotiationDialog.add"));
             this.addButton.addActionListener(this);
-            this.addButton.setActionCommand("add");
+            this.addButton.setActionCommand(ADD);
             this.label = new JLabel(Messages.message("tradeItem.goods"));
             this.allGoods = allGoods;
 
@@ -379,10 +383,10 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
          */
         public void actionPerformed(ActionEvent event) {
             final String command = event.getActionCommand();
-            if (command.equals("add")) {
+            if (ADD.equals(command)) {
                 DiplomaticTradeDialog.this.addGoodsTradeItem(source,
                     (Goods)goodsBox.getSelectedItem());
-            } else if (command.equals("clear")) {
+            } else if (CLEAR.equals(command)) {
                 DiplomaticTradeDialog.this.removeTradeItems(GoodsTradeItem.class);
             } else {
                 logger.warning("Bad command: " + command);
@@ -429,11 +433,11 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             this.clearButton
                 = new JButton(Messages.message("negotiationDialog.clear"));
             this.clearButton.addActionListener(this);
-            this.clearButton.setActionCommand("clear");
+            this.clearButton.setActionCommand(CLEAR);
             this.addButton
                 = new JButton(Messages.message("negotiationDialog.add"));
             this.addButton.addActionListener(this);
-            this.addButton.setActionCommand("add");
+            this.addButton.setActionCommand(ADD);
             this.label = new JLabel(Messages.message("tradeItem.incite"));
 
             setBorder(BorderFactory.createCompoundBorder(
@@ -489,12 +493,12 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
          */
         public void actionPerformed(ActionEvent event) {
             final String command = event.getActionCommand();
-            if (command.equals("add")) {
+            if (ADD.equals(command)) {
                 Player victim = (Player)victimBox.getSelectedItem();
                 if (victim != null) {
                     DiplomaticTradeDialog.this.addInciteTradeItem(source, victim);
                 }
-            } else if (command.equals("clear")) {
+            } else if (CLEAR.equals(command)) {
                 DiplomaticTradeDialog.this
                     .removeTradeItems(InciteTradeItem.class);
             } else {
@@ -544,11 +548,11 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             this.clearButton
                 = new JButton(Messages.message("negotiationDialog.clear"));
             this.clearButton.addActionListener(this);
-            this.clearButton.setActionCommand("clear");
+            this.clearButton.setActionCommand(CLEAR);
             this.addButton
                 = new JButton(Messages.message("negotiationDialog.add"));
             this.addButton.addActionListener(this);
-            this.addButton.setActionCommand("add");
+            this.addButton.setActionCommand(ADD);
 
             setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createLineBorder(Color.BLACK),
@@ -599,10 +603,10 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
          */
         public void actionPerformed(ActionEvent event) {
             final String command = event.getActionCommand();
-            if (command.equals("add")) {
+            if (ADD.equals(command)) {
                 Stance stance = (Stance)stanceBox.getSelectedItem();
                 DiplomaticTradeDialog.this.addStanceTradeItem(stance);
-            } else if (command.equals("clear")) {
+            } else if (CLEAR.equals(command)) {
                 DiplomaticTradeDialog.this.removeTradeItems(StanceTradeItem.class);
             } else {
                 logger.warning("Bad command: " + command);
@@ -648,11 +652,11 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             this.clearButton
                 = new JButton(Messages.message("negotiationDialog.clear"));
             this.clearButton.addActionListener(this);
-            this.clearButton.setActionCommand("clear");
+            this.clearButton.setActionCommand(CLEAR);
             this.addButton
                 = new JButton(Messages.message("negotiationDialog.add"));
             this.addButton.addActionListener(this);
-            this.addButton.setActionCommand("add");
+            this.addButton.setActionCommand(ADD);
             this.label = new JLabel(Messages.message("tradeItem.unit"));
             this.allUnits = allUnits;
 
@@ -711,10 +715,10 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
          */
         public void actionPerformed(ActionEvent event) {
             final String command = event.getActionCommand();
-            if (command.equals("add")) {
+            if (ADD.equals(command)) {
                 DiplomaticTradeDialog.this.addUnitTradeItem(source,
                     (Unit)unitBox.getSelectedItem());
-            } else if (command.equals("clear")) {
+            } else if (CLEAR.equals(command)) {
                 DiplomaticTradeDialog.this.removeTradeItems(UnitTradeItem.class);
             } else {
                 logger.warning("Bad command: " + command);

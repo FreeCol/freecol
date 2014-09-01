@@ -1964,7 +1964,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         for (Event event : father.getEvents()) {
             String eventId = event.getId();
-            if (eventId.equals("model.event.resetNativeAlarm")) {
+            if ("model.event.resetNativeAlarm".equals(eventId)) {
                 for (Player p : game.getLiveNativePlayers(null)) {
                     if (!p.hasContacted(this)) continue;
                     p.setTension(this, new Tension(Tension.TENSION_MIN));
@@ -1979,7 +1979,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     csChangeStance(Stance.PEACE, (ServerPlayer)p, true, cs);
                 }
 
-            } else if (eventId.equals("model.event.boycottsLifted")) {
+            } else if ("model.event.boycottsLifted".equals(eventId)) {
                 Market market = getMarket();
                 for (GoodsType goodsType : spec.getGoodsTypeList()) {
                     if (market.getArrears(goodsType) > 0) {
@@ -1988,13 +1988,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     }
                 }
 
-            } else if (eventId.equals("model.event.freeBuilding")) {
+            } else if ("model.event.freeBuilding".equals(eventId)) {
                 BuildingType type = spec.getBuildingType(event.getValue());
                 for (Colony colony : getColonies()) {
                     ((ServerColony)colony).csFreeBuilding(type, cs);
                 }
 
-            } else if (eventId.equals("model.event.seeAllColonies")) {
+            } else if ("model.event.seeAllColonies".equals(eventId)) {
                 visibilityChange = true;//-vis(this), can now see other colonies
                 for (Tile t : game.getMap().getAllTiles()) {
                     Colony colony = t.getColony();
@@ -2004,7 +2004,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     }
                 }
 
-            } else if (eventId.equals("model.event.newRecruits")
+            } else if ("model.event.newRecruits".equals(eventId)
                        && europe != null) {
                 List<RandomChoice<UnitType>> recruits
                     = generateRecruitablesList();
@@ -2019,7 +2019,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     }
                 }
 
-            } else if (eventId.equals("model.event.movementChange")) {
+            } else if ("model.event.movementChange".equals(eventId)) {
                 for (Unit u : getUnits()) {
                     if (u.getMovesLeft() > 0) {
                         u.setMovesLeft(u.getInitialMovesLeft());

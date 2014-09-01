@@ -144,13 +144,13 @@ public class FreeColDataFile {
 
         List<String> result = new ArrayList<String>(4);
 
-        if (!language.equals("")) {
+        if (!"".equals(language)) {
             language = "_" + language;
         }
-        if (!country.equals("")) {
+        if (!"".equals(country)) {
             country = "_" + country;
         }
-        if (!variant.equals("")) {
+        if (!"".equals(variant)) {
             variant = "_" + variant;
         }
 

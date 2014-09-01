@@ -329,7 +329,7 @@ public final class ReportTurnPanel extends ReportPanel {
                 FreeColGameObject messageSource = getFreeColClient().getGame().getMessageSource(message);
                 if (item != null && var.equals(item[0])) {
                     // found variable to replace
-                    if (var.equals("%colony%")) {
+                    if ("%colony%".equals(var)) {
                         Colony colony = player.getColonyByName(item[1]);
                         if (colony != null) {
                             insertLinkButton(document, colony, item[1]);
@@ -338,10 +338,11 @@ public final class ReportTurnPanel extends ReportPanel {
                         } else {
                             insertText(document, item[1]);
                         }
-                    } else if (var.equals("%europe%")) {
+                    } else if ("%europe%".equals(var)) {
                         insertLinkButton(document, player.getEurope(),
                                          Messages.message(player.getEurope().getNameKey()));
-                    } else if (var.equals("%unit%") || var.equals("%newName%")) {
+                    } else if ("%unit%".equals(var)
+                        || "%newName%".equals(var)) {
                         Tile tile = null;
                         if (messageSource instanceof Unit) {
                             tile = ((Unit) messageSource).getTile();
@@ -353,7 +354,7 @@ public final class ReportTurnPanel extends ReportPanel {
                         } else {
                             insertText(document, item[1]);
                         }
-                    } else if (var.equals("%repairLocation%")) {
+                    } else if ("%repairLocation%".equals(var)) {
                         if (messageSource instanceof Europe) {
                             insertLinkButton(document, player.getEurope(),
                                              Messages.message(player.getEurope().getNameKey()));

@@ -235,7 +235,7 @@ public final class FreeCol {
 
         // Do the potentially fatal system checks as early as possible.
         String version = System.getProperty("java.version");
-        if (javaCheck && version.compareTo(JAVA_VERSION_MIN) < 0) {
+        if (javaCheck && JAVA_VERSION_MIN.compareTo(version) > 0) {
             fatal(StringTemplate.template("main.javaVersion")
                 .addName("%version%", version)
                 .addName("%minVersion%", JAVA_VERSION_MIN));
@@ -281,7 +281,7 @@ public final class FreeCol {
         // nothing, since we have already set up the default locale.
         String clientLanguage = ClientOptions.getLanguageOption();
         if (!(clientLanguage == null
-              || clientLanguage.equalsIgnoreCase(ClientOptions.AUTOMATIC))) {
+                || ClientOptions.AUTOMATIC.equalsIgnoreCase(clientLanguage))) {
             locale = Messages.getLocale(clientLanguage);
             if (!Locale.getDefault().equals(locale)) {
                 Messages.setMessageBundle(locale);

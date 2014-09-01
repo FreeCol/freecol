@@ -253,63 +253,63 @@ public final class InGameInputHandler extends InputHandler {
         String type = element.getTagName();
         logger.log(Level.FINEST, "Received message: " + type);
 
-        if (type.equals("disconnect")) { // Inherited
+        if ("disconnect".equals(type)) { // Inherited
             reply = disconnect(element);
-        } else if (type.equals("addObject")) {
+        } else if ("addObject".equals(type)) {
             reply = addObject(element);
-        } else if (type.equals("addPlayer")) {
+        } else if ("addPlayer".equals(type)) {
             reply = addPlayer(element);
-        } else if (type.equals("animateAttack")) {
+        } else if ("animateAttack".equals(type)) {
             reply = animateAttack(element);
-        } else if (type.equals("animateMove")) {
+        } else if ("animateMove".equals(type)) {
             reply = animateMove(element);
-        } else if (type.equals("chat")) {
+        } else if ("chat".equals(type)) {
             reply = chat(element);
-        } else if (type.equals("chooseFoundingFather")) {
+        } else if ("chooseFoundingFather".equals(type)) {
             reply = chooseFoundingFather(element);
-        } else if (type.equals("closeMenus")) {
+        } else if ("closeMenus".equals(type)) {
             reply = closeMenus();
-        } else if (type.equals("diplomacy")) {
+        } else if ("diplomacy".equals(type)) {
             reply = diplomacy(element);
-        } else if (type.equals("error")) {
+        } else if ("error".equals(type)) {
             reply = error(element);
-        } else if (type.equals("featureChange")) {
+        } else if ("featureChange".equals(type)) {
             reply = featureChange(element);
-        } else if (type.equals("firstContact")) {
+        } else if ("firstContact".equals(type)) {
             reply = firstContact(element);
-        } else if (type.equals("fountainOfYouth")) {
+        } else if ("fountainOfYouth".equals(type)) {
             reply = fountainOfYouth(element);
-        } else if (type.equals("gameEnded")) {
+        } else if ("gameEnded".equals(type)) {
             reply = gameEnded(element);
-        } else if (type.equals("indianDemand")) {
+        } else if ("indianDemand".equals(type)) {
             reply = indianDemand(element);
-        } else if (type.equals("lootCargo")) {
+        } else if ("lootCargo".equals(type)) {
             reply = lootCargo(element);
-        } else if (type.equals("monarchAction")) {
+        } else if ("monarchAction".equals(type)) {
             reply = monarchAction(element);
-        } else if (type.equals("multiple")) {
+        } else if ("multiple".equals(type)) {
             reply = multiple(connection, element);
-        } else if (type.equals("newLandName")) {
+        } else if ("newLandName".equals(type)) {
             reply = newLandName(element);
-        } else if (type.equals("newRegionName")) {
+        } else if ("newRegionName".equals(type)) {
             reply = newRegionName(element);
-        } else if (type.equals("newTurn")) {
+        } else if ("newTurn".equals(type)) {
             reply = newTurn(element);
-        } else if (type.equals("reconnect")) {
+        } else if ("reconnect".equals(type)) {
             reply = reconnect(element);
-        } else if (type.equals("remove")) {
+        } else if ("remove".equals(type)) {
             reply = remove(element);
-        } else if (type.equals("setAI")) {
+        } else if ("setAI".equals(type)) {
             reply = setAI(element);
-        } else if (type.equals("setCurrentPlayer")) {
+        } else if ("setCurrentPlayer".equals(type)) {
             reply = setCurrentPlayer(element);
-        } else if (type.equals("setDead")) {
+        } else if ("setDead".equals(type)) {
             reply = setDead(element);
-        } else if (type.equals("setStance")) {
+        } else if ("setStance".equals(type)) {
             reply = setStance(element);
-        } else if (type.equals("spyResult")) {
+        } else if ("spyResult".equals(type)) {
             reply = spyResult(element);
-        } else if (type.equals("update")) {
+        } else if ("update".equals(type)) {
             reply = update(element);
         } else {
             logger.warning("Unsupported message type: " + type);

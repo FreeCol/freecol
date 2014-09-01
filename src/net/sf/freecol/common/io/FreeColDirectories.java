@@ -165,7 +165,7 @@ public class FreeColDirectories {
      * @return True if Mac OS X appears to be present.
      */
     public static boolean onMacOSX() {
-        return System.getProperty("os.name").equals("Mac OS X");
+        return "Mac OS X".equals(System.getProperty("os.name"));
     }
 
     /**

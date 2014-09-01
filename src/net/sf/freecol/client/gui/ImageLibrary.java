@@ -1189,14 +1189,15 @@ public final class ImageLibrary {
                                       boolean nativeEthnicity,
                                       boolean grayscale, double scale) {
         // units that can only be native don't need the .native key part
-        if (unitType.getId().equals("model.unit.indianConvert")
-            || unitType.getId().equals("model.unit.brave")) {
+        if ("model.unit.indianConvert".equals(unitType.getId())
+            || "model.unit.brave".equals(unitType.getId())) {
             nativeEthnicity = false;
-        } else for (Entry<String, Boolean> entry
-                      : unitType.getRequiredAbilities().entrySet()) {
-            if (entry.getKey().equals(Ability.NATIVE)
-                && entry.getValue() == true) {
-                nativeEthnicity = false;
+        } else {
+            for (Entry<String, Boolean> entry
+                     : unitType.getRequiredAbilities().entrySet()) {
+                if (Ability.NATIVE.equals(entry.getKey()) && entry.getValue()) {
+                    nativeEthnicity = false;
+                }
             }
         }
 

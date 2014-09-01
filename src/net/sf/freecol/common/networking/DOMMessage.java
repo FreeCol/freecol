@@ -370,10 +370,10 @@ public class DOMMessage {
      */
     public static Element createError(String messageID, String message) {
         Element errorElement = createMessage("error");
-        if (messageID != null && !messageID.equals("")) {
+        if (messageID != null && !"".equals(messageID)) {
             errorElement.setAttribute("messageID", messageID);
         }
-        if (message != null && !message.equals("")) {
+        if (message != null && !"".equals(message)) {
             errorElement.setAttribute("message", message);
         }
         return errorElement;
@@ -392,11 +392,11 @@ public class DOMMessage {
         try {
             xw.writeStartElement("error");
 
-            if (messageID != null && !messageID.equals("")) {
+            if (messageID != null && !"".equals(messageID)) {
                 xw.writeAttribute("messageID", messageID);
             }
 
-            if (message != null && !message.equals("")) {
+            if (message != null && !"".equals(message)) {
                 xw.writeAttribute("message", message);
             }
             xw.writeEndElement();

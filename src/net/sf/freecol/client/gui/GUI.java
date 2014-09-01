@@ -715,7 +715,7 @@ public class GUI {
                 public void propertyChange(PropertyChangeEvent e) {
                     Language language = (Language)e.getNewValue();
                     logger.info("Set language to: " + language);
-                    if (language.getKey().equals(LanguageOption.AUTO)) {
+                    if (LanguageOption.AUTO.equals(language.getKey())) {
                         showInformationMessage("autodetectLanguageSelected");
                     } else {
                         Locale l = language.getLocale();

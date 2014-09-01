@@ -135,9 +135,7 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
         }
 
         String s = KeyEvent.getKeyModifiersText(keyStroke.getModifiers());
-        if (!s.equals("")) {
-            s += "+";
-        }
+        if (!"".equals(s)) s += "+";
         return s + KeyEvent.getKeyText(keyStroke.getKeyCode());
     }
 

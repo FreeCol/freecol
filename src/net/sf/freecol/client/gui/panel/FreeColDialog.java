@@ -401,8 +401,8 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
         // case the new value will be null).  Otherwise, close the dialog.
         if (this.isVisible()
             && e.getSource() == pane
-            && (e.getPropertyName().equals(JOptionPane.VALUE_PROPERTY)
-                || e.getPropertyName().equals(JOptionPane.INPUT_VALUE_PROPERTY))
+            && (JOptionPane.VALUE_PROPERTY.equals(e.getPropertyName())
+                || JOptionPane.INPUT_VALUE_PROPERTY.equals(e.getPropertyName()))
             && e.getNewValue() != null
             && e.getNewValue() != JOptionPane.UNINITIALIZED_VALUE) {
             this.setVisible(false);

@@ -102,39 +102,39 @@ public final class UnitButton extends JButton {
 
         public void propertyChange(PropertyChangeEvent e) {
             String propertyName = e.getPropertyName();
-            if (e.getPropertyName().equals(Action.NAME)
-                    || e.getPropertyName().equals(Action.SHORT_DESCRIPTION)) {
+            if (Action.NAME.equals(e.getPropertyName())
+                || Action.SHORT_DESCRIPTION.equals(e.getPropertyName())) {
                 String text = (String) e.getNewValue();
                 button.setToolTipText(text);
-            } else if (propertyName.equals("enabled")) {
+            } else if ("enabled".equals(propertyName)) {
                 Boolean enabledState = (Boolean) e.getNewValue();
                 button.setEnabled(enabledState.booleanValue());
                 button.repaint();
-            } else if (e.getPropertyName().equals(Action.SMALL_ICON)) {
+            } else if (Action.SMALL_ICON.equals(e.getPropertyName())) {
                 Icon icon = (Icon) e.getNewValue();
                 button.setIcon(icon);
                 button.repaint();
-            } else if (e.getPropertyName().equals(FreeColAction.BUTTON_IMAGE)) {
+            } else if (FreeColAction.BUTTON_IMAGE.equals(e.getPropertyName())) {
                 Icon icon = (Icon) e.getNewValue();
                 button.setIcon(icon);
                 button.repaint();
-            } else if (e.getPropertyName().equals(FreeColAction.BUTTON_ROLLOVER_IMAGE)) {
+            } else if (FreeColAction.BUTTON_ROLLOVER_IMAGE.equals(e.getPropertyName())) {
                 Icon icon = (Icon) e.getNewValue();
                 button.setRolloverIcon(icon);
                 button.repaint();
-            } else if (e.getPropertyName().equals(FreeColAction.BUTTON_PRESSED_IMAGE)) {
+            } else if (FreeColAction.BUTTON_PRESSED_IMAGE.equals(e.getPropertyName())) {
                 Icon icon = (Icon) e.getNewValue();
                 button.setPressedIcon(icon);
                 button.repaint();
-            } else if (e.getPropertyName().equals(FreeColAction.BUTTON_DISABLED_IMAGE)) {
+            } else if (FreeColAction.BUTTON_DISABLED_IMAGE.equals(e.getPropertyName())) {
                 Icon icon = (Icon) e.getNewValue();
                 button.setDisabledIcon(icon);
                 button.repaint();
-            } else if (e.getPropertyName().equals(Action.MNEMONIC_KEY)) {
+            } else if (Action.MNEMONIC_KEY.equals(e.getPropertyName())) {
                 Integer mn = (Integer) e.getNewValue();
                 button.setMnemonic(mn.intValue());
                 button.repaint();
-            } else if (e.getPropertyName().equals(Action.ACTION_COMMAND_KEY)) {
+            } else if (Action.ACTION_COMMAND_KEY.equals(e.getPropertyName())) {
                 button.setActionCommand((String)e.getNewValue());
             }
         }

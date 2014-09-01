@@ -94,7 +94,7 @@ public final class SimpleZippedAnimation implements Iterable<AnimationEvent> {
         try {
             ZipEntry entry;
             while ((entry = zipStream.getNextEntry()) != null) {
-                if (entry.getName().equals(ANIMATION_DESCRIPTOR_FILE)) {
+                if (ANIMATION_DESCRIPTOR_FILE.equals(entry.getName())) {
                     final BufferedReader in = new BufferedReader(new InputStreamReader(zipStream, "UTF-8"));
                     String line;
                     while ((line = in.readLine()) != null) {

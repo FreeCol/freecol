@@ -150,7 +150,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
          */
         @Override
         public String toString() {
-            if (getKey().equals(AUTO)) {
+            if (AUTO.equals(getKey())) {
                 return Messages.message("clientOptions.gui.languageOption.autoDetectLanguage");
             }
 

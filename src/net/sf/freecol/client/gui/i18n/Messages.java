@@ -999,15 +999,15 @@ public class Messages {
         }
         if (st.hasMoreTokens()) {
             String token = st.nextToken();
-            if (!token.equals("_")) {
+            if (!"_".equals(token)) {
                 country = token;
             }
             if (st.hasMoreTokens()) {
                 token = st.nextToken();
-                if (token.equals("_") && st.hasMoreTokens()) {
+                if ("_".equals(token) && st.hasMoreTokens()) {
                     token = st.nextToken();
                 }
-                if (!token.equals("_")) {
+                if (!"_".equals(token)) {
                     variant = token;
                 }
             }

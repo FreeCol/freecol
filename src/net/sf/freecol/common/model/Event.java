@@ -203,7 +203,7 @@ public class Event extends FreeColGameObjectType {
         if (Limit.getXMLElementTagName().equals(tag)) {
             Limit limit = new Limit(xr, spec);
             // @compat 0.10.5
-            if (limit.getId().equals("model.limit.independence.colonies")) {
+            if ("model.limit.independence.colonies".equals(limit.getId())) {
                 limit.setId("model.limit.independence.coastalColonies");
                 limit.getLeftHandSide().setMethodName("isConnectedPort");
             }

@@ -167,7 +167,7 @@ public final class ColorCellEditor extends AbstractCellEditor
      */
     public void actionPerformed(ActionEvent event) {
         final String command = event.getActionCommand();
-        if (command.equals(EDIT)) {
+        if (EDIT.equals(command)) {
             if (!canvas.isAncestorOf(colorChooserPanel)) {
                 colorChooser.setColor(currentColor);
     
@@ -175,12 +175,12 @@ public final class ColorCellEditor extends AbstractCellEditor
                 canvas.add(colorChooserPanel, 0);
                 colorChooserPanel.requestFocus();
             }
-        } else if (command.equals(OK)) {
+        } else if (OK.equals(command)) {
             currentColor = colorChooser.getColor();
             // Remove the colorChooserPanel.
             canvas.remove(colorChooserPanel);
             fireEditingStopped();
-        } else if (command.equals(CANCEL)) {
+        } else if (CANCEL.equals(command)) {
             // Remove the colorChooserPanel.
             canvas.remove(colorChooserPanel);
             fireEditingCanceled();

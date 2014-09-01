@@ -1254,11 +1254,11 @@ public abstract class FreeColObject
         for (int i = 0; i < n; i++) {
             String name = xr.getAttributeLocalName(i);
 
-            if (name.equals(ID_ATTRIBUTE_TAG)
+            if (ID_ATTRIBUTE_TAG.equals(name)
                 // @compat 0.10.x
-                || name.equals(ID_ATTRIBUTE)
+                || ID_ATTRIBUTE.equals(name)
                 // end @compat
-                || name.equals(PARTIAL_ATTRIBUTE_TAG)) continue;
+                || PARTIAL_ATTRIBUTE_TAG.equals(name)) continue;
 
             try {
                 Introspector intro = new Introspector(theClass, name);

@@ -172,7 +172,7 @@ public final class ConnectController {
             Element reply = mc.askDumping(element);
             if (reply == null) {
                 return null;
-            } else if (!reply.getTagName().equals("gameState")) {
+            } else if (!"gameState".equals(reply.getTagName())) {
                 logger.warning("The reply has an unknown type: "
                     + reply.getTagName());
                 return null;
@@ -213,7 +213,7 @@ public final class ConnectController {
             if (reply == null) {
                 logger.warning("The server did not return a list.");
                 return null;
-            } else if (!reply.getTagName().equals("vacantPlayers")) {
+            } else if (!"vacantPlayers".equals(reply.getTagName())) {
                 logger.warning("The reply has an unknown type: "
                     + reply.getTagName());
                 return null;
