@@ -606,7 +606,7 @@ public final class FreeCol {
                 }
                 if (!FreeColDebugger.setDebugModes(arg)) { // Not fatal.
                     gripe(StringTemplate.template("cli.error.debug")
-                        .addName("%modes", FreeColDebugger.getDebugModes()));
+                        .addName("%modes%", FreeColDebugger.getDebugModes()));
                 }
                 // user set log level has precedence
                 if (!line.hasOption("log-level")) logLevel = Level.FINEST;
