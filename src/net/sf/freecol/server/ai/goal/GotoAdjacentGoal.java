@@ -109,7 +109,7 @@ public class GotoAdjacentGoal extends Goal {
             }
         }
         
-        if (availableUnitsList.size()==0) {
+        if (availableUnitsList.isEmpty()) {
             //we don't have any units left to deal with,
             //signal that we may safely be cancelled now
             isFinished = true;

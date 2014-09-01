@@ -121,7 +121,7 @@ public class TranslationReport {
                 }
             }
             
-            if (missingKeys.size() > 0) {
+            if (!missingKeys.isEmpty()) {
                 System.out.println("** Total of " + missingKeys.size() + " properties missing:\n");
                 for (String key : sort(missingKeys)) {
                     System.out.println(key + "=" + master.getProperty(key));
@@ -132,7 +132,7 @@ public class TranslationReport {
                 System.out.println("** No properties missing.\n");
             }
             
-            if (copiedFromMaster.size() > 0){
+            if (!copiedFromMaster.isEmpty()){
                 System.out.println("** Total of " + copiedFromMaster.size() + " properties copied from master properties:\n");
                 for (String key : sort(copiedFromMaster)) {
                     System.out.println(key + "=" + master.getProperty(key));
@@ -143,7 +143,7 @@ public class TranslationReport {
                 System.out.println("** No properties copied.\n");
             }
 
-            if (missingVariables.size() > 0) {
+            if (!missingVariables.isEmpty()) {
                 System.out.println("** Total of " + missingVariables.size() + " properties with missing variables:\n");
                 for (String key : sort(missingVariables)) {
                     System.out.println("* CORRECT: " + key + "=" + master.getProperty(key));
@@ -188,7 +188,7 @@ public class TranslationReport {
                 }
             }
 
-            if (superfluousKeys.size() > 0) {
+            if (!superfluousKeys.isEmpty()) {
                 System.out.println("** Total of " + superfluousKeys.size() + " superfluous properties:\n");
                 for (String key : sort(superfluousKeys)) {
                     System.out.println(key + "=" + properties.getProperty(key));
@@ -199,7 +199,7 @@ public class TranslationReport {
                 System.out.println("** No superfluous properties.\n");
             }
             
-            if (superfluousVariables.size() > 0) {
+            if (!superfluousVariables.isEmpty()) {
                 System.out.println("** Total of " + superfluousVariables.size() +
                                    " properties with superfluous variables:\n");
                 for (String key : sort(superfluousVariables)) {

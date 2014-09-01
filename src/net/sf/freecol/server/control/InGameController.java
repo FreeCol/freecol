@@ -946,7 +946,7 @@ public final class InGameController extends Controller {
                 surrenderUnits.add(u);
             }
         }
-        if (surrenderUnits.size() > 0) {
+        if (!surrenderUnits.isEmpty()) {
             for (Unit u : surrenderUnits) {
                 Tile oldTile = u.getTile();
                 if (serverPlayer.csChangeOwner(u, independent,
@@ -4164,7 +4164,7 @@ public final class InGameController extends Controller {
                 landUnits.add(undead);
             }
         }
-        if (navalUnits.size() == 0 || landUnits.size() == 0) {
+        if (navalUnits.isEmpty() || landUnits.isEmpty()) {
             return DOMMessage.clientError("Can not enter revenge mode,"
                 + " because we can not find the undead units.");
         }

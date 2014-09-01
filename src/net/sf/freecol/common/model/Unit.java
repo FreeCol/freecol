@@ -1438,7 +1438,7 @@ public class Unit extends GoodsLocation
             currentStop = -1;
         } else {
             List<TradeRouteStop> stops = tradeRoute.getStops();
-            if (stops == null || stops.size() == 0) {
+            if (stops == null || stops.isEmpty()) {
                 currentStop = -1;
             } else {
                 if (currentStop < 0 || currentStop >= stops.size()) {

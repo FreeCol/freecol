@@ -106,7 +106,7 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
             }
 
             panel.add(localizedLabel("colopedia.goods.improvedBy"), "newline 20, top");
-            if (improvements.size() == 0) {
+            if (improvements.isEmpty()) {
                 panel.add(localizedLabel("none"), "span");
             } else {
                 for (int index = 0; index < improvements.size(); index++) {
@@ -138,7 +138,7 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
         if (type.isBuildingMaterial()) {
             List<BuildingType> buildingTypes = new ArrayList<BuildingType>();
             boolean allTypes = filterBuildables(getSpecification().getBuildingTypeList(), buildingTypes, type);
-            if (buildingTypes.size() > 0) {
+            if (!buildingTypes.isEmpty()) {
                 panel.add(localizedLabel("colopedia.goods.buildings"), "newline 20");
                 if (allTypes) {
                     JButton button = getButton(PanelType.BUILDINGS,
@@ -175,7 +175,7 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
             }
             List<UnitType> unitTypes = new ArrayList<UnitType>();
             allTypes = filterBuildables(getSpecification().getUnitTypeList(), unitTypes, type);
-            if (unitTypes.size() > 0) {
+            if (!unitTypes.isEmpty()) {
                 panel.add(localizedLabel("colopedia.goods.units"), "newline 20");
                 if (allTypes) {
                     JButton button = getButton(PanelType.UNITS,

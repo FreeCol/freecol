@@ -144,7 +144,7 @@ public final class ServerListPanel extends FreeColPanel {
 
         tableModel.setItems(servers);
         setEnabled(true);
-        if (servers.size() == 0) {
+        if (servers.isEmpty()) {
             connect.setEnabled(false);
         } else {
             table.setRowSelectionInterval(0, 0);

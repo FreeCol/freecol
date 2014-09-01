@@ -48,7 +48,7 @@ public final class ReportHistoryPanel extends ReportPanel {
 
         // Display Panel
         reportPanel.removeAll();
-        if (history.size() == 0) return;
+        if (history.isEmpty()) return;
 
         reportPanel.setLayout(new MigLayout("wrap 2", "[]20[fill]", ""));
 

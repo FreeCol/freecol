@@ -105,7 +105,7 @@ public class TerrainDetailPanel
         panel.add(new JLabel(new ImageIcon(terrainImage)), "spany 3");
 
         List<ResourceType> resourceList = tileType.getResourceTypes();
-        if (resourceList.size() > 0) {
+        if (!resourceList.isEmpty()) {
             panel.add(localizedLabel("colopedia.terrain.resource"));
             if (resourceList.size() > 1) {
                 panel.add(getResourceButton(resourceList.get(0)), "split " + resourceList.size());
@@ -128,7 +128,7 @@ public class TerrainDetailPanel
         panel.add(localizedLabel("colopedia.terrain.production"));
 
         List<AbstractGoods> production = tileType.getPossibleProduction();
-        if (production.size() > 0) {
+        if (!production.isEmpty()) {
             AbstractGoods goods = production.get(0);
             if (production.size() > 1) {
                 panel.add(getGoodsButton(goods.getType(), goods.getAmount()),

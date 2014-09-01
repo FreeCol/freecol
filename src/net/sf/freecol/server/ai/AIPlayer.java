@@ -316,7 +316,7 @@ public abstract class AIPlayer extends AIObject {
      * @return A list of AIUnits.
      */
     protected List<AIUnit> getAIUnits() {
-        if (aiUnits.size() == 0) createAIUnits();
+        if (aiUnits.isEmpty()) createAIUnits();
         return new ArrayList<AIUnit>(aiUnits);
     }
 
@@ -327,7 +327,7 @@ public abstract class AIPlayer extends AIObject {
      * @return The <code>Iterator</code>.
      */
     protected Iterator<AIUnit> getAIUnitIterator() {
-        if (aiUnits.size() == 0) createAIUnits();
+        if (aiUnits.isEmpty()) createAIUnits();
         return aiUnits.iterator();
     }
 

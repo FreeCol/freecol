@@ -405,7 +405,7 @@ public final class ReportColonyPanel extends ReportPanel
         // Field: The number of potential colony tiles that need
         // exploring.
         // Colour: Always cAlarm
-        if (exploreTiles.size() > 0) {
+        if (!exploreTiles.isEmpty()) {
             b = colourButton(cac, Integer.toString(exploreTiles.size()),
                 null, cAlarm,
                 stpl("report.colony.exploring.description")
@@ -420,7 +420,7 @@ public final class ReportColonyPanel extends ReportPanel
         // benefit from ploughing.
         // Colour: Always cAlarm
         // Font: Bold if one of the tiles is the colony center.
-        if (plowTiles.size() > 0) {
+        if (!plowTiles.isEmpty()) {
             b = colourButton(cac, Integer.toString(plowTiles.size()),
                 null, cAlarm,
                 stpl("report.colony.plowing.description")
@@ -437,7 +437,7 @@ public final class ReportColonyPanel extends ReportPanel
         // Field: The number of existing colony tiles that would
         // benefit from a road.
         // Colour: cAlarm
-        if (roadTiles.size() > 0) {
+        if (!roadTiles.isEmpty()) {
             b = colourButton(cac, Integer.toString(roadTiles.size()),
                 null, cAlarm,
                 stpl("report.colony.roadBuilding.description")

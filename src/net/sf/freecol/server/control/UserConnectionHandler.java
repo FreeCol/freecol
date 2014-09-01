@@ -207,7 +207,7 @@ public final class UserConnectionHandler extends FreeColServerHolder
             }
 
             // Create and add the new player:
-            boolean admin = game.getLivePlayers(null).size() == 0;
+            boolean admin = game.getLivePlayers(null).isEmpty();
             player = new ServerPlayer(game, userName, admin,
                                       game.getVacantNation(),
                                       connection.getSocket(), connection);

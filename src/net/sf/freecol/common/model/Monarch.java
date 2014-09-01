@@ -625,7 +625,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         // Nothing happens during the first few turns, if there are no
         // colonies, or after the revolution begins.
         if (turn < grace
-            || player.getSettlements().size() == 0
+            || player.getSettlements().isEmpty()
             || player.getPlayerType() != PlayerType.COLONIAL) {
             return choices;
         }

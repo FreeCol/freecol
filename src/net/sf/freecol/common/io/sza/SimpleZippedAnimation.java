@@ -111,7 +111,7 @@ public final class SimpleZippedAnimation implements Iterable<AnimationEvent> {
             } catch (Exception e) {}
         }
         
-        if (loadingDescriptor.size() == 0) {
+        if (loadingDescriptor.isEmpty()) {
             throw new IOException("animation.txt is missing from the SZA.");
         }
         

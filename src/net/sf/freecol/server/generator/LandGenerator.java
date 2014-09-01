@@ -233,7 +233,7 @@ public class LandGenerator {
         //get a random position from the list,
         //set it to land,
         //add its valid neighbours to the list
-        while (size < maxsize && l.size()>0) {
+        while (size < maxsize && !l.isEmpty()) {
             int i = Utils.randomInt(logger, "Lsiz", random, l.size());
             p = l.remove(i);
 

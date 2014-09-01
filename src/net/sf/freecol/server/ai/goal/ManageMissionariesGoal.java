@@ -132,7 +132,7 @@ public class ManageMissionariesGoal extends Goal {
             }
         }
 
-        if (availableUnitsList.size()==0 && subGoalList.size()==0) {
+        if (availableUnitsList.isEmpty() && subGoalList.isEmpty()) {
             //we don't have any units to deal with, and no active subgoals
             //signal that we may safely be cancelled now
             isFinished = true;

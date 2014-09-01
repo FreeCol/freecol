@@ -2083,7 +2083,7 @@ public final class MapViewer {
         =======
         Display units
         */
-        if (units.size() > 0) {
+        if (!units.isEmpty()) {
             g.setColor(Color.BLACK);
             final Image im = lib.getMiscImage(ImageLibrary.DARKNESS);
             for (int index = 0; index < units.size(); index++) {
@@ -2103,7 +2103,7 @@ public final class MapViewer {
         ======
         Display the colony names.
         */
-        if (settlements.size() > 0
+        if (!settlements.isEmpty()
             && colonyLabels != ClientOptions.COLONY_LABELS_NONE) {
             for (int index = 0; index < settlements.size(); index++) {
                 final Settlement settlement = settlements.get(index);

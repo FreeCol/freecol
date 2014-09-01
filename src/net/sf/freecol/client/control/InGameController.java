@@ -1366,7 +1366,7 @@ public final class InGameController implements NetworkConstants {
             }
         }
 
-        if (messages.size() > 0) {
+        if (!messages.isEmpty()) {
             Runnable uiTask;
             if (endOfTurn) {
                 turnReportMessages.addAll(messages);
@@ -3020,12 +3020,12 @@ public final class InGameController implements NetworkConstants {
                 disembarkable.add(u);
             }
         }
-        if (disembarkable.size() == 0) {
+        if (disembarkable.isEmpty()) {
             // Did not find any unit that could disembark, fail.
             return false;
         }
 
-        while (disembarkable.size() > 0) {
+        while (!disembarkable.isEmpty()) {
             if (disembarkable.size() == 1) {
                 if (gui.showConfirmDialog(true, tile,
                         StringTemplate.key("disembark.text"),
@@ -3092,7 +3092,7 @@ public final class InGameController implements NetworkConstants {
                 carrier = u; // Save a default
             }
         }
-        if (choices.size() == 0) {
+        if (choices.isEmpty()) {
             throw new RuntimeException("Unit " + unit.getId()
                 + " found no carrier to embark upon.");
         } else if (choices.size() == 1) {
