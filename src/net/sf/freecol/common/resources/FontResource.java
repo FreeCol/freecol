@@ -69,8 +69,7 @@ public class FontResource extends Resource {
                 .registerFont(font);
         }
 
-        logger.info("Loaded font: "
-                    + ((font==null) ? "(null)" : font.getFontName())
+        logger.info("Loaded font: " + font.getFontName()
                     + " from: " + resourceLocator);
     }
 

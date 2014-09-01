@@ -315,7 +315,7 @@ public final class ReportTurnPanel extends ReportPanel {
             int start = input.indexOf('%');
             if (start == -1) {
                 // no variables present
-                insertText(document, input.substring(0));
+                insertText(document, input);
                 return;
             } else if (start > 0) {
                 // output any string before the first occurrence of '%'
