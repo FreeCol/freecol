@@ -19,7 +19,8 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.JComboBox;
@@ -76,7 +77,7 @@ public final class SelectAmountDialog extends FreeColInputDialog<Integer> {
             = GUI.getDefaultTextArea(Messages.message("goodsTransfer.text"));
 
         int defaultIndex = -1;
-        Vector<Integer> values = new Vector<Integer>();
+        List<Integer> values = new ArrayList<Integer>();
         for (int index = 0; index < amounts.length; index++) {
             if (amounts[index] < available) {
                 if (amounts[index] == defaultAmount) defaultIndex = index;
@@ -90,13 +91,13 @@ public final class SelectAmountDialog extends FreeColInputDialog<Integer> {
         if (defaultAmount > 0 && defaultIndex < 0) {
             for (int index = 0; index < values.size(); index++) {
                 if (defaultAmount < values.get(index)) {
-                    values.insertElementAt(Integer.valueOf(defaultAmount), index);
+                    values.add(index, Integer.valueOf(defaultAmount));
                     defaultIndex = index;
                     break;
                 }
             }
         }
-        this.comboBox = new JComboBox(values);
+        this.comboBox = new JComboBox(values.toArray());
         this.comboBox.setEditable(true);
         if (defaultIndex >= 0) this.comboBox.setSelectedIndex(defaultIndex);
 
