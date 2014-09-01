@@ -1526,7 +1526,8 @@ public class Map extends FreeColGameObject implements Location {
                             - f.get(p2.getLocation().getId()).intValue());
                     }
                 });
-        final Europe europe = unit.getOwner().getEurope();
+        final Europe europe = (unit == null) ? null
+            : unit.getOwner().getEurope();
         final Unit offMapUnit = (carrier != null) ? carrier : unit;
         Unit currentUnit = (start.isLand())
             ? ((start.hasSettlement()

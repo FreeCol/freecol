@@ -1147,7 +1147,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         Map map = getGame().getMap();
         for (Tile t : map.getCircleTiles(this, true, radius)) {
             if (t == this
-                || (same && !map.isSameContiguity(this, t))) continue;
+                || (same && !isConnectedTo(t))) continue;
             Settlement settlement = t.getSettlement();
             if (settlement != null
                 && (owner == null || owner.owns(settlement))) {

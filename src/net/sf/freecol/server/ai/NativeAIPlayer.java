@@ -617,8 +617,8 @@ public class NativeAIPlayer extends AIPlayer {
 
             // Send the unit.
             Mission m = new IndianBringGiftMission(getAIMain(), aiUnit, target);
-            lb.add(m, " gift from ", is.getName(), " to ", target.getName(),
-                ", ");
+            lb.add(m, " gift from ", is.getName(),
+                   " to ", target.getName(), ", ");
         }
         if (lb.grew("\n  Gifts: ")) lb.shrink(", ");
     }
@@ -719,10 +719,8 @@ public class NativeAIPlayer extends AIPlayer {
 
             // Send the unit.
             Mission m = new IndianDemandMission(getAIMain(), aiUnit, target);
-            if (m != null) {
-                lb.add("At ", is.getName(), " ", m,
-                       " will demand of ", target, ", ");
-            }
+            lb.add("At ", is.getName(), " ", m,
+                   " will demand of ", target, ", ");
         }
         if (lb.grew("\n  Tribute: ")) lb.shrink(", ");
     }

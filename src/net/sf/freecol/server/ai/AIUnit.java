@@ -600,8 +600,7 @@ public class AIUnit extends TransportableAIObject {
         int bestTurns = Integer.MAX_VALUE;
         Settlement settlement = null;
         for (Tile t : tiles) {
-            if (settlement == null
-                || !map.isSameContiguity(t, settlement.getTile())) {
+            if (settlement == null || t.isConnectedTo(settlement.getTile())) {
                 settlement = t.getNearestSettlement(player, 10, true);
             }
             if (settlement != null) {

@@ -1101,7 +1101,8 @@ public class Game extends FreeColGameObject {
     }
 
 
-    // Interface Object
+    // Override Object
+    //
     // Two games are not the same just because they have the same
     // identifier, but to avoid having to check everything in the Game
     // just insist on object equality for the equals() test, and

@@ -1474,12 +1474,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             if (ag.isDisposed() || ag.getGoods() == null) continue;
             if (ag.getGoods().getLocation() == colony) disposeList.add(ag);
         }
-        for (Wish w : wishes) {
-            disposeList.add(w);
-        }
-        for (TileImprovementPlan ti : tileImprovementPlans) {
-            disposeList.add(ti);
-        }
+        disposeList.addAll(wishes);
+        disposeList.addAll(tileImprovementPlans);
         for (AIObject o : disposeList) o.dispose();
         colonyPlan = null;
         // Do not clear this.colony, the identifier is still required.

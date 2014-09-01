@@ -1030,8 +1030,7 @@ public class ColonyPlan {
         int oldRoleCount = expert.getRoleCount();
         GoodsType work = expert.getType().getExpertProduction();
         GoodsType oldWork = expert.getWorkType();
-        for (int i = 0; i < others.size(); i++) {
-            Unit other = others.get(i);
+        for (Unit other : others) {
             if (!other.isPerson()) continue;
             if (other.getWorkType() == work
                 && other.getType().getExpertProduction() != work) {

@@ -278,9 +278,9 @@ public class TransportMission extends Mission {
     private Cargo tFirst() {
         Cargo cargo = null;
         synchronized (cargoes) {
-            for (int i = 0; i < cargoes.size(); i++) {
-                if (cargoes.get(i).isValid()) {
-                    cargo = cargoes.get(i);
+            for (Cargo c : cargoes) {
+                if (c.isValid()) {
+                    cargo = c;
                     break;
                 }
             }
@@ -322,15 +322,14 @@ public class TransportMission extends Mission {
         boolean result = false, change = false;
         final TransportableAIObject t = cargo.getTransportable();
         synchronized (cargoes) {
-            int i;
-            for (i = 0; i < cargoes.size(); i++) {
-                if (cargoes.get(i).getTransportable() == t) break;
-            }
-            if (i < cargoes.size()) {
-                cargoes.remove(i);
-                tSpace();
-                change = i == 0;
-                result = true;
+            for (int i = 0; i < cargoes.size(); i++) {
+                if (cargoes.get(i).getTransportable() == t) {
+                    cargoes.remove(i);
+                    tSpace();
+                    change = i == 0;
+                    result = true;
+                    break;
+                }
             }
         }
         if (change) tRetarget();
@@ -623,7 +622,7 @@ public class TransportMission extends Mission {
                     holds += newSpace;
                     if (holds < 0 || holds > maxHolds) continue outer;
                 }
-                if (cargo.compareTo(tr) <= 0) {
+                if (tr.getNewSpace() <= cargo.getNewSpace()) {
                     candidate = i;
                     break;
                 }

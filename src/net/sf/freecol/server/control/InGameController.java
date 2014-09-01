@@ -4214,7 +4214,6 @@ public final class InGameController extends Controller {
     public Element rearrangeColony(ServerPlayer serverPlayer, Colony colony,
                                    List<UnitChange> unitChanges) {
         final Role defaultRole = getGame().getSpecification().getDefaultRole();
-        ChangeSet cs = new ChangeSet();
         Tile tile = colony.getTile();
         tile.cacheUnseen();//+til
         final int oldUnitCount = colony.getUnitCount();

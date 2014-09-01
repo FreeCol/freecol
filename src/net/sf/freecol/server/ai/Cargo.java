@@ -603,16 +603,6 @@ public class Cargo {
         return lb.toString();
     }
 
-    // Implement Comparable<Cargo>
-
-    /**
-     * {@inheritDoc}
-     */
-    public int compareTo(Cargo other) {
-        // Cargoes that reduce the carried amount should sort
-        // before those that do not.
-        return other.getNewSpace() - getNewSpace();
-    }
 
     // Override Object
 

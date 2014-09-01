@@ -328,7 +328,6 @@ public final class InGameController implements NetworkConstants {
                 ? 1 : -1;
 
         } else {
-            Colony colony = (Colony)settlement;
             NationSummary ns = getNationSummary(other);
             int otherStrength = ns.getMilitaryStrength();
             int mil = (otherStrength <= 1 || otherStrength * 5 < strength) ? 0

@@ -582,7 +582,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                         }
                     }
                 }
-                player.logCheat("Make " + aiu.getUnit());
+                if (aiu != null) player.logCheat("Make " + aiu.getUnit());
             }
         }
 
@@ -718,7 +718,8 @@ public class EuropeanAIPlayer extends AIPlayer {
         UnitType unitToPurchase
             = RandomChoice.getWeightedRandom(logger, "Cheat which unit",
                                              rc, getAIRandom());
-        return cheatUnit(unitToPurchase, what, lb);
+        return (unitToPurchase == null) ? null
+            : cheatUnit(unitToPurchase, what, lb);
     }
 
     /**
@@ -2240,7 +2241,6 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
         }
 
-        transportSupply.remove(colony);
         transportDemand.remove(colony);
 
         Set<Wish> wishes = new HashSet<Wish>(aic.getWishes());
