@@ -214,8 +214,7 @@ public class UnitWas implements Comparable<UnitWas> {
         hash = 37 * hash + Utils.hashCode(loc);
         hash = 37 * hash + Utils.hashCode(work);
         hash = 37 * hash + workAmount;
-        hash = 37 * hash + Utils.hashCode(colony);
-        return hash;
+        return 37 * hash + Utils.hashCode(colony);
     }
 
     /**

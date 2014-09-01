@@ -233,7 +233,7 @@ public class UnitSeekAndDestroyMission extends Mission {
      */
     private static GoalDecider getGoalDecider(final AIUnit aiUnit,
                                               boolean deferOK) {
-        GoalDecider gd = new GoalDecider() {
+        return new GoalDecider() {
                 private PathNode bestPath = null;
                 private int bestValue = Integer.MIN_VALUE;
             
@@ -249,7 +249,6 @@ public class UnitSeekAndDestroyMission extends Mission {
                     return false;
                 }
             };
-        return gd;
     }
 
     /**

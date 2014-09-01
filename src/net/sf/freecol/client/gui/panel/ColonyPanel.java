@@ -1371,8 +1371,7 @@ public final class ColonyPanel extends PortPanel
                 }
             } else {
                 ((UnitLabel)comp).setSmall(false);
-                Component c = add(comp);
-                return c;
+                return add(comp);
             }
         }
 

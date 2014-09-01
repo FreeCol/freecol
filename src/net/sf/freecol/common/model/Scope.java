@@ -321,8 +321,7 @@ public class Scope extends FreeColObject {
         hash = 31 * hash + (methodName == null ? 0 : methodName.hashCode());
         hash = 31 * hash + (methodValue == null ? 0 : methodValue.hashCode());
         hash = 31 * hash + (matchesNull ? 1 : 0);
-        hash = 31 * hash + (matchNegated ? 1 : 0);
-        return hash;
+        return 31 * hash + (matchNegated ? 1 : 0);
     }
 
 

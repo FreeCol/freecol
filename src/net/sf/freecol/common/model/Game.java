@@ -423,8 +423,7 @@ public class Game extends FreeColGameObject {
                         nextValue = o;
                     }
                 }
-
-                return nextValue != null;
+                return true;
             }
 
             public FreeColGameObject next() {

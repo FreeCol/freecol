@@ -545,8 +545,7 @@ public abstract class Goal extends AIObject implements GoalConstants {
         if (parentGoal!=null) {
             descr = parentGoal.getGoalDescription() + ">>";
         }
-        descr += getGoalDescription();
-        return descr;
+        return descr + getGoalDescription();
     }
 
     /**

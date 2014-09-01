@@ -111,10 +111,9 @@ public class TileTypeChange implements Comparable<TileTypeChange> {
             : (other.from == null) ? 1
             : FreeColObject.compareIds(from, other.from);
         if (cmp != 0) return cmp;
-        cmp = (to == null) ? ((other.to == null) ? 0 : -1)
+        return (to == null) ? ((other.to == null) ? 0 : -1)
             : (other.to == null) ? 1
             : FreeColObject.compareIds(to, other.to);
-        return cmp;
     }
 
     // Override Object
@@ -138,8 +137,7 @@ public class TileTypeChange implements Comparable<TileTypeChange> {
         int hash = super.hashCode();
         hash = 37 * hash + Utils.hashCode(from);
         hash = 37 * hash + Utils.hashCode(to);
-        hash = 37 * hash + Utils.hashCode(production);
-        return hash;
+        return 37 * hash + Utils.hashCode(production);
     }
 
 

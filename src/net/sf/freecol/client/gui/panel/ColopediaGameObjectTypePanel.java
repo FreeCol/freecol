@@ -137,9 +137,8 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
 
     protected DefaultMutableTreeNode buildItem(FreeColGameObjectType type, ImageIcon icon) {
         String name = Messages.getName(type);
-        DefaultMutableTreeNode item =
-            new DefaultMutableTreeNode(new ColopediaTreeItem(this, type.getId(), name, icon));
-        return item;
+        return new DefaultMutableTreeNode(new ColopediaTreeItem(this, 
+                type.getId(), name, icon));
     }
 
 

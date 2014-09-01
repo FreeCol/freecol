@@ -142,8 +142,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
         @Override
         public int hashCode() {
             int hash = super.hashCode();
-            hash = 31 * hash + Utils.hashCode(this.key);
-            return hash;
+            return 31 * hash + Utils.hashCode(this.key);
         }
 
         /**

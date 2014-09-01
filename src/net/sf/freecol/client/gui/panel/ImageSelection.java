@@ -40,20 +40,22 @@ public final class ImageSelection implements Transferable {
     private JLabel label;
 
     /**
-    * The constructor to use.
-    * @param label The data that this ImageSelection should hold.
-    */
+     * The constructor to use.
+     *
+     * @param label The data that this ImageSelection should hold.
+     */
     public ImageSelection(JLabel label) {
         this.label = label;
     }
 
     /**
-    * Returns the data that this Transferable represents or 'null' if
-    * the data is not of the given flavor.
-    * @param flavor The flavor that the data should have.
-    * @return The data that this Transferable represents or 'null' if
-    * the data is not of the given flavor.
-    */
+     * Get the data that this Transferable represents or null if
+     * the data is not of the given flavor.
+     *
+     * @param flavor The flavor that the data should have.
+     * @return The data that this Transferable represents, or null if
+     *     the data is not of the given flavor.
+     */
     public Object getTransferData(DataFlavor flavor) {
         if (isDataFlavorSupported(flavor)) {
             return label;
@@ -62,20 +64,21 @@ public final class ImageSelection implements Transferable {
     }
 
     /**
-    * Returns the flavors that are supported by this Transferable.
-    * @return The flavors that are supported by this Transferable.
-    */
+     * Get the flavors that are supported by this Transferable.
+     *
+     * @return The flavors that are supported by this Transferable.
+     */
     public DataFlavor[] getTransferDataFlavors() {
-        DataFlavor[] flavors = {DefaultTransferHandler.flavor};
-        return flavors;
+        return new DataFlavor[] { DefaultTransferHandler.flavor };
     }
 
     /**
-    * Checks if the given data flavor is supported by this Transferable.
-    * @param flavor The data flavor to check.
-    * @return 'true' if the given data flavor is supported by this Transferable,
-    * 'false' otherwise.
-    */
+     * Checks if the given data flavor is supported by this Transferable.
+     *
+     * @param flavor The data flavor to check.
+     * @return True if the given data flavor is supported by this Transferable.
+     * 'false' otherwise.
+     */
     public boolean isDataFlavorSupported(DataFlavor flavor) {
         return flavor.equals(DefaultTransferHandler.flavor);
     }

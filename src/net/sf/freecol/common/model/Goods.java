@@ -228,8 +228,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     @Override
     public int hashCode() {
         int hash = super.hashCode();
-        hash = 31 * hash + Utils.hashCode(this.location);
-        return hash;
+        return 31 * hash + Utils.hashCode(this.location);
     }
 
 

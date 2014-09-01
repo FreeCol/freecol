@@ -2167,9 +2167,8 @@ public final class Canvas extends JDesktopPane {
         }
         DiplomaticTradeDialog dtd = new DiplomaticTradeDialog(freeColClient,
             our, other, agreement, comment);
-        Tile tile = (our instanceof Location) ? ((Location)our).getTile()
-            : null;
-        return showFreeColDialog(dtd, tile);
+        return showFreeColDialog(dtd,
+            (our == null) ? null : ((Location)our).getTile());
     }
 
     /**

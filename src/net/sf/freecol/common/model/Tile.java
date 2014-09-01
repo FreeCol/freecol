@@ -752,8 +752,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     private <T extends TileItem> T removeTileItem(T item) {
         if (item == null || tileItemContainer == null) return null;
-        T result = tileItemContainer.removeTileItem(item);
-        return result;
+        return tileItemContainer.removeTileItem(item);
     }
 
     /**

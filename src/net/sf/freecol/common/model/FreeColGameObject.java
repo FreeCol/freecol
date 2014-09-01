@@ -274,8 +274,7 @@ public abstract class FreeColGameObject extends FreeColObject {
     @Override
     public int hashCode() {
         int hash = super.hashCode();
-        hash = 31 * hash + Utils.hashCode(this.game);
-        return hash;
+        return 31 * hash + Utils.hashCode(this.game);
     }
 
 

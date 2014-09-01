@@ -2862,8 +2862,7 @@ public class Colony extends Settlement implements Nameable {
         }
         // end @compat 0.10.x
 
-        result = Math.min(result, checkBuildQueueIntegrity(fix));
-        return result;
+        return Math.min(result, checkBuildQueueIntegrity(fix));
     }
 
 

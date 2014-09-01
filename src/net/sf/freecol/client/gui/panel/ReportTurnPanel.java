@@ -168,9 +168,7 @@ public final class ReportTurnPanel extends ReportPanel {
                     button.addActionListener(this);
                     button.setBorder(BorderFactory.createEmptyBorder());
                     component = button;
-                } else if (messageDisplay instanceof Player) {
-                    component = new JLabel(icon);
-                } else {
+                } else { // includes Player
                     component = new JLabel(icon);
                 }
             }

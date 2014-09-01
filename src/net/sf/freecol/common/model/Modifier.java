@@ -532,8 +532,7 @@ public class Modifier extends Feature {
         hash = 31 * hash + Float.floatToIntBits(increment);
         hash = 31 * hash + Utils.hashCode(modifierType);
         hash = 31 * hash + Utils.hashCode(incrementType);
-        hash = 31 * hash + modifierIndex;
-        return hash;
+        return 31 * hash + modifierIndex;
     }
 
 

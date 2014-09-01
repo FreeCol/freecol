@@ -152,8 +152,7 @@ public final class MapViewer {
         public int hashCode() {
             int hash = super.hashCode();
             hash = 37 * hash + Utils.hashCode(image);
-            hash = 37 * hash + index;
-            return hash;
+            return 37 * hash + index;
         }
     }
 

@@ -149,8 +149,7 @@ public class ManageMissionariesGoal extends Goal {
 
     public String getGoalDescription() {
         String descr = super.getGoalDescription();
-        descr += ":"+availableUnitsList.size();
-        return descr;
+        return descr + ":" + availableUnitsList.size();
     }
 
 /* INTERNAL *******************************************************************/

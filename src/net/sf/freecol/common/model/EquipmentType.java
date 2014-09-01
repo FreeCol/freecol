@@ -191,14 +191,11 @@ public class EquipmentType extends BuildableType {
      */
     @Override
     public int hashCode() {
-        final int prime = 31;
         int result = 1;
-        result = prime
-            * result
+        result = 37 * result
             + ((compatibleEquipment == null) ? 0 : compatibleEquipment
                .hashCode());
-        result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
-        return result;
+        return 37 * result + ((getId() == null) ? 0 : getId().hashCode());
     }
 
     /**

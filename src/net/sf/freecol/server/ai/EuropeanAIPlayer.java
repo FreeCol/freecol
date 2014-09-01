@@ -2757,9 +2757,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         // what we could get for the goods in Europe (minus taxes)
         int netProfits = ((100 - getPlayer().getTax())
                           * getPlayer().getMarket().getSalePrice(goods.getType(), amount)) / 100;
-        int price = (netProfits * percentage) / 100;
-        return price;
-
+        return (netProfits * percentage) / 100;
     }
 
     /**

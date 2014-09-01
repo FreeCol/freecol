@@ -383,8 +383,7 @@ public class ModelMessage extends StringTemplate {
     public int hashCode() {
         int hash = super.hashCode();
         hash = 37 * hash + sourceId.hashCode();
-        hash = 37 * hash + messageType.ordinal();
-        return hash;
+        return 37 * hash + messageType.ordinal();
     }
 
 

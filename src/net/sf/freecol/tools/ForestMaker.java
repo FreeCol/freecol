@@ -111,8 +111,7 @@ public class ForestMaker {
             int hash = super.hashCode();
             hash = 37 * hash + x;
             hash = 37 * hash + y;
-            hash = 37 * hash + image.hashCode();
-            return hash;
+            return 37 * hash + image.hashCode();
         }
     }
 

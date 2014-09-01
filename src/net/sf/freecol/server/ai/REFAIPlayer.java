@@ -123,8 +123,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
             hash = 37 * hash + Utils.hashCode(path);
             hash = 37 * hash + Utils.hashCode(score);
             hash = 37 * hash + Utils.hashCode(disembarkTile);
-            hash = 37 * hash + Utils.hashCode(entry);
-            return hash;
+            return 37 * hash + Utils.hashCode(entry);
         }
     }
 
