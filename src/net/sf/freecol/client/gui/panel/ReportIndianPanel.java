@@ -195,9 +195,8 @@ public final class ReportIndianPanel extends ReportPanel {
                         skillString = "indianSettlement.skillNone";
                     } else {
                         skillString = skillType.getNameKey();
-                        ImageIcon skillImage = getLibrary()
-                            .getUnitImageIcon(skillType, 0.66);
-                        skillLabel.setIcon(skillImage);
+                        skillLabel.setIcon(getLibrary()
+                            .getUnitImageIcon(skillType, 0.66));
                     }
                 } else {
                     skillString = "indianSettlement.skillUnknown";

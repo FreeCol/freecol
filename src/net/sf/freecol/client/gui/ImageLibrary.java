@@ -1189,16 +1189,8 @@ public final class ImageLibrary {
                                       boolean nativeEthnicity,
                                       boolean grayscale, double scale) {
         // units that can only be native don't need the .native key part
-        if ("model.unit.indianConvert".equals(unitType.getId())
-            || "model.unit.brave".equals(unitType.getId())) {
+        if (unitType.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)) {
             nativeEthnicity = false;
-        } else {
-            for (Entry<String, Boolean> entry
-                     : unitType.getRequiredAbilities().entrySet()) {
-                if (Ability.NATIVE.equals(entry.getKey()) && entry.getValue()) {
-                    nativeEthnicity = false;
-                }
-            }
         }
 
         // try to get an image matching the key
@@ -1214,39 +1206,14 @@ public final class ImageLibrary {
             ? ResourceManager.getGrayscaleImage(key, scale)
             : ResourceManager.getImage(key, scale);
         if (image == null) {
-            logger.warning("No image icon for: unitType=" + unitType.getId()
+            String complain = "No image icon for: unitType=" + unitType.getId()
                 + " role=" + roleId + " native=" + nativeEthnicity
                 + " gray=" + grayscale + " scale=" + scale
-                + " (roleQual=" + roleQual + " key=" + key + ")");
-            // FIXME: these require the game specification, which
-            // ImageLibrary doesn't yet have access to
-
-            /*
-            if (role != Role.DEFAULT && !unitType.getId().equals("model.unit.freeColonist")) {
-                // try a free colonist with the same role
-                unitType = getGame().getSpecification().getUnitType("model.unit.freeColonist");
-                return getUnitImageIcon(unitType, role, false, grayscale, scale);
-            } else {
-                // give up, draw a standard unit icon
-                unitType = getGame().getSpecification().getUnitType("model.unit.freeColonist");
-                return getUnitImageIcon(unitType, Role.DEFAULT, false, grayscale, scale);
-            }*/
+                + " roleQual=" + roleQual + " key=" + key;
+            logger.warning(complain);
             return null;
+            // Consider throwing a RuntimeException.
         }
         return new ImageIcon(image);
     }
-
-    /*
-    private Image getPathIllegalImage(Unit u) {
-        if (u == null || u.isNaval()) {
-            return (Image) UIManager.get("path.naval.illegal.image");
-        } else if (u.isMounted()) {
-            return (Image) UIManager.get("path.horse.illegal.image");
-        } else if (u.getType() == Unit.WAGON_TRAIN || u.getType() == Unit.TREASURE_TRAIN || u.getType() == Unit.ARTILLERY || u.getType() == Unit.DAMAGED_ARTILLERY) {
-            return (Image) UIManager.get("path.wagon.illegal.image");
-        } else {
-            return (Image) UIManager.get("path.foot.illegal.image");
-        }
-    }
-    */
 }

@@ -180,25 +180,35 @@ public final class UnitLabel extends JLabel
      * @param isSmall The image will be smaller if set to <code>true</code>.
      */
     public void setSmall(boolean isSmall) {
-        ImageIcon imageIcon = gui.getImageLibrary().getUnitImageIcon(unit);
-        ImageIcon disabledImageIcon = gui.getImageLibrary().getUnitImageIcon(unit, true);
+        final ImageLibrary lib = gui.getImageLibrary();
+        ImageIcon imageIcon = lib.getUnitImageIcon(unit);
+        ImageIcon disabledImageIcon = lib.getUnitImageIcon(unit, true);
         if (isSmall) {
             setPreferredSize(null);
-            // setIcon(new
-            // ImageIcon(imageIcon.getImage().getScaledInstance(imageIcon.getIconWidth()
-            // / 2, imageIcon.getIconHeight() / 2, Image.SCALE_DEFAULT)));
-            setIcon(new ImageIcon(imageIcon.getImage().getScaledInstance((imageIcon.getIconWidth() / 3) * 2,
-                                                                         (imageIcon.getIconHeight() / 3) * 2, Image.SCALE_SMOOTH)));
-
-            setDisabledIcon(new ImageIcon(disabledImageIcon.getImage().getScaledInstance(
-                                                                                         (imageIcon.getIconWidth() / 3) * 2, (imageIcon.getIconHeight() / 3) * 2, Image.SCALE_SMOOTH)));
+            if (imageIcon != null) {
+                // setIcon(new ImageIcon(imageIcon.getImage()
+                //     .getScaledInstance(imageIcon.getIconWidth() / 2,
+                //                        imageIcon.getIconHeight() / 2,
+                //                        Image.SCALE_DEFAULT)));
+                setIcon(new ImageIcon(imageIcon.getImage()
+                        .getScaledInstance((imageIcon.getIconWidth() / 3) * 2,
+                                           (imageIcon.getIconHeight() / 3) * 2,
+                                           Image.SCALE_SMOOTH)));
+            }
+            if (disabledImageIcon != null && imageIcon != null) {
+                setDisabledIcon(new ImageIcon(disabledImageIcon.getImage()
+                        .getScaledInstance((imageIcon.getIconWidth() / 3) * 2,
+                                           (imageIcon.getIconHeight() / 3) * 2,
+                                           Image.SCALE_SMOOTH)));
+            }
             setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 0));
             this.isSmall = true;
         } else {
             if (unit.getLocation() instanceof ColonyTile) {
                 final Tile tile = ((ColonyTile) unit.getLocation()).getTile();
                 final TileType tileType = tile.getType();
-                final Image image = gui.getImageLibrary().getTerrainImage(tileType, tile.getX(), tile.getY());
+                final Image image = lib.getTerrainImage(tileType, tile.getX(),
+                                                        tile.getY());
                 setSize(new Dimension(image.getWidth(null) / 2,
                                       imageIcon.getIconHeight()));
             } else {

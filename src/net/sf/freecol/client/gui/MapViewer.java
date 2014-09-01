@@ -969,8 +969,9 @@ public final class MapViewer {
             centerImage(g, image);
         }
 
-        if (unit != null) {
-            ImageIcon image = lib.getUnitImageIcon(unit, 0.5);
+        ImageIcon image;
+        if (unit != null
+            && (image = lib.getUnitImageIcon(unit, 0.5)) != null) {
             g.drawImage(image.getImage(),
                         tileWidth/4 - image.getIconWidth() / 2,
                         halfHeight - image.getIconHeight() / 2, null);
@@ -2552,53 +2553,48 @@ public final class MapViewer {
     private void displayUnit(Graphics2D g, Unit unit) {
         final Player player = freeColClient.getMyPlayer();
 
-        try {
-            // Draw the 'selected unit' image if needed.
-            //if ((unit == getActiveUnit()) && cursor) {
-            if (displayUnitCursor(unit)) {
-                drawCursor(g);
-            }
+        // Draw the 'selected unit' image if needed.
+        //if ((unit == getActiveUnit()) && cursor) {
+        if (displayUnitCursor(unit)) drawCursor(g);
 
-            // Draw the unit.
-            // If unit is sentry, draw in grayscale
-            boolean fade = (unit.getState() == Unit.UnitState.SENTRY)
-                || (unit.hasTile()
-                    && player != null
-                    && !player.canSee(unit.getTile()));
-            Image image = lib.getUnitImageIcon(unit, fade).getImage();
-            Point p = getUnitImagePositionInTile(image);
-            g.drawImage(image, p.x, p.y, null);
+        // Draw the unit.
+        // If unit is sentry, draw in grayscale
+        boolean fade = (unit.getState() == Unit.UnitState.SENTRY)
+            || (unit.hasTile()
+                && player != null && !player.canSee(unit.getTile()));
+        Image image = lib.getUnitImageIcon(unit, fade).getImage();
+        if (image == null) return; // Defend against resource failure
 
-            // Draw an occupation and nation indicator.
-            boolean owned = player != null && player.owns(unit);
-            String text = Messages.message(unit.getOccupationKey(owned));
-            g.drawImage(lib.getOccupationIndicatorChip(unit, text),
-                        (int)(STATE_OFFSET_X * lib.getScalingFactor()), 0,
-                        null);
+        Point p = getUnitImagePositionInTile(image);
+        g.drawImage(image, p.x, p.y, null);
 
-            // Draw one small line for each additional unit (like in civ3).
-            int unitsOnTile = 0;
-            if (unit.hasTile()) {
-                // When a unit is moving from tile to tile, it is
-                // removed from the source tile.  So the unit stack
-                // indicator cannot be drawn during the movement see
-                // UnitMoveAnimation.animate() for details
-                unitsOnTile = unit.getTile().getTotalUnitCount();
+        // Draw an occupation and nation indicator.
+        boolean owned = player != null && player.owns(unit);
+        String text = Messages.message(unit.getOccupationKey(owned));
+        g.drawImage(lib.getOccupationIndicatorChip(unit, text),
+                    (int)(STATE_OFFSET_X * lib.getScalingFactor()), 0,
+                    null);
+
+        // Draw one small line for each additional unit (like in civ3).
+        int unitsOnTile = 0;
+        if (unit.hasTile()) {
+            // When a unit is moving from tile to tile, it is
+            // removed from the source tile.  So the unit stack
+            // indicator cannot be drawn during the movement see
+            // UnitMoveAnimation.animate() for details
+            unitsOnTile = unit.getTile().getTotalUnitCount();
+        }
+        if (unitsOnTile > 1) {
+            g.setColor(Color.WHITE);
+            int unitLinesY = OTHER_UNITS_OFFSET_Y;
+            int x1 = (int)((STATE_OFFSET_X + OTHER_UNITS_OFFSET_X)
+                * lib.getScalingFactor());
+            int x2 = (int)((STATE_OFFSET_X + OTHER_UNITS_OFFSET_X
+                    + OTHER_UNITS_WIDTH) * lib.getScalingFactor());
+            for (int i = 0; i < unitsOnTile && i < MAX_OTHER_UNITS; i++) {
+                g.drawLine(x1, unitLinesY, x2, unitLinesY);
+                unitLinesY += 2;
             }
-            if (unitsOnTile > 1) {
-                g.setColor(Color.WHITE);
-                int unitLinesY = OTHER_UNITS_OFFSET_Y;
-                int x1 = (int)((STATE_OFFSET_X + OTHER_UNITS_OFFSET_X)
-                    * lib.getScalingFactor());
-                int x2 = (int)((STATE_OFFSET_X + OTHER_UNITS_OFFSET_X
-                        + OTHER_UNITS_WIDTH) * lib.getScalingFactor());
-                for (int i = 0; i < unitsOnTile && i < MAX_OTHER_UNITS; i++) {
-                    g.drawLine(x1, unitLinesY, x2, unitLinesY);
-                    unitLinesY += 2;
-                }
-            }
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "displayUnit " + unit, e);
         }
 
         // FOR DEBUGGING
@@ -2952,6 +2948,7 @@ public final class MapViewer {
      */
     private JLabel getUnitLabel(Unit unit) {
         final Image unitImg = lib.getUnitImageIcon(unit).getImage();
+        if (unitImg == null) return null;
 
         final int width = halfWidth + unitImg.getWidth(null)/2;
         final int height = unitImg.getHeight(null);
