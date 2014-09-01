@@ -122,6 +122,20 @@ public final class InGameController implements NetworkConstants {
 
     private static final Logger logger = Logger.getLogger(InGameController.class.getName());
 
+    /**
+     * Selecting next unit depends on mode--- either from the active list,
+     * from the going-to list, or flush going-to and end the turn.
+     */
+    private static enum MoveMode {
+        NEXT_ACTIVE_UNIT,
+        EXECUTE_GOTO_ORDERS,
+        END_TURN;
+
+        public MoveMode maximize(MoveMode m) {
+            return (this.ordinal() < m.ordinal()) ? m : this;
+        }
+    }
+
     /** Warning levels. */
     private static final String levels[] = new String[] {
         "low", "normal", "high"
@@ -141,12 +155,8 @@ public final class InGameController implements NetworkConstants {
 
     private final short UNIT_LAST_MOVE_DELAY = 300;
 
-    // Selecting next unit depends on mode--- either from the active list,
-    // from the going-to list, or flush going-to and end the turn.
-    private final int MODE_NEXT_ACTIVE_UNIT = 0;
-    private final int MODE_EXECUTE_GOTO_ORDERS = 1;
-    private final int MODE_END_TURN = 2;
-    private int moveMode = MODE_NEXT_ACTIVE_UNIT;
+    /** Current mode for moving units. */
+    private MoveMode moveMode = MoveMode.NEXT_ACTIVE_UNIT;
 
     private int turnsPlayed = 0;
 
@@ -430,9 +440,7 @@ public final class InGameController implements NetworkConstants {
         Unit stillActive = null;
 
         // Ensure the goto mode sticks.
-        if (moveMode < MODE_EXECUTE_GOTO_ORDERS) {
-            moveMode = MODE_EXECUTE_GOTO_ORDERS;
-        }
+        moveMode = moveMode.maximize(MoveMode.EXECUTE_GOTO_ORDERS);
 
         // Deal with the trade route units first.
         List<ModelMessage> messages = new ArrayList<ModelMessage>();
@@ -500,7 +508,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Restart the selection cycle.
-        moveMode = MODE_NEXT_ACTIVE_UNIT;
+        moveMode = MoveMode.NEXT_ACTIVE_UNIT;
         turnsPlayed++;
 
         // Clear outdated turn report messages.
@@ -924,7 +932,7 @@ public final class InGameController implements NetworkConstants {
      */
     public void endTurn() {
         // Ensure end-turn mode sticks.
-        if (moveMode < MODE_END_TURN) moveMode = MODE_END_TURN;
+        moveMode = moveMode.maximize(MoveMode.END_TURN);
 
         // Make sure all goto orders are complete before ending turn.
         if (!doExecuteGotoOrders()) return;
@@ -3943,7 +3951,7 @@ public final class InGameController implements NetworkConstants {
         nextModelMessage();
 
         // Flush any outstanding orders once the mode is raised.
-        if (moveMode >= MODE_EXECUTE_GOTO_ORDERS
+        if (moveMode != MoveMode.NEXT_ACTIVE_UNIT
             && !doExecuteGotoOrders()) {
             return;
         }
