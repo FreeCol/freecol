@@ -207,7 +207,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
             if (file.getName() == null
                 || !file.getName().startsWith(prefix)) continue;
             final String languageID = file.getName()
-                .substring(prefixLength, file.getName().indexOf("."));
+                .substring(prefixLength, file.getName().indexOf('.'));
             // qqq contains explanations only
             if ("qqq".equals(languageID)) continue;
             try {

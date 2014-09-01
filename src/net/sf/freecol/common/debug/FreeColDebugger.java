@@ -186,7 +186,7 @@ public class FreeColDebugger {
      * @param option The command line option.
      */
     public static void configureDebugRun(String option) {
-        int comma = option.indexOf(",");
+        int comma = option.indexOf(',');
         String turns = option.substring(0, (comma < 0) ? option.length()
             : comma);
         try {

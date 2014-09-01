@@ -334,13 +334,13 @@ public class Messages {
                 return result.toString();
             }
             highWaterMark = closeChoice + 2;
-            int colonIndex = input.indexOf(":", openChoice + 2);
+            int colonIndex = input.indexOf(':', openChoice + 2);
             if (colonIndex < 0 || colonIndex > closeChoice) {
                 logger.warning("No tag found: " + input);
                 continue;
             }
             String tag = input.substring(openChoice + 2, colonIndex);
-            int pipeIndex = input.indexOf("|", colonIndex + 1);
+            int pipeIndex = input.indexOf('|', colonIndex + 1);
             if (pipeIndex < 0 || pipeIndex > closeChoice) {
                 logger.warning("No choices found: " + input);
                 continue;
@@ -426,10 +426,10 @@ public class Messages {
                 }
             } else {
                 int start = keyIndex + selector.length() + 1;
-                int replacementIndex = input.indexOf("|", start);
+                int replacementIndex = input.indexOf('|', start);
                 int nextOpenIndex = input.indexOf("{{", start);
                 if (nextOpenIndex >= 0 && nextOpenIndex < replacementIndex) {
-                    replacementIndex = input.indexOf("|", findMatchingBracket(input, nextOpenIndex + 2) + 2);
+                    replacementIndex = input.indexOf('|', findMatchingBracket(input, nextOpenIndex + 2) + 2);
                 }
                 int end = (replacementIndex < 0 || replacementIndex > closeChoice)
                     ? closeChoice : replacementIndex;
@@ -459,7 +459,7 @@ public class Messages {
             return null;
         } else {
             int start = keyIndex + key.length() + 1;
-            int end = input.indexOf("|", start);
+            int end = input.indexOf('|', start);
             if (end < 0) {
                 end = input.indexOf("}}", start);
                 if (end < 0) {

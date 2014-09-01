@@ -103,7 +103,7 @@ public class FreeColMenuTest implements ActionListener, ItemListener {
     // Returns just the class name -- no package info.
     protected String getClassName(Object o) {
         String classString = o.getClass().getName();
-        int dotIndex = classString.lastIndexOf(".");
+        int dotIndex = classString.lastIndexOf('.');
         return classString.substring(dotIndex+1);
     }
 
