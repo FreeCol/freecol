@@ -333,11 +333,10 @@ public class Player extends FreeColGameObject implements Nameable {
 
 
         // Helpers to enforce valid transitions
-        private void badStance() throws IllegalStateException {
+        private void badStance() {
             throw new IllegalStateException("Bogus stance");
         }
-        private void badTransition(Stance newStance)
-            throws IllegalStateException {
+        private void badTransition(Stance newStance) {
             throw new IllegalStateException("Bad transition: " + this
                                             + " -> " + newStance);
         }

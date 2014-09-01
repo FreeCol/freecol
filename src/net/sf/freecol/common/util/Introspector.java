@@ -189,8 +189,7 @@ public class Introspector {
      * @return A <code>String</code> containing the result of invoking
      *         the get-method.
      */
-    public String getter(Object obj)
-        throws IllegalArgumentException {
+    public String getter(Object obj) {
         Method getMethod = getGetMethod();
         Class<?> fieldType = getMethodReturnType(getMethod);
 
@@ -287,8 +286,8 @@ public class Introspector {
      * @return The new object instance.
      * @exception IllegalArgumentException wraps all exceptional conditions.
      */
-    public static Object instantiate(String tag, Class[] types, Object[] params)
-        throws IllegalArgumentException {
+    public static Object instantiate(String tag, Class[] types,
+                                     Object[] params) {
         Class<?> messageClass;
         try {
             messageClass = Class.forName(tag);

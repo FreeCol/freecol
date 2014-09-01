@@ -258,7 +258,7 @@ public class Game extends FreeColGameObject {
      * @return The game object, or null if not found.
      */
     public <T extends FreeColGameObject> T getFreeColGameObject(String id,
-        Class<T> returnClass) throws ClassCastException {
+        Class<T> returnClass) {
         FreeColGameObject fcgo = getFreeColGameObject(id);
         try {
             return returnClass.cast(fcgo);
