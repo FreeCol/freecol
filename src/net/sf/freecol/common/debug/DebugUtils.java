@@ -380,7 +380,11 @@ public class DebugUtils {
         // Note "game" is no longer valid after reconnect.
         Unit unit = freeColClient.getGame()
             .getFreeColGameObject(sUnit.getId(), Unit.class);
-        if (unit != null) gui.setActiveUnit(unit);
+        if (unit != null) {
+            gui.setActiveUnit(unit);
+            gui.refresh();
+            gui.resetMenuBar();
+        }
     }
 
     /**
@@ -509,6 +513,8 @@ public class DebugUtils {
             && gui.getActiveUnit().getOwner() != myPlayer) {
             freeColClient.getInGameController().nextActiveUnit();
         }
+        gui.refresh();
+        gui.resetMenuBar();
     }
 
     /**
@@ -549,6 +555,8 @@ public class DebugUtils {
         } else {
             freeColClient.getInGameController().nextActiveUnit();
         }
+        gui.refresh();
+        gui.resetMenuBar();
     }
 
     /**
@@ -804,9 +812,10 @@ public class DebugUtils {
         final FreeColServer server = freeColClient.getFreeColServer();
         final AIMain aiMain = server.getAIMain();
         final AIUnit aiUnit = aiMain.getAIUnit(unit);
-        TransportMission tm = aiUnit.getMission(TransportMission.class);
-        String msg = (tm != null) ? tm.toFullString()
-            : "Unit has no transport mission.";
+        Mission m = aiUnit.getMission();
+        String msg = (m == null) ? "No mission"
+            : (m instanceof TransportMission) ? ((TransportMission)m).toFullString()
+            : m.toString();
         freeColClient.getGUI().showInformationMessage(msg);
     }
 
@@ -907,6 +916,7 @@ public class DebugUtils {
             }
         }
         gui.refresh();
+        gui.resetMenuBar();
     }
 
     /**

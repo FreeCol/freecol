@@ -1527,14 +1527,18 @@ public final class Canvas extends JDesktopPane {
      */
     public OptionGroup showClientOptionsDialog() {
         ClientOptionsDialog dialog = new ClientOptionsDialog(freeColClient);
-        //clientOptionsDialogShowing = true;
-        OptionGroup group = showFreeColDialog(dialog, null);
-        clientOptionsDialogShowing = false;
-        if (group != null) {
-            freeColClient.updateActions();
-            gui.resetMenuBar();
-            // Immediately redraw the minimap if that was updated.
-            gui.updateMapControls();
+        OptionGroup group = null;
+        clientOptionsDialogShowing = true;
+        try {
+            group = showFreeColDialog(dialog, null);
+        } finally {
+            clientOptionsDialogShowing = false;
+            if (group != null) {
+                freeColClient.updateActions();
+                gui.resetMenuBar();
+                // Immediately redraw the minimap if that was updated.
+                gui.updateMapControls();
+            }
         }
         return group;
     }
