@@ -411,4 +411,14 @@ public final class ReportTurnPanel extends ReportPanel {
         StyleConstants.setComponent(document.getStyle("button"), button);
         document.insertString(document.getLength(), " ", document.getStyle("button"));
     }
+    
+
+    // Interface ActionListener
+
+    /**
+     * {@inheritDoc}
+     */
+    public void actionPerformed(ActionEvent event) {
+        super.actionPerformed(event);
+    }
 }

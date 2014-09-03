@@ -346,9 +346,6 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
     @Override
     public void requestFocus() {
         // The OK button requests focus if it exists.
-        if (okButton != null) {
-System.err.println("RQF " + this);
-            okButton.requestFocus();
-        }
+        if (okButton != null) okButton.requestFocus();
     }
 }

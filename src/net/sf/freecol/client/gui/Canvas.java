@@ -2918,7 +2918,6 @@ public final class Canvas extends JDesktopPane {
             showSubPanel(new ReportTurnPanel(freeColClient, messages), true);
         } else {
             r.setMessages(messages);
-            r.requestFocus();
         }
     }
 }
