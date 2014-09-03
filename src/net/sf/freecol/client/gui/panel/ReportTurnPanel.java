@@ -22,7 +22,7 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.List;
@@ -67,7 +67,7 @@ public final class ReportTurnPanel extends ReportPanel {
     private static final Logger logger = Logger.getLogger(ReportTurnPanel.class.getName());
 
     /** The messages to display. */
-    private ModelMessage[] messages;
+    private List<ModelMessage> messages;
 
     private Hashtable<String, Vector<JComponent>> textPanesByMessage
         = new Hashtable<String, Vector<JComponent>>();
@@ -82,7 +82,7 @@ public final class ReportTurnPanel extends ReportPanel {
      * @param messages The <code>ModelMessages</code> to display in the report.
      */
     public ReportTurnPanel(FreeColClient freeColClient,
-                           ModelMessage... messages) {
+                           List<ModelMessage> messages) {
         super(freeColClient, Messages.message("reportTurnAction.name"));
 
         // Display Panel
@@ -96,7 +96,7 @@ public final class ReportTurnPanel extends ReportPanel {
      *
      * @param messages The <code>ModelMessages</code> to display in the report.
      */
-    public void setMessages(ModelMessage[] messages) {
+    public void setMessages(List<ModelMessage> messages) {
         this.messages = messages;
         if (messages != null) displayMessages();
     }
@@ -111,8 +111,8 @@ public final class ReportTurnPanel extends ReportPanel {
         // count number of headlines
         Object source = this;
         ModelMessage.MessageType type = null;
-        if (comparator != null) Arrays.sort(messages, comparator);
-        for (final ModelMessage message : messages) {
+        if (comparator != null) Collections.sort(messages, comparator);
+        for (ModelMessage message : messages) {
             if (groupBy == ClientOptions.MESSAGES_GROUP_BY_SOURCE) {
                 FreeColGameObject messageSource = game.getMessageSource(message);
                 if (messageSource != source) {
@@ -126,7 +126,7 @@ public final class ReportTurnPanel extends ReportPanel {
         
         source = this;
         type = null;
-        for (final ModelMessage message : messages) {
+        for (ModelMessage message : messages) {
             // add headline if necessary
             if (groupBy == ClientOptions.MESSAGES_GROUP_BY_SOURCE) {
                 FreeColGameObject messageSource = game.getMessageSource(message);
@@ -187,10 +187,11 @@ public final class ReportTurnPanel extends ReportPanel {
             if (message.getMessageType() == ModelMessage.MessageType.WAREHOUSE_CAPACITY) {
                 JButton ignoreButton = new JButton("x");
                 ignoreButton.setToolTipText(Messages.message(new StringTemplate("model.message.ignore", message)));
+                final ModelMessage m = message;
                 ignoreButton.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent event) {
                             boolean flag = label.isEnabled();
-                            getController().ignoreMessage(message, flag);
+                            getController().ignoreMessage(m, flag);
                             textPane.setEnabled(!flag);
                             label.setEnabled(!flag);
                         }
@@ -218,6 +219,7 @@ public final class ReportTurnPanel extends ReportPanel {
                 JButton filterButton = new JButton("X");
                 filterButton.setToolTipText(Messages.message(StringTemplate.template("model.message.filter")
                         .add("%type%", message.getMessageTypeName())));
+                final ModelMessage m = message;
                 filterButton.addActionListener(new ActionListener() {
                         
                         public void actionPerformed(ActionEvent event) {
@@ -226,7 +228,7 @@ public final class ReportTurnPanel extends ReportPanel {
                             //textPane.setEnabled(!flag);
                             //label.setEnabled(!flag);
                             
-                            setEnabledByType(message.getMessageType(), !flag);
+                            setEnabledByType(m.getMessageType(), !flag);
                         }
                         
                     });
@@ -240,12 +242,12 @@ public final class ReportTurnPanel extends ReportPanel {
     }
 
     private void setEnabledByType(ModelMessage.MessageType type, boolean enabled) {
-        for (int i = 0; i < messages.length; i++) {
-            if (messages[i].getMessageType() == type) {
-                for (JComponent textPane: textPanesByMessage.get(messages[i].getId())) {
+        for (ModelMessage m : messages) {
+            if (m.getMessageType() == type) {
+                for (JComponent textPane: textPanesByMessage.get(m.getId())) {
                     textPane.setEnabled(enabled);
                 }
-                for (JComponent label: labelsByMessage.get(messages[i].getId())) {
+                for (JComponent label: labelsByMessage.get(m.getId())) {
                     label.setEnabled(enabled);
                 }
             }

@@ -144,7 +144,8 @@ public final class InGameController implements NetworkConstants {
         = new HashMap<String, Integer>();
 
     /** The messages in the last turn report. */
-    private ModelMessage[] turnReportMessages;
+    private final List<ModelMessage> turnReportMessages
+        = new ArrayList<ModelMessage>();
 
     private GUI gui;
 
@@ -494,7 +495,7 @@ public final class InGameController implements NetworkConstants {
         turnsPlayed++;
 
         // Clear outdated turn report messages.
-        turnReportMessages = null;
+        turnReportMessages.clear();
 
         // Inform the server of end of turn.
         askServer().endTurn();
@@ -1210,7 +1211,6 @@ public final class InGameController implements NetworkConstants {
         } catch (IOException e) {
             gui.showErrorMessage("couldNotSaveGame");
         }
-        gui.requestFocusInWindow();
         return result;
     }
 
@@ -1359,17 +1359,16 @@ public final class InGameController implements NetworkConstants {
         if (messages.size() > 0) {
             Runnable uiTask;
             if (endOfTurn) {
-                turnReportMessages = messages.toArray(new ModelMessage[0]);
+                turnReportMessages.addAll(messages);
                 uiTask = new Runnable() {
                         public void run() {
                             displayTurnReportMessages();
                         }
                     };
             } else {
-                final ModelMessage[] a = messages.toArray(new ModelMessage[0]);
                 uiTask = new Runnable() {
                         public void run() {
-                            gui.showModelMessages(a);
+                            gui.showModelMessages(messages);
                         }
                     };
             }

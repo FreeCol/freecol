@@ -1491,7 +1491,7 @@ public class GUI {
         return canvas.showMapSizeDialog();
     }
 
-    public void showModelMessages(ModelMessage... modelMessages) {
+    public void showModelMessages(List<ModelMessage> modelMessages) {
         if (canvas == null) return;
         canvas.showModelMessages(modelMessages);
     }
@@ -1672,7 +1672,7 @@ public class GUI {
         canvas.showReportTradePanel();
     }
 
-    public void showReportTurnPanel(ModelMessage... messages) {
+    public void showReportTurnPanel(List<ModelMessage> messages) {
         if (canvas == null) return;
         canvas.showReportTurnPanel(messages);
     }

@@ -2067,16 +2067,16 @@ public final class Canvas extends JDesktopPane {
      *
      * @param messages The <code>ModelMessage</code>s to display.
      */
-    public void showModelMessages(ModelMessage... messages) {
-        final int n = messages.length;
-        if (n <= 0) return;
+    public void showModelMessages(List<ModelMessage> messages) {
+        if (messages.isEmpty()) return;
         final Game game = freeColClient.getGame();
+        int n = messages.size();
         String[] texts = new String[n];
         FreeColObject[] fcos = new FreeColObject[n];
         ImageIcon[] icons = new ImageIcon[n];
         Tile tile = null;
         for (int i = 0; i < n; i++) {
-            ModelMessage m = messages[i];
+            ModelMessage m = messages.get(i);
             texts[i] = Messages.message(m);
             fcos[i] = game.getMessageSource(m);
             icons[i] = gui.getImageIcon(game.getMessageDisplay(m), false);
@@ -2912,7 +2912,7 @@ public final class Canvas extends JDesktopPane {
      *
      * @param messages The <code>ModelMessage</code>s to show.
      */
-    public void showReportTurnPanel(ModelMessage... messages) {
+    public void showReportTurnPanel(List<ModelMessage> messages) {
         ReportTurnPanel r = getExistingFreeColPanel(ReportTurnPanel.class);
         if (r == null) {
             showSubPanel(new ReportTurnPanel(freeColClient, messages), true);
