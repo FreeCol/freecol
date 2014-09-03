@@ -277,9 +277,16 @@ public final class DefaultTransferHandler extends TransferHandler {
                 }
 
                 if (comp instanceof UnitLabel) {
-                    return equipUnitIfPossible((UnitLabel)comp,
-                                               label.getGoods());
-                } else if (comp instanceof CargoPanel) {
+                    if (equipUnitIfPossible((UnitLabel)comp,
+                                            label.getGoods())) return true;
+                    // Try again with parent
+                    if (comp.getParent() instanceof JComponent) {
+                        comp = (JComponent)comp.getParent();
+                    } else {
+                        return false;
+                    }
+                }
+                if (comp instanceof CargoPanel) {
                     ((CargoPanel)comp).add(data, true);
                     comp.revalidate();
                     return true;
@@ -368,7 +375,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                 recognizer = new FreeColDragGestureRecognizer(new FreeColDragHandler());
             }
 
-            recognizer.gestured(comp, (MouseEvent) e , srcActions, dragAction);
+            recognizer.gestured(comp, (MouseEvent)e, srcActions, dragAction);
         } else {
             exportDone(comp, null, NONE);
         }
@@ -379,7 +386,8 @@ public final class DefaultTransferHandler extends TransferHandler {
      * This is the default drag handler for drag and drop operations that
      * use the <code>TransferHandler</code>.
      */
-    private static class FreeColDragHandler implements DragGestureListener, DragSourceListener {
+    private static class FreeColDragHandler
+        implements DragGestureListener, DragSourceListener {
 
         private boolean scrolls;
 

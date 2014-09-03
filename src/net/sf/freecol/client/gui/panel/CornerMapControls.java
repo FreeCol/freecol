@@ -197,7 +197,7 @@ public final class CornerMapControls extends MapControls {
             canvas.add(miniMapPanel, CONTROLS_LAYER);
         } catch (Exception e) {
             logger.log(Level.WARNING, "Minimap add fail: "
-                + miniMapPanel.getLocation(), e);
+                + miniMapPanel.getLocation() + " in " + canvas.getSize(), e);
         }
         if (rose) canvas.add(compassRose, CONTROLS_LAYER);
 

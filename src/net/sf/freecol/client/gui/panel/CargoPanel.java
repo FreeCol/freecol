@@ -250,7 +250,8 @@ public class CargoPanel extends FreeColPanel
                 MarketLabel label = (MarketLabel) comp;
                 Player player = carrier.getOwner();
                 if (player.canTrade(label.getType())) {
-                    getController().buyGoods(label.getType(), label.getAmount(), carrier);
+                    getController().buyGoods(label.getType(), 
+                                             label.getAmount(), carrier);
                     getController().nextModelMessage();
                     update();
                     return comp;
