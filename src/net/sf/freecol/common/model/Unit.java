@@ -70,6 +70,12 @@ public class Unit extends GoodsLocation
 
     private static final Logger logger = Logger.getLogger(Unit.class.getName());
 
+    /**
+     * A large number of turns, denoting pathfinding failure.  Do not use
+     * INFINITY as further calculation might use this.
+     */
+    public static final int MANY_TURNS = 10000;
+
     /** A comparator to order units by skill level. */
     private static Comparator<Unit> skillLevelComp
         = new Comparator<Unit>() {
@@ -2502,12 +2508,12 @@ public class Unit extends GoodsLocation
      * @param costDecider An optional <code>CostDecider</code> to
      *     score the path with.
      * @return The number of turns it will take to reach the <code>end</code>,
-     *         or <code>INFINITY</code> if no path can be found.
+     *         or <code>MANY_TURNS</code> if no path can be found.
      */
     public int getTurnsToReach(Location start, Location end, Unit carrier,
                                CostDecider costDecider) {
         PathNode path = findPath(start, end, carrier, costDecider);
-        return (path == null) ? INFINITY : path.getTotalTurns();
+        return (path == null) ? MANY_TURNS : path.getTotalTurns();
     }
 
     /**
