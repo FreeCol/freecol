@@ -2344,19 +2344,28 @@ public class EuropeanAIPlayer extends AIPlayer {
     protected List<AIUnit> doMissions(List<AIUnit> aiUnits, LogBuilder lb) {
         lb.add("\n  Do missions:");
         List<AIUnit> result = new ArrayList<AIUnit>();
+
+        // For all units, do their mission and collect the ones that need
+        // to be revisited.
         for (AIUnit aiu : aiUnits) {
             final Unit unit = aiu.getUnit();
             if (unit == null || unit.isDisposed()) continue;
-            final Mission old = aiu.getMission();
-            if (old == null) {
-                // WishRealizationMission cancelled by transport delivery?
+
+            // giveNormalMissions should have given all units a
+            // mission, but TransportMissions may have delivered a
+            // unit and completed its WishRealizationMission, so it is
+            // possible for a null mission to happen here.  Refer such
+            // units back to giveNormalMissions.
+            final Mission oldMission = aiu.getMission();
+            if (oldMission == null) {
                 result.add(aiu);
                 continue;
             }
+            final Location oldTarget = oldMission.getTarget();
+            final Location oldLocation = unit.getLocation();
+            final Colony oldColony = oldLocation.getColony();
 
-            // Do the mission.
-            final Location oldTarget = (old == null) ? null : old.getTarget();
-            final Colony oldLocation = unit.getLocation().getColony();
+            // Do the mission.  Clean up dead units.
             lb.add("\n  ", unit, " ");
             try {
                 aiu.doMission(lb);
@@ -2370,21 +2379,28 @@ public class EuropeanAIPlayer extends AIPlayer {
                 continue;
             }
 
-            // If the mission has changed, non-boarded transport will have
-            // been dropped already.  Boarded transport needs to be checked
-            // for a target change.
+            // If the mission has changed
+            //   - drop all non-boarded transport unless the target
+            //     is the same
+            //   - dump boarded transport with no target
+            //   - requeue all boarded transport unless the target
+            //     is the same
             final AIUnit aiCarrier = aiu.getTransport();
-            if (aiCarrier != null
-                && unit.getLocation() == aiCarrier.getUnit()) {
-                Mission m = aiu.getMission();
-                Location newTarget = (m == null) ? null : m.getTarget();
-                TransportMission tm
-                    = aiCarrier.getMission(TransportMission.class);
-                if (tm != null) {
-                    if (newTarget == null) {
-                        tm.dumpTransportable(aiu, lb);
-                    } else if (!Map.isSameLocation(newTarget, oldTarget)
-                        || unit.shouldTakeTransportTo(newTarget)) {
+            final Mission newMission = aiu.getMission();
+            TransportMission tm;
+            if (newMission != oldMission && aiCarrier != null
+                && (tm = aiCarrier.getMission(TransportMission.class)) != null) {
+                Location newTarget = (newMission == null) ? null
+                    : newMission.getTarget();
+                if (unit.getLocation() != aiCarrier.getUnit()) {
+                    if (!Map.isSameLocation(newTarget, oldTarget)) {
+                        lb.add(", drop transport on ", aiCarrier, ".");
+                        aiu.dropTransport();
+                    }
+                } else if (newTarget == null) {
+                    tm.dumpTransportable(aiu, lb);
+                } else {
+                    if (!Map.isSameLocation(newTarget, oldTarget)) {
                         tm.requeueTransportable(aiu, lb);
                     }
                 }
@@ -2404,7 +2420,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             // units that are about to wake up can see its tile
             // improvement plans.
             Colony newColony = unit.getLocation().getColony();
-            if (newColony != null
+            if (oldColony == null && newColony != null
                 && Map.isSameLocation(oldLocation, newColony)) {
                 AIColony aiColony = getAIColony(newColony);
                 aiColony.update(lb);
