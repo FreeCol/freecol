@@ -219,9 +219,7 @@ public final class PreGameInputHandler extends InputHandler {
 
         Player player = game
             .getFreeColGameObject(element.getAttribute("player"), Player.class);
-        boolean ready = Boolean.valueOf(element.getAttribute("value"))
-            .booleanValue();
-
+        boolean ready = Boolean.parseBoolean(element.getAttribute("value"));
         player.setReady(ready);
         getGUI().refreshPlayersTable();
 

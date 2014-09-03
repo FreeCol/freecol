@@ -51,11 +51,11 @@ public final class PercentageOptionUI extends SliderOptionUI<PercentageOption>  
 
         slider.setModel(new DefaultBoundedRangeModel(option.getValue(), 0, 0, 100));
         Hashtable<Integer, JComponent> labels = new Hashtable<Integer, JComponent>();
-        labels.put(new Integer(0), new JLabel("0 %"));
-        labels.put(new Integer(25), new JLabel("25 %"));
-        labels.put(new Integer(50), new JLabel("50 %"));
-        labels.put(new Integer(75), new JLabel("75 %"));
-        labels.put(new Integer(100), new JLabel("100 %"));
+        labels.put(Integer.valueOf(0),   new JLabel("0 %"));
+        labels.put(Integer.valueOf(25),  new JLabel("25 %"));
+        labels.put(Integer.valueOf(50),  new JLabel("50 %"));
+        labels.put(Integer.valueOf(75),  new JLabel("75 %"));
+        labels.put(Integer.valueOf(100), new JLabel("100 %"));
         slider.setLabelTable(labels);
         slider.setValue(option.getValue());
         slider.setMajorTickSpacing(5);

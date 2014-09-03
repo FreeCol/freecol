@@ -381,7 +381,7 @@ public class Operand extends Scope {
                                      ScopeLevel.class, ScopeLevel.NONE);
 
         int val = xr.getAttribute(VALUE_TAG, INFINITY);
-        if (val != INFINITY) value = new Integer(val);
+        if (val != INFINITY) value = Integer.valueOf(val);
     }
 
     /**

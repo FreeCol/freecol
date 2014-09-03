@@ -573,7 +573,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
 
                 int amount = xr.getAttribute(AMOUNT_TAG, 0);
 
-                storage.put(goodsType, new Integer(amount));
+                storage.put(goodsType, Integer.valueOf(amount));
 
             } else {
                 throw new XMLStreamException("Bogus GoodsContainer tag: "

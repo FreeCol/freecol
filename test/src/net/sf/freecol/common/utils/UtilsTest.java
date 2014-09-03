@@ -31,15 +31,15 @@ public class UtilsTest extends FreeColTestCase {
 
     private List<Integer> makeList(int... args) {
         List<Integer> l = new ArrayList<Integer>();
-        for (int a : args) l.add(new Integer(a));
+        for (int a : args) l.add(Integer.valueOf(a));
         return l;
     }
 
     public void testGetPermutations() {
         List<Integer> l = new ArrayList<Integer>();
-        l.add(new Integer(1));
-        l.add(new Integer(2));
-        l.add(new Integer(3));
+        l.add(Integer.valueOf(1));
+        l.add(Integer.valueOf(2));
+        l.add(Integer.valueOf(3));
         List<List<Integer>> p = new ArrayList<List<Integer>>();
         try {
             for (List<Integer> li : Utils.getPermutations(l)) p.add(li);

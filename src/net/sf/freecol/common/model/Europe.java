@@ -529,7 +529,7 @@ public class Europe extends UnitLocation implements Ownable, Named {
 
             int price = xr.getAttribute(PRICE_TAG, -1);
 
-            unitPrices.put(unitType, new Integer(price));
+            unitPrices.put(unitType, Integer.valueOf(price));
             xr.closeTag(UNIT_PRICE_TAG);
 
         } else {

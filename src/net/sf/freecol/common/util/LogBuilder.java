@@ -112,7 +112,7 @@ public class LogBuilder {
      * Remember a position in a buffer.
      */
     public void mark() {
-        if (sb != null) this.points.add(new Integer(sb.length()));
+        if (sb != null) this.points.add(Integer.valueOf(sb.length()));
     }
 
     /**

@@ -293,7 +293,7 @@ public final class TradeRoutePanel extends FreeColPanel {
             if (tradeRoute != null) {
                 Integer i = counts.get(tradeRoute);
                 int value = (i == null) ? 0 : i.intValue();
-                counts.put(tradeRoute, new Integer(value + 1));
+                counts.put(tradeRoute, Integer.valueOf(value + 1));
             }
         }
 

@@ -166,7 +166,7 @@ public class ServerEurope extends Europe implements ServerModelObject {
             : "model.option.priceIncrease";
         int increase = (spec.hasOption(option)) ? spec.getInteger(option) : 0;
         if (increase != 0) {
-            unitPrices.put(unitType, new Integer(price + increase));
+            unitPrices.put(unitType, Integer.valueOf(price + increase));
         }
     }
 

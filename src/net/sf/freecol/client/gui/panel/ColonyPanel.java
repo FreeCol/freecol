@@ -1879,7 +1879,7 @@ public final class ColonyPanel extends PortPanel
                     ASingleTilePanel aSTP = new ASingleTilePanel(colonyTile,
                                                                  x, y);
                     aSTP.initialize();
-                    add(aSTP, new Integer(layer++));
+                    add(aSTP, Integer.valueOf(layer++));
                 }
             }
 

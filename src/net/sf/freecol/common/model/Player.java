@@ -855,7 +855,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param value The new value.
      */
     public void setNameIndex(String key, int value) {
-        nameIndex.put(key, new Integer(value));
+        nameIndex.put(key, Integer.valueOf(value));
     }
 
     /**

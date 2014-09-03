@@ -212,7 +212,7 @@ public class Message {
      * @param value The value of the attribute.
      */
     public void setAttribute(String key, int value) {
-        setAttribute(key, (new Integer(value)).toString());
+        setAttribute(key, Integer.toString(value));
     }
 
     /**

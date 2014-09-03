@@ -440,7 +440,7 @@ public class ColonyPlan {
                         m = new HashMap<WorkLocation, Integer>();
                         production.put(g, m);
                     }
-                    m.put(wl, new Integer(p));
+                    m.put(wl, Integer.valueOf(p));
                 }
             }
         }

@@ -73,11 +73,11 @@ public final class EmigrationDialog extends FreeColChoiceDialog<Integer> {
         int i = 1;
         UnitType u0 = recruitables.remove(0);
         c.add(new ChoiceItem<Integer>(Messages.message(u0.getNameKey()),
-                new Integer(i++)).defaultOption()
+                Integer.valueOf(i++)).defaultOption()
             .setIcon(lib.getUnitImageIcon(u0, 0.66)));
         for (UnitType ut : recruitables) {
             c.add(new ChoiceItem<Integer>(Messages.message(ut.getNameKey()),
-                    new Integer(i++))
+                    Integer.valueOf(i++))
                 .setIcon(lib.getUnitImageIcon(ut, 0.66)));
         }
 

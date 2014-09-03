@@ -582,7 +582,7 @@ public class CombatTest extends FreeColTestCase {
         
         MockPseudoRandom random = new MockPseudoRandom();
         List<Integer> il = new ArrayList<Integer>();
-        il.add(new Integer(0));
+        il.add(Integer.valueOf(0));
         random.setNextNumbers(il, true);
 
         List<CombatResult> crs = combatModel.generateAttackResult(random,

@@ -289,7 +289,7 @@ public class ServerGame extends Game implements ServerModelObject {
             // between AI players.
             if (player.isAI()) { 
                 scores.put(player,
-                    new Integer(player.getSpanishSuccessionScore()));
+                    Integer.valueOf(player.getSpanishSuccessionScore()));
             }
         }
         if (!ready) return; // No player meets the support limit.

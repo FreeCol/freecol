@@ -1761,7 +1761,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 java.util.Map<Player, Integer> extra
                     = new HashMap<Player, Integer>();
                 for (Player enemy : game.getLiveEuropeanPlayers(this)) {
-                    extra.put(enemy, new Integer(0));
+                    extra.put(enemy, Integer.valueOf(0));
                 }
 
                 // Look at the uses of tiles surrounding the settlement.
@@ -3338,7 +3338,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     if (votes.get(claimant) != null) {
                         value += votes.get(claimant).intValue();
                     }
-                    votes.put(claimant, new Integer(value));
+                    votes.put(claimant, Integer.valueOf(value));
                 }
             }
             claimant = null;

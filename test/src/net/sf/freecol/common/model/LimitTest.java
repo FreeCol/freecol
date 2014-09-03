@@ -97,16 +97,16 @@ public class LimitTest extends FreeColTestCase {
         assertEquals(Limit.Operator.GE, rebelLimit.getOperator());
         assertEquals(Operand.OperandType.NONE, rebelLimit.getLeftHandSide().getOperandType());
         assertEquals(Operand.ScopeLevel.PLAYER, rebelLimit.getLeftHandSide().getScopeLevel());
-        assertEquals(new Integer(0), rebelLimit.getLeftHandSide().getValue(dutch));
-        assertEquals(new Integer(50), rebelLimit.getRightHandSide().getValue(dutch));
+        assertEquals(Integer.valueOf(0), rebelLimit.getLeftHandSide().getValue(dutch));
+        assertEquals(Integer.valueOf(50), rebelLimit.getRightHandSide().getValue(dutch));
         assertFalse(rebelLimit.evaluate(dutch));
 
         assertNotNull(colonyLimit);
         assertEquals(Limit.Operator.GT, colonyLimit.getOperator());
         assertEquals(Operand.OperandType.SETTLEMENTS, colonyLimit.getLeftHandSide().getOperandType());
         assertEquals(Operand.ScopeLevel.PLAYER, colonyLimit.getLeftHandSide().getScopeLevel());
-        assertEquals(new Integer(0), colonyLimit.getLeftHandSide().getValue(dutch));
-        assertEquals(new Integer(0), colonyLimit.getRightHandSide().getValue(dutch));
+        assertEquals(Integer.valueOf(0), colonyLimit.getLeftHandSide().getValue(dutch));
+        assertEquals(Integer.valueOf(0), colonyLimit.getRightHandSide().getValue(dutch));
         assertFalse(colonyLimit.evaluate(dutch));
 
         assertNotNull(yearLimit);
@@ -114,8 +114,8 @@ public class LimitTest extends FreeColTestCase {
         assertEquals(Operand.OperandType.YEAR, yearLimit.getLeftHandSide().getOperandType());
         assertEquals(Operand.OperandType.OPTION, yearLimit.getRightHandSide().getOperandType());
         assertEquals(GameOptions.LAST_COLONIAL_YEAR, yearLimit.getRightHandSide().getType());
-        assertEquals(new Integer(1492), yearLimit.getLeftHandSide().getValue(dutch));
-        assertEquals(new Integer(1800), yearLimit.getRightHandSide().getValue(dutch));
+        assertEquals(Integer.valueOf(1492), yearLimit.getLeftHandSide().getValue(dutch));
+        assertEquals(Integer.valueOf(1800), yearLimit.getRightHandSide().getValue(dutch));
         assertTrue(yearLimit.evaluate(dutch));
 
         colony.modifyLiberty(10000);
@@ -160,24 +160,24 @@ public class LimitTest extends FreeColTestCase {
         assertEquals(Limit.Operator.GT, strongestPlayerLimit.getOperator());
         assertEquals(Operand.OperandType.NONE, strongestPlayerLimit.getLeftHandSide().getOperandType());
         assertEquals(Operand.ScopeLevel.PLAYER, strongestPlayerLimit.getLeftHandSide().getScopeLevel());
-        assertEquals(new Integer(0), strongestPlayerLimit.getLeftHandSide().getValue(dutch));
-        assertEquals(new Integer(50), strongestPlayerLimit.getRightHandSide().getValue(dutch));
+        assertEquals(Integer.valueOf(0), strongestPlayerLimit.getLeftHandSide().getValue(dutch));
+        assertEquals(Integer.valueOf(50), strongestPlayerLimit.getRightHandSide().getValue(dutch));
         assertFalse(strongestPlayerLimit.evaluate(dutch));
 
         assertNotNull(weakestPlayerLimit);
         assertEquals(Limit.Operator.LT, weakestPlayerLimit.getOperator());
         assertEquals(Operand.OperandType.NONE, weakestPlayerLimit.getLeftHandSide().getOperandType());
         assertEquals(Operand.ScopeLevel.PLAYER, weakestPlayerLimit.getLeftHandSide().getScopeLevel());
-        assertEquals(new Integer(0), weakestPlayerLimit.getLeftHandSide().getValue(dutch));
-        assertEquals(new Integer(50), weakestPlayerLimit.getRightHandSide().getValue(dutch));
+        assertEquals(Integer.valueOf(0), weakestPlayerLimit.getLeftHandSide().getValue(dutch));
+        assertEquals(Integer.valueOf(50), weakestPlayerLimit.getRightHandSide().getValue(dutch));
         assertTrue(weakestPlayerLimit.evaluate(dutch));
 
         assertNotNull(yearLimit);
         assertEquals(Limit.Operator.GE, yearLimit.getOperator());
         assertEquals(Operand.OperandType.YEAR, yearLimit.getLeftHandSide().getOperandType());
         assertEquals(Operand.ScopeLevel.GAME, yearLimit.getLeftHandSide().getScopeLevel());
-        assertEquals(new Integer(1492), yearLimit.getLeftHandSide().getValue(game));
-        assertEquals(new Integer(1600), yearLimit.getRightHandSide().getValue());
+        assertEquals(Integer.valueOf(1492), yearLimit.getLeftHandSide().getValue(game));
+        assertEquals(Integer.valueOf(1600), yearLimit.getRightHandSide().getValue());
         assertFalse(yearLimit.evaluate(game));
 
         colony.modifyLiberty(10000);

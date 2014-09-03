@@ -885,14 +885,14 @@ public class NativeAIPlayer extends AIPlayer {
             }
             price = (int)FeatureContainer.applyModifiers((float)price,
                 getGame().getTurn(), modifiers);
-            sessionRegister.put(goldKey, new Integer(price));
+            sessionRegister.put(goldKey, Integer.valueOf(price));
             return price;
         }
         price = registered.intValue();
         if (price < 0 || price == gold) return price;
         if (gold < (price * 9) / 10) {
             logger.warning("Cheating attempt: sending offer too low");
-            sessionRegister.put(goldKey, new Integer(-1));
+            sessionRegister.put(goldKey, Integer.valueOf(-1));
             return NetworkConstants.NO_TRADE;
         }
 
@@ -902,11 +902,11 @@ public class NativeAIPlayer extends AIPlayer {
         }
         if (Utils.randomInt(logger, "Haggle-buy",
                 getAIRandom(), 3 + haggling) >= 3) {
-            sessionRegister.put(goldKey, new Integer(-1));
+            sessionRegister.put(goldKey, Integer.valueOf(-1));
             return NetworkConstants.NO_TRADE_HAGGLE;
         }
-        sessionRegister.put(goldKey, new Integer(gold));
-        sessionRegister.put(hagglingKey, new Integer(haggling + 1));
+        sessionRegister.put(goldKey, Integer.valueOf(gold));
+        sessionRegister.put(hagglingKey, Integer.valueOf(haggling + 1));
         return gold;
     }
 
@@ -953,12 +953,12 @@ public class NativeAIPlayer extends AIPlayer {
             price = (int)FeatureContainer.applyModifiers((float)price,
                 getGame().getTurn(), modifiers);
             if (price <= 0) return 0;
-            sessionRegister.put(goldKey, new Integer(price));
+            sessionRegister.put(goldKey, Integer.valueOf(price));
         }
         if (gold < 0 || price == gold) return price;
         if (gold > (price * 11) / 10) {
             logger.warning("Cheating attempt: haggling request too high");
-            sessionRegister.put(goldKey, new Integer(-1));
+            sessionRegister.put(goldKey, Integer.valueOf(-1));
             return NetworkConstants.NO_TRADE;
         }
         int haggling = 1;
@@ -967,11 +967,11 @@ public class NativeAIPlayer extends AIPlayer {
         }
         if (Utils.randomInt(logger, "Haggle-sell",
                 getAIRandom(), 3 + haggling) >= 3) {
-            sessionRegister.put(goldKey, new Integer(-1));
+            sessionRegister.put(goldKey, Integer.valueOf(-1));
             return NetworkConstants.NO_TRADE_HAGGLE;
         }
-        sessionRegister.put(goldKey, new Integer(gold));
-        sessionRegister.put(hagglingKey, new Integer(haggling + 1));
+        sessionRegister.put(goldKey, Integer.valueOf(gold));
+        sessionRegister.put(hagglingKey, Integer.valueOf(haggling + 1));
         return gold;
     }
 

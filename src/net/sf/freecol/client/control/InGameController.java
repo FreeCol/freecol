@@ -1259,7 +1259,7 @@ public final class InGameController implements NetworkConstants {
 
     private synchronized void startIgnoringMessage(String key, int turn) {
         logger.finer("Ignoring model message with key " + key);
-        messagesToIgnore.put(key, new Integer(turn));
+        messagesToIgnore.put(key, Integer.valueOf(turn));
     }
 
     private synchronized void stopIgnoringMessage(String key) {
