@@ -200,15 +200,17 @@ public class Cargo {
             //
             // The mode depends whether the carrier and transportable
             // have the same terminal points.
-            boolean same = this.cdst instanceof Europe
-                || this.cdst == this.twait;
             if (carrying) {
                 this.turns = deliver.getTotalTurns();
-                this.mode = (same) ? CargoMode.UNLOAD : CargoMode.DROPOFF;
+                this.mode = (this.cdst instanceof Europe
+                    || this.cdst == this.tdst) ? CargoMode.UNLOAD
+                    : CargoMode.DROPOFF;
             } else {
                 this.turns = Math.max(pick.getTurns(), collect.getTotalTurns())
                     + pick.getTotalTurns();
-                this.mode = (same) ? CargoMode.LOAD : CargoMode.PICKUP;
+                this.mode = (this.cwait instanceof Europe
+                    || this.cwait == this.twait) ? CargoMode.LOAD
+                    : CargoMode.PICKUP;
             }
             return null;
         }

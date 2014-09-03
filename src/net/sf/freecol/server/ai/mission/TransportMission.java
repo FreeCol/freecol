@@ -850,6 +850,7 @@ public class TransportMission extends Mission {
             return CargoResult.TCONTINUE;
         }
         Direction d = null;
+        Location tloc = here;
 
         switch (cargo.getMode()) {
         case PICKUP:
@@ -858,12 +859,12 @@ public class TransportMission extends Mission {
                 return CargoResult.TCONTINUE;
             }
             d = cargo.getJoinDirection();
+            tloc = tloc.getTile().getNeighbourOrNull(d.getReverseDirection());
             // Fall through
         case LOAD:
-            if (!Map.isSameLocation(t.getLocation(),
-                                    cargo.getTransportTarget())) {
-                lb.add(", ", t, " at ", t.getLocation(),
-                    " not ", cargo.getTransportTarget());
+            if (!Map.isSameLocation(tloc, t.getLocation())) {
+                lb.add(", ", t, " at ", t.getLocation(), " not ", tloc,
+                    " # ", cargo.toShortString());
                 return CargoResult.TCONTINUE;
             }
             switch (carrier.getNoAddReason(l)) {
