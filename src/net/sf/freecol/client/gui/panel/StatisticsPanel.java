@@ -52,6 +52,10 @@ public final class StatisticsPanel extends FreeColPanel {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(StatisticsPanel.class.getName());
 
+    private static final String[] memoryKeys = {
+        "freeMemory", "totalMemory", "maxMemory"
+    };
+
     private static class StatisticsModel extends AbstractTableModel {
 
         private static final int NAME_COLUMN = 0, VALUE_COLUMN = 1;
@@ -191,9 +195,6 @@ public final class StatisticsPanel extends FreeColPanel {
 
     private JPanel displayStatsMessage(String title,
                                        Map<String, String> stats) {
-        final String[] memoryKeys = {
-            "freeMemory", "totalMemory", "maxMemory"
-        };
         JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(title));
         Box b = new Box(BoxLayout.Y_AXIS);

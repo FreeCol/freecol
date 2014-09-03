@@ -77,6 +77,11 @@ public final class FreeCol {
 
     private static final Logger logger = Logger.getLogger(FreeCol.class.getName());
 
+    /** The difficulty levels. */
+    public static final String[] DIFFICULTIES = new String[] {
+        "veryEasy", "easy", "medium", "hard", "veryHard"
+    };
+
     /** The extension for FreeCol saved games. */
     public static final String  FREECOL_SAVE_EXTENSION = ".fsg";
 
@@ -841,8 +846,7 @@ public final class FreeCol {
      * @return The name of the selected difficulty, or null if none.
      */
     public static String selectDifficulty(String arg) {
-        for (String d : new String[] { "veryEasy", "easy", "medium",
-                                       "hard", "veryHard" }) {
+        for (String d : DIFFICULTIES) {
             String key = "model.difficulty." + d;
             String value = Messages.message(key + ".name");
             if (value.equals(arg)) {
@@ -879,8 +883,7 @@ public final class FreeCol {
      */
     public static String getValidDifficulties() {
         String s = "";
-        for (String d : new String[] { "veryEasy", "easy", "medium",
-                                       "hard", "veryHard" }) {
+        for (String d : DIFFICULTIES) {
             String key = "model.difficulty." + d;
             String value = Messages.message(key + ".name");
             s += "," + value;

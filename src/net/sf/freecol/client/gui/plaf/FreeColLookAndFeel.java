@@ -46,6 +46,28 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
 
     private static final Logger logger = Logger.getLogger(FreeColLookAndFeel.class.getName());
 
+    private static final Class uiClasses[] = new Class[] {
+        FreeColButtonUI.class,
+        FreeColCheckBoxUI.class,
+        FreeColComboBoxUI.class,
+        FreeColFileChooserUI.class,
+        FreeColLabelUI.class,
+        FreeColListUI.class,
+        FreeColMenuBarUI.class,
+        FreeColMenuItemUI.class,
+        FreeColOptionPaneUI.class,
+        FreeColPanelUI.class,
+        FreeColPopupMenuUI.class,
+        FreeColRadioButtonUI.class,
+        FreeColScrollPaneUI.class,
+        FreeColTableHeaderUI.class,
+        FreeColTableUI.class,
+        FreeColTextAreaUI.class,
+        FreeColTextFieldUI.class,
+        FreeColToolTipUI.class,
+        FreeColTransparentPanelUI.class
+    };
+
 
     /**
      * Initiates a new FreeCol look and feel.
@@ -96,27 +118,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
 
         try {
             int offset = "FreeCol".length();
-            for (Class<?> uiClass : new Class[] {
-                    FreeColButtonUI.class,
-                    FreeColCheckBoxUI.class,
-                    FreeColComboBoxUI.class,
-                    FreeColFileChooserUI.class,
-                    FreeColLabelUI.class,
-                    FreeColListUI.class,
-                    FreeColMenuBarUI.class,
-                    FreeColMenuItemUI.class,
-                    FreeColOptionPaneUI.class,
-                    FreeColPanelUI.class,
-                    FreeColPopupMenuUI.class,
-                    FreeColRadioButtonUI.class,
-                    FreeColScrollPaneUI.class,
-                    FreeColTableHeaderUI.class,
-                    FreeColTableUI.class,
-                    FreeColTextAreaUI.class,
-                    FreeColTextFieldUI.class,
-                    FreeColToolTipUI.class,
-                    FreeColTransparentPanelUI.class
-                }) {
+            for (Class<?> uiClass : uiClasses) {
                 String name = uiClass.getName();
                 int index = name.lastIndexOf("FreeCol");
                 if (index >= 0) {

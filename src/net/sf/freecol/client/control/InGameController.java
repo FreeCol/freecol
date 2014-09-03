@@ -122,6 +122,11 @@ public final class InGameController implements NetworkConstants {
 
     private static final Logger logger = Logger.getLogger(InGameController.class.getName());
 
+    /** Warning levels. */
+    private static final String levels[] = new String[] {
+        "low", "normal", "high"
+    };
+
     /** A template to use as a magic cookie for aborted trades. */
     private static final StringTemplate abortTrade
         = StringTemplate.template("");
@@ -347,13 +352,12 @@ public final class InGameController implements NetworkConstants {
                 return -1;
             }
             int fin = (gold <= 100) ? 0 : (gold <= 1000) ? 1 : 2;
-            String val[] = new String[] { "low", "normal", "high" };
             t = StringTemplate.template("confirmTribute.european")
                     .addStringTemplate("%nation%", other.getNationName())
                     .addStringTemplate("%danger%",
-                        StringTemplate.template("danger." + val[mil]))
+                        StringTemplate.template("danger." + levels[mil]))
                     .addStringTemplate("%finance%",
-                        StringTemplate.template("finance." + val[fin]));
+                        StringTemplate.template("finance." + levels[fin]));
             return gui.showSelectTributeAmountDialog(t, gold);
         }
     }
