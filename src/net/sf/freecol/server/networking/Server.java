@@ -239,8 +239,7 @@ public final class Server extends Thread {
             // thread to finish.  For more info see the run() method
         }
 
-        Connection c;
-        while ((c = connections.remove(0)) != null) c.close();
+        for (Connection c : connections.values()) c.close();
         connections.clear();
 
         freeColServer.removeFromMetaServer();
