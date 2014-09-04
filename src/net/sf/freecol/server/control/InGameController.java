@@ -1354,6 +1354,8 @@ public final class InGameController extends Controller {
                                                       serverPlayer);
             if (upgrade != null) upgrades.put(unitType, upgrade);
         }
+        java.util.Map<UnitType, List<Unit>> unitMap
+            = new HashMap<UnitType, List<Unit>>();
         for (Colony colony : serverPlayer.getColonies()) {
             List<Unit> allUnits = new ArrayList<Unit>();
             allUnits.addAll(colony.getTile().getUnitList());
@@ -1361,8 +1363,7 @@ public final class InGameController extends Controller {
             int limit = (allUnits.size() + 2) * (colony.getSoL() - 50) / 100;
             if (limit <= 0) continue;
 
-            java.util.Map<UnitType, List<Unit>> unitMap
-                = new HashMap<UnitType, List<Unit>>();
+            unitMap.clear();
             for (Unit unit : allUnits) {
                 if (upgrades.containsKey(unit.getType())) {
                     List<Unit> unitList = unitMap.get(unit.getType());

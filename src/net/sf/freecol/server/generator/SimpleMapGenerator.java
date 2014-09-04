@@ -834,14 +834,16 @@ public class SimpleMapGenerator implements MapGenerator {
 
         List<Position> positions = generateStartingPositions(map, europeanPlayers);
         List<Tile> startingTiles = new ArrayList<Tile>();
+        List<Unit> carriers = new ArrayList<Unit>();
+        List<Unit> passengers = new ArrayList<Unit>();
 
         for (int index = 0; index < europeanPlayers.size(); index++) {
             Player player = europeanPlayers.get(index);
             Position position = positions.get(index);
             logger.fine("generating units for player " + player);
 
-            List<Unit> carriers = new ArrayList<Unit>();
-            List<Unit> passengers = new ArrayList<Unit>();
+            carriers.clear();
+            passengers.clear();
             List<AbstractUnit> unitList = ((EuropeanNationType) player.getNationType())
                 .getStartingUnits();
             for (AbstractUnit startingUnit : unitList) {

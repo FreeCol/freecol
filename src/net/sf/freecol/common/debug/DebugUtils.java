@@ -731,14 +731,18 @@ public class DebugUtils {
         final AIMain aiMain = server.getAIMain();
 
         LogBuilder lb = new LogBuilder(256);
+        List<Unit> inEurope = new ArrayList<Unit>();
+        List<Unit> toEurope = new ArrayList<Unit>();
+        List<Unit> toAmerica = new ArrayList<Unit>();
+        HashMap<String,List<Unit>> units
+            = new HashMap<String, List<Unit>>();
         for (Player tp : sGame.getLiveEuropeanPlayers(null)) {
             Player p = sGame.getFreeColGameObject(tp.getId(), Player.class);
             if (p.getEurope() == null) continue;
-            List<Unit> inEurope = new ArrayList<Unit>();
-            List<Unit> toEurope = new ArrayList<Unit>();
-            List<Unit> toAmerica = new ArrayList<Unit>();
-            HashMap<String,List<Unit>> units
-                = new HashMap<String, List<Unit>>();
+            inEurope.clear();
+            toEurope.clear();
+            toAmerica.clear();
+            units.clear();
             units.put("To Europe", toEurope);
             units.put("In Europe", inEurope);
             units.put("To America", toAmerica);

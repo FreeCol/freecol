@@ -1331,6 +1331,7 @@ public class TerrainGenerator {
         logger.fine(sb.toString());
 
         // Make lake regions from unassigned lake tiles.
+        List<Tile> todo = new ArrayList<Tile>();
         int lakeCount = 0;
         while (!lakes.isEmpty()) {
             Tile tile = lakes.get(0);
@@ -1345,7 +1346,7 @@ public class TerrainGenerator {
             map.putRegion(lakeRegion);
             // Pretend lakes are discovered with the surrounding terrain?
             lakeRegion.setPrediscovered(false);
-            List<Tile> todo = new ArrayList<Tile>();
+            todo.clear();
             todo.add(tile);
             while (!todo.isEmpty()) {
                 Tile t = todo.remove(0);
