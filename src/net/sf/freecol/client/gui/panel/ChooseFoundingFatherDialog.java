@@ -80,8 +80,7 @@ public final class ChooseFoundingFatherDialog
 
         FatherDetailPanel details = new FatherDetailPanel(freeColClient,
             new ColopediaPanel(freeColClient));
-        for (int index = 0; index < possibleFoundingFathers.size(); index++) {
-            FoundingFather father = possibleFoundingFathers.get(index);
+        for (FoundingFather father : possibleFoundingFathers) {
             JPanel jp = new MigPanel();
             details.buildDetail(father, jp);
             jp.validate();

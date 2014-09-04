@@ -3354,9 +3354,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
             claims.put(tile, claimant);
         }
-        for (Tile t : claims.keySet()) {
-            claimant = claims.get(t);
-            if (claimant == null) {
+        for (Entry<Tile, Settlement> e : claims.entrySet()) {
+            Tile t = e.getKey();
+            if ((claimant = e.getValue()) == null) {
                 t.changeOwnership(null, null);//-til
             } else {
                 ServerPlayer newOwner = (ServerPlayer)claimant.getOwner();

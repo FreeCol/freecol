@@ -315,8 +315,8 @@ public class ServerGame extends Game implements ServerModelObject {
             || weakestAIPlayer == strongestAIPlayer) return;
 
         lb.add("Spanish succession scores[");
-        for (Player player : scores.keySet()) {
-            lb.add(" ", player.getName(), "=", scores.get(player));
+        for (Entry<Player, Integer> entry : scores.entrySet()) {
+            lb.add(" ", entry.getKey().getName(), "=", entry.getValue());
         }
         lb.add(" ]=> ", weakestAIPlayer.getName(),
                " cedes to ", strongestAIPlayer.getName(), ":");

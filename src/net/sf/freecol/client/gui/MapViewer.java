@@ -2499,8 +2499,8 @@ public final class MapViewer {
             }
 
             // draw all remaining items
-            for (int index = startIndex; index < tileItems.size(); index++) {
-                drawItem(g, tile, tileItems.get(index));
+            for (TileItem ti : tileItems.subList(startIndex, tileItems.size())) {
+                drawItem(g, tile, ti);
             }
         }
     }
