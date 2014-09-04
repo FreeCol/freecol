@@ -763,7 +763,7 @@ public class Map extends FreeColGameObject implements Location {
         return (l1 == null || l2 == null) ? false
             : (l1 == l2) ? true
             : (l1.getTile() == null || l2.getTile() == null) ? false
-            : l1.getTile().getContiguity() == l2.getTile().getContiguity();
+            : l1.getTile().isConnectedTo(l2.getTile());
     }            
 
     /**
