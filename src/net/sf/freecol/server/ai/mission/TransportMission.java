@@ -1138,7 +1138,7 @@ public class TransportMission extends Mission {
                 cargo = null;
             }
             if (cargo == null) continue;
-            float value = t.getTransportPriority() / (cargo.getTurns() + 1);
+            float value = t.getTransportPriority() / (cargo.getTurns() + 1.0f);
             if (cargo.isFallback()) {
                 if (bestFallbackValue < value) {
                     bestFallbackValue = value;

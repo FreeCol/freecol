@@ -790,8 +790,8 @@ public final class FreeColClient {
     public void quit() {
         getConnectController().quitGame(isSinglePlayer());
         try { // delete outdated autosave files
-            long validPeriod = clientOptions.getInteger(ClientOptions.AUTOSAVE_VALIDITY)
-                * 24 * 60 * 60 * 1000L; // convert days to milliseconds
+            long validPeriod = 1000L * 24L * 60L * 60L // days to ms
+                * clientOptions.getInteger(ClientOptions.AUTOSAVE_VALIDITY);
             long timeNow = System.currentTimeMillis();
             File autoSave = FreeColDirectories.getAutosaveDirectory();
             String[] flist;
