@@ -444,7 +444,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             if (wic == null) {
                 if (aiPlayer.getWorkInsideColonyMission(aiu, this) == null) {
                     result.add(aiu); 
-                } else lb.add(", ", aiu.getMission());
+                } else {
+                    lb.add(", ", aiu.getMission());
+                    aiu.dropTransport();
+                }
             }
         }
         for (Unit u : tile.getUnitList()) {
@@ -469,7 +472,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 && !(m instanceof DefendSettlementMission)) {
                 if (aiPlayer.getDefendSettlementMission(aiu, colony) == null) {
                     result.add(aiu);
-                } else lb.add(", ", aiu.getMission());
+                } else {
+                    lb.add(", ", aiu.getMission());
+                    aiu.dropTransport();
+                }
             }
         }
 
