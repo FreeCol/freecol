@@ -128,6 +128,12 @@ public final class InGameController implements NetworkConstants {
 
     private final FreeColClient freeColClient;
 
+    /**
+     * Warn about colonies that can not produce this amount of
+     * a building material.
+     */
+    private static final int LOW_PRODUCTION_WARNING_VALUE = 4;
+
     private final short UNIT_LAST_MOVE_DELAY = 300;
 
     // Selecting next unit depends on mode--- either from the active list,
@@ -1604,6 +1610,7 @@ public final class InGameController implements NetworkConstants {
      * @param unit The <code>Unit</code> which is to build the colony.
      */
     private boolean buildColonyShowWarnings(Tile tile, Unit unit) {
+        final Specification spec = getSpecification();
         boolean landLocked = true;
         boolean ownedByEuropeans = false;
         boolean ownedBySelf = false;
@@ -1611,7 +1618,7 @@ public final class InGameController implements NetworkConstants {
 
         java.util.Map<GoodsType, Integer> goodsMap
             = new HashMap<GoodsType, Integer>();
-        for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
+        for (GoodsType goodsType : spec.getGoodsTypeList()) {
             if (goodsType.isBuildingMaterial()) {
                 while (goodsType.isRefined()) {
                     goodsType = goodsType.getInputType();
@@ -1630,21 +1637,20 @@ public final class InGameController implements NetworkConstants {
             }
         }
 
-        for (Tile newTile: tile.getSurroundingTiles(1)) {
-            if (!newTile.isLand()) {
-                landLocked = false;
-            }
+        for (Tile t : tile.getSurroundingTiles(1)) {
+            if (!t.isLand()) landLocked = false;
             for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
-                entry.setValue(entry.getValue().intValue()
-                    + newTile.getPotentialProduction(entry.getKey(), null));
+                entry.setValue(entry.getValue()
+                    + t.getPotentialProduction(entry.getKey(),
+                        spec.getDefaultUnitType()));
             }
-            Player tileOwner = newTile.getOwner();
+            Player tileOwner = t.getOwner();
             if (unit.getOwner() == tileOwner) {
-                if (newTile.getOwningSettlement() != null) {
+                if (t.getOwningSettlement() != null) {
                     // we are using newTile
                     ownedBySelf = true;
                 } else {
-                    for (Tile ownTile: newTile.getSurroundingTiles(1)) {
+                    for (Tile ownTile : t.getSurroundingTiles(1)) {
                         Colony colony = ownTile.getColony();
                         if (colony != null
                             && colony.getOwner() == unit.getOwner()) {
@@ -1678,7 +1684,7 @@ public final class InGameController implements NetworkConstants {
         }
         for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
             if (!entry.getKey().isFoodType()
-                && entry.getValue().intValue() < 4) {
+                && entry.getValue().intValue() < LOW_PRODUCTION_WARNING_VALUE) {
                 lb.add(Messages.message(StringTemplate
                         .template("buildColony.noBuildingMaterials")
                         .add("%goods%", entry.getKey().getNameKey())),
