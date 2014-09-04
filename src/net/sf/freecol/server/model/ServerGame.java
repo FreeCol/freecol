@@ -428,6 +428,22 @@ public class ServerGame extends Game implements ServerModelObject {
         Utils.randomShuffle(logger, "Cibola", citiesOfCibola, random);
     }
 
+
+    // Interface Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        // ServerGame does not add any significant fields, so Game.equals
+        // suffices.
+        return super.equals(o);
+    }
+
+
+    // Serialization
+
     /**
      * Gets the tag name of the root element representing this object.
      *

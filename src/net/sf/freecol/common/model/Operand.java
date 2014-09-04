@@ -345,6 +345,24 @@ public class Operand extends Scope {
     }
 
 
+    // Interface Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o instanceof Operand) {
+            Operand op = (Operand)o;
+            return operandType == op.operandType
+                && scopeLevel == op.scopeLevel
+                && value == op.value;
+        }
+        return false;
+    }
+
+
     // Serialization
 
     private static final String OPERAND_TYPE_TAG = "operandType";

@@ -24,6 +24,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
 
@@ -213,6 +214,23 @@ public class HistoryEvent extends StringTemplate {
     @Override
     public HistoryEvent addStringTemplate(String key, StringTemplate template) {
         return (HistoryEvent) super.addStringTemplate(key, template);
+    }
+
+    // Interface Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o instanceof HistoryEvent) {
+            HistoryEvent h = (HistoryEvent)o;
+            return turn == h.turn && eventType == h.eventType
+                && Utils.equals(playerId, h.playerId)
+                && score == h.score;
+        }
+        return false;
     }
 
 
