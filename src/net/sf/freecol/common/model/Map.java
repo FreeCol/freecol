@@ -1057,9 +1057,8 @@ public class Map extends FreeColGameObject implements Location {
      * @param path The <code>PathNode</code> to finish.
      * @param unit The <code>Unit</code> that is travelling along the path.
      * @param lb An optional <code>LogBuilder</code> to log to.
-     * @return The finished path.
      */
-    private PathNode finishPath(PathNode path, Unit unit, LogBuilder lb) {
+    private void finishPath(PathNode path, Unit unit, LogBuilder lb) {
         if (path != null) {
             // Add the turns remaining on the high seas.
             final int initialTurns = (!unit.isAtSea()) ? 0
@@ -1072,7 +1071,6 @@ public class Map extends FreeColGameObject implements Location {
             }
         }
         if (lb != null) lb.log(logger, Level.INFO);
-        return path;
     }
         
     /**
@@ -1201,7 +1199,8 @@ public class Map extends FreeColGameObject implements Location {
                                             + ", " + realEnd);
         }
 
-        return finishPath(path, unit, lb);
+        finishPath(path, unit, lb);
+        return path;
     }
 
     /**
@@ -1264,7 +1263,8 @@ public class Map extends FreeColGameObject implements Location {
                              costDecider, maxTurns, carrier, null, lb);
         }
 
-        return finishPath(path, unit, lb);
+        finishPath(path, unit, lb);
+        return path;
     }
 
     /**
