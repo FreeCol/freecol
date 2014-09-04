@@ -313,9 +313,7 @@ public class ChangeSet {
          *
          * @param element The <code>Element</code> to attach to.
          */
-        public void attachToElement(Element element) {
-            ; // Deliberately do nothing
-        }
+        public abstract void attachToElement(Element element);
     }
 
     /**
@@ -415,6 +413,11 @@ public class ChangeSet {
             }
             return element;
         }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void attachToElement(Element element) {} // Noop
 
         /**
          * {@inheritDoc}
@@ -557,6 +560,11 @@ public class ChangeSet {
         /**
          * {@inheritDoc}
          */
+        public void attachToElement(Element element) {} // Noop
+
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
@@ -675,6 +683,11 @@ public class ChangeSet {
         /**
          * {@inheritDoc}
          */
+        public void attachToElement(Element element) {} // Noop
+
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
@@ -770,6 +783,11 @@ public class ChangeSet {
             element.appendChild(fcgo.toXMLElement(doc, serverPlayer));
             return element;
         }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void attachToElement(Element element) {} // Noop
 
         /**
          * {@inheritDoc}
@@ -932,6 +950,11 @@ public class ChangeSet {
         /**
          * {@inheritDoc}
          */
+        public void attachToElement(Element element) {} // Noop
+
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
@@ -988,6 +1011,11 @@ public class ChangeSet {
             element.appendChild(child);
             return element;
         }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void attachToElement(Element element) {} // Noop
 
         /**
          * {@inheritDoc}
@@ -1057,6 +1085,11 @@ public class ChangeSet {
         /**
          * {@inheritDoc}
          */
+        public void attachToElement(Element element) {} // Noop
+
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
@@ -1115,6 +1148,11 @@ public class ChangeSet {
                 .toXMLElement(doc, serverPlayer));
             return element;
         }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void attachToElement(Element element) {} // Noop
 
         /**
          * {@inheritDoc}
@@ -1183,6 +1221,11 @@ public class ChangeSet {
         /**
          * {@inheritDoc}
          */
+        public void attachToElement(Element element) {} // Noop
+
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
@@ -1247,6 +1290,11 @@ public class ChangeSet {
             }
             return element;
         }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void attachToElement(Element element) {} // Noop
 
         /**
          * Debug helper.
