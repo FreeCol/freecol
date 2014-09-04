@@ -72,7 +72,6 @@ public class BuildingToolTip extends JToolTip {
         // TODO: consider several outputs
         final GoodsType output = (outputs.isEmpty()) ? null
             : outputs.get(0).getType();
-        final Colony colony = building.getColony();
 
         String columns = "[align center]";
         for (int index = 0; index < workplaces; index++) {

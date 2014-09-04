@@ -2417,8 +2417,7 @@ public class Colony extends Settlement implements Nameable {
      * @return A scratch version of this colony.
      */
     public Colony copyColony() {
-        Game game = getGame();
-        Player owner = getOwner();
+        final Game game = getGame();
         Tile tile = getTile();
         Tile tileCopy = tile.copy(game, tile.getClass());
         Colony colony = tileCopy.getColony();

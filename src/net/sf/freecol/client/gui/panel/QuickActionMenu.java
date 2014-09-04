@@ -643,7 +643,6 @@ public final class QuickActionMenu extends JPopupMenu {
     private boolean addRoleItems(final UnitLabel unitLabel) {
         final Unit unit = unitLabel.getUnit();
         final Role role = unit.getRole();
-        final Location loc = unit.getLocation();
         final int roleCount = unit.getRoleCount();
         boolean separatorNeeded = false;
         JMenuItem newItem;
@@ -842,7 +841,6 @@ public final class QuickActionMenu extends JPopupMenu {
      */
     public void createMarketMenu(final MarketLabel marketLabel,
                                  final Europe europe) {
-        final InGameController igc = freeColClient.getInGameController();
         final Player player = freeColClient.getMyPlayer();
         final AbstractGoods ag = marketLabel.getGoods();
         final ImageLibrary imageLibrary = gui.getImageLibrary();

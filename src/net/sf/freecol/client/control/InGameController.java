@@ -748,8 +748,8 @@ public final class InGameController implements NetworkConstants {
         Player player = unit.getOwner();
         Location loc = unit.getLocation();
         String route = unit.getTradeRoute().getName();
-        String key = null;
-        int more = 0;
+        String key;
+        int more;
 
         if (demand < export) {
             key = "tradeRoute.loadStopImport";
@@ -760,6 +760,7 @@ public final class InGameController implements NetworkConstants {
             more = present - export;
         } else {
             key = "tradeRoute.loadStop";
+            more = -1; // not displayed
         }
         return Messages.message(StringTemplate.template(key)
             .addAmount("%amount%", amount)

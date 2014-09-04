@@ -185,7 +185,6 @@ public class DebugUtils {
     public static void addFathers(final FreeColClient freeColClient,
                                   String fatherTitle) {
         final FreeColServer server = freeColClient.getFreeColServer();
-        final Game game = freeColClient.getGame();
         final GUI gui = freeColClient.getGUI();
         final Player player = freeColClient.getMyPlayer();
         final Game sGame = server.getGame();
@@ -219,7 +218,6 @@ public class DebugUtils {
      */
     public static void addGold(final FreeColClient freeColClient) {
         final FreeColServer server = freeColClient.getFreeColServer();
-        final Game game = freeColClient.getGame();
         final GUI gui = freeColClient.getGUI();
         final Player player = freeColClient.getMyPlayer();
         final Game sGame = server.getGame();
@@ -249,7 +247,6 @@ public class DebugUtils {
      */
     public static void addImmigration(final FreeColClient freeColClient) {
         final FreeColServer server = freeColClient.getFreeColServer();
-        final Game game = freeColClient.getGame();
         final GUI gui = freeColClient.getGUI();
         final Player player = freeColClient.getMyPlayer();
         final Game sGame = server.getGame();
@@ -279,12 +276,9 @@ public class DebugUtils {
      */
     public static void addLiberty(final FreeColClient freeColClient) {
         final FreeColServer server = freeColClient.getFreeColServer();
-        final Game game = freeColClient.getGame();
         final GUI gui = freeColClient.getGUI();
         final Player player = freeColClient.getMyPlayer();
         final Game sGame = server.getGame();
-        final Player sPlayer = sGame.getFreeColGameObject(player.getId(),
-                                                          Player.class);
 
         String response = gui.showInputDialog(true, null,
             StringTemplate.key("menuBar.debug.addLiberty"),
@@ -363,8 +357,6 @@ public class DebugUtils {
                 if (u.isNaval()
                     && u.getSpaceLeft() >= unitChoice.getSpaceTaken()) {
                     sCarrier = u;
-                    carrier = game.getFreeColGameObject(sCarrier.getId(),
-                                                        Unit.class);
                     break;
                 }
             }
@@ -466,8 +458,6 @@ public class DebugUtils {
         final Game sGame = server.getGame();
         final ServerColony sColony = sGame.getFreeColGameObject(colony.getId(),
             ServerColony.class);
-        final ServerPlayer sPlayer = sGame.getFreeColGameObject(player.getId(),
-            ServerPlayer.class);
         final Disaster sDisaster = sGame.getSpecification()
             .getDisaster(disaster.getId());
         if (server.getInGameController().debugApplyDisaster(sColony, sDisaster)
@@ -603,7 +593,6 @@ public class DebugUtils {
         final Map sMap = sGame.getMap();
         final ServerPlayer sPlayer = sGame.getFreeColGameObject(player.getId(),
                                                                 ServerPlayer.class);
-        final GUI gui = freeColClient.getGUI();
 
         boolean problemDetected = false;
         LogBuilder lb = new LogBuilder(256);
@@ -794,7 +783,6 @@ public class DebugUtils {
                 lb.add(Messages.getName(unitType), "\n");
             }
             lb.add("\n");
-
         }
         freeColClient.getGUI().showInformationMessage(lb.toString());
     }
@@ -1198,8 +1186,6 @@ public class DebugUtils {
         final FreeColServer server = freeColClient.getFreeColServer();
         final Game sGame = server.getGame();
         final Player player = freeColClient.getMyPlayer();
-        final Player sPlayer = sGame.getFreeColGameObject(player.getId(),
-                                                          Player.class);
         final AIMain aiMain = server.getAIMain();
         final AIPlayer ap = aiMain.getAIPlayer(player);
 

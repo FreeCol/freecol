@@ -73,8 +73,7 @@ public class ServerGame extends Game implements ServerModelObject {
     /** How many cities of Cibola? */
     private static final int CIBOLA_COUNT = 7;
 
-    // Timestamp of last move, if any.
-    // Do not serialize.
+    /** Timestamp of last move, if any.  Do not serialize. */
     private long lastTime = -1L;
 
 

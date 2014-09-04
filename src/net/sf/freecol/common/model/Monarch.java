@@ -500,9 +500,6 @@ public final class Monarch extends FreeColGameObject implements Named {
                 }
             }
         }
-// TODO: Drop these when tested
-assert mountedRole != null && mountedRole.equals("model.role.dragoon");
-assert armedRole != null && armedRole.equals("model.role.soldier");
     }
 
     /**

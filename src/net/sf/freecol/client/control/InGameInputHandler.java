@@ -760,7 +760,6 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element firstContact(Element element) {
         final Game game = getGame();
-        final Specification spec = game.getSpecification();
         final FirstContactMessage message
             = new FirstContactMessage(game, element);
 
