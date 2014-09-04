@@ -1431,27 +1431,27 @@ public class Map extends FreeColGameObject implements Location {
         /**
          * Replace a given path with that of this candidate move.
          *
-         * @param openList The list of available nodes.
-         * @param openListQueue The queue of available nodes.
+         * @param openMap The list of available nodes.
+         * @param openMapQueue The queue of available nodes.
          * @param f The heuristic values for A*.
          * @param sh An optional <code>SearchHeuristic</code> to apply.
          */
-        public void improve(HashMap<String, PathNode> openList,
-                            PriorityQueue<PathNode> openListQueue,
+        public void improve(HashMap<String, PathNode> openMap,
+                            PriorityQueue<PathNode> openMapQueue,
                             HashMap<String, Integer> f,
                             SearchHeuristic sh) {
-            PathNode best = openList.get(dst.getId());
+            PathNode best = openMap.get(dst.getId());
             if (best != null) {
-                openList.remove(dst.getId());
-                openListQueue.remove(best);
+                openMap.remove(dst.getId());
+                openMapQueue.remove(best);
             }
             int fcost = cost;
             if (sh != null && dst.getTile() != null) {
                 fcost += sh.getValue(dst.getTile());
             }
-            f.put(dst.getId(), new Integer(fcost));
-            openList.put(dst.getId(), path);
-            openListQueue.offer(path);
+            f.put(dst.getId(), Integer.valueOf(fcost));
+            openMap.put(dst.getId(), path);
+            openMapQueue.offer(path);
         }
 
         /**
@@ -1476,8 +1476,8 @@ public class Map extends FreeColGameObject implements Location {
      * Searches for a path to a goal determined by the given
      * <code>GoalDecider</code>.
      *
-     * Using A* with a List (closedList) for marking the visited nodes
-     * and using a PriorityQueue (openListQueue) for getting the next
+     * Using A* with a List (closedMap) for marking the visited nodes
+     * and using a PriorityQueue (openMapQueue) for getting the next
      * edge with the least cost.  This implementation could be
      * improved by having the visited attribute stored on each Tile in
      * order to avoid both of the HashMaps currently being used to
@@ -1512,13 +1512,13 @@ public class Map extends FreeColGameObject implements Location {
                                final int maxTurns, final Unit carrier,
                                final SearchHeuristic searchHeuristic,
                                final LogBuilder lb) {
-        final HashMap<String, PathNode> openList
+        final HashMap<String, PathNode> openMap
             = new HashMap<String, PathNode>();
-        final HashMap<String, PathNode> closedList
+        final HashMap<String, PathNode> closedMap
             = new HashMap<String, PathNode>();
         final HashMap<String, Integer> f
             = new HashMap<String, Integer>();
-        final PriorityQueue<PathNode> openListQueue
+        final PriorityQueue<PathNode> openMapQueue
             = new PriorityQueue<PathNode>(1024,
                 new Comparator<PathNode>() {
                     public int compare(PathNode p1, PathNode p2) {
@@ -1545,18 +1545,18 @@ public class Map extends FreeColGameObject implements Location {
             ((currentUnit != null) ? currentUnit.getMovesLeft() : -1),
             0, carrier != null && currentUnit == carrier, null, null);
         f.put(start.getId(),
-            new Integer((searchHeuristic == null) ? 0
+            Integer.valueOf((searchHeuristic == null) ? 0
                 : searchHeuristic.getValue(start)));
-        openList.put(start.getId(), firstNode);
-        openListQueue.offer(firstNode);
+        openMap.put(start.getId(), firstNode);
+        openMapQueue.offer(firstNode);
 
         PathNode best = null;
         int bestScore = INFINITY;
-        while (!openList.isEmpty()) {
+        while (!openMap.isEmpty()) {
             // Choose the node with the lowest f.
-            final PathNode currentNode = openListQueue.poll();
+            final PathNode currentNode = openMapQueue.poll();
             final Location currentLocation = currentNode.getLocation();
-            openList.remove(currentLocation.getId());
+            openMap.remove(currentLocation.getId());
             if (lb != null) lb.add("\n  ", currentNode);
 
             // Reset current unit to that of this node.
@@ -1574,7 +1574,7 @@ public class Map extends FreeColGameObject implements Location {
 
             // Skip nodes that can not beat the current best path.
             if (bestScore < currentNode.getCost()) {
-                closedList.put(currentLocation.getId(), currentNode);
+                closedMap.put(currentLocation.getId(), currentNode);
                 if (lb != null) lb.add(" ...goal cost wins(",
                     bestScore, " < ", currentNode.getCost(), ")...");
                 continue;
@@ -1587,7 +1587,7 @@ public class Map extends FreeColGameObject implements Location {
             }
 
             // Valid candidate for the closed list.
-            closedList.put(currentLocation.getId(), currentNode);
+            closedMap.put(currentLocation.getId(), currentNode);
             if (lb != null) lb.add("...close");
 
             // Collect the parameters for the current node.
@@ -1617,7 +1617,7 @@ public class Map extends FreeColGameObject implements Location {
 
                 // Skip neighbouring tiles already too expensive.
                 int cc;
-                if ((closed = closedList.get(moveTile.getId())) != null
+                if ((closed = closedMap.get(moveTile.getId())) != null
                     && (cc = closed.getCost()) <= currentNode.getCost()) {
                     if (lb != null) lb.add(" ", cc);
                     continue;
@@ -1754,15 +1754,15 @@ public class Map extends FreeColGameObject implements Location {
                     // Tighten the bounds on a previously seen case if possible
                     if (closed != null) {
                         if (move.canImprove(closed)) {
-                            closedList.remove(moveTile.getId());
-                            move.improve(openList, openListQueue, f,
+                            closedMap.remove(moveTile.getId());
+                            move.improve(openMap, openMapQueue, f,
                                          searchHeuristic);
                             stepLog = "^" + Integer.toString(move.getCost());
                         } else {
                             stepLog = ".";
                         }
-                    } else if (move.canImprove(openList.get(moveTile.getId()))){
-                        move.improve(openList, openListQueue, f,
+                    } else if (move.canImprove(openMap.get(moveTile.getId()))){
+                        move.improve(openMap, openMapQueue, f,
                                      searchHeuristic);
                         stepLog = "+" + Integer.toString(move.getCost());
                     } else {
