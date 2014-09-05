@@ -1271,16 +1271,18 @@ public class TransportMission extends Mission {
      *
      * @param t The <code>TransportableAIObject</code> to dump.
      * @param lb A <code>LogBuilder</code> to log to.
-     * @return True if the transportable was either dumped or queued to be.
+     * @return True if the transportable is no longer on board, queued, or
+     *     was reset to be dumped at the next stop.
      */
     public boolean dumpTransportable(TransportableAIObject t, LogBuilder lb) {
-        Cargo cargo = tFind(t);
         if (t == null) return true;
+        Cargo cargo = tFind(t);
+        if (cargo == null) return true;
         if (!isCarrying(t)) {
             removeTransportable(t);
             return true;
         }
-        return dumpCargo(cargo, lb);
+        return (cargo == null) ? true : dumpCargo(cargo, lb);
     }
 
 
