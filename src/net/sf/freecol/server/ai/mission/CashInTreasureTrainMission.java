@@ -446,7 +446,7 @@ public class CashInTreasureTrainMission extends Mission {
                                 ? lbDone(lb, false, "cashed in")
                                 : lbFail(lb, false, "cashin");
             }
-            return retargetMission("arrived "+unit.getColony().getName(), lb);
+            return retargetMission("transport expected", lb);
         }
     }
 
