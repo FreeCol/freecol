@@ -420,6 +420,37 @@ public class TransportMission extends Mission {
     }
 
     /**
+     * Get the collection location for an uncollected transportable.
+     *
+     * Public so that mobile transportables (units) can move to the
+     * collection point.
+     *
+     * @param t The <code>TransportableAIObject</code> to collect.
+     * @return The collection <code>Location<code>, or null if not found.
+     */
+    public Location getTransportTarget(TransportableAIObject t) {
+        if (isCarrying(t)) return null;
+        Cargo cargo = tFind(t);
+        return (cargo == null) ? null : cargo.getTransportTarget();
+    }
+
+    /**
+     * Get the expected turns for an uncollected transport
+     *
+     * Public so that mobile transportables (units) can renege on
+     * transport if they find themselves better able to get there
+     * themselves.
+     *
+     * @param t The <code>TransportableAIObject</code> to collect.
+     * @return The expected transport turns.
+     */
+    public int getTransportTurns(TransportableAIObject t) {
+        if (isCarrying(t)) return INFINITY;
+        Cargo cargo = tFind(t);
+        return (cargo == null) ? INFINITY : cargo.getTurns();
+    }
+
+    /**
      * Wrap up the compatible cargoes in a list.
      * O(N^2) alas.
      *
@@ -901,7 +932,9 @@ public class TransportMission extends Mission {
             // Fall through
         case UNLOAD:
             if (isCarrying(t) && !t.leaveTransport(d)) {
-                lb.add(", ", t, " NO-LEAVE");
+                //lb.add(", ", t, " NO-LEAVE");
+                PathNode pn = t.getDeliveryPath(carrier, t.getTransportDestination());
+                lb.add(", ", t, " NO-LEAVE(", here, "~", cargo.getLeaveDirection(), "~", t.getTransportDestination(), " ", ((pn == null) ? pn : pn.fullPathToString()));
                 return CargoResult.TRETRY;
             }
             lb.add(", ", t, " COMPLETED");

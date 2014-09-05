@@ -664,26 +664,30 @@ public abstract class Mission extends AIObject {
         }
         final Unit unit = getUnit();
         final AIUnit aiUnit = getAIUnit();
-        final AIUnit aiCarrier = aiUnit.getTransport();
+        AIUnit aiCarrier = aiUnit.getTransport();
         final Map map = unit.getGame().getMap();
         PathNode path = null;
-        boolean needsTransport = false;
-
+        boolean useTransport = false;
         target = upLoc(target);
+
+        // Consider where the unit is starting.
         if (unit.isAtSea()) {
-            // Wait for carrier to arrive on the map.
+            // Wait for carrier to arrive on the map or in Europe.
             lb.add(", at sea");
             return MoveType.MOVE_HIGH_SEAS;
+
         } else if (unit.isOnCarrier()) {
             // Transport mission will disembark the unit when it
             // arrives at the drop point.
             lb.add(", on carrier");
             return MoveType.MOVE_NO_ACCESS_EMBARK;
+
         } else if (unit.isAtLocation(target)) {
             // Arrived!
             return MoveType.MOVE;
+
         } else if (unit.isInEurope()) {
-            // Leave or wait for transport.
+            // Leave, or require transport.
             if (!unit.getOwner().canMoveToEurope()) {
                 lb.add(", impossible move from Europe");
                 return MoveType.MOVE_ILLEGAL;
@@ -698,43 +702,139 @@ public abstract class Mission extends AIObject {
                     return MoveType.MOVE_ILLEGAL;
                 }
             }
-            needsTransport = true;
+            useTransport = true;
+
         } else if (!unit.hasTile()) {
+            // Fail!
             return MoveType.MOVE_ILLEGAL;
+
         } else {
-            // On map
+            // On map.  Either find a path or decide to use transport.
             if (target instanceof Europe) {
+                // Going to Europe.
                 if (!unit.getOwner().canMoveToEurope()) {
                     lb.add(", impossible move to Europe");
                     return MoveType.MOVE_ILLEGAL;
                 }
-                if (!unit.getType().canMoveToHighSeas()) {
-                    needsTransport = true;
-                } else {
-                    path = unit.findPath(unit.getLocation(), target,
-                                         null, costDecider);
-                }
-            } else {
                 if (!unit.getType().canMoveToHighSeas()
-                    && !Map.isSameContiguity(target, unit.getLocation())) {
-                    needsTransport = true;
+                    || aiCarrier != null) {
+                    useTransport = true;
                 } else {
                     path = unit.findPath(unit.getLocation(), target,
                                          null, costDecider);
                 }
+            } else if (aiCarrier != null) {
+                // Transport already allocated.
+                useTransport = true;
+
+            } else if (!unit.getType().canMoveToHighSeas()
+                && !Map.isSameContiguity(target, unit.getLocation())) {
+                // Transport necessary.
+                useTransport = true;
+
+            } else {
+                // Should not need transport within the same contiguity.
+                path = unit.findPath(unit.getLocation(), target,
+                                     null, costDecider);
             }
         }
-        if (needsTransport) {
-            if (aiCarrier == null) {
+
+        if (useTransport) {
+            if (aiCarrier != null) {
+                // A carrier has been assigned.  Try to go to the
+                // collection point.
+                Location pick;
+                TransportMission tm;
+                boolean waiting = false;
+                PathNode ownPath;
+                int pathTurns, ownTurns;
+
+                if ((tm = aiCarrier.getMission(TransportMission.class)) == null) {
+                    // Carrier has no transport mission?!?  Bogus.
+                    lb.add(", had bogus carrier ", aiCarrier.getUnit());
+                    logger.warning(unit + " has transport " + aiCarrier
+                        + " without transport mission");
+                    aiUnit.dropTransport();
+                    aiCarrier = null;
+
+                } else if ((pick = tm.getTransportTarget(aiUnit)) == null) {
+                    // No collection point for this unit?  Bogus.
+                    lb.add(", had bogus transport on ", aiCarrier.getUnit());
+                    logger.warning(unit + " has transport " + aiCarrier
+                        + " with transport mission but null transport target\n"
+                        + tm.toFullString());
+                    aiUnit.dropTransport();
+                    aiCarrier = null;
+
+                } else if (Map.isSameLocation(pick, unit.getLocation())) {
+                    // Waiting for the carrier at the collection point.
+                    waiting = true;
+
+                } else if ((path = unit.findPath(unit.getLocation(), pick,
+                                                 null, costDecider)) == null) {
+                    // No path to the collection point.
+                    lbAt(lb);
+                    lb.add(", no path to meet ", aiCarrier.getUnit(),
+                           " at ", pick);
+                    path = unit.findPath(unit.getLocation(), target,
+                                         null, costDecider);
+                    if (path == null) {
+                        // Unable to fall back to going direct.
+                        // Return failure in the hope that it is a
+                        // transient blockage.
+                        return MoveType.MOVE_NO_TILE;
+                    }
+                    // Fall back to going direct to the target.
+                    lb.add(", dropped carrier");
+                    aiUnit.dropTransport();
+                    aiCarrier = null;
+                    useTransport = false;
+
+                } else if ((ownPath = unit.findPath(unit.getLocation(), 
+                            target, null, costDecider)) == null
+                    || (ownTurns = ownPath.getTotalTurns())
+                    > (pathTurns = path.getTotalTurns())) {
+                    // Either there is no direct path to the target or
+                    // a path exists but takes longer than using the
+                    // carrier.  This confirms that it is not only
+                    // possible to travel to the collection point, it
+                    // is also the best plan.
+                    MoveType ret = followMapPath(path.next, lb);
+                    if (ret != MoveType.MOVE) return ret;
+                    waiting = true; // Arrived for collection.
+
+                } else {
+                    // It is quicker to cancel the transport and go to
+                    // the target directly.
+                    lb.add(", dropping carrier", aiCarrier.getUnit(),
+                        " as it is faster (", ownTurns, "<", pathTurns,
+                        " without it");
+                    aiUnit.dropTransport();
+                    aiCarrier = null;
+                    path = ownPath;
+                    useTransport = false;
+                }
+
+                if (waiting) {
+                    // If waiting for the carrier, signal that this
+                    // unit can be reexamined if the carrier is still
+                    // moving.
+                    lbAt(lb);
+                    lb.add(", wait for ", aiCarrier.getUnit());
+                    return (aiCarrier.getUnit().getMovesLeft() > 0)
+                        ? MoveType.MOVE_NO_ACCESS_EMBARK
+                        : MoveType.MOVE_NO_MOVES;
+                }
+            }
+
+            if (useTransport && aiCarrier == null) {
+                // Still interested in transport but no carrier.
                 lb.add(", needs transport to ", target);
                 return MoveType.MOVE_NO_ACCESS_EMBARK;
             }
-            lb.add(", wait at ", upLoc(unit.getLocation()),
-                   " for ", aiCarrier.getUnit());
-            return (aiCarrier.getUnit().getMovesLeft() > 0)
-                ? MoveType.MOVE_NO_ACCESS_EMBARK
-                : MoveType.MOVE_NO_MOVES;
-        }            
+        }
+
+        // Follow the path to the target.  If there is one.
         if (path == null) {
             lbAt(lb);
             lb.add(", no path to ", target);
