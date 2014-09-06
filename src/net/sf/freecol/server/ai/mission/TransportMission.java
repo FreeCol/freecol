@@ -889,7 +889,13 @@ public class TransportMission extends Mission {
                 lb.add(", ", t, " out of moves");
                 return CargoResult.TCONTINUE;
             }
-            d = cargo.getJoinDirection();
+            if ((d = cargo.getJoinDirection()) == null) {
+                logger.warning("Null pickup direction"
+                    + " for " + cargo.toShortString()
+                    + " at " + t.getLocation().toString()
+                    + " to " + carrier);
+                return CargoResult.TFAIL;
+            }                    
             tloc = tloc.getTile().getNeighbourOrNull(d.getReverseDirection());
             // Fall through
         case LOAD:
@@ -928,7 +934,17 @@ public class TransportMission extends Mission {
                 lb.add(", ", t, " about to leave");
                 return CargoResult.TCONTINUE;
             }
-            d = cargo.getLeaveDirection();
+            if ((d = cargo.getLeaveDirection()) == null) {
+                PathNode path = t.getDeliveryPath(carrier, cargo.getTransportTarget());
+                logger.warning("Null dropoff direction"
+                    + " for " + cargo.toShortString()
+                    + " at " + t.getLocation().toShortString()
+                    + "/" + carrier.getLocation().toShortString()
+                    + " to " + cargo.getTransportTarget()
+                    + " mov=" + ((AIUnit)t).getUnit().getSimpleMoveType(t.getLocation().getTile(), cargo.getTransportTarget().getTile())
+                    + " path=" + ((path == null) ? "null" : path.fullPathToString()));
+                return CargoResult.TFAIL;
+            }
             // Fall through
         case UNLOAD:
             if (isCarrying(t) && !t.leaveTransport(d)) {
