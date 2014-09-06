@@ -2326,7 +2326,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             if (aiUnits.isEmpty()) break;
             aiUnits = doMissions(aiUnits, lb);
         }
-        lb.log(logger, Level.FINEST);
+        lb.log(logger, Level.FINE);
 
         clearAIUnits();
         tipMap.clear();

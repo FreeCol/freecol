@@ -431,7 +431,7 @@ public class BuildColonyMission extends Mission {
                     if (m == null) {
                         return lbDone(lb, false, "joining");
                     } else {
-                        return lbDone(lb, true, "improving");
+                        return lbDone(lb, true, "improving with ", m);
                     }
                 }
                 setTarget(newTarget);
@@ -471,6 +471,7 @@ public class BuildColonyMission extends Mission {
                         || !player.owns(tile);
                 }
                 if (fail) return retargetMission("tile-claim-at-" + tile, lb);
+                lb.add(", claimed colony tile");
             }
 
             // Check that the unit has moves left, which are required

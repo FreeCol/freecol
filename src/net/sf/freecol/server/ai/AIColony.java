@@ -262,7 +262,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * @param lb A <code>LogBuilder</code> to log to.
      */
     public void update(LogBuilder lb) {
-        lb.add("\n    ", colony.getName());
+        lb.add("\n  ", colony.getName());
         resetExports();
         updateAIGoods(lb);
         updateTileImprovementPlans(lb);

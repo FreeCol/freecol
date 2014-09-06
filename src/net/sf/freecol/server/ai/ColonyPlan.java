@@ -1349,7 +1349,7 @@ public class ColonyPlan {
             for (;;) {
                 if (wlp == null) { // Time to use a food plan.
                     if (foodPlans.isEmpty()) {
-                        lb.add("Food plans exhausted\n");
+                        lb.add("    Food plans exhausted\n");
                         done = true;
                         break;
                     }
