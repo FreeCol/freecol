@@ -422,10 +422,16 @@ public class PioneeringMission extends Mission {
      *      none found.
      */
     private static String invalidTileReason(AIUnit aiUnit, Tile tile) {
-        return (tile == null) ? Mission.TARGETINVALID
-            : (!hasTools(aiUnit)) ? "unit-needs-tools"
+        return (tile == null)
+            ? Mission.TARGETINVALID
+            : (!hasTools(aiUnit))
+            ? "unit-needs-tools"
             : (getPlan(aiUnit, tile) == null
-                && getBestPlan(aiUnit, tile) == null) ? "tile-has-no-plan"
+                && getBestPlan(aiUnit, tile) == null)
+            ? "tile-has-no-plan"
+            : (tile.getOwningSettlement() != null)
+            ? invalidTargetReason(tile.getOwningSettlement(),
+                                  aiUnit.getUnit().getOwner())
             : null;
     }
 
