@@ -2495,10 +2495,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 ok = isAttack && result != CombatResult.NO_RESULT;
                 if (ok) {
                     if (result == CombatResult.WIN) {
-                        csPromoteUnit(attackerUnit, defenderUnit, cs);
+                        csPromoteUnit(attackerUnit, cs);
                         attackerTileDirty = true;
                     } else {
-                        csPromoteUnit(defenderUnit, attackerUnit, cs);
+                        csPromoteUnit(defenderUnit, cs);
                         defenderTileDirty = true;
                     }
                 }
@@ -3684,10 +3684,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * Promotes a unit.
      *
      * @param winner The <code>Unit</code> that won and should be promoted.
-     * @param loser The <code>Unit</code> that lost.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    private void csPromoteUnit(Unit winner, Unit loser, ChangeSet cs) {
+    private void csPromoteUnit(Unit winner, ChangeSet cs) {
         ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
         StringTemplate winnerNation = winnerPlayer.getNationName();
         StringTemplate oldName = winner.getLabel();

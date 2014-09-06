@@ -181,8 +181,7 @@ public final class TilePanel extends FreeColPanel {
             List<Double> values = player.getAllColonyValues(tile);
             int result = player.getColonyValue(tile);
             if (result < 0) {
-                add(new JLabel(DebugUtils.displayColonyValue(freeColClient,
-                                                             tile)),
+                add(new JLabel(DebugUtils.getColonyValue(tile)),
                     "newline 5, span, align center");
             } else {
                 for (Player.ColonyValueCategory c

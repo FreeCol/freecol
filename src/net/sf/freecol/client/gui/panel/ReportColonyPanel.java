@@ -320,7 +320,7 @@ public final class ReportColonyPanel extends ReportPanel
         reportPanel.removeAll();
 
         Market market = getMyPlayer().getMarket();
-        conciseHeaders(goodsTypes, true, market);
+        conciseHeaders(goodsTypes, market);
 
         for (Colony colony : colonies) {
             // Do not include colonies that have been abandoned but are
@@ -330,7 +330,7 @@ public final class ReportColonyPanel extends ReportPanel
             }
         }
 
-        conciseHeaders(goodsTypes, false, market);
+        conciseHeaders(goodsTypes, market);
     }
 
     private void updateColony(Colony colony) {
@@ -704,7 +704,7 @@ public final class ReportColonyPanel extends ReportPanel
 
         // Field: The units that could be upgraded.
         if (!improve.isEmpty()) {
-            addUnits(improve, couldWork, colony, grow);
+            addUnits(improve, couldWork, colony);
         } else {
             reportPanel.add(new JLabel(""));
         }
@@ -714,7 +714,7 @@ public final class ReportColonyPanel extends ReportPanel
             // TODO: explain food limitations better
             grow = Math.min(grow, colony.getNetProductionOf(foodType)
                 / Settlement.FOOD_PER_COLONIST);
-            addUnits(want, couldWork, colony, grow);
+            addUnits(want, couldWork, colony);
         } else {
             reportPanel.add(new JLabel(""));
         }
@@ -724,8 +724,7 @@ public final class ReportColonyPanel extends ReportPanel
         return StringTemplate.template(messageId);
     }
 
-    private void conciseHeaders(List<GoodsType> goodsTypes, boolean top,
-                                Market market) {
+    private void conciseHeaders(List<GoodsType> goodsTypes, Market market) {
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL),
             "newline, span, growx");
 
@@ -842,7 +841,7 @@ public final class ReportColonyPanel extends ReportPanel
     }
 
     private void addUnits(final HashMap<UnitType, Suggestion> suggestions,
-                          List<UnitType> have, Colony colony, int grow) {
+                          List<UnitType> have, Colony colony) {
         final String action = colony.getId();
         final ImageLibrary lib = getGUI().getImageLibrary();
 

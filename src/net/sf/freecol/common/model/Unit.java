@@ -1983,7 +1983,8 @@ public class Unit extends GoodsLocation
      * @param target The target <code>Tile</code> of the move.
      * @return The move type.
      */
-    private MoveType getNavalMoveType(Tile from, Tile target) {
+    private MoveType getNavalMoveType(@SuppressWarnings("unused") Tile from,
+                                      Tile target) {
         if (target == null) {
             return (getOwner().canMoveToEurope()) ? MoveType.MOVE_HIGH_SEAS
                 : MoveType.MOVE_NO_EUROPE;
@@ -2441,7 +2442,7 @@ public class Unit extends GoodsLocation
             if (tile != null && tile.isOnRiver()
                 && tile.isHighSeasConnected()) {
                 path = search(getLocation(), 
-                    GoalDeciders.getCornerGoalDecider(this),
+                    GoalDeciders.getCornerGoalDecider(),
                     CostDeciders.avoidSettlementsAndBlockingUnits(),
                     INFINITY, null);
             }

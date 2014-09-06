@@ -37,7 +37,7 @@ public class FreeColTransparentPanelUI extends BasicPanelUI {
     private static FreeColTransparentPanelUI sharedInstance = new FreeColTransparentPanelUI();
 
 
-    public static ComponentUI createUI(JComponent c) {
+    public static ComponentUI createUI(@SuppressWarnings("unused") JComponent c) {
         return sharedInstance;
     }
 

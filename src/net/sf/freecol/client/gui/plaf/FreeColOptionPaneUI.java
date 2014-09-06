@@ -60,7 +60,7 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
 
     private FreeColOptionPaneUI() {}
 
-    public static ComponentUI createUI(JComponent c) {
+    public static ComponentUI createUI(@SuppressWarnings("unused") JComponent c) {
         return new FreeColOptionPaneUI();
     }
 

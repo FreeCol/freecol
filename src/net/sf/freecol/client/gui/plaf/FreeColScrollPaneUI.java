@@ -31,7 +31,7 @@ import javax.swing.plaf.basic.BasicScrollPaneUI;
  */
 public class FreeColScrollPaneUI extends BasicScrollPaneUI {
 
-    public static ComponentUI createUI(JComponent c) {
+    public static ComponentUI createUI(@SuppressWarnings("unused") JComponent c) {
         return new FreeColScrollPaneUI();
     }
 

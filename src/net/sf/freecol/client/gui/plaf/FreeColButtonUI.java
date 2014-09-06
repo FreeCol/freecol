@@ -46,7 +46,7 @@ public class FreeColButtonUI extends MetalButtonUI {
     private static FreeColButtonUI sharedInstance = new FreeColButtonUI();
 
 
-    public static ComponentUI createUI(JComponent c) {
+    public static ComponentUI createUI(@SuppressWarnings("unused") JComponent c) {
         return sharedInstance;
     }
 

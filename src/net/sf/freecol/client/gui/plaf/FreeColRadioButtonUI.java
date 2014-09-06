@@ -31,7 +31,7 @@ import javax.swing.plaf.basic.BasicRadioButtonUI;
  */
 public class FreeColRadioButtonUI extends BasicRadioButtonUI {
 
-    public static ComponentUI createUI(JComponent c) {
+    public static ComponentUI createUI(@SuppressWarnings("unused") JComponent c) {
         return new FreeColRadioButtonUI();
     }
 

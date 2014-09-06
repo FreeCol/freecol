@@ -38,7 +38,7 @@ public class FreeColSelectedPanelUI extends BasicPanelUI {
     private static FreeColSelectedPanelUI sharedInstance = new FreeColSelectedPanelUI();
 
 
-    public static ComponentUI createUI(JComponent c) {
+    public static ComponentUI createUI(@SuppressWarnings("unused") JComponent c) {
         return sharedInstance;
     }
 

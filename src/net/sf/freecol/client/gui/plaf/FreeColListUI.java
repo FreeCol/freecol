@@ -36,7 +36,7 @@ import net.sf.freecol.client.gui.ImageLibrary;
  */
 public class FreeColListUI extends BasicListUI {
 
-    public static ComponentUI createUI(JComponent c) {
+    public static ComponentUI createUI(@SuppressWarnings("unused") JComponent c) {
         return new FreeColListUI();
     }
 

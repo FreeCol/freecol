@@ -35,7 +35,7 @@ public class FreeColMenuBarUI extends BasicMenuBarUI {
     private static FreeColMenuBarUI sharedInstance = new FreeColMenuBarUI();
 
 
-    public static ComponentUI createUI(JComponent c) {
+    public static ComponentUI createUI(@SuppressWarnings("unused") JComponent c) {
         return sharedInstance;
     }
 

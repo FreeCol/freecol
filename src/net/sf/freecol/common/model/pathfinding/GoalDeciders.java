@@ -365,10 +365,9 @@ public final class GoalDeciders {
      * a river.  By moving to a corner (i.e. where another unit can get
      * past it) the chance that the blockage clears is enhanced.
      *
-     * @param unit The <code>Unit</code> that is stuck on the river.
      * @return A suitable goal decider.
      */
-    public static GoalDecider getCornerGoalDecider(final Unit unit) {
+    public static GoalDecider getCornerGoalDecider() {
         return new GoalDecider() {
             private PathNode goal = null;
             private int score = Integer.MAX_VALUE;

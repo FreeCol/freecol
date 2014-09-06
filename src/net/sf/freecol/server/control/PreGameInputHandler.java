@@ -162,7 +162,8 @@ public final class PreGameInputHandler extends InputHandler {
      * @param element The <code>Element</code> containing the request.
      * @return Null, or an error message on failure.
      */
-    private Element requestLaunch(Connection connection, Element element) {
+    private Element requestLaunch(Connection connection,
+        @SuppressWarnings("unused") Element element) {
         FreeColServer freeColServer = getFreeColServer();
 
         // Check if launching player is an admin.

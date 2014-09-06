@@ -31,7 +31,7 @@ import javax.swing.plaf.metal.MetalLabelUI;
  */
 public class FreeColLabelUI extends MetalLabelUI {
 
-    public static ComponentUI createUI(JComponent c) {
+    public static ComponentUI createUI(@SuppressWarnings("unused") JComponent c) {
         return new FreeColLabelUI();
     }
 

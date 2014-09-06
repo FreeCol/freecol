@@ -31,7 +31,7 @@ import javax.swing.plaf.basic.BasicCheckBoxUI;
  */
 public class FreeColCheckBoxUI extends BasicCheckBoxUI {
 
-    public static ComponentUI createUI(JComponent c) {
+    public static ComponentUI createUI(@SuppressWarnings("unused") JComponent c) {
         return new FreeColCheckBoxUI();
     }
 

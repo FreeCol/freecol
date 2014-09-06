@@ -271,11 +271,11 @@ public final class PreGameInputHandler extends InputHandler {
      * message arrives when map is still null. Wait in other
      * thread in order not to block and it can receive the map.
      *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *                holds all the information.
+     * @param element The element (root element in a DOM-parsed XML
+     *     tree) that holds all the information.
      * @return Null.
      */
-    private Element startGame(Element element) {
+    private Element startGame(@SuppressWarnings("unused") Element element) {
         new Thread(FreeCol.CLIENT_THREAD + "Starting game") {
                 @Override
                 public void run() {

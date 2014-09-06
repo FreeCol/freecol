@@ -98,7 +98,8 @@ public final class UserConnectionHandler extends FreeColServerHolder
      *     DOM-parsed XML tree) that holds all the information.
      * @return The reply.
      */
-    private Element disconnect(Connection connection, Element element) {
+    private Element disconnect(Connection connection,
+        @SuppressWarnings("unused") Element element) {
         try {
             connection.reallyClose();
         } catch (IOException e) {
@@ -114,7 +115,9 @@ public final class UserConnectionHandler extends FreeColServerHolder
      * @param element The element containing the request.
      * @return An element with a "gameState" attribute set.
      */
-    private Element gameState(Connection connection, Element element) {
+    private Element gameState(
+        @SuppressWarnings("unused") Connection connection,
+        @SuppressWarnings("unused") Element element) {
         final FreeColServer freeColServer = getFreeColServer();
         final Game game = getGame();
 
@@ -133,7 +136,9 @@ public final class UserConnectionHandler extends FreeColServerHolder
      *     list if the game is starting, or a list of all the inactive
      *     European players.
      */
-    private Element getVacantPlayers(Connection connection, Element element) {
+    private Element getVacantPlayers(
+        @SuppressWarnings("unused") Connection connection,
+        @SuppressWarnings("unused") Element element) {
         final FreeColServer freeColServer = getFreeColServer();
         final Game game = getGame();
 

@@ -30,7 +30,7 @@ import javax.swing.plaf.metal.MetalComboBoxUI;
  */
 public class FreeColComboBoxUI extends MetalComboBoxUI {
 
-    public static ComponentUI createUI(JComponent c) {
+    public static ComponentUI createUI(@SuppressWarnings("unused") JComponent c) {
         return new FreeColComboBoxUI();
     }
 

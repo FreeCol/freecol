@@ -484,8 +484,7 @@ public final class Canvas extends JDesktopPane {
                 break;
             }
         }
-        if ((p = getClearSpace((Component)comp, x, y, width, height,
-                               MAXTRY)) != null
+        if ((p = getClearSpace(x, y, width, height, MAXTRY)) != null
             && p.x >= 0 && p.x < getWidth()
             && p.y >= 0 && p.y < getHeight()) {
             x = p.x;
@@ -509,7 +508,6 @@ public final class Canvas extends JDesktopPane {
      * Try to find some free space on the canvas for a component,
      * starting at x,y.
      *
-     * @param comp The <code>Component</code> to place.
      * @param x A starting x coordinate.
      * @param y A starting y coordinate.
      * @param w The component width to use.
@@ -517,8 +515,7 @@ public final class Canvas extends JDesktopPane {
      * @return A <code>Point</code> to place the component at or null
      *     on failure.
      */
-    private Point getClearSpace(Component comp, int x, int y, int w, int h,
-                                int tries) {
+    private Point getClearSpace(int x, int y, int w, int h, int tries) {
         Rectangle bounds = this.getBounds();
         if (!bounds.contains(x, y)) return null;
         tries = 3 * tries + 1; // 3 new candidates per level

@@ -139,7 +139,7 @@ public final class DefaultHandler extends Handler {
     @Override
     public void publish(LogRecord record) {
         if (record.getThrown() != null) {
-            FreeColDebugger.handleCrash(record);
+            FreeColDebugger.handleCrash();
         }
         if (record.getLevel().intValue() < getLevel().intValue()) {
             return;

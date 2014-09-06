@@ -31,7 +31,7 @@ import javax.swing.plaf.basic.BasicMenuItemUI;
  */
 public class FreeColMenuItemUI extends BasicMenuItemUI {
 
-    public static ComponentUI createUI(JComponent c) {
+    public static ComponentUI createUI(@SuppressWarnings("unused") JComponent c) {
         return new FreeColMenuItemUI();
     }
 

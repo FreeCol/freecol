@@ -2355,7 +2355,7 @@ public final class MapViewer {
             }
             centerString(g, posString);
         }
-        String value = DebugUtils.displayColonyValue(freeColClient, tile);
+        String value = DebugUtils.getColonyValue(tile);
         if (value != null) centerString(g, value);
     }
 

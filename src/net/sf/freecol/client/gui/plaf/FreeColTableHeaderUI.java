@@ -33,7 +33,7 @@ import javax.swing.table.JTableHeader;
  */
 public class FreeColTableHeaderUI extends BasicTableHeaderUI {
 
-    public static ComponentUI createUI(JComponent c) {
+    public static ComponentUI createUI(@SuppressWarnings("unused") JComponent c) {
         return new FreeColTableHeaderUI();
     }
 

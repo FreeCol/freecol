@@ -361,10 +361,8 @@ public class FreeColDebugger {
 
     /**
      * Handler for log records that include a crash.
-     *
-     * @param record The <code>LogRecord</code> with a crash.
      */
-    public static void handleCrash(LogRecord record) {
+    public static void handleCrash() {
         if (debugRunSave != null) signalEndDebugRun();
     }
 

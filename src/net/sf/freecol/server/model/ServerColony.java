@@ -208,7 +208,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                 }
             } else {
                 // Ready to build something.  TODO: OO!
-                BuildableType buildable = csNextBuildable(queue, random, cs);
+                BuildableType buildable = csNextBuildable(queue, cs);
                 if (buildable == null) {
                     ; // It was invalid, ignore.
                 } else if (buildable instanceof UnitType) {
@@ -302,16 +302,18 @@ public class ServerColony extends Colony implements ServerModelObject {
                     }
                     break;
                 case REMOVE_EXCEPT_LAST:
-                    if (queue.size() == 1 && queue.getCurrentlyBuilding() instanceof UnitType) {
-                        // several units can co-exist
+                    if (queue.size() == 1
+                        && queue.getCurrentlyBuilding() instanceof UnitType) {
+                        // Repeat last unit
                         break;
                     }
+                    // Fall through
                 case REMOVE:
                 default:
                     queue.remove(0);
                     break;
                 }
-                csNextBuildable(queue, random, cs);
+                csNextBuildable(queue, cs);
             }
             tileDirty = true;
         }
@@ -667,12 +669,11 @@ public class ServerColony extends Colony implements ServerModelObject {
      * a valid buildable is now being built if possible.
      *
      * @param queue The <code>BuildQueue</code> to update.
-     * @param random A pseudo-random number source.
      * @param cs A <code>ChangeSet</code> to update.
      * @return The next buildable that can be built, or null if nothing.
      */
     private BuildableType csNextBuildable(BuildQueue<? extends BuildableType> queue,
-                                          Random random, ChangeSet cs) {
+                                          ChangeSet cs) {
         Specification spec = getSpecification();
         ServerPlayer owner = (ServerPlayer) getOwner();
         BuildableType buildable;
