@@ -579,7 +579,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                           .addStringTemplate("%unit%", unit.getLabel()));
         }
 
-        logger.info("New unit created in " + getName() + ": " + unit);
+        logger.info("New unit in " + getName() + ": " + type.getSuffix());
         return unit;
     }
 
@@ -656,6 +656,8 @@ public class ServerColony extends Colony implements ServerModelObject {
             if (owner.isAI()) {
                 firePropertyChange(REARRANGE_WORKERS, true, false);
             }
+            logger.info("New building in " + getName()
+                + ": " + type.getSuffix());
         }
         return success;
     }
@@ -678,6 +680,10 @@ public class ServerColony extends Colony implements ServerModelObject {
 
         while ((buildable = queue.getCurrentlyBuilding()) != null) {
             switch (getNoBuildReason(buildable, null)) {
+            case LIMIT_EXCEEDED:
+                // Expected when a player builds its last available wagon
+                // and there is nothing else in the build queue.
+                break;
             case NONE:
                 return buildable;
             case NOT_BUILDING:
