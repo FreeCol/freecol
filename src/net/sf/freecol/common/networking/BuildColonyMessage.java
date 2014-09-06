@@ -106,8 +106,8 @@ public class BuildColonyMessage extends DOMMessage {
 
         Tile tile = unit.getTile();
         if (!player.canClaimToFoundSettlement(tile)) {
-            return DOMMessage.clientError("Can not build colony on tile: "
-                + tile);
+            return DOMMessage.clientError("Can not build colony on tile "
+                + tile + ": " + player.canClaimToFoundSettlementReason(tile));
         }
 
         // Build can proceed.
