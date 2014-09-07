@@ -1800,6 +1800,8 @@ public class EuropeanAIPlayer extends AIPlayer {
                 reasons.put(unit, "At-Sea");
 
             } else { // Unit needs a mission
+                if (!aiUnit.getUnit().isOnCarrier()
+                    && aiUnit.getTransport() != null) aiUnit.dropTransport();
                 continue;
             }
             done.add(aiUnit);
