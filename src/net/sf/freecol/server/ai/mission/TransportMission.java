@@ -1053,6 +1053,12 @@ public class TransportMission extends Mission {
                 for (Cargo c : next) queueCargo(c, false, lb);
             }
 
+            // Delivering might have invalidated other cargo missions.
+            // It may be rare, but there have been cases where a scout
+            // has disembarked onto an LCR, invalidating the mission
+            // of a scout further down the transport list.  Run check
+            // cargoes again to handle this.  Then optimize.
+            checkCargoes(lb);
             optimizeCargoes(lb);
         }
 
@@ -1221,7 +1227,7 @@ public class TransportMission extends Mission {
         final TransportableAIObject t = cargo.getTransportable();
         String reason;
         return (t == null) ? "null-transportable"
-            : ((reason = t.invalidReason()) != null) ? reason
+            : ((reason = t.invalidReason()) != null) ? "cargo-" + reason
             : null;
     }
             

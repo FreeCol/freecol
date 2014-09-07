@@ -617,7 +617,7 @@ public class Cargo {
         lb.add("[", transportable,
             " ", getModeString(),
             " ", getTurns(), "/", tries, " space=", spaceLeft,
-            ((wrapped == null) ? " " : " wrap "));
+            ((wrapped == null) ? "" : " wrap"));
         if (plan.twait != null && plan.cwait != null) {
             lb.add(" ", plan.twait.toShortString(),
                 "/", plan.cwait.toShortString());
