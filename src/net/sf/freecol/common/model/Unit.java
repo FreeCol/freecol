@@ -2470,6 +2470,36 @@ public class Unit extends GoodsLocation
     }
 
     /**
+     * Finds a quickest path to a neighbouring tile to a specified target
+     * tile, optionally using a carrier and special purpose cost decider.
+     *
+     * @param start The <code>Location</code> to start at.
+     * @param end The <code>Tile</code> to end at a neighbour of.
+     * @param carrier An optional carrier <code>Unit</code> to carry the unit.
+     * @param costDecider An optional <code>CostDecider</code> for
+     *     determining the movement costs (uses default cost deciders
+     *     for the unit/s if not provided).
+     * @return A <code>PathNode</code>, or null if no path is found.
+     */
+    public PathNode findPathToNeighbour(Location start, Tile end, Unit carrier,
+                                        CostDecider costDecider) {
+        final Player owner = getOwner();
+        int bestValue = INFINITY;
+        PathNode best = null;
+        for (Tile t : end.getSurroundingTiles(1)) {
+            if (isTileAccessible(t)
+                && (t.getFirstUnit() == null || owner.owns(t.getFirstUnit()))) {
+                PathNode p = findPath(start, t, carrier, costDecider);
+                if (p != null && bestValue > p.getTotalTurns()) {
+                    bestValue = p.getTotalTurns();
+                    best = p;
+                }
+            }
+        }
+        return best;
+    }
+
+    /**
      * Gets the number of turns required for this unit to reach a
      * destination location from its current position.  If the unit is
      * currently on a carrier, it will be used.
