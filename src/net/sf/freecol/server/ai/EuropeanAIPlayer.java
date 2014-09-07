@@ -928,7 +928,39 @@ public class EuropeanAIPlayer extends AIPlayer {
     }
 
 
-    // Transport maps handling
+    // Transport handling
+
+    /**
+     * Update the transport of a unit following a target change.
+     *
+     * If the target has changed
+     * - drop all non-boarded transport unless the target is the same
+     * - dump boarded transport with no target
+     * - requeue all boarded transport unless the target is the same
+     *
+     * @param aiu The <code>AIUnit</code> to check.
+     * @param oldTarget The old target <code>Location</code>.
+     * @param lb A <code>LogBuilder</code> to log to.
+     */
+    public void updateTransport(AIUnit aiu, Location oldTarget, LogBuilder lb) {
+        final AIUnit aiCarrier = aiu.getTransport();
+        final Mission newMission = aiu.getMission();
+        final Location newTarget = (newMission == null) ? null
+            : newMission.getTarget();
+        TransportMission tm;
+        if (aiCarrier != null
+            && (tm = aiCarrier.getMission(TransportMission.class)) != null
+            && !Map.isSameLocation(oldTarget, newTarget)) {
+            if (aiu.getUnit().getLocation() != aiCarrier.getUnit()) {
+                lb.add(", drop transport ", aiCarrier.getUnit());
+                aiu.dropTransport();
+            } else if (newTarget == null) {
+                tm.dumpTransportable(aiu, lb);
+            } else {
+                tm.requeueTransportable(aiu, lb);
+            }
+        }
+    }
 
     /**
      * Checks if a transportable needs transport.
@@ -2381,32 +2413,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 continue;
             }
 
-            // If the mission has changed
-            //   - drop all non-boarded transport unless the target
-            //     is the same
-            //   - dump boarded transport with no target
-            //   - requeue all boarded transport unless the target
-            //     is the same
-            final AIUnit aiCarrier = aiu.getTransport();
-            final Mission newMission = aiu.getMission();
-            TransportMission tm;
-            if (newMission != oldMission && aiCarrier != null
-                && (tm = aiCarrier.getMission(TransportMission.class)) != null) {
-                Location newTarget = (newMission == null) ? null
-                    : newMission.getTarget();
-                if (unit.getLocation() != aiCarrier.getUnit()) {
-                    if (!Map.isSameLocation(newTarget, oldTarget)) {
-                        lb.add(", drop transport on ", aiCarrier, ".");
-                        aiu.dropTransport();
-                    }
-                } else if (newTarget == null) {
-                    tm.dumpTransportable(aiu, lb);
-                } else {
-                    if (!Map.isSameLocation(newTarget, oldTarget)) {
-                        tm.requeueTransportable(aiu, lb);
-                    }
-                }
-            }
+            updateTransport(aiu, oldTarget, lb);
             
             // Units with moves left should be requeued.  If they are on a
             // carrier the carrier needs to have moves left.

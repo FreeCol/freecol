@@ -453,21 +453,31 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         for (Unit u : tile.getUnitList()) {
             final AIUnit aiu = getAIUnit(u);
             Mission m = aiu.getMission();
+            Location oldTarget = (m == null) ? null : m.getTarget();
             if (u.hasAbility(Ability.SPEAK_WITH_CHIEF)
                 && !(m instanceof ScoutingMission)) {
                 if (aiPlayer.getScoutingMission(aiu) == null) {
                     result.add(aiu);
-                } else lb.add(", ", aiu.getMission());
+                } else {
+                    lb.add(", ", aiu.getMission());
+                    aiPlayer.updateTransport(aiu, oldTarget, lb);
+                }
             } else if (u.hasAbility(Ability.IMPROVE_TERRAIN)
                 && !(m instanceof PioneeringMission)) {
                 if (aiPlayer.getPioneeringMission(aiu, null) == null) {
                     result.add(aiu);
-                } else lb.add(", ", aiu.getMission());
+                } else {
+                    lb.add(", ", aiu.getMission());
+                    aiPlayer.updateTransport(aiu, oldTarget, lb);
+                }
             } else if (u.hasAbility(Ability.ESTABLISH_MISSION)
                 && !(m instanceof MissionaryMission)) {
                 if (aiPlayer.getMissionaryMission(aiu) == null) {
                     result.add(aiu);
-                } else lb.add(", ", aiu.getMission());
+                } else {
+                    lb.add(", ", aiu.getMission());
+                    aiPlayer.updateTransport(aiu, oldTarget, lb);
+                }
             } else if (u.isDefensiveUnit()
                 && !(m instanceof DefendSettlementMission)) {
                 if (aiPlayer.getDefendSettlementMission(aiu, colony) == null) {
