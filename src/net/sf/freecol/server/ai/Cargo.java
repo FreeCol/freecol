@@ -276,8 +276,8 @@ public class Cargo {
      * @return A reason the planning failed, null if it succeeded.
      */
     private String initialize(Location destination, boolean allowFallback) {
-        return this.plan.initialize(transportable, carrier, destination,
-                                    allowFallback);
+        return this.plan.initialize(this.transportable, this.carrier,
+                                    destination, allowFallback);
     }
 
     /**
@@ -286,7 +286,7 @@ public class Cargo {
      * @return A reason the planning failed, null if it succeeded.
      */
     public String update() {
-        return this.plan.initialize(transportable, carrier, this.plan.tdst,
+        return this.plan.initialize(this.transportable, this.carrier, null,
                                     this.plan.fallback);
     }
 

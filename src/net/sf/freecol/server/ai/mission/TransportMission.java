@@ -770,7 +770,9 @@ public class TransportMission extends Mission {
                 if (reason.startsWith("invalid")) {
                     removeCargo(cargo);
                     lb.add(", FAIL(", reason, ") ", cargo.toShortString());
-                } else if (!cargo.retry()) {
+                } else if (cargo.retry()) {
+                    lb.add(", retry-", cargo.getTries(), "(", reason, ")");
+                } else {
                     dump = true;
                 }
             } else {
