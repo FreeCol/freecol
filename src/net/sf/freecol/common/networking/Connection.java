@@ -125,8 +125,8 @@ public class Connection {
                       String name) throws IOException {
         this(name);
 
-        this.in = socket.getInputStream();
         this.socket = socket;
+        this.in = socket.getInputStream();
         this.out = socket.getOutputStream();
         Transformer myTransformer = null;
         try {
@@ -150,6 +150,7 @@ public class Connection {
      *
      * @param host The host to connect to.
      * @param port The port to connect to.
+     * @exception IOException on failure to create/connect the socket.
      * @return A new socket.
      */
     private static Socket createSocket(String host, int port)
@@ -157,7 +158,6 @@ public class Connection {
         Socket socket = new Socket();
         SocketAddress addr = new InetSocketAddress(host, port);
         socket.connect(addr, TIMEOUT);
-
         return socket;
     }
 
@@ -200,39 +200,59 @@ public class Connection {
 
     /**
      * Sends a "disconnect"-message and closes this connection.
+     *
+     * Failure is expected if the other end has closed already.
      */
     public void close() {
-        try {
-            sendDumping(DOMMessage.createMessage(DISCONNECT_TAG));
-            reallyClose();
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Error closing " + this, e);
+        synchronized (this.out) {
+            if (this.out != null) {
+                try {
+                    sendDumping(DOMMessage.createMessage(DISCONNECT_TAG));
+                } catch (IOException ioe) {
+                    logger.fine("Error disconnecting " + this.name
+                        + ": " + ioe.getMessage());
+                } finally {
+                    reallyClose();
+                }
+            }
         }
     }
 
     /**
      * Really closes this connection.
-     *
-     * @exception IOException
      */
-    public void reallyClose() throws IOException {
+    public void reallyClose() {
         if (thread != null) thread.askToStop();
 
-        if (out != null) {
-            out.close();
-            out = null;
+        if (this.out != null) {
+            try {
+                this.out.close();
+            } catch (IOException ioe) {
+                logger.log(Level.WARNING, "Error closing output", ioe);
+            } finally {
+                this.out = null;
+            }
+        }
+        if (this.in != null) {
+            try {
+                this.in.close();
+            } catch (IOException ioe) {
+                logger.log(Level.WARNING, "Error closing input", ioe);
+            } finally {
+                this.in = null;
+            }
+        }
+        if (this.socket != null) {
+            try {
+                this.socket.close();
+            } catch (IOException ioe) {
+                logger.log(Level.WARNING, "Error closing socket", ioe);
+            } finally {
+                this.socket = null;
+            }
         }
 
-        if (socket != null) {
-            socket.close();
-            socket = null;
-        }
-
-        if (in != null) {
-            in.close();
-            in = null;
-        }
-        logger.fine("Connection really closed.");
+        logger.fine("Connection really closed for " + this.name);
     }
 
     /**
@@ -244,19 +264,18 @@ public class Connection {
      * @exception IOException If an error occur while sending the message.
      */
     private void send(Element element, boolean logOK) throws IOException {
-        synchronized (out) {
+        if (logOK) logger.fine("Send: " + element.getTagName());
+        synchronized (this.out) {
             try {
                 xmlTransformer.transform(new DOMSource(element),
-                                         new StreamResult(out));
+                                         new StreamResult(this.out));
+                this.out.write('\n');
+                this.out.flush();
+                this.out.notifyAll(); // Just in case others are waiting
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Failed to transform and send!", e);
             }
-
-            out.write('\n');
-            out.flush();
-            out.notifyAll(); // Just in case others are waiting
         }
-        if (logOK) logger.fine("Send: " + element.getTagName());
     }
 
     /**
@@ -294,7 +313,7 @@ public class Connection {
 
     /**
      * Sends the given message over this <code>Connection</code> and waits for
-     * confirmation of receiveval before returning.
+     * confirmation of reception before returning.
      *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information
@@ -346,6 +365,7 @@ public class Connection {
 
     /**
      * Dumping wrapper for ask().
+     *
      * Dumps to System.err with a faked-XML prefix so the whole line can
      * be fed to an XML-pretty printer if required.
      *
@@ -354,29 +374,21 @@ public class Connection {
      * @exception IOException if ask() fails.
      */
     public Element askDumping(Element request) throws IOException {
-        if (!dump) return ask(request);
-
-        try {
-            String x = getName() + "-request";
-            System.err.println("<" + x + ">"
-                + DOMMessage.elementToString(request) + "</" + x + ">\n");
-        } catch (Exception e) {}
-        try {
-            Element reply = ask(request);
+        Element reply = ask(request);
+        if (dump) {
+            final String name = getName();
             try {
-                String x = getName() + "-reply";
-                System.err.println("<" + x + ">"
-                    + DOMMessage.elementToString(reply) + "</" + x + ">\n");
-            } catch (Exception x) {}
-            return reply;
-            
-        } catch (IOException e) {
-            try {
-                System.err.println("<" + getName() + "-exception e=\""
-                    + e.getMessage() + "\" />\n");
-            } catch (Exception x) {}
-            throw e;
+                System.err.println("<" + name + "-request>"
+                    + DOMMessage.elementToString(request)
+                    + "</" + name + "-request>\n"
+                    + "<" + name + "-reply>"
+                    + DOMMessage.elementToString(reply)
+                    + "</" + name + "-reply>\n");
+            } catch (Exception x) {
+                logger.log(Level.WARNING, "Dump log fail for " + name, x);
+            }
         }
+        return reply;
     }
 
     /**
@@ -471,6 +483,6 @@ public class Connection {
      */
     @Override
     public String toString() {
-        return "[Connection " + name + " (" + socket + ") ]";
+        return "[Connection " + name + " (" + socket + ")]";
     }
 }

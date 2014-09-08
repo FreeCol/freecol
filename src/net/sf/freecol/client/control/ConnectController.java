@@ -92,6 +92,22 @@ public final class ConnectController {
 
 
     /**
+     * The game is finishing.  Release/unhook everything.
+     */
+    private void finish() {
+        ResourceManager.setScenarioMapping(null);
+        ResourceManager.setCampaignMapping(null);
+
+        if (!freeColClient.isHeadless()) {
+            freeColClient.setInGame(false);
+        }
+        freeColClient.setGame(null);
+        freeColClient.setMyPlayer(null);
+        freeColClient.askServer().reset();
+        freeColClient.setLoggedIn(false);
+    }
+
+    /**
      * Shut down an existing server on a given port.
      *
      * @param port The port to unblock.
@@ -640,17 +656,7 @@ public final class ConnectController {
             freeColClient.askServer().logout();
         }
         freeColClient.askServer().disconnect();
-
-        ResourceManager.setScenarioMapping(null);
-        ResourceManager.setCampaignMapping(null);
-
-        if (!freeColClient.isHeadless()) {
-            freeColClient.setInGame(false);
-        }
-        freeColClient.setGame(null);
-        freeColClient.setMyPlayer(null);
-        freeColClient.askServer().reset();
-        freeColClient.setLoggedIn(false);
+        finish();
     }
 
     /**
@@ -662,12 +668,13 @@ public final class ConnectController {
      *     out then we don't need to confirm with a logout message.
      */
     public void quitGame(boolean stopServer, boolean notifyServer) {
-        if (freeColClient.isLoggedIn()) logout(notifyServer);
-
         final FreeColServer server = freeColClient.getFreeColServer();
         if (stopServer && server != null) {
             server.getController().shutdown();
             freeColClient.setFreeColServer(null);
+            finish();
+        } else {
+            if (freeColClient.isLoggedIn()) logout(notifyServer);
         }
     }
 

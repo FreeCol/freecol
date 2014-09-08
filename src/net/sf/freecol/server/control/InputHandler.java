@@ -175,11 +175,7 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
             if (player != null && player.isConnected()) {
                 logout(connection, null);
             }
-            try {
-                connection.reallyClose();
-            } catch (IOException e) {
-                logger.log(Level.WARNING, "Could not close the connection.", e);
-            }
+            connection.reallyClose();
             Server server = getFreeColServer().getServer();
             if (server != null) {
                 server.removeConnection(connection);

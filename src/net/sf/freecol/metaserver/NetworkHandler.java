@@ -179,14 +179,8 @@ public final class NetworkHandler implements MessageHandler {
      * @return The reply: <code>null</code>.
      */
     private Element disconnect(Connection connection, Element element) {
-        try {
-            connection.reallyClose();
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Could not close the connection.", e);
-        }
-
+        connection.reallyClose();
         metaServer.removeConnection(connection);
-
         return null;
     }
 }

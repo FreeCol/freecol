@@ -88,7 +88,7 @@ final class ReceivingThread extends Thread {
          * instead of <code>-1</code>.
          */
         public void enable() {
-            wait = false;
+            this.wait = false;
         }
 
         /**
@@ -99,22 +99,22 @@ final class ReceivingThread extends Thread {
          * @exception IllegalStateException if the buffer is not empty.
          */
         private boolean fill() throws IOException {
-            if (!empty) throw new IllegalStateException("Not empty.");
+            if (!this.empty) throw new IllegalStateException("Not empty.");
 
             int r;
-            if (bStart < bEnd) {
-                r = in.read(buffer, bEnd, BUFFER_SIZE - bEnd);
-            } else if (bStart == bEnd) {
-                bStart = bEnd = 0; // Might as well resync.
-                r = in.read(buffer, bEnd, BUFFER_SIZE - bEnd);
+            if (this.bStart < this.bEnd) {
+                r = this.in.read(buffer, this.bEnd, BUFFER_SIZE - this.bEnd);
+            } else if (this.bStart == this.bEnd) {
+                this.bStart = this.bEnd = 0; // Might as well resync.
+                r = this.in.read(buffer, this.bEnd, BUFFER_SIZE - this.bEnd);
             } else {
-                r = in.read(buffer, bEnd, bStart - bEnd);
+                r = this.in.read(buffer, this.bEnd, this.bStart - this.bEnd);
             }
             if (r <= 0) return false;
 
-            empty = false;
-            bEnd += r;
-            if (bEnd >= BUFFER_SIZE) bEnd = 0;
+            this.empty = false;
+            this.bEnd += r;
+            if (this.bEnd >= BUFFER_SIZE) this.bEnd = 0;
             return true;
         }
 
@@ -126,20 +126,20 @@ final class ReceivingThread extends Thread {
          * @exception IOException is thrown by the underlying read.
          */
         public int read() throws IOException {
-            if (wait) return -1;
+            if (this.wait) return -1;
 
-            if (empty && !fill()) {
-                wait = true;
+            if (this.empty && !fill()) {
+                this.wait = true;
                 return -1;
             }
 
-            int ret = buffer[bStart];
-            bStart++;
-            if (bStart >= BUFFER_SIZE) bStart = 0;
-            if (bStart == bEnd) empty = true;
+            int ret = buffer[this.bStart];
+            this.bStart++;
+            if (this.bStart >= BUFFER_SIZE) this.bStart = 0;
+            if (this.bStart == this.bEnd) this.empty = true;
 
             if (ret == END_OF_STREAM) {
-                wait = true;
+                this.wait = true;
                 ret = -1;
             }
             return ret;
@@ -155,28 +155,28 @@ final class ReceivingThread extends Thread {
          *     message has ended ({@link #END_OF_STREAM} was encountered).
          */
         public int read(byte[] b, int off, int len) throws IOException {
-            if (wait) return -1;
+            if (this.wait) return -1;
 
             int n = 0;
             for (; n < len; n++) {
-                if (empty && !fill()) {
-                    wait = true;
+                if (this.empty && !fill()) {
+                    this.wait = true;
                     break;
                 }
 
-                byte value = buffer[bStart];
-                bStart++;
-                if (bStart == BUFFER_SIZE) bStart = 0;
-                if (bStart == bEnd) empty = true;
+                byte value = buffer[this.bStart];
+                this.bStart++;
+                if (this.bStart == BUFFER_SIZE) this.bStart = 0;
+                if (this.bStart == this.bEnd) this.empty = true;
 
                 if (value == END_OF_STREAM) {
-                    wait = true;
+                    this.wait = true;
                     break;
                 }
                 b[n + off] = value;
             }
 
-            return (n <= 0 && wait) ? -1 : n;
+            return (n <= 0 && this.wait) ? -1 : n;
         }
     }
 
@@ -209,7 +209,7 @@ final class ReceivingThread extends Thread {
      * @param in The stream to read from.
      */
     ReceivingThread(Connection connection, InputStream in, String threadName) {
-        super(threadName + "ReceivingThread - " + connection);
+        super(threadName + "-ReceivingThread-" + connection);
 
         this.in = new FreeColNetworkInputStream(in);
         this.connection = connection;
@@ -255,8 +255,7 @@ final class ReceivingThread extends Thread {
     public synchronized void askToStop() {
         if (shouldRun) {
             shouldRun = false;
-            Collection<NetworkReplyObject> waiting = waitingThreads.values();
-            for (NetworkReplyObject o : waiting) o.interrupt();
+            for (NetworkReplyObject o : waitingThreads.values()) o.interrupt();
         }
     }
 
@@ -357,6 +356,6 @@ final class ReceivingThread extends Thread {
         } finally {
             askToStop();
         }
-        logger.info("Receiving thread " + getName() + " finished.");
+        logger.info("Finished: " + getName());
     }
 }

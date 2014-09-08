@@ -100,11 +100,7 @@ public final class UserConnectionHandler extends FreeColServerHolder
      */
     private Element disconnect(Connection connection,
         @SuppressWarnings("unused") Element element) {
-        try {
-            connection.reallyClose();
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Could not close the connection.", e);
-        }
+        connection.reallyClose();
         return null;
     }
 

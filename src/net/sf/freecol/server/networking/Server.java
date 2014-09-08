@@ -84,11 +84,21 @@ public final class Server extends Thread {
      */
     public Server(FreeColServer freeColServer, int port) throws IOException {
         super(FreeCol.SERVER_THREAD+"Server");
+
         this.freeColServer = freeColServer;
         this.port = port;
-        serverSocket = new ServerSocket(port);
+        this.serverSocket = new ServerSocket(port);
     }
 
+
+    /**
+     * Gets the TCP port that is beeing used for the public socket.
+     *
+     * @return The TCP port.
+     */
+    public int getPort() {
+        return this.port;
+    }
 
     /**
      * Gets a <code>Connection</code> identified by a <code>Socket</code>.
@@ -170,20 +180,11 @@ public final class Server extends Thread {
     }
 
     /**
-     * Gets the TCP port that is beeing used for the public socket.
-     *
-     * @return The TCP port.
-     */
-    public int getPort() {
-        return port;
-    }
-
-    /**
-     * Starts the thread's processing.  Contains the loop that is
-     * waiting for new connections to the public socket.  When a new
-     * client connects to the server a new {@link Connection} is made,
-     * with {@link net.sf.freecol.server.control.UserConnectionHandler}
-     * as the control object.
+     * Start the thread processing.  Contains the loop that is waiting
+     * for new connections to the public socket.  When a new client
+     * connects to the server a new {@link Connection} is made, with
+     * {@link net.sf.freecol.server.control.UserConnectionHandler} as
+     * the control object.
      */
     public void run() {
         // This method's entire body is synchronized to shutdownLock.
@@ -191,8 +192,8 @@ public final class Server extends Thread {
         // method from finishing before this thread is finished
         // working.  We have to do this because the
         // ServerSocket::close method keeps the server alive for
-        // several milliseconds EVEN AFTER THE CLOSE METHOD IS
-        // FINISHED. And because of this a new server can't be created
+        // several milliseconds *even after the close method is
+        // finished*.  Because of this a new server can't be created
         // on the same port as this server right after closing this
         // server.
         //
@@ -207,11 +208,12 @@ public final class Server extends Thread {
 
                     logger.info("Got client connection from "
                                 + clientSocket.getInetAddress());
-                    //Connection connection =
-                    new Connection(clientSocket,
-                                   freeColServer.getUserConnectionHandler(),
-                                   FreeCol.SERVER_THREAD);
-                    //connections.put(clientSocket, connection);
+                    Connection connection = new Connection(clientSocket,
+                        freeColServer.getUserConnectionHandler(),
+                        FreeCol.SERVER_THREAD);
+                    if (connection != null) {
+                        connections.put(clientSocket, connection);
+                    }
                 } catch (IOException e) {
                     if (running) {
                         logger.log(Level.WARNING, "Connection failed: ", e);
@@ -225,7 +227,7 @@ public final class Server extends Thread {
      * Shuts down the server thread.
      */
     public void shutdown() {
-        running = false;
+        this.running = false;
  
         try {
             serverSocket.close();
@@ -235,12 +237,11 @@ public final class Server extends Thread {
         }
 
         synchronized (shutdownLock) {
-            // Nothing to do here... just waiting for the server
-            // thread to finish.  For more info see the run() method
+            // See run() above.
+            logger.fine("Wait for Server.run to complete.");
         }
 
-        Connection c;
-        while ((c = connections.remove(0)) != null) c.close();
+        for (Connection c : connections.values()) c.close();
         connections.clear();
 
         freeColServer.removeFromMetaServer();
