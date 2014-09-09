@@ -350,7 +350,7 @@ public class AIGoods extends TransportableAIObject {
      */
     @Override
     public void dispose() {
-        changeTransport(null);
+        dropTransport();
         if (destination != null) {
             if (destination instanceof Colony) {
                 AIColony aic = getAIMain().getAIColony((Colony)destination);
