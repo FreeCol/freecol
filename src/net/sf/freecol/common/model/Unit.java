@@ -709,6 +709,17 @@ public class Unit extends GoodsLocation
     }
 
     /**
+     * Get a military role for this unit.
+     *
+     * @return A military <code>Role</code>, or null if none found.
+     */
+    public Role getMilitaryRole() {
+        List<Role> roles
+            = getAvailableRoles(getSpecification().getMilitaryRoles());
+        return (roles.isEmpty()) ? null : roles.get(0);
+    }
+
+    /**
      * Get a description of the unit's role-equipment.
      *
      * FIXME: missionary equipment needs work, but has been left as is

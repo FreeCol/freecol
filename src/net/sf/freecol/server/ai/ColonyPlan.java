@@ -1270,10 +1270,7 @@ public class ColonyPlan {
                 if (workers.size() <= 1) break;
                 Role role = outdoorRoles[j];
                 if (role == null) {
-                    List<Role> roles
-                        = u.getAvailableRoles(spec().getMilitaryRoles());
-                    if (roles.isEmpty()) continue; // convert has none
-                    role = roles.get(0);
+                    if ((role = u.getMilitaryRole()) == null) continue;
                 }
                 if (u.getType() == role.getExpertUnit()
                     && fullEquipUnit(spec(), u, role, col)) {
@@ -1312,8 +1309,8 @@ public class ColonyPlan {
         for (Unit u : new ArrayList<Unit>(workers)) {
             if (workers.size() <= 1) break;
             if (!AIColony.isBadlyDefended(col)) break;
-            Role role = u.getAvailableRoles(spec().getMilitaryRoles()).get(0);
-            if (fullEquipUnit(spec(), u, role, col)) {
+            Role role = u.getMilitaryRole();
+            if (role != null && fullEquipUnit(spec(), u, role, col)) {
                 workers.remove(u);
                 lb.add(u.getId(), "(", u.getType().getSuffix(), ") -> ",
                        u.getRoleSuffix(), "\n");
@@ -1568,7 +1565,8 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
         // Rearm what remains as far as possible.
         Collections.sort(workers, soldierComparator);
         for (Unit u : new ArrayList<Unit>(workers)) {
-            Role role = u.getAvailableRoles(spec().getMilitaryRoles()).get(0);
+            Role role = u.getMilitaryRole();
+            if (role == null) continue;
             if (fullEquipUnit(spec(), u, role, col)) {
                 lb.add("    ", u.getId(), "(", u.getType().getSuffix(),
                        ") -> ", u.getRoleSuffix(), "\n");
