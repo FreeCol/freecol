@@ -237,6 +237,8 @@ public class SimpleCombatModel extends CombatModel {
         case 2:
             result.addAll(spec.getModifiers(Modifier.SMALL_MOVEMENT_PENALTY));
             break;
+        default:
+            break;
         }
 
         // Amphibious attack?

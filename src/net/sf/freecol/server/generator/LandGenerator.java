@@ -144,23 +144,24 @@ public class LandGenerator {
             break;
         case MapGeneratorOptions.LAND_GENERATOR_ARCHIPELAGO:
             addPolarRegions();
-            //create 5 islands of 10% each
+            // create 5 islands of 10% each
             int archsize = (minimumNumberOfTiles*10)/100;
             for (int i=0;i<5;i++) {
                 addLandmass(archsize-10,archsize);
             }
-            //then, fall into next case to generate small islands
+            // then, fall into next case to generate small islands
         case MapGeneratorOptions.LAND_GENERATOR_ISLANDS:
             addPolarRegions();
-            //creates only islands of 25..75 tiles
+            // creates only islands of 25..75 tiles
             while (numberOfLandTiles < minimumNumberOfTiles) {
                 int s = Utils.randomInt(logger, "Island", random, 50) + 25;
                 addLandmass(20,s);
             }
             cleanMap();
             break;
+        default:
+            break;
         }
-
         return map;
     }
 

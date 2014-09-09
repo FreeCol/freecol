@@ -173,6 +173,8 @@ public abstract class MapControls {
                 }
             }
             break;
+        default:
+            break;
         }
     }
 

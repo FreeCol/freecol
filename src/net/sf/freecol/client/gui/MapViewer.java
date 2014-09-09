@@ -328,6 +328,8 @@ public final class MapViewer {
             savedActiveUnit = activeUnit;
             setActiveUnit(null);
             break;
+        default:
+            break;
         }
     }
 
@@ -3060,6 +3062,7 @@ public final class MapViewer {
                         case NE: dx = halfWidth; dy = halfHeight; break;
                         case SE: dx = -halfWidth; dy = halfHeight; break;
                         case SW: dx = -halfWidth; dy = -halfHeight; break;
+                        default: break;
                         }
                         if (tile1 != null
                             && ((type == BorderType.COUNTRY && owner.owns(tile1))
@@ -3076,6 +3079,7 @@ public final class MapViewer {
                             case NE: ddx = tileWidth; break;
                             case SE: ddy = tileHeight; break;
                             case SW: ddx = -tileWidth; break;
+                            default: break;
                             }
                             path.quadTo(controlPoints.get(previous).x + dx,
                                         controlPoints.get(previous).y + dy,

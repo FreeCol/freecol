@@ -76,6 +76,8 @@ public class MoveAction extends MapboardAction {
         case GUI.VIEW_TERRAIN_MODE:
             getInGameController().moveTileCursor(direction);
             break;
+        default:
+            break;
         }
     }
 }

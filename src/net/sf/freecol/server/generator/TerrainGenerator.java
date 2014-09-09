@@ -220,7 +220,7 @@ public class TerrainGenerator {
         // temperature calculation
         int poleTemperature = -20;
         int equatorTemperature= 40;
-        switch(temperaturePreference) {
+        switch (temperaturePreference) {
         case MapGeneratorOptions.TEMPERATURE_COLD:
             poleTemperature = -20;
             equatorTemperature = 25;
@@ -240,6 +240,8 @@ public class TerrainGenerator {
         case MapGeneratorOptions.TEMPERATURE_HOT:
             poleTemperature = 0;
             equatorTemperature = 40;
+            break;
+        default:
             break;
         }
 

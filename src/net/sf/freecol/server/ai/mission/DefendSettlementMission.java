@@ -339,6 +339,7 @@ public class DefendSettlementMission extends Mission {
         switch (unit.getState()) {
         case FORTIFIED:  return lbWait(lb, ", fortified");
         case FORTIFYING: return lbWait(lb, ", fortifying");
+        default: break;
         }
 
         // Check if the settlement is badly defended.  If so, try to fortify.
@@ -352,6 +353,7 @@ public class DefendSettlementMission extends Mission {
                 defenderCount++;
                 switch (u.getState()) {
                 case FORTIFIED: case FORTIFYING: fortifyCount++; break;
+                default: break;
                 }
             }
         }

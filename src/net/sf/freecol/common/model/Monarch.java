@@ -563,6 +563,8 @@ public final class Monarch extends FreeColGameObject implements Named {
                         friends.add(enemy);
                     }
                     break;
+                default:
+                    break;
                 }
             }
         }

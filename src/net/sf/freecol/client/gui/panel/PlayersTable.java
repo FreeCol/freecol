@@ -605,8 +605,9 @@ public final class PlayersTable extends JTable {
                         update();
                     }
                     break;
+                default:
+                    break;
                 }
-
                 fireTableCellUpdated(row, column);
             }
         }

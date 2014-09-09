@@ -183,44 +183,42 @@ public final class Playlist {
                 playedSounds[i] = num;
                 Arrays.sort(playedSounds);
             }
-        }
-        else {
+        } else {
             switch (repeatMode) {
-                case PLAY_ALL:
-                    if (pickMode == FORWARDS) {
-                        num++;
-                        if (num == soundFiles.length) {
-                            num = -2;
-                        }
+            case PLAY_ALL:
+                if (pickMode == FORWARDS) {
+                    num++;
+                    if (num == soundFiles.length) {
+                        num = -2;
                     }
-                    else { // (pickMode == BACKWARDS)
-                        num--;
-                        if (num == -1) {
-                            num = -2;
-                        }
+                } else { // (pickMode == BACKWARDS)
+                    num--;
+                    if (num == -1) {
+                        num = -2;
                     }
-                    break;
-                case REPEAT_ALL:
-                    if (pickMode == FORWARDS) {
-                        num++;
-                        if (num == soundFiles.length) {
-                            num = 0;
-                        }
+                }
+                break;
+            case REPEAT_ALL:
+                if (pickMode == FORWARDS) {
+                    num++;
+                    if (num == soundFiles.length) {
+                        num = 0;
                     }
-                    else { // (pickMode == BACKWARDS)
-                        num--;
-                        if (num == -1) {
-                            num = soundFiles.length - 1;
-                        }
+                } else { // (pickMode == BACKWARDS)
+                    num--;
+                    if (num == -1) {
+                        num = soundFiles.length - 1;
                     }
-                    break;
+                }
+                break;
+            default:
+                break;
             }
         }
         
         if ((num >= 0) && (num < soundFiles.length)) {
             return soundFiles[num];
-        }
-        else {
+        } else {
             return null;
         }
     }

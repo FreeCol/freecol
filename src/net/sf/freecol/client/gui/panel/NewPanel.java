@@ -388,6 +388,8 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
             enableComponents(serverComponents, false);
             enableComponents(gameComponents, false);
             break;
+        default:
+            break;
         }
     }
 
@@ -472,6 +474,8 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
                     getGUI().showServerListPanel(servers);
                 }
                 break;
+            default:
+                break;
             }
             break;
         case CANCEL:
@@ -481,14 +485,12 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
         case SHOW_DIFFICULTY:
             getGUI().showDifficultyDialog(spec, level);
             break;
-        case SINGLE:
-        case JOIN:
-        case START:
-        case META_SERVER:
+        case SINGLE: case JOIN: case START: case META_SERVER:
             enableComponents();
             break;
         default:
             super.actionPerformed(event);
+            break;
         }
     }
 }

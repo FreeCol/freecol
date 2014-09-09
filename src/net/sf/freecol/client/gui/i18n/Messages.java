@@ -506,6 +506,8 @@ public class Messages {
                     last = '}';
                 }
                 break;
+            default:
+                break;
             }
         }
         // found no matching bracket

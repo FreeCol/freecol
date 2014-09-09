@@ -89,6 +89,8 @@ public class MonarchSession extends TransactionSession {
         case MONARCH_MERCENARIES: case HESSIAN_MERCENARIES:
             if (result) serverPlayer.csAddMercenaries(mercenaries, price, cs);
             break;
+        default:
+            break;
         }
         super.complete(cs);
     }
@@ -105,6 +107,8 @@ public class MonarchSession extends TransactionSession {
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage("model.monarch.ignoredMercenaries",
                                  serverPlayer));
+            break;
+        default:
             break;
         }
         super.complete(cs);

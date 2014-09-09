@@ -1039,6 +1039,8 @@ public class Player extends FreeColGameObject implements Nameable {
                 addAbility(new Ability(Ability.INDEPENDENCE_DECLARED, true));
                 addAbility(new Ability(Ability.INDEPENDENT_NATION, true));
                 break;
+            default:
+                break;
             }
         }
 
