@@ -20,8 +20,8 @@
 package net.sf.freecol.common.logging;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -30,6 +30,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.networking.DOMMessage;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -38,7 +39,7 @@ import net.sf.freecol.common.networking.DOMMessage;
  */
 public final class DefaultHandler extends Handler {
 
-    private FileWriter fileWriter;
+    private Writer writer;
 
     private final boolean consoleLogging;
 
@@ -70,17 +71,13 @@ public final class DefaultHandler extends Handler {
             throw new FreeColException("Log file \"" + fileName
                 + "\" could not be created.", e);
         }
-
         if (!file.canWrite()) {
             throw new FreeColException("Can not write in log file \""
                 + fileName + "\".");
         }
-
-        try {
-            fileWriter = new FileWriter(file);
-        } catch (IOException e) {
+        if ((writer = Utils.getFileUTF8Writer(file)) == null) {
             throw new FreeColException("Can not write in log file \""
-                + fileName + "\".", e);
+                + fileName + "\".");
         }
 
         // We should use XMLFormatter here in the future
@@ -88,21 +85,31 @@ public final class DefaultHandler extends Handler {
         setFormatter(new TextFormatter());
 
         try {
-            String str = "FreeCol game version: " + FreeCol.getRevision()
-                + "\nFreeCol protocol version: "
-                + DOMMessage.getFreeColProtocolVersion()
-                + "\n\nJava vendor: " + System.getProperty("java.vendor")
-                + "\nJava version: " + System.getProperty("java.version")
-                + "\nJava WM name: " + System.getProperty("java.vm.name")
-                + "\nJava WM vendor: " + System.getProperty("java.vm.vendor")
-                + "\nJava WM version: " + System.getProperty("java.vm.version")
-                + "\n\nOS name: " + System.getProperty("os.name")
-                + "\nOS architecture: " + System.getProperty("os.arch")
-                + "\nOS version: " + System.getProperty("os.version")
-                + "\n\n";
-            fileWriter.write(str, 0, str.length());
+            StringBuilder sb = new StringBuilder(512);
+            sb.append("FreeCol game version: ")
+                .append(FreeCol.getRevision())
+                .append("\nFreeCol protocol version: ")
+                .append(DOMMessage.getFreeColProtocolVersion())
+                .append("\n\nJava vendor: ")
+                .append(System.getProperty("java.vendor"))
+                .append("\nJava version: ")
+                .append(System.getProperty("java.version"))
+                .append("\nJava WM name: ")
+                .append(System.getProperty("java.vm.name"))
+                .append("\nJava WM vendor: ")
+                .append(System.getProperty("java.vm.vendor"))
+                .append("\nJava WM version: ")
+                .append(System.getProperty("java.vm.version"))
+                .append("\n\nOS name: ")
+                .append(System.getProperty("os.name"))
+                .append("\nOS architecture: ")
+                .append(System.getProperty("os.arch"))
+                .append("\nOS version: ")
+                .append(System.getProperty("os.version"))
+                .append("\n\n");
+            writer.write(sb.toString());
         } catch (IOException e) {
-            e.printStackTrace();
+            e.printStackTrace(System.err);
         }
     }
 
@@ -112,9 +119,9 @@ public final class DefaultHandler extends Handler {
     @Override
     public void close() {
         try {
-            fileWriter.close();
+            writer.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            e.printStackTrace(System.err);
         }
     }
 
@@ -124,9 +131,9 @@ public final class DefaultHandler extends Handler {
     @Override
     public void flush() {
         try {
-            fileWriter.flush();
+            writer.flush();
         } catch (IOException e) {
-            e.printStackTrace();
+            e.printStackTrace(System.err);
         }
     }
 
@@ -152,7 +159,7 @@ public final class DefaultHandler extends Handler {
         }
 
         try {
-            fileWriter.write(str, 0, str.length());
+            writer.write(str, 0, str.length());
         } catch (IOException e) {
             System.err.println("Failed to write log record!");
             e.printStackTrace(System.err);

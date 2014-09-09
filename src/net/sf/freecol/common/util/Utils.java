@@ -21,9 +21,13 @@ package net.sf.freecol.common.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -396,5 +400,36 @@ public class Utils {
         List<T> tmp = new ArrayList<T>();
         for (T t : members) tmp.add(t);
         return Collections.<T>unmodifiableList(tmp);
+    }
+
+    /**
+     * Create a new file writer that uses UTF-8.
+     *
+     * @param file A <code>File</code> to write to.
+     * @return A <code>Writer</code> for this file.
+     */
+    public static Writer getFileUTF8Writer(File file) {
+        FileOutputStream fos;
+        try {
+            fos = new FileOutputStream(file);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "No FileOutputStream for "
+                + file.getName(), e);
+            return null;
+        }
+        OutputStreamWriter osw;
+        try {
+            osw = new OutputStreamWriter(fos, "UTF-8");
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "No OutputStreamWriter for "
+                + file.getName(), e);
+            try {
+                fos.close();
+            } catch (IOException ioe) {
+                logger.log(Level.WARNING, "Failed to close", ioe);
+            }
+            return null;
+        }
+        return osw;
     }
 }
