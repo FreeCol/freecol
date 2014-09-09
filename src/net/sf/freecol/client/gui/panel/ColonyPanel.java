@@ -1803,7 +1803,6 @@ public final class ColonyPanel extends PortPanel
              * {@inheritDoc}
              */
             public Component add(Component comp, boolean editState) {
-                Container oldParent = comp.getParent();
                 if (editState) {
                     if (comp instanceof UnitLabel) {
                         if (!tryWork(((UnitLabel)comp).getUnit())) return null;
@@ -2162,7 +2161,6 @@ public final class ColonyPanel extends PortPanel
              * {@inheritDoc}
              */
             public Component add(Component comp, boolean editState) {
-                Container oldParent = comp.getParent();
                 if (editState) {
                     if (comp instanceof UnitLabel) {
                         UnitLabel label = (UnitLabel)comp;

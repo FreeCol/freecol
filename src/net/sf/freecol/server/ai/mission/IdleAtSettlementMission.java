@@ -151,7 +151,6 @@ public class IdleAtSettlementMission extends Mission {
             return lbAt(lb);
         }
 
-        final Unit unit = getUnit();
         Location target = getTarget();
         if (target == null) {
             // Just make a random moves if no target can be found.

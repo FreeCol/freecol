@@ -165,9 +165,7 @@ public class UnitWanderHostileMission extends Mission {
         // Make random moves in a reasonably consistent direction,
         // checking for a target along the way.
         final Unit unit = getUnit();
-        final AIMain aiMain = getAIMain();
         final AIUnit aiUnit = getAIUnit();
-        final Location oldLoc = unit.getLocation();
         int check = 0, checkTurns = Utils.randomInt(logger, "Hostile",
                                                     getAIRandom(), 4);
         Direction d = Direction.getRandomDirection(tag, getAIRandom());

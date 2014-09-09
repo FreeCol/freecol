@@ -1739,7 +1739,6 @@ public class EuropeanAIPlayer extends AIPlayer {
     protected void giveNormalMissions(LogBuilder lb) {
         final AIMain aiMain = getAIMain();
         final Player player = getPlayer();
-        final int turnNumber = getGame().getTurn().getNumber();
         java.util.Map<Unit, String> reasons = new HashMap<Unit, String>();
         BuildColonyMission bcm = null;
         Mission m;

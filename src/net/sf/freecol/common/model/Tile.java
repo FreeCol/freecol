@@ -1867,7 +1867,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                 power = cm.getDefencePower(attacker, u);
                 if (Unit.betterDefender(defender, defenderPower, u, power)) {
                     defender = u;
-                    defenderPower = power;
+                    //defenderPower = power;
                 }
             }
         }

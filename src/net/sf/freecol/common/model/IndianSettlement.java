@@ -1254,7 +1254,6 @@ public class IndianSettlement extends Settlement {
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
-        final Player client = xw.getClientPlayer();
         final Player hated = getMostHated();
 
         if (getName() != null) { // Delegated from Settlement
@@ -1408,7 +1407,6 @@ public class IndianSettlement extends Settlement {
      */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
-        final Specification spec = getSpecification();
         final Game game = getGame();
         final String tag = xr.getLocalName();
 

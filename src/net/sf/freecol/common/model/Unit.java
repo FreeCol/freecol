@@ -2131,8 +2131,6 @@ public class Unit extends GoodsLocation
         if (settlement instanceof Colony) {
             return MoveType.MOVE_NO_ACCESS_SETTLEMENT;
         } else if (settlement instanceof IndianSettlement) {
-            UnitType scoutSkill = getSpecification()
-                .getUnitType("model.unit.seasonedScout");
             return (!allowContact(settlement))
                 ? MoveType.MOVE_NO_ACCESS_CONTACT
                 : (!allowMoveFrom(from))

@@ -328,7 +328,6 @@ public final class DefaultTransferHandler extends TransferHandler {
                                         AbstractGoods goods) {
         final Unit unit = unitLabel.getUnit();
         if (!unit.hasAbility(Ability.CAN_BE_EQUIPPED)) return false;
-        final Specification spec = freeColClient.getGame().getSpecification();
 
         for (Role role : unit.getAvailableRoles(null)) {
             if (role.isDefaultRole()) continue;

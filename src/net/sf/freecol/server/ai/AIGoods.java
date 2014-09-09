@@ -176,7 +176,6 @@ public class AIGoods extends TransportableAIObject {
         if (carrier.getGoodsCount(type) < amount) return false;
 
         final AIUnit aiCarrier = getAIMain().getAIUnit(carrier);
-        Colony colony = carrier.getColony();
         int oldAmount = carrier.getGoodsCount(type);
         Goods newGoods = new Goods(carrier.getGame(), carrier, type, amount);
         boolean result;

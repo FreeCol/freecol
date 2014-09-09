@@ -639,7 +639,6 @@ public class TransportMission extends Mission {
         final int maxHolds = carrier.getCargoCapacity();
         final List<Cargo> ts = tCopy();
         final int newSpace = cargo.getNewSpace();
-        final TransportableAIObject t = cargo.getTransportable();
 
         // Match an existing target?
         int candidate = -1;
@@ -732,10 +731,7 @@ public class TransportMission extends Mission {
     private void checkCargoes(LogBuilder lb) {
         final Unit carrier = getUnit();
         if (carrier.isAtSea()) return; // Let it emerge.
-
         final AIUnit aiCarrier = getAIUnit();
-        final EuropeanAIPlayer euaip = getEuropeanAIPlayer();
-        final Location here = carrier.getLocation();
 
         List<Unit> unitsPresent = carrier.getUnitList();
         List<Goods> goodsPresent = carrier.getCompactGoods();
@@ -1181,8 +1177,6 @@ public class TransportMission extends Mission {
      */
     private Cargo getBestCargo(Unit carrier) {
         final EuropeanAIPlayer euaip = getEuropeanAIPlayer();
-        final Location src = (carrier.isAtSea()) ? carrier.resolveDestination()
-            : carrier.getLocation();
         Cargo bestDirect = null, bestFallback = null;
         float bestDirectValue = 0.0f, bestFallbackValue = 0.0f;
         for (TransportableAIObject t : euaip.getUrgentTransportables()) {

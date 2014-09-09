@@ -2406,7 +2406,6 @@ public final class MapViewer {
                 Image chip = null;
                 Color background = is.getOwner().getNationColor();
                 if (background == null) background = Color.WHITE;
-                Color foreground = lib.getForegroundColor(background);
                 float xOffset = STATE_OFFSET_X * lib.getScalingFactor();
                 float yOffset = STATE_OFFSET_Y * lib.getScalingFactor();
                 int colonyLabels = freeColClient.getClientOptions()
@@ -2744,13 +2743,12 @@ public final class MapViewer {
         Integer i = unitsOutForAnimation.get(unit);
         if (i == null) {
             final JLabel unitLabel = getUnitLabel(unit);
-            final Integer UNIT_LABEL_LAYER = JLayeredPane.DEFAULT_LAYER;
 
             i = 1;
             unitLabel.setLocation(getUnitLabelPositionInTile(unitLabel,
                     getTilePosition(sourceTile)));
             unitsOutForAnimationLabels.put(unit, unitLabel);
-            gui.getCanvas().add(unitLabel, UNIT_LABEL_LAYER);
+            gui.getCanvas().add(unitLabel, JLayeredPane.DEFAULT_LAYER);
         } else {
             i++;
         }

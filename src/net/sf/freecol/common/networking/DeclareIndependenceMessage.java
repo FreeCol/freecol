@@ -87,7 +87,6 @@ public class DeclareIndependenceMessage extends DOMMessage {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
-        final Specification spec = serverPlayer.getSpecification();
 
         if (nationName == null || nationName.length() == 0
             || countryName == null || countryName.length() == 0) {

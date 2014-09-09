@@ -257,7 +257,6 @@ public class CashInTreasureTrainMission extends Mission {
      */
     public static Location findTarget(AIUnit aiUnit, int range, 
                                       boolean deferOK) {
-        final Player player = aiUnit.getUnit().getOwner();
         PathNode path = findTargetPath(aiUnit, range, deferOK);
         return (path != null) ? extractTarget(aiUnit, path)
             : upLoc(findCircleTarget(aiUnit, getGoalDecider(aiUnit, deferOK),

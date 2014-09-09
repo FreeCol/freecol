@@ -178,7 +178,6 @@ public final class CornerMapControls extends MapControls {
                 height = Math.max(height, ub.getHeight());
                 width += SPACE + ub.getWidth();
             }
-            int length = unitButtons.size();
             int x = miniMapPanel.getWidth() + 1
                 + (infoPanel.getX() - miniMapPanel.getWidth() - width) / 2;
             int y = ch - height - SPACE;

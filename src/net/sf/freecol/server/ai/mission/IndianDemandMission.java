@@ -380,7 +380,6 @@ public class IndianDemandMission extends Mission {
             Goods goods = selectGoods(colony);
             GoodsType type = (goods == null) ? null : goods.getType();
             int amount = (goods == null) ? 0 : goods.getAmount();
-            int oldGoods = (goods == null) ? 0 : unit.getGoodsCount(type);
             if (goods == null) {
                 if (!enemy.checkGold(1)) {
                     return lbDone(lb, false, "empty handed");

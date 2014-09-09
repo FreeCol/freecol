@@ -989,7 +989,6 @@ public final class InGameController extends Controller {
 
     private StringTemplate abstractUnitTemplate(String base,
                                                 List<AbstractUnit> units) {
-        final Specification spec = getGame().getSpecification();
         StringTemplate template = StringTemplate.label(base);
         for (AbstractUnit au : units) {
             template.addStringTemplate(au.getLabel());
@@ -3412,7 +3411,6 @@ public final class InGameController extends Controller {
     public Element diplomacy(ServerPlayer serverPlayer, Colony ourColony,
                              Unit otherUnit, DiplomaticTrade agreement) {
         ChangeSet cs = new ChangeSet();
-        TradeStatus status = agreement.getStatus();
         DiplomacySession session
             = TransactionSession.lookup(DiplomacySession.class,
                                         otherUnit, ourColony);
@@ -3475,7 +3473,6 @@ public final class InGameController extends Controller {
         colony.equipForRole(unit, spec.getDefaultRole(), 0);
 
         // Check for upgrade.
-        UnitType oldType = unit.getType();
         UnitType newType = unit.getTypeChange(ChangeType.ENTER_COLONY,
                                               unit.getOwner());
         if (newType != null) unit.changeType(newType);//-vis: safe in colony
@@ -4214,7 +4211,6 @@ public final class InGameController extends Controller {
         final Role defaultRole = getGame().getSpecification().getDefaultRole();
         Tile tile = colony.getTile();
         tile.cacheUnseen();//+til
-        final int oldUnitCount = colony.getUnitCount();
 
         // Move everyone out of the way and stockpile their equipment.
         for (UnitChange uc : unitChanges) {

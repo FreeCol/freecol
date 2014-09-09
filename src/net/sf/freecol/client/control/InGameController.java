@@ -749,9 +749,6 @@ public final class InGameController implements NetworkConstants {
     private String getLoadGoodsMessage(Unit unit, GoodsType type,
                                        int amount, int present,
                                        int export, int demand) {
-        Player player = unit.getOwner();
-        Location loc = unit.getLocation();
-        String route = unit.getTradeRoute().getName();
         String key;
         int more;
 
@@ -1411,7 +1408,6 @@ public final class InGameController implements NetworkConstants {
      *     a new high score has been achieved, or no information if null.
      */
     public void displayHighScores(Boolean high) {
-        int score = freeColClient.getMyPlayer().getScore();
         List<HighScore> scores = askServer().getHighScores();
         gui.showHighScoresPanel((high == null) ? null
             : (high.booleanValue()) ? "highscores.yes"
@@ -1532,7 +1528,6 @@ public final class InGameController implements NetworkConstants {
      */
     public void buildColony() {
         if (!requireOurTurn()) return;
-        final Specification spec = getSpecification();
         final Player player = freeColClient.getMyPlayer();
 
         // Check unit can build, and is on the map.
@@ -2023,8 +2018,7 @@ public final class InGameController implements NetworkConstants {
      */
     public void declareIndependence() {
         if (!requireOurTurn()) return;
-        Game game = freeColClient.getGame();
-        Player player = freeColClient.getMyPlayer();
+        final Player player = freeColClient.getMyPlayer();
 
         // Check for adequate support.
         StringTemplate declare = player.checkDeclareIndependence();
@@ -3844,10 +3838,12 @@ public final class InGameController implements NetworkConstants {
      * @param direction a <code>Direction</code> value 
      */
     public void moveTileCursor(Direction direction) {
-        if (gui.getSelectedTile() != null) {
-            Tile newTile = gui.getSelectedTile().getNeighbourOrNull(direction);
-            if (newTile != null) 
+        Tile tile = gui.getSelectedTile();
+        if (tile != null) {
+            Tile newTile = tile.getNeighbourOrNull(direction);
+            if (newTile != null) {
                 gui.setSelectedTile(newTile, false);
+            }
         } else {
             logger.warning("selectedTile is null");
         }

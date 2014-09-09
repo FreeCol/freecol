@@ -153,7 +153,6 @@ public class SimpleCombatModel extends CombatModel {
         } else if (combatIsAttackMeasurement(attacker, defender)
             || combatIsAttack(attacker, defender)
             || combatIsSettlementAttack(attacker, defender)) {
-            final Specification spec = attacker.getSpecification();
             final Unit attackerUnit = (Unit)attacker;
 
             // Base offense

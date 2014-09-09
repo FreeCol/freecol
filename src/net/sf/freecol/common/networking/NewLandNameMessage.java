@@ -104,7 +104,6 @@ public class NewLandNameMessage extends DOMMessage {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
-        final Game game = server.getGame();
 
         Unit unit;
         try {

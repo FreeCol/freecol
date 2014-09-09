@@ -634,7 +634,6 @@ public final class InGameInputHandler extends InputHandler {
         final DiplomacyMessage message
             = new DiplomacyMessage(getGame(), element);
         final DiplomaticTrade agreement = message.getAgreement();
-        final Unit extraUnit = message.getExtraUnit();
 
         final FreeColGameObject our = message.getOurFCGO(game);
         if (our == null) {

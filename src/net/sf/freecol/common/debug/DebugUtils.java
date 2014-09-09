@@ -333,7 +333,6 @@ public class DebugUtils {
                                         Tile tile) {
         final FreeColServer server = freeColClient.getFreeColServer();
         final Game sGame = server.getGame();
-        final Game game = freeColClient.getGame();
         final Specification sSpec = sGame.getSpecification();
         final Player player = freeColClient.getMyPlayer();
         final Player sPlayer = sGame.getFreeColGameObject(player.getId(),
@@ -453,7 +452,6 @@ public class DebugUtils {
                                                  null, "cancel", choices);
         if (disaster == null) return;
 
-        final Player player = colony.getOwner();
         final FreeColServer server = freeColClient.getFreeColServer();
         final Game sGame = server.getGame();
         final ServerColony sColony = sGame.getFreeColGameObject(colony.getId(),
@@ -1186,7 +1184,6 @@ public class DebugUtils {
      */
     public static void useAI(final FreeColClient freeColClient) {
         final FreeColServer server = freeColClient.getFreeColServer();
-        final Game sGame = server.getGame();
         final Player player = freeColClient.getMyPlayer();
         final AIMain aiMain = server.getAIMain();
         final AIPlayer ap = aiMain.getAIPlayer(player);

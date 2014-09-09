@@ -862,7 +862,6 @@ public abstract class Mission extends AIObject {
     private MoveType followMapPath(PathNode path, LogBuilder lb) {
         final Unit unit = getUnit();
         final AIUnit aiUnit = getAIUnit();
-        final Unit carrier = unit.getCarrier();
         final Location target = path.getLastNode().getLocation();
 
         for (; path != null; path = path.next) {
@@ -912,7 +911,6 @@ public abstract class Mission extends AIObject {
      *     null on failure to retarget.
      */
     public Mission retargetMission(String reason, LogBuilder lb) {
-        final AIUnit aiu = getAIUnit();
         lb.add(", failing(", reason, ")");
 
         Location newTarget = findTarget();

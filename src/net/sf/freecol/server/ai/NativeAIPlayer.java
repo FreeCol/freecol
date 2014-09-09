@@ -528,7 +528,6 @@ public class NativeAIPlayer extends AIPlayer {
      */
     private void bringGifts(int[] randoms, LogBuilder lb) {
         final Player player = getPlayer();
-        final Map map = getGame().getMap();
         final CostDecider cd = CostDeciders.numberOfLegalTiles();
         final int giftProbability = getGame().getSpecification()
             .getInteger(GameOptions.GIFT_PROBABILITY);
@@ -630,7 +629,6 @@ public class NativeAIPlayer extends AIPlayer {
      * @param lb A <code>LogBuilder</code> to log to.
      */
     private void demandTribute(int[] randoms, LogBuilder lb) {
-        final Map map = getGame().getMap();
         final Player player = getPlayer();
         final CostDecider cd = CostDeciders.numberOfLegalTiles();
         final int demandProbability = getGame().getSpecification()

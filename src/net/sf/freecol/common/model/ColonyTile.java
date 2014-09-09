@@ -172,7 +172,6 @@ public class ColonyTile extends WorkLocation {
                 pi.addProduction(production);
             }
         } else {
-            final Turn turn = getGame().getTurn();
             boolean onlyNaturalImprovements = false;
             for (AbstractGoods output : getOutputs()) {
                 final GoodsType goodsType = output.getType();

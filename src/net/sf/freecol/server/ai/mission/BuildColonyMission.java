@@ -363,7 +363,6 @@ public class BuildColonyMission extends Mission {
      */
     public Mission doMission(LogBuilder lb) {
         lb.add(tag);
-        final Specification spec = getSpecification();
         final AIMain aiMain = getAIMain();
         final AIUnit aiUnit = getAIUnit();
         final Unit unit = getUnit();

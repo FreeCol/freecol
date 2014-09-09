@@ -2193,12 +2193,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
         Settlement attackerSettlement = null;
         Tile attackerTile = null;
         Unit defenderUnit = null;
-        ServerPlayer attackerPlayer = null;
+        //ServerPlayer attackerPlayer = null;
         ServerPlayer defenderPlayer = null;
         Tile defenderTile = null;
         if (isAttack) {
             attackerUnit = (Unit)attacker;
-            attackerPlayer = (ServerPlayer)attackerUnit.getOwner();
+            //attackerPlayer = (ServerPlayer)attackerUnit.getOwner();
             attackerTile = attackerUnit.getTile();
             defenderUnit = (Unit)defender;
             defenderPlayer = (ServerPlayer)defenderUnit.getOwner();
@@ -2224,7 +2224,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
         } else if (isBombard) {
             attackerSettlement = (Settlement)attacker;
-            attackerPlayer = (ServerPlayer)attackerSettlement.getOwner();
+            //attackerPlayer = (ServerPlayer)attackerSettlement.getOwner();
             attackerTile = attackerSettlement.getTile();
             defenderUnit = (Unit)defender;
             defenderPlayer = (ServerPlayer)defenderUnit.getOwner();
@@ -3648,7 +3648,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
     private void csDamageBuilding(Building building, ChangeSet cs) {
         ServerColony colony = (ServerColony)building.getColony();
         Tile copied = colony.getTile().getTileToCache();
-        int unitCount = colony.getUnitCount();
         boolean changed = false;
         BuildingType type = building.getType();
         if (type.getUpgradesFrom() == null) {

@@ -334,7 +334,6 @@ public class ServerUnit extends Unit implements ServerModelObject {
             unitDirty = true;
             if (getLocation() instanceof HighSeas) {
                 Europe europe = owner.getEurope();
-                Map map = getGame().getMap();
                 Location dst = getDestination();
                 Location result = resolveDestination();
                 if (result == europe) {

@@ -119,7 +119,6 @@ public final class UserConnectionHandler extends FreeColServerHolder
         @SuppressWarnings("unused") Connection connection,
         @SuppressWarnings("unused") Element element) {
         final FreeColServer freeColServer = getFreeColServer();
-        final Game game = getGame();
 
         Element reply = DOMMessage.createMessage("gameState");
         reply.setAttribute("state",

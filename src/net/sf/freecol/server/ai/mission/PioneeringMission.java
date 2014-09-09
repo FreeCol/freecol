@@ -255,7 +255,6 @@ public class PioneeringMission extends Mission {
      */
     private static GoalDecider getGoalDecider(final AIUnit aiUnit,
                                               final boolean deferOK) {
-        final Player owner = aiUnit.getUnit().getOwner();
         final GoalDecider gd = new GoalDecider() {
                 private PathNode bestPath = null;
                 private int bestValue = Integer.MIN_VALUE;

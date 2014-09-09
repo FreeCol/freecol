@@ -555,7 +555,6 @@ public class AIUnit extends TransportableAIObject {
         // Pick the available tile with the shortest path to one of our
         // settlements, or the tile with the highest defence value.
         final Player player = unit.getOwner();
-        final Map map = getGame().getMap();
         Tile safe = tiles.get(0);
         Tile best = null;
         int bestTurns = Integer.MAX_VALUE;
@@ -602,7 +601,6 @@ public class AIUnit extends TransportableAIObject {
     public boolean joinTransport(Unit carrier, Direction direction) {
         AIUnit aiCarrier = getAIMain().getAIUnit(carrier);
         if (aiCarrier == null) return false;
-        Location old = upLoc(unit.getLocation());
         boolean result = AIMessage.askEmbark(aiCarrier, unit, direction)
             && unit.getLocation() == carrier;
 

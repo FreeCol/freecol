@@ -355,7 +355,6 @@ public class PrivateerMission extends Mission {
      */
     public Mission doMission(LogBuilder lb) {
         lb.add(tag);
-        final AIMain aiMain = getAIMain();
         final AIUnit aiUnit = getAIUnit();
         if (aiUnit.hasCargo()) { // Deliver the goods
             Mission m = getEuropeanAIPlayer().getTransportMission(aiUnit);
