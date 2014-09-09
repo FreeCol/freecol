@@ -382,6 +382,15 @@ public class Scope extends FreeColObject {
         matchesNull = xr.getAttribute(MATCHES_NULL_TAG, true);
 
         type = xr.getAttribute(TYPE_TAG, (String)null);
+        // @compat 0.10.x
+        if ("model.equipment.muskets".equals(type)) {
+            type = "model.role.soldier";
+        } else if ("model.equipment.indian.horses".equals(type)) {
+            type = "model.role.mountedBrave";
+        } else if ("model.equipment.indian.muskets".equals(type)) {
+            type = "model.role.armedBrave";
+        }
+        // end @compat 0.10.x
 
         abilityId = xr.getAttribute(ABILITY_ID_TAG, (String)null);
 

@@ -1718,10 +1718,6 @@ resources of 400, lost city rumours of 500
         <input goods-type="model.goods.ore" value="3"/>
         <output goods-type="model.goods.tools" value="3"/>
       </production>
-      <ability id="model.ability.build" value="true">
-        <scope type="model.equipment.tools"/>
-        <scope type="model.equipment.muskets"/>
-      </ability>
     </building-type>
     <building-type id="model.building.blacksmithShop"
                    extends="model.building.blacksmithHouse"
@@ -2017,9 +2013,6 @@ resources of 400, lost city rumours of 500
       </production>
       <ability id="model.ability.autoProduction"/>
       <ability id="model.ability.avoidExcessProduction"/>
-      <ability id="model.ability.build" value="true">
-        <scope type="model.equipment.horses"/>
-      </ability>
       <modifier id="model.modifier.breedingDivisor" index="60"
                 type="additive" value="50"/>
       <modifier id="model.modifier.breedingFactor" index="60"
