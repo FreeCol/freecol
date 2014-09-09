@@ -1270,8 +1270,10 @@ public class ColonyPlan {
                 if (workers.size() <= 1) break;
                 Role role = outdoorRoles[j];
                 if (role == null) {
-                    role = u.getAvailableRoles(spec().getMilitaryRoles())
-                        .get(0);
+                    List<Role> roles
+                        = u.getAvailableRoles(spec().getMilitaryRoles());
+                    if (roles.isEmpty()) continue; // convert has none
+                    role = roles.get(0);
                 }
                 if (u.getType() == role.getExpertUnit()
                     && fullEquipUnit(spec(), u, role, col)) {
