@@ -1290,7 +1290,9 @@ public class GUI {
 
     public OptionGroup showClientOptionsDialog() {
         if (canvas == null) return null;
-        return canvas.showClientOptionsDialog();
+        OptionGroup group = canvas.showClientOptionsDialog();
+        if (!freeColClient.isInGame()) showMainPanel(null);
+        return group;
     }
 
     public ColonyPanel showColonyPanel(Colony colony, Unit unit) {
