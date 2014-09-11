@@ -371,38 +371,15 @@ public final class GoalDeciders {
         return new GoalDecider() {
             private PathNode goal = null;
             private int score = Integer.MAX_VALUE;
-            private List<Tile> tiles = new ArrayList<Tile>();
 
             public PathNode getGoal() { return goal; }
             public boolean hasSubGoals() { return true; }
             public boolean check(Unit u, PathNode pathNode) {
                 Tile tile = pathNode.getTile();
-                if (tile.getHighSeasCount() < score) {
-                    tiles.clear();
-                    for (Tile t : tile.getSurroundingTiles(1)) {
-                        if (t.isOnRiver()) tiles.add(t);
-                    }
-                    boolean ok = false;
-                    switch (tiles.size()) {
-                    case 0: case 1:
-                        break;
-                    case 2:
-                        ok = tiles.get(0).isAdjacent(tiles.get(1));
-                        break;
-                    case 3:
-                        ok = tiles.get(0).isAdjacent(tiles.get(1))
-                            || tiles.get(1).isAdjacent(tiles.get(2))
-                            || tiles.get(2).isAdjacent(tiles.get(0));
-                        break;
-                    default:
-                        ok = true;
-                        break;
-                    }
-                    if (ok) {
-                        score = tile.getHighSeasCount();
-                        goal = pathNode;
-                        return true;
-                    }
+                if (tile.getHighSeasCount() < score && tile.isRiverCorner()) {
+                    score = tile.getHighSeasCount();
+                    goal = pathNode;
+                    return true;
                 }
                 return false;
             }

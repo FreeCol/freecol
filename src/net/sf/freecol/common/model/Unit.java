@@ -2443,6 +2443,10 @@ public class Unit extends GoodsLocation
                     GoalDeciders.getCornerGoalDecider(),
                     CostDeciders.avoidSettlementsAndBlockingUnits(),
                     INFINITY, null);
+                if (path == null && tile.isRiverCorner()) {
+                    // Return trivial path if already present.
+                    return new PathNode(tile, 0, 0, false, null, null);
+                }
             }
         }
         return path;

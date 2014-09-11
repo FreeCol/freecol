@@ -487,6 +487,32 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
+     * Is this tile on a river corner?
+     *
+     * @return True if this is a river corner.
+     */
+    public boolean isRiverCorner() {
+        List<Tile> tiles = new ArrayList<Tile>();
+        for (Tile t : getSurroundingTiles(1)) {
+            if (t.isOnRiver()) tiles.add(t);
+        }
+        switch (tiles.size()) {
+        case 0: case 1:
+            return false;
+        case 2:
+            return tiles.get(0).isAdjacent(tiles.get(1));
+        case 3:
+            return tiles.get(0).isAdjacent(tiles.get(1))
+                || tiles.get(1).isAdjacent(tiles.get(2))
+                || tiles.get(2).isAdjacent(tiles.get(0));
+        default:
+            break;
+        }
+        return true;
+    }
+
+
+    /**
      * Get the style value.
      *
      * @return The <code>Tile</code> style.
