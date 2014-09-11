@@ -339,27 +339,6 @@ public class TerrainGenerator {
         }
     }
 
-    /**
-     * Select a random land tile on the map.
-     *
-     * @param map The <code>Map</code> to search in.
-     * @param random A <code>Random</code> number source.
-     * @return A random land tile, or null if none found.
-     */
-    public Tile getRandomLandTile(Map map, Random random) {
-        int x = (map.getWidth() < 10)
-            ? Utils.randomInt(logger, "W1", random, map.getWidth())
-            : Utils.randomInt(logger, "W2", random, map.getWidth() - 10) + 5;
-        int y = (map.getHeight() < 10)
-            ? Utils.randomInt(logger, "H1", random, map.getHeight())
-            : Utils.randomInt(logger, "H2", random, map.getHeight() - 10) + 5;
-        for (Tile t : map.getCircleTiles(map.getTile(x, y), true,
-                                         FreeColObject.INFINITY)) {
-            if (t.isLand()) return t;
-        }
-        return null;
-    }
-
 
     // Main functionality, create the map.
 
@@ -1139,7 +1118,7 @@ public class TerrainGenerator {
         int counter = 0;
         nextTry: for (int tries = 0; tries < 100; tries++) {
             if (counter < number) {
-                Tile startTile = getRandomLandTile(map, random);
+                Tile startTile = map.getRandomLandTile(random);
                 if (startTile == null) return; // No land found!
 
                 if (startTile.getType() == hills
@@ -1206,7 +1185,7 @@ public class TerrainGenerator {
         counter = 0;
         nextTry: for (int tries = 0; tries < 1000; tries++) {
             if (counter < number) {
-                Tile t = getRandomLandTile(map, random);
+                Tile t = map.getRandomLandTile(random);
                 if (t == null) return;
 
                 if (t.getType() == hills || t.getType() == mountains) {
@@ -1253,7 +1232,7 @@ public class TerrainGenerator {
 
         for (int i = 0; i < number; i++) {
             nextTry: for (int tries = 0; tries < 100; tries++) {
-                Tile tile = getRandomLandTile(map, random);
+                Tile tile = map.getRandomLandTile(random);
                 if (tile == null) return;
 
                 if (!riverType.isTileTypeAllowed(tile.getType())) continue;
