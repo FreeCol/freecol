@@ -415,6 +415,48 @@ public final class Specification {
     }
 
     /**
+     * Load a limited set of options from a file.
+     *
+     * Useful to load the user game and map generator options before
+     * starting a new game.
+     *
+     * @param optionId The root identifier of an option group expected to
+     *     be found in the file.
+     * @param file The <code>File</code> to load from.
+     * @return The <code>OptionGroup</code> found.
+     */
+    public OptionGroup loadOptionsFile(String optionId, File file) {
+        OptionGroup group = null;
+        FreeColXMLReader xr = null;
+        try {
+            xr = new FreeColXMLReader(new FileInputStream(file));
+            xr.nextTag();
+            group = new OptionGroup(this);
+            group.readFromXML(xr);
+            if (!optionId.equals(group.getId())) {
+                try {
+                    group = group.getOptionGroup(optionId);
+                } catch (Exception e) {
+                    logger.log(Level.WARNING, "Options file " + file.getPath()
+                        + " does not contain expected group " + optionId, e);
+                    group = null;
+                }
+            }
+            if (group != null) {
+                getOptionGroup(optionId).setValue(group);
+                logger.info("Loaded " + optionId + " options from file "
+                    + file.getPath());
+            }
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Failed to load OptionGroup "
+                + optionId + " from " + file.getName(), e);
+        } finally {
+            if (xr != null) xr.close();
+        }
+        return group;
+    }
+
+    /**
      * Clean up the specification.
      *
      * Builds all the cached containers and secondary variables.  This

@@ -41,6 +41,7 @@ import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
@@ -83,6 +84,14 @@ public final class StartGamePanel extends FreeColPanel {
     public void initialize(boolean singlePlayer) {
         removeAll();
         this.singlePlayerGame = singlePlayer;
+
+        if (singlePlayer || getMyPlayer().isAdmin()) {
+            Specification spec = getSpecification();
+            spec.loadOptionsFile(GameOptions.getXMLElementTagName(),
+                FreeColDirectories.getOptionsFile(FreeColDirectories.GAME_OPTIONS_FILE_NAME));
+            spec.loadOptionsFile(MapGeneratorOptions.getXMLElementTagName(),
+                FreeColDirectories.getOptionsFile(FreeColDirectories.MAP_GENERATOR_OPTIONS_FILE_NAME));
+        }
 
         NationOptions nationOptions = getGame().getNationOptions();
 
