@@ -55,6 +55,7 @@ import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.LandMap;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
@@ -138,7 +139,6 @@ public class SimpleMapGenerator implements MapGenerator {
     private final Random random;
     private final Specification specification;
 
-    private LandGenerator landGenerator = null;
     private TerrainGenerator terrainGenerator = null;
 
 
@@ -163,18 +163,9 @@ public class SimpleMapGenerator implements MapGenerator {
      */
     private void initialize() {
         final OptionGroup mgo = getMapGeneratorOptions();
-        this.landGenerator = new LandGenerator(mgo, random);
         this.terrainGenerator = new TerrainGenerator(mgo, random);
     }
         
-    public LandGenerator getLandGenerator() {
-        return landGenerator;
-    }
-
-    public TerrainGenerator getTerrainGenerator() {
-        return terrainGenerator;
-    }
-
     /**
      * Gets the approximate number of land tiles.
      *
@@ -1125,29 +1116,14 @@ public class SimpleMapGenerator implements MapGenerator {
     }
 
     /**
-     * Creates a <code>Map</code> for the given <code>Game</code>.
-     *
-     * The <code>Map</code> is added to the <code>Game</code> after
-     * it is created.
-     *
-     * @param game The game.
-     * @param landMap Determines whether there should be land
-     *                or ocean on a given tile. This array also
-     *                specifies the size of the map that is going
-     *                to be created.
-     * @see Map
-     * @see TerrainGenerator#createMap
+     * {@inheritDoc}
      */
-    public void createEmptyMap(Game game, boolean[][] landMap) {
-        terrainGenerator.createMap(game, null, landMap);
+    public void createEmptyMap(Game game, int width, int height) {
+        terrainGenerator.createMap(game, null, new LandMap(width, height));
     }
 
     /**
-     * Creates a map given for a game.
-     *
-     * @param game The <code>Game</code> to use.
-     * @exception FreeColException on map import or generation failure.
-     * @see net.sf.freecol.server.generator.MapGenerator#createMap(net.sf.freecol.common.model.Game)
+     * {@inheritDoc}
      */
     public void createMap(Game game) throws FreeColException {
         // Reinitialize.
@@ -1173,12 +1149,8 @@ public class SimpleMapGenerator implements MapGenerator {
         }
 
         // Create land map.
-        boolean[][] landMap;
-        if (importGame != null) {
-            landMap = LandGenerator.importLandMap(importGame);
-        } else {
-            landMap = landGenerator.createLandMap();
-        }
+        LandMap landMap = (importGame != null) ? new LandMap(importGame)
+            : new LandMap(mgo, random);
 
         // Create terrain.
         terrainGenerator.createMap(game, importGame, landMap);

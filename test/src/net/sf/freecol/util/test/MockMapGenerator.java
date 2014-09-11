@@ -72,7 +72,7 @@ public class MockMapGenerator implements MapGenerator {
         }
     }
 
-    public void createEmptyMap(Game game, boolean[][] landMap) {
+    public void createEmptyMap(Game game, int width, int height) {
         // do nothing yet
     }
 	

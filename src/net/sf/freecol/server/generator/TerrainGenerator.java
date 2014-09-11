@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.LandMap;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Region;
@@ -145,9 +146,9 @@ public class TerrainGenerator {
      * @param latitude The tile latitude.
      * @return The created tile.
      */
-    private Tile createTile(Game game, int x, int y, boolean[][] landMap,
+    private Tile createTile(Game game, int x, int y, LandMap landMap,
                             int latitude) {
-        return (landMap[x][y])
+        return (landMap.isLand(x, y))
             ? new Tile(game, getRandomLandTileType(game, latitude), x, y)
             : new Tile(game, getRandomOceanTileType(game, latitude), x, y);
     }
@@ -369,12 +370,10 @@ public class TerrainGenerator {
      * it is created.
      *
      * @param game The <code>Game</code> to add the map to.
-     * @param landMap Determines whether there should be land or ocean
-     *     on a given tile.  This array also specifies the size of the
-     *     map that is going to be created.
+     * @param landMap The <code>LandMap</code> to use as a template.
      * @see Map
      */
-    public void createMap(Game game, boolean[][] landMap) {
+    public void createMap(Game game, LandMap landMap) {
         createMap(game, null, landMap);
     }
 
@@ -386,15 +385,13 @@ public class TerrainGenerator {
      *
      * @param game The <code>Game</code> to add the map to.
      * @param importGame The <code>Game</code> to import information form.
-     * @param landMap Determines whether there should be land or ocean
-     *     on a given tile.  This array also specifies the size of the
-     *     map that is going to be created.
+     * @param landMap The <code>LandMap</code> to use as a template.
      * @see Map
      */
-    public void createMap(Game game, Game importGame, boolean[][] landMap) {
+    public void createMap(Game game, Game importGame, LandMap landMap) {
         final Specification spec = game.getSpecification();
-        final int width = landMap.length;
-        final int height = landMap[0].length;
+        final int width = landMap.getWidth();
+        final int height = landMap.getHeight();
         final boolean importTerrain = (importGame != null)
             && mapOptions.getBoolean(MapGeneratorOptions.IMPORT_TERRAIN);
         final boolean importBonuses = (importGame != null)
@@ -440,12 +437,12 @@ public class TerrainGenerator {
         for (int y = 0; y < height; y++) {
             int latitude = map.getLatitude(y);
             for (int x = 0; x < width; x++) {
-                if (landMap[x][y]) mapHasLand = true;
+                if (landMap.isLand(x, y)) mapHasLand = true;
                 Tile t, importTile = null;
                 if (importTerrain
                     && importGame.getMap().isValid(x, y)
                     && (importTile = importGame.getMap().getTile(x, y)) != null
-                    && importTile.isLand() == landMap[x][y]) {
+                    && importTile.isLand() == landMap.isLand(x, y)) {
                     String id = importTile.getType().getId();
                     t = new Tile(game, spec.getTileType(id), x, y);
                     if (importTile.getMoveToEurope() != null) {
@@ -834,7 +831,7 @@ public class TerrainGenerator {
      * Creates land map regions in the given Map.
      *
      * First, the arctic/antarctic regions are defined, based on
-     * <code>LandGenerator.POLAR_HEIGHT</code>.
+     * <code>Map.POLAR_HEIGHT</code>.
      *
      * For the remaining land tiles, one region per contiguous
      * landmass is created.

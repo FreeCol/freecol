@@ -21,6 +21,7 @@ package net.sf.freecol.server.generator;
 
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.LandMap;
 import net.sf.freecol.common.option.OptionGroup;
 
 /**
@@ -29,12 +30,10 @@ import net.sf.freecol.common.option.OptionGroup;
 public interface MapGenerator {
 
     /**
-     * Creates the map with the current set options
-     *
-     * @param game a <code>Game</code> value
-     * @exception FreeColException if an error occurs
+     * Gets the options used when generating the map.
+     * @return The <code>MapGeneratorOptions</code>.
      */
-    public abstract void createMap(Game game) throws FreeColException;
+    public abstract OptionGroup getMapGeneratorOptions();
 
     /**
      * Creates a <code>Map</code> for the given <code>Game</code>.
@@ -42,19 +41,18 @@ public interface MapGenerator {
      * The <code>Map</code> is added to the <code>Game</code> after
      * it is created.
      *
-     * @param game The game.
-     * @param landMap Determines whether there should be land
-     *                or ocean on a given tile. This array also
-     *                specifies the size of the map that is going
-     *                to be created.
+     * @param game The <code>Game</code> to create the map for.
+     * @param width The map width.
+     * @param height The map height.
      * @see net.sf.freecol.common.model.Map
      */
-    public abstract void createEmptyMap(Game game, boolean[][] landMap);
+    public abstract void createEmptyMap(Game game, int width, int height);
 
     /**
-     * Gets the options used when generating the map.
-     * @return The <code>MapGeneratorOptions</code>.
+     * Creates the map with the current set options
+     *
+     * @param game The <code>Game</code> to create the map for.
+     * @exception FreeColException if an error occurs
      */
-    public abstract OptionGroup getMapGeneratorOptions();
-
+    public abstract void createMap(Game game) throws FreeColException;
 }
