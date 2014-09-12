@@ -712,7 +712,7 @@ public class TransportMission extends Mission {
             lb.add(" requeue/queue fail ", cargo.toShortString());
             dropTransportable(t);
         } else {
-            lb.add(" requeued(", cargo.getTransportTarget(), ")",
+            lb.add(" requeued(", cargo.getTransportTarget(), ") ",
                    cargo.toShortString());
             takeTransportable(t);
             ret = true;
