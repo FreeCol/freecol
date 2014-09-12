@@ -1797,6 +1797,14 @@ public class EuropeanAIPlayer extends AIPlayer {
                     if (tm.destinationCapacity() > 0) {
                         transportMissions.add(tm);
                     }
+                } else if (m instanceof PrivateerMission) {
+                    if (!(m.getTarget() instanceof Unit)) {
+                        // Privateering but not chasing a unit, consider
+                        // reassigning to transport.
+                        navalUnits.add(aiUnit);
+                        done.add(aiUnit);
+                        continue;
+                    }
                 }
                 reasons.put(unit, "Valid");
 

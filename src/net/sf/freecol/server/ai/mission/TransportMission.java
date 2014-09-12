@@ -1410,12 +1410,17 @@ public class TransportMission extends Mission {
         final Unit unit = getUnit();
         final CostDecider fallBackDecider
             = CostDeciders.avoidSettlementsAndBlockingUnits();
+        final EuropeanAIPlayer euaip = getEuropeanAIPlayer();
         CostDecider costDecider = CostDeciders.defaultCostDeciderFor(unit);
         for (;;) {
             Unit.MoveType mt = travelToTarget(target, costDecider, lb);
             switch (mt) {
             case MOVE: // Arrived at transport target
                 doTransport(lb);
+                if (isEmpty() && unit.isOffensiveUnit()) {
+                    Mission m = euaip.getPrivateerMission(aiCarrier, null);
+                    if (m != null) return lbDone(lb, false, "going pirate");
+                }                    
                 if ((reason = invalidReason()) != null) {
                     logger.warning(tag + " post-stop failure(" + reason
                         + "): " + this.toFullString());
