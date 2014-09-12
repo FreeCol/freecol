@@ -174,7 +174,7 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
      * @param unit an <code>Unit</code> value
      * @return false
      */
-    public static boolean isValidFor(Unit unit) {
+    public static boolean isValidFor(@SuppressWarnings("unusued") Unit unit) {
         return false;
     }
 

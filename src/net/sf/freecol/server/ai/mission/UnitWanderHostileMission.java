@@ -109,7 +109,8 @@ public class UnitWanderHostileMission extends Mission {
      * @param loc The <code>Location</code> to check.
      * @return A reason for invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit, Location loc) {
+    public static String invalidReason(AIUnit aiUnit,
+        @SuppressWarnings("unused") Location loc) {
         String reason;
         return ((reason = invalidAIUnitReason(aiUnit)) != null) ? reason
             : ((reason = invalidMissionReason(aiUnit)) != null) ? reason

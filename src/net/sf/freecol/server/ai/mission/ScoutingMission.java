@@ -308,7 +308,8 @@ public class ScoutingMission extends Mission {
      * @param tile The <code>Tile</code> to test.
      * @return A reason why the mission would be invalid, or null if none found.
      */
-    private static String invalidTileReason(AIUnit aiUnit, Tile tile) {
+    private static String invalidTileReason(@SuppressWarnings("unused") AIUnit aiUnit,
+                                            Tile tile) {
         return (tile == null) ? "tile-null"
             : (!tile.hasLostCityRumour()) ? "tile-lacks-rumour"
             : null;
