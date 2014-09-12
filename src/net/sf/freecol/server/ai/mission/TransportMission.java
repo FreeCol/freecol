@@ -948,7 +948,7 @@ public class TransportMission extends Mission {
             if (isCarrying(t) && !t.leaveTransport(d)) {
                 //lb.add(", ", t, " NO-LEAVE");
                 PathNode pn = t.getDeliveryPath(carrier, t.getTransportDestination());
-                lb.add(", ", t, " NO-LEAVE(", here, "~", cargo.getLeaveDirection(), "~", t.getTransportDestination(), " ", ((pn == null) ? pn : pn.fullPathToString()));
+                lb.add(", ", t, " NO-LEAVE(", here, "~", cargo.getLeaveDirection(), "~", t.getTransportDestination(), " ", ((pn == null) ? "no-path" : pn.fullPathToString()));
                 return CargoResult.TRETRY;
             }
             lb.add(", ", t, " COMPLETED");
@@ -1333,7 +1333,7 @@ public class TransportMission extends Mission {
             removeTransportable(t);
             return true;
         }
-        return (cargo == null) ? true : dumpCargo(cargo, lb);
+        return dumpCargo(cargo, lb);
     }
 
 
