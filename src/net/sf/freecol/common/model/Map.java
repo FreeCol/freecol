@@ -2223,6 +2223,94 @@ public class Map extends FreeColGameObject implements Location {
     }        
 
     /**
+     * Places the "high seas"-tiles on the border of this map.
+     *
+     * All other tiles previously of type High Seas will be set to Ocean.
+     *
+     * @param distToLandFromHighSeas The distance between the land
+     *     and the high seas (given in tiles).
+     * @param maxDistanceToEdge The maximum distance a high sea tile
+     *     can have from the edge of the map.
+     */
+    public void resetHighSeas(int distToLandFromHighSeas,
+                              int maxDistanceToEdge) {
+        final Specification spec = getSpecification();
+        final TileType ocean = spec.getTileType("model.tile.ocean");
+        final TileType highSeas = spec.getTileType("model.tile.highSeas");
+        if (highSeas == null) {
+            throw new RuntimeException("HighSeas TileType must exist");
+        }
+        if (ocean == null) {
+            throw new RuntimeException("Ocean TileType must exist");
+        }
+        if (distToLandFromHighSeas < 0) {
+            throw new RuntimeException("Land<->HighSeas distance can not be negative");
+        }
+        if (maxDistanceToEdge < 0) {
+            throw new RuntimeException("Distance to edge can not be negative");
+        }
+
+        // Reset all highSeas tiles to the default ocean type.
+        for (Tile t : getAllTiles()) {
+            if (t.getType() == highSeas) t.setType(ocean);
+        }
+
+        final int width = getWidth(), height = getHeight();
+        Tile t, seaL = null, seaR = null;
+        int totalL = 0, totalR = 0, distanceL = -1, distanceR = -1;
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < maxDistanceToEdge && x < width
+                     && isValid(x, y)
+                     && (t = getTile(x, y)).getType() == ocean; x++) {
+                Tile other = getLandWithinDistance(x, y,
+                                                   distToLandFromHighSeas);
+                if (other == null) {
+                    t.setType(highSeas);
+                    totalL++;
+                } else {
+                    int distance = t.getDistanceTo(other);
+                    if (distanceL < distance) {
+                        distanceL = distance;
+                        seaL = t;
+                    }
+                }
+            }
+            for (int x = 0; x < maxDistanceToEdge && x < width
+                     && isValid(width-1-x, y)
+                     && (t = getTile(width-1-x, y)).getType() == ocean; x++) {
+                Tile other = getLandWithinDistance(width-1-x, y,
+                                                   distToLandFromHighSeas);
+                if (other == null) {
+                    t.setType(highSeas);
+                    totalR++;
+                } else {
+                    int distance = t.getDistanceTo(other);
+                    if (distanceR < distance) {
+                        distanceR = distance;
+                        seaR = t;
+                    }
+                }
+            }
+        }
+        if (totalL <= 0 && seaL != null) {
+            seaL.setType(highSeas);
+            totalL++;
+        }
+        if (totalR <= 0 && seaR != null) {
+            seaR.setType(highSeas);
+            totalR++;
+        }
+        if (totalL <= 0 || totalR <= 0) {
+            logger.warning("No high seas on "
+                + ((totalL <= 0 && totalR <= 0) ? "either"
+                    : (totalL <= 0) ? "left"
+                    : (totalR <= 0) ? "right"
+                    : "BOGUS") + " side of the map."
+                + "  This can cause failures on small test maps.");
+        }
+    }
+
+    /**
      * Sets the high seas count for all tiles connected to the high seas.
      * Any ocean tiles on the map vertical edges that do not have an
      * explicit false moveToEurope attribute are given a true one.

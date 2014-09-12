@@ -70,8 +70,7 @@ public class DetermineHighSeasAction extends FreeColAction {
         
         Parameters p = getGUI().showParametersDialog();
         if (p != null) {
-            TerrainGenerator.determineHighSeas(map, p.distToLandFromHighSeas,
-                p.maxDistanceToEdge);
+            map.resetHighSeas(p.distToLandFromHighSeas, p.maxDistanceToEdge);
         }
     }
 }
