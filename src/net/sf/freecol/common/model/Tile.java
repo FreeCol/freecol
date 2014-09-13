@@ -2327,8 +2327,11 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                     xw.setWriteScope(FreeColXMLWriter.WriteScope.toClient(p));
                     // Do not call toXML!  It will look for a cached tile,
                     // inside t which is already a cached copy!
-                    t.internalToXML(xw, getXMLElementTagName());
-                    xw.setWriteScope(scope);
+                    try {
+                        t.internalToXML(xw, getXMLElementTagName());
+                    } finally {
+                        xw.setWriteScope(scope);
+                    }
                 }
 
                 xw.writeEndElement();
