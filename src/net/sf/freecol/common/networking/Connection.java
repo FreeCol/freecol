@@ -204,16 +204,14 @@ public class Connection {
      * Failure is expected if the other end has closed already.
      */
     public void close() {
-        synchronized (this.out) {
-            if (this.out != null) {
-                try {
-                    sendDumping(DOMMessage.createMessage(DISCONNECT_TAG));
-                } catch (IOException ioe) {
-                    logger.fine("Error disconnecting " + this.name
-                        + ": " + ioe.getMessage());
-                } finally {
-                    reallyClose();
-                }
+        if (this.out != null) {
+            try {
+                sendDumping(DOMMessage.createMessage(DISCONNECT_TAG));
+            } catch (IOException ioe) {
+                logger.fine("Error disconnecting " + this.name
+                    + ": " + ioe.getMessage());
+            } finally {
+                reallyClose();
             }
         }
     }
@@ -225,12 +223,14 @@ public class Connection {
         if (thread != null) thread.askToStop();
 
         if (this.out != null) {
-            try {
-                this.out.close();
-            } catch (IOException ioe) {
-                logger.log(Level.WARNING, "Error closing output", ioe);
-            } finally {
-                this.out = null;
+            synchronized (this.out) {
+                try {
+                    this.out.close();
+                } catch (IOException ioe) {
+                    logger.log(Level.WARNING, "Error closing output", ioe);
+                } finally {
+                    this.out = null;
+                }
             }
         }
         if (this.in != null) {
@@ -272,8 +272,8 @@ public class Connection {
                 this.out.write('\n');
                 this.out.flush();
                 this.out.notifyAll(); // Just in case others are waiting
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Failed to transform and send!", e);
+            } catch (TransformerException te) {
+                logger.log(Level.WARNING, "Failed to transform", te);
             }
         }
     }
