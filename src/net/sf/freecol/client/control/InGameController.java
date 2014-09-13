@@ -722,13 +722,13 @@ public final class InGameController implements NetworkConstants {
                 Goods cargo = new Goods(game, loc, type, amount);
                 if (loadGoods(cargo, unit)) {
                     if (lb != null) lb.add(" ",
-                        getLoadGoodsMessage(unit, type, amount,
-                                            present, export, demand));
+                        getLoadGoodsMessage(type, amount, present,
+                                            export, demand));
                     ret = true;
                 }
             } else if (present > 0) {
                 if (lb != null) lb.add(" ",
-                    getLoadGoodsMessage(unit, type, 0, present, 0, demand));
+                    getLoadGoodsMessage(type, 0, present, 0, demand));
             }
         }
         return ret;
@@ -737,7 +737,6 @@ public final class InGameController implements NetworkConstants {
     /**
      * Gets a message describing a goods loading.
      *
-     * @param unit The <code>Unit</code> that is loading.
      * @param type The <code>GoodsType</code> the type of goods being loaded.
      * @param amount The amount of goods loaded.
      * @param present The amount of goods already at the location.
@@ -746,7 +745,7 @@ public final class InGameController implements NetworkConstants {
      *     the trade route orders.
      * @return A summary of the load.
      */
-    private String getLoadGoodsMessage(Unit unit, GoodsType type,
+    private String getLoadGoodsMessage(GoodsType type,
                                        int amount, int present,
                                        int export, int demand) {
         String key;
@@ -1353,14 +1352,15 @@ public final class InGameController implements NetworkConstants {
             m.setBeenDisplayed(true);
         }
 
+        List<String> todo = new ArrayList<String>();
         for (Entry<String, Integer> entry : messagesToIgnore.entrySet()) {
             if (entry.getValue().intValue() < thisTurn - 1) {
-                if (logger.isLoggable(Level.FINER)) {
-                    logger.finer("Removing old model message with key "
-                        + entry.getKey() + " from ignored messages.");
-                }
-                stopIgnoringMessage(entry.getKey());
+                todo.add(entry.getKey());
             }
+        }
+        while (!todo.isEmpty()) {
+            String key = todo.remove(0);
+            stopIgnoringMessage(key);
         }
 
         if (!messages.isEmpty()) {
