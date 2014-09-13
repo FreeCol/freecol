@@ -2052,26 +2052,35 @@ public class EuropeanAIPlayer extends AIPlayer {
 
         } else {
             // CashIn missions are obvious
-            ret = ((m = getCashInTreasureTrainMission(aiUnit)) != null) ? m
+            ret = (old instanceof CashInTreasureTrainMission) ? old
+                : ((m = getCashInTreasureTrainMission(aiUnit)) != null) ? m
 
                 // Working in colony is obvious
+                : (unit.isInColony()
+                    && old instanceof WorkInsideColonyMission) ? old
                 : (unit.isInColony()
                     && (m = getWorkInsideColonyMission(aiUnit, null)) != null) ? m
 
                 // Try to maintain defence
+                : (old instanceof DefendSettlementMission) ? old
                 : ((m = getDefendSettlementMission(aiUnit, false)) != null) ? m
 
                 // Favour wish realization for expert units
                 : (unit.isColonist() && unit.getSkillLevel() > 0
+                    && old instanceof WishRealizationMission) ? old
+                : (unit.isColonist() && unit.getSkillLevel() > 0
                     && (m = getWishRealizationMission(aiUnit, null)) != null) ? m
 
                 // Try nearby offence
+                : (old instanceof UnitSeekAndDestroyMission) ? old
                 : ((m = getSeekAndDestroyMission(aiUnit, 8)) != null) ? m
 
                 // Missionary missions are only available to some units
+                : (old instanceof MissionaryMission) ? old
                 : ((m = getMissionaryMission(aiUnit)) != null) ? m
 
                 // Try to satisfy any remaining wishes, such as population
+                : (old instanceof WishRealizationMission) ? old
                 : ((m = getWishRealizationMission(aiUnit, null)) != null) ? m
 
                 // Another try to defend, with relaxed cost decider
@@ -2081,6 +2090,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 : ((m = getSeekAndDestroyMission(aiUnit, 16)) != null) ? m
 
                 // Leftover offensive units should go out looking for trouble
+                : (old instanceof UnitWanderHostileMission) ? old
                 : ((m = getWanderHostileMission(aiUnit)) != null) ? m
 
                 : null;
