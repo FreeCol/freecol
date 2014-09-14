@@ -223,14 +223,12 @@ public class Connection {
         if (thread != null) thread.askToStop();
 
         if (this.out != null) {
-            synchronized (this.out) {
-                try {
-                    this.out.close();
-                } catch (IOException ioe) {
-                    logger.log(Level.WARNING, "Error closing output", ioe);
-                } finally {
-                    this.out = null;
-                }
+            try {
+                this.out.close();
+            } catch (IOException ioe) {
+                logger.log(Level.WARNING, "Error closing output", ioe);
+            } finally {
+                this.out = null;
             }
         }
         if (this.in != null) {
