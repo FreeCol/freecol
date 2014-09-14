@@ -180,16 +180,15 @@ public class MapTest extends FreeColTestCase {
         Game game = getStandardGame();
         final int xmax = 5;
         final int ymax = 6;
-        Tile[][] tiles = new Tile[xmax][ymax];
         Set<Tile> allTiles = new HashSet<Tile>();
+        Map map = new Map(game, xmax, ymax);
         for (int x = 0; x < xmax; x++) {
             for (int y = 0; y < ymax; y++) {
                 Tile tile = new Tile(game, plainsType, x, y);
-                tiles[x][y] = tile;
+                map.setTile(tile, x, y);
                 allTiles.add(tile);
             }
         }
-        Map map = new Map(game, tiles);
         
         int i = 0;
         for (Tile t : map.getAllTiles()) {

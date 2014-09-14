@@ -53,33 +53,33 @@ public class FreeColMapLoader implements MapLoader {
 
 
     public Layer loadMap(Game game, Layer layer) {
-        Map map = importGame.getMap();
-        Layer highestLayer = layer.compareTo(map.getLayer()) < 0
-            ? layer : map.getLayer();
-        int width = map.getWidth();
-        int height = map.getHeight();
+        Map importMap = importGame.getMap();
+        Layer highestLayer = layer.compareTo(importMap.getLayer()) < 0
+            ? layer : importMap.getLayer();
+        int width = importMap.getWidth();
+        int height = importMap.getHeight();
 
         java.util.Map<String, ServerRegion> regions
             = new HashMap<String, ServerRegion>();
 
-        Tile[][] tiles = new Tile[width][height];
+        Map map = new Map(game, width, height);
         if (highestLayer == Layer.LAND) {
             // import only the land / water distinction
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {
-                    if (map.getTile(x, y).getType().isWater()) {
-                        tiles[x][y] = new Tile(game, TileType.WATER, x, y);
-                    } else {
-                        tiles[x][y] = new Tile(game, TileType.LAND, x, y);
-                    }
+                    Tile t = new Tile(game,
+                        (importMap.getTile(x, y).getType().isWater())
+                        ? TileType.WATER : TileType.LAND,
+                        x, y);
+                    map.setTile(t, x, y);
                 }
             }
         } else {
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {
-                    Tile template = map.getTile(x, y);
+                    Tile template = importMap.getTile(x, y);
                     Tile tile = new Tile(game, null, x, y);
-                    tiles[x][y] = tile;
+                    map.setTile(tile, x, y);
 
                     // import tile types
                     tile.setType(game.getSpecification().getTileType(template.getType().getId()));
@@ -124,7 +124,6 @@ public class FreeColMapLoader implements MapLoader {
                 }
             }
         }
-        map = new Map(game, tiles);
         for (Region region : regions.values()) {
             map.putRegion(region);
         }
@@ -137,6 +136,4 @@ public class FreeColMapLoader implements MapLoader {
     public Layer getHighestLayer() {
         return Layer.NATIVES;
     }
-
-
 }

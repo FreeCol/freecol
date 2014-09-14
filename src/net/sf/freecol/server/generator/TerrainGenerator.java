@@ -377,8 +377,7 @@ public class TerrainGenerator {
             && mapOptions.getBoolean(MapGeneratorOptions.IMPORT_BONUSES);
 
         boolean mapHasLand = false;
-        Tile[][] tiles = new Tile[width][height];
-        Map map = new Map(game, tiles);
+        Map map = new Map(game, width, height);
         int minimumLatitude = mapOptions
             .getInteger(MapGeneratorOptions.MINIMUM_LATITUDE);
         int maximumLatitude = mapOptions
@@ -453,7 +452,7 @@ public class TerrainGenerator {
                 } else {
                     t = createTile(game, x, y, landMap, latitude);
                 }
-                tiles[x][y] = t;
+                map.setTile(t, x, y);
             }
         }
         game.setMap(map);

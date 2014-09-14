@@ -83,7 +83,7 @@ public class ScaleMapAction extends FreeColAction {
         final int oldWidth = oldMap.getWidth();
         final int oldHeight = oldMap.getHeight();
 
-        Tile[][] tiles = new Tile[width][height];
+        Map map = new Map(game, width, height);
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 final int oldX = (x * oldWidth) / width;
@@ -100,11 +100,9 @@ public class ScaleMapAction extends FreeColAction {
                 if (t.getTileItemContainer() != null) {
                     t.getTileItemContainer().copyFrom(importTile.getTileItemContainer());
                 }
-                tiles[x][y] = t;
+                map.setTile(t, x, y);
             }
         }
-
-        Map map = new Map(game, tiles);
         game.setMap(map);
 
         /* Commented because it doesn't appear to do anything valuable

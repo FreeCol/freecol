@@ -471,12 +471,13 @@ public class Map extends FreeColGameObject implements Location {
      * Create a new <code>Map</code> from a collection of tiles.
      *
      * @param game The enclosing <code>Game</code>.
-     * @param tiles The 2D array of tiles to contain.
+     * @param width The map width.
+     * @param height The map height.
      */
-    public Map(Game game, Tile[][] tiles) {
+    public Map(Game game, int width, int height) {
         super(game);
 
-        this.tiles = tiles;
+        this.tiles = new Tile[width][height];
         setLayer(Layer.RESOURCES);
         calculateLatitudePerRow();
     }

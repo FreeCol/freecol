@@ -428,28 +428,28 @@ public class FreeColTestCase extends TestCase {
 
         public Map build(){
             completeWorkingGrid();
-            Tile[][] mapTiles = new Tile[width][height];
+            Map map = new Map(game, width, height);
             Region region = new Region(game);
 
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {
                     TileType tileType = tiles[x][y];
-                    mapTiles[x][y] = new Tile(game, tileType, x, y);
-                    mapTiles[x][y].setRegion(region);
+                    Tile t = new Tile(game, tileType, x, y);
+                    t.setRegion(region);
+                    map.setTile(t, x, y);
                 }
             }
 
-            Map m = new Map(game, mapTiles);
             if (exploredByAll) {
                 for (Player player : game.getPlayers()) {
-                    for (Tile tile : m.getAllTiles()) {
+                    for (Tile tile : map.getAllTiles()) {
                         tile.setExplored(player, true);
                     }
                 }
             }
-            m.resetContiguity();
-            m.resetHighSeasCount();
-            return m;
+            map.resetContiguity();
+            map.resetHighSeasCount();
+            return map;
         }
 
         public MapBuilder reset() {
