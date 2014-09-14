@@ -2657,8 +2657,7 @@ public final class InGameController implements NetworkConstants {
         gui.setActiveUnit(unit);
 
         // Clear ordinary destinations if arrived.
-        if (followPath(unit, path) && destination != null
-            && unit.isAtLocation(destination)) {
+        if (followPath(unit, path) && unit.isAtLocation(destination)) {
             clearGotoOrders(unit);
             // Check cash-in, and if the unit has moves left and was
             // not set to SKIPPED by moveDirection, then return true

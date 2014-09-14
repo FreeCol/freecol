@@ -230,10 +230,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
                             }
                         }
                         if (sale != null && more != null) {
-                            lb.add(Messages.getName(g));
-                            if (sale != null) lb.add(" ", sale);
-                            if (more != null) lb.add(more);
-                            lb.add(sep);
+                            lb.add(Messages.getName(g), " ", sale, more, sep);
                             dropSep = true;
                         }
                     }

@@ -181,8 +181,6 @@ public class Messages {
         }
 
         File i18nDirectory = FreeColDirectories.getI18nDirectory();
-        if (i18nDirectory == null) return;
-
         if (!NumberRules.isInitialized()) {
             // attempt to read grammatical rules
             File cldr = new File(i18nDirectory, "plurals.xml");

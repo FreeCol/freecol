@@ -189,7 +189,7 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
             = freeColClient.getMapEditorController();
         final boolean isTransformActive = controller.getMapTransform() != null;
 
-        if ((endPoint = e.getPoint()) == null) return;
+        endPoint = e.getPoint();
         if (startPoint == null) startPoint = endPoint;
         drawBox(component, startPoint, endPoint);
         Tile start = mapViewer.convertToMapTile(startPoint.x, startPoint.y);

@@ -916,7 +916,6 @@ public class GUI {
                         Font font = ResourceManager.getFont(StyleConstants
                             .getFontFamily(attr),
                             StyleConstants.getFontSize(attr));
-                        if (font == null) return super.getFont(attr);
                         int fontStyle = Font.PLAIN;
                         if (StyleConstants.isBold(attr)) {
                             fontStyle |= Font.BOLD;

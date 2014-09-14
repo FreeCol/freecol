@@ -101,10 +101,6 @@ public class SoundPlayer {
         } else {
             in = AudioSystem.getAudioInputStream(file);
         }
-        if (in == null) {
-            throw new IllegalArgumentException("Not an audio file: "
-                + file.getName());
-        }
         return in;
     }
 

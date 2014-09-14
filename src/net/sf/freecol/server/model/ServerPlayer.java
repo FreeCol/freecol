@@ -2256,7 +2256,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         case WIN:
             vis = See.perhaps().always(defenderPlayer);
             if (isAttack) {
-                if (attackerTile == null || defenderTile == null
+                if (attackerTile == null
                     || attackerTile == defenderTile
                     || !attackerTile.isAdjacent(defenderTile)) {
                     logger.warning("Bogus attack from " + attackerTile
@@ -2271,7 +2271,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         case LOSE:
             vis = See.perhaps().always(this);
             if (isAttack) {
-                if (attackerTile == null || defenderTile == null
+                if (attackerTile == null
                     || attackerTile == defenderTile
                     || !attackerTile.isAdjacent(defenderTile)) {
                     logger.warning("Bogus attack from " + attackerTile

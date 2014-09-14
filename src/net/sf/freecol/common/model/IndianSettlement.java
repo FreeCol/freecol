@@ -559,8 +559,7 @@ public class IndianSettlement extends Settlement {
      */
     protected void initializeAlarm(Player player) {
         Tension tension = owner.getTension(player);
-        setAlarm(player, new Tension((tension == null) ? 0
-                : tension.getValue()));
+        setAlarm(player, new Tension(tension.getValue()));
     }
 
     /**
