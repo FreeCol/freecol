@@ -307,7 +307,7 @@ public final class StartGamePanel extends FreeColPanel {
                 refreshPlayersTable();
                 break;
             case CHAT:
-                if (chat.getText().length() > 0) {
+                if (!chat.getText().isEmpty()) {
                     fcc.getPreGameController().chat(chat.getText());
                     displayChat(getMyPlayer().getName(), chat.getText(),
                                 false);

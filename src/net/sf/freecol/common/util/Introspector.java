@@ -46,7 +46,7 @@ public class Introspector {
      * @param field The field name within the class of interest.
      */
     public Introspector(Class<?> theClass, String field) {
-        if (field == null || field.length() == 0) {
+        if (field == null || field.isEmpty()) {
             throw new IllegalArgumentException("Field may not be empty");
         }
         this.theClass = theClass;

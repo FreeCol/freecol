@@ -227,7 +227,7 @@ public class DebugUtils {
         String response = gui.showInputDialog(true, null,
             StringTemplate.key("menuBar.debug.addGold"),
             Integer.toString(1000), "ok", "cancel");
-        if (response == null || response.length() == 0) return;
+        if (response == null || response.isEmpty()) return;
         int gold;
         try {
             gold = Integer.parseInt(response);
@@ -256,7 +256,7 @@ public class DebugUtils {
         String response = gui.showInputDialog(true, null,
             StringTemplate.key("menuBar.debug.addImmigration"),
             Integer.toString(100), "ok", "cancel");
-        if (response == null || response.length() == 0) return;
+        if (response == null || response.isEmpty()) return;
         int crosses;
         try {
             crosses = Integer.parseInt(response);
@@ -283,7 +283,7 @@ public class DebugUtils {
         String response = gui.showInputDialog(true, null,
             StringTemplate.key("menuBar.debug.addLiberty"),
             Integer.toString(100), "ok", "cancel");
-        if (response == null || response.length() == 0) return;
+        if (response == null || response.isEmpty()) return;
         int liberty;
         try {
             liberty = Integer.parseInt(response);
@@ -961,7 +961,7 @@ public class DebugUtils {
                 StringTemplate.name("Select Goods Amount"),
                 Integer.toString(colony.getGoodsCount(goodsType)),
                 "ok", "cancel");
-        if (response == null || response.length() == 0) return;
+        if (response == null || response.isEmpty()) return;
         int a;
         try {
             a = Integer.parseInt(response);
@@ -1055,7 +1055,7 @@ public class DebugUtils {
         String response = freeColClient.getGUI().showInputDialog(true, null,
             StringTemplate.key("menuBar.debug.skipTurns"),
             Integer.toString(10), "ok", "cancel");
-        if (response == null || response.length() == 0) return;
+        if (response == null || response.isEmpty()) return;
         int skip;
         try {
             skip = Integer.parseInt(response);

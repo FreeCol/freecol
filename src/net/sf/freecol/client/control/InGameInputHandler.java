@@ -415,18 +415,18 @@ public final class InGameInputHandler extends InputHandler {
         String str;
         Unit u;
 
-        if ((str = element.getAttribute("attacker")) == null) {
+        if ((str = element.getAttribute("attacker")).isEmpty()) {
             throw new IllegalStateException("Attack animation for: "
                 + player.getId() + " missing attacker attribute.");
         }
-        if ((u = game.getFreeColGameObject(str, Unit.class)) == null
+        if ((u = game.getFreeColGameObject(str, Unit.class)).isEmpty()
             && (u = selectUnitFromElement(game, element, str)) == null) {
             throw new IllegalStateException("Attack animation for: "
                 + player.getId() + " omitted attacker: " + str);
         }
         final Unit attacker = u;
 
-        if ((str = element.getAttribute("defender")) == null) {
+        if ((str = element.getAttribute("defender")).isEmpty()) {
             throw new IllegalStateException("Attack animation for: "
                 + player.getId() + " missing defender attribute.");
         }
@@ -437,7 +437,7 @@ public final class InGameInputHandler extends InputHandler {
         }
         final Unit defender = u;
 
-        if ((str = element.getAttribute("attackerTile")) == null) {
+        if ((str = element.getAttribute("attackerTile")).isEmpty()) {
             throw new IllegalStateException("Attack animation for: "
                 + player.getId() + " missing attacker tile attribute.");
         }
@@ -447,7 +447,7 @@ public final class InGameInputHandler extends InputHandler {
                 + player.getId() + " omitted attacker tile: " + str);
         }
 
-        if ((str = element.getAttribute("defenderTile")) == null) {
+        if ((str = element.getAttribute("defenderTile")).isEmpty()) {
             throw new IllegalStateException("Attack animation for: "
                 + player.getId() + " missing defender tile attribute.");
         }
@@ -496,7 +496,7 @@ public final class InGameInputHandler extends InputHandler {
         final Player player = freeColClient.getMyPlayer();
 
         String unitId = element.getAttribute("unit");
-        if (unitId == null) {
+        if (unitId.isEmpty()) {
             logger.warning("Animation for: " + player.getId()
                 + " missing unitId.");
             return null;
@@ -514,7 +514,7 @@ public final class InGameInputHandler extends InputHandler {
         final Unit unit = u;
 
         String oldTileId = element.getAttribute("oldTile");
-        if (oldTileId == null) {
+        if (oldTileId.isEmpty()) {
             logger.warning("Animation for: " + player.getId()
                 + " missing oldTileId");
             return null;
@@ -527,7 +527,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         String newTileId = element.getAttribute("newTile");
-        if (newTileId == null) {
+        if (newTileId.isEmpty()) {
             logger.warning("Animation for: " + player.getId()
                 + " missing newTileId");
             return null;

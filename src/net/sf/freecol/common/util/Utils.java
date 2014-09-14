@@ -360,7 +360,7 @@ public class Utils {
      * @return The restored <code>Random</code>.
      */
     public static synchronized Random restoreRandomState(String state) {
-        if (state == null || state.length() == 0) return null;
+        if (state == null || state.isEmpty()) return null;
         byte[] bytes = new byte[state.length() / 2];
         int pos = 0;
         for (int i = 0; i < bytes.length; i++) {

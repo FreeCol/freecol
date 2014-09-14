@@ -1575,7 +1575,7 @@ public final class InGameController implements NetworkConstants {
         name = gui.showInputDialog(true, tile,
             StringTemplate.key("nameColony.text"), name,
             "nameColony.yes", "nameColony.no");
-        if (name == null) return; else if (name.length() == 0) {
+        if (name == null) return; else if (name.isEmpty()) {
             gui.showErrorMessage("enterSomeText");
             return; // 0-length invalid.
         }
@@ -2034,8 +2034,8 @@ public final class InGameController implements NetworkConstants {
         // Confirm intention, and collect nation+country names.
         List<String> names = gui.showConfirmDeclarationDialog();
         if (names == null
-            || names.get(0) == null || names.get(0).length() == 0
-            || names.get(1) == null || names.get(1).length() == 0) {
+            || names.get(0) == null || names.get(0).isEmpty()
+            || names.get(1) == null || names.get(1).isEmpty()) {
             // Empty name => user cancelled.
             return;
         }
@@ -4112,7 +4112,7 @@ public final class InGameController implements NetworkConstants {
                 "renameColony.yes", "renameColony.no");
             if (name == null) { // User cancelled
                 return;
-            } else if (name.length() == 0) { // Zero length invalid
+            } else if (name.isEmpty()) { // Zero length invalid
                 gui.showErrorMessage("enterSomeText");
             } else if (colony.getName().equals(name)) { // No change
                 return;

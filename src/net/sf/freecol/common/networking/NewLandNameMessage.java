@@ -120,7 +120,7 @@ public class NewLandNameMessage extends DOMMessage {
                 + unitId);
         }
 
-        if (newLandName == null || newLandName.length() == 0) {
+        if (newLandName == null || newLandName.isEmpty()) {
             return DOMMessage.clientError("Empty new land name");
         }
 

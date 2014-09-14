@@ -237,7 +237,7 @@ public class Game extends FreeColGameObject {
      * @return The game object, or null if not found.
      */
     public FreeColGameObject getFreeColGameObject(String id) {
-        if (id != null && id.length() > 0) {
+        if (id != null && !id.isEmpty()) {
             final WeakReference<FreeColGameObject> ro
                 = freeColGameObjects.get(id);
             if (ro != null) {
@@ -278,7 +278,7 @@ public class Game extends FreeColGameObject {
      *     object are null.
      */
     public void setFreeColGameObject(String id, FreeColGameObject fcgo) {
-        if (id == null || id.length() == 0) {
+        if (id == null || id.isEmpty()) {
             throw new IllegalArgumentException("Null/empty id.");
         } else if (fcgo == null) {
             throw new IllegalArgumentException("Null FreeColGameObject.");
@@ -305,7 +305,7 @@ public class Game extends FreeColGameObject {
      * @exception IllegalArgumentException If the identifier is null or empty.
      */
     public void removeFreeColGameObject(String id) {
-        if (id == null || id.length() == 0) {
+        if (id == null || id.isEmpty()) {
             throw new IllegalArgumentException("Null/empty identifier.");
         }
 

@@ -136,8 +136,7 @@ public class FreeColDebugger {
         for (DebugMode mode : DebugMode.values()) {
             if (isInDebugMode(mode)) ret += "," + mode;
         }
-        return (ret.length() > 0) ? ret.substring(1, ret.length())
-            : ret;
+        return (ret.isEmpty()) ? ret : ret.substring(1, ret.length());
     }
 
     /**

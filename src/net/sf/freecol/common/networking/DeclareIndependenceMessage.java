@@ -88,8 +88,8 @@ public class DeclareIndependenceMessage extends DOMMessage {
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
 
-        if (nationName == null || nationName.length() == 0
-            || countryName == null || countryName.length() == 0) {
+        if (nationName == null || nationName.isEmpty()
+            || countryName == null || countryName.isEmpty()) {
             return DOMMessage.clientError("Empty nation or country name.");
         }
         StringTemplate problem = player.checkDeclareIndependence();

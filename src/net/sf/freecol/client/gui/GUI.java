@@ -1516,7 +1516,7 @@ public class GUI {
         canvas.showNameNewLandDialog(key, defaultName, unit,
             new DialogHandler<String>() {
                 public void handle(String name) {
-                    if (name == null || name.length() == 0) name = defaultName;
+                    if (name == null || name.isEmpty()) name = defaultName;
                     igc().nameNewLand(unit, name);
                 }
             });
@@ -1530,7 +1530,7 @@ public class GUI {
         canvas.showNameNewRegionDialog(template, defaultName, unit, 
             new DialogHandler<String>() {
                 public void handle(String name) {
-                    if (name == null || name.length() == 0) name = defaultName;
+                    if (name == null || name.isEmpty()) name = defaultName;
                     igc().nameNewRegion(tile, unit, region, name);
                 }
             });
