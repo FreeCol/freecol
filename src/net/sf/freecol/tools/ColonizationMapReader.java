@@ -161,6 +161,9 @@ public class ColonizationMapReader {
                     case 6: terrain = '='; // major river
                         break;
                     case 7: terrain = 'X'; // mountain + major river
+                        break;
+                    default:
+                        break;
                     };
                     System.out.print(terrain);
                     index++;

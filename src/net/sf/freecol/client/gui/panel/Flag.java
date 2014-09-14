@@ -516,6 +516,8 @@ public class Flag {
         case PER_SALTIRE:
             drawPerSaltire(g);
             break;
+        default:
+            break;
         }
 
         // draw decoration
@@ -546,6 +548,8 @@ public class Flag {
             decorationShape = getBend(true);
             decorationShape.append(getBend(false), false);
             decorationShape.append(getCross(Decoration.CROSS), false);
+            break;
+        default:
             break;
         }
         if (decorationShape != null) {
@@ -937,6 +941,8 @@ public class Flag {
         case GREEK_CROSS:
             width = height = Math.min(WIDTH, HEIGHT) - 2 * DECORATION_SIZE;
             break;
+        default:
+            break;
         }
         GeneralPath cross = new GeneralPath();
         cross.append(new Rectangle2D.Double((WIDTH - width) / 2, quarterHeight,
@@ -1020,6 +1026,8 @@ public class Flag {
                 path.lineTo(HEIGHT / 2 - y, WIDTH / 2);
                 path.lineTo(0, WIDTH - x);
             }
+            break;
+        default:
             break;
         }
         return path;
