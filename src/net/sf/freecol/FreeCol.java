@@ -393,19 +393,22 @@ public final class FreeCol {
      */
     private static void handleArgs(String[] args) {
         Options options = new Options();
+        final String help = Messages.message("cli.help");
+        final File dummy = new File("dummy");
+        final String argDirectory = Messages.message("cli.arg.directory");
 
         // Help options.
         options.addOption(OptionBuilder.withLongOpt("usage")
-                          .withDescription(Messages.message("cli.help"))
+                          .withDescription(help)
                           .create());
         options.addOption(OptionBuilder.withLongOpt("help")
-                          .withDescription(Messages.message("cli.help"))
+                          .withDescription(help)
                           .create());
 
         // Special options handled early.
         options.addOption(OptionBuilder.withLongOpt("freecol-data")
                           .withDescription(Messages.message("cli.freecol-data"))
-                          .withArgName(Messages.message("cli.arg.directory"))
+                          .withArgName(argDirectory)
                           .hasArg()
                           .create());
         options.addOption(OptionBuilder.withLongOpt("default-locale")
@@ -533,20 +536,20 @@ public final class FreeCol {
                           .create());
         options.addOption(OptionBuilder.withLongOpt("user-cache-directory")
                           .withDescription(Messages.message("cli.user-cache-directory"))
-                          .withArgName(Messages.message("cli.arg.directory"))
-                          .withType(new File("dummy"))
+                          .withArgName(argDirectory)
+                          .withType(dummy)
                           .hasArg()
                           .create());
         options.addOption(OptionBuilder.withLongOpt("user-config-directory")
                           .withDescription(Messages.message("cli.user-config-directory"))
-                          .withArgName(Messages.message("cli.arg.directory"))
-                          .withType(new File("dummy"))
+                          .withArgName(argDirectory)
+                          .withType(dummy)
                           .hasArg()
                           .create());
         options.addOption(OptionBuilder.withLongOpt("user-data-directory")
                           .withDescription(Messages.message("cli.user-data-directory"))
-                          .withArgName(Messages.message("cli.arg.directory"))
-                          .withType(new File("dummy"))
+                          .withArgName(argDirectory)
+                          .withType(dummy)
                           .hasArg()
                           .create());
         options.addOption(OptionBuilder.withLongOpt("version")

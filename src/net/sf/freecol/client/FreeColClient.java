@@ -191,7 +191,7 @@ public final class FreeColClient {
         ResourceManager.setBaseMapping(baseData.getResourceMapping());
 
         // Once the basic resources are in place the GUI can be started.
-        final GraphicsDevice gd = gui.getGoodGraphicsDevice();
+        final GraphicsDevice gd = GUI.getGoodGraphicsDevice();
         this.gui = new GUI(this);
         this.serverAPI = new UserServerAPI(gui);
         if (!headless) gui.displaySplashScreen(splashFilename, gd);

@@ -1360,17 +1360,17 @@ public class ColonyPlan {
                 goodsType = wlp.getGoodsType();
                 wl = col.getCorresponding(wlp.getWorkLocation());
                 best = null;
-                lb.add("    ", lb.wide(2, col.getUnitCount()),
-                       ": ", lb.wide(-15, goodsType.getSuffix()),
-                       "@", lb.wide(25, locationDescription(wl)),
+                lb.add("    ", LogBuilder.wide(2, col.getUnitCount()),
+                       ": ", LogBuilder.wide(-15, goodsType.getSuffix()),
+                       "@", LogBuilder.wide(25, locationDescription(wl)),
                        " => ");
 
                 if (!wl.canBeWorked()) {
                     err = "can not be worked";
                 } else if (wl.isFull()) {
                     err = "full";
-                } else if ((best = getBestWorker(wl, goodsType,
-                                                 workers)) == null) {
+                } else if ((best = ColonyPlan.getBestWorker(wl, goodsType,
+                                                            workers)) == null) {
                     err = "no worker found";
                 }
                 if (err != null) {
