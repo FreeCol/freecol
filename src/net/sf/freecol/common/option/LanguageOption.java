@@ -248,7 +248,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
     /**
      * {@inheritDoc}
      */
-    public LanguageOption clone() throws CloneNotSupportedException {
+    public LanguageOption clone() {
         LanguageOption result = new LanguageOption(getSpecification());
         result.setValues(this);
         return result;
