@@ -63,11 +63,11 @@ public final class StatisticsPanel extends FreeColPanel {
 
         private Object data[][] = null;
 
+
         /**
          * A standard constructor.
          */
-        public StatisticsModel() {
-        }
+        public StatisticsModel() {}
 
         /**
          * Gives this table model the data that is being used in the
@@ -77,7 +77,7 @@ public final class StatisticsPanel extends FreeColPanel {
          */
         public void setData(java.util.Map<String, String> statsData) {
             this.data = new Object[2][statsData.size()];
-            int i=0;
+            int i = 0;
             List<String> keys = new ArrayList<String>(statsData.keySet());
             Collections.sort(keys);
             for (String s : keys) {
@@ -87,39 +87,49 @@ public final class StatisticsPanel extends FreeColPanel {
             }
         }
 
+        // AbstractTableModel
+
         /**
-         * Returns the amount of columns in this statesTable.
-         *
-         * @return The amount of columns in this statesTable.
+         * {@inheritDoc}
+         */
+        public Class<?> getColumnClass(int column) {
+            return String.class;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public String getColumnName(int column) {
+            return columnNames[column];
+        }
+
+        ///**
+        // * {@inheritDoc}
+        // */
+        //@Override
+        //public boolean isCellEditable(int row, int column) {
+        //    return false;
+        //}
+
+
+        // Interface TableModel
+
+        /**
+         * {@inheritDoc}
          */
         public int getColumnCount() {
             return columnNames.length;
         }
 
         /**
-         * Returns the name of the specified column.
-         *
-         * @return The name of the specified column.
-         */
-        public String getColumnName(int column) {
-            return columnNames[column];
-        }
-
-        /**
-         * Returns the amount of rows in this statesTable.
-         *
-         * @return The amount of rows in this statesTable.
+         * {@inheritDoc}
          */
         public int getRowCount() {
             return data[NAME_COLUMN].length;
         }
 
         /**
-         * Returns the value at the requested location.
-         *
-         * @param row The requested row.
-         * @param column The requested column.
-         * @return The value at the requested location.
+         * {@inheritDoc}
          */
         public Object getValueAt(int row, int column) {
             if ((row < getRowCount()) && (column < getColumnCount())
@@ -132,24 +142,6 @@ public final class StatisticsPanel extends FreeColPanel {
                 }
             }
             return null;
-        }
-
-        /**
-         * Returns 'true' if the specified cell is editable, 'false' otherwise.
-         *
-         * @param row The specified row.
-         * @param column The specified column.
-         * @return 'true' if the specified cell is editable, 'false' otherwise.
-         */
-        public boolean isCellEditable(int row, int column) {
-            return false;
-        }
-
-        /**
-         * Returns the Class of the objects in the given column.
-         */
-        public Class<?> getColumnClass(int column) {
-            return String.class;
         }
     }
 
