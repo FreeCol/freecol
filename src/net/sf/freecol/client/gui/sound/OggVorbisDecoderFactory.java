@@ -182,8 +182,10 @@ public class OggVorbisDecoderFactory {
             return wr;
         }
 
-        public void mark(int readLimit) {}
-        public boolean markSupported() { return false; }
+        // No need to override InputStream behaviour.
+        //public void mark(int readLimit) {}
+        //public boolean markSupported() { return false; }
+
         public void reset() {}
 
         /**
@@ -379,9 +381,10 @@ public class OggVorbisDecoderFactory {
             return os.getFormat();
         }
 
-        public long getFrameLength() {
-            return frameLength;
-        }
+        // No need to override AudioInputStream
+        //public long getFrameLength() {
+        //    return frameLength;
+        //}
 
         public int available() {
             return os.available();

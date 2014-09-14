@@ -823,14 +823,6 @@ public class ChangeSet {
             this.fields = fields;
         }
 
-        /**
-         * Gets the sort priority.
-         *
-         * @return CHANGE_UPDATE.  Special update, but still an update.
-         */
-        public int getPriority() {
-            return ChangePriority.CHANGE_UPDATE.getPriority();
-        }
 
         /**
          * Should a player perhaps be notified of this update?
