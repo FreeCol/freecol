@@ -23,6 +23,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
+import net.sf.freecol.server.model.ServerUnit;
 
 import org.w3c.dom.Element;
 
@@ -73,16 +74,17 @@ public class UpdateCurrentStopMessage extends DOMMessage {
     public Element handle(FreeColServer server, Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
 
-        Unit unit;
+        ServerUnit serverUnit;
         try {
-            unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
+            serverUnit = serverPlayer.getOurFreeColGameObject(unitId,
+                ServerUnit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
 
         // Valid, update.
         return server.getInGameController()
-            .updateCurrentStop(serverPlayer, unit);
+            .updateCurrentStop(serverPlayer, serverUnit);
     }
 
     /**

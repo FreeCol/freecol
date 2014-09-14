@@ -65,6 +65,7 @@ import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.model.ServerBuilding;
 import net.sf.freecol.server.model.ServerColony;
+import net.sf.freecol.server.model.ServerIndianSettlement;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -273,11 +274,11 @@ public class InGameControllerTest extends FreeColTestCase {
         ServerPlayer french = (ServerPlayer)game.getPlayer("model.nation.french");
         FreeColTestCase.IndianSettlementBuilder builder
             = new FreeColTestCase.IndianSettlementBuilder(game);
-        IndianSettlement camp = builder.build();
+        ServerIndianSettlement camp = (ServerIndianSettlement)builder.build();
         camp.setContacted(dutch);
         camp.setContacted(french);
         Tile tile = camp.getTile().getNeighbourOrNull(Map.Direction.N);
-        Unit dutchJesuit = new ServerUnit(game, tile, dutch, missionaryType);
+        ServerUnit dutchJesuit = new ServerUnit(game, tile, dutch, missionaryType);
         dutch.exploreForUnit(dutchJesuit);
         Unit frenchJesuit = new ServerUnit(game, tile, french, missionaryType);
         french.exploreForUnit(frenchJesuit);
@@ -400,11 +401,11 @@ public class InGameControllerTest extends FreeColTestCase {
         ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
         Tile landTile = map.getTile(9, 9);
         Tile seaTile = map.getTile(10, 9);
-        Unit colonist = new ServerUnit(game, landTile, dutch, colonistType);
-        Unit galleon = new ServerUnit(game, seaTile, dutch, galleonType);
-        Unit caravel = new ServerUnit(game, seaTile, dutch, caravelType);
+        ServerUnit colonist = new ServerUnit(game, landTile, dutch, colonistType);
+        ServerUnit galleon = new ServerUnit(game, seaTile, dutch, galleonType);
+        ServerUnit caravel = new ServerUnit(game, seaTile, dutch, caravelType);
         caravel.getType().setSpaceTaken(2);
-        Unit wagon = new ServerUnit(game, landTile, dutch, wagonTrainType);
+        ServerUnit wagon = new ServerUnit(game, landTile, dutch, wagonTrainType);
 
         // Can not put ship on carrier
         igc.embarkUnit(dutch, caravel, galleon);
@@ -1881,8 +1882,8 @@ public class InGameControllerTest extends FreeColTestCase {
         FreeColTestCase.IndianSettlementBuilder builder
             = new FreeColTestCase.IndianSettlementBuilder(game)
                 .settlementTile(map.getTile(8, 8));
-        IndianSettlement camp = builder.build();
-        Player indian = camp.getOwner();
+        ServerIndianSettlement camp = (ServerIndianSettlement)builder.build();
+        ServerPlayer indian = (ServerPlayer)camp.getOwner();
         Player.makeContact(indian, player);
         camp.setContacted(player);
 

@@ -182,14 +182,15 @@ public class NativeAIPlayer extends AIPlayer {
      * @param lb A <code>LogBuilder</code> to log to.
      */
     private void determineStances(LogBuilder lb) {
-        final Player player = getPlayer();
+        final ServerPlayer serverPlayer = (ServerPlayer)getPlayer();
         lb.mark();
 
-        for (Player p : getGame().getLivePlayers(player)) {
+        for (Player p : getGame().getLivePlayers(serverPlayer)) {
             Stance newStance = determineStance(p);
-            if (newStance != player.getStance(p)) {
+            if (newStance != serverPlayer.getStance(p)) {
                 getAIMain().getFreeColServer().getInGameController()
-                    .changeStance(player, newStance, p, true);
+                    .changeStance(serverPlayer, newStance, 
+                                  (ServerPlayer)p, true);
                 lb.add(" ", p.getNation().getSuffix(),
                        "->", newStance, ", ");
             }

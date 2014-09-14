@@ -28,6 +28,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
+import net.sf.freecol.server.model.ServerUnit;
 
 import org.w3c.dom.Element;
 
@@ -94,9 +95,9 @@ public class EmbarkMessage extends DOMMessage {
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
 
-        Unit unit;
+        ServerUnit unit;
         try {
-            unit = player.getOurFreeColGameObject(unitId, Unit.class);
+            unit = player.getOurFreeColGameObject(unitId, ServerUnit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }

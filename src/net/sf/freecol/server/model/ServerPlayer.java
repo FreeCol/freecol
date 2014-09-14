@@ -3292,10 +3292,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
         Tile centerTile = settlement.getTile();
 
         // Get rid of the any missionary first.
-        if (settlement instanceof IndianSettlement) {
-            if (((IndianSettlement)settlement).hasMissionary()) {
-                ((ServerIndianSettlement)settlement)
-                    .csKillMissionary("indianSettlement.mission.destroyed", cs);
+        if (settlement instanceof ServerIndianSettlement) {
+            ServerIndianSettlement sis = (ServerIndianSettlement)settlement;
+            if (sis.hasMissionary()) {
+                sis.csKillMissionary("indianSettlement.mission.destroyed", cs);
             }
         }
             

@@ -276,10 +276,10 @@ public class MissionAssignmentTest extends FreeColTestCase {
             = new FreeColTestCase.IndianSettlementBuilder(game);
         IndianSettlement camp = builder.player(inca)
             .settlementTile(settlementTile).initialBravesInCamp(10).build();
-        Unit galleon = new ServerUnit(game, seaTile, dutch, galleonType);
+        ServerUnit galleon = new ServerUnit(game, seaTile, dutch, galleonType);
         int unitsInGalleon = 6;
         for (int i = 0; i < unitsInGalleon; i++) {
-            Unit artillery = new ServerUnit(game, settlementTile, dutch,
+            ServerUnit artillery = new ServerUnit(game, settlementTile, dutch,
                 artilleryType);
             igc.embarkUnit(dutch, artillery, galleon);
         }

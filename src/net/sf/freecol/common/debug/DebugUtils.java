@@ -993,8 +993,8 @@ public class DebugUtils {
         final FreeColServer server = freeColClient.getFreeColServer();
         final Game sGame = server.getGame();
         final Player player = freeColClient.getMyPlayer();
-        final Player sPlayer = sGame.getFreeColGameObject(player.getId(),
-                                                          Player.class);
+        final ServerPlayer sPlayer = sGame.getFreeColGameObject(player.getId(),
+            ServerPlayer.class);
         final GUI gui = freeColClient.getGUI();
 
         List<ChoiceItem<MonarchAction>> actions

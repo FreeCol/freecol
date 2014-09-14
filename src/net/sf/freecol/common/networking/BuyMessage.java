@@ -26,6 +26,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.model.ServerIndianSettlement;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -121,9 +122,9 @@ public class BuyMessage extends DOMMessage {
             return DOMMessage.clientError(e.getMessage());
         }
 
-        IndianSettlement settlement;
+        ServerIndianSettlement settlement;
         try {
-            settlement = unit.getAdjacentIndianSettlementSafely(settlementId);
+            settlement = (ServerIndianSettlement)unit.getAdjacentIndianSettlementSafely(settlementId);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }

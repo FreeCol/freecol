@@ -202,12 +202,14 @@ public final class InGameController extends Controller {
     /**
      * Sets a monarch action to debug/test.
      *
-     * @param player The <code>Player</code> whose monarch should act.
+     * @param serverPlayer The <code>ServerPlayer</code> whose monarch
+     *     should act.
      * @param action The <code>MonarchAction</code> to be taken.
      */
-    public void setMonarchAction(Player player, MonarchAction action) {
+    public void setMonarchAction(ServerPlayer serverPlayer,
+                                 MonarchAction action) {
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
-            debugMonarchPlayer = (ServerPlayer) player;
+            debugMonarchPlayer = serverPlayer;
             debugMonarchAction = action;
         }
     }
@@ -255,17 +257,16 @@ public final class InGameController extends Controller {
      * Public change stance and inform all routine.  Mostly used in the
      * test suite, but the AIs also call it.
      *
-     * @param player The originating <code>Player</code>.
+     * @param serverPlayer The originating <code>ServerPlayer</code>.
      * @param stance The new <code>Stance</code>.
-     * @param other The <code>Player</code> wrt which the
+     * @param other The <code>ServerPlayer</code> wrt which the
      *     stance changes.
      * @param symmetric If true, change the otherPlayer stance as well.
      */
-    public void changeStance(Player player, Stance stance,
-                             Player other, boolean symmetric) {
+    public void changeStance(ServerPlayer serverPlayer, Stance stance,
+                             ServerPlayer other, boolean symmetric) {
         ChangeSet cs = new ChangeSet();
-        if (((ServerPlayer)player).csChangeStance(stance, (ServerPlayer)other,
-                                                  symmetric, cs)) {
+        if (serverPlayer.csChangeStance(stance, other, symmetric, cs)) {
             sendToAll(cs);
         }
     }
@@ -1712,13 +1713,14 @@ public final class InGameController extends Controller {
      * Move a unit.
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is moving.
-     * @param unit The <code>Unit</code> to move.
+     * @param unit The <code>ServerUnit</code> to move.
      * @param newTile The <code>Tile</code> to move to.
      * @return An <code>Element</code> encapsulating this action.
      */
-    public Element move(ServerPlayer serverPlayer, Unit unit, Tile newTile) {
+    public Element move(ServerPlayer serverPlayer, ServerUnit unit,
+                        Tile newTile) {
         ChangeSet cs = new ChangeSet();
-        ((ServerUnit)unit).csMove(newTile, random, cs);
+        unit.csMove(newTile, random, cs);
         sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
@@ -1894,24 +1896,24 @@ public final class InGameController extends Controller {
      * Checking that the locations are appropriate is not done here.
      *
      * @param serverPlayer The <code>ServerPlayer</code> embarking.
-     * @param unit The <code>Unit</code> that is embarking.
+     * @param unit The <code>ServerUnit</code> that is embarking.
      * @param carrier The <code>Unit</code> to embark onto.
      * @return An <code>Element</code> encapsulating this action.
      */
-    public Element embarkUnit(ServerPlayer serverPlayer, Unit unit,
+    public Element embarkUnit(ServerPlayer serverPlayer, ServerUnit serverUnit,
                               Unit carrier) {
-        if (unit.isNaval()) {
-            return DOMMessage.clientError("Naval unit " + unit.getId()
+        if (serverUnit.isNaval()) {
+            return DOMMessage.clientError("Naval unit " + serverUnit.getId()
                 + " can not embark.");
         }
-        UnitLocation.NoAddReason reason = carrier.getNoAddReason(unit);
+        UnitLocation.NoAddReason reason = carrier.getNoAddReason(serverUnit);
         if (reason != UnitLocation.NoAddReason.NONE) {
             return DOMMessage.clientError("Carrier: " + carrier.getId()
-                + " can not carry " + unit.getId() + ": " + reason);
+                + " can not carry " + serverUnit.getId() + ": " + reason);
         }
 
         ChangeSet cs = new ChangeSet();
-        ((ServerUnit)unit).csEmbark(carrier, cs);
+        serverUnit.csEmbark(carrier, cs);
 
         // Others might see the unit disappear, or the carrier capacity.
         sendToOthers(serverPlayer, cs);
@@ -1923,17 +1925,18 @@ public final class InGameController extends Controller {
      *
      * @param serverPlayer The <code>ServerPlayer</code> whose unit is
      *                     embarking.
-     * @param unit The <code>Unit</code> that is disembarking.
+     * @param unit The <code>ServerUnit</code> that is disembarking.
      * @return An <code>Element</code> encapsulating this action.
      */
-    public Element disembarkUnit(ServerPlayer serverPlayer, Unit unit) {
-        if (unit.isNaval()) {
-            return DOMMessage.clientError("Naval unit " + unit.getId()
+    public Element disembarkUnit(ServerPlayer serverPlayer,
+                                 ServerUnit serverUnit) {
+        if (serverUnit.isNaval()) {
+            return DOMMessage.clientError("Naval unit " + serverUnit.getId()
                 + " can not disembark.");
         }
-        Unit carrier = unit.getCarrier();
+        Unit carrier = serverUnit.getCarrier();
         if (carrier == null) {
-            return DOMMessage.clientError("Unit " + unit.getId()
+            return DOMMessage.clientError("Unit " + serverUnit.getId()
                 + " is not embarked.");
         }
 
@@ -1941,10 +1944,10 @@ public final class InGameController extends Controller {
 
         Location newLocation = carrier.getLocation();
         List<Tile> newTiles = (newLocation.getTile() == null) ? null
-            : ((ServerUnit) unit).collectNewTiles(newLocation.getTile());
-        unit.setLocation(newLocation);//-vis(serverPlayer)
+            : serverUnit.collectNewTiles(newLocation.getTile());
+        serverUnit.setLocation(newLocation);//-vis(serverPlayer)
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
-        unit.setMovesLeft(0); // In Col1 disembark consumes whole move.
+        serverUnit.setMovesLeft(0); // In Col1 disembark consumes whole move.
         cs.add(See.perhaps(), (FreeColGameObject)newLocation);
         if (newTiles != null) {
             serverPlayer.csSeeNewTiles(newTiles, cs);
@@ -2070,12 +2073,12 @@ public final class InGameController extends Controller {
      *
      * @param serverPlayer The <code>ServerPlayer</code> demanding the tribute.
      * @param unit The <code>Unit</code> that is demanding the tribute.
-     * @param settlement The <code>IndianSettlement</code> demanded of.
+     * @param settlement The <code>ServerIndianSettlement</code> demanded of.
      * @return An <code>Element</code> encapsulating this action.
      * TODO: Move TURNS_PER_TRIBUTE magic number to the spec.
      */
     public Element demandTribute(ServerPlayer serverPlayer, Unit unit,
-                                 IndianSettlement settlement) {
+                                 ServerIndianSettlement settlement) {
         ChangeSet cs = new ChangeSet();
         final int TURNS_PER_TRIBUTE = 5;
 
@@ -2105,8 +2108,8 @@ public final class InGameController extends Controller {
 
         // Increase tension whether we paid or not.  Apply tension
         // directly to the settlement and let propagation work.
-        ((ServerIndianSettlement)settlement).csModifyAlarm(serverPlayer,
-            Tension.TENSION_ADD_NORMAL, true, cs);
+        settlement.csModifyAlarm(serverPlayer, Tension.TENSION_ADD_NORMAL,
+                                 true, cs);
         settlement.setLastTribute(year);
         ModelMessage m;
         if (gold > 0) {
@@ -2266,12 +2269,12 @@ public final class InGameController extends Controller {
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is denouncing.
      * @param unit The <code>Unit</code> denouncing.
-     * @param settlement The <code>IndianSettlement</code>
+     * @param settlement The <code>ServerIndianSettlement</code>
      *     containing the mission to denounce.
      * @return An <code>Element</code> encapsulating this action.
      */
     public Element denounceMission(ServerPlayer serverPlayer, Unit unit,
-                                   IndianSettlement settlement) {
+                                   ServerIndianSettlement settlement) {
         ChangeSet cs = new ChangeSet();
         csVisit(serverPlayer, settlement, 0, cs);
 
@@ -2325,12 +2328,12 @@ public final class InGameController extends Controller {
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is establishing.
      * @param unit The missionary <code>Unit</code>.
-     * @param settlement The <code>IndianSettlement</code> to establish at.
+     * @param settlement The <code>ServerIndianSettlement</code> to
+     *     establish at.
      * @return An <code>Element</code> encapsulating this action.
      */
     public Element establishMission(ServerPlayer serverPlayer, Unit unit,
-                                    IndianSettlement settlement) {
-        final ServerIndianSettlement sis = (ServerIndianSettlement)settlement;
+                                    ServerIndianSettlement settlement) {
         ChangeSet cs = new ChangeSet();
         csVisit(serverPlayer, settlement, 0, cs);
 
@@ -2348,12 +2351,12 @@ public final class InGameController extends Controller {
 
         case HAPPY: case CONTENT: case DISPLEASED:
             if (settlement.hasMissionary()) {
-                sis.csKillMissionary("indianSettlement.mission.denounced", cs);
+                settlement.csKillMissionary("indianSettlement.mission.denounced", cs);
             }
             // Always show the tile the unit was on
             cs.add(See.perhaps().always(serverPlayer), unit.getTile());
-
-            sis.csChangeMissionary(unit, cs);//+vis(serverPlayer)
+            
+            settlement.csChangeMissionary(unit, cs);//+vis(serverPlayer)
             break;
         }
 
@@ -2377,13 +2380,13 @@ public final class InGameController extends Controller {
      * @param serverPlayer The <code>ServerPlayer</code> that is inciting.
      * @param unit The missionary <code>Unit</code> inciting.
      * @param settlement The <code>IndianSettlement</code> to incite.
-     * @param enemy The <code>Player</code> to be incited against.
+     * @param enemy The <code>ServerPlayer</code> to be incited against.
      * @param gold The amount of gold in the bribe.
      * @return An <code>Element</code> encapsulating this action.
      */
     public Element incite(ServerPlayer serverPlayer, Unit unit,
                           IndianSettlement settlement,
-                          Player enemy, int gold) {
+                          ServerPlayer enemy, int gold) {
         ChangeSet cs = new ChangeSet();
 
         Tile tile = settlement.getTile();
@@ -2392,7 +2395,7 @@ public final class InGameController extends Controller {
         cs.add(See.only(serverPlayer), tile);
 
         // How much gold will be needed?
-        ServerPlayer enemyPlayer = (ServerPlayer)enemy;
+        ServerPlayer enemyPlayer = enemy;
         ServerPlayer nativePlayer = (ServerPlayer)settlement.getOwner();
         int payingValue = nativePlayer.getTension(serverPlayer).getValue();
         int targetValue = nativePlayer.getTension(enemyPlayer).getValue();
@@ -2466,27 +2469,28 @@ public final class InGameController extends Controller {
      * Set current stop of a unit to the next valid stop if any.
      *
      * @param serverPlayer The <code>ServerPlayer</code> the unit belongs to.
-     * @param unit The <code>Unit</code> to update.
+     * @param unit The <code>ServerUnit</code> to update.
      * @return An <code>Element</code> encapsulating this action.
      */
-    public Element updateCurrentStop(ServerPlayer serverPlayer, Unit unit) {
+    public Element updateCurrentStop(ServerPlayer serverPlayer,
+                                     ServerUnit serverUnit) {
         // Check if there is a valid current stop?
-        int current = unit.validateCurrentStop();
+        int current = serverUnit.validateCurrentStop();
         if (current < 0) { // No valid stop
-            unit.setTradeRoute(null);
-            return new ChangeSet().add(See.only(serverPlayer), unit)
+            serverUnit.setTradeRoute(null);
+            return new ChangeSet().add(See.only(serverPlayer), serverUnit)
                 .build(serverPlayer);
         }
 
-        List<TradeRouteStop> stops = unit.getTradeRoute().getStops();
+        List<TradeRouteStop> stops = serverUnit.getTradeRoute().getStops();
         int next = current;
         for (;;) {
             if (++next >= stops.size()) next = 0;
             if (next == current) return null; // No work at any stop, stay put.
             TradeRouteStop nextStop = stops.get(next);
-            boolean work = ((ServerUnit)unit).hasWorkAtStop(nextStop);
-            logger.finest("Unit " + unit
-                + " in trade route " + unit.getTradeRoute().getName()
+            boolean work = serverUnit.hasWorkAtStop(nextStop);
+            logger.finest("Unit " + serverUnit
+                + " in trade route " + serverUnit.getTradeRoute().getName()
                 + " found" + ((work) ? "" : " no")
                 + " work at: " + (FreeColGameObject)nextStop.getLocation());
             if (work) break;
@@ -2495,10 +2499,10 @@ public final class InGameController extends Controller {
         // Next is the updated stop.
         // Could do just a partial update of currentStop if we did not
         // also need to set the unit destination.
-        unit.setCurrentStop(next);
+        serverUnit.setCurrentStop(next);
 
         // Others can not see a stop change.
-        return new ChangeSet().add(See.only(serverPlayer), unit)
+        return new ChangeSet().add(See.only(serverPlayer), serverUnit)
             .build(serverPlayer);
     }
 
@@ -2508,13 +2512,13 @@ public final class InGameController extends Controller {
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is buying.
      * @param unit The <code>Unit</code> that will carry the goods.
-     * @param settlement The <code>IndianSettlement</code> to buy from.
+     * @param settlement The <code>ServerIndianSettlement</code> to buy from.
      * @param goods The <code>Goods</code> to buy.
      * @param amount How much gold to pay.
      * @return An <code>Element</code> encapsulating this action.
      */
     public Element buyFromSettlement(ServerPlayer serverPlayer, Unit unit,
-                                     IndianSettlement settlement,
+                                     ServerIndianSettlement settlement,
                                      Goods goods, int amount) {
         ChangeSet cs = new ChangeSet();
         csVisit(serverPlayer, settlement, 0, cs);
@@ -2550,8 +2554,7 @@ public final class InGameController extends Controller {
         settlement.updateWantedGoods();
         settlementPlayer.modifyGold(amount);
         serverPlayer.modifyGold(-amount);
-        ((ServerIndianSettlement)settlement).csModifyAlarm(serverPlayer,
-            -amount / 50, true, cs);
+        settlement.csModifyAlarm(serverPlayer, -amount / 50, true, cs);
         tile.updateIndianSettlement(serverPlayer);
         cs.add(See.only(serverPlayer), tile);
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
@@ -2569,13 +2572,13 @@ public final class InGameController extends Controller {
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is selling.
      * @param unit The <code>Unit</code> carrying the goods.
-     * @param settlement The <code>IndianSettlement</code> to sell to.
+     * @param settlement The <code>ServerIndianSettlement</code> to sell to.
      * @param goods The <code>Goods</code> to sell.
      * @param amount How much gold to expect.
      * @return An <code>Element</code> encapsulating this action.
      */
     public Element sellToSettlement(ServerPlayer serverPlayer, Unit unit,
-                                    IndianSettlement settlement,
+                                    ServerIndianSettlement settlement,
                                     Goods goods, int amount) {
         ChangeSet cs = new ChangeSet();
         csVisit(serverPlayer, settlement, 0, cs);
@@ -2603,8 +2606,7 @@ public final class InGameController extends Controller {
         Player settlementPlayer = settlement.getOwner();
         settlementPlayer.modifyGold(-amount);
         serverPlayer.modifyGold(amount);
-        ((ServerIndianSettlement)settlement).csModifyAlarm(serverPlayer,
-            -amount / 500, true, cs);
+        settlement.csModifyAlarm(serverPlayer, -amount / 500, true, cs);
         Tile tile = settlement.getTile();
         settlement.updateWantedGoods();
         tile.updateIndianSettlement(serverPlayer);
@@ -2646,12 +2648,12 @@ public final class InGameController extends Controller {
         Tile tile = settlement.getTile();
         moveGoods(goods, settlement);
         cs.add(See.perhaps(), unit);
-        if (settlement instanceof IndianSettlement) {
-            IndianSettlement is = (IndianSettlement) settlement;
-            csVisit(serverPlayer, is, 0, cs);
-            ((ServerIndianSettlement)is).csModifyAlarm(serverPlayer,
-                -is.getPriceToBuy(goods) / 50, true, cs);
-            is.updateWantedGoods();
+        if (settlement instanceof ServerIndianSettlement) {
+            ServerIndianSettlement sis = (ServerIndianSettlement)settlement;
+            csVisit(serverPlayer, sis, 0, cs);
+            sis.csModifyAlarm(serverPlayer, -sis.getPriceToBuy(goods) / 50,
+                              true, cs);
+            sis.updateWantedGoods();
             tile.updateIndianSettlement(serverPlayer);
             cs.add(See.only(serverPlayer), tile);
         }

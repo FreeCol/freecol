@@ -27,6 +27,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.model.ServerIndianSettlement;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -115,14 +116,16 @@ public class InciteMessage extends DOMMessage {
             return DOMMessage.clientError(e.getMessage());
         }
 
-        IndianSettlement is = tile.getIndianSettlement();
+        ServerIndianSettlement is
+            = (ServerIndianSettlement)tile.getIndianSettlement();
         if (is == null) {
             return DOMMessage.clientError("There is no native settlement at: "
                 + tile.getId());
         }
 
         MoveType type;
-        Player enemy = game.getFreeColGameObject(enemyId, Player.class);
+        ServerPlayer enemy = game.getFreeColGameObject(enemyId,
+            ServerPlayer.class);
         if (enemy == null) {
             return DOMMessage.clientError("Not a player: " + enemyId);
         } else if (enemy == player) {
