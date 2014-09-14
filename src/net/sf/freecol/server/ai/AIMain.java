@@ -39,6 +39,7 @@ import net.sf.freecol.common.model.FreeColGameObjectListener;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.FreeColServer;
@@ -443,6 +444,16 @@ public class AIMain extends FreeColObject
             ao.dispose();
             setFreeColGameObject(source.getId(), source);
         }
+    }
+
+
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    public Specification getSpecification() {
+        return getGame().getSpecification();
     }
 
 

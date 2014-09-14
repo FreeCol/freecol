@@ -437,7 +437,7 @@ public class NativeAIPlayer extends AIPlayer {
     private void giveNormalMissions(LogBuilder lb) {
         final AIMain aiMain = getAIMain();
         final Player player = getPlayer();
-        final Specification spec = aiMain.getGame().getSpecification();
+        final Specification spec = getSpecification();
         final int turnNumber = getGame().getTurn().getNumber();
         final List<AbstractGoods> scoutEq = spec.getRole("model.role.mountedBrave")
             .getRequiredGoods();
@@ -530,7 +530,7 @@ public class NativeAIPlayer extends AIPlayer {
     private void bringGifts(int[] randoms, LogBuilder lb) {
         final Player player = getPlayer();
         final CostDecider cd = CostDeciders.numberOfLegalTiles();
-        final int giftProbability = getGame().getSpecification()
+        final int giftProbability = getSpecification()
             .getInteger(GameOptions.GIFT_PROBABILITY);
         int randomIdx = 0;
         lb.mark();
@@ -632,7 +632,7 @@ public class NativeAIPlayer extends AIPlayer {
     private void demandTribute(int[] randoms, LogBuilder lb) {
         final Player player = getPlayer();
         final CostDecider cd = CostDeciders.numberOfLegalTiles();
-        final int demandProbability = getGame().getSpecification()
+        final int demandProbability = getSpecification()
             .getInteger(GameOptions.DEMAND_PROBABILITY);
         int randomIdx = 0;
         lb.mark();

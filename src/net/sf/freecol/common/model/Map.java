@@ -1174,8 +1174,8 @@ public class Map extends FreeColGameObject implements Location {
                         ", ", ((Tile)realEnd), ", ", carrier, ")\n");
                     l2.addStackTrace();
                     l2.add(p.fullPathToString());
-                    path = findMapPath(unit, tile, (Tile)realEnd,
-                                       carrier, costDecider, l2);
+                    findMapPath(unit, tile, (Tile)realEnd,
+                                carrier, costDecider, l2);
                     l2.log(logger, Level.WARNING);
                 }
                 path = null;

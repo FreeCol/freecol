@@ -131,15 +131,6 @@ public abstract class AIObject extends FreeColObject {
     }
 
     /**
-     * Convenience accessor for the specification.
-     *
-     * @return The <code>Specification</code>.
-     */
-    public final Specification getSpecification() {
-        return getGame().getSpecification();
-    }
-
-    /**
      * Checks if this <code>AIObject</code>
      * is uninitialized. That is: it has been referenced
      * by another object, but has not yet been updated with
@@ -189,6 +180,17 @@ public abstract class AIObject extends FreeColObject {
         return (loc == null) ? null
             : (loc.getSettlement() != null) ? loc.getSettlement()
             : loc;
+    }
+
+
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final Specification getSpecification() {
+        return getGame().getSpecification();
     }
 
 

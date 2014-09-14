@@ -389,8 +389,6 @@ public class ColonyPlan {
      * colony.
      */
     public void update() {
-        UnitType defaultUnitType = spec().getDefaultUnitType();
-
         // Update the profile type.
         profileType = ProfileType
             .getProfileTypeFromSize(colony.getUnitCount());
@@ -1086,7 +1084,7 @@ public class ColonyPlan {
      * @param workers A list of potential <code>Unit</code>s to try.
      * @return The best worker for the job.
      */
-    static public Unit getBestWorker(WorkLocation wl, GoodsType goodsType,
+    public static Unit getBestWorker(WorkLocation wl, GoodsType goodsType,
                                      List<Unit> workers) {
         if (workers == null || workers.isEmpty()) return null;
         final Colony colony = wl.getColony();
@@ -1226,9 +1224,6 @@ public class ColonyPlan {
     public Colony assignWorkers(List<Unit> workers, boolean preferScout,
                                 LogBuilder lb) {
         final GoodsType foodType = spec().getPrimaryFoodType();
-        final int maxUnitFood = colony.getOwner().getMaximumFoodConsumption();
-        final String name = colony.getName();
-        final Turn turn = aiMain.getGame().getTurn();
 
         // Collect the work location plans.  Note that the plans are
         // pre-sorted in order of desirability.

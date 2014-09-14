@@ -427,7 +427,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             List<BuildableType> queue = new ArrayList<BuildableType>();
             if (newBuild != null) queue.add(newBuild);
             AIMessage.askSetBuildQueue(this, queue);
-            build = colony.getCurrentlyBuilding();
             nextRearrange = 1;
         }
 
