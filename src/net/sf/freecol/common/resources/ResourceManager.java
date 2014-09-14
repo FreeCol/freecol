@@ -42,22 +42,22 @@ public class ResourceManager {
 
     private static final Logger logger = Logger.getLogger(ResourceManager.class.getName());
 
-    /*
-     * The following fields are mappings from resource IDs
-     * to resources. A mapping is defined within a specific
-     * context. See the comment on each field's setter for
-     * more information:
+    /**
+     * The following fields are mappings from resource IDs to
+     * resources.  A mapping is defined within a specific context.
+     * See the comment on each field's setter for more information:
      */
     private static ResourceMapping baseMapping;
     private static ResourceMapping tcMapping;
     private static ResourceMapping campaignMapping;
     private static ResourceMapping scenarioMapping;
     private static ResourceMapping gameMapping;
-    private static List<ResourceMapping> modMappings = new LinkedList<ResourceMapping>();
+    private static List<ResourceMapping> modMappings
+        = new LinkedList<ResourceMapping>();
 
-    /*
-     * All the mappings above merged into this single
-     * ResourceMapping according to precendence.
+    /**
+     * All the mappings above merged into this single ResourceMapping
+     * according to precendence.
      */
     private static ResourceMapping mergedContainer;
 
@@ -69,7 +69,8 @@ public class ResourceManager {
 
 
     /**
-     * Sets the mappings specified in the date/base-directory
+     * Sets the mappings specified in the date/base-directory.
+     *
      * @param _baseMapping The mapping between IDs and files.
      */
     public static void setBaseMapping(final ResourceMapping _baseMapping) {
@@ -79,6 +80,7 @@ public class ResourceManager {
 
     /**
      * Sets the mappings specified for a Total Conversion (TC).
+     *
      * @param _tcMapping The mapping between IDs and files.
      */
     public static void setTcMapping(final ResourceMapping _tcMapping) {
@@ -88,7 +90,8 @@ public class ResourceManager {
 
     /**
      * Sets the mappings specified by mods.
-     * @param _modMappings A list of the mapping between IDs and files.
+     *
+     * @param modMappings A list of the mapping between IDs and files.
      */
     public static void setModMappings(final List<ResourceMapping> _modMappings) {
         modMappings = _modMappings;
@@ -97,6 +100,7 @@ public class ResourceManager {
 
     /**
      * Sets the mappings specified in a campaign.
+     *
      * @param _campaignMapping The mapping between IDs and files.
      */
     public static void setCampaignMapping(final ResourceMapping _campaignMapping) {
@@ -106,6 +110,7 @@ public class ResourceManager {
 
     /**
      * Sets the mappings specified in a scenario.
+     *
      * @param _scenarioMapping The mapping between IDs and files.
      */
     public static void setScenarioMapping(final ResourceMapping _scenarioMapping) {
@@ -126,9 +131,9 @@ public class ResourceManager {
     /**
      * Add more mappings to the game mapping.
      *
-     * @param mapping The <code>ResourceMapping</code> to add.
+     * @param _mapping The <code>ResourceMapping</code> to add.
      */
-    public static void addGameMapping(final ResourceMapping mapping) {
+    public static synchronized void addGameMapping(final ResourceMapping mapping) {
         if (gameMapping == null) gameMapping = new ResourceMapping();
         gameMapping.addAll(mapping);
         dirty = true;
@@ -140,10 +145,10 @@ public class ResourceManager {
      * @param key The key.
      * @param resource The resource to add.
      */
-    public static void addGameMapping(String key, Resource resource) {
+    public static synchronized void addGameMapping(String key, Resource resource) {
         if (gameMapping == null) gameMapping = new ResourceMapping();
         gameMapping.add(key, resource);
-        mergedContainer.add(key, resource);
+        if (!dirty) mergedContainer.add(key, resource);
     }
 
     /**
@@ -170,11 +175,12 @@ public class ResourceManager {
         }
         if (lastWindowSize == null) return; // Wait for initial preload.
 
-        preloadThread = new Thread(FreeCol.CLIENT_THREAD+"Resource loader") {
+        preloadThread = new Thread(FreeCol.CLIENT_THREAD
+            + "-Resource loader") {
                 public void run() {
                     // Make a local copy of the resources to load.
                     List<Resource> resources
-                        = new LinkedList<Resource>(mergedContainer.getResources().values());
+                        = new LinkedList<Resource>(getResources().values());
                     int n = 0;
                     for (Resource r : resources) {
                         if (preloadThread != this) return; // Cancelled!
@@ -201,10 +207,32 @@ public class ResourceManager {
         }
     }
 
+    public static synchronized boolean hasResource(final String resourceId) {
+        return mergedContainer.containsKey(resourceId);
+    }
+
+    private static synchronized Resource getResource(final String resourceId) {
+        return mergedContainer.get(resourceId);
+    }
+
+    public static synchronized Map<String, Resource> getResources() {
+        return mergedContainer.getResources();
+    }
+
+    /**
+     * Returns a list of all keys starting with the given prefix.
+     *
+     * @param prefix the prefix
+     * @return a list of all keys starting with the given prefix
+     */
+    public static synchronized List<String> getKeys(String prefix) {
+        return mergedContainer.getKeys(prefix);
+    }
+
     /**
      * Creates a merged container containing all the resources.
      */
-    private static void createMergedContainer() {
+    private static synchronized void createMergedContainer() {
         ResourceMapping mc = new ResourceMapping();
         mc.addAll(baseMapping);
         mc.addAll(tcMapping);
@@ -227,7 +255,7 @@ public class ResourceManager {
     public static <T> T getResource(final String resourceId,
                                     final Class<T> type) {
         updateIfDirty();
-        final Resource r = mergedContainer.get(resourceId);
+        final Resource r = getResource(resourceId);
         if (r == null) { // Log only unexpected failures
             if (!resourceId.startsWith("dynamic.")) {
                 logger.finest("getResource(" + resourceId
@@ -243,26 +271,6 @@ public class ResourceManager {
         }
         return type.cast(r);
     }
-
-    public static boolean hasResource(final String resourceId) {
-        return mergedContainer.containsKey(resourceId);
-    }
-
-    public static Map<String, Resource> getResources() {
-        return mergedContainer.getResources();
-    }
-
-
-    /**
-     * Returns a list of all keys starting with the given prefix.
-     *
-     * @param prefix the prefix
-     * @return a list of all keys starting with the given prefix
-     */
-    public static List<String> getKeys(String prefix) {
-        return mergedContainer.getKeys(prefix);
-    }
-
 
     /**
      * Returns the animation specified by the given name.
