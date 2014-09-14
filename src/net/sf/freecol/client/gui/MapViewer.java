@@ -1685,9 +1685,12 @@ public final class MapViewer {
         g2.setColor(lib.getForegroundColor(backgroundColor));
         int offset = 0;
         for (i = 0; i < labels.length; i++) {
-            if (i > 0) offset += labels[i - 1].getAscent() + linePadding + vPadding/2;
-            labels[i].draw(g2, (float) (width - labels[i].getBounds().getWidth())/2,
-                           offset + labels[i].getAscent() + vPadding/2);
+            if (i > 0) {
+                offset += labels[i - 1].getAscent() + linePadding + vPadding/2;
+            }
+            float x = (width - (float)labels[i].getBounds().getWidth()) / 2.0f;
+            float y = labels[i].getAscent() + offset + vPadding/2;
+            labels[i].draw(g2, x, y);
         }
         return bi;
     }
@@ -3311,7 +3314,7 @@ public final class MapViewer {
 
 
         borderStroke = new BasicStroke(dy);
-        roadStroke = new BasicStroke(dy/2);
+        roadStroke = new BasicStroke(dy / 2.0f);
         gridStroke = new BasicStroke(lib.getScalingFactor());
 
         fog.reset();

@@ -320,16 +320,17 @@ public class Building extends WorkLocation
             for (AbstractGoods output : getOutputs()) {
                 double production = output.getAmount() * minimumRatio;
                 if (production <= 0) continue;
-                int amountPresent = getAvailable(output.getType(), outputs);
+                double headroom = (double)capacity
+                    - getAvailable(output.getType(), outputs);
                 // Clamp production at warehouse capacity
-                if (production + amountPresent > capacity) {
+                if (production > headroom) {
                     minimumRatio = Math.min(minimumRatio,
-                        (capacity - amountPresent) / output.getAmount());
+                        headroom / output.getAmount());
                 }
                 production = output.getAmount() * maximumRatio;
-                if (production + amountPresent > capacity) {
+                if (production > headroom) {
                     maximumRatio = Math.min(maximumRatio, 
-                        (capacity - amountPresent) / output.getAmount());
+                        headroom / output.getAmount());
                 }
             }
         }

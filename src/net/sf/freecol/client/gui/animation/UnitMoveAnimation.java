@@ -88,7 +88,7 @@ final class UnitMoveAnimation {
                     final Point dstPoint
                         = gui.getMapViewer().getUnitLabelPositionInTile(unitLabel, dstP);
                     final double xratio = gui.getMapViewer().getTileWidth()
-                        / gui.getMapViewer().getTileHeight();
+                        / (double)gui.getMapViewer().getTileHeight();
                     final int stepX = (srcPoint.getX() == dstPoint.getX()) ? 0
                         : (srcPoint.getX() > dstPoint.getX()) ? -1 : 1;
                     final int stepY = (srcPoint.getY() == dstPoint.getY()) ? 0

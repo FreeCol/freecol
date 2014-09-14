@@ -307,7 +307,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         // Row per row; start with the top modified row
         for (int row = firstRow; row <= lastRow; row++) {
             rowTransform = g.getTransform();
-            if (row % 2 == 1) {
+            if ((row & 1) == 1) {
                 g.translate(halfWidth, 0);
             }
 
