@@ -545,8 +545,8 @@ public abstract class Mission extends AIObject {
         if (path != null && path.next != null) {
             Tile tile = path.next.getTile();
             Settlement settlement = tile.getSettlement();
-            Unit defender = tile.getDefendingUnit(unit);
-            Location blocker = (settlement != null) ? settlement : unit;
+            Location blocker = (settlement != null) ? settlement
+                : tile.getDefendingUnit(unit);
             if (UnitSeekAndDestroyMission.invalidReason(aiUnit, blocker)
                 == null) return blocker;
         }
