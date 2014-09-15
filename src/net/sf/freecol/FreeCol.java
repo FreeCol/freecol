@@ -775,6 +775,31 @@ public final class FreeCol {
         System.exit(status);
     }
 
+    /**
+     * Get the specification from the specified TC.
+     *
+     * @return A <code>Specification</code>.  Quits on error.
+     */
+    private static Specification getTCSpecification() {
+        Specification spec;
+        try {
+            FreeColTcFile tcf = FreeCol.getTCFile();
+            if (tcf == null) {
+                spec = null;
+            } else {
+                spec = tcf.getSpecification();
+                spec.applyDifficultyLevel(FreeCol.getDifficulty());
+            }
+        } catch (IOException ioe) {
+            spec = null;
+        }
+        if (spec == null) {
+            fatal(StringTemplate.template("cli.error.badTC")
+                .addName("%tc%", getTC()));
+        }
+        return spec;
+    }
+
 
     // Accessors, mutators and support for the cli variables.
 
@@ -1096,14 +1121,14 @@ public final class FreeCol {
         Specification spec = null;
         File savegame = FreeColDirectories.getSavegameFile();
         if (debugStart) {
-            spec = getSpecification();
+            spec = FreeCol.getTCSpecification();
         } else if (fastStart) {
             if (savegame == null) {
                 // continue last saved game if possible,
                 // otherwise start a new one
                 savegame = FreeColDirectories.getLastSaveGameFile();
                 if (savegame == null) {
-                    spec = getSpecification();
+                    spec = FreeCol.getTCSpecification();
                 }
             }
             // savegame was specified on command line
@@ -1111,20 +1136,6 @@ public final class FreeCol {
         new FreeColClient(savegame, windowSize,
                           sound, splashFilename, introVideo, fontName,
                           userMsg, spec);
-    }
-
-    private static Specification getSpecification() {
-        Specification spec = null;
-        try {
-            FreeColTcFile tcf = getTCFile();
-            if (tcf == null) {
-                fatal(StringTemplate.template("cli.error.badTC")
-                      .addName("%tc%", getTC()));
-            }
-            spec = tcf.getSpecification();
-            spec.applyDifficultyLevel(FreeCol.getDifficulty());
-        } catch (IOException ioe) {}
-        return spec;
     }
 
     /**
@@ -1154,15 +1165,10 @@ public final class FreeCol {
                 return;
             }
         } else {
-            FreeColTcFile tcf = FreeCol.getTCFile();
-            if (tcf == null) {
-                fatal(StringTemplate.template("cli.error.badTC")
-                    .addName("%tc%", tc));
-            }
+            Specification spec = FreeCol.getTCSpecification();
             try {
                 // TODO: command line advantages setting?
-                freeColServer = new FreeColServer(publicServer, false,
-                                                  tcf.getSpecification(),
+                freeColServer = new FreeColServer(publicServer, false, spec,
                                                   serverPort, serverName);
             } catch (NoRouteToServerException nrtse) {
                 fatal(Messages.message("server.noRouteToServer"));

@@ -216,7 +216,6 @@ public final class FreeColClient {
         this.inGameController = new InGameController(this);
         this.inGameInputHandler = new InGameInputHandler(this);
         this.mapEditorController = new MapEditorController(this);
-        this.actionManager = new ActionManager(this);
         this.worker = new Worker();
         this.worker.start();
 
@@ -238,6 +237,7 @@ public final class FreeColClient {
         } catch (IOException e) {
             fatal(Messages.message("client.classic") + "\n" + e.getMessage());
         }
+        this.actionManager = new ActionManager(this);
         actionManager.initializeActions(inGameController, connectController);
 
         // Load the client options, which handle reloading the

@@ -422,7 +422,6 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
      * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent event) {
-        final Specification spec = getSpecification();
         final ConnectController connectController
             = getFreeColClient().getConnectController();
         String command = event.getActionCommand();
@@ -433,6 +432,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
             FreeCol.setName(name.getText());
             FreeCol.setTC(getTC().getId());
             FreeCol.setAdvantages(getAdvantages());
+            Specification spec = getSpecification();
             if (getAdvantages() == Advantages.NONE) {
                 spec.clearEuropeanNationalAdvantages();
             }
@@ -442,8 +442,8 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
             case SINGLE:
                 spec.applyDifficultyLevel(level);
                 // Launch!
-                if (connectController.startSinglePlayerGame(spec,
-                        false)) return;
+                if (connectController.startSinglePlayerGame(spec, false))
+                    return;
                 break;
             case JOIN:
                 try {
@@ -483,7 +483,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
             getGUI().showMainPanel(null);
             break;
         case SHOW_DIFFICULTY:
-            getGUI().showDifficultyDialog(spec, level);
+            getGUI().showDifficultyDialog(getSpecification(), level);
             break;
         case SINGLE: case JOIN: case START: case META_SERVER:
             enableComponents();
