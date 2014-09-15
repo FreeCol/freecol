@@ -441,6 +441,12 @@ public class BuildColonyMission extends Mission {
                 return lbFail(lb, false, "bogus target ", getTarget());
             }
             Tile tile = (Tile)getTarget();
+            // Check that the unit has moves left, which are required
+            // for building.
+            if (unit.getMovesLeft() <= 0) {
+                return lbWait(lb, ", waiting to build at ", tile);
+            }
+
             if (tile.getOwner() == null) {
                 ; // All is well
             } else if (player.owns(tile)) { // Already ours, clear users
@@ -471,12 +477,6 @@ public class BuildColonyMission extends Mission {
                 }
                 if (fail) return retargetMission("tile-claim-at-" + tile, lb);
                 lb.add(", claimed colony tile");
-            }
-
-            // Check that the unit has moves left, which are required
-            // for building.
-            if (unit.getMovesLeft() <= 0) {
-                return lbWait(lb, ", waiting to build at ", tile);
             }
 
             // Log the colony values so we can improve things
