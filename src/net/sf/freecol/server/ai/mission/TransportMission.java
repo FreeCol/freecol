@@ -556,9 +556,13 @@ public class TransportMission extends Mission {
                 cargo = null;
             }
         }
-        if (reason == null) return cargo;
-        lb.add(", failed to make cargo for ", t, " (", reason, ")");
-        return null;
+        if (reason == null) {
+            lb.add(", made ", cargo.toShortString());
+            return cargo;
+        } else {
+            lb.add(", failed to make cargo for ", t, " (", reason, ")");
+            return null;
+        }
     }
 
     /**

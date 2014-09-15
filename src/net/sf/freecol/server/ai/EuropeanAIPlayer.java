@@ -797,7 +797,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 }
             }
             if (best != null) {
-                lb.add(best.getUnit(), " chosen");
+                lb.add(" ", best.getUnit(), " chosen");
                 if (best.queueTransportable(t, false, lb)) {
                     claimTransportable(t);
                     if (best.destinationCapacity() <= 0) {
