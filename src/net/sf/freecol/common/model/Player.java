@@ -3299,6 +3299,8 @@ public class Player extends FreeColGameObject implements Nameable {
         return (!tile.getType().canSettle()) ? NoClaimReason.TERRAIN
             : ((reason = canClaimForSettlementReason(tile))
                != NoClaimReason.NATIVES) ? reason
+            : (!tile.getAdjacentSettlements()
+                .isEmpty()) ? NoClaimReason.SETTLEMENT
             : (canClaimFreeCenterTile(tile)) ? NoClaimReason.NONE
             : NoClaimReason.NATIVES;
     }

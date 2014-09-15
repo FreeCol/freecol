@@ -1157,6 +1157,19 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         return n;
     }
 
+    /**
+     * Get the adjacent settlements.
+     *
+     * @return A list of adjacent <code>Settlement</code>.
+     */
+    public List<Settlement> getAdjacentSettlements() {
+        List<Settlement> result = new ArrayList<Settlement>();
+        for (Tile t : getSurroundingTiles(1)) {
+            Settlement s = t.getSettlement();
+            if (s != null) result.add(s);
+        }
+        return result;
+    }
 
     /**
      * Finds the nearest settlement to this tile.

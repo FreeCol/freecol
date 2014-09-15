@@ -371,7 +371,7 @@ public class ColonyTest extends FreeColTestCase {
         assertFalse("Europeans can not own tile with an LCR on it",
                     dutch.canOwnTile(lcrTile));
         assertTrue("Natives can own tile with an LCR on it",
-                    indianPlayer.canOwnTile(campTile));
+                   indianPlayer.canOwnTile(campTile));
         assertTrue("Europeans can own water tile",
                    dutch.canOwnTile(waterTile));
         assertFalse("Natives can not own water tile",
@@ -398,9 +398,14 @@ public class ColonyTest extends FreeColTestCase {
         assertEquals("Can not found on European tile",
                      NoClaimReason.EUROPEANS,
                      dutch.canClaimToFoundSettlementReason(frenchTile));
-        assertEquals("Can not found on native tile",
-                     NoClaimReason.NATIVES,
+        assertEquals("Can not found on native settlement tile",
+                     NoClaimReason.SETTLEMENT,
                      dutch.canClaimToFoundSettlementReason(nativeTile));
+        landTile.setOwner(indianPlayer);
+        assertEquals("Can not found on loose native tile",
+                     NoClaimReason.NATIVES,
+                     dutch.canClaimToFoundSettlementReason(landTile));
+        landTile.setOwner(null);
 
         assertEquals("Can use land",
                      NoClaimReason.NONE,
