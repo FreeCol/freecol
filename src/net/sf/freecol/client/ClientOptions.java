@@ -23,6 +23,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,6 +31,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColModFile;
@@ -57,7 +60,7 @@ import javax.xml.stream.events.XMLEvent;
 
 /**
  * Defines how available client options are displayed on the Setting
- * dialog from File>Preferences Also contains several Comparators used
+ * dialog from File/Preferences Also contains several Comparators used
  * for display purposes.
  *
  * Most available client options and their default values are defined
@@ -633,6 +636,7 @@ public class ClientOptions extends OptionGroup {
      */
     public ClientOptions() {
         super(getXMLElementTagName());
+
         addDefaultOptions();
     }
 
@@ -668,34 +672,56 @@ public class ClientOptions extends OptionGroup {
      * Loads the options from the given file.
      *
      * @param optionsFile The <code>File</code> to read the options from.
+     * @return True if the options were loaded without error.
      */
-    public void loadOptions(File optionsFile) {
+    public boolean loadOptions(File optionsFile) {
+        boolean ret = false;
+        FileInputStream fis = null;
         try {
-            loadOptions(new BufferedInputStream(new FileInputStream(optionsFile)));
-        } catch (FileNotFoundException e) {
-            logger.warning("Could not find the client options file: "
-                + optionsFile.getPath());
+            fis = new FileInputStream(optionsFile);
+            try {
+                ret = loadOptions(new BufferedInputStream(fis));
+            } catch (IOException ioe) {
+                logger.log(Level.WARNING, "Error reading client options file: "
+                    + optionsFile.getPath(), ioe);
+            } catch (XMLStreamException xse) {
+                logger.log(Level.WARNING, "Error reading client options file: "
+                    + optionsFile.getPath(), xse);
+            }
+        } catch (FileNotFoundException fnfe) {
+            logger.log(Level.WARNING, "Client options file not found: "
+                + optionsFile.getPath(), fnfe);
+        } finally {
+            try { if (fis != null) fis.close(); } catch (IOException ioe) {
+                logger.log(Level.WARNING, "Failed to close stream.", ioe);
+            }
         }
+        return ret;
     }
 
     /**
      * Loads the options from the given stream.
      *
      * @param in The <code>InputStream</code> to read the options from.
+     * @return True if the options were loaded without error.
+     * @exception IOException if there is a problem opening a
+     *     <code>FreeColXMLStreamReader</code>.
+     * @exception XMLStreamException if there is problem reading the stream.
      */
-    public void loadOptions(InputStream in) {
-        if (in == null) return;
-        FreeColXMLReader xr = null;
-        try {
-            xr = new FreeColXMLReader(in);
-            xr.nextTag();
-            readFromXML(xr);
-
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Exception when loading options.", e);
-        } finally {
-            if (xr != null) xr.close();
+    public boolean loadOptions(InputStream in)
+        throws IOException, XMLStreamException {
+        if (in != null) {
+            FreeColXMLReader xr = null;
+            try {
+                xr = new FreeColXMLReader(in);
+                xr.nextTag();
+                readFromXML(xr);
+                return true;
+            } finally {
+                if (xr != null) xr.close();
+            }
         }
+        return false;
     }
 
     /**
