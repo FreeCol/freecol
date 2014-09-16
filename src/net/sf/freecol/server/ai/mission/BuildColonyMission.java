@@ -110,18 +110,6 @@ public class BuildColonyMission extends Mission {
      */
     private int getColonyValue(Tile tile) {
         final Player owner = getAIUnit().getUnit().getOwner();
-        /*
-        // Track down errant colony tile valuation
-        LogBuilder lb = new LogBuilder(64);
-        lb.add(owner.getNation().getSuffix(), " checks ", tile, ":");
-        double result = 1.0;
-        for (Double v : owner.getAllColonyValues((Tile)target)) {
-            lb.add(" ", v);
-            result *= v;
-        }
-        lb.add(" = ", (int)Math.round(result));
-        logger.finest(lb.toString());
-        */
         return owner.getColonyValue(tile);
     }
 
@@ -158,8 +146,8 @@ public class BuildColonyMission extends Mission {
 
         final Tile tile = (Tile)loc;
         final Player player = aiUnit.getUnit().getOwner();
-        int turns = path.getTotalTurns() + 1;
-        return (float)player.getColonyValue(tile) / turns;
+        float turns = path.getTotalTurns() + 1.0f;
+        return player.getColonyValue(tile) / turns;
     }
 
     /**
@@ -378,6 +366,10 @@ public class BuildColonyMission extends Mission {
             if (target instanceof Tile
                 && (c = ((Tile)target).getColony()) != null
                 && player.owns(c)) {
+                // Favour improving colony center.
+                Mission m = euaip.getPioneeringMission(aiUnit, c.getTile());
+                if (m != null) return lbDone(lb, true, "improving with ", m);
+                // Just go to the colony.
                 setTarget(c);
                 return lbRetarget(lb);
             }
@@ -420,21 +412,46 @@ public class BuildColonyMission extends Mission {
                 // another building site, unless the existing one is small
                 // or nothing is found.
                 Colony colony = (Colony)getTarget();
-                String name = colony.getName();
+
+                // Improve colony center?
+                Mission m
+                    = euaip.getPioneeringMission(aiUnit, colony.getTile());
+                if (m != null) return lbDone(lb, true, "improving with ", m);
+
+                // Colony too small?
+                if (colony.getUnitCount() <= 1) {
+                    setTarget(colony);
+                    return lbDone(lb, false, "join small colony");
+                }
+
+                // Find a real tile target?
                 Location newTarget;
-                if (colony.getUnitCount() <= 1
-                    || (newTarget = findTarget(aiUnit, 5, false)) == null) {
-                    // Favour improving colony center?
-                    Mission m
-                        = euaip.getPioneeringMission(aiUnit, colony.getTile());
-                    if (m == null) {
-                        return lbDone(lb, false, "joining");
-                    } else {
-                        return lbDone(lb, true, "improving with ", m);
+                if ((newTarget = findTarget(aiUnit, 5, false)) != null) {
+                    setTarget(newTarget);
+                    return lbRetarget(lb);
+                }
+
+                // Go to the nearest smaller colony?
+                Colony best = null;
+                int bestValue = INFINITY;
+                for (Colony c : player.getColonies()) {
+                    if (c == colony) continue;
+                    if (c.getUnitCount() < colony.getUnitCount()) continue;
+                    PathNode path = unit.findPath(c);
+                    if (path != null && path.getTotalTurns() < bestValue) {
+                        bestValue = path.getTotalTurns();
+                        best = c;
                     }
                 }
-                setTarget(newTarget);
-                return lbRetarget(lb);
+                if (best != null) {
+                    lb.add(", going to smaller ", best.getUnitCount(), "<",
+                        colony.getUnitCount(), " colony");
+                    setTarget(best);
+                    return lbRetarget(lb);
+                }
+
+                // Just join up then.
+                return lbDone(lb, false, "joining");
             }
 
             if (!(getTarget() instanceof Tile)) {
