@@ -756,10 +756,6 @@ public class TransportMission extends Mission {
                 // Just remove, it is invalid
                 removeCargo(cargo);
                 lb.add(", INVALID(", reason, ") ", cargo.toShortString());
-            } else if (cargo.isCollectable()) {
-                lb.add(", collect ", cargo.toShortString());
-            } else if (cargo.isDeliverable()) {
-                lb.add(", deliver ", cargo.toShortString());
             } else if (cargo.isDelivered()) {
                 removeCargo(cargo);
                 lb.add(", COMPLETED ", cargo.toShortString());
@@ -775,11 +771,14 @@ public class TransportMission extends Mission {
                 } else {
                     dump = true;
                 }
+            } else if (cargo.isCollectable()) {
+                lb.add(", collect ", cargo.toShortString());
+            } else if (cargo.isDeliverable()) {
+                lb.add(", deliver ", cargo.toShortString());
             } else {
                 lb.add(", ok ", cargo.toShortString()); // Good
                 cargo.resetTries();
             }
-
             if (dump) {
                 if (cargo.isCarried()) {
                     dumpCargo(cargo, lb); // FIXME: can fail
