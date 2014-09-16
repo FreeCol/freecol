@@ -937,15 +937,25 @@ public class TransportMission extends Mission {
                 return CargoResult.TCONTINUE;
             }
             if ((d = cargo.getLeaveDirection()) == null) {
-                PathNode path = t.getDeliveryPath(carrier, cargo.getTransportTarget());
-                logger.warning("Null dropoff direction"
-                    + " for " + cargo.toShortString()
-                    + " at " + t.getLocation().toShortString()
-                    + "/" + carrier.getLocation().toShortString()
-                    + " to " + cargo.getTransportTarget()
-                    + " mov=" + ((AIUnit)t).getUnit().getSimpleMoveType(t.getLocation().getTile(), cargo.getTransportTarget().getTile())
-                    + " path=" + ((path == null) ? "null" : path.fullPathToString()));
-                return CargoResult.TFAIL;
+                Unit.MoveType mt = ((AIUnit)t).getUnit()
+                    .getSimpleMoveType(t.getLocation().getTile(),
+                                       cargo.getTransportTarget().getTile());
+                switch (mt) {
+                case MOVE_NO_ATTACK_CIVILIAN:
+                    return CargoResult.TRETRY;
+                default:
+                    PathNode path = t.getDeliveryPath(carrier,
+                        cargo.getTransportTarget());
+                    logger.warning("Null dropoff direction"
+                        + " for " + cargo.toShortString()
+                        + " at " + t.getLocation().toShortString()
+                        + "/" + carrier.getLocation().toShortString()
+                        + " to " + cargo.getTransportTarget()
+                        + " mov=" + mt
+                        + " path=" + ((path == null) ? "null"
+                            : path.fullPathToString()));
+                    return CargoResult.TFAIL;
+                }
             }
             // Fall through
         case UNLOAD:
