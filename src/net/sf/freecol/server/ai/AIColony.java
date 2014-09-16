@@ -82,6 +82,7 @@ import net.sf.freecol.server.ai.mission.MissionaryMission;
 import net.sf.freecol.server.ai.mission.PioneeringMission;
 import net.sf.freecol.server.ai.mission.ScoutingMission;
 import net.sf.freecol.server.ai.mission.TransportMission;
+import net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission;
 import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
 import net.sf.freecol.server.ai.mission.WishRealizationMission;
 
@@ -133,19 +134,32 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     private static final Set<GoodsType> partExport = new HashSet<GoodsType>();
 
     /**
+     * Comparator to favour expert pioneers, then units in that role,
+     * then least skillful.
+     */
+    private static final Comparator<Unit> pioneerComparator
+        = new Comparator<Unit>() {
+            private int score(Unit unit) {
+                return (unit == null) ? -1000 : unit.getPioneerScore();
+            }
+
+            public int compare(Unit u1, Unit u2) {
+                return score(u2) - score(u1);
+            }
+        };
+
+    /**
      * Comparator to favour expert scouts, then units in that role,
      * then least skillful.
      */
     private static final Comparator<Unit> scoutComparator
         = new Comparator<Unit>() {
+            private int score(Unit unit) {
+                return (unit == null) ? -1000 : unit.getScoutScore();
+            }
+
             public int compare(Unit u1, Unit u2) {
-                boolean a1 = u1.hasAbility(Ability.EXPERT_SCOUT);
-                boolean a2 = u2.hasAbility(Ability.EXPERT_SCOUT);
-                if (a1 != a2) return (a1) ? -1 : 1;
-                a1 = u1.hasAbility(Ability.SPEAK_WITH_CHIEF);
-                a2 = u2.hasAbility(Ability.SPEAK_WITH_CHIEF);
-                if (a1 != a2) return (a1) ? -1 : 1;
-                return u1.getType().getSkill() - u2.getType().getSkill();
+                return score(u2) - score(u1);
             }
         };
 
@@ -450,43 +464,56 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 }
             }
         }
+
+        // Allocate pioneers if possible.
+        int tipSize = tileImprovementPlans.size();
+        if (tipSize > 0) {
+            List<Unit> pioneers = new ArrayList<Unit>();
+            for (Unit u : tile.getUnitList()) {
+                if (u.getPioneerScore() >= 0) pioneers.add(u);
+            }
+            Collections.sort(pioneers, pioneerComparator);
+            for (Unit u : pioneers) {
+                final AIUnit aiu = getAIUnit(u);
+                Mission m = aiu.getMission();
+                Location oldTarget = (m == null) ? null : m.getTarget();
+
+                if ((m = aiPlayer.getPioneeringMission(aiu, null)) != null) {
+                    lb.add(", ", aiu.getMission());
+                    aiPlayer.updateTransport(aiu, oldTarget, lb);
+                    if (--tipSize <= 0) break;
+                }
+            }
+        }
+                
         for (Unit u : tile.getUnitList()) {
             final AIUnit aiu = getAIUnit(u);
             Mission m = aiu.getMission();
+            if (m instanceof BuildColonyMission
+                || m instanceof DefendSettlementMission
+                || m instanceof MissionaryMission
+                || m instanceof PioneeringMission
+                || m instanceof ScoutingMission
+                || m instanceof UnitSeekAndDestroyMission) continue;
             Location oldTarget = (m == null) ? null : m.getTarget();
+
             if (u.hasAbility(Ability.SPEAK_WITH_CHIEF)
-                && !(m instanceof ScoutingMission)) {
-                if (aiPlayer.getScoutingMission(aiu) == null) {
-                    result.add(aiu);
-                } else {
-                    lb.add(", ", aiu.getMission());
-                    aiPlayer.updateTransport(aiu, oldTarget, lb);
-                }
-            } else if (u.hasAbility(Ability.IMPROVE_TERRAIN)
-                && !(m instanceof PioneeringMission)) {
-                if (aiPlayer.getPioneeringMission(aiu, null) == null) {
-                    result.add(aiu);
-                } else {
-                    lb.add(", ", aiu.getMission());
-                    aiPlayer.updateTransport(aiu, oldTarget, lb);
-                }
-            } else if (u.hasAbility(Ability.ESTABLISH_MISSION)
-                && !(m instanceof MissionaryMission)) {
-                if (aiPlayer.getMissionaryMission(aiu) == null) {
-                    result.add(aiu);
-                } else {
-                    lb.add(", ", aiu.getMission());
-                    aiPlayer.updateTransport(aiu, oldTarget, lb);
-                }
+                && (m = aiPlayer.getScoutingMission(aiu)) != null) {
+                lb.add(", ", m);
+                aiPlayer.updateTransport(aiu, oldTarget, lb);
+                continue;
             } else if (u.isDefensiveUnit()
-                && !(m instanceof DefendSettlementMission)) {
-                if (aiPlayer.getDefendSettlementMission(aiu, colony) == null) {
-                    result.add(aiu);
-                } else {
-                    lb.add(", ", aiu.getMission());
-                    aiu.dropTransport();
-                }
+                && (m = aiPlayer.getDefendSettlementMission(aiu, colony)) != null) {
+                lb.add(", ", m);
+                aiPlayer.updateTransport(aiu, oldTarget, lb);
+                continue;
+            } else if (u.hasAbility(Ability.ESTABLISH_MISSION)
+                && (m = aiPlayer.getMissionaryMission(aiu)) != null) {
+                lb.add(", ", m);
+                aiPlayer.updateTransport(aiu, oldTarget, lb);
+                continue;
             }
+            result.add(aiu);
         }
 
         // Log the changes.

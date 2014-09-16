@@ -3255,6 +3255,42 @@ public class Unit extends GoodsLocation
         return result;
     }
 
+    /**
+     * Score this unit with its suitability for pioneering.
+     *
+     * Favour existing pioneers, especially if on the map, then experts
+     * pioneers, then by skill but not other experts.
+     *
+     * @return A pioneering score.
+     */
+    public int getPioneerScore() {
+        int ht = (hasTile()) ? 100 : 0;
+        return (getLocation() == null || !isColonist()) ? -1000
+            : (hasAbility(Ability.IMPROVE_TERRAIN)) ? 900 + ht
+            : (hasAbility(Ability.EXPERT_PIONEER)) ? 700
+            : (!hasDefaultRole()) ? 0
+            : (getSkillLevel() > 0) ? 0
+            : 200 + getSkillLevel() * 50;
+    }
+
+    /**
+     * Score this unit with its suitability for scouting.
+     *
+     * Favour existing scouts, then expert scouts, then favour lower skill
+     * levels as scouting is a good career for crims and servants.
+     *
+     * @return A scouting score.
+     */
+    public int getScoutScore() {
+        int ht = (hasTile()) ? 100 : 0;
+        return (getLocation() == null || !isColonist()) ? -1000
+            : (hasAbility(Ability.SPEAK_WITH_CHIEF)) ? 900 + ht
+            : (hasAbility(Ability.EXPERT_SCOUT)) ? 700
+            : (!hasDefaultRole()) ? 0
+            : (getSkillLevel() <= 0) ? -200 * getSkillLevel()
+            : 0;
+    }
+
 
     // Message unpacking support.
 

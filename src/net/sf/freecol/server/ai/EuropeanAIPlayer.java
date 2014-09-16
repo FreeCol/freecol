@@ -164,27 +164,17 @@ public class EuropeanAIPlayer extends AIPlayer {
         };
 
     /**
-     * A comparator to sort units by suitability for a ScoutingMission.
+     * A comparator to sort units by suitability for a PioneeringMission.
      *
-     * Favours existing scouts (especially if on the map), then dismounted
-     * experts, then units that can become scouts.
-     *
-     * We do not check if a unit is near to a colony that can provide horses,
+     * We do not check if a unit is near to a colony that can provide tools,
      * as that is likely to be too expensive.  TODO: revise
      */
-    private static final Comparator<AIUnit> scoutComparator
+    public static final Comparator<AIUnit> pioneerComparator
         = new Comparator<AIUnit>() {
             private int score(AIUnit a) {
                 Unit unit;
-                return (a == null || (unit = a.getUnit()) == null
-                    || unit.getLocation() == null
-                    || !unit.isColonist()) ? -1000
-                : (unit.hasAbility(Ability.SPEAK_WITH_CHIEF))
-                ? 900 + ((unit.hasTile()) ? 100 : 0)
-                : (unit.hasAbility(Ability.EXPERT_SCOUT)) ? 600
-                : (!unit.hasDefaultRole()) ? 100
-                : (unit.getSkillLevel() <= 0) ? 200
-                : 0;
+                return (a == null || (unit = a.getUnit()) == null) ? -1000
+                    : unit.getPioneerScore();
             }
 
             public int compare(AIUnit a1, AIUnit a2) {
@@ -193,33 +183,24 @@ public class EuropeanAIPlayer extends AIPlayer {
         };
 
     /**
-     * A comparator to sort units by suitability for a PioneeringMission.
+     * A comparator to sort units by suitability for a ScoutingMission.
      *
-     * Favours existing pioneers (especially if on the map), then experts
-     * missing tools, then units that can become pioneers.
-     *
-     * We do not check if a unit is near to a colony that can provide tools,
+     * We do not check if a unit is near to a colony that can provide horses,
      * as that is likely to be too expensive.  TODO: revise
      */
-    private static final Comparator<AIUnit> pioneerComparator
+    public static final Comparator<AIUnit> scoutComparator
         = new Comparator<AIUnit>() {
             private int score(AIUnit a) {
                 Unit unit;
-                return (a == null || (unit = a.getUnit()) == null
-                    || unit.getLocation() == null
-                    || !unit.isColonist()) ? -1000
-                : (unit.hasAbility(Ability.IMPROVE_TERRAIN))
-                ? 900 + ((unit.hasTile()) ? 100 : 0)
-                : (unit.hasAbility(Ability.EXPERT_PIONEER)) ? 600
-                : (!unit.hasDefaultRole()) ? 100
-                : (unit.getSkillLevel() > 0) ? 200
-                : 200 + unit.getSkillLevel() * 50;
+                return (a == null || (unit = a.getUnit()) == null) ? -1000
+                    : unit.getScoutScore();
             }
 
             public int compare(AIUnit a1, AIUnit a2) {
                 return score(a2) - score(a1);
             }
         };
+
 
     // These should be final, but need the spec.
 
