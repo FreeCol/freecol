@@ -1692,6 +1692,12 @@ public class Map extends FreeColGameObject implements Location {
                             unitMove = currentNode.getTurns() > 0
                                 && moveTile.getAvailableAdjacentCount() >= 3;
                             break;
+                        case MOVE_NO_ACCESS_WATER:
+                            // The unit can not disembark directly to the
+                            // goal along this path, but the goal is still
+                            // available by other paths.
+                            if (lb != null) lb.add(" !disembark");
+                            continue;
                         default:
                             break;
                         }
