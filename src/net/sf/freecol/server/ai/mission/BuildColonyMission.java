@@ -368,7 +368,7 @@ public class BuildColonyMission extends Mission {
                 && player.owns(c)) {
                 // Favour improving colony center.
                 Mission m = euaip.getPioneeringMission(aiUnit, c.getTile());
-                if (m != null) return lbDone(lb, true, "improving with ", m);
+                if (m != null) return lbDrop(lb, ", improving with ", m);
                 // Just go to the colony.
                 setTarget(c);
                 return lbRetarget(lb);
@@ -416,12 +416,12 @@ public class BuildColonyMission extends Mission {
                 // Improve colony center?
                 Mission m
                     = euaip.getPioneeringMission(aiUnit, colony.getTile());
-                if (m != null) return lbDone(lb, true, "improving with ", m);
+                if (m != null) return lbDrop(lb, ", improving with ", m);
 
                 // Colony too small?
                 if (colony.getUnitCount() <= 1) {
                     setTarget(colony);
-                    return lbDone(lb, false, "join small colony");
+                    return lbDrop(lb, ", join small colony");
                 }
 
                 // Find a real tile target?
@@ -451,7 +451,7 @@ public class BuildColonyMission extends Mission {
                 }
 
                 // Just join up then.
-                return lbDone(lb, false, "joining");
+                return lbDrop(lb, ", joining");
             }
 
             if (!(getTarget() instanceof Tile)) {

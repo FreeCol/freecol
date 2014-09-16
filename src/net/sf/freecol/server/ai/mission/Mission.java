@@ -445,11 +445,12 @@ public abstract class Mission extends AIObject {
      * Drop the current mission.
      *
      * @param lb A <code>LogBuilder</code> to log to.
+     * @param reasons Optional reasons to drop the mission.
      * @return Null, which is now the current <code>Mission</code> of
      *     this unit.
      */
-    protected Mission lbDrop(LogBuilder lb) {
-        lb.add(", DROPPED");
+    protected Mission lbDrop(LogBuilder lb, Object... reasons) {
+        lb.add(", DROPPED", reasons);
         return (aiUnit == null) ? null : aiUnit.changeMission(null);
     }
 
@@ -495,6 +496,7 @@ public abstract class Mission extends AIObject {
      * State that the unit is waiting for something.
      *
      * @param lb A <code>LogBuilder</code> to log to.
+     * @param reasons Reasons for the wait.
      * @return This <code>Mission</code>.
      */
     protected Mission lbWait(LogBuilder lb, Object... reasons) {
