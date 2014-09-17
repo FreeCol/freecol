@@ -473,11 +473,11 @@ public class REFAIPlayer extends EuropeanAIPlayer {
     @Override
     public void giveNormalMissions(LogBuilder lb) {
         // Give military missions to all REF units.
-        lb.add("Military mission changes:");
+        lb.add("\n  Military mission changes:");
         for (AIUnit aiu : getAIUnits()) {
             Unit u = aiu.getUnit();
             if (u.isDisposed() || u.isNaval() || aiu.hasMission()) continue;
-            if (u.isOffensiveUnit()) {
+            if (u.hasAbility(Ability.REF_UNIT)) {
                 Location target = UnitSeekAndDestroyMission.findTarget(aiu, 
                     seekAndDestroyRange, false);
                 Mission m = (target == null)

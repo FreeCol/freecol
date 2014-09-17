@@ -1839,9 +1839,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 lb.add(", ", m);
                 updateTransport(aiUnit, oldTarget, lb);
                 done.add(aiUnit);
-                if (requestsTransport(aiUnit)) {
-                    transportSupply.add(aiUnit);
-                }
+                if (requestsTransport(aiUnit)) transportSupply.add(aiUnit);
                 reasons.put(aiUnit.getUnit(), "0Builder");
             }
             aiUnits.removeAll(done);
@@ -1857,9 +1855,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 lb.add(", ", m);
                 updateTransport(aiUnit, oldTarget, lb);
                 done.add(aiUnit);
-                if (requestsTransport(aiUnit)) {
-                    transportSupply.add(aiUnit);
-                }
+                if (requestsTransport(aiUnit)) transportSupply.add(aiUnit);
                 reasons.put(aiUnit.getUnit(), "Builder" + nBuilders);
                 if (--nBuilders <= 0) break;
             }
@@ -1876,9 +1872,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 lb.add(", ", m);
                 updateTransport(aiUnit, oldTarget, lb);
                 done.add(aiUnit);
-                if (requestsTransport(aiUnit)) {
-                    transportSupply.add(aiUnit);
-                }
+                if (requestsTransport(aiUnit)) transportSupply.add(aiUnit);
                 reasons.put(unit, "Scout" + nScouts);
                 if (--nScouts <= 0) break;
             }
@@ -1895,9 +1889,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 lb.add(", ", m);
                 updateTransport(aiUnit, oldTarget, lb);
                 done.add(aiUnit);
-                if (requestsTransport(aiUnit)) {
-                    transportSupply.add(aiUnit);
-                }
+                if (requestsTransport(aiUnit)) transportSupply.add(aiUnit);
                 reasons.put(unit, "Pioneer" + nPioneers);
                 if (--nPioneers <= 0) break;
             }
@@ -1915,9 +1907,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             updateTransport(aiUnit, oldTarget, lb);
             reasons.put(unit, "New-Land");
             done.add(aiUnit);
-            if (requestsTransport(aiUnit)) {
-                transportSupply.add(aiUnit);
-            }
+            if (requestsTransport(aiUnit)) transportSupply.add(aiUnit);
         }
         aiUnits.removeAll(done);
         done.clear();
@@ -2054,15 +2044,24 @@ public class EuropeanAIPlayer extends AIPlayer {
                 : (unit.isInColony()
                     && (m = getWorkInsideColonyMission(aiUnit, null)) != null) ? m
 
-                // Try to maintain defence
+                // Try to maintain local defence
                 : (old instanceof DefendSettlementMission) ? old
-                : ((m = getDefendSettlementMission(aiUnit, false)) != null) ? m
+                : ((m = getDefendCurrentSettlementMission(aiUnit)) != null) ? m
+
+                // REF override
+                : (unit.hasAbility(Ability.REF_UNIT))
+                ? ((old instanceof UnitSeekAndDestroyMission) ? old
+                    : ((m = getSeekAndDestroyMission(aiUnit, 12)) != null) ? m
+                    : (m = getWanderHostileMission(aiUnit)))
 
                 // Favour wish realization for expert units
                 : (unit.isColonist() && unit.getSkillLevel() > 0
                     && old instanceof WishRealizationMission) ? old
                 : (unit.isColonist() && unit.getSkillLevel() > 0
                     && (m = getWishRealizationMission(aiUnit, null)) != null) ? m
+
+                // Ordinary defence
+                : ((m = getDefendSettlementMission(aiUnit, false)) != null) ? m
 
                 // Try nearby offence
                 : (old instanceof UnitSeekAndDestroyMission) ? old

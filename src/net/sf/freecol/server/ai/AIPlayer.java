@@ -441,6 +441,24 @@ public abstract class AIPlayer extends AIObject {
     }
 
     /**
+     * Get a DefendSettlementMission for the current settlement of a
+     * unit if it is badly defended.
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @return A new misison, or null if impossible or not worthwhile.
+     */
+    public Mission getDefendCurrentSettlementMission(AIUnit aiUnit) {
+        if (DefendSettlementMission.invalidReason(aiUnit) != null) return null;
+        final Unit unit = aiUnit.getUnit();
+        final Location loc = unit.getLocation();
+        final Settlement settlement = (loc == null) ? null
+            : loc.getSettlement();
+        return (settlement != null && settlement.isBadlyDefended())
+            ? getDefendSettlementMission(aiUnit, settlement)
+            : null;
+    }
+
+    /**
      * Gets a new DefendSettlementMission for a unit.
      *
      * @param aiUnit The <code>AIUnit</code> to check.
