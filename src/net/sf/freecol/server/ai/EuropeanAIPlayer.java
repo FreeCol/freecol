@@ -747,6 +747,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         //lb.add(" ->");
         //for (Mission m : missions) lb.add(" ", m);
 
+        LogBuilder lb2 = new LogBuilder(0);
         TransportMission best;
         float bestValue;
         boolean present;
@@ -754,12 +755,13 @@ public class EuropeanAIPlayer extends AIPlayer {
         outer: while (i < transportables.size()) {
             if (missions.isEmpty()) break;
             TransportableAIObject t = transportables.get(i);
+            lb.add(" for ", t);
             best = null;
             bestValue = 0.0f;
             present = false;
             for (TransportMission tm : missions) {
                 if (!tm.spaceAvailable(t)) continue;
-                Cargo cargo = tm.makeCargo(t, lb);
+                Cargo cargo = tm.makeCargo(t, lb2);
                 if (cargo == null) { // Serious problem with this cargo
                     transportables.remove(i);
                     continue outer;
@@ -779,7 +781,9 @@ public class EuropeanAIPlayer extends AIPlayer {
                     best = tm;
                 }
             }
-            if (best != null) {
+            if (best == null) {
+                lb.add(" nothing found");
+            } else {
                 lb.add(" ", best.getUnit(), " chosen");
                 if (best.queueTransportable(t, false, lb)) {
                     claimTransportable(t);

@@ -504,7 +504,28 @@ public class REFAIPlayer extends EuropeanAIPlayer {
             logger.warning("No work for REF: " + player);
             return;
         }
+
         super.startWorking();
+
+        // Always allocate transport for all land units in Europe.
+        List<TransportMission> transport = new ArrayList<TransportMission>();
+        List<TransportableAIObject> land
+            = new ArrayList<TransportableAIObject>();
+        for (AIUnit aiu : getAIUnits()) {
+            final Unit u = aiu.getUnit();
+            if (u.isNaval()) {
+                if (aiu.hasMission(TransportMission.class)) {
+                    transport.add(aiu.getMission(TransportMission.class));
+                }
+            } else {
+                if (u.isInEurope()) land.add(aiu);
+            }
+        }
+        if (!land.isEmpty() && !transport.isEmpty()) {
+            LogBuilder lb = new LogBuilder(256);
+            allocateTransportables(land, transport, lb);
+            lb.log(logger, Level.FINE);
+        }
     }
 
     /**
