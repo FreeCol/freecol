@@ -288,16 +288,14 @@ public class PioneeringMission extends Mission {
                                           boolean deferOK) {
         if (invalidAIUnitReason(aiUnit) != null) return null;
         final Unit unit = aiUnit.getUnit();
-        final Tile startTile = unit.getPathStartTile();
-        if (startTile == null) return null;
-
+        final Location start = unit.getPathStartLocation();
         final Unit carrier = unit.getCarrier();
         final GoalDecider gd = getGoalDecider(aiUnit, deferOK);
         final CostDecider standardCd
             = CostDeciders.avoidSettlementsAndBlockingUnits();
 
         // Try for something sensible nearby.
-        return unit.search(startTile, gd, standardCd, range, carrier);
+        return unit.search(start, gd, standardCd, range, carrier);
     }
 
     /**

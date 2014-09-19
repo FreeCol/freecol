@@ -176,16 +176,14 @@ public class MissionaryMission extends Mission {
                                            boolean deferOK) {
         if (invalidAIUnitReason(aiUnit) != null) return null;
         final Unit unit = aiUnit.getUnit();
-        final Tile startTile = unit.getPathStartTile();
-        if (startTile == null) return null;
-
+        final Location start = unit.getPathStartLocation();
         final Unit carrier = unit.getCarrier();
         final GoalDecider gd = getGoalDecider(aiUnit, deferOK);
         final CostDecider standardCd
             = CostDeciders.avoidSettlementsAndBlockingUnits();
 
         // Is there a valid target available from the starting tile?
-        return unit.search(startTile, gd, standardCd, range, carrier);
+        return unit.search(start, gd, standardCd, range, carrier);
     }
 
     /**

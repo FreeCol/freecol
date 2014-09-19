@@ -263,12 +263,11 @@ public class UnitSeekAndDestroyMission extends Mission {
                                           boolean deferOK) {
         if (invalidAIUnitReason(aiUnit) != null) return null;
         final Unit unit = aiUnit.getUnit();
-        final Tile startTile = unit.getPathStartTile();
-        if (startTile == null) return null;
+        final Location start = unit.getPathStartLocation();
 
         // Can the unit legally reach a valid target from where it
         // currently is?
-        return unit.search(startTile, getGoalDecider(aiUnit, false),
+        return unit.search(start, getGoalDecider(aiUnit, false),
             CostDeciders.avoidIllegal(), range, unit.getCarrier());
     }
 

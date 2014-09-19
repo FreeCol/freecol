@@ -191,16 +191,14 @@ public class ScoutingMission extends Mission {
                                           boolean deferOK) {
         if (invalidAIUnitReason(aiUnit) != null) return null;
         final Unit unit = aiUnit.getUnit();
-        final Tile startTile = unit.getPathStartTile();
-        if (startTile == null) return null;
-
+        final Location start = unit.getPathStartLocation();
         final Unit carrier = unit.getCarrier();
         final GoalDecider gd = getGoalDecider(aiUnit, deferOK);
         final CostDecider standardCd = CostDeciders.avoidIllegal();
 
         // Can the scout legally reach a valid target from where it
         // currently is?
-        return unit.search(startTile, gd, standardCd, range, carrier);
+        return unit.search(start, gd, standardCd, range, carrier);
     }
 
     /**

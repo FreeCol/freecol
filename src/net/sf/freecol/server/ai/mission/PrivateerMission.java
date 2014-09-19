@@ -193,12 +193,11 @@ public class PrivateerMission extends Mission {
                                           boolean deferOK) {
         if (invalidAIUnitReason(aiUnit) != null) return null;
         final Unit unit = aiUnit.getUnit();
-        final Tile startTile = unit.getPathStartTile();
-        if (startTile == null) return null;
+        final Location start = unit.getPathStartLocation();
 
         // Can the privateer legally reach a valid target from where
         // it currently is?
-        return unit.search(startTile, getGoalDecider(aiUnit, deferOK),
+        return unit.search(start, getGoalDecider(aiUnit, deferOK),
                            CostDeciders.avoidIllegal(), range, null);
     }
 

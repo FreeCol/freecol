@@ -2370,31 +2370,84 @@ public class Unit extends GoodsLocation
     // Map support routines
 
     /**
-     * Gets a suitable tile to start path searches from for a unit.
+     * Gets a suitable location to start path searches for a unit.
      *
      * Must handle all the cases where the unit is off the map, and
      * take account of the use of a carrier.
      *
-     * If the unit is in or heading to Europe, return null because there
-     * is no good way to tell where the unit will reappear on the map,
-     * which is in question anyway if not on a carrier.
-     *
-     * @return A suitable starting tile, or null if none found.
+     * @return A suitable starting location, or null if none found.
      */
-    public Tile getPathStartTile() {
+    public Location getPathStartLocation() {
+        final Unit carrier = getCarrier();
+        Location ret = getTile();
         if (isOnCarrier()) {
-            final Unit carrier = getCarrier();
-            return (carrier.hasTile())
-                ? carrier.getTile()
-                : (carrier.getDestination() instanceof Map)
-                ? carrier.getFullEntryLocation()
-                : (carrier.getDestination() instanceof Settlement)
-                ? ((Settlement)carrier.getDestination()).getTile()
-                //: (carrier.getDestination() instanceof Europe)
-                //? null
-                : null;
+            if (ret != null) {
+                ; // OK
+            } else if (carrier.getDestination() == null) {
+                ret = null;
+            } else if (carrier.getDestination() instanceof Map) {
+                ret = carrier.getEntryLocation();
+            } else if (carrier.getDestination() instanceof Settlement) {
+                ret = carrier.getDestination();
+            } else { // destination must be Europe
+                ret = null;
+            }
+        } else if (isNaval()) {
+            if (ret != null) {
+                ; // OK
+            } else if (getDestination() == null
+                || getDestination() instanceof Map) {
+                ret = getEntryLocation();
+            } else if (getDestination() instanceof Settlement) {
+                ret = getDestination();
+            } else {
+                ret = getEntryLocation();
+            }
         }
-        return getTile(); // Or null if heading to or in Europe.
+        if (ret != null) return ret;
+
+        // Must be a land unit not on the map.  May have a carrier.
+        // Get our nearest settlement to Europe, fallback to any other.
+        final Player owner = getOwner();
+        int bestValue = INFINITY;
+        for (Settlement s : owner.getSettlements()) {
+            if (s.getTile().isHighSeasConnected()) {
+                int value = s.getTile().getHighSeasCount();
+                if (bestValue > value) {
+                    bestValue = value;
+                    ret = s;
+                }
+            } else if (bestValue == INFINITY) ret = s;
+        }
+        if (ret != null) return ret;
+
+        // Owner has no settlements.  If it is the REF, start from a
+        // rebel colony.  Prefer the closest port.
+        if (owner.isREF()) {
+            bestValue = INFINITY;
+            for (Player p : owner.getRebels()) {
+                for (Settlement s : p.getSettlements()) {
+                    if (s.getTile().isHighSeasConnected()) {
+                        int value = s.getTile().getHighSeasCount();
+                        if (bestValue > value) {
+                            bestValue = value;
+                            ret = s;
+                        }
+                    } else if (bestValue == INFINITY) ret = s;
+                }
+            }
+            if (ret != null) return ret;
+        }
+
+        // Desperately find the nearest land to the entry location.
+        Tile entryTile = getEntryLocation().getTile();
+        if (entryTile != null) {
+            for (Tile t : entryTile.getSurroundingTiles(INFINITY)) {
+                if (t.isLand()) return t;
+            }
+        }
+
+        return null; // Fail
     }
 
     /**
@@ -2574,9 +2627,29 @@ public class Unit extends GoodsLocation
                                              int range, final boolean coastal) {
         final Player player = getOwner();
         if (player.getNumberOfSettlements() <= 0 || !hasTile()) return null;
+        return findOurNearestSettlement(getTile(), excludeStart,
+                                        range, coastal);
+    }
 
-        final Tile startTile = getTile();
+    /**
+     * Find a path for this unit to the nearest settlement with the
+     * same owner that is reachable without a carrier.
+     *
+     * @param startTile The <code>Tile</code> to start searching from.
+     * @param excludeStart If true, ignore any settlement the unit is
+     *     currently in.
+     * @param range An upper bound on the number of moves.
+     * @param coastal If true, the settlement must have a path to Europe.
+     * @return The nearest matching settlement if any, otherwise null.
+     */
+    public PathNode findOurNearestSettlement(final Tile startTile,
+                                             final boolean excludeStart,
+                                             int range, final boolean coastal) {
+        final Player player = getOwner();
+        if (startTile == null
+            || player.getNumberOfSettlements() <= 0) return null;
         final GoalDecider gd = new GoalDecider() {
+
                 private int bestValue = Integer.MAX_VALUE;
                 private PathNode best = null;
 

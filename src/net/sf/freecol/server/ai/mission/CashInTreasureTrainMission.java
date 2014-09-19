@@ -225,7 +225,7 @@ public class CashInTreasureTrainMission extends Mission {
                                            boolean deferOK) {
         if (invalidAIUnitReason(aiUnit) != null) return null;
         final Unit unit = aiUnit.getUnit();
-        final Tile startTile = unit.getPathStartTile();
+        final Location start = unit.getPathStartLocation();
         final Player player = unit.getOwner();
         final Europe europe = player.getEurope();
         final Unit carrier = unit.getCarrier();
@@ -233,7 +233,7 @@ public class CashInTreasureTrainMission extends Mission {
             = CostDeciders.avoidSettlementsAndBlockingUnits();
         PathNode path;
 
-        if (player.getNumberOfSettlements() <= 0 || startTile == null) {
+        if (player.getNumberOfSettlements() <= 0 || start == null) {
             // No settlements or not on the map, so go straight to
             // Europe.  If Europe does not exist then this mission is
             // doomed.
@@ -243,8 +243,8 @@ public class CashInTreasureTrainMission extends Mission {
         }
 
         // Can the unit get to a cash in site?
-        final GoalDecider gd = getGoalDecider(aiUnit, deferOK);
-        return unit.search(startTile, gd, standardCd, range, carrier);
+        return unit.search(start, getGoalDecider(aiUnit, deferOK),
+                           standardCd, range, carrier);
     }
 
     /**

@@ -165,10 +165,9 @@ public class DefendSettlementMission extends Mission {
                                           boolean deferOK) {
         if (invalidAIUnitReason(aiUnit) != null) return null;
         final Unit unit = aiUnit.getUnit();
-        final Tile startTile = unit.getPathStartTile();
-        if (startTile == null) return null;
+        final Location start = unit.getPathStartLocation();
 
-        return unit.search(startTile, getGoalDecider(aiUnit),
+        return unit.search(start, getGoalDecider(aiUnit),
                            CostDeciders.avoidSettlementsAndBlockingUnits(),
                            range, unit.getCarrier());
     }
