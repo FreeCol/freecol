@@ -419,7 +419,7 @@ public final class InGameInputHandler extends InputHandler {
             throw new IllegalStateException("Attack animation for: "
                 + player.getId() + " missing attacker attribute.");
         }
-        if ((u = game.getFreeColGameObject(str, Unit.class)).isEmpty()
+        if ((u = game.getFreeColGameObject(str, Unit.class)) == null
             && (u = selectUnitFromElement(game, element, str)) == null) {
             throw new IllegalStateException("Attack animation for: "
                 + player.getId() + " omitted attacker: " + str);
