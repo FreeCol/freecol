@@ -385,29 +385,37 @@ public class ChangeSet {
          * @return An "animateAttack" element.
          */
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
+            final Game game = serverPlayer.getGame();
             Element element = doc.createElement("animateAttack");
             element.setAttribute("attacker", attacker.getId());
             element.setAttribute("defender", defender.getId());
             element.setAttribute("attackerTile", attackerTile.getId());
             element.setAttribute("defenderTile", defenderTile.getId());
             element.setAttribute("success", Boolean.toString(success));
+            // If scoped to serverPlayer insufficient information is
+            // serialized when a unit is inside a settlement, but if
+            // unscoped too much is disclosed.  So we make a copy
+            // and neuter it.
+            //
+            // We just have to accept that combat animation is an
+            // exception to the normal visibility rules.
             if (!canSeeUnit(serverPlayer, attacker)) {
-                element.appendChild(attacker.toXMLElement(doc, serverPlayer));
+                Unit copy = attacker.copy(game, Unit.class);
+                if (attackerTile.hasSettlement()) {
+                    copy.setLocationNoUpdate(attackerTile.getSettlement());
+                }
+                copy.setWorkType(null);
+                element.appendChild(copy.toXMLElement(doc));
                 if (attacker.getLocation() instanceof Unit) {
                     Unit loc = (Unit)attacker.getLocation();
                     element.appendChild(loc.toXMLElement(doc, serverPlayer));
                 }
             }
             if (!canSeeUnit(serverPlayer, defender)) {
-                // If scoped to serverPlayer insufficient information
-                // is serialized when inside a settlement, but if
-                // unscoped too much is disclosed.  So we make a copy
-                // and neuter it.
-                //
-                // We just have to accept that combat animation is an
-                // exception to the normal visibility rules.
-                Unit copy = defender.copy(serverPlayer.getGame(), Unit.class);
-                copy.setLocationNoUpdate(defenderTile.getSettlement());
+                Unit copy = defender.copy(game, Unit.class);
+                if (defenderTile.hasSettlement()) {
+                    copy.setLocationNoUpdate(defenderTile.getSettlement());
+                }
                 copy.setWorkType(null);
                 element.appendChild(copy.toXMLElement(doc));
             }
