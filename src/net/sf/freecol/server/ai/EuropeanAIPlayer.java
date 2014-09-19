@@ -729,17 +729,19 @@ public class EuropeanAIPlayer extends AIPlayer {
      * These supply driven assignments supplement the demand driven
      * calls inside TransportMission.
      *
+     * @param transportables A list of <code>TransportableAIObject</code>s to
+     *     allocated transport for.
      * @param missions A list of <code>TransportMission</code>s to potentially
      *     assign more transportables to.
      * @param lb A <code>LogBuilder</code> to log to.
      */
-    private void allocateTransportables(List<TransportMission> missions,
+    public void allocateTransportables(List<TransportableAIObject> transportables,
+                                        List<TransportMission> missions,
                                         LogBuilder lb) {
+        if (transportables.isEmpty()) return;
         if (missions.isEmpty()) return;
-        List<TransportableAIObject> urgent = getUrgentTransportables();
-        if (urgent.isEmpty()) return;
 
-        lb.add("\n  Allocate Transport cargo=", urgent.size(),
+        lb.add("\n  Allocate Transport cargo=", transportables.size(),
                " carriers=", missions.size());
         //for (TransportableAIObject t : urgent) lb.add(" ", t);
         //lb.add(" ->");
@@ -749,9 +751,9 @@ public class EuropeanAIPlayer extends AIPlayer {
         float bestValue;
         boolean present;
         int i = 0;
-        outer: while (i < urgent.size()) {
+        outer: while (i < transportables.size()) {
             if (missions.isEmpty()) break;
-            TransportableAIObject t = urgent.get(i);
+            TransportableAIObject t = transportables.get(i);
             best = null;
             bestValue = 0.0f;
             present = false;
@@ -759,7 +761,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 if (!tm.spaceAvailable(t)) continue;
                 Cargo cargo = tm.makeCargo(t, lb);
                 if (cargo == null) { // Serious problem with this cargo
-                    urgent.remove(i);
+                    transportables.remove(i);
                     continue outer;
                 }
                 int turns = cargo.getTurns();
@@ -1991,7 +1993,8 @@ public class EuropeanAIPlayer extends AIPlayer {
         lb.grew("\n  Mission changes");
 
         // Now see if transport can be found
-        allocateTransportables(transportMissions, lb);
+        allocateTransportables(getUrgentTransportables(),
+                               transportMissions, lb);
 
         // Log
         if (!aiUnits.isEmpty()) {
