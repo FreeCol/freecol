@@ -2386,7 +2386,7 @@ public class Unit extends GoodsLocation
             } else if (carrier.getDestination() == null) {
                 ret = null;
             } else if (carrier.getDestination() instanceof Map) {
-                ret = carrier.getEntryLocation();
+                ret = carrier.getFullEntryLocation();
             } else if (carrier.getDestination() instanceof Settlement) {
                 ret = carrier.getDestination();
             } else { // destination must be Europe
@@ -2397,11 +2397,11 @@ public class Unit extends GoodsLocation
                 ; // OK
             } else if (getDestination() == null
                 || getDestination() instanceof Map) {
-                ret = getEntryLocation();
+                ret = getFullEntryLocation();
             } else if (getDestination() instanceof Settlement) {
                 ret = getDestination();
             } else {
-                ret = getEntryLocation();
+                ret = getFullEntryLocation();
             }
         }
         if (ret != null) return ret;
@@ -2440,9 +2440,9 @@ public class Unit extends GoodsLocation
         }
 
         // Desperately find the nearest land to the entry location.
-        Tile entryTile = getEntryLocation().getTile();
-        if (entryTile != null) {
-            for (Tile t : entryTile.getSurroundingTiles(INFINITY)) {
+        Location entry = getFullEntryLocation();
+        if (entry != null && entry.getTile() != null) {
+            for (Tile t : entry.getTile().getSurroundingTiles(INFINITY)) {
                 if (t.isLand()) return t;
             }
         }
