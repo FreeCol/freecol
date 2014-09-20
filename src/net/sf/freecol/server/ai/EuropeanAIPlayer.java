@@ -2177,8 +2177,11 @@ public class EuropeanAIPlayer extends AIPlayer {
         if (MissionaryMission.prepare(aiUnit) != null) return null;
         Location loc = MissionaryMission.findTarget(aiUnit, missionaryRange,
                                                     true);
-        return (loc == null) ? null
-            : new MissionaryMission(getAIMain(), aiUnit, loc);
+        if (loc == null) {
+            aiUnit.equipForRole(Specification.DEFAULT_ROLE_ID);
+            return null;
+        }
+        return new MissionaryMission(getAIMain(), aiUnit, loc);
     }
 
     /**
@@ -2195,8 +2198,14 @@ public class EuropeanAIPlayer extends AIPlayer {
             target = PioneeringMission.findTarget(aiUnit, pioneeringRange,
                                                   true);
         }
-        return (target == null) ? null
-            : new PioneeringMission(getAIMain(), aiUnit, target);
+        if (target == null) {
+            Unit unit = aiUnit.getUnit();
+            if (unit.isInEurope() || unit.getSettlement() != null) {
+                aiUnit.equipForRole(Specification.DEFAULT_ROLE_ID);
+            }
+            return null;
+        }
+        return new PioneeringMission(getAIMain(), aiUnit, target);
     }
 
     /**
@@ -2224,8 +2233,14 @@ public class EuropeanAIPlayer extends AIPlayer {
     public Mission getScoutingMission(AIUnit aiUnit) {
         if (ScoutingMission.prepare(aiUnit) != null) return null;
         Location loc = ScoutingMission.findTarget(aiUnit, scoutingRange, true);
-        return (loc == null) ? null
-            : new ScoutingMission(getAIMain(), aiUnit, loc);
+        if (loc == null) {
+            Unit unit = aiUnit.getUnit();
+            if (unit.isInEurope() || unit.getSettlement() != null) {
+                aiUnit.equipForRole(Specification.DEFAULT_ROLE_ID);
+            }
+            return null;
+        }            
+        return new ScoutingMission(getAIMain(), aiUnit, loc);
     }
 
     /**
