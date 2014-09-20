@@ -157,11 +157,10 @@ public class NativeAIPlayer extends AIPlayer {
         // leave the rest with the default wander-hostile mission.
         List<Unit> units = new ArrayList<Unit>();
         for (IndianSettlement is : player.getIndianSettlements()) {
-            int defence = is.getType().getMinimumSize() - 1;
             units.clear();
             units.addAll(is.getTile().getUnitList());
             units.addAll(is.getUnitList());
-            while (units.size() > defence) {
+            while (units.size() > is.getRequiredDefenders()) {
                 Unit u = units.remove(0);
                 AIUnit aiu = getAIUnit(u);
                 Mission m = getWanderHostileMission(aiu);
