@@ -135,6 +135,9 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     private static final int pioneeringRange = 10;
 
+    /** Maximum number of turns to travel to a privateering target. */
+    private static final int privateerRange = 12;
+
     /** Maximum number of turns to travel to a scouting target. */
     private static final int scoutingRange = 20;
 
@@ -2218,7 +2221,7 @@ public class EuropeanAIPlayer extends AIPlayer {
     public Mission getPrivateerMission(AIUnit aiUnit, Location target) {
         if (PrivateerMission.invalidReason(aiUnit) != null) return null;
         if (target == null) {
-            target = PrivateerMission.findTarget(aiUnit, 8, true);
+            target = PrivateerMission.findTarget(aiUnit, privateerRange, true);
         }
         return (target == null) ? null
             : new PrivateerMission(getAIMain(), aiUnit, target);

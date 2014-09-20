@@ -27,6 +27,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Location;
@@ -124,14 +125,15 @@ public class PrivateerMission extends Mission {
      * @return A score for the attack.
      */
     private static int scoreUnit(AIUnit aiUnit, Unit defender) {
-        Unit attacker = aiUnit.getUnit();
-        int value = 1000;
+        final Unit attacker = aiUnit.getUnit();
+        int value = 100;
         // Pirates want cargo
         value += defender.getVisibleGoodsCount() * 200;
         // But they are wary of danger
         if (defender.isOffensiveUnit()) {
-            value -= attacker.getGame().getCombatModel()
-                .getDefencePower(attacker, defender) * 100;
+            CombatModel.CombatOdds co = attacker.getGame().getCombatModel()
+                .calculateCombatOdds(attacker, defender);
+            if (co != null) value += (co.win - 0.5) * 200;
         }
         return value;
     }
@@ -229,7 +231,6 @@ public class PrivateerMission extends Mission {
         final Unit unit = aiUnit.getUnit();
         return (!unit.isCarrier()) ? "unit-not-a-carrier"
             : (!unit.isOffensiveUnit()) ? Mission.UNITNOTOFFENSIVE
-            : (!unit.hasAbility(Ability.PIRACY)) ? "unit-not-a-pirate"
             : null;
     }
 
