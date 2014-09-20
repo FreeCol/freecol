@@ -415,6 +415,8 @@ public class ChangeSet {
                 Unit copy = defender.copy(game, Unit.class);
                 if (defenderTile.hasSettlement()) {
                     copy.setLocationNoUpdate(defenderTile.getSettlement());
+                } else { // The settlement might be falling!
+                    copy.setLocationNoUpdate(defenderTile);
                 }
                 copy.setWorkType(null);
                 element.appendChild(copy.toXMLElement(doc));
