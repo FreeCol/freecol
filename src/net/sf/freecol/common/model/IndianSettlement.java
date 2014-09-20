@@ -1018,6 +1018,16 @@ public class IndianSettlement extends Settlement {
         }
     }
 
+    /**
+     * Get the number of braves expected to be present for the settlement
+     * not to be "badly defended".
+     *
+     * @return The required defender number.
+     */
+    public int getRequiredDefenders() {
+        return getType().getMinimumSize() - 1;
+    }
+
 
     // Override FreeColGameObject
 
@@ -1137,6 +1147,13 @@ public class IndianSettlement extends Settlement {
     public float getDefenceRatio() {
         return getUnitCount() * 2.0f / (getType().getMinimumSize()
             + getType().getMaximumSize());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isBadlyDefended() {
+        return getUnitCount() < getRequiredDefenders();
     }
 
     /**

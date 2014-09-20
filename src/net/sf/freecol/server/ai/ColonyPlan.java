@@ -830,7 +830,7 @@ public class ColonyPlan {
             if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
                 ; // TODO: decide to build a ship
             } else if (unitType.isDefensive()) {
-                if (AIColony.isBadlyDefended(colony)) {
+                if (colony.isBadlyDefended()) {
                     prioritize(unitType, DEFENCE_WEIGHT,
                         1.0/*FIXME: how badly defended?*/);
                 }
@@ -1303,7 +1303,7 @@ public class ColonyPlan {
         Collections.sort(workers, soldierComparator);
         for (Unit u : new ArrayList<Unit>(workers)) {
             if (workers.size() <= 1) break;
-            if (!AIColony.isBadlyDefended(col)) break;
+            if (!col.isBadlyDefended()) break;
             Role role = u.getMilitaryRole();
             if (role != null && fullEquipUnit(spec(), u, role, col)) {
                 workers.remove(u);

@@ -2722,6 +2722,13 @@ public class Colony extends Settlement implements Nameable {
     /**
      * {@inheritDoc}
      */
+    public boolean isBadlyDefended() {
+        return getTotalDefencePower() < 0.95f * getUnitCount() - 2.5f;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public RandomRange getPlunderRange(Unit attacker) {
         if (canBePlundered()) {
             int upper = (owner.getGold() * (getUnitCount() + 1))

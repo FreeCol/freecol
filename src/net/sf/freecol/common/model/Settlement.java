@@ -622,6 +622,13 @@ public abstract class Settlement extends GoodsLocation
     public abstract float getDefenceRatio();
 
     /**
+     * Is this settlement insufficiently defended?
+     *
+     * @return True if this settlement needs more defence.
+     */
+    public abstract boolean isBadlyDefended();
+        
+    /**
      * Gets the range of gold plunderable when this settlement is captured.
      *
      * @param attacker The <code>Unit</code> that takes the settlement.

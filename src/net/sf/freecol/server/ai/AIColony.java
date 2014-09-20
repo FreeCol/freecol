@@ -246,24 +246,12 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     }
 
     /**
-     * Is a colony badly defended?
-     * Deliberately does not require defenders for small colonies.
-     *
-     * @param colony The <code>Colony</code> to consider.
-     * @return True if the colony needs more defenders.
-     */
-    public static boolean isBadlyDefended(Colony colony) {
-        return colony.getTotalDefencePower()
-            < 0.95f * colony.getUnitCount() - 2.5f;
-    }
-
-    /**
-     * Is this colony badly defended?
+     * Is this AI colony badly defended?
      *
      * @return True if this colony needs more defenders.
      */
     public boolean isBadlyDefended() {
-        return isBadlyDefended(colony);
+        return colony.isBadlyDefended();
     }
 
     /**
