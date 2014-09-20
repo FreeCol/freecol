@@ -400,13 +400,10 @@ public final class FeatureContainer {
      *
      * @param fco The <code>FreeColObject</code> to find features to remove
      *     in.
-     * @param logMe An explanatory string for the log message.
      */
-    public void removeFeatures(FreeColObject fco, String logMe) {
+    public void removeFeatures(FreeColObject fco) {
         FeatureContainer c = fco.getFeatureContainer();
         if (c == null) return;
-        LogBuilder lb = new LogBuilder(64);
-        lb.mark();
 
         if (abilitiesPresent() && c.abilitiesPresent()) {
             Set<String> ca = new HashSet<String>();
@@ -418,10 +415,7 @@ public final class FeatureContainer {
                     Set<Ability> abilitySet = abilities.get(key);
                     if (abilitySet == null) continue;
                     for (Ability a : new HashSet<Ability>(abilitySet)) {
-                        if (a.getSource() == fco) {
-                            abilitySet.remove(a);
-                            lb.add(" ", a.getId());
-                        }
+                        if (a.getSource() == fco) abilitySet.remove(a);
                     }
                 }
             }
@@ -437,15 +431,11 @@ public final class FeatureContainer {
                     Set<Modifier> modifierSet = modifiers.get(key);
                     if (modifierSet == null) continue;
                     for (Modifier m : new HashSet<Modifier>(modifierSet)) {
-                        if (m.getSource() == fco) {
-                            modifierSet.remove(m);
-                            lb.add(" ", m.getId());
-                        }
+                        if (m.getSource() == fco) modifierSet.remove(m);
                     }
                 }
             }
         }
-        if (lb.grew(logMe, "Removed features:")) lb.log(logger, Level.FINE);
     }
 
     /**

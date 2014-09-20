@@ -129,9 +129,7 @@ public abstract class Settlement extends GoodsLocation
      * @param newType The new <code>SettlementType</code>.
      */
     private final void changeType(final SettlementType newType) {
-        if (type != null) removeFeatures(type, "Changing type from " + type
-                                         + " to " + newType
-                                         + " at " + getName());
+        if (type != null) removeFeatures(type);
         setType(newType);
         if (newType != null) addFeatures(newType);
     }

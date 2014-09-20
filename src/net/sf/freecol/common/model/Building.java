@@ -98,9 +98,8 @@ public class Building extends WorkLocation
      */
     private List<Unit> setType(final BuildingType newBuildingType) {
         // remove features from current type
-        Colony colony = getColony();
-        colony.removeFeatures(buildingType, "Building change " + buildingType
-            + " -> " + newBuildingType + " at " + colony.getName());
+        final Colony colony = getColony();
+        colony.removeFeatures(buildingType);
         List<Unit> eject = new ArrayList<Unit>();
 
         if (newBuildingType != null) {
