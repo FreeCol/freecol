@@ -158,9 +158,9 @@ public abstract class CombatModel {
         return attacker instanceof Unit
             && ((Unit)attacker).hasTile()
             && !((Unit)attacker).getTile().isLand()
-            && defender instanceof Locatable
-            && ((Locatable)defender).getTile() != null
-            && ((Locatable)defender).getTile().isLand();
+            && defender instanceof Location
+            && ((Location)defender).getTile() != null
+            && ((Location)defender).getTile().isLand();
     }
 
     /**
