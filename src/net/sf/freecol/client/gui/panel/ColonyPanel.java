@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -1218,9 +1219,15 @@ public final class ColonyPanel extends PortPanel
             royalistMemberLabel.setText(colony.getTory() + "%");
             add(royalistMemberLabel);
 
-            royalistShield.setIcon(new ImageIcon(getLibrary()
-                    .getCoatOfArmsImage(nation.getREFNation(), 0.5)));
-            add(royalistShield, "bottom");
+            Nation other = (colony.getOwner().isREF()) ? nation.getRebelNation()
+                : nation.getREFNation();
+            try {
+                royalistShield.setIcon(new ImageIcon(getLibrary()
+                        .getCoatOfArmsImage(other, 0.5)));
+                add(royalistShield, "bottom");
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Shield: " + nation + "/" + other, e);
+            }
 
             revalidate();
             repaint();

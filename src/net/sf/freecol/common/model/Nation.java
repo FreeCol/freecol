@@ -169,6 +169,18 @@ public class Nation extends FreeColGameObjectType {
     }
 
     /**
+     * Get the rebel nation to oppose this REF nation.
+     *
+     * @return The rebel <code>Nation</code>, or null if not applicable.
+     */
+    public final Nation getRebelNation() {
+        for (Nation n : getSpecification().getEuropeanNations()) {
+            if (n.getREFNation() == this) return n;
+        }
+        return null;
+    }
+
+    /**
      * Get the preferred latitude of this nation.
      *
      * @return The preferred latitude.
