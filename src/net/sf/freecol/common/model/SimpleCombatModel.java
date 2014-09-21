@@ -328,7 +328,8 @@ public class SimpleCombatModel extends CombatModel {
                                     Specification.BASE_DEFENCE_SOURCE));
 
             // Unit specific
-            result.addAll(defenderUnit.getModifiers(Modifier.DEFENCE));
+            result.addAll(defenderUnit.getModifiers(Modifier.DEFENCE,
+                    defenderUnit.getType(), null));
 
             // Land/naval split
             if (defenderUnit.isNaval()) {
