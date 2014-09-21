@@ -274,7 +274,8 @@ public final class FeatureContainer {
      */
     public final float applyModifiers(float number, Turn turn,
                                       String id, FreeColGameObjectType fcgot) {
-        return applyModifiers(number, turn, getModifiers(id, fcgot, turn));
+        return applyModifiers(number, turn, getModifiers(id, fcgot, turn),
+                              null);
     }
 
     /**
@@ -283,18 +284,30 @@ public final class FeatureContainer {
      * @param number The number to modify.
      * @param turn An optional applicable <code>Turn</code>.
      * @param mods The <code>Modifier</code>s to apply.
+     * @param logMe An optional logging string.
      * @return The modified number.
      */
     public static float applyModifiers(float number, Turn turn,
-                                       Collection<Modifier> mods) {
+                                       Collection<Modifier> mods,
+                                       String logMe) {
         if (mods == null || mods.isEmpty()) return number;
         List<Modifier> modifiers = new ArrayList<Modifier>(mods);
         Collections.sort(modifiers);
         float result = number;
+        LogBuilder lb = null;
+        if (logMe != null) {
+            lb = new LogBuilder(256);
+            lb.add(logMe, " ", result);
+        }
         for (Modifier m : modifiers) {
             float value = m.getValue(turn);
             if (value == Modifier.UNKNOWN) return value;
             result = m.apply(result, value);
+            if (lb != null) lb.add(", ", m);
+        }
+        if (lb != null) {
+            lb.add(" = ", result);
+            lb.log(logger, Level.FINEST);
         }
         return result;
     }

@@ -128,7 +128,8 @@ public class ProductionCache {
                     surplus.setAmount(surplus.getAmount() + getGoodsCount(g.getType()));
                 } else {
                     surplus.setAmount((int)FeatureContainer
-                        .applyModifiers(surplus.getAmount(), null, modifiers));
+                        .applyModifiers(surplus.getAmount(), null,
+                                        modifiers, null));
                 }
                 goods.add(surplus);
             }

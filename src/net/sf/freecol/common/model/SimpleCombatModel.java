@@ -93,9 +93,10 @@ public class SimpleCombatModel extends CombatModel {
         } else if (combatIsAttackMeasurement(attacker, defender)
             || combatIsAttack(attacker, defender)
             || combatIsSettlementAttack(attacker, defender)) {
-            result = FreeColObject.applyModifiers(0.0f,
+            result = FeatureContainer.applyModifiers(0.0f,
                 attacker.getGame().getTurn(),
-                getOffensiveModifiers(attacker, defender));
+                getOffensiveModifiers(attacker, defender),
+                logString(attacker, "attacks", defender));
 
         } else if (combatIsBombard(attacker, defender)) {
             Settlement attackerSettlement = (Settlement) attacker;
@@ -130,12 +131,20 @@ public class SimpleCombatModel extends CombatModel {
             || combatIsBombard(attacker, defender)) {
             result = FeatureContainer.applyModifiers(0.0f,
                 defender.getGame().getTurn(),
-                getDefensiveModifiers(attacker, defender));
+                getDefensiveModifiers(attacker, defender),
+                logString(defender, "defends", attacker));
 
         } else {
             throw new IllegalArgumentException("Bogus combat");
         }
         return result;
+    }
+
+    private String logString(FreeColGameObject fcgo1, String joiner,
+                             FreeColGameObject fcgo2) {
+        return ((fcgo1 == null) ? "null" : fcgo1.toString())
+            + " " + joiner + " "
+            + ((fcgo2 == null) ? "null" : fcgo2.toString());
     }
 
     /**
@@ -187,6 +196,7 @@ public class SimpleCombatModel extends CombatModel {
         } else {
             throw new IllegalArgumentException("Bogus combat");
         }
+        
         return result;
     }
 
