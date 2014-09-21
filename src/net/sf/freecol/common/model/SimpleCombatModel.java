@@ -265,10 +265,12 @@ public class SimpleCombatModel extends CombatModel {
             // Popular support bonus
             if (combatIsWarOfIndependence(attacker, defender)) {
                 Colony colony = (Colony)defender;
-                int bonus = Math.max(100, colony.getSoL());
-                if (attacker.getOwner().isREF()) bonus = 100 - bonus;
-                result.add(new Modifier(Modifier.POPULAR_SUPPORT, bonus,
-                                        ModifierType.PERCENTAGE, colony));
+                int bonus = colony.getSoLPercentage();
+                if (bonus >= 0) {
+                    if (attacker.getOwner().isREF()) bonus = 100 - bonus;
+                    result.add(new Modifier(Modifier.POPULAR_SUPPORT, bonus,
+                            ModifierType.PERCENTAGE, colony));
+                }
             }
 
         } else if (combatIsAttack(attacker, defender)) {
@@ -279,6 +281,19 @@ public class SimpleCombatModel extends CombatModel {
                     // Bombard bonus applies to settlement defence
                     result.addAll(attacker
                                   .getModifiers(Modifier.BOMBARD_BONUS));
+
+                    // Popular support bonus
+                    if (combatIsWarOfIndependence(attacker, defender)) {
+                        Colony colony = (Colony)tile.getSettlement();
+                        int bonus = colony.getSoLPercentage();
+                        if (bonus >= 0) {
+                            if (attacker.getOwner().isREF()) {
+                                bonus = 100 - bonus;
+                            }
+                            result.add(new Modifier(Modifier.POPULAR_SUPPORT,
+                                    bonus, ModifierType.PERCENTAGE, colony));
+                        }
+                    }
                 } else {
                     // Ambush bonus in the open = defender's defence
                     // bonus, if defender is REF, or attacker is indian.

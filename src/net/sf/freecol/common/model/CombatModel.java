@@ -171,9 +171,9 @@ public abstract class CombatModel {
     public boolean combatIsWarOfIndependence(FreeColGameObject attacker,
                                              FreeColGameObject defender) {
         if (attacker instanceof Unit
-            && defender instanceof Colony) {
+            && defender instanceof Ownable) {
             Player aPlayer = ((Unit)attacker).getOwner();
-            Player dPlayer = ((Colony)defender).getOwner();
+            Player dPlayer = ((Ownable)defender).getOwner();
             return (aPlayer.getPlayerType() == Player.PlayerType.REBEL
                     && aPlayer.getREFPlayer() == dPlayer)
                 || (dPlayer.getPlayerType() == Player.PlayerType.REBEL

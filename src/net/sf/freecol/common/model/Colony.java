@@ -1346,7 +1346,7 @@ public class Colony extends Settlement implements Nameable {
         int uc = getUnitCount();
         oldSonsOfLiberty = sonsOfLiberty;
         oldTories = tories;
-        sonsOfLiberty = calculateSoL(uc, getEffectiveLiberty());
+        sonsOfLiberty = calculateSoLPercentage(uc, getEffectiveLiberty());
         tories = uc - calculateRebels(uc, sonsOfLiberty);
     }
 
@@ -1356,10 +1356,10 @@ public class Colony extends Settlement implements Nameable {
      *
      * @param uc The proposed number of units in the colony.
      * @param liberty The amount of liberty.
-     * @return The percentage of SoLs.
+     * @return The percentage of SoLs, negative if not calculable.
      */
-    private static int calculateSoL(int uc, int liberty) {
-        if (uc <= 0) return 0;
+    private static int calculateSoLPercentage(int uc, int liberty) {
+        if (uc <= 0) return -1;
 
         int membership = (liberty * 100) / (LIBERTY_PER_REBEL * uc);
         if (membership < 0) {
@@ -1368,6 +1368,15 @@ public class Colony extends Settlement implements Nameable {
             membership = 100;
         }
         return membership;
+    }
+
+    /**
+     * Calculate the SoL membership percentage of a colony.
+     *
+     * @return The percentage of SoLs, negative if not calculable.
+     */
+    public int getSoLPercentage() {
+        return calculateSoLPercentage(getUnitCount(), getEffectiveLiberty());
     }
 
     /**
@@ -1527,7 +1536,7 @@ public class Colony extends Settlement implements Nameable {
         final int goodGovernment
             = spec.getInteger(GameOptions.GOOD_GOVERNMENT_LIMIT);
 
-        int rebelPercent = calculateSoL(unitCount, getEffectiveLiberty());
+        int rebelPercent = calculateSoLPercentage(unitCount, getEffectiveLiberty());
         int rebelCount = calculateRebels(unitCount, rebelPercent);
         int loyalistCount = unitCount - rebelCount;
 
