@@ -403,6 +403,8 @@ public class ChangeSet {
                 Unit copy = attacker.copy(game, Unit.class);
                 if (attackerTile.hasSettlement()) {
                     copy.setLocationNoUpdate(attackerTile.getSettlement());
+                } else {
+                    copy.setLocationNoUpdate(attackerTile);
                 }
                 copy.setWorkType(null);
                 element.appendChild(copy.toXMLElement(doc));
