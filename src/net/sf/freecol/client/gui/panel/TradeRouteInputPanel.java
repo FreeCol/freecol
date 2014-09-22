@@ -521,14 +521,10 @@ public final class TradeRouteInputPanel extends FreeColPanel {
                 }
 
                 @Override
-                public void keyPressed(KeyEvent e) {
-                    throw new UnsupportedOperationException("Not supported yet.");
-                }
+                public void keyPressed(KeyEvent e) {} // Ignore
 
                 @Override
-                public void keyReleased(KeyEvent e) {
-                    throw new UnsupportedOperationException("Not supported yet.");
-                }
+                public void keyReleased(KeyEvent e) {} // Ignore
             });
         this.stopList.addListSelectionListener(new ListSelectionListener() {
                 public void valueChanged(ListSelectionEvent e) {
