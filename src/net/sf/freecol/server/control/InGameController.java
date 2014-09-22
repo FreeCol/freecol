@@ -3597,15 +3597,12 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
         if (loc instanceof Europe) {
             cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
-        }
-        if (loc instanceof WorkLocation) {
+        } else if (unit.isInColony()) {
             loc.getTile().cacheUnseen();//+til
             unit.setLocation(loc.getTile());//-vis: safe/colony,-til
-            cs.add(See.perhaps(), unit.getTile());
-        } else if (loc instanceof Settlement) {
+            cs.add(See.perhaps(), loc.getTile());
+        } else { // Settlement tile
             cs.add(See.only(serverPlayer), unit.getTile());
-        } else {
-            cs.add(See.only(serverPlayer), unit);
         }
         if (unit.getInitialMovesLeft() != unit.getMovesLeft()) {
             unit.setMovesLeft(0);
