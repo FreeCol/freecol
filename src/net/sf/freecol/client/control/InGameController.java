@@ -2695,7 +2695,9 @@ public final class InGameController implements NetworkConstants {
         boolean result = mt.isLegal();
         switch (mt) {
         case MOVE_HIGH_SEAS:
-            if (destination == null) {
+            if (freeColClient.getMyPlayer().getEurope() == null) {
+                ; // do nothing
+            } else if (destination == null) {
                 result = moveHighSeas(unit, direction);
                 break;
             } else if (destination instanceof Europe) {
