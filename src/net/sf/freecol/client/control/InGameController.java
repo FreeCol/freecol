@@ -2903,6 +2903,10 @@ public final class InGameController implements NetworkConstants {
                 && confirmPreCombat(unit, target)) {
                 askServer().attack(unit, direction);
                 nextActiveUnit();
+                Colony col = target.getColony();
+                if (col != null && unit.getOwner().owns(col)) {
+                    gui.showColonyPanel(col, unit);
+                }
                 return false;
             }
             break;
