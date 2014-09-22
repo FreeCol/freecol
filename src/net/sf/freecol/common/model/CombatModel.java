@@ -174,10 +174,8 @@ public abstract class CombatModel {
             && defender instanceof Ownable) {
             Player aPlayer = ((Unit)attacker).getOwner();
             Player dPlayer = ((Ownable)defender).getOwner();
-            return (aPlayer.getPlayerType() == Player.PlayerType.REBEL
-                    && aPlayer.getREFPlayer() == dPlayer)
-                || (dPlayer.getPlayerType() == Player.PlayerType.REBEL
-                    && dPlayer.getREFPlayer() == aPlayer);
+            return (aPlayer.isRebel() && aPlayer.getREFPlayer() == dPlayer)
+                || (dPlayer.isRebel() && dPlayer.getREFPlayer() == aPlayer);
         }
         return false;
     }

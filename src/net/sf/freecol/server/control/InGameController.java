@@ -1278,7 +1278,7 @@ public final class InGameController extends Controller {
             new ModelMessage(messageId, serverPlayer, unit)
                 .addAmount("%amount%", fullAmount)
                 .addAmount("%cashInAmount%", cashInAmount));
-        messageId = (serverPlayer.getPlayerType() == PlayerType.REBEL
+        messageId = (serverPlayer.isRebel()
                      || serverPlayer.getPlayerType() == PlayerType.INDEPENDENT)
             ? "model.unit.cashInTreasureTrain.other.independent"
             : "model.unit.cashInTreasureTrain.other.colonial";

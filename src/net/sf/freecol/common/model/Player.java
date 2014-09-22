@@ -1079,6 +1079,15 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Is this a colonial rebel player?
+     *
+     * @return True if this player is a rebel player.
+     */
+    public boolean isRebel() {
+        return playerType == PlayerType.REBEL;
+    }
+
+    /**
      * Is this an undead player?
      *
      * @return True if this player is undead.
@@ -1291,8 +1300,7 @@ public class Player extends FreeColGameObject implements Nameable {
         List<Player> rebels = new ArrayList<Player>();
         for (Player p : getGame().getLiveEuropeanPlayers(this)) {
             if (p.getREFPlayer() == this
-                && (p.getPlayerType() == PlayerType.REBEL
-                    || p.getPlayerType() == PlayerType.UNDEAD)) rebels.add(p);
+                && (p.isRebel() || p.isUndead())) rebels.add(p);
         }
         return rebels;
     }
@@ -1579,7 +1587,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public void modifyLiberty(int amount) {
         setLiberty(Math.max(0, liberty + amount));
-        if (playerType == PlayerType.REBEL) interventionBells += amount;
+        if (isRebel()) interventionBells += amount;
     }
 
     /**

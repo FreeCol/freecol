@@ -1326,8 +1326,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 csNaturalDisasters(random, cs, probability);
             }
 
-            if (getPlayerType() == PlayerType.REBEL
-                && interventionBells >= getSpecification().getInteger(GameOptions.INTERVENTION_BELLS)) {
+            if (isRebel() && interventionBells
+                >= getSpecification().getInteger(GameOptions.INTERVENTION_BELLS)) {
                 interventionBells = Integer.MIN_VALUE;
                 // TODO: this assumes that the entry location will
                 // always be a tile.  This seems safe enough at the moment.

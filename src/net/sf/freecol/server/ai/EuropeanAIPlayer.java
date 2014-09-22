@@ -2299,6 +2299,23 @@ public class EuropeanAIPlayer extends AIPlayer {
      * {@inheritDoc}
      */
     @Override
+    protected Stance determineStance(Player other) {
+        final Player player = getPlayer();
+        if (other.isREF()) {
+            if (player.getREFPlayer() == other) {
+                return (player.isRebel()) ? Stance.WAR : Stance.PEACE;
+            }
+            // Do not mess with other player's REF unless they conquer
+            // their rebellious colonies.
+            if (!other.getRebels().isEmpty()) return Stance.PEACE;
+        }
+        return super.determineStance(other);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void removeAIColony(AIColony aic) {
         final Colony colony = aic.getColony();
         

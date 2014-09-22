@@ -2036,7 +2036,7 @@ public final class InGameController implements NetworkConstants {
         String nationName = names.get(0);
         String countryName = names.get(1);
         if (askServer().declareIndependence(nationName, countryName)
-            && player.getPlayerType() == PlayerType.REBEL) {
+            && player.isRebel()) {
             freeColClient.updateActions();
             nextModelMessage();
             gui.showDeclarationPanel();

@@ -459,10 +459,11 @@ public class REFAIPlayer extends EuropeanAIPlayer {
      */
     @Override
     protected Stance determineStance(Player other) {
-        Player player = getPlayer();
+        final Player player = getPlayer();
         // The REF is always at war with rebels.
-        return (other.getREFPlayer() == player
-            && other.getPlayerType() == Player.PlayerType.REBEL) ? Stance.WAR
+        return (other.getREFPlayer() == player)
+            ? ((other.isRebel()) ? Stance.WAR : Stance.PEACE)
+            : (!player.getRebels().isEmpty()) ? Stance.PEACE // Focus!
             : super.determineStance(other);
     }
 

@@ -338,7 +338,6 @@ public abstract class AIPlayer extends AIObject {
      * @return The new <code>Stance</code>.
      */
     protected Stance determineStance(Player other) {
-        Player player = getPlayer();
         return player.getStance(other)
             .getStanceFromTension(player.getTension(other));
     }

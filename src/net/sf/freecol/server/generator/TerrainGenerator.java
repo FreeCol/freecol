@@ -1193,9 +1193,9 @@ public class TerrainGenerator {
     /**
      * Make lake regions from unassigned lake tiles.
      *
-     * @compat 0.10.x
-     * Public/static to allow Map to remediate missing lake regions
-     * end @compat 0.10.x
+     * // @compat 0.10.x
+     * // Public/static to allow Map to remediate missing lake regions
+     * // end @compat 0.10.x
      *
      * @param map The <code>Map</code> to add to.
      * @param lakes A list of lake <code>Tile</code>s.
