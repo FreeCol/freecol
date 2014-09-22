@@ -3813,11 +3813,14 @@ public class ServerPlayer extends Player implements ServerModelObject {
     private void csSlaughterUnit(Unit winner, Unit loser, ChangeSet cs) {
         ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
         StringTemplate winnerNation = winner.getApparentOwnerName();
-        StringTemplate winnerLocation = winner.getLocation()
-            .getLocationNameFor(winnerPlayer);
+        Location winnerLoc = (winner.isInColony()) ? winner.getColony()
+            : winner.getLocation();
+        StringTemplate winnerLocation
+            = winnerLoc.getLocationNameFor(winnerPlayer);
         ServerPlayer loserPlayer = (ServerPlayer) loser.getOwner();
         StringTemplate loserNation = loser.getApparentOwnerName();
-        Location loserLoc = loser.getLocation();
+        Location loserLoc = (loser.isInColony()) ? loser.getColony()
+            : loser.getLocation();
         StringTemplate loserLocation = loserLoc.getLocationNameFor(loserPlayer);
         String messageId = loser.getType().getId() + ".destroyed";
 
