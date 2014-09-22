@@ -120,16 +120,25 @@ public class AbstractUnit extends FreeColObject {
     }
 
     /**
-     * Gets a description of this abstract unit.
+     * Gets a template describing this abstract unit.
      *
      * @return A <code>StringTemplate</code> describing the abstract unit.
      */
     public StringTemplate getLabel() {
-        StringTemplate unitTemplate = Messages.getLabel(getId(), getRoleId(),
-                                                        getNumber());
+        StringTemplate tmpl = Messages.getTemplate(null, getId(), getRoleId(),
+                                                   getNumber());
         return StringTemplate.template("abstractUnit")
                              .addAmount("%number%", getNumber())
-                             .addStringTemplate("%unit%", unitTemplate);
+                             .addStringTemplate("%unit%", tmpl);
+    }
+
+    /**
+     * Get a description of this abstract unit.
+     *
+     * @return A <code>String</code> describing this abstract unit.
+     */
+    public String getDescription() {
+        return Messages.message(getLabel());
     }
 
     /**

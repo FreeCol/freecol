@@ -655,68 +655,79 @@ public class Messages {
     }
 
     /**
-     * Get a label for a unit given the type and role identifiers and
-     * the number of units.  This is the fundamental routine called
-     * from Unit and AbstractUnit.getLabel().
+     * Get a template for a collection of units given a name, type,
+     * role identifier and number.
      *
+     * @param name An optional unit name.
      * @param typeId The unit type identifier.
      * @param roleId The unit role identifier.
      * @param number The number of units.
      * @return A <code>StringTemplate</code> to describe the given unit.
      */
-    public static StringTemplate getLabel(String typeId, String roleId,
-                                          int number) {
+    public static StringTemplate getTemplate(String name, String typeId,
+                                             String roleId, int number) {
+        StringTemplate ret = StringTemplate.label("");
+        if (name != null) ret.addName(name + " (");
         // Check for special role-specific key, which will not have a
         // %role% argument.  These exist so we can avoid mentioning
         // the role twice, e.g. "Seasoned Scout Scout".
         String baseKey = typeId + "." + Role.getRoleSuffix(roleId);
-        StringTemplate result;
         if (containsKey(baseKey)) {
-            return StringTemplate.label("")
-                .addStringTemplate(StringTemplate.template(baseKey)
-                    .addAmount("%number%", number));
+            ret.addStringTemplate(StringTemplate.template(baseKey)
+                .addAmount("%number%", number));
+        } else {
+            ret.addStringTemplate(StringTemplate.template(typeId + NAME_SUFFIX)
+                .addAmount("%number%", number));
+            String roleKey = Role.getRoleKey(roleId);
+            if (roleKey != null) ret.addName(" ").add(roleKey);
         }
-        StringTemplate baseTemplate
-            = StringTemplate.template(typeId + NAME_SUFFIX)
-                .addAmount("%number%", number);
-        StringTemplate roleTemplate = StringTemplate.label("");
-        String roleKey = Role.getRoleKey(roleId);
-        if (roleKey != null) roleTemplate.addName(" ").add(roleKey);
-        return StringTemplate.label("")
-            .addStringTemplate(baseTemplate)
-            .addStringTemplate(roleTemplate);
+        if (name != null) ret.addName(")");
+        return ret;
     }
 
-    public static String getLabel(Unit unit) {
-        return message(getLabelTemplate(unit));
-    }
-
-    public static StringTemplate getLabelTemplate(Unit unit) {
-        UnitType type = unit.getType();
-        Role role = unit.getRole();
-        Player owner = unit.getOwner();
+    /**
+     * Get a detailed template for a unit.
+     *
+     * TODO: The two getTemplate routines are largely independent ATM.
+     * They should share code.
+     *
+     * @param unit The <code>Unit</code> to query.
+     * @param equipment Always show all equipment.
+     * @return A <code>StringTemplate</code> to describe the unit.
+     */
+    public static StringTemplate getFullTemplate(Unit unit, boolean equipment) {
+        final UnitType type = unit.getType();
+        final Role role = unit.getRole();
+        final Player owner = unit.getOwner();
         if (type == null || role == null || owner == null) {
             return null; // Probably disposed
         }
 
-        Role defaultRole = unit.getSpecification().getDefaultRole();
+        final Role defaultRole = unit.getSpecification().getDefaultRole();
         String nationName = getName(owner.getNation());
-        String unitName = getName(type);
+        String typeName = getName(type);
         String roleName = getName(role);
-        String extra = unitName;
-        boolean showRole = true;
+        String extra = typeName;
+        boolean showRole = true, addEquipment = false;
 
-        String key = type.getId() + "." + role.getSuffix();
-        if (role.getMaximumCount() == 1 && containsKey(key)) {
-            // first, check for special unit/role combinations (ignore
-            // pioneer for historical reasons)
-            showRole = false;
-            unitName = message(StringTemplate.template(key)
-                               .addAmount("%number%", 1));
+        // First, check for special type-role combinations, such as
+        // model.unit.seasonedScout.scout.  We must handle cases where the
+        // role is implicit in the unit type to avoid calling things
+        // "Seasoned Scout Scout".
+        String roleKey = type.getId() + "." + role.getSuffix();
+        if (role.getMaximumCount() == 1 && containsKey(roleKey)) {
+            typeName = message(StringTemplate.template(roleKey)
+                                             .addAmount("%number%", 1));
+            if (equipment) {
+                addEquipment = true;
+            } else {
+                showRole = false;
+            }
+
         } else if (defaultRole == role) {
             if (unit.canCarryTreasure()) {
                 // treasure trains display amount of gold
-                roleName = unitName;
+                roleName = typeName;
                 extra = message(StringTemplate.template("goldAmount")
                                 .addAmount("%amount%", unit.getTreasureAmount()));
             } else {
@@ -724,36 +735,59 @@ public class Messages {
                 // unequipped expert has no-equipment label
                 List<Role> expertRoles = type.getExpertRoles();
                 for (Role someRole : expertRoles) {
-                    if (containsKey(someRole.getId() + ".noequipment")) {
-                        roleName = unitName;
-                        extra = message(someRole.getId() + ".noequipment");
+                    String key = someRole.getId() + ".noequipment";
+                    if (containsKey(key)) {
+                        roleName = typeName;
+                        extra = message(key);
                         noEquipment = true;
                         break;
                     }
                 }
-                if (!noEquipment) {
-                    // no extra label
-                    showRole = false;
-                }
+                if (!noEquipment) showRole = false; // no extra label
             }
         } else if (role.getExpertUnit() == type) {
-            // expert equipped as expert has no additional label,
-            // unless maximum equipment count is greater than one
-            if (role.getMaximumCount() > 1) {
-                List<AbstractGoods> requiredGoods = role.getRequiredGoods();
-                if (!requiredGoods.isEmpty()) {
-                    int count = unit.getRoleCount();
-                    AbstractGoods goods = requiredGoods.get(0);
-                    roleName = unitName;
-                    extra = message(StringTemplate.template("model.goods.goodsAmount")
-                                    .addAmount("%amount%", goods.getAmount() * count)
-                                    .addName("%goods%", goods.getType()));
-                }
+            // expert equipped as such has no additional label if the
+            // amount of equipment must be 1, but if the amount can
+            // vary a label is required.
+            if (role.getMaximumCount() > 1 || equipment) {
+                addEquipment = true;
             } else {
                 showRole = false;
             }
+        } else if (equipment) {
+            addEquipment = true;
         }
 
+        if (addEquipment) {
+            List<AbstractGoods> requiredGoods
+                = role.getRequiredGoods(unit.getRoleCount());
+            if (requiredGoods.isEmpty()) {
+                // FIXME: hack for missionary
+                if ("model.role.missionary".equals(role.getId())) {
+                    extra = message(StringTemplate
+                        .template("model.goods.goodsAmount")
+                        .add("%goods%", "model.equipment.missionary.name")
+                        .addAmount("%amount%", 1));
+                }
+            } else {
+                StringTemplate g = StringTemplate.label("");
+                boolean first = true;
+                for (AbstractGoods ag : requiredGoods) {
+                    if (first) first = false; else g.addName(" ");
+                    g.addStringTemplate(StringTemplate
+                        .template("model.goods.goodsAmount")
+                        .addName("%goods%", ag.getType())
+                        .addAmount("%amount%", ag.getAmount()));
+                }
+                extra = message(g);
+            }
+            roleName = typeName;
+        }
+
+        // model.unit.nationUnit=%nation% %unit%
+        // model.unit.nationUnitRole=%nation% %role% (%extra%)
+        // model.unit.namedNationUnit=%name% (%nation% %unit%)
+        // model.unit.namedNationUnitRole=%name% (%nation% %role%/%extra%)
         StringTemplate result = null;
         if (unit.getName() == null) {
             if (showRole) {
@@ -770,7 +804,7 @@ public class Messages {
             result.addName("%name%", unit.getName());
         }
         result.addName("%nation%", nationName)
-            .addName("%unit%", unitName)
+            .addName("%unit%", typeName)
             .addName("%role%", roleName)
             .addName("%extra%", extra);
         return result;

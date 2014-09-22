@@ -602,7 +602,7 @@ public class DebugUtils {
                     && (t.hasSettlement() || u.isOnCarrier())) continue;
                 if (game.getFreeColGameObject(u.getId(), Unit.class) == null) {
                     lb.add("Unit missing on client-side.\n", "  Server: ",
-                           Messages.message(u.getFullLabel()),
+                           u.getFullDescription(false),
                            "(", u.getId(), ") from: ", 
                            u.getLocation().getId(), ".\n");
                     try {
@@ -617,10 +617,10 @@ public class DebugUtils {
                     if (cUnit.hasTile()
                         && !cUnit.getTile().getId().equals(u.getTile().getId())) {
                         lb.add("Unit located on different tiles.\n",
-                            "  Server: ", Messages.message(u.getFullLabel()),
+                            "  Server: ", u.getFullDescription(false),
                             "(", u.getId(), ") from: ",
                             u.getLocation().getId(), "\n",
-                            "  Client: ", Messages.message(cUnit.getFullLabel()),
+                            "  Client: ", cUnit.getFullDescription(false),
                             "(", cUnit.getId(), ") at: ",
                             cUnit.getLocation().getId(), "\n");
                         problemDetected = true;
@@ -762,7 +762,7 @@ public class DebugUtils {
                 if (list.isEmpty()) continue;
                 lb.add("\n->", label, "\n");
                 for (Unit u : list) {
-                    lb.add("\n", Messages.message(u.getFullLabel()));
+                    lb.add("\n", u.getFullDescription(false));
                     if (u.isDamaged()) {
                         lb.add(" (Repairing)");
                     } else {

@@ -180,7 +180,7 @@ public class Role extends BuildableType {
      */
     public static String getRoleKey(String roleId) {
         return (Specification.DEFAULT_ROLE_ID.equals(roleId)) ? null
-            : getRoleSuffix(roleId);
+            : "model.unit.role." + getRoleSuffix(roleId);
     }
 
     /**

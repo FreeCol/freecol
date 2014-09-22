@@ -79,7 +79,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
         if (missionary != null) {
             String missionaryName = Messages.message(StringTemplate.template("model.unit.nationUnit")
                 .addStringTemplate("%nation%", missionary.getOwner().getNationName())
-                .addStringTemplate("%unit%", Messages.getLabelTemplate(missionary)));
+                .addStringTemplate("%unit%", missionary.getFullLabel(false)));
             add(new JLabel(missionaryName, getGUI().getImageIcon(missionary, true), JLabel.CENTER));
         }
 

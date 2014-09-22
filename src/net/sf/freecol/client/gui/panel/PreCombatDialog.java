@@ -83,14 +83,14 @@ public class PreCombatDialog extends FreeColConfirmDialog {
                 + "[sg label]20[sg value, right]1px[sg percent]", ""));
         // left hand side: attacker
         // right hand side: defender
-        String attackerName = Messages.getLabel(attacker);
+        String attackerName = attacker.getFullDescription(false);
         JLabel attackerLabel = new UnitLabel(freeColClient, attacker,
                                              false, true);
         String defenderName = null;
         JLabel defenderLabel = null;
         if (combatModel.combatIsAttack(attacker, defender)) {
             Unit defenderUnit = (Unit)defender;
-            defenderName = Messages.getLabel(defenderUnit);
+            defenderName = defenderUnit.getFullDescription(false);
             defenderLabel = new UnitLabel(freeColClient, defenderUnit,
                                           false, true);
 

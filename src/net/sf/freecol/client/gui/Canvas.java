@@ -2385,8 +2385,8 @@ public final class Canvas extends JDesktopPane {
                                                           boolean neg) {
         JTextArea text = GUI.getDefaultTextArea(Messages.message(StringTemplate
                 .template("scoutColony.text")
-                    .addStringTemplate("%unit%", unit.getFullLabel())
-                    .addName("%colony%", colony.getName())));
+                .addStringTemplate("%unit%", unit.getFullLabel(false))
+                .addName("%colony%", colony.getName())));
 
         List<ChoiceItem<ScoutColonyAction>> choices
             = new ArrayList<ChoiceItem<ScoutColonyAction>>();

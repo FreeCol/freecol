@@ -1088,8 +1088,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                     "model.unit.slowed", this, slowedBy)
-                .addStringTemplate("%unit%", this.getFullLabel())
-                .addStringTemplate("%enemyUnit%", slowedBy.getFullLabel())
+                .addStringTemplate("%unit%", getFullLabel(false))
+                .addStringTemplate("%enemyUnit%", slowedBy.getFullLabel(false))
                 .addStringTemplate("%enemyNation%", enemy));
         }
 

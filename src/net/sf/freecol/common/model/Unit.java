@@ -269,8 +269,9 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Get a string template for a unit in a human readable form.  The
-     * label consists of up to three items:
+     * Get a string template for a unit.
+     *
+     * The template contains:
      * - The type of the unit
      * - A role if not the default
      * - The specific name of the unit if it has one
@@ -278,22 +279,45 @@ public class Unit extends GoodsLocation
      * @return The <code>StringTemplate</code> to describe the given unit.
      */
     public StringTemplate getLabel() {
-        StringTemplate result = Messages.getLabel(getType().getId(),
-                                                  getRole().getId(), 1);
-        if (getName() != null) result.addName(" ").addName(getName());
-        return result;
+        return Messages.getTemplate(getName(), getType().getId(),
+                                    getRole().getId(), 1);
     }
 
     /**
-     * Get a string template for a unit in a human readable form.  The
-     * label consists of the three items of getLabel() plus extra
-     * information about treasure (for treasure trains) or missing
-     * expected role-equipment.
+     * Get the basic i18n description for this unit.
      *
-     * @return The <code>StringTemplate</code> to describe the given unit.
+     * @return A <code>String</code> describing this unit.
      */
-    public StringTemplate getFullLabel() {
-        return Messages.getLabelTemplate(this);
+    public String getDescription() {
+        return Messages.message(getLabel());
+    }
+
+    /**
+     * Get a detailed string template for a unit.
+     *
+     * This routine extends getLabel() with:
+     * - The nation
+     * - information about treasure if the unit is a treasure train
+     * - missing expected equipment given the unit role
+     * - equipment if the amount can vary (pioneers), or the equipment
+     *   flag is true (only user is the UnitLabel descriptionLabel)
+     *
+     * @param equipment If true always list all equipment.
+     * @return The <code>StringTemplate</code> to fully describe the
+     *      given unit.
+     */
+    public StringTemplate getFullLabel(boolean equipment) {
+        return Messages.getFullTemplate(this, equipment);
+    }
+
+    /**
+     * Get the full i18n description for this unit.
+     *
+     * @param equipment If true always list all equipment.
+     * @return The full <code>String</code> describing this unit.
+     */
+    public String getFullDescription(boolean equipment) {
+        return Messages.message(Messages.getFullTemplate(this, equipment));
     }
 
     /**
@@ -717,33 +741,6 @@ public class Unit extends GoodsLocation
         List<Role> roles
             = getAvailableRoles(getSpecification().getMilitaryRoles());
         return (roles.isEmpty()) ? null : roles.get(0);
-    }
-
-    /**
-     * Get a description of the unit's role-equipment.
-     *
-     * FIXME: missionary equipment needs work, but has been left as is
-     * for now.
-     *
-     * @return A <code>StringTemplate</code> summarizing the role-equipment.
-     */
-    public StringTemplate getRoleLabel() {
-        if (hasDefaultRole()) return null;
-
-        StringTemplate result = StringTemplate.label("/");
-        List<AbstractGoods> req = getRole().getRequiredGoods(getRoleCount());
-        if ("model.role.missionary".equals(role.getId())) {
-            result.addStringTemplate(StringTemplate.template("model.goods.goodsAmount")
-                .add("%goods%", "model.equipment.missionary.name")
-                .addName("%amount%", Integer.toString(getRoleCount())));
-        } else {
-            for (AbstractGoods ag : req) {
-                result.addStringTemplate(StringTemplate.template("model.goods.goodsAmount")
-                    .add("%goods%", ag.getType().getNameKey())
-                    .addName("%amount%", Integer.toString(ag.getAmount())));
-            }
-        }
-        return result;
     }
 
     /**
@@ -3151,16 +3148,16 @@ public class Unit extends GoodsLocation
 
         return (leavingColony)
             ? StringTemplate.template("abandonEducation.text")
-            .addStringTemplate("%unit%", getFullLabel())
-            .addName("%colony%", getColony().getName())
-            .add("%building%", school.getNameKey())
-            .addName("%action%", (teacher)
-                ? Messages.message("abandonEducation.action.teaching")
-                : Messages.message("abandonEducation.action.studying"))
+                            .addStringTemplate("%unit%", getFullLabel(false))
+                            .addName("%colony%", getColony().getName())
+                            .add("%building%", school.getNameKey())
+                            .addName("%action%", (teacher)
+                                ? Messages.message("abandonEducation.action.teaching")
+                                : Messages.message("abandonEducation.action.studying"))
             : (teacher)
             ? StringTemplate.template("abandonTeaching.text")
-            .addStringTemplate("%unit%", getFullLabel())
-            .add("%building%", school.getNameKey())
+                            .addStringTemplate("%unit%", getFullLabel(false))
+                            .add("%building%", school.getNameKey())
             : null;
     }
 

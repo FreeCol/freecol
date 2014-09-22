@@ -624,8 +624,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
                 Object value, int index, boolean isSelected,
                 boolean cellHasFocus) {
                 Unit unit = (Unit)value;
-                setText((unit == null) ? ""
-                    : Messages.message(unit.getLabel()));
+                setText((unit == null) ? "" : unit.getDescription());
                 return this;
             }
         }

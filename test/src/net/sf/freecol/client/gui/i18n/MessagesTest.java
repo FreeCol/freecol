@@ -60,29 +60,36 @@ public class MessagesTest extends FreeColTestCase {
         = spec().getRole("model.role.nativeDragoon");
     private static final Role pioneerRole
         = spec().getRole("model.role.pioneer");
+    private static final Role scoutRole
+        = spec().getRole("model.role.scout");
     private static final Role soldierRole
         = spec().getRole("model.role.soldier");
 
-
-    public static final UnitType artillery
+    private static final UnitType artillery
         = spec().getUnitType("model.unit.artillery");
-    public static final UnitType brave
+    private static final UnitType brave
         = spec().getUnitType("model.unit.brave");
-    public static final UnitType caravel
+    private static final UnitType caravel
         = spec().getUnitType("model.unit.caravel");
-    public static final UnitType colonialRegular
+    private static final UnitType colonialRegular
         = spec().getUnitType("model.unit.colonialRegular");
-    public static final UnitType hardyPioneer
+    private static final UnitType freeColonist
+        = spec().getUnitType("model.unit.freeColonist");
+    private static final UnitType hardyPioneer
         = spec().getUnitType("model.unit.hardyPioneer");
-    public static final UnitType jesuitMissionary
+    private static final UnitType jesuitMissionary
         = spec().getUnitType("model.unit.jesuitMissionary");
-    public static final UnitType kingsRegular
+    private static final UnitType kingsRegular
         = spec().getUnitType("model.unit.kingsRegular");
-    public static final UnitType manOWar
+    private static final UnitType manOWar
         = spec().getUnitType("model.unit.manOWar");
-    public static final UnitType treasureTrain
+    private static final UnitType masterCarpenter
+        = spec().getUnitType("model.unit.masterCarpenter");
+    private static final UnitType seasonedScout
+        = spec().getUnitType("model.unit.seasonedScout");
+    private static final UnitType treasureTrain
         = spec().getUnitType("model.unit.treasureTrain");
-    public static final UnitType veteranSoldier
+    private static final UnitType veteranSoldier
         = spec().getUnitType("model.unit.veteranSoldier");
 
 
@@ -91,31 +98,34 @@ public class MessagesTest extends FreeColTestCase {
     }
 
     public void testMessageString() {
-        assertEquals("Press enter in order to end the turn.", Messages.message("infoPanel.endTurnPanel.text"));
-        assertEquals("Trade Advisor", Messages.message("reportTradeAction.name"));
+        assertTrue("Press enter in order to end the turn."
+            .equals(Messages.message("infoPanel.endTurnPanel.text")));
+        assertTrue("Trade Advisor"
+            .equals(Messages.message("reportTradeAction.name")));
 
         // With parameters
-        assertEquals("Score: %score%    |    Gold: %gold%    |    Tax: %tax%%    |    Year: %year%",
-                     Messages.message("menuBar.statusLine"));
+        assertTrue("Score: %score%    |    Gold: %gold%    |    Tax: %tax%%    |    Year: %year%"
+            .equals(Messages.message("menuBar.statusLine")));
 
         // Long String
-        assertEquals("Food is necessary to feed your colonists and to breed horses. "
-                     + "A new colonist is born whenever a colony has 200 units of food or more.",
-                     Messages.message("model.goods.food.description"));
+        assertTrue("Food is necessary to feed your colonists and to breed horses. A new colonist is born whenever a colony has 200 units of food or more."
+            .equals(Messages.message("model.goods.food.description")));
 
         // Message not found
-        assertEquals(noSuchKey, Messages.message(noSuchKey));
+        assertTrue(noSuchKey.equals(Messages.message(noSuchKey)));
     }
 
 
     public void testChangeLocaleSettings() {
         Messages.setMessageBundle(Locale.US);
 
-        assertEquals("Trade Advisor", Messages.message("reportTradeAction.name"));
+        assertTrue("Trade Advisor"
+            .equals(Messages.message("reportTradeAction.name")));
 
         Messages.setMessageBundle(Locale.GERMANY);
 
-        assertEquals("Handelsberater", Messages.message("reportTradeAction.name"));
+        assertTrue("Handelsberater"
+            .equals(Messages.message("reportTradeAction.name")));
     }
 
     // Tests if messages with special chars (like $) are well processed
@@ -123,7 +133,7 @@ public class MessagesTest extends FreeColTestCase {
         String errMsg = "Error setting up test.";
         String expected = "You establish the colony of %colony%.";
         String message = Messages.message("model.history.FOUND_COLONY");
-        assertEquals(errMsg, expected, message);
+        assertTrue(errMsg, expected.equals(message));
 
         String colNameWithSpecialChars="$specialColName\\";
         errMsg = "Wrong message";
@@ -132,12 +142,12 @@ public class MessagesTest extends FreeColTestCase {
             message = Messages.message(StringTemplate.template("model.history.FOUND_COLONY")
                                        .addName("%colony%", colNameWithSpecialChars));
         } catch(IllegalArgumentException e){
-            if(e.getMessage().contains("Illegal group reference")){
+            if (e.getMessage().contains("Illegal group reference")){
                 fail("Does not process messages with special chars");
             }
             throw e;
         }
-        assertEquals(errMsg, expected, message);
+        assertTrue(errMsg, expected.equals(message));
     }
 
     public void testStringTemplates() {
@@ -145,10 +155,12 @@ public class MessagesTest extends FreeColTestCase {
 
         // template with key not in message bundle
         StringTemplate s1 = StringTemplate.key("!no.such.string.template");
-        assertEquals(s1.getId(), Messages.message(s1));
+        assertTrue(s1.getId()
+            .equals(Messages.message(s1)));
 
         StringTemplate s2 = StringTemplate.key("model.tile.plains.name");
-        assertEquals("Plains", Messages.message(s2));
+        assertTrue("Plains"
+            .equals(Messages.message(s2)));
 
         StringTemplate t1 = StringTemplate.template("model.goods.goodsAmount")
             .add("%goods%", "model.goods.food.name")
@@ -159,29 +171,34 @@ public class MessagesTest extends FreeColTestCase {
                      t1.getReplacements().get(0).getTemplateType());
         assertEquals(StringTemplate.TemplateType.NAME,
                      t1.getReplacements().get(1).getTemplateType());
-        assertEquals("model.goods.goodsAmount", t1.getId());
-        assertEquals("100 Food", Messages.message(t1));
+        assertTrue("model.goods.goodsAmount"
+            .equals(t1.getId()));
+        assertTrue("100 Food"
+            .equals(Messages.message(t1)));
 
         StringTemplate t2 = StringTemplate.label(" / ")
             .add("model.goods.food.name")
             .addName("xyz");
-        assertEquals("Food / xyz", Messages.message(t2));
+        assertTrue("Food / xyz"
+            .equals(Messages.message(t2)));
 
         Game game = getGame();
         game.setMap(getTestMap());
         Colony colony = getStandardColony();
-        assertEquals("New Amsterdam", colony.getName());
+        assertTrue("New Amsterdam"
+            .equals(colony.getName()));
 
         StringTemplate t3 = StringTemplate.template("inLocation")
             .addName("%location%", colony.getName());
-        assertEquals("In New Amsterdam", Messages.message(t3));
+        assertTrue("In New Amsterdam"
+            .equals(Messages.message(t3)));
 
         StringTemplate t4 = StringTemplate.label("")
             .addName("(")
             .add("model.goods.food.name")
             .addName(")");
-        assertEquals("(Food)", Messages.message(t4));
-
+        assertTrue("(Food)"
+            .equals(Messages.message(t4)));
     }
 
     public void testReplaceGarbage() {
@@ -192,7 +209,8 @@ public class MessagesTest extends FreeColTestCase {
         try {
             Messages.loadMessages(stream);
         } catch (IOException ioe) { fail(); }
-        assertEquals("abc   def", Messages.message("some.key"));
+        assertTrue("abc   def"
+            .equals(Messages.message("some.key")));
     }
 
     public void testReplaceNumber() {
@@ -210,21 +228,23 @@ public class MessagesTest extends FreeColTestCase {
         // default Number is Other
         Messages.setGrammaticalNumber(NumberRules.OTHER_NUMBER_RULE);
         for (double d : numbers) {
-            assertEquals("abcother|xyz", Messages.message(StringTemplate.template("some.key")
-                                                          .addAmount("%number%", d)));
+            assertTrue("abcother|xyz"
+                .equals(Messages.message(StringTemplate.template("some.key")
+                        .addAmount("%number%", d))));
         }
         // apply English rules
         Messages.setGrammaticalNumber(NumberRules.PLURAL_NUMBER_RULE);
         for (double d : numbers) {
             if (d == 1) {
-                assertEquals("abcone|xyz", Messages.message(StringTemplate.template("some.key")
-                                                            .addAmount("%number%", d)));
+                assertTrue("abcone|xyz"
+                    .equals(Messages.message(StringTemplate.template("some.key")
+                            .addAmount("%number%", d))));
             } else {
-                assertEquals("abcother|xyz", Messages.message(StringTemplate.template("some.key")
-                                                              .addAmount("%number%", d)));
+                assertTrue("abcother|xyz"
+                    .equals(Messages.message(StringTemplate.template("some.key")
+                            .addAmount("%number%", d))));
             }
         }
-
     }
 
     public void testReplaceArbitraryTag() {
@@ -233,27 +253,27 @@ public class MessagesTest extends FreeColTestCase {
         String expected = "After months at sea, you have finally arrived off the "
             + "coast of an unknown continent. Sail eastward in order to discover "
             + "the New World and to claim it for the Crown.";
-        assertEquals(expected, Messages.message(template));
+        assertTrue(expected
+            .equals(Messages.message(template)));
 
         template = StringTemplate.template("tutorial.startGame")
             .add("%direction%", "west");
         expected = "After months at sea, you have finally arrived off the "
             + "coast of an unknown continent. Sail westward in order to discover "
             + "the New World and to claim it for the Crown.";
-        assertEquals(expected, Messages.message(template));
+        assertTrue(expected
+            .equals(Messages.message(template)));
 
         template = StringTemplate.template("tutorial.startGame")
             .add("%direction%", "whatever");
         expected = "After months at sea, you have finally arrived off the "
             + "coast of an unknown continent. Sail into the wind in order to discover "
             + "the New World and to claim it for the Crown.";
-        assertEquals(expected, Messages.message(template));
-
+        assertTrue(expected
+            .equals(Messages.message(template)));
     }
 
-
     public void testReplaceChoicesPlural() {
-
         String mapping = "some.key=This is {{plural:%number%|one=a test|other=one of several tests"
             + "|default=not much of a test}}.\n"
             + "unit.template=%number% {{plural:%number%|%unit%}}\n"
@@ -264,27 +284,27 @@ public class MessagesTest extends FreeColTestCase {
             Messages.loadMessages(stream);
         } catch (IOException ioe) { fail(); }
 
-        assertEquals("artillery", Messages.message("unit.key"));
+        assertTrue("artillery"
+            .equals(Messages.message("unit.key")));
 
-        assertEquals("This is one of several tests.",
-                     Messages.message(StringTemplate.template("some.key")
-                                      .addAmount("%number%", 0)));
-        assertEquals("This is a test.",
-                     Messages.message(StringTemplate.template("some.key")
-                                      .addAmount("%number%", 1)));
-        assertEquals("This is one of several tests.",
-                     Messages.message(StringTemplate.template("some.key")
-                                      .addAmount("%number%", 2)));
-        assertEquals("This is one of several tests.",
-                     Messages.message(StringTemplate.template("some.key")
-                                      .addAmount("%number%", 24)));
+        assertTrue("This is one of several tests."
+            .equals(Messages.message(StringTemplate.template("some.key")
+                                                   .addAmount("%number%", 0))));
+        assertTrue("This is a test."
+            .equals(Messages.message(StringTemplate.template("some.key")
+                                                   .addAmount("%number%", 1))));
+        assertTrue("This is one of several tests."
+            .equals(Messages.message(StringTemplate.template("some.key")
+                                                   .addAmount("%number%", 2))));
+        assertTrue("This is one of several tests."
+            .equals(Messages.message(StringTemplate.template("some.key")
+                                                   .addAmount("%number%", 24))));
 
         StringTemplate template = StringTemplate.template("unit.template")
             .addAmount("%number%", 1)
             .add("%unit%", "unit.key");
-
-        assertEquals("1 piece of artillery", Messages.message(template));
-
+        assertTrue("1 piece of artillery"
+            .equals(Messages.message(template)));
     }
 
     public void testReplaceChoicesGrammar() {
@@ -298,21 +318,23 @@ public class MessagesTest extends FreeColTestCase {
             Messages.loadMessages(stream);
         } catch (IOException ioe) { fail(); }
 
-        assertEquals("French people", Messages.message("key.france"));
+        assertTrue("French people"
+            .equals(Messages.message("key.france")));
 
         StringTemplate t1 = StringTemplate.template("key.france")
             .add("%randomKey%", "country");
-        assertEquals("France", Messages.message(t1));
+        assertTrue("France"
+            .equals(Messages.message(t1)));
 
         StringTemplate t2 = StringTemplate.template("greeting1")
             .add("%nation%", "key.france");
-        assertEquals("The French people are happy to see you.", Messages.message(t2));
+        assertTrue("The French people are happy to see you."
+            .equals(Messages.message(t2)));
 
         StringTemplate t3 = StringTemplate.template("greeting2")
             .add("%nation%", "key.france");
-        assertEquals("The French are happy to see you.", Messages.message(t3));
-
-
+        assertTrue("The French are happy to see you."
+            .equals(Messages.message(t3)));
     }
 
     public void testNestedChoices() {
@@ -330,12 +352,12 @@ public class MessagesTest extends FreeColTestCase {
         StringTemplate t = StringTemplate.template("key1")
             .addName("%colony%", "someColony")
             .add("%goods%", "key2");
-
-        assertEquals("someColony tuottaa tuotetta viljaa.", Messages.message(t));
-
-        assertEquals("Ruoka", Messages.message(StringTemplate.key("key3")));
-        assertEquals("Ruoka", Messages.message("key3"));
-
+        assertTrue("someColony tuottaa tuotetta viljaa."
+            .equals(Messages.message(t)));
+        assertTrue("Ruoka"
+            .equals(Messages.message(StringTemplate.key("key3"))));
+        assertTrue("Ruoka"
+            .equals(Messages.message("key3")));
     }
 
     public void testTurnChoices() {
@@ -350,117 +372,41 @@ public class MessagesTest extends FreeColTestCase {
 
         StringTemplate t = StringTemplate.template("monarch")
             .addName("%turn%", Turn.toString(1));
-        assertEquals("bob", Messages.message(t));
+        assertTrue("bob"
+            .equals(Messages.message(t)));
 
         t = StringTemplate.template("monarch")
             .addName("%turn%", Turn.toString(2));
-        assertEquals("anson", Messages.message(t));
+        assertTrue("anson"
+            .equals(Messages.message(t)));
 
         t = StringTemplate.template("monarch")
             .addName("%turn%", "AUTUMN 1493");
-        assertEquals("paul", Messages.message(t));
+        assertTrue("paul"
+            .equals(Messages.message(t)));
 
         t = StringTemplate.template("monarch")
             .addName("%turn%", Turn.toString(100));
-        assertEquals("james", Messages.message(t));
+        assertTrue("james"
+            .equals(Messages.message(t)));
 
         t = StringTemplate.template("monarch")
             .addName("%turn%", Turn.toString(150));
-        assertEquals("nathan", Messages.message(t));
+        assertTrue("nathan"
+            .equals(Messages.message(t)));
 
         t = StringTemplate.template("monarch")
             .addName("%turn%", "YEAR 1624");
-        assertEquals("nathan", Messages.message(t));
+        assertTrue("nathan"
+            .equals(Messages.message(t)));
 
         t = StringTemplate.template("monarch")
             .addName("%turn%", Turn.toString(1000));
-        assertEquals("fred", Messages.message(t));
-
+        assertTrue("fred"
+            .equals(Messages.message(t)));
     }
 
-
-    public void testAbstractUnitLabels() {
-        AbstractUnit unit = new AbstractUnit("model.unit.merchantman",
-                                             Specification.DEFAULT_ROLE_ID, 1);
-        assertEquals("one Merchantman", Messages.message(unit.getLabel()));
-
-    }
-
-
-    public void testLabels() {
-        Game game = getStandardGame();
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
-        ServerPlayer dutchREF = new ServerPlayer(game, "dutchREF", false,
-            dutch.getNation().getREFNation(), null, null);
-        ServerPlayer sioux = (ServerPlayer)game.getPlayer("model.nation.sioux");
-        Unit unit;
-
-        // King's regulars
-        unit = new ServerUnit(game, null, dutchREF,
-                              kingsRegular, defaultRole);
-        assertEquals("King's Regular", Messages.message(unit.getLabel()));
-
-        unit.changeRole(infantryRole, 1);
-        assertEquals("Infantry", Messages.message(unit.getLabel()));
-
-        unit.changeRole(cavalryRole, 1);
-        assertEquals("Cavalry", Messages.message(unit.getLabel()));
-
-        // Colonial regulars
-        unit = new ServerUnit(game, null, dutch, 
-                              colonialRegular, defaultRole);
-        assertEquals("Colonial Regular", Messages.message(unit.getLabel()));
-
-        unit.changeRole(soldierRole, 1);
-        assertEquals("Continental Army", Messages.message(unit.getLabel()));
-
-        unit.changeRole(dragoonRole, 1);
-        assertEquals("Continental Cavalry", Messages.message(unit.getLabel()));
-
-        // Veteran Soldiers
-        unit = new ServerUnit(game, null, dutch,
-                              veteranSoldier, soldierRole);
-        assertEquals("Dutch Veteran Soldier", Messages.message(unit.getFullLabel()));
-
-        unit.changeRole(defaultRole, 0);
-        assertEquals("Dutch Veteran Soldier (no muskets)",
-                     Messages.message(unit.getFullLabel()));
-
-        unit.changeRole(dragoonRole, 1);
-        assertEquals("Veteran Dragoon", Messages.message(unit.getLabel()));
-
-        // Indian Braves
-        unit = new ServerUnit(game, null, sioux, brave);
-        assertEquals("Brave", Messages.message(unit.getLabel()));
-
-        unit.changeRole(armedBraveRole, 1);
-        assertEquals("Armed Brave", Messages.message(unit.getLabel()));
-
-        unit.changeRole(mountedBraveRole, 1);
-        assertEquals("Mounted Brave", Messages.message(unit.getLabel()));
-
-        unit.changeRole(nativeDragoonRole, 1);
-        assertEquals("Native Dragoon", Messages.message(unit.getLabel()));
-
-        // Hardy Pioneers
-        unit = new ServerUnit(game, null, dutch,
-                              hardyPioneer, pioneerRole);
-        assertEquals("Hardy Pioneer", Messages.message(unit.getLabel()));
-
-        unit.changeRole(defaultRole, 0);
-        assertEquals("Dutch Hardy Pioneer (no tools)",
-                     Messages.message(unit.getFullLabel()));
-
-        // Jesuit Missionaries
-        unit = new ServerUnit(game, null, dutch,
-                              jesuitMissionary, missionaryRole);
-        assertEquals("Jesuit Missionary", Messages.message(unit.getLabel()));
-
-        unit.changeRole(defaultRole, 0);
-        assertEquals("Dutch Jesuit Missionary (not commissioned)",
-                     Messages.message(unit.getFullLabel()));
-
-        // REF addition message
+    public void testREFMessages() {
         StringTemplate template
             = StringTemplate.template("model.monarch.action.ADD_TO_REF")
                             .addAmount("%number%", 1)
@@ -468,7 +414,8 @@ public class MessagesTest extends FreeColTestCase {
         String expected = "The Crown has added 1 King's Regular"
             + " to the Royal Expeditionary Force."
             + " Colonial leaders express concern.";
-        assertEquals(expected, Messages.message(template));
+        assertTrue(expected
+            .equals(Messages.message(template)));
 
         template = StringTemplate.template("model.monarch.action.ADD_TO_REF")
                                  .addAmount("%number%", 2)
@@ -476,7 +423,8 @@ public class MessagesTest extends FreeColTestCase {
         expected = "The Crown has added 2 Pieces of Artillery"
             + " to the Royal Expeditionary Force."
             + " Colonial leaders express concern.";
-        assertEquals(expected, Messages.message(template));
+        assertTrue(expected
+            .equals(Messages.message(template)));
 
         template = StringTemplate.template("model.monarch.action.ADD_TO_REF")
                                  .addAmount("%number%", 3)
@@ -484,137 +432,278 @@ public class MessagesTest extends FreeColTestCase {
         expected = "The Crown has added 3 Men of War"
             + " to the Royal Expeditionary Force."
             + " Colonial leaders express concern.";
-        assertEquals(expected, Messages.message(template));
+        assertTrue(expected
+            .equals(Messages.message(template)));
     }
 
-    public void testUnitLabel() {
+    public void testAbstractUnitDescription() {
+        AbstractUnit au = new AbstractUnit("model.unit.merchantman",
+                                           Specification.DEFAULT_ROLE_ID, 1);
+        assertTrue("one Merchantman".equals(au.getDescription()));
+    }
+
+    public void testUnitDescription() {
+        // Unit.getDescription/getFullDescription are just wrappers around
+        // Messages.getTemplate/getFullTemplate.
         Game game = getStandardGame();
         ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
         ServerPlayer dutchREF = new ServerPlayer(game, "dutchREF", false,
             dutch.getNation().getREFNation(), null, null);
         ServerPlayer sioux = (ServerPlayer)game.getPlayer("model.nation.sioux");
-
-        Role scout = spec().getRole("model.role.scout");
-        Role soldier = spec().getRole("model.role.soldier");
-        Role dragoon = spec().getRole("model.role.dragoon");
-        Role pioneer = spec().getRole("model.role.pioneer");
-        Role missionary = spec().getRole("model.role.missionary");
         Unit unit;
 
-        // Free Colonists
-        unit = new ServerUnit(game, null, dutch, spec()
-                              .getUnitType("model.unit.freeColonist"));
-        assertEquals("Dutch Free Colonist", Messages.getLabel(unit));
-
-        unit.setRole(soldier);
-        assertEquals("Dutch Soldier (Free Colonist)", Messages.getLabel(unit));
-
-        unit.setName("John Doe");
-        assertEquals("John Doe (Dutch Soldier/Free Colonist)", Messages.getLabel(unit));
-
-        // Master Carpenter
-        unit = new ServerUnit(game, null, dutch, spec()
-                              .getUnitType("model.unit.masterCarpenter"));
-        assertEquals("Dutch Master Carpenter", Messages.getLabel(unit));
-
-        unit.setRole(missionary);
-        assertEquals("Dutch Missionary (Master Carpenter)", Messages.getLabel(unit));
-
-
         // King's regulars
-        unit = new ServerUnit(game, null, dutchREF,
-                              kingsRegular, defaultRole);
-        assertEquals("Dutch Royal Expeditionary Force King's Regular",
-                     Messages.getLabel(unit));
+        unit = new ServerUnit(game, null, dutchREF, kingsRegular, defaultRole);
+
+        assertTrue("King's Regular"
+            .equals(unit.getDescription()));
+        assertTrue("Dutch Royal Expeditionary Force King's Regular"
+            .equals(unit.getFullDescription(false)));
+        assertTrue("Dutch Royal Expeditionary Force King's Regular"
+            .equals(unit.getFullDescription(true)));
 
         unit.changeRole(infantryRole, 1);
-        assertEquals("Dutch Royal Expeditionary Force Infantry",
-                     Messages.getLabel(unit));
+        assertTrue("Infantry"
+            .equals(unit.getDescription()));
+        assertTrue("Dutch Royal Expeditionary Force Infantry"
+            .equals(unit.getFullDescription(false)));
+        assertTrue("Dutch Royal Expeditionary Force Infantry (50 Muskets)"
+            .equals(unit.getFullDescription(true)));
 
         unit.changeRole(cavalryRole, 1);
-        assertEquals("Dutch Royal Expeditionary Force Cavalry", Messages.getLabel(unit));
+        assertTrue("Cavalry"
+            .equals(unit.getDescription()));
+        assertTrue("Dutch Royal Expeditionary Force Cavalry"
+            .equals(unit.getFullDescription(false)));
+        assertTrue("Dutch Royal Expeditionary Force Cavalry (50 Muskets 50 Horses)"
+            .equals(unit.getFullDescription(true)));
 
         // Colonial regulars
-        unit = new ServerUnit(game, null, dutch,
-                              colonialRegular, defaultRole);
-        assertEquals("Dutch Colonial Regular", Messages.getLabel(unit));
+        unit = new ServerUnit(game, null, dutch, colonialRegular, defaultRole);
+
+        assertTrue("Colonial Regular"
+            .equals(unit.getDescription()));
+        assertTrue("Dutch Colonial Regular"
+            .equals(unit.getFullDescription(false)));
+        assertTrue("Dutch Colonial Regular"
+            .equals(unit.getFullDescription(true)));
 
         unit.changeRole(soldierRole, 1);
-        assertEquals("Dutch Continental Army", Messages.getLabel(unit));
+        assertTrue("Continental Army"
+            .equals(unit.getDescription()));
+        assertTrue("Dutch Continental Army"
+            .equals(unit.getFullDescription(false)));
+        assertTrue("Dutch Continental Army (50 Muskets)"
+            .equals(unit.getFullDescription(true)));
 
         unit.changeRole(dragoonRole, 1);
-        assertEquals("Dutch Continental Cavalry", Messages.getLabel(unit));
+        assertTrue("Continental Cavalry"
+            .equals(unit.getDescription()));
+        assertTrue("Dutch Continental Cavalry"
+            .equals(unit.getFullDescription(false)));
+        assertTrue("Dutch Continental Cavalry (50 Muskets 50 Horses)"
+            .equals(unit.getFullDescription(true)));
 
         // Veteran Soldiers
-        unit = new ServerUnit(game, null, dutch,
-                              veteranSoldier, soldierRole);
-        assertEquals("Dutch Veteran Soldier", Messages.getLabel(unit));
+        unit = new ServerUnit(game, null, dutch, veteranSoldier, soldierRole);
+
+        assertTrue("Veteran Soldier"
+            .equals(unit.getDescription()));
+        assertTrue("Dutch Veteran Soldier"
+            .equals(unit.getFullDescription(false)));
+        assertTrue("Dutch Veteran Soldier (50 Muskets)"
+            .equals(unit.getFullDescription(true)));
 
         unit.changeRole(defaultRole, 0);
-        assertEquals("Dutch Veteran Soldier (no muskets)",
-                     Messages.getLabel(unit));
+        assertTrue("Veteran Soldier"
+            .equals(unit.getDescription()));
+        assertTrue("Dutch Veteran Soldier (no muskets)"
+            .equals(unit.getFullDescription(false)));
+        assertTrue("Dutch Veteran Soldier (no muskets)"
+            .equals(unit.getFullDescription(true)));
 
         unit.changeRole(dragoonRole, 1);
-        assertEquals("Dutch Veteran Dragoon", Messages.getLabel(unit));
+        assertTrue("Veteran Dragoon"
+            .equals(unit.getDescription()));
+        assertTrue("Dutch Veteran Dragoon"
+            .equals(unit.getFullDescription(false)));
+        assertTrue("Dutch Veteran Dragoon (50 Muskets 50 Horses)"
+            .equals(unit.getFullDescription(true)));
 
         unit.setName("Davy Crockett");
-        assertEquals("Davy Crockett (Dutch Veteran Dragoon)",
-                     Messages.getLabel(unit));
+        assertTrue("Davy Crockett (Veteran Dragoon)"
+            .equals(unit.getDescription()));
+        assertTrue("Davy Crockett (Dutch Veteran Dragoon)"
+            .equals(unit.getFullDescription(false)));
+        assertTrue("Davy Crockett (Dutch Veteran Dragoon/50 Muskets 50 Horses)"
+            .equals(unit.getFullDescription(true)));
 
         // Indian Braves
         unit = new ServerUnit(game, null, sioux, brave, defaultRole);
-        assertEquals("Sioux Brave", Messages.getLabel(unit));
+
+        assertTrue("Brave"
+            .equals(unit.getDescription()));
+        assertTrue("Sioux Brave"
+            .equals(unit.getFullDescription(false)));
+        assertTrue("Sioux Brave"
+            .equals(unit.getFullDescription(true)));
 
         unit.changeRole(armedBraveRole, 1);
-        assertEquals("Sioux Armed Brave", Messages.getLabel(unit));
+        assertTrue("Armed Brave"
+            .equals(unit.getDescription()));
+        assertTrue("Sioux Armed Brave"
+            .equals(unit.getFullDescription(false)));
+        assertTrue("Sioux Armed Brave (25 Muskets)"
+            .equals(unit.getFullDescription(true)));
+
+        unit.changeRole(mountedBraveRole, 1);
+        assertTrue("Mounted Brave"
+            .equals(unit.getDescription()));
+        assertTrue("Sioux Mounted Brave"
+            .equals(unit.getFullDescription(false)));
+        assertTrue("Sioux Mounted Brave (25 Horses)"
+            .equals(unit.getFullDescription(true)));
 
         unit.changeRole(nativeDragoonRole, 1);
-        assertEquals("Sioux Native Dragoon", Messages.getLabel(unit));
+        assertTrue("Native Dragoon"
+            .equals(unit.getDescription()));
+        assertTrue("Sioux Native Dragoon"
+            .equals(unit.getFullDescription(false)));
+        assertTrue("Sioux Native Dragoon (25 Muskets 25 Horses)"
+            .equals(unit.getFullDescription(true)));
 
         unit.setName("Chingachgook");
-        assertEquals("Chingachgook (Sioux Native Dragoon)",
-                     Messages.getLabel(unit));
+        assertTrue("Chingachgook (Native Dragoon)"
+            .equals(unit.getDescription()));
+        assertTrue("Chingachgook (Sioux Native Dragoon)"
+            .equals(unit.getFullDescription(false)));
+        assertTrue("Chingachgook (Sioux Native Dragoon/25 Muskets 25 Horses)"
+            .equals(unit.getFullDescription(true)));
 
         // Hardy Pioneers
-        unit = new ServerUnit(game, null, dutch,
-                              hardyPioneer, pioneerRole);
-        assertEquals("Dutch Hardy Pioneer (100 Tools)",
-                     Messages.getLabel(unit));
+        unit = new ServerUnit(game, null, dutch, hardyPioneer, pioneerRole);
+
+        assertTrue("Hardy Pioneer"
+            .equals(unit.getDescription()));
+        assertTrue("Dutch Hardy Pioneer (100 Tools)"
+            .equals(unit.getFullDescription(false)));
+        assertTrue("Dutch Hardy Pioneer (100 Tools)"
+            .equals(unit.getFullDescription(true)));
 
         unit.changeRole(defaultRole, 0);
-        assertEquals("Dutch Hardy Pioneer (no tools)",
-                     Messages.getLabel(unit));
+        assertTrue("Hardy Pioneer"
+            .equals(unit.getDescription()));
+        assertTrue("Dutch Hardy Pioneer (no tools)"
+            .equals(unit.getFullDescription(false)));
+        assertTrue("Dutch Hardy Pioneer (no tools)"
+            .equals(unit.getFullDescription(true)));
 
         unit.setName("Daniel Boone");
-        assertEquals("Daniel Boone (Dutch Hardy Pioneer/no tools)",
-                     Messages.getLabel(unit));
+        assertTrue("Daniel Boone (Hardy Pioneer)"
+            .equals(unit.getDescription()));
+        assertTrue("Daniel Boone (Dutch Hardy Pioneer/no tools)"
+            .equals(unit.getFullDescription(false)));
+        assertTrue("Daniel Boone (Dutch Hardy Pioneer/no tools)"
+            .equals(unit.getFullDescription(true)));
 
         // Jesuit Missionaries
-        unit = new ServerUnit(game, null, dutch,
-                              jesuitMissionary, missionaryRole);
-        assertEquals("Dutch Jesuit Missionary", Messages.getLabel(unit));
+        unit = new ServerUnit(game, null, dutch, jesuitMissionary, 
+                              missionaryRole);
+
+        assertTrue("Jesuit Missionary"
+            .equals(unit.getDescription()));
+        assertTrue("Dutch Jesuit Missionary"
+            .equals(unit.getFullDescription(false)));
+        assertTrue("Dutch Jesuit Missionary (1 Bible)"
+            .equals(unit.getFullDescription(true)));
 
         unit.changeRole(defaultRole, 0);
-        assertEquals("Dutch Jesuit Missionary (not commissioned)",
-                     Messages.getLabel(unit));
+        assertTrue("Jesuit Missionary"
+            .equals(unit.getDescription()));
+        assertTrue("Dutch Jesuit Missionary (not commissioned)"
+            .equals(unit.getFullDescription(false)));
+        assertTrue("Dutch Jesuit Missionary (not commissioned)"
+            .equals(unit.getFullDescription(true)));
+
+        // Free Colonists
+        unit = new ServerUnit(game, null, dutch, freeColonist, defaultRole);
+
+        assertTrue("Free Colonist"
+            .equals(unit.getDescription()));
+        assertTrue("Dutch Free Colonist"
+            .equals(unit.getFullDescription(false)));
+        assertTrue("Dutch Free Colonist"
+            .equals(unit.getFullDescription(true)));
+
+        unit.setRole(soldierRole);
+        assertTrue("Free Colonist Soldier" // FIXME: "Solider (Free Colonist)"
+            .equals(unit.getDescription()));
+        assertTrue("Dutch Soldier (Free Colonist)"
+            .equals(unit.getFullDescription(false)));
+        assertTrue("Dutch Free Colonist (50 Muskets)"
+            .equals(unit.getFullDescription(true)));
+
+        unit.setName("John Doe");
+        assertTrue("John Doe (Free Colonist Soldier)" // FIXME "John Doe (Solider/Free Colonist)"
+            .equals(unit.getDescription()));
+        assertTrue("John Doe (Dutch Soldier/Free Colonist)"
+            .equals(unit.getFullDescription(false)));
+        assertTrue("John Doe (Dutch Free Colonist/50 Muskets)" // FIXME: John Doe (Dutch Soldier/Free Colonist/50 Muskets)"
+            .equals(unit.getFullDescription(true)));
+
+        // Expert
+        unit = new ServerUnit(game, null, dutch, masterCarpenter, defaultRole);
+
+        assertTrue("Master Carpenter"
+            .equals(unit.getDescription()));
+        assertTrue("Dutch Master Carpenter"
+            .equals(unit.getFullDescription(false)));
+        assertTrue("Dutch Master Carpenter"
+            .equals(unit.getFullDescription(true)));
+
+        unit.setRole(missionaryRole);
+        assertTrue("Master Carpenter Missionary" // FIXME "Missionary (Master Carpenter)"
+            .equals(unit.getDescription()));
+        assertTrue("Dutch Missionary (Master Carpenter)"
+            .equals(unit.getFullDescription(false)));
+        assertTrue("Dutch Master Carpenter (1 Bible)" // FIXME: "Dutch Missionary (Master Carpenter/1 Bible)"
+            .equals(unit.getFullDescription(true)));
 
         // Treasure Train
-        unit = new ServerUnit(game, null, dutch,
-                              treasureTrain, defaultRole);
+        unit = new ServerUnit(game, null, dutch, treasureTrain, defaultRole);
         unit.setTreasureAmount(4567);
-        assertEquals("Dutch Treasure Train (4567 gold)",
-                     Messages.getLabel(unit));
+
+        assertTrue("Treasure Train"
+            .equals(unit.getDescription()));
+        assertTrue("Dutch Treasure Train (4567 gold)"
+            .equals(unit.getFullDescription(false)));
+        assertTrue("Dutch Treasure Train (4567 gold)"
+            .equals(unit.getFullDescription(true)));
 
         unit.setName("The Gold of El Dorado");
-        assertEquals("The Gold of El Dorado (Dutch Treasure Train/4567 gold)",
-                     Messages.getLabel(unit));
+        assertTrue("The Gold of El Dorado (Treasure Train)"
+            .equals(unit.getDescription()));
+        assertTrue("The Gold of El Dorado (Dutch Treasure Train/4567 gold)"
+            .equals(unit.getFullDescription(false)));
+        assertTrue("The Gold of El Dorado (Dutch Treasure Train/4567 gold)"
+            .equals(unit.getFullDescription(true)));
 
         // Caravel
-        unit = new ServerUnit(game, null, dutch,
-                              caravel, defaultRole);
-        assertEquals("Dutch Caravel", Messages.getLabel(unit));
+        unit = new ServerUnit(game, null, dutch, caravel, defaultRole);
+
+        assertTrue("Caravel"
+            .equals(unit.getDescription()));
+        assertTrue("Dutch Caravel"
+            .equals(unit.getFullDescription(false)));
+        assertTrue("Dutch Caravel"
+            .equals(unit.getFullDescription(true)));
 
         unit.setName("Santa Maria");
-        assertEquals("Santa Maria (Dutch Caravel)", Messages.getLabel(unit));
+        assertTrue("Santa Maria (Caravel)"
+            .equals(unit.getDescription()));
+        assertTrue("Santa Maria (Dutch Caravel)"
+            .equals(unit.getFullDescription(false)));
+        assertTrue("Santa Maria (Dutch Caravel)"
+            .equals(unit.getFullDescription(true)));
     }
 }

@@ -176,7 +176,7 @@ public final class ReportIndianPanel extends ReportPanel {
                             .addStringTemplate("%nation%",
                                 missionary.getOwner().getNationName())
                             .addStringTemplate("%unit%",
-                                missionary.getFullLabel()));
+                                missionary.getFullLabel(false)));
                     missionLabel.setToolTipText(text);
                 }
                 reportPanel.add(missionLabel);

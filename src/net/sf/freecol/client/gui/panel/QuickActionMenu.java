@@ -123,7 +123,7 @@ public final class QuickActionMenu extends JPopupMenu {
 
         this.setLabel("Unit");
         ImageIcon unitIcon = imageLibrary.getUnitImageIcon(unit, 0.66);
-        JMenuItem name = new JMenuItem(Messages.getLabel(unit)
+        JMenuItem name = new JMenuItem(unit.getFullDescription(false)
             + " (" + Messages.message("menuBar.colopedia") + ")", unitIcon);
         name.setActionCommand(UnitAction.COLOPEDIA.toString());
         name.addActionListener(unitLabel);
@@ -134,8 +134,9 @@ public final class QuickActionMenu extends JPopupMenu {
 
         if (unit.isInEurope()) {
             if (addCommandItems(unitLabel)) this.addSeparator();
-            if (addBoardItems(unitLabel,
-                    unit.getOwner().getEurope())) this.addSeparator();
+            if (addBoardItems(unitLabel, unit.getOwner().getEurope())) {
+                this.addSeparator();
+            }
         } else if (unit.hasTile()) {
             Colony colony = unit.getLocation().getTile().getColony();
             if (colony != null) {
@@ -176,7 +177,7 @@ public final class QuickActionMenu extends JPopupMenu {
                 && unit.canAdd(tempUnit)
                 && tempUnit.getLocation() != unit) {
                 StringTemplate template = StringTemplate.template("board")
-                    .addStringTemplate("%unit%", Messages.getLabelTemplate(unit));
+                    .addStringTemplate("%unit%", unit.getFullLabel(false));
                 JMenuItem menuItem = new JMenuItem(Messages.message(template));
                 menuItem.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
@@ -198,7 +199,7 @@ public final class QuickActionMenu extends JPopupMenu {
             if (unit.isCarrier() && unit.canCarryGoods()
                 && unit.canAdd(goods)) {
                 StringTemplate template = StringTemplate.template("loadOnTo")
-                    .addStringTemplate("%unit%", Messages.getLabelTemplate(unit));
+                    .addStringTemplate("%unit%", unit.getFullLabel(false));
                 JMenuItem menuItem = new JMenuItem(Messages.message(template));
                 menuItem.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
@@ -224,7 +225,7 @@ public final class QuickActionMenu extends JPopupMenu {
             if (unit.isCarrier() && unit.canCarryGoods()
                 && unit.canAdd(goods)) {
                 StringTemplate template = StringTemplate.template("loadOnTo")
-                    .addStringTemplate("%unit%", Messages.getLabelTemplate(unit));
+                    .addStringTemplate("%unit%", unit.getFullLabel(false));
                 JMenuItem menuItem = new JMenuItem(Messages.message(template));
                 menuItem.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
@@ -250,7 +251,7 @@ public final class QuickActionMenu extends JPopupMenu {
 
         for (Unit passenger : unit.getUnitList()) {
             JMenuItem menuItem = new JMenuItem("    "
-                + Messages.getLabel(passenger));
+                + passenger.getFullDescription(false));
             menuItem.setFont(menuItem.getFont().deriveFont(Font.ITALIC));
             this.add(menuItem);
         }

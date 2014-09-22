@@ -136,7 +136,7 @@ public class ReportPanel extends FreeColPanel {
         if (count == 0) {
             unitLabel.setForeground(Color.GRAY);
         }
-        unitLabel.setToolTipText(Messages.message(au.getLabel()));
+        unitLabel.setToolTipText(au.getDescription());
         return unitLabel;
     }
 

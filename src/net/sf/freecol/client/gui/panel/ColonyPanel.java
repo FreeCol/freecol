@@ -614,7 +614,7 @@ public final class ColonyPanel extends PortPanel
             unitIcon = getLibrary().getUnitImageIcon(unit, 0.5);
             StringBuilder sb = new StringBuilder(64);
             if (student != null) {
-                sb.append(Messages.message(unit.getLabel()))
+                sb.append(unit.getDescription())
                     .append(" ").append(Messages.message("producing.name"))
                     .append(" ").append(Messages.message(unit.getType()
                             .getSkillTaught().getNameKey()))
@@ -624,7 +624,7 @@ public final class ColonyPanel extends PortPanel
                 int producing = workingOnLand.getProductionOf(unit, goodsType);
                 String nominative = Messages.message(StringTemplate.template(
                     goodsType.getNameKey()).addAmount("%amount%", producing));
-                sb.append(Messages.message(unit.getLabel()))
+                sb.append(unit.getDescription())
                     .append(" ").append(Messages.message("producing.name"))
                     .append(" ").append(producing)
                     .append(" ").append(nominative);
@@ -634,12 +634,12 @@ public final class ColonyPanel extends PortPanel
                 String nominative = Messages.message(
                     StringTemplate.template(goodsType.getNameKey())
                         .addAmount("%amount%", producing));
-                sb.append(Messages.message(unit.getLabel()))
+                sb.append(unit.getDescription())
                     .append(" ").append(Messages.message("producing.name"))
                     .append(" ").append(producing)
                     .append(" ").append(nominative);
             } else {
-                sb.append(Messages.message(unit.getLabel()))
+                sb.append(unit.getDescription())
                     .append(" ").append(Messages.message("producing.name"))
                     .append(" ").append(Messages.message("nothing"));
             }
@@ -659,7 +659,7 @@ public final class ColonyPanel extends PortPanel
         for (final Unit unit : colonyTile.getUnitList()) {
             if(unit.isCarrier()){
                 unitIcon = getLibrary().getUnitImageIcon(unit, 0.5);
-                String menuTitle = Messages.message(unit.getLabel())
+                String menuTitle = unit.getDescription()
                     + " " + Messages.message("inPort.name");
                 subMenu = new JMenuItem(menuTitle, unitIcon);
                 subMenu.addActionListener(new ActionListener() {
@@ -674,9 +674,9 @@ public final class ColonyPanel extends PortPanel
                 if (unit.getUnitList() != null) {
                     for (final Unit innerUnit : unit.getUnitList()) {
                         unitIcon = getLibrary().getUnitImageIcon(innerUnit, 0.5);
-                        menuTitle = Messages.message(innerUnit.getLabel())
+                        menuTitle = innerUnit.getDescription()
                             + " " + Messages.message("cargoOnCarrier")
-                            + " " + Messages.message(unit.getLabel());
+                            + " " + unit.getDescription();
                         subMenu = new JMenuItem(menuTitle, unitIcon);
                         subMenu.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent e) {
@@ -690,7 +690,7 @@ public final class ColonyPanel extends PortPanel
                 }
             }else if(!unit.isOnCarrier()){
                 unitIcon = getLibrary().getUnitImageIcon(unit, 0.5);
-                String menuTitle = Messages.message(unit.getLabel())
+                String menuTitle = unit.getDescription()
                     + " " + Messages.message("outsideOfColony.name");
                 subMenu = new JMenuItem(menuTitle, unitIcon);
                 subMenu.addActionListener(new ActionListener() {
@@ -2066,15 +2066,14 @@ public final class ColonyPanel extends PortPanel
              *
              * If a unit is on it update the tooltip of it instead.
              */
-            private void updateDescriptionLabel(UnitLabel unit, boolean toAdd) {
+            private void updateDescriptionLabel(UnitLabel unitLabel, boolean toAdd) {
                 String tileMsg = Messages.message(colonyTile.getLabel());
-                if (unit == null) {
+                if (unitLabel == null) {
                     setToolTipText(tileMsg);
                 } else {
-                    String unitMsg
-                        = Messages.message(unit.getUnit().getFullLabel());
+                    String unitMsg = unitLabel.getUnit().getFullDescription(false);
                     if (toAdd) unitMsg = tileMsg + " [" + unitMsg + "]";
-                    unit.setDescriptionLabel(unitMsg);
+                    unitLabel.setDescriptionLabel(unitMsg);
                 }
             }
 
@@ -2136,9 +2135,10 @@ public final class ColonyPanel extends PortPanel
                     if (best != null && colonyTile != best
                         && (colonyTile.getPotentialProduction(workType, unit.getType())
                             < best.getPotentialProduction(workType, unit.getType()))) {
-                        StringTemplate template
-                            = StringTemplate.template("colonyPanel.notBestTile")
-                            .addStringTemplate("%unit%", unit.getFullLabel())
+                        StringTemplate template = StringTemplate
+                            .template("colonyPanel.notBestTile")
+                            .addStringTemplate("%unit%",
+                                unit.getFullLabel(false))
                             .add("%goods%", workType.getNameKey())
                             .addStringTemplate("%tile%", best.getLabel());
                         getGUI().showInformationMessage(best, template);
