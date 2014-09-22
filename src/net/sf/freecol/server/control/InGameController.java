@@ -3886,6 +3886,7 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
 
         Tile tile = unit.getTile();
+        boolean tileDirty = tile != null && tile.getIndianSettlement() != null;
         if (state == UnitState.FORTIFYING && tile != null) {
             ServerColony colony = (tile.getOwningSettlement() instanceof Colony)
                 ? (ServerColony) tile.getOwningSettlement()
@@ -3898,15 +3899,18 @@ public final class InGameController extends Controller {
                 if (colony.isTileInUse(tile)) {
                     colony.csEvictUsers(unit, cs);
                 }
+                if (serverPlayer.getStance(owner) == Stance.WAR) {
+                    tile.changeOwnership(null, null); // Clear owner if at war
+                    tileDirty = true;
+                }
             }
         }
 
         unit.setState(state);
-        Location loc = unit.getLocation();
-        if (tile != null && tile.getIndianSettlement() != null) {
-            cs.add(See.only((ServerPlayer)unit.getOwner()), tile);
+        if (tileDirty) {
+            cs.add(See.perhaps(), tile);
         } else {
-            cs.add(See.perhaps(), (FreeColGameObject)loc);
+            cs.add(See.perhaps(), (FreeColGameObject)unit.getLocation());
         }
 
         // Others might be able to see the unit.
