@@ -1644,8 +1644,8 @@ public class Unit extends GoodsLocation
      *     that a defensive unit also will be offensive.
      */
     public boolean isDefensiveUnit() {
-        return (unitType.isDefensive() || isArmed() || isMounted())
-            && !isNaval();
+        return (unitType.isDefensive() || getRole().isDefensive())
+            && !isCarrier(); // Not wagons or ships
     }
 
     /**

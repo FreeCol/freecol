@@ -204,6 +204,10 @@ public final class UnitType extends BuildableType implements Consumer {
     /**
      * Is this a defensive unit type?
      *
+     * Default defence is 1, same a for colonists, thus to be defensive, a
+     * colonist must have a military role.  Artillery of all sorts has
+     * higher defense so they are automatically defensive.
+     *
      * @return True if base defensive ability is greater than the default.
      */
     public boolean isDefensive() {
