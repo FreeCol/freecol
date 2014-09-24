@@ -690,6 +690,11 @@ public class SimpleCombatModel extends CombatModel {
                         crs.add(CombatResult.DEMOTE_UNIT);
                     }
 
+                // Some losers are just doomed (e.g. seasonedScout), do not
+                // check for capture/demote/lose-equipment.
+                } else if (loserMustDie) {
+                    crs.add(CombatResult.SLAUGHTER_UNIT);
+
                 // Then check if the user had other offensive
                 // role-equipment, that can be captured or lost, which
                 // may kill or demote the loser.
@@ -704,18 +709,14 @@ public class SimpleCombatModel extends CombatModel {
                         crs.add(CombatResult.DEMOTE_UNIT);
                     }
 
-                // Some losers are just doomed
-                } else if (loserMustDie) {
-                    crs.add(CombatResult.SLAUGHTER_UNIT);
-
-                // But some can be captured
+                // But some can be captured.
                 } else if (loser.hasAbility(Ability.CAN_BE_CAPTURED)
                     && winner.hasAbility(Ability.CAPTURE_UNITS)
                     && !combatIsAmphibious(winner, loser)) {
                     // Demotion on capture is handled by capture routine.
                     crs.add(CombatResult.CAPTURE_UNIT);
 
-                // Or losing just causes a demotion
+                // Or losing just causes a demotion.
                 } else if (loser.getTypeChange(ChangeType.DEMOTION,
                                                loserPlayer) != null) {
                     crs.add(CombatResult.DEMOTE_UNIT);

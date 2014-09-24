@@ -522,7 +522,7 @@ public class CombatTest extends FreeColTestCase {
         // slaughter King's Regular
         crs = combatModel.generateAttackResult(random, colonial, regular);
         checkCombat("Regular should be slaughtered upon losing all equipment",
-            crs, CombatResult.WIN, CombatResult.LOSE_EQUIP, CombatResult.SLAUGHTER_UNIT);
+            crs, CombatResult.WIN, CombatResult.SLAUGHTER_UNIT);
 
         regular = new ServerUnit(game, tile2, french, kingsRegularType,
                                  cavalryRole);

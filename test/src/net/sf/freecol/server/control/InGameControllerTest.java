@@ -1029,8 +1029,7 @@ public class InGameControllerTest extends FreeColTestCase {
         List<CombatResult> crs
             = fakeAttackResult(CombatResult.WIN, soldier, scout);
         checkCombat("Soldier v scout", crs,
-                    CombatResult.WIN, CombatResult.LOSE_EQUIP,
-                    CombatResult.SLAUGHTER_UNIT);
+                    CombatResult.WIN, CombatResult.SLAUGHTER_UNIT);
         igc.combat(french, soldier, scout, crs);
 
         assertTrue("Scout should be dead",
@@ -1402,7 +1401,7 @@ public class InGameControllerTest extends FreeColTestCase {
                    dragoon.isDisposed());
     }
 
-    public void testScoutDemotedBySoldier() {
+    public void testScoutDefeatedBySoldier() {
         final Game game = ServerTestHelper.startServerGame(getTestMap(plains));
         final Map map = game.getMap();
         final InGameController igc = ServerTestHelper.getInGameController();
@@ -1426,8 +1425,7 @@ public class InGameControllerTest extends FreeColTestCase {
         List<CombatResult> crs
             = fakeAttackResult(CombatResult.LOSE, scout, soldier);
         checkCombat("Scout v Soldier", crs,
-                    CombatResult.LOSE, CombatResult.LOSE_EQUIP,
-                    CombatResult.SLAUGHTER_UNIT);
+                    CombatResult.LOSE, CombatResult.SLAUGHTER_UNIT);
         igc.combat(dutch, scout, soldier, crs);
 
         assertTrue("Scout should be disposed",
