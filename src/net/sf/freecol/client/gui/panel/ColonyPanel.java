@@ -871,7 +871,7 @@ public final class ColonyPanel extends PortPanel
     public void closeColonyPanel() {
         final Colony colony = getColony();
         boolean abandon = false;
-        if (colony.getUnitCount() == 0) {
+        if (colony.getUnitCount() == 0 && getMyPlayer().owns(colony)) {
             if (!getGUI().showConfirmDialog(true, null,
                     StringTemplate.key("abandonColony.text"), this,
                     "abandonColony.yes", "abandonColony.no")) return;
