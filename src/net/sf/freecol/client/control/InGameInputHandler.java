@@ -1167,21 +1167,27 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         final Game game = getGame();
-        final Element fullTile = (Element) nodeList.item(0);
-        final Element normalTile = (Element) nodeList.item(1);
-        String tileId = element.getAttribute("tile");
+        final String tileId = element.getAttribute("tile");
         final Tile tile = game.getFreeColGameObject(tileId, Tile.class);
         if (tile == null) {
             logger.warning("spyResult bad tile = " + tileId);
             return null;
         }
-        tile.readFromXMLElement(fullTile);
-        final Colony colony = tile.getColony().copy(game, Colony.class);
-        tile.readFromXMLElement(normalTile);
 
+        // Read the privileged tile information from fullElement, and
+        // pass a runnable to the display routine that restores the
+        // normal view of the tile, which happens when the colony panel
+        // is closed.
+        final Element fullElement = (Element)nodeList.item(0);
+        final Element normalElement = (Element)nodeList.item(1);
         SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    getGUI().showColonyPanel(colony, null);
+                    tile.readFromXMLElement(fullElement);
+                    getGUI().showSpyColonyPanel(tile, new Runnable() {
+                            public void run() {
+                                tile.readFromXMLElement(normalElement);
+                            }
+                        });
                 }
             });
         return null;

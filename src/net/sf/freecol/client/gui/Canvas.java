@@ -2581,6 +2581,22 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
+     * Displays the colony panel of the given <code>Colony</code>
+     * following a spying action.
+     *
+     * @param tile The <code>Tile</code> containing the colony to display.
+     * @return The colony panel.
+     * @see ColonyPanel
+     */
+    public ColonyPanel showSpyColonyPanel(Tile tile) {
+        Colony colony = tile.getColony();
+        if (colony == null) return null;
+        ColonyPanel panel = new ColonyPanel(freeColClient, colony);
+        showFreeColPanel(panel, tile, true);
+        return panel;
+    }
+
+    /**
      * Displays the <code>StartGamePanel</code>.
      *
      * @param game The <code>Game</code> that is about to start.

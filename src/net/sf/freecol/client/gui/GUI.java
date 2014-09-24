@@ -1569,6 +1569,12 @@ public class GUI {
         canvas.showOpeningVideoPanel(userMsg);
     }
 
+    public void showSpyColonyPanel(final Tile tile, Runnable callback) {
+        if (canvas == null) return;
+        ColonyPanel panel = canvas.showSpyColonyPanel(tile);
+        panel.addClosingCallback(callback);
+    }
+
     public Parameters showParametersDialog() {
         if (canvas == null) return null;
         return canvas.showParametersDialog();
