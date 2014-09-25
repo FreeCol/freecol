@@ -82,11 +82,12 @@ import net.sf.freecol.client.gui.panel.CornerMapControls;
 import net.sf.freecol.client.gui.panel.DialogHandler;
 import net.sf.freecol.client.gui.panel.EuropePanel;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
-import net.sf.freecol.client.gui.panel.MiniMap;
 import net.sf.freecol.client.gui.panel.LabourData.UnitData;
 import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.gui.panel.MapControls;
+import net.sf.freecol.client.gui.panel.MiniMap;
 import net.sf.freecol.client.gui.panel.Parameters;
+import net.sf.freecol.client.gui.panel.TradeRoutePanel;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
 import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.model.Colony;
@@ -1197,6 +1198,11 @@ public class GUI {
     public void removeInGameComponents() {
         if (canvas == null) return;
         canvas.removeInGameComponents();
+    }
+
+    public void removeTradeRoutePanel(TradeRoutePanel panel) {
+        if (canvas == null) return;
+        canvas.removeTradeRoutePanel(panel);
     }
 
     public void requestFocusForSubPanel() {

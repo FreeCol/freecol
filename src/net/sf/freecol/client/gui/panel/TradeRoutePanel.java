@@ -353,7 +353,7 @@ public final class TradeRoutePanel extends FreeColPanel {
             super.actionPerformed(event);
 
         } else if (CANCEL.equals(command)) {
-            getGUI().removeFromCanvas(this);
+            getGUI().removeTradeRoutePanel(this);
 
         } else {
             super.actionPerformed(event);

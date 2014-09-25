@@ -1321,6 +1321,13 @@ public final class Canvas extends JDesktopPane {
 
     // Simple front ends to display each panel or dialog.
 
+    public void removeTradeRoutePanel(TradeRoutePanel panel) {
+        remove(panel);
+        TradeRouteInputPanel trip
+            = getExistingFreeColPanel(TradeRouteInputPanel.class);
+        if (trip != null) trip.cancelTradeRoute();
+    }
+        
     /**
      * Display the AboutPanel.
      */

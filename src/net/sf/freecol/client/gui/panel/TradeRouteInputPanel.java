@@ -683,6 +683,18 @@ public final class TradeRouteInputPanel extends FreeColPanel {
         }
     }
 
+
+    /**
+     * Make sure the original route is invalid and remove this panel.
+     *
+     * Public so that this panel can be signalled to close if the parent
+     * TradeRoutePanel is closed.
+     */
+    public void cancelTradeRoute() {
+        this.newRoute.setName(null);
+        getGUI().removeFromCanvas(this);
+    }
+
     /**
      * Enables the remove stop button if a stop is selected and disables it
      * otherwise.
@@ -761,9 +773,7 @@ public final class TradeRouteInputPanel extends FreeColPanel {
             super.actionPerformed(event);
 
         } else if (CANCEL.equals(command)) {
-            // Make sure the original route is invalid.
-            this.newRoute.setName(null);
-            getGUI().removeFromCanvas(this);
+            cancelTradeRoute();
 
         } else {
             super.actionPerformed(event);
