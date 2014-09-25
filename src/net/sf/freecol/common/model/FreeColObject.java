@@ -618,7 +618,7 @@ public abstract class FreeColObject
      */
     public static final float applyModifiers(float number, Turn turn,
                                              Collection<Modifier> mods) {
-        return FeatureContainer.applyModifiers(number, turn, mods, null);
+        return FeatureContainer.applyModifiers(number, turn, mods);
     }
 
     /**

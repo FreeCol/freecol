@@ -93,6 +93,19 @@ public class LogBuilder {
     }
 
     /**
+     * Add a delimited collection to the buffer.
+     *
+     * @param delim An internal delimiter.
+     * @param c The <code>Collection</code> of objects to add.
+     */
+    public <T> void addCollection(String delim, Collection<T> c) {
+        if (sb != null) {
+            for (T t : c) add(sb, t, delim);
+            if (!c.isEmpty()) shrink(delim);
+        }
+    }
+
+    /**
      * Add a stack trace to the buffer.
      */
     public void addStackTrace() {

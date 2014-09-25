@@ -71,7 +71,7 @@ public class FoundingFatherTest extends FreeColTestCase {
         assertEquals(1, modifierSet.size());
         assertEquals(2f, modifierSet.iterator().next().getValue());
         assertEquals(4f, FeatureContainer.applyModifiers(2, null,
-                modifierSet, null));
+                modifierSet));
 
         FoundingFather father3 = new FoundingFather("father3", spec());
         father3.setType(FoundingFatherType.TRADE);

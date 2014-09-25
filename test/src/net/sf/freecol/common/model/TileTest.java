@@ -487,11 +487,11 @@ public class TileTest extends FreeColTestCase {
         assertEquals(oldBase, newBase);
         assertEquals(
             (int)FeatureContainer.applyModifiers(newBase, turn,
-                tile1.getProductionModifiers(sugar, null), null),
+                tile1.getProductionModifiers(sugar, null)),
             (int)FeatureContainer.applyModifiers(oldBase, turn,
-                addedSugar.getProductionModifiers(sugar, null), null)
+                addedSugar.getProductionModifiers(sugar, null))
             + (int)FeatureContainer.applyModifiers(0f, turn,
-                river1.getProductionModifiers(sugar, null), null));
+                river1.getProductionModifiers(sugar, null)));
         assertTrue(hasBonusFrom(tile1.getProductionModifiers(sugar, null),
                                 river1.getType()));
         assertTrue(hasBonusFrom(tile1.getProductionModifiers(sugar, null),
@@ -507,11 +507,11 @@ public class TileTest extends FreeColTestCase {
         assertEquals(oldBase, newBase);
         assertEquals(
             (int)FeatureContainer.applyModifiers(newBase, turn,
-                tile2.getProductionModifiers(silver, null), null),
+                tile2.getProductionModifiers(silver, null)),
             (int)FeatureContainer.applyModifiers(oldBase, turn,
-                addedSilver.getProductionModifiers(silver, null), null)
+                addedSilver.getProductionModifiers(silver, null))
             + (int)FeatureContainer.applyModifiers(0f, turn,
-                road2.getProductionModifiers(silver, null), null));
+                road2.getProductionModifiers(silver, null)));
         assertTrue(tile2.canProduce(silver, null));
         assertTrue(hasBonusFrom(tile2.getProductionModifiers(silver, null),
                                 road2.getType()));

@@ -20,16 +20,19 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Modifier.ModifierType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -64,16 +67,35 @@ public class SimpleCombatModel extends CombatModel {
      */
     public CombatOdds calculateCombatOdds(FreeColGameObject attacker,
                                           FreeColGameObject defender) {
+        return calculateCombatOdds(attacker, defender, null);
+    }
+
+    /**
+     * Calculates the odds of success in combat.
+     *
+     * @param attacker The attacker.
+     * @param defender The defender.
+     * @param lb An optional <code>LogBuilder</code> to log to.
+     * @return The combat odds.
+     */
+    private CombatOdds calculateCombatOdds(FreeColGameObject attacker,
+                                           FreeColGameObject defender,
+                                           LogBuilder lb) {
         if (attacker == null || defender == null) {
+            if (lb != null) lb.add(" odds=unknowable");
             return new CombatOdds(CombatOdds.UNKNOWN_ODDS);
         }
 
-        float attackPower = getOffencePower(attacker, defender);
-        float defencePower = getDefencePower(attacker, defender);
+        if (lb != null) lb.add(" attacker=", attacker, " ");
+        float attackPower = getOffencePower(attacker, defender, lb);
+        if (lb != null) lb.add(" defender=", defender, " ");
+        float defencePower = getDefencePower(attacker, defender, lb);
         if (attackPower == 0.0f && defencePower == 0.0f) {
+            if (lb != null) lb.add(" odds=unknown");
             return new CombatOdds(CombatOdds.UNKNOWN_ODDS);
         }
         float victory = attackPower / (attackPower + defencePower);
+        if (lb != null) lb.add(" odds=", victory);
         return new CombatOdds(victory);
     }
 
@@ -86,6 +108,33 @@ public class SimpleCombatModel extends CombatModel {
      */
     public float getOffencePower(FreeColGameObject attacker,
                                  FreeColGameObject defender) {
+        return getOffencePower(attacker, defender, null);
+    }
+
+    /**
+     * Helper to log modifiers with.
+     *
+     * @param lb The <code>LogBuilder</code> to log to.
+     * @param modSet A set of <code>Modifiers</code> to log.
+     */   
+    private void logModifiers(LogBuilder lb, Set<Modifier> modSet) {
+        List<Modifier> modList = new ArrayList<Modifier>();
+        modList.addAll(modSet);
+        Collections.sort(modList);
+        lb.addCollection(" ", modList);
+    }
+
+    /**
+     * Get the offensive power of a unit attacking another.
+     *
+     * @param attacker The attacker.
+     * @param defender The defender.
+     * @param lb An optional <code>LogBuilder</code> to log to.
+     * @return The offensive power.
+     */
+    private float getOffencePower(FreeColGameObject attacker,
+                                  FreeColGameObject defender,
+                                  LogBuilder lb) {
         float result = 0.0f;
         if (attacker == null) {
             throw new IllegalStateException("Null attacker");
@@ -93,10 +142,13 @@ public class SimpleCombatModel extends CombatModel {
         } else if (combatIsAttackMeasurement(attacker, defender)
             || combatIsAttack(attacker, defender)
             || combatIsSettlementAttack(attacker, defender)) {
-            result = FeatureContainer.applyModifiers(0.0f,
-                attacker.getGame().getTurn(),
-                getOffensiveModifiers(attacker, defender),
-                logString(attacker, "attacks", defender));
+            Set<Modifier> mods = getOffensiveModifiers(attacker, defender);
+            Turn turn = attacker.getGame().getTurn(); 
+            result = FeatureContainer.applyModifiers(0.0f, turn, mods);
+            if (lb != null) {
+                logModifiers(lb, mods);
+                lb.add(" = ", result);
+            }
 
         } else if (combatIsBombard(attacker, defender)) {
             Settlement attackerSettlement = (Settlement) attacker;
@@ -108,6 +160,7 @@ public class SimpleCombatModel extends CombatModel {
                 }
             }
             if (result > MAXIMUM_BOMBARD_POWER) result = MAXIMUM_BOMBARD_POWER;
+            if (lb != null) lb.add(" bombard=", result);
 
         } else {
             throw new IllegalArgumentException("Bogus combat");
@@ -124,27 +177,37 @@ public class SimpleCombatModel extends CombatModel {
      */
     public float getDefencePower(FreeColGameObject attacker,
                                  FreeColGameObject defender) {
+        return getDefencePower(attacker, defender, null);
+    }
+
+    /**
+     * Get the defensive power wrt an attacker.
+     *
+     * @param attacker The attacker.
+     * @param defender The defender.
+     * @param lb An optional <code>LogBuilder</code> to log to.
+     * @return The defensive power.
+     */
+    public float getDefencePower(FreeColGameObject attacker,
+                                 FreeColGameObject defender,
+                                 LogBuilder lb) {
         float result;
         if (combatIsDefenceMeasurement(attacker, defender)
             || combatIsAttack(attacker, defender)
             || combatIsSettlementAttack(attacker, defender)
             || combatIsBombard(attacker, defender)) {
-            result = FeatureContainer.applyModifiers(0.0f,
-                defender.getGame().getTurn(),
-                getDefensiveModifiers(attacker, defender),
-                logString(defender, "defends", attacker));
+            Set<Modifier> mods = getDefensiveModifiers(attacker, defender);
+            Turn turn = defender.getGame().getTurn();
+            result = FeatureContainer.applyModifiers(0.0f, turn, mods);
+            if (lb != null) {
+                logModifiers(lb, mods);
+                lb.add(" = ", result);
+            }
 
         } else {
             throw new IllegalArgumentException("Bogus combat");
         }
         return result;
-    }
-
-    private String logString(FreeColGameObject fcgo1, String joiner,
-                             FreeColGameObject fcgo2) {
-        return ((fcgo1 == null) ? "null" : fcgo1.toString())
-            + " " + joiner + " "
-            + ((fcgo2 == null) ? "null" : fcgo2.toString());
     }
 
     /**
@@ -180,7 +243,7 @@ public class SimpleCombatModel extends CombatModel {
                 Player owner = ((Ownable)defender).getOwner();
                 result.addAll(attackerUnit
                     .getModifiers(Modifier.OFFENCE_AGAINST,
-                                    owner.getNationType()));
+                                  owner.getNationType()));
             }
 
             // Land/naval specific
@@ -453,9 +516,12 @@ public class SimpleCombatModel extends CombatModel {
      */
     public List<CombatResult> generateAttackResult(Random random,
         FreeColGameObject attacker, FreeColGameObject defender) {
+        LogBuilder lb = new LogBuilder(256);
+        lb.add("Combat");
         ArrayList<CombatResult> crs = new ArrayList<CombatResult>();
-        CombatOdds odds = calculateCombatOdds(attacker, defender);
+        CombatOdds odds = calculateCombatOdds(attacker, defender, lb);
         float r = Utils.randomFloat(logger, "AttackResult", random);
+        lb.add(" random(1.0)=", r);
         boolean great = false; // Great win or loss?
         String action;
 
@@ -541,12 +607,10 @@ public class SimpleCombatModel extends CombatModel {
         // Log the results so that we have a solid record of combat
         // determinations for debugging and investigation of user
         // `I just lost N combats' complaints.
-        List<String> results = new ArrayList<String>();
-        for (CombatResult cr : crs) results.add(cr.toString());
-        logger.info(attacker + " " + action
-                    + " " + defender + ": victory=" + odds.win
-                    + " random(1.0)=" + r + " great=" + great
-                    + " => " + Utils.join(" ", results));
+        lb.add(" great=", great, " ", action);
+        for (CombatResult cr : crs) lb.add(" ", cr);
+        lb.log(logger, Level.INFO);
+
         return crs;
     }
 

@@ -2749,8 +2749,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
                 Unit u = is.getMissionary();
                 price = (int)FeatureContainer.applyModifiers(price,
-                    getGame().getTurn(), u.getMissionaryTradeModifiers(false),
-                    null);
+                    getGame().getTurn(), u.getMissionaryTradeModifiers(false));
             }
             sessionRegister.put(goldKey, Integer.valueOf(price));
             return price;

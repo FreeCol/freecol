@@ -72,7 +72,7 @@ public class ModifierTest extends FreeColTestCase {
         modifierSet.add(modifier1);
         modifierSet.add(modifier2);
         assertEquals(1 + 3 + 4f,
-            FeatureContainer.applyModifiers(1, null, modifierSet, null));
+            FeatureContainer.applyModifiers(1, null, modifierSet));
     }
 
     public void testCombineMultiplicativeModifiers() {
@@ -84,7 +84,7 @@ public class ModifierTest extends FreeColTestCase {
         modifierSet.add(modifier1);
         modifierSet.add(modifier2);
         assertEquals(2 * 3 * 4f,
-            FeatureContainer.applyModifiers(2, null, modifierSet, null));
+            FeatureContainer.applyModifiers(2, null, modifierSet));
     }
 
     public void testCombinePercentageModifiers() {
@@ -96,7 +96,7 @@ public class ModifierTest extends FreeColTestCase {
         modifierSet.add(modifier1);
         modifierSet.add(modifier2);
         assertEquals(100 * (100 + 3)/100f * (100 + 4)/100f,
-            FeatureContainer.applyModifiers(100, null, modifierSet, null));
+            FeatureContainer.applyModifiers(100, null, modifierSet));
     }
 
     public void testCombinedModifier() {
@@ -111,15 +111,15 @@ public class ModifierTest extends FreeColTestCase {
         modifierSet.add(modifier1);
         modifierSet.add(modifier2);
         assertEquals((1 + 3) * 1.5f,
-            FeatureContainer.applyModifiers(1, null, modifierSet, null));
+            FeatureContainer.applyModifiers(1, null, modifierSet));
 
         modifierSet.add(modifier3);
         assertEquals(((1 + 3) * 1.5f) * 1.5f,
-            FeatureContainer.applyModifiers(1, null, modifierSet, null));
+            FeatureContainer.applyModifiers(1, null, modifierSet));
 
         modifierSet.remove(modifier1);
         assertEquals(10 * 1.5f * 1.5f,
-            FeatureContainer.applyModifiers(10, null, modifierSet, null));
+            FeatureContainer.applyModifiers(10, null, modifierSet));
     }
 
     public void testScope() {
@@ -157,12 +157,12 @@ public class ModifierTest extends FreeColTestCase {
             = featureContainer.getModifiers("test", frigate, null);
         assertEquals(3, result.size());
         assertEquals(((1 + 3) * 1.5f) + ((1 + 3) * 1.5f) * 30 / 100,
-            FeatureContainer.applyModifiers(1, null, result, null));
+            FeatureContainer.applyModifiers(1, null, result));
 
         result = featureContainer.getModifiers("test", carpenter, null);
         assertEquals(2, result.size());
         assertEquals(1.5f + (1.5f * 30) / 100,
-            FeatureContainer.applyModifiers(1, null, result, null));
+            FeatureContainer.applyModifiers(1, null, result));
 
         List<Scope> scopes2 = new ArrayList<Scope>();
         scopes2.add(scope2);
@@ -174,13 +174,13 @@ public class ModifierTest extends FreeColTestCase {
         result = featureContainer.getModifiers("test", frigate, null);
         assertEquals(3, result.size());
         assertEquals(((1 + 3) * 1.5f) + ((1 + 3) * 1.5f) * 30 / 100,
-            FeatureContainer.applyModifiers(1, null, result, null));
+            FeatureContainer.applyModifiers(1, null, result));
 
         result = featureContainer.getModifiers("test", carpenter, null);
         assertEquals(2, result.size());
 
         assertEquals(1.5f + (1.5f * 30) / 100,
-            FeatureContainer.applyModifiers(1, null, result, null));
+            FeatureContainer.applyModifiers(1, null, result));
     }
 
     public void testTimeLimits() {
