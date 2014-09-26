@@ -2139,7 +2139,6 @@ public class Colony extends Settlement implements Nameable {
      * Invalidates the production cache.
      */
     public void invalidateCache() {
-        //logger.finest("invalidating production cache");
         productionCache.invalidate();
     }
 

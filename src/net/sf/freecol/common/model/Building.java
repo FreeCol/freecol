@@ -239,35 +239,38 @@ public class Building extends WorkLocation
         if (!hasOutputs()) return result;
         final Specification spec = getSpecification();
         final Turn turn = getGame().getTurn();
+        final boolean avoidOverflow
+            = hasAbility(Ability.AVOID_EXCESS_PRODUCTION);
+        final int capacity = getColony().getWarehouseCapacity();
+        // Calculate two production ratios, the minimum (and actual)
+        // possible multiplier between the nominal input and output
+        // goods and the amount actually consumed and produced, and
+        // the maximum possible ratio that would apply but for
+        // circumstances such as limited input availability.
+        double maximumRatio = 0.0, minimumRatio = Double.MAX_VALUE;
 
-        // first, calculate the maximum production
-        double minimumRatio = Double.MAX_VALUE;
-        double maximumRatio = 0;
+        // First, calculate the nominal production ratios.
         if (canAutoProduce()) {
+            // Autoproducers are special
             for (AbstractGoods output : getOutputs()) {
-                GoodsType outputType = output.getType();
-                int available = getColony().getGoodsCount(outputType);
-                if (available >= outputType.getBreedingNumber()) {
-                    // we need at least these many horses/animals to breed
-                    double newRatio = 0.0;
-                    int divisor = (int)getType().applyModifiers(0f, turn,
-                        Modifier.BREEDING_DIVISOR);
-                    if (divisor > 0) {
-                        int factor = (int)getType().applyModifiers(0f, turn,
-                            Modifier.BREEDING_FACTOR);
-                        int maximumOutput = ((available - 1) / divisor + 1)
-                            * factor;
-                        newRatio = (double)maximumOutput / output.getAmount();
-                    }
-                    minimumRatio = Math.min(minimumRatio, newRatio);
-                    maximumRatio = Math.max(maximumRatio, newRatio);
-                } else {
-                    minimumRatio = 0;
-                }
+                if (output.getAmount() <= 0) continue;
+                final GoodsType goodsType = output.getType();
+                int available = getColony().getGoodsCount(goodsType);
+                int divisor = (int)getType().applyModifiers(0f, turn,
+                    Modifier.BREEDING_DIVISOR);
+                int factor = (int)getType().applyModifiers(0f, turn,
+                    Modifier.BREEDING_FACTOR);
+                int production = (available < goodsType.getBreedingNumber()
+                    || divisor <= 0) ? 0
+                    // Deliberate use of integer division
+                    : ((available - 1) / divisor + 1) * factor;
+                double newRatio = (double)production / output.getAmount();
+                minimumRatio = Math.min(minimumRatio, newRatio);
+                maximumRatio = Math.max(maximumRatio, newRatio);
             }
         } else {
             for (AbstractGoods output : getOutputs()) {
-                GoodsType goodsType = output.getType();
+                final GoodsType goodsType = output.getType();
                 float production = 0f;
                 for (Unit u : getUnitList()) {
                     production += getUnitProduction(u, goodsType);
@@ -276,6 +279,7 @@ public class Building extends WorkLocation
                 production += getBaseProduction(null, goodsType, null);
                 production = applyModifiers(production, turn,
                     getProductionModifiers(goodsType, null));
+                production = (int)Math.floor(production);
                 // Beware!  If we ever unify this code with ColonyTile,
                 // ColonyTiles have outputs with zero amount.
                 double newRatio = production / output.getAmount();
@@ -284,14 +288,15 @@ public class Building extends WorkLocation
             }
         }
 
-        // then, check whether the required inputs are available
+        // Then reduce the minimum ratio if some input is in short supply.
         for (AbstractGoods input : getInputs()) {
-            int required = (int) (input.getAmount() * minimumRatio);
+            int required = (int)Math.floor(input.getAmount() * minimumRatio);
             int available = getAvailable(input.getType(), inputs);
             // Do not allow auto-production to go negative.
             if (canAutoProduce()) available = Math.max(0, available);
-            // experts in factory level buildings may produce a
-            // certain amount of goods even when no input is available
+            // Experts in factory level buildings may produce a
+            // certain amount of goods even when no input is available.
+            // Factories have the EXPERTS_USE_CONNECTIONS ability.
             if (available < required
                 && hasAbility(Ability.EXPERTS_USE_CONNECTIONS)
                 && spec.getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS)) {
@@ -306,16 +311,16 @@ public class Building extends WorkLocation
                     available = minimumGoodsInput;
                 }
             }
+            // Scale production by limitations on availability.
             if (available < required) {
-                minimumRatio = (minimumRatio * available) / required;
-                maximumRatio = Math.max(maximumRatio, minimumRatio);
+                minimumRatio *= (double)available / required;
+                //maximumRatio = Math.max(maximumRatio, minimumRatio);
             }
         }
 
-        // finally, check whether there is space enough to store the
-        // goods produced in order to avoid excess production
-        if (hasAbility(Ability.AVOID_EXCESS_PRODUCTION)) {
-            final int capacity = getColony().getWarehouseCapacity();
+        // Check whether there is space enough to store the goods
+        // produced in order to avoid excess production.
+        if (avoidOverflow) {
             for (AbstractGoods output : getOutputs()) {
                 double production = output.getAmount() * minimumRatio;
                 if (production <= 0) continue;
@@ -334,11 +339,14 @@ public class Building extends WorkLocation
             }
         }
 
+        final double epsilon = 0.0001;
         for (AbstractGoods input : getInputs()) {
             GoodsType type = input.getType();
             // maximize consumption
-            int consumption = (int) Math.ceil(input.getAmount() * minimumRatio);
-            int maximumConsumption = (int) Math.ceil(input.getAmount() * maximumRatio);
+            int consumption = (int)Math.floor(input.getAmount()
+                * minimumRatio + epsilon);
+            int maximumConsumption = (int)Math.floor(input.getAmount()
+                * maximumRatio);
             result.addConsumption(new AbstractGoods(type, consumption));
             if (consumption < maximumConsumption) {
                 result.addMaximumConsumption(new AbstractGoods(type, maximumConsumption));
@@ -349,8 +357,9 @@ public class Building extends WorkLocation
             // minimize production, but add a magic little something
             // to counter rounding errors
             int production = (int)Math.floor(output.getAmount() * minimumRatio
-                + 0.0001);
-            int maximumProduction = (int)Math.floor(output.getAmount() * maximumRatio);
+                + epsilon);
+            int maximumProduction = (int)Math.floor(output.getAmount()
+                * maximumRatio);
             result.addProduction(new AbstractGoods(type, production));
             if (production < maximumProduction) {
                 result.addMaximumProduction(new AbstractGoods(type, maximumProduction));

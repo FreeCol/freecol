@@ -82,9 +82,11 @@ public class ProductionCache {
      * assumption is made explicit by getting the ProductionInfo from
      * ColonyTiles with the simple getBasicProductionInfo() routine,
      * but from Buildings with getAdjustedProductionInfo() which takes
-     * account of the input and output goods levels.  Ideally these
-     * should be unified into a WorkLocation.getProductionInfo with the
-     * Building-form arguments.
+     * account of the input and output goods levels.
+     *
+     * TODO: Ideally these should be unified into a
+     * WorkLocation.getProductionInfo with the Building-form
+     * arguments.
      */
     private synchronized void update() {
         if (upToDate) return; // nothing to do

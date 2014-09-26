@@ -144,10 +144,11 @@ public class ColonyTile extends WorkLocation {
      * irrelevant).
      *
      * In the original game, the following special rules apply to
-     * colony center tiles: All tile improvements contribute to the
-     * production of food. Only natural tile improvements, such as
-     * rivers, contribute to the production of other types of goods.
-     * Artificial tile improvements, such as plowing, are ignored.
+     * colony center tiles:
+     * - All tile improvements contribute to the production of food
+     * - Only natural tile improvements, such as rivers, contribute
+     *   to the production of other types of goods.
+     * - Artificial tile improvements, such as plowing, are ignored.
      *
      * @return The raw production of this colony tile.
      * @see ProductionCache#update
@@ -172,14 +173,14 @@ public class ColonyTile extends WorkLocation {
                 pi.addProduction(production);
             }
         } else {
-            boolean onlyNaturalImprovements = false;
             for (AbstractGoods output : getOutputs()) {
                 final GoodsType goodsType = output.getType();
+                int amount = 0;
                 for (Unit u : getUnitList()) {
-                    int amount = getUnitProduction(u, goodsType);
-                    if (amount > 0) {
-                        pi.addProduction(new AbstractGoods(goodsType, amount));
-                    }
+                    amount += getUnitProduction(u, goodsType);
+                }
+                if (amount > 0) {
+                    pi.addProduction(new AbstractGoods(goodsType, amount));
                 }
             }
         }
