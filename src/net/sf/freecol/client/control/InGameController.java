@@ -549,7 +549,7 @@ public final class InGameController implements NetworkConstants {
 
         // If required accumulate a summary of all the activity of
         // this unit on its trade route into this string buffer.
-        LogBuilder lb = new LogBuilder((tr.isSilent()) ? -1 : 256);
+        LogBuilder lb = new LogBuilder((detailed && !tr.isSilent()) ? 256 : -1);
         lb.mark();
 
         for (;;) {
@@ -573,16 +573,16 @@ public final class InGameController implements NetworkConstants {
                     + (FreeColGameObject)stop.getLocation());
             }
             if (atStop) {
-                if (detailed) lb.mark();
+                lb.mark();
 
                 // Anything to unload?
-                unloadUnitAtStop(unit, (detailed) ? lb : null);
+                unloadUnitAtStop(unit, lb);
 
                 // Anything to load?
-                loadUnitAtStop(unit, (detailed) ? lb : null);
+                loadUnitAtStop(unit, lb);
 
                 // Wrap load/unload messages.
-                if (detailed) lb.grew(" ", stopMessage("tradeRoute.atStop", stop, player));
+                lb.grew(" ", stopMessage("tradeRoute.atStop", stop, player));
 
                 // If the un/load consumed the moves, break now before
                 // updating the stop.  This allows next move to arrive
@@ -601,9 +601,8 @@ public final class InGameController implements NetworkConstants {
                 // messages notifying that a stop has been skipped.
                 int next = unit.validateCurrentStop();
                 if (next == index) {
-                    if (detailed) {
-                        lb.add(" ", Messages.message("tradeRoute.wait"));
-                    }
+                    lb.add(" ", Messages.message("tradeRoute.wait"));
+
                     // Prevent reselection
                     askServer().changeState(unit, UnitState.SKIPPED);
                     break;
@@ -611,10 +610,8 @@ public final class InGameController implements NetworkConstants {
                 for (;;) {
                     if (++index >= stops.size()) index = 0;
                     if (index == next) break;
-                    if (detailed) {
-                        lb.add(" ", stopMessage("tradeRoute.skipStop",
-                                                stops.get(index), player));
-                    }
+                    lb.add(" ", stopMessage("tradeRoute.skipStop",
+                                            stops.get(index), player));
                 }
 
                 continue; // Stop was updated, loop.
@@ -625,9 +622,7 @@ public final class InGameController implements NetworkConstants {
             if (unit.getMovesLeft() <= 0
                 || unit.getState() == UnitState.SKIPPED
                 || !more) {
-                if (detailed) {
-                    lb.add(" ", stopMessage("tradeRoute.toStop", stop, player));
-                }
+                lb.add(" ", stopMessage("tradeRoute.toStop", stop, player));
                 break;
             }
 
@@ -643,9 +638,7 @@ public final class InGameController implements NetworkConstants {
             // Try to follow the path.  Mark if the path is complete
             // but loop so as to check for unload before returning.
             more = followPath(unit, path);
-            if (!more) {
-                unit.setState(UnitState.SKIPPED);
-            }
+            if (!more) unit.setState(UnitState.SKIPPED);
         }
 
         if (lb.grew()) {
@@ -721,14 +714,12 @@ public final class InGameController implements NetworkConstants {
                 int amount = Math.min(demand, export);
                 Goods cargo = new Goods(game, loc, type, amount);
                 if (loadGoods(cargo, unit)) {
-                    if (lb != null) lb.add(" ",
-                        getLoadGoodsMessage(type, amount, present,
-                                            export, demand));
+                    lb.add(" ", getLoadGoodsMessage(type, amount, present,
+                                                    export, demand));
                     ret = true;
                 }
             } else if (present > 0) {
-                if (lb != null) lb.add(" ",
-                    getLoadGoodsMessage(type, 0, present, 0, demand));
+                lb.add(" ", getLoadGoodsMessage(type, 0, present, 0, demand));
             }
         }
         return ret;
@@ -827,9 +818,8 @@ public final class InGameController implements NetworkConstants {
             Goods cargo = new Goods(game, unit, type, amount);
             ret = (cargo.getAmount() == 0) ? false
                 : unloadGoods(cargo, unit, colony);
-            if (lb != null) lb.add(" ",
-                getUnloadGoodsMessage(unit, type, amount,
-                                      present, atStop, toUnload));
+            lb.add(" ", getUnloadGoodsMessage(unit, type, amount,
+                                              present, atStop, toUnload));
         }
 
         return ret;

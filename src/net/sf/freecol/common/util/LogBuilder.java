@@ -125,7 +125,9 @@ public class LogBuilder {
      * Remember a position in a buffer.
      */
     public void mark() {
-        if (sb != null) this.points.add(Integer.valueOf(sb.length()));
+        if (sb != null) {
+            this.points.add(0, Integer.valueOf(sb.length()));
+        }
     }
 
     /**
@@ -160,15 +162,6 @@ public class LogBuilder {
     }
 
     /**
-     * Get the buffer contents as a string.
-     *
-     * @return The buffer contents.
-     */
-    public String toString() {
-        return (sb == null) ? "" : sb.toString();
-    }
-
-    /**
      * Output to a logger.
      *
      * @param logger The <code>Logger</code> to write to.
@@ -179,6 +172,15 @@ public class LogBuilder {
             && logger.isLoggable(level)) {
             logger.log(level, toString());
         }
+    }
+
+    /**
+     * Get the amount of accumulated data.
+     *
+     * @return The amount of data accumulated so far.
+     */
+    public int size() {
+        return (sb == null) ? 0 : sb.length();
     }
 
     /**
@@ -201,5 +203,14 @@ public class LogBuilder {
         }
         if (delta < 0) s2.setLength(size);
         return s2.toString();
+    }
+
+    /**
+     * Get the buffer contents as a string.
+     *
+     * @return The buffer contents.
+     */
+    public String toString() {
+        return (sb == null) ? "" : sb.toString();
     }
 }
