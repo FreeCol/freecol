@@ -175,7 +175,7 @@ public class UnitWanderHostileMission extends Mission {
             if (check == 0) {
                 Mission m = getAIPlayer().getSeekAndDestroyMission(aiUnit, 1);
                 if (m != null) {
-                    return lbDone(lb, false, "found target ", m.getTarget());
+                    return lbDone(lb, true, "found target ", m.getTarget());
                 }
                 check = checkTurns;
             } else check--;
