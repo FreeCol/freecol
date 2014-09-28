@@ -255,6 +255,7 @@ public class AIUnit extends TransportableAIObject {
      */
     public AIPlayer getAIOwner() {
         return (unit == null) ? null
+            : (unit.getOwner() == null) ? null
             : getAIMain().getAIPlayer(unit.getOwner());
     }
 
@@ -695,6 +696,11 @@ public class AIUnit extends TransportableAIObject {
 
         unit = xr.findFreeColGameObject(aiMain.getGame(), ID_ATTRIBUTE_TAG,
                                         Unit.class, (Unit)null, true);
+        if (unit.isUninitialized()) {
+            xr.nextTag(); // Move off the opening <AIUnit> tag
+            throw new XMLStreamException("AIUnit for uninitialized Unit: "
+                + unit.getId());
+        }
     }
 
     /**

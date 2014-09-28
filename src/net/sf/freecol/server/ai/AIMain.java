@@ -617,15 +617,11 @@ public class AIMain extends FreeColObject
         } catch (Exception e) {
             logger.log(Level.WARNING, "Exception reading AIObject: "
                        + tag + ", id=" + oid, e);
-            // We are hosed.  Try to at least resynchronize at the end
-            // of aiMain.
-            while (!xr.getLocalName().equals(tag)
-                && !xr.getLocalName().equals(getXMLElementTagName())) {
-                xr.nextTag();
-            }
-            if (!xr.getLocalName().equals(getXMLElementTagName())) {
-                xr.nextTag();
-            }
+            // We are hosed.  Try to resynchronize at the end of the tag
+            // or aiMain.
+            final String mainTag = getXMLElementTagName();
+            while (xr.nextTag() != XMLStreamConstants.END_ELEMENT
+                || !(xr.atTag(tag) || xr.atTag(mainTag)));
         }
     }
 
