@@ -36,9 +36,10 @@ public class FreeColSavegameFile extends FreeColDataFile {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(FreeColSavegameFile.class.getName());
 
-    /**
-     * The name of the file that contains the actual savegame.
-     */
+    /** The tag for the version string in the saved game. */
+    public static final String VERSION_TAG = "version";
+
+    /** The name of the file that contains the actual savegame. */
     public static final String SAVEGAME_FILE = "savegame.xml";
 
     /**
@@ -69,6 +70,25 @@ public class FreeColSavegameFile extends FreeColDataFile {
 
     public FreeColSavegameFile(File file) throws IOException {
         super(file);
+    }
+
+    /**
+     * Gets the save game version from this saved game.
+     *
+     * @return The saved game version, or negative on error.
+     */
+    public int getSavegameVersion() {
+        FreeColXMLReader xr = null;
+        try {
+            xr = this.getFreeColXMLReader();
+            xr.nextTag();
+            return xr.getAttribute(VERSION_TAG, -1);
+        } catch (Exception e) {
+            ; // Just fail
+        } finally {
+            if (xr != null) xr.close();
+        }
+        return -1;
     }
 
     /**

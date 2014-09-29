@@ -126,7 +126,6 @@ public final class FreeColServer {
     public static final String SAVED_GAME_TAG = "savedGame";
     public static final String SERVER_OBJECTS_TAG = "serverObjects";
     public static final String SINGLE_PLAYER_TAG = "singleplayer";
-    public static final String VERSION_TAG = "version";
 
     private static final int META_SERVER_UPDATE_INTERVAL = 60000;
 
@@ -804,7 +803,8 @@ public final class FreeColServer {
 
             xw.writeAttribute(SINGLE_PLAYER_TAG, singlePlayer);
 
-            xw.writeAttribute(VERSION_TAG, SAVEGAME_VERSION);
+            xw.writeAttribute(FreeColSavegameFile.VERSION_TAG,
+                              SAVEGAME_VERSION);
 
             xw.writeAttribute(RANDOM_STATE_TAG, Utils.getRandomState(random));
 
@@ -882,7 +882,7 @@ public final class FreeColServer {
                                       Specification specification,
                                       FreeColServer server)
         throws IOException, FreeColException, XMLStreamException {
-        final int savegameVersion = getSavegameVersion(fis);
+        final int savegameVersion = fis.getSavegameVersion();
         if (savegameVersion < MINIMUM_SAVEGAME_VERSION) {
             throw new FreeColException("incompatibleVersions");
         }
@@ -969,7 +969,7 @@ public final class FreeColServer {
         gameState = GameState.IN_GAME;
         integrity = game.checkIntegrity(true);
 
-        int savegameVersion = getSavegameVersion(fis);
+        int savegameVersion = fis.getSavegameVersion();
         // @compat 0.10.x
         if (savegameVersion < 12) {
             for (Player p : game.getPlayers()) {
@@ -1074,26 +1074,6 @@ public final class FreeColServer {
         }
 
         return game;
-    }
-
-    /**
-     * Gets the save game version from a saved game.
-     *
-     * @param fis The saved game.
-     * @return The saved game version.
-     */
-    private static int getSavegameVersion(final FreeColSavegameFile fis) {
-        FreeColXMLReader xr = null;
-        try {
-            xr = fis.getFreeColXMLReader();
-            xr.nextTag();
-            return xr.getAttribute(VERSION_TAG, -1);
-        } catch (Exception e) {
-            ; // Just fail
-        } finally {
-            if (xr != null) xr.close();
-        }
-        return -1;
     }
 
     /**
