@@ -2339,6 +2339,7 @@ public class Map extends FreeColGameObject implements Location {
             t.setHighSeasCount(-1);
             if (!t.isLand()) {
                 if ((t.getX() == 0 || t.getX() == getWidth()-1)
+                    && t.getType() != null
                     && t.getType().isHighSeasConnected()
                     && !t.getType().isDirectlyHighSeasConnected()
                     && t.getMoveToEurope() == null) {
