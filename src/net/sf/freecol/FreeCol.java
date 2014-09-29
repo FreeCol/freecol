@@ -1159,7 +1159,7 @@ public final class FreeCol {
                     gripe((integrityOK)
                         ? "cli.check-savegame.success"
                         : "cli.check-savegame.failure");
-                    System.exit((integrityOK) ? 0 : 1);
+                    System.exit((integrityOK) ? 0 : 2);
                 }
             } catch (Exception e) {
                 if (checkIntegrity) gripe("cli.check-savegame.failure");
