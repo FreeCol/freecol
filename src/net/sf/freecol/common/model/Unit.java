@@ -4043,6 +4043,18 @@ public class Unit extends GoodsLocation
 
         role = xr.getRole(spec, ROLE_TAG, Role.class,
                           spec.getDefaultRole());
+        // @compat 0.10.x
+        // Fix roles
+        if (owner.isIndian()) {
+            if ("model.role.scout".equals(role.getId())) {
+                role = spec.getRole("model.role.mountedBrave");
+            } else if ("model.role.soldier".equals(role.getId())) {
+                role = spec.getRole("model.role.armedBrave");
+            } else if ("model.role.dragoon".equals(role.getId())) {
+                role = spec.getRole("model.role.nativeDragoon");
+            }
+        }
+        // end @compat 0.10.x
 
         roleCount = xr.getAttribute(ROLE_COUNT_TAG,
             // @compat 0.10.x
