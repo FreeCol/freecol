@@ -2203,6 +2203,10 @@ public class Player extends FreeColGameObject implements Nameable {
     public boolean removeUnit(final Unit oldUnit) {
         if (oldUnit == null) return false;
 
+        nextActiveUnitIterator.remove(oldUnit);
+        nextGoingToUnitIterator.remove(oldUnit);
+        nextTradeRouteUnitIterator.remove(oldUnit);
+
         synchronized (units) {
             return units.remove(oldUnit);
         }
