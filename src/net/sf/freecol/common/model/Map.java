@@ -857,7 +857,6 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * Select a random land tile on the map.
      *
-     * @param map The <code>Map</code> to search in.
      * @param random A <code>Random</code> number source.
      * @return A random land tile, or null if none found.
      */

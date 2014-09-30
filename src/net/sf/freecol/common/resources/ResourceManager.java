@@ -71,67 +71,67 @@ public class ResourceManager {
     /**
      * Sets the mappings specified in the date/base-directory.
      *
-     * @param _baseMapping The mapping between IDs and files.
+     * @param mapping The mapping between IDs and files.
      */
-    public static void setBaseMapping(final ResourceMapping _baseMapping) {
-        baseMapping = _baseMapping;
+    public static void setBaseMapping(final ResourceMapping mapping) {
+        baseMapping = mapping;
         dirty = true;
     }
 
     /**
      * Sets the mappings specified for a Total Conversion (TC).
      *
-     * @param _tcMapping The mapping between IDs and files.
+     * @param mapping The mapping between IDs and files.
      */
-    public static void setTcMapping(final ResourceMapping _tcMapping) {
-        tcMapping = _tcMapping;
+    public static void setTcMapping(final ResourceMapping mapping) {
+        tcMapping = mapping;
         dirty = true;
     }
 
     /**
      * Sets the mappings specified by mods.
      *
-     * @param modMappings A list of the mapping between IDs and files.
+     * @param mappings A list of the mappings between IDs and files.
      */
-    public static void setModMappings(final List<ResourceMapping> _modMappings) {
-        modMappings = _modMappings;
+    public static void setModMappings(final List<ResourceMapping> mappings) {
+        modMappings = mappings;
         dirty = true;
     }
 
     /**
      * Sets the mappings specified in a campaign.
      *
-     * @param _campaignMapping The mapping between IDs and files.
+     * @param mapping The mapping between IDs and files.
      */
-    public static void setCampaignMapping(final ResourceMapping _campaignMapping) {
-        campaignMapping = _campaignMapping;
+    public static void setCampaignMapping(final ResourceMapping mapping) {
+        campaignMapping = mapping;
         dirty = true;
     }
 
     /**
      * Sets the mappings specified in a scenario.
      *
-     * @param _scenarioMapping The mapping between IDs and files.
+     * @param mapping The mapping between IDs and files.
      */
-    public static void setScenarioMapping(final ResourceMapping _scenarioMapping) {
-        scenarioMapping = _scenarioMapping;
+    public static void setScenarioMapping(final ResourceMapping mapping) {
+        scenarioMapping = mapping;
         dirty = true;
     }
 
     /**
      * Sets the mappings specified in a game, such as the player colors.
      *
-     * @param _gameMapping The mapping between IDs and resources.
+     * @param mapping The mapping between IDs and resources.
      */
-    public static void setGameMapping(final ResourceMapping _gameMapping) {
-        gameMapping = _gameMapping;
+    public static void setGameMapping(final ResourceMapping mapping) {
+        gameMapping = mapping;
         dirty = true;
     }
 
     /**
      * Add more mappings to the game mapping.
      *
-     * @param _mapping The <code>ResourceMapping</code> to add.
+     * @param mapping The <code>ResourceMapping</code> to add.
      */
     public static synchronized void addGameMapping(final ResourceMapping mapping) {
         if (gameMapping == null) gameMapping = new ResourceMapping();

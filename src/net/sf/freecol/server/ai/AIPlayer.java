@@ -503,7 +503,6 @@ public abstract class AIPlayer extends AIObject {
      *
      * @param aiUnit The <code>AIUnit</code> to check.
      * @param loc The target <code>Location</code>.
-     * @param lb A <code>LogBuilder</code> to log to.
      * @return A new mission, or null if impossible.
      */
     public Mission getSeekAndDestroyMission(AIUnit aiUnit, Location loc) {

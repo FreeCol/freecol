@@ -71,7 +71,6 @@ public class MissionaryMission extends Mission {
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
      * @param target The target <code>Location</code> for this mission.
-     * @param lb A <code>LogBuilder</code> to log to.
      */
     public MissionaryMission(AIMain aiMain, AIUnit aiUnit, Location target) {
         super(aiMain, aiUnit, target);

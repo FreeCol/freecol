@@ -564,7 +564,6 @@ public class Cargo {
      * Check the integrity of this cargo.
      *
      * @param aiCarrier The <code>AIUnit</code> version of the carrier.
-     * @param tm A <code>TransportMission</code> to check with.
      * @return A reason for integrity failure, or null if none.
      */
     public String check(AIUnit aiCarrier) {

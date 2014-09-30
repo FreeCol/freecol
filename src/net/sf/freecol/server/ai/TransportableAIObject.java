@@ -216,7 +216,7 @@ public abstract class TransportableAIObject extends ValuedAIObject {
      * TransportMission lists, and disembark from the old carrier if
      * possible.
      *
-     * @param carrier The new carrier <code>AIUnit</code>.
+     * @param aiCarrier The new carrier <code>AIUnit</code>.
      * @return True if the transport was changed, false if the transportable
      *     was unable to disembark from the old carrier or unable to be
      *     added to the new carrier transport list.

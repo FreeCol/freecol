@@ -61,7 +61,6 @@ public class WishRealizationMission extends Mission {
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
      * @param wish The <code>Wish</code> which will be realized by
      *     the unit and this mission.
-     * @param lb A <code>LogBuilder</code> to log to.
      */
     public WishRealizationMission(AIMain aiMain, AIUnit aiUnit, Wish wish) {
         super(aiMain, aiUnit, wish.getDestination());

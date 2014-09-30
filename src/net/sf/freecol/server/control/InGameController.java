@@ -1896,7 +1896,7 @@ public final class InGameController extends Controller {
      * Checking that the locations are appropriate is not done here.
      *
      * @param serverPlayer The <code>ServerPlayer</code> embarking.
-     * @param unit The <code>ServerUnit</code> that is embarking.
+     * @param serverUnit The <code>ServerUnit</code> that is embarking.
      * @param carrier The <code>Unit</code> to embark onto.
      * @return An <code>Element</code> encapsulating this action.
      */
@@ -1925,7 +1925,7 @@ public final class InGameController extends Controller {
      *
      * @param serverPlayer The <code>ServerPlayer</code> whose unit is
      *                     embarking.
-     * @param unit The <code>ServerUnit</code> that is disembarking.
+     * @param serverUnit The <code>ServerUnit</code> that is disembarking.
      * @return An <code>Element</code> encapsulating this action.
      */
     public Element disembarkUnit(ServerPlayer serverPlayer,
@@ -2469,7 +2469,7 @@ public final class InGameController extends Controller {
      * Set current stop of a unit to the next valid stop if any.
      *
      * @param serverPlayer The <code>ServerPlayer</code> the unit belongs to.
-     * @param unit The <code>ServerUnit</code> to update.
+     * @param serverUnit The <code>ServerUnit</code> to update.
      * @return An <code>Element</code> encapsulating this action.
      */
     public Element updateCurrentStop(ServerPlayer serverPlayer,

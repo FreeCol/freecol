@@ -100,10 +100,10 @@ public abstract class Wish extends ValuedAIObject {
     /**
      * Gets the <code>TransportableAIObject</code> assigned to this wish.
      *
+     * @see #setTransportable
+     * @see net.sf.freecol.server.ai.mission.WishRealizationMission
      * @return The <code>TransportableAIObject</code> which will
      *     realize this wish, or null if none has been assigned.
-     * @see #setTransportableAIObject
-     * @see net.sf.freecol.server.ai.mission.WishRealizationMission
      */
     public TransportableAIObject getTransportable() {
         return transportable;

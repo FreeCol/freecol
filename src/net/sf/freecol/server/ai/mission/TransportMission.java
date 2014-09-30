@@ -590,8 +590,6 @@ public class TransportMission extends Mission {
      * Removes the given Cargo from the cargoes list.
      *
      * @param cargo The <code>Cargo</code> to remove.
-     * @param reason The reason for its removal (if null, do not log, it has
-     *     already been mentioned).
      */
     private void removeCargo(Cargo cargo) {
         if (!tRemove(cargo)) {
