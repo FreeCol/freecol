@@ -2408,8 +2408,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                                          Player.class, (Player)null, false);
 
         region = xr.findFreeColGameObject(game, REGION_TAG,
-                                          Region.class, (Region)null, true);
-
+                                          Region.class, (Region)null, false);
+        
         moveToEurope = (xr.hasAttribute(MOVE_TO_EUROPE_TAG))
             ? Boolean.valueOf(xr.getAttribute(MOVE_TO_EUROPE_TAG, false))
             : null;

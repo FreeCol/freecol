@@ -1166,10 +1166,6 @@ public class TerrainGenerator {
      * @param map The <code>Map</code> to work on.
      */
     private void createLakeRegions(Map map) {
-        Game game = map.getGame();
-        final TileType lakeType = map.getSpecification()
-            .getTileType("model.tile.lake");
-
         // Create the water map, and find any tiles that are water but
         // not part of any region (such as the oceans).  These are
         // lake tiles.
@@ -1188,9 +1184,29 @@ public class TerrainGenerator {
             }
         }
         logger.fine(sb.toString());
+        for (ServerRegion sr : makeLakes(map, lakes)) {
+            setGeographicRegion(sr);
+        }            
+    }
 
-        // Make lake regions from unassigned lake tiles.
+
+    /**
+     * Make lake regions from unassigned lake tiles.
+     *
+     * @compat 0.10.x
+     * Public/static to allow Map to remediate missing lake regions
+     * end @compat 0.10.x
+     *
+     * @param map The <code>Map</code> to add to.
+     * @param lakes A list of lake <code>Tile</code>s.
+     * @return A list of new <code>ServerRegion</code>s.
+     */
+    public static List<ServerRegion> makeLakes(Map map, List<Tile> lakes) {
+        Game game = map.getGame();
+        final TileType lakeType = map.getSpecification()
+            .getTileType("model.tile.lake");
         List<Tile> todo = new ArrayList<Tile>();
+        List<ServerRegion> result = new ArrayList<ServerRegion>();
         int lakeCount = 0;
         while (!lakes.isEmpty()) {
             Tile tile = lakes.get(0);
@@ -1201,7 +1217,6 @@ public class TerrainGenerator {
                     + lakeCount) != null) lakeCount++;
             ServerRegion lakeRegion = new ServerRegion(game, id,
                                                        RegionType.LAKE, null);
-            setGeographicRegion(lakeRegion);
             map.putRegion(lakeRegion);
             // Pretend lakes are discovered with the surrounding terrain?
             lakeRegion.setPrediscovered(false);
@@ -1213,10 +1228,20 @@ public class TerrainGenerator {
                     t.setRegion(lakeRegion);
                     t.setType(lakeType);
                     lakes.remove(t);
-                    todo.addAll(t.getSurroundingTiles(1, 1));
+                    // It would be better to do:
+                    //   todo.addAll(t.getSurroundingTiles(1, 1));
+                    // but this routine can be called from Map.readChildren
+                    // before game.getMap() works.  When that use goes away,
+                    // use the above code.
+                    for (Direction d : Direction.allDirections) {
+                        Tile t0 = map.getAdjacentTile(t, d);
+                        if (t0 != null) todo.add(t0);
+                    }
                 }
             }
+            result.add(lakeRegion);
         }
+        return result;
     }
 
     /**
