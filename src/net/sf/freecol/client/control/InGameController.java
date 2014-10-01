@@ -2869,9 +2869,11 @@ public final class InGameController implements NetworkConstants {
             && confirmPreCombat(unit, target)) {
             askServer().attack(unit, direction);
             nextActiveUnit();
-            return false;
         }
-        return true;
+        // Always return false, as the unit has either attacked and lost
+        // its remaining moves, or the move can not proceed because it is
+        // blocked.
+        return false;
     }
 
     /**
