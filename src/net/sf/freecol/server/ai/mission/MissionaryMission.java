@@ -112,7 +112,7 @@ public class MissionaryMission extends Mission {
                 (IndianSettlement)settlement) == null)
             ? (IndianSettlement)settlement
             : (settlement instanceof Colony
-                && invalidColonyReason(aiUnit, (Colony)settlement) != null)
+                && invalidColonyReason(aiUnit, (Colony)settlement) == null)
             ? (Colony)settlement
             : null;        
     }
@@ -136,8 +136,7 @@ public class MissionaryMission extends Mission {
      * Makes a goal decider that checks for potential missions.
      *
      * @param aiUnit The <code>AIUnit</code> to find a mission with.
-     * @param deferOK Keep track of the nearest of our colonies, to use
-     *     as a fallback destination.
+     * @param deferOK Enable deferring to a fallback colony.
      * @return A suitable <code>GoalDecider</code>.
      */
     private static GoalDecider getGoalDecider(final AIUnit aiUnit,
@@ -149,11 +148,14 @@ public class MissionaryMission extends Mission {
                 public PathNode getGoal() { return bestPath; }
                 public boolean hasSubGoals() { return true; }
                 public boolean check(Unit u, PathNode path) {
-                    int value = scorePath(aiUnit, path);
-                    if (bestValue < value) {
-                        bestValue = value;
-                        bestPath = path;
-                        return true;
+                    if (path.getLastNode().getLocation().getSettlement()
+                        instanceof IndianSettlement) {
+                        int value = scorePath(aiUnit, path);
+                        if (bestValue < value) {
+                            bestValue = value;
+                            bestPath = path;
+                            return true;
+                        }
                     }
                     return false;
                 }
@@ -180,7 +182,6 @@ public class MissionaryMission extends Mission {
         final GoalDecider gd = getGoalDecider(aiUnit, deferOK);
         final CostDecider standardCd
             = CostDeciders.avoidSettlementsAndBlockingUnits();
-
         // Is there a valid target available from the starting tile?
         return unit.search(start, gd, standardCd, range, carrier);
     }
@@ -197,9 +198,7 @@ public class MissionaryMission extends Mission {
     public static Location findTarget(AIUnit aiUnit, int range,
                                       boolean deferOK) {
         PathNode path = findTargetPath(aiUnit, range, deferOK);
-        return (path != null) ? extractTarget(aiUnit, path)
-            : upLoc(findCircleTarget(aiUnit, getGoalDecider(aiUnit, deferOK),
-                                     range*3, deferOK));
+        return (path == null) ? null : extractTarget(aiUnit, path);
     }
 
     /**
