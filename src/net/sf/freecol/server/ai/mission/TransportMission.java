@@ -213,7 +213,6 @@ public class TransportMission extends Mission {
             old.addAll(cargoes);
             cargoes.clear();
         }
-        tRetarget();
         return old;
     }
 
@@ -496,6 +495,7 @@ public class TransportMission extends Mission {
             dropTransportable(cargo.getTransportable());
             log += " " + cargo;
         }
+        tRetarget();
         return log;
     }
 

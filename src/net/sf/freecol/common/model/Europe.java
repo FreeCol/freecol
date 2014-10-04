@@ -390,6 +390,9 @@ public class Europe extends UnitLocation implements Ownable, Named {
     private static final String RECRUIT_PRICE_TAG = "recruitPrice";
     private static final String UNIT_PRICE_TAG = "unitPrice";
     private static final String UNIT_TYPE_TAG = "unitType";
+    // @compat 0.10.0
+    private static final String UNITS_TAG = "units";
+    // end @compat 0.10.0
 
 
     /**
@@ -531,6 +534,13 @@ public class Europe extends UnitLocation implements Ownable, Named {
 
             unitPrices.put(unitType, Integer.valueOf(price));
             xr.closeTag(UNIT_PRICE_TAG);
+
+        // @compat 0.10.0
+        } else if (UNITS_TAG.equals(tag)) {
+            while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                super.readChild(xr);
+            }
+        // end @compat 0.10.0
 
         } else {
             super.readChild(xr);
