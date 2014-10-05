@@ -115,9 +115,9 @@ public final class ImageLibrary {
         public static PathType getPathType(Unit u) {
             return (u == null) ? PathType.FOOT
                 : (u.isNaval()) ? PathType.NAVAL
-                : (u.isCarrier()) ? PathType.WAGON
                 : (u.isMounted()) ? PathType.HORSE
-                : PathType.FOOT;
+                : (u.isPerson()) ? PathType.FOOT
+                : PathType.WAGON;
         }
     };
 
