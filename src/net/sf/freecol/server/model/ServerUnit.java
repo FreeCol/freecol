@@ -293,7 +293,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
             case IMPROVING:
                 // Has the improvement been completed already? Do nothing.
                 TileImprovement ti = getWorkImprovement();
-                if (ti.isComplete()) {
+                if (ti == null // Another unit on the tile completed it first
+                    || ti.isComplete()) {
                     setState(UnitState.ACTIVE);
                     setWorkLeft(-1);
                 } else {
