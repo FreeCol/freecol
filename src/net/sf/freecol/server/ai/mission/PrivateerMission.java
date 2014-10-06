@@ -231,6 +231,8 @@ public class PrivateerMission extends Mission {
         final Unit unit = aiUnit.getUnit();
         return (!unit.isCarrier()) ? "unit-not-a-carrier"
             : (!unit.isOffensiveUnit()) ? Mission.UNITNOTOFFENSIVE
+            : (!unit.isEmpty()
+                || !unit.getCompactGoods().isEmpty()) ? "unit-has-cargo"
             : null;
     }
 
