@@ -4053,7 +4053,27 @@ public class Unit extends GoodsLocation
             } else if ("model.role.dragoon".equals(role.getId())) {
                 role = spec.getRole("model.role.nativeDragoon");
             }
-        }
+        } else if (owner.isREF()) {
+            if ("model.role.soldier".equals(role.getId())
+                && unitType.hasAbility(Ability.REF_UNIT)) {
+                role = spec.getRole("model.role.infantry");
+            } else if ("model.role.dragoon".equals(role.getId())
+                && unitType.hasAbility(Ability.REF_UNIT)) {
+                role = spec.getRole("model.role.cavalry");
+            } else if ("model.role.infantry".equals(role.getId())
+                && !unitType.hasAbility(Ability.REF_UNIT)) {
+                role = spec.getRole("model.role.soldier");
+            } else if ("model.role.cavalry".equals(role.getId())
+                && !unitType.hasAbility(Ability.REF_UNIT)) {
+                role = spec.getRole("model.role.dragoon");
+            }
+        } else {
+            if ("model.role.infantry".equals(role.getId())) {
+                role = spec.getRole("model.role.soldier");
+            } else if ("model.role.cavalry".equals(role.getId())) {
+                role = spec.getRole("model.role.dragoon");
+            }
+        }            
         // end @compat 0.10.x
 
         roleCount = xr.getAttribute(ROLE_COUNT_TAG,
