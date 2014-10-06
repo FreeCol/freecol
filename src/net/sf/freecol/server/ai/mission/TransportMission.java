@@ -137,7 +137,8 @@ public class TransportMission extends Mission {
      */
     public void dispose() {
         logger.finest(tag + " disposing (" + clearCargoes() + "): " + this
-            + "\n" + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
+            //+ "\n" + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString()
+            );
         super.dispose();
     }
 
