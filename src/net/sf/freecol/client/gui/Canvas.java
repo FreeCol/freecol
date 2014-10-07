@@ -275,14 +275,14 @@ public final class Canvas extends JDesktopPane {
 
     private final ServerListPanel serverListPanel;
 
-    private final LoadingSavegameDialog loadingSavegameDialog;    
-
     /** Used to detect resizing. */
     private Dimension oldSize = null;
 
     private Dimension initialSize = null;
 
     private boolean clientOptionsDialogShowing = false;
+
+    private LoadingSavegameDialog loadingSavegameDialog;
 
     /** Filters for loadable game files. */
     private FileFilter[] fileFilters = null;
@@ -320,7 +320,6 @@ public final class Canvas extends JDesktopPane {
             freeColClient.getConnectController());
         statusPanel = new StatusPanel(freeColClient);
         chatPanel = new ChatPanel(freeColClient);
-        loadingSavegameDialog = new LoadingSavegameDialog(freeColClient);
 
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
@@ -969,7 +968,9 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Gets the <code>LoadingSavegameDialog</code>.
+     * Gets the last <code>LoadingSavegameDialog</code>.
+     *
+     * TODO: clean this up
      *
      * @return The <code>LoadingSavegameDialog</code>.
      */
@@ -2010,7 +2011,7 @@ public final class Canvas extends JDesktopPane {
      */
     public boolean showLoadingSavegameDialog(boolean publicServer,
                                              boolean singlePlayer) {
-        loadingSavegameDialog.reset(publicServer, singlePlayer);
+        loadingSavegameDialog = new LoadingSavegameDialog(freeColClient);
         return showFreeColDialog(loadingSavegameDialog, null);
     }
 
