@@ -939,12 +939,12 @@ public class TransportMission extends Mission {
                     .getSimpleMoveType(t.getLocation().getTile(),
                                        cargo.getTransportTarget().getTile());
                 switch (mt) {
-                case MOVE_NO_ATTACK_CIVILIAN:
+                case ATTACK_UNIT: case MOVE_NO_ATTACK_CIVILIAN:
                     return CargoResult.TRETRY;
                 default:
                     PathNode path = t.getDeliveryPath(carrier,
                         cargo.getTransportTarget());
-                    logger.warning("Null dropoff direction"
+                    logger.warning("Null direction"
                         + " for " + cargo.toShortString()
                         + " at " + t.getLocation().toShortString()
                         + "/" + carrier.getLocation().toShortString()
