@@ -449,7 +449,8 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
      */
     @Override
     public void requestFocus() {
-        if (this.pane.getUI() instanceof FreeColOptionPaneUI) {
+        if (this.pane != null
+            && this.pane.getUI() instanceof FreeColOptionPaneUI) {
             Component c = ((FreeColOptionPaneUI)this.pane.getUI())
                 .getInitialFocusComponent();
             if (c != null) {
