@@ -80,6 +80,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DiplomacyMessage;
@@ -1329,16 +1330,25 @@ public class ServerPlayer extends Player implements ServerModelObject {
             if (isRebel() && interventionBells
                 >= getSpecification().getInteger(GameOptions.INTERVENTION_BELLS)) {
                 interventionBells = Integer.MIN_VALUE;
-                // TODO: this assumes that the entry location will
-                // always be a tile.  This seems safe enough at the moment.
-                Tile entryLocation = ((Tile)getEntryLocation())
-                    .getSafeTile(this, random);
+                
+                // Enter near a port.
+                List<Colony> ports = new ArrayList<Colony>();
+                for (Colony c : getColonies()) {
+                    if (c.isConnectedPort()) ports.add(c);
+                }
+                Colony port = Utils.getRandomMember(logger, "Intervention port",
+                    ports, random);
+                Tile portTile = port.getTile();
+                Tile entry = getGame().getMap().searchCircle(portTile,
+                    GoalDeciders.getSimpleHighSeasGoalDecider(),
+                    portTile.getHighSeasCount()+1).getSafeTile(this, random);
+                
+                // Create the force.
                 Monarch.Force ivf = getMonarch().getInterventionForce();
-
                 List<Unit> landUnits = createUnits(ivf.getLandUnits(),
-                                                   entryLocation);//-vis(this)
+                                                   entry);//-vis(this)
                 List<Unit> navalUnits = createUnits(ivf.getNavalUnits(),
-                                                    entryLocation);//-vis(this)
+                                                    entry);//-vis(this)
                 List<Unit> leftOver = loadShips(landUnits, navalUnits,
                                                 random);//-vis(this)
                 for (Unit unit : leftOver) {
@@ -1347,12 +1357,19 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     unit.setLocationNoUpdate(null);//-vis: safe, off map
                     unit.disposeList();//-vis: safe, never sighted
                 }
+                List<Tile> tiles = exploreForUnit(navalUnits.get(0));
+                if (!tiles.contains(entry)) tiles.add(entry);
                 invalidateCanSeeTiles();//+vis(this)
-                cs.add(See.perhaps(), entryLocation);
+                cs.add(See.perhaps(), tiles);
                 cs.addMessage(See.only(this),
                     new ModelMessage(ModelMessage.MessageType.DEFAULT,
                         "declareIndependence.interventionForceArrives",
                         this));
+                logger.info("Intervention force ("
+                    + navalUnits.size() + " naval, "
+                    + landUnits.size() + " land, "
+                    + leftOver.size() + " left over) arrives at " + entry
+                    + "(for " + port.getName() + ")");
             }
         }
 

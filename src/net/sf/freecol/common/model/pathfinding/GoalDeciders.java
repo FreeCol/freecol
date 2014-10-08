@@ -160,6 +160,30 @@ public final class GoalDeciders {
     }
 
     /**
+     * Build a simple goal decider to find the first high seas tile
+     * without using the unit parameter.
+     *
+     * @return A <code>GoalDecider</code> that finds the nearest high seas tile.
+     */
+    public static GoalDecider getSimpleHighSeasGoalDecider() {
+        return new GoalDecider() {
+            private PathNode first = null;
+
+            public PathNode getGoal() { return first; }
+            public boolean hasSubGoals() { return false; }
+            public boolean check(Unit u, PathNode path) {
+                Tile tile = path.getTile();
+                if (tile != null
+                    && tile.isDirectlyHighSeasConnected()) {
+                    first = path;
+                    return true;
+                }
+                return false;
+            }
+        };
+    }
+
+    /**
      * Builds a simple goal decider to find a single target location.
      *
      * @param target The target <code>Location</code>.
