@@ -135,8 +135,11 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     private static final int pioneeringRange = 10;
 
-    /** Maximum number of turns to travel to a privateering target. */
-    private static final int privateerRange = 12;
+    /**
+     * Maximum number of turns to travel to a privateering target.
+     * Low number because of large naval moves.
+     */
+    private static final int privateerRange = 1;
 
     /** Maximum number of turns to travel to a scouting target. */
     private static final int scoutingRange = 20;
