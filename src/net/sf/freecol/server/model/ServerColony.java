@@ -195,15 +195,17 @@ public class ServerColony extends Colony implements ServerModelObject {
                     int complete = getTurnsToComplete(build, needed);
                     // Warn if about to fail, or if no useful progress
                     // towards completion is possible.
-                    if (complete == -1 && needed.getType() != null) {
+                    GoodsType type = needed.getType();
+                    if (type != null && complete == -1) {
+                        int amount = needed.getAmount() - getGoodsCount(type);
                         cs.addMessage(See.only(owner),
                             new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
-                                "model.colony.buildableNeedsGoods",
-                                this, build)
-                            .addName("%colony%", getName())
-                            .add("%buildable%", build.getNameKey())
-                            .addAmount("%amount%", needed.getAmount())
-                            .add("%goodsType%", needed.getType().getNameKey()));
+                                             "model.colony.buildableNeedsGoods",
+                                             this, build)
+                                .addName("%colony%", getName())
+                                .add("%buildable%", build.getNameKey())
+                                .addAmount("%amount%", amount)
+                                .add("%goodsType%", type.getNameKey()));
                     }
                 }
             } else {
