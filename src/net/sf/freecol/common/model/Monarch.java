@@ -533,12 +533,11 @@ public final class Monarch extends FreeColGameObject implements Named {
         // Benjamin Franklin puts an end to the monarch's interference
         if (!player.hasAbility(Ability.IGNORE_EUROPEAN_WARS)) {
             for (Player enemy : getGame().getLiveEuropeanPlayers(player)) {
-                if (enemy.isREF()) continue;
+                if (enemy.hasAbility(Ability.IGNORE_EUROPEAN_WARS)
+                    || enemy.isREF()) continue;
                 switch (player.getStance(enemy)) {
                 case PEACE: case CEASE_FIRE:
-                    if (!enemy.hasAbility(Ability.IGNORE_EUROPEAN_WARS)) {
-                        enemies.add(enemy);
-                    }
+                    enemies.add(enemy);
                     break;
                 default:
                     break;
@@ -551,23 +550,20 @@ public final class Monarch extends FreeColGameObject implements Named {
     /**
      * Collects a list of potential friends for this player.
      *
+     * Do not apply Franklin, he stops wars, not peace.
+     *
      * @return A list of potential friendly <code>Player</code>s.
      */
     public List<Player> collectPotentialFriends() {
         List<Player> friends = new ArrayList<Player>();
-        // Benjamin Franklin puts an end to the monarch's interference
-        if (!player.hasAbility(Ability.IGNORE_EUROPEAN_WARS)) {
-            for (Player enemy : getGame().getLiveEuropeanPlayers(player)) {
-                if (enemy.isREF()) continue;
-                switch (player.getStance(enemy)) {
-                case WAR: case CEASE_FIRE:
-                    if (!enemy.hasAbility(Ability.IGNORE_EUROPEAN_WARS)) {
-                        friends.add(enemy);
-                    }
-                    break;
-                default:
-                    break;
-                }
+        for (Player enemy : getGame().getLiveEuropeanPlayers(player)) {
+            if (enemy.isREF()) continue;
+            switch (player.getStance(enemy)) {
+            case WAR: case CEASE_FIRE:
+                friends.add(enemy);
+                break;
+            default:
+                break;
             }
         }
         return friends;

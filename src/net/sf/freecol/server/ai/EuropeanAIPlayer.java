@@ -2301,15 +2301,16 @@ public class EuropeanAIPlayer extends AIPlayer {
     @Override
     protected Stance determineStance(Player other) {
         final Player player = getPlayer();
-        if (other.isREF()) {
-            if (player.getREFPlayer() == other) {
-                return (player.isRebel()) ? Stance.WAR : Stance.PEACE;
-            }
-            // Do not mess with other player's REF unless they conquer
-            // their rebellious colonies.
-            if (!other.getRebels().isEmpty()) return Stance.PEACE;
-        }
-        return super.determineStance(other);
+        return (other.isREF())
+            ? ((player.getREFPlayer() == other) 
+                // At war with our REF if rebel, otherwise at peace.
+                ? ((player.isRebel()) ? Stance.WAR : Stance.PEACE)
+                // Do not mess with other player's REF unless they conquer
+                // their rebellious colonies.
+                : ((!other.getRebels().isEmpty()) ? Stance.PEACE
+                    : super.determineStance(other)))
+            // Use normal stance determination for non-REF nations.
+            : super.determineStance(other);
     }
 
     /**
