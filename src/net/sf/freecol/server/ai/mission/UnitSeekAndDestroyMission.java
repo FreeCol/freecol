@@ -472,7 +472,16 @@ public class UnitSeekAndDestroyMission extends Mission {
             if (nearbyTarget == getTarget()) {
                 nearbyTarget = null;
             } else {
-                lb.add(", found target of opportunity ", nearbyTarget);
+                Tile now = unit.getTile();
+                Tile nearbyTile = nearbyTarget.getTile();
+                Tile targetTile = getTarget().getTile();
+                if (now != null && nearbyTile != null && targetTile != null
+                    && (now.getDistanceTo(nearbyTile)
+                        >= now.getDistanceTo(targetTile))) {
+                    nearbyTarget = null;
+                } else {
+                    lb.add(", found target of opportunity ", nearbyTarget);
+                }
             }
         }
 
