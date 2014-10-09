@@ -94,6 +94,19 @@ public class PrivateerMission extends Mission {
 
 
     /**
+     * Hack to help REF planning.
+     *
+     * This should go away.  AI units should not exploit seeing the whole map.
+     *
+     * @return The distance to the target, or a large value on failure.
+     */
+    public int getDistanceToTarget() {
+        return (target == null || target.getTile() == null
+            || !getUnit().hasTile()) ? 1000000
+            : getUnit().getTile().getDistanceTo(target.getTile());
+    }
+
+    /**
      * Extract a valid target for this mission from a path.
      *
      * @param aiUnit A <code>AIUnit</code> to perform the mission.
