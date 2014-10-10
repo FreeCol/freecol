@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -157,21 +158,21 @@ public final class FeatureContainer {
     public Set<Ability> getAbilities(String id, FreeColGameObjectType fcgot,
                                      Turn turn) {
         Set<Ability> result = new HashSet<Ability>();
-        if (!abilitiesPresent()) return result;
-
-        synchronized (abilitiesLock) {
-            Set<Ability> abilitySet;
-            if (id == null) {
-                abilitySet = new HashSet<Ability>();
-                for (Set<Ability> aset : abilities.values()) {
-                    abilitySet.addAll(aset);
+        if (abilitiesPresent()) {
+            synchronized (abilitiesLock) {
+                if (id == null) {
+                    for (Set<Ability> aset : abilities.values()) {
+                        result.addAll(aset);
+                    }
+                } else {
+                    Set<Ability> aset = abilities.get(id);
+                    if (aset != null) result.addAll(aset);
                 }
-            } else {
-                if ((abilitySet = abilities.get(id)) == null) return result;
             }
-
-            for (Ability a : abilitySet) {
-                if (a.appliesTo(fcgot, turn)) result.add(a);
+            Iterator<Ability> it = result.iterator();
+            while (it.hasNext()) {
+                Ability a = it.next();
+                if (!a.appliesTo(fcgot, turn)) it.remove();
             }
         }
         return result;
@@ -241,21 +242,21 @@ public final class FeatureContainer {
     public Set<Modifier> getModifiers(String id, FreeColGameObjectType fcgot,
                                       Turn turn) {
         Set<Modifier> result = new HashSet<Modifier>();
-        if (!modifiersPresent()) return result;
-
-        synchronized (modifiersLock) {
-            Set<Modifier> modifierSet;
-            if (id == null) {
-                modifierSet = new HashSet<Modifier>();
-                for (Set<Modifier> mset : modifiers.values()) {
-                    modifierSet.addAll(mset);
+        if (modifiersPresent()) {
+            synchronized (modifiersLock) {
+                if (id == null) {
+                    for (Set<Modifier> mset : modifiers.values()) {
+                        result.addAll(mset);
+                    }
+                } else {
+                    Set<Modifier> mset = modifiers.get(id);
+                    if (mset != null) result.addAll(mset);
                 }
-            } else {
-                if ((modifierSet = modifiers.get(id)) == null) return result;
             }
-            
-            for (Modifier m : modifierSet) {
-                if (m.appliesTo(fcgot, turn)) result.add(m);
+            Iterator<Modifier> it = result.iterator();
+            while (it.hasNext()) {
+                Modifier m = it.next();
+                if (!m.appliesTo(fcgot, turn)) it.remove();
             }
         }
         return result;
