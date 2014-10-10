@@ -505,9 +505,7 @@ public class ServerIndianSettlement extends IndianSettlement
             csChangeAlarm(newOwner, ALARM_NEW_MISSIONARY, true, cs);//-til
             tile.updateIndianSettlement(newOwner);
             
-            final boolean enhanced = getSpecification() 
-                .getBoolean(GameOptions.ENHANCED_MISSIONARIES);
-            int radius = (enhanced) ? getLineOfSight() : 1;
+            int radius = getMissionaryLineOfSight();
             for (Tile t : tile.getSurroundingTiles(1, radius)) {
                 if (newOwner.exploreTile(t) || !newOwner.canSee(t)) {
                     cs.add(See.only(newOwner), t);

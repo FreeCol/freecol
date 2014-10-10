@@ -3307,11 +3307,15 @@ public class ServerPlayer extends Player implements ServerModelObject {
         Set<Tile> owned = settlement.getOwnedTiles();
         for (Tile t : owned) t.cacheUnseen();//+til
         Tile centerTile = settlement.getTile();
+        ServerPlayer missionaryOwner = null;
+        int radius = 0;
 
         // Get rid of the any missionary first.
         if (settlement instanceof ServerIndianSettlement) {
             ServerIndianSettlement sis = (ServerIndianSettlement)settlement;
             if (sis.hasMissionary()) {
+                missionaryOwner = (ServerPlayer)sis.getMissionary().getOwner();
+                radius = sis.getMissionaryLineOfSight();
                 sis.csKillMissionary("indianSettlement.mission.destroyed", cs);
             }
         }
@@ -3381,9 +3385,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
         }
 
-        cs.add(See.perhaps().always(owner), owned);
-        cs.addDispose(See.perhaps().always(owner), centerTile, 
-                      settlement);//-vis(owner)
+        See vis = See.perhaps().always(owner);
+        if (missionaryOwner != null) vis.except(missionaryOwner);
+        cs.add(vis, owned);
+        cs.addDispose(vis, centerTile, settlement);//-vis(owner)
         owner.invalidateCanSeeTiles();//+vis(owner)
         // Recache, should only show now cleared tiles to former owner.
         for (Tile t : owned) t.cacheUnseen();
@@ -3392,6 +3397,16 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // needs to be completely cleared for players that can see the
         // settlement is gone.
         if (settlement instanceof IndianSettlement) centerTile.seeTile();
+
+        // Former missionary owner knows that the settlement fell.
+        if (missionaryOwner != null) {
+            for (Tile t : centerTile.getSurroundingTiles(1, radius)) {
+                if (!owned.contains(t)) owned.add(t);
+            }
+            cs.add(See.only(missionaryOwner), owned);
+            cs.addDispose(See.only(missionaryOwner), centerTile, settlement);
+            centerTile.seeTile(missionaryOwner);
+        }
     }
 
     /**

@@ -327,6 +327,17 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
+     * Get the line of sight used by a missionary at this settlement.
+     *
+     * @return The missionary line of sight.
+     */
+    public int getMissionaryLineOfSight() {
+        final boolean enhanced = getSpecification() 
+            .getBoolean(GameOptions.ENHANCED_MISSIONARIES);
+        return (enhanced) ? getLineOfSight() : 1;
+    }
+
+    /**
      * Gets the convert progress status for this settlement.
      *
      * @return The convert progress status.
