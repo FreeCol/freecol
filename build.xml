@@ -577,12 +577,12 @@
     -->
     <target name="test" depends="build-unit-tests"
             description="Runs a particular unit test">
-        <echo message="if the next task fails then please read the build script" />
         <!-- if the next fails then here is the long answer:
              http://ant.apache.org/faq.html#delegating-classloader
              the short answer depends.
              if you have Ant 1.7, the junit.jar can exist on the classpath.
-             upgrading to 1.7 may be the best solution.
+             upgrading to 1.7 may be the best solution.  Later ant
+             should be fine.             
 
              if you have Ant 1.6:
              ant -lib test/lib/junit.jar testall
