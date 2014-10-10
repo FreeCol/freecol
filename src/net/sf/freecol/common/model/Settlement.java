@@ -704,11 +704,11 @@ public abstract class Settlement extends GoodsLocation
             super.writeChildren(xw);
 
             for (Ability ability : getSortedAbilities()) {
-                ability.toXML(xw);
+                if (ability.isIndependent()) ability.toXML(xw);
             }
 
             for (Modifier modifier : getSortedModifiers()) {
-                modifier.toXML(xw);
+                if (modifier.isIndependent()) modifier.toXML(xw);
             }
         }
     }
@@ -759,10 +759,12 @@ public abstract class Settlement extends GoodsLocation
         final String tag = xr.getLocalName();
 
         if (Ability.getXMLElementTagName().equals(tag)) {
-            addAbility(new Ability(xr, spec));
+            Ability ability = new Ability(xr, spec);
+            if (ability.isIndependent()) addAbility(ability);
 
         } else if (Modifier.getXMLElementTagName().equals(tag)) {
-            addModifier(new Modifier(xr, spec));
+            Modifier modifier = new Modifier(xr, spec);
+            if (modifier.isIndependent()) addModifier(modifier);
 
         } else {
             super.readChild(xr);

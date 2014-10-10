@@ -4044,11 +4044,14 @@ public class Player extends FreeColGameObject implements Nameable {
         if (xw.validFor(this)) {
 
             for (Ability ability : getSortedAbilities()) {
-                ability.toXML(xw);
+                if (ability.isIndependent()) ability.toXML(xw);
             }
 
+            Turn turn = getGame().getTurn();
             for (Modifier modifier : getSortedModifiers()) {
-                modifier.toXML(xw);
+                if (modifier.isTemporary() && !modifier.isOutOfDate(turn)) {
+                    modifier.toXML(xw);
+                }
             }
 
             for (Player p : getSortedCopy(tension.keySet())) {
@@ -4099,13 +4102,6 @@ public class Player extends FreeColGameObject implements Nameable {
             if (lastSales != null) {
                 for (LastSale ls : getSortedCopy(lastSales.values())) {
                     ls.toXML(xw);
-                }
-            }
-
-            Turn turn = getGame().getTurn();
-            for (Modifier modifier : getSortedModifiers()) {
-                if (modifier.isTemporary() && !modifier.isOutOfDate(turn)) {
-                    modifier.toXML(xw);
                 }
             }
 
@@ -4272,7 +4268,8 @@ public class Player extends FreeColGameObject implements Nameable {
             xr.closeTag(TENSION_TAG);
         
         } else if (Ability.getXMLElementTagName().equals(tag)) {
-            addAbility(new Ability(xr, spec));
+            Ability ability = new Ability(xr, spec);
+            if (ability.isIndependent()) addAbility(ability);
 
         } else if (Europe.getXMLElementTagName().equals(tag)) {
             europe = xr.readFreeColGameObject(game, Europe.class);
@@ -4293,7 +4290,8 @@ public class Player extends FreeColGameObject implements Nameable {
             addModelMessage(new ModelMessage(xr));
 
         } else if (Modifier.getXMLElementTagName().equals(tag)) {
-            addModifier(new Modifier(xr, spec));
+            Modifier modifier = new Modifier(xr, spec);
+            if (modifier.isIndependent()) addModifier(modifier);
 
         } else if (Monarch.getXMLElementTagName().equals(tag)) {
             monarch = xr.readFreeColGameObject(game, Monarch.class);

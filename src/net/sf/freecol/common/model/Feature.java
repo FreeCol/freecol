@@ -276,6 +276,22 @@ public abstract class Feature extends FreeColObject {
             && turn.getNumber() > lastTurn.getNumber();
     }
 
+    /**
+     * Is this feature an independent stand-alone one, or is it
+     * derived from some other entity such as a founding father.  This
+     * is important for player and colony serialization, where we do
+     * *not* want to read or write derived features because they are
+     * added to the player by the source.
+     *
+     * @return True if the feature is independent.
+     */
+    public boolean isIndependent() {
+        if (source instanceof BuildingType
+            || source instanceof FoundingFather
+            || source instanceof NationType) return false;
+        return true;
+    }
+
 
     // Override Object
 
