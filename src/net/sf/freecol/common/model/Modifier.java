@@ -477,6 +477,19 @@ public class Modifier extends Feature {
             : apply(number, getValue(turn), getType());
     }
 
+    // @compat 0.10.7
+    /**
+     * Helper for scope fixups.
+     *
+     * @return True if a negated person scope was added.
+     */
+    public boolean requireNegatedPersonScope() {
+        if (hasScope()) return false;
+        addScope(Scope.makeNegatedPersonScope());
+        return true;
+    }
+    // end @compat 0.10.7
+
 
     // Override FreeColObject
 

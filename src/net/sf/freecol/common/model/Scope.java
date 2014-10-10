@@ -257,6 +257,21 @@ public class Scope extends FreeColObject {
     }
 
 
+    // @compat 0.10.7
+    /**
+     * Helper for scope fixups.
+     *
+     * @return A new scope to negatively match on persons.
+     */
+    public static Scope makeNegatedPersonScope() {
+        Scope scope = new Scope();
+        scope.setAbilityId("model.ability.person");
+        scope.setMatchNegated(true);
+        return scope;
+    }
+    // end @compat 0.10.7
+
+
     // Override Object
 
     /**

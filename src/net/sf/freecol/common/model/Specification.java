@@ -33,6 +33,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -244,6 +245,11 @@ public final class Specification {
         = new HashMap<Role, Map<Role, Role>>();
 
     /* Other containers. */
+
+    // @compat 0.10.7
+    public final Map<String, String> fatherGoodsFixMap
+        = new HashMap<String, String>();
+    // end @compat 0.10.7
 
     private final Map<String, FreeColGameObjectType> allTypes
         = new HashMap<String, FreeColGameObjectType>();
@@ -2011,6 +2017,23 @@ public final class Specification {
         // end @compat
 
         // @compat 0.10.7
+        // Require the scopes added to founding fathers in git.8971674
+        fatherGoodsFixMap.clear();
+        fatherGoodsFixMap.put("model.foundingFather.henryHudson",
+                              "model.goods.furs");
+        fatherGoodsFixMap.put("model.foundingFather.thomasJefferson",
+                              "model.goods.bells");
+        fatherGoodsFixMap.put("model.foundingFather.thomasPaine",
+                              "model.goods.bells");
+        fatherGoodsFixMap.put("model.foundingFather.williamPenn",
+                              "model.goods.crosses");
+        for (Entry<String, String> e : fatherGoodsFixMap.entrySet()) {
+            FoundingFather father = getFoundingFather(e.getKey());
+            for (Modifier m : father.getModifiers(e.getValue())) {
+                m.requireNegatedPersonScope();
+            }
+        }
+
         for (EuropeanNationType ent : europeanNationTypes) {
             if (ent.hasAbility(Ability.FOUND_COLONY)) {
                 ent.removeAbilities(Ability.FOUND_COLONY);

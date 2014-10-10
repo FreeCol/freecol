@@ -700,8 +700,9 @@ public class BuildingTest extends FreeColTestCase {
     }
 
     public void testTownhallProduction() {
-        Game game = getGame();
+        final Game game = getGame();
         game.setMap(getTestMap(true));
+        final Turn turn = game.getTurn();
 
         Colony colony = getStandardColony(6);
         Player owner = colony.getOwner();
@@ -736,10 +737,16 @@ public class BuildingTest extends FreeColTestCase {
 
         // Jefferson is a property of the player...
         assertTrue("Jefferson should be present in player",
-            colony.getOwner().getModifiers("model.goods.bells")
-                             .contains(bellsModifier));
+            owner.getModifiers("model.goods.bells")
+                .contains(bellsModifier));
+        assertTrue("Jefferson should be present in player in building scope",
+            owner.getModifiers("model.goods.bells", townHallType, turn)
+                .contains(bellsModifier));
+        assertFalse("Jefferson should not be present in player in unit scope",
+            owner.getModifiers("model.goods.bells", freeColonistType, turn)
+                .contains(bellsModifier));
         // ...not the colony,
-        assertFalse("Jefferson should not be present in colony",
+        assertFalse("Jefferson modifier should not be present in colony",
             colony.getModifiers("model.goods.bells")
                   .contains(bellsModifier));
         // ...and the building modifiers do not have it.

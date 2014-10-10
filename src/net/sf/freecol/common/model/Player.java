@@ -4228,6 +4228,18 @@ public class Player extends FreeColGameObject implements Nameable {
 
         super.readChildren(xr);
 
+        // @compat 0.10.7
+        // Fixup production modifiers deriving from founding fathers
+        final Specification spec = getSpecification();
+        for (Modifier m : getModifiers()) {
+            if (m.getSource() == null) continue;
+            String type = spec.fatherGoodsFixMap.get(m.getSource().getId());
+            if (type != null && m.getId().equals(type)) {
+                m.requireNegatedPersonScope();
+            }
+        }
+        // end @compat 0.10.7
+
         recalculateBellsBonus(); // Bells bonuses depend on tax
     }
 

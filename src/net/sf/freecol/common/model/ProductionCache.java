@@ -119,15 +119,18 @@ public class ProductionCache {
         productionAndConsumption.put(this, bellsInfo);
         netProduction.incrementCount(bells, amount);
 
+        List<AbstractGoods> goods = new ArrayList<AbstractGoods>();
         for (Consumer consumer : colony.getConsumers()) {
             Set<Modifier> modifiers = consumer
                 .getModifiers(Modifier.CONSUME_ONLY_SURPLUS_PRODUCTION);
-            List<AbstractGoods> goods = new ArrayList<AbstractGoods>();
+            goods.clear();
             for (AbstractGoods g : consumer.getConsumedGoods()) {
                 goodsUsed.add(g.getType());
-                AbstractGoods surplus = new AbstractGoods(production.get(g.getType()));
+                AbstractGoods surplus
+                    = new AbstractGoods(production.get(g.getType()));
                 if (modifiers.isEmpty()) {
-                    surplus.setAmount(surplus.getAmount() + getGoodsCount(g.getType()));
+                    surplus.setAmount(surplus.getAmount()
+                        + getGoodsCount(g.getType()));
                 } else {
                     surplus.setAmount((int)FeatureContainer
                         .applyModifiers(surplus.getAmount(), null, modifiers));
@@ -141,24 +144,28 @@ public class ProductionCache {
                 for (AbstractGoods output : building.getOutputs()) {
                     GoodsType outputType = output.getType();
                     goodsUsed.add(outputType);
-                    AbstractGoods newOutput = new AbstractGoods(production.get(outputType));
-                    newOutput.setAmount(newOutput.getAmount() + getGoodsCount(outputType));
+                    AbstractGoods newOutput
+                        = new AbstractGoods(production.get(outputType));
+                    newOutput.setAmount(newOutput.getAmount()
+                        + getGoodsCount(outputType));
                     outputs.add(newOutput);
                 }
                 info = building.getAdjustedProductionInfo(goods, outputs);
             } else if (consumer instanceof Unit) {
-                info = ((Unit) consumer).getProductionInfo(goods);
+                info = ((Unit)consumer).getProductionInfo(goods);
             } else if (consumer instanceof BuildQueue) {
-                info = ((BuildQueue<?>) consumer).getProductionInfo(goods);
+                info = ((BuildQueue<?>)consumer).getProductionInfo(goods);
             }
             if (info != null) {
                 production.add(info.getProduction());
                 production.remove(info.getConsumption());
                 for (AbstractGoods g : info.getProduction()) {
-                    netProduction.incrementCount(g.getType().getStoredAs(), g.getAmount());
+                    netProduction.incrementCount(g.getType().getStoredAs(),
+                                                 g.getAmount());
                 }
                 for (AbstractGoods g : info.getConsumption()) {
-                    netProduction.incrementCount(g.getType().getStoredAs(), -g.getAmount());
+                    netProduction.incrementCount(g.getType().getStoredAs(),
+                                                 -g.getAmount());
                 }
                 productionAndConsumption.put(consumer, info);
             }
