@@ -579,16 +579,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                     }                    
                 } else if (mission instanceof UnitSeekAndDestroyMission) {
                     if (mission.isValid()) continue;
-                    // Check if a target colony fell, and go there and defend
-                    if (mission.getTarget() instanceof Colony
-                        && (colony = (Colony)mission.getTarget()) != null
-                        && player.owns(colony)
-                        && colony.isBadlyDefended()
-                        && (m = getDefendSettlementMission(aiu, colony)) != null) {
-                        lb.add(" ATTACKOVER ", m);
-                    } else {
-                        land.add(aiu);
-                    }
+                    land.add(aiu);
                 } else {
                     land.add(aiu);
                 }

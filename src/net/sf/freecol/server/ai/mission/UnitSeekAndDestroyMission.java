@@ -452,8 +452,19 @@ public class UnitSeekAndDestroyMission extends Mission {
     @Override
     public Mission doMission(LogBuilder lb) {
         lb.add(tag);
+        final AIUnit aiUnit = getAIUnit();
         String reason = invalidReason();
         if (isTargetReason(reason)) {
+            Colony colony;
+            Mission m;
+            if (Mission.TARGETOWNERSHIP.equals(reason)
+                && getTarget() instanceof Colony
+                && (colony = (Colony)getTarget()) != null
+                && getPlayer().owns(colony)
+                && (m = getAIPlayer().getDefendSettlementMission(aiUnit,
+                        colony)) != null) {
+                return lbDone(lb, true, " capturing colony ", colony.getName());
+            }            
             return retargetMission(reason, lb);
         } else if (reason != null) {
             return lbFail(lb, false, reason);
@@ -461,7 +472,6 @@ public class UnitSeekAndDestroyMission extends Mission {
 
         // Is there a target-of-opportunity?
         final Unit unit = getUnit();
-        final AIUnit aiUnit = getAIUnit();
         Location nearbyTarget = (unit.isOnCarrier()) ? null
             : findTarget(aiUnit, 1, false);
         if (nearbyTarget != null) {
