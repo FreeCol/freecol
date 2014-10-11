@@ -20,6 +20,7 @@
 package net.sf.freecol.server.networking;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -50,6 +51,9 @@ import org.w3c.dom.Element;
 public final class Server extends Thread {
 
     private static Logger logger = Logger.getLogger(Server.class.getName());
+
+    /** Backlog for socket. */
+    private static final int BACKLOG_DEFAULT = 10;
 
     /** The public "well-known" socket to which clients may connect. */
     private ServerSocket serverSocket;
@@ -87,7 +91,9 @@ public final class Server extends Thread {
 
         this.freeColServer = freeColServer;
         this.port = port;
-        this.serverSocket = new ServerSocket(port);
+        this.serverSocket = new ServerSocket(port, BACKLOG_DEFAULT,
+            InetAddress.getByName(FreeColServer.LOCALHOST));
+        this.serverSocket.setReuseAddress(true);
     }
 
 

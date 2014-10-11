@@ -62,7 +62,7 @@ public class Connection {
     public static final String QUESTION_TAG = "question";
     public static final String REPLY_TAG = "reply";
 
-    private static final int TIMEOUT = 5000;
+    private static final int TIMEOUT = 5000; // 5s
 
     private InputStream in;
 

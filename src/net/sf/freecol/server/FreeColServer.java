@@ -118,6 +118,9 @@ public final class FreeColServer {
 
     private static final Logger logger = Logger.getLogger(FreeColServer.class.getName());
 
+    /** Default host to use for connections. */
+    public static final String LOCALHOST = "localhost";
+
     public static final String ACTIVE_UNIT_TAG = "activeUnit";
     public static final String DEBUG_TAG = "debug";
     public static final String RANDOM_STATE_TAG = "randomState";

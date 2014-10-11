@@ -22,7 +22,6 @@ package net.sf.freecol.common.networking;
 
 import java.awt.Color;
 import java.io.IOException;
-import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -381,12 +380,12 @@ public abstract class ServerAPI {
      * @param host The name of the machine running the
      *     <code>FreeColServer</code>.
      * @param port The port to use when connecting to the host.
-     * @exception ConnectException
-     * @exception IOException
+     * @return True if the connection succeeded.
+     * @exception IOException on connection failure.
      */
-    public void connect(String threadName, String host, int port,
-                        MessageHandler messageHandler) 
-        throws ConnectException, IOException {
+    public boolean connect(String threadName, String host, int port,
+                           MessageHandler messageHandler) 
+        throws IOException {
         int tries;
         if (port < 0) {
             port = FreeCol.getServerPort();
@@ -398,12 +397,11 @@ public abstract class ServerAPI {
             try {
                 client = new Client(host, port, messageHandler, threadName);
                 if (client != null) break;
-            } catch (ConnectException e) {
-                if (i == 1) throw e;
             } catch (IOException e) {
-                if (i == 1) throw e;
+                if (i <= 1) throw e;
             }
         }
+        return client != null;
     }
 
 

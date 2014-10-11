@@ -73,8 +73,6 @@ public final class ConnectController {
 
     private static final Logger logger = Logger.getLogger(ConnectController.class.getName());
 
-    public static final String LOCALHOST = "localhost";
-
     private final FreeColClient freeColClient;
 
     private final GUI gui;
@@ -187,16 +185,20 @@ public final class ConnectController {
         try {
             Element reply = mc.askDumping(element);
             if (reply == null) {
+                gui.showErrorMessage("server.couldNotConnect", "no reply");
                 return null;
             } else if (!"gameState".equals(reply.getTagName())) {
                 logger.warning("The reply has an unknown type: "
                     + reply.getTagName());
+                gui.showErrorMessage("server.couldNotConnect",
+                    "bad reply: " + reply.getTagName());
                 return null;
             }
             state = reply.getAttribute("state");
 
         } catch (IOException e) {
             logger.log(Level.WARNING, "Could not send message to server.", e);
+            gui.showErrorMessage("server.couldNotConnect", e.getMessage());
             return null;
         } finally {
             mc.close();
@@ -206,6 +208,7 @@ public final class ConnectController {
             return Enum.valueOf(GameState.class, state);
         } catch (Exception e) {
             logger.log(Level.WARNING, "Bad state: " + state, e);
+            gui.showErrorMessage("server.couldNotConnect", e.getMessage());
         }
         return null;
     }
@@ -264,13 +267,20 @@ public final class ConnectController {
  
         freeColClient.askServer().disconnect();
 
+        String message = null;
         try {
-            freeColClient.askServer().connect(FreeCol.CLIENT_THREAD + user,
-                host, port, freeColClient.getPreGameInputHandler());
+            if (!freeColClient.askServer().connect(FreeCol.CLIENT_THREAD + user,
+                    host, port, freeColClient.getPreGameInputHandler())) {
+                message = "repeated failure";
+            }
         } catch (Exception e) {
-            gui.showErrorMessage("server.couldNotConnect", e.getMessage());
+            message = e.getMessage();
+        }
+        if (message != null) {
+            gui.showErrorMessage("server.couldNotConnect", message);
             return false;
         }
+        logger.info("Connected to " + host + ":" + port);
 
         LoginMessage msg = freeColClient.askServer().login(user,
             FreeCol.getVersion());
@@ -370,7 +380,7 @@ public final class ConnectController {
         if (freeColServer == null) return false;
 
         freeColClient.setFreeColServer(freeColServer);
-        return joinMultiplayerGame(LOCALHOST, port);
+        return joinMultiplayerGame(FreeColServer.LOCALHOST, port);
     }
 
     /**
@@ -396,10 +406,17 @@ public final class ConnectController {
             break;
 
         case IN_GAME:
-            if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS))
+            // Disable this check if you need to debug a multiplayer client.
+            // TODO: allow if the server is in debug mode.
+            if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
+                // TODO: gui.showErrorMessage("Can not connect to existing game in debug mode");
                 return false;
+            }
             List<String> names = getVacantPlayers(host, port);
-            if (names == null || names.isEmpty()) return false;
+            if (names == null || names.isEmpty()) {
+                // TODO: gui.showErrorMessage("no names")
+                return false;
+            }
 
             List<ChoiceItem<String>> choices
                 = new ArrayList<ChoiceItem<String>>();
@@ -409,13 +426,17 @@ public final class ConnectController {
             String id = gui.showChoiceDialog(true, null,
                 Messages.message("connectController.choicePlayer"), null,
                 "cancel", choices);
-            if (id == null) return false;
+            if (id == null) return false; // User cancelled
 
-            if (!login(id + ".ruler", host, port)) return false;
+            if (!login(id + ".ruler", host, port)) {
+                // TODO: gui.showErrorMessage() or better, have login() do it
+                return false;
+            }
             freeColClient.setSinglePlayer(false);
             break;
 
         case ENDING_GAME: default:
+            // TODO: gui.showErrorMessage("game is ending");
             return false;
         }
         return true;
@@ -448,9 +469,8 @@ public final class ConnectController {
 
         freeColClient.setFreeColServer(freeColServer);
         freeColClient.setSinglePlayer(true);
-        if (!login(FreeCol.getName(), LOCALHOST, freeColServer.getPort())) {
-            return false;
-        }
+        if (!login(FreeCol.getName(), FreeColServer.LOCALHOST, 
+                freeColServer.getPort())) return false;
 
         final ClientOptions co = freeColClient.getClientOptions();
         if (co.getBoolean(ClientOptions.AUTOSAVE_DELETE)) {
@@ -580,7 +600,8 @@ public final class ConnectController {
                     final int serverPort = freeColServer.getPort();
                     freeColClient.setSinglePlayer(singlePlayer);
                     freeColClient.getInGameController().setGameConnected();
-                    if (login(FreeCol.getName(), LOCALHOST, serverPort)) {
+                    if (login(FreeCol.getName(), FreeColServer.LOCALHOST, 
+                            serverPort)) {
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 ResourceManager.setScenarioMapping(saveGame.getResourceMapping());
