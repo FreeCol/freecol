@@ -68,6 +68,9 @@ public class REFAIPlayer extends EuropeanAIPlayer {
 
     private static final Logger logger = Logger.getLogger(REFAIPlayer.class.getName());
 
+    /** Limit on the number of REF units chasing a single hostile unit. */
+    private static final int UNIT_USAD_THRESHOLD = 5;
+
     /** Container class for REF target colony information. */
     private static class TargetTuple implements Comparable<TargetTuple> {
 
@@ -484,9 +487,8 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                 if (target instanceof Unit && aiu.getUnit().hasTile()) {
                     naval.add(aiu);
                 } else if ((m = getTransportMission(aiu)) != null) {
-                    lb.add(" ", m);
+                    lb.add(" notarget ", m);
                     result.add(aiu);
-                    if (result.size() + transports.size() >= nt) break;
                 }
             }
         }
@@ -503,9 +505,10 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                 });
             while (!naval.isEmpty()) {
                 AIUnit aiu = naval.remove(0);
-                String logMe = " REQUIRED-" + aiu.getMission(PrivateerMission.class).getDistanceToTarget();
+                int distance = aiu.getMission(PrivateerMission.class)
+                    .getDistanceToTarget();
                 if ((m = getTransportMission(aiu)) != null) {
-                    lb.add(logMe, m);
+                    lb.add(" REQUIRED ", distance, " ", m);
                     result.add(aiu);
                     if (result.size() + transports.size() >= nt) break;
                 }
@@ -542,6 +545,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         List<AIUnit> transports = new ArrayList<AIUnit>();
         List<AIUnit> todo = new ArrayList<AIUnit>();
         List<AIUnit> land = new ArrayList<AIUnit>();
+        Map<Location, Integer> targetMap = new HashMap<Location, Integer>();
         Mission m;
         Colony colony;
         lb.add("\n  REF mission changes:");
@@ -578,7 +582,13 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                         land.add(aiu);
                     }                    
                 } else if (mission instanceof UnitSeekAndDestroyMission) {
-                    if (mission.isValid()) continue;
+                    if (mission.isValid()) {
+                        Location loc = mission.getTarget();
+                        int count = (targetMap.containsKey(loc))
+                            ? targetMap.get(loc) : 0;
+                        targetMap.put(loc, count+1);
+                        continue;
+                    }
                     land.add(aiu);
                 } else {
                     land.add(aiu);
@@ -599,16 +609,28 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         int nt = Math.max(3, privateers.size() / 10);
         requireTransports(nt, transports, privateers, lb);
 
-        // Use the free land units to mop up nearby hostile targets.
+        // Use the free land units to mop up nearby hostile targets,
+        // but do not all rush after one loose wagon!
         for (AIUnit aiu : land) {
             Location target = UnitSeekAndDestroyMission.findTarget(aiu, 
                 seekAndDestroyRange, false);
-            if (target != null
-                && (m = getSeekAndDestroyMission(aiu, target)) != null) {
-                lb.add(" NEW-SEEK ", m);
-            } else {
-                todo.add(aiu);
+            if (target != null) {
+                int count = targetMap.containsKey(target)
+                    ? targetMap.get(target) : 0;
+                if (target instanceof Unit
+                    && count < UNIT_USAD_THRESHOLD
+                    && (m = getSeekAndDestroyMission(aiu, target)) != null) {
+                    lb.add(" NEW-SEEK-", count, " ", m);
+                    targetMap.put(target, count + 1);
+                    continue;
+                } else if (target instanceof Settlement
+                    && (m = getSeekAndDestroyMission(aiu, target)) != null) {
+                    lb.add(" NEW-SEEK ", m);
+                    continue;
+                }
             }
+            // Could not target
+            todo.add(aiu);
         }
 
         // Go defend our nearest port unless already there.
@@ -634,6 +656,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
 
         if (!idlers.isEmpty()) { // Left with units idling at ports.
             // See what transport is present at a colony already.
+            requireTransports(0, transports, privateers, lb);
             todo.clear();
             Map<Colony, List<AIUnit>> ready
                 = new HashMap<Colony, List<AIUnit>>();
@@ -642,7 +665,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                 if (!tm.isEmpty()) continue;
                 Unit u = aiu.getUnit();
                 colony = u.getColony();
-                if (colony != null && idlers.keySet().contains(colony)) {
+                if (colony != null && idlers.containsKey(colony)) {
                     Utils.appendToMapList(ready, colony, aiu);
                 } else {
                     todo.add(aiu);
