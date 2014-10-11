@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -357,7 +358,8 @@ public class Operand extends Scope {
             Operand op = (Operand)o;
             return operandType == op.operandType
                 && scopeLevel == op.scopeLevel
-                && value == op.value;
+                && Utils.equals(value, op.value)
+                && super.equals(o);
         }
         return false;
     }
