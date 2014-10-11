@@ -1043,7 +1043,10 @@ public final class InGameInputHandler extends InputHandler {
                 player.divertModelMessages(fcgo, divert);
             }
             if (fcgo instanceof Settlement) {
-                player.removeSettlement((Settlement)fcgo);
+                Settlement settlement = (Settlement)fcgo;
+                if (settlement != null && settlement.getOwner() != null) {
+                    settlement.getOwner().removeSettlement(settlement);
+                }
                 visibilityChange = true;//-vis(player)
                 
             } else if (fcgo instanceof Unit) {
@@ -1053,7 +1056,9 @@ public final class InGameInputHandler extends InputHandler {
                     invokeAndWait(deselectActiveUnitRunnable);
                 }
                 // Temporary hack until we have real containers.
-                player.removeUnit(u);
+                if (u != null && u.getOwner() != null) {
+                    u.getOwner().removeUnit(u);
+                }
                 visibilityChange = true;//-vis(player)
             }
 
