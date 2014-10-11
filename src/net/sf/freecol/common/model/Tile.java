@@ -1988,7 +1988,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                         .add("%direction%", "direction." + d)
                         .addName("%location%", name);
                     return StringTemplate.template("nameLocation")
-                        .add("%name%", type.getNameKey())
+                        .add("%name%", ((type == null) ? "unexplored"
+                                : type.getNameKey()))
                         .addStringTemplate("%location%", l);
                 }
             }
