@@ -3390,6 +3390,20 @@ public class ServerPlayer extends Player implements ServerModelObject {
         cs.add(vis, owned);
         cs.addDispose(vis, centerTile, settlement);//-vis(owner)
         owner.invalidateCanSeeTiles();//+vis(owner)
+
+        // Former missionary owner knows that the settlement fell.
+        if (missionaryOwner != null) {
+            List<Tile> surrounding = new ArrayList<Tile>();
+            for (Tile t : centerTile.getSurroundingTiles(1, radius)) {
+                if (!owned.contains(t)) surrounding.add(t);
+            }
+            cs.add(See.only(missionaryOwner), owned);
+            cs.add(See.only(missionaryOwner), surrounding);
+            cs.addDispose(See.only(missionaryOwner), centerTile, settlement);
+            missionaryOwner.invalidateCanSeeTiles();//+vis(missionaryOwner)
+            for (Tile t : surrounding) t.cacheUnseen(missionaryOwner);
+        }
+
         // Recache, should only show now cleared tiles to former owner.
         for (Tile t : owned) t.cacheUnseen();
         // Center tile is special for native settlements.  Because
@@ -3397,16 +3411,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // needs to be completely cleared for players that can see the
         // settlement is gone.
         if (settlement instanceof IndianSettlement) centerTile.seeTile();
-
-        // Former missionary owner knows that the settlement fell.
-        if (missionaryOwner != null) {
-            for (Tile t : centerTile.getSurroundingTiles(1, radius)) {
-                if (!owned.contains(t)) owned.add(t);
-            }
-            cs.add(See.only(missionaryOwner), owned);
-            cs.addDispose(See.only(missionaryOwner), centerTile, settlement);
-            centerTile.seeTile(missionaryOwner);
-        }
+        if (missionaryOwner != null) centerTile.seeTile(missionaryOwner);
     }
 
     /**

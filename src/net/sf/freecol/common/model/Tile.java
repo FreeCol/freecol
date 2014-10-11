@@ -2417,14 +2417,12 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
         contiguity = xr.getAttribute(CONTIGUITY_TAG, -1);
 
+        // Tiles are added to the settlement owned tiles list in Map.
+        // Doing it here can cause cache weirdness.
         Location loc = xr.getLocationAttribute(game, OWNING_SETTLEMENT_TAG,
                                                true);
-        if (loc == null || loc instanceof Settlement) {
-            changeOwningSettlement((Settlement)loc);
-        } else {
-            throw new XMLStreamException("Settlement expected: "
-                + xr.currentTag());
-        }
+        owningSettlement = (loc instanceof Settlement) ? (Settlement)loc
+            : null;
     }
 
     /**

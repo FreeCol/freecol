@@ -2646,6 +2646,13 @@ public class Map extends FreeColGameObject implements Location {
         // @compat 0.10.5
         if (fixupHighSeas) resetHighSeasCount();
         // end @compat
+
+        // Fix up settlement tile ownership in one hit here, avoiding
+        // complications with cached tiles within the Tile serialization.
+        for (Tile t : getAllTiles()) {
+            Settlement s = t.getOwningSettlement();
+            if (s != null) s.addTile(t);
+        }
     }
 
     /**
