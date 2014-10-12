@@ -22,6 +22,8 @@ package net.sf.freecol.server.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
@@ -914,10 +916,13 @@ public class ServerUnit extends Unit implements ServerModelObject {
 
         // Plan to update tiles that could not be seen before but will
         // now be within the line-of-sight.
+        final Location oldLocation = getLocation();
+        List<Tile> oldTiles = (oldLocation.getTile() == null)
+            ? Collections.<Tile>emptyList()
+            : oldLocation.getTile().getSurroundingTiles(1, getLineOfSight());
         List<Tile> newTiles = collectNewTiles(newTile);
 
         // Update unit state.
-        Location oldLocation = getLocation();
         setState(UnitState.ACTIVE);
         setStateToAllChildren(UnitState.SENTRY);
         if (oldLocation instanceof HighSeas) {
@@ -948,6 +953,12 @@ public class ServerUnit extends Unit implements ServerModelObject {
         }
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
 
+        // Update tiles that are now invisible.
+        Iterator<Tile> it = oldTiles.iterator();
+        while (it.hasNext()) {
+            if (serverPlayer.canSee(it.next())) it.remove();
+        }
+        if (!oldTiles.isEmpty()) cs.add(See.only(serverPlayer), oldTiles);
         // Unless moving in from off-map, update the old location and
         // make sure the move is always visible even if the unit
         // dies (including the animation).  However, dead units
