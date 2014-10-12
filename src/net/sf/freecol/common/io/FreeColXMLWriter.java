@@ -98,10 +98,6 @@ public class FreeColXMLWriter implements XMLStreamWriter {
             return WriteScope.SAVE;
         }
 
-        public Player getPlayer() {
-            return player;
-        }
-
         public boolean isValid() {
             return (this == WriteScope.CLIENT) == (player != null);
         }
@@ -362,7 +358,7 @@ public class FreeColXMLWriter implements XMLStreamWriter {
     // Delegations to the WriteScope.
 
     public Player getClientPlayer() {
-        return writeScope.getPlayer();
+        return writeScope.getClient();
     }
 
     //public boolean isValid() {

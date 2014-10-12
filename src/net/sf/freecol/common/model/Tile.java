@@ -2303,11 +2303,13 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
-        // Show tile contents (e.g. enemy units) if there is no
-        // blocking enemy settlement.
-        if (settlement == null
-            || xw.validFor(settlement.getOwner())) {
-
+        // Show tile contents (e.g. enemy units) if not scoped to a
+        // player that can not see the tile, and there is no blocking
+        // enemy settlement.
+        Player player = xw.getClientPlayer();
+        if ((player == null || player.canSee(this)) 
+            && (settlement == null
+                || xw.validFor(settlement.getOwner()))) {
             super.writeChildren(xw);
         }
 
