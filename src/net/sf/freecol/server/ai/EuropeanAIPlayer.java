@@ -277,6 +277,9 @@ public class EuropeanAIPlayer extends AIPlayer {
     private final java.util.Map<Integer, Integer> wagonsNeeded
         = new HashMap<Integer, Integer>();
 
+    /** The colonies that start the turn badly defended. */
+    private final List<AIColony> badlyDefended = new ArrayList<AIColony>();
+
     /**
      * Current estimate of the number of new
      * <code>BuildColonyMission</code>s to create.
@@ -351,6 +354,16 @@ public class EuropeanAIPlayer extends AIPlayer {
             = spec.getInteger(GameOptions.OFFENSIVE_NAVAL_UNIT_CHEAT);
         transportNavalUnitCheatPercent
             = spec.getInteger(GameOptions.TRANSPORT_NAVAL_UNIT_CHEAT);
+    }
+
+    /**
+     * Get the list of badly defended colonies.
+     *
+     * @return A list of <code>AIColony</code>s that were badly
+     *     defended at the start of this turn.
+     */
+    protected List<AIColony> getBadlyDefended() {
+        return badlyDefended;
     }
 
     /**
@@ -618,10 +631,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
             // Otherwise attack something near a weak colony
             if (target == null && !colonies.isEmpty()) {
-                List<AIColony> bad = new ArrayList<AIColony>();
-                for (AIColony aic : getAIColonies()) {
-                    if (aic.isBadlyDefended()) bad.add(aic);
-                }
+                List<AIColony> bad = new ArrayList<AIColony>(getBadlyDefended());
                 if (bad.isEmpty()) bad.addAll(getAIColonies());
                 AIColony defend = Utils.getRandomMember(logger,
                     "AIColony to defend", bad, air);
@@ -2159,10 +2169,11 @@ public class EuropeanAIPlayer extends AIPlayer {
                     worstColony = colony;
                     break;
                 }
-                double value = colony.getDefenceRatio() * 100.0
-                    / unit.getTurnsToReach(loc, colony.getTile(),
-                        unit.getCarrier(),
-                        ((relaxed) ? CostDeciders.numberOfTiles() : null));
+                int ttr = 1 + unit.getTurnsToReach(loc, colony.getTile(),
+                    unit.getCarrier(),
+                    ((relaxed) ? CostDeciders.numberOfTiles() : null));
+                if (ttr < 0) continue;
+                double value = colony.getDefenceRatio() * 100.0 / ttr;
                 if (worstValue > value) {
                     worstValue = value;
                     worstColony = colony;
@@ -2377,6 +2388,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         sessionRegister.clear();
         clearAIUnits();
         cacheNations();
+        badlyDefended.clear();
 
         // Note call to getAIUnits().  This triggers
         // AIPlayer.createAIUnits which we want to do early, certainly
@@ -2397,7 +2409,10 @@ public class EuropeanAIPlayer extends AIPlayer {
         if (colonyCount > 0) {
             lb.add("\n  Badly defended:"); // TODO: prioritize defence
             for (AIColony aic : getAIColonies()) {
-                if (aic.isBadlyDefended()) lb.add(" ", aic.getColony());
+                if (aic.isBadlyDefended()) {
+                    badlyDefended.add(aic);
+                    lb.add(" ", aic.getColony());
+                }
             }
 
             lb.add("\n  Update colonies:");

@@ -134,6 +134,10 @@ public class REFAIPlayer extends EuropeanAIPlayer {
 
     private static final int seekAndDestroyRange = 12;
 
+    /** Map of target to count. */
+    private final Map<Location, Integer> targetMap
+        = new HashMap<Location, Integer>();
+
 
     /**
      * Creates a new <code>REFAIPlayer</code>.
@@ -539,19 +543,19 @@ public class REFAIPlayer extends EuropeanAIPlayer {
     @Override
     public void giveNormalMissions(LogBuilder lb) {
         final Player player = getPlayer();
-        final Map<Colony, List<AIUnit>> idlers
-            = new HashMap<Colony, List<AIUnit>>();
+        final Map<Location, List<AIUnit>> idlers
+            = new HashMap<Location, List<AIUnit>>();
         List<AIUnit> privateers = new ArrayList<AIUnit>();
         List<AIUnit> transports = new ArrayList<AIUnit>();
         List<AIUnit> todo = new ArrayList<AIUnit>();
         List<AIUnit> land = new ArrayList<AIUnit>();
-        Map<Location, Integer> targetMap = new HashMap<Location, Integer>();
         Mission m;
         Colony colony;
         lb.add("\n  REF mission changes:");
 
         // Collect the REF units, the privateers, the transports, the
         // unemployed navy, and the unemployed land units.
+        targetMap.clear();
         for (AIUnit aiu : getAIUnits()) {
             Unit u = aiu.getUnit();
             if (u.isDisposed() || !u.hasAbility(Ability.REF_UNIT)) continue;
@@ -563,6 +567,8 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                     transports.add(aiu);
                 } else if (mission instanceof PrivateerMission) {
                     privateers.add(aiu);
+                    Location loc = mission.getTarget();
+                    if (loc != null) Utils.incrementMapCount(targetMap, loc);
                 } else {
                     todo.add(aiu);
                 }
@@ -577,16 +583,17 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                             && !colony.isBadlyDefended()
                             && Utils.randomInt(logger,
                                 "REF defend " + colony.getName(), getAIRandom(),
-                                3) == 0) land.add(aiu);
+                                3) == 0) {
+                            land.add(aiu);
+                        } else {
+                            Utils.incrementMapCount(targetMap, mission.getTarget());
+                        }                          
                     } else {
                         land.add(aiu);
                     }                    
                 } else if (mission instanceof UnitSeekAndDestroyMission) {
                     if (mission.isValid()) {
-                        Location loc = mission.getTarget();
-                        int count = (targetMap.containsKey(loc))
-                            ? targetMap.get(loc) : 0;
-                        targetMap.put(loc, count+1);
+                        Utils.incrementMapCount(targetMap, mission.getTarget());
                         continue;
                     }
                     land.add(aiu);
@@ -609,64 +616,100 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         int nt = Math.max(3, privateers.size() / 10);
         requireTransports(nt, transports, privateers, lb);
 
-        // Use the free land units to mop up nearby hostile targets,
-        // but do not all rush after one loose wagon!
+        // Use up the free land units:
+        // - mop up nearby hostile targets (but do not all rush after
+        //   one loose wagon!)
+        // - if idle at a well defended port, consider further attacks below
+        // - defend the closest settlement needing defence
+        // - defend the closest port
+        // - go idle in a port
         for (AIUnit aiu : land) {
             Location target = UnitSeekAndDestroyMission.findTarget(aiu, 
                 seekAndDestroyRange, false);
             if (target != null) {
-                int count = targetMap.containsKey(target)
+                int count = (targetMap.containsKey(target))
                     ? targetMap.get(target) : 0;
                 if (target instanceof Unit
                     && count < UNIT_USAD_THRESHOLD
                     && (m = getSeekAndDestroyMission(aiu, target)) != null) {
                     lb.add(" NEW-SEEK-", count, " ", m);
-                    targetMap.put(target, count + 1);
+                    Utils.incrementMapCount(targetMap, target);
                     continue;
                 } else if (target instanceof Settlement
                     && (m = getSeekAndDestroyMission(aiu, target)) != null) {
                     lb.add(" NEW-SEEK ", m);
+                    Utils.incrementMapCount(targetMap, target);
                     continue;
-                }
-            }
-            // Could not target
-            todo.add(aiu);
-        }
-
-        // Go defend our nearest port unless already there.
-        while (!todo.isEmpty()) {
-            AIUnit aiu = todo.remove(0);
-            Unit u = aiu.getUnit();
-            colony = u.getColony();
-            if (colony != null && colony.isConnectedPort()) {
-                Utils.appendToMapList(idlers, colony, aiu);
-            } else {
-                PathNode path = u.findOurNearestPort();
-                colony = (path == null) ? null
-                    : path.getLastNode().getTile().getColony();
-                if (colony != null) {
-                    m = getDefendSettlementMission(aiu, colony);
-                    lb.add(" GOTO-", colony.getName(), " " , m);
                 } else {
-                    m = getIdleAtSettlementMission(aiu);
-                    lb.add(" GO-IDLE ", m);
+                    throw new RuntimeException("Bogus target: " + target);
                 }
             }
+
+            // Find units idle at a port
+            final Unit u = aiu.getUnit();
+            if (u.isInEurope()) {
+                Utils.appendToMapList(idlers, player.getEurope(), aiu);
+                continue;
+            } else if ((colony = u.getColony()) != null
+                && colony.isConnectedPort()) {
+                Utils.appendToMapList(idlers, colony, aiu);
+                continue;
+            }
+
+            // Go defend the nearest colony needing defence
+            int bestValue = Integer.MAX_VALUE;
+            Colony best = null;
+            for (AIColony aic : getBadlyDefended()) {
+                Colony c = aic.getColony();
+                int value = u.getTurnsToReach(c);
+                if (value >= 0 && value < bestValue) {
+                    bestValue = value;
+                    best = c;
+                }
+            }
+            if (best != null
+                && (m = getDefendSettlementMission(aiu, best)) != null) {
+                lb.add(" GO-DEFEND-", best.getName(), " " , m);
+                Utils.incrementMapCount(targetMap, best);
+                continue;
+            }
+
+            // Just go defend the nearest port.  Once there and enough
+            // defenders are clearly allocated, some will be made available
+            // to launch new attacks.
+            PathNode path = u.findOurNearestPort();
+            colony = (path == null) ? null
+                : path.getLastNode().getTile().getColony();
+            if (colony != null
+                && (m = getDefendSettlementMission(aiu, colony)) != null) {
+                lb.add(" GOTO-", colony.getName(), " " , m);
+                Utils.incrementMapCount(targetMap, colony);
+                continue;
+            }
+
+            // Just go somewhere and idle.
+            m = getIdleAtSettlementMission(aiu);
+            lb.add(" ", m);
         }
 
-        if (!idlers.isEmpty()) { // Left with units idling at ports.
+        // Try to find new attacks for units left idling at ports.
+        if (!idlers.isEmpty()) {
             // See what transport is present at a colony already.
             requireTransports(0, transports, privateers, lb);
             todo.clear();
-            Map<Colony, List<AIUnit>> ready
-                = new HashMap<Colony, List<AIUnit>>();
+            Map<Location, List<AIUnit>> ready
+                = new HashMap<Location, List<AIUnit>>();
             for (AIUnit aiu : transports) {
                 TransportMission tm = aiu.getMission(TransportMission.class);
                 if (!tm.isEmpty()) continue;
                 Unit u = aiu.getUnit();
-                colony = u.getColony();
-                if (colony != null && idlers.containsKey(colony)) {
-                    Utils.appendToMapList(ready, colony, aiu);
+                Location key;
+                if (u.isInEurope()
+                    && idlers.containsKey(key = player.getEurope())) {
+                    Utils.appendToMapList(ready, key, aiu);
+                } else if ((key = u.getColony()) != null
+                    && idlers.containsKey(key)) {
+                    Utils.appendToMapList(ready, key, aiu);
                 } else {
                     todo.add(aiu);
                 }
@@ -677,16 +720,17 @@ public class REFAIPlayer extends EuropeanAIPlayer {
             // missions with them.  Collect the ports that still
             // contain idle units, and accumulate the amount of space
             // needed to move the units.
-            List<Colony> idlePorts = new ArrayList<Colony>();
+            List<Location> idlePorts = new ArrayList<Location>();
             List<AIUnit> aiCarriers = new ArrayList<AIUnit>();
             int space = 0;
-            for (Entry<Colony, List<AIUnit>> e : idlers.entrySet()) {
+            for (Entry<Location, List<AIUnit>> e : idlers.entrySet()) {
                 if (e.getValue() == null) continue;
                 aiCarriers.clear();
-                colony = e.getKey();
-                if (ready.get(colony).isEmpty()) continue; // No carrier present
+                Location key = e.getKey();
+                if (!ready.containsKey(key)
+                    || ready.get(key).isEmpty()) continue; // No carrier here
                 landUnit: for (AIUnit aiu : e.getValue()) {
-                    for (AIUnit aiCarrier : ready.get(colony)) {
+                    for (AIUnit aiCarrier : ready.get(key)) {
                         Unit carrier = aiCarrier.getUnit();
                         if (carrier.canAdd(aiu.getUnit())
                             && aiu.joinTransport(carrier, null)) {
@@ -739,64 +783,69 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                     for (Unit u : aiCarrier.getUnit().getUnitList()) {
                         if (u.hasAbility(Ability.REF_UNIT)
                             && (aiu = getAIUnit(u)) != null
-                            && (m = getSeekAndDestroyMission(aiu, colony)) != null) {
+                            && (m = getSeekAndDestroyMission(aiu, target)) != null) {
                             lb.add(" IDLER->", target, " ", m);
                             tm.queueTransportable(aiu, false, lb);
                             e.getValue().remove(aiu);
                         }
                     }
-                    ready.get(colony).remove(aiCarrier);
                 }
 
                 // Are there more idle units waiting here?
                 if (!e.getValue().isEmpty()) {
-                    idlePorts.add(colony);
+                    idlePorts.add(key);
                     for (AIUnit aiu : e.getValue()) {
                         space += aiu.getUnit().getSpaceTaken();
                     }
                 }
             }
 
-            // Do we need to switch more units from privateering to transport?
-            for (AIUnit aiu : todo) {
-                space -= aiu.getUnit().getCargoCapacity()
-                    - aiu.getUnit().getCargoSpaceTaken();
-            }
-            nt = todo.size();
-            if (space < 0) {
-                nt += -space / 5 + 1; // Quick and dirty hack
-                requireTransports(nt, todo, privateers, lb);
-            }
+            if (!idlePorts.isEmpty()) {
+                // Do we need to switch more units from privateering
+                // to transport?
+                for (AIUnit aiu : todo) {
+                    space -= aiu.getUnit().getCargoCapacity()
+                        - aiu.getUnit().getCargoSpaceTaken();
+                }
+                nt = todo.size();
+                if (space < 0) {
+                    nt += -space / 5 + 1; // Quick and dirty hack
+                    requireTransports(nt, todo, privateers, lb);
+                }
 
-            // Send transports to the idle ports, preferring the ones
-            // with the most units.
-            Collections.sort(idlePorts, new Comparator<Colony>() {
-                    public int compare(Colony c1, Colony c2) {
-                        return idlers.get(c1).size() - idlers.get(c2).size();
-                    }
-                });
-            while (!todo.isEmpty()) {
-                for (Colony c : idlePorts) {
-                    int bestValue = INFINITY;
-                    AIUnit best = null;
-                    for (AIUnit aiu : todo) {
-                        int v = aiu.getUnit().getTile()
-                            .getDistanceTo(c.getTile());
-                        if (bestValue > v) {
-                            bestValue = v;
-                            best = aiu;
+                // Send transports to the idle ports, preferring the ones
+                // with the most units.
+                Collections.sort(idlePorts, new Comparator<Location>() {
+                        public int compare(Location l1, Location l2) {
+                            return idlers.get(l1).size() - idlers.get(l2).size();
                         }
+                    });
+                boolean bad = false;
+                while (!bad && !todo.isEmpty()) {
+                    for (Location l : idlePorts) {
+                        int bestValue = INFINITY;
+                        AIUnit best = null;
+                        for (AIUnit aiu : todo) {
+                            int value = aiu.getUnit().getTurnsToReach(l);
+                            if (value >= 0 && value < bestValue) {
+                                bestValue = value;
+                                best = aiu;
+                            }
+                        }
+                        if (best == null) {
+                            bad = true;
+                            continue;
+                        }
+                        todo.remove(best);
+                        best.getMission().setTarget(l);
+                        lb.add(" retarget ", best, " to ", l,
+                            "(", idlers.get(l).size(), ")");
                     }
-                    if (best == null) break;
-                    todo.remove(best);
-                    best.getMission().setTarget(c);
-                    lb.add(" retarget ", best.getUnit(), " to ", c,
-                        "(", idlers.get(c).size(), ")");
                 }
             }
         }
 
-        // Fall back to the normal EuropeanAI behaviour for non-REF.
+        // Fall back to the normal EuropeanAI behaviour for remaining units.
         super.giveNormalMissions(lb);
     }
 
@@ -846,8 +895,9 @@ public class REFAIPlayer extends EuropeanAIPlayer {
             if (type == DefendSettlementMission.class) {
                 // REF garrisons thinly.
                 Location loc = DefendSettlementMission.extractTarget(aiUnit, path);
-                if (loc instanceof Settlement
-                    && getSettlementDefenders((Settlement)loc) > 0) value = 0;
+                if (loc instanceof Colony && !((Colony)loc).isBadlyDefended()) {
+                    return Integer.MIN_VALUE;
+                }
             } else if (type == UnitSeekAndDestroyMission.class) {
                 Location target = UnitSeekAndDestroyMission
                     .extractTarget(aiUnit, path);

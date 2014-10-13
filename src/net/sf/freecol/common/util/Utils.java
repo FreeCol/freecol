@@ -153,6 +153,19 @@ public class Utils {
     }
 
     /**
+     * Increment the count in an integer valued map for a given key.
+     *
+     * @param map The map to increment within.
+     * @param key The key to increment the value for.
+     * @return The new count associated with the key.
+     */
+    public static <K> int incrementMapCount(Map<K, Integer> map, K key) {
+        int count = map.containsKey(key) ? map.get(key) : 0;
+        map.put(key, count+1);
+        return count+1;
+    }
+
+    /**
      * Given a list, return an iterable that yields all permutations
      * of the original list.
      *
