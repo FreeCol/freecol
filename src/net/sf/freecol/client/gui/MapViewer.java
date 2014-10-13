@@ -2657,7 +2657,11 @@ public final class MapViewer {
                     g.drawImage(overlay, 0, 0, null);
                 } else if (ti.isRiver()
                     && ti.getMagnitude() < TileImprovement.FJORD_RIVER) {
-                    g.drawImage(lib.getRiverImage(ti.getStyle()), 0, 0, null);
+                    // @compat 0.10.5
+                    // America_large had some bogus rivers in 0.10.5
+                    if (ti.getStyle() != null)
+                    // end @compat 0.10.5
+                        g.drawImage(lib.getRiverImage(ti.getStyle()), 0, 0, null);
                 } else if (ti.isRoad()) {
                     drawRoad(g, tile);
                 }
