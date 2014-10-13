@@ -3838,7 +3838,18 @@ public class Unit extends GoodsLocation
         if (getSettlement() != null) {
             result.addAll(getSettlement().getAbilities(id, unitType, turn));
         } else if (isInEurope()) {
-            result.addAll(owner.getEurope().getAbilities(id, unitType, turn));
+            // @compat 0.10.x
+            // It makes sense here to do:
+            //   Europe europe = owner.getEurope();
+            // However while there is fixup code in readChildren that calls
+            // this routine we can not rely on owner.europe being initialized
+            // yet.  Hence the following:
+            Location loc = getLocation();
+            Europe europe = (loc instanceof Europe) ? (Europe)loc
+                : (loc instanceof Unit) ? (Europe)((Unit)loc).getLocation()
+                : null;
+            // end @compat 0.10.x
+            result.addAll(europe.getAbilities(id, unitType, turn));
         }
         return result;
     }
