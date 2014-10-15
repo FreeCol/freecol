@@ -1276,7 +1276,7 @@ public final class ColonyPanel extends PortPanel
         public OutsideColonyPanel() {
             super(ColonyPanel.this, null, ColonyPanel.this.isEditable());
 
-            setLayout(new MigLayout("wrap 4, fill, insets 0"));
+            setLayout(new MigLayout("wrap 3, fill, insets 0"));
             GUI.setTitledBorder(this, "outsideColony");
         }
 
