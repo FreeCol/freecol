@@ -1015,17 +1015,22 @@ public class ServerPlayer extends Player implements ServerModelObject {
         List<Unit> leftOver = new ArrayList<Unit>();
         Utils.randomShuffle(logger, "Naval load", navalUnits, random);
         Utils.randomShuffle(logger, "Land load", landUnits, random);
+        LogBuilder lb = new LogBuilder(256);
+        lb.mark();
         landUnit: for (Unit unit : landUnits) {
             for (Unit carrier : navalUnits) {
                 if (carrier.canAdd(unit)) {
                     unit.setLocation(carrier);//-vis(owner)
-                    logger.finest("Loading " + unit
-                        + " onto carrier " + carrier);
+                    lb.add(unit, " -> ", carrier, ", ");
                     continue landUnit;
                 }
             }
             leftOver.add(unit);
         }
+        if (lb.grew("Load ships: ")) {
+            lb.shrink(", ");
+            lb.log(logger, Level.FINEST);
+        }        
         return leftOver;
     }
 
@@ -1344,32 +1349,40 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     portTile.getHighSeasCount()+1).getSafeTile(this, random);
                 
                 // Create the force.
-                Monarch.Force ivf = getMonarch().getInterventionForce();
-                List<Unit> landUnits = createUnits(ivf.getLandUnits(),
-                                                   entry);//-vis(this)
-                List<Unit> navalUnits = createUnits(ivf.getNavalUnits(),
-                                                    entry);//-vis(this)
-                List<Unit> leftOver = loadShips(landUnits, navalUnits,
-                                                random);//-vis(this)
-                for (Unit unit : leftOver) {
-                    // no use for left over units
-                    logger.warning("Disposing of left over unit " + unit);
-                    unit.setLocationNoUpdate(null);//-vis: safe, off map
-                    unit.disposeList();//-vis: safe, never sighted
+                // @compat 0.10.5
+                // We used to nullify the monarch when declaring independence.
+                // There are saved games out there where this happened
+                // (see BR#2435).  Defend against NPE.
+                Monarch.Force ivf = null;
+                if (getMonarch() != null
+                // end @compat 0.10.5
+                    && (ivf = getMonarch().getInterventionForce()) != null) {
+                    List<Unit> landUnits = createUnits(ivf.getLandUnits(),
+                                                       entry);//-vis(this)
+                    List<Unit> navalUnits = createUnits(ivf.getNavalUnits(),
+                                                        entry);//-vis(this)
+                    List<Unit> leftOver = loadShips(landUnits, navalUnits,
+                                                    random);//-vis(this)
+                    for (Unit unit : leftOver) {
+                        // no use for left over units
+                        logger.warning("Disposing of left over unit " + unit);
+                        unit.setLocationNoUpdate(null);//-vis: safe, off map
+                        unit.disposeList();//-vis: safe, never sighted
+                    }
+                    List<Tile> tiles = exploreForUnit(navalUnits.get(0));
+                    if (!tiles.contains(entry)) tiles.add(entry);
+                    invalidateCanSeeTiles();//+vis(this)
+                    cs.add(See.perhaps(), tiles);
+                    cs.addMessage(See.only(this),
+                        new ModelMessage(ModelMessage.MessageType.DEFAULT,
+                            "declareIndependence.interventionForceArrives",
+                            this));
+                    logger.info("Intervention force ("
+                        + navalUnits.size() + " naval, "
+                        + landUnits.size() + " land, "
+                        + leftOver.size() + " left over) arrives at " + entry
+                        + "(for " + port.getName() + ")");
                 }
-                List<Tile> tiles = exploreForUnit(navalUnits.get(0));
-                if (!tiles.contains(entry)) tiles.add(entry);
-                invalidateCanSeeTiles();//+vis(this)
-                cs.add(See.perhaps(), tiles);
-                cs.addMessage(See.only(this),
-                    new ModelMessage(ModelMessage.MessageType.DEFAULT,
-                        "declareIndependence.interventionForceArrives",
-                        this));
-                logger.info("Intervention force ("
-                    + navalUnits.size() + " naval, "
-                    + landUnits.size() + " land, "
-                    + leftOver.size() + " left over) arrives at " + entry
-                    + "(for " + port.getName() + ")");
             }
         }
 
