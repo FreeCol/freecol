@@ -1200,7 +1200,14 @@ public class Game extends FreeColGameObject {
         // end @compat
 
         String str = xr.getAttribute(UUID_TAG, (String)null);
-        uuid = (str == null) ? null : UUID.fromString(str);
+        if (str != null) {
+            try {
+                UUID u = UUID.fromString(str);
+                this.uuid = u;
+            } catch (IllegalArgumentException iae) {
+                ;// Preserve existing uuid
+            }
+        }
 
         turn = new Turn(xr.getAttribute(TURN_TAG, 1));
 
