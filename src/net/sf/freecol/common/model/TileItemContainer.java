@@ -636,7 +636,14 @@ public class TileItemContainer extends FreeColGameObject {
         final String tag = xr.getLocalName();
 
         if (LostCityRumour.getXMLElementTagName().equals(tag)) {
-            tileItems.add(xr.readFreeColGameObject(game, LostCityRumour.class));
+            LostCityRumour lcr = xr.readFreeColGameObject(game, LostCityRumour.class);
+            if (lcr != null) {
+                tileItems.add(lcr);
+                // @compat 0.10.4
+                // Fix LCR tile, see LostCityRumour.readAttributes
+                lcr.setTile(tile);
+                // end @compat 0.10.4
+            }
 
         } else if (Resource.getXMLElementTagName().equals(tag)) {
             tileItems.add(xr.readFreeColGameObject(game, Resource.class));
