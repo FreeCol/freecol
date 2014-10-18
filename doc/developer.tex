@@ -341,8 +341,6 @@ using tabs.
 
 \hypertarget{How to build a FreeCol release}{\chapter{How to build a FreeCol release}}
 
-\emph{svn instructions need revision for git next time we do a release}
-
 \begin{itemize}
 
 \item Make sure that all relevant changes have been committed to the
@@ -351,29 +349,23 @@ using tabs.
   before branching.
 
 \item Merge translations from trunk if the release is not made from
-  trunk, with \verb+ant merge-translations+. Skip this step if the
+  trunk, with \verb+ant merge-translations+.  Skip this step if the
   localization files are essentially the same as the ones in trunk (we
-  try to ensure this). Make sure they are up to date, however.
+  try to ensure this).  Make sure they are up to date, however.
 
-\item Create a copy of the branch you want to release in the tags
-  folder. Subversion does not distinguish between tags and
-  branches. Example:
+\item Lately we release from the git master and continue to work from
+  there, so there is no urgent need to create a special release branch.
 
-{\small
-\begin{verbatim}
-  svn copy -m "Creating tag for release 0.9.0-alpha2." \
-  https://freecol.svn.sourceforge.net/svnroot/freecol/freecol/branches/0.9.x \
-  https://freecol.svn.sourceforge.net/svnroot/freecol/freecol/tags/0.9.0-alpha2
-\end{verbatim}
-}
+\item Change the \verb+FREECOL_VERSION+ constant in FreeCol.java to
+  match the release version.
 
-\item Check out the newly created branch and do all further work in that
-  new branch.
+\item Likewise, change the value of the \verb+fcversion+ macro in
+  doc/FreeCol.tex to the release version.
 
-\item Change the \verb$FREECOL_VERSION$ constant in FreeCol.java to
-  match the release version and commit the change. Start a clean
-  compile, run all tests and verify the specification(s). You can do
-  that by calling \verb+ant prepare-commit+.
+\item Start a clean compile, run all tests and verify the
+  specification(s). You can do that by calling \verb+ant prepare-commit+.
+ 
+\item Commit the changes.
 
 \item Call \verb+ant dist+ in order to build all packages. You will be
   prompted for the version of this release. Alternatively, you can
@@ -391,7 +383,7 @@ using tabs.
   so. It might also be a good idea to compile the game from one of the
   source packages.
 
-\item Upload the packages to \verb$sftp://frs.sourceforge.net/$ and ensure that
+\item Upload the packages to \verb+sftp://frs.sourceforge.net/+ and ensure that
   all packages get uploaded. You can use a script similar to this:
 
 \begin{verbatim}
@@ -450,11 +442,11 @@ The following items can be omitted for unstable releases:
 
 \begin{itemize}
 
-\item Go to the page ``Tickets > Admin > Bugs'' and create a new
-  milestone called ``Fixed\_\emph{release}''
-  (e.g. ``Fixed\_0.10.2'').  Do a mass edit (the pencil icon in the
-  top right of the bug tracker list) and move all bugs from the
-  ``Fixed\_trunk'' milestone to the new milestone.
+\item Go to the bug tracker and create a new milestone (``Edit
+  Milestones'') called ``Fixed\_\emph{release}''
+  (e.g. ``Fixed\_0.10.2'').  Select the ``Fixed\_trunk'' group and do
+  a mass edit (the pencil icon in the top right of the bug tracker
+  list) and move all bugs to the new milestone.
 
 \item Do the corresponding action in other ticket categories that
   have distinct release milestones.
@@ -492,12 +484,11 @@ The following items should be omitted for unstable releases:
 
 \begin{itemize}
 
-\item Post a news item on the FreeCol project news page on sourceforge
-(at \verb+https://sourceforge.net/news/?group_id=43225+).
+\item Post a news item on the FreeCol project news page on sourceforge.
 
-\item Create news items at \href{Linuxgames.com}{Linuxgames.com},
-  \href{linux-gamers.com}{linux-gamers.com} and
-  \href{happypenguin.org}{happypenguin.org}.
+%\item Create news items at \href{Linuxgames.com}{Linuxgames.com},
+%  \href{linux-gamers.com}{linux-gamers.com} and
+%  \href{happypenguin.org}{happypenguin.org}.
 
 \end{itemize}
 
