@@ -42,14 +42,16 @@ public class VideoComponent extends JPanel {
 
     private static final Logger logger = Logger.getLogger(VideoComponent.class.getName());
 
+    //private List<VideoListener> videoListeners
+    //    = new LinkedList<VideoListener>();
+
     private final Cortado applet;
-    private List<VideoListener> videoListeners
-        = new LinkedList<VideoListener>();
 
 
     /**
      * Creates a component for displaying the given video.
      * @param video The <code>Video</code> to be displayed.
+     *
      * @param mute boolean silence
      */
     public VideoComponent(Video video, boolean mute) {
@@ -63,16 +65,15 @@ public class VideoComponent extends JPanel {
         // FIXME: -1 avoids transparent part of border.
         applet.setLocation(insets.left - 1, insets.top - 1);
 
-        applet.setParam ("url", url);
-        applet.setParam ("local", "false");
-        applet.setParam ("framerate", "60");
-        applet.setParam ("keepaspect", "true");
-        applet.setParam ("video", "true");
-        applet.setParam ("audio", mute ? "false" : "true");
-        applet.setParam ("kateIndex", "0");
-        applet.setParam ("bufferSize", "200");
-        applet.setParam ("showStatus", "hide");
-        applet.setParam ("debug", "0");
+        applet.setParam("url", url);
+        applet.setParam("framerate", "60");
+        applet.setParam("keepaspect", "true");
+        applet.setParam("video", "true");
+        applet.setParam("audio", mute ? "false" : "true");
+        applet.setParam("kateIndex", "0");
+        applet.setParam("bufferSize", "200");
+        applet.setParam("showStatus", "hide");
+        applet.setParam("debug", "0");
         applet.init();
 
         // Disable the feature that seems to be missing from the stock Cortado
@@ -96,32 +97,41 @@ public class VideoComponent extends JPanel {
                 applet.getHeight() + insets.top + insets.bottom - 2);
     }
 
-    /**
-     * Adds a listener for video playback events.
-     * @param videoListener A listener for video playback events.
-     */
-    public void addVideoListener(VideoListener videoListener) {
-        videoListeners.add(videoListener);
+
+    private Border createBorder() {
+        return FreeColImageBorder.imageBorder;
     }
 
-    /**
-     * Removes the given listener.
-     * @param videoListener The listener to be removed from this
-     *      <code>VideoComponent</code>.
-     */
-    public void removeVideoListener(VideoListener videoListener) {
-        videoListeners.remove(videoListener);
-    }
+    ///**
+    // * Adds a listener for video playback events.
+    // *
+    // * @param videoListener A listener for video playback events.
+    // */
+    //public void addVideoListener(VideoListener videoListener) {
+    //    videoListeners.add(videoListener);
+    //}
+    //
+    ///**
+    // * Removes the given listener.
+    // *
+    // * @param videoListener The listener to be removed from this
+    // *     <code>VideoComponent</code>.
+    // */
+    //public void removeVideoListener(VideoListener videoListener) {
+    //    videoListeners.remove(videoListener);
+    //}
 
     @Override
     public void addMouseListener(MouseListener l) {
         super.addMouseListener(l);
+
         applet.addMouseListener(l);
     }
 
     @Override
     public void removeMouseListener(MouseListener l) {
         super.removeMouseListener(l);
+
         applet.removeMouseListener(l);
     }
 
@@ -137,10 +147,6 @@ public class VideoComponent extends JPanel {
      */
     public void stop() {
         applet.stop();
-    }
-
-    private Border createBorder() {
-        return FreeColImageBorder.imageBorder;
     }
 
 
@@ -171,7 +177,7 @@ public class VideoComponent extends JPanel {
         try {
             super.removeNotify();
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Mystery crash", e);
+            logger.log(Level.WARNING, "Video removal crash", e);
         }
     }
 }

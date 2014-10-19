@@ -25,6 +25,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -47,6 +49,7 @@ import javax.swing.JLayeredPane;
 import javax.swing.JMenuItem;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
@@ -2211,11 +2214,8 @@ public final class Canvas extends JDesktopPane {
         final Video video = ResourceManager.getVideo("Opening.video");
         boolean muteAudio = !gui.canPlaySound();
         final VideoComponent vp = new VideoComponent(video, muteAudio);
-        addCentered(vp, JLayeredPane.PALETTE_LAYER);
-        vp.play();
-
-        final class AbortListener implements KeyListener, MouseListener, 
-            VideoListener {
+        final class AbortListener implements ActionListener, KeyListener,
+            MouseListener, VideoListener {
             public void keyPressed(KeyEvent e) {}
 
             public void keyReleased(KeyEvent e) {
@@ -2237,11 +2237,15 @@ public final class Canvas extends JDesktopPane {
                 execute();
             }
 
+            public void actionPerformed(ActionEvent e) {
+                execute();
+            }
+
             private void execute() {
                 removeKeyListener(this);
                 removeMouseListener(this);
                 vp.removeMouseListener(this);
-                vp.removeVideoListener(this);
+                //vp.removeVideoListener(this);
                 vp.stop();
                 Canvas.this.remove(vp);
                 gui.playSound("sound.intro.general");
@@ -2253,7 +2257,13 @@ public final class Canvas extends JDesktopPane {
         addMouseListener(l);
         addKeyListener(l);
         vp.addMouseListener(l);
-        vp.addVideoListener(l);
+        //vp.addVideoListener(l);
+        addCentered(vp, JLayeredPane.PALETTE_LAYER);
+        vp.play();
+        // Cortado applet is failing to quit when finished, make sure it
+        // eventually gets kicked.  Change the magic number if we
+        // change the opening video length.
+        new Timer(75000, l).start();
     }
 
     /**
