@@ -24,7 +24,6 @@ import java.util.List;
 
 import javax.swing.JLayeredPane;
 import net.sf.freecol.client.ClientOptions;
-import static net.sf.freecol.client.ClientOptions.MINIMAP_TOGGLE_FOG_OF_WAR;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;

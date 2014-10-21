@@ -49,6 +49,8 @@ import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.util.LogBuilder;
+import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.RandomUtils.*;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
 import net.sf.freecol.server.ai.mission.Mission;
@@ -195,9 +197,9 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         // but decrease for fortifications.
         // TODO: use Modifiers?
         final int percentTwiddle = 20; // Perturb score by +/-20%
-        int[] twiddle = Utils.randomInts(logger, "REF target twiddle",
-                                         getAIRandom(), 2*percentTwiddle+1,
-                                         targets.size());
+        int[] twiddle = randomInts(logger, "REF target twiddle",
+                                   getAIRandom(), 2*percentTwiddle+1,
+                                   targets.size());
         int twidx = 0;
         for (TargetTuple t : targets) {
             t.score *= 0.01 * (101 - Math.min(100, t.colony.getSoL()));
@@ -446,8 +448,8 @@ public class REFAIPlayer extends EuropeanAIPlayer {
             Tile start;
             if (enemy == null) {
                 if ((m = getWanderHostileMission(aiu)) != null) {
-                    start = Utils.getRandomMember(logger, "REF patrol entry",
-                                                  entries, aiRandom);
+                    start = getRandomMember(logger, "REF patrol entry",
+                                            entries, aiRandom);
                     u.setEntryLocation(start);
                     lb.add("\n  Patrol from ", start, " with ", m);
                 }
@@ -568,7 +570,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                 } else if (mission instanceof PrivateerMission) {
                     privateers.add(aiu);
                     Location loc = mission.getTarget();
-                    if (loc != null) Utils.incrementMapCount(targetMap, loc);
+                    if (loc != null) incrementMapCount(targetMap, loc);
                 } else {
                     todo.add(aiu);
                 }
@@ -581,19 +583,18 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                         // Bleed off excessive defenders.
                         if (u.isAtLocation(colony)
                             && !colony.isBadlyDefended()
-                            && Utils.randomInt(logger,
-                                "REF defend " + colony.getName(), getAIRandom(),
-                                3) == 0) {
+                            && randomInt(logger, "REF defend " + colony.getName(), 
+                                         getAIRandom(), 3) == 0) {
                             land.add(aiu);
                         } else {
-                            Utils.incrementMapCount(targetMap, mission.getTarget());
+                            incrementMapCount(targetMap, mission.getTarget());
                         }                          
                     } else {
                         land.add(aiu);
                     }                    
                 } else if (mission instanceof UnitSeekAndDestroyMission) {
                     if (mission.isValid()) {
-                        Utils.incrementMapCount(targetMap, mission.getTarget());
+                        incrementMapCount(targetMap, mission.getTarget());
                         continue;
                     }
                     land.add(aiu);
@@ -633,12 +634,12 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                     && count < UNIT_USAD_THRESHOLD
                     && (m = getSeekAndDestroyMission(aiu, target)) != null) {
                     lb.add(" NEW-SEEK-", count, " ", m);
-                    Utils.incrementMapCount(targetMap, target);
+                    incrementMapCount(targetMap, target);
                     continue;
                 } else if (target instanceof Settlement
                     && (m = getSeekAndDestroyMission(aiu, target)) != null) {
                     lb.add(" NEW-SEEK ", m);
-                    Utils.incrementMapCount(targetMap, target);
+                    incrementMapCount(targetMap, target);
                     continue;
                 } else {
                     throw new RuntimeException("Bogus target: " + target);
@@ -648,11 +649,11 @@ public class REFAIPlayer extends EuropeanAIPlayer {
             // Find units idle at a port
             final Unit u = aiu.getUnit();
             if (u.isInEurope()) {
-                Utils.appendToMapList(idlers, player.getEurope(), aiu);
+                appendToMapList(idlers, player.getEurope(), aiu);
                 continue;
             } else if ((colony = u.getColony()) != null
                 && colony.isConnectedPort()) {
-                Utils.appendToMapList(idlers, colony, aiu);
+                appendToMapList(idlers, colony, aiu);
                 continue;
             }
 
@@ -670,7 +671,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
             if (best != null
                 && (m = getDefendSettlementMission(aiu, best)) != null) {
                 lb.add(" GO-DEFEND-", best.getName(), " " , m);
-                Utils.incrementMapCount(targetMap, best);
+                incrementMapCount(targetMap, best);
                 continue;
             }
 
@@ -683,7 +684,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
             if (colony != null
                 && (m = getDefendSettlementMission(aiu, colony)) != null) {
                 lb.add(" GOTO-", colony.getName(), " " , m);
-                Utils.incrementMapCount(targetMap, colony);
+                incrementMapCount(targetMap, colony);
                 continue;
             }
 
@@ -706,10 +707,10 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                 Location key;
                 if (u.isInEurope()
                     && idlers.containsKey(key = player.getEurope())) {
-                    Utils.appendToMapList(ready, key, aiu);
+                    appendToMapList(ready, key, aiu);
                 } else if ((key = u.getColony()) != null
                     && idlers.containsKey(key)) {
-                    Utils.appendToMapList(ready, key, aiu);
+                    appendToMapList(ready, key, aiu);
                 } else {
                     todo.add(aiu);
                 }

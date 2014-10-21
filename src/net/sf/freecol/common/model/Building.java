@@ -29,7 +29,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -616,7 +616,7 @@ public class Building extends WorkLocation
         StringBuilder sb = new StringBuilder(32);
         sb.append("[").append(getId())
             .append(" ").append((buildingType == null) ? ""
-                : Utils.lastPart(buildingType.getId(), "."))
+                : lastPart(buildingType.getId(), "."))
             .append("/").append(getColony().getName())
             .append("]");
         return sb.toString();

@@ -87,7 +87,8 @@ import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.RandomUtils.*;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
 import net.sf.freecol.server.ai.mission.CashInTreasureTrainMission;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
@@ -481,7 +482,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
         }
         final int nCheats = arrears.size() + 6; // 6 cheats + arrears
-        int[] randoms = Utils.randomInts(logger, "cheats", air, 100, nCheats);
+        int[] randoms = randomInts(logger, "cheats", air, 100, nCheats);
         int cheatIndex = 0;
 
         for (GoodsType goodsType : arrears) {
@@ -633,7 +634,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             if (target == null && !colonies.isEmpty()) {
                 List<AIColony> bad = new ArrayList<AIColony>(getBadlyDefended());
                 if (bad.isEmpty()) bad.addAll(getAIColonies());
-                AIColony defend = Utils.getRandomMember(logger,
+                AIColony defend = getRandomMember(logger,
                     "AIColony to defend", bad, air);
                 Tile center = defend.getColony().getTile();
                 Tile t = game.getMap().searchCircle(center,
@@ -1096,7 +1097,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             if (t != null && t.getTransport() == null
                 && t.getTransportDestination() != null) {
                 Location loc = upLoc(t.getTransportDestination());
-                Utils.appendToMapList(transportDemand, loc, w);
+                appendToMapList(transportDemand, loc, w);
             }
         }
 
@@ -1299,12 +1300,12 @@ public class EuropeanAIPlayer extends AIPlayer {
             if (w instanceof WorkerWish) {
                 WorkerWish ww = (WorkerWish)w;
                 if (ww.getTransportable() == null) {
-                    Utils.appendToMapList(workerWishes, ww.getUnitType(), ww);
+                    appendToMapList(workerWishes, ww.getUnitType(), ww);
                 }
             } else if (w instanceof GoodsWish) {
                 GoodsWish gw = (GoodsWish)w;
                 if (gw.getDestination() instanceof Colony) {
-                    Utils.appendToMapList(goodsWishes, gw.getGoodsType(), gw);
+                    appendToMapList(goodsWishes, gw.getGoodsType(), gw);
                 }
             }
         }
@@ -1591,7 +1592,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         // Apply Franklin's modifier
         prob = p.applyModifiers(prob, turn, Modifier.PEACE_TREATY);
         return prob > 0.0f
-            && (Utils.randomInt(logger, "Peace holds?",  getAIRandom(), 100)
+            && (randomInt(logger, "Peace holds?",  getAIRandom(), 100)
                 < (int)(100.0f * prob));
     }
 
@@ -2716,8 +2717,8 @@ public class EuropeanAIPlayer extends AIPlayer {
 
         if (result == null) {
             // Give up?
-            if (Utils.randomInt(logger, "Enough diplomacy?", getAIRandom(),
-                                1 + agreement.getVersion()) > 5) {
+            if (randomInt(logger, "Enough diplomacy?", getAIRandom(),
+                          1 + agreement.getVersion()) > 5) {
                 result = rejectAgreement(peace, agreement);
                 lb.add(", Ran out of patience at ", agreement.getVersion());
             }
@@ -2801,8 +2802,8 @@ public class EuropeanAIPlayer extends AIPlayer {
                 if (sessionRegister.containsKey(hagglingKey)) {
                     haggling = sessionRegister.get(hagglingKey).intValue();
                 }
-                if (Utils.randomInt(logger, "Buy gold", getAIRandom(),
-                        3 + haggling) <= 3) {
+                if (randomInt(logger, "Buy gold", getAIRandom(),
+                              3 + haggling) <= 3) {
                     sessionRegister.put(goldKey, Integer.valueOf(gold));
                     sessionRegister.put(hagglingKey,
                         Integer.valueOf(haggling + 1));

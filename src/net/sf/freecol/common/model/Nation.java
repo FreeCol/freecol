@@ -31,7 +31,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.resources.ResourceManager;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -84,14 +84,13 @@ public class Nation extends FreeColGameObjectType {
      * A list of European nation names, where model.nation.X.name exists.
      * Used by getNonPlayerNation().
      */
-    public static final List<String> EUROPEAN_NATIONS
-        = Utils.makeUnmodifiableList(
-            // Original Col1 nations
-            "dutch", "english", "french", "spanish",
-            // FreeCol's additions
-            "danish", "portuguese", "swedish", "russian",
-            // other European non-player nations
-            "austrian", "prussian", "turkish");
+    public static final List<String> EUROPEAN_NATIONS = makeUnmodifiableList(
+        // Original Col1 nations
+        "dutch", "english", "french", "spanish",
+        // FreeCol's additions
+        "danish", "portuguese", "swedish", "russian",
+        // other European non-player nations
+        "austrian", "prussian", "turkish");
 
     /** The nation type, European, native, etc. */
     private NationType type;

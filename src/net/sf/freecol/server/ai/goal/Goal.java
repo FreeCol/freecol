@@ -34,7 +34,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.AIPlayer;
@@ -520,14 +520,14 @@ public abstract class Goal extends AIObject implements GoalConstants {
     }
 
     /**
-     * Returns a string describing just this goal.
-     * An implementing class may override this method to add specialized information.
+     * Returns a string describing just this goal.  An implementing
+     * class may override this method to add specialized information.
      * Used by {@link #getDebugDescription()}.
      *
      * @return a string describing this goal
      */
     public String getGoalDescription() {
-        String goalName = Utils.lastPart(getClass().getName(), ".");
+        String goalName = lastPart(getClass().getName(), ".");
         return goalName.substring(0, goalName.length() - "goal".length());
     }
 

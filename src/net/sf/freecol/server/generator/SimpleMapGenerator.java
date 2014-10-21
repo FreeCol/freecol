@@ -78,7 +78,7 @@ import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.util.RandomChoice;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.RandomUtils.*;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerBuilding;
 import net.sf.freecol.server.model.ServerColony;
@@ -434,8 +434,7 @@ public class SimpleMapGenerator implements MapGenerator {
                 settlementTiles.add(tile);
             }
         }
-        Utils.randomShuffle(logger, "Settlement tiles",
-                            settlementTiles, random);
+        randomShuffle(logger, "Settlement tiles", settlementTiles, random);
 
         // Check number of settlements.
         int settlementsToPlace = settlementTiles.size();
@@ -519,7 +518,7 @@ public class SimpleMapGenerator implements MapGenerator {
         // Also collect the skills provided
         HashMap<UnitType, List<IndianSettlement>> skills
             = new HashMap<UnitType, List<IndianSettlement>>();
-        Utils.randomShuffle(logger, "Settlements", settlements, random);
+        randomShuffle(logger, "Settlements", settlements, random);
         for (IndianSettlement is : settlements) {
             List<Tile> tiles = new ArrayList<Tile>();
             for (Tile tile : is.getOwnedTiles()) {
@@ -530,12 +529,12 @@ public class SimpleMapGenerator implements MapGenerator {
                     }
                 }
             }
-            Utils.randomShuffle(logger, "Settlement tiles", tiles, random);
+            randomShuffle(logger, "Settlement tiles", tiles, random);
             int minGrow = is.getType().getMinimumGrowth();
             int maxGrow = is.getType().getMaximumGrowth();
             if (maxGrow > minGrow) {
-                for (int i = Utils.randomInt(logger, "Gdiff", random,
-                                             maxGrow - minGrow) + minGrow;
+                for (int i = randomInt(logger, "Gdiff", random,
+                                       maxGrow - minGrow) + minGrow;
                      i > 0; i--) {
                     Tile tile = findFreeNeighbouringTile(is, tiles, random);
                     if (tile == null) break;
@@ -784,7 +783,7 @@ public class SimpleMapGenerator implements MapGenerator {
         if (skill == null) {
             // Seasoned Scout
             List<UnitType> unitList = map.getSpecification().getUnitTypesWithAbility(Ability.EXPERT_SCOUT);
-            return Utils.getRandomMember(logger, "Scout", unitList, random);
+            return getRandomMember(logger, "Scout", unitList, random);
         } else {
             return skill;
         }
@@ -812,8 +811,8 @@ public class SimpleMapGenerator implements MapGenerator {
                 // eastern edge of the map
                 int x = width - 2;
                 // random latitude, not too close to the pole
-                int y = Utils.randomInt(logger, "Pole", random,
-                                        height - 2*poleDistance) + poleDistance;
+                int y = randomInt(logger, "Pole", random,
+                                  height - 2*poleDistance) + poleDistance;
                 player.setEntryLocation(map.getTile(x, y));
                 continue;
             }
@@ -1076,8 +1075,8 @@ public class SimpleMapGenerator implements MapGenerator {
                     positions.add(new Position(east, row));
                     row += distance;
                 }
-                Utils.randomShuffle(logger, "Classic starting positions",
-                                    positions, random);
+                randomShuffle(logger, "Classic starting positions",
+                              positions, random);
                 break;
             case GameOptions.STARTING_POSITIONS_RANDOM:
                 distance = 2 * map.getHeight() / number;
@@ -1090,8 +1089,8 @@ public class SimpleMapGenerator implements MapGenerator {
                         row += distance;
                     }
                 }
-                Utils.randomShuffle(logger, "Random starting positions",
-                                    positions, random);
+                randomShuffle(logger, "Random starting positions",
+                              positions, random);
                 break;
             case GameOptions.STARTING_POSITIONS_HISTORICAL:
                 for (Player player : players) {

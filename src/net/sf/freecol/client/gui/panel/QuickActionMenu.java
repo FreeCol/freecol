@@ -68,7 +68,7 @@ import net.sf.freecol.common.model.UnitLocation;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -599,7 +599,7 @@ public final class QuickActionMenu extends JPopupMenu {
         }
         if (change != null) {
             key = "model.equipment."
-                + Utils.lastPart(change.getType().getId(), ".")
+                + lastPart(change.getType().getId(), ".")
                 + ((change.getAmount() < 0) ? ".remove" : ".add");
         }
         if (key == null) return null;

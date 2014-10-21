@@ -48,7 +48,7 @@ import net.sf.freecol.common.model.UnitLocation;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.util.LogBuilder;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIObject;
@@ -1062,8 +1062,8 @@ public abstract class Mission extends AIObject {
     @Override
     public String toString() {
         LogBuilder lb = new LogBuilder(64);
-        lb.add(Utils.lastPart(getClass().getName(), "."), "@", hashCode(),
-            "-", aiUnit.getUnit(), "->", getTarget());
+        lb.add(lastPart(getClass().getName(), "."), "@", hashCode(),
+               "-", aiUnit.getUnit(), "->", getTarget());
         return lb.toString();
     }
 }

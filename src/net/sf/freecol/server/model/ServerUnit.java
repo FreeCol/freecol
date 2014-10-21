@@ -74,7 +74,7 @@ import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.RandomUtils.*;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.ChangePriority;
 import net.sf.freecol.server.control.ChangeSet.See;
@@ -263,7 +263,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             int maxValue = (100 * maximumExperience) /
                 getType().getUnitTypeChange(learn).getProbability(ChangeType.EXPERIENCE);
             if (maxValue > 0
-                && Utils.randomInt(logger, "Experience", random, maxValue)
+                && randomInt(logger, "Experience", random, maxValue)
                 < Math.min(getExperience(), maximumExperience)) {
                 StringTemplate oldName = getLabel();
                 changeType(learn);//-vis: safe within colony
@@ -455,7 +455,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         TileImprovementType tileImprovementType = ti.getType();
         int exposeResource = tileImprovementType.getExposeResourcePercent();
         if (exposeResource > 0 && !tile.hasResource()) {
-            if (Utils.randomInt(logger, "Expose resource", random, 100)
+            if (randomInt(logger, "Expose resource", random, 100)
                 < exposeResource) {
                 ResourceType resType = RandomChoice
                     .getWeightedRandom(logger, "Resource type",
@@ -464,8 +464,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 int minValue = resType.getMinValue();
                 int maxValue = resType.getMaxValue();
                 int value = minValue + ((minValue == maxValue) ? 0
-                    : Utils.randomInt(logger, "Resource quantity",
-                                      random, maxValue - minValue + 1));
+                    : randomInt(logger, "Resource quantity",
+                                random, maxValue - minValue + 1));
                 tile.addResource(new Resource(getGame(), tile,
                                               resType, value));//-til
             }
@@ -592,7 +592,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         if (attacker != null) {
             float defencePower = combatModel.getDefencePower(attacker, this);
             float totalProbability = totalAttackPower + defencePower;
-            if (Utils.randomInt(logger, "Slowed", random,
+            if (randomInt(logger, "Slowed", random,
                     Math.round(totalProbability) + 1) < totalAttackPower) {
                 int diff = Math.max(0, Math.round(totalAttackPower - defencePower));
                 int moves = Math.min(9, 3 + diff / 3);
@@ -691,7 +691,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     // Misiulo confirms that in Col1 deSoto does *not*
                     // protect against a burial ground at the same
                     // time as a ruins find!
-                    if (Utils.randomInt(logger, "Ruins+Burial", random, 100)
+                    if (randomInt(logger, "Ruins+Burial", random, 100)
                         >= spec.getInteger(GameOptions.BAD_RUMOUR)) break;
                     // Fall through
                 case BURIAL_GROUND:
@@ -721,7 +721,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             break;
         case NOTHING:
             if (game.getTurn().getYear() % 100 == 12
-                && Utils.randomInt(logger, "Mayans?", random, 4) == 0) {
+                && randomInt(logger, "Mayans?", random, 4) == 0) {
                 int years = MAYAN_PROPHESY_YEAR - game.getTurn().getYear();
                 cs.addMessage(See.only(serverPlayer),
                     new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
@@ -742,15 +742,15 @@ public class ServerUnit extends Unit implements ServerModelObject {
             }
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                    "lostCityRumour.nothing." + Utils.randomInt(logger,
+                    "lostCityRumour.nothing." + randomInt(logger,
                         "Nothing rumour", random, rumourNothing),
                     serverPlayer, this));
             break;
         case LEARN:
             StringTemplate oldName = getLabel();
             List<UnitType> learnTypes = getType().getUnitTypesLearntInLostCity();
-            unitType = Utils.getRandomMember(logger, "Choose learn",
-                                             learnTypes, random);
+            unitType = getRandomMember(logger, "Choose learn",
+                                       learnTypes, random);
             changeType(unitType);//-vis(serverPlayer)
             serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
             cs.addMessage(See.only(serverPlayer),
@@ -760,8 +760,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 .add("%type%", getType().getNameKey()));
             break;
         case TRIBAL_CHIEF:
-            int chiefAmount = Utils.randomInt(logger, "Chief base amount",
-                                              random, dx * 10) + dx * 5;
+            int chiefAmount = randomInt(logger, "Chief base amount",
+                                        random, dx * 10) + dx * 5;
             serverPlayer.modifyGold(chiefAmount);
             cs.addPartial(See.only(serverPlayer), serverPlayer, "gold", "score");
             cs.addMessage(See.only(serverPlayer),
@@ -774,8 +774,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
             break;
         case COLONIST:
             List<UnitType> foundTypes = spec.getUnitTypesWithAbility(Ability.FOUND_IN_LOST_CITY);
-            unitType = Utils.getRandomMember(logger, "Choose found",
-                                             foundTypes, random);
+            unitType = getRandomMember(logger, "Choose found",
+                                       foundTypes, random);
             newUnit = new ServerUnit(game, tile, serverPlayer,
                                      unitType);//-vis: safe, scout on tile
             cs.addMessage(See.only(serverPlayer),
@@ -785,10 +785,10 @@ public class ServerUnit extends Unit implements ServerModelObject {
         case CIBOLA:
             String cityKey = game.nextCityOfCibola();
             if (cityKey != null) {
-                int treasureAmount = Utils.randomInt(logger,
+                int treasureAmount = randomInt(logger,
                     "Base treasure amount", random, dx * 600) + dx * 300;
-                unitType = Utils.getRandomMember(logger, "Choose train",
-                                                 treasureUnitTypes, random);
+                unitType = getRandomMember(logger, "Choose train",
+                                           treasureUnitTypes, random);
                 newUnit = new ServerUnit(game, tile, serverPlayer,
                                          unitType);//-vis: safe, scout on tile
                 newUnit.setTreasureAmount(treasureAmount);
@@ -807,15 +807,15 @@ public class ServerUnit extends Unit implements ServerModelObject {
             }
             // Fall through, found all the cities of gold.
         case RUINS:
-            int ruinsAmount = Utils.randomInt(logger,
-                "Base ruins amount", random, dx * 2) * 300 + 50;
+            int ruinsAmount = randomInt(logger, "Base ruins amount", random,
+                                        dx * 2) * 300 + 50;
             if (ruinsAmount < 500) { // TODO remove magic number
                 serverPlayer.modifyGold(ruinsAmount);
                 cs.addPartial(See.only(serverPlayer), serverPlayer,
                               "gold", "score");
             } else {
-                unitType = Utils.getRandomMember(logger, "Choose train",
-                                                 treasureUnitTypes, random);
+                unitType = getRandomMember(logger, "Choose train",
+                                           treasureUnitTypes, random);
                 newUnit = new ServerUnit(game, tile, serverPlayer,
                                          unitType);//-vis: safe, scout on tile
                 newUnit.setTreasureAmount(ruinsAmount);
@@ -988,8 +988,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 && ((d = newTile.getDistanceTo(settlement.getTile()))
                     < (settlement.getRadius()
                         + settlement.getType().getExtraClaimableRadius()))
-                && Utils.randomInt(logger, "Claim tribal land", random,
-                                   d + 1) == 0) {
+                && randomInt(logger, "Claim tribal land", random, d + 1) == 0) {
                 newTile.cacheUnseen();//+til
                 newTile.changeOwnership(serverPlayer, settlement);//-til
             }

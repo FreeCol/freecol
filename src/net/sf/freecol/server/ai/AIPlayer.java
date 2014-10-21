@@ -52,6 +52,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.util.LogBuilder;
+import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.ai.mission.Mission;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
@@ -424,17 +425,17 @@ public abstract class AIPlayer extends AIObject {
             Location target = null;
             if (aiu.hasMission()) {
                 Mission m = aiu.getMission();
-                ms = Utils.lastPart(m.getClass().toString(), ".");
+                ms = lastPart(m.getClass().toString(), ".");
                 ms = ms.substring(0, ms.length() - "Mission".length());
                 target = m.getTarget();
             }
 
             lb.add("\n  @",
                 String.format("%-30s%-10s%-40s%-16s",
-                    Utils.chop(u.getLocation().toShortString(), 30),
-                    Utils.chop(reason, 10),
-                    Utils.chop(u.toShortString(), 40),
-                    Utils.chop(ms, 16)));
+                    chop(u.getLocation().toShortString(), 30),
+                    chop(reason, 10),
+                    chop(u.toShortString(), 40),
+                    chop(ms, 16)));
             if (target != null) lb.add("->", target);
         }
     }
@@ -708,7 +709,7 @@ public abstract class AIPlayer extends AIObject {
             ServerPlayer.class, (ServerPlayer)null, true);
 
         Random rnd = Utils.restoreRandomState(xr.getAttribute(RANDOM_STATE_TAG,
-                                              (String)null));
+                                                              (String)null));
         aiRandom = (rnd != null) ? rnd
             : new Random(aiMain.getRandomSeed("Seed for " + getId()));
     }

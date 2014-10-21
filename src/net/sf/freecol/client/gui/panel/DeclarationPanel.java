@@ -42,7 +42,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.resources.FAFile;
 import net.sf.freecol.common.resources.ResourceManager;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -174,13 +174,13 @@ public final class DeclarationPanel extends FreeColPanel {
 
             // Abbreviate middle names:
             for (int i = 1; i < partNames.length - 1
-                     && isTooLarge(Utils.join(" ", partNames)); i++) {
+                     && isTooLarge(join(" ", partNames)); i++) {
                 partNames[i] = partNames[i].charAt(0) + ".";
             }
 
             // Remove middle names:
             while (partNames.length > 2
-                && isTooLarge(Utils.join(" ", partNames))) {
+                && isTooLarge(join(" ", partNames))) {
                 String[] newPartNames = new String[partNames.length - 1];
                 newPartNames[0] = partNames[0];
                 for (int i = 1; i < newPartNames.length; i++) {
@@ -190,7 +190,7 @@ public final class DeclarationPanel extends FreeColPanel {
             }
 
             String first = partNames[0], second = partNames[1];
-            String s = Utils.join(" ", partNames);
+            String s = join(" ", partNames);
             if (!isTooLarge(s)) return s;
             s = first.charAt(0) + ". " + second;
             if (!isTooLarge(s)) return s;

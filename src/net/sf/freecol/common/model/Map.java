@@ -45,7 +45,8 @@ import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.util.LogBuilder;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.RandomUtils.*;
 // @compat 0.10.x
 import net.sf.freecol.server.generator.TerrainGenerator;
 // end @compat 0.10.x
@@ -102,18 +103,18 @@ public class Map extends FreeColGameObject implements Location {
         public final static int NUMBER_OF_DIRECTIONS = values().length;
 
         public static final List<Direction> allDirections
-            = Utils.makeUnmodifiableList(Direction.N, Direction.NE,
-                                         Direction.E, Direction.SE,
-                                         Direction.S, Direction.SW,
-                                         Direction.W, Direction.NW);
+            = makeUnmodifiableList(Direction.N, Direction.NE,
+                                   Direction.E, Direction.SE,
+                                   Direction.S, Direction.SW,
+                                   Direction.W, Direction.NW);
 
         public static final List<Direction> longSides
-            = Utils.makeUnmodifiableList(Direction.NE, Direction.SE,
-                                         Direction.SW, Direction.NW);
+            = makeUnmodifiableList(Direction.NE, Direction.SE,
+                                   Direction.SW, Direction.NW);
 
         public static final List<Direction> corners
-            = Utils.makeUnmodifiableList(Direction.N, Direction.E,
-                                         Direction.S, Direction.W);
+            = makeUnmodifiableList(Direction.N, Direction.E,
+                                   Direction.S, Direction.W);
         
 
         private int oddDX, oddDY, evenDX, evenDY;
@@ -201,8 +202,8 @@ public class Map extends FreeColGameObject implements Location {
          */
         public static Direction getRandomDirection(String logMe,
                                                    Random random) {
-            return values()[Utils.randomInt(logger, logMe, random,
-                                            NUMBER_OF_DIRECTIONS)];
+            return values()[randomInt(logger, logMe, random,
+                                      NUMBER_OF_DIRECTIONS)];
         }
 
         /**
@@ -214,17 +215,9 @@ public class Map extends FreeColGameObject implements Location {
          */
         public static Direction[] getRandomDirections(String logMe,
                                                       Random random) {
-            int[] randoms = Utils.randomInts(logger, logMe, random,
-                NUMBER_OF_DIRECTIONS, NUMBER_OF_DIRECTIONS);
-            Direction[] directions = Direction.values();
-            for (int i = 0; i < directions.length; i++) {
-                if (randoms[i] != i) {
-                    Direction temp = directions[randoms[i]];
-                    directions[randoms[i]] = directions[i];
-                    directions[i] = temp;
-                }
-            }
-            return directions;
+            List<Direction> directions = new ArrayList<Direction>(allDirections);
+            randomShuffle(logger, logMe, directions, random);
+            return directions.toArray(new Direction[0]);
         }
 
         /**
@@ -246,7 +239,7 @@ public class Map extends FreeColGameObject implements Location {
             // Will need 3 bits of randomness --- 2 directions are known,
             // need one bit to randomize each remaining pair.
             final int nbits = (NUMBER_OF_DIRECTIONS - 2) / 2;
-            final int r = Utils.randomInt(logger, logMe, random, 1 << nbits);
+            final int r = randomInt(logger, logMe, random, 1 << nbits);
 
             Direction[] ret = new Direction[NUMBER_OF_DIRECTIONS];
             ret[0] = this;
@@ -874,8 +867,8 @@ public class Map extends FreeColGameObject implements Location {
             height -= SLOSH;
             y += SLOSH/2;
         }
-        x += Utils.randomInt(logger, "W", random, width);
-        y += Utils.randomInt(logger, "H", random, height);
+        x += randomInt(logger, "W", random, width);
+        y += randomInt(logger, "H", random, height);
         for (Tile t : getCircleTiles(getTile(x, y), true, INFINITY)) {
             if (t.isLand()) return t;
         }

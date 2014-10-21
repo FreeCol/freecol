@@ -68,7 +68,6 @@ import net.sf.freecol.common.model.UnitWas;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.util.LogBuilder;
-import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.AIGoods;
 import net.sf.freecol.server.ai.GoodsWish;

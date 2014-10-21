@@ -45,7 +45,7 @@ import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.util.RandomChoice;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -201,7 +201,7 @@ public class NationTypeDetailPanel extends ColopediaGameObjectTypePanel<NationTy
             regionNames.add(Messages.message(regionName + ".name"));
         }
         panel.add(localizedLabel("colopedia.nationType.regions"));
-        panel.add(new JLabel(Utils.join(", ", regionNames)));
+        panel.add(new JLabel(join(", ", regionNames)));
 
         panel.add(localizedLabel("colopedia.nationType.skills"), "top, newline 20");
         GridLayout gridLayout = new GridLayout(0, 2);

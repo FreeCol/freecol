@@ -53,7 +53,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.util.LogBuilder;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.RandomUtils.*;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.See;
 
@@ -257,8 +257,8 @@ public class ServerColony extends Colony implements ServerModelObject {
                 // Check for famine when total primary food goes negative.
                 if (net + stored < 0) {
                     if (getUnitCount() > 1) {
-                        Unit victim = Utils.getRandomMember(logger,
-                            "Choose starver", getUnitList(), random);
+                        Unit victim = getRandomMember(logger, "Starver",
+                                                      getUnitList(), random);
                         cs.addDispose(See.only(owner), null,
                                       victim);//-vis: safe, all within colony
                         cs.addMessage(See.only(owner),
@@ -299,8 +299,8 @@ public class ServerColony extends Colony implements ServerModelObject {
                 switch (queue.getCompletionAction()) {
                 case SHUFFLE:
                     if (queue.size() > 1) {
-                        Utils.randomShuffle(logger, "Build queue",
-                                            queue.getValues(), random);
+                        randomShuffle(logger, "Build queue",
+                                      queue.getValues(), random);
                     }
                     break;
                 case REMOVE_EXCEPT_LAST:

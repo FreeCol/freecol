@@ -41,7 +41,7 @@ import java.util.logging.Logger;
 import net.sf.freecol.common.resources.Resource;
 import net.sf.freecol.common.resources.ResourceFactory;
 import net.sf.freecol.common.resources.ResourceMapping;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -286,7 +286,7 @@ public class FreeColDataFile {
         }
         if (!todo.isEmpty()) {
             logger.warning("Could not resolve virtual resource/s: "
-                           + Utils.join(" ", todo));
+                           + join(" ", todo));
         }
         return rc;
     }

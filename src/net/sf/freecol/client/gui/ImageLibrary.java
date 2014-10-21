@@ -70,7 +70,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.resources.ResourceManager;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -1203,7 +1203,7 @@ public final class ImageLibrary {
 
         // try to get an image matching the key
         String roleQual = (Specification.DEFAULT_ROLE_ID.equals(roleId)) ? ""
-            : "." + Utils.lastPart(roleId, ".");
+            : "." + lastPart(roleId, ".");
         String key = unitType.getId() + roleQual
             + ((nativeEthnicity) ? ".native" : "")
             + ".image";

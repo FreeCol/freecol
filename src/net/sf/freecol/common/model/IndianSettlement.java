@@ -32,18 +32,18 @@ import java.util.Random;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.GoodsContainer;
-import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.Settlement;
-import net.sf.freecol.common.util.Utils;
-
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+
+import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsContainer;
+import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension.Level;
+import static net.sf.freecol.common.util.RandomUtils.*;
 
 
 /**
@@ -991,14 +991,14 @@ public class IndianSettlement extends Settlement {
             if (n >= GIFT_THRESHOLD) {
                 n -= GIFT_MINIMUM;
                 Goods goods = new Goods(getGame(), this, type,
-                    Math.min(Utils.randomInt(logger, "Gift amount", random, n)
+                    Math.min(randomInt(logger, "Gift amount", random, n)
                         + GIFT_MINIMUM, GIFT_MAXIMUM));
                 goodsList.add(goods);
             }
 
         }
         return (goodsList.isEmpty()) ? null
-            : Utils.getRandomMember(logger, "Gift type", goodsList, random);
+            : getRandomMember(logger, "Gift type", goodsList, random);
     }
 
 
@@ -1019,8 +1019,8 @@ public class IndianSettlement extends Settlement {
                 goodsMap.put(type, value + ag.getAmount());
             }
         }
-        double d = Utils.randomInt(logger, "Goods at " + getName(), random,
-                                   10) * 0.1 + 1.0;
+        double d = randomInt(logger, "Goods at " + getName(), random, 10)
+            * 0.1 + 1.0;
         for (Entry<GoodsType, Integer> e : goodsMap.entrySet()) {
             int i = e.getValue();
             if (!e.getKey().isFoodType()) i = (int)Math.round(d * e.getValue());

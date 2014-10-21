@@ -57,7 +57,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.util.LogBuilder;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.RandomUtils.*;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.ChangePriority;
 import net.sf.freecol.server.control.ChangeSet.See;
@@ -425,7 +425,7 @@ public class ServerGame extends Game implements ServerModelObject {
         for (int index = 0; index < CIBOLA_COUNT; index++) {
             citiesOfCibola.add("lostCityRumour.cityName." + index);
         }
-        Utils.randomShuffle(logger, "Cibola", citiesOfCibola, random);
+        randomShuffle(logger, "Cibola", citiesOfCibola, random);
     }
 
 

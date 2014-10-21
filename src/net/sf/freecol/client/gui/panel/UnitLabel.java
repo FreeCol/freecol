@@ -53,7 +53,7 @@ import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.resources.ResourceManager;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -336,7 +336,7 @@ public final class UnitLabel extends JLabel
      * @return The unit action as a string.
      */
     public static String getWorkLabel(WorkLocation wl) {
-        return "WORK_" + Utils.lastPart(wl.getClass().toString(), ".")
+        return "WORK_" + lastPart(wl.getClass().toString(), ".")
             .toUpperCase(Locale.US);
     }
 

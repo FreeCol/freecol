@@ -89,7 +89,7 @@ import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.RandomUtils.*;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.ChangePriority;
 import net.sf.freecol.server.control.ChangeSet.See;
@@ -344,7 +344,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     min = max;
                     max = bad;
                 } else if (max == min) continue;
-                int add = Utils.randomInt(null, null, random, max - min);
+                int add = randomInt(null, null, random, max - min);
                 if (add > 0) {
                     market.setInitialPrice(type, min + add);
                     market.update(type);
@@ -1013,8 +1013,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                                 List<Unit> navalUnits,
                                 Random random) {
         List<Unit> leftOver = new ArrayList<Unit>();
-        Utils.randomShuffle(logger, "Naval load", navalUnits, random);
-        Utils.randomShuffle(logger, "Land load", landUnits, random);
+        randomShuffle(logger, "Naval load", navalUnits, random);
+        randomShuffle(logger, "Land load", landUnits, random);
         LogBuilder lb = new LogBuilder(256);
         lb.mark();
         landUnit: for (Unit unit : landUnits) {
@@ -1341,8 +1341,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 for (Colony c : getColonies()) {
                     if (c.isConnectedPort()) ports.add(c);
                 }
-                Colony port = Utils.getRandomMember(logger, "Intervention port",
-                    ports, random);
+                Colony port = getRandomMember(logger, "Intervention port",
+                                              ports, random);
                 Tile portTile = port.getTile();
                 Tile entry = getGame().getMap().searchCircle(portTile,
                     GoalDeciders.getSimpleHighSeasGoalDecider(),
@@ -1449,14 +1449,15 @@ public class ServerPlayer extends Player implements ServerModelObject {
         if (changed) cs.addPartial(See.only(this), this, "bankrupt");
     }
 
-    public void csNaturalDisasters(Random random, ChangeSet cs, int probability) {
-        if (Utils.randomInt(logger, "check for natural disasters", random, 100) < probability) {
+    public void csNaturalDisasters(Random random, ChangeSet cs,
+                                   int probability) {
+        if (randomInt(logger, "Natural disaster", random, 100) < probability) {
             int size = getNumberOfSettlements();
             if (size < 1) return;
             // randomly select a colony to start with, then generate
             // an appropriate disaster if possible, else continue with
             // the next colony
-            int start = Utils.randomInt(logger, "select colony", random, size);
+            int start = randomInt(logger, "select colony", random, size);
             for (int index = 0; index < size; index++) {
                 Colony colony = getColonies().get((start + index) % size);
                 List<RandomChoice<Disaster>> disasters = colony.getDisasters();
@@ -1513,7 +1514,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             break;
         case SEVERAL:
             for (RandomChoice<Effect> effect : disaster.getEffects()) {
-                if (Utils.randomInt(logger, "Get effects of disaster", random, 100)
+                if (randomInt(logger, "Get effects of disaster", random, 100)
                     < effect.getProbability()) {
                     effects.add(effect.getObject());
                     sb.append(" ").append(Messages.getName(effect.getObject()));
@@ -1563,8 +1564,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         colonyDirty = true;
                     }
                 } else if (Effect.LOSS_OF_GOODS.equals(effect.getId())) {
-                    Goods goods = Utils.getRandomMember(logger, "select goods",
-                                                        colony.getLootableGoodsList(), random);
+                    Goods goods = getRandomMember(logger, "select goods",
+                                                  colony.getLootableGoodsList(),
+                                                  random);
                     if (goods != null) {
                         goods.setAmount(Math.min(goods.getAmount() / 2, 50));
                         colony.removeGoods(goods);
@@ -1631,8 +1633,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
     public Building getBuildingForEffect(Colony colony, Effect effect, Random random) {
         List<Building> buildings = colony.getBurnableBuildings();
         if (buildings.isEmpty()) return null;
-        return Utils.getRandomMember(logger, "Select building for effect",
-                                     buildings, random);
+        return getRandomMember(logger, "Select building for effect",
+                               buildings, random);
     }
 
     public Unit getUnitForEffect(Colony colony, Effect effect, Random random) {
@@ -1648,8 +1650,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
         }
         if (units.isEmpty()) return null;
-        return Utils.getRandomMember(logger, "Select unit for effect",
-                                     units, random);
+        return getRandomMember(logger, "Select unit for effect", units, random);
     }
 
     /**
@@ -1666,8 +1667,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // Propagate 5-30% of the original change.
         final int lowerBound = 5; // TODO: make into game option?
         final int upperBound = 30;// TODO: make into game option?
-        amount *= Utils.randomInt(logger, "Propagate goods", random,
-                                  upperBound - lowerBound + 1) + lowerBound;
+        amount *= randomInt(logger, "Propagate goods", random,
+                            upperBound - lowerBound + 1) + lowerBound;
         amount /= 100;
         if (amount == 0) return;
 
@@ -1696,9 +1697,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // Pick a random type of storable goods to add/remove an extra
         // amount of.
         GoodsType extraType;
-        while (!(extraType = Utils.getRandomMember(logger, "Choose goods type",
-                                                   goodsTypes, random))
-               .isStorable());
+        while (!(extraType = getRandomMember(logger, "Choose goods type",
+                                             goodsTypes, random)).isStorable());
 
         // Remove standard amount, and the extra amount.
         for (GoodsType type : goodsTypes) {
@@ -1708,8 +1708,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 int amount = game.getTurn().getNumber() / 10;
                 if (type == extraType) amount = 2 * amount + 1;
                 if (amount <= 0) continue;
-                amount = Utils.randomInt(logger, "Market adjust " + type,
-                                         random, amount);
+                amount = randomInt(logger, "Market adjust " + type,
+                                   random, amount);
                 if (!add) amount = -amount;
                 market.addGoodsToMarket(type, amount);
                 logger.finest(getName() + " adjust of " + amount
@@ -2138,8 +2138,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // recruit type.
         boolean selected = 1 <= slot && slot <= Europe.RECRUIT_COUNT;
         int index = (selected) ? slot-1
-            : Utils.randomInt(logger, "Choose emigrant", random,
-                              Europe.RECRUIT_COUNT);
+            : randomInt(logger, "Choose emigrant", random,
+                        Europe.RECRUIT_COUNT);
 
         // Create the recruit, move it to the docks.
         ServerEurope europe = (ServerEurope)getEurope();
@@ -2887,7 +2887,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         StringTemplate convertNation = nativePlayer.getNationName();
         List<Unit> units = is.getTile().getUnitList();
         if (units.isEmpty()) units.addAll(is.getUnitList());
-        ServerUnit convert = (ServerUnit)Utils.getRandomMember(logger,
+        ServerUnit convert = (ServerUnit)getRandomMember(logger,
             "Choose convert", units, random);
         if (nativePlayer.csChangeOwner(convert, attackerPlayer,
                                        ChangeType.CONVERSION,
@@ -3265,8 +3265,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         if (plunder > 0) {
             List<UnitType> unitTypes
                 = spec.getUnitTypesWithAbility(Ability.CARRY_TREASURE);
-            UnitType type = Utils.getRandomMember(logger, "Choose train",
-                                                  unitTypes, random);
+            UnitType type = getRandomMember(logger, "Choose train",
+                                            unitTypes, random);
             Unit train = new ServerUnit(game, tile, attackerPlayer,
                                         type);//-vis: safe, attacker on tile
             train.setTreasureAmount(plunder);
@@ -3628,7 +3628,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         List<Goods> goodsList = colony.getLootableGoodsList();
 
         // Pick one, with one extra choice for stealing gold.
-        int pillage = Utils.randomInt(logger, "Pillage choice", random,
+        int pillage = randomInt(logger, "Pillage choice", random,
             buildingList.size() + shipList.size() + goodsList.size()
             + ((colony.canBePlundered()) ? 1 : 0));
         if (pillage < buildingList.size()) {

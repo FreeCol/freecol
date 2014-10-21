@@ -45,6 +45,7 @@ import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
+import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
@@ -1076,13 +1077,13 @@ public class Game extends FreeColGameObject {
             if (fcgo.isUninitialized()) {
                 if (fix) {
                     logger.warning("Uninitialized object: " + fcgo.getId()
-                        + " (" + Utils.lastPart(fcgo.getClass().getName(), ".")
+                        + " (" + lastPart(fcgo.getClass().getName(), ".")
                         + "), dropping.");
                     iterator.remove();
                     result = 0;
                 } else {
                     logger.warning("Uninitialized object: " + fcgo.getId()
-                        + " (" + Utils.lastPart(fcgo.getClass().getName(), ".")
+                        + " (" + lastPart(fcgo.getClass().getName(), ".")
                         + ").");
                     result = -1;
                 }

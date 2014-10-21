@@ -88,6 +88,7 @@ import net.sf.freecol.common.model.TileItem;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.resources.ResourceManager;
+import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -2320,7 +2321,7 @@ public final class MapViewer {
             if (tile.getRegion() != null) {
                 if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
                     && tile.getRegion().getName() == null) {
-                    text = Utils.lastPart(tile.getRegion().getNameKey(), ".");
+                    text = lastPart(tile.getRegion().getNameKey(), ".");
                 } else {
                     text = Messages.message(tile.getRegion().getLabel());
                 }
@@ -2612,7 +2613,7 @@ public final class MapViewer {
             if (FreeColDebugger.debugShowMission()) {
                 g.setColor(Color.WHITE);
                 g.drawString((!au.hasMission()) ? "No mission"
-                    : Utils.lastPart(au.getMission().getClass().toString(), "."),
+                    : lastPart(au.getMission().getClass().toString(), "."),
                     0, 0);
             }
             if (FreeColDebugger.debugShowMissionInfo() && au.hasMission()) {

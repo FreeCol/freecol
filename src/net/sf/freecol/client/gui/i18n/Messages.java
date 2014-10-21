@@ -55,7 +55,6 @@ import net.sf.freecol.common.model.StringTemplate.TemplateType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.Option;
-import net.sf.freecol.common.util.Utils;
 
 
 /**

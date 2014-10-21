@@ -55,7 +55,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.util.LogBuilder;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIGoods;
 import net.sf.freecol.server.ai.AIMain;
@@ -1164,7 +1164,7 @@ public class TransportMission extends Mission {
             //
             final Location current = getUnit().getLocation();
             float bestValue = INFINITY;
-            for (List<Cargo> tl : Utils.getPermutations(ts)) {
+            for (List<Cargo> tl : getPermutations(ts)) {
                 float value = scoreCargoOrder(current, tl);
                 if (value > 0.0f && bestValue > value) {
                     bestValue = value;

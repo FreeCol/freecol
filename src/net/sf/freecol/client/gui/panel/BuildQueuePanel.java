@@ -79,7 +79,7 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.resources.ResourceManager;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -320,7 +320,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                 lockReasons.put(unitType, null);
             } else {
                 lockReasons.put(unitType, Messages.message(StringTemplate.template("colonyPanel.requires")
-                                                           .addName("%string%", Utils.join("/", lockReason))));
+                                                           .addName("%string%", join("/", lockReason))));
             }
             if (lockReason.isEmpty() || showAllBox.isSelected()) {
                 units.addElement(unitType);
@@ -392,7 +392,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                 lockReasons.put(buildingType, null);
             } else {
                 lockReasons.put(buildingType, Messages.message(StringTemplate.template("colonyPanel.requires")
-                                                               .addName("%string%", Utils.join("/", lockReason))));
+                                                               .addName("%string%", join("/", lockReason))));
             }
             if (lockReason.isEmpty() || showAllBox.isSelected()) {
                 buildings.addElement(buildingType);

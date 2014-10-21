@@ -29,7 +29,7 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.util.LogBuilder;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.RandomUtils.*;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIUnit;
 
@@ -167,8 +167,8 @@ public class UnitWanderHostileMission extends Mission {
         // checking for a target along the way.
         final Unit unit = getUnit();
         final AIUnit aiUnit = getAIUnit();
-        int check = 0, checkTurns = Utils.randomInt(logger, "Hostile",
-                                                    getAIRandom(), 4);
+        int check = 0, checkTurns = randomInt(logger, "Hostile",
+                                              getAIRandom(), 4);
         Direction d = Direction.getRandomDirection(tag, getAIRandom());
         while (unit.getMovesLeft() > 0) {
             // Every checkTurns, look for a target of opportunity.

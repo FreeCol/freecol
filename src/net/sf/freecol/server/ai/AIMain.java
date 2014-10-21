@@ -41,7 +41,8 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.RandomUtils.*;
+import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -136,8 +137,8 @@ public class AIMain extends FreeColObject
      * @return A random seed.
      */
     public int getRandomSeed(String logMe) {
-        return Utils.randomInt(logger, logMe, freeColServer.getServerRandom(),
-            Integer.MAX_VALUE);
+        return randomInt(logger, logMe, freeColServer.getServerRandom(),
+                         Integer.MAX_VALUE);
     }
 
     /**
@@ -338,7 +339,7 @@ public class AIMain extends FreeColObject
             int integ = aio.checkIntegrity(fix);
             if (integ < 0 && fix) {
                 logger.warning("Invalid AIObject: " + aio.getId()
-                    + " (" + Utils.lastPart(aio.getClass().getName(), ".")
+                    + " (" + lastPart(aio.getClass().getName(), ".")
                     + "), dropping.");
                 removeAIObject(aio.getId());
                 aio.dispose();

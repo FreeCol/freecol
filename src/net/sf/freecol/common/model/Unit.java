@@ -49,7 +49,7 @@ import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.model.TradeRouteStop;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.util.EmptyIterator;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 // @compat 0.10.x
 import net.sf.freecol.common.model.EquipmentType;
@@ -4278,7 +4278,7 @@ public class Unit extends GoodsLocation
         } else if (isDisposed()) {
             sb.append(" disposed");
         } else {
-            sb.append(" ").append(Utils.lastPart(owner.getNationId(), "."))
+            sb.append(" ").append(lastPart(owner.getNationId(), "."))
                 .append(" ").append(getType().getSuffix());
             if (!hasDefaultRole()) {
                 sb.append("-").append(getRoleSuffix());

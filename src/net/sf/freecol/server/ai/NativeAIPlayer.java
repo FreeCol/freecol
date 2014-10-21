@@ -69,7 +69,7 @@ import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.RandomUtils.*;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
 import net.sf.freecol.server.ai.mission.IdleAtSettlementMission;
 import net.sf.freecol.server.ai.mission.IndianBringGiftMission;
@@ -568,9 +568,8 @@ public class NativeAIPlayer extends AIPlayer {
             AIUnit aiUnit = null;
             Tile home = is.getTile();
             while (unit == null && !availableUnits.isEmpty()) {
-                Unit u = availableUnits.get(Utils.randomInt(logger,
-                        "Choose gift unit", getAIRandom(),
-                        availableUnits.size()));
+                Unit u = availableUnits.get(randomInt(logger, "Gift unit",
+                        getAIRandom(), availableUnits.size()));
                 availableUnits.remove(u);
                 aiUnit = getAIUnit(u);
                 if (IndianBringGiftMission.invalidReason(aiUnit) == null
@@ -666,9 +665,8 @@ public class NativeAIPlayer extends AIPlayer {
             Unit unit = null;
             AIUnit aiUnit = null;
             while (unit == null && !availableUnits.isEmpty()) {
-                Unit u = availableUnits.get(Utils.randomInt(logger,
-                        "Choose demand unit", getAIRandom(),
-                        availableUnits.size()));
+                Unit u = availableUnits.get(randomInt(logger, "Demand unit",
+                        getAIRandom(), availableUnits.size()));
                 availableUnits.remove(u);
                 aiUnit = getAIUnit(u);
                 if (IndianDemandMission.invalidReason(aiUnit) == null
@@ -785,14 +783,12 @@ public class NativeAIPlayer extends AIPlayer {
         } else {
             int[] randoms;
             abortInvalidMissions();
-            randoms = Utils.randomInts(logger, "Trades", air,
-                                       nSettlements, nSettlements);
+            randoms = randomInts(logger, "Trades", air,
+                                 nSettlements, nSettlements);
             secureSettlements(randoms, lb);
-            randoms = Utils.randomInts(logger, "Gifts", air,
-                                       100, nSettlements);
+            randoms = randomInts(logger, "Gifts", air, 100, nSettlements);
             bringGifts(randoms, lb);
-            randoms = Utils.randomInts(logger, "Tribute", air,
-                                       100, nSettlements);
+            randoms = randomInts(logger, "Tribute", air, 100, nSettlements);
             demandTribute(randoms, lb);
             giveNormalMissions(lb);
             more = doMissions(getAIUnits(), lb);
@@ -896,8 +892,7 @@ public class NativeAIPlayer extends AIPlayer {
         if (sessionRegister.containsKey(hagglingKey)) {
             haggling = sessionRegister.get(hagglingKey).intValue();
         }
-        if (Utils.randomInt(logger, "Haggle-buy",
-                getAIRandom(), 3 + haggling) >= 3) {
+        if (randomInt(logger, "Haggle-buy", getAIRandom(), 3 + haggling) >= 3) {
             sessionRegister.put(goldKey, Integer.valueOf(-1));
             return NetworkConstants.NO_TRADE_HAGGLE;
         }
@@ -961,8 +956,7 @@ public class NativeAIPlayer extends AIPlayer {
         if (sessionRegister.containsKey(hagglingKey)) {
             haggling = sessionRegister.get(hagglingKey).intValue();
         }
-        if (Utils.randomInt(logger, "Haggle-sell",
-                getAIRandom(), 3 + haggling) >= 3) {
+        if (randomInt(logger, "Haggle-sell", getAIRandom(), 3 + haggling) >= 3) {
             sessionRegister.put(goldKey, Integer.valueOf(-1));
             return NetworkConstants.NO_TRADE_HAGGLE;
         }

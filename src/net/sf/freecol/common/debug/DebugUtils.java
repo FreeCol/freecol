@@ -80,7 +80,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIGoods;
@@ -167,7 +167,7 @@ public class DebugUtils {
                 fails++;
             }
         }
-        gui.showInformationMessage(Utils.join(", ", results));
+        gui.showInformationMessage(join(", ", results));
         if (fails < sPlayer.getNumberOfSettlements()) {
             // Brutally resynchronize
             freeColClient.getConnectController().reconnect();

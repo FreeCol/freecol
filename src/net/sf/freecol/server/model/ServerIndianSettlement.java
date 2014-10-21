@@ -44,7 +44,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.util.LogBuilder;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.RandomUtils.*;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.See;
 
@@ -175,8 +175,8 @@ public class ServerIndianSettlement extends IndianSettlement
             // tile-residents.
             List<Unit> ul = tile.getUnitList();
             if (ul.isEmpty()) ul.addAll(getUnitList());
-            ServerUnit brave = (ServerUnit)Utils.getRandomMember(logger,
-                "Convert", ul, random);
+            ServerUnit brave = (ServerUnit)getRandomMember(logger, "Convert",
+                                                           ul, random);
             ServerPlayer owner = (ServerPlayer)getOwner();
             if (owner.csChangeOwner(brave, other, ChangeType.CONVERSION, 
                                     colony.getTile(), cs)) { //-vis(other)
@@ -210,8 +210,8 @@ public class ServerIndianSettlement extends IndianSettlement
         int low = getType().getMinimumSize();
         int high = getType().getMaximumSize();
         int count = (random == null) ? (high + low) / 2
-            : Utils.randomInt(logger, "Units at " + getName(), random,
-                              high - low + 1) + low;
+            : randomInt(logger, "Units at " + getName(), random, high - low + 1)
+                + low;
         addUnits(count);
     }
 
@@ -259,8 +259,8 @@ public class ServerIndianSettlement extends IndianSettlement
         // Now check the food situation
         int storedFood = getGoodsCount(spec.getPrimaryFoodType());
         if (storedFood <= 0 && getUnitCount() > 0) {
-            Unit victim = Utils.getRandomMember(logger, "Choose starver",
-                                                getUnitList(), random);
+            Unit victim = getRandomMember(logger, "Choose starver",
+                                          getUnitList(), random);
             cs.addDispose(See.only(owner), this, victim);//-vis(owner)
             lb.add(" FAMINE");
         }
@@ -287,8 +287,8 @@ public class ServerIndianSettlement extends IndianSettlement
                 // number.  This is more than sufficient. Do not
                 // increase the amount without discussing it on the
                 // developer's mailing list first.
-                UnitType type = Utils.getRandomMember(logger, "Choose birth",
-                                                      unitTypes, random);
+                UnitType type = getRandomMember(logger, "Choose birth",
+                                                unitTypes, random);
                 Unit unit = new ServerUnit(getGame(), getTile(), owner,
                                            type);//-vis: safe within settlement
                 consumeGoods(rumType, FOOD_PER_COLONIST/4);

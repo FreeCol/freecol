@@ -31,7 +31,7 @@ import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.SelectOption;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.RandomUtils.*;
 
 
 /**
@@ -184,7 +184,7 @@ public class LandMap {
             addPolarRegions();
             int contsize = (minimumNumberOfTiles * 75) / 100;
             addLandMass(contsize, contsize, width/2, height/4
-                        + Utils.randomInt(logger, "Landmass", random, height/2),
+                        + randomInt(logger, "Landmass", random, height/2),
                         preferredDistanceToEdge, random);
             while (numberOfLandTiles < minimumNumberOfTiles) {
                 addLandMass(15, 25, -1, -1, preferredDistanceToEdge, random);
@@ -204,7 +204,7 @@ public class LandMap {
             // Create islands of 25..75 tiles.
             addPolarRegions();
             while (numberOfLandTiles < minimumNumberOfTiles) {
-                int s = Utils.randomInt(logger, "Island", random, 50) + 25;
+                int s = randomInt(logger, "Island", random, 50) + 25;
                 addLandMass(25, s, -1, -1,
                             preferredDistanceToEdge, random);
             }
@@ -222,11 +222,11 @@ public class LandMap {
         while (numberOfLandTiles < minimumNumberOfTiles) {
             int failCounter = 0;
             do {
-                x = (Utils.randomInt(logger, "ClassicW", random,
-                        width - preferredDistanceToEdge * 4))
+                x = (randomInt(logger, "ClassicW", random,
+                               width - preferredDistanceToEdge * 4))
                     + preferredDistanceToEdge * 2;
-                y = (Utils.randomInt(logger, "ClassicH", random,
-                        height - preferredDistanceToEdge * 4))
+                y = (randomInt(logger, "ClassicH", random,
+                               height - preferredDistanceToEdge * 4))
                     + preferredDistanceToEdge * 2;
                 failCounter++;
                 // If landmass% is set too high, this loop may fail to
@@ -351,7 +351,7 @@ public class LandMap {
         // This value is part random, part based on position, that is:
         // -1 in the center of the map, and growing to
         // preferredDistanceToEdge (*2 for pole ends) at the maps edges.
-        int r = Utils.randomInt(logger, "Grow", random, 8)
+        int r = randomInt(logger, "Grow", random, 8)
             + Math.max(-1,
                 (1 + Math.max(preferredDistanceToEdge - Math.min(x, width-x),
                     2 * preferredDistanceToEdge - Math.min(y, height-y))));
@@ -388,11 +388,11 @@ public class LandMap {
         // Pick a starting position that is sea without neighbouring land.
         if (x < 0 || y < 0) {
             do {
-                x = Utils.randomInt(logger, "LandW", random, 
-                                    width - preferredDistanceToEdge * 2)
+                x = randomInt(logger, "LandW", random, 
+                              width - preferredDistanceToEdge * 2)
                     + preferredDistanceToEdge;
-                y = Utils.randomInt(logger, "LandH", random,
-                                    height - preferredDistanceToEdge * 2)
+                y = randomInt(logger, "LandH", random,
+                              height - preferredDistanceToEdge * 2)
                     + preferredDistanceToEdge;
             } while (map[x][y] || !isSingleTile(x, y));
         }
@@ -416,10 +416,10 @@ public class LandMap {
         // Get a random position from the list,
         // set it to land,
         // add its valid neighbours to the list
-        int enough = minSize + Utils.randomInt(logger, "LandSize", random,
-                                               maxSize - minSize + 1);
+        int enough = minSize + randomInt(logger, "LandSize", random,
+                                         maxSize - minSize + 1);
         while (size < enough && !l.isEmpty()) {
-            int i = Utils.randomInt(logger, "Lsiz", random, l.size());
+            int i = randomInt(logger, "Lsiz", random, l.size());
             p = l.remove(i);
 
             if (!newLand[p.getX()][p.getY()]) {

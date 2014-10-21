@@ -27,7 +27,6 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.WorkLocation;
-import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

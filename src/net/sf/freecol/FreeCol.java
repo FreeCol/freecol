@@ -229,8 +229,8 @@ public final class FreeCol {
         // Locale established, now load some messages.
         Messages.setMessageBundle(locale);
 
-        // Now we can emit error messages, parse the other command
-        // line arguments.
+        // Now that we can emit error messages, parse the other
+        // command line arguments.
         handleArgs(args);
 
         // Do the potentially fatal system checks as early as possible.

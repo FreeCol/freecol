@@ -42,7 +42,7 @@ import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.util.LogBuilder;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.RandomUtils.*;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
@@ -476,8 +476,7 @@ public class BuildColonyMission extends Mission {
                 int price = player.getLandPrice(tile);
                 boolean fail = price < 0;
                 if (price > 0 && !player.checkGold(price)) {
-                    if (Utils.randomInt(logger, "Land gold?",
-                                        getAIRandom(), 4) == 0) {
+                    if (randomInt(logger, "Land gold?", getAIRandom(), 4) == 0) {
                         lb.add(", ");
                         euaip.cheatGold(price, lb);
                         lb.add(" to buy ", tile);

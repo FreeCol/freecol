@@ -22,7 +22,7 @@ package net.sf.freecol.common.utils;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.freecol.common.util.Utils;
+import net.sf.freecol.common.util.CollectionUtils;
 
 import net.sf.freecol.util.test.FreeColTestCase;
 
@@ -42,7 +42,7 @@ public class UtilsTest extends FreeColTestCase {
         l.add(Integer.valueOf(3));
         List<List<Integer>> p = new ArrayList<List<Integer>>();
         try {
-            for (List<Integer> li : Utils.getPermutations(l)) p.add(li);
+            for (List<Integer> li : CollectionUtils.getPermutations(l)) p.add(li);
         } catch (Exception e) {
             fail();
         }

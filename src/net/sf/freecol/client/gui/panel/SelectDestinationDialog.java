@@ -79,7 +79,6 @@ import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders.MultipleAdjacentDecider;
 import net.sf.freecol.common.util.LogBuilder;
-import net.sf.freecol.common.util.Utils;
 
 import net.miginfocom.swing.MigLayout;
 

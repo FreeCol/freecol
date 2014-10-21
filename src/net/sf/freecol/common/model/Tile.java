@@ -41,7 +41,7 @@ import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.util.RandomChoice;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.RandomUtils.*;
 
 
 /**
@@ -1213,7 +1213,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             List<Tile> tiles = getSurroundingTiles(r, r);
             if (tiles.isEmpty()) return null;
             if (random != null) {
-                Utils.randomShuffle(logger, "Safe tile", tiles, random);
+                randomShuffle(logger, "Safe tile", tiles, random);
             }
             for (Tile t : tiles) {
                 if ((t.getFirstUnit() == null

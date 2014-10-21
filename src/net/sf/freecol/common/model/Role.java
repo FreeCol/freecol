@@ -34,7 +34,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -169,7 +169,7 @@ public class Role extends BuildableType {
      * @return The role suffix.
      */
     public static String getRoleSuffix(String roleId) {
-        return Utils.lastPart(roleId, ".");
+        return lastPart(roleId, ".");
     }
 
     /**

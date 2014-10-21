@@ -37,7 +37,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Scope;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -104,7 +104,7 @@ public class ResourcesDetailPanel extends ColopediaGameObjectTypePanel<ResourceT
                     }
                 }
                 if (!scopeStrings.isEmpty()) {
-                    text += " (" + Utils.join(", ", scopeStrings) + ")";
+                    text += " (" + join(", ", scopeStrings) + ")";
                 }
             }
 

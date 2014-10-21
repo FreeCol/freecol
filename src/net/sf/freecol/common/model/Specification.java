@@ -58,7 +58,7 @@ import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.common.option.StringOption;
 import net.sf.freecol.common.option.UnitListOption;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -1905,7 +1905,7 @@ public final class Specification {
         for (Role r : getRoles()) roles.add(r.getId());
         logger.info("Loading role backward compatibility fragment: "
             + ROLES_COMPAT_FILE_NAME
-            + " with roles: " + Utils.join(" ", roles));
+            + " with roles: " + join(" ", roles));
     }
 
     private void fixup010x() {

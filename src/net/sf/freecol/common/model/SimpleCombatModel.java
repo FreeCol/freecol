@@ -33,11 +33,14 @@ import net.sf.freecol.common.model.Modifier.ModifierType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.util.LogBuilder;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.RandomUtils.*;
 
 
 /**
  * This class implements the original Colonization combat model.
+ *
+ * The name of this class is laughably wrong.
+ *
  * Note that the damage part of any CombatResult is ignored throughout.
  */
 public class SimpleCombatModel extends CombatModel {
@@ -520,7 +523,7 @@ public class SimpleCombatModel extends CombatModel {
         lb.add("Combat");
         ArrayList<CombatResult> crs = new ArrayList<CombatResult>();
         CombatOdds odds = calculateCombatOdds(attacker, defender, lb);
-        float r = Utils.randomFloat(logger, "AttackResult", random);
+        float r = randomFloat(logger, "AttackResult", random);
         lb.add(" random(1.0)=", r);
         boolean great = false; // Great win or loss?
         String action;

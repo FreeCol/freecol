@@ -33,7 +33,7 @@ import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.server.model.ServerRegion;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.RandomUtils.*;
 
 
 /**
@@ -146,8 +146,8 @@ public class River {
         this.random = random;
         this.riverType = map.getSpecification()
             .getTileImprovementType("model.improvement.river");
-        this.direction = Utils.getRandomMember(logger, "River",
-                                               Direction.longSides, random);
+        this.direction = getRandomMember(logger, "River", Direction.longSides,
+                                         random);
         logger.fine("Starting new river flowing " + direction);
     }
 
@@ -298,7 +298,7 @@ public class River {
         if (sections.size() % 2 == 0) {
             // get random new direction
             int length = DirectionChange.values().length;
-            int index = Utils.randomInt(logger, "Flow", random, length);
+            int index = randomInt(logger, "Flow", random, length);
             DirectionChange change = DirectionChange.values()[index];
             this.direction = change.getNewDirection(this.direction);
             logger.fine("Direction is now " + direction);
@@ -393,7 +393,7 @@ public class River {
             drawToMap(deltaSections);
         } else if (riverType.isTileTypeAllowed(t.getType())) {
             Tile t2 = t.getNeighbourOrNull(direction);
-            if (!t2.isLand() && Utils.randomInt(logger, "Delta", random, 2) == 0) {
+            if (!t2.isLand() && randomInt(logger, "Delta", random, 2) == 0) {
                 List<RiverSection> deltaSections = new ArrayList<RiverSection>();
                 section.setBranch(d, TileImprovement.SMALL_RIVER);
                 RiverSection rs = new RiverSection(t, direction);

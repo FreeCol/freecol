@@ -30,7 +30,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.RandomUtils.*;
 
 
 /**
@@ -160,16 +160,16 @@ public class RandomRange {
     public int getAmount(String prefix, Random random, boolean continuous) {
         if (probability >= 100
             || (probability > 0
-                && Utils.randomInt(logger, prefix + " check-probability",
-                                   random, 100) < probability)) {
+                && randomInt(logger, prefix + " check-probability",
+                             random, 100) < probability)) {
             int range = maximum - minimum + 1;
             if (continuous) {
-                int r = Utils.randomInt(logger, prefix + " random-range",
-                                        random, range * factor);
+                int r = randomInt(logger, prefix + " random-range",
+                                  random, range * factor);
                 return r + minimum * factor;
             } else {
-                int r = Utils.randomInt(logger, prefix + " random-range",
-                                        random, range);
+                int r = randomInt(logger, prefix + " random-range",
+                                  random, range);
                 return (r + minimum) * factor;
             }
         }

@@ -116,7 +116,7 @@ import net.sf.freecol.common.networking.RearrangeColonyMessage;
 import net.sf.freecol.common.networking.RearrangeColonyMessage.UnitChange;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.RandomUtils.*;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.REFAIPlayer;
@@ -220,7 +220,7 @@ public final class InGameController extends Controller {
      * @return The next random number in series, in the range 0-99.
      */
     public int stepRandom() {
-        return Utils.randomInt(logger, "step random", random, 100);
+        return randomInt(logger, "step random", random, 100);
     }
 
     /**
@@ -1010,7 +1010,7 @@ public final class InGameController extends Controller {
 
     private String getNonPlayerNation() {
         int nations = Nation.EUROPEAN_NATIONS.size();
-        int start = Utils.randomInt(logger, "Random nation", random, nations);
+        int start = randomInt(logger, "Random nation", random, nations);
         for (int index = 0; index < nations; index++) {
             String nationId = "model.nation."
                 + Nation.EUROPEAN_NATIONS.get((start + index) % nations);
@@ -1076,7 +1076,7 @@ public final class InGameController extends Controller {
                 template = template.add("%nation%", getNonPlayerNation());
             } else if (action == MonarchAction.RAISE_TAX_ACT) {
                 template = template.addAmount("%number%",
-                    Utils.randomInt(logger, "Tax act goods", random, 6))
+                    randomInt(logger, "Tax act goods", random, 6))
                     .addName("%newWorld%", serverPlayer.getNewLandName());
             }
             message = new MonarchActionMessage(action, template, monarchKey)
@@ -1096,7 +1096,7 @@ public final class InGameController extends Controller {
                 template = template.add("%nation%", getNonPlayerNation());
             } else {
                 template = template.addAmount("%number%",
-                    Utils.randomInt(logger, "Lower tax reason", random, 5));
+                    randomInt(logger, "Lower tax reason", random, 5));
             }
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
                 new MonarchActionMessage(action, template, monarchKey));
@@ -1120,8 +1120,8 @@ public final class InGameController extends Controller {
         case DECLARE_PEACE:
             List<Player> friends = monarch.collectPotentialFriends();
             if (friends.isEmpty()) break;
-            Player friend = Utils.getRandomMember(logger, "Choose friend",
-                                                  friends, random);
+            Player friend = getRandomMember(logger, "Choose friend",
+                                            friends, random);
             serverPlayer.csChangeStance(Stance.PEACE, (ServerPlayer)friend,
                                         true, cs);
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
@@ -1133,8 +1133,8 @@ public final class InGameController extends Controller {
         case DECLARE_WAR:
             List<Player> enemies = monarch.collectPotentialEnemies();
             if (enemies.isEmpty()) break;
-            Player enemy = Utils.getRandomMember(logger, "Choose enemy",
-                                                 enemies, random);
+            Player enemy = getRandomMember(logger, "Choose enemy",
+                                           enemies, random);
             serverPlayer.csChangeStance(Stance.WAR, (ServerPlayer)enemy,
                                         true, cs);
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
@@ -1177,7 +1177,7 @@ public final class InGameController extends Controller {
                 = monarch.getMercenaries(random);
             if (hessians.isEmpty()) break;
             int n = Messages.getMercenaryLeaderCount();
-            n = Utils.randomInt(logger, "Mercenary leader", random, n);
+            n = randomInt(logger, "Mercenary leader", random, n);
             final int hessPrice = serverPlayer.priceMercenaries(hessians);
             message = new MonarchActionMessage(action,
                 StringTemplate.template("model.monarch.action.HESSIAN_MERCENARIES")
@@ -2204,7 +2204,7 @@ public final class InGameController extends Controller {
                 : scoutTypes.get(0);
             int radius = unit.getLineOfSight();
             UnitType skill = settlement.getLearnableSkill();
-            int rnd = Utils.randomInt(logger, "scouting", random, 10);
+            int rnd = randomInt(logger, "scouting", random, 10);
             if (settlement.hasAnyScouted()) {
                 // Do nothing if already spoken to.
                 result = "nothing";
@@ -2295,7 +2295,7 @@ public final class InGameController extends Controller {
             return DOMMessage.clientError("Denouncing null missionary");
         }
         ServerPlayer enemy = (ServerPlayer) missionary.getOwner();
-        double denounce = Utils.randomDouble(logger, "Denounce base", random)
+        double denounce = randomDouble(logger, "Denounce base", random)
             * enemy.getImmigration() / (serverPlayer.getImmigration() + 1);
         if (missionary.hasAbility(Ability.EXPERT_MISSIONARY)) {
             denounce += 0.2;
@@ -2915,8 +2915,7 @@ public final class InGameController extends Controller {
             if (skill == null) { // Seasoned Scout
                 List<UnitType> scouts = spec
                     .getUnitTypesWithAbility(Ability.EXPERT_SCOUT);
-                skill = Utils.getRandomMember(logger, "Choose scout",
-                                              scouts, random);
+                skill = getRandomMember(logger, "Choose scout", scouts, random);
             }
             settlement = new ServerIndianSettlement(game, serverPlayer, name,
                                                     tile, false, skill, null);
@@ -4181,15 +4180,15 @@ public final class InGameController extends Controller {
         }
 
         ChangeSet cs = new ChangeSet();
-        UnitType navalType = navalUnits.get(Utils.randomInt(logger,
-                "Choose undead navy", random, navalUnits.size()));
+        UnitType navalType = getRandomMember(logger, "Choose undead navy",
+                                             navalUnits, random);
         Tile start = ((Tile)serverPlayer.getEntryLocation())
             .getSafeTile(serverPlayer, random);
         Unit theFlyingDutchman
             = new ServerUnit(game, start, serverPlayer,
                              navalType);//-vis(serverPlayer)
-        UnitType landType = landUnits.get(Utils.randomInt(logger,
-                "Choose undead army", random, landUnits.size()));
+        UnitType landType = getRandomMember(logger, "Choose undead army",
+                                            landUnits, random);
         new ServerUnit(game, theFlyingDutchman, serverPlayer, landType);//-vis
         serverPlayer.setDead(false);
         serverPlayer.changePlayerType(PlayerType.UNDEAD);
