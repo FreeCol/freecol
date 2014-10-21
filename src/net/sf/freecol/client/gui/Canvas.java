@@ -1510,16 +1510,24 @@ public final class Canvas extends JDesktopPane {
      */
     public ClaimAction showClaimDialog(Tile tile, Player player, int price,
                                        Player owner, boolean canAccept) {
-        StringTemplate template = StringTemplate.template("indianLand.text")
-            .addStringTemplate("%player%", owner.getNationName());
-        JTextArea text = GUI.getDefaultTextArea(Messages.message(template));
-
         List<ChoiceItem<ClaimAction>> choices
             = new ArrayList<ChoiceItem<ClaimAction>>();
-        StringTemplate pay = StringTemplate.template("indianLand.pay")
-            .addAmount("%amount%", price);
-        choices.add(new ChoiceItem<ClaimAction>(Messages.message(pay),
-                ClaimAction.ACCEPT, canAccept));
+        
+        StringTemplate template;
+        
+        if (owner.hasContacted(player)) {
+            template = StringTemplate.template("indianLand.text")
+                .addStringTemplate("%player%", owner.getNationName());
+            
+            StringTemplate pay = StringTemplate.template("indianLand.pay")
+                .addAmount("%amount%", price);
+            choices.add(new ChoiceItem<ClaimAction>(Messages.message(pay),
+                    ClaimAction.ACCEPT, canAccept));
+        } else {
+            template = StringTemplate.template("indianLand.unknown");
+        }
+        
+        JTextArea text = GUI.getDefaultTextArea(Messages.message(template));
         choices.add(new ChoiceItem<ClaimAction>(Messages.message("indianLand.take"),
                 ClaimAction.STEAL));
 
