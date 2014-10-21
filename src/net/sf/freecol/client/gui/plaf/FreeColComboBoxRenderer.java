@@ -47,7 +47,8 @@ import net.sf.freecol.client.gui.i18n.Messages;
  * <code>FreeColListUI</code> and <code>JComboBox</code>es that
  * display <code>ObjectWithId</code> values.
  */
-public class FreeColComboBoxRenderer implements ListCellRenderer, UIResource {
+public class FreeColComboBoxRenderer<T>
+    implements ListCellRenderer<T>, UIResource {
 
     private static final Logger logger = Logger.getLogger(FreeColComboBoxRenderer.class.getName());
 
@@ -100,9 +101,10 @@ public class FreeColComboBoxRenderer implements ListCellRenderer, UIResource {
      * @param hasFocus <code>false</code> if the given list cell has the focus.
      * @return The <code>ListCellRenderer</code>
      */
-    public Component getListCellRendererComponent(JList list, Object value, int index,
-                                                  boolean isSelected, boolean hasFocus) {
-
+    public Component getListCellRendererComponent(JList<? extends T> list,
+                                                  T value, int index,
+                                                  boolean isSelected,
+                                                  boolean hasFocus) {
         JLabel c = isSelected ? SELECTED_COMPONENT : NORMAL_COMPONENT;
         c.setForeground(list.getForeground());
         c.setFont(list.getFont());
@@ -116,7 +118,7 @@ public class FreeColComboBoxRenderer implements ListCellRenderer, UIResource {
      * @param c The <code>JLabel</code> to assign.
      * @param value The object to derive a text value from.
      */
-    public void setLabelValues(JLabel c, Object value) {
+    public void setLabelValues(JLabel c, T value) {
         if (value == null) {
             c.setText(null);
         } else if (value instanceof Integer) {
