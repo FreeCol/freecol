@@ -24,6 +24,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.Locale;
 
+import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -55,41 +56,30 @@ import net.sf.freecol.common.option.UnitTypeOption;
 public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
     implements ItemListener {
 
-    private class AbstractUnitRenderer extends FreeColComboBoxRenderer {
+    private class AbstractUnitRenderer
+        extends FreeColComboBoxRenderer<AbstractUnitOption> {
 
         @Override
-        public void setLabelValues(JLabel label, Object value) {
-            final Specification spec = getOption().getSpecification();
-            AbstractUnit au = (AbstractUnit)((AbstractUnitOption)value)
-                .getValue();
-            String key = au.getId();
-            if (au.getType(spec).hasAbility(Ability.CAN_BE_EQUIPPED)
-                && !Specification.DEFAULT_ROLE_ID.equals(au.getRoleId())) {
-                key = au.getRoleId();
-            }
-            StringTemplate template = StringTemplate.template(Messages.nameKey(key))
-                .addAmount("%number%", au.getNumber())
-                .add("%unit%", Messages.nameKey(au.getId()));
-            label.setText(Integer.toString(au.getNumber()) + " "
-                          + Messages.message(template));
+        public void setLabelValues(JLabel label, AbstractUnitOption value) {
+            label.setText(Messages.message(value.getValue().getLabel()));
         }
     }
 
-    private static class RoleRenderer extends FreeColComboBoxRenderer {
+    private class RoleRenderer
+        extends FreeColComboBoxRenderer<String> {
 
         @Override
-        public void setLabelValues(JLabel label, Object value) {
-            label.setText(Messages.getName((String)value));
+        public void setLabelValues(JLabel label, String value) {
+            label.setText(Messages.getName(value));
         }
     }
-
 
     private JPanel panel;
     private IntegerOptionUI numberUI;
     private UnitTypeOptionUI typeUI;
     private StringOptionUI roleUI;
-
     private boolean roleEditable;
+
 
     /**
      * Creates a new <code>AbstractUnitOptionUI</code> for the given
@@ -99,7 +89,6 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
      *     user interface for
      * @param editable boolean whether user can modify the setting
      */
-    @SuppressWarnings("unchecked") // FIXME in Java7
     public AbstractUnitOptionUI(GUI gui, final AbstractUnitOption option,
                                 boolean editable) {
         super(gui, option, editable);
@@ -114,41 +103,46 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
         boolean numberEditable = editable
             && (numberOption.getMaximumValue() > numberOption.getMinimumValue());
         numberUI = new IntegerOptionUI(gui, numberOption, numberEditable);
-        numberUI.getComponent().setToolTipText(Messages.message("report.numberOfUnits"));
+        numberUI.getComponent()
+            .setToolTipText(Messages.message("report.numberOfUnits"));
         panel.add(numberUI.getComponent(), "width 30%");
 
         boolean typeEditable = editable
             && typeOption.getChoices().size() > 1;
         typeUI = new UnitTypeOptionUI(gui, typeOption, typeEditable);
 
-        typeUI.getComponent().setToolTipText(Messages.message("model.unit.type"));
+        typeUI.getComponent()
+            .setToolTipText(Messages.message("model.unit.type"));
         typeUI.getComponent().addItemListener(this);
         panel.add(typeUI.getComponent(), "width 35%");
 
         roleEditable = editable
             && roleOption.getChoices().size() > 1;
-        roleUI = new StringOptionUI(gui,roleOption, roleEditable);
-        roleUI.getComponent().setToolTipText(Messages.message("model.unit.role.name"));
+        roleUI = new StringOptionUI(gui, roleOption, roleEditable);
+        roleUI.getComponent()
+            .setToolTipText(Messages.message("model.unit.role.name"));
         roleUI.getComponent().setRenderer(new RoleRenderer());
         panel.add(roleUI.getComponent(), "width 35%");
 
         initialize();
-
     }
 
 
-    @SuppressWarnings("unchecked") // FIXME in Java7
     public void itemStateChanged(ItemEvent e) {
-        JComboBox box = roleUI.getComponent();
-        UnitType type = (UnitType) typeUI.getComponent().getSelectedItem();
+        JComboBox<String> box = roleUI.getComponent();
+        DefaultComboBoxModel<String> model;
+        boolean enable = false;
+        UnitType type = (UnitType)typeUI.getComponent().getSelectedItem();
         if (type.hasAbility(Ability.CAN_BE_EQUIPPED)) {
-            box.setModel(new DefaultComboBoxModel(roleUI.getOption().getChoices().toArray(new String[0])));
-            box.setEnabled(roleEditable);
+            model = new DefaultComboBoxModel<String>(roleUI.getOption()
+                .getChoices().toArray(new String[0]));
+            enable = roleEditable;
         } else {
-            box.setModel(new DefaultComboBoxModel(new String[] {
-                        Specification.DEFAULT_ROLE_ID }));
-            box.setEnabled(false);
+            model = new DefaultComboBoxModel<String>(new String[] {
+                    Specification.DEFAULT_ROLE_ID });
         }
+        box.setModel(model);
+        box.setEnabled(enable);
     }
 
 
@@ -169,8 +163,7 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
     }
 
     /**
-     * Updates the value of the {@link net.sf.freecol.common.option.Option}
-     * this object keeps.
+     * {@inheritDoc}
      */
     public void updateOption() {
         typeUI.updateOption();
