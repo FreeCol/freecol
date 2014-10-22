@@ -251,7 +251,6 @@ public class ServerColony extends Colony implements ServerModelObject {
             } else {
                 addGoods(goodsType, net);
             }
-if ("model.goods.bells".equals(goodsType.getId()))System.err.println("BELLS at " + getName() + " = " + net);
 
             // Handle the food situation
             if (goodsType == spec.getPrimaryFoodType()) {
