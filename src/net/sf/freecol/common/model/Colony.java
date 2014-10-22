@@ -2910,8 +2910,6 @@ public class Colony extends Settlement implements Nameable {
 
         if (xw.validFor(getOwner())) {
 
-            xw.writeAttribute(SONS_OF_LIBERTY_TAG, sonsOfLiberty);
-            
             xw.writeAttribute(OLD_SONS_OF_LIBERTY_TAG, oldSonsOfLiberty);
 
             xw.writeAttribute(TORIES_TAG, tories);
@@ -2935,6 +2933,10 @@ public class Colony extends Settlement implements Nameable {
                     + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
             }
             xw.writeAttribute(UNIT_COUNT_TAG, uc);
+
+            // SoL has to be visible for the popular support bonus to be
+            // visible to an attacking rebel player.
+            xw.writeAttribute(SONS_OF_LIBERTY_TAG, sonsOfLiberty);
         }
     }
 

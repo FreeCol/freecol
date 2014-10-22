@@ -331,11 +331,13 @@ public class SimpleCombatModel extends CombatModel {
             // Popular support bonus
             if (combatIsWarOfIndependence(attacker, defender)) {
                 Colony colony = (Colony)defender;
-                int bonus = colony.getSoLPercentage();
+                int bonus = colony.getSoL();
                 if (bonus >= 0) {
                     if (attacker.getOwner().isREF()) bonus = 100 - bonus;
-                    result.add(new Modifier(Modifier.POPULAR_SUPPORT, bonus,
-                            ModifierType.PERCENTAGE, colony));
+                    if (bonus > 0) {
+                        result.add(new Modifier(Modifier.POPULAR_SUPPORT,
+                                bonus, ModifierType.PERCENTAGE, colony));
+                    }
                 }
             }
 
