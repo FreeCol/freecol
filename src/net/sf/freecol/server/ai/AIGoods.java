@@ -337,7 +337,7 @@ public class AIGoods extends TransportableAIObject {
                 && !((Unit)goods.getLocation())
                     .getOwner().owns(s = (Settlement)destination))
             ? "transportableDestination-" + s.getName() + "-captured-by-"
-                + s.getOwner().getNation().getSuffix()
+                + s.getOwner().getDebugName()
             : null;
     }
 

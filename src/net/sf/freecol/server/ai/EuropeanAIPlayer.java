@@ -1549,8 +1549,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                     getAIMain().getFreeColServer().getInGameController()
                         .changeStance(serverPlayer, newStance,
                                       (ServerPlayer)p, true);
-                    lb.add(" ", p.getNation().getSuffix(),
-                           "->", newStance, ", ");
+                    lb.add(" ", p.getDebugName(), "->", newStance, ", ");
                 }
             }
         }
@@ -2396,7 +2395,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         // happen.
         LogBuilder lb = new LogBuilder(1024);
         int colonyCount = getAIColonies().size();
-        lb.add(player.getNation().getSuffix(),
+        lb.add(player.getDebugName(),
                " in ", turn, "/", turn.getNumber(),
                " units=", getAIUnits().size(),
                " colonies=", colonyCount,

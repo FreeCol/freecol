@@ -190,8 +190,7 @@ public class NativeAIPlayer extends AIPlayer {
                 getAIMain().getFreeColServer().getInGameController()
                     .changeStance(serverPlayer, newStance, 
                                   (ServerPlayer)p, true);
-                lb.add(" ", p.getNation().getSuffix(),
-                       "->", newStance, ", ");
+                lb.add(" ", p.getDebugName(), "->", newStance, ", ");
             }
         }
         if (lb.grew("\n  Stance changes:")) lb.shrink(", ");
@@ -773,8 +772,7 @@ public class NativeAIPlayer extends AIPlayer {
         final Random air = getAIRandom();
 
         LogBuilder lb = new LogBuilder(1024);
-        lb.add(player.getNation().getSuffix(), " in ", turn,
-               "/", turn.getNumber());
+        lb.add(player.getDebugName(), " in ", turn, "/", turn.getNumber());
 
         sessionRegister.clear();
         clearAIUnits();

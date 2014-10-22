@@ -309,7 +309,7 @@ public abstract class Mission extends AIObject {
             } else if (loc instanceof Settlement && l instanceof Ownable
                 && !((Ownable)l).getOwner().owns(s = (Settlement)loc)) {
                 return "transportable-source-" + s.getName()
-                    + "-captured-by-" + s.getOwner().getNation().getSuffix();
+                    + "-captured-by-" + s.getOwner().getDebugName();
             }
         } else {
             loc = t.getTransportDestination();

@@ -820,6 +820,15 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Get a short debug-suitable name for this player.
+     *
+     * @return A short name for this player.
+     */
+    public String getDebugName() {
+        return getNation().getSuffix();
+    }
+
+    /**
      * Get a name key for the player nation ruler.
      *
      * @return The ruler name key.

@@ -3329,8 +3329,10 @@ public class Unit extends GoodsLocation
     /**
      * Score this unit with its suitability for pioneering.
      *
-     * Favour existing pioneers, especially if on the map, then experts
-     * pioneers, then by skill but not other experts.
+     * A pioneer must be a colonst.  Favour:
+     * - existing pioneers especially if on the map
+     * - expert pioneer units
+     * - then by skill but not other experts
      *
      * @return A pioneering score.
      */
@@ -3347,8 +3349,11 @@ public class Unit extends GoodsLocation
     /**
      * Score this unit with its suitability for scouting.
      *
-     * Favour existing scouts, then expert scouts, then favour lower skill
-     * levels as scouting is a good career for crims and servants.
+     * A scout must be a colonist.  Favour:
+     * - existing scouts especially if on the map
+     * - expert scouts
+     * - lower skill level as scouting is a good career for crims and servants
+     *   which might become seasoned scouts
      *
      * @return A scouting score.
      */
