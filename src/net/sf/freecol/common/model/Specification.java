@@ -403,8 +403,10 @@ public final class Specification {
         for (FreeColModFile mod : mods) {
             InputStream sis = null;
             try {
-                sis = mod.getSpecificationInputStream();
-                load(sis);
+                if ((sis = mod.getSpecificationInputStream()) != null) {
+                    // Some mods are resource only
+                    load(sis);
+                }
                 loadedMod = true;
                 logger.info("Loaded mod " + mod.getId());
             } catch (IOException ioe) {
