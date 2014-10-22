@@ -2224,6 +2224,9 @@ public final class Canvas extends JDesktopPane {
         final VideoComponent vp = new VideoComponent(video, muteAudio);
         final class AbortListener implements ActionListener, KeyListener,
             MouseListener, VideoListener {
+
+            private Timer t = null;
+
             public void keyPressed(KeyEvent e) {}
 
             public void keyReleased(KeyEvent e) {
@@ -2249,6 +2252,10 @@ public final class Canvas extends JDesktopPane {
                 execute();
             }
 
+            private void setTimer(Timer t) {
+                this.t = t;
+            }
+
             private void execute() {
                 removeKeyListener(this);
                 removeMouseListener(this);
@@ -2256,6 +2263,7 @@ public final class Canvas extends JDesktopPane {
                 //vp.removeVideoListener(this);
                 vp.stop();
                 Canvas.this.remove(vp);
+                if (t != null) t.stop();
                 gui.playSound("sound.intro.general");
                 showMainPanel(userMsg);
             }
@@ -2272,6 +2280,7 @@ public final class Canvas extends JDesktopPane {
         // eventually gets kicked.  Change the magic number if we
         // change the opening video length.
         Timer t = new Timer(75000, l);
+        l.setTimer(t);
         t.setRepeats(false);
         t.start();
     }
