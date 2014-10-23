@@ -223,23 +223,29 @@ public class SimpleCombatModel extends CombatModel {
     public Set<Modifier> getOffensiveModifiers(FreeColGameObject attacker,
                                                FreeColGameObject defender) {
         Set<Modifier> result = new HashSet<Modifier>();
+        Modifier m;
         if (attacker == null) {
             throw new IllegalStateException("Null attacker");
         } else if (combatIsAttackMeasurement(attacker, defender)
             || combatIsAttack(attacker, defender)
             || combatIsSettlementAttack(attacker, defender)) {
             final Unit attackerUnit = (Unit)attacker;
+            final Turn turn = attackerUnit.getGame().getTurn();
 
             // Base offense
             result.add(new Modifier(Modifier.OFFENCE,
                                     attackerUnit.getType().getBaseOffence(),
                                     ModifierType.ADDITIVE,
-                                    Specification.BASE_OFFENCE_SOURCE));
+                                    Specification.BASE_OFFENCE_SOURCE,
+                                    Modifier.BASE_COMBAT_INDEX));
 
             // Unit offensive modifiers, including role+equipment,
             // qualified by unit type so that scopes work
-            result.addAll(attackerUnit.getModifiers(Modifier.OFFENCE,
-                          attackerUnit.getType()));
+            // @compat 0.11.0
+            // getCombatModifiers -> getModifiers one day
+            result.addAll(attackerUnit.getCombatModifiers(Modifier.OFFENCE,
+                    attackerUnit.getType(), turn));
+            // end @compat 0.11.0
 
             // Special bonuses against certain nation types
             if (defender instanceof Ownable) {
@@ -262,7 +268,16 @@ public class SimpleCombatModel extends CombatModel {
         } else {
             throw new IllegalArgumentException("Bogus combat");
         }
-        
+
+        // @compat 0.11.0
+        // Any modifier with the default modifier index needs to be fixed
+        for (Modifier r : result) {
+            if (r.getModifierIndex() == Modifier.DEFAULT_MODIFIER_INDEX) {
+                r.setModifierIndex(Modifier.GENERAL_COMBAT_INDEX);
+            }
+        }
+        // end @compat 0.11.0
+
         return result;
     }
 
@@ -303,7 +318,8 @@ public class SimpleCombatModel extends CombatModel {
             if (attacker.getOwner().isREF()) bonus = 100 - bonus;
             if (bonus > 0) {
                 result.add(new Modifier(Modifier.POPULAR_SUPPORT,
-                        bonus, ModifierType.PERCENTAGE, colony));
+                                        bonus, ModifierType.PERCENTAGE, colony,
+                                        Modifier.GENERAL_COMBAT_INDEX));
             }
         }
     }
@@ -407,16 +423,21 @@ public class SimpleCombatModel extends CombatModel {
             || combatIsAttack(attacker, defender)
             || combatIsBombard(attacker, defender)) {
             final Unit defenderUnit = (Unit)defender;
+            final Turn turn = defenderUnit.getGame().getTurn();
 
             // Base defence
             result.add(new Modifier(Modifier.DEFENCE,
                                     defenderUnit.getType().getBaseDefence(),
                                     ModifierType.ADDITIVE,
-                                    Specification.BASE_DEFENCE_SOURCE));
+                                    Specification.BASE_DEFENCE_SOURCE,
+                                    Modifier.BASE_COMBAT_INDEX));
 
             // Unit specific
-            result.addAll(defenderUnit.getModifiers(Modifier.DEFENCE,
-                    defenderUnit.getType(), null));
+            // @compat 0.11.0
+            // getCombatModifiers -> getModifiers one day
+            result.addAll(defenderUnit.getCombatModifiers(Modifier.DEFENCE,
+                    defenderUnit.getType(), turn));
+            // end @compat 0.11.0
 
             // Land/naval split
             if (defenderUnit.isNaval()) {
@@ -442,6 +463,16 @@ public class SimpleCombatModel extends CombatModel {
         } else {
             throw new IllegalArgumentException("Bogus combat");
         }
+
+        // @compat 0.11.0
+        // Any modifier with the default modifier index needs to be fixed
+        for (Modifier r : result) {
+            if (r.getModifierIndex() == Modifier.DEFAULT_MODIFIER_INDEX) {
+                r.setModifierIndex(Modifier.GENERAL_COMBAT_INDEX);
+            }
+        }
+        // end @compat 0.11.0
+
         return result;
     }
 

@@ -118,10 +118,11 @@ public class Modifier extends Feature {
 
     public static final float UNKNOWN = Float.MIN_VALUE;
 
+    public static final int DEFAULT_MODIFIER_INDEX = 0;
+
     // @compat 0.10.x
     // These are now attached to modifiers in the spec, but
     // Specification.fixup010x() still needs them for now.
-    public static final int DEFAULT_MODIFIER_INDEX = 0;
     public static final int RESOURCE_PRODUCTION_INDEX = 10;
     public static final int COLONY_PRODUCTION_INDEX = 20;
     public static final int EXPERT_PRODUCTION_INDEX = 30;
@@ -130,9 +131,16 @@ public class Modifier extends Feature {
     public static final int AUTO_PRODUCTION_INDEX = 60;
     public static final int BUILDING_PRODUCTION_INDEX = 70;
     public static final int NATION_PRODUCTION_INDEX = 80;
+    public static final int PARTY_PRODUCTION_INDEX = 90;
+    public static final int DISASTER_PRODUCTION_INDEX = 100;
     // end @compat 0.10.x
-
     public static final int DEFAULT_PRODUCTION_INDEX = 100;
+
+    // Specific combat indicies
+    public static final int BASE_COMBAT_INDEX = 10;
+    public static final int UNIT_COMBAT_INDEX = 20;
+    public static final int ROLE_COMBAT_INDEX = 30;
+    public static final int GENERAL_COMBAT_INDEX = 50;
 
     public static enum ModifierType {
         ADDITIVE,
@@ -201,6 +209,21 @@ public class Modifier extends Feature {
     }
 
     /**
+     * Creates a new <code>Modifier</code> instance.
+     *
+     * @param id The object identifier.
+     * @param value The modifier value.
+     * @param type The type of the modifier.
+     * @param source The source <code>FreeColObject</code>.
+     * @param modifierIndex The modifier index.
+     */
+    public Modifier(String id, float value, ModifierType type,
+                    FreeColObject source, int modifierIndex) {
+        this(id, value, type, source);
+        setModifierIndex(modifierIndex);
+    }
+
+    /**
      * Creates a new <code>Modifier</code> instance from another.
      *
      * @param template A <code>Modifier</code> to copy.
@@ -211,6 +234,7 @@ public class Modifier extends Feature {
         setValue(template.getValue());
         setIncrementType(template.getIncrementType());
         setIncrement(template.getIncrement());
+        setModifierIndex(template.getModifierIndex());
     }
 
     /**

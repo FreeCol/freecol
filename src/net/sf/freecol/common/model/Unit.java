@@ -3365,6 +3365,42 @@ public class Unit extends GoodsLocation
             : 0;
     }
 
+    // @compat 0.11.0
+    /**
+     * Get modifiers required for combat.
+     *
+     * This can be replaced with just getModifiers() when accepted
+     * specifications have all combat modifiers with correct index
+     * values.
+     */
+    public Set<Modifier> getCombatModifiers(String id,
+        FreeColGameObjectType fcgot, Turn turn) {
+        final Player owner = getOwner();
+        final UnitType unitType = getType();
+        Set<Modifier> result = new HashSet<Modifier>();
+
+        // UnitType modifiers always apply
+        for (Modifier m : unitType.getModifiers(id, fcgot, turn)) {
+            m.setModifierIndex(Modifier.UNIT_COMBAT_INDEX);
+            result.add(m);
+        }
+
+        // The player's modifiers may not all apply
+        for (Modifier m : owner.getModifiers(id, fcgot, turn)) {
+            m.setModifierIndex(Modifier.GENERAL_COMBAT_INDEX);
+            result.add(m);
+        }
+        
+        // Role modifiers apply
+        for (Modifier m : role.getModifiers(id, fcgot, turn)) {
+            m.setModifierIndex(Modifier.ROLE_COMBAT_INDEX);
+            result.add(m);
+        }
+
+        return result;
+    }
+    // end @compat 0.11.0
+
 
     // Message unpacking support.
 

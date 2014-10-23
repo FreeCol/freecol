@@ -1540,6 +1540,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     if (modifier.getDuration() > 0) {
                         Modifier timedModifier = Modifier
                             .makeTimedModifier(modifier.getId(), modifier, getGame().getTurn());
+                        modifier.setModifierIndex(Modifier.DISASTER_PRODUCTION_INDEX);
                         cs.addFeatureChange(this, this, timedModifier, true);
                     } else {
                         cs.addFeatureChange(this, this, modifier, true);
@@ -1617,6 +1618,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         if (modifier.getDuration() > 0) {
                             Modifier timedModifier = Modifier
                                 .makeTimedModifier(modifier.getId(), modifier, getGame().getTurn());
+                            timedModifier.setModifierIndex(Modifier.DISASTER_PRODUCTION_INDEX);
                             cs.addFeatureChange(this, colony, timedModifier, true);
                         } else {
                             cs.addFeatureChange(this, colony, modifier, true);
@@ -3926,6 +3928,25 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
+     * Make a tea party modifier for the current turn.
+     *
+     * Public for the test suite.
+     *
+     * @return A tea party <code>Modifier</code>.
+     */
+    public Modifier makeTeaPartyModifier() {
+        final Specification spec = getGame().getSpecification();
+        final Turn turn = getGame().getTurn();
+        for (Modifier modifier : spec.getModifiers(Modifier.COLONY_GOODS_PARTY)) {
+            Modifier m = Modifier.makeTimedModifier("model.goods.bells",
+                                                    modifier, turn);
+            m.setModifierIndex(Modifier.PARTY_PRODUCTION_INDEX);
+            return m;
+        }
+        return null;
+    }
+
+    /**
      * Raises the players tax rate, or handles a goods party.
      *
      * @param tax The new tax rate.
@@ -3964,16 +3985,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
             Market market = getMarket();
             market.setArrears(goodsType, arrears);
 
-            Turn turn = getGame().getTurn();
-            for (Modifier modifier
-                     : spec.getModifiers(Modifier.COLONY_GOODS_PARTY)) {
-                Modifier m = Modifier.makeTimedModifier("model.goods.bells",
-                                                        modifier, turn);
-                cs.addFeatureChange(this, colony, m, true);
-                cs.add(See.only(this), colony.getGoodsContainer());
-                cs.add(See.only(this), market.getMarketData(goodsType));
-            }
-
+            Modifier tpm = makeTeaPartyModifier();
+            cs.addFeatureChange(this, colony, tpm, true);
+            cs.add(See.only(this), colony.getGoodsContainer());
+            cs.add(See.only(this), market.getMarketData(goodsType));
+            
             String messageId = goodsType.getId() + ".destroyed";
             if (!Messages.containsKey(messageId)) {
                 messageId = (colony.isLandLocked())

@@ -26,6 +26,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.NoClaimReason;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.server.model.ServerUnit;
+import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 
@@ -184,39 +185,29 @@ public class ColonyTest extends FreeColTestCase {
         assertEquals(bellsGoodsType, colonist.getWorkType());
     }
 
-    private Modifier createTeaPartyModifier(Turn turn) {
-        Modifier template = spec()
-            .getModifiers(Modifier.COLONY_GOODS_PARTY).get(0);
-        return Modifier.makeTimedModifier("model.goods.bells", template, turn);
-    }
-
-    public void testTeaParty() {
-        Game game = getGame();
-        game.setMap(getTestMap(true));
-        Colony colony = getStandardColony(5);
-
-        colony.addModifier(createTeaPartyModifier(game.getTurn()));
-        colony.addModifier(createTeaPartyModifier(game.getTurn()));
-        colony.addModifier(createTeaPartyModifier(game.getTurn()));
-
+    private int countParties(Colony colony) {
         int modifierCount = 0;
         for (Modifier existingModifier
                  : colony.getModifiers("model.goods.bells")) {
             if (Specification.COLONY_GOODS_PARTY_SOURCE
                 .equals(existingModifier.getSource())) modifierCount++;
         }
-        assertEquals(1, modifierCount);
+        return modifierCount;
+    }
 
-        Turn newTurn = new Turn(game.getTurn().getNumber() + 1);
-        colony.addModifier(createTeaPartyModifier(newTurn));
+    public void testTeaParty() {
+        Game game = getGame();
+        game.setMap(getTestMap(true));
+        Colony colony = getStandardColony(5);
+        ServerPlayer serverPlayer = (ServerPlayer)colony.getOwner();
 
-        modifierCount = 0;
-        for (Modifier existingModifier
-                 : colony.getModifiers("model.goods.bells")) {
-            if (Specification.COLONY_GOODS_PARTY_SOURCE
-                .equals(existingModifier.getSource())) modifierCount++;
-        }
-        assertEquals(2, modifierCount);
+        assertEquals(0, countParties(colony));
+        colony.addModifier(serverPlayer.makeTeaPartyModifier());
+        assertEquals(1, countParties(colony));
+        Modifier m = serverPlayer.makeTeaPartyModifier();
+        m.setFirstTurn(new Turn(game.getTurn().getNumber() + 1));
+        colony.addModifier(m);
+        assertEquals(2, countParties(colony));
     }
 
     public void testAddUnitToColony() {
