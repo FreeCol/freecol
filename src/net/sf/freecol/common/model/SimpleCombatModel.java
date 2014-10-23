@@ -290,6 +290,25 @@ public class SimpleCombatModel extends CombatModel {
     }
 
     /**
+     * Add the popular support bonus to the result set if applicable.
+     *
+     * @param colony The <code>Colony</code> under attack.
+     * @param attacker The attacking <code>Unit</code>.
+     * @param result The set of modifiers to add to.
+     */
+    private void addPopularSupportBonus(Colony colony, Unit attacker,
+                                        Set<Modifier> result) {
+        int bonus = colony.getSoL();
+        if (bonus >= 0) {
+            if (attacker.getOwner().isREF()) bonus = 100 - bonus;
+            if (bonus > 0) {
+                result.add(new Modifier(Modifier.POPULAR_SUPPORT,
+                        bonus, ModifierType.PERCENTAGE, colony));
+            }
+        }
+    }
+
+    /**
      * Add all the offensive modifiers that apply to a land attack.
      *
      * @param attacker The attacker <code>Unit</code>.
@@ -330,15 +349,7 @@ public class SimpleCombatModel extends CombatModel {
 
             // Popular support bonus
             if (combatIsWarOfIndependence(attacker, defender)) {
-                Colony colony = (Colony)defender;
-                int bonus = colony.getSoL();
-                if (bonus >= 0) {
-                    if (attacker.getOwner().isREF()) bonus = 100 - bonus;
-                    if (bonus > 0) {
-                        result.add(new Modifier(Modifier.POPULAR_SUPPORT,
-                                bonus, ModifierType.PERCENTAGE, colony));
-                    }
-                }
+                addPopularSupportBonus((Colony)defender, attacker, result);
             }
 
         } else if (combatIsAttack(attacker, defender)) {
@@ -352,15 +363,8 @@ public class SimpleCombatModel extends CombatModel {
 
                     // Popular support bonus
                     if (combatIsWarOfIndependence(attacker, defender)) {
-                        Colony colony = (Colony)tile.getSettlement();
-                        int bonus = colony.getSoLPercentage();
-                        if (bonus >= 0) {
-                            if (attacker.getOwner().isREF()) {
-                                bonus = 100 - bonus;
-                            }
-                            result.add(new Modifier(Modifier.POPULAR_SUPPORT,
-                                    bonus, ModifierType.PERCENTAGE, colony));
-                        }
+                        addPopularSupportBonus((Colony)tile.getSettlement(),
+                                               attacker, result);
                     }
                 } else {
                     // Ambush bonus in the open = defender's defence

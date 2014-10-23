@@ -1110,10 +1110,9 @@
         result in all non-forested land tiles.
       tile child options: id
       change child options: from, to
-
-zIndex: tile improvements will be layered according to their z-index
-tile overlays (e.g. hills) have a zIndex of 100, forests of 200,
-resources of 400, lost city rumours of 500
+      zIndex: tile improvements will be layered according to their z-index
+        tile overlays (e.g. hills) have a zIndex of 100, forests of 200,
+        resources of 400, lost city rumours of 500
   -->
   <tileimprovement-types>
     <tileimprovement-type id="model.improvement.river" natural="true"
