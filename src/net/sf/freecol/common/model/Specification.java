@@ -2033,6 +2033,17 @@ public final class Specification {
             }
         }
 
+        // Bolivar changed from being an event to a liberty modifier.
+        FoundingFather bolivar
+            = getFoundingFather("model.foundingFather.simonBolivar");
+        if (!bolivar.getEvents().isEmpty()) {
+            bolivar.setEvents(Collections.<Event>emptyList());
+            bolivar.addModifier(new Modifier(Modifier.LIBERTY, 20,
+                    Modifier.ModifierType.PERCENTAGE, bolivar,
+                    Modifier.FATHER_PRODUCTION_INDEX));
+        }
+
+        // Nation FOUND_COLONY -> FOUNDS_COLONIES
         for (EuropeanNationType ent : europeanNationTypes) {
             if (ent.hasAbility(Ability.FOUND_COLONY)) {
                 ent.removeAbilities(Ability.FOUND_COLONY);
@@ -2064,6 +2075,7 @@ public final class Specification {
                 }
             }
         }
+
         // Fix all other UnitListOptions
         List<Option> todo
             = new ArrayList<Option>(allOptionGroups.get("difficultyLevels")

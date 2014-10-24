@@ -1203,7 +1203,8 @@ public final class ColonyPanel extends PortPanel
             royalistMemberLabel.setText(colony.getTory() + "%");
             add(royalistMemberLabel);
 
-            Nation other = (colony.getOwner().isREF()) ? nation.getRebelNation()
+            Nation other = (colony.getOwner().isREF())
+                ? nation.getRebelNation()
                 : nation.getREFNation();
             try {
                 royalistShield.setIcon(new ImageIcon(getLibrary()

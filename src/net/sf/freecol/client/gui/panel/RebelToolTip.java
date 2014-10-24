@@ -20,25 +20,29 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Dimension;
+import java.util.Set;
 
 import javax.swing.JLabel;
 import javax.swing.JToolTip;
 
-import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.Turn;
+
+import net.miginfocom.swing.MigLayout;
 
 
 /**
  * This panel provides detailed information about rebels in a colony.
  */
 public class RebelToolTip extends JToolTip {
-
 
     /**
      * Creates a RebelToolTip.
@@ -51,6 +55,7 @@ public class RebelToolTip extends JToolTip {
         final int population = colony.getUnitCount();
         final int solPercent = colony.getSoL();
         final int rebels = Colony.calculateRebels(population, solPercent);
+        final Turn turn = colony.getGame().getTurn();
         StringTemplate t;
 
         setLayout(new MigLayout("fillx, wrap 3", "[][right][right]", ""));
@@ -71,20 +76,29 @@ public class RebelToolTip extends JToolTip {
 
         add(new JLabel(colony.getTory() + "%"));
 
+        Set<Modifier> modifiers = colony.getOwner()
+            .getModifiers(Modifier.LIBERTY);
         int libertyProduction = 0;
         for (GoodsType goodsType : spec.getLibertyGoodsTypeList()) {
             add(new JLabel(Messages.message(goodsType.getNameKey())));
             int production = colony.getNetProductionOf(goodsType);
             libertyProduction += production;
             add(new ProductionLabel(freeColClient, goodsType, production),
-                "span 2");
+                                    "span 2");
+        }
+        libertyProduction = (int)FeatureContainer
+            .applyModifiers((float)libertyProduction, turn, modifiers);
+        for (Modifier m : modifiers) {
+            JLabel[] labels = ModifierFormat.getModifierLabels(m, null, turn);
+            for (JLabel j : labels) add(j);
         }
 
         final int liberty = colony.getEffectiveLiberty();
         final int modulo = liberty % Colony.LIBERTY_PER_REBEL;
         final int width = (int)getPreferredSize().getWidth() - 32;
-        FreeColProgressBar progress = new FreeColProgressBar(freeColClient.getGUI(), null, 0, 
-            Colony.LIBERTY_PER_REBEL, modulo, libertyProduction);
+        FreeColProgressBar progress
+            = new FreeColProgressBar(freeColClient.getGUI(), null, 0, 
+                Colony.LIBERTY_PER_REBEL, modulo, libertyProduction);
         progress.setPreferredSize(new Dimension(width, 20));
         add(progress, "span 3");
 
