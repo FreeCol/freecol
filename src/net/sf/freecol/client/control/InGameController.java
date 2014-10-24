@@ -1129,6 +1129,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         freeColClient.getConnectController().quitGame(true);
+        turnReportMessages.clear();
         gui.setActiveUnit(null);
         gui.removeInGameComponents();
         freeColClient.getConnectController().startSavedGame(file, null);
