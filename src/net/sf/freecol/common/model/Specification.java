@@ -2015,14 +2015,11 @@ public final class Specification {
                 }
             }
         }
-        
         // end @compat
 
         // @compat 0.10.7
         // Require the scopes added to founding fathers in git.8971674
         fatherGoodsFixMap.clear();
-        fatherGoodsFixMap.put("model.foundingFather.henryHudson",
-                              "model.goods.furs");
         fatherGoodsFixMap.put("model.foundingFather.thomasJefferson",
                               "model.goods.bells");
         fatherGoodsFixMap.put("model.foundingFather.thomasPaine",

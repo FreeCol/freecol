@@ -2187,7 +2187,7 @@
                      weight1="10" weight2="1" weight3="1">
       <modifier id="model.goods.furs" index="40"
                 type="percentage" value="100">
-        <scope ability-id="model.ability.person" matchNegated="true"/>
+        <scope ability-id="model.ability.person" matchNegated="false"/>
       </modifier>
     </founding-father>
     <founding-father id="model.foundingFather.laSalle" type="exploration"
