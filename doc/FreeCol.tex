@@ -385,19 +385,22 @@ server options.
   and 60 seconds in multiplayer.
 \item\verb$--user-cache-directory DIRECTORY$ Use the given directory
   instead of your default FreeCol user cache directory to save
-  temporary files such as the log file.
+  temporary files such as the log file.  If the specified directory does not
+  exist this option will be ignored.
 \item\verb$--user-config-directory DIRECTORY$ Use the given directory
   instead of your default FreeCol user configuration directory to load
   client and custom options. You can use this in order to run the
   game from a USB stick\index{USB stick}, for example.  Please note
   that specifying a client options file on the command line will override
-  the options directory.
+  the options directory.  If the specified directory does not
+  exist this option will be ignored.
 \item\verb$--user-data-directory DIRECTORY$ Use the given directory
   instead of your default FreeCol user data directory to load and save
   games, and user mods. You can use this in order to run the
   game from a USB stick\index{USB stick}, for example. Please note
   that specifying a save game file on the command line will override
-  the save game directory.
+  the save game directory.  If the specified directory does not
+  exist FreeCol will exit.
 \item\verb$--windowed[[=]WIDTHxHEIGHT]$ Run FreeCol in windowed mode
   instead of full screen mode and set the window width and height. You
   will need this if your window manager or Java Virtual Machine do not
