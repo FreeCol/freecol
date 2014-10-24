@@ -730,13 +730,19 @@ public final class FreeCol {
             if (line.hasOption("user-cache-directory")) {
                 String arg = line.getOptionValue("user-cache-directory");
                 String errMsg = FreeColDirectories.setUserCacheDirectory(arg);
-                if (errMsg != null) gripe(errMsg); // Not fatal.
+                if (errMsg != null) { // Not fatal.
+                    gripe(StringTemplate.template(errMsg)
+                        .addName("%string%", arg));
+                }
             }
 
             if (line.hasOption("user-config-directory")) {
                 String arg = line.getOptionValue("user-config-directory");
                 String errMsg = FreeColDirectories.setUserConfigDirectory(arg);
-                if (errMsg != null) gripe(errMsg); // Not fatal.
+                if (errMsg != null) { // Not fatal.
+                    gripe(StringTemplate.template(errMsg)
+                        .addName("%string%", arg));
+                }
             }
 
             if (line.hasOption("user-data-directory")) {
