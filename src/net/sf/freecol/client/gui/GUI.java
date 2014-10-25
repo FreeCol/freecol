@@ -37,6 +37,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.Insets;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -78,6 +79,7 @@ import net.sf.freecol.client.gui.menu.InGameMenuBar;
 import net.sf.freecol.client.gui.menu.MapEditorMenuBar;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
+import net.sf.freecol.client.gui.panel.ColorChooserPanel;
 import net.sf.freecol.client.gui.panel.CornerMapControls;
 import net.sf.freecol.client.gui.panel.DialogHandler;
 import net.sf.freecol.client.gui.panel.EuropePanel;
@@ -1308,6 +1310,11 @@ public class GUI {
     public void showColopediaPanel(String nodeId) {
         if (canvas == null) return;
         canvas.showColopediaPanel(nodeId);
+    }
+
+    public ColorChooserPanel showColorChooserPanel(ActionListener al) {
+        if (canvas == null) return null;
+        return canvas.showColorChooserPanel(al);
     }
 
     public void showCompactLabourReport() {

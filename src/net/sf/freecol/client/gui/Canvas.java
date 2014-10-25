@@ -76,6 +76,7 @@ import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.ChooseFoundingFatherDialog;
 import net.sf.freecol.client.gui.panel.ClientOptionsDialog;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
+import net.sf.freecol.client.gui.panel.ColorChooserPanel;
 import net.sf.freecol.client.gui.panel.ColopediaPanel;
 import net.sf.freecol.client.gui.panel.CompactLabourReport;
 import net.sf.freecol.client.gui.panel.ConfirmDeclarationDialog;
@@ -1592,7 +1593,20 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Show the compat labour report.
+     * Show a <code>ColorChooserPanel</code>.
+     *
+     * @param al An <code>ActionListener</code> to handle panel button
+     *     presses.
+     * @return The <code>ColorChooserPanel</code> created.
+     */
+    public ColorChooserPanel showColorChooserPanel(ActionListener al) {
+        ColorChooserPanel ccp = new ColorChooserPanel(freeColClient, al);
+        showFreeColPanel(ccp, null, false);
+        return ccp;
+    }
+
+    /**
+     * Show the compact labour report.
      */
     public void showCompactLabourReport() {
         CompactLabourReport details = new CompactLabourReport(freeColClient);

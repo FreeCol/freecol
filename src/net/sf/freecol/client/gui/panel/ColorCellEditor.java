@@ -32,11 +32,10 @@ import javax.swing.JColorChooser;
 import javax.swing.JTable;
 import javax.swing.table.TableCellEditor;
 
-import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.ColorChooserPanel;
 
 
 /**
@@ -48,65 +47,11 @@ public final class ColorCellEditor extends AbstractCellEditor
     private static final Logger logger = Logger.getLogger(ColorCellEditor.class.getName());
 
     private static final String EDIT = "EDIT";
-    private static final String OK = "OK";
-    private static final String CANCEL = "CANCEL";
 
     private final FreeColClient        freeColClient;
-    private final Canvas               canvas;
-    private JButton cancelButton = null;
     private final JButton              colorEditButton;
-    private final JColorChooser        colorChooser;
-    private final ColorChooserPanel    colorChooserPanel;
-    private Color currentColor;
-
-
-    /**
-     * This class represents a panel that holds a JColorChooser and OK
-     * and cancel buttons.  Once constructed this panel is comparable
-     * to the dialog that is returned from
-     * JColorChooser::createDialog.
-     */
-    private final class ColorChooserPanel extends FreeColPanel {
-
-        /**
-         * The constructor to use.
-         *
-         * @param freeColClient The top level component that holds all
-         *     other components.
-         * @param l The ActionListener for the OK and cancel buttons.
-         */
-        public ColorChooserPanel(FreeColClient freeColClient,
-                                 ActionListener l) {
-            super(freeColClient, new MigLayout("", "", ""));
-
-            add(colorChooser);
-
-            add(okButton, "newline 20, split 2, tag ok");
-            okButton.addActionListener(l);
-
-            JButton cancelButton = new JButton(Messages.message("cancel"));
-            add(cancelButton, "tag cancel");
-            cancelButton.setActionCommand(CANCEL);
-            cancelButton.addActionListener(l);
-
-            setOpaque(true);
-            setSize(getPreferredSize());
-        }
-
-
-        // Override Component
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void removeNotify() {
-            super.removeNotify();
-
-            removeAll();
-            cancelButton = null;
-        }
-    }
+    private ColorChooserPanel          colorChooserPanel = null;
+    private Color                      currentColor;
 
 
     /**
@@ -117,48 +62,35 @@ public final class ColorCellEditor extends AbstractCellEditor
      */
     public ColorCellEditor(FreeColClient freeColClient) {
         this.freeColClient = freeColClient;
-        this.canvas = freeColClient.getGUI().getCanvas();
 
-        colorEditButton = new JButton();
-        colorEditButton.setActionCommand(EDIT);
-        colorEditButton.addActionListener(this);
-        colorEditButton.setBorderPainted(false);
-
-        colorChooser = new JColorChooser();
-
-        colorChooserPanel = new ColorChooserPanel(freeColClient, this);
-        colorChooserPanel.setLocation(
-            canvas.getWidth() / 2 - colorChooserPanel.getWidth() / 2,
-            canvas.getHeight() / 2 - colorChooserPanel.getHeight() / 2);
+        this.colorEditButton = new JButton();
+        this.colorEditButton.setActionCommand(EDIT);
+        this.colorEditButton.addActionListener(this);
+        this.colorEditButton.setBorderPainted(false);
     }
 
 
+    // Implement TableCellEditor
+
     /**
-     * Get the component used to edit the cell's value.
-     *
-     * @param table The table whose cell needs to be edited.
-     * @param value The value of the cell being edited.
-     * @param hasFocus Indicates whether or not the cell in question has focus.
-     * @param row The row index of the cell that is being edited.
-     * @param column The column index of the cell that is being edited.
-     * @return The component used to edit the cell's value.
+     * {@inheritDoc}
      */
     public Component getTableCellEditorComponent(JTable table, Object value,
         boolean hasFocus, int row, int column) {
 
-        currentColor = (Color)value;
-        return colorEditButton;
+        this.currentColor = (Color)value;
+        return this.colorEditButton;
     }
+
+    // Override CellEditor
 
     /**
-     * Get the value of the cell editor.
-     *
-     * @return The value of the cell editor.
+     * {@inheritDoc}
      */
+    @Override
     public Object getCellEditorValue() {
-        return currentColor;
+        return this.currentColor;
     }
-
 
     // Interface ActionListener
 
@@ -167,22 +99,20 @@ public final class ColorCellEditor extends AbstractCellEditor
      */
     public void actionPerformed(ActionEvent event) {
         final String command = event.getActionCommand();
+        GUI gui = freeColClient.getGUI();
         if (EDIT.equals(command)) {
-            if (!canvas.isAncestorOf(colorChooserPanel)) {
-                colorChooser.setColor(currentColor);
-    
-                // Add the colorChooserPanel.
-                canvas.add(colorChooserPanel, 0);
-                colorChooserPanel.requestFocus();
+            this.colorChooserPanel = gui.showColorChooserPanel(this);
+
+        } else if (FreeColPanel.OK.equals(command)) {
+            if (this.colorChooserPanel != null) {
+                this.currentColor = this.colorChooserPanel.getColor();
+                gui.removeFromCanvas(this.colorChooserPanel);
             }
-        } else if (OK.equals(command)) {
-            currentColor = colorChooser.getColor();
-            // Remove the colorChooserPanel.
-            canvas.remove(colorChooserPanel);
             fireEditingStopped();
-        } else if (CANCEL.equals(command)) {
-            // Remove the colorChooserPanel.
-            canvas.remove(colorChooserPanel);
+        } else if (FreeColPanel.CANCEL.equals(command)) {
+            if (this.colorChooserPanel != null) {
+                gui.removeFromCanvas(this.colorChooserPanel);
+            }
             fireEditingCanceled();
         } else {
             logger.warning("Bad event: " + command);
