@@ -192,7 +192,7 @@ public final class TilePopup extends JPopupMenu {
                 !currentUnit.isDamaged(), false);
         }
 
-        if (tile.getUnitCount() > 1) {
+        if (tile.getUnitCount() > 1 && player.owns(tile.getFirstUnit())) {
             if (moreUnits) addSeparator();
             JMenuItem activateAllItem = new JMenuItem(Messages
                 .message(StringTemplate.template("activateAllUnits")));
