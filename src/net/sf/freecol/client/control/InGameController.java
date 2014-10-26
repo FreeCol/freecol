@@ -2851,7 +2851,7 @@ public final class InGameController implements NetworkConstants {
             result = false;
             break;
         }
-        if (clearDestination) clearGotoOrders(unit);
+        if (clearDestination && !unit.isDisposed()) clearGotoOrders(unit);
         return result;
     }
 
