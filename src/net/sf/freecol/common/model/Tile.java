@@ -926,9 +926,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return True if this tile can be improved with the improvement type.
      */
     public boolean isImprovementTypeAllowed(TileImprovementType type) {
+        TileImprovement ti;
         return type != null
             && type.isTileTypeAllowed(getType())
-            && getTileImprovement(type) == null;
+            && ((ti = getTileImprovement(type)) == null || !ti.isComplete());
     }
         
     /**
