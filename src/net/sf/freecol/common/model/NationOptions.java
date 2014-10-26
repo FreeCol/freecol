@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -39,6 +41,8 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
  * The options specific to a nation.
  */
 public class NationOptions extends FreeColObject {
+
+    private static final Logger logger = Logger.getLogger(NationOptions.class.getName());
 
     /** Type of national advantages for European players. */
     public static enum Advantages implements ObjectWithId {
@@ -227,11 +231,22 @@ public class NationOptions extends FreeColObject {
             while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 tag = xr.getLocalName();
                 if (NATION_TAG.equals(tag)) {
-                    Nation nation = xr.getType(specification, ID_ATTRIBUTE_TAG,
-                        Nation.class, (Nation)null);
-                    NationState state = xr.getAttribute(STATE_TAG,
-                        NationState.class, (NationState)null);
-                    nations.put(nation, state);
+                    Nation nation = null;
+                    try {
+                        // Defend against invalid nation tag.  This
+                        // can happen when using classic mode (no
+                        // extra Europeans) but loading a map that
+                        // contains the extra Europeans.
+                        nation = xr.getType(specification, ID_ATTRIBUTE_TAG,
+                                            Nation.class, (Nation)null);
+                    } catch (IllegalArgumentException iae) {
+                        logger.warning("Bad nation tag: " + xr.readId());
+                    }
+                    if (nation != null) {
+                        NationState state = xr.getAttribute(STATE_TAG,
+                            NationState.class, (NationState)null);
+                        nations.put(nation, state);
+                    }
                     xr.closeTag(NATION_TAG);
 
                 } else {
